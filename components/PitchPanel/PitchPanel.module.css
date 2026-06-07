@@ -12,9 +12,9 @@
 .yellowCircle {
   position: absolute;
   z-index: 0;
-  top: -34px;
-  left: 4px;
-  width: clamp(150px, 17vw, 250px);
+  top: -56px;
+  left: -10px;
+  width: clamp(240px, 26vw, 400px);
   aspect-ratio: 1 / 1;
   background: var(--yellow);
   border-radius: 50%;
@@ -47,10 +47,9 @@
 }
 /* much larger, lifted so it pokes up onto the hero and over the yellow circle */
 .photo {
-  width: clamp(320px, 48vw, 580px);
+  width: clamp(380px, 56vw, 720px);
   height: auto;
-  margin-top: clamp(-170px, -12vw, -96px);
-  filter: drop-shadow(0 20px 34px rgba(10, 58, 87, 0.32));
+  margin-top: clamp(-200px, -14vw, -110px);
 }
 .content {
   color: var(--white);
@@ -69,13 +68,13 @@
     text-align: center;
   }
   .photo {
-    width: clamp(280px, 70vw, 420px);
-    margin-top: clamp(-120px, -22vw, -64px);
+    width: clamp(300px, 82vw, 520px);
+    margin-top: clamp(-140px, -26vw, -80px);
   }
   .content :global(.points) {
     align-items: center;
   }
   .yellowCircle {
-    width: 130px;
+    width: 190px;
   }
 }
