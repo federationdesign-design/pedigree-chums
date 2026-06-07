@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------- design tokens */
+/* Note: --font-display and --font-body are set on <html> by next/font in
+   layout.tsx. Do NOT redefine them here, doing so shadows the loader's value
+   and the fonts fall back to system-ui. */
 :root {
   --blue: #1497d6;        /* primary section blue */
   --blue-deep: #0b78bd;   /* darker blue for depth */
@@ -10,9 +13,6 @@
   --navy: #0a3a57;        /* heading outline + dark text */
   --cream: #fbf7ec;       /* warm off-white */
   --white: #ffffff;
-
-  --font-display: var(--font-display, "Luckiest Guy"), system-ui, sans-serif;
-  --font-body: var(--font-body, Montserrat), system-ui, sans-serif;
 
   --radius-card: 22px;
   --radius-pill: 999px;
@@ -30,7 +30,7 @@ body {
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-body), system-ui, sans-serif;
   background: var(--blue);
   color: var(--white);
   -webkit-font-smoothing: antialiased;
@@ -43,7 +43,7 @@ body {
    stay crisp. Apply .display to any heading; add .display-yellow for the
    yellow fill used on accent words. */
 .display {
-  font-family: var(--font-display);
+  font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 400;
   color: var(--white);
   line-height: 0.95;
@@ -70,4 +70,57 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* --------------------------------------------------------- content utilities */
+.lead {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+  margin: 16px 0 2px;
+  color: var(--white);
+}
+.subLead {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  margin: 0;
+  color: var(--white);
+}
+.points {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.point {
+  position: relative;
+  padding-left: 36px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.4vw, 1.18rem);
+  color: var(--white);
+  line-height: 1.35;
+}
+.point::before {
+  content: "\2713";
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--navy);
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+.note {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  margin: 8px 0 0;
 }

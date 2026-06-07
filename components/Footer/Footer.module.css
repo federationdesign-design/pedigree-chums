@@ -1,0 +1,71 @@
+.footer {
+  background: var(--blue-deep);
+  color: var(--white);
+  padding: clamp(40px, 6vw, 72px) clamp(20px, 6vw, 90px) 28px;
+  border-top: 6px solid var(--yellow);
+}
+.inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.brandLine {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.2rem;
+  margin: 0 0 4px;
+  color: var(--yellow);
+  -webkit-text-stroke: 1px var(--navy);
+  paint-order: stroke fill;
+}
+.email {
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  word-break: break-word;
+}
+.colHead {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.05rem;
+  margin: 0 0 6px;
+}
+.link {
+  font-weight: 600;
+  font-size: 0.95rem;
+  opacity: 0.92;
+  transition: color 0.15s ease;
+}
+.link:hover {
+  color: var(--yellow);
+}
+.logoCol {
+  display: flex;
+  justify-content: flex-end;
+}
+.logoCol img {
+  width: clamp(130px, 18vw, 170px);
+  height: auto;
+}
+.legal {
+  margin: clamp(28px, 4vw, 48px) 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+@media (max-width: 780px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+  }
+  .logoCol {
+    justify-content: flex-start;
+  }
+}

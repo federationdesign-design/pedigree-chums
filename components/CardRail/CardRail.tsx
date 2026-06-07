@@ -7,10 +7,10 @@ export default function CardRail() {
     <section className={`${styles.section} paw-bg`}>
       <div className={styles.head}>
         <h2 className="display">
-          54 Unique <span className="display-yellow">Dog Cards</span>
+          Meet the <span className="display-yellow">Pack</span>
         </h2>
         <p className={styles.sub}>
-          40 of the most popular UK breeds, plus 10 designer crossbreeds. Swipe through the pack.
+          Hand-illustrated cards for 54 breeds. Swipe through to see them all.
         </p>
       </div>
 
