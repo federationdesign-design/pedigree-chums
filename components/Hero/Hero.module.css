@@ -6,13 +6,14 @@
   overflow: hidden;
 }
 
-/* Vimeo background: the iframe is scaled to cover the hero, cropping overflow,
-   so it behaves like a silent looping background rather than a player. */
+/* The iframe is scaled to cover the hero, cropping overflow, so it reads like a
+   silent video rather than a framed player. It plays once and ends on the
+   Vimeo end image (background mode removed so it no longer force-loops). */
 .videoWrap {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: var(--blue-sky);
+  background: var(--blue-sky) url("/initial-preload-hero-img.jpg") center / cover no-repeat;
 }
 .video {
   position: absolute;
@@ -26,6 +27,21 @@
   border: 0;
   pointer-events: none;
 }
+
+/* First-frame poster: covers the hero instantly, then fades out once the
+   video has had time to start, hiding any black load frame. */
+.poster {
+  position: absolute;
+  inset: 0;
+  background: url("/initial-preload-hero-img.jpg") center / cover no-repeat;
+  animation: posterFade 0.6s ease 1.4s forwards;
+}
+@keyframes posterFade {
+  to {
+    opacity: 0;
+  }
+}
+
 .tint {
   position: absolute;
   inset: 0;
@@ -33,5 +49,8 @@
 }
 
 @media (max-width: 700px) {
-  .hero { height: 72vh; min-height: 460px; }
+  .hero {
+    height: 72vh;
+    min-height: 460px;
+  }
 }

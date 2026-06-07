@@ -1,11 +1,12 @@
 import CardRail from "../CardRail/CardRail";
 import LabPop from "./LabPop";
+import YellowCircle from "./YellowCircle";
 import styles from "./PitchPanel.module.css";
 
 export default function PitchPanel() {
   return (
     <div className={styles.outer}>
-      <span className={styles.yellowCircle} aria-hidden="true" />
+      <YellowCircle />
       <section className={styles.panel}>
         <div className={styles.pitch}>
           <div className={styles.photoCol}>
