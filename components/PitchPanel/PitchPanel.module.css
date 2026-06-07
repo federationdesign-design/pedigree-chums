@@ -12,7 +12,7 @@
 .yellowCircle {
   position: absolute;
   z-index: 0;
-  top: -76px;
+  top: -116px;
   right: -10px;
   width: clamp(240px, 26vw, 400px);
   aspect-ratio: 1 / 1;
