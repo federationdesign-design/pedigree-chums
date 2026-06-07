@@ -75,3 +75,10 @@
 .large .photoWrap {
   width: clamp(300px, 54vw, 640px);
 }
+
+/* keep section content above the rotated paw pattern (.paw-bg::before) */
+.photoCol,
+.contentCol {
+  position: relative;
+  z-index: 1;
+}

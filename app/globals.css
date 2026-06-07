@@ -56,10 +56,20 @@ body {
 
 /* paw-print texture, a tiled inline SVG used as a subtle section background */
 .paw-bg {
+  position: relative;
+  overflow: hidden;
   background-color: var(--blue);
-  background-image: url("/paw-pattern-smallsqauer.svg");
+}
+.paw-bg::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background-image: url("/paw-pattern2.svg");
   background-repeat: repeat;
   background-size: 96px auto;
+  transform: rotate(20deg);
+  z-index: 0;
+  pointer-events: none;
 }
 
 a {
