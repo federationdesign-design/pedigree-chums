@@ -28,7 +28,7 @@ export default function CardRail() {
   }, []);
 
   return (
-    <section className={`${styles.section} paw-bg`}>
+    <section className={styles.section}>
       <div className={styles.head}>
         <h2 className="display">
           Meet the <span className="display-yellow">Pack</span>

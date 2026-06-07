@@ -1,7 +1,7 @@
 import Nav from "../components/Nav/Nav";
 import Hero from "../components/Hero/Hero";
+import PitchPanel from "../components/PitchPanel/PitchPanel";
 import PhotoSplit from "../components/PhotoSplit/PhotoSplit";
-import CardRail from "../components/CardRail/CardRail";
 import Footer from "../components/Footer/Footer";
 
 export default function Home() {
@@ -11,20 +11,7 @@ export default function Home() {
       <main>
         <Hero />
 
-        <PhotoSplit photo="/lab.png" alt="A Labrador being spotted in the park">
-          <h1 className="display">
-            The Ultimate <span className="display-yellow">On-the-Go</span> Dog Spotting Game
-          </h1>
-          <p className="lead">Fun. Educational. Addictive.</p>
-          <p className="subLead">Perfect for Families, Tourists &amp; Dog Lovers.</p>
-          <ul className="points">
-            <li className="point">54 hand-illustrated breed cards</li>
-            <li className="point">Compact, durable, pocket-friendly</li>
-            <li className="point">Made in the UK. Built for play.</li>
-          </ul>
-        </PhotoSplit>
-
-        <CardRail />
+        <PitchPanel />
 
         <PhotoSplit
           photo="/spaniel.png"
