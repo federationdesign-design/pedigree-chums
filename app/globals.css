@@ -10,7 +10,7 @@
   --blue-sky: #5cc4ee;    /* lighter sky blue */
   --cyan: #45cfef;        /* card / bright accent */
   --yellow: #ffd23e;      /* punchy accent */
-  --navy: #0a3a57;        /* heading outline + dark text */
+  --navy: #0a3a57;        /* dark text */
   --cream: #fbf7ec;       /* warm off-white */
   --white: #ffffff;
 
@@ -38,10 +38,9 @@ body {
 }
 
 /* ----------------------------------------------- the chunky cartoon headings */
-/* Luckiest Guy with a navy outline behind a white (or yellow) fill, plus a
-   hard drop shadow. paint-order keeps the stroke behind the fill so letters
-   stay crisp. Apply .display to any heading; add .display-yellow for the
-   yellow fill used on accent words. */
+/* Luckiest Guy, solid white fill with a soft drop shadow. No outline stroke,
+   the logo's outline is baked into its SVG; heading text is clean fill only.
+   Add .display-yellow for the yellow accent words. */
 .display {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 400;
@@ -49,16 +48,10 @@ body {
   line-height: 0.95;
   letter-spacing: 0.01em;
   margin: 0;
-  -webkit-text-stroke: 2.5px var(--navy);
-  paint-order: stroke fill;
-  text-shadow: 0 5px 0 rgba(10, 58, 87, 0.22);
+  text-shadow: 0 4px 6px rgba(10, 58, 87, 0.25);
 }
 .display-yellow {
   color: var(--yellow);
-}
-.display-sm {
-  -webkit-text-stroke: 2px var(--navy);
-  text-shadow: 0 3px 0 rgba(10, 58, 87, 0.22);
 }
 
 /* paw-print texture, a tiled inline SVG used as a subtle section background */
@@ -118,9 +111,4 @@ a {
   place-items: center;
   font-size: 0.85rem;
   font-weight: 800;
-}
-.note {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 600;
-  margin: 8px 0 0;
 }

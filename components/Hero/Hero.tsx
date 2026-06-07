@@ -1,5 +1,3 @@
-import Image from "next/image";
-import { heroCard } from "../../content/cards";
 import styles from "./Hero.module.css";
 
 export default function Hero() {
@@ -14,17 +12,6 @@ export default function Hero() {
           frameBorder="0"
         />
         <div className={styles.tint} />
-      </div>
-
-      <div className={styles.cardFloat}>
-        <Image
-          src={heroCard}
-          alt="Pedigree Chums breed card"
-          width={360}
-          height={520}
-          className={styles.card}
-          priority
-        />
       </div>
     </section>
   );

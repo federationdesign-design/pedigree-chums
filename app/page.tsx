@@ -11,8 +11,8 @@ export default function Home() {
       <main>
         <Hero />
 
-        <PhotoSplit photo="/lab.png" alt="A Labrador being spotted in the park" label="Labrador">
-          <h1 className="display display-sm">
+        <PhotoSplit photo="/lab.png" alt="A Labrador being spotted in the park">
+          <h1 className="display">
             The Ultimate <span className="display-yellow">On-the-Go</span> Dog Spotting Game
           </h1>
           <p className="lead">Fun. Educational. Addictive.</p>
@@ -29,8 +29,8 @@ export default function Home() {
         <PhotoSplit
           photo="/spaniel.png"
           alt="A Cocker Spaniel being spotted on a walk"
-          label="Cocker Spaniel"
           reverse
+          card="/card.jpg"
         >
           <h2 className="display">
             54 Unique <span className="display-yellow">Dog Cards</span>
@@ -47,7 +47,7 @@ export default function Home() {
           </ul>
         </PhotoSplit>
 
-        <PhotoSplit photo="/corgi.png" alt="A Corgi being spotted in the park" label="Corgi">
+        <PhotoSplit photo="/corgi.png" alt="A Corgi being spotted in the park">
           <h2 className="display">
             Who <span className="display-yellow">It's For</span>
           </h2>

@@ -4,9 +4,6 @@
   height: 88vh;
   min-height: 560px;
   overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
 }
 
 /* Vimeo background: the iframe is scaled to cover the hero, cropping overflow,
@@ -32,25 +29,7 @@
 .tint {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 58, 87, 0.05) 0%, rgba(10, 58, 87, 0.35) 100%);
-}
-
-.cardFloat {
-  position: relative;
-  z-index: 2;
-  transform: translateY(14%) rotate(-5deg);
-  animation: bob 5s ease-in-out infinite;
-}
-.card {
-  width: clamp(210px, 34vw, 360px);
-  height: auto;
-  border-radius: 18px;
-  box-shadow: var(--shadow-card);
-}
-
-@keyframes bob {
-  0%, 100% { transform: translateY(14%) rotate(-5deg); }
-  50% { transform: translateY(10%) rotate(-5deg); }
+  background: linear-gradient(180deg, rgba(10, 58, 87, 0.04) 0%, rgba(10, 58, 87, 0.22) 100%);
 }
 
 @media (max-width: 700px) {

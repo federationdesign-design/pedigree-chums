@@ -13,40 +13,33 @@
 }
 
 .photoCol {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.disc {
-  position: absolute;
-  width: clamp(250px, 40vw, 460px);
-  aspect-ratio: 1 / 1;
-  background: var(--yellow);
-  border-radius: 50%;
-  transform: translate(20px, 22px);
-  z-index: 0;
-}
-.blob {
+/* The PNGs are already finished circular artwork (ring + label baked in),
+   so they are placed as-is with no crop or decoration. */
+.photoWrap {
   position: relative;
-  z-index: 1;
-  width: clamp(240px, 38vw, 440px);
-  aspect-ratio: 1 / 1;
-  border-radius: 62% 38% 55% 45% / 52% 58% 42% 48%;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
+  width: clamp(260px, 42vw, 500px);
 }
-.label {
+.photo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* Optional breed card tucked against the photo (e.g. the Cocker card by the
+   Cocker Spaniel photo). */
+.card {
   position: absolute;
+  left: -8%;
+  bottom: -6%;
+  width: 46%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  transform: rotate(-6deg);
   z-index: 2;
-  left: 8%;
-  bottom: 2%;
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.3rem, 3.5vw, 2.1rem);
-  color: var(--yellow);
-  -webkit-text-stroke: 2px var(--navy);
-  paint-order: stroke fill;
-  transform: rotate(-7deg);
 }
 
 .contentCol {
@@ -75,9 +68,5 @@
   }
   .contentCol :global(.points) {
     align-items: center;
-  }
-  .label {
-    left: 50%;
-    transform: translateX(-50%) rotate(-7deg);
   }
 }
