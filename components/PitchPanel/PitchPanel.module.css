@@ -78,3 +78,26 @@
     width: 190px;
   }
 }
+
+/* Lab pops into view (once) when scrolling starts. */
+.prePop {
+  opacity: 0;
+  transform: scale(0.2);
+}
+.popped {
+  animation: labPop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes labPop {
+  0% { opacity: 0; transform: scale(0.2); }
+  60% { opacity: 1; transform: scale(1.08); }
+  80% { transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .prePop,
+  .popped {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

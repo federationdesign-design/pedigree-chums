@@ -1,5 +1,5 @@
-import Image from "next/image";
 import CardRail from "../CardRail/CardRail";
+import LabPop from "./LabPop";
 import styles from "./PitchPanel.module.css";
 
 export default function PitchPanel() {
@@ -9,14 +9,7 @@ export default function PitchPanel() {
       <section className={styles.panel}>
         <div className={styles.pitch}>
           <div className={styles.photoCol}>
-            <Image
-              src="/lab.png"
-              alt="A Labrador being spotted in the park"
-              width={620}
-              height={620}
-              className={styles.photo}
-              priority
-            />
+            <LabPop />
           </div>
           <div className={styles.content}>
             <h1 className="display">
