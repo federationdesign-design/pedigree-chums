@@ -6,21 +6,24 @@ type Props = {
   alt: string;
   reverse?: boolean;
   card?: string;
+  large?: boolean;
   children: React.ReactNode;
 };
 
-export default function PhotoSplit({ photo, alt, reverse = false, card, children }: Props) {
+export default function PhotoSplit({ photo, alt, reverse = false, card, large = false, children }: Props) {
   return (
-    <section className={`${styles.split} ${reverse ? styles.reverse : ""} paw-bg`}>
+    <section
+      className={`${styles.split} ${reverse ? styles.reverse : ""} ${large ? styles.large : ""} paw-bg`}
+    >
       <div className={styles.photoCol}>
         <div className={styles.photoWrap}>
           <Image
             src={photo}
             alt={alt}
-            width={520}
-            height={520}
+            width={620}
+            height={620}
             className={styles.photo}
-            sizes="(max-width: 900px) 80vw, 480px"
+            sizes="(max-width: 900px) 84vw, 620px"
           />
           {card && (
             <Image

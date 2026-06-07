@@ -34,7 +34,7 @@ export default function Home() {
           </ul>
         </PhotoSplit>
 
-        <PhotoSplit photo="/corgi.png" alt="A Corgi being spotted in the park">
+        <PhotoSplit photo="/corgi.png" alt="A Corgi being spotted in the park" large>
           <h2 className="display">
             Who <span className="display-yellow">It's For</span>
           </h2>

@@ -70,3 +70,8 @@
     align-items: center;
   }
 }
+
+/* Larger photo variant (e.g. the Corgi section). */
+.large .photoWrap {
+  width: clamp(300px, 54vw, 640px);
+}
