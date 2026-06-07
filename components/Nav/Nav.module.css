@@ -1,0 +1,83 @@
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px clamp(18px, 4vw, 48px);
+}
+
+.logo {
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(10, 58, 87, 0.35));
+}
+.logo img {
+  width: clamp(112px, 16vw, 150px);
+  height: auto;
+}
+
+.burger {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 13px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--yellow);
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+}
+.burger span {
+  display: block;
+  width: 26px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--navy);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--blue-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.close {
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--yellow);
+  color: var(--navy);
+  font-size: 2.2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+}
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  text-align: center;
+}
+.menuLink {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  color: var(--white);
+  -webkit-text-stroke: 2px var(--navy);
+  paint-order: stroke fill;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.menuLink:hover {
+  color: var(--yellow);
+  transform: scale(1.04);
+}

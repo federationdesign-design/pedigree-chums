@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------- design tokens */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --blue: #1497d6;        /* primary section blue */
+  --blue-deep: #0b78bd;   /* darker blue for depth */
+  --blue-sky: #5cc4ee;    /* lighter sky blue */
+  --cyan: #45cfef;        /* card / bright accent */
+  --yellow: #ffd23e;      /* punchy accent */
+  --navy: #0a3a57;        /* heading outline + dark text */
+  --cream: #fbf7ec;       /* warm off-white */
+  --white: #ffffff;
+
+  --font-display: var(--font-display, "Luckiest Guy"), system-ui, sans-serif;
+  --font-body: var(--font-body, Montserrat), system-ui, sans-serif;
+
+  --radius-card: 22px;
+  --radius-pill: 999px;
+  --shadow-card: 0 18px 40px rgba(10, 58, 87, 0.28);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background: var(--blue);
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ----------------------------------------------- the chunky cartoon headings */
+/* Luckiest Guy with a navy outline behind a white (or yellow) fill, plus a
+   hard drop shadow. paint-order keeps the stroke behind the fill so letters
+   stay crisp. Apply .display to any heading; add .display-yellow for the
+   yellow fill used on accent words. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--white);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  margin: 0;
+  -webkit-text-stroke: 2.5px var(--navy);
+  paint-order: stroke fill;
+  text-shadow: 0 5px 0 rgba(10, 58, 87, 0.22);
+}
+.display-yellow {
+  color: var(--yellow);
+}
+.display-sm {
+  -webkit-text-stroke: 2px var(--navy);
+  text-shadow: 0 3px 0 rgba(10, 58, 87, 0.22);
+}
+
+/* paw-print texture, a tiled inline SVG used as a subtle section background */
+.paw-bg {
+  background-color: var(--blue);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cellipse cx='60' cy='66' rx='13' ry='16'/%3E%3Cellipse cx='42' cy='44' rx='6' ry='8'/%3E%3Cellipse cx='60' cy='38' rx='6' ry='8'/%3E%3Cellipse cx='78' cy='44' rx='6' ry='8'/%3E%3Cellipse cx='86' cy='62' rx='5' ry='7'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
