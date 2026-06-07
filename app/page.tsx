@@ -18,6 +18,7 @@ export default function Home() {
           alt="A Cocker Spaniel being spotted on a walk"
           reverse
           card="/card.jpg"
+          large
         >
           <h2 className="display">
             54 Unique <span className="display-yellow">Dog Cards</span>
