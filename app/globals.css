@@ -66,7 +66,7 @@ body {
   inset: -30%;
   background-image: url("/paw-pattern2.svg");
   background-repeat: repeat;
-  background-size: 96px auto;
+  background-size: 144px auto;
   transform: rotate(20deg);
   z-index: 0;
   pointer-events: none;
