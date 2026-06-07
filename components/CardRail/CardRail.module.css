@@ -24,11 +24,16 @@
   display: flex;
   gap: clamp(16px, 2.4vw, 28px);
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
+  cursor: grab;
+  user-select: none;
   -webkit-overflow-scrolling: touch;
   padding: 10px clamp(20px, 8vw, 120px) 26px;
   scrollbar-width: thin;
   scrollbar-color: var(--yellow) rgba(255, 255, 255, 0.25);
+}
+.rail:active {
+  cursor: grabbing;
 }
 .rail::-webkit-scrollbar {
   height: 10px;
