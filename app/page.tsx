@@ -17,7 +17,6 @@ export default function Home() {
           photo="/spaniel.png"
           alt="A Cocker Spaniel being spotted on a walk"
           reverse
-          card="/card.jpg"
           large
         >
           <h2 className="display">
