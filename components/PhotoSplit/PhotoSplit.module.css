@@ -121,10 +121,6 @@
   width: 100%;
   max-width: 1000px;
 }
-.xl .photoCircle {
-  width: clamp(340px, 50vw, 760px);
-  height: clamp(340px, 50vw, 760px);
-}
 
 /* Yellow circle: a section-level layer BEHIND both columns (not trapped in the
    photo container), drifting via parallax. Sits on the photo side. */
