@@ -23,7 +23,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: min(80vw, 640px);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1108 / 720;
   z-index: 100;
   border-radius: 16px;
   overflow: hidden;
