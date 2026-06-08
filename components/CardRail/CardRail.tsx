@@ -17,16 +17,30 @@ function vimeoIdFromSrc(src: string): string | null {
   return m ? m[1] : null;
 }
 
-// The ordered list of video cards (for the lightbox prev/next), and a lookup
-// from card src to its position in that list.
-const videoCards: LightboxVideo[] = deck
+// The pre-load (placeholder) image for a video card: strip the Vimeo id and
+// extension to get the base name, then add the pre-load suffix. card14's file
+// is misspelled on disk as "pre-laod", so it gets a special case.
+function preloadFromSrc(src: string): string {
+  const base = src.replace(/^\//, "").replace(/\.[a-z0-9]+$/i, "").replace(/-\d+$/, "");
+  const suffix = base === "card14" ? "-pre-laod.jpg" : "-pre-load.jpg";
+  return `/${base}${suffix}`;
+}
+
+// The ordered list of video card sources, the lightbox list (using the
+// landscape pre-load image as the poster), and a lookup from card src to its
+// position in that list (so the rail's click handler stays keyed by card src).
+const videoSources = deck
   .map((src) => ({ src, vimeoId: vimeoIdFromSrc(src) }))
-  .filter((c): c is { src: string; vimeoId: string } => c.vimeoId !== null)
-  .map((c) => ({ poster: c.src, vimeoId: c.vimeoId }));
+  .filter((c): c is { src: string; vimeoId: string } => c.vimeoId !== null);
+
+const videoCards: LightboxVideo[] = videoSources.map((c) => ({
+  poster: preloadFromSrc(c.src),
+  vimeoId: c.vimeoId,
+}));
 
 const videoIndexBySrc: Record<string, number> = {};
-videoCards.forEach((c, i) => {
-  videoIndexBySrc[c.poster] = i;
+videoSources.forEach((c, i) => {
+  videoIndexBySrc[c.src] = i;
 });
 
 export default function CardRail() {
