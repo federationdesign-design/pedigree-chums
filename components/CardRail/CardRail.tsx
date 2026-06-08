@@ -49,12 +49,14 @@ videoSources.forEach((c, i) => {
 });
 
 export default function CardRail() {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    const wrap = wrapRef.current;
     const el = railRef.current;
-    if (!el) return;
+    if (!wrap || !el) return;
 
     const holdDistance = () => {
       const items = el.querySelectorAll<HTMLElement>('[role="listitem"]');
@@ -88,10 +90,10 @@ export default function CardRail() {
       }
     };
 
-    el.addEventListener("wheel", onWheel, { passive: false });
+    wrap.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("resize", onResize);
     return () => {
-      el.removeEventListener("wheel", onWheel);
+      wrap.removeEventListener("wheel", onWheel);
       window.removeEventListener("resize", onResize);
     };
   }, []);
@@ -107,7 +109,7 @@ export default function CardRail() {
         </p>
       </div>
 
-      <div className={styles.railWrap}>
+      <div ref={wrapRef} className={styles.railWrap}>
         <Image
           src={FEATURE}
           alt="Cocker Spaniel breed card"

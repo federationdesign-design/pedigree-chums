@@ -36,7 +36,6 @@
   z-index: 3;
   border-radius: 20px;
   box-shadow: 0 26px 54px rgba(10, 58, 87, 0.42);
-  pointer-events: none; /* let scroll/swipe pass through to the row behind */
 }
 
 /* A single horizontal row of the rest of the cards. */
