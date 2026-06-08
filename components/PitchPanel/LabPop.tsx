@@ -7,19 +7,19 @@ export default function LabPop() {
   const [popped, setPopped] = useState(false);
 
   useEffect(() => {
-    // Pop on the first genuine user scroll input. We deliberately avoid the
-    // generic "scroll" event because layout shifts on load can fire it and
-    // trip the pop before the user has interacted.
-    const trigger = () => setPopped(true);
-    const opts = { once: true, passive: true } as AddEventListenerOptions;
-    window.addEventListener("wheel", trigger, opts);
-    window.addEventListener("touchmove", trigger, opts);
-    window.addEventListener("keydown", trigger, opts);
-    return () => {
-      window.removeEventListener("wheel", trigger);
-      window.removeEventListener("touchmove", trigger);
-      window.removeEventListener("keydown", trigger);
+    // Pop once the page has been scrolled past 5% of its scrollable height.
+    // The scrollY > 0 guard means layout shifts on load (scrollY stays 0)
+    // cannot trip it.
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const threshold = max * 0.05;
+      if (window.scrollY > 0 && window.scrollY >= threshold) {
+        setPopped(true);
+        window.removeEventListener("scroll", onScroll);
+      }
     };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
