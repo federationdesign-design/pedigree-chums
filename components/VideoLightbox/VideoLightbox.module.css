@@ -46,31 +46,67 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: clamp(46px, 7vw, 60px);
-  height: clamp(46px, 7vw, 60px);
+  width: clamp(120px, 16vw, 210px);
+  height: clamp(120px, 16vw, 210px);
   border-radius: 50%;
   border: 0;
   background: #ffed00;
-  color: var(--navy, #0a3a57);
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 2rem;
-  line-height: 1;
+  cursor: pointer;
+  z-index: 110;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 110;
-  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.45);
+  gap: clamp(2px, 0.6vw, 8px);
+  padding: 0 clamp(10px, 1.4vw, 22px);
+  box-shadow: 0 14px 34px rgba(10, 58, 87, 0.4);
   transition: transform 0.15s ease;
 }
 .arrow:hover {
-  transform: translateY(-50%) scale(1.12);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.label {
+  font-family: var(--font-display), system-ui, sans-serif;
+  color: var(--blue-deep, #0b78bd);
+  font-size: clamp(0.95rem, 1.5vw, 1.5rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-align: left;
+}
+.chev {
+  font-family: var(--font-display), system-ui, sans-serif;
+  color: var(--blue-deep, #0b78bd);
+  font-size: clamp(2rem, 3.2vw, 3.2rem);
+  line-height: 1;
 }
 .prev {
-  left: clamp(12px, 4vw, 56px);
+  left: clamp(8px, 3vw, 60px);
 }
 .next {
-  right: clamp(12px, 4vw, 56px);
+  right: clamp(8px, 3vw, 60px);
+}
+
+/* On phones the labelled circles would swallow the video, so drop to a
+   plain chevron disc. */
+@media (max-width: 640px) {
+  .arrow {
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    gap: 0;
+  }
+  .label {
+    display: none;
+  }
+  .chev {
+    font-size: 2rem;
+  }
+  .prev {
+    left: 8px;
+  }
+  .next {
+    right: 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

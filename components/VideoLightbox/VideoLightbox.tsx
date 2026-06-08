@@ -40,7 +40,12 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
           }}
           aria-label="Previous video"
         >
-          &#8249;
+          <span className={styles.label}>
+            Last
+            <br />
+            Pooch
+          </span>
+          <span className={styles.chev}>&#8249;</span>
         </button>
       )}
 
@@ -65,7 +70,12 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
           }}
           aria-label="Next video"
         >
-          &#8250;
+          <span className={styles.label}>
+            Next
+            <br />
+            Pooch
+          </span>
+          <span className={styles.chev}>&#8250;</span>
         </button>
       )}
     </div>
