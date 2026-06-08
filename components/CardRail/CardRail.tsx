@@ -145,6 +145,7 @@ export default function CardRail() {
                     draggable={false}
                   />
                 )}
+                <span className={styles.cardHover} aria-hidden="true" />
               </div>
             );
           })}

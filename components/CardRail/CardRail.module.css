@@ -1,6 +1,5 @@
 .section {
   padding: clamp(48px, 8vw, 96px) 0;
-  margin-top: clamp(-160px, -14vw, -90px);
 }
 .head {
   text-align: center;
@@ -65,6 +64,8 @@
 
 .item {
   flex: 0 0 auto;
+  position: relative;
+  transition: transform 0.2s ease;
 }
 .card {
   display: block;
@@ -74,8 +75,24 @@
   box-shadow: var(--shadow-card);
   transition: transform 0.2s ease;
 }
-.item:hover .card {
+.item:hover {
   transform: translateY(-8px) scale(1.02);
+}
+
+/* Quick fade-in hover overlay (card-hover.png) covering the whole card.
+   pointer-events: none so it never blocks the video-card click. */
+.cardHover {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: url("/card-hover.png") center / cover no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 2;
+}
+.item:hover .cardHover {
+  opacity: 1;
 }
 
 /* On small screens, shrink the fixed Cocker and the track's left clearance so
