@@ -14,6 +14,7 @@
 }
 .reverse .contentCol {
   order: 1;
+  align-self: start;
 }
 
 /* Section content sits above the rotated paw pattern and the yellow circle. */
@@ -75,6 +76,14 @@
 }
 .contentCol ul + p {
   margin-top: 18px;
+}
+
+/* Spaniel (reverse) block: copy bumped ~2pt larger than the shared defaults. */
+.reverse .contentCol :global(.lead) {
+  font-size: clamp(1.32rem, 3.2vw, 1.72rem);
+}
+.reverse .contentCol :global(.point) {
+  font-size: clamp(1.17rem, 2.6vw, 1.35rem);
 }
 
 /* Larger photo (corgi). */
