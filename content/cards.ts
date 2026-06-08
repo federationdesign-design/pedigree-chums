@@ -3,7 +3,7 @@
 // A card named cardN-<vimeoId>.jpg is a video popout (id parsed from the name).
 export const cards: string[] = [
   "/card.jpg",
-  "/card10.jpg",
+  "/card10-1199436307.jpg",
   "/card11-1199268788.jpg",
   "/card8-1199364230.jpg",
   "/card28-1199378147.jpg",
