@@ -10,6 +10,20 @@ import HoverCardVideo from "../HoverCardVideo/HoverCardVideo";
 const FEATURE = "/card.jpg";
 const deck = cards.filter((c) => c !== FEATURE);
 
+// Real Vimeo IDs where we have them; the rest are placeholders to be
+// swapped for the real videos later.
+const PLACEHOLDER = "1199364230";
+const VIDEO_IDS: Record<string, string> = {
+  "/card11.jpg": "1199364230",
+  "/card8.jpg": "1199268788",
+  "/card10.jpg": PLACEHOLDER,
+  "/card14.jpg": PLACEHOLDER,
+  "/card21.jpg": PLACEHOLDER,
+  "/card36.jpg": PLACEHOLDER,
+  "/card44.jpg": PLACEHOLDER,
+  "/card28.jpg": "1199378147",
+};
+
 export default function CardRail() {
   const railRef = useRef<HTMLDivElement>(null);
 
@@ -87,21 +101,9 @@ export default function CardRail() {
         />
 
         <div ref={railRef} className={styles.rail} role="list" aria-label="Breed cards">
-          {deck.map((src, i) => (
+          {deck.map((src) => (
             <div className={styles.item} role="listitem" key={src}>
-              {src === "/card11.jpg" ? (
-                <HoverCardVideo poster={src} vimeoId="1199364230" />
-              ) : (
-                <Image
-                  src={src}
-                  alt={`Breed card ${i + 1}`}
-                  width={300}
-                  height={430}
-                  className={styles.card}
-                  sizes="(max-width: 700px) 60vw, 280px"
-                  draggable={false}
-                />
-              )}
+              <HoverCardVideo poster={src} vimeoId={VIDEO_IDS[src] ?? PLACEHOLDER} />
             </div>
           ))}
         </div>
