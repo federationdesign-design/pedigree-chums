@@ -1,10 +1,14 @@
+/* Full-bleed: no side padding so the strip spans 100% of the width. The pitch
+   gradient replaces paw-bg's solid blue; the paw pattern (paw-bg ::before, at
+   z-index 0) stays on top of it, and the strip is lifted above the pattern. */
 .section {
-  padding: clamp(16px, 3vw, 48px) clamp(16px, 4vw, 80px) clamp(40px, 6vw, 90px);
+  padding: clamp(24px, 4vw, 72px) 0;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
 }
 .strip {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
-  max-width: 1100px;
   height: auto;
-  margin: 0 auto;
 }
