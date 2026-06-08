@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 type Props = {
   className?: string;
+  style?: CSSProperties;
   speed?: number; // drift as a fraction of local scroll (slower than page)
   spin?: boolean; // rotate while scrolling (holds when scrolling stops)
   spinFactor?: number; // degrees per pixel scrolled
@@ -11,6 +12,7 @@ type Props = {
 
 export default function ParallaxShape({
   className,
+  style,
   speed = 0.18,
   spin = false,
   spinFactor = 0.15,
@@ -23,11 +25,9 @@ export default function ParallaxShape({
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Anchor to the parent (never transformed), so the drift is measured
-    // locally to this section and stays bounded to the viewport.
-    const anchor = el.parentElement;
+    const anchor = el.parentElement; // transform-free, so drift stays local
     let raf = 0;
-    const update = () => {
+    const apply = () => {
       raf = 0;
       const top = anchor ? anchor.getBoundingClientRect().top : 0;
       const ty = -top * speed;
@@ -36,12 +36,12 @@ export default function ParallaxShape({
         : `translateY(${ty}px)`;
     };
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
+      if (!raf) raf = requestAnimationFrame(apply);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
-    update();
+    apply();
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
@@ -50,7 +50,7 @@ export default function ParallaxShape({
   }, [speed, spin, spinFactor]);
 
   return (
-    <span ref={ref} className={className} aria-hidden="true">
+    <span ref={ref} className={className} style={style} aria-hidden="true">
       {children}
     </span>
   );

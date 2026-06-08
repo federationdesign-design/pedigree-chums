@@ -1,0 +1,6 @@
+.tri {
+  position: absolute;
+  background: url("/yellow-triangle.svg") center / contain no-repeat;
+  transform-origin: center center;
+  pointer-events: none;
+}

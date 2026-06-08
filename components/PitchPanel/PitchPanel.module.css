@@ -12,24 +12,12 @@
 .yellowCircle {
   position: absolute;
   z-index: 0;
-  top: -196px;
+  top: -96px;
   right: -10px;
   width: clamp(240px, 26vw, 400px);
   aspect-ratio: 1 / 1;
   background: var(--yellow);
   border-radius: 50%;
-}
-
-.triangle {
-  position: absolute;
-  z-index: 2;
-  top: clamp(90px, 13vw, 200px);
-  left: 46%;
-  width: clamp(36px, 5vw, 64px);
-  aspect-ratio: 1 / 1;
-  background: url("/yellow-triangle.svg") center / contain no-repeat;
-  transform-origin: center center;
-  pointer-events: none;
 }
 
 /* The floating panel: rounded on all four corners, drop shadow all around,
@@ -47,6 +35,7 @@
 }
 
 .pitch {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(28px, 5vw, 72px);
@@ -54,6 +43,8 @@
   padding: 0 clamp(45px, 5vw, 95px);
 }
 .photoCol {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
 }
@@ -64,6 +55,8 @@
   margin-top: clamp(-200px, -14vw, -110px);
 }
 .content {
+  position: relative;
+  z-index: 1;
   color: var(--white);
 }
 .content h1 {
