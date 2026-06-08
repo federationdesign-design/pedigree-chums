@@ -40,6 +40,13 @@
   width: 100%;
   height: auto;
   display: block;
+  transition: transform 0.25s ease;
+}
+.clickable {
+  cursor: pointer;
+}
+.clickable:hover .photo {
+  transform: scale(1.03);
 }
 
 /* Optional breed card tucked against the photo. */

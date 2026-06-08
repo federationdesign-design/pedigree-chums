@@ -19,6 +19,7 @@ export default function Home() {
           reverse
           xl
           circle
+          howToPlay
         >
           <h2 className="display">
             54 Unique <span className="display-yellow">Dog Cards</span>
