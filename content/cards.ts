@@ -8,7 +8,7 @@ export const cards: string[] = [
   "/card8-1199364230.jpg",
   "/card28-1199378147.jpg",
   "/card14-1199399283.jpg",
-  "/card21.jpg",
+  "/card21-1199411114.jpg",
   "/card36.jpg",
   "/card44.jpg",
 ];
