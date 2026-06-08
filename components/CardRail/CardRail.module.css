@@ -1,7 +1,7 @@
 .section {
   position: relative;
   padding: clamp(48px, 8vw, 96px) 0;
-  margin-top: clamp(-310px, calc(-14vw - 150px), -240px);
+  margin-top: clamp(-210px, calc(-14vw - 50px), -140px);
 }
 .head {
   text-align: center;

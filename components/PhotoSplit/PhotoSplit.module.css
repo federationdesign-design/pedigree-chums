@@ -112,6 +112,7 @@
 .large {
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: clamp(12px, 2vw, 32px);
+  z-index: 2;
 }
 .large .photoWrap {
   width: 100%;

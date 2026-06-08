@@ -3,6 +3,8 @@
    transparent; the paw pattern (paw-bg ::before, z-index 0) sits on the
    gradient and the strip is lifted above it. */
 .section {
+  position: relative;
+  z-index: 3;
   padding: clamp(24px, 4vw, 72px) 0;
   margin-top: -200px;
 }

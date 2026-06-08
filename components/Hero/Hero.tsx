@@ -41,9 +41,10 @@ export default function Hero() {
     let player: VimeoPlayer | null = null;
     let cancelled = false;
     const onEnded = () => {
-      document
-        .getElementById("lab")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const el = document.getElementById("lab");
+      if (!el) return;
+      const y = el.getBoundingClientRect().top + window.scrollY - 200;
+      window.scrollTo({ top: y, behavior: "smooth" });
     };
     loadVimeoSdk().then((Vimeo) => {
       if (cancelled || !Vimeo || !iframeRef.current) return;
