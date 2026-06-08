@@ -38,7 +38,7 @@ export default function Home() {
 
         <PhotoSplit photo="/corgi.png" alt="A Corgi being spotted in the park" large>
           <h2 className="display">
-            Who <span className="display-yellow">It's For</span>
+            Who <span className="display-yellow">It&apos;s For</span>
           </h2>
           <ul className="points">
             <li className="point">Families on outings</li>

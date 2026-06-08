@@ -40,24 +40,27 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
   // player docks to the bottom-right corner (YouTube-style) and lets the page
   // behind it stay interactive. Scrolling back up restores it to centre.
   const [minimized, setMinimized] = useState(false);
+  const isOpen = index !== null;
   useEffect(() => {
-    if (index === null) {
-      setMinimized(false);
-      return;
-    }
+    if (!isOpen) return;
     const openY = window.scrollY;
     const onScroll = () => setMinimized(window.scrollY - openY > 100);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [index]);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      setMinimized(false);
+    };
+  }, [isOpen]);
 
   // Keep the latest advance handler in a ref so the player's "ended" listener
   // (attached once per video) always advances from the current index.
   const advanceRef = useRef<() => void>(() => {});
-  advanceRef.current = () => {
-    if (index === null) return;
-    onIndex((index + 1) % videos.length);
-  };
+  useEffect(() => {
+    advanceRef.current = () => {
+      if (index === null) return;
+      onIndex((index + 1) % videos.length);
+    };
+  });
 
   // Keyboard nav.
   useEffect(() => {
