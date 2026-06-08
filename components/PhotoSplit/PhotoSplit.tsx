@@ -12,6 +12,7 @@ type Props = {
   xl?: boolean;
   circle?: boolean;
   howToPlay?: boolean;
+  hoverPhoto?: string;
   children: React.ReactNode;
 };
 
@@ -24,6 +25,7 @@ export default function PhotoSplit({
   xl = false,
   circle = false,
   howToPlay = false,
+  hoverPhoto,
   children,
 }: Props) {
   return (
@@ -32,15 +34,37 @@ export default function PhotoSplit({
     >
       {circle && <ParallaxShape className={styles.photoCircle} speed={0.16} />}
       <div className={styles.photoCol}>
-        <div className={`${styles.photoWrap} ${howToPlay ? styles.clickable : ""}`}>
-          <Image
-            src={photo}
-            alt={alt}
-            width={620}
-            height={620}
-            className={styles.photo}
-            sizes="(max-width: 900px) 84vw, 800px"
-          />
+        <div
+          className={`${styles.photoWrap} ${hoverPhoto ? styles.rollover : ""} ${howToPlay ? styles.clickable : ""}`}
+        >
+          {hoverPhoto ? (
+            <>
+              <Image
+                src={photo}
+                alt={alt}
+                fill
+                className={styles.photo}
+                sizes="(max-width: 900px) 84vw, 800px"
+              />
+              <Image
+                src={hoverPhoto}
+                alt=""
+                aria-hidden="true"
+                fill
+                className={styles.hoverPhoto}
+                sizes="(max-width: 900px) 84vw, 800px"
+              />
+            </>
+          ) : (
+            <Image
+              src={photo}
+              alt={alt}
+              width={620}
+              height={620}
+              className={styles.photo}
+              sizes="(max-width: 900px) 84vw, 800px"
+            />
+          )}
           {card && (
             <Image
               src={card}

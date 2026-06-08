@@ -7,7 +7,7 @@
   padding: clamp(48px, 8vw, 110px) clamp(20px, 6vw, 90px);
 }
 .reverse {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
 }
 .reverse .photoCol {
   order: 2;
@@ -34,6 +34,7 @@
 .photoWrap {
   position: relative;
   width: clamp(260px, 42vw, 500px);
+  max-width: 100%;
 }
 .photo {
   position: relative;
@@ -48,6 +49,23 @@
 }
 .clickable:hover .photo {
   transform: scale(1.03);
+}
+
+/* Image rollover: resting image swaps to the hover image on mouse over.
+   Contain keeps either image undistorted whatever its exact dimensions. */
+.rollover {
+  aspect-ratio: 1740 / 1406;
+}
+.rollover .photo {
+  object-fit: contain;
+}
+.hoverPhoto {
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.rollover:hover .hoverPhoto {
+  opacity: 1;
 }
 
 /* Optional breed card tucked against the photo. */

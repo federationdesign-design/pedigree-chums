@@ -15,12 +15,12 @@ export default function Home() {
         <PitchPanel />
 
         <PhotoSplit
-          photo="/spaniel.png"
+          photo="/how-to-play-img-resting.png"
+          hoverPhoto="/how-to-play-img-hover.png"
           alt="A Cocker Spaniel being spotted on a walk"
           reverse
           xl
           circle
-          howToPlay
         >
           <PopHeading className="display">
             54 Unique <span className="display-yellow">Dog Cards</span>
