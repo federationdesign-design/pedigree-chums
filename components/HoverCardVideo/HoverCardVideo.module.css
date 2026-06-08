@@ -3,6 +3,7 @@
   flex: 0 0 auto;
   width: clamp(190px, 60vw, 280px);
   aspect-ratio: 300 / 430;
+  cursor: pointer;
 }
 .poster {
   width: 100%;
@@ -13,52 +14,24 @@
   display: block;
 }
 
-/* The video overlay is fixed so it can expand past the card rail's clipping. */
-.stage {
+/* The video pops out centred over the page at a consistent size: no backdrop,
+   no crop, no resize. Click anywhere to close. */
+.popout {
   position: fixed;
-  overflow: hidden;
-  border-radius: 18px;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 50;
-  transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease,
-    opacity 0.15s ease;
-}
-.stage.active {
-  opacity: 1;
-}
-/* Phase 1: crop tightly to the card rectangle within the frame. */
-.video {
-  position: absolute;
-  width: calc(100% / var(--cw));
-  height: calc(100% / var(--ch));
-  left: calc(var(--cx) / var(--cw) * -100%);
-  top: calc(var(--cy) / var(--ch) * -100%);
-  object-fit: fill;
-  transition: width 0.35s ease, height 0.35s ease, left 0.35s ease, top 0.35s ease;
-}
-/* Phase 2: expand to a larger centred box and reveal the whole frame. */
-.stage.expanded {
-  top: 50% !important;
-  left: 50% !important;
-  width: min(70vw, 560px) !important;
-  height: auto !important;
-  aspect-ratio: 4 / 3;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 30px 80px rgba(10, 58, 87, 0.45);
+  width: min(80vw, 640px);
+  aspect-ratio: 4 / 3;
+  z-index: 100;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(10, 58, 87, 0.5);
 }
-.stage.expanded .video {
+.video {
   width: 100%;
   height: 100%;
-  left: 0;
-  top: 0;
   object-fit: cover;
-  background: transparent;
-}
-
-@media (hover: none) {
-  /* No hover on touch devices: just show the static card. */
-  .stage {
-    display: none;
-  }
+  display: block;
+  background: #000;
 }

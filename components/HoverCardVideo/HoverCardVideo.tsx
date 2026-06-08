@@ -1,85 +1,62 @@
 "use client";
-import { useRef, useState, useCallback, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./HoverCardVideo.module.css";
-
-type Crop = { x: number; y: number; w: number; h: number };
 
 type Props = {
   poster: string;
   video: string;
-  expandAtMs?: number;
-  crop?: Crop; // the card's rectangle within the video frame, as 0-1 fractions
 };
 
-export default function HoverCardVideo({
-  poster,
-  video,
-  expandAtMs = 2000,
-  // defaults eyeballed from the first frame (card centred with white margin)
-  crop = { x: 0.4, y: 0.15, w: 0.2, h: 0.6 },
-}: Props) {
-  const slotRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+export default function HoverCardVideo({ poster, video }: Props) {
   const vidRef = useRef<HTMLVideoElement>(null);
-  const timer = useRef<number | undefined>(undefined);
-  const [active, setActive] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const onEnter = useCallback(() => {
-    const slot = slotRef.current;
-    const stage = stageRef.current;
+  const openVideo = (e: React.MouseEvent) => {
+    e.stopPropagation(); // don't let the opening click immediately close it
+    setOpen(true);
+  };
+
+  useEffect(() => {
     const v = vidRef.current;
-    if (!slot || !stage) return;
-    // pin the fixed overlay exactly over the static card to start
-    const r = slot.getBoundingClientRect();
-    stage.style.top = `${r.top}px`;
-    stage.style.left = `${r.left}px`;
-    stage.style.width = `${r.width}px`;
-    stage.style.height = `${r.height}px`;
-    setActive(true);
-    setExpanded(false);
-    if (v) {
-      v.currentTime = 0;
-      v.play().catch(() => {});
+    if (open) {
+      if (v) {
+        v.currentTime = 0;
+        v.play().catch(() => {});
+      }
+      const close = () => setOpen(false);
+      // attach on the next tick so the opening click doesn't trigger it
+      const id = window.setTimeout(() => {
+        document.addEventListener("click", close);
+        document.addEventListener("keydown", close);
+      }, 0);
+      return () => {
+        window.clearTimeout(id);
+        document.removeEventListener("click", close);
+        document.removeEventListener("keydown", close);
+      };
     }
-    timer.current = window.setTimeout(() => setExpanded(true), expandAtMs);
-  }, [expandAtMs]);
-
-  const onLeave = useCallback(() => {
-    setActive(false);
-    setExpanded(false);
-    if (timer.current) window.clearTimeout(timer.current);
-    const v = vidRef.current;
     if (v) {
       v.pause();
       v.currentTime = 0;
     }
-  }, []);
-
-  const cropVars = {
-    "--cx": crop.x,
-    "--cy": crop.y,
-    "--cw": crop.w,
-    "--ch": crop.h,
-  } as CSSProperties;
+  }, [open]);
 
   return (
-    <div
-      ref={slotRef}
-      className={styles.slot}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-    >
+    <div className={styles.slot} onClick={openVideo}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={poster} alt="Breed card" className={styles.poster} draggable={false} />
-      <div
-        ref={stageRef}
-        className={`${styles.stage} ${active ? styles.active : ""} ${expanded ? styles.expanded : ""}`}
-        style={cropVars}
-        aria-hidden="true"
-      >
-        <video ref={vidRef} className={styles.video} src={video} muted playsInline preload="metadata" />
-      </div>
+      {open && (
+        <div className={styles.popout}>
+          <video
+            ref={vidRef}
+            className={styles.video}
+            src={video}
+            muted
+            playsInline
+            preload="metadata"
+          />
+        </div>
+      )}
     </div>
   );
 }
