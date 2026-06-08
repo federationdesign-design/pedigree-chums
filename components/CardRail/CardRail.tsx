@@ -5,6 +5,19 @@ import { cards } from "../../content/cards";
 import styles from "./CardRail.module.css";
 import VideoLightbox, { type LightboxVideo } from "../VideoLightbox/VideoLightbox";
 import HowToPlay from "../HowToPlay/HowToPlay";
+import Triangles, { type Tri } from "../Parallax/Triangles";
+
+// Decorative parallax triangles scattered through the rail section, drifting
+// the same way as the ones on the hero. Pointer-events are off, so they never
+// block the cards.
+const railTriangles: Tri[] = [
+  { size: 58, top: "14%", left: "6%", speed: 0.16, spin: 0.22 },
+  { size: 38, top: "26%", right: "9%", speed: 0.26, spin: -0.3 },
+  { size: 64, bottom: "24%", left: "47%", speed: 0.18, spin: 0.2 },
+  { size: 76, bottom: "12%", left: "13%", speed: 0.14, spin: 0.16 },
+  { size: 34, bottom: "9%", left: "31%", speed: 0.3, spin: -0.4 },
+  { size: 48, bottom: "16%", right: "18%", speed: 0.22, spin: -0.24 },
+];
 
 // The Cocker (card.jpg) is the fixed feature card, so keep it out of the
 // scrolling deck to avoid showing it twice.
@@ -101,7 +114,8 @@ export default function CardRail() {
   }, []);
 
   return (
-    <section className={styles.section}>
+    <section id="meet-the-pack" className={styles.section}>
+      <Triangles items={railTriangles} z={0} />
       <div className={styles.head}>
         <h2 className="display">
           Meet the <span className="display-yellow">Pack</span>

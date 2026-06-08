@@ -111,10 +111,18 @@
 /* Larger photo (corgi): give the photo side more of the row and let it grow. */
 .large {
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(12px, 2vw, 32px);
 }
 .large .photoWrap {
   width: 100%;
   max-width: 940px;
+}
+/* Corgi (large) block: title and bullets scaled up to match the spaniel block. */
+.large .contentCol h2 {
+  font-size: clamp(4.2rem, 11vw, 7.2rem);
+}
+.large .contentCol :global(.point) {
+  font-size: clamp(1.17rem, 2.6vw, 1.35rem);
 }
 /* Extra-large photo (spaniel): fills its wider column. */
 .xl .photoWrap {

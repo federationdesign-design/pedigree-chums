@@ -26,13 +26,12 @@ export default function Home() {
           <PopHeading className="display">
             54 Unique <span className="display-yellow">Dog Cards</span>
           </PopHeading>
-          <ul className="points">
-            <li className="point">40 of the most popular UK dog breeds</li>
-            <li className="point">Plus 10 designer crossbreeds (Labradoodle, Cavapoo, and more)</li>
-          </ul>
           <p className="lead">Each card includes:</p>
           <ul className="points">
-            <li className="point">Breed facts: traits, colours, size and tell-tale identifiers</li>
+            <li className="point">Breed traits and temperament</li>
+            <li className="point">Coat colours and markings</li>
+            <li className="point">Size and build</li>
+            <li className="point">Tell-tale identifiers</li>
             <li className="point">Cute yet accurate illustrations</li>
             <li className="point">Quick-reference stats</li>
           </ul>

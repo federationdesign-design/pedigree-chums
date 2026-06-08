@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useRef } from "react";
 import styles from "./Hero.module.css";
 import Triangles, { type Tri } from "../Parallax/Triangles";
 
@@ -7,11 +9,59 @@ const heroTriangles: Tri[] = [
   { size: 92, bottom: "16%", left: "42%", speed: 0.16, spin: 0.14 },
 ];
 
+// Load the Vimeo Player SDK once, on demand. Returns the global Vimeo object.
+let vimeoSdkPromise: Promise<unknown> | null = null;
+function loadVimeoSdk(): Promise<unknown> {
+  if (typeof window === "undefined") return Promise.resolve(null);
+  const w = window as unknown as { Vimeo?: unknown };
+  if (w.Vimeo) return Promise.resolve(w.Vimeo);
+  if (vimeoSdkPromise) return vimeoSdkPromise;
+  vimeoSdkPromise = new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://player.vimeo.com/api/player.js";
+    script.async = true;
+    script.onload = () => resolve((window as unknown as { Vimeo?: unknown }).Vimeo ?? null);
+    script.onerror = () => resolve(null);
+    document.head.appendChild(script);
+  });
+  return vimeoSdkPromise;
+}
+
+type VimeoPlayer = {
+  on: (event: string, cb: () => void) => void;
+  off: (event: string, cb: () => void) => void;
+};
+
 export default function Hero() {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // When the hero clip finishes (loop is off), glide the viewer down to the
+  // "Meet the Pack" rail so the cards become the next thing they see.
+  useEffect(() => {
+    let player: VimeoPlayer | null = null;
+    let cancelled = false;
+    const onEnded = () => {
+      document
+        .getElementById("meet-the-pack")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    loadVimeoSdk().then((Vimeo) => {
+      if (cancelled || !Vimeo || !iframeRef.current) return;
+      const Player = (Vimeo as { Player: new (el: HTMLIFrameElement) => VimeoPlayer }).Player;
+      player = new Player(iframeRef.current);
+      player.on("ended", onEnded);
+    });
+    return () => {
+      cancelled = true;
+      player?.off("ended", onEnded);
+    };
+  }, []);
+
   return (
     <section className={styles.hero}>
       <div className={styles.videoWrap} aria-hidden="true">
         <iframe
+          ref={iframeRef}
           className={styles.video}
           src="https://player.vimeo.com/video/1199216471?autoplay=1&loop=0&muted=1&controls=0&title=0&byline=0&portrait=0&autopause=0"
           title="Pedigree Chums"

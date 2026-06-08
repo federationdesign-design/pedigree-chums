@@ -31,9 +31,12 @@ export default function PitchPanel() {
             <p className="lead">Fun. Educational. Addictive.</p>
             <p className="subLead">Perfect for Families, Tourists &amp; Dog Lovers.</p>
             <ul className="points">
-              <li className="point">54 hand-illustrated breed cards</li>
-              <li className="point">Compact, durable, pocket-friendly</li>
-              <li className="point">Made in the UK. Built for play.</li>
+              <li className="point">54 uniquely illustrated cards</li>
+              <li className="point">Compact size, pocket-friendly, lightweight</li>
+              <li className="point">Made in the UK using recycled paper</li>
+              <li className="point">Fully biodegradable – no plastic coatings</li>
+              <li className="point">40 of the most popular UK dog breeds</li>
+              <li className="point">Plus 12 designer crossbreeds (Labradoodle, Cavapoo, and many more)</li>
             </ul>
           </div>
         </div>
