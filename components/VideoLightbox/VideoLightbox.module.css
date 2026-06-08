@@ -147,3 +147,46 @@
     animation: none;
   }
 }
+
+/* Sticky mini-player: when scrolled, the overlay stops catching clicks (so the
+   page stays usable) and the stage docks to the bottom-right corner. */
+.minimized {
+  pointer-events: none;
+}
+.minimized .stage {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: min(360px, 72vw);
+  margin: 0;
+  z-index: 120;
+  pointer-events: auto;
+  transition: width 0.25s ease;
+}
+.minimized .arrow {
+  display: none;
+}
+
+/* Close button: only shown in the docked mini-player, where clicking the page
+   no longer closes the video. */
+.close {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 130;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: #ffed00;
+  color: var(--navy, #0a3a57);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.minimized .close {
+  display: flex;
+}

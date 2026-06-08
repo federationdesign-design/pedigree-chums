@@ -36,6 +36,21 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
   // there is no black screen while Vimeo loads.
   const [posterShown, setPosterShown] = useState(true);
 
+  // Sticky mini-player: once the page is scrolled while the video is open, the
+  // player docks to the bottom-right corner (YouTube-style) and lets the page
+  // behind it stay interactive. Scrolling back up restores it to centre.
+  const [minimized, setMinimized] = useState(false);
+  useEffect(() => {
+    if (index === null) {
+      setMinimized(false);
+      return;
+    }
+    const openY = window.scrollY;
+    const onScroll = () => setMinimized(window.scrollY - openY > 100);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [index]);
+
   // Keep the latest advance handler in a ref so the player's "ended" listener
   // (attached once per video) always advances from the current index.
   const advanceRef = useRef<() => void>(() => {});
@@ -110,7 +125,7 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
   const next = () => onIndex((index + 1) % videos.length);
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={`${styles.overlay} ${minimized ? styles.minimized : ""}`} onClick={onClose}>
       {videos.length > 1 && (
         <button
           type="button"
@@ -133,6 +148,17 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
 
       {/* keyed by id so it remounts (and re-runs the pop) on each navigation */}
       <div key={v.vimeoId} className={styles.stage} onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className={styles.close}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          aria-label="Close video"
+        >
+          &times;
+        </button>
         <iframe
           ref={iframeRef}
           className={styles.video}
