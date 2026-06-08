@@ -1,9 +1,9 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { cards } from "../../content/cards";
 import styles from "./CardRail.module.css";
-import HoverCardVideo from "../HoverCardVideo/HoverCardVideo";
+import VideoLightbox, { type LightboxVideo } from "../VideoLightbox/VideoLightbox";
 
 // The Cocker (card.jpg) is the fixed feature card, so keep it out of the
 // scrolling deck to avoid showing it twice.
@@ -17,16 +17,26 @@ function vimeoIdFromSrc(src: string): string | null {
   return m ? m[1] : null;
 }
 
+// The ordered list of video cards (for the lightbox prev/next), and a lookup
+// from card src to its position in that list.
+const videoCards: LightboxVideo[] = deck
+  .map((src) => ({ src, vimeoId: vimeoIdFromSrc(src) }))
+  .filter((c): c is { src: string; vimeoId: string } => c.vimeoId !== null)
+  .map((c) => ({ poster: c.src, vimeoId: c.vimeoId }));
+
+const videoIndexBySrc: Record<string, number> = {};
+videoCards.forEach((c, i) => {
+  videoIndexBySrc[c.poster] = i;
+});
+
 export default function CardRail() {
   const railRef = useRef<HTMLDivElement>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const el = railRef.current;
     if (!el) return;
 
-    // "Hold" distance = how far the row scrolls before the page is allowed to
-    // scroll too. We hold for the first 3 cards, then release: the page scrolls
-    // while the remaining cards keep moving at the same time.
     const holdDistance = () => {
       const items = el.querySelectorAll<HTMLElement>('[role="listitem"]');
       if (items.length > 3) {
@@ -45,18 +55,13 @@ export default function CardRail() {
       const max = el.scrollWidth - el.clientWidth;
 
       if (delta > 0) {
-        // scrolling down / forward
-        if (el.scrollLeft >= max) return; // row finished: let the page scroll
+        if (el.scrollLeft >= max) return;
         if (el.scrollLeft < hold) {
-          // hold zone: freeze the page, move the cards
           e.preventDefault();
         }
-        // release zone (>= hold): do NOT preventDefault, so the page scrolls
-        // AND the cards advance together
         el.scrollLeft = Math.min(el.scrollLeft + delta, max);
       } else {
-        // scrolling up / back
-        if (el.scrollLeft <= 0) return; // row at start: let the page scroll up
+        if (el.scrollLeft <= 0) return;
         if (el.scrollLeft <= hold) {
           e.preventDefault();
         }
@@ -99,7 +104,22 @@ export default function CardRail() {
             return (
               <div className={styles.item} role="listitem" key={src}>
                 {vimeoId ? (
-                  <HoverCardVideo poster={src} vimeoId={vimeoId} />
+                  <button
+                    type="button"
+                    className={styles.videoCard}
+                    onClick={() => setOpenIndex(videoIndexBySrc[src])}
+                    aria-label="Play breed video"
+                  >
+                    <Image
+                      src={src}
+                      alt="Breed card"
+                      width={300}
+                      height={430}
+                      className={styles.card}
+                      sizes="(max-width: 700px) 60vw, 280px"
+                      draggable={false}
+                    />
+                  </button>
                 ) : (
                   <Image
                     src={src}
@@ -116,6 +136,13 @@ export default function CardRail() {
           })}
         </div>
       </div>
+
+      <VideoLightbox
+        videos={videoCards}
+        index={openIndex}
+        onClose={() => setOpenIndex(null)}
+        onIndex={setOpenIndex}
+      />
     </section>
   );
 }

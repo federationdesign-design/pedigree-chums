@@ -88,3 +88,12 @@
     padding-left: clamp(160px, 52vw, 240px);
   }
 }
+
+/* Clickable video-card poster (opens the lightbox). */
+.videoCard {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
