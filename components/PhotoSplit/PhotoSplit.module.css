@@ -24,6 +24,8 @@
   width: clamp(260px, 42vw, 500px);
 }
 .photo {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: auto;
   display: block;
@@ -81,4 +83,21 @@
 .contentCol {
   position: relative;
   z-index: 1;
+}
+
+/* Extra-large photo variant (spaniel: ~25% bigger than .large). */
+.xl .photoWrap {
+  width: clamp(375px, 68vw, 800px);
+}
+
+/* Parallax yellow circle sitting behind the photo, peeking out. */
+.photoCircle {
+  position: absolute;
+  z-index: 0;
+  top: -8%;
+  right: -14%;
+  width: 96%;
+  aspect-ratio: 1 / 1;
+  background: var(--yellow);
+  border-radius: 50%;
 }

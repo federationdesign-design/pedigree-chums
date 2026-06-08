@@ -12,12 +12,24 @@
 .yellowCircle {
   position: absolute;
   z-index: 0;
-  top: -116px;
+  top: -196px;
   right: -10px;
   width: clamp(240px, 26vw, 400px);
   aspect-ratio: 1 / 1;
   background: var(--yellow);
   border-radius: 50%;
+}
+
+.triangle {
+  position: absolute;
+  z-index: 2;
+  top: clamp(90px, 13vw, 200px);
+  left: 46%;
+  width: clamp(28px, 4vw, 48px);
+  aspect-ratio: 1 / 1;
+  background: url("/yellow-triangle.svg") center / contain no-repeat;
+  transform-origin: center center;
+  pointer-events: none;
 }
 
 /* The floating panel: rounded on all four corners, drop shadow all around,

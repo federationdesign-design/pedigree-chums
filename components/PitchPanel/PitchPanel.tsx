@@ -1,13 +1,14 @@
 import CardRail from "../CardRail/CardRail";
 import LabPop from "./LabPop";
-import YellowCircle from "./YellowCircle";
+import ParallaxShape from "../Parallax/ParallaxShape";
 import styles from "./PitchPanel.module.css";
 
 export default function PitchPanel() {
   return (
     <div className={styles.outer}>
-      <YellowCircle />
+      <ParallaxShape className={styles.yellowCircle} speed={0.25} />
       <section className={styles.panel}>
+        <ParallaxShape className={styles.triangle} speed={0.18} spin spinFactor={0.3} />
         <div className={styles.pitch}>
           <div className={styles.photoCol}>
             <LabPop />
