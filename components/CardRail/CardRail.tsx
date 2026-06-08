@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 import Image from "next/image";
 import { cards } from "../../content/cards";
 import styles from "./CardRail.module.css";
+import HoverCardVideo from "../HoverCardVideo/HoverCardVideo";
 
 // The Cocker (card.jpg) is the fixed feature card, so keep it out of the
 // scrolling deck to avoid showing it twice.
@@ -88,15 +89,19 @@ export default function CardRail() {
         <div ref={railRef} className={styles.rail} role="list" aria-label="Breed cards">
           {deck.map((src, i) => (
             <div className={styles.item} role="listitem" key={src}>
-              <Image
-                src={src}
-                alt={`Breed card ${i + 1}`}
-                width={300}
-                height={430}
-                className={styles.card}
-                sizes="(max-width: 700px) 60vw, 280px"
-                draggable={false}
-              />
+              {src === "/card11.jpg" ? (
+                <HoverCardVideo poster={src} video="/card11.mp4" expandAtMs={200} />
+              ) : (
+                <Image
+                  src={src}
+                  alt={`Breed card ${i + 1}`}
+                  width={300}
+                  height={430}
+                  className={styles.card}
+                  sizes="(max-width: 700px) 60vw, 280px"
+                  draggable={false}
+                />
+              )}
             </div>
           ))}
         </div>
