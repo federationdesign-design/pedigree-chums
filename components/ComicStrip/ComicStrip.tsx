@@ -1,21 +1,16 @@
-import Image from "next/image";
 import styles from "./ComicStrip.module.css";
 
-// Full-width "how to play" comic strip. Uses contain inside an aspect-ratio
-// frame so the artwork never distorts (the ratio is an estimate; adjust the
-// frame aspect-ratio if the real image differs).
+// Full-width stacked "how to play" comic strip below the corgi section.
+// Rendered at its natural ratio so the cells are never distorted.
 export default function ComicStrip() {
   return (
     <section className={`${styles.section} paw-bg`}>
-      <div className={styles.frame}>
-        <Image
-          src="/how-to-play-comic-strip.png"
-          alt="How to play, step by step"
-          fill
-          className={styles.strip}
-          sizes="100vw"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/stacked-comicstrip.png"
+        alt="How to play, step by step"
+        className={styles.strip}
+      />
     </section>
   );
 }

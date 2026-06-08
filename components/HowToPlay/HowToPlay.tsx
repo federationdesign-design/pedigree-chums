@@ -1,13 +1,20 @@
 "use client";
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import styles from "./HowToPlay.module.css";
 
 type Props = {
   open: boolean;
   onClose: () => void;
 };
+
+const STEPS = [
+  "Deal 3–6 cards per player",
+  "Go for a walk, visit a park, or explore your town or city",
+  "Spot real dogs and match with your cards",
+  "Try and spot all your chums",
+  "The player with the most pedigree chums wins",
+];
 
 // Controlled "How it works" popup. The trigger (the feature card) lives in
 // CardRail and drives this via the open/onClose props.
@@ -37,17 +44,19 @@ export default function HowToPlay({ open, onClose }: Props) {
 
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
+          <span className={styles.tri} aria-hidden="true">&#9661;</span>
         </h3>
 
-        <div className={styles.stripFrame}>
-          <Image
-            src="/how-to-play-comic-strip.png"
-            alt="How to play, step by step"
-            fill
-            className={styles.strip}
-            sizes="(max-width: 900px) 92vw, 1100px"
-          />
-        </div>
+        <ol className={styles.steps}>
+          {STEPS.map((step) => (
+            <li key={step} className={styles.step}>
+              <span className={styles.num} aria-hidden="true" />
+              <span className={styles.text}>{step}</span>
+            </li>
+          ))}
+        </ol>
+
+        <span className={styles.logo} aria-hidden="true" />
       </div>
     </div>
   );
