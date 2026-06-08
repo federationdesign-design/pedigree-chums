@@ -27,7 +27,7 @@
   left: 46%;
   width: clamp(28px, 4vw, 48px);
   aspect-ratio: 1 / 1;
-  background: url("/yellow-triangle.svg") center / contain no-repeat;
+  background: url("/yellow-yellow-triangle.svg") center / contain no-repeat;
   transform-origin: center center;
   pointer-events: none;
 }
