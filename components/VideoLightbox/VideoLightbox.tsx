@@ -68,7 +68,11 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
         on: (e: string, cb: () => void) => void;
         off?: (e: string) => void;
         destroy?: () => void;
+        setLoop?: (loop: boolean) => Promise<unknown>;
       };
+      // Force loop off via the API so the clip actually reaches its end and
+      // fires "ended", regardless of the video's Vimeo embed settings.
+      p.setLoop?.(false).catch(() => {});
       p.on("ended", () => advanceRef.current());
       player = p;
     });
