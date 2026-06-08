@@ -7,20 +7,18 @@ export default function LabPop() {
   const [popped, setPopped] = useState(false);
 
   useEffect(() => {
-    // If the page is already scrolled (e.g. reload mid-page), show it now.
-    if (window.scrollY > 0) {
-      setPopped(true);
-      return;
-    }
+    // Pop on the first genuine user scroll input. We deliberately avoid the
+    // generic "scroll" event because layout shifts on load can fire it and
+    // trip the pop before the user has interacted.
     const trigger = () => setPopped(true);
     const opts = { once: true, passive: true } as AddEventListenerOptions;
-    window.addEventListener("scroll", trigger, opts);
     window.addEventListener("wheel", trigger, opts);
     window.addEventListener("touchmove", trigger, opts);
+    window.addEventListener("keydown", trigger, opts);
     return () => {
-      window.removeEventListener("scroll", trigger);
       window.removeEventListener("wheel", trigger);
       window.removeEventListener("touchmove", trigger);
+      window.removeEventListener("keydown", trigger);
     };
   }, []);
 
