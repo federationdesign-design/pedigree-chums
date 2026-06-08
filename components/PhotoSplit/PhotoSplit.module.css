@@ -7,7 +7,7 @@
   padding: clamp(48px, 8vw, 110px) clamp(20px, 6vw, 90px);
 }
 .reverse {
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
 }
 .reverse .photoCol {
   order: 2;
@@ -116,10 +116,14 @@
   width: 100%;
   max-width: 940px;
 }
-/* Extra-large photo (spaniel): fills its wider 60% column. */
+/* Extra-large photo (spaniel): fills its wider column. */
 .xl .photoWrap {
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
+}
+.xl .photoCircle {
+  width: clamp(340px, 50vw, 760px);
+  height: clamp(340px, 50vw, 760px);
 }
 
 /* Yellow circle: a section-level layer BEHIND both columns (not trapped in the
