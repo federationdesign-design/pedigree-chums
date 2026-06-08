@@ -16,7 +16,7 @@ export default function HoverCardVideo({
   video,
   expandAtMs = 2000,
   // defaults eyeballed from the first frame (card centred with white margin)
-  crop = { x: 0.3, y: 0.12, w: 0.4, h: 0.76 },
+  crop = { x: 0.4, y: 0.15, w: 0.2, h: 0.6 },
 }: Props) {
   const slotRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
