@@ -42,7 +42,7 @@ export default function Hero() {
     let cancelled = false;
     const onEnded = () => {
       document
-        .getElementById("meet-the-pack")
+        .getElementById("lab")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
     loadVimeoSdk().then((Vimeo) => {

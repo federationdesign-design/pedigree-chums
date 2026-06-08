@@ -4,6 +4,7 @@
    gradient and the strip is lifted above it. */
 .section {
   padding: clamp(24px, 4vw, 72px) 0;
+  margin-top: -200px;
 }
 .strip {
   position: relative;

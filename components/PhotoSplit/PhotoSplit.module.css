@@ -116,6 +116,7 @@
 .large .photoWrap {
   width: 100%;
   max-width: 940px;
+  margin-top: -200px;
 }
 /* Corgi (large) block: title and bullets scaled up to match the spaniel block. */
 .large .contentCol h2 {
@@ -148,6 +149,9 @@
 }
 
 @media (max-width: 900px) {
+  .large .photoWrap {
+    margin-top: 0;
+  }
   .split,
   .reverse {
     grid-template-columns: 1fr;

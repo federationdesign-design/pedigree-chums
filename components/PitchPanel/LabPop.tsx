@@ -25,6 +25,7 @@ export default function LabPop() {
   return (
     <Image
       src="/lab.png"
+      id="lab"
       alt="A Labrador being spotted in the park"
       width={620}
       height={620}

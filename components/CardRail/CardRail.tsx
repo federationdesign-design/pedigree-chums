@@ -114,16 +114,8 @@ export default function CardRail() {
   }, []);
 
   return (
-    <section id="meet-the-pack" className={styles.section}>
+    <section className={styles.section}>
       <Triangles items={railTriangles} z={0} />
-      <div className={styles.head}>
-        <h2 className="display">
-          Meet the <span className="display-yellow">Pack</span>
-        </h2>
-        <p className={styles.sub}>
-          Hand-illustrated cards for all 54 breeds. Scroll through to see them all.
-        </p>
-      </div>
 
       <div ref={wrapRef} className={styles.railWrap}>
         <button
