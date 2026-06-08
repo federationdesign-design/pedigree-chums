@@ -1,6 +1,5 @@
 import Image from "next/image";
 import ParallaxShape from "../Parallax/ParallaxShape";
-import HowToPlay from "../HowToPlay/HowToPlay";
 import styles from "./PhotoSplit.module.css";
 
 type Props = {
@@ -11,7 +10,6 @@ type Props = {
   large?: boolean;
   xl?: boolean;
   circle?: boolean;
-  howToPlay?: boolean;
   hoverPhoto?: string;
   children: React.ReactNode;
 };
@@ -24,7 +22,6 @@ export default function PhotoSplit({
   large = false,
   xl = false,
   circle = false,
-  howToPlay = false,
   hoverPhoto,
   children,
 }: Props) {
@@ -35,7 +32,7 @@ export default function PhotoSplit({
       {circle && <ParallaxShape className={styles.photoCircle} speed={0.16} />}
       <div className={styles.photoCol}>
         <div
-          className={`${styles.photoWrap} ${hoverPhoto ? styles.rollover : ""} ${howToPlay ? styles.clickable : ""}`}
+          className={`${styles.photoWrap} ${hoverPhoto ? styles.rollover : ""}`}
         >
           {hoverPhoto ? (
             <>
@@ -75,7 +72,6 @@ export default function PhotoSplit({
               sizes="(max-width: 900px) 40vw, 230px"
             />
           )}
-          {howToPlay && <HowToPlay />}
         </div>
       </div>
       <div className={styles.contentCol}>{children}</div>

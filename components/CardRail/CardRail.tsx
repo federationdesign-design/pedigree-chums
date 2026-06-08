@@ -4,6 +4,7 @@ import Image from "next/image";
 import { cards } from "../../content/cards";
 import styles from "./CardRail.module.css";
 import VideoLightbox, { type LightboxVideo } from "../VideoLightbox/VideoLightbox";
+import HowToPlay from "../HowToPlay/HowToPlay";
 
 // The Cocker (card.jpg) is the fixed feature card, so keep it out of the
 // scrolling deck to avoid showing it twice.
@@ -52,6 +53,7 @@ export default function CardRail() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [howToPlayOpen, setHowToPlayOpen] = useState(false);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -110,14 +112,29 @@ export default function CardRail() {
       </div>
 
       <div ref={wrapRef} className={styles.railWrap}>
-        <Image
-          src={FEATURE}
-          alt="Cocker Spaniel breed card"
-          width={300}
-          height={430}
+        <button
+          type="button"
           className={styles.featureCard}
-          priority
-        />
+          onClick={() => setHowToPlayOpen(true)}
+          aria-label="How to play"
+        >
+          <Image
+            src={FEATURE}
+            alt="Cocker Spaniel breed card"
+            width={300}
+            height={430}
+            className={styles.featureImg}
+            priority
+          />
+          <Image
+            src="/howtoplay.png"
+            alt=""
+            aria-hidden="true"
+            width={300}
+            height={430}
+            className={styles.featureHover}
+          />
+        </button>
 
         <div ref={railRef} className={styles.rail} role="list" aria-label="Breed cards">
           {deck.map((src) => {
@@ -165,6 +182,8 @@ export default function CardRail() {
         onClose={() => setOpenIndex(null)}
         onIndex={setOpenIndex}
       />
+
+      <HowToPlay open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)} />
     </section>
   );
 }
