@@ -16,7 +16,13 @@
   right: -10px;
   width: clamp(240px, 26vw, 400px);
   aspect-ratio: 1 / 1;
+}
+.yellowCircle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: url("/pre-order-yellow-circle.svg") center / contain no-repeat;
+  transform: rotate(-15deg);
 }
 
 /* The floating panel: rounded on all four corners, drop shadow all around,
@@ -54,6 +60,7 @@
   position: relative;
   z-index: 1;
   color: var(--white);
+  margin-top: clamp(-72px, -5vw, -36px);
 }
 .content h1 {
   font-size: clamp(2.3rem, 6vw, 4.2rem);
