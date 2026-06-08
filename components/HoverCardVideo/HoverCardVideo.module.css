@@ -43,7 +43,7 @@
   left: 50% !important;
   width: min(70vw, 560px) !important;
   height: auto !important;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
   transform: translate(-50%, -50%);
   box-shadow: 0 30px 80px rgba(10, 58, 87, 0.45);
 }
@@ -52,8 +52,8 @@
   height: 100%;
   left: 0;
   top: 0;
-  object-fit: contain;
-  background: #ffffff;
+  object-fit: cover;
+  background: transparent;
 }
 
 @media (hover: none) {

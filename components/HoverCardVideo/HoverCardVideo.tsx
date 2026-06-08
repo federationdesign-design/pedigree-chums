@@ -14,7 +14,7 @@ type Props = {
 export default function HoverCardVideo({
   poster,
   video,
-  expandAtMs = 200,
+  expandAtMs = 2000,
   // defaults eyeballed from the first frame (card centred with white margin)
   crop = { x: 0.3, y: 0.12, w: 0.4, h: 0.76 },
 }: Props) {
