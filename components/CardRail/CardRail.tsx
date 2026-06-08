@@ -24,6 +24,7 @@ function vimeoIdFromSrc(src: string): string | null {
 const PRELOAD_OVERRIDES: Record<string, string> = {
   card14: "/card14-pre-laod.jpg",
   card36: "/card36-pre-loader.jpg",
+  card44: "/card44-pre-laoder.jpg",
 };
 function preloadFromSrc(src: string): string {
   const base = src.replace(/^\//, "").replace(/\.[a-z0-9]+$/i, "").replace(/-\d+$/, "");

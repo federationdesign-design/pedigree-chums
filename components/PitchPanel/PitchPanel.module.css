@@ -16,8 +16,7 @@
   right: -10px;
   width: clamp(240px, 26vw, 400px);
   aspect-ratio: 1 / 1;
-  background: var(--yellow);
-  border-radius: 50%;
+  background: url("/pre-order-yellow-circle.svg") center / contain no-repeat;
 }
 
 /* The floating panel: rounded on all four corners, drop shadow all around,

@@ -10,7 +10,7 @@ export const cards: string[] = [
   "/card14-1199399283.jpg",
   "/card21-1199411114.jpg",
   "/card36-1199482204.jpg",
-  "/card44.jpg",
+  "/card44-1199502279.jpg",
 ];
 
 export const heroCard = cards[0];
