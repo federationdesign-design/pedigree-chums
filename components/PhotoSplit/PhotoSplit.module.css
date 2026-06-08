@@ -60,6 +60,7 @@
   object-fit: contain;
 }
 .hoverPhoto {
+  z-index: 2;
   object-fit: contain;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -107,9 +108,13 @@
   font-size: clamp(1.17rem, 2.6vw, 1.35rem);
 }
 
-/* Larger photo (corgi). */
+/* Larger photo (corgi): give the photo side more of the row and let it grow. */
+.large {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
 .large .photoWrap {
-  width: clamp(300px, 54vw, 640px);
+  width: 100%;
+  max-width: 940px;
 }
 /* Extra-large photo (spaniel): fills its wider 60% column. */
 .xl .photoWrap {
