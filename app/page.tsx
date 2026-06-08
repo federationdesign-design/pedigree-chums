@@ -4,6 +4,7 @@ import PitchPanel from "../components/PitchPanel/PitchPanel";
 import PhotoSplit from "../components/PhotoSplit/PhotoSplit";
 import PopHeading from "../components/PopHeading/PopHeading";
 import Footer from "../components/Footer/Footer";
+import ComicStrip from "../components/ComicStrip/ComicStrip";
 
 export default function Home() {
   return (
@@ -50,6 +51,8 @@ export default function Home() {
             <li className="point">Great as a stocking filler</li>
           </ul>
         </PhotoSplit>
+
+        <ComicStrip />
       </main>
       <Footer />
     </>

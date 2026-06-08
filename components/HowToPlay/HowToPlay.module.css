@@ -10,13 +10,13 @@
   perspective: 1400px;
 }
 
-/* Blue "How it works" panel with the same 3D pop as the video lightbox. */
+/* Blue panel holding the comic-strip instructions, with the same 3D pop as the
+   video lightbox. */
 .stage {
   position: relative;
-  overflow: hidden;
-  width: min(94vw, 940px);
+  width: min(96vw, 1200px);
   border-radius: 26px;
-  padding: clamp(28px, 4.5vw, 56px) clamp(26px, 4.5vw, 60px) clamp(30px, 4.5vw, 60px);
+  padding: clamp(24px, 4vw, 48px) clamp(22px, 4vw, 48px) clamp(26px, 4vw, 52px);
   background:
     radial-gradient(120% 90% at 80% 25%, rgba(255, 255, 255, 0.18), transparent 60%),
     linear-gradient(135deg, #2aa6e0 0%, var(--blue, #1497d6) 45%, var(--blue-deep, #0b78bd) 100%);
@@ -24,28 +24,6 @@
     inset 0 0 0 6px rgba(255, 255, 255, 0.18);
   transform-style: preserve-3d;
   animation: pop3d 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-/* Soft overlapping bubbles on the right, like the artwork. */
-.stage::before,
-.stage::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-.stage::before {
-  width: 42%;
-  aspect-ratio: 1;
-  top: 6%;
-  right: 4%;
-  background: rgba(255, 255, 255, 0.12);
-}
-.stage::after {
-  width: 26%;
-  aspect-ratio: 1;
-  bottom: -10%;
-  right: 24%;
-  background: rgba(255, 255, 255, 0.08);
 }
 
 @keyframes pop3d {
@@ -82,85 +60,25 @@
 .title {
   position: relative;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.35em;
   font-family: var(--font-display), system-ui, sans-serif;
   color: #ffffff;
-  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
   line-height: 1;
-  margin: 0 0 clamp(20px, 3vw, 36px);
+  margin: 0 0 clamp(16px, 2.4vw, 26px);
   text-shadow: 0 4px 0 rgba(10, 58, 87, 0.22);
 }
 .accent {
   color: var(--yellow, #ffd23e);
 }
-.tri {
-  font-size: 0.42em;
-  opacity: 0.9;
-  transform: translateY(-0.15em);
-}
 
-.steps {
+.stripFrame {
   position: relative;
   z-index: 2;
-  counter-reset: step;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-width: 68%;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 2.2vw, 26px);
+  width: 100%;
+  aspect-ratio: 49 / 10;
 }
-.step {
-  counter-increment: step;
-  display: flex;
-  align-items: flex-start;
-  gap: clamp(14px, 2vw, 26px);
-}
-.num {
-  flex: none;
-  min-width: 1.1em;
-  text-align: center;
-  font-family: var(--font-display), system-ui, sans-serif;
-  color: var(--yellow, #ffd23e);
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  line-height: 0.85;
-}
-.num::before {
-  content: counter(step);
-}
-.text {
-  padding-top: 0.18em;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 700;
-  color: #ffffff;
-  font-size: clamp(1rem, 2.2vw, 1.45rem);
-  line-height: 1.25;
-}
-
-.logo {
-  position: absolute;
-  right: clamp(20px, 4vw, 56px);
-  bottom: clamp(16px, 3vw, 40px);
-  z-index: 2;
-  width: clamp(140px, 20vw, 230px);
-  aspect-ratio: 230 / 150;
-  background: url("/dogbingo.svg") center / contain no-repeat;
-  pointer-events: none;
-}
-
-@media (max-width: 700px) {
-  .steps {
-    max-width: 100%;
-  }
-  .logo {
-    position: static;
-    display: block;
-    margin: 22px auto 0;
-    width: 160px;
-  }
+.strip {
+  object-fit: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {
