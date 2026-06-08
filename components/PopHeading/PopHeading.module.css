@@ -1,0 +1,47 @@
+/* Hidden until revealed, so the pop is visible when it scrolls into view. */
+.pop {
+  opacity: 0;
+  transform: scale(0.4);
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+
+/* Pop up past full size, then wobble a couple of times into place. */
+.shown {
+  animation: popJiggle 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popJiggle {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-7deg);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.12) rotate(5deg);
+  }
+  62% {
+    transform: scale(0.95) rotate(-3deg);
+  }
+  78% {
+    transform: scale(1.04) rotate(1.5deg);
+  }
+  90% {
+    transform: scale(0.99) rotate(-0.6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Respect users who prefer no motion: just show it. */
+@media (prefers-reduced-motion: reduce) {
+  .pop {
+    opacity: 1;
+    transform: none;
+  }
+  .shown {
+    animation: none;
+  }
+}

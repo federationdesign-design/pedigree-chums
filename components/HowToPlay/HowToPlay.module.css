@@ -4,9 +4,23 @@
   inset: 0;
   z-index: 3;
   border: 0;
+  padding: 0;
   background: none;
   cursor: pointer;
   border-radius: 50%;
+  overflow: hidden;
+}
+/* howtoplay.png fades in over the photo on hover. */
+.hoverImg {
+  position: absolute;
+  inset: 0;
+  background: url("/howtoplay.png") center / cover no-repeat;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.trigger:hover .hoverImg {
+  opacity: 1;
 }
 
 .overlay {

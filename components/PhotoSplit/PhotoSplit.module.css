@@ -79,6 +79,9 @@
 }
 
 /* Spaniel (reverse) block: copy bumped ~2pt larger than the shared defaults. */
+.reverse .contentCol h2 {
+  font-size: clamp(4.2rem, 11vw, 7.2rem);
+}
 .reverse .contentCol :global(.lead) {
   font-size: clamp(1.32rem, 3.2vw, 1.72rem);
 }

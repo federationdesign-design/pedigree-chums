@@ -2,6 +2,7 @@ import Nav from "../components/Nav/Nav";
 import Hero from "../components/Hero/Hero";
 import PitchPanel from "../components/PitchPanel/PitchPanel";
 import PhotoSplit from "../components/PhotoSplit/PhotoSplit";
+import PopHeading from "../components/PopHeading/PopHeading";
 import Footer from "../components/Footer/Footer";
 
 export default function Home() {
@@ -21,9 +22,9 @@ export default function Home() {
           circle
           howToPlay
         >
-          <h2 className="display">
+          <PopHeading className="display">
             54 Unique <span className="display-yellow">Dog Cards</span>
-          </h2>
+          </PopHeading>
           <ul className="points">
             <li className="point">40 of the most popular UK dog breeds</li>
             <li className="point">Plus 10 designer crossbreeds (Labradoodle, Cavapoo, and more)</li>

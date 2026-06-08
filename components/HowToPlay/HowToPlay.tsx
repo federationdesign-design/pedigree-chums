@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import styles from "./HowToPlay.module.css";
 
 export default function HowToPlay() {
@@ -27,6 +28,53 @@ export default function HowToPlay() {
     setSent(true);
   }
 
+  const modal = (
+    <div className={styles.overlay} onClick={() => setOpen(false)}>
+      <div className={styles.stage} onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className={styles.close}
+          onClick={() => setOpen(false)}
+          aria-label="Close"
+        >
+          &times;
+        </button>
+
+        <div className={styles.form}>
+          {sent ? (
+            <p className={styles.thanks}>Thanks! We will be in touch.</p>
+          ) : (
+            <>
+              <h3 className={styles.formTitle}>Be first to play</h3>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                className={styles.input}
+                type="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                type="button"
+                className={styles.submit}
+                onClick={submit}
+                disabled={!ready}
+              >
+                Sign up
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <button
@@ -34,54 +82,11 @@ export default function HowToPlay() {
         className={styles.trigger}
         onClick={() => setOpen(true)}
         aria-label="See how to play"
-      />
+      >
+        <span className={styles.hoverImg} aria-hidden="true" />
+      </button>
 
-      {open && (
-        <div className={styles.overlay} onClick={() => setOpen(false)}>
-          <div className={styles.stage} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className={styles.close}
-              onClick={() => setOpen(false)}
-              aria-label="Close"
-            >
-              &times;
-            </button>
-
-            <div className={styles.form}>
-              {sent ? (
-                <p className={styles.thanks}>Thanks! We will be in touch.</p>
-              ) : (
-                <>
-                  <h3 className={styles.formTitle}>Be first to play</h3>
-                  <input
-                    className={styles.input}
-                    type="text"
-                    placeholder="Your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <input
-                    className={styles.input}
-                    type="email"
-                    placeholder="Your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className={styles.submit}
-                    onClick={submit}
-                    disabled={!ready}
-                  >
-                    Sign up
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {open && typeof document !== "undefined" && createPortal(modal, document.body)}
     </>
   );
 }
