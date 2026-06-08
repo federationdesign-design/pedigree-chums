@@ -1,11 +1,11 @@
 // The breed cards shown in the "Meet the Pack" rail. card.jpg (Cocker) is the
 // fixed feature card; the list below is the scrolling deck behind it.
+// card11 sits where card6 used to and is the click-to-play video card.
 export const cards: string[] = [
   "/card.jpg",
   "/card4.jpg",
-  "/card6.jpg",
-  "/card10.jpg",
   "/card11.jpg",
+  "/card10.jpg",
   "/card14.jpg",
   "/card21.jpg",
   "/card36.jpg",

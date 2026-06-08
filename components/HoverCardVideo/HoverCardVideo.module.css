@@ -18,6 +18,7 @@
    no crop, no resize. Click anywhere to close. */
 .popout {
   position: fixed;
+  border: 8px solid #ffed00;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -34,4 +35,14 @@
   object-fit: cover;
   display: block;
   background: #000;
+}
+
+/* Transparent layer over the video so clicking it also closes the popout. */
+.clickCatch {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }

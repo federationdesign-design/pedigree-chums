@@ -26,10 +26,7 @@
   position: relative;
   z-index: 1;
   border-radius: 40px;
-  background:
-    radial-gradient(60% 55% at 72% 6%, rgba(85, 215, 255, 0.55), rgba(85, 215, 255, 0) 70%),
-    radial-gradient(55% 50% at 6% 96%, rgba(85, 215, 255, 0.5), rgba(85, 215, 255, 0) 70%),
-    linear-gradient(150deg, #1ab6ee 0%, #1597da 55%, #1497d6 100%);
+  background: transparent;
   box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
   padding-top: clamp(56px, 7vw, 96px);
 }
@@ -105,4 +102,36 @@
     transform: none;
     animation: none;
   }
+}
+
+/* Glow layer: clips the two Screen circles to the panel's rounded corners,
+   without clipping the Labrador that pokes out the top. */
+.glowLayer {
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+}
+.glowCircle {
+  position: absolute;
+  border-radius: 50%;
+  background: #09c1f3;
+  mix-blend-mode: screen;
+  opacity: 0.43;
+}
+.glowTop {
+  width: clamp(420px, 62%, 1000px);
+  aspect-ratio: 1 / 1;
+  top: -16%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.glowBottom {
+  width: clamp(320px, 48%, 760px);
+  aspect-ratio: 1 / 1;
+  bottom: -20%;
+  left: -10%;
 }

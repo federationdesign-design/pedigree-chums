@@ -15,6 +15,10 @@ export default function PitchPanel() {
     <div className={styles.outer}>
       <ParallaxShape className={styles.yellowCircle} speed={0.25} />
       <section className={styles.panel}>
+        <div className={styles.glowLayer} aria-hidden="true">
+          <span className={`${styles.glowCircle} ${styles.glowTop}`} />
+          <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
+        </div>
         <div className={styles.pitch}>
           <Triangles items={pitchTriangles} z={0} />
           <div className={styles.photoCol}>

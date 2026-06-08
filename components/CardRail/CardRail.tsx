@@ -90,7 +90,7 @@ export default function CardRail() {
           {deck.map((src, i) => (
             <div className={styles.item} role="listitem" key={src}>
               {src === "/card11.jpg" ? (
-                <HoverCardVideo poster={src} video="/card11.mp4" />
+                <HoverCardVideo poster={src} vimeoId="1199364230" />
               ) : (
                 <Image
                   src={src}

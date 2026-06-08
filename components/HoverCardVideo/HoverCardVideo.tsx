@@ -4,10 +4,11 @@ import styles from "./HoverCardVideo.module.css";
 
 type Props = {
   poster: string;
-  video: string;
+  video?: string; // self-hosted mp4
+  vimeoId?: string; // vimeo video id
 };
 
-export default function HoverCardVideo({ poster, video }: Props) {
+export default function HoverCardVideo({ poster, video, vimeoId }: Props) {
   const vidRef = useRef<HTMLVideoElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -24,7 +25,6 @@ export default function HoverCardVideo({ poster, video }: Props) {
         v.play().catch(() => {});
       }
       const close = () => setOpen(false);
-      // attach on the next tick so the opening click doesn't trigger it
       const id = window.setTimeout(() => {
         document.addEventListener("click", close);
         document.addEventListener("keydown", close);
@@ -47,13 +47,30 @@ export default function HoverCardVideo({ poster, video }: Props) {
       <img src={poster} alt="Breed card" className={styles.poster} draggable={false} />
       {open && (
         <div className={styles.popout}>
-          <video
-            ref={vidRef}
-            className={styles.video}
-            src={video}
-            muted
-            playsInline
-            preload="metadata"
+          {vimeoId ? (
+            <iframe
+              className={styles.video}
+              src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=0&muted=1&controls=0&title=0&byline=0&portrait=0`}
+              title="Breed video"
+              allow="autoplay; fullscreen; picture-in-picture"
+              frameBorder="0"
+            />
+          ) : (
+            <video
+              ref={vidRef}
+              className={styles.video}
+              src={video}
+              muted
+              playsInline
+              preload="metadata"
+            />
+          )}
+          {/* transparent catcher so a click on the video area also closes it */}
+          <button
+            type="button"
+            className={styles.clickCatch}
+            aria-label="Close video"
+            onClick={() => setOpen(false)}
           />
         </div>
       )}
