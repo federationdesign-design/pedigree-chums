@@ -46,7 +46,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 10px clamp(20px, 8vw, 120px) 26px;
+  padding: 10px clamp(20px, 8vw, 120px) 26px clamp(260px, 40vw, 500px);
   scrollbar-width: thin;
   scrollbar-color: var(--yellow) rgba(255, 255, 255, 0.25);
 }
@@ -75,4 +75,16 @@
 }
 .item:hover .card {
   transform: translateY(-8px) scale(1.02);
+}
+
+/* On small screens, shrink the fixed Cocker and the track's left clearance so
+   the scrolling cards still have room. */
+@media (max-width: 700px) {
+  .featureCard {
+    width: clamp(150px, 46vw, 220px);
+    left: 8px;
+  }
+  .rail {
+    padding-left: clamp(160px, 52vw, 240px);
+  }
 }
