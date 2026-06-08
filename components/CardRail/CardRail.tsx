@@ -10,19 +10,12 @@ import HoverCardVideo from "../HoverCardVideo/HoverCardVideo";
 const FEATURE = "/card.jpg";
 const deck = cards.filter((c) => c !== FEATURE);
 
-// Real Vimeo IDs where we have them; the rest are placeholders to be
-// swapped for the real videos later.
-const PLACEHOLDER = "1199364230";
-const VIDEO_IDS: Record<string, string> = {
-  "/card11.jpg": "1199364230",
-  "/card8.jpg": "1199268788",
-  "/card10.jpg": PLACEHOLDER,
-  "/card14.jpg": PLACEHOLDER,
-  "/card21.jpg": PLACEHOLDER,
-  "/card36.jpg": PLACEHOLDER,
-  "/card44.jpg": PLACEHOLDER,
-  "/card28.jpg": "1199378147",
-};
+// A card whose filename ends in -<digits> (e.g. card11-1199268788.jpg) is a
+// video card; the digits are its Vimeo ID. Plain-named cards are just images.
+function vimeoIdFromSrc(src: string): string | null {
+  const m = src.match(/-(\d+)\.[a-z0-9]+$/i);
+  return m ? m[1] : null;
+}
 
 export default function CardRail() {
   const railRef = useRef<HTMLDivElement>(null);
@@ -101,11 +94,26 @@ export default function CardRail() {
         />
 
         <div ref={railRef} className={styles.rail} role="list" aria-label="Breed cards">
-          {deck.map((src) => (
-            <div className={styles.item} role="listitem" key={src}>
-              <HoverCardVideo poster={src} vimeoId={VIDEO_IDS[src] ?? PLACEHOLDER} />
-            </div>
-          ))}
+          {deck.map((src) => {
+            const vimeoId = vimeoIdFromSrc(src);
+            return (
+              <div className={styles.item} role="listitem" key={src}>
+                {vimeoId ? (
+                  <HoverCardVideo poster={src} vimeoId={vimeoId} />
+                ) : (
+                  <Image
+                    src={src}
+                    alt="Breed card"
+                    width={300}
+                    height={430}
+                    className={styles.card}
+                    sizes="(max-width: 700px) 60vw, 280px"
+                    draggable={false}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
