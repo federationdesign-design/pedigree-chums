@@ -25,9 +25,9 @@
   z-index: 2;
   top: clamp(90px, 13vw, 200px);
   left: 46%;
-  width: clamp(28px, 4vw, 48px);
+  width: clamp(36px, 5vw, 64px);
   aspect-ratio: 1 / 1;
-  background: url("/yellow-yellow-triangle.svg") center / contain no-repeat;
+  background: url("/yellow-triangle.svg") center / contain no-repeat;
   transform-origin: center center;
   pointer-events: none;
 }
@@ -51,7 +51,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(28px, 5vw, 72px);
   align-items: center;
-  padding: 0 clamp(20px, 5vw, 70px);
+  padding: 0 clamp(45px, 5vw, 95px);
 }
 .photoCol {
   display: flex;

@@ -1,9 +1,13 @@
+/* Photo column is the wider one (60/40). Reverse flips which side that is. */
 .split {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: clamp(28px, 5vw, 72px);
   align-items: center;
   padding: clamp(48px, 8vw, 110px) clamp(20px, 6vw, 90px);
+}
+.reverse {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
 }
 .reverse .photoCol {
   order: 2;
@@ -12,13 +16,20 @@
   order: 1;
 }
 
+/* Section content sits above the rotated paw pattern and the yellow circle. */
+.photoCol,
+.contentCol {
+  position: relative;
+  z-index: 1;
+}
 .photoCol {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-/* The PNGs are already finished circular artwork (ring + label baked in),
-   so they are placed as-is with no crop or decoration. */
+
+/* The PNGs are finished circular artwork (ring + label baked in): placed
+   as-is, no crop. */
 .photoWrap {
   position: relative;
   width: clamp(260px, 42vw, 500px);
@@ -30,8 +41,8 @@
   height: auto;
   display: block;
 }
-/* Optional breed card tucked against the photo (e.g. the Cocker card by the
-   Cocker Spaniel photo). */
+
+/* Optional breed card tucked against the photo. */
 .card {
   position: absolute;
   left: -8%;
@@ -59,8 +70,36 @@
   margin-top: 18px;
 }
 
+/* Larger photo (corgi). */
+.large .photoWrap {
+  width: clamp(300px, 54vw, 640px);
+}
+/* Extra-large photo (spaniel): fills its wider 60% column. */
+.xl .photoWrap {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Yellow circle: a section-level layer BEHIND both columns (not trapped in the
+   photo container), drifting via parallax. Sits on the photo side. */
+.photoCircle {
+  position: absolute;
+  z-index: 0;
+  top: 8%;
+  left: 4%;
+  width: clamp(300px, 42vw, 600px);
+  height: clamp(300px, 42vw, 600px);
+  background: var(--yellow);
+  border-radius: 50%;
+}
+.reverse .photoCircle {
+  left: auto;
+  right: 4%;
+}
+
 @media (max-width: 900px) {
-  .split {
+  .split,
+  .reverse {
     grid-template-columns: 1fr;
     text-align: center;
   }
@@ -71,33 +110,12 @@
   .contentCol :global(.points) {
     align-items: center;
   }
-}
-
-/* Larger photo variant (e.g. the Corgi section). */
-.large .photoWrap {
-  width: clamp(300px, 54vw, 640px);
-}
-
-/* keep section content above the rotated paw pattern (.paw-bg::before) */
-.photoCol,
-.contentCol {
-  position: relative;
-  z-index: 1;
-}
-
-/* Extra-large photo variant (spaniel: ~25% bigger than .large). */
-.xl .photoWrap {
-  width: clamp(375px, 68vw, 800px);
-}
-
-/* Parallax yellow circle sitting behind the photo, peeking out. */
-.photoCircle {
-  position: absolute;
-  z-index: 0;
-  top: -8%;
-  right: -14%;
-  width: 96%;
-  aspect-ratio: 1 / 1;
-  background: var(--yellow);
-  border-radius: 50%;
+  .photoCircle {
+    left: 50%;
+    right: auto;
+    margin-left: -39vw;
+    width: 78vw;
+    height: 78vw;
+    top: 2%;
+  }
 }

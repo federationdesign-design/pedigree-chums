@@ -27,9 +27,9 @@ export default function PhotoSplit({
     <section
       className={`${styles.split} ${reverse ? styles.reverse : ""} ${large ? styles.large : ""} ${xl ? styles.xl : ""} paw-bg`}
     >
+      {circle && <ParallaxShape className={styles.photoCircle} speed={0.16} />}
       <div className={styles.photoCol}>
         <div className={styles.photoWrap}>
-          {circle && <ParallaxShape className={styles.photoCircle} speed={0.18} />}
           <Image
             src={photo}
             alt={alt}
