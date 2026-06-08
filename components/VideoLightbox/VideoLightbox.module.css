@@ -95,6 +95,16 @@
   font-size: clamp(2rem, 3.2vw, 3.2rem);
   line-height: 1;
 }
+/* SVG arrow inside the Last/Next Pooch circles. blue-arrow.svg points right,
+   so the prev side is flipped horizontally. */
+.chevImg {
+  width: clamp(26px, 3.6vw, 46px);
+  height: auto;
+  display: block;
+}
+.prev .chevImg {
+  transform: scaleX(-1);
+}
 .prev {
   left: clamp(8px, 3vw, 60px);
 }

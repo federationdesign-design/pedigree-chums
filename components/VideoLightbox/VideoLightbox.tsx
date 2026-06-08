@@ -126,7 +126,8 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
             <br />
             Pooch
           </span>
-          <span className={styles.chev}>&#8249;</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/blue-arrow.svg" className={styles.chevImg} alt="" />
         </button>
       )}
 
@@ -162,7 +163,8 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
             <br />
             Pooch
           </span>
-          <span className={styles.chev}>&#8250;</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/blue-arrow.svg" className={styles.chevImg} alt="" />
         </button>
       )}
     </div>

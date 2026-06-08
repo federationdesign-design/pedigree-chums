@@ -18,12 +18,16 @@ function vimeoIdFromSrc(src: string): string | null {
 }
 
 // The pre-load (placeholder) image for a video card: strip the Vimeo id and
-// extension to get the base name, then add the pre-load suffix. card14's file
-// is misspelled on disk as "pre-laod", so it gets a special case.
+// extension to get the base name, then add the standard pre-load suffix.
+// Some files were saved with inconsistent spellings, so those carry an
+// explicit override here. Tidy fix later: rename them all to "-pre-load.jpg".
+const PRELOAD_OVERRIDES: Record<string, string> = {
+  card14: "/card14-pre-laod.jpg",
+  card36: "/card36-pre-loader.jpg",
+};
 function preloadFromSrc(src: string): string {
   const base = src.replace(/^\//, "").replace(/\.[a-z0-9]+$/i, "").replace(/-\d+$/, "");
-  const suffix = base === "card14" ? "-pre-laod.jpg" : "-pre-load.jpg";
-  return `/${base}${suffix}`;
+  return PRELOAD_OVERRIDES[base] ?? `/${base}-pre-load.jpg`;
 }
 
 // The ordered list of video card sources, the lightbox list (using the
