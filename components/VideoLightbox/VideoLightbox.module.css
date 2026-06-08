@@ -38,8 +38,24 @@
   width: 100%;
   height: 100%;
   display: block;
-  background: #000;
+  background: var(--blue, #1497d6);
   border: 0;
+}
+
+/* Poster placeholder over the video frame until the clip starts playing,
+   so there is no black screen during load. Fades out on "playing". */
+.poster {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--blue, #1497d6);
+  transition: opacity 0.45s ease;
+}
+.posterHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .arrow {

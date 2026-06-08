@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./VideoLightbox.module.css";
 
 export type LightboxVideo = { poster: string; vimeoId: string };
@@ -32,6 +32,10 @@ function loadVimeoSdk(): Promise<unknown> {
 export default function VideoLightbox({ videos, index, onClose, onIndex }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Poster placeholder covers the frame until the clip actually starts, so
+  // there is no black screen while Vimeo loads.
+  const [posterShown, setPosterShown] = useState(true);
+
   // Keep the latest advance handler in a ref so the player's "ended" listener
   // (attached once per video) always advances from the current index.
   const advanceRef = useRef<() => void>(() => {});
@@ -52,14 +56,20 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
     return () => document.removeEventListener("keydown", onKey);
   }, [index, videos.length, onClose, onIndex]);
 
-  // Attach the Vimeo SDK to the current iframe and, when the clip ends,
-  // auto-advance to the next card (looping forever via the modulo above).
+  // Attach the Vimeo SDK to the current iframe: force loop off (so the clip
+  // ends and "ended" fires for auto-advance), and hide the poster once the
+  // video is playing. A timeout is a safety net if the SDK or events never
+  // fire, so the poster never gets stuck over the video.
   useEffect(() => {
     if (index === null) return;
     if (!iframeRef.current) return;
 
+    setPosterShown(true);
+
     let player: { off?: (e: string) => void; destroy?: () => void } | null = null;
     let cancelled = false;
+    const hidePoster = () => setPosterShown(false);
+    const fallback = window.setTimeout(hidePoster, 1600);
 
     loadVimeoSdk().then((Vimeo) => {
       if (cancelled || !Vimeo || !iframeRef.current) return;
@@ -73,14 +83,17 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
       // Force loop off via the API so the clip actually reaches its end and
       // fires "ended", regardless of the video's Vimeo embed settings.
       p.setLoop?.(false).catch(() => {});
+      p.on("playing", hidePoster);
       p.on("ended", () => advanceRef.current());
       player = p;
     });
 
     return () => {
       cancelled = true;
+      window.clearTimeout(fallback);
       if (player) {
         try {
+          player.off?.("playing");
           player.off?.("ended");
           player.destroy?.();
         } catch {
@@ -126,6 +139,11 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
           title="Breed video"
           allow="autoplay; fullscreen; picture-in-picture"
           frameBorder="0"
+        />
+        <div
+          className={`${styles.poster} ${posterShown ? "" : styles.posterHidden}`}
+          style={{ backgroundImage: `url(${v.poster})` }}
+          aria-hidden="true"
         />
       </div>
 
