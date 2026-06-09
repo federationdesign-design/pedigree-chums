@@ -56,7 +56,7 @@ export default function OfferModal({
           &times;
         </button>
         <h3 className={styles.title}>
-          Get <span className={styles.accent}>50% off code</span>
+          Get <span className={styles.accent}>discount code</span> emailed
         </h3>
         {sent ? (
           <p className={styles.thanks}>
@@ -67,9 +67,10 @@ export default function OfferModal({
           <>
             <p className={styles.sub}>
               Pop in your email and we will send your discount code 1 day before we
-              release for general sale. Orders will be taken on a first come first
-              served basis unless you check the box below. We expect the stock to
-              run out so be quick.
+              pre-release which will be before general sale. Orders will be taken on
+              a first come first served basis unless you check the box below. We
+              expect the stock to run out so be quick. After our pre-release launch,
+              we will have a general release, so don&apos;t panic.
             </p>
             <div className={styles.form}>
               <input
