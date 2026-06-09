@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Luckiest_Guy, Montserrat } from "next/font/google";
+import CookieBanner from "../components/CookieBanner/CookieBanner";
 import "./globals.css";
 
 const display = Luckiest_Guy({
@@ -27,7 +28,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }
