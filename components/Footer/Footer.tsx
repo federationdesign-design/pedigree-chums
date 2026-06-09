@@ -11,7 +11,7 @@ export default function Footer() {
       <p className={styles.legal}>
         Pedigree Chums | The Dog Bingo Game. Registered in England and Wales.
         Copyright 2026: Taylor James Stephens Ltd Trading as Pedigree Chums |
-        United Kingdom | Copyright 2026
+        United Kingdom
       </p>
     </footer>
   );
