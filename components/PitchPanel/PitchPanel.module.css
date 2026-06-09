@@ -80,10 +80,11 @@
     margin-top: clamp(-140px, -26vw, -80px);
   }
   .content :global(.points) {
-    align-items: center;
+    align-items: flex-start;
+    text-align: left;
   }
   .yellowCircle {
-    width: 190px;
+    width: 95px;
   }
 }
 
