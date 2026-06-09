@@ -97,6 +97,37 @@
 .submit:hover {
   transform: translateY(-2px);
 }
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--white);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  cursor: pointer;
+}
+.check input {
+  margin: 3px 0 0;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--yellow);
+  cursor: pointer;
+}
+.gdpr {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.gdpr .check {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.95;
+}
 .error {
   color: var(--white);
   background: rgba(0, 0, 0, 0.18);

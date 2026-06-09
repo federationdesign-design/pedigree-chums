@@ -46,12 +46,21 @@
    off the page as the user scrolls, just as the fixed header logo fades in. */
 .announce {
   position: absolute;
+  display: block;
   top: clamp(22px, 5vw, 40px);
   left: clamp(18px, 4vw, 48px);
   right: clamp(16px, 4vw, 48px);
   z-index: 3;
   margin: 0;
+  padding: 0;
+  width: auto;
   max-width: 760px;
+  background: transparent;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: left;
+  cursor: pointer;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
@@ -83,8 +92,8 @@
   .heroTris {
     display: none;
   }
-  /* Announcement ~2pt smaller on mobile. */
+  /* Announcement ~2pt smaller again on mobile. */
   .announce {
-    font-size: clamp(0.78rem, 2.2vw, 0.92rem);
+    font-size: clamp(0.62rem, 1.8vw, 0.75rem);
   }
 }

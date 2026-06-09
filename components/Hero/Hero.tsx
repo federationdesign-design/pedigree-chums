@@ -72,9 +72,17 @@ export default function Hero() {
         <div className={styles.poster} />
         <div className={styles.tint} />
       </div>
-      <p className={styles.announce}>
+      <button
+        type="button"
+        className={styles.announce}
+        onClick={() => {
+          document
+            .getElementById("preorder")
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
+      >
         <strong>Released Soon!</strong> Add your email to get 50% off code to use on launch day
-      </p>
+      </button>
       <div className={styles.heroTris}>
         <Triangles items={heroTriangles} z={1} />
       </div>
