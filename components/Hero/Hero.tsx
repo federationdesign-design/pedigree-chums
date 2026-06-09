@@ -77,7 +77,7 @@ export default function Hero() {
         className={styles.announce}
         onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
       >
-        <strong>Released Soon!</strong> Add your email to get 50% off code to use on launch day
+        <strong>Released Soon!</strong> Add your email to get a discount code to use on launch day
       </button>
       <div className={styles.heroTris}>
         <Triangles items={heroTriangles} z={1} />
