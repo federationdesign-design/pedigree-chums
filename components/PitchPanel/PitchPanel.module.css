@@ -105,6 +105,7 @@
   .labWrap {
     width: clamp(432px, 118vw, 749px);
     margin-top: clamp(0px, 1.5vw, 8px);
+    flex-shrink: 0;
   }
   .content :global(.points) {
     align-items: flex-start;
