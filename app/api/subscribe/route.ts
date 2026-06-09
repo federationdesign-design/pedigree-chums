@@ -6,10 +6,10 @@ import { NextResponse } from "next/server";
 // confirmation email. Everything sensitive is read from environment variables
 // (set these in Vercel, nothing is committed):
 //
-//   MAILERLITE_API_KEY       - MailerLite API token (required)
+//   Mailerlite_Key           - MailerLite API token (required)
 //   MAILERLITE_GROUP_ID      - id of the group to add subscribers to (optional)
 //   MAILERLITE_RESERVE_FIELD - custom field key to record the reserve choice (optional)
-//   RESEND_API_KEY           - Resend API key (optional, enables the confirmation email)
+//   Resend_Key               - Resend API key (optional, enables the confirmation email)
 //   RESEND_FROM              - verified sender, e.g. "Pedigree Chums <hello@pedigreechums.co.uk>"
 //
 // The visitor is added to MailerLite as the primary action; the Resend email is
@@ -39,9 +39,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Consent is required." }, { status: 400 });
   }
 
-  const mlKey = process.env.MAILERLITE_API_KEY;
+  const mlKey = process.env.Mailerlite_Key;
   if (!mlKey) {
-    console.error("MAILERLITE_API_KEY is not set.");
+    console.error("Mailerlite_Key is not set.");
     return NextResponse.json(
       { error: "Sign-ups are not configured yet. Please try again later." },
       { status: 503 }
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
   }
 
   // 2. Send a confirmation email via Resend (best effort).
-  const resendKey = process.env.RESEND_API_KEY;
+  const resendKey = process.env.Resend_Key;
   const resendFrom = process.env.RESEND_FROM;
   if (resendKey && resendFrom) {
     try {
