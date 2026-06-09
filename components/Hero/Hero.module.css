@@ -41,3 +41,21 @@
   inset: 0;
   background: linear-gradient(180deg, rgba(10, 58, 87, 0.04) 0%, rgba(10, 58, 87, 0.22) 100%);
 }
+
+/* Mobile: make the hero ~20% taller. The 16:9 iframe is scaled to fill the
+   taller frame (width 120%, centred), so it stays undistorted and the left/
+   right edges crop instead of letterboxing. */
+@media (max-width: 900px) {
+  .hero {
+    aspect-ratio: 16 / 10.8;
+  }
+  .video {
+    top: 0;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    width: 120%;
+    height: 100%;
+    transform: translateX(-50%);
+  }
+}

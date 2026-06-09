@@ -16,6 +16,10 @@ const STEPS = [
   "The player with the most pedigree chums wins",
 ];
 
+// Individual step images, shown on mobile as a user-scrollable horizontal row
+// in place of the single wide comic strip.
+const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
+
 // Controlled "How it works" popup. The trigger (the feature card) lives in
 // CardRail and drives this via open/onClose. The panel pops in with the same
 // 3D effect as the video lightbox: the stage is a DIRECT child of the overlay,
@@ -55,6 +59,20 @@ export default function HowToPlay({ open, onClose }: Props) {
             alt="How to play, step by step"
             className={styles.strip}
           />
+        </div>
+
+        <div className={styles.stepScroll}>
+          {STEP_IMAGES.map((src, i) => {
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={src}
+                src={src}
+                alt={`How to play, step ${i + 1}`}
+                className={styles.stepImg}
+              />
+            );
+          })}
         </div>
 
         <ol className={styles.steps}>

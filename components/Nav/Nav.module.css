@@ -30,7 +30,9 @@
 }
 
 .burger {
-  display: inline-flex;
+  /* Hidden for now (across mobile and desktop). Restore by switching this to
+     inline-flex. */
+  display: none;
   flex-direction: column;
   gap: 6px;
   padding: 14px 13px;

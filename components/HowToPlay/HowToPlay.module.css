@@ -92,6 +92,40 @@
   height: auto;
 }
 
+/* Mobile: user-scrollable horizontal row of the individual step images,
+   replacing the single wide comic strip. */
+.stepScroll {
+  display: none;
+}
+@media (max-width: 900px) {
+  .stripWrap {
+    display: none;
+  }
+  .stepScroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    margin-left: calc(0px - clamp(20px, 5vw, 40px));
+    margin-right: calc(0px - clamp(20px, 5vw, 40px));
+    padding: 0 clamp(20px, 5vw, 40px) 14px;
+    margin-bottom: clamp(16px, 4vw, 26px);
+    scrollbar-width: none;
+  }
+  .stepScroll::-webkit-scrollbar {
+    display: none;
+  }
+  .stepImg {
+    flex: 0 0 auto;
+    width: 76%;
+    max-width: 340px;
+    height: auto;
+    border-radius: 16px;
+    scroll-snap-align: center;
+  }
+}
+
 .steps {
   position: relative;
   z-index: 2;

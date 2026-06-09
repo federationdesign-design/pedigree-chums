@@ -89,6 +89,13 @@
   .yellowCircle {
     width: 95px;
   }
+  /* Show the Lab straight away on mobile - no scroll-triggered pop. */
+  .prePop,
+  .popped {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }
 
 /* Lab pops into view (once) when scrolling starts. */
