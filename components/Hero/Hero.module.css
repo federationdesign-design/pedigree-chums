@@ -42,6 +42,27 @@
   background: linear-gradient(180deg, rgba(10, 58, 87, 0.04) 0%, rgba(10, 58, 87, 0.22) 100%);
 }
 
+/* Announcement over the video, top-left. It sits in the hero so it scrolls
+   off the page as the user scrolls, just as the fixed header logo fades in. */
+.announce {
+  position: absolute;
+  top: clamp(22px, 5vw, 40px);
+  left: clamp(18px, 4vw, 48px);
+  right: clamp(16px, 4vw, 48px);
+  z-index: 3;
+  margin: 0;
+  max-width: 760px;
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(0.95rem, 2vw, 1.2rem);
+  line-height: 1.35;
+  text-shadow: 0 2px 8px rgba(10, 58, 87, 0.55);
+}
+.announce strong {
+  font-weight: 800;
+}
+
 /* Mobile: make the hero ~20% taller. The 16:9 iframe is scaled to fill the
    taller frame (width 120%, centred), so it stays undistorted and the left/
    right edges crop instead of letterboxing. */

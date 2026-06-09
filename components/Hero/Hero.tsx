@@ -72,6 +72,9 @@ export default function Hero() {
         <div className={styles.poster} />
         <div className={styles.tint} />
       </div>
+      <p className={styles.announce}>
+        <strong>Released Soon!</strong> Add your email to get 50% off code to use on launch day
+      </p>
       <Triangles items={heroTriangles} z={1} />
     </section>
   );
