@@ -31,6 +31,7 @@ export default function CookieBanner() {
     } catch {
       // ignore storage failures (private mode etc.)
     }
+    window.dispatchEvent(new CustomEvent("pc:consent", { detail: value }));
     setVisible(false);
   };
 

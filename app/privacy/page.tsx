@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "./privacy.module.css";
@@ -100,9 +101,10 @@ export default function PrivacyPage() {
 
           <h2>Cookies and analytics</h2>
           <p>
-            This site embeds a video from Vimeo, which may set its own cookies. We
-            do not currently use our own analytics or advertising cookies. If that
-            changes we will update this policy.
+            If you accept cookies, we use Google Analytics to understand how the
+            site is used. This site also embeds a video from Vimeo, which may set
+            its own cookies. We do not use advertising cookies. For the full
+            detail, see our <Link href="/cookies">Cookie Policy</Link>.
           </p>
 
           <h2>Changes to this policy</h2>

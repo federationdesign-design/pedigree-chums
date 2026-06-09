@@ -46,6 +46,13 @@ export default function CookiesPage() {
               your preference and cannot be turned off.
             </li>
             <li>
+              <strong>Google Analytics (analytics).</strong> If you accept
+              cookies, we load Google Analytics, which sets cookies to help us
+              understand how visitors use the site so we can improve it. These
+              are only loaded after you accept; if you decline, they are not
+              loaded at all.
+            </li>
+            <li>
               <strong>Vimeo (third party).</strong> Our product video is embedded
               from Vimeo. When the video loads, Vimeo may set its own cookies to
               play the video and measure playback performance. These are set by
@@ -54,9 +61,8 @@ export default function CookiesPage() {
             </li>
           </ul>
           <p>
-            We do not currently use analytics or advertising cookies. If we add
-            analytics in future, we will update this policy and only load them
-            for visitors who have accepted cookies.
+            We do not use advertising cookies. Analytics cookies are only set
+            once you have accepted them on our cookie notice.
           </p>
 
           <h2>Managing cookies</h2>
