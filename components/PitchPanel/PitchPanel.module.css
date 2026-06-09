@@ -71,13 +71,16 @@
   .outer {
     padding: 0 14px;
   }
+  .panel {
+    padding-top: clamp(40px, 6vw, 56px);
+  }
   .pitch {
     grid-template-columns: 1fr;
     text-align: center;
   }
   .photo {
     width: clamp(300px, 82vw, 520px);
-    margin-top: clamp(-140px, -26vw, -80px);
+    margin-top: clamp(12px, 3vw, 24px);
   }
   .content :global(.points) {
     align-items: flex-start;
