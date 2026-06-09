@@ -9,6 +9,10 @@ export default function OfferCta() {
   const [open, setOpen] = useState(false);
   return (
     <>
+      <p className={styles.ctaTitle}>
+        The only way to get your hands on the chums is via the{" "}
+        <span className={styles.ctaTitleAccent}>pre-release offer</span>.
+      </p>
       <div className={styles.ctaRow} id="preorder">
         <button
           type="button"

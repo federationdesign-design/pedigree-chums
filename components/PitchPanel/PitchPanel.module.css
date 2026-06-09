@@ -51,10 +51,23 @@
   justify-content: center;
 }
 /* much larger, lifted so it pokes up onto the hero and over the yellow circle */
-.photo {
+.labWrap {
+  position: relative;
   width: clamp(380px, 56vw, 720px);
-  height: auto;
+  aspect-ratio: 1 / 1;
   margin-top: clamp(-200px, -14vw, -110px);
+}
+.photo {
+  object-fit: contain;
+}
+.labHover {
+  z-index: 2;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.labWrap:hover .labHover {
+  opacity: 1;
 }
 .content {
   position: relative;
@@ -83,7 +96,7 @@
   .content {
     margin-top: 0;
   }
-  .photo {
+  .labWrap {
     width: clamp(360px, 98vw, 624px);
     margin-top: clamp(0px, 1.5vw, 8px);
   }

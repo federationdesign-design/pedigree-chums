@@ -22,15 +22,29 @@ export default function LabPop() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // The wrapper carries the sizing, the pop animation and the #lab scroll
+  // target. The beagle sits on top and crossfades in on hover.
   return (
-    <Image
-      src="/lab.png"
+    <div
       id="lab"
-      alt="A Labrador being spotted in the park"
-      width={620}
-      height={620}
-      className={`${styles.photo} ${popped ? styles.popped : styles.prePop}`}
-      priority
-    />
+      className={`${styles.labWrap} ${popped ? styles.popped : styles.prePop}`}
+    >
+      <Image
+        src="/lab.png"
+        alt="A Labrador being spotted in the park"
+        fill
+        className={styles.photo}
+        sizes="(max-width: 900px) 98vw, 720px"
+        priority
+      />
+      <Image
+        src="/beagle-img.png"
+        alt=""
+        aria-hidden="true"
+        fill
+        className={styles.labHover}
+        sizes="(max-width: 900px) 98vw, 720px"
+      />
+    </div>
   );
 }

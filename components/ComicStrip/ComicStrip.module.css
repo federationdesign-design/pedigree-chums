@@ -5,7 +5,7 @@
   position: relative;
   z-index: 5;
   padding: clamp(24px, 4vw, 72px) 0;
-  margin-top: -200px;
+  margin-top: -300px;
 }
 
 /* Desktop: single wide comic strip image. */
