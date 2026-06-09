@@ -42,11 +42,13 @@ export default function Home() {
             Who <span className="display-yellow">It&apos;s For</span>
           </h2>
           <ul className="points">
-            <li className="point">Families on outings</li>
-            <li className="point">Tourists in dog-friendly cities</li>
+            <li className="point">Dog loving Families</li>
+            <li className="point">Pooch mad Tourists</li>
+            <li className="point">Visits to the local park</li>
+            <li className="point">Trips in the car or on the train</li>
             <li className="point">Pet owners and walkers</li>
             <li className="point">Schools and educators</li>
-            <li className="point">Gifting and presents</li>
+            <li className="point">Great for Gifting</li>
             <li className="point">Great as a stocking filler</li>
           </ul>
         </PhotoSplit>

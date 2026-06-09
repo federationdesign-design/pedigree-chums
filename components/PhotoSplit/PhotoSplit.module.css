@@ -126,6 +126,9 @@
   margin-top: -300px;
 }
 /* Corgi (large) block: title and bullets scaled up to match the spaniel block. */
+.large .contentCol {
+  transform: translateY(-150px);
+}
 .large .contentCol h2 {
   font-size: clamp(4.2rem, 11vw, 7.2rem);
 }
@@ -158,6 +161,9 @@
 @media (max-width: 900px) {
   .large .photoWrap {
     margin-top: 0;
+  }
+  .large .contentCol {
+    transform: none;
   }
   .split,
   .reverse {
