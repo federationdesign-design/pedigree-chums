@@ -1,23 +1,25 @@
 /* Full-bleed: no side padding so the strip spans 100% of the width. The page
-   background (set on body) now supplies the pitch gradient, so this section is
-   transparent; the paw pattern (paw-bg ::before, z-index 0) sits on the
-   gradient and the strip is lifted above it. */
+   background (set on body) supplies the gradient, so this section is
+   transparent; the paw pattern sits on the gradient and the strip is above it. */
 .section {
   position: relative;
   z-index: 5;
   padding: clamp(24px, 4vw, 72px) 0;
   margin-top: -200px;
 }
-.steps {
+
+/* Desktop: single wide comic strip image. */
+.stripDesktop {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(18px, 3vw, 40px);
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 clamp(16px, 4vw, 48px);
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile: individual step images stacked. Hidden on desktop. */
+.steps {
+  display: none;
 }
 .step {
   display: block;
@@ -30,5 +32,19 @@
      under and would overlap the bullets above. Let it flow normally instead. */
   .section {
     margin-top: 0;
+  }
+  .stripDesktop {
+    display: none;
+  }
+  .steps {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(18px, 3vw, 36px);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 clamp(16px, 5vw, 32px);
   }
 }

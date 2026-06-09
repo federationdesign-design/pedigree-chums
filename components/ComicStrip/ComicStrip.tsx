@@ -2,11 +2,17 @@ import styles from "./ComicStrip.module.css";
 
 const STEPS = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
 
-// Individual "how to play" step images, stacked below the corgi section so the
-// information reads clearly at any width instead of one large strip image.
+// Desktop shows the single wide comic strip; mobile stacks the individual step
+// images instead (toggled via CSS in the module).
 export default function ComicStrip() {
   return (
     <section className={`${styles.section} paw-bg`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/stacked-comicstrip.png"
+        alt="How to play, step by step"
+        className={styles.stripDesktop}
+      />
       <div className={styles.steps}>
         {STEPS.map((src, i) => {
           return (
