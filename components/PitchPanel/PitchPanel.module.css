@@ -70,17 +70,18 @@
 @media (max-width: 900px) {
   .outer {
     padding: 0 14px;
+    margin-top: 0;
   }
   .panel {
-    padding-top: clamp(40px, 6vw, 56px);
+    padding-top: clamp(16px, 4vw, 32px);
   }
   .pitch {
     grid-template-columns: 1fr;
     text-align: center;
   }
   .photo {
-    width: clamp(300px, 82vw, 520px);
-    margin-top: clamp(12px, 3vw, 24px);
+    width: clamp(360px, 98vw, 624px);
+    margin-top: clamp(0px, 1.5vw, 8px);
   }
   .content :global(.points) {
     align-items: flex-start;
@@ -88,13 +89,6 @@
   }
   .yellowCircle {
     width: 95px;
-  }
-  /* Show the Lab straight away on mobile - no scroll-triggered pop. */
-  .prePop,
-  .popped {
-    opacity: 1;
-    transform: none;
-    animation: none;
   }
 }
 
@@ -151,4 +145,15 @@
   aspect-ratio: 1 / 1;
   bottom: -20%;
   left: -10%;
+}
+
+@media (max-width: 900px) {
+  /* Lab appears immediately on mobile, no scroll pop. Placed after the base
+     .prePop/.popped so it wins the cascade. */
+  .prePop,
+  .popped {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }

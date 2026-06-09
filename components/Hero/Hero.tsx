@@ -75,7 +75,9 @@ export default function Hero() {
       <p className={styles.announce}>
         <strong>Released Soon!</strong> Add your email to get 50% off code to use on launch day
       </p>
-      <Triangles items={heroTriangles} z={1} />
+      <div className={styles.heroTris}>
+        <Triangles items={heroTriangles} z={1} />
+      </div>
     </section>
   );
 }
