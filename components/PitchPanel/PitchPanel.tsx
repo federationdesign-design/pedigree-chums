@@ -36,7 +36,7 @@ export default function PitchPanel() {
               <li className="point">Made in the UK using recycled paper</li>
               <li className="point">Fully biodegradable – no plastic coatings</li>
               <li className="point">40 of the most popular UK dog breeds</li>
-              <li className="point">Plus 12 designer crossbreeds (Labradoodle, Cavapoo, and many more)</li>
+              <li className="point">Plus 12 designer crossbreeds</li>
             </ul>
           </div>
         </div>
