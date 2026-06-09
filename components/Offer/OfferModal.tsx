@@ -20,6 +20,7 @@ export default function OfferModal({
   const [reserve, setReserve] = useState(reserveDefault);
   const [consent, setConsent] = useState(false);
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function OfferModal({
     };
   }, [onClose]);
 
-  const submit = () => {
+  const submit = async () => {
     const ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim());
     if (!ok) {
       setError("Please enter a valid email address.");
@@ -46,8 +47,24 @@ export default function OfferModal({
       return;
     }
     setError("");
-    // TODO: wire to Resend (reuse the ANT Training pattern). Simulated for now.
-    setSent(true);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), reserve, consent }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Sorry, something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Sorry, something went wrong. Please try again.");
+      setLoading(false);
+    }
   };
 
   return createPortal(
@@ -61,8 +78,9 @@ export default function OfferModal({
         </h3>
         {sent ? (
           <p className={styles.thanks}>
-            Thanks! Your discount code is on its way
-            {reserve ? ", and we have noted your request to reserve a pack" : ""}.
+            Thanks! You are on the list. We will email your discount code 1 day
+            before our pre-release launch
+            {reserve ? ", and we have noted your pack reservation" : ""}.
           </p>
         ) : (
           <>
@@ -126,8 +144,13 @@ export default function OfferModal({
                 </label>
               </div>
 
-              <button type="button" className={styles.submit} onClick={submit}>
-                Send my code
+              <button
+                type="button"
+                className={styles.submit}
+                onClick={submit}
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send my code"}
               </button>
             </div>
             {error && <p className={styles.error}>{error}</p>}

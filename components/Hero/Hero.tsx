@@ -75,11 +75,7 @@ export default function Hero() {
       <button
         type="button"
         className={styles.announce}
-        onClick={() => {
-          document
-            .getElementById("preorder")
-            ?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }}
+        onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
       >
         <strong>Released Soon!</strong> Add your email to get 50% off code to use on launch day
       </button>
