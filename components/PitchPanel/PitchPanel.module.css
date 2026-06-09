@@ -14,15 +14,17 @@
   z-index: 0;
   top: -96px;
   right: -10px;
-  width: clamp(240px, 26vw, 400px);
+  width: clamp(216px, 23.4vw, 360px);
   aspect-ratio: 1 / 1;
 }
 .yellowCircle::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--yellow);
-  border-radius: 50%;
+  background-image: url(/pre-order-yellow-circle2.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* The floating panel: rounded on all four corners, drop shadow all around,
@@ -105,7 +107,7 @@
     text-align: left;
   }
   .yellowCircle {
-    width: 95px;
+    width: 57px;
   }
 }
 
