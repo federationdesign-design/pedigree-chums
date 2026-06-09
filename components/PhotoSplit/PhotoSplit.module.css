@@ -112,7 +112,19 @@
 .large {
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: clamp(12px, 2vw, 32px);
-  z-index: 2;
+  z-index: 4;
+}
+/* The corgi image is lifted 200px, so it must escape the section's clip and
+   sit above every neighbour. overflow:visible stops the top being cut off;
+   the higher specificity (.split.large) beats paw-bg's overflow:hidden. With
+   clipping off, the paw pattern is pinned to the box (inset 0, no rotation) so
+   it can't bleed into the spaniel or comic-strip sections. */
+.split.large {
+  overflow: visible;
+}
+.split.large::before {
+  inset: 0;
+  transform: none;
 }
 .large .photoWrap {
   width: 100%;
