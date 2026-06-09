@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./Nav.module.css";
@@ -13,8 +13,22 @@ const links = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    // Defer the first read out of the effect body (avoids set-state-in-effect)
+    // and covers the case of loading already scrolled down the page.
+    const raf = requestAnimationFrame(onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
-    <header className={styles.bar}>
+    <header className={`${styles.bar} ${scrolled ? styles.scrolled : ""}`}>
       <Link href="/" className={styles.logo} aria-label="Pedigree Chums home">
         <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
       </Link>

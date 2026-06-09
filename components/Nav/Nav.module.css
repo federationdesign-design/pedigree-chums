@@ -1,5 +1,5 @@
 .bar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -8,11 +8,25 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px clamp(18px, 4vw, 48px);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.bar.scrolled {
+  background: var(--blue);
+  box-shadow: 0 6px 20px rgba(10, 58, 87, 0.28);
 }
 
 .logo {
   display: block;
   filter: drop-shadow(0 4px 8px rgba(10, 58, 87, 0.35));
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.bar.scrolled .logo {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 .logo img {
   width: clamp(112px, 16vw, 150px);
