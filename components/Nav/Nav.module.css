@@ -10,10 +10,6 @@
   padding: 18px clamp(18px, 4vw, 48px);
   transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
-.bar.scrolled {
-  background: var(--blue);
-  box-shadow: 0 6px 20px rgba(10, 58, 87, 0.28);
-}
 
 .logo {
   display: block;
