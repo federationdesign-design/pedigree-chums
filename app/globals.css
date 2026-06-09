@@ -38,6 +38,21 @@ body {
   overflow-x: hidden;
 }
 
+/* One paw pattern for the whole page: fixed behind all content, sitting on top
+   of the fixed gradient. Replaces the old per-section .paw-bg::before so the
+   pattern is consistent everywhere and never overlaps section content. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* ----------------------------------------------- the chunky cartoon headings */
 /* Luckiest Guy, solid white fill with a soft drop shadow. No outline stroke,
    the logo's outline is baked into its SVG; heading text is clean fill only.
@@ -56,22 +71,12 @@ body {
 }
 
 /* paw-print texture, a tiled inline SVG used as a subtle section background */
+/* paw-bg now only provides a positioning context for section content; the paw
+   pattern lives once on body::before. */
 .paw-bg {
   position: relative;
   overflow: hidden;
   background-color: transparent;
-}
-.paw-bg::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  background-image: url("/paw-pattern2.svg");
-  background-repeat: repeat;
-  background-size: 144px auto;
-  transform: rotate(20deg);
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.5;
 }
 
 a {

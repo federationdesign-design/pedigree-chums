@@ -74,14 +74,14 @@
   color: var(--yellow, #ffd23e);
 }
 
-/* Comic strip across the top, full panel width. */
+/* Comic strip breaks out of the text padding to span the full panel width. */
 .strip {
   position: relative;
   z-index: 2;
   display: block;
-  width: 100%;
+  width: calc(100% + 2 * clamp(28px, 4vw, 64px));
   height: auto;
-  margin: 0 0 clamp(20px, 2.8vw, 38px);
+  margin: 0 calc(-1 * clamp(28px, 4vw, 64px)) clamp(20px, 2.8vw, 38px);
 }
 
 .steps {
