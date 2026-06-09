@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import styles from "./VideoLightbox.module.css";
 
 export type LightboxVideo = { poster: string; vimeoId: string };
@@ -122,12 +123,12 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
     // Re-attach whenever the video changes (the iframe is keyed by vimeoId).
   }, [index, videos.length]);
 
-  if (index === null) return null;
+  if (index === null || typeof document === "undefined") return null;
   const v = videos[index];
   const prev = () => onIndex((index - 1 + videos.length) % videos.length);
   const next = () => onIndex((index + 1) % videos.length);
 
-  return (
+  return createPortal(
     <div className={`${styles.overlay} ${minimized ? styles.minimized : ""}`} onClick={onClose}>
       {videos.length > 1 && (
         <button
@@ -196,6 +197,7 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
           <img src="/blue-arrow.svg" className={styles.chevImg} alt="" />
         </button>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }

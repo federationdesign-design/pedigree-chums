@@ -67,10 +67,6 @@ export default function HowToPlay({ open, onClose }: Props) {
           />
         </div>
 
-        <p className={styles.swipeHint} aria-hidden="true">
-          Swipe to view <span className={styles.swipeArrow}>&rarr;</span>
-        </p>
-
         <div className={styles.stepScroll}>
           {STEP_IMAGES.map((src, i) => {
             return (
@@ -84,6 +80,10 @@ export default function HowToPlay({ open, onClose }: Props) {
             );
           })}
         </div>
+
+        <p className={styles.swipeHint} aria-hidden="true">
+          Swipe to view <span className={styles.swipeArrow}>&rarr;</span>
+        </p>
 
         <ol className={styles.steps}>
           {STEPS.map((step) => (

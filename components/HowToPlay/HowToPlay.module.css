@@ -147,6 +147,9 @@
     border-radius: 16px;
     scroll-snap-align: center;
   }
+  .logo {
+    display: none;
+  }
 }
 @keyframes swipeNudge {
   0%, 100% { transform: translateX(0); }
@@ -231,10 +234,7 @@
     max-width: 100%;
   }
   .logo {
-    position: static;
-    display: block;
-    margin: 22px auto 0;
-    width: 170px;
+    display: none;
   }
   .deco {
     display: none;
