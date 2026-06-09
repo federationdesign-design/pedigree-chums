@@ -31,7 +31,13 @@ export default function HowToPlay({ open, onClose }: Props) {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    // Freeze the page behind the popup so a swipe scrolls the cards, not the page.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [open, onClose]);
 
   if (!open || typeof document === "undefined") return null;
@@ -60,6 +66,10 @@ export default function HowToPlay({ open, onClose }: Props) {
             className={styles.strip}
           />
         </div>
+
+        <p className={styles.swipeHint} aria-hidden="true">
+          Swipe to view <span className={styles.swipeArrow}>&rarr;</span>
+        </p>
 
         <div className={styles.stepScroll}>
           {STEP_IMAGES.map((src, i) => {
