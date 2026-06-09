@@ -1,5 +1,6 @@
 import CardRail from "../CardRail/CardRail";
 import LabPop from "./LabPop";
+import OfferCta from "../Offer/OfferCta";
 import ParallaxShape from "../Parallax/ParallaxShape";
 import Triangles, { type Tri } from "../Parallax/Triangles";
 import styles from "./PitchPanel.module.css";
@@ -38,6 +39,7 @@ export default function PitchPanel() {
               <li className="point">40 of the most popular UK dog breeds</li>
               <li className="point">Plus 12 designer crossbreeds</li>
             </ul>
+            <OfferCta />
           </div>
         </div>
 

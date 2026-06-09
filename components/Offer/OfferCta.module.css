@@ -1,0 +1,41 @@
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: clamp(26px, 3.4vw, 40px);
+}
+.btn {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  padding: clamp(14px, 1.5vw, 19px) clamp(28px, 3vw, 46px);
+  border-radius: 999px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.btnPrimary {
+  background: var(--yellow);
+  color: var(--navy);
+  border-color: var(--yellow);
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.22);
+}
+.btnPrimary:hover {
+  transform: translateY(-2px);
+}
+.btnOutline {
+  background: transparent;
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+.btnOutline:hover {
+  background: var(--white);
+  color: var(--blue-deep);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .ctaRow {
+    justify-content: center;
+  }
+}
