@@ -41,6 +41,9 @@ export default function Hero() {
     let player: VimeoPlayer | null = null;
     let cancelled = false;
     const onEnded = () => {
+      // If the viewer has already scrolled, leave them where they are instead
+      // of yanking them back up to the Lab.
+      if (window.scrollY > 16) return;
       const el = document.getElementById("lab");
       if (!el) return;
       const y = el.getBoundingClientRect().top + window.scrollY - 200;

@@ -102,7 +102,7 @@
     margin-top: 0;
   }
   .labWrap {
-    width: clamp(360px, 98vw, 624px);
+    width: clamp(432px, 118vw, 749px);
     margin-top: clamp(0px, 1.5vw, 8px);
   }
   .content :global(.points) {
