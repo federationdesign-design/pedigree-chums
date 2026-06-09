@@ -75,16 +75,20 @@
   color: var(--yellow, #ffd23e);
 }
 
-/* Comic strip breaks OUT of the panel: pulled past the padding and beyond the
-   panel edges. The overlay clips any excess at the screen edge. */
+/* Comic strip fills the full panel width: the wrapper is pulled out past the
+   text padding to the panel edges (robust subtraction, no calc multiplication),
+   and the image fills it 100% so it is centered edge-to-edge. */
+.stripWrap {
+  margin-left: calc(0px - clamp(28px, 4vw, 64px));
+  margin-right: calc(0px - clamp(28px, 4vw, 64px));
+  margin-bottom: clamp(20px, 2.8vw, 38px);
+}
 .strip {
-  --pull: calc(clamp(28px, 4vw, 64px) + clamp(20px, 4vw, 70px));
   position: relative;
   z-index: 2;
   display: block;
-  width: calc(100% + 2 * var(--pull));
+  width: 100%;
   height: auto;
-  margin: 0 calc(-1 * var(--pull)) clamp(20px, 2.8vw, 38px);
 }
 
 .steps {

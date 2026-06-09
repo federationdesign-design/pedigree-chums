@@ -48,12 +48,14 @@ export default function HowToPlay({ open, onClose }: Props) {
           How <span className={styles.accent}>it works</span>
         </h3>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/how-to-play-comic-strip.png"
-          alt="How to play, step by step"
-          className={styles.strip}
-        />
+        <div className={styles.stripWrap}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/how-to-play-comic-strip.png"
+            alt="How to play, step by step"
+            className={styles.strip}
+          />
+        </div>
 
         <ol className={styles.steps}>
           {STEPS.map((step) => (

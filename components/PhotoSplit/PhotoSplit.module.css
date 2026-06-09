@@ -134,8 +134,8 @@
 }
 /* Extra-large photo (spaniel): fills its wider column. */
 .xl .photoWrap {
-  width: 100%;
-  max-width: 1000px;
+  width: 120%;
+  max-width: 1200px;
 }
 
 /* Yellow circle: a section-level layer BEHIND both columns (not trapped in the
