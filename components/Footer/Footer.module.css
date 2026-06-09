@@ -3,50 +3,22 @@
   color: var(--white);
   padding: clamp(40px, 6vw, 72px) clamp(20px, 6vw, 90px) 28px;
   border-top: 6px solid var(--yellow);
-}
-.inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(24px, 4vw, 56px);
-  flex-wrap: wrap;
+  text-align: center;
 }
 .logoCol {
   display: flex;
+  justify-content: center;
 }
 .logoCol img {
   width: clamp(260px, 36vw, 340px);
   height: auto;
 }
-.menu {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: clamp(20px, 3vw, 44px);
-}
-.link {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 400;
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  opacity: 0.95;
-  transition: color 0.15s ease;
-}
-.link:hover {
-  color: var(--yellow);
-}
 .legal {
-  margin: clamp(28px, 4vw, 48px) 0 0;
+  margin: clamp(28px, 4vw, 48px) auto 0;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
+  max-width: 760px;
   font-size: 0.8rem;
   font-weight: 500;
   opacity: 0.8;
-}
-
-@media (max-width: 780px) {
-  .inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
 }
