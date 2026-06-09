@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import styles from "./OfferModal.module.css";
 
 // Shared email popup. Mounted only while open (so its form state resets each
@@ -110,7 +111,17 @@ export default function OfferModal({
                   <span>
                     I agree to Pedigree Chums storing my email so they can send my
                     discount code and launch updates. I can unsubscribe at any time.
-                    See the Privacy Policy for how your data is handled.
+                    See the{" "}
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.link}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Privacy Policy
+                    </Link>{" "}
+                    for how your data is handled.
                   </span>
                 </label>
               </div>

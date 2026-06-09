@@ -12,7 +12,7 @@
 }
 .stage {
   position: relative;
-  width: min(92vw, 520px);
+  width: min(92vw, 624px);
   border-radius: 28px;
   padding: clamp(30px, 4vw, 48px) clamp(24px, 4vw, 44px) clamp(32px, 4vw, 46px);
   text-align: center;
@@ -132,6 +132,14 @@
   font-size: 0.82rem;
   font-weight: 500;
   opacity: 0.95;
+}
+.link {
+  color: var(--yellow);
+  font-weight: 700;
+  text-decoration: underline;
+}
+.link:hover {
+  text-decoration: none;
 }
 .error {
   color: var(--white);
