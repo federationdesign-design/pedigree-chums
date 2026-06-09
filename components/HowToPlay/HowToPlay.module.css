@@ -8,6 +8,8 @@
   padding: clamp(12px, 3vw, 40px);
   background: rgba(10, 58, 87, 0.55);
   perspective: 1400px; /* same depth as the video lightbox */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Blue panel: comic strip on top, numbered steps below. Pops in with the exact
@@ -16,8 +18,7 @@
 .stage {
   position: relative;
   width: min(94vw, 1180px);
-  max-height: 92vh;
-  overflow-y: auto;
+  overflow: visible;
   border-radius: 30px;
   padding: clamp(26px, 3.5vw, 56px) clamp(28px, 4vw, 64px) clamp(30px, 4vw, 60px);
   background:
@@ -74,14 +75,16 @@
   color: var(--yellow, #ffd23e);
 }
 
-/* Comic strip breaks out of the text padding to span the full panel width. */
+/* Comic strip breaks OUT of the panel: pulled past the padding and beyond the
+   panel edges. The overlay clips any excess at the screen edge. */
 .strip {
+  --pull: calc(clamp(28px, 4vw, 64px) + clamp(20px, 4vw, 70px));
   position: relative;
   z-index: 2;
   display: block;
-  width: calc(100% + 2 * clamp(28px, 4vw, 64px));
+  width: calc(100% + 2 * var(--pull));
   height: auto;
-  margin: 0 calc(-1 * clamp(28px, 4vw, 64px)) clamp(20px, 2.8vw, 38px);
+  margin: 0 calc(-1 * var(--pull)) clamp(20px, 2.8vw, 38px);
 }
 
 .steps {

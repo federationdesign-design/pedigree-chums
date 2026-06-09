@@ -21,8 +21,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: url("/pre-order-yellow-circle.svg") center / contain no-repeat;
-  transform: rotate(-15deg);
+  background: var(--yellow);
+  border-radius: 50%;
 }
 
 /* The floating panel: rounded on all four corners, drop shadow all around,

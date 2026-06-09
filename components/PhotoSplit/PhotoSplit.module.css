@@ -7,7 +7,7 @@
   padding: clamp(48px, 8vw, 110px) clamp(20px, 6vw, 90px);
 }
 .reverse {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
 }
 .reverse .photoCol {
   order: 2;
@@ -99,7 +99,7 @@
 
 /* Spaniel (reverse) block: copy bumped ~2pt larger than the shared defaults. */
 .reverse .contentCol h2 {
-  font-size: clamp(4.2rem, 11vw, 7.2rem);
+  font-size: clamp(3.8rem, 9.5vw, 6rem);
 }
 .reverse .contentCol :global(.lead) {
   font-size: clamp(1.32rem, 3.2vw, 1.72rem);
