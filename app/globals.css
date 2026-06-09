@@ -27,6 +27,8 @@ html,
 body {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -35,7 +37,6 @@ body {
   background-attachment: fixed;
   color: var(--white);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
 /* One paw pattern for the whole page: fixed behind all content, sitting on top
