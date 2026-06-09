@@ -74,19 +74,41 @@
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 10px clamp(20px, 8vw, 120px) 26px clamp(260px, 40vw, 500px);
-  scrollbar-width: thin;
-  scrollbar-color: var(--yellow) rgba(255, 255, 255, 0.25);
+  scrollbar-width: none;
 }
 .rail::-webkit-scrollbar {
-  height: 10px;
+  display: none;
 }
-.rail::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.2);
+
+/* Custom horizontal scrollbar pinned to the bottom edge of the pitch panel.
+   The .section bottom is the panel bottom (panel has no bottom padding and the
+   rail is its last child), so this sits flush at the panel's lower edge. The
+   thumb is synced and draggable from CardRail.tsx. */
+.scrollbar {
+  position: absolute;
+  left: clamp(40px, 6vw, 90px);
+  right: clamp(40px, 6vw, 90px);
+  bottom: clamp(20px, 3vw, 40px);
+  height: 12px;
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  z-index: 4;
+  transition: opacity 0.2s ease;
 }
-.rail::-webkit-scrollbar-thumb {
+.scrollThumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: 999px;
   background: var(--yellow);
-  border-radius: 999px;
+  cursor: grab;
+  touch-action: none;
+}
+.scrollThumb:active {
+  cursor: grabbing;
 }
 
 .item {
