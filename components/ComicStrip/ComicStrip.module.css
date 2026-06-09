@@ -27,6 +27,33 @@
   height: auto;
 }
 
+/* Mobile-only CTA under the stacked steps. Dispatches pc:open-offer, which
+   OfferCta listens for to open the discount modal. */
+.ctaWrap {
+  display: none;
+}
+.cta {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1rem, 4.4vw, 1.25rem);
+  line-height: 1;
+  padding: clamp(15px, 4vw, 19px) clamp(30px, 9vw, 46px);
+  border: 0;
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--navy);
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(10, 58, 87, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.cta:hover {
+  transform: translateY(-2px);
+}
+.cta:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.22);
+}
+
 @media (max-width: 900px) {
   /* On mobile the corgi is not lifted, so the upward pull has nothing to tuck
      under and would overlap the bullets above. Let it flow normally instead. */
@@ -46,5 +73,10 @@
     max-width: 760px;
     margin: 0 auto;
     padding: 0 clamp(16px, 5vw, 32px);
+  }
+  .ctaWrap {
+    display: flex;
+    justify-content: center;
+    padding: clamp(24px, 6vw, 40px) clamp(16px, 5vw, 32px) 0;
   }
 }

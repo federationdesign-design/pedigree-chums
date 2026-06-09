@@ -97,6 +97,7 @@
   .pitch {
     grid-template-columns: minmax(0, 1fr);
     text-align: center;
+    padding: 0 clamp(14px, 3.5vw, 20px);
   }
   .content {
     margin-top: 0;

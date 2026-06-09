@@ -1,3 +1,4 @@
+"use client";
 import styles from "./ComicStrip.module.css";
 
 const STEPS = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
@@ -25,6 +26,15 @@ export default function ComicStrip() {
             />
           );
         })}
+      </div>
+      <div className={styles.ctaWrap}>
+        <button
+          type="button"
+          className={styles.cta}
+          onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
+        >
+          Get a discount code
+        </button>
       </div>
     </section>
   );

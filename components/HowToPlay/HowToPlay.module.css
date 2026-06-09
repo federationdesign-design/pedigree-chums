@@ -22,9 +22,7 @@
   overflow: visible;
   border-radius: 30px;
   padding: clamp(26px, 3.5vw, 56px) clamp(28px, 4vw, 64px) clamp(30px, 4vw, 60px);
-  background:
-    radial-gradient(120% 90% at 80% 20%, rgba(255, 255, 255, 0.18), transparent 60%),
-    linear-gradient(135deg, #2aa6e0 0%, var(--blue, #1497d6) 45%, var(--blue-deep, #0b78bd) 100%);
+  background: linear-gradient(to top right, #00e2ff, #008eff);
   box-shadow: 0 48px 110px rgba(10, 58, 87, 0.55),
     inset 0 0 0 8px rgba(255, 255, 255, 0.18);
   transform-style: preserve-3d;
@@ -70,7 +68,6 @@
   font-size: clamp(2.2rem, 5.5vw, 4.2rem);
   line-height: 1;
   margin: 0 0 clamp(16px, 2.2vw, 30px);
-  text-shadow: 0 5px 0 rgba(10, 58, 87, 0.22);
 }
 .accent {
   color: var(--yellow, #ffd23e);
