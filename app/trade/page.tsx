@@ -6,7 +6,7 @@ import PopHeading from "../../components/PopHeading/PopHeading";
 import CardRail from "../../components/CardRail/CardRail";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import TradeHero from "./TradeHero";
-import SocialFeed from "./SocialFeed";
+import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import TradeEnquiryForm from "./TradeEnquiryForm";
 import styles from "./trade.module.css";
 
