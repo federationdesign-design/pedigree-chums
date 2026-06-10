@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
-import PhotoSplit from "../../components/PhotoSplit/PhotoSplit";
+import AboutSplit from "../../components/AboutSplit/AboutSplit";
 import PopHeading from "../../components/PopHeading/PopHeading";
 
 export const metadata: Metadata = {
@@ -35,10 +35,10 @@ export default function About() {
         </section>
 
         {/* 1 — Designer doodle pack */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-cockapoo.png"
           alt="Designer crossbreed cards: Labradoodle, Goldendoodle, Maltipoo and Cockapoo"
-          large
+         
         >
           <PopHeading className="display">
             Cockapoo&apos;s <span className="display-yellow">a plenty!</span>
@@ -48,13 +48,13 @@ export default function About() {
             Goldendoodles, Puggles and Cavapoos, along with a classic and still
             popular Lurcher.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
 
         {/* 2 — Where to play */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-corgi.png"
           alt="A Corgi running in the park"
-          large
+         
           reverse
         >
           <PopHeading className="display">
@@ -66,13 +66,13 @@ export default function About() {
             deal each player a few cards and you&apos;re already playing Pedigree
             Chums.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
 
         {/* 3 — The aim */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-lab.png"
           alt="A Labrador wearing sunglasses at a party"
-          large
+         
         >
           <PopHeading className="display">
             The <span className="display-yellow">aim</span>
@@ -83,13 +83,13 @@ export default function About() {
             with the breed&apos;s characteristics, traits, sizes, weights, colours
             and a tell-tale feature.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
 
         {/* 4 — Is it difficult */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-golden.png"
           alt="A Golden Retriever on a walk"
-          large
+         
           reverse
         >
           <PopHeading className="display">
@@ -101,13 +101,13 @@ export default function About() {
             them is easy once you know what to look for, and luckily each card
             has tips for spotting every breed.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
 
         {/* 5 — How long does it take */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-cockapoo.png"
           alt="A Cockapoo riding along in a car"
-          large
+         
         >
           <PopHeading className="display">
             How long does it <span className="display-yellow">take to play?</span>
@@ -121,13 +121,13 @@ export default function About() {
             is to play the &lsquo;first pooch past the post&rsquo; game mode,
             which is ideal for a quick game.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
 
         {/* 6 — Is it complicated to explain */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-french.png"
           alt="A woman laughing while holding a French Bulldog"
-          large
+         
           reverse
         >
           <PopHeading className="display">
@@ -138,13 +138,13 @@ export default function About() {
             a distance away. It&apos;s not hard to explain either — each card has
             an illustration of the dog.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
 
         {/* 7 — Is it educational */}
-        <PhotoSplit
+        <AboutSplit
           photo="/about-beagle.png"
           alt="A Beagle wearing glasses at a desk"
-          large
+         
         >
           <PopHeading className="display">
             Is it <span className="display-yellow">educational?</span>
@@ -155,7 +155,7 @@ export default function About() {
             tested too, as you try to remember which chums you have and their
             defining characteristics.
           </p>
-        </PhotoSplit>
+        </AboutSplit>
       </main>
       <Footer />
     </>
