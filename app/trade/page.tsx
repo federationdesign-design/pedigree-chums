@@ -133,67 +133,7 @@ export default function TradePage() {
           <CardRail />
         </section>
 
-        {/* WHY IT SELLS */}
-        {/* WHY IT SELLS — image tiles + POS block inside a pitch panel (deck style) */}
-        <section className={styles.pitch}>
-          <div className={styles.pitchGlow} aria-hidden="true">
-            <span className={`${styles.glowCircle} ${styles.glowTop}`} />
-            <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
-          </div>
-          <div className={styles.pitchInner}>
-            <Triangles items={whyTris} z={0} />
-            <PopHeading className="display">
-              Why it <span className="display-yellow">sells</span>
-            </PopHeading>
-            <div className={styles.tileRow}>
-              <div className={styles.tile}>
-                <div className={styles.tileImg}>
-                  <Image src="/trade-img1.png" alt="An impulse buy at the till" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
-                </div>
-                <h3 className={styles.tileTitle}>Impulse price point</h3>
-                <p className={styles.tileBody}>Sits by the till at an under-a-tenner RRP — an easy add-on buy.</p>
-              </div>
-              <div className={styles.tile}>
-                <div className={styles.tileImg}>
-                  <Image src="/trade-img2.png" alt="Healthy retail margin" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
-                </div>
-                <h3 className={styles.tileTitle}>~60% retail margin</h3>
-                <p className={styles.tileBody}>£4.00 wholesale to a £9.99 suggested RRP. Healthy on every pack.</p>
-              </div>
-              <div className={styles.tile}>
-                <div className={styles.tileImg}>
-                  <Image src="/trade-img3.png" alt="Multi-market appeal" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
-                </div>
-                <h3 className={styles.tileTitle}>Multi-market appeal</h3>
-                <p className={styles.tileBody}>Gift shops, attractions, garden centres, pet shops, tourist spots.</p>
-              </div>
-              <div className={styles.tile}>
-                <div className={styles.tileImg}>
-                  <Image src="/trade-img4.png" alt="Low return risk" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
-                </div>
-                <h3 className={styles.tileTitle}>Low return risk</h3>
-                <p className={styles.tileBody}>No setup, endlessly replayable, nothing to go wrong on the shelf.</p>
-              </div>
-            </div>
-
-            <div className={styles.posBlock}>
-              <div className={styles.posCopy}>
-                <h3 className="display">
-                  Display units <span className="display-yellow">available</span>
-                </h3>
-                <p className={styles.body}>
-                  A free standing POS display unit is included with orders of 1,000+,
-                  with further point-of-sale material available on larger orders.
-                </p>
-              </div>
-              <div className={styles.posDiagram}>
-                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto", mixBlendMode: "screen" }} />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* HOW IT PLAYS — the instructional comic strip */}
+        {/* HOW IT PLAYS — the instructional comic strip, directly below the rail */}
         <section className={styles.comicSection}>
           <div className={styles.center}>
             <PopHeading className="display">How it plays</PopHeading>
@@ -211,6 +151,67 @@ export default function TradePage() {
                 <img key={src} src={src} alt={`How to play, step ${i + 1}`} className={styles.comicStep} />
               )
             )}
+          </div>
+        </section>
+
+        {/* WHY IT SELLS — image tiles + POS block inside a pitch panel (deck style) */}
+        <section className={styles.pitch}>
+          <div className={styles.pitchGlow} aria-hidden="true">
+            <span className={`${styles.glowCircle} ${styles.glowTop}`} />
+            <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
+          </div>
+          <div className={styles.pitchInner}>
+            <Triangles items={whyTris} z={0} />
+            <PopHeading className="display">
+              Why it <span className="display-yellow">sells</span>
+            </PopHeading>
+            <div className={styles.tileRow}>
+              <div className={styles.tile}>
+                <div className={styles.tileImg}>
+                  <Image src="/trade-img1.png" alt="An impulse buy at the till" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                </div>
+                <h3 className={styles.tileTitle}>Impulse price point</h3>
+                <p className={styles.tileBody}>Priced to sit by the till at an under-a-tenner RRP — the kind of low-commitment, grab-it-on-the-way-out buy that drives add-on sales without a customer thinking twice.</p>
+              </div>
+              <div className={styles.tile}>
+                <div className={styles.tileImg}>
+                  <Image src="/trade-img2.png" alt="Healthy retail margin" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                </div>
+                <h3 className={styles.tileTitle}>~60% retail margin</h3>
+                <p className={styles.tileBody}>£4.00 wholesale against a £9.99 suggested RRP leaves a healthy margin on every single pack — strong returns from a very small slice of shelf or counter space.</p>
+              </div>
+              <div className={styles.tile}>
+                <div className={styles.tileImg}>
+                  <Image src="/trade-img3.png" alt="Multi-market appeal" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                </div>
+                <h3 className={styles.tileTitle}>Multi-market appeal</h3>
+                <p className={styles.tileBody}>It isn&apos;t tied to one kind of shop. Gift shops, museums and attractions, garden centres, pet shops, farm shops and tourist spots all have the dog-loving, impulse-buying customers it&apos;s made for.</p>
+              </div>
+              <div className={styles.tile}>
+                <div className={styles.tileImg}>
+                  <Image src="/trade-img4.png" alt="Low return risk" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                </div>
+                <h3 className={styles.tileTitle}>Low return risk</h3>
+                <p className={styles.tileBody}>No batteries, no setup, nothing to break or go out of date. It&apos;s endlessly replayable and sits happily on the shelf, so there&apos;s very little that can go wrong once you&apos;ve stocked it.</p>
+              </div>
+            </div>
+
+            <div className={styles.posBlock}>
+              <div className={styles.posCopy}>
+                <h3 className="display">
+                  Display units <span className="display-yellow">available</span>
+                </h3>
+                <ul className={styles.bullets}>
+                  <li className={styles.bullet}>A free standing POS display unit included with every order of 1,000 units or more.</li>
+                  <li className={styles.bullet}>Holds the packs upright and fully branded, turning a small footprint into an eye-catching feature by the till.</li>
+                  <li className={styles.bullet}>Further point-of-sale material — shelf-talkers, posters and more — available on larger orders.</li>
+                  <li className={styles.bullet}>Custom or co-branded display options can be discussed for bigger commitments.</li>
+                </ul>
+              </div>
+              <div className={styles.posDiagram}>
+                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto", mixBlendMode: "screen" }} />
+              </div>
+            </div>
           </div>
         </section>
 
