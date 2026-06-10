@@ -164,28 +164,28 @@ export default function TradePage() {
             <div className={styles.tileRow}>
               <div className={styles.tile}>
                 <div className={styles.tileImg}>
-                  <Image src="/trade-img1.png" alt="An impulse buy at the till" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                  <Image src="/trade-img1.png" alt="An impulse buy at the till" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "contain" }} />
                 </div>
                 <h3 className={styles.tileTitle}>Impulse price point</h3>
                 <p className={styles.tileBody}>Priced to sit by the till at an under-a-tenner RRP — the kind of low-commitment, grab-it-on-the-way-out buy that drives add-on sales without a customer thinking twice.</p>
               </div>
               <div className={styles.tile}>
                 <div className={styles.tileImg}>
-                  <Image src="/trade-img2.png" alt="Healthy retail margin" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                  <Image src="/trade-img2.png" alt="Healthy retail margin" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "contain" }} />
                 </div>
                 <h3 className={styles.tileTitle}>~60% retail margin</h3>
                 <p className={styles.tileBody}>£4.00 wholesale against a £9.99 suggested RRP leaves a healthy margin on every single pack — strong returns from a very small slice of shelf or counter space.</p>
               </div>
               <div className={styles.tile}>
                 <div className={styles.tileImg}>
-                  <Image src="/trade-img3.png" alt="Multi-market appeal" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                  <Image src="/trade-img3.png" alt="Multi-market appeal" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "contain" }} />
                 </div>
                 <h3 className={styles.tileTitle}>Multi-market appeal</h3>
                 <p className={styles.tileBody}>It isn&apos;t tied to one kind of shop. Gift shops, museums and attractions, garden centres, pet shops, farm shops and tourist spots all have the dog-loving, impulse-buying customers it&apos;s made for.</p>
               </div>
               <div className={styles.tile}>
                 <div className={styles.tileImg}>
-                  <Image src="/trade-img4.png" alt="Low return risk" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "cover" }} />
+                  <Image src="/trade-img4.png" alt="Low return risk" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "contain" }} />
                 </div>
                 <h3 className={styles.tileTitle}>Low return risk</h3>
                 <p className={styles.tileBody}>No batteries, no setup, nothing to break or go out of date. It&apos;s endlessly replayable and sits happily on the shelf, so there&apos;s very little that can go wrong once you&apos;ve stocked it.</p>
@@ -333,6 +333,14 @@ export default function TradePage() {
                 Soft toys, bandanas, keyrings, greeting cards and more are in the
                 pipeline — a brand to grow with, not a one-off line.
               </p>
+              <video
+                className={styles.rangeVideo}
+                src="/expanded-range.mov"
+                autoPlay
+                muted
+                playsInline
+                aria-label="The growing Pedigree Chums range"
+              />
             </div>
 
             {/* Become a founding stockist — blue gradient, with the form */}

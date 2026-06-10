@@ -388,11 +388,9 @@
 }
 .tileImg {
   position: relative;
-  width: 100%;
+  width: 67%;
+  margin: 0 auto;
   aspect-ratio: 1 / 1;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: 0 14px 30px rgba(10, 58, 87, 0.32);
 }
 .tileTitle {
   font-family: var(--font-body), system-ui, sans-serif;
@@ -413,7 +411,7 @@
 
 /* Display-units / POS block beneath the tiles */
 .posBlock {
-  margin-top: 200px;
+  margin-top: clamp(16px, 3vw, 40px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(24px, 5vw, 64px);
@@ -638,6 +636,38 @@
   outline: none;
   border-color: var(--yellow);
   box-shadow: 0 0 0 3px rgba(255, 210, 62, 0.45);
+}
+/* On-brand dropdown: white pill, navy text, custom chevron, yellow focus. */
+.select {
+  width: 100%;
+  padding: 15px 46px 15px 18px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--white);
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230a3a57' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 16px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--navy);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.select:focus {
+  outline: none;
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 210, 62, 0.45);
+}
+/* Expanded-range video sits in the white grid card. */
+.rangeVideo {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 16px;
+  border-radius: 14px;
 }
 .submit {
   padding: 15px 20px;

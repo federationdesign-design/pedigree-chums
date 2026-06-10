@@ -111,7 +111,7 @@ export default function TradeEnquiryForm() {
         aria-label="Email address"
       />
       <select
-        className={styles.input}
+        className={styles.select}
         value={businessType}
         onChange={(e) => setBusinessType(e.target.value)}
         aria-label="Business type"
