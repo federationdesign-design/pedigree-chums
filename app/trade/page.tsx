@@ -61,7 +61,7 @@ export default function TradePage() {
         <TradeHero />
 
         {/* PITCH BAND 1 — value intro on the dark-blue diagonal gradient */}
-        <section className={styles.pitch}>
+        <section className={`${styles.pitch} ${styles.pitchFirst}`}>
           <div className={styles.pitchGlow} aria-hidden="true">
             <span className={`${styles.glowCircle} ${styles.glowTop}`} />
             <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
@@ -183,7 +183,7 @@ export default function TradePage() {
                 </p>
               </div>
               <div className={styles.posDiagram}>
-                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto" }} />
+                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto", mixBlendMode: "screen" }} />
               </div>
             </div>
           </div>
