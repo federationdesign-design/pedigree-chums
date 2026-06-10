@@ -423,6 +423,7 @@
 .posDiagram {
   display: flex;
   justify-content: center;
+  margin-top: clamp(40px, 6vw, 96px);
 }
 
 @media (max-width: 760px) {
