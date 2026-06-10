@@ -380,7 +380,7 @@
 .tileRow {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(16px, 2.4vw, 32px);
 }
 .tile {
@@ -404,8 +404,8 @@
 .tileBody {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 500;
-  font-size: 0.98rem;
-  line-height: 1.4;
+  font-size: 1.06rem;
+  line-height: 1.45;
   color: var(--white);
   opacity: 0.92;
   margin: 0;
@@ -413,7 +413,7 @@
 
 /* Display-units / POS block beneath the tiles */
 .posBlock {
-  margin-top: clamp(40px, 6vw, 72px);
+  margin-top: 200px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(24px, 5vw, 64px);
@@ -473,7 +473,7 @@
   text-align: center;
   padding: 16px 18px;
   border: 2px solid rgba(255, 255, 255, 0.8);
-  font-size: 1.18rem;
+  font-size: 1.32rem;
   vertical-align: middle;
   background: transparent;
 }
@@ -483,7 +483,7 @@
   width: 38%;
 }
 .dataTable td {
-  font-weight: 500;
+  font-weight: 700;
 }
 .priceCtaRow {
   text-align: center;
@@ -559,6 +559,61 @@
   line-height: 1.5;
   max-width: 56ch;
   margin: 14px auto 0;
+}
+
+/* ------------------------------------------------------- final 2x2 card grid */
+.finalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 2.5vw, 32px);
+}
+.gridCard {
+  border-radius: var(--radius-card);
+  padding: clamp(26px, 3.5vw, 44px);
+  box-shadow: var(--shadow-card);
+}
+.gridCard :global(.display) {
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  margin-bottom: 6px;
+}
+.gridCard p {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+/* Yellow card — navy text */
+.cardYellow {
+  background: var(--yellow);
+  color: var(--navy);
+}
+.cardYellow :global(.display) {
+  color: var(--navy) !important;
+  text-shadow: none;
+}
+/* White card — navy text */
+.cardWhite {
+  background: var(--white);
+  color: var(--navy);
+}
+.cardWhite :global(.display) {
+  color: var(--blue-deep) !important;
+  text-shadow: none;
+}
+/* Blue gradient cards — white text */
+.cardGradient {
+  background: linear-gradient(160deg, #5cc4ee 0%, #1497d6 58%, #0a3a57 100%);
+  color: var(--white);
+}
+.cardGradient :global(.points),
+.cardGradient .bullets {
+  margin-top: 12px;
+}
+@media (max-width: 760px) {
+  .finalGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ----------------------------------------------------------- enquire + form */

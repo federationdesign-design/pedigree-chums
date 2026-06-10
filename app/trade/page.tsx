@@ -32,10 +32,6 @@ const pitchTris: Tri[] = [
   { size: 42, bottom: "22%", right: "14%", speed: 0.28, spin: -0.34 },
   { size: 80, bottom: "12%", left: "40%", speed: 0.14, spin: 0.16 },
 ];
-const sustainTris: Tri[] = [
-  { size: 52, top: "18%", right: "8%", speed: 0.2, spin: -0.26 },
-  { size: 68, bottom: "16%", left: "10%", speed: 0.15, spin: 0.2 },
-];
 
 export default function TradePage() {
   return (
@@ -162,7 +158,7 @@ export default function TradePage() {
           </div>
           <div className={styles.pitchInner}>
             <Triangles items={whyTris} z={0} />
-            <PopHeading className="display">
+            <PopHeading className={`display ${styles.titleCenter}`}>
               Why it <span className="display-yellow">sells</span>
             </PopHeading>
             <div className={styles.tileRow}>
@@ -198,7 +194,7 @@ export default function TradePage() {
 
             <div className={styles.posBlock}>
               <div className={styles.posCopy}>
-                <h3 className="display">
+                <h3 className={`display ${styles.titleCenter}`}>
                   Display units <span className="display-yellow">available</span>
                 </h3>
                 <ul className={styles.bullets}>
@@ -209,7 +205,7 @@ export default function TradePage() {
                 </ul>
               </div>
               <div className={styles.posDiagram}>
-                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto", mixBlendMode: "screen" }} />
+                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto", filter: "invert(1)", mixBlendMode: "screen" }} />
               </div>
             </div>
           </div>
@@ -227,7 +223,7 @@ export default function TradePage() {
                 </tr>
                 <tr>
                   <th scope="row">Card size</th>
-                  <td>6.4 &times; 8.9 cm, 0.9 mm thick</td>
+                  <td>6.4 &times; 8.9 cm, 0.15 mm thick</td>
                 </tr>
                 <tr>
                   <th scope="row">Material</th>
@@ -235,7 +231,7 @@ export default function TradePage() {
                 </tr>
                 <tr>
                   <th scope="row">Pack size &amp; weight</th>
-                  <td>Available on request</td>
+                  <td>6.4 cm tall &times; 8.9 cm wide, 0.9 mm thick</td>
                 </tr>
                 <tr>
                   <th scope="row">Barcode</th>
@@ -243,7 +239,7 @@ export default function TradePage() {
                 </tr>
                 <tr>
                   <th scope="row">Case quantity</th>
-                  <td>Available on request</td>
+                  <td>256 per box</td>
                 </tr>
               </tbody>
             </table>
@@ -306,56 +302,48 @@ export default function TradePage() {
           </div>
         </section>
 
-        {/* SUSTAINABILITY */}
-        <section className={`${styles.section} ${styles.relative}`}>
-          <Triangles items={sustainTris} z={0} />
-          <PopHeading className="display">Made responsibly</PopHeading>
-          <ul className={styles.bullets}>
-            <li className={styles.bullet}>Printed in the UK — low carbon footprint</li>
-            <li className={styles.bullet}>FSC-certified recycled card stock</li>
-            <li className={styles.bullet}>Fully biodegradable, no plastic coatings</li>
-            <li className={styles.bullet}>Recyclable packaging</li>
-          </ul>
-          <p className={styles.bodyMuted}>
-            A genuine fit for eco-conscious retailers, museum and attraction shops,
-            and ethical gift ranges.
-          </p>
-        </section>
-
-        {/* TRIAL CALLOUT */}
+        {/* FINAL 2x2 GRID — four cards, each a different fill */}
         <section className={styles.section}>
-          <div className={styles.callout}>
-            <h3 className="display">Not ready for 1,000? Try 48.</h3>
-            <p>
-              A 48-unit trial pack lets you test it on your shelf before committing
-              to a full run, with a quick turnaround. Sample packs available now to
-              see and play before you decide.
-            </p>
-          </div>
-        </section>
+          <div className={styles.finalGrid}>
+            {/* Made responsibly — blue gradient */}
+            <div className={`${styles.gridCard} ${styles.cardGradient}`}>
+              <h3 className="display">Made responsibly</h3>
+              <ul className={styles.bullets}>
+                <li className={styles.bullet}>Printed in the UK — low carbon footprint</li>
+                <li className={styles.bullet}>FSC-certified recycled card stock</li>
+                <li className={styles.bullet}>Fully biodegradable, no plastic coatings</li>
+                <li className={styles.bullet}>Recyclable packaging</li>
+              </ul>
+            </div>
 
-        {/* GROWING RANGE */}
-        <section className={styles.section}>
-          <PopHeading className="display">A growing range</PopHeading>
-          <p className={styles.body}>
-            Soft toys, bandanas, keyrings, greeting cards and more are in the
-            pipeline — a brand to grow with, not a one-off line.
-          </p>
-        </section>
+            {/* Trial — yellow */}
+            <div className={`${styles.gridCard} ${styles.cardYellow}`}>
+              <h3 className="display">Not ready for 1,000? Try 48.</h3>
+              <p>
+                A 48-unit trial pack lets you test it on your shelf before committing
+                to a full run, with a quick turnaround. Sample packs available now to
+                see and play before you decide.
+              </p>
+            </div>
 
-        {/* ENQUIRE — pitch band with the form */}
-        <section className={styles.pitch} id="enquire">
-          <div className={styles.pitchGlow} aria-hidden="true">
-            <span className={`${styles.glowCircle} ${styles.glowTop}`} />
-            <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
-          </div>
-          <div className={styles.pitchInner}>
-            <PopHeading className="display">Become a founding stockist</PopHeading>
-            <p className={styles.body}>
-              Tell us a little about your shop and we&apos;ll send the full trade
-              price list and next steps.
-            </p>
-            <TradeEnquiryForm />
+            {/* Growing range — white */}
+            <div className={`${styles.gridCard} ${styles.cardWhite}`}>
+              <h3 className="display">A growing range</h3>
+              <p>
+                Soft toys, bandanas, keyrings, greeting cards and more are in the
+                pipeline — a brand to grow with, not a one-off line.
+              </p>
+            </div>
+
+            {/* Become a founding stockist — blue gradient, with the form */}
+            <div className={`${styles.gridCard} ${styles.cardGradient}`} id="enquire">
+              <h3 className="display">Become a founding stockist</h3>
+              <p>
+                Tell us a little about your shop and we&apos;ll send the full trade
+                price list and next steps.
+              </p>
+              <TradeEnquiryForm />
+            </div>
           </div>
         </section>
       </main>
