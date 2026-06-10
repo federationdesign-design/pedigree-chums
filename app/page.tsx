@@ -6,6 +6,7 @@ import PopHeading from "../components/PopHeading/PopHeading";
 import Footer from "../components/Footer/Footer";
 import ComicStrip from "../components/ComicStrip/ComicStrip";
 import SocialFeed from "../components/SocialFeed/SocialFeed";
+import styles from "./page.module.css";
 
 export default function Home() {
   return (
@@ -56,22 +57,11 @@ export default function Home() {
 
         <ComicStrip />
 
-        <section
-          style={{
-            padding: "clamp(48px, 8vw, 96px) clamp(18px, 4vw, 48px)",
-            textAlign: "center",
-          }}
-        >
-          <PopHeading className="display">
+        <section className={styles.feedSection}>
+          <PopHeading className={`display ${styles.feedTitle}`}>
             See it <span className="display-yellow">in action</span>
           </PopHeading>
-          <p
-            className="lead"
-            style={{
-              maxWidth: "54ch",
-              margin: "12px auto clamp(28px, 5vw, 48px)",
-            }}
-          >
+          <p className={styles.feedSub}>
             Real games, real dogs, real chaos — straight from our feed.
           </p>
           <SocialFeed />
