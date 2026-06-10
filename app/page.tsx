@@ -5,6 +5,8 @@ import PhotoSplit from "../components/PhotoSplit/PhotoSplit";
 import PopHeading from "../components/PopHeading/PopHeading";
 import Footer from "../components/Footer/Footer";
 import ComicStrip from "../components/ComicStrip/ComicStrip";
+import SocialFeed from "../components/SocialFeed/SocialFeed";
+import styles from "./page.module.css";
 
 export default function Home() {
   return (
@@ -54,6 +56,16 @@ export default function Home() {
         </PhotoSplit>
 
         <ComicStrip />
+
+        <section className={styles.feedSection}>
+          <PopHeading className={`display ${styles.feedTitle}`}>
+            See it <span className="display-yellow">in action</span>
+          </PopHeading>
+          <p className={styles.feedSub}>
+            Real games, real dogs, real chaos — straight from our feed.
+          </p>
+          <SocialFeed />
+        </section>
       </main>
       <Footer />
     </>

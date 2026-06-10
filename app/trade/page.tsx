@@ -6,6 +6,7 @@ import PopHeading from "../../components/PopHeading/PopHeading";
 import CardRail from "../../components/CardRail/CardRail";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import TradeHero from "./TradeHero";
+import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import TradeEnquiryForm from "./TradeEnquiryForm";
 import styles from "./trade.module.css";
 
@@ -294,6 +295,17 @@ export default function TradePage() {
               </a>
             </div>
           </div>
+        </section>
+
+        {/* SOCIAL PROOF — live TikTok feed */}
+        <section className={styles.section}>
+          <PopHeading className={`display ${styles.bigTitle} ${styles.titleCenter}`}>
+            See it <span className="display-yellow">in action</span>
+          </PopHeading>
+          <p className={styles.feedSub}>
+            Real games, real dogs, real chaos — straight from our feed.
+          </p>
+          <SocialFeed />
         </section>
 
         {/* FINAL 2x2 GRID — four cards, each a different fill */}
