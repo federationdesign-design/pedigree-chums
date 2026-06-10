@@ -229,21 +229,23 @@ export default function TradePage() {
           </div>
           <div className={styles.pitchInner}>
             <PopHeading className={`display ${styles.bigTitle} ${styles.titleCenter}`}>Trade pricing &amp; terms</PopHeading>
+            <div className={styles.priceHeadline}>
+              <div className={styles.priceFig}>
+                <span className={styles.priceVal}>£4.00</span>
+                <span className={styles.priceLabel}>wholesale / unit</span>
+              </div>
+              <div className={styles.priceFig}>
+                <span className={styles.priceVal}>£9.99</span>
+                <span className={styles.priceLabel}>suggested RRP</span>
+              </div>
+              <div className={styles.priceFig}>
+                <span className={styles.priceVal}>~60%</span>
+                <span className={styles.priceLabel}>retailer margin</span>
+              </div>
+            </div>
             <div className={styles.specCard}>
               <table className={styles.dataTable}>
                 <tbody>
-                  <tr>
-                    <th scope="row">Wholesale price</th>
-                    <td>£4.00 per unit</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Suggested RRP</th>
-                    <td>£9.99</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Retailer margin</th>
-                    <td>~60%</td>
-                  </tr>
                   <tr>
                     <th scope="row">Minimum order</th>
                     <td>1,000 units</td>
