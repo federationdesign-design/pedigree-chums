@@ -280,34 +280,61 @@
   padding: 0 clamp(20px, 6vw, 96px);
 }
 
-/* --------------------------------------------------------------- why grid */
-.grid {
+/* --------------------------------------------------- why-it-sells tiles */
+.tileRow {
   margin-top: 28px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(14px, 1.6vw, 22px);
+  gap: clamp(16px, 2.4vw, 32px);
 }
-.benefitCard {
-  background: var(--white);
-  color: var(--navy);
-  border-radius: var(--radius-card);
-  padding: clamp(20px, 2vw, 28px);
-  box-shadow: var(--shadow-card);
+.tile {
+  text-align: center;
 }
-.benefitCard p {
+.tileImg {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 14px 30px rgba(10, 58, 87, 0.32);
+}
+.tileTitle {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: var(--white);
+  margin: 16px 0 6px;
+}
+.tileBody {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 500;
-  font-size: 1.02rem;
-  line-height: 1.45;
-  margin: 8px 0 0;
-}
-.benefitTitle {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 400;
-  font-size: 1.4rem;
-  line-height: 1.05;
-  color: var(--blue-deep);
+  font-size: 0.98rem;
+  line-height: 1.4;
+  color: var(--white);
+  opacity: 0.92;
   margin: 0;
+}
+
+/* Display-units / POS block beneath the tiles */
+.posBlock {
+  margin-top: clamp(40px, 6vw, 72px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+}
+.posCopy :global(.display) {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+.posDiagram {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 760px) {
+  .posBlock {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --------------------------------------------------------------- comic strip */
@@ -581,13 +608,13 @@
   }
 }
 @media (max-width: 980px) {
-  .grid {
+  .tileRow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 620px) {
-  .grid {
-    grid-template-columns: 1fr;
+  .tileRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .comicDesktop {
     display: none;
