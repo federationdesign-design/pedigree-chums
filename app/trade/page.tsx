@@ -11,7 +11,7 @@ import styles from "./trade.module.css";
 export const metadata: Metadata = {
   title: "Pedigree Chums — Trade & Wholesale",
   description:
-    "Wholesale the on-the-go dog spotting game. 54 hand-illustrated breed cards, made in the UK. Founding stockist enquiries now open.",
+    "Wholesale the on-the-go dog spotting game. 54 uniquely illustrated cards, made in the UK. Founding stockist enquiries now open.",
   robots: { index: false, follow: false },
 };
 
@@ -119,11 +119,13 @@ export default function TradePage() {
 
         {/* MEET THE PACK — the real horizontal card rail */}
         <section className={styles.railSection}>
-          <div className={styles.center}>
+          <div className={styles.railTitle}>
             <PopHeading className="display">Meet the pack</PopHeading>
+          </div>
+          <div className={styles.railSub}>
             <p className={styles.bodyCenter}>
-              54 hand-illustrated breeds and crossbreeds — 40 of the UK&apos;s most
-              popular dogs plus 12 designer crossbreeds.
+              54 uniquely illustrated cards — 40 of the UK&apos;s most popular
+              breeds plus 12 designer crossbreeds.
             </p>
           </div>
           <CardRail />
@@ -218,7 +220,7 @@ export default function TradePage() {
               <tbody>
                 <tr>
                   <th scope="row">Cards</th>
-                  <td>54 illustrated breeds &amp; crossbreeds (40 breeds + 12 designer crossbreeds)</td>
+                  <td>54 uniquely illustrated cards (40 breeds + 12 designer crossbreeds)</td>
                 </tr>
                 <tr>
                   <th scope="row">Card size</th>
