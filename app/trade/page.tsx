@@ -68,28 +68,43 @@ export default function TradePage() {
           </div>
           <div className={styles.pitchInner}>
             <Triangles items={pitchTris} z={0} />
-            <p className={styles.eyebrow}>Founding stockists — enquiries open</p>
-            <h1 className="display">
-              Stock the on-the-go <span className="display-yellow">dog spotting</span> game
-            </h1>
-            <p className={styles.heroSub}>
-              A pocket-size, made-in-UK card game for the dog-mad nation. Played
-              and proven; first production run shipping {DISPATCH_WINDOW}.
-            </p>
-            <div className={styles.heroCtas}>
-              <a href="#enquire" className={`${styles.btn} ${styles.btnPrimary}`}>
-                Become a founding stockist
-              </a>
-              <a href="#pricing" className={`${styles.btn} ${styles.btnGhost}`}>
-                See trade pricing
-              </a>
+            <div className={styles.pitchSplit}>
+              <div className={styles.pitchCopy}>
+                <p className={styles.eyebrow}>Founding stockists — enquiries open</p>
+                <h1 className="display">
+                  Stock the on-the-go <span className="display-yellow">dog spotting</span> game
+                </h1>
+                <p className={styles.heroSub}>
+                  A pocket-size, made-in-UK card game for the dog-mad nation. Played
+                  and proven; first production run shipping {DISPATCH_WINDOW}.
+                </p>
+                <div className={styles.heroCtas}>
+                  <a href="#enquire" className={`${styles.btn} ${styles.btnPrimary}`}>
+                    Become a founding stockist
+                  </a>
+                  <a href="#pricing" className={`${styles.btn} ${styles.btnGhost}`}>
+                    See trade pricing
+                  </a>
+                </div>
+                <ul className={styles.bullets} aria-label="At a glance">
+                  <li className={styles.bullet}>Made in the UK</li>
+                  <li className={styles.bullet}>FSC recycled card</li>
+                  <li className={styles.bullet}>Low MOQ + 48-unit trial</li>
+                  <li className={styles.bullet}>Free POS on 1,000+</li>
+                </ul>
+              </div>
+              <div className={styles.pitchMedia}>
+                <video
+                  className={styles.pitchVideo}
+                  src="/spaniel.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  aria-label="A spaniel being spotted on a dog walk"
+                />
+              </div>
             </div>
-            <ul className={styles.bullets} aria-label="At a glance">
-              <li className={styles.bullet}>Made in the UK</li>
-              <li className={styles.bullet}>FSC recycled card</li>
-              <li className={styles.bullet}>Low MOQ + 48-unit trial</li>
-              <li className={styles.bullet}>Free POS on 1,000+</li>
-            </ul>
           </div>
         </section>
 

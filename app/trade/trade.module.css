@@ -150,6 +150,38 @@
   padding: 0 clamp(24px, 5vw, 72px);
 }
 
+/* Two-column pitch layout: copy left, looping video right. */
+.pitchSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: center;
+}
+.pitchCopy {
+  min-width: 0;
+}
+.pitchMedia {
+  min-width: 0;
+}
+.pitchVideo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 22px;
+  box-shadow: 0 18px 40px rgba(10, 58, 87, 0.35);
+}
+@media (max-width: 860px) {
+  .pitchSplit {
+    grid-template-columns: 1fr;
+  }
+  .pitchMedia {
+    order: -1;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
 /* --------------------------------------------------------- generic section */
 .section {
   position: relative;
