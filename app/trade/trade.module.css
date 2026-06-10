@@ -42,9 +42,12 @@
 /* -------------------------------------------------------------- hero (B2C) */
 .hero {
   position: relative;
-  width: 100%;
+  width: min(1500px, 100% - clamp(40px, 8vw, 140px));
+  margin: clamp(40px, 6vw, 88px) auto 0;
   aspect-ratio: 16 / 9;
+  border-radius: 40px;
   overflow: hidden;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
 }
 .heroVideoWrap {
   position: absolute;
@@ -100,26 +103,32 @@
 }
 
 /* ------------------------------------------------------------ pitch bands */
-/* Full-bleed section with the dark-blue diagonal gradient + screen-blend glow,
-   mirroring the B2C PitchPanel treatment. */
+/* Pitch panel: a floating rounded card inset from the page edges, sitting on
+   the paw background (matches the XD — not a full-bleed band). */
 .pitch {
   position: relative;
+  width: min(1500px, 100% - clamp(40px, 8vw, 140px));
+  margin: clamp(40px, 6vw, 88px) auto;
+  padding: clamp(40px, 6vw, 96px) 0;
+  border-radius: 40px;
   overflow: hidden;
-  padding: clamp(48px, 8vw, 110px) 0;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
 }
 .pitchGlow {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(135deg, #0a3a57 0%, #0b78bd 58%, #1497d6 100%);
+  border-radius: 40px;
+  overflow: hidden;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
 }
 .glowCircle {
   position: absolute;
   border-radius: 50%;
   background: #09c1f3;
   mix-blend-mode: screen;
-  opacity: 0.4;
+  opacity: 0.43;
 }
 .glowTop {
   width: clamp(420px, 56%, 1000px);
@@ -138,9 +147,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 0 clamp(20px, 6vw, 96px);
+  padding: 0 clamp(24px, 5vw, 72px);
 }
 
 /* --------------------------------------------------------- generic section */
@@ -200,6 +207,45 @@
   font-size: 0.95rem;
   color: var(--yellow);
   margin: 0 0 14px;
+}
+
+/* Big centred section title (≈2× the standard display size). !important wins
+   over the .section/.pitchInner display sizing without fragile selectors. */
+.bigTitle {
+  font-size: clamp(3.4rem, 11vw, 7rem) !important;
+  line-height: 0.92;
+}
+.titleCenter {
+  text-align: center;
+}
+
+/* Standardised bullet list (natural bullet, not the global yellow tick). */
+.bullets {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bullet {
+  position: relative;
+  padding-left: 26px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--white);
+}
+.bullet::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  top: -0.05em;
+  color: var(--yellow);
+  font-weight: 900;
+  font-size: 1.3em;
+  line-height: 1;
 }
 .heroSub {
   font-family: var(--font-body), system-ui, sans-serif;
@@ -358,36 +404,40 @@
   height: auto;
 }
 
-/* Spec table: outline-only, no cell fills, centred text — sits on the gradient. */
+/* Data tables (spec + pricing): outline-only, no cell fills, centred text. */
 .specCard {
-  margin: 24px auto 0;
+  margin: 28px auto 0;
   max-width: 880px;
 }
-.specTable {
+.dataTable {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-body), system-ui, sans-serif;
   color: var(--white);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   overflow: hidden;
 }
-.specTable th,
-.specTable td {
+.dataTable th,
+.dataTable td {
   text-align: center;
   padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  font-size: 1.02rem;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  font-size: 1.18rem;
   vertical-align: middle;
   background: transparent;
 }
-.specTable th {
+.dataTable th {
   font-weight: 800;
   color: var(--yellow);
   width: 38%;
 }
-.specTable td {
+.dataTable td {
   font-weight: 500;
+}
+.priceCtaRow {
+  text-align: center;
+  margin-top: 28px;
 }
 
 /* -------------------------------------------------------------- price card */
@@ -613,6 +663,17 @@
   }
 }
 @media (max-width: 620px) {
+  .hero {
+    border-radius: 28px;
+    margin-top: clamp(24px, 6vw, 40px);
+  }
+  .pitch {
+    border-radius: 28px;
+    margin: clamp(24px, 6vw, 40px) auto;
+  }
+  .pitchGlow {
+    border-radius: 28px;
+  }
   .tileRow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

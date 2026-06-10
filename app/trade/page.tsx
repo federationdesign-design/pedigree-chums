@@ -84,12 +84,11 @@ export default function TradePage() {
                 See trade pricing
               </a>
             </div>
-            <ul className={styles.trustStrip} aria-label="At a glance">
-              <li className={styles.pill}>Made in the UK</li>
-              <li className={styles.pill}>FSC recycled card</li>
-              <li className={styles.pill}>Low MOQ + 48-unit trial</li>
-              <li className={styles.pill}>Free POS on 1,000+</li>
-              <li className={styles.pill}>Samples available now</li>
+            <ul className={styles.bullets} aria-label="At a glance">
+              <li className={styles.bullet}>Made in the UK</li>
+              <li className={styles.bullet}>FSC recycled card</li>
+              <li className={styles.bullet}>Low MOQ + 48-unit trial</li>
+              <li className={styles.bullet}>Free POS on 1,000+</li>
             </ul>
           </div>
         </section>
@@ -189,9 +188,9 @@ export default function TradePage() {
 
         {/* PRODUCT SPEC */}
         <section className={styles.section} id="product">
-          <PopHeading className="display">The product</PopHeading>
+          <PopHeading className={`display ${styles.bigTitle} ${styles.titleCenter}`}>The product</PopHeading>
           <div className={styles.specCard}>
-            <table className={styles.specTable}>
+            <table className={styles.dataTable}>
               <tbody>
                 <tr>
                   <th scope="row">Cards</th>
@@ -229,30 +228,47 @@ export default function TradePage() {
             <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
           </div>
           <div className={styles.pitchInner}>
-            <PopHeading className="display">Trade pricing &amp; terms</PopHeading>
-            <div className={styles.priceCard}>
-              <div className={styles.priceHeadline}>
-                <div className={styles.priceFig}>
-                  <span className={styles.priceVal}>£4.00</span>
-                  <span className={styles.priceLabel}>wholesale / unit</span>
-                </div>
-                <div className={styles.priceFig}>
-                  <span className={styles.priceVal}>£9.99</span>
-                  <span className={styles.priceLabel}>suggested RRP</span>
-                </div>
-                <div className={styles.priceFig}>
-                  <span className={styles.priceVal}>~60%</span>
-                  <span className={styles.priceLabel}>retailer margin</span>
-                </div>
-              </div>
-              <ul className="points">
-                <li className="point">Minimum order: 1,000 units</li>
-                <li className="point">Volume discounts on 2,000 / 5,000 / 10,000 — see the full price list</li>
-                <li className="point">Free standing POS display unit on orders of 1,000+</li>
-                <li className="point">48-unit trial available to test sell-through first</li>
-                <li className="point">Pro-forma for first orders · UK dispatch · no VAT currently applicable</li>
-              </ul>
-              <a href="#enquire" className={`${styles.btn} ${styles.btnPrimary} ${styles.btnInline}`}>
+            <PopHeading className={`display ${styles.bigTitle} ${styles.titleCenter}`}>Trade pricing &amp; terms</PopHeading>
+            <div className={styles.specCard}>
+              <table className={styles.dataTable}>
+                <tbody>
+                  <tr>
+                    <th scope="row">Wholesale price</th>
+                    <td>£4.00 per unit</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Suggested RRP</th>
+                    <td>£9.99</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Retailer margin</th>
+                    <td>~60%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Minimum order</th>
+                    <td>1,000 units</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Volume discounts</th>
+                    <td>2,000 / 5,000 / 10,000 — full price list on request</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">POS display</th>
+                    <td>Free standing unit included on orders of 1,000+</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Trial</th>
+                    <td>48-unit trial available to test sell-through first</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Terms</th>
+                    <td>Pro-forma for first orders · UK dispatch · no VAT currently applicable</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className={styles.priceCtaRow}>
+              <a href="#enquire" className={`${styles.btn} ${styles.btnPrimary}`}>
                 Request the full price list
               </a>
             </div>
@@ -263,11 +279,11 @@ export default function TradePage() {
         <section className={`${styles.section} ${styles.relative}`}>
           <Triangles items={sustainTris} z={0} />
           <PopHeading className="display">Made responsibly</PopHeading>
-          <ul className="points">
-            <li className="point">Printed in the UK — low carbon footprint</li>
-            <li className="point">FSC-certified recycled card stock</li>
-            <li className="point">Fully biodegradable, no plastic coatings</li>
-            <li className="point">Recyclable packaging</li>
+          <ul className={styles.bullets}>
+            <li className={styles.bullet}>Printed in the UK — low carbon footprint</li>
+            <li className={styles.bullet}>FSC-certified recycled card stock</li>
+            <li className={styles.bullet}>Fully biodegradable, no plastic coatings</li>
+            <li className={styles.bullet}>Recyclable packaging</li>
           </ul>
           <p className={styles.bodyMuted}>
             A genuine fit for eco-conscious retailers, museum and attraction shops,
