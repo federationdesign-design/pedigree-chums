@@ -85,7 +85,7 @@ export default function TradePage() {
                 <ul className={styles.bullets} aria-label="At a glance">
                   <li className={styles.bullet}>Made in the UK</li>
                   <li className={styles.bullet}>FSC recycled card</li>
-                  <li className={styles.bullet}>Low MOQ + 48-unit trial</li>
+                  <li className={styles.bullet}>Low MOQ + 250-unit starter order</li>
                   <li className={styles.bullet}>Free POS on 1,000+</li>
                 </ul>
               </div>
@@ -285,7 +285,7 @@ export default function TradePage() {
                   </tr>
                   <tr>
                     <th scope="row">Trial</th>
-                    <td>48-unit trial available to test sell-through first</td>
+                    <td>250-unit starter order at £5.00/unit, bought upfront</td>
                   </tr>
                   <tr>
                     <th scope="row">Terms</th>
@@ -318,11 +318,12 @@ export default function TradePage() {
 
             {/* Trial — yellow */}
             <div className={`${styles.gridCard} ${styles.cardYellow}`}>
-              <h3 className="display">Not ready for 1,000? Try 48.</h3>
+              <h3 className="display">Not ready for 1,000? Try 250.</h3>
               <p>
-                A 48-unit trial pack lets you test it on your shelf before committing
-                to a full run, with a quick turnaround. Sample packs available now to
-                see and play before you decide.
+                A 250-unit starter order lets you test it on your shelf before
+                committing to a full run. It&apos;s bought upfront at £5.00 per unit
+                (250 units = £1,250), with a quick turnaround. Sample packs are
+                available now to see and play before you decide.
               </p>
             </div>
 
