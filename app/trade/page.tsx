@@ -120,7 +120,9 @@ export default function TradePage() {
         {/* MEET THE PACK — the real horizontal card rail */}
         <section className={styles.railSection}>
           <div className={styles.railTitle}>
-            <PopHeading className="display">Meet the pack</PopHeading>
+            <PopHeading className={`display ${styles.bigTitle}`}>
+              <span className="display-yellow">Meet the</span> pack
+            </PopHeading>
           </div>
           <div className={styles.railSub}>
             <p className={styles.bodyCenter}>
