@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Nav from "../../components/Nav/Nav";
+import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import CardRail from "../../components/CardRail/CardRail";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
@@ -9,18 +11,22 @@ import styles from "./trade.module.css";
 
 // Keep the trade page out of search and fully separate from the consumer site.
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.pedigreechums.co.uk"),
   title: "Pedigree Chums — Trade & Wholesale",
   description:
     "Wholesale the on-the-go dog spotting game. 54 uniquely illustrated cards, made in the UK. Founding stockist enquiries now open.",
   robots: { index: false, follow: false },
+  openGraph: {
+    title: "Pedigree Chums — Trade & Wholesale",
+    description:
+      "Wholesale the on-the-go dog spotting game. 54 uniquely illustrated cards, made in the UK. Founding stockist enquiries now open.",
+    type: "website",
+    url: "/trade",
+  },
 };
 
-// Company / legal line for the footer. Update once the dedicated Pedigree Chums
-// company is formed (currently the brand trades under another entity).
-const COMPANY_LEGAL = "Pedigree Chums";
-const CONTACT_EMAIL = "hello@pedigreechums.co.uk";
-const CONTACT_PHONE = "+44 (0) 7507 235 380";
-const DISPATCH_WINDOW = "your launch window"; // e.g. "Autumn 2026" once known
+// Dispatch window shown in the hero. Update once known (e.g. "Autumn 2026").
+const DISPATCH_WINDOW = "your launch window";
 
 const whyTris: Tri[] = [
   { size: 56, top: "12%", left: "7%", speed: 0.16, spin: 0.22 },
@@ -36,21 +42,9 @@ const pitchTris: Tri[] = [
 export default function TradePage() {
   return (
     <>
-      {/* Trade-only header: logo only, non-linking, no menu, no doorway back
-          into the consumer site. */}
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <Image
-            src="/dogbingo.svg"
-            alt="Pedigree Chums"
-            width={150}
-            height={64}
-            priority
-            className={styles.logo}
-          />
-          <span className={styles.headerTag}>Trade &amp; Wholesale</span>
-        </div>
-      </header>
+      {/* Shared site header — identical to the homepage (scroll-reveal logo,
+          transparent bar, no button). */}
+      <Nav />
 
       <main>
         {/* HERO — full-bleed video, same treatment as B2C */}
@@ -362,20 +356,8 @@ export default function TradePage() {
         </section>
       </main>
 
-      {/* Minimal trade footer: contact + legal only, no consumer links. */}
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <p className={styles.footerContact}>
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-            <span aria-hidden="true"> · </span>
-            <a href={`tel:${CONTACT_PHONE.replace(/[^+\d]/g, "")}`}>{CONTACT_PHONE}</a>
-          </p>
-          <p className={styles.footerLegal}>
-            {COMPANY_LEGAL} — The Dog Bingo Game. Registered in England and Wales.
-            &copy; {new Date().getFullYear()}.
-          </p>
-        </div>
-      </footer>
+      {/* Shared site footer — identical to the homepage. */}
+      <Footer />
     </>
   );
 }
