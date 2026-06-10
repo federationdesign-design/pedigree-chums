@@ -221,6 +221,16 @@ export default function TradePage() {
           </div>
         </section>
 
+        {/* CARD ART — full-width image band */}
+        <section className={styles.imageBand}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/actual-cards.jpg"
+            alt="A selection of the Pedigree Chums breed cards"
+            className={styles.imageBandImg}
+          />
+        </section>
+
         {/* PRICING — pitch band */}
         <section className={styles.pitch} id="pricing">
           <div className={styles.pitchGlow} aria-hidden="true">

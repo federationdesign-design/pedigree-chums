@@ -440,6 +440,18 @@
   margin-top: 28px;
 }
 
+/* Full-width card-art band between the product and pricing tables (full-bleed). */
+.imageBand {
+  width: 100%;
+  margin: clamp(40px, 7vw, 88px) 0;
+  line-height: 0;
+}
+.imageBandImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* ----------------------------------------------------- price figures headline */
 .priceHeadline {
   display: flex;
