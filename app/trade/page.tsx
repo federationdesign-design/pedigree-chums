@@ -162,20 +162,20 @@ export default function TradePage() {
                   <td>54 illustrated breeds &amp; crossbreeds (40 breeds + 12 designer crossbreeds)</td>
                 </tr>
                 <tr>
-                  <th scope="row">Format</th>
-                  <td>Pocket-size deck, durable card</td>
+                  <th scope="row">Card size</th>
+                  <td>6.4 &times; 8.9 cm, 0.9 mm thick</td>
                 </tr>
                 <tr>
-                  <th scope="row">Materials</th>
-                  <td>FSC-certified recycled stock, printed in the UK, fully biodegradable</td>
+                  <th scope="row">Material</th>
+                  <td>FSC-certified recycled cardboard, printed in the UK, fully biodegradable</td>
+                </tr>
+                <tr>
+                  <th scope="row">Pack size &amp; weight</th>
+                  <td>Available on request</td>
                 </tr>
                 <tr>
                   <th scope="row">Barcode</th>
                   <td>EAN-13 (registering with GS1)</td>
-                </tr>
-                <tr>
-                  <th scope="row">Pack dimensions</th>
-                  <td>Available on request</td>
                 </tr>
                 <tr>
                   <th scope="row">Case quantity</th>
