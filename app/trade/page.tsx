@@ -98,7 +98,6 @@ export default function TradePage() {
                   className={styles.pitchVideo}
                   src="/spaniel.mp4"
                   autoPlay
-                  loop
                   muted
                   playsInline
                   aria-label="A spaniel being spotted on a dog walk"
@@ -106,6 +105,16 @@ export default function TradePage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* CARD ART — full-width image band */}
+        <section className={styles.imageBand}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/actual-cards.jpg"
+            alt="A selection of the Pedigree Chums breed cards"
+            className={styles.imageBandImg}
+          />
         </section>
 
         {/* MEET THE PACK — the real horizontal card rail */}
@@ -234,16 +243,6 @@ export default function TradePage() {
               </tbody>
             </table>
           </div>
-        </section>
-
-        {/* CARD ART — full-width image band */}
-        <section className={styles.imageBand}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/actual-cards.jpg"
-            alt="A selection of the Pedigree Chums breed cards"
-            className={styles.imageBandImg}
-          />
         </section>
 
         {/* PRICING — pitch band */}
