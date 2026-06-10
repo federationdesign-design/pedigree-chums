@@ -285,7 +285,7 @@ export default function TradePage() {
                   </tr>
                   <tr>
                     <th scope="row">Trial</th>
-                    <td>250-unit starter order at £5.00/unit, bought upfront</td>
+                    <td>250-unit starter at £5.00/unit; £250 credited if you order 1,000+ within 60 days</td>
                   </tr>
                   <tr>
                     <th scope="row">Terms</th>
@@ -321,9 +321,14 @@ export default function TradePage() {
               <h3 className="display">Not ready for 1,000? Try 250.</h3>
               <p>
                 A 250-unit starter order lets you test it on your shelf before
-                committing to a full run. It&apos;s bought upfront at £5.00 per unit
-                (250 units = £1,250), with a quick turnaround. Sample packs are
-                available now to see and play before you decide.
+                committing to a full run — bought upfront at £5.00 per unit
+                (250 units = £1,250).
+              </p>
+              <p>
+                Go on to place a 1,000+ order within 60 days and we credit
+                <strong> £250 against it</strong> — bringing your starter units
+                down to the full £4.00 wholesale price. Sample packs are available
+                now to see and play before you decide.
               </p>
             </div>
 
