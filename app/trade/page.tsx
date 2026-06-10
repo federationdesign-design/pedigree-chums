@@ -335,7 +335,7 @@ export default function TradePage() {
               </p>
               <video
                 className={styles.rangeVideo}
-                src="/expanded-range.mov"
+                src="/expanded-range.mp4"
                 autoPlay
                 muted
                 playsInline
