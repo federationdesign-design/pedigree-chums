@@ -32,6 +32,24 @@ type Section = {
 
 const SECTIONS: Section[] = [
   {
+    title: "Medieval and Tudor Britain",
+    accent: "Tudor Britain",
+    intro:
+      "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
+    bullets: [
+      "Norman kings set aside up to a third of England as royal forest, where only the king could hunt.",
+      "Commoners living near a forest had to have their dogs 'lawed', having three toes chopped off, to stop them chasing the king's game.",
+      "By Tudor times, Henry VIII kept spaniels, beagles and greyhounds, and owned sixty-five dog leashes.",
+      "Ladies of the court adored their little lapdogs, which they fondly called 'comforters'.",
+    ],
+    detail:
+      "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
+    fact:
+      "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.",
+    image: "/history/medieveal-dogs.jpg",
+    imageAlt: "Medieval hunting hounds and a Tudor lapdog",
+  },
+  {
     title: "Working roots",
     accent: "roots",
     intro:
@@ -64,7 +82,7 @@ const SECTIONS: Section[] = [
       "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
     fact:
       "Parliamentarian propaganda during the Civil War seriously claimed Prince Rupert's poodle was a witch in disguise.",
-    image: "/history/armed-forces.jpg",
+    image: "/history/boy-the-poodle.jpg",
     imageAlt: "A 17th-century white poodle beside a Civil War cavalier",
   },
   {
@@ -100,7 +118,7 @@ const SECTIONS: Section[] = [
       "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
     fact:
       "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete.",
-    image: "/history/victorian.jpg",
+    image: "/history/Portrait_of_Dash.jpg",
     imageAlt: "A Victorian lady with a small spaniel companion",
   },
   {
@@ -118,7 +136,7 @@ const SECTIONS: Section[] = [
       "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
     fact:
       "Greyfriars Bobby's headstone reads: 'Let his loyalty and devotion be a lesson to us all.'",
-    image: "/history/popular-culture.jpg",
+    image: "/history/bobby.jpeg",
     imageAlt: "The Greyfriars Bobby statue in Edinburgh",
   },
   {
@@ -136,7 +154,7 @@ const SECTIONS: Section[] = [
       "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
     fact:
       "Primley Sceptre, the first Best in Show winner, was picked from an entry of 9,466 dogs and described by the judge as 'faultless'.",
-    image: "/history/dog-shows.jpg",
+    image: "/history/primley-sceptre.jpeg",
     imageAlt: "A Greyhound being presented in a dog show ring",
   },
   {
@@ -154,7 +172,7 @@ const SECTIONS: Section[] = [
       "As Britain became more urban and homes grew more comfortable, dogs came indoors for good. The relationship deepened from usefulness into genuine companionship. By the end of the century, the question was no longer what a dog could do for you, but simply the pleasure of its company, a shift that set the stage for the boom still unfolding today.",
     fact:
       "Today around 99 percent of UK dog owners consider their dog to be a full member of the family.",
-    image: "/history/modern-home.jpg",
+    image: "/history/poodle-bed.jpg",
     imageAlt: "A family relaxing at home with their pet dog",
   },
   {
@@ -172,7 +190,7 @@ const SECTIONS: Section[] = [
       "The most common breeds tell the story of changing tastes. Among dogs of all ages the classic Labrador still leads, but among puppies the French Bulldog and the Cockapoo have raced to the top, a clear sign of the designer-crossbreed boom. The pack brings both worlds together, the old favourites and the new, each with centuries of history behind them.",
     fact:
       "Among dogs under one year old, the French Bulldog and Cockapoo now rank among the three most common breeds in the UK.",
-    image: "/history/todays-boom.jpg",
+    image: "/history/pappered-dog.jpg",
     imageAlt: "A modern Cockapoo, one of Britain's most popular dogs today",
   },
 ];
