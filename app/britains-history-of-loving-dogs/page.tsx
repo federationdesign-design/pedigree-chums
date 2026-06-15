@@ -190,30 +190,39 @@ export default function HistoryPage() {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <section key={i} className={styles.section}>
-                <div className={styles.imageSlot}>
-                  <Image
-                    src={s.image}
-                    alt={s.imageAlt}
-                    width={760}
-                    height={320}
-                    className={styles.sectionImg}
-                    unoptimized
-                  />
+                <div className={styles.colLeft}>
+                  <div className={styles.imageSlot}>
+                    <Image
+                      src={s.image}
+                      alt={s.imageAlt}
+                      width={600}
+                      height={600}
+                      className={styles.sectionImg}
+                      unoptimized
+                    />
+                  </div>
+                  <h2 className={`display ${styles.sectionTitle}`}>
+                    {prefix}
+                    <span className="display-yellow">{s.accent}</span>
+                  </h2>
+                  <p className={styles.sectionIntro}>{s.intro}</p>
+                  <p className={styles.detail}>{s.detail}</p>
                 </div>
-                <h2 className={`display ${styles.sectionTitle}`}>
-                  {prefix}
-                  <span className="display-yellow">{s.accent}</span>
-                </h2>
-                <p className={styles.sectionIntro}>{s.intro}</p>
-                <ul className={styles.bullets}>
-                  {s.bullets.map((b, j) => (
-                    <li key={j}>{b}</li>
-                  ))}
-                </ul>
-                <p className={styles.detail}>{s.detail}</p>
-                <div className={styles.fact}>
-                  <span className={styles.factLabel}>Did you know?</span>
-                  <span className={styles.factText}>{s.fact}</span>
+                <div className={styles.colRight}>
+                  <ul className={styles.bullets}>
+                    {s.bullets.map((b, j) => (
+                      <li key={j}>{b}</li>
+                    ))}
+                  </ul>
+                  <div className={styles.fact}>
+                    <div className={styles.factImg}>
+                      <Image src={s.image} alt="" width={120} height={120} unoptimized />
+                    </div>
+                    <div className={styles.factBody}>
+                      <span className={styles.factLabel}>Did you know?</span>
+                      <span className={styles.factText}>{s.fact}</span>
+                    </div>
+                  </div>
                 </div>
               </section>
             );
