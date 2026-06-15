@@ -805,6 +805,16 @@
   .heroAnnounce {
     font-size: clamp(0.62rem, 1.8vw, 0.75rem);
   }
+  /* Card rail: the big +/-180px desktop pulls make the title collide with the
+     photo on narrow screens. Reset to gentle, padded spacing. */
+  .railTitle {
+    margin-top: clamp(-40px, -6vw, -16px);
+    padding-top: 8px;
+  }
+  .railSub {
+    margin-top: clamp(20px, 5vw, 40px);
+>>>>>>> trade-page
+  }
 }
 @media (max-width: 980px) {
   .tileRow {

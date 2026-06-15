@@ -1,0 +1,68 @@
+/* Balanced text/image row for the About page. Photo gets a little more room
+   than the copy, but the copy column stays wide enough that long single-word
+   headings (e.g. "EDUCATIONAL") fit. No homepage-specific lifts. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+  padding: clamp(40px, 7vw, 90px) clamp(20px, 6vw, 90px);
+}
+.reverse .photoCol {
+  order: 2;
+}
+.reverse .contentCol {
+  order: 1;
+}
+
+.photoCol,
+.contentCol {
+  position: relative;
+  z-index: 1;
+}
+.photoCol {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photoWrap {
+  position: relative;
+  width: clamp(280px, 44vw, 600px);
+  max-width: 100%;
+}
+.photo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.contentCol {
+  color: var(--white);
+}
+/* Heading: bold and on-brand, but capped so a long word can't run off-screen.
+   overflow-wrap is the safety net if the column ever gets very tight. */
+.contentCol h2 {
+  font-size: clamp(2.2rem, 4.8vw, 3.8rem);
+  line-height: 0.95;
+  margin: 0 0 12px;
+  overflow-wrap: break-word;
+}
+.contentCol :global(.lead) {
+  font-size: clamp(1.2rem, 2.6vw, 1.5rem);
+}
+.contentCol :global(.lead) + :global(.lead) {
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  .split,
+  .reverse {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .reverse .photoCol,
+  .reverse .contentCol {
+    order: 0;
+  }
+}
