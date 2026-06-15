@@ -100,7 +100,7 @@ const SECTIONS: Section[] = [
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
     fact:
       "One estimate suggests the 1839 London ban alone led to the loss of more than 3,000 working dogs almost overnight.",
-    image: "/history/dogs-in-london.jpg",
+    image: "/history/dog-carts.jpg",
     imageAlt: "A Victorian street trader with a dog-drawn cart in London",
   },
   {
