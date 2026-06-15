@@ -102,6 +102,7 @@ export default function BreedDirectory() {
                 height={300}
                 className={styles.cardImg}
                 sizes="(max-width: 700px) 45vw, 240px"
+                unoptimized
               />
               {b.type === "designer-crossbreed" && (
                 <span className={styles.badge}>Designer cross</span>
