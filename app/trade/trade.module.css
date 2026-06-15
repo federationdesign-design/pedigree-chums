@@ -813,7 +813,6 @@
   }
   .railSub {
     margin-top: clamp(20px, 5vw, 40px);
->>>>>>> trade-page
   }
 }
 @media (max-width: 980px) {
