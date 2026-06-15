@@ -241,35 +241,168 @@
   gap: clamp(12px, 2vw, 24px);
 }
 
-/* shared chum card (themed rows + search results) */
+/* flip card (themed rows + search results): no frame, no name below.
+   Hover/focus flips to reveal the name; click opens the modal. */
 .chumCard {
-  background: var(--white);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 12px 12px 14px;
-  display: flex;
-  flex-direction: column;
-}
-.chumImgWrap {
-  position: relative;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
   aspect-ratio: 1 / 1;
-  border-radius: 16px;
+  perspective: 900px;
+  border-radius: var(--radius-card);
+}
+.flipInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.chumCard:hover .flipInner,
+.chumCard:focus-visible .flipInner {
+  transform: rotateY(180deg);
+}
+.flipFront,
+.flipBack {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
   overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flipFront {
   background: linear-gradient(to top right, #00e2ff, #008eff);
-  margin-bottom: 10px;
 }
 .chumImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.chumName {
+.flipBack {
+  transform: rotateY(180deg);
+  background: var(--yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+.flipName {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.05rem, 2vw, 1.4rem);
+  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
   color: var(--navy);
-  margin: 0;
-  line-height: 1.05;
   text-align: center;
+  line-height: 1.05;
+}
+
+/* ------------------------------------------------------------- breed modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 58, 87, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 48px);
+  animation: kycFade 0.2s ease;
+}
+@keyframes kycFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modalCard {
+  position: relative;
+  width: min(960px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+  border-radius: 28px;
+  box-shadow: var(--shadow-card);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 3vw, 36px);
+  padding: clamp(20px, 3.5vw, 44px);
+}
+.modalClose {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  z-index: 2;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--white);
+  font-size: 2.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 10px;
+}
+.modalImgWrap {
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  aspect-ratio: 1 / 1;
+  align-self: start;
+}
+.modalImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modalInfo {
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+.modalName {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--white);
+  margin: 0 0 10px;
+  line-height: 1;
+}
+.modalLookFor {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  margin: 0 0 18px;
+}
+.modalLookFor strong {
+  font-weight: 800;
+}
+.modalStats {
+  margin: 0 0 18px;
+}
+.modalStatRow {
+  display: flex;
+  gap: 8px;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  padding: 3px 0;
+}
+.modalStatRow dt {
+  font-weight: 800;
+  min-width: 76px;
+}
+.modalStatRow dd {
+  margin: 0;
+}
+.modalSubhead {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+  color: var(--yellow);
+  margin: 0 0 6px;
+}
+.modalChar {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+.modalFact {
+  font-size: clamp(0.9rem, 1.8vw, 1.02rem);
+  font-style: italic;
+  opacity: 0.92;
+  margin: 0;
 }
 
 /* search results */
@@ -313,6 +446,9 @@
   .resultGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+  }
+  .modalCard {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 // Verified facts. Sources: PDSA PAW Report, UK Pet Food, RVC VetCompass,
 // Guinness World Records. Population estimates vary by source, so the
 // headline figure is given as a range.
-type IconKey = "crown" | "family" | "microchip" | "tent";
+type IconKey = "crown" | "home" | "microchip" | "tent" | "uk" | "trend" | "virus" | "bottle";
 
 const ICONS: Record<IconKey, React.ReactNode> = {
   crown: (
@@ -23,9 +23,9 @@ const ICONS: Record<IconKey, React.ReactNode> = {
       <path d="M3 7l4.5 3.4L12 3.6l4.5 6.8L21 7l-1.9 11H4.9L3 7zm1.9 12.4h14.2V22H4.9z" />
     </svg>
   ),
-  family: (
+  home: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7.3 2.8a2.3 2.3 0 110 4.6 2.3 2.3 0 010-4.6zm9.4 0a2.3 2.3 0 110 4.6 2.3 2.3 0 010-4.6zM4 21.2v-7.4a3.3 3.3 0 016.6 0v7.4H8.7v-5.2H7.9v5.2H4zm9.4 0v-7.4a3.3 3.3 0 016.6 0v7.4h-1.9v-5.2h-.8v5.2h-3.9z" />
+      <path d="M12 2.6L1.8 11l1.5 1.8L4 12.3V21h6v-5h4v5h6v-8.7l.7.5L22.2 11 12 2.6z" />
     </svg>
   ),
   microchip: (
@@ -41,14 +41,34 @@ const ICONS: Record<IconKey, React.ReactNode> = {
       <path d="M2 11.3l2.8 10.2H9l1-8.2h4l1 8.2h4.2L22 11.3l-5 1-5-1-5 1z" />
     </svg>
   ),
+  uk: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14.5 2l-1.2 2.4 1.6 1.7-2.3.6-1 2.2-1.6-1.3-2 .7.4-2.4-1.7-1.2 2.3-.9.3-2 1.9 1.1L11 2.4l1.5 1.3L14.5 2zM6.2 9.6l2 .6-.4 2.3 1.9 1.4-.7 2.2 2.3.2.6 2.3 1.8-1.5 2.2.8-.2-2.4 1.9-1.4-1.6-1.7 2-1.2-2.1-1.1.2-2.3-2.2.7-1.5-1.8-1.4 1.9-2.3-.3-.7 2-2 .6.3 2.4z" />
+    </svg>
+  ),
+  trend: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 17.5l6-6 4 4 6-6V5h-5l2.3 2.3-3.3 3.3-4-4L2 14.5z" />
+    </svg>
+  ),
+  virus: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 1h2v3.1a7 7 0 012.5 1l2.2-2.2 1.4 1.4-2.2 2.2a7 7 0 011 2.5H21v2h-3.1a7 7 0 01-1 2.5l2.2 2.2-1.4 1.4-2.2-2.2a7 7 0 01-2.5 1V23h-2v-3.1a7 7 0 01-2.5-1l-2.2 2.2-1.4-1.4 2.2-2.2a7 7 0 01-1-2.5H1v-2h3.1a7 7 0 011-2.5L2.9 6.3l1.4-1.4 2.2 2.2a7 7 0 012.5-1V1zm1 6a5 5 0 100 10 5 5 0 000-10z" />
+    </svg>
+  ),
+  bottle: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 1h6v2l-1 1v2.2c1.8.9 3 2.7 3 4.8v9a2 2 0 01-2 2H9a2 2 0 01-2-2v-9c0-2.1 1.2-3.9 3-4.8V4L9 3V1zm-1 12h8v-1H8v1zm0 3h8v-1H8v1z" />
+    </svg>
+  ),
 };
 
 const FACTS: { hero: string; label: string; icon?: IconKey }[] = [
   { hero: "11\u201313m", label: "dogs in the UK today, and the number keeps rising" },
-  { hero: "8.2m", label: "dogs back in 2011; ownership has climbed ever since" },
-  { hero: "99%", label: "of owners say their dog is one of the family", icon: "family" },
-  { hero: "3.2m", label: "households welcomed a new pet during the pandemic" },
-  { hero: "24", label: "puppies in Britain's record-breaking litter, born in 2004" },
+  { hero: "8.2m", label: "dogs back in 2011; ownership has climbed ever since", icon: "trend" },
+  { hero: "99%", label: "of owners say their dog is one of the family", icon: "home" },
+  { hero: "3.2m", label: "households welcomed a new pet during the pandemic", icon: "virus" },
+  { hero: "24", label: "puppies in Britain's record-breaking litter, born in 2004", icon: "bottle" },
   { hero: "22,742", label: "dogs at the world's largest dog walk, in South Shields" },
   { hero: "1859", label: "the year Britain held its first ever dog show, in Newcastle", icon: "tent" },
   { hero: "Dash", label: "Queen Victoria's spaniel, who helped make pet dogs the fashion", icon: "crown" },
