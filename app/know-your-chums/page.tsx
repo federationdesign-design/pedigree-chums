@@ -2,17 +2,30 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
-import BreedDirectory from "./BreedDirectory";
-import { breeds } from "../../data/breeds";
+import BreedStats from "./BreedStats";
+import ChumExplorer from "./ChumExplorer";
 import styles from "./know.module.css";
 
 export const metadata: Metadata = {
-  title: "Know Your Chums — The 54 Dog Breeds in the Pack",
+  title: "Know Your Chums — Britain's Best-Loved Dog Breeds",
   description:
-    "Your field guide to the 54 dog breeds in the pack: what they look like, how they behave, and the tell-tale features that help you spot each one in the wild.",
+    "Your field guide to Britain's favourite dogs: the facts, the most popular breeds, and the chums in the pack — what they look like, how they behave, and how to spot them.",
 };
 
-const crossbreeds = breeds.filter((b) => b.type === "designer-crossbreed").length;
+// Verified facts. Sources: PDSA PAW Report, UK Pet Food, RVC VetCompass,
+// Guinness World Records. Population estimates vary by source, so the
+// headline figure is given as a range.
+const FACTS: { hero: string; label: string }[] = [
+  { hero: "11–13m", label: "dogs in the UK today — and the number keeps rising" },
+  { hero: "8.2m", label: "dogs back in 2011; ownership has climbed ever since" },
+  { hero: "99%", label: "of owners say their dog is one of the family" },
+  { hero: "3.2m", label: "households welcomed a new pet during the pandemic" },
+  { hero: "24", label: "puppies in Britain's record-breaking litter, born in 2004" },
+  { hero: "22,742", label: "dogs at the world's largest dog walk, in South Shields" },
+  { hero: "1859", label: "the year Britain held its first ever dog show, in Newcastle" },
+  { hero: "Dash", label: "Queen Victoria's spaniel, who helped make pet dogs the fashion" },
+  { hero: "Law", label: "microchipping has been a legal requirement for UK dogs since 2016" },
+];
 
 export default function KnowYourChums() {
   return (
@@ -25,48 +38,37 @@ export default function KnowYourChums() {
             Know your <span className="display-yellow">chums</span>
           </PopHeading>
           <p className={styles.lead}>
-            Britain is a nation of dog lovers, and the pack celebrates 54 of our
-            favourites. This is your field guide: what each breed looks like, how
-            they behave, and the tell-tale feature that helps you spot them on a
-            walk. Get to know your chums, then go find them in the wild.
+            Britain is a nation of dog lovers, and the pack celebrates our
+            favourites. Here are the facts, the most popular breeds of the moment,
+            and every chum in the pack — what they look like, how they behave, and
+            how to spot them in the wild.
           </p>
         </section>
 
-        {/* VetCompass data band */}
-        <section className={styles.dataBand}>
-          <h2 className={`display ${styles.dataTitle}`}>
-            Britain&apos;s dogs <span className="display-yellow">by the numbers</span>
+        {/* Britain's dog facts — 3x3 panel */}
+        <section className={styles.factsPanel}>
+          <h2 className={`display ${styles.panelTitle}`}>
+            Britain&apos;s <span className="display-yellow">dog facts</span>
           </h2>
-          <div className={styles.statRow}>
-            <div className={styles.stat}>
-              <span className={styles.statNum}>2.2m</span>
-              <span className={styles.statLabel}>UK dogs studied in 2019</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statNum}>800</span>
-              <span className={styles.statLabel}>distinct breeds recorded</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statNum}>{crossbreeds}</span>
-              <span className={styles.statLabel}>designer crossbreeds in the pack</span>
-            </div>
+          <div className={styles.factGrid}>
+            {FACTS.map((f, i) => (
+              <div key={i} className={styles.fact}>
+                <span className={styles.factHero}>{f.hero}</span>
+                <span className={styles.factLabel}>{f.label}</span>
+              </div>
+            ))}
           </div>
-          <p className={styles.dataBody}>
-            The most common dogs across all ages were the crossbreed, Labrador and
-            Jack Russell. But look at the puppies: among dogs under one year, the
-            French Bulldog and Cockapoo had surged into the top three, a sign of the
-            designer-crossbreed boom. The pack has both the classics and the new
-            favourites.
-          </p>
           <p className={styles.source}>
-            Source: RVC VetCompass, O&apos;Neill et al. (2023), UK canine demography.
+            Sources: PDSA, UK Pet Food, RVC VetCompass and Guinness World Records.
+            Population figures are estimates and vary by source.
           </p>
         </section>
 
-        {/* Directory */}
-        <section className={styles.directory}>
-          <BreedDirectory />
-        </section>
+        {/* Animated breed-popularity bars */}
+        <BreedStats />
+
+        {/* Search + themed rows */}
+        <ChumExplorer />
       </main>
       <Footer />
     </>
