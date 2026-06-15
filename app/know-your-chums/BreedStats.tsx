@@ -25,7 +25,7 @@ const PUPPIES: Bar[] = [
 
 const MAX_PCT = 7.0; // longest bar = French Bulldog 7.0%
 
-function BarTable({ title, bars }: { title: string; bars: Bar[] }) {
+function BarTable({ caption, bars }: { caption: string; bars: Bar[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
 
@@ -39,7 +39,7 @@ function BarTable({ title, bars }: { title: string; bars: Bar[] }) {
           obs.disconnect();
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.2 }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -47,28 +47,26 @@ function BarTable({ title, bars }: { title: string; bars: Bar[] }) {
 
   return (
     <div className={styles.statBlock} ref={ref}>
-      <h3 className={styles.statTitle}>{title}</h3>
+      <p className={styles.statCaption}>{caption}</p>
       {bars.map((b, i) => (
         <div className={styles.barRow} key={`${b.name}-${i}`}>
           <div className={styles.barThumb}>
             {b.img ? (
-              <Image src={b.img} alt={b.name} width={56} height={56} unoptimized />
+              <Image src={b.img} alt={b.name} width={120} height={120} unoptimized />
             ) : (
               <span className={styles.barThumbPaw} aria-hidden="true">
                 🐾
               </span>
             )}
           </div>
-          <div className={styles.barMain}>
-            <span className={styles.barName}>{b.name}</span>
-            <div className={styles.barTrack}>
-              <div
-                className={styles.barFill}
-                style={{ width: inView ? `${(b.pct / MAX_PCT) * 100}%` : "0%" }}
-              >
-                <span className={styles.barPct}>{b.pct.toFixed(1)}%</span>
-              </div>
+          <div className={styles.barTrack}>
+            <div
+              className={styles.barFill}
+              style={{ width: inView ? `${(b.pct / MAX_PCT) * 78}%` : "0%" }}
+            >
+              <span className={styles.barName}>{b.name}</span>
             </div>
+            <span className={styles.barPct}>{b.pct.toFixed(1)}%</span>
           </div>
         </div>
       ))}
@@ -82,15 +80,19 @@ export default function BreedStats() {
       <h2 className={`display ${styles.statsHeading}`}>
         The trends <span className="display-yellow">&amp; stats</span>
       </h2>
+
+      <BarTable caption="The most common dog breeds across all ages" bars={ALL_AGES} />
+
       <p className={styles.statsIntro}>
-        The share of the UK dog population made up by each breed. Look at the
-        puppies: the French Bulldog and Cockapoo have surged to the top, a sign of
-        the designer-crossbreed boom.
+        The most common dogs across all ages were the crossbreed, Labrador and
+        Jack Russell. But look at the puppies: among dogs under one year, the
+        French Bulldog and Cockapoo had surged into the top three, a sign of the
+        designer-crossbreed boom. The pack has both the classics and the new
+        favourites.
       </p>
-      <div className={styles.statGrid}>
-        <BarTable title="Most common breeds (all ages)" bars={ALL_AGES} />
-        <BarTable title="Most common puppy breeds (under one year)" bars={PUPPIES} />
-      </div>
+
+      <BarTable caption="The most common puppy breeds" bars={PUPPIES} />
+
       <p className={styles.source}>Source: RVC VetCompass, O&apos;Neill et al. (2023).</p>
     </section>
   );
