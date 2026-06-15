@@ -125,7 +125,7 @@
 .barRow {
   display: flex;
   align-items: center;
-  gap: clamp(12px, 2vw, 22px);
+  gap: 0;
   margin-bottom: clamp(14px, 2.4vw, 24px);
 }
 .barRow:last-child {
@@ -162,8 +162,8 @@
   gap: clamp(12px, 1.6vw, 20px);
 }
 .barFill {
-  height: clamp(42px, 6vw, 60px);
-  background: var(--yellow);
+  height: clamp(48px, 7vw, 68px);
+  background: #FFED60;
   border-radius: var(--radius-pill);
   width: 0;
   transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
@@ -175,14 +175,14 @@
 .barName {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
-  font-size: clamp(0.8rem, 1.7vw, 1.05rem);
-  color: var(--navy);
-  padding: 0 clamp(14px, 2vw, 24px);
+  font-size: clamp(0.85rem, 1.8vw, 1.15rem);
+  color: #00AEFF;
+  padding: 0 clamp(16px, 2.2vw, 26px);
   white-space: nowrap;
 }
 .barPct {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.6rem, 4.5vw, 2.8rem);
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
   color: var(--white);
   flex: 0 0 auto;
   line-height: 1;
