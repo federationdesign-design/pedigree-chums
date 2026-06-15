@@ -190,24 +190,40 @@
   color: var(--white);
 }
 
-/* decorative yellow circle behind a panel, like the homepage */
-.deco {
+/* plain yellow circles, drawn in CSS, sitting on the PAGE BACKGROUND behind
+   the panels (not on the cards). They live in .sections as absolute children. */
+.bgLayer {
   position: absolute;
+  inset: 0;
   z-index: 0;
-  width: clamp(140px, 16vw, 240px);
-  aspect-ratio: 1 / 1;
-  background: url(/pre-order-yellow-circle2.svg) center / contain no-repeat;
-  transform: rotate(-10deg);
+  overflow: hidden;
   pointer-events: none;
 }
-.decoA {
-  top: -52px;
-  right: -28px;
+.bgCircle {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  background: var(--yellow);
+  pointer-events: none;
+  opacity: 0.9;
 }
-.decoB {
-  bottom: -40px;
-  left: -30px;
-  transform: rotate(8deg);
+.bgCircleA {
+  width: clamp(160px, 20vw, 320px);
+  aspect-ratio: 1 / 1;
+  top: 6%;
+  right: -90px;
+}
+.bgCircleB {
+  width: clamp(200px, 24vw, 380px);
+  aspect-ratio: 1 / 1;
+  top: 44%;
+  left: -120px;
+}
+.bgCircleC {
+  width: clamp(140px, 16vw, 260px);
+  aspect-ratio: 1 / 1;
+  bottom: 4%;
+  right: -70px;
 }
 
 .sourceNote {
@@ -233,7 +249,7 @@
     grid-template-columns: 1fr;
     gap: clamp(14px, 3vw, 22px);
   }
-  .deco {
-    display: none;
+  .bgCircle {
+    opacity: 0.5;
   }
 }

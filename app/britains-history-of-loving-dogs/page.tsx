@@ -212,6 +212,11 @@ export default function HistoryPage() {
         </section>
 
         <div className={styles.sections}>
+          <div className={styles.bgLayer} aria-hidden="true">
+            <span className={`${styles.bgCircle} ${styles.bgCircleA}`} />
+            <span className={`${styles.bgCircle} ${styles.bgCircleB}`} />
+            <span className={`${styles.bgCircle} ${styles.bgCircleC}`} />
+          </div>
           <Triangles items={pageTriangles} z={0} />
           {SECTIONS.map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
@@ -221,11 +226,6 @@ export default function HistoryPage() {
                   <div className={`${styles.glowCircle} ${styles.glowTop}`} />
                   <div className={`${styles.glowCircle} ${styles.glowBottom}`} />
                 </div>
-                {i % 2 === 0 ? (
-                  <span className={`${styles.deco} ${styles.decoA}`} aria-hidden="true" />
-                ) : (
-                  <span className={`${styles.deco} ${styles.decoB}`} aria-hidden="true" />
-                )}
                 <div className={styles.colLeft}>
                   <div className={styles.imageSlot}>
                     <Image
