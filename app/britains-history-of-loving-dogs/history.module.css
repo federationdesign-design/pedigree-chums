@@ -1,6 +1,7 @@
 /* Britain's history of loving dogs.
-   Sits on the homepage-style two-tone diagonal gradient with a half-circle
-   motif at the top. Two-column sections, liquid width, white text. */
+   Each section is its own floating panel (homepage glow treatment), separated
+   by 50px gaps where the site's paw background shows through. Yellow circles
+   and parallax triangles echo the homepage. */
 
 .intro {
   padding: clamp(120px, 18vw, 190px) clamp(20px, 5vw, 64px) clamp(16px, 3vw, 32px);
@@ -23,57 +24,79 @@
   margin: 16px auto 0;
 }
 
-/* gradient backdrop + half-circle, like the homepage hero */
+/* liquid container; sections stack with 50px gaps between panels */
 .sections {
   position: relative;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: clamp(30px, 5vw, 60px) clamp(20px, 5vw, 64px) clamp(40px, 7vw, 80px);
-  background: linear-gradient(to top right, #00e2ff, #008eff);
-  overflow: hidden;
+  padding: clamp(20px, 4vw, 40px) clamp(18px, 4vw, 40px) clamp(40px, 7vw, 80px);
   z-index: 1;
 }
-.sections::before {
-  content: "";
-  position: absolute;
-  top: -42vw;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 130%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  z-index: 0;
-  pointer-events: none;
-}
 
-/* two-column section: left = image + title + intro + detail, right = bullets + did-you-know */
+/* each section = its own floating panel, like the homepage pitch panel */
 .section {
   position: relative;
   z-index: 1;
+  border-radius: 40px;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
+  overflow: hidden;
+  margin-bottom: 50px;
+  padding: clamp(24px, 3.5vw, 48px);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(20px, 3.5vw, 48px);
   align-items: start;
-  padding: clamp(20px, 3vw, 40px) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 .section:last-of-type {
-  border-bottom: 0;
+  margin-bottom: 0;
 }
+
+/* homepage glow: gradient base + two screen-blended cyan circles, clipped */
+.glowLayer {
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+}
+.glowCircle {
+  position: absolute;
+  border-radius: 50%;
+  background: #09c1f3;
+  mix-blend-mode: screen;
+  opacity: 0.43;
+}
+.glowTop {
+  width: clamp(420px, 62%, 1000px);
+  aspect-ratio: 1 / 1;
+  top: -16%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.glowBottom {
+  width: clamp(320px, 48%, 760px);
+  aspect-ratio: 1 / 1;
+  bottom: -20%;
+  left: -10%;
+}
+
 .colLeft,
 .colRight {
+  position: relative;
+  z-index: 1;
   min-width: 0;
 }
 
-/* main image now 1:1 */
+/* main image 1:1 */
 .imageSlot {
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 22px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
   margin: 0 0 clamp(16px, 2.4vw, 24px);
 }
 .sectionImg {
@@ -107,7 +130,7 @@
   margin: 0;
 }
 
-/* standard bullets */
+/* standard bullets, yellow markers */
 .bullets {
   list-style: disc;
   padding-left: 1.2em;
@@ -130,7 +153,7 @@
   display: flex;
   align-items: center;
   gap: clamp(12px, 2vw, 18px);
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
   border-radius: 18px;
   padding: clamp(14px, 2.2vw, 20px);
 }
@@ -167,6 +190,26 @@
   color: var(--white);
 }
 
+/* decorative yellow circle behind a panel, like the homepage */
+.deco {
+  position: absolute;
+  z-index: 0;
+  width: clamp(140px, 16vw, 240px);
+  aspect-ratio: 1 / 1;
+  background: url(/pre-order-yellow-circle2.svg) center / contain no-repeat;
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+.decoA {
+  top: -52px;
+  right: -28px;
+}
+.decoB {
+  bottom: -40px;
+  left: -30px;
+  transform: rotate(8deg);
+}
+
 .sourceNote {
   width: 100%;
   max-width: 1400px;
@@ -189,5 +232,8 @@
   .section {
     grid-template-columns: 1fr;
     gap: clamp(14px, 3vw, 22px);
+  }
+  .deco {
+    display: none;
   }
 }

@@ -3,7 +3,15 @@ import Image from "next/image";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
+import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import styles from "./history.module.css";
+
+const pageTriangles: Tri[] = [
+  { size: 64, top: "12%", left: "6%", speed: 0.14, spin: 0.18 },
+  { size: 48, top: "42%", right: "8%", speed: 0.2, spin: -0.28 },
+  { size: 84, top: "68%", left: "10%", speed: 0.12, spin: 0.12 },
+  { size: 56, top: "88%", right: "12%", speed: 0.18, spin: -0.2 },
+];
 
 export const metadata: Metadata = {
   title: "Britain's History of Loving Dogs",
@@ -186,10 +194,20 @@ export default function HistoryPage() {
         </section>
 
         <div className={styles.sections}>
+          <Triangles items={pageTriangles} z={0} />
           {SECTIONS.map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <section key={i} className={styles.section}>
+                <div className={styles.glowLayer} aria-hidden="true">
+                  <div className={`${styles.glowCircle} ${styles.glowTop}`} />
+                  <div className={`${styles.glowCircle} ${styles.glowBottom}`} />
+                </div>
+                {i % 2 === 0 ? (
+                  <span className={`${styles.deco} ${styles.decoA}`} aria-hidden="true" />
+                ) : (
+                  <span className={`${styles.deco} ${styles.decoB}`} aria-hidden="true" />
+                )}
                 <div className={styles.colLeft}>
                   <div className={styles.imageSlot}>
                     <Image
