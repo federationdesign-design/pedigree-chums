@@ -18,9 +18,9 @@ const ERA_RANGES: Record<string, [number, number]> = {
   "ancient-medieval": [0, 1499],
   c1500: [1500, 1699],
   c1700: [1700, 1799],
-  early1800: [1800, 1844],
-  mid1800: [1845, 1879],
-  late1800: [1880, 1899],
+  early1800: [1800, 1849],
+  mid1800: [1850, 1872],
+  late1800: [1873, 1899],
   c1900: [1900, 1999],
   crosses: [2000, 9999],
 };
@@ -42,6 +42,19 @@ export default function BreedStrip({ era }: { era: string }) {
   const breeds: UKBreed[] = ukBreeds.filter(
     (b) => b.anchor >= range[0] && b.anchor <= range[1]
   );
+
+  // The mid-1800s strip sits just before the Greyfriars Bobby story, so we add
+  // a Skye Terrier node here as a nod to Bobby, Britain's most famous Skye.
+  if (era === "mid1800") {
+    breeds.push({
+      name: "Skye Terrier",
+      era: "Bobby's breed",
+      anchor: 1850,
+      note: "Greyfriars Bobby, Edinburgh's most faithful dog, was a Skye Terrier.",
+      image: undefined,
+    });
+  }
+
   if (breeds.length === 0) return null;
 
   return (

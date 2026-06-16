@@ -112,7 +112,6 @@ const SECTIONS: Section[] = [
   {
     title: "The Victorian turning point",
     accent: "turning point",
-    era: "mid1800",
     intro:
       "If one era turned the British dog from worker to companion, it is the Victorian age. In just a few decades, dogs moved from the farmyard into the drawing room, and modern pet keeping was born.",
     bullets: [
