@@ -228,6 +228,9 @@
   border-radius: 18px;
   padding: clamp(14px, 2.2vw, 20px);
 }
+.fact + .fact {
+  margin-top: clamp(12px, 2vw, 16px);
+}
 .factImg {
   flex: 0 0 auto;
   width: clamp(56px, 9vw, 84px);
