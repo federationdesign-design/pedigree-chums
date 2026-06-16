@@ -18,12 +18,12 @@ export type UKBreed = {
 
 export const ukBreeds: UKBreed[] = [
   // Ancient to medieval
-  { name: "Irish Wolfhound", strip: "ancient-medieval", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound.jpg", tag: "endangered" },
-  { name: "English Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, prized as far back as Roman times.", image: "/history/breeds/english-mastiff.jpg", tag: "endangered" },
-  { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/greyhound.jpg", tag: "in-decline" },
+  { name: "Irish Wolfhound", strip: "ancient-medieval", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound-photo.jpg", tag: "endangered" },
+  { name: "English Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, prized as far back as Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
+  { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/greyhound-photo.jpg", tag: "in-decline" },
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-drawing.jpg", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "ancient-medieval", era: "Medieval", anchor: 1250, note: "Ancient Welsh cattle dog, the older of the two corgi breeds.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
-  { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/bloodhound.jpg", tag: "endangered" },
+  { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/bloodhound-photo.jpg", tag: "endangered" },
   { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/ScottishDeerhound-photo.avif", tag: "endangered" },
 
   // The 1500s and 1600s
@@ -84,17 +84,17 @@ export const ukBreeds: UKBreed[] = [
   { name: "Irish Terrier", strip: "late1800", era: "late 1800s", anchor: 1875, note: "Fiery red terrier, the 'daredevil' of Ireland.", image: "/history/breeds/irish-terrier-photo.jpg", tag: "in-decline" },
   { name: "Soft-Coated Wheaten Terrier", strip: "late1800", era: "late 1800s", anchor: 1876, note: "Silky-coated Irish farm terrier.", image: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", tag: "endangered" },
   { name: "Glen of Imaal Terrier", strip: "late1800", era: "late 1800s", anchor: 1877, note: "Low-slung Wicklow terrier of great strength.", image: "/history/breeds/glen-of-Imaal-terrier.jpg", tag: "endangered" },
-  { name: "Gordon Setter", strip: "late1800", era: "late 1800s", anchor: 1878, note: "Black-and-tan setter from the Scottish Highlands.", tag: "endangered" },
-  { name: "Irish Setter", strip: "late1800", era: "late 1800s", anchor: 1879, note: "Flashy red gundog full of energy." },
-  { name: "Curly-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1850, note: "The oldest retriever breed, with a coat of tight curls.", tag: "endangered" },
-  { name: "Flat-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1854, note: "Glossy gamekeeper's retriever, ever cheerful." },
-  { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/lab-square.png" },
+  { name: "Gordon Setter", strip: "late1800", era: "late 1800s", anchor: 1878, note: "Black-and-tan setter from the Scottish Highlands.", image: "/history/breeds/gordon-setter-photo.jpg", tag: "endangered" },
+  { name: "Irish Setter", strip: "late1800", era: "late 1800s", anchor: 1879, note: "Flashy red gundog full of energy.", image: "/history/breeds/irish-setter-photo.jpg" },
+  { name: "Curly-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1850, note: "The oldest retriever breed, with a coat of tight curls.", image: "/history/breeds/Curly-Coated-Retriever-photo.jpg", tag: "endangered" },
+  { name: "Flat-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1854, note: "Glossy gamekeeper's retriever, ever cheerful.", image: "/history/breeds/flatcoated_retriever-photo.jpg" },
+  { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/history/breeds/Labrador-retriever-photo.jpg" },
   { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", image: "/history/breeds/bearded-collie-photo.jpg", tag: "endangered" },
-  { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/border-collie-square.png", tag: "in-decline" },
-  { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/border-collie-square.png" },
-  { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/golden-square.png" },
-  { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/corgi-square.png" },
-  { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", tag: "endangered" },
+  { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
+  { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/history/breeds/Border_Collie_photo.jpg" },
+  { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/history/breeds/golden-retriever-photo.jpg" },
+  { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg" },
+  { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
 
   // The 1900s
   { name: "Norwich Terrier", strip: "c1900", era: "early 1900s", anchor: 1900, note: "Small, hardy red terrier with prick ears.", tag: "endangered" },
