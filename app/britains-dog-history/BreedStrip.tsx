@@ -34,19 +34,6 @@ export default function BreedStrip({ era }: { era: string }) {
 
   const breeds: UKBreed[] = ukBreeds.filter((b) => b.strip === era);
 
-  // The mid-1800s strip follows the Greyfriars Bobby story, so we add a Skye
-  // Terrier node here as a nod to Bobby, Britain's most famous Skye.
-  if (era === "mid1800") {
-    breeds.push({
-      name: "Skye Terrier",
-      strip: "mid1800",
-      era: "Bobby's breed",
-      anchor: 1850,
-      note: "Greyfriars Bobby, Edinburgh's most faithful dog, was a Skye Terrier.",
-      tag: "endangered",
-    });
-  }
-
   // Homepage-style scroll: convert vertical wheel into horizontal scroll for
   // the first few cards (the "hold"), then release the page to scroll on.
   useEffect(() => {

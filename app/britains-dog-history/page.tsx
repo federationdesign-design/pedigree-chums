@@ -237,9 +237,11 @@ export default function HistoryPage() {
             Britain&apos;s dog <span className="display-yellow">history</span>
           </PopHeading>
           <p className={styles.lead}>
-            Britain is a nation of dog lovers, and that bond runs deep. From working
-            the land to ruling the sofa, here is the story of how dogs became part
-            of who we are.
+            We are a nation of dog lovers now, but it was not always so. For
+            much of history Britain&apos;s dogs were worked hard, taxed, banned
+            from the streets and even maimed under harsh forest laws. This is the
+            story of how they went from tools and outcasts to the treasured
+            companions ruling our sofas today.
           </p>
         </section>
 
