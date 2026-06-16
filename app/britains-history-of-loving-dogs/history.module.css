@@ -274,45 +274,64 @@
 }
 
 /* horizontal track: native scroll only (no wheel-jacking), styled scrollbar */
-.stripTrack {
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 24px 4px 16px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--yellow) rgba(255, 255, 255, 0.22);
-}
-.stripTrack::-webkit-scrollbar {
-  height: 10px;
-}
-.stripTrack::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-pill);
-}
-.stripTrack::-webkit-scrollbar-thumb {
-  background: var(--yellow);
-  border-radius: var(--radius-pill);
+/* relative wrap holds the scrolling rail; the wheel listener lives here */
+.stripWrap {
+  position: relative;
 }
 
-/* the row sits on a horizontal timeline line */
-.stripRow {
+/* the rail: native horizontal scroll, native scrollbar hidden (we draw our
+   own yellow draggable thumb below, exactly like the homepage card rail) */
+.stripRail {
   display: flex;
+  flex-wrap: nowrap;
   gap: clamp(16px, 2.2vw, 30px);
   align-items: flex-start;
-  width: max-content;
-  min-width: 100%;
-  justify-content: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px clamp(16px, 5vw, 60px) 16px;
+  justify-content: safe center;
   position: relative;
-  padding-top: 20px;
+  scrollbar-width: none;
 }
-.stripRow::before {
+.stripRail::-webkit-scrollbar {
+  display: none;
+}
+.stripRail::before {
   content: "";
   position: absolute;
-  top: 8px;
-  left: 0;
-  right: 0;
+  top: 12px;
+  left: clamp(16px, 5vw, 60px);
+  right: clamp(16px, 5vw, 60px);
   height: 4px;
   background: rgba(255, 255, 255, 0.32);
   border-radius: var(--radius-pill);
+}
+
+/* custom yellow scrollbar (hidden until the rail overflows) */
+.stripScrollbar {
+  position: relative;
+  height: 12px;
+  margin: 8px clamp(40px, 8vw, 120px) 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.22);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.stripThumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--yellow);
+  cursor: grab;
+  touch-action: none;
+}
+.stripThumb:active {
+  cursor: grabbing;
 }
 
 /* one breed node */
@@ -443,6 +462,10 @@
   background: var(--yellow);
   color: var(--navy);
 }
+.nodeTagEndangered {
+  background: #ff9f1c;
+  color: var(--navy);
+}
 .nodeName {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
@@ -453,7 +476,7 @@
 }
 
 @media (max-width: 720px) {
-  .stripRow {
+  .stripRail {
     justify-content: flex-start;
   }
 }

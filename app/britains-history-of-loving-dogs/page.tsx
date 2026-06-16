@@ -112,6 +112,7 @@ const SECTIONS: Section[] = [
   {
     title: "The Victorian turning point",
     accent: "turning point",
+    era: "spaniels",
     intro:
       "If one era turned the British dog from worker to companion, it is the Victorian age. In just a few decades, dogs moved from the farmyard into the drawing room, and modern pet keeping was born.",
     bullets: [
@@ -130,6 +131,7 @@ const SECTIONS: Section[] = [
   {
     title: "Dogs in popular culture",
     accent: "culture",
+    era: "mid1800",
     intro:
       "Some dogs become more than pets, they become legends. No British dog story is more beloved than that of Greyfriars Bobby, the little terrier whose loyalty captured a nation's heart.",
     bullets: [
@@ -231,7 +233,6 @@ export default function HistoryPage() {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <div key={i}>
-                {s.era && <BreedStrip era={s.era} />}
                 <section className={styles.section}>
                 <div className={styles.glowLayer} aria-hidden="true">
                   <div className={`${styles.glowCircle} ${styles.glowTop}`} />
@@ -272,6 +273,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
               </section>
+              {s.era && <BreedStrip era={s.era} />}
               </div>
             );
           })}
