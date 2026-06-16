@@ -74,7 +74,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Airedale Terrier", strip: "mid1800", era: "mid-1800s", anchor: 1867, note: "The 'King of Terriers', largest of the terrier breeds.", image: "/history/breeds/airedale-terrier-photo.jpg", tag: "in-decline" },
   { name: "Sealyham Terrier", strip: "mid1800", era: "mid-1800s", anchor: 1868, note: "White Welsh terrier bred to take on badgers.", image: "/history/breeds/sealyham-terrier-photo.jpg", tag: "endangered" },
   { name: "Cairn Terrier", strip: "mid1800", era: "1800s", anchor: 1870, note: "Highland vermin-hunter that flushed prey from rock cairns.", image: "/history/breeds/cairn-terrier-photo.jpg", tag: "in-decline" },
-  { name: "Border Terrier", strip: "mid1800", era: "1800s", anchor: 1870, note: "Tough little fell terrier from the English-Scottish border.", image: "/history/breeds/border-terrier-photo.jpg" },
+  { name: "Border Terrier", strip: "late1800", era: "late 1800s", anchor: 1874, note: "Tough little fell terrier from the English-Scottish border.", image: "/history/breeds/border-terrier-photo.jpg" },
   { name: "Lakeland Terrier", strip: "mid1800", era: "1800s", anchor: 1871, note: "Fell-pack terrier from the Lake District.", image: "/history/breeds/lakeland-terrier-photo.jpg", tag: "endangered" },
   { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
   { name: "Fox Terrier", strip: "mid1800", era: "1800s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "in-decline" },
