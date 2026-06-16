@@ -62,8 +62,8 @@ export const ukBreeds: UKBreed[] = [
   // The mid-1800s
   { name: "Jack Russell Terrier", strip: "mid1800", era: "mid-1800s", anchor: 1840, note: "Bold fox-bolting terrier bred by the Reverend John Russell." },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1847", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
-  { name: "Bull Terrier", strip: "mid1800", era: "1800s", anchor: 1850, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/history/breeds/Bull-Terrier-photo.jpg" },
-  { name: "Staffordshire Bull Terrier", strip: "mid1800", era: "1800s", anchor: 1851, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.png" },
+  { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/history/breeds/Bull-Terrier-photo.jpg" },
+  { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.png" },
   { name: "Bullmastiff", strip: "mid1800", era: "Victorian", anchor: 1860, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
   { name: "Whippet", strip: "mid1800", era: "1800s", anchor: 1860, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/whippet-square.png" },
   { name: "Lurcher", strip: "mid1800", era: "1800s", anchor: 1861, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/Lurcher-square.png" },
@@ -76,7 +76,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cairn Terrier", strip: "mid1800", era: "1800s", anchor: 1870, note: "Highland vermin-hunter that flushed prey from rock cairns.", image: "/history/breeds/cairn-terrier-photo.jpg", tag: "in-decline" },
   { name: "Border Terrier", strip: "mid1800", era: "1800s", anchor: 1870, note: "Tough little fell terrier from the English-Scottish border.", image: "/history/breeds/border-terrier-photo.jpg" },
   { name: "Lakeland Terrier", strip: "mid1800", era: "1800s", anchor: 1871, note: "Fell-pack terrier from the Lake District.", image: "/history/breeds/lakeland-terrier-photo.jpg", tag: "endangered" },
-  { name: "Welsh Terrier", strip: "mid1800", era: "1800s", anchor: 1871, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
+  { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
   { name: "Fox Terrier", strip: "mid1800", era: "1800s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "in-decline" },
   { name: "English Toy Terrier", strip: "mid1800", era: "1800s", anchor: 1873, note: "Tiny black-and-tan toy bred down from the ratting terriers.", image: "/history/breeds/english-toy-terrier-photo.jpg", tag: "endangered" },
 
