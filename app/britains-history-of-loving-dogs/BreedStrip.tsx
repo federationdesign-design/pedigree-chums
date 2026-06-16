@@ -151,12 +151,20 @@ export default function BreedStrip({ era }: { era: string }) {
   if (breeds.length === 0) return null;
 
   const tagLabel = (t: string) =>
-    t === "extinct" ? "Extinct" : t === "cross" ? "Cross" : "Endangered";
+    t === "extinct"
+      ? "Extinct"
+      : t === "cross"
+      ? "Cross"
+      : t === "in-decline"
+      ? "In decline"
+      : "Endangered";
   const tagClass = (t: string) =>
     t === "extinct"
       ? styles.nodeTagExtinct
       : t === "cross"
       ? styles.nodeTagCross
+      : t === "in-decline"
+      ? styles.nodeTagDecline
       : styles.nodeTagEndangered;
 
   return (

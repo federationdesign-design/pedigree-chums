@@ -490,7 +490,7 @@
   z-index: 2;
 }
 .nodeTagExtinct {
-  background: #ff6b6b;
+  background: #d64545;
   color: var(--white);
 }
 .nodeTagCross {
@@ -498,7 +498,11 @@
   color: var(--navy);
 }
 .nodeTagEndangered {
-  background: #ff9f1c;
+  background: #ff7a3c;
+  color: var(--white);
+}
+.nodeTagDecline {
+  background: #ffb02e;
   color: var(--navy);
 }
 .nodeName {
