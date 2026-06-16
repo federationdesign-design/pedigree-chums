@@ -32,7 +32,9 @@ export default function BreedStrip({ era }: { era: string }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
 
-  const breeds: UKBreed[] = ukBreeds.filter((b) => b.strip === era);
+  const breeds: UKBreed[] = ukBreeds
+    .filter((b) => b.strip === era)
+    .sort((a, b) => a.anchor - b.anchor);
 
   // Homepage-style scroll: convert vertical wheel into horizontal scroll for
   // the first few cards (the "hold"), then release the page to scroll on.
