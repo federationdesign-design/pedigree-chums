@@ -87,9 +87,9 @@
 .yellowCircle {
   position: absolute;
   z-index: 0;
-  top: clamp(-96px, -6vw, -56px);
-  right: clamp(-44px, -3vw, -12px);
-  width: clamp(180px, 21vw, 340px);
+  top: 6%;
+  right: -8%;
+  width: clamp(180px, 20vw, 320px);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: var(--yellow);
@@ -97,7 +97,7 @@
 }
 .circleLeft {
   right: auto;
-  left: clamp(-44px, -3vw, -12px);
+  left: -8%;
 }
 @media (max-width: 900px) {
   .yellowCircle {

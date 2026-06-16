@@ -24,7 +24,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "ancient-medieval", era: "Medieval", anchor: 1250, note: "Ancient Welsh cattle dog, the older of the two corgi breeds.", image: "/corgi-square.png", tag: "endangered" },
   { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/bloodhound-square.png" },
-  { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1350, note: "Tall, rough-coated Highland hound bred to course red deer." },
+  { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer." },
 
   // The 1500s and 1600s
   { name: "Old English Bulldog", strip: "c1500", era: "1500s", anchor: 1550, note: "Stocky bull-baiting dog, ancestor of today's Bulldog.", tag: "extinct" },

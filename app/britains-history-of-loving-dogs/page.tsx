@@ -28,7 +28,7 @@ const heroTriangles: Tri[] = [
 ];
 
 export const metadata: Metadata = {
-  title: "Britain's History of Loving Dogs",
+  title: "Britain's Dog History",
   description:
     "How Britain became a nation of dog lovers: from working dogs and war mascots to Greyfriars Bobby, Crufts and the Victorian pet boom, right up to today's designer crossbreeds.",
 };
@@ -224,7 +224,7 @@ export default function HistoryPage() {
     <>
       <Nav />
       <main className={styles.page}>
-        <section className={styles.hero} aria-label="Britain's history of loving dogs">
+        <section className={styles.hero} aria-label="Britain's dog history">
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
           <div className={styles.heroTris}>
@@ -234,7 +234,7 @@ export default function HistoryPage() {
 
         <section className={styles.intro}>
           <PopHeading className={`display ${styles.title}`}>
-            Britain&apos;s history of <span className="display-yellow">loving dogs</span>
+            Britain&apos;s dog <span className="display-yellow">history</span>
           </PopHeading>
           <p className={styles.lead}>
             Britain is a nation of dog lovers, and that bond runs deep. From working
