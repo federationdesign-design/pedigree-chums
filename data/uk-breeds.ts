@@ -51,13 +51,13 @@ export const ukBreeds: UKBreed[] = [
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
   // The spaniel explosion
-  { name: "English Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1870, note: "Tireless gundog that springs game from cover." },
-  { name: "Welsh Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1872, note: "Red-and-white Welsh flushing spaniel.", tag: "endangered" },
-  { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/cocker-square.png" },
-  { name: "Field Spaniel", strip: "spaniels", era: "1800s", anchor: 1876, note: "Elegant working gundog spaniel.", tag: "endangered" },
-  { name: "Sussex Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", tag: "endangered" },
-  { name: "Irish Water Spaniel", strip: "spaniels", era: "mid-1800s", anchor: 1880, note: "Curly-coated water retriever with a rat-like tail.", tag: "endangered" },
-  { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", tag: "extinct" },
+  { name: "English Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1870, note: "Tireless gundog that springs game from cover.", image: "/history/breeds/english-springer-spaniel-photo.jpg" },
+  { name: "Welsh Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1872, note: "Red-and-white Welsh flushing spaniel.", image: "/history/breeds/welsh-springer-spaniel-photo.jpg", tag: "endangered" },
+  { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/history/breeds/cocker_spaniel-photo.jpg" },
+  { name: "Field Spaniel", strip: "spaniels", era: "1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
+  { name: "Sussex Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/sussex-spaniel-drawing.jpg", tag: "endangered" },
+  { name: "Irish Water Spaniel", strip: "spaniels", era: "mid-1800s", anchor: 1880, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel.jpg", tag: "endangered" },
+  { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
   { name: "Jack Russell Terrier", strip: "mid1800", era: "mid-1800s", anchor: 1840, note: "Bold fox-bolting terrier bred by the Reverend John Russell." },
