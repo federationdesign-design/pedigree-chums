@@ -38,17 +38,17 @@ export const ukBreeds: UKBreed[] = [
   { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.png", tag: "endangered" },
   { name: "Scottish Terrier", strip: "c1700", era: "1700s", anchor: 1700, note: "Sturdy Highland earth-dog with a determined streak.", image: "/scotty-square.png", tag: "in-decline" },
   { name: "King Charles Spaniel", strip: "c1700", era: "1700s", anchor: 1710, note: "Royal toy spaniel beloved at the Stuart court.", tag: "endangered" },
-  { name: "Pointer", strip: "c1700", era: "1700s", anchor: 1720, note: "Gundog that freezes and 'points' to hidden game birds.", tag: "in-decline" },
-  { name: "English Setter", strip: "c1700", era: "1700s", anchor: 1730, note: "Feathered bird dog that 'sets' low before the gun.", tag: "endangered" },
-  { name: "Dandie Dinmont Terrier", strip: "c1700", era: "1700s", anchor: 1740, note: "Distinctive terrier with a soft top-knot, from the Borders.", tag: "endangered" },
-  { name: "Clumber Spaniel", strip: "c1700", era: "1700s", anchor: 1750, note: "Heavy, stately gundog spaniel of the English aristocracy.", tag: "endangered" },
-  { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped cattle heels and ducked the kick.", tag: "extinct" },
+  { name: "Pointer", strip: "c1700", era: "1700s", anchor: 1720, note: "Gundog that freezes and 'points' to hidden game birds.", image: "/history/breeds/pointer-photo.jpg", tag: "in-decline" },
+  { name: "English Setter", strip: "c1700", era: "1700s", anchor: 1730, note: "Feathered bird dog that 'sets' low before the gun.", image: "/history/breeds/english_setter-photo.jpg", tag: "endangered" },
+  { name: "Dandie Dinmont Terrier", strip: "c1700", era: "1700s", anchor: 1740, note: "Distinctive terrier with a soft top-knot, from the Borders.", image: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", tag: "endangered" },
+  { name: "Clumber Spaniel", strip: "c1700", era: "1700s", anchor: 1750, note: "Heavy, stately gundog spaniel of the English aristocracy.", image: "/history/breeds/clumber-spaniel-photo.jpg", tag: "endangered" },
+  { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped cattle heels and ducked the kick.", image: "/history/breeds/Cur-dog-drawing.jpg", tag: "extinct" },
 
   // The early 1800s
   { name: "Beagle", strip: "early1800", era: "c. 1800", anchor: 1800, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/beagle-square.png" },
-  { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", tag: "extinct" },
-  { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", tag: "endangered" },
-  { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", tag: "endangered" },
+  { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/water-spaniel-illustration.jpg", tag: "extinct" },
+  { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
+  { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
   // The spaniel explosion
   { name: "English Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1870, note: "Tireless gundog that springs game from cover." },

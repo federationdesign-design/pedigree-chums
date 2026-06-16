@@ -100,7 +100,7 @@ const SECTIONS: Section[] = [
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     fact:
       "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey.",
-    image: "/history/working-roots.jpg",
+    image: "/history/working-roots.jpeg",
     imageAlt: "A working sheepdog herding livestock on a British hillside",
   },
   {
