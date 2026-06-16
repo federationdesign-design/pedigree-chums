@@ -57,6 +57,9 @@ const SECTIONS: Section[] = [
       "Commoners living near a forest had to have their dogs 'lawed', having three toes chopped off, to stop them chasing the king's game.",
       "By Tudor times, Henry VIII kept spaniels, beagles and greyhounds, and owned sixty-five dog leashes.",
       "Ladies of the court adored their little lapdogs, which they fondly called 'comforters'.",
+      "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.",
+      "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.",
+      "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.",
     ],
     detail:
       "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
@@ -76,6 +79,9 @@ const SECTIONS: Section[] = [
       "He followed his master onto the battlefield and was killed at the Battle of Marston Moor in 1644.",
       "Royalist soldiers adored him and reportedly gave him the rank of Sergeant-Major-General.",
       "He is often remembered as the first official British Army dog.",
+      "The Dickin Medal, the 'Animal VC', has been awarded to 38 dogs since 1943 for bravery in wartime.",
+      "Crumstone Irma, a search dog in the London Blitz, helped find 191 people buried in bombed buildings.",
+      "Judy, a pointer, survived Japanese prisoner-of-war camps and is the only dog ever officially registered as a POW.",
     ],
     detail:
       "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
@@ -95,6 +101,9 @@ const SECTIONS: Section[] = [
       "Terriers were developed to hunt vermin, going to ground after rats, mice and foxes.",
       "Sighthounds such as the Greyhound and Whippet were built for speed and the chase.",
       "Guarding and droving breeds protected homes and moved cattle to market.",
+      "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.",
+      "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home.",
+      "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold.",
     ],
     detail:
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
@@ -114,6 +123,9 @@ const SECTIONS: Section[] = [
       "The Metropolitan Police Act of 1839 banned dog-drawn carts within 15 miles of Charing Cross.",
       "A national ban on the public highways followed in 1854.",
       "The campaign against dog-carts helped shape Britain's early animal-welfare laws.",
+      "During the Great Plague of 1665, dogs were wrongly blamed for spreading the disease and the city ordered them destroyed.",
+      "London's dog-catcher killed over 4,000 dogs, which likely made things worse by sparing the rats that truly carried the plague.",
+      "Winston Churchill, nicknamed the British Bulldog, in fact kept a brown poodle named Rufus who slept by his bed all through the war.",
     ],
     detail:
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
@@ -133,6 +145,9 @@ const SECTIONS: Section[] = [
       "Her childhood companion was a Cavalier King Charles Spaniel named Dash, painted by royal artists.",
       "Britain held the world's first organised dog show in Newcastle in 1859.",
       "Battersea Dogs Home opened in 1860 and the Kennel Club followed in 1873.",
+      "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.",
+      "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.",
+      "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom.",
     ],
     detail:
       "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
@@ -152,6 +167,9 @@ const SECTIONS: Section[] = [
       "After Gray died in 1858, Bobby reportedly refused to leave his master's grave.",
       "The story says he kept watch over the grave for fourteen years until his own death in 1872.",
       "A statue and fountain were raised in his honour, and still draw visitors today.",
+      "Charles Dickens gave the villain Bill Sikes a fearful dog called Bull's-eye in Oliver Twist.",
+      "The poet Elizabeth Barrett Browning adored her spaniel Flush, later given his own book by Virginia Woolf.",
+      "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.",
     ],
     detail:
       "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
@@ -171,6 +189,9 @@ const SECTIONS: Section[] = [
       "The famous Best in Show title was not introduced until 1928.",
       "The first ever Best in Show winner was a Greyhound named Primley Sceptre.",
       "Crufts is now recognised as the largest dog show in the world.",
+      "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.",
+      "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year.",
+      "Charles Cruft never owned a dog himself, for fear of being seen to favour any one breed.",
     ],
     detail:
       "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
@@ -190,6 +211,9 @@ const SECTIONS: Section[] = [
       "Veterinary care, commercial dog food and training advice grew into established industries.",
       "Breeds rose and fell in popularity as fashions and lifestyles changed.",
       "The dog moved from the yard to the hearth, and often to the foot of the bed.",
+      "Around a third of British dogs are now allowed up onto their owner's bed to sleep.",
+      "Some 58 percent of owners buy their dog birthday and Christmas presents.",
+      "Pampered pets now enjoy spas, bakeries, dog fashion and even their own social media accounts.",
     ],
     detail:
       "As Britain became more urban and homes grew more comfortable, dogs came indoors for good. The relationship deepened from usefulness into genuine companionship. By the end of the century, the question was no longer what a dog could do for you, but simply the pleasure of its company, a shift that set the stage for the boom still unfolding today.",
@@ -209,6 +233,9 @@ const SECTIONS: Section[] = [
       "More than three million UK households welcomed a new pet during the pandemic.",
       "Younger owners now make up a fast-growing share of the dog-loving population.",
       "Designer crossbreeds like the Cockapoo and Labradoodle have surged in popularity.",
+      "British owners now spend around 10 billion pounds a year on their dogs.",
+      "There are an estimated 13.5 million pet dogs in the UK, living in roughly a third of all households.",
+      "The pet-tech market alone, covering smart feeders, cameras and GPS trackers, is now worth over 400 million pounds.",
     ],
     detail:
       "The most common breeds tell the story of changing tastes. Among dogs of all ages the classic Labrador still leads, but among puppies the French Bulldog and the Cockapoo have raced to the top, a clear sign of the designer-crossbreed boom. The pack brings both worlds together, the old favourites and the new, each with centuries of history behind them.",
@@ -264,6 +291,10 @@ export default function HistoryPage() {
                   <div className={`${styles.glowCircle} ${styles.glowBottom}`} />
                 </div>
                 <div className={styles.colLeft}>
+                  <h2 className={`display ${styles.sectionTitle}`}>
+                    {prefix}
+                    <span className="display-yellow">{s.accent}</span>
+                  </h2>
                   <div className={styles.imageSlot}>
                     <Image
                       src={s.image}
@@ -274,10 +305,6 @@ export default function HistoryPage() {
                       unoptimized
                     />
                   </div>
-                  <h2 className={`display ${styles.sectionTitle}`}>
-                    {prefix}
-                    <span className="display-yellow">{s.accent}</span>
-                  </h2>
                   <p className={styles.sectionIntro}>{s.intro}</p>
                   <p className={styles.detail}>{s.detail}</p>
                 </div>

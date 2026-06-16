@@ -13,7 +13,7 @@ export type UKBreed = {
   anchor: number;
   note: string;
   image?: string;
-  tag?: "extinct" | "cross" | "endangered" | "in-decline";
+  tag?: "extinct" | "trending" | "endangered" | "in-decline";
 };
 
 export const ukBreeds: UKBreed[] = [
@@ -60,7 +60,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
-  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/history/breeds/jack_russell_terrier_photo.jpg" },
+  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/history/breeds/jack_russell_terrier_photo.jpg", tag: "trending" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1847", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/history/breeds/Bull-Terrier-photo.jpg" },
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/history/breeds/staffordshire-bull-terrier-photo.jpg" },
@@ -106,8 +106,8 @@ export const ukBreeds: UKBreed[] = [
   { name: "Northern Inuit Dog", strip: "c1900", era: "1980s", anchor: 1985, note: "Wolf-look companion breed developed in the UK." },
 
   // Today's crossbreeds
-  { name: "Cockapoo", strip: "crosses", era: "1950s", anchor: 2000, note: "Cocker Spaniel crossed with a Poodle; the original 'designer dog'.", image: "/cockapoo-square.png", tag: "cross" },
-  { name: "Labradoodle", strip: "crosses", era: "1980s", anchor: 2005, note: "Labrador crossed with a Poodle, first bred as a guide dog.", image: "/Labradoodle-square.png", tag: "cross" },
-  { name: "Goldendoodle", strip: "crosses", era: "1990s", anchor: 2010, note: "Golden Retriever crossed with a Poodle.", image: "/goldendoodle-square.png", tag: "cross" },
-  { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 2012, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.png", tag: "cross" },
+  { name: "Cockapoo", strip: "crosses", era: "1950s", anchor: 2000, note: "Cocker Spaniel crossed with a Poodle; the original 'designer dog'.", image: "/cockapoo-square.png", tag: "trending" },
+  { name: "Labradoodle", strip: "crosses", era: "1980s", anchor: 2005, note: "Labrador crossed with a Poodle, first bred as a guide dog.", image: "/Labradoodle-square.png", tag: "trending" },
+  { name: "Goldendoodle", strip: "crosses", era: "1990s", anchor: 2010, note: "Golden Retriever crossed with a Poodle.", image: "/goldendoodle-square.png", tag: "trending" },
+  { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 2012, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.png", tag: "trending" },
 ];

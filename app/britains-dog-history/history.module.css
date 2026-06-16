@@ -493,9 +493,9 @@
   background: #d64545;
   color: var(--white);
 }
-.nodeTagCross {
-  background: var(--yellow);
-  color: var(--navy);
+.nodeTagTrending {
+  background: #2e9e5b;
+  color: var(--white);
 }
 .nodeTagEndangered {
   background: #ff7a3c;
