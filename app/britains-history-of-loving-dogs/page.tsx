@@ -4,7 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
-import BreedTimeline from "./BreedTimeline";
+import BreedStrip from "./BreedStrip";
 import styles from "./history.module.css";
 
 const pageTriangles: Tri[] = [
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 type Section = {
   title: string;
   accent: string;
+  era?: string; // which breed-strip era shows above this card
   intro: string;
   bullets: string[];
   detail: string;
@@ -35,6 +36,7 @@ const SECTIONS: Section[] = [
   {
     title: "Medieval and Tudor Britain",
     accent: "Tudor Britain",
+    era: "ancient-medieval",
     intro:
       "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
     bullets: [
@@ -51,8 +53,28 @@ const SECTIONS: Section[] = [
     imageAlt: "Medieval hunting hounds and a Tudor lapdog",
   },
   {
+    title: "Dogs in the armed forces",
+    accent: "armed forces",
+    era: "c1500",
+    intro:
+      "Dogs have marched alongside British soldiers for centuries, as scouts, messengers, guards and mascots. The most famous of all was a white poodle who became a legend of the English Civil War.",
+    bullets: [
+      "Boy was a white hunting poodle belonging to the Royalist commander Prince Rupert of the Rhine.",
+      "He followed his master onto the battlefield and was killed at the Battle of Marston Moor in 1644.",
+      "Royalist soldiers adored him and reportedly gave him the rank of Sergeant-Major-General.",
+      "He is often remembered as the first official British Army dog.",
+    ],
+    detail:
+      "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
+    fact:
+      "Parliamentarian propaganda during the Civil War seriously claimed Prince Rupert's poodle was a witch in disguise.",
+    image: "/history/boy-the-poodle.jpg",
+    imageAlt: "A 17th-century white poodle beside a Civil War cavalier",
+  },
+{
     title: "Working roots",
     accent: "roots",
+    era: "c1700",
     intro:
       "Long before dogs curled up by the fire, they worked for a living. Across Britain, breeds were shaped by the jobs they were needed to do, and you can still see those jobs written into their bodies and behaviour today.",
     bullets: [
@@ -69,26 +91,9 @@ const SECTIONS: Section[] = [
     imageAlt: "A working sheepdog herding livestock on a British hillside",
   },
   {
-    title: "Dogs in the armed forces",
-    accent: "armed forces",
-    intro:
-      "Dogs have marched alongside British soldiers for centuries, as scouts, messengers, guards and mascots. The most famous of all was a white poodle who became a legend of the English Civil War.",
-    bullets: [
-      "Boy was a white hunting poodle belonging to the Royalist commander Prince Rupert of the Rhine.",
-      "He followed his master onto the battlefield and was killed at the Battle of Marston Moor in 1644.",
-      "Royalist soldiers adored him and reportedly gave him the rank of Sergeant-Major-General.",
-      "He is often remembered as the first official British Army dog.",
-    ],
-    detail:
-      "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
-    fact:
-      "Parliamentarian propaganda during the Civil War seriously claimed Prince Rupert's poodle was a witch in disguise.",
-    image: "/history/boy-the-poodle.jpg",
-    imageAlt: "A 17th-century white poodle beside a Civil War cavalier",
-  },
-  {
     title: "Dogs in London",
     accent: "London",
+    era: "early1800",
     intro:
       "In the bustling streets of Victorian London, dogs were not just companions, they were engines of trade. For decades, teams of dogs hauled carts of goods through the capital, until the law stepped in.",
     bullets: [
@@ -107,6 +112,7 @@ const SECTIONS: Section[] = [
   {
     title: "The Victorian turning point",
     accent: "turning point",
+    era: "mid1800",
     intro:
       "If one era turned the British dog from worker to companion, it is the Victorian age. In just a few decades, dogs moved from the farmyard into the drawing room, and modern pet keeping was born.",
     bullets: [
@@ -143,6 +149,7 @@ const SECTIONS: Section[] = [
   {
     title: "Dog shows",
     accent: "shows",
+    era: "late1800",
     intro:
       "Once dogs became companions worth celebrating, Britain found a new way to honour them: the dog show. From modest beginnings grew Crufts, the most famous dog show in the world.",
     bullets: [
@@ -161,6 +168,7 @@ const SECTIONS: Section[] = [
   {
     title: "Into the modern home",
     accent: "home",
+    era: "c1900",
     intro:
       "Through the twentieth century, the dog's place in British life became firmly domestic. No longer just workers or status symbols, dogs settled in as everyday members of the household.",
     bullets: [
@@ -179,6 +187,7 @@ const SECTIONS: Section[] = [
   {
     title: "Today's boom",
     accent: "boom",
+    era: "crosses",
     intro:
       "Britain's dog population is bigger than ever, and still growing. A new generation of owners, and a global pandemic, have reshaped which dogs we choose and why.",
     bullets: [
@@ -222,7 +231,9 @@ export default function HistoryPage() {
           {SECTIONS.map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
-              <section key={i} className={styles.section}>
+              <div key={i}>
+                {s.era && <BreedStrip era={s.era} />}
+                <section className={styles.section}>
                 <div className={styles.glowLayer} aria-hidden="true">
                   <div className={`${styles.glowCircle} ${styles.glowTop}`} />
                   <div className={`${styles.glowCircle} ${styles.glowBottom}`} />
@@ -262,11 +273,10 @@ export default function HistoryPage() {
                   </div>
                 </div>
               </section>
+              </div>
             );
           })}
         </div>
-
-        <BreedTimeline />
 
         <section className={styles.sourceNote}>
           <p>
