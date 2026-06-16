@@ -15,6 +15,12 @@ const pageTriangles: Tri[] = [
   { size: 56, top: "88%", right: "12%", speed: 0.18, spin: -0.2 },
 ];
 
+const heroTriangles: Tri[] = [
+  { size: 72, top: "20%", left: "14%", speed: 0.12, spin: 0.2 },
+  { size: 46, top: "32%", right: "18%", speed: 0.22, spin: -0.3 },
+  { size: 92, bottom: "16%", left: "46%", speed: 0.16, spin: 0.14 },
+];
+
 export const metadata: Metadata = {
   title: "Britain's History of Loving Dogs",
   description:
@@ -212,6 +218,14 @@ export default function HistoryPage() {
     <>
       <Nav />
       <main className={styles.page}>
+        <section className={styles.hero} aria-label="Britain's history of loving dogs">
+          <div className={styles.heroImg} aria-hidden="true" />
+          <div className={styles.heroTint} aria-hidden="true" />
+          <div className={styles.heroTris}>
+            <Triangles items={heroTriangles} z={2} />
+          </div>
+        </section>
+
         <section className={styles.intro}>
           <PopHeading className={`display ${styles.title}`}>
             Britain&apos;s history of <span className="display-yellow">loving dogs</span>

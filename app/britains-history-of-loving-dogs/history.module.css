@@ -6,8 +6,45 @@
 .page {
   overflow-x: hidden;
 }
+
+/* full-bleed hero banner, like the homepage hero: a cover image with a soft
+   tint and drifting parallax triangles. The global fixed Nav sits over it and
+   fades its logo in on scroll, so no logo logic is needed here. */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: clamp(420px, 64vh, 720px);
+  overflow: hidden;
+}
+.heroImg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--blue-sky) url("/history-hero.jpg") center / cover no-repeat;
+}
+.heroTint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10, 58, 87, 0.08) 0%, rgba(10, 58, 87, 0.32) 100%);
+}
+.heroTris {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  .hero {
+    min-height: clamp(300px, 50vh, 460px);
+  }
+  .heroTris {
+    display: none;
+  }
+}
 .intro {
-  padding: clamp(120px, 18vw, 190px) clamp(20px, 5vw, 64px) clamp(16px, 3vw, 32px);
+  padding: clamp(40px, 6vw, 80px) clamp(20px, 5vw, 64px) clamp(16px, 3vw, 32px);
   text-align: center;
   position: relative;
   z-index: 1;
