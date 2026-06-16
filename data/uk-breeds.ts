@@ -23,7 +23,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/greyhound.jpg", tag: "endangered" },
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-drawing.jpg", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "ancient-medieval", era: "Medieval", anchor: 1250, note: "Ancient Welsh cattle dog, the older of the two corgi breeds.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
-  { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/bloodhound.jpg" },
+  { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/bloodhound.jpg" },
   { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/ScottishDeerhound-photo.avif" },
 
   // The 1500s and 1600s
