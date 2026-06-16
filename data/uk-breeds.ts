@@ -36,7 +36,7 @@ export const ukBreeds: UKBreed[] = [
 
   // The 1700s
   { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.png", tag: "endangered" },
-  { name: "Scottish Terrier", strip: "c1700", era: "1700s", anchor: 1700, note: "Sturdy Highland earth-dog with a determined streak.", image: "/scotty-square.png", tag: "in-decline" },
+  { name: "Scottish Terrier", strip: "c1700", era: "1700s", anchor: 1700, note: "Sturdy Highland earth-dog with a determined streak.", image: "/history/breeds/scottish-terrier-image.jpg", tag: "in-decline" },
   { name: "King Charles Spaniel", strip: "c1700", era: "1700s", anchor: 1710, note: "Royal toy spaniel beloved at the Stuart court.", image: "/history/breeds/king-charles-spaniel-photo.jpg", tag: "endangered" },
   { name: "Pointer", strip: "c1700", era: "1700s", anchor: 1720, note: "Gundog that freezes and 'points' to hidden game birds.", image: "/history/breeds/pointer-photo.jpg", tag: "in-decline" },
   { name: "English Setter", strip: "c1700", era: "1700s", anchor: 1730, note: "Feathered bird dog that 'sets' low before the gun.", image: "/history/breeds/english_setter-photo.jpg", tag: "endangered" },
@@ -45,7 +45,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped cattle heels and ducked the kick.", image: "/history/breeds/Cur-dog-drawing.jpg", tag: "extinct" },
 
   // The early 1800s
-  { name: "Beagle", strip: "early1800", era: "c. 1800", anchor: 1800, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/beagle-square.png" },
+  { name: "Beagle", strip: "early1800", era: "c. 1800", anchor: 1800, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/history/breeds/beagle-photo.jpg" },
   { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/water-spaniel-illustration.jpg", tag: "extinct" },
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
@@ -60,17 +60,17 @@ export const ukBreeds: UKBreed[] = [
   { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
-  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell." },
+  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/history/breeds/jack_russell_terrier_photo.jpg" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1847", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/history/breeds/Bull-Terrier-photo.jpg" },
-  { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.png" },
+  { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/history/breeds/staffordshire-bull-terrier-photo.jpg" },
   { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
-  { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/whippet-square.png" },
-  { name: "Lurcher", strip: "early1800", era: "1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/Lurcher-square.png" },
+  { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/history/breeds/whippet-photo.jpg" },
+  { name: "Lurcher", strip: "early1800", era: "1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/history/breeds/lurcher-photo.jpg" },
   { name: "Longdog", strip: "early1800", era: "1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" },
   { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
-  { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/yorkshire-square.png" },
-  { name: "West Highland White Terrier", strip: "mid1800", era: "late 1800s", anchor: 1885, note: "The plucky white terrier of the Scottish Highlands.", image: "/scotty-square.png" },
+  { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/history/breeds/yorkshire-terrier-photo.jpg" },
+  { name: "West Highland White Terrier", strip: "mid1800", era: "late 1800s", anchor: 1885, note: "The plucky white terrier of the Scottish Highlands.", image: "/history/breeds/west-highland-white-terrier-photo.jpg" },
   { name: "Airedale Terrier", strip: "mid1800", era: "1850s", anchor: 1853, note: "The 'King of Terriers', largest of the terrier breeds.", image: "/history/breeds/airedale-terrier-photo.jpg", tag: "in-decline" },
   { name: "Sealyham Terrier", strip: "mid1800", era: "1870s", anchor: 1875, note: "White Welsh terrier bred to take on badgers.", image: "/history/breeds/sealyham-terrier-photo.jpg", tag: "endangered" },
   { name: "Cairn Terrier", strip: "mid1800", era: "late 1800s", anchor: 1888, note: "Highland vermin-hunter that flushed prey from rock cairns.", image: "/history/breeds/cairn-terrier-photo.jpg", tag: "in-decline" },
@@ -89,7 +89,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Curly-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1850, note: "The oldest retriever breed, with a coat of tight curls.", tag: "endangered" },
   { name: "Flat-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1854, note: "Glossy gamekeeper's retriever, ever cheerful." },
   { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/lab-square.png" },
-  { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", tag: "endangered" },
+  { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", image: "/history/breeds/bearded-collie-photo.jpg", tag: "endangered" },
   { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/border-collie-square.png", tag: "in-decline" },
   { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/border-collie-square.png" },
   { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/golden-square.png" },
