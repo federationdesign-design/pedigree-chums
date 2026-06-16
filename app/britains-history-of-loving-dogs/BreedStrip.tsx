@@ -16,7 +16,7 @@ function DogIcon() {
 
 const ERA_LABELS: Record<string, string> = {
   "ancient-medieval": "Ancient to medieval",
-  c1500: "The 1500s and 1600s",
+  c1500: "Tudor times",
   c1700: "The 1700s",
   early1800: "The early 1800s",
   spaniels: "The spaniel explosion",

@@ -9,10 +9,16 @@ import BreedStrip from "./BreedStrip";
 import styles from "./history.module.css";
 
 const pageTriangles: Tri[] = [
-  { size: 64, top: "12%", left: "6%", speed: 0.14, spin: 0.18 },
-  { size: 48, top: "42%", right: "8%", speed: 0.2, spin: -0.28 },
-  { size: 84, top: "68%", left: "10%", speed: 0.12, spin: 0.12 },
-  { size: 56, top: "88%", right: "12%", speed: 0.18, spin: -0.2 },
+  { size: 34, top: "5%", left: "4%", speed: 0.16, spin: 0.22 },
+  { size: 28, top: "13%", right: "5%", speed: 0.24, spin: -0.3 },
+  { size: 44, top: "25%", left: "3%", speed: 0.14, spin: 0.18 },
+  { size: 30, top: "34%", right: "4%", speed: 0.26, spin: -0.34 },
+  { size: 38, top: "45%", left: "5%", speed: 0.18, spin: 0.2 },
+  { size: 26, top: "54%", right: "3%", speed: 0.3, spin: -0.4 },
+  { size: 42, top: "65%", left: "4%", speed: 0.15, spin: 0.16 },
+  { size: 30, top: "73%", right: "5%", speed: 0.22, spin: -0.28 },
+  { size: 36, top: "85%", left: "3%", speed: 0.17, spin: 0.2 },
+  { size: 28, top: "92%", right: "4%", speed: 0.25, spin: -0.32 },
 ];
 
 const heroTriangles: Tri[] = [
@@ -238,16 +244,18 @@ export default function HistoryPage() {
         </section>
 
         <div className={styles.sections}>
-          <Triangles items={pageTriangles} z={0} />
+          <Triangles items={pageTriangles} z={3} />
           {SECTIONS.map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <div key={i}>
                 <div className={styles.panelOuter}>
-                <ParallaxShape
-                  className={`${styles.yellowCircle} ${i % 2 ? styles.circleLeft : ""}`}
-                  speed={0.25}
-                />
+                {i < 2 && (
+                  <ParallaxShape
+                    className={`${styles.yellowCircle} ${i % 2 ? styles.circleLeft : ""}`}
+                    speed={0.25}
+                  />
+                )}
                 <section className={styles.section}>
                 <div className={styles.glowLayer} aria-hidden="true">
                   <div className={`${styles.glowCircle} ${styles.glowTop}`} />
