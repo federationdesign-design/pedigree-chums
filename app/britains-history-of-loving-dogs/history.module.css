@@ -3,6 +3,9 @@
    by 50px gaps where the site's paw background shows through. Yellow circles
    and parallax triangles echo the homepage. */
 
+.page {
+  overflow-x: hidden;
+}
 .intro {
   padding: clamp(120px, 18vw, 190px) clamp(20px, 5vw, 64px) clamp(16px, 3vw, 32px);
   text-align: center;
@@ -32,6 +35,37 @@
   margin: 0 auto;
   padding: clamp(20px, 4vw, 40px) clamp(18px, 4vw, 40px) clamp(40px, 7vw, 80px);
   z-index: 1;
+}
+
+/* per-panel yellow circle, copied from the homepage pitch panel: the circle is
+   a SIBLING of the panel (not a shared background layer), sitting behind it
+   (z-index 0) on a wrapper with NO overflow clipping, and the panel's gradient
+   lives in an inner glowLayer so the panel itself is transparent. The circle
+   peeks from the panel's top corner and is only ever cut by the window edge.
+   Wrapped in ParallaxShape, so it drifts slower than the page on scroll. */
+.panelOuter {
+  position: relative;
+  z-index: 1;
+}
+.yellowCircle {
+  position: absolute;
+  z-index: 0;
+  top: clamp(-96px, -6vw, -56px);
+  right: clamp(-44px, -3vw, -12px);
+  width: clamp(180px, 21vw, 340px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: var(--yellow);
+  pointer-events: none;
+}
+.circleLeft {
+  right: auto;
+  left: clamp(-44px, -3vw, -12px);
+}
+@media (max-width: 900px) {
+  .yellowCircle {
+    display: none;
+  }
 }
 
 /* each section = its own floating panel, like the homepage pitch panel */
@@ -190,41 +224,6 @@
   color: var(--white);
 }
 
-/* plain yellow circles, drawn in CSS, sitting on the PAGE BACKGROUND behind
-   the panels (not on the cards). They live in .sections as absolute children. */
-.bgLayer {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.bgCircle {
-  position: absolute;
-  z-index: 0;
-  border-radius: 50%;
-  background: var(--yellow);
-  pointer-events: none;
-  opacity: 0.9;
-}
-.bgCircleA {
-  width: clamp(160px, 20vw, 320px);
-  aspect-ratio: 1 / 1;
-  top: 6%;
-  right: -90px;
-}
-.bgCircleB {
-  width: clamp(200px, 24vw, 380px);
-  aspect-ratio: 1 / 1;
-  top: 44%;
-  left: -120px;
-}
-.bgCircleC {
-  width: clamp(140px, 16vw, 260px);
-  aspect-ratio: 1 / 1;
-  bottom: 4%;
-  right: -70px;
-}
 
 .sourceNote {
   width: 100%;
@@ -249,10 +248,7 @@
     grid-template-columns: 1fr;
     gap: clamp(14px, 3vw, 22px);
   }
-  .bgCircle {
-    opacity: 0.5;
   }
-}
 
 /* ---------------------------------------------- breed strip (per era, inline) */
 .strip {

@@ -4,6 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
+import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import BreedStrip from "./BreedStrip";
 import styles from "./history.module.css";
 
@@ -210,7 +211,7 @@ export default function HistoryPage() {
   return (
     <>
       <Nav />
-      <main>
+      <main className={styles.page}>
         <section className={styles.intro}>
           <PopHeading className={`display ${styles.title}`}>
             Britain&apos;s history of <span className="display-yellow">loving dogs</span>
@@ -223,16 +224,16 @@ export default function HistoryPage() {
         </section>
 
         <div className={styles.sections}>
-          <div className={styles.bgLayer} aria-hidden="true">
-            <span className={`${styles.bgCircle} ${styles.bgCircleA}`} />
-            <span className={`${styles.bgCircle} ${styles.bgCircleB}`} />
-            <span className={`${styles.bgCircle} ${styles.bgCircleC}`} />
-          </div>
           <Triangles items={pageTriangles} z={0} />
           {SECTIONS.map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <div key={i}>
+                <div className={styles.panelOuter}>
+                <ParallaxShape
+                  className={`${styles.yellowCircle} ${i % 2 ? styles.circleLeft : ""}`}
+                  speed={0.25}
+                />
                 <section className={styles.section}>
                 <div className={styles.glowLayer} aria-hidden="true">
                   <div className={`${styles.glowCircle} ${styles.glowTop}`} />
@@ -273,6 +274,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
               </section>
+              </div>
               {s.era && <BreedStrip era={s.era} />}
               </div>
             );
