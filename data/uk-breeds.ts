@@ -18,7 +18,7 @@ export type UKBreed = {
 
 export const ukBreeds: UKBreed[] = [
   // Ancient to medieval
-  { name: "Irish Wolfhound", strip: "ancient-medieval", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/irish-square.png" },
+  { name: "Irish Wolfhound", strip: "ancient-medieval", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound.jpg" },
   { name: "English Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, prized as far back as Roman times.", image: "/history/breeds/english-mastiff.jpg", tag: "endangered" },
   { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/greyhound.jpg", tag: "endangered" },
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-drawing.jpg", tag: "extinct" },
@@ -27,12 +27,12 @@ export const ukBreeds: UKBreed[] = [
   { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/ScottishDeerhound-photo.avif" },
 
   // The 1500s and 1600s
-  { name: "Old English Bulldog", strip: "c1500", era: "1500s", anchor: 1550, note: "Stocky bull-baiting dog, ancestor of today's Bulldog.", tag: "extinct" },
-  { name: "Skye Terrier", strip: "c1500", era: "1500s", anchor: 1560, note: "Long-bodied, long-coated terrier from Scotland's Isle of Skye.", tag: "endangered" },
-  { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", tag: "endangered" },
-  { name: "Otterhound", strip: "c1500", era: "1500s", anchor: 1580, note: "Rough-coated, web-footed scent hound bred to hunt otters; now the rarest native breed.", tag: "endangered" },
-  { name: "Turnspit Dog", strip: "c1500", era: "c. 1576", anchor: 1576, note: "Short-legged dog bred to run inside a wheel and turn the roasting spit.", tag: "extinct" },
-  { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", tag: "extinct" },
+  { name: "Old English Bulldog", strip: "c1500", era: "1500s", anchor: 1550, note: "Stocky bull-baiting dog, ancestor of today's Bulldog.", image: "/history/breeds/old-engish-bulldog.webp", tag: "extinct" },
+  { name: "Skye Terrier", strip: "c1500", era: "1500s", anchor: 1560, note: "Long-bodied, long-coated terrier from Scotland's Isle of Skye.", image: "/history/breeds/skye-terrier-photo.webp", tag: "endangered" },
+  { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", image: "/history/breeds/English_Foxhound_photo.jpeg", tag: "endangered" },
+  { name: "Otterhound", strip: "c1500", era: "1500s", anchor: 1580, note: "Rough-coated, web-footed scent hound bred to hunt otters; now the rarest native breed.", image: "/history/breeds/otterhound-photo.jpg", tag: "endangered" },
+  { name: "Turnspit Dog", strip: "c1500", era: "c. 1576", anchor: 1576, note: "Short-legged dog bred to run inside a wheel and turn the roasting spit.", image: "/history/breeds/Turnspitdog-drawing.jpg", tag: "extinct" },
+  { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound-illustration.jpg", tag: "extinct" },
 
   // The 1700s
   { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.png", tag: "endangered" },
