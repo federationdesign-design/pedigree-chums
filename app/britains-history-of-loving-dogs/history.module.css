@@ -253,3 +253,183 @@
     opacity: 0.5;
   }
 }
+
+/* -------------------------------------------------- breed timeline (scroll) */
+.timeline {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 48px) 0 clamp(30px, 5vw, 60px);
+}
+.timelineHeading {
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  color: var(--white);
+  text-align: center;
+  margin: 0 0 12px;
+  padding: 0 clamp(20px, 5vw, 48px);
+}
+.timelineIntro {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.3em;
+  color: var(--white);
+  max-width: 60ch;
+  margin: 0 auto clamp(24px, 4vw, 36px);
+  text-align: center;
+  padding: 0 clamp(20px, 5vw, 48px);
+}
+
+/* horizontal scroll track */
+.timelineTrack {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 16px clamp(20px, 5vw, 48px) 28px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--yellow) rgba(255, 255, 255, 0.2);
+}
+.timelineTrack::-webkit-scrollbar {
+  height: 10px;
+}
+.timelineTrack::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-pill);
+}
+.timelineTrack::-webkit-scrollbar-thumb {
+  background: var(--yellow);
+  border-radius: var(--radius-pill);
+}
+
+/* the row sits on a horizontal "timeline" line */
+.timelineRow {
+  display: flex;
+  gap: clamp(14px, 2vw, 26px);
+  align-items: flex-start;
+  width: max-content;
+  position: relative;
+  padding-top: 18px;
+}
+.timelineRow::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-pill);
+}
+
+/* each breed card */
+.tlCard {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(120px, 14vw, 150px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  outline: none;
+}
+.tlCard::before {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--yellow);
+  border: 3px solid #008eff;
+}
+.tlEra {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--yellow);
+  margin-bottom: 8px;
+  line-height: 1;
+}
+.tlThumb {
+  position: relative;
+  width: clamp(72px, 9vw, 96px);
+  height: clamp(72px, 9vw, 96px);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tlThumb :global(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dogIcon {
+  width: 56%;
+  height: 56%;
+  fill: var(--white);
+  opacity: 0.85;
+}
+.tlTag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 2px 0;
+  color: var(--navy);
+}
+.tlTagExtinct {
+  background: #ff6b6b;
+  color: var(--white);
+}
+.tlTagCross {
+  background: var(--yellow);
+}
+.tlName {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.82rem;
+  line-height: 1.15;
+  color: var(--white);
+  margin-top: 10px;
+}
+.tlNote {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: var(--navy);
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.25s ease;
+  pointer-events: none;
+}
+.tlCard:hover .tlNote,
+.tlCard:focus .tlNote,
+.tlCard:focus-within .tlNote {
+  max-height: 160px;
+  opacity: 1;
+}
+.timelineHint {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--white);
+  opacity: 0.75;
+  text-align: center;
+  margin: 8px 0 0;
+}

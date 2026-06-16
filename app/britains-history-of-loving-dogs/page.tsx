@@ -4,6 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
+import BreedTimeline from "./BreedTimeline";
 import styles from "./history.module.css";
 
 const pageTriangles: Tri[] = [
@@ -264,6 +265,8 @@ export default function HistoryPage() {
             );
           })}
         </div>
+
+        <BreedTimeline />
 
         <section className={styles.sourceNote}>
           <p>
