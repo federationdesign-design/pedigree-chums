@@ -70,8 +70,12 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: clamp(20px, 4vw, 40px) clamp(18px, 4vw, 40px) clamp(40px, 7vw, 80px);
+  padding: clamp(20px, 4vw, 40px) clamp(18px, 4vw, 40px) clamp(8px, 1.5vw, 16px);
   z-index: 1;
+}
+/* the final breed strip has no following section, so drop its trailing gap */
+.sections > div:last-child .strip {
+  margin-bottom: 0;
 }
 
 /* per-panel yellow circle, copied from the homepage pitch panel: the circle is
@@ -519,6 +523,22 @@
   line-height: 1.15;
   color: var(--white);
   margin-top: 16px;
+}
+
+/* mobile: the rail advances horizontally as the page scrolls (driven by JS in
+   BreedStrip on touch devices, which have no wheel events), so disable native
+   horizontal scroll and clip the translated rail at the viewport edges */
+@media (max-width: 900px) {
+  .stripWrap {
+    overflow-x: clip;
+  }
+  .stripRail {
+    overflow-x: hidden;
+    will-change: transform;
+  }
+  .stripScrollbar {
+    display: none;
+  }
 }
 
 @media (max-width: 720px) {

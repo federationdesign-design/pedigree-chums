@@ -77,6 +77,44 @@ export default function BreedStrip({ era }: { era: string }) {
     };
   }, []);
 
+  // Mobile: touch devices fire no wheel events, so advance the rail horizontally
+  // as the page scrolls, mapping the strip's travel through the viewport to its
+  // horizontal scroll. Mirrors the homepage's scroll-linked feel.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 900px)").matches) return;
+    const wrap = wrapRef.current;
+    const rail = railRef.current;
+    if (!wrap || !rail) return;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const maxT = rail.scrollWidth - wrap.clientWidth;
+      if (maxT <= 0) {
+        rail.style.transform = "";
+        return;
+      }
+      const rect = wrap.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      let p = (vh - rect.top) / (vh + rect.height);
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+      rail.style.transform = `translate3d(-${(p * maxT).toFixed(1)}px,0,0)`;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+      rail.style.transform = "";
+    };
+  }, []);
+
   // Yellow draggable scrollbar thumb synced to the rail's scroll position.
   useEffect(() => {
     const el = railRef.current;
