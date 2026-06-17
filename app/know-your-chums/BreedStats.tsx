@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import styles from "./know.module.css";
 
-type Bar = { name: string; pct: number; img: string | null; label?: string };
+type Bar = { name: string; pct: number; img: string | null; label?: string; w?: number };
 
 // RVC VetCompass (O'Neill et al. 2023), UK 2019 demography.
 const ALL_AGES: Bar[] = [
@@ -26,27 +26,26 @@ const PUPPIES: Bar[] = [
 // The rarest breeds in the pack, by estimated share of the UK dog population.
 // Derived from Kennel Club annual puppy registrations (2024): Bloodhound ~50,
 // Mastiff ~100, Irish Wolfhound 165, English Setter 185, Old English Sheepdog 241.
+// `w` is the bar width (%); the labels carry the true estimated share. Bars are
+// scaled up for legibility so the breed name sits inside the bar.
 const RARE: Bar[] = [
-  { name: "Bloodhound", pct: 0.004, label: "0.004%", img: "/bloodhound-square.png" },
-  { name: "Mastiff", pct: 0.007, label: "0.007%", img: "/mastiff-square.jpg" },
-  { name: "Irish Wolfhound", pct: 0.01, label: "0.01%", img: "/irish-square.png" },
-  { name: "English Setter", pct: 0.019, label: "0.019%", img: "/english-setter-square.jpg" },
-  { name: "Old English Sheepdog", pct: 0.024, label: "0.024%", img: "/old-english-square.png" },
+  { name: "Bloodhound", pct: 0.004, label: "0.004%", w: 34, img: "/bloodhound-square.png" },
+  { name: "Mastiff", pct: 0.007, label: "0.007%", w: 42, img: "/mastiff-square.jpg" },
+  { name: "Irish Wolfhound", pct: 0.01, label: "0.01%", w: 50, img: "/irish-square.png" },
+  { name: "English Setter", pct: 0.019, label: "0.019%", w: 56, img: "/english-setter-square.jpg" },
+  { name: "Old English Sheepdog", pct: 0.024, label: "0.024%", w: 70, img: "/old-english-square.png" },
 ];
 
 const MAX_PCT = 7.0; // longest common-breed bar = French Bulldog 7.0%
-const RARE_MAX = 0.0625; // scales the rarest breeds down to short stubs
 
 function BarTable({
   caption,
   bars,
   max = MAX_PCT,
-  nameOutside = false,
 }: {
   caption: string;
   bars: Bar[];
   max?: number;
-  nameOutside?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
@@ -70,29 +69,31 @@ function BarTable({
   return (
     <div className={styles.statBlock} ref={ref}>
       <p className={styles.statCaption}>{caption}</p>
-      {bars.map((b, i) => (
-        <div className={styles.barRow} key={`${b.name}-${i}`}>
-          <div className={styles.barThumb}>
-            {b.img ? (
-              <Image src={b.img} alt={b.name} width={120} height={120} unoptimized />
-            ) : (
-              <span className={styles.barThumbPaw} aria-hidden="true">
-                🐾
-              </span>
-            )}
-          </div>
-          <div className={styles.barTrack}>
-            <div
-              className={styles.barFill}
-              style={{ width: inView ? `${(b.pct / max) * 78}%` : "0%" }}
-            >
-              {!nameOutside && <span className={styles.barName}>{b.name}</span>}
+      {bars.map((b, i) => {
+        const target = b.w != null ? b.w : (b.pct / max) * 78;
+        return (
+          <div className={styles.barRow} key={`${b.name}-${i}`}>
+            <div className={styles.barThumb}>
+              {b.img ? (
+                <Image src={b.img} alt={b.name} width={120} height={120} unoptimized />
+              ) : (
+                <span className={styles.barThumbPaw} aria-hidden="true">
+                  🐾
+                </span>
+              )}
             </div>
-            {nameOutside && <span className={styles.barNameOut}>{b.name}</span>}
-            <span className={styles.barPct}>{b.label ?? `${b.pct.toFixed(1)}%`}</span>
+            <div className={styles.barTrack}>
+              <div
+                className={styles.barFill}
+                style={{ width: inView ? `${target}%` : "0%" }}
+              >
+                <span className={styles.barName}>{b.name}</span>
+              </div>
+              <span className={styles.barPct}>{b.label ?? `${b.pct.toFixed(1)}%`}</span>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -125,12 +126,7 @@ export default function BreedStats() {
         a quiet act of rescue.
       </p>
 
-      <BarTable
-        caption="And the rarest breeds in the pack"
-        bars={RARE}
-        max={RARE_MAX}
-        nameOutside
-      />
+      <BarTable caption="And the rarest breeds in the pack" bars={RARE} />
 
       <p className={styles.source}>
         Rarity estimated from Kennel Club puppy registrations (2024). Most-common
