@@ -31,15 +31,6 @@ export default function Nav() {
       <Link href="/" className={styles.logo} aria-label="Pedigree Chums home">
         <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
       </Link>
-
-      <nav className={styles.topMenu} aria-label="Primary">
-        {links.map((l) => (
-          <Link key={l.href} href={l.href} className={styles.topLink}>
-            {l.label}
-          </Link>
-        ))}
-      </nav>
-
       <button
         type="button"
         className={styles.burger}

@@ -8,13 +8,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px clamp(18px, 4vw, 48px);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease;
-}
-/* Solid bar once scrolled, so the logo and menu stay legible over the
-   cream/white page content below the hero. */
-.bar.scrolled {
-  background: var(--navy);
-  box-shadow: 0 2px 14px rgba(10, 58, 87, 0.28);
 }
 
 .logo {
@@ -35,41 +28,10 @@
   height: auto;
 }
 
-/* Visible top-right menu (desktop). Fades in on scroll alongside the logo and
-   the navy bar, mirroring the logo behaviour, so the hero stays clean at the
-   top and the white links always sit on the navy bar. */
-.topMenu {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 2.4vw, 34px);
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-.bar.scrolled .topMenu {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-.topLink {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: clamp(0.85rem, 1.3vw, 1.05rem);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  color: var(--white);
-  transition: color 0.15s ease, transform 0.15s ease;
-}
-.topLink:hover {
-  color: var(--yellow);
-  transform: translateY(-1px);
-}
-
+/* Hamburger, always visible, on both mobile and desktop. The yellow pill is
+   legible over the hero and over the page content, so no header fill is needed. */
 .burger {
-  /* Hidden on desktop; the inline menu above is shown instead. Restored on
-     mobile via the media query below. */
-  display: none;
+  display: inline-flex;
   flex-direction: column;
   gap: 6px;
   padding: 14px 13px;
@@ -127,14 +89,4 @@
 .menuLink:hover {
   color: var(--yellow);
   transform: scale(1.04);
-}
-
-/* Mobile: hide the inline menu and show the hamburger instead. */
-@media (max-width: 760px) {
-  .topMenu {
-    display: none;
-  }
-  .burger {
-    display: inline-flex;
-  }
 }
