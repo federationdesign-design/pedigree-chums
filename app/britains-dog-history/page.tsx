@@ -61,7 +61,11 @@ const SECTIONS: Section[] = [
     detail:
       "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
     facts: [
-      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/purkoy.jpg" },      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/medieval-law.jpg" },      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/bandogs.jpg" },      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg" },    ],
+      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/purkoy.jpg" },
+      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/medieval-law.jpg" },
+      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/bandogs.jpg" },
+      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg" },
+    ],
     image: "/history/medieveal-dogs.jpg",
     imageAlt: "Medieval hunting hounds and a Tudor lapdog",
   },
@@ -81,7 +85,10 @@ const SECTIONS: Section[] = [
     detail:
       "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
     facts: [
-      { text: "Parliamentarian propaganda during the Civil War seriously claimed Prince Rupert's poodle was a witch in disguise.", image: "/history/boy.jpg" },      { text: "The Dickin Medal, the 'Animal VC', has been awarded to 38 dogs since 1943 for bravery in wartime.", image: "/history/animal-vc.jpg" },      { text: "Crumstone Irma, a search dog in the London Blitz, helped find 191 people buried in bombed buildings.", image: "/history/crumstone-irma.jpg" },    ],
+      { text: "Parliamentarian propaganda during the Civil War seriously claimed Prince Rupert's poodle was a witch in disguise.", image: "/history/boy.jpg" },
+      { text: "The Dickin Medal, the 'Animal VC', has been awarded to 38 dogs since 1943 for bravery in wartime.", image: "/history/animal-vc.jpg" },
+      { text: "Crumstone Irma, a search dog in the London Blitz, helped find 191 people buried in bombed buildings.", image: "/history/crumstone-irma.jpg" },
+    ],
     image: "/history/boy-the-poodle.jpg",
     imageAlt: "A 17th-century white poodle beside a Civil War cavalier",
   },
@@ -100,8 +107,11 @@ const SECTIONS: Section[] = [
     detail:
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     facts: [
-      { text: "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey.", image: "/history/terra.jpg" },      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/turnspitdog-drawing.jpg" },
-      { text: "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home.", image: "/history/drovers-dogs.jpg" },      { text: "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold.", image: "/history/waterdog.jpg" },    ],
+      { text: "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey.", image: "/history/terra.jpg" },
+      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/turnspitdog-drawing.jpg" },
+      { text: "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home.", image: "/history/drovers-dogs.jpg" },
+      { text: "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold.", image: "/history/waterdog.jpg" },
+    ],
     image: "/history/working-roots.jpeg",
     imageAlt: "A working sheepdog herding livestock on a British hillside",
   },
@@ -121,7 +131,10 @@ const SECTIONS: Section[] = [
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
     facts: [
       { text: "One estimate suggests the 1839 London ban alone led to the loss of more than 3,000 working dogs almost overnight." },
-      { text: "During the Great Plague of 1665, dogs were wrongly blamed for spreading the disease and the city ordered them destroyed.", image: "/history/plague.jpg" },      { text: "London's dog-catcher killed over 4,000 dogs, which likely made things worse by sparing the rats that truly carried the plague.", image: "/history/plague2.jpg" },      { text: "Winston Churchill, nicknamed the British Bulldog, in fact kept a brown poodle named Rufus who slept by his bed all through the war.", image: "/history/winston-churchill.jpg" },    ],
+      { text: "During the Great Plague of 1665, dogs were wrongly blamed for spreading the disease and the city ordered them destroyed.", image: "/history/plague.jpg" },
+      { text: "London's dog-catcher killed over 4,000 dogs, which likely made things worse by sparing the rats that truly carried the plague.", image: "/history/plague2.jpg" },
+      { text: "Winston Churchill, nicknamed the British Bulldog, in fact kept a brown poodle named Rufus who slept by his bed all through the war.", image: "/history/winston-churchill.jpg" },
+    ],
     image: "/history/dog-carts.jpg",
     imageAlt: "A Victorian street trader with a dog-drawn cart in London",
   },
@@ -141,7 +154,9 @@ const SECTIONS: Section[] = [
       "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
     facts: [
       { text: "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete." },
-      { text: "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.", image: "/history/dog-licence.jpg" },      { text: "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.", image: "/history/dog-biscuit.jpg" },      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom." },
+      { text: "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.", image: "/history/dog-licence.jpg" },
+      { text: "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.", image: "/history/dog-biscuit.jpg" },
+      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom." },
     ],
     image: "/history/portrait-of-dash.jpg",
     imageAlt: "A Victorian lady with a small spaniel companion",
@@ -161,7 +176,11 @@ const SECTIONS: Section[] = [
     detail:
       "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
     facts: [
-      { text: "Greyfriars Bobby's headstone reads: 'Let his loyalty and devotion be a lesson to us all.'", image: "/history/greyfriars-bobby.jpg" },      { text: "Charles Dickens gave the villain Bill Sikes a fearful dog called Bull's-eye in Oliver Twist.", image: "/history/dickens.jpg" },      { text: "The poet Elizabeth Barrett Browning adored her spaniel Flush, later given his own book by Virginia Woolf.", image: "/history/elizabeth-barrett-browning.jpg" },      { text: "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.", image: "/history/peterpan.jpg" },    ],
+      { text: "Greyfriars Bobby's headstone reads: 'Let his loyalty and devotion be a lesson to us all.'", image: "/history/greyfriars-bobby.jpg" },
+      { text: "Charles Dickens gave the villain Bill Sikes a fearful dog called Bull's-eye in Oliver Twist.", image: "/history/dickens.jpg" },
+      { text: "The poet Elizabeth Barrett Browning adored her spaniel Flush, later given his own book by Virginia Woolf.", image: "/history/elizabeth-barrett-browning.jpg" },
+      { text: "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.", image: "/history/peterpan.jpg" },
+    ],
     image: "/history/bobby.jpeg",
     imageAlt: "The Greyfriars Bobby statue in Edinburgh",
   },
@@ -181,7 +200,8 @@ const SECTIONS: Section[] = [
       "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
     facts: [
       { text: "Primley Sceptre, the first Best in Show winner, was picked from an entry of 9,466 dogs and described by the judge as 'faultless'." },
-      { text: "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.", image: "/history/james-spratt.jpg" },      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year." },
+      { text: "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.", image: "/history/james-spratt.jpg" },
+      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year." },
       { text: "Charles Cruft never owned a dog himself, for fear of being seen to favour any one breed." },
     ],
     image: "/history/primley-sceptre.jpeg",
