@@ -5,6 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
+import Announce from "../../components/Announce/Announce";
 import BreedStrip from "./BreedStrip";
 import styles from "./history.module.css";
 
@@ -22,9 +23,9 @@ const pageTriangles: Tri[] = [
 ];
 
 const heroTriangles: Tri[] = [
-  { size: 72, top: "20%", left: "14%", speed: 0.12, spin: 0.2 },
-  { size: 46, top: "32%", right: "18%", speed: 0.22, spin: -0.3 },
-  { size: 92, bottom: "16%", left: "46%", speed: 0.16, spin: 0.14 },
+  { size: 70, top: "14%", left: "16%", speed: 0.12, spin: 0.2 },
+  { size: 44, top: "30%", right: "22%", speed: 0.22, spin: -0.32 },
+  { size: 92, bottom: "16%", left: "42%", speed: 0.16, spin: 0.14 },
 ];
 
 export const metadata: Metadata = {
@@ -263,6 +264,7 @@ export default function HistoryPage() {
         <section className={styles.hero} aria-label="Britain's dog history">
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
+          <Announce />
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
           </div>
