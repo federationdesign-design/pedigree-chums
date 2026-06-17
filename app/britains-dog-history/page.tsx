@@ -108,7 +108,7 @@ const SECTIONS: Section[] = [
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     facts: [
       { text: "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey." },
-      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/Turnspitdog-drawing.jpg" },
+      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/turnspitdog-drawing.jpg" },
       { text: "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home." },
       { text: "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold." },
     ],
