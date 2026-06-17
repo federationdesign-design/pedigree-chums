@@ -6,11 +6,15 @@ import { breeds, type Breed } from "../../data/breeds";
 import styles from "./know.module.css";
 
 const ROWS: { title: string; accent: string; names: string[] }[] = [
-  { title: "Popular UK breeds", accent: "breeds", names: ["Yorkshire Terrier", "Greyhound", "Bulldog", "Golden Retriever"] },
-  { title: "Oldest UK breeds", accent: "breeds", names: ["Lurcher", "Greyhound", "Corgi", "Bloodhound"] },
-  { title: "The top dogs", accent: "dogs", names: ["Labrador", "Border Collie", "Cocker Spaniel", "Staffordshire Bull Terrier"] },
-  { title: "The ol' favourites", accent: "favourites", names: ["West Highland Terrier", "German Shepherd", "Beagle", "Old English Sheepdog"] },
-  { title: "The new favourites", accent: "favourites", names: ["French Bulldog", "Pug", "Cockapoo", "Cavapoo"] },
+  { title: "The top dogs", accent: "dogs", names: ["French Bulldog", "Chihuahua", "Dachshund", "German Shepherd"] },
+  { title: "Popular UK breeds", accent: "breeds", names: ["Cocker Spaniel", "Golden Retriever", "Staffordshire Bull Terrier", "Springer Spaniel"] },
+  { title: "The ol' favourites", accent: "favourites", names: ["West Highland Terrier", "Yorkshire Terrier", "Cavalier King Charles Spaniel", "Whippet"] },
+  { title: "The new favourites", accent: "favourites", names: ["Cockapoo", "Cavapoo", "Labradoodle", "Goldendoodle"] },
+  { title: "Oldest UK breeds", accent: "breeds", names: ["Irish Wolfhound", "Corgi", "Bulldog", "Beagle"] },
+  { title: "Furthest from home", accent: "home", names: ["Afghan Hound", "Shih Tzu", "Pug", "Siberian Husky"] },
+  { title: "Endangered dogs", accent: "dogs", names: ["Old English Sheepdog", "Bloodhound", "Greyhound", "Mastiff"] },
+  { title: "Employed dogs", accent: "dogs", names: ["Labrador", "Border Collie", "Rottweiler", "Doberman Pinscher"] },
+  { title: "Pint-sized pups", accent: "pups", names: ["Pomeranian", "Maltese", "Papillon", "Bichon Frise"] },
 ];
 
 const byName = (name: string): Breed | undefined => breeds.find((b) => b.name === name);

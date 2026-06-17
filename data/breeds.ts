@@ -1,7 +1,7 @@
 // Single source of truth for the 54 dogs in the pack.
 // Physical characteristics + personality, from the card data.
 // `draft: true` entries (Irish Setter, Bernedoodle) are placeholder
-// copy pending final card content — review before relying on them.
+// copy pending final card content – review before relying on them.
 
 export type SizeBand = "small" | "medium" | "large" | "giant";
 export type Skull = "flat" | "medium" | "long";
@@ -77,7 +77,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/mastiff-square.jpg",
   },
   {
     name: "Great Dane",
@@ -536,7 +536,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "long",
-    image: "/lab-square.png",
+    image: "/greyhound-square.jpg",
   },
   {
     name: "Lurcher",
@@ -938,7 +938,7 @@ export const breeds: Breed[] = [
     coatColour: "Black, white & rust tri-colour, or solid",
     coatLength: "Wavy to curly, low-shedding",
     height: "74cm",
-    length: "—",
+    length: "–",
     weight: "(11-41 kg)",
     fact: "cross bred from Bernese Mountain Dog & Poodle",
     character: "Comes in Tiny, Mini & Standard sizes. Gentle, loyal and playful. Often low-shedding. Friendly family dogs that bond closely with their owners.",

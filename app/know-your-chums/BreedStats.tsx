@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import styles from "./know.module.css";
 
-type Bar = { name: string; pct: number; img: string | null };
+type Bar = { name: string; pct: number; img: string | null; label?: string };
 
 // RVC VetCompass (O'Neill et al. 2023), UK 2019 demography.
 const ALL_AGES: Bar[] = [
   { name: "Labrador Retriever", pct: 6.9, img: "/lab-square.png" },
-  { name: "Jack Russell Terrier", pct: 4.5, img: null },
+  { name: "Jack Russell Terrier", pct: 4.5, img: "/jack-russel-square.jpg" },
   { name: "English Cocker Spaniel", pct: 4.3, img: "/cocker-square.png" },
   { name: "Staffordshire Bull Terrier", pct: 4.2, img: "/staffy-square.png" },
   { name: "Chihuahua", pct: 3.6, img: "/Chihuahua-square.png" },
@@ -23,9 +23,31 @@ const PUPPIES: Bar[] = [
   { name: "Chihuahua", pct: 4.2, img: "/Chihuahua-square.png" },
 ];
 
-const MAX_PCT = 7.0; // longest bar = French Bulldog 7.0%
+// The rarest breeds in the pack, by estimated share of the UK dog population.
+// Derived from Kennel Club annual puppy registrations (2024): Bloodhound ~50,
+// Mastiff ~100, Irish Wolfhound 165, English Setter 185, Old English Sheepdog 241.
+const RARE: Bar[] = [
+  { name: "Bloodhound", pct: 0.004, label: "0.004%", img: "/bloodhound-square.png" },
+  { name: "Mastiff", pct: 0.007, label: "0.007%", img: "/mastiff-square.jpg" },
+  { name: "Irish Wolfhound", pct: 0.01, label: "0.01%", img: "/irish-square.png" },
+  { name: "English Setter", pct: 0.019, label: "0.019%", img: "/english-setter-square.jpg" },
+  { name: "Old English Sheepdog", pct: 0.024, label: "0.024%", img: "/old-english-square.png" },
+];
 
-function BarTable({ caption, bars }: { caption: string; bars: Bar[] }) {
+const MAX_PCT = 7.0; // longest common-breed bar = French Bulldog 7.0%
+const RARE_MAX = 0.0625; // scales the rarest breeds down to short stubs
+
+function BarTable({
+  caption,
+  bars,
+  max = MAX_PCT,
+  nameOutside = false,
+}: {
+  caption: string;
+  bars: Bar[];
+  max?: number;
+  nameOutside?: boolean;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
 
@@ -62,11 +84,12 @@ function BarTable({ caption, bars }: { caption: string; bars: Bar[] }) {
           <div className={styles.barTrack}>
             <div
               className={styles.barFill}
-              style={{ width: inView ? `${(b.pct / MAX_PCT) * 78}%` : "0%" }}
+              style={{ width: inView ? `${(b.pct / max) * 78}%` : "0%" }}
             >
-              <span className={styles.barName}>{b.name}</span>
+              {!nameOutside && <span className={styles.barName}>{b.name}</span>}
             </div>
-            <span className={styles.barPct}>{b.pct.toFixed(1)}%</span>
+            {nameOutside && <span className={styles.barNameOut}>{b.name}</span>}
+            <span className={styles.barPct}>{b.label ?? `${b.pct.toFixed(1)}%`}</span>
           </div>
         </div>
       ))}
@@ -93,7 +116,26 @@ export default function BreedStats() {
 
       <BarTable caption="The most common puppy breeds" bars={PUPPIES} />
 
-      <p className={styles.source}>Source: RVC VetCompass, O&apos;Neill et al. (2023).</p>
+      <p className={styles.statsIntro}>
+        Now the other end of the lead. These five are in the pack too, yet you
+        would be lucky to pass one in the park. Each makes up the tiniest sliver
+        of Britain&apos;s dogs: the Bloodhound, with only around fifty puppies
+        registered a year, the gentle Mastiff at roughly a hundred, and three
+        more native breeds the Kennel Club counts as vulnerable. Choosing one is
+        a quiet act of rescue.
+      </p>
+
+      <BarTable
+        caption="And the rarest breeds in the pack"
+        bars={RARE}
+        max={RARE_MAX}
+        nameOutside
+      />
+
+      <p className={styles.source}>
+        Rarity estimated from Kennel Club puppy registrations (2024). Most-common
+        figures: RVC VetCompass, O&apos;Neill et al. (2023).
+      </p>
     </section>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
+import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import BreedStats from "./BreedStats";
 import ChumExplorer from "./ChumExplorer";
 import styles from "./know.module.css";
@@ -75,11 +76,26 @@ const FACTS: { hero: string; label: string; icon?: IconKey }[] = [
   { hero: "Law", label: "microchipping has been a legal requirement for UK dogs since 2016", icon: "microchip" },
 ];
 
+const heroTriangles: Tri[] = [
+  { size: 70, top: "14%", left: "16%", speed: 0.12, spin: 0.2 },
+  { size: 44, top: "30%", right: "22%", speed: 0.22, spin: -0.32 },
+  { size: 92, bottom: "16%", left: "42%", speed: 0.16, spin: 0.14 },
+];
+
 export default function KnowYourChums() {
   return (
     <>
       <Nav />
-      <main>
+      <main className={styles.page}>
+        {/* Hero banner, matching the other pages */}
+        <section className={styles.hero} aria-label="Know your chums">
+          <div className={styles.heroImg} aria-hidden="true" />
+          <div className={styles.heroTint} aria-hidden="true" />
+          <div className={styles.heroTris}>
+            <Triangles items={heroTriangles} z={2} />
+          </div>
+        </section>
+
         {/* Intro */}
         <section className={styles.intro}>
           <PopHeading className={`display ${styles.title}`}>
