@@ -61,15 +61,18 @@
 }
 .close {
   position: absolute;
-  top: 22px;
-  right: 26px;
-  width: 56px;
-  height: 56px;
+  top: 24px;
+  right: clamp(18px, 4vw, 48px);
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--yellow);
   color: var(--navy);
-  font-size: 2.2rem;
+  font-size: 2rem;
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
@@ -84,6 +87,10 @@
   font-family: var(--font-display);
   font-size: clamp(2rem, 8vw, 3.4rem);
   color: var(--white);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 .menuLink:hover {

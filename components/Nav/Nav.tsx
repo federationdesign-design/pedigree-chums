@@ -58,6 +58,16 @@ export default function Nav() {
                 {l.label}
               </Link>
             ))}
+            <button
+              type="button"
+              className={styles.menuLink}
+              onClick={() => {
+                setOpen(false);
+                window.dispatchEvent(new CustomEvent("pc:open-offer"));
+              }}
+            >
+              Get discount code
+            </button>
           </nav>
         </div>
       )}
