@@ -144,6 +144,8 @@ export default function BreedStrip({ era }: { era: string }) {
       ? "Extinct"
       : t === "trending"
       ? "Trending"
+      : t === "popular"
+      ? "Popular"
       : t === "in-decline"
       ? "In decline"
       : "Endangered";
@@ -152,6 +154,8 @@ export default function BreedStrip({ era }: { era: string }) {
       ? styles.nodeTagExtinct
       : t === "trending"
       ? styles.nodeTagTrending
+      : t === "popular"
+      ? styles.nodeTagPopular
       : t === "in-decline"
       ? styles.nodeTagDecline
       : styles.nodeTagEndangered;

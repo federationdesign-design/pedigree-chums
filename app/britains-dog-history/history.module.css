@@ -500,6 +500,10 @@
   background: #2e9e5b;
   color: var(--white);
 }
+.nodeTagPopular {
+  background: var(--blue);
+  color: var(--white);
+}
 .nodeTagEndangered {
   background: #ff7a3c;
   color: var(--white);
