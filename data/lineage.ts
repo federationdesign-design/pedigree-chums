@@ -23,19 +23,27 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       {
         name: "St John's Water Dog",
-        note: "The fishermen's dog of Newfoundland, and the heart of the Labrador. It hauled nets and fetched fish from the cold Atlantic.",
-        children: [
-          { name: "Fishermen's water dogs", note: "Working water dogs the European fishing crews brought across the Atlantic.", value: 47 },
-          { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with on arrival.", value: 25 }
-        ]
+        note: "The earlier dog it all grew from: the fishermen's water dog of Newfoundland, brought to Britain and bred up from there.",
+        img: "/history/waterdog.jpg",
+        value: 55
       },
       {
-        name: "British gundog refining",
-        note: "Once the dogs reached England in the 1800s, breeders polished them into the retriever we know.",
-        children: [
-          { name: "Wavy and flat-coated retrievers", note: "Early British retrievers used to fix the type.", value: 16 },
-          { name: "Setter and pointer crosses", note: "A little gundog blood for nose and biddability.", value: 12 }
-        ]
+        name: "British Pointers",
+        note: "Crossed in by British breeders for nose and a steady, focused drive in the field.",
+        img: "/history/breeds/pointer-photo.jpg",
+        value: 17
+      },
+      {
+        name: "British Setters",
+        note: "Added biddability and a love of working close with people on the shoot.",
+        img: "/history/breeds/english_setter-photo.jpg",
+        value: 15
+      },
+      {
+        name: "British Spaniels",
+        note: "A touch of spaniel for a soft mouth and real keenness in water and cover.",
+        img: "/history/breeds/english-springer-spaniel-photo.jpg",
+        value: 13
       }
     ]
   },
@@ -49,7 +57,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The base type, and where the name comes from: a sharp German farm and ratting dog.",
         children: [
           { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", value: 22 },
-          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", value: 16 }
+          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/miniature-schnauzer-square.jpg", value: 16 }
         ]
       },
       {
@@ -57,7 +65,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "Brought bone, substance and a steady guarding drive.",
         img: "/Rottweiler-square.jpg",
         children: [
-          { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", value: 17 },
+          { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", img: "/history/drovers-dogs.jpg", value: 17 },
           { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.", value: 10 }
         ]
       },
@@ -66,8 +74,8 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "Gave the sleek coat, the tan points and the terrier fire. This is the Manchester Terrier line.",
         img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg",
         children: [
-          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", value: 14 },
-          { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", value: 8 }
+          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 14 },
+          { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
         ]
       },
       { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/greyhound square.jpg", value: 13 }

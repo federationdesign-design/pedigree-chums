@@ -495,6 +495,13 @@
 .familySub {
   margin: 0 0 12px;
 }
+.familyText {
+  transition: opacity 0.35s ease;
+}
+.familyTextDim {
+  opacity: 0.1;
+  pointer-events: none;
+}
 .familyCol {
   position: absolute;
   inset: 0;

@@ -39,6 +39,8 @@ function ChumCard({ breed, onOpen }: { breed: Breed; onOpen: (b: Breed) => void 
 }
 
 function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
+  const [treeActive, setTreeActive] = useState(false);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
@@ -89,13 +91,15 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
           <>
             <div className={styles.familyLead}>
               <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{breed.name}</h3>
-              <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>
-                Where the breed comes from
-              </h4>
-              {details}
+              <div className={`${styles.familyText} ${treeActive ? styles.familyTextDim : ""}`}>
+                <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>
+                  Where the breed comes from
+                </h4>
+                {details}
+              </div>
             </div>
             <div className={styles.familyCol}>
-              <BreedTree root={lineage} rootImage={breed.image} />
+              <BreedTree root={lineage} rootImage={breed.image} onActiveChange={setTreeActive} />
             </div>
           </>
         ) : (

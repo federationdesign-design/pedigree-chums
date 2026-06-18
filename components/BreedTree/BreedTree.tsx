@@ -13,7 +13,15 @@ const PAD = 1.4;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
-export default function BreedTree({ root, rootImage }: { root: LineageNode; rootImage?: string }) {
+export default function BreedTree({
+  root,
+  rootImage,
+  onActiveChange,
+}: {
+  root: LineageNode;
+  rootImage?: string;
+  onActiveChange?: (active: boolean) => void;
+}) {
   const nodes = useMemo<Node[]>(() => {
     const h = hierarchy<LineageNode>(root)
       .sum((d) => d.value ?? 0)
@@ -78,6 +86,7 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   function zoom(d: Node) {
     focusRef.current = d;
     setFocus(d);
+    onActiveChange?.(d !== nodes[0]);
     const target: View = [d.x, d.y, d.r * 2 * PAD];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
@@ -130,10 +139,13 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   }, []);
 
   // Widen (or heighten) the viewBox to the stage's aspect so the focused circle
-  // still fits the short side while the long side gains room for siblings.
+  // still fits the short side while the long side gains room for siblings. On a
+  // wide canvas we also push the origin rightwards so the diagram sits on the
+  // right of the pop-up, clear of the text column, rather than dead centre.
   const vbW = aspect >= 1 ? SIZE * aspect : SIZE;
   const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
-  const viewBox = `${-vbW / 2} ${-SIZE / 2} ${vbW} ${vbH}`;
+  const xMin = aspect >= 1 ? -vbW * 0.72 : -vbW / 2;
+  const viewBox = `${xMin} ${-SIZE / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();
   const share = focus.parent ? Math.round((focus.value ?? 0) / (focus.parent.value || 1) * 100) : null;
