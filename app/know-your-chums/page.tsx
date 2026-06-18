@@ -91,6 +91,7 @@ export default function KnowYourChums() {
         <section className={styles.hero} aria-label="Know your chums">
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
+          <span className={styles.comingSoon}>Coming soon</span>
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
           </div>

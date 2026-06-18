@@ -40,6 +40,51 @@
   }
 }
 
+/* "Coming soon" status pill, pinned to the hero's top-left */
+.comingSoon {
+  position: absolute;
+  z-index: 3;
+  top: clamp(20px, 5vw, 40px);
+  left: clamp(18px, 4vw, 48px);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: clamp(9px, 1.4vw, 13px) clamp(16px, 2.4vw, 24px);
+  border-radius: var(--radius-pill);
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(0.82rem, 1.8vw, 1.05rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 28px rgba(10, 58, 87, 0.4);
+}
+.comingSoon::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--navy);
+  animation: comingPulse 1.6s ease-in-out infinite;
+}
+@keyframes comingPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .comingSoon::before {
+    animation: none;
+  }
+}
+
 /* ---------------------------------------------------------------- intro */
 .intro {
   padding: clamp(40px, 6vw, 80px) clamp(20px, 5vw, 64px) clamp(16px, 3vw, 32px);

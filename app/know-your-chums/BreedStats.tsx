@@ -4,22 +4,31 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import styles from "./know.module.css";
 
-type Bar = { name: string; pct: number; img: string | null; label?: string; w?: number };
+type Bar = {
+  name: string;
+  pct: number;
+  img: string | null;
+  label?: string;
+  w?: number;
+  // Shorter nickname shown inside the bar so the label fits (the full `name`
+  // is kept for the image alt text). e.g. "Staffordshire Bull Terrier" -> "Staffy".
+  short?: string;
+};
 
 // RVC VetCompass (O'Neill et al. 2023), UK 2019 demography.
 const ALL_AGES: Bar[] = [
-  { name: "Labrador Retriever", pct: 6.9, img: "/lab-square.jpg" },
-  { name: "Jack Russell Terrier", pct: 4.5, img: "/jack-russel-square.jpg" },
-  { name: "English Cocker Spaniel", pct: 4.3, img: "/cocker-square.jpg" },
-  { name: "Staffordshire Bull Terrier", pct: 4.2, img: "/staffy-square.jpg" },
+  { name: "Labrador Retriever", short: "Labrador", pct: 6.9, img: "/lab-square.jpg" },
+  { name: "Jack Russell Terrier", short: "Jack Russell", pct: 4.5, img: "/jack-russel-square.jpg" },
+  { name: "English Cocker Spaniel", short: "Cocker", pct: 4.3, img: "/cocker-square.jpg" },
+  { name: "Staffordshire Bull Terrier", short: "Staffy", pct: 4.2, img: "/staffy-square.jpg" },
   { name: "Chihuahua", pct: 3.6, img: "/Chihuahua-square.jpg" },
 ];
 
 const PUPPIES: Bar[] = [
-  { name: "French Bulldog", pct: 7.0, img: "/frenchy0square.jpg" },
+  { name: "French Bulldog", short: "Frenchies", pct: 7.0, img: "/frenchy0square.jpg" },
   { name: "Cockapoo", pct: 6.2, img: "/Cockapoo-square.jpg" },
-  { name: "Labrador Retriever", pct: 5.8, img: "/lab-square.jpg" },
-  { name: "English Cocker Spaniel", pct: 4.7, img: "/cocker-square.jpg" },
+  { name: "Labrador Retriever", short: "Labrador", pct: 5.8, img: "/lab-square.jpg" },
+  { name: "English Cocker Spaniel", short: "Cocker", pct: 4.7, img: "/cocker-square.jpg" },
   { name: "Chihuahua", pct: 4.2, img: "/Chihuahua-square.jpg" },
 ];
 
@@ -31,9 +40,9 @@ const PUPPIES: Bar[] = [
 const RARE: Bar[] = [
   { name: "Bloodhound", pct: 0.004, label: "0.004%", w: 34, img: "/bloodhound-square.jpg" },
   { name: "Mastiff", pct: 0.007, label: "0.007%", w: 42, img: "/mastiff-square.jpg" },
-  { name: "Irish Wolfhound", pct: 0.01, label: "0.01%", w: 50, img: "/Irish Wolfhound-square.jpg" },
+  { name: "Irish Wolfhound", short: "Wolfhound", pct: 0.01, label: "0.01%", w: 50, img: "/Irish Wolfhound-square.jpg" },
   { name: "English Setter", pct: 0.019, label: "0.019%", w: 56, img: "/english-setter-square.jpg" },
-  { name: "Old English Sheepdog", pct: 0.024, label: "0.024%", w: 70, img: "/old-english-square.jpg" },
+  { name: "Old English Sheepdog", short: "Old English", pct: 0.024, label: "0.024%", w: 70, img: "/old-english-square.jpg" },
 ];
 
 const MAX_PCT = 7.0; // longest common-breed bar = French Bulldog 7.0%
@@ -87,7 +96,7 @@ function BarTable({
                 className={styles.barFill}
                 style={{ width: inView ? `${target}%` : "0%" }}
               >
-                <span className={styles.barName}>{b.name}</span>
+                <span className={styles.barName}>{b.short ?? b.name}</span>
               </div>
               <span className={styles.barPct}>{b.label ?? `${b.pct.toFixed(1)}%`}</span>
             </div>
