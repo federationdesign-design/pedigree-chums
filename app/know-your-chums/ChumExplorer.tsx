@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { breeds, type Breed } from "../../data/breeds";
+import { getLineage } from "../../data/lineage";
+import BreedTree from "../../components/BreedTree/BreedTree";
 import styles from "./know.module.css";
 
 const ROWS: { title: string; accent: string; names: string[] }[] = [
@@ -47,6 +49,8 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
     };
   }, [onClose]);
 
+  const lineage = getLineage(breed.name);
+
   const stats: [string, string][] = [
     ["Size", cap(breed.sizeBand)],
     ["Muzzle", cap(breed.skull)],
@@ -57,13 +61,15 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
 
   return (
     <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={breed.name}>
-      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+      <div className={`${styles.modalCard} ${lineage ? styles.modalCardSolo : ""}`} onClick={(e) => e.stopPropagation()}>
         <button className={styles.modalClose} onClick={onClose} aria-label="Close">
           &times;
         </button>
-        <div className={styles.modalImgWrap}>
-          <Image src={breed.image} alt={breed.name} width={600} height={600} className={styles.modalImg} unoptimized />
-        </div>
+        {!lineage && (
+          <div className={styles.modalImgWrap}>
+            <Image src={breed.image} alt={breed.name} width={600} height={600} className={styles.modalImg} unoptimized />
+          </div>
+        )}
         <div className={styles.modalInfo}>
           <h3 className={styles.modalName}>{breed.name}</h3>
           <p className={styles.modalLookFor}>
@@ -80,6 +86,16 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
           <h4 className={styles.modalSubhead}>Personality</h4>
           <p className={styles.modalChar}>{breed.character}</p>
           {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
+          {lineage && (
+            <div className={styles.familyBlock}>
+              <hr className={styles.familyDivider} />
+              <h4 className={styles.modalSubhead}>Where the {breed.name} comes from</h4>
+              <p className={styles.familyIntro}>
+                A best-guess family tree. Tap a circle to dig into the breeds that made it; it opens up full screen.
+              </p>
+              <BreedTree root={lineage} rootImage={breed.image} />
+            </div>
+          )}
         </div>
       </div>
     </div>

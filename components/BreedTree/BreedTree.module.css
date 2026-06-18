@@ -1,0 +1,131 @@
+/* Embedded inside the breed pop-up: circles sit straight on the card gradient,
+   no boxy container. Promotes to a full-screen overlay on first interaction. */
+.tree {
+  position: relative;
+}
+
+.stage {
+  width: min(100%, 52vh);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+.stage svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  min-height: 22px;
+}
+.crumb,
+.crumbCur {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  border: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.crumb {
+  background: var(--yellow);
+  color: var(--navy);
+}
+.crumbCur {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--navy);
+}
+.sep {
+  color: var(--white);
+  opacity: 0.65;
+  font-weight: 700;
+  margin: 0 2px;
+}
+
+.caption {
+  background: var(--navy);
+  color: var(--white);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+.cName {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.3rem;
+}
+.cShare {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--navy);
+  font-weight: 800;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.cNote {
+  margin: 7px 0 0;
+  line-height: 1.45;
+  opacity: 0.95;
+  font-size: 0.92rem;
+}
+
+.fsClose {
+  display: none;
+}
+
+/* full-screen takeover */
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  margin: 0;
+  padding: 18px 18px 22px;
+  background: linear-gradient(165deg, var(--blue-sky), var(--blue) 45%, var(--blue-deep));
+  display: flex;
+  flex-direction: column;
+  animation: btRise 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@keyframes btRise {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.fullscreen .crumbs { order: 1; }
+.fullscreen .stage { order: 2; width: min(92vw, 72vh); flex: 0 0 auto; }
+.fullscreen .caption { order: 3; }
+.fullscreen .fsClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  order: 0;
+  align-self: flex-end;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+.fullscreen .fsClose:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fullscreen { animation: none; }
+  .stage svg { transition: none; }
+}
