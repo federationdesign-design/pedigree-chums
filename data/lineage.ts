@@ -70,7 +70,7 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", value: 8 }
         ]
       },
-      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/history/breeds/greyhound-photo.jpg", value: 13 }
+      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/greyhound square.jpg", value: 13 }
     ]
   }
 };

@@ -34,6 +34,11 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   function fillFor(d: Node): string {
     return d.depth === 0 ? "#0a3a57" : d.depth === 1 ? "#1f8fd0" : "#bfe3f7";
   }
+  // Outermost visible ring (depth 1) gets a 5-unit stroke; each level deeper
+  // loses one, down to a minimum of 1.
+  function strokeWidthFor(d: Node): number {
+    return Math.max(6 - d.depth, 1);
+  }
 
   function zoomTo(v: View) {
     const k = SIZE / v[2];
@@ -133,23 +138,32 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
             {nodes.map((d, i) =>
               nodeImg(d) ? (
                 <pattern key={i} id={`bt-img-${i}`} patternContentUnits="objectBoundingBox" width="1" height="1">
-                  <image href={nodeImg(d)} width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+                  <image href={encodeURI(nodeImg(d) as string)} width="1" height="1" preserveAspectRatio="xMidYMid slice" />
                 </pattern>
               ) : null
             )}
           </defs>
 
           <g ref={circlesRef}>
-            {nodes.map((d, i) => (
-              <circle
-                key={i}
-                fill={nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
-                stroke="rgba(10,58,87,0.35)"
-                strokeWidth={2}
-                style={{ cursor: "pointer" }}
-                onClick={(e) => onCircle(e, d)}
-              />
-            ))}
+            {nodes.map((d, i) => {
+              // The outer breed circle (root) is hidden so only the ancestor
+              // circles inside it show. It stays in the DOM (rendered invisible
+              // and non-interactive) so the index alignment used by zoomTo holds.
+              const hidden = d.depth === 0;
+              return (
+                <circle
+                  key={i}
+                  fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  stroke={hidden ? "none" : "#ffd23e"}
+                  strokeWidth={hidden ? 0 : strokeWidthFor(d)}
+                  style={{
+                    cursor: hidden ? "default" : "pointer",
+                    pointerEvents: hidden ? "none" : "auto",
+                  }}
+                  onClick={(e) => onCircle(e, d)}
+                />
+              );
+            })}
           </g>
 
           <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
