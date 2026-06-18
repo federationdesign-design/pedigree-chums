@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import styles from "./OfferModal.module.css";
+import { startCheckout } from "./startCheckout";
 
 // Shared email popup. Mounted only while open (so its form state resets each
 // time) and portaled to the body so it escapes the pitch panel's stacking
@@ -22,6 +23,19 @@ export default function OfferModal({
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [buying, setBuying] = useState(false);
+  const [buyError, setBuyError] = useState("");
+
+  const preorder = async () => {
+    setBuyError("");
+    setBuying(true);
+    try {
+      await startCheckout();
+    } catch (e) {
+      setBuyError(e instanceof Error ? e.message : "Could not start checkout.");
+      setBuying(false);
+    }
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -73,6 +87,29 @@ export default function OfferModal({
         <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
           &times;
         </button>
+
+        <div className={styles.buy}>
+          <p className={styles.buyKicker}>Skip the wait</p>
+          <p className={styles.buyLead}>
+            Pre-order now at the pre-release price and we will ship your pack on
+            launch.
+          </p>
+          <button
+            type="button"
+            className={styles.buyBtn}
+            onClick={preorder}
+            disabled={buying}
+          >
+            {buying ? "Taking you to checkout..." : "Pre-order now and pay £6.99"}
+          </button>
+          <p className={styles.buyNote}>Free UK mainland delivery.</p>
+          {buyError && <p className={styles.error}>{buyError}</p>}
+        </div>
+
+        <div className={styles.divider}>
+          <span>or get the code for later</span>
+        </div>
+
         <h3 className={styles.title}>
           Get <span className={styles.accent}>discount code</span> emailed
         </h3>

@@ -160,6 +160,84 @@
   margin: 8px 0 0;
 }
 
+/* Pre-order (pay now) block, sits above the email form so both choices are
+   offered everywhere the modal opens. */
+.buy {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: clamp(18px, 3vw, 24px);
+  margin: clamp(6px, 1.5vw, 10px) 0 0;
+}
+.buyKicker {
+  margin: 0 0 6px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+.buyLead {
+  margin: 0 0 16px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--white);
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  line-height: 1.35;
+}
+.buyBtn {
+  width: 100%;
+  padding: 16px 22px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.02rem, 2.4vw, 1.18rem);
+  cursor: pointer;
+  box-shadow: 0 8px 0 rgba(10, 58, 87, 0.24);
+  transition: transform 0.15s ease;
+}
+.buyBtn:hover {
+  transform: translateY(-2px);
+}
+.buyBtn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
+}
+.buyNote {
+  margin: 12px 0 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--white);
+  font-size: 0.88rem;
+  opacity: 0.92;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: clamp(18px, 3vw, 24px) 0;
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .stage {
     animation: none;

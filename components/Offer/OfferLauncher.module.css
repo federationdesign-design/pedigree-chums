@@ -72,6 +72,35 @@
   display: none;
 }
 
+/* Pre-order (pay now) button in the card. Desktop only; hidden in the phone tab
+   collapse below so the slim tab stays a single control. White on the navy card
+   so it reads as the primary action next to the yellow "get code" button. */
+.preorder {
+  display: block;
+  width: 100%;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1.15;
+  padding: 13px 22px;
+  margin: 0 0 10px;
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--white);
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
+  transition: transform 0.15s ease;
+}
+.preorder:hover {
+  transform: translateY(-2px);
+}
+.preorder:disabled {
+  opacity: 0.75;
+  cursor: default;
+  transform: none;
+}
+
 .dismiss {
   position: absolute;
   top: 8px;
@@ -106,6 +135,9 @@
   .kicker,
   .headline,
   .dismiss {
+    display: none;
+  }
+  .preorder {
     display: none;
   }
   .cta {

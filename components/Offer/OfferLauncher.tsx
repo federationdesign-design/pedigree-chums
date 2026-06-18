@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import OfferModal from "./OfferModal";
 import styles from "./OfferLauncher.module.css";
+import { startCheckout } from "./startCheckout";
 
 // Global offer launcher, mounted once in the root layout so every page can open
 // the email popup. It owns the modal's open state and listens for the shared
@@ -16,6 +17,19 @@ export default function OfferLauncher() {
   const [open, setOpen] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [buying, setBuying] = useState(false);
+
+  const preorder = async () => {
+    setBuying(true);
+    try {
+      await startCheckout();
+    } catch {
+      // On failure, fall back to opening the modal so the visitor still has a
+      // route to the offer rather than a dead button.
+      setBuying(false);
+      setOpen(true);
+    }
+  };
 
   // Open the popup from anywhere on the site.
   useEffect(() => {
@@ -61,6 +75,15 @@ export default function OfferLauncher() {
         <p className={styles.headline}>
           pre-release <span className={styles.accent}>discount</span>
         </p>
+        <button
+          type="button"
+          className={styles.preorder}
+          onClick={preorder}
+          disabled={buying}
+          tabIndex={focusable}
+        >
+          {buying ? "One sec..." : "Pre-order £6.99"}
+        </button>
         <button
           type="button"
           className={styles.cta}
