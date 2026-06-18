@@ -35,12 +35,30 @@
   z-index: 2;
   pointer-events: none;
 }
+/* Pre-order badge sticker, bottom-right of the hero */
+.heroBadge {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(16px, 3.5vw, 40px);
+  right: clamp(16px, 4vw, 56px);
+  width: clamp(118px, 17vw, 210px);
+  aspect-ratio: 1 / 1;
+  background: url("/pre-order-yellow-circle2.svg") center / contain no-repeat;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  filter: drop-shadow(0 10px 22px rgba(10, 58, 87, 0.35));
+}
 @media (max-width: 900px) {
   .hero {
     min-height: clamp(300px, 50vh, 460px);
   }
   .heroTris {
     display: none;
+  }
+  .heroBadge {
+    width: clamp(96px, 26vw, 150px);
+    bottom: clamp(12px, 3vw, 24px);
+    right: clamp(12px, 3vw, 24px);
   }
 }
 .intro {

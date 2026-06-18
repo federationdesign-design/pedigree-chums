@@ -265,6 +265,7 @@ export default function HistoryPage() {
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
           <Announce />
+          <span className={styles.heroBadge} aria-hidden="true" />
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
           </div>
