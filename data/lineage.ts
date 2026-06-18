@@ -25,7 +25,10 @@ const LINEAGE: Record<string, LineageNode> = {
         name: "St John's Water Dog",
         note: "The earlier dog it all grew from: the fishermen's water dog of Newfoundland, brought to Britain and bred up from there.",
         img: "/history/waterdog.jpg",
-        value: 55
+        children: [
+          { name: "Fishermen's water dogs", note: "The working water dogs the European fishing crews brought across the Atlantic.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 34 },
+          { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 21 }
+        ]
       },
       {
         name: "British Pointers",
@@ -55,8 +58,9 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "German Pinscher",
         note: "The base type, and where the name comes from: a sharp German farm and ratting dog.",
+        img: "/history/breeds/german-pinscher-illustration.jpg",
         children: [
-          { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", value: 22 },
+          { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", img: "/history/breeds/old-german-ratting-terriers-illustration.jpg", value: 22 },
           { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/miniature-schnauzer-square.jpg", value: 16 }
         ]
       },
@@ -65,8 +69,8 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "Brought bone, substance and a steady guarding drive.",
         img: "/Rottweiler-square.jpg",
         children: [
-          { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", img: "/history/drovers-dogs.jpg", value: 17 },
-          { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.", value: 10 }
+          { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", img: "/history/breeds/Roman-drover-dog.jpg", value: 17 },
+          { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.", img: "/history/breeds/German-cattle-dog.jpg", value: 10 }
         ]
       },
       {
