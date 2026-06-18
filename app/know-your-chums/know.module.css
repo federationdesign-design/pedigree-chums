@@ -47,7 +47,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: url("/pre-order-yellow-circle2.svg") center / contain no-repeat;
+  background: url("/pre-order-yellow-circle3.svg") center / contain no-repeat;
   transform: rotate(-8deg);
   filter: drop-shadow(0 10px 22px rgba(10, 58, 87, 0.35));
 }
