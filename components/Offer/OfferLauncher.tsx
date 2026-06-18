@@ -57,9 +57,9 @@ export default function OfferLauncher() {
         >
           {"\u00D7"}
         </button>
-        <p className={styles.kicker}>Pre-release offer</p>
+        <p className={styles.kicker}>Exclusive offer</p>
         <p className={styles.headline}>
-          Want a <span className={styles.accent}>discount?</span>
+          pre-release <span className={styles.accent}>discount</span>
         </p>
         <button
           type="button"
@@ -67,8 +67,8 @@ export default function OfferLauncher() {
           onClick={() => setOpen(true)}
           tabIndex={focusable}
         >
-          <span className={styles.ctaFull}>Get your discount code</span>
-          <span className={styles.ctaShort}>Discount code</span>
+          <span className={styles.ctaFull}>Get code emailed</span>
+          <span className={styles.ctaShort}>Get code</span>
         </button>
       </aside>
 
