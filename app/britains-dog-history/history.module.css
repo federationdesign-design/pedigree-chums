@@ -4,7 +4,7 @@
    and parallax triangles echo the homepage. */
 
 .page {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* full-bleed hero banner, like the homepage hero: a cover image with a soft
