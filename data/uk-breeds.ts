@@ -35,7 +35,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound-illustration.jpg", tag: "extinct" },
 
   // The 1700s
-  { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.png", tag: "endangered" },
+  { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/history/breeds/Old-English-Sheepdog.jpg", tag: "endangered" },
   { name: "Scottish Terrier", strip: "c1700", era: "1700s", anchor: 1700, note: "Sturdy Highland earth-dog with a determined streak.", image: "/history/breeds/scottish-terrier-image.jpg", tag: "in-decline" },
   { name: "King Charles Spaniel", strip: "c1700", era: "1700s", anchor: 1710, note: "Royal toy spaniel beloved at the Stuart court.", image: "/history/breeds/king-charles-spaniel-photo.jpg", tag: "endangered" },
   { name: "Pointer", strip: "c1700", era: "1700s", anchor: 1720, note: "Gundog that freezes and 'points' to hidden game birds.", image: "/history/breeds/pointer-photo.jpg", tag: "in-decline" },
@@ -113,7 +113,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Celtic Hound", strip: "ancient-medieval", era: "Ancient", anchor: 80, note: "Ancient war and hunting sighthound of the Celtic tribes, remembered as the legendary forebear of the Irish Wolfhound and Scottish Deerhound.", tag: "extinct", image: "/history/breeds/celtic-hound-drawing.jpg" },
   { name: "Rache", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack, an old type whose name fell from use as foxhounds and beagles emerged.", tag: "extinct", image: "/history/breeds/rache-illustration.jpg" },
   { name: "Buckhound", strip: "ancient-medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck, lighter and faster than the great staghounds.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
-  { name: "Southern Hound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot, absorbed into the foxhound and beagle packs that replaced it.", tag: "extinct" },
+  { name: "Southern Hound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot, absorbed into the foxhound and beagle packs that replaced it.", tag: "extinct", image: "/history/breeds/Southern_Hound-drawing.jpg" },
   { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, the working ancestor behind the fell terriers and the Welsh Terrier.", tag: "extinct", image: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg" },
   { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hunting hound bred away into the modern Beagle by the early 1800s.", tag: "extinct", image: "/history/breeds/North-Country-Beagle-illustration.jpg" },
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, close kin to the Bearded Collie, lost as smooth-coated collies took the farms.", tag: "extinct", image: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg" },

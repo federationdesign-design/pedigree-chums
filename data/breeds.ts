@@ -825,7 +825,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/lab-square.jpg",
+    image: "/springer-square.jpg",
   },
   {
     name: "Border Terrier",
