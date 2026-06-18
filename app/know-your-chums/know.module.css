@@ -36,6 +36,7 @@
   position: absolute;
   z-index: 3;
   bottom: clamp(16px, 3.5vw, 40px);
+  margin-bottom: -10px;
   right: clamp(16px, 4vw, 56px);
   width: clamp(216px, 23.4vw, 360px);
   aspect-ratio: 1 / 1;
