@@ -479,6 +479,7 @@
   width: min(1280px, 92vw);
   height: min(90vh, 880px);
   overflow: hidden;
+  isolation: isolate;
   padding-top: calc(clamp(20px, 3.5vw, 44px) + 50px);
 }
 .familyLead {
@@ -496,6 +497,7 @@
   margin: 0 0 12px;
 }
 .familyText {
+  max-width: 19rem;
   transition: opacity 0.35s ease;
 }
 .familyTextDim {
@@ -505,7 +507,6 @@
 .familyCol {
   position: absolute;
   inset: 0;
-  z-index: 0;
 }
 .familyBlock {
   margin-top: 22px;
