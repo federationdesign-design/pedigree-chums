@@ -37,7 +37,7 @@
   z-index: 3;
   bottom: clamp(16px, 3.5vw, 40px);
   right: clamp(16px, 4vw, 56px);
-  width: clamp(118px, 17vw, 210px);
+  width: clamp(216px, 23.4vw, 360px);
   aspect-ratio: 1 / 1;
   pointer-events: none;
 }
@@ -59,7 +59,7 @@
     display: none;
   }
   .heroBadge {
-    width: clamp(96px, 26vw, 150px);
+    width: clamp(150px, 40vw, 230px);
     bottom: clamp(12px, 3vw, 24px);
     right: clamp(12px, 3vw, 24px);
   }
