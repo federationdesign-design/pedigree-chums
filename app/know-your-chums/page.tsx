@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
+import Announce from "../../components/Announce/Announce";
 import BreedStats from "./BreedStats";
 import ChumExplorer from "./ChumExplorer";
 import styles from "./know.module.css";
@@ -91,7 +92,7 @@ export default function KnowYourChums() {
         <section className={styles.hero} aria-label="Know your chums">
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
-          <span className={styles.comingSoon}>Coming soon</span>
+          <Announce />
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
           </div>
