@@ -9,7 +9,7 @@ import styles from "./BreedTree.module.css";
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
 // clipped against the square edge, and so siblings stay well out of frame.
-const PAD = 1.18;
+const PAD = 1.4;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
@@ -53,6 +53,7 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
     viewRef.current = v;
     const cg = circlesRef.current;
     const lg = labelsRef.current;
+    const fr = focusRef.current.r * k; // focused circle radius in the current view
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
@@ -62,7 +63,15 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
         c.setAttribute("r", String(d.r * k));
       }
       const l = lg?.children[i] as SVGTextElement | undefined;
-      if (l) l.setAttribute("transform", `translate(${tx},${ty + d.r * k + 12})`);
+      if (l) {
+        // Park the label just outside the focused circle, pushed out along the
+        // line from the centre to this node, so it never sits on any circle.
+        const dist = Math.hypot(tx, ty) || 1;
+        const rad = fr + 58;
+        const lx = (tx / dist) * rad;
+        const ly = (ty / dist) * rad;
+        l.setAttribute("transform", `translate(${lx},${ly})`);
+      }
     });
   }
 
@@ -197,13 +206,13 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
                     pointerEvents: "none",
                   }}
                 >
-                  <tspan x={0} dy={14} style={{ fontWeight: 800, fontSize: "15px" }}>
+                  <tspan x={0} dy={-30} style={{ fontWeight: 800, fontSize: "15px" }}>
                     {d.data.name}
                   </tspan>
-                  <tspan x={0} dy={56} style={{ fontWeight: 800, fontSize: "60px" }}>
+                  <tspan x={0} dy={46} style={{ fontWeight: 800, fontSize: "60px" }}>
                     {pct !== null ? `${pct}%` : ""}
                   </tspan>
-                  <tspan x={0} dy={20} style={{ fontWeight: 700, fontSize: "12px", opacity: 0.85 }}>
+                  <tspan x={0} dy={18} style={{ fontWeight: 700, fontSize: "12px", opacity: 0.85 }}>
                     {pct !== null ? "of the mix" : ""}
                   </tspan>
                 </text>

@@ -475,14 +475,16 @@
   margin: 0;
 }
 .modalCardSolo {
-  grid-template-columns: 1fr 1.25fr;
-  grid-template-areas: "lead tree";
+  display: block;
   width: min(1280px, 92vw);
-  align-items: start;
+  height: min(90vh, 880px);
+  overflow: hidden;
   padding-top: calc(clamp(20px, 3.5vw, 44px) + 50px);
 }
 .familyLead {
-  grid-area: lead;
+  position: relative;
+  z-index: 1;
+  max-width: 46%;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
 }
@@ -494,8 +496,9 @@
   margin: 0 0 12px;
 }
 .familyCol {
-  grid-area: tree;
-  align-self: start;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 .familyBlock {
   margin-top: 22px;
@@ -559,10 +562,16 @@
     grid-template-columns: 1fr;
   }
   .modalCardSolo {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "lead"
-      "tree";
+    height: auto;
+    overflow: visible;
+  }
+  .familyLead {
+    max-width: none;
+  }
+  .familyCol {
+    position: static;
+    height: 62vh;
+    margin-top: 16px;
   }
 }
 

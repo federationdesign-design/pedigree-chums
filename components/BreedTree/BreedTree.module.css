@@ -2,11 +2,15 @@
    no boxy container. Promotes to a full-screen overlay on first interaction. */
 .tree {
   position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .stage {
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: min(72vh, 760px);
   margin: 0;
 }
 .stage svg {
@@ -17,12 +21,17 @@
 }
 
 .crumbs {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 6px;
-  margin: 0 0 10px;
-  min-height: 22px;
+  margin: 0;
+  max-width: 58%;
 }
 .crumb,
 .crumbCur {
