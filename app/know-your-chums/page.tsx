@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
+import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import Announce from "../../components/Announce/Announce";
 import BreedStats from "./BreedStats";
 import ChumExplorer from "./ChumExplorer";
@@ -93,7 +94,7 @@ export default function KnowYourChums() {
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
           <Announce />
-          <span className={styles.heroBadge} aria-hidden="true" />
+          <ParallaxShape className={styles.heroBadge} speed={0.2} />
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
           </div>

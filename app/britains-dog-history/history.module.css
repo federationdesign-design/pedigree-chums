@@ -43,9 +43,16 @@
   right: clamp(16px, 4vw, 56px);
   width: clamp(118px, 17vw, 210px);
   aspect-ratio: 1 / 1;
+  pointer-events: none;
+}
+/* SVG + tilt sit on the pseudo so ParallaxShape can drive translateY on the
+   element itself (like the homepage yellow circle) without clobbering the tilt */
+.heroBadge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: url("/pre-order-yellow-circle2.svg") center / contain no-repeat;
   transform: rotate(-8deg);
-  pointer-events: none;
   filter: drop-shadow(0 10px 22px rgba(10, 58, 87, 0.35));
 }
 @media (max-width: 900px) {
