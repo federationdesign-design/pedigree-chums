@@ -471,14 +471,27 @@
   margin: 0;
 }
 .modalCardSolo {
-  grid-template-columns: 1fr;
-  width: min(1180px, 88vw);
+  grid-template-columns: 1fr 1.25fr;
+  grid-template-areas:
+    "lead tree"
+    "details tree";
+  width: min(1280px, 92vw);
+  align-items: start;
 }
-/* Keep the body copy readable when the lineage card is wide: the tree can use
-   the full width, but the text blocks stay in a comfortable centred column. */
+.familyLead,
 .modalDetails {
-  max-width: 760px;
-  margin: 0 auto;
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+.familyLead {
+  grid-area: lead;
+}
+.familyCol {
+  grid-area: tree;
+  align-self: start;
+}
+.modalDetails {
+  grid-area: details;
 }
 .familyBlock {
   margin-top: 22px;
@@ -540,6 +553,13 @@
   }
   .modalCard {
     grid-template-columns: 1fr;
+  }
+  .modalCardSolo {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "lead"
+      "tree"
+      "details";
   }
 }
 

@@ -5,7 +5,7 @@
 }
 
 .stage {
-  width: min(100%, 52vh);
+  width: min(100%, 72vh);
   aspect-ratio: 1;
   margin: 0 auto;
 }

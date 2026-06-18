@@ -59,46 +59,57 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
     ["Length", breed.length],
   ];
 
+  const details = (
+    <>
+      <p className={styles.modalLookFor}>
+        <strong>Look for:</strong> {breed.lookFor}
+      </p>
+      <dl className={styles.modalStats}>
+        {stats.map(([k, v]) => (
+          <div key={k} className={styles.modalStatRow}>
+            <dt>{k}:</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <h4 className={styles.modalSubhead}>Personality</h4>
+      <p className={styles.modalChar}>{breed.character}</p>
+      {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
+    </>
+  );
+
   return (
     <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={breed.name}>
       <div className={`${styles.modalCard} ${lineage ? styles.modalCardSolo : ""}`} onClick={(e) => e.stopPropagation()}>
         <button className={styles.modalClose} onClick={onClose} aria-label="Close">
           &times;
         </button>
-        {!lineage && (
-          <div className={styles.modalImgWrap}>
-            <Image src={breed.image} alt={breed.name} width={600} height={600} className={styles.modalImg} unoptimized />
-          </div>
-        )}
-        <div className={styles.modalInfo}>
-          <h3 className={styles.modalName}>{breed.name}</h3>
-          {lineage && (
-            <div className={styles.familyBlock}>
+
+        {lineage ? (
+          <>
+            <div className={styles.familyLead}>
+              <h3 className={styles.modalName}>{breed.name}</h3>
               <h4 className={styles.modalSubhead}>Where the {breed.name} comes from</h4>
               <p className={styles.familyIntro}>
                 A best-guess family tree. Tap a circle to dig into the breeds that made it; it opens up full screen.
               </p>
-              <BreedTree root={lineage} rootImage={breed.image} />
-              <hr className={styles.familyDivider} />
             </div>
-          )}
-          <div className={styles.modalDetails}>
-            <p className={styles.modalLookFor}>
-              <strong>Look for:</strong> {breed.lookFor}
-            </p>
-            <dl className={styles.modalStats}>
-              {stats.map(([k, v]) => (
-                <div key={k} className={styles.modalStatRow}>
-                  <dt>{k}:</dt>
-                  <dd>{v}</dd>
-                </div>
-              ))}
-            </dl>
-            <h4 className={styles.modalSubhead}>Personality</h4>
-            <p className={styles.modalChar}>{breed.character}</p>
-            {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
-          </div>
-        </div>
+            <div className={styles.familyCol}>
+              <BreedTree root={lineage} rootImage={breed.image} />
+            </div>
+            <div className={styles.modalDetails}>{details}</div>
+          </>
+        ) : (
+          <>
+            <div className={styles.modalImgWrap}>
+              <Image src={breed.image} alt={breed.name} width={600} height={600} className={styles.modalImg} unoptimized />
+            </div>
+            <div className={styles.modalInfo}>
+              <h3 className={styles.modalName}>{breed.name}</h3>
+              {details}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
