@@ -7,6 +7,9 @@ import type { LineageNode } from "../../data/lineage";
 import styles from "./BreedTree.module.css";
 
 const SIZE = 760;
+// A little breathing room around the focused circle so its stroke is not
+// clipped against the square edge, and so siblings stay well out of frame.
+const PAD = 1.12;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
@@ -19,14 +22,19 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   }, [root]);
 
   const wrapRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const circlesRef = useRef<SVGGElement>(null);
   const labelsRef = useRef<SVGGElement>(null);
-  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2]);
+  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD]);
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
 
   const [focus, setFocus] = useState<Node>(nodes[0]);
   const [ready, setReady] = useState(false);
+  // Aspect ratio of the visible stage. The viewBox is widened to match it so
+  // the diagram uses the whole available canvas: the surrounding circles spread
+  // out into the extra space and stay in view instead of cropping at the edges.
+  const [aspect, setAspect] = useState(1);
 
   function nodeImg(d: Node): string | undefined {
     return d.depth === 0 ? rootImage ?? d.data.img : d.data.img;
@@ -61,7 +69,7 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   function zoom(d: Node) {
     focusRef.current = d;
     setFocus(d);
-    const target: View = [d.x, d.y, d.r * 2];
+    const target: View = [d.x, d.y, d.r * 2 * PAD];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
     if (reduce) {
@@ -97,13 +105,34 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   }
 
   useEffect(() => {
-    zoomTo([nodes[0].x, nodes[0].y, nodes[0].r * 2]);
+    zoomTo([nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD]);
     focusRef.current = nodes[0];
     setFocus(nodes[0]);
     setReady(true);
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes]);
+
+  // Track the stage's real aspect ratio. This also catches the fullscreen
+  // toggle (done via a class), so the canvas re-widens when it takes over the
+  // screen and narrows back when it returns to the pop-up column.
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w > 0 && h > 0) setAspect(w / h);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Widen (or heighten) the viewBox to the stage's aspect so the focused circle
+  // still fits the short side while the long side gains room for siblings.
+  const vbW = aspect >= 1 ? SIZE * aspect : SIZE;
+  const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
+  const viewBox = `${-vbW / 2} ${-vbH / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();
   const share = focus.parent ? Math.round((focus.value ?? 0) / (focus.parent.value || 1) * 100) : null;
@@ -128,9 +157,9 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
         ))}
       </div>
 
-      <div className={styles.stage}>
+      <div className={styles.stage} ref={stageRef}>
         <svg
-          viewBox={`${-SIZE / 2} ${-SIZE / 2} ${SIZE} ${SIZE}`}
+          viewBox={viewBox}
           onClick={onBackground}
           style={{ opacity: ready ? 1 : 0 }}
         >
