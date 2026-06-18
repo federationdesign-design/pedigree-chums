@@ -525,22 +525,6 @@
   margin-top: 16px;
 }
 
-/* mobile: the rail advances horizontally as the page scrolls (driven by JS in
-   BreedStrip on touch devices, which have no wheel events), so disable native
-   horizontal scroll and clip the translated rail at the viewport edges */
-@media (max-width: 900px) {
-  .stripWrap {
-    overflow-x: clip;
-  }
-  .stripRail {
-    overflow-x: hidden;
-    will-change: transform;
-  }
-  .stripScrollbar {
-    display: none;
-  }
-}
-
 @media (max-width: 720px) {
   .stripRail {
     justify-content: flex-start;
