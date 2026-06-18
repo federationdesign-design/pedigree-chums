@@ -186,6 +186,7 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
           <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
             {nodes.map((d, i) => {
               const visible = d.parent === focus;
+              const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               return (
                 <text
                   key={i}
@@ -193,18 +194,17 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
                     display: visible ? "inline" : "none",
                     fillOpacity: visible ? 1 : 0,
                     fill: "#ffffff",
-                    stroke: "rgba(10,58,87,0.6)",
-                    strokeWidth: 3,
-                    strokeLinejoin: "round",
-                    paintOrder: "stroke",
                     pointerEvents: "none",
                   }}
                 >
-                  <tspan x={0} dy="0.9em" style={{ fontWeight: 800, fontSize: "15px" }}>
+                  <tspan x={0} dy={14} style={{ fontWeight: 800, fontSize: "15px" }}>
                     {d.data.name}
                   </tspan>
-                  <tspan x={0} dy="1.15em" style={{ fontWeight: 700, fontSize: "12px", opacity: 0.85 }}>
-                    {d.parent ? `${Math.round((d.value ?? 0) / (d.parent.value || 1) * 100)}% of the mix` : ""}
+                  <tspan x={0} dy={56} style={{ fontWeight: 800, fontSize: "60px" }}>
+                    {pct !== null ? `${pct}%` : ""}
+                  </tspan>
+                  <tspan x={0} dy={20} style={{ fontWeight: 700, fontSize: "12px", opacity: 0.85 }}>
+                    {pct !== null ? "of the mix" : ""}
                   </tspan>
                 </text>
               );

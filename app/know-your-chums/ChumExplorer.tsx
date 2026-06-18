@@ -87,18 +87,15 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
 
         {lineage ? (
           <>
-            <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{breed.name}</h3>
-            <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>
-              Where the {breed.name} comes from
-            </h4>
+            <div className={styles.familyLead}>
+              <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{breed.name}</h3>
+              <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>
+                Where the breed comes from
+              </h4>
+              {details}
+            </div>
             <div className={styles.familyCol}>
               <BreedTree root={lineage} rootImage={breed.image} />
-            </div>
-            <div className={styles.familyBody}>
-              <p className={styles.familyIntro}>
-                A best-guess family tree. Tap a circle to dig into the breeds that made it.
-              </p>
-              {details}
             </div>
           </>
         ) : (

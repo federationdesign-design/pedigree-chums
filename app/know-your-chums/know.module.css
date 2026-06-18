@@ -476,25 +476,22 @@
 }
 .modalCardSolo {
   grid-template-columns: 1fr 1.25fr;
-  grid-template-areas:
-    "title title"
-    "sub   sub"
-    "body  tree";
+  grid-template-areas: "lead tree";
   width: min(1280px, 92vw);
   align-items: start;
   padding-top: calc(clamp(20px, 3.5vw, 44px) + 50px);
 }
-.familyTitle {
-  grid-area: title;
-  font-size: clamp(3.6rem, 8vw, 5.6rem);
-}
-.familySub {
-  grid-area: sub;
-}
-.familyBody {
-  grid-area: body;
+.familyLead {
+  grid-area: lead;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
+}
+.familyTitle {
+  font-size: clamp(3.6rem, 8vw, 5.6rem);
+  margin: 0 0 4px;
+}
+.familySub {
+  margin: 0 0 12px;
 }
 .familyCol {
   grid-area: tree;
@@ -564,10 +561,8 @@
   .modalCardSolo {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "title"
-      "sub"
-      "tree"
-      "body";
+      "lead"
+      "tree";
   }
 }
 
