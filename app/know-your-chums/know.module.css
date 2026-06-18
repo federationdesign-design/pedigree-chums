@@ -132,11 +132,13 @@
   width: clamp(36px, 5vw, 56px);
   height: clamp(36px, 5vw, 56px);
   margin-bottom: 2px;
-}
-.factIcon :global(svg) {
-  width: 100%;
-  height: 100%;
-  fill: var(--navy);
+  background-color: var(--yellow);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 .factHero {
   font-family: var(--font-display), system-ui, sans-serif;
