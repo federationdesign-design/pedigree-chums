@@ -55,6 +55,7 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Rottweiler",
         note: "Brought bone, substance and a steady guarding drive.",
+        img: "/Rottweiler-square.jpg",
         children: [
           { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", value: 17 },
           { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.", value: 10 }
@@ -63,12 +64,13 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Black and Tan Terrier",
         note: "Gave the sleek coat, the tan points and the terrier fire. This is the Manchester Terrier line.",
+        img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg",
         children: [
           { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", value: 14 },
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", value: 8 }
         ]
       },
-      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", value: 13 }
+      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/history/breeds/greyhound-photo.jpg", value: 13 }
     ]
   }
 };
