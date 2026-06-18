@@ -72,13 +72,18 @@ export default function BreedTree({
       }
       const l = lg?.children[i] as SVGTextElement | undefined;
       if (l) {
-        // Park the label just outside the focused circle, pushed out along the
-        // line from the centre to this node, so it never sits on any circle.
-        const dist = Math.hypot(tx, ty) || 1;
-        const rad = fr + 58;
-        const lx = (tx / dist) * rad;
-        const ly = (ty / dist) * rad;
-        l.setAttribute("transform", `translate(${lx},${ly})`);
+        if (d === focusRef.current) {
+          // The focused circle's own label sits at its centre.
+          l.setAttribute("transform", "translate(0,0)");
+        } else {
+          // Park child labels just outside the focused circle, pushed out along
+          // the line from the centre to the node, so they never sit on a circle.
+          const dist = Math.hypot(tx, ty) || 1;
+          const rad = fr + 58;
+          const lx = (tx / dist) * rad;
+          const ly = (ty / dist) * rad;
+          l.setAttribute("transform", `translate(${lx},${ly})`);
+        }
       }
     });
   }
@@ -152,20 +157,6 @@ export default function BreedTree({
 
   return (
     <div className={styles.tree} ref={wrapRef}>
-      <div className={styles.crumbs}>
-        {trail.map((n, i) => (
-          <span key={i}>
-            {i > 0 && <span className={styles.sep}>&rsaquo;</span>}
-            <button
-              className={n === focus ? styles.crumbCur : styles.crumb}
-              onClick={() => zoom(n)}
-            >
-              {n.data.name}
-            </button>
-          </span>
-        ))}
-      </div>
-
       <div className={styles.stage} ref={stageRef}>
         <svg
           viewBox={viewBox}
@@ -206,7 +197,11 @@ export default function BreedTree({
 
           <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
             {nodes.map((d, i) => {
-              const visible = d.parent === focus;
+              const isChild = d.parent === focus;
+              // When zoomed right into a single circle that has nothing inside
+              // it, show that circle's own share centred within it.
+              const isLeafFocus = d === focus && !!d.parent && !d.children;
+              const visible = isChild || isLeafFocus;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               return (
                 <text
@@ -219,7 +214,7 @@ export default function BreedTree({
                   }}
                 >
                   <tspan x={0} dy={-30} style={{ fontWeight: 800, fontSize: "15px" }}>
-                    {d.data.name}
+                    {isChild ? d.data.name : ""}
                   </tspan>
                   <tspan x={0} dy={46} style={{ fontWeight: 800, fontSize: "60px" }}>
                     {pct !== null ? `${pct}%` : ""}
@@ -234,17 +229,33 @@ export default function BreedTree({
         </svg>
       </div>
 
-      <div className={styles.caption}>
-        <span className={styles.cName}>{focus.data.name}</span>
-        {share !== null && focus.parent && (
-          <span className={styles.cShare}>
-            {share}% of {focus.parent.data.name}
-          </span>
-        )}
-        <p className={styles.cNote}>
-          {focus.data.note}
-          {focus.children ? " Tap a circle inside to keep digging." : ""}
-        </p>
+      <div className={styles.aside}>
+        <div className={styles.crumbs}>
+          {trail.map((n, i) => (
+            <span key={i}>
+              {i > 0 && <span className={styles.sep}>&rsaquo;</span>}
+              <button
+                className={n === focus ? styles.crumbCur : styles.crumb}
+                onClick={() => zoom(n)}
+              >
+                {n.data.name}
+              </button>
+            </span>
+          ))}
+        </div>
+
+        <div className={styles.caption}>
+          <span className={styles.cName}>{focus.data.name}</span>
+          {share !== null && focus.parent && (
+            <span className={styles.cShare}>
+              {share}% of {focus.parent.data.name}
+            </span>
+          )}
+          <p className={styles.cNote}>
+            {focus.data.note}
+            {focus.children ? " Tap a circle inside to keep digging." : ""}
+          </p>
+        </div>
       </div>
     </div>
   );
