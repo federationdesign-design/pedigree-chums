@@ -43,7 +43,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/irish-square.png",
+    image: "/Irish Wolfhound-square.jpg",
   },
   {
     name: "Bloodhound",
@@ -60,7 +60,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/bloodhound-square.png",
+    image: "/bloodhound-square.jpg",
   },
   {
     name: "Mastiff",
@@ -94,7 +94,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/great-dane-square.png",
+    image: "/great dane-square.jpg",
   },
   {
     name: "Bull Terrier",
@@ -111,7 +111,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/bull-terrier-square.jpg",
   },
   {
     name: "Doberman Pinscher",
@@ -128,7 +128,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "long",
-    image: "/lab-square.png",
+    image: "/Doberman Pinscher-square.jpg",
   },
   {
     name: "Saint Bernard",
@@ -145,7 +145,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/st-bernard-square.png",
+    image: "/Saint Bernard-square-.jpg",
   },
   {
     name: "Afghan Hound",
@@ -162,7 +162,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "long",
-    image: "/afgan-square.png",
+    image: "/afgan-square.jpg",
   },
   {
     name: "Weimaraner",
@@ -179,7 +179,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/Weimaraner-square.png",
+    image: "/Weimaraner-square.jpg",
   },
   {
     name: "Dalmatian",
@@ -196,7 +196,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/dalmation-square.png",
+    image: "/Dalmatian-square.jpg",
   },
   {
     name: "Rottweiler",
@@ -213,7 +213,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/rottweiler-square.png",
+    image: "/Rottweiler-square.jpg",
   },
   {
     name: "Old English Sheepdog",
@@ -230,7 +230,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "giant",
     skull: "medium",
-    image: "/old-english-square.png",
+    image: "/old-english-square.jpg",
   },
   {
     name: "Basset Hound",
@@ -247,7 +247,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/basset-hound-square.png",
+    image: "/basset-square.jpg",
   },
   {
     name: "Cavalier King Charles Spaniel",
@@ -264,7 +264,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "flat",
-    image: "/Cavalier-Spaniel-square.png",
+    image: "/Cavalier King Charles Spaniel-square.jpg",
   },
   {
     name: "Bulldog",
@@ -281,7 +281,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "flat",
-    image: "/bulldog-square.png",
+    image: "/bulldog-square.jpg",
   },
   {
     name: "Italian Greyhound",
@@ -298,7 +298,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "long",
-    image: "/lab-square.png",
+    image: "/italian-greyhound-square.jpg",
   },
   {
     name: "Papillon",
@@ -315,7 +315,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/papillion-square.png",
+    image: "/Papillion-square.jpg",
   },
   {
     name: "Corgi",
@@ -332,7 +332,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "medium",
-    image: "/corgi-square.png",
+    image: "/corgi-square.jpg",
   },
   {
     name: "Bichon Frise",
@@ -349,7 +349,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/bichon-square.png",
+    image: "/bichon-square.jpg",
   },
   {
     name: "Maltese",
@@ -366,7 +366,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/maltese-squares.png",
+    image: "/matlese-square.jpg",
   },
   {
     name: "Boston Terrier",
@@ -383,7 +383,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "flat",
-    image: "/boston-square.png",
+    image: "/bosten-square.jpg",
   },
   {
     name: "Beagle",
@@ -400,7 +400,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "medium",
-    image: "/beagle-square.png",
+    image: "/beagle-square.jpg",
   },
   {
     name: "Siberian Husky",
@@ -417,7 +417,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/hustry-square.png",
+    image: "/husky-square.jpg",
   },
   {
     name: "Shih Tzu",
@@ -434,7 +434,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "flat",
-    image: "/shi-tzu-square.png",
+    image: "/Shih Tzu-square.jpg",
   },
   {
     name: "Jackapoo",
@@ -451,7 +451,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "medium",
     skull: "medium",
-    image: "/jackapoo-square.png",
+    image: "/jackapoo-square.jpg",
   },
   {
     name: "Cavachon",
@@ -468,7 +468,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "small",
     skull: "flat",
-    image: "/lab-square.png",
+    image: "/Cavachon-square.jpg",
   },
   {
     name: "Puggle",
@@ -485,7 +485,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "small",
     skull: "flat",
-    image: "/puggle-square.png",
+    image: "/puggle-square.jpg",
   },
   {
     name: "Cavapoo",
@@ -502,7 +502,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "small",
     skull: "medium",
-    image: "/Cavapoo-square.png",
+    image: "/Cavapoo-square.jpg",
   },
   {
     name: "Miniature Schnauzer",
@@ -519,7 +519,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/miniature-schnauzer-square.jpg",
   },
   {
     name: "Greyhound",
@@ -553,7 +553,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "long",
-    image: "/Lurcher-square.png",
+    image: "/lucher-square.jpg",
   },
   {
     name: "Whippet",
@@ -570,7 +570,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "long",
-    image: "/whippet-square.png",
+    image: "/Whippet-square.jpg",
   },
   {
     name: "Maltipoo",
@@ -587,7 +587,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "medium",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/multipoo-square.jpg",
   },
   {
     name: "Goldendoodle",
@@ -604,7 +604,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "large",
     skull: "medium",
-    image: "/goldendoodle-square.png",
+    image: "/Goldendoodle-square.jpg",
   },
   {
     name: "Cockapoo",
@@ -621,7 +621,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "medium",
     skull: "medium",
-    image: "/cockapoo-square.png",
+    image: "/Cockapoo-square.jpg",
   },
   {
     name: "West Highland Terrier",
@@ -638,7 +638,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "medium",
-    image: "/scotty-square.png",
+    image: "/west-highland-square.jpg",
   },
   {
     name: "Pomeranian",
@@ -655,7 +655,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/Pomeranian-square.png",
+    image: "/Pomeranian-square.jpg",
   },
   {
     name: "French Bulldog",
@@ -672,7 +672,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "flat",
-    image: "/frenchy-square.png",
+    image: "/frenchy0square.jpg",
   },
   {
     name: "Staffordshire Bull Terrier",
@@ -689,7 +689,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "medium",
-    image: "/staffy-square.png",
+    image: "/staffy-square.jpg",
   },
   {
     name: "Chihuahua",
@@ -706,7 +706,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/Chihuahua-square.png",
+    image: "/Chihuahua-square.jpg",
   },
   {
     name: "German Shepherd",
@@ -723,7 +723,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/german-shepard-square.png",
+    image: "/german-shepard-square.jpg",
   },
   {
     name: "Pug",
@@ -740,7 +740,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "flat",
-    image: "/pug-square.png",
+    image: "/pug-square.jpg",
   },
   {
     name: "Labradoodle",
@@ -757,7 +757,7 @@ export const breeds: Breed[] = [
     type: "designer-crossbreed",
     sizeBand: "large",
     skull: "medium",
-    image: "/Labradoodle-square.png",
+    image: "/Labradoodle-square.jpg",
   },
   {
     name: "Yorkshire Terrier",
@@ -774,7 +774,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/yorkshire-square.png",
+    image: "/yorkshire-square.jpg",
   },
   {
     name: "Poodle",
@@ -791,7 +791,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/poodle-square.jpg",
   },
   {
     name: "Dachshund",
@@ -808,7 +808,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/lab-square.jpg",
   },
   {
     name: "Springer Spaniel",
@@ -825,7 +825,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/lab-square.jpg",
   },
   {
     name: "Border Terrier",
@@ -842,7 +842,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/lab-square.jpg",
   },
   {
     name: "Border Collie",
@@ -859,7 +859,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "medium",
     skull: "long",
-    image: "/border-collie-square.png",
+    image: "/collie-square.jpg",
   },
   {
     name: "Cocker Spaniel",
@@ -876,7 +876,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/cocker-square.png",
+    image: "/cocker-square.jpg",
   },
   {
     name: "Golden Retriever",
@@ -893,7 +893,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/golden-square.png",
+    image: "/golden-square.jpg",
   },
   {
     name: "Labrador",
@@ -910,7 +910,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/lab-square.png",
+    image: "/lab-square.jpg",
   },
   {
     name: "Irish Setter",
@@ -928,7 +928,7 @@ export const breeds: Breed[] = [
     sizeBand: "large",
     skull: "long",
     draft: true,
-    image: "/lab-square.png",
+    image: "/lab-square.jpg",
   },
   {
     name: "Bernedoodle",
@@ -946,6 +946,6 @@ export const breeds: Breed[] = [
     sizeBand: "large",
     skull: "medium",
     draft: true,
-    image: "/lab-square.png",
+    image: "/lab-square.jpg",
   },
 ];
