@@ -1,20 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
-import OfferModal from "./OfferModal";
 import styles from "./OfferCta.module.css";
 
-// Single CTA in the pitch panel that opens the email popup. The id lets the
-// hero announcement scroll target this row, and the "pc:open-offer" window
-// event lets the hero announcement open the popup directly.
+// CTA copy + button in the pitch panel. The button dispatches the shared
+// "pc:open-offer" window event; the popup itself is owned by OfferLauncher,
+// mounted once in the root layout, so the modal lives in a single place
+// site-wide (and there is never more than one open at a time).
 export default function OfferCta() {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onOpen = () => setOpen(true);
-    window.addEventListener("pc:open-offer", onOpen);
-    return () => window.removeEventListener("pc:open-offer", onOpen);
-  }, []);
-
   return (
     <>
       <p className={styles.ctaTitle}>
@@ -25,12 +16,11 @@ export default function OfferCta() {
         <button
           type="button"
           className={`${styles.btn} ${styles.btnPrimary}`}
-          onClick={() => setOpen(true)}
+          onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
         >
           Get discount code
         </button>
       </div>
-      {open && <OfferModal onClose={() => setOpen(false)} />}
     </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Luckiest_Guy, Montserrat } from "next/font/google";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
+import OfferLauncher from "../components/Offer/OfferLauncher";
 import "./globals.css";
 
 const display = Luckiest_Guy({
@@ -60,6 +61,7 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body>
         {children}
+        <OfferLauncher />
         <CookieBanner />
         <Analytics />
       </body>
