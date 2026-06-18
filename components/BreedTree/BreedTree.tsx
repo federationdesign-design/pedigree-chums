@@ -9,7 +9,7 @@ import styles from "./BreedTree.module.css";
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
 // clipped against the square edge, and so siblings stay well out of frame.
-const PAD = 1.12;
+const PAD = 1.18;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
@@ -62,7 +62,7 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
         c.setAttribute("r", String(d.r * k));
       }
       const l = lg?.children[i] as SVGTextElement | undefined;
-      if (l) l.setAttribute("transform", `translate(${tx},${ty})`);
+      if (l) l.setAttribute("transform", `translate(${tx},${ty + d.r * k + 12})`);
     });
   }
 
@@ -87,21 +87,13 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
     rafRef.current = requestAnimationFrame(step);
   }
 
-  function isFullscreen() {
-    return wrapRef.current?.classList.contains(styles.fullscreen) ?? false;
-  }
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
-    if (!isFullscreen()) wrapRef.current?.classList.add(styles.fullscreen);
     if (focusRef.current !== d) zoom(d);
     else if (d.parent) zoom(d.parent);
   }
   function onBackground() {
-    if (isFullscreen()) zoom(nodes[0]);
-  }
-  function exitFullscreen() {
-    wrapRef.current?.classList.remove(styles.fullscreen);
-    zoom(nodes[0]);
+    if (focusRef.current !== nodes[0]) zoom(nodes[0]);
   }
 
   useEffect(() => {
@@ -132,17 +124,13 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
   // still fits the short side while the long side gains room for siblings.
   const vbW = aspect >= 1 ? SIZE * aspect : SIZE;
   const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
-  const viewBox = `${-vbW / 2} ${-vbH / 2} ${vbW} ${vbH}`;
+  const viewBox = `${-vbW / 2} ${-SIZE / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();
   const share = focus.parent ? Math.round((focus.value ?? 0) / (focus.parent.value || 1) * 100) : null;
 
   return (
     <div className={styles.tree} ref={wrapRef}>
-      <button className={styles.fsClose} onClick={exitFullscreen} aria-label="Close the family view">
-        &times;
-      </button>
-
       <div className={styles.crumbs}>
         {trail.map((n, i) => (
           <span key={i}>
@@ -204,14 +192,18 @@ export default function BreedTree({ root, rootImage }: { root: LineageNode; root
                   style={{
                     display: visible ? "inline" : "none",
                     fillOpacity: visible ? 1 : 0,
-                    fill: d.depth >= 2 ? "#0a3a57" : "#ffffff",
+                    fill: "#ffffff",
+                    stroke: "rgba(10,58,87,0.6)",
+                    strokeWidth: 3,
+                    strokeLinejoin: "round",
+                    paintOrder: "stroke",
                     pointerEvents: "none",
                   }}
                 >
-                  <tspan x={0} dy="-0.1em" style={{ fontWeight: 800, fontSize: "15px" }}>
+                  <tspan x={0} dy="0.9em" style={{ fontWeight: 800, fontSize: "15px" }}>
                     {d.data.name}
                   </tspan>
-                  <tspan x={0} dy="1.3em" style={{ fontWeight: 700, fontSize: "12px", opacity: 0.78 }}>
+                  <tspan x={0} dy="1.15em" style={{ fontWeight: 700, fontSize: "12px", opacity: 0.85 }}>
                     {d.parent ? `${Math.round((d.value ?? 0) / (d.parent.value || 1) * 100)}% of the mix` : ""}
                   </tspan>
                 </text>
