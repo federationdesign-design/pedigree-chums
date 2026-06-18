@@ -61,6 +61,14 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
     ["Length", breed.length],
   ];
 
+  const charBlock = (
+    <>
+      <h4 className={styles.modalSubhead}>Personality</h4>
+      <p className={styles.modalChar}>{breed.character}</p>
+      {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
+    </>
+  );
+
   const details = (
     <>
       <p className={styles.modalLookFor}>
@@ -74,9 +82,7 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
           </div>
         ))}
       </dl>
-      <h4 className={styles.modalSubhead}>Personality</h4>
-      <p className={styles.modalChar}>{breed.character}</p>
-      {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
+      {charBlock}
     </>
   );
 
@@ -95,7 +101,7 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
                 <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>
                   Where the breed comes from
                 </h4>
-                {details}
+                {charBlock}
               </div>
             </div>
             <div className={styles.familyCol}>

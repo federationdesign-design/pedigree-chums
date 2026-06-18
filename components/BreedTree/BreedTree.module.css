@@ -12,6 +12,7 @@
   height: 100%;
   margin: 0;
   z-index: -1;
+  pointer-events: auto;
 }
 .stage svg {
   width: 100%;
@@ -27,6 +28,7 @@
   width: 34%;
   max-width: 460px;
   z-index: 3;
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
   align-items: stretch;

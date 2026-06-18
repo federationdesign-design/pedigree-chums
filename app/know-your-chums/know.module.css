@@ -507,6 +507,7 @@
 .familyCol {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 .familyBlock {
   margin-top: 22px;
