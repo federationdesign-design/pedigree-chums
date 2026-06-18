@@ -154,10 +154,10 @@ const SECTIONS: Section[] = [
     detail:
       "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
     facts: [
-      { text: "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete." },
+      { text: "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete.", image: "/history/first-dog-show.jpg" },
       { text: "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.", image: "/history/dog-licence.jpg" },
       { text: "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.", image: "/history/dog-biscuit.jpg" },
-      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom." },
+      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom.", image: "/history/Dog-theft.jpg" },
     ],
     image: "/history/portrait-of-dash.jpg",
     imageAlt: "A Victorian lady with a small spaniel companion",
@@ -202,7 +202,7 @@ const SECTIONS: Section[] = [
     facts: [
       { text: "Primley Sceptre, the first Best in Show winner, was picked from an entry of 9,466 dogs and described by the judge as 'faultless'." },
       { text: "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.", image: "/history/james-spratt.jpg" },
-      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year." },
+      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year.", image: "/history/breeds/crufts-dogshow.jpg" },
       { text: "Charles Cruft never owned a dog himself, for fear of being seen to favour any one breed." },
     ],
     image: "/history/primley-sceptre.jpeg",
@@ -223,10 +223,10 @@ const SECTIONS: Section[] = [
     detail:
       "As Britain became more urban and homes grew more comfortable, dogs came indoors for good. The relationship deepened from usefulness into genuine companionship. By the end of the century, the question was no longer what a dog could do for you, but simply the pleasure of its company, a shift that set the stage for the boom still unfolding today.",
     facts: [
-      { text: "Today around 99 percent of UK dog owners consider their dog to be a full member of the family." },
-      { text: "Around a third of British dogs are now allowed up onto their owner's bed to sleep." },
-      { text: "Some 58 percent of owners buy their dog birthday and Christmas presents." },
-      { text: "Pampered pets now enjoy spas, bakeries, dog fashion and even their own social media accounts." },
+      { text: "Today around 99 percent of UK dog owners consider their dog to be a full member of the family.", image: "/history/family-dog.jpg" },
+      { text: "Around a third of British dogs are now allowed up onto their owner's bed to sleep.", image: "/history/dog-in-bed.jpg" },
+      { text: "Some 58 percent of owners buy their dog birthday and Christmas presents.", image: "/history/dog-birthday.jpg" },
+      { text: "Pampered pets now enjoy spas, bakeries, dog fashion and even their own social media accounts.", image: "/history/Pampered-pets.jpg" },
     ],
     image: "/history/poodle-bed.jpg",
     imageAlt: "A family relaxing at home with their pet dog",
@@ -247,9 +247,9 @@ const SECTIONS: Section[] = [
     detail:
       "The most common breeds tell the story of changing tastes. Among dogs of all ages the classic Labrador still leads, but among puppies the French Bulldog and the Cockapoo have raced to the top, a clear sign of the designer-crossbreed boom. The pack brings both worlds together, the old favourites and the new, each with centuries of history behind them.",
     facts: [
-      { text: "Among dogs under one year old, the French Bulldog and Cockapoo now rank among the three most common breeds in the UK." },
-      { text: "British owners now spend around 10 billion pounds a year on their dogs." },
-      { text: "There are an estimated 13.5 million pet dogs in the UK, living in roughly a third of all households." },
+      { text: "Among dogs under one year old, the French Bulldog and Cockapoo now rank among the three most common breeds in the UK.", image: "/history/cockapoo-circle.jpg" },
+      { text: "British owners now spend around 10 billion pounds a year on their dogs.", image: "/history/10-billion-pounds.jpg" },
+      { text: "There are an estimated 13.5 million pet dogs in the UK, living in roughly a third of all households.", image: "/history/britian.jpg" },
     ],
     image: "/history/pappered-dog.jpg",
     imageAlt: "A modern Cockapoo, one of Britain's most popular dogs today",
