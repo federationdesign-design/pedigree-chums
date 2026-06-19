@@ -78,7 +78,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "Gave the sleek coat, the tan points and the terrier fire. This is the Manchester Terrier line.",
         img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg",
         children: [
-          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 14 },
+          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 14 },
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
         ]
       },
@@ -155,6 +155,64 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Pug", note: "Brings the comical, affectionate, people-loving side.", img: "/pug-square.jpg", value: 50 },
       { name: "Beagle", note: "Brings the curious nose and the waggy, sociable streak.", img: "/beagle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Bull Terrier": {
+    name: "Bull Terrier",
+    note: "A Victorian invention. James Hinks set out in the 1860s to build a cleaner, all-white gentleman's companion from the old bull-and-terrier dogs.",
+    children: [
+      { name: "Bulldog", note: "Brought the power, the broad chest and the determined grip.", img: "/history/breeds/old-engish-bulldog.webp", value: 45 },
+      { name: "White English Terrier", note: "A now-extinct breed that gave the clean white coat and terrier sharpness.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 40 },
+      { name: "Dalmatian", note: "Crossed in for size, substance and a pure white finish.", img: "/Dalmatian-square.jpg", value: 15 }
+    ]
+  },
+
+  "Boston Terrier": {
+    name: "Boston Terrier",
+    note: "An American original from 1870s Boston, traced back to a single dog, Hooper's Judge, a bulldog and terrier cross bred smaller and smarter.",
+    children: [
+      { name: "Bulldog", note: "Brought the stocky frame and the easy-going, affectionate streak.", img: "/history/breeds/old-engish-bulldog.webp", value: 55 },
+      { name: "White English Terrier", note: "The now-extinct terrier behind the neat build and lively mind.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 45 }
+    ]
+  },
+
+  "West Highland Terrier": {
+    name: "West Highland Terrier",
+    note: "Bred from the white pups of the Highland working terriers, kept apart on purpose so they would show up against the heather and rock.",
+    children: [
+      { name: "Cairn Terrier", note: "The closest cousin, and the main source of the Westie's plucky working type.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 64 },
+      { name: "Scottish Terrier", note: "Another of the old Highland terriers sharing the same rugged roots.", img: "/history/breeds/scottish-terrier-image.jpg", value: 22 },
+      { name: "Skye Terrier", note: "Part of the same west-coast terrier family that shaped the breed.", img: "/history/breeds/skye-terrier-photo.webp", value: 14 }
+    ]
+  },
+
+  "Staffordshire Bull Terrier": {
+    name: "Staffordshire Bull Terrier",
+    note: "A classic bull-and-terrier, bred in the Black Country by crossing the old bulldog with game local terriers for grip and gameness.",
+    children: [
+      { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/old-engish-bulldog.webp", value: 55 },
+      { name: "Old English Black and Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 }
+    ]
+  },
+
+  "Yorkshire Terrier": {
+    name: "Yorkshire Terrier",
+    note: "A working dog before a lap dog. Scottish weavers brought their terriers to the Yorkshire mills in the 1800s and crossed them with local ratters.",
+    children: [
+      { name: "Paisley Terrier", note: "A long-coated Scottish terrier that gave the silky, flowing coat.", img: "/history/breeds/Paisley-Terrier=photo.jpg", value: 45 },
+      { name: "Skye Terrier", note: "Another Scottish terrier behind the long, fine hair.", img: "/history/breeds/skye-terrier-photo.webp", value: 30 },
+      { name: "Old English Black and Tan Terrier", note: "Local ratting terriers that brought the size down and the colour in.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 25 }
+    ]
+  },
+
+  "Border Terrier": {
+    name: "Border Terrier",
+    note: "A true working terrier from the hills along the English and Scottish border, bred to keep up with the hunt and go to ground after foxes.",
+    children: [
+      { name: "Bedlington Terrier", note: "Shares the same old Border terrier stock and a common working ancestor.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 34 },
+      { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 33 },
+      { name: "Local fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 33 }
     ]
   }
 };
