@@ -6,7 +6,7 @@ import { getLineage, type LineageNode } from "../../data/lineage";
 import LineageMap from "./LineageMap";
 import styles from "./PackPit.module.css";
 
-const RADIUS: Record<string, number> = { small: 42.47, medium: 50.49, large: 59.4, giant: 60.48 }; // all bands -10% for mobile
+const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
 
 // a child's share is the sum of its leaf values (leaves total 100 across the tree)
@@ -47,7 +47,7 @@ export default function PackPit() {
       // original giant card half) so changing the card bands never resizes them.
       // Each body matches its SVG aspect ratio; `aspect` is a starting guess that
       // gets corrected from the loaded image.
-      const BIG = 75.6;
+      const BIG = 84;
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5, aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38, aspect: 3.22 };
