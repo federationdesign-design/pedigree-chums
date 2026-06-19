@@ -53,7 +53,8 @@ export default function PackPit() {
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
-      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * 5, aspect: 2.745 };
+      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 5 : 6.25), aspect: 2.745 };
+      const logo = { key: "__logo", label: "Pedigree Chums", src: "/dogbingo.svg", shape: "logo", width: BIG * 3.4, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
@@ -121,6 +122,32 @@ export default function PackPit() {
         return b;
       }
 
+      // The logo sits fixed in the pit on load. It is a static sensor, so falling
+      // dogs and toys pass through it but the first touch knocks it loose: it goes
+      // dynamic and, still a sensor, falls straight through the floor and pile and
+      // off the bottom of the screen, where it is removed.
+      let logoBody: any = null;
+      function makeLogo(w: number, h: number) {
+        const img = getImg(logo.key, logo.src);
+        const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
+        const bw = logo.width, bh = logo.width / ar;
+        const b: any = Bodies.rectangle(w / 2, h * 0.2, bw, bh, { isStatic: true, isSensor: true, render: { visible: false } });
+        b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
+        if (!(img.complete && img.naturalWidth)) {
+          img.addEventListener("load", () => {
+            const a = img.naturalWidth / img.naturalHeight, newH = logo.width / a;
+            if (Math.abs(newH - b.plugin.h) > 1) { Body.scale(b, 1, newH / b.plugin.h); b.plugin.h = newH; b.plugin.half = Math.min(b.plugin.w, newH) / 2; }
+          }, { once: true });
+        }
+        return b;
+      }
+      const onCollide = (ev: any) => {
+        for (const pair of ev.pairs) {
+          const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
+          const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (lg && lg.isStatic && other && !other.isStatic) Body.setStatic(lg, false); // knock it loose
+        }
+      };
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       function dropAll() {
@@ -297,6 +324,12 @@ export default function PackPit() {
       let hoverBody: any = null, hoverStart = 0;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
+        // the resting logo is static (excluded from dyn()), so draw it here until it
+        // dislodges; once dynamic it falls with everything else and is drawn via dyn()
+        if (logoBody) {
+          if (logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
+          else if (logoBody.position.y > render.canvas.height + 200) { Composite.remove(engine.world, logoBody); logoBody = null; }
+        }
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); return; }
         const hov = pointer ? Query.point(bodies, pointer)[0] : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
@@ -341,6 +374,12 @@ export default function PackPit() {
         });
       };
 
+      if (!isMobile) {
+        logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
+        Composite.add(engine.world, logoBody);
+        Events.on(engine, "collisionStart", onCollide);
+      }
+
       dropAll();
 
       dispose = () => {
@@ -355,6 +394,7 @@ export default function PackPit() {
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
         Events.off(render, "afterRender", onAfter);
+        Events.off(engine, "collisionStart", onCollide);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);
