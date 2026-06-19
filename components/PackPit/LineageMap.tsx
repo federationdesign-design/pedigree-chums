@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import styles from "./LineageMap.module.css";
 
@@ -79,6 +79,11 @@ export default function LineageMap({
   // the circle whose breed image is currently popped out, if any
   const [picked, setPicked] = useState<string | null>(null);
   useEffect(() => setPicked(null), [breed.name]);
+  // pan offset so the whole diagram can be dragged to reveal off-screen parts
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  useEffect(() => setPan({ x: 0, y: 0 }), [breed.name]);
+  const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
+  const suppressClick = useRef(false);
 
   const base = lean(breed.angle || 0);
 
@@ -118,6 +123,29 @@ export default function LineageMap({
       c = c._parent;
     }
     setOpen(s);
+  };
+
+  // Drag anywhere to pan the diagram. A drag suppresses the click that would
+  // otherwise close the overlay or select a circle.
+  const onPanDown = (e: React.PointerEvent) => {
+    suppressClick.current = false;
+    drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
+  };
+  const onPanMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
+    if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
+    if (d.moved) setPan({ x: d.px + dx, y: d.py + dy });
+  };
+  const onPanUp = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (d && d.moved) suppressClick.current = true;
+  };
+  const closeIfTap = () => {
+    if (suppressClick.current) { suppressClick.current = false; return; }
+    onClose();
   };
 
   const tagW = breed.name.length * 9.5 + 28;
@@ -160,11 +188,18 @@ export default function LineageMap({
   );
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div
+      className={styles.overlay}
+      onClick={closeIfTap}
+      onPointerDown={onPanDown}
+      onPointerMove={onPanMove}
+      onPointerUp={onPanUp}
+      onPointerCancel={onPanUp}
+    >
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
-      <svg className={styles.svg} viewBox={`0 0 ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+      <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         {hasTree ? (
           <>
             {shown
@@ -194,9 +229,10 @@ export default function LineageMap({
                     key={n._id}
                     className={styles.node}
                     transform={`translate(${n._x},${n._y})`}
-                    onMouseEnter={() => follow(n)}
+                    onMouseEnter={() => { if (!drag.current?.moved) follow(n); }}
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (suppressClick.current) { suppressClick.current = false; return; }
                       follow(n);
                       setPicked((cur) => (cur === n._id ? null : n._id));
                     }}

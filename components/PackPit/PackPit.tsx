@@ -50,9 +50,9 @@ export default function PackPit() {
       const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
       const SCALE = isMobile ? 0.67 : 1; // mobile shrinks cards and toys uniformly by a third
       const BIG = 84 * SCALE;
-      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5, aspect: 1 };
-      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 };
-      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38, aspect: 3.22 };
+      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
+      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
+      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone];
 
@@ -105,7 +105,7 @@ export default function PackPit() {
         }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
         const bw = prop.width, bh = prop.width / ar;
-        const b: any = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: Math.min(bw, bh) * 0.18 }, restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008, render: { visible: false } });
+        const b: any = Bodies.rectangle(x, y, bw, bh, { angle: prop.angle || 0, chamfer: { radius: Math.min(bw, bh) * 0.18 }, restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008, render: { visible: false } });
         b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: prop.shape === "bone" ? "#f6ecd6" : "#bfe3f7", img, prop: prop.shape, family: null, ping: 0 };
         // once the SVG loads, reshape the body to its true ratio so the art fills it
         if (!(img.complete && img.naturalWidth)) {

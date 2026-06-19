@@ -2,6 +2,8 @@
   position: fixed;
   inset: 0;
   z-index: 60;
+  touch-action: none;
+  cursor: grab;
   /* faint wash so the faded pack stays visible behind the diagram */
   background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.22), rgba(12, 91, 146, 0.46));
   animation: lm-fade 0.2s ease;
