@@ -131,7 +131,7 @@ export default function PackPit() {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const b: any = Bodies.rectangle(w / 2, h * 0.2, bw, bh, { isStatic: true, isSensor: true, render: { visible: false } });
+        const b: any = Bodies.rectangle(w / 2, h * 0.2, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
@@ -142,6 +142,7 @@ export default function PackPit() {
         return b;
       }
       const LOGO_HITS_TO_FALL = 5;
+      const LOGO_SINK = BIG * 0.7; // how far each hit pushes it down before it finally goes
       const logoHits = new Set<number>();
       const onCollide = (ev: any) => {
         if (!logoBody || !logoBody.isStatic) return;
@@ -149,10 +150,10 @@ export default function PackPit() {
           const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
           if (!lg) continue;
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
-          if (other && !other.isStatic) {
-            logoHits.add(other.id);
-            if (logoHits.size >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // released: now a normal solid body
-          }
+          if (!other || other.isStatic || logoHits.has(other.id)) continue;
+          logoHits.add(other.id);
+          if (logoHits.size >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it: now a normal solid body
+          Body.translate(lg, { x: 0, y: LOGO_SINK }); // each earlier hit just shoves it down a notch
         }
       };
       let dropTimer: any = null;
