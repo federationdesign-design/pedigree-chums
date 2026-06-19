@@ -395,17 +395,27 @@
 }
 .modalClose {
   position: absolute;
-  top: 12px;
+  top: 14px;
   right: 16px;
-  z-index: 2;
+  z-index: 5;
   appearance: none;
   border: 0;
-  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(10, 58, 87, 0.55);
   color: var(--white);
-  font-size: 2.4rem;
+  font-size: 2rem;
   line-height: 1;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 0;
+  transition: background 0.18s ease;
+}
+.modalClose:hover {
+  background: rgba(10, 58, 87, 0.78);
 }
 .modalImgWrap {
   border-radius: 22px;
@@ -485,7 +495,7 @@
 .familyLead {
   position: relative;
   z-index: 1;
-  max-width: 46%;
+  max-width: 50%;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
 }
@@ -495,9 +505,10 @@
 }
 .familySub {
   margin: 0 0 12px;
+  white-space: nowrap;
 }
 .familyText {
-  max-width: 19rem;
+  max-width: 24rem;
   transition: opacity 0.35s ease;
 }
 .familyTextDim {
@@ -576,6 +587,9 @@
   }
   .familyLead {
     max-width: none;
+  }
+  .familySub {
+    white-space: normal;
   }
   .familyCol {
     position: static;

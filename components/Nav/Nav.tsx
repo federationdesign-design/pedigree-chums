@@ -28,7 +28,7 @@ export default function Nav() {
   }, []);
 
   return (
-    <header className={`${styles.bar} ${scrolled ? styles.scrolled : ""}`}>
+    <header className={`pc-nav ${styles.bar} ${scrolled ? styles.scrolled : ""}`}>
       <Link href="/" className={styles.logo} aria-label="Pedigree Chums home">
         <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
       </Link>

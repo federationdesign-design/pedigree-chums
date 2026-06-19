@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import type { LineageNode } from "../../data/lineage";
 import styles from "../../app/know-your-chums/know.module.css";
@@ -14,20 +15,29 @@ type Props = {
   onClose: () => void;
 };
 
-export default function LineageModal({ name, image, character, fact, lineage, onClose }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose }: Props) {
   const [treeActive, setTreeActive] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    // Flag the page so the site nav steps aside while the pop-up is open, so
+    // the close button is the only control in the top corner.
+    document.body.classList.add("pc-modal-open");
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      document.body.classList.remove("pc-modal-open");
     };
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={name}>
       <div className={`${styles.modalCard} ${styles.modalCardSolo}`} onClick={(e) => e.stopPropagation()}>
         <button className={styles.modalClose} onClick={onClose} aria-label="Close">
@@ -40,13 +50,13 @@ export default function LineageModal({ name, image, character, fact, lineage, on
             <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>Where the breed comes from</h4>
             {character && <h4 className={styles.modalSubhead}>Personality</h4>}
             {character && <p className={styles.modalChar}>{character}</p>}
-            {fact && <p className={styles.modalFact}>Did you know? {fact}.</p>}
           </div>
         </div>
         <div className={styles.familyCol}>
           <BreedTree root={lineage} rootImage={image} onActiveChange={setTreeActive} />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

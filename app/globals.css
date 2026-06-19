@@ -132,3 +132,9 @@ a {
   font-size: 0.85rem;
   font-weight: 800;
 }
+
+/* Hide the site nav while a breed pop-up is open, so its close button is the
+   only control in the top corner instead of overlapping the menu. */
+body.pc-modal-open .pc-nav {
+  display: none;
+}
