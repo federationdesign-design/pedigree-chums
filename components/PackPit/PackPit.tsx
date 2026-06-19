@@ -47,11 +47,13 @@ export default function PackPit() {
       // original giant card half) so changing the card bands never resizes them.
       // Each body matches its SVG aspect ratio; `aspect` is a starting guess that
       // gets corrected from the loaded image.
-      const BIG = 84;
+      const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+      const SCALE = isMobile ? 0.67 : 1; // mobile shrinks cards and toys uniformly by a third
+      const BIG = 84 * SCALE;
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5, aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38, aspect: 3.22 };
-      const BALLS = [ball, ball, ball];
+      const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
@@ -82,7 +84,7 @@ export default function PackPit() {
       const dyn = () => Composite.allBodies(engine.world).filter((b: any) => !b.isStatic);
 
       function makeBall(breed: any, i: number, w: number) {
-        const s = (RADIUS[breed.size] || 32) + (Math.random() * 4 - 2);
+        const s = ((RADIUS[breed.size] || 32) + (Math.random() * 4 - 2)) * SCALE;
         const cr = Math.max(7, s * 0.22);
         const color = PALETTE[i % PALETTE.length];
         const b = Bodies.rectangle(40 + Math.random() * (w - 80), -120 - Math.random() * 600, 2 * s, 2 * s, {
@@ -142,7 +144,7 @@ export default function PackPit() {
           if (disposed) return;
           dropTimer = setInterval(() => {
             if (k >= order.length) { clearInterval(dropTimer); return; }
-            if (k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
+            if (!isMobile && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
             Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
             k++;
           }, 70);
@@ -172,12 +174,9 @@ export default function PackPit() {
       };
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { downAt = localPoint(e); };
-      const onClick = (e: MouseEvent) => {
-        const up = localPoint(e);
-        // ignore drags: only a near-stationary click opens the lineage
-        if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
+      const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop) return; // dogs only, not the toys
+        if (!hit || hit.plugin.prop) return false; // dogs only, not the toys
         const r = render.canvas.getBoundingClientRect();
         setActiveBreed({
           name: hit.plugin.name,
@@ -186,12 +185,33 @@ export default function PackPit() {
           y: r.top + hit.position.y,
           angle: hit.angle,
         });
+        return true;
+      };
+      const onClick = (e: MouseEvent) => {
+        const up = localPoint(e);
+        // ignore drags: only a near-stationary click opens the lineage
+        if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
+        openLineageAt(up);
+      };
+      // Touch: Matter's drag constraint swallows the synthesised click, so taps
+      // are handled directly here.
+      let touchDown: { x: number; y: number } | null = null;
+      const touchLocal = (t: Touch) => { const r = render.canvas.getBoundingClientRect(); return { x: t.clientX - r.left, y: t.clientY - r.top }; };
+      const onTouchStart = (e: TouchEvent) => { if (e.touches.length === 1) touchDown = touchLocal(e.touches[0]); };
+      const onTouchEnd = (e: TouchEvent) => {
+        const start = touchDown; touchDown = null;
+        if (!start || e.changedTouches.length !== 1) return;
+        const up = touchLocal(e.changedTouches[0]);
+        if (Math.hypot(up.x - start.x, up.y - start.y) > 10) return; // a drag, not a tap
+        if (openLineageAt(up)) e.preventDefault(); // opened: stop the ghost click reaching the overlay
       };
       render.canvas.addEventListener("mousemove", onMove);
       render.canvas.addEventListener("mouseleave", onLeave);
       render.canvas.addEventListener("dblclick", onDbl);
       render.canvas.addEventListener("mousedown", onDown);
       render.canvas.addEventListener("click", onClick);
+      render.canvas.addEventListener("touchstart", onTouchStart, { passive: true });
+      render.canvas.addEventListener("touchend", onTouchEnd, { passive: false });
 
       function rrect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
         if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
@@ -324,6 +344,8 @@ export default function PackPit() {
         render.canvas.removeEventListener("dblclick", onDbl);
         render.canvas.removeEventListener("mousedown", onDown);
         render.canvas.removeEventListener("click", onClick);
+        render.canvas.removeEventListener("touchstart", onTouchStart);
+        render.canvas.removeEventListener("touchend", onTouchEnd);
         Events.off(render, "afterRender", onAfter);
         Render.stop(render);
         Runner.stop(runner);

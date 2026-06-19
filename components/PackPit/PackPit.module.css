@@ -68,3 +68,11 @@
 .shake:active {
   transform: translateY(1px);
 }
+
+/* Mobile: instructions sit at the top, clear of the fixed nav. */
+@media (max-width: 768px) {
+  .controls {
+    top: 96px;
+    bottom: auto;
+  }
+}
