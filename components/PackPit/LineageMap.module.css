@@ -96,6 +96,11 @@
   stroke: var(--yellow);
   stroke-width: 4;
 }
+.pickCard {
+  fill: var(--navy);
+  stroke: var(--yellow);
+  stroke-width: 3;
+}
 .tag {
   fill: var(--navy);
 }

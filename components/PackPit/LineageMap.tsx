@@ -25,6 +25,8 @@ const SPREAD1 = Math.PI * 1.5;
 const SPREADN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
+// size of the breed image card that pops out beside a clicked circle
+const CARD = 82;
 
 function sumLeaves(n: LineageNode): number {
   const c = n.children || [];
@@ -74,6 +76,9 @@ export default function LineageMap({
   // the open set is the single line currently being followed (root..node)
   const [open, setOpen] = useState<Set<string>>(() => new Set(["0"]));
   useEffect(() => setOpen(new Set(["0"])), [breed.name]);
+  // the circle whose breed image is currently popped out, if any
+  const [picked, setPicked] = useState<string | null>(null);
+  useEffect(() => setPicked(null), [breed.name]);
 
   const base = lean(breed.angle || 0);
 
@@ -117,6 +122,9 @@ export default function LineageMap({
 
   const tagW = breed.name.length * 9.5 + 28;
   const clip = "lm-clip-root";
+
+  // only show the pop-out while its circle is actually on screen and has art
+  const pickedNode = picked ? shown.find((n) => n._id === picked && n._parent && n.img) || null : null;
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => (
@@ -190,6 +198,7 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       follow(n);
+                      setPicked((cur) => (cur === n._id ? null : n._id));
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} />
@@ -207,6 +216,42 @@ export default function LineageMap({
                   </g>
                 );
               })}
+            {pickedNode
+              ? (() => {
+                  const share = Math.round((pickedNode._leaves / (pickedNode._parent as Node)._leaves) * 100);
+                  const r = radius(share);
+                  const d = r + 10 + CARD / 2;
+                  const cx = pickedNode._x + Math.cos(pickedNode._dir) * d;
+                  const cy = pickedNode._y + Math.sin(pickedNode._dir) * d;
+                  const ex = pickedNode._x + Math.cos(pickedNode._dir) * r;
+                  const ey = pickedNode._y + Math.sin(pickedNode._dir) * r;
+                  return (
+                    <g className={styles.rootHit} onClick={(e) => e.stopPropagation()}>
+                      <line className={`${styles.edge} ${styles.lit}`} x1={ex} y1={ey} x2={cx} y2={cy} />
+                      <clipPath id="lm-pick-clip">
+                        <rect x={cx - CARD / 2} y={cy - CARD / 2} width={CARD} height={CARD} rx={15} />
+                      </clipPath>
+                      <rect
+                        x={cx - CARD / 2 - 4}
+                        y={cy - CARD / 2 - 4}
+                        width={CARD + 8}
+                        height={CARD + 8}
+                        rx={19}
+                        className={styles.pickCard}
+                      />
+                      <image
+                        href={pickedNode.img as string}
+                        x={cx - CARD / 2}
+                        y={cy - CARD / 2}
+                        width={CARD}
+                        height={CARD}
+                        clipPath="url(#lm-pick-clip)"
+                        preserveAspectRatio="xMidYMid slice"
+                      />
+                    </g>
+                  );
+                })()
+              : null}
             {rootCard(breed.x, breed.y)}
           </>
         ) : (
