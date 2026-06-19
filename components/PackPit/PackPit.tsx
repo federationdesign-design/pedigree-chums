@@ -48,7 +48,7 @@ export default function PackPit() {
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38, aspect: 3.22 };
       const BALLS = [ball, ball, ball];
-      const HEAVY = [bone, bowl];
+      const HEAVY = [bone];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
 
@@ -124,18 +124,21 @@ export default function PackPit() {
         const w = stage.clientWidth;
         // wave 1: the three tennis balls bounce in
         BALLS.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        // wave 2 (after 1s): the bone and bowl drop
+        // wave 2 (after 1s): the bone drops
         waveTimers.push(setTimeout(() => {
           if (disposed) return;
           HEAVY.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
         }, 1000));
-        // wave 3 (after another 1s): the pack spills in
+        // wave 3 (after another 1s): the pack spills in, with the bowl landing
+        // midway through the pack so it drops in among the dogs
         const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
+        const bowlAt = Math.floor(order.length / 2);
         let k = 0;
         waveTimers.push(setTimeout(() => {
           if (disposed) return;
           dropTimer = setInterval(() => {
             if (k >= order.length) { clearInterval(dropTimer); return; }
+            if (k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
             Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
             k++;
           }, 70);
