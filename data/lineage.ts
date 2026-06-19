@@ -214,6 +214,67 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 33 },
       { name: "Local fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 33 }
     ]
+  },
+
+  "Bulldog": {
+    name: "Bulldog",
+    note: "Once a fierce bull-baiting dog, then bred into the gentle, wrinkly companion we know after blood sports were banned in 1835.",
+    children: [
+      { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog.", img: "/history/breeds/old-engish-bulldog.webp", value: 60 },
+      { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/mastiff-square.jpg", value: 25 },
+      { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/pug-square.jpg", value: 15 }
+    ]
+  },
+
+  "Whippet": {
+    name: "Whippet",
+    note: "The poor man's racehorse. Northern miners bred a pocket-sized sighthound for weekend racing and rabbit coursing.",
+    children: [
+      { name: "Greyhound", note: "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.", img: "/greyhound-square.jpg", value: 62 },
+      { name: "Terriers", note: "Added grit and gameness for the rabbit-coursing the early dogs were bred for.", img: "/history/breeds/manchester-terrior.jpg", value: 23 },
+      { name: "Italian Greyhound", note: "A later refinement for the elegant, fine-boned outline.", img: "/italian-greyhound-square.jpg", value: 15 }
+    ]
+  },
+
+  "Corgi": {
+    name: "Corgi",
+    note: "A big dog in a small body. The Pembroke is a true cattle herder, nipping at heels and ducking the kicks.",
+    children: [
+      { name: "Nordic Spitz dogs", note: "Spitz-type herders thought to have arrived with Flemish weavers and Viking settlers.", img: "/husky-square.jpg", value: 55 },
+      { name: "Welsh herding dogs", note: "The local Welsh working stock that shaped it into a low, nimble cattle dog.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
+    ]
+  },
+
+  "Golden Retriever": {
+    name: "Golden Retriever",
+    note: "A Scottish creation. Lord Tweedmouth kept careful records as he built the perfect gundog on his Highland estate from the 1860s.",
+    children: [
+      { name: "Wavy-Coated Retriever", note: "The yellow retriever at the heart of Tweedmouth's project.", img: "/history/breeds/flatcoated_retriever-photo.jpg", value: 45 },
+      { name: "Tweed Water Spaniel", note: "A now-extinct local water dog that gave the gentle nature and love of water.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
+      { name: "Irish Setter", note: "A dash of setter for the rich golden colour.", img: "/history/breeds/irish-setter-photo.jpg", value: 15 },
+      { name: "Bloodhound", note: "A little hound blood for tracking power and a good nose.", img: "/history/breeds/bloodhound-photo.jpg", value: 10 }
+    ]
+  },
+
+  "Border Collie": {
+    name: "Border Collie",
+    note: "Widely called the cleverest dog of all, bred purely for the work of gathering and moving sheep on the hills.",
+    children: [
+      { name: "Old Scotch Collie", note: "The hardy hill-collie stock at the heart of the breed, traced to one famous dog, Old Hemp.", img: "/history/breeds/rough-collie-photo.jpg", value: 50 },
+      { name: "Welsh sheepdogs", note: "Local Welsh herding dogs that fed into the working type along the border.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 },
+      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 25 }
+    ]
+  },
+
+  "Irish Setter": {
+    name: "Irish Setter",
+    note: "The flashy red gundog of Ireland, bred to range wide and find game birds across open country.",
+    children: [
+      { name: "English Setter", note: "The base setter type behind the breed's style and stance.", img: "/history/breeds/english_setter-photo.jpg", value: 35 },
+      { name: "Irish Water Spaniel", note: "Native Irish spaniel blood for coat and a love of water.", img: "/history/breeds/irish-water-spaniel.jpg", value: 25 },
+      { name: "Gordon Setter", note: "Another setter in the mix, adding substance and steadiness.", img: "/history/breeds/gordon-setter-photo.jpg", value: 20 },
+      { name: "Pointer", note: "A touch of pointer for nose and a wide-ranging hunt.", img: "/history/breeds/pointer-photo.jpg", value: 20 }
+    ]
   }
 };
 
