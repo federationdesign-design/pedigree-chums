@@ -53,7 +53,7 @@ export default function PackPit() {
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
-      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 5 : 6.25), aspect: 2.745 };
+      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
@@ -143,17 +143,20 @@ export default function PackPit() {
       }
       const LOGO_HITS_TO_FALL = 5;
       const LOGO_SINK = BIG * 0.7; // how far each hit pushes it down before it finally goes
-      const logoHits = new Set<number>();
+      const LOGO_W = BIG * 6.8;    // matches logo.width
+      const LOGO_TILT = Math.asin(Math.min(1, LOGO_SINK / LOGO_W)); // tilt that drops the free edge 3x the pinned edge
+      let logoHits = 0;
       const onCollide = (ev: any) => {
         if (!logoBody || !logoBody.isStatic) return;
         for (const pair of ev.pairs) {
           const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
           if (!lg) continue;
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
-          if (!other || other.isStatic || logoHits.has(other.id)) continue;
-          logoHits.add(other.id);
-          if (logoHits.size >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it: now a normal solid body
-          Body.translate(lg, { x: 0, y: LOGO_SINK }); // each earlier hit just shoves it down a notch
+          if (!other || other.isStatic) continue;
+          logoHits++; // count every hit, including repeat knocks from the same object
+          if (logoHits >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it: now a normal solid body
+          Body.translate(lg, { x: 0, y: LOGO_SINK }); // shove the centre down a notch
+          Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
         }
       };
       let dropTimer: any = null;
