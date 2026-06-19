@@ -988,6 +988,149 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/Pomeranian-square.jpg", value: 40 }
     ]
   },
+  "Great Dane": {
+    name: "Great Dane",
+    note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
+    children: [
+      { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front.", img: "/history/breeds/english-mastiff.jpg", value: 50 },
+      { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", value: 30 },
+      { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed.", value: 20 }
+    ]
+  },
+  "Saint Bernard": {
+    name: "Saint Bernard",
+    note: "The Alpine rescue dog of the Great St Bernard hospice, grown from Roman farm mastiffs and later thickened with Newfoundland blood.",
+    children: [
+      { name: "Alpine mastiff farm dogs", note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.", value: 55 },
+      { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 25 },
+      { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to.", img: "/mastiff-square.jpg", value: 20 }
+    ]
+  },
+  "Afghan Hound": {
+    name: "Afghan Hound",
+    note: "An ancient sighthound from the mountains of Afghanistan, coated long against the cold, one of the oldest coursing lines there is.",
+    children: [
+      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old Silk Road, its deepest root.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 65 },
+      { name: "Mountain coursing hounds", note: "The high altitude hunting dogs that gave it the heavy coat and big feet for rough ground.", value: 35 }
+    ]
+  },
+  "Weimaraner": {
+    name: "Weimaraner",
+    note: "The grey ghost, a noble gun dog from the Weimar court of Germany, built on old scent trailing and pointing stock.",
+    children: [
+      { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", value: 40 },
+      { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", value: 40 },
+      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", value: 20 }
+    ]
+  },
+  "Dalmatian": {
+    name: "Dalmatian",
+    note: "The spotted coach dog, named for Dalmatia on the Adriatic coast, bred to trot for miles beside a carriage.",
+    children: [
+      { name: "Ancient spotted hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.", value: 55 },
+      { name: "Pointer", note: "Pointing and hound blood that shaped its build and steady working head.", value: 30 },
+      { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for.", value: 15 }
+    ]
+  },
+  "Rottweiler": {
+    name: "Rottweiler",
+    note: "The butcher's dog of Rottweil, descended from the drover mastiffs the Roman legions marched over the Alps.",
+    children: [
+      { name: "Ancient Molossers", note: "The Roman drover and war mastiffs left in the region, the breed's deepest root.", img: "/mastiff-square.jpg", value: 60 },
+      { name: "Local German cattle dogs", note: "The herding farm dogs of the Wurttemberg valleys it was crossed with to make a steady drover.", value: 40 }
+    ]
+  },
+  "Basset Hound": {
+    name: "Basset Hound",
+    note: "A low set French scenthound bred short in the leg on purpose, so hunters could keep up with it on foot.",
+    children: [
+      { name: "Bloodhound", note: "The St Hubert scent trailing line behind its nose, long ears and deep voice.", value: 55 },
+      { name: "Old French basset hounds", note: "The short legged basset packs of France, dwarfed for slow, close hunting in cover.", value: 45 }
+    ]
+  },
+  "Italian Greyhound": {
+    name: "Italian Greyhound",
+    note: "A sighthound shrunk to a lapdog in ancient Italy, all the speed in miniature, kept for warmth and company.",
+    children: [
+      { name: "Ancient eastern sighthounds", note: "The small Mediterranean coursing dogs it descends from, prized since antiquity.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 65 },
+      { name: "Companion miniaturisation", note: "Generations of breeding for the smallest, most elegant dogs as court companions.", value: 35 }
+    ]
+  },
+  "Papillon": {
+    name: "Papillon",
+    note: "The butterfly dog, a tiny continental spaniel with winged ears, a fixture of European courts for 700 years.",
+    children: [
+      { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance.", value: 70 },
+      { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds.", value: 30 }
+    ]
+  },
+  "Siberian Husky": {
+    name: "Siberian Husky",
+    note: "The sled dog of the Chukchi people of north east Siberia, bred to pull light loads vast distances in brutal cold.",
+    children: [
+      { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them.", value: 75 },
+      { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat.", value: 25 }
+    ]
+  },
+  "Shih Tzu": {
+    name: "Shih Tzu",
+    note: "The lion dog of the Chinese imperial court, made by crossing Tibetan holy dogs with the palace's own toys.",
+    children: [
+      { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court.", value: 55 },
+      { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls.", img: "/pug-square.jpg", value: 45 }
+    ]
+  },
+  "Miniature Schnauzer": {
+    name: "Miniature Schnauzer",
+    note: "A small German farm ratter, the standard schnauzer shrunk with toy blood into a sharp little vermin dog.",
+    children: [
+      { name: "Standard Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", value: 60 },
+      { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down.", value: 25 },
+      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, biddable head.", value: 15 }
+    ]
+  },
+  "Pomeranian": {
+    name: "Pomeranian",
+    note: "A spitz shrunk to a toy in the Pomerania region, descended from big Arctic sled and herding dogs.",
+    children: [
+      { name: "Large German spitz", note: "The sturdy Wolfspitz and sled type dogs it was bred down from, many times its size.", value: 75 },
+      { name: "Companion miniaturisation", note: "Generations of breeding for ever smaller lap dogs once it reached the royal courts.", value: 25 }
+    ]
+  },
+  "French Bulldog": {
+    name: "French Bulldog",
+    note: "Born when English lacemakers took their little toy bulldogs to France, where Paris fell for the bat eared result.",
+    children: [
+      { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", value: 65 },
+      { name: "Parisian ratters and terriers", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears.", value: 35 }
+    ]
+  },
+  "Chihuahua": {
+    name: "Chihuahua",
+    note: "The smallest dog of all, traced to the Techichi companion dogs kept by the peoples of ancient Mexico.",
+    children: [
+      { name: "Ancient Techichi dogs", note: "The small sacred companion dogs of the Toltec and Aztec, the breed's direct root.", value: 80 },
+      { name: "Small imported dogs", note: "Tiny dogs brought by later traders, thought to add coat and the bold, terrier like spark.", value: 20 }
+    ]
+  },
+  "German Shepherd": {
+    name: "German Shepherd",
+    note: "Standardised from Germany's regional sheep herding dogs into one clever, hard working breed in the 1890s.",
+    children: [
+      { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", value: 45 },
+      { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head.", value: 40 },
+      { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type.", value: 15 }
+    ]
+  },
+  "Dachshund": {
+    name: "Dachshund",
+    note: "The German badger dog, a scenthound bred low and long to follow its quarry straight down into the earth.",
+    children: [
+      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", value: 60 },
+      { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", value: 25 },
+      { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", value: 15 }
+    ]
+  },
 };
 
 const MAX_LINEAGE_DEPTH = 5;
