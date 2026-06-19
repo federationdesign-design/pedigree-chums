@@ -16,6 +16,17 @@ const SHIFT = 0.66;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
+// Classic bounce easing for the drop-in entrance: overshoots slightly and
+// settles, so circles land with a little bounce rather than a dead stop.
+function easeOutBounce(x: number): number {
+  const n1 = 7.5625;
+  const d1 = 2.75;
+  if (x < 1 / d1) return n1 * x * x;
+  if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + 0.75;
+  if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + 0.9375;
+  return n1 * (x -= 2.625 / d1) * x + 0.984375;
+}
+
 export default function BreedTree({
   root,
   rootImage,
@@ -42,6 +53,7 @@ export default function BreedTree({
 
   const [focus, setFocus] = useState<Node>(nodes[0]);
   const [hovered, setHovered] = useState<Node | null>(null);
+  const [entered, setEntered] = useState(false);
   const [ready, setReady] = useState(false);
   // Aspect ratio of the visible stage. The viewBox is widened to match it so
   // the diagram uses the whole available canvas: the surrounding circles spread
@@ -136,10 +148,54 @@ export default function BreedTree({
   }
 
   useEffect(() => {
-    zoomTo([nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD]);
     focusRef.current = nodes[0];
     setFocus(nodes[0]);
     setReady(true);
+
+    const v: View = [nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD];
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduce) {
+      zoomTo(v);
+      setEntered(true);
+      return () => cancelAnimationFrame(rafRef.current);
+    }
+
+    // Drop-in entrance: every circle starts above the canvas and falls into its
+    // packed position with a small bounce, staggered by index so the larger
+    // outer circles land first and the nested ones drop in just after. Labels
+    // stay hidden until everything has settled.
+    setEntered(false);
+    const cg = circlesRef.current;
+    const k = SIZE / v[2];
+    const dropFrom = SIZE * 1.3;
+    const dur = 700;
+    const stagger = 45;
+    const total = dur + stagger * Math.max(0, nodes.length - 1);
+    const start = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - start;
+      nodes.forEach((d, i) => {
+        const c = cg?.children[i] as SVGCircleElement | undefined;
+        if (!c) return;
+        const tx = (d.x - v[0]) * k;
+        const ty = (d.y - v[1]) * k;
+        const lt = Math.max(0, Math.min(1, (elapsed - i * stagger) / dur));
+        const drop = (1 - easeOutBounce(lt)) * dropFrom;
+        c.setAttribute("transform", `translate(${tx},${ty - drop})`);
+        c.setAttribute("r", String(d.r * k));
+      });
+      if (elapsed < total) {
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        zoomTo(v);
+        setEntered(true);
+      }
+    };
+    rafRef.current = requestAnimationFrame(step);
+
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes]);
@@ -251,7 +307,7 @@ export default function BreedTree({
             })}
           </g>
 
-          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
+          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }}>
             {nodes.map((d, i) => {
               const isChild = d.parent === focus;
               // When zoomed right into a single circle that has nothing inside
