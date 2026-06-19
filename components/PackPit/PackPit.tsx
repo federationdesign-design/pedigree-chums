@@ -5,7 +5,7 @@ import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import styles from "./PackPit.module.css";
 
-const RADIUS: Record<string, number> = { small: 28.6, medium: 37.4, large: 44, giant: 56 };
+const RADIUS: Record<string, number> = { small: 42.9, medium: 56.1, large: 66, giant: 84 }; // 50% larger across the board
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
 
 // a child's share is the sum of its leaf values (leaves total 100 across the tree)
