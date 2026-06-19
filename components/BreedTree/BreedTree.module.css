@@ -158,7 +158,51 @@
   }
 }
 
+/* Inset breed images: a faint veil over every nested image, plus an alternating
+   duotone tint by depth (set in BreedTree.tsx) so each ring reads as its own
+   layer. Hovering any image clears the veil and tint to show it in full. */
+.imgCircle {
+  opacity: 0.9;
+  transition: opacity 0.22s ease;
+}
+.tintA {
+  filter: url(#bt-tint-a);
+}
+.tintB {
+  filter: url(#bt-tint-b);
+}
+.imgCircle:hover {
+  filter: none;
+  opacity: 1;
+}
+
+/* A quick rattle of the whole diagram when a circle is tapped. */
+.shake {
+  animation: bt-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes bt-shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0) rotate(-0.4deg);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0) rotate(0.5deg);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0) rotate(-0.9deg);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0) rotate(0.9deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fullscreen { animation: none; }
   .stage svg { transition: none; }
+  .imgCircle { transition: none; }
+  .shake { animation: none; }
 }

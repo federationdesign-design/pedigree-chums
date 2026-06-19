@@ -117,6 +117,15 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const st = stageRef.current;
+    if (st && !reduce) {
+      st.classList.remove(styles.shake);
+      void st.offsetWidth; // force reflow so the animation can retrigger
+      st.classList.add(styles.shake);
+    }
     if (focusRef.current !== d) zoom(d);
     else if (d.parent) zoom(d.parent);
   }
@@ -169,6 +178,26 @@ export default function BreedTree({
           style={{ opacity: ready ? 1 : 0 }}
         >
           <defs>
+            {/* Per-level duotone tints. feColorMatrix flattens the image to
+                brightness (a luminance-preserving greyscale), then
+                feComponentTransfer maps that brightness onto a two-colour ramp,
+                so each tinted ring keeps its tones but reads as a single hue. */}
+            <filter id="bt-tint-a" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0" />
+              <feComponentTransfer>
+                <feFuncR type="table" tableValues="0.05 0.72" />
+                <feFuncG type="table" tableValues="0.22 0.86" />
+                <feFuncB type="table" tableValues="0.40 0.98" />
+              </feComponentTransfer>
+            </filter>
+            <filter id="bt-tint-b" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0" />
+              <feComponentTransfer>
+                <feFuncR type="table" tableValues="0.24 0.98" />
+                <feFuncG type="table" tableValues="0.15 0.82" />
+                <feFuncB type="table" tableValues="0.03 0.42" />
+              </feComponentTransfer>
+            </filter>
             {nodes.map((d, i) =>
               nodeImg(d) ? (
                 <pattern key={i} id={`bt-img-${i}`} patternContentUnits="objectBoundingBox" width="1" height="1">
@@ -184,9 +213,22 @@ export default function BreedTree({
               // circles inside it show. It stays in the DOM (rendered invisible
               // and non-interactive) so the index alignment used by zoomTo holds.
               const hidden = d.depth === 0;
+              const hasImg = !hidden && !!nodeImg(d);
+              // Alternate the look by depth so nested rings stay legible: odd
+              // rings get a duotone tint, even rings stay full colour. The two
+              // tints rotate so neighbouring tinted rings differ in hue. Every
+              // inset image is also faintly veiled; hovering clears both.
+              const tinted = hasImg && d.depth % 2 === 1;
+              const tintClass = tinted
+                ? Math.floor((d.depth - 1) / 2) % 2 === 0
+                  ? styles.tintA
+                  : styles.tintB
+                : "";
+              const cls = hasImg ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
               return (
                 <circle
                   key={i}
+                  className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   stroke={hidden ? "none" : "#ffd23e"}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}

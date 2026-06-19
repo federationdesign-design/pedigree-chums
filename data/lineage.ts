@@ -971,8 +971,24 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
-};
+  "Poodle": {
+    name: "Poodle",
+    note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
+    children: [
+      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 55 },
+      { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 45 }
+    ]
+  },
 
+  "Pug": {
+    name: "Pug",
+    note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
+    children: [
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs.", img: "/pug-square.jpg", value: 60 },
+      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/Pomeranian-square.jpg", value: 40 }
+    ]
+  },
+};
 
 const MAX_LINEAGE_DEPTH = 5;
 
