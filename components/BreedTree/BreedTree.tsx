@@ -214,13 +214,13 @@ export default function BreedTree({
               // and non-interactive) so the index alignment used by zoomTo holds.
               const hidden = d.depth === 0;
               const hasImg = !hidden && !!nodeImg(d);
-              // Alternate the look by depth so nested rings stay legible: odd
-              // rings get a duotone tint, even rings stay full colour. The two
-              // tints rotate so neighbouring tinted rings differ in hue. Every
-              // inset image is also faintly veiled; hovering clears both.
-              const tinted = hasImg && d.depth % 2 === 1;
+              // The larger "bottom" image in each circle stays full colour and
+              // the images nested on top of it are tinted, alternating inward.
+              // The root (depth 0) is hidden, so depth 1 is the first visible
+              // ring and stays full colour; depth 2 is the first tinted ring.
+              const tinted = hasImg && d.depth % 2 === 0;
               const tintClass = tinted
-                ? Math.floor((d.depth - 1) / 2) % 2 === 0
+                ? Math.floor((d.depth - 2) / 2) % 2 === 0
                   ? styles.tintA
                   : styles.tintB
                 : "";
