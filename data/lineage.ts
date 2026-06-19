@@ -996,6 +996,7 @@ const MAX_LINEAGE_DEPTH = 5;
 // the same history is grafted in wherever the name appears.
 const LINEAGE_ALIASES: Record<string, string> = {
   "Jack Russell": "Jack Russell Terrier",
+  "Mastiff": "English Mastiff",
 };
 function aliasName(name: string): string {
   return LINEAGE_ALIASES[name] ?? name;

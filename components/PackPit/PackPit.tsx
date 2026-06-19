@@ -39,6 +39,13 @@ export default function PackPit() {
         return IMG[name];
       };
 
+      // Two toys that tip in ahead of the pack. Drop the SVGs into /public and
+      // confirm these filenames; until then a placeholder shape falls instead.
+      const PROPS = [
+        { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", radius: 40 },
+        { key: "__bone", label: "Bone", src: "/bone.svg", shape: "bone", radius: 34 },
+      ];
+
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
 
       const engine = Engine.create();
@@ -77,19 +84,42 @@ export default function PackPit() {
         return b;
       }
 
+      function makeProp(prop: any, w: number) {
+        const s = prop.radius;
+        const x = 60 + Math.random() * (w - 120), y = -160 - Math.random() * 160;
+        let b: any;
+        if (prop.shape === "ball") {
+          b = Bodies.circle(x, y, s, { restitution: 0.55, friction: 0.22, frictionAir: 0.01, density: 0.0012, render: { visible: false } });
+          b.plugin = { name: prop.label, half: s, w: 2 * s, h: 2 * s, color: "#c7e65a", img: getImg(prop.key, prop.src), prop: prop.shape, family: null, ping: 0 };
+        } else {
+          const bw = 2 * s * 1.9, bh = 2 * s * 0.78;
+          b = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: bh * 0.45 }, restitution: 0.32, friction: 0.3, frictionAir: 0.012, density: 0.001, render: { visible: false } });
+          b.plugin = { name: prop.label, half: s, w: bw, h: bh, color: "#f6ecd6", img: getImg(prop.key, prop.src), prop: prop.shape, family: null, ping: 0 };
+        }
+        return b;
+      }
+
       let dropTimer: any = null;
+      let dropDelay: any = null;
       function dropAll() {
         const ex = dyn();
         if (ex.length) Composite.remove(engine.world, ex);
         if (dropTimer) clearInterval(dropTimer);
-        const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
+        if (dropDelay) clearTimeout(dropDelay);
         const w = stage.clientWidth;
+        // toys tip in first
+        PROPS.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
+        // then the pack spills in after a short beat
+        const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
         let k = 0;
-        dropTimer = setInterval(() => {
-          if (k >= order.length) { clearInterval(dropTimer); return; }
-          Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
-          k++;
-        }, 70);
+        dropDelay = setTimeout(() => {
+          if (disposed) return;
+          dropTimer = setInterval(() => {
+            if (k >= order.length) { clearInterval(dropTimer); return; }
+            Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
+            k++;
+          }, 70);
+        }, 520);
       }
 
       const mouse = Mouse.create(render.canvas);
@@ -138,6 +168,21 @@ export default function PackPit() {
         const p = b.position, s = b.plugin.half, cr = b.plugin.corner, img = b.plugin.img;
         ctx.save(); ctx.globalAlpha = alpha;
         ctx.translate(p.x, p.y); ctx.rotate(b.angle);
+        if (b.plugin.prop) {
+          const pw = b.plugin.w, ph = b.plugin.h;
+          if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
+          if (img && img.complete && img.naturalWidth) {
+            ctx.drawImage(img, -pw / 2, -ph / 2, pw, ph);
+          } else if (b.plugin.prop === "ball") {
+            ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2); ctx.fillStyle = b.plugin.color; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = "rgba(10,58,87,0.45)"; ctx.stroke();
+            ctx.beginPath(); ctx.arc(-s * 1.1, 0, s * 1.45, -0.7, 0.7); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.stroke();
+          } else {
+            rrect(ctx, -pw / 2, -ph / 2, pw, ph, ph * 0.45); ctx.fillStyle = b.plugin.color; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = "rgba(10,58,87,0.4)"; ctx.stroke();
+          }
+          ctx.restore(); return;
+        }
         if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2; }
         rrect(ctx, -s, -s, 2 * s, 2 * s, cr); ctx.fillStyle = b.plugin.color; ctx.fill();
         ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
@@ -219,6 +264,7 @@ export default function PackPit() {
 
       dispose = () => {
         if (dropTimer) clearInterval(dropTimer);
+        if (dropDelay) clearTimeout(dropDelay);
         ro.disconnect();
         render.canvas.removeEventListener("mousemove", onMove);
         render.canvas.removeEventListener("mouseleave", onLeave);
