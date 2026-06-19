@@ -45,8 +45,8 @@ export default function PackPit() {
       const BIG = RADIUS.giant;
       const PROPS = [
         { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", radius: BIG * 1.25 },
-        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", radius: BIG * 1.15, wide: 1.9, tall: 0.78 },
-        { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", radius: BIG * 1.35, wide: 1.25, tall: 1.0 },
+        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", radius: BIG * 1.53, wide: 1.9, tall: 0.78 },
+        { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", radius: BIG * 2.7, wide: 1.25, tall: 1.0 },
       ];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
@@ -129,6 +129,10 @@ export default function PackPit() {
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
       Composite.add(engine.world, mc);
       render.mouse = mouse;
+      // matter binds the wheel to the canvas and cancels it, which eats page
+      // scroll when the cursor is over the pit. Unhook it; dragging is unaffected.
+      mouse.element.removeEventListener("mousewheel", (mouse as any).mousewheel);
+      mouse.element.removeEventListener("DOMMouseScroll", (mouse as any).mousewheel);
 
       let pointer: any = null;
       const localPoint = (e: MouseEvent) => { const r = render.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
