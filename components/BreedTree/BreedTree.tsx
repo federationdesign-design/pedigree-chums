@@ -10,6 +10,9 @@ const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
 // clipped against the square edge, and so siblings stay well out of frame.
 const PAD = 1.4;
+// How far right of centre the diagram sits, as a fraction of the canvas width,
+// so it clears the text column on the left.
+const SHIFT = 0.66;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
@@ -61,7 +64,6 @@ export default function BreedTree({
     viewRef.current = v;
     const cg = circlesRef.current;
     const lg = labelsRef.current;
-    const fr = focusRef.current.r * k; // focused circle radius in the current view
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
@@ -76,12 +78,15 @@ export default function BreedTree({
           // The focused circle's own label sits at its centre.
           l.setAttribute("transform", "translate(0,0)");
         } else {
-          // Park child labels just outside the focused circle, pushed out along
-          // the line from the centre to the node, so they never sit on a circle.
-          const dist = Math.hypot(tx, ty) || 1;
-          const rad = fr + 58;
-          const lx = (tx / dist) * rad;
-          const ly = (ty / dist) * rad;
+          // Child labels sit above or below their circle (never to the side, so
+          // they do not run off the narrow horizontal edges), centred on the
+          // circle and clamped to stay inside the canvas.
+          const childR = d.r * k;
+          const vbWl = aspect >= 1 ? SIZE * aspect : SIZE;
+          const xMinl = aspect >= 1 ? -vbWl * SHIFT : -vbWl / 2;
+          const margin = 120;
+          const lx = Math.max(xMinl + margin, Math.min(xMinl + vbWl - margin, tx));
+          const ly = ty < 0 ? ty - childR - 46 : ty + childR + 46;
           l.setAttribute("transform", `translate(${lx},${ly})`);
         }
       }
@@ -149,7 +154,7 @@ export default function BreedTree({
   // right of the pop-up, clear of the text column, rather than dead centre.
   const vbW = aspect >= 1 ? SIZE * aspect : SIZE;
   const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
-  const xMin = aspect >= 1 ? -vbW * 0.72 : -vbW / 2;
+  const xMin = aspect >= 1 ? -vbW * SHIFT : -vbW / 2;
   const viewBox = `${xMin} ${-SIZE / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();

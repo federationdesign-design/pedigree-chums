@@ -476,7 +476,7 @@
 }
 .modalCardSolo {
   display: block;
-  width: min(1280px, 92vw);
+  width: min(1344px, 96vw);
   height: min(90vh, 880px);
   overflow: hidden;
   isolation: isolate;
