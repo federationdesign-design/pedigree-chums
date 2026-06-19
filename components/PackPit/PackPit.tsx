@@ -17,6 +17,7 @@ function sumLeaves(n: LineageNode): number {
 export default function PackPit() {
   const stageRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<() => void>(() => {});
+  const motionRef = useRef<() => void>(() => {});
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const lineageOpenRef = useRef(false);
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
@@ -243,7 +244,7 @@ export default function PackPit() {
       // are handled directly here.
       let touchDown: { x: number; y: number } | null = null;
       const touchLocal = (t: Touch) => { const r = render.canvas.getBoundingClientRect(); return { x: t.clientX - r.left, y: t.clientY - r.top }; };
-      const onTouchStart = (e: TouchEvent) => { if (e.touches.length === 1) touchDown = touchLocal(e.touches[0]); };
+      const onTouchStart = (e: TouchEvent) => { motionRef.current(); if (e.touches.length === 1) touchDown = touchLocal(e.touches[0]); };
       const onTouchEnd = (e: TouchEvent) => {
         const start = touchDown; touchDown = null;
         if (!start || e.changedTouches.length !== 1) return;
@@ -391,6 +392,36 @@ export default function PackPit() {
         });
       };
 
+      // mobile: let the phone's own motion drive the pit. tilting steers gravity so the
+      // pack rolls to the low side, and a sharp shake kicks everything like the button.
+      let lastAx = 0, lastAy = 0, lastAz = 0, lastShake = 0;
+      const onMotion = (e: any) => {
+        if (disposed) return;
+        const a = e.accelerationIncludingGravity; if (!a) return;
+        const ax = a.x || 0, ay = a.y || 0, az = a.z || 0;
+        const delta = Math.abs(ax - lastAx) + Math.abs(ay - lastAy) + Math.abs(az - lastAz);
+        lastAx = ax; lastAy = ay; lastAz = az;
+        const t = performance.now();
+        if (delta > 32 && t - lastShake > 600) { lastShake = t; shakeRef.current(); }
+      };
+      const onOrient = (e: any) => {
+        if (disposed) return;
+        const tx = Math.max(-1.2, Math.min(1.2, (e.gamma || 0) / 45)); // left/right tilt, full pull near 45deg
+        engine.gravity.x += (tx - engine.gravity.x) * 0.25; // ease toward it so it never jitters
+      };
+      let motionOn = false, motionAsking = false;
+      const askPerm = (E: any) => (E && typeof E.requestPermission === "function") ? E.requestPermission().catch(() => "denied") : Promise.resolve("granted");
+      const enableMotion = () => {
+        if (motionOn || motionAsking) return;
+        motionAsking = true;
+        Promise.all([askPerm((window as any).DeviceMotionEvent), askPerm((window as any).DeviceOrientationEvent)]).then(([m, o]: any[]) => {
+          motionAsking = false;
+          if (m === "granted") { window.addEventListener("devicemotion", onMotion); motionOn = true; }
+          if (o === "granted") { window.addEventListener("deviceorientation", onOrient); motionOn = true; }
+        }).catch(() => { motionAsking = false; });
+      };
+      if (isMobile) { motionRef.current = enableMotion; enableMotion(); } // Android grants now; iOS waits for a tap
+
       if (!isMobile) {
         logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
         Composite.add(engine.world, logoBody);
@@ -410,6 +441,9 @@ export default function PackPit() {
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
+        window.removeEventListener("devicemotion", onMotion);
+        window.removeEventListener("deviceorientation", onOrient);
+        motionRef.current = () => {};
         Events.off(render, "afterRender", onAfter);
         Events.off(engine, "collisionStart", onCollide);
         Render.stop(render);
@@ -435,7 +469,7 @@ export default function PackPit() {
         <span className={styles.help}><b>Drag</b> to pick up</span>
         <span className={styles.help}><b>Click</b> for the family tree</span>
         <span className={styles.help}><b>Double-click</b> to ping</span>
-        <button type="button" className={styles.shake} onClick={() => shakeRef.current()} aria-label="Shake the pit">
+        <button type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); }} aria-label="Shake the pit">
           <span className={styles.shakeIcon} aria-hidden="true" />
           <span className={styles.shakeText}>Shake</span>
         </button>
