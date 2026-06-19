@@ -128,27 +128,34 @@ export default function PackPit() {
         if (dropTimer) clearInterval(dropTimer);
         waveTimers.forEach(clearTimeout); waveTimers = [];
         const w = stage.clientWidth;
-        // wave 1: the three tennis balls bounce in
-        BALLS.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        // wave 2 (after 1s): the bone drops
-        waveTimers.push(setTimeout(() => {
-          if (disposed) return;
-          HEAVY.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        }, 1000));
-        // wave 3 (after another 1s): the pack spills in, with the bowl landing
-        // midway through the pack so it drops in among the dogs
-        const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
-        const bowlAt = Math.floor(order.length / 2);
-        let k = 0;
-        waveTimers.push(setTimeout(() => {
-          if (disposed) return;
-          dropTimer = setInterval(() => {
-            if (k >= order.length) { clearInterval(dropTimer); return; }
-            if (!isMobile && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
-            Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
-            k++;
-          }, 70);
-        }, 2000));
+        const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
+        // Drop the pack in, optionally landing the bowl midway through.
+        const dropDogs = (delay: number, withBowl: boolean) => {
+          const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
+          const bowlAt = Math.floor(order.length / 2);
+          let k = 0;
+          waveTimers.push(setTimeout(() => {
+            if (disposed) return;
+            dropTimer = setInterval(() => {
+              if (k >= order.length) { clearInterval(dropTimer); return; }
+              if (withBowl && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
+              Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
+              k++;
+            }, 70);
+          }, delay));
+        };
+        if (isMobile) {
+          // mobile: bowl first, then the two tennis balls, then the bone, then the pack
+          addProps([bowl]);
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(BALLS); }, 700));
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
+          dropDogs(2100, false);
+        } else {
+          // desktop: tennis balls, then bone, then the pack with the bowl midway through
+          addProps(BALLS);
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
+          dropDogs(2000, true);
+        }
       }
 
       const mouse = Mouse.create(render.canvas);
@@ -370,7 +377,14 @@ export default function PackPit() {
         <span className={styles.help}><b>Drag</b> to pick up</span>
         <span className={styles.help}><b>Click</b> for the family tree</span>
         <span className={styles.help}><b>Double-click</b> to ping</span>
-        <button type="button" className={styles.shake} onClick={() => shakeRef.current()}>Shake</button>
+        <button type="button" className={styles.shake} onClick={() => shakeRef.current()} aria-label="Shake the pit">
+          <svg className={styles.shakeIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="9" y="4.5" width="6" height="15" rx="1.6" transform="rotate(-9 12 12)" />
+            <path d="M4.8 9.4c-1.1 1.7-1.1 3.5 0 5.2" />
+            <path d="M19.2 9.4c1.1 1.7 1.1 3.5 0 5.2" />
+          </svg>
+          <span className={styles.shakeText}>Shake</span>
+        </button>
       </div>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} />}
     </section>
