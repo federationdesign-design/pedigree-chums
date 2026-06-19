@@ -24,8 +24,8 @@ export default function PackPit() {
     (async () => {
       const mod: any = await import("matter-js");
       const Matter = mod.default || mod;
+      if (disposed || !stageRef.current) return;
       const stage = stageRef.current;
-      if (disposed || !stage) return;
 
       const BREEDS = breeds.map((b) => ({ name: b.name, size: b.sizeBand as string, img: b.image }));
       const FAMILY: Record<string, { name: string; share: number }[]> = {};
@@ -82,7 +82,7 @@ export default function PackPit() {
         const ex = dyn();
         if (ex.length) Composite.remove(engine.world, ex);
         if (dropTimer) clearInterval(dropTimer);
-        const order = BREEDS.map((_, i) => i).sort(() => Math.random() - 0.5);
+        const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
         const w = stage.clientWidth;
         let k = 0;
         dropTimer = setInterval(() => {
