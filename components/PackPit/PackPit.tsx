@@ -54,7 +54,7 @@ export default function PackPit() {
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 5 : 6.25), aspect: 2.745 };
-      const logo = { key: "__logo", label: "Pedigree Chums", src: "/dogbingo.svg", shape: "logo", width: BIG * 3.4, aspect: 150 / 64 };
+      const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
@@ -141,11 +141,18 @@ export default function PackPit() {
         }
         return b;
       }
+      const LOGO_HITS_TO_FALL = 5;
+      const logoHits = new Set<number>();
       const onCollide = (ev: any) => {
+        if (!logoBody || !logoBody.isStatic) return;
         for (const pair of ev.pairs) {
           const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
+          if (!lg) continue;
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
-          if (lg && lg.isStatic && other && !other.isStatic) Body.setStatic(lg, false); // knock it loose
+          if (other && !other.isStatic) {
+            logoHits.add(other.id);
+            if (logoHits.size >= LOGO_HITS_TO_FALL) { Body.setStatic(lg, false); break; } // knocked loose after enough touches
+          }
         }
       };
       let dropTimer: any = null;
