@@ -2,10 +2,10 @@
   position: relative;
   width: 100%;
   /* taller than the viewport so the pack falls a way down and the page scrolls
-     to the pile, but not excessively. Tune the 122 to taste. */
-  height: 122vh;
-  height: 122svh;
-  min-height: 780px;
+     to the pile. Tripled for the deeper mobile pit. */
+  height: 366vh;
+  height: 366svh;
+  min-height: 2340px;
   overflow: hidden;
   background: linear-gradient(165deg, var(--blue-sky), var(--blue) 48%, var(--blue-deep));
 }
@@ -28,7 +28,7 @@
 .controls {
   position: absolute;
   left: 50%;
-  bottom: 18px;
+  top: 92px;
   transform: translateX(-50%);
   z-index: 5;
   display: flex;
