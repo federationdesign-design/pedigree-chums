@@ -1,0 +1,124 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  /* faint wash so the faded pack stays visible behind the diagram */
+  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.28), rgba(12, 91, 146, 0.55));
+  animation: lm-fade 0.2s ease;
+}
+@keyframes lm-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.scroll {
+  margin: auto;
+  padding: 40px;
+}
+.svg {
+  display: block;
+  overflow: visible;
+}
+.close {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--yellow);
+  color: var(--navy);
+  font-size: 1.7rem;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(10, 58, 87, 0.35);
+  z-index: 2;
+}
+.close:hover {
+  filter: brightness(0.95);
+}
+
+.edge {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+.edge.lit {
+  stroke: var(--yellow);
+  stroke-width: 5;
+}
+
+.node {
+  cursor: pointer;
+}
+.disc {
+  fill: var(--yellow);
+  stroke: var(--navy);
+  stroke-width: 3;
+  transition: r 0.18s ease;
+}
+.disc.has {
+  stroke-dasharray: 5 5;
+}
+.node:hover .disc {
+  stroke-width: 5;
+}
+.pct {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  fill: var(--navy);
+}
+.nm {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  fill: var(--white);
+  paint-order: stroke;
+  stroke: rgba(10, 58, 87, 0.6);
+  stroke-width: 3px;
+}
+.plus {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  fill: var(--navy);
+}
+
+.rootCard {
+  fill: var(--blue);
+  stroke: var(--yellow);
+  stroke-width: 4;
+}
+.tag {
+  fill: var(--navy);
+}
+.tagText {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  fill: var(--white);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+  background: rgba(10, 58, 87, 0.55);
+  padding: 28px 34px;
+  border-radius: 18px;
+}
+.empty strong {
+  font-size: 1.4rem;
+}

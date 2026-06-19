@@ -14,6 +14,15 @@
   inset: 0;
   z-index: 0;
   display: block;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+.dimmed > canvas {
+  opacity: 0.16;
+  filter: saturate(0.7);
+}
+.dimmed > .controls {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .controls {

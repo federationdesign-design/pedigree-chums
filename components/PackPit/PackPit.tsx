@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
+import LineageMap from "./LineageMap";
 import styles from "./PackPit.module.css";
 
 const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
@@ -16,6 +17,7 @@ function sumLeaves(n: LineageNode): number {
 export default function PackPit() {
   const stageRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<() => void>(() => {});
+  const [activeBreed, setActiveBreed] = useState<{ name: string; image: string } | null>(null);
 
   useEffect(() => {
     let disposed = false;
@@ -166,9 +168,21 @@ export default function PackPit() {
         Body.setAngularVelocity(hit, (Math.random() - 0.5) * 0.7);
         hit.plugin.ping = performance.now();
       };
+      let downAt: { x: number; y: number } | null = null;
+      const onDown = (e: MouseEvent) => { downAt = localPoint(e); };
+      const onClick = (e: MouseEvent) => {
+        const up = localPoint(e);
+        // ignore drags: only a near-stationary click opens the lineage
+        if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
+        const hit = Query.point(dyn(), up)[0];
+        if (!hit || hit.plugin.prop) return; // dogs only, not the toys
+        setActiveBreed({ name: hit.plugin.name, image: hit.plugin.img?.src || "" });
+      };
       render.canvas.addEventListener("mousemove", onMove);
       render.canvas.addEventListener("mouseleave", onLeave);
       render.canvas.addEventListener("dblclick", onDbl);
+      render.canvas.addEventListener("mousedown", onDown);
+      render.canvas.addEventListener("click", onClick);
 
       function rrect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
         if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
@@ -298,6 +312,8 @@ export default function PackPit() {
         render.canvas.removeEventListener("mousemove", onMove);
         render.canvas.removeEventListener("mouseleave", onLeave);
         render.canvas.removeEventListener("dblclick", onDbl);
+        render.canvas.removeEventListener("mousedown", onDown);
+        render.canvas.removeEventListener("click", onClick);
         Events.off(render, "afterRender", onAfter);
         Render.stop(render);
         Runner.stop(runner);
@@ -313,13 +329,18 @@ export default function PackPit() {
   }, []);
 
   return (
-    <section className={styles.stage} ref={stageRef} aria-label="The Pack Pit: tip out all the chums and play">
+    <section
+      className={`${styles.stage}${activeBreed ? " " + styles.dimmed : ""}`}
+      ref={stageRef}
+      aria-label="The Pack Pit: tip out all the chums and play"
+    >
       <div className={styles.controls}>
         <span className={styles.help}><b>Drag</b> to pick up</span>
+        <span className={styles.help}><b>Click</b> for the family tree</span>
         <span className={styles.help}><b>Double-click</b> to ping</span>
-        <span className={styles.help}><b>Hover</b> for the family</span>
         <button type="button" className={styles.shake} onClick={() => shakeRef.current()}>Shake</button>
       </div>
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} />}
     </section>
   );
 }
