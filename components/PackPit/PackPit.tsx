@@ -378,11 +378,7 @@ export default function PackPit() {
         <span className={styles.help}><b>Click</b> for the family tree</span>
         <span className={styles.help}><b>Double-click</b> to ping</span>
         <button type="button" className={styles.shake} onClick={() => shakeRef.current()} aria-label="Shake the pit">
-          <svg className={styles.shakeIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <rect x="9" y="4.5" width="6" height="15" rx="1.6" transform="rotate(-9 12 12)" />
-            <path d="M4.8 9.4c-1.1 1.7-1.1 3.5 0 5.2" />
-            <path d="M19.2 9.4c1.1 1.7 1.1 3.5 0 5.2" />
-          </svg>
+          <span className={styles.shakeIcon} aria-hidden="true" />
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
