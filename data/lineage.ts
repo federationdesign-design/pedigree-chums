@@ -523,6 +523,193 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Yorkshire Terrier", note: "A silky terrier said to add to the early type.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 25 }
     ]
   },
+
+  "Tweed Water Spaniel": {
+    name: "Tweed Water Spaniel",
+    note: "An extinct liver-brown water dog from the Scottish Borders and the Tweed valley, famous as a key ancestor of the Golden and Curly-Coated Retrievers.",
+    children: [
+      { name: "Old water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 55 },
+      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 45 }
+    ]
+  },
+
+  "Lurcher": {
+    name: "Lurcher",
+    note: "Not a breed but a type: a sighthound crossed with a working dog, long the poacher's and traveller's companion, fast and quiet.",
+    children: [
+      { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/greyhound-photo.jpg", value: 50 },
+      { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability.", img: "/history/breeds/rough-collie-photo.jpg", value: 30 },
+      { name: "Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/border-terrier-photo.jpg", value: 20 }
+    ]
+  },
+
+  "Longdog": {
+    name: "Longdog",
+    note: "A sighthound crossed with another sighthound, bred purely for speed rather than the all-round craft of the lurcher.",
+    children: [
+      { name: "Greyhound", note: "The foundation of nearly every running dog.", img: "/history/breeds/greyhound-photo.jpg", value: 50 },
+      { name: "Whippet", note: "Added for nimble, sprinting pace.", img: "/history/breeds/whippet-photo.jpg", value: 25 },
+      { name: "Deerhound", note: "Bigger sighthound blood for stamina over rough ground.", img: "/history/breeds/ScottishDeerhound-photo.avif", value: 25 }
+    ]
+  },
+
+  "Welsh Springer Spaniel": {
+    name: "Welsh Springer Spaniel",
+    note: "An old red-and-white Welsh gundog, known for generations as the Welsh Cocker before becoming the Welsh Springer in 1902.",
+    children: [
+      { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 60 },
+      { name: "Springing land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/english-springer-spaniel-photo.jpg", value: 40 }
+    ]
+  },
+
+  "Field Spaniel": {
+    name: "Field Spaniel",
+    note: "A long, low black spaniel bred up in Victorian show rings from the larger cocking spaniels, once nearly ruined by exaggeration.",
+    children: [
+      { name: "Black Cocker Spaniels", note: "The larger black cockers at its foundation.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 45 },
+      { name: "Sussex Spaniel", note: "Lent weight, bone and a longer body.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 35 },
+      { name: "Clumber Spaniel", note: "Heavier spaniel blood for substance.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 20 }
+    ]
+  },
+
+  "Sussex Spaniel": {
+    name: "Sussex Spaniel",
+    note: "An old, short-legged, golden-liver spaniel from the county of Sussex, bred to work slowly and give tongue in dense cover.",
+    children: [
+      { name: "Old land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 60 },
+      { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 40 }
+    ]
+  },
+
+  "Norfolk Spaniel": {
+    name: "Norfolk Spaniel",
+    note: "An extinct liver-and-white springer-type spaniel, the Victorian forerunner of the English Springer, rolled into that breed in 1903.",
+    children: [
+      { name: "Old springing land spaniels", note: "The larger flushing spaniels it grew from.", img: "/history/breeds/english-springer-spaniel-photo.jpg", value: 60 },
+      { name: "Land spaniel stock", note: "The broad old land-spaniel family.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 40 }
+    ]
+  },
+
+  "Toy Trawler Spaniel": {
+    name: "Toy Trawler Spaniel",
+    note: "An extinct small black-and-tan toy spaniel, a sporting-bred miniature linked to the King Charles and Sussex spaniels.",
+    children: [
+      { name: "King Charles Spaniel", note: "The toy spaniel at its heart.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 60 },
+      { name: "Sussex Spaniel", note: "Sporting spaniel blood from the old land-spaniel side.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 40 }
+    ]
+  },
+
+  "Irish Water Spaniel": {
+    name: "Irish Water Spaniel",
+    note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
+    children: [
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 55 },
+      { name: "Poodle and Barbet water dogs", note: "Continental curly water dogs that shaped the coat.", img: "/poodle-square.jpg", value: 45 }
+    ]
+  },
+
+  "Bullmastiff": {
+    name: "Bullmastiff",
+    note: "The gamekeeper's night dog, built in Victorian England to track and pin poachers without mauling them. Mostly Mastiff, with Bulldog for grip.",
+    children: [
+      { name: "English Mastiff", note: "The larger share, for size, scent and a steady nerve.", img: "/history/breeds/english-mastiff-photo.jpg", value: 60 },
+      { name: "Old English Bulldog", note: "Bulldog drive and a tenacious grip.", img: "/history/breeds/old-engish-bulldog.webp", value: 40 }
+    ]
+  },
+
+  "Curly-Coated Retriever": {
+    name: "Curly-Coated Retriever",
+    note: "One of the oldest retrievers, a tall water dog covered in tight curls, the gamekeeper's and poacher's choice for wildfowl.",
+    children: [
+      { name: "English Water Spaniel", note: "The extinct native water spaniel at its core.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 35 },
+      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood for retrieving.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 30 },
+      { name: "Irish Water Spaniel", note: "Its closest relative, sharing the curly water-dog coat.", img: "/history/breeds/irish-water-spaniel.jpg", value: 20 },
+      { name: "Poodle", note: "A later touch, often credited for the tight curls.", img: "/poodle-square.jpg", value: 15 }
+    ]
+  },
+
+  "Flat-Coated Retriever": {
+    name: "Flat-Coated Retriever",
+    note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
+    children: [
+      { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 50 },
+      { name: "Setter", note: "Setter blood for feathering and a good nose.", img: "/history/breeds/english_setter-photo.jpg", value: 30 },
+      { name: "Water spaniel and Collie", note: "A little water-spaniel and collie for coat and brains.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
+    ]
+  },
+
+  "Rough Collie": {
+    name: "Rough Collie",
+    note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
+    children: [
+      { name: "Old working collies", note: "The hardy Scottish farm-collie stock at its heart.", img: "/history/breeds/Border_Collie_photo.jpg", value: 65 },
+      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family.", img: "/history/breeds/bearded-collie-photo.jpg", value: 35 }
+    ]
+  },
+
+  "Gordon Setter": {
+    name: "Gordon Setter",
+    note: "Scotland's black-and-tan setter, built up at the Duke of Gordon's kennels into a heavier, steady bird dog.",
+    children: [
+      { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/english_setter-photo.jpg", value: 65 },
+      { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/bloodhound-photo.jpg", value: 20 },
+      { name: "Collie", note: "A little collie for steadiness, by tradition.", img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
+    ]
+  },
+
+  "Lancashire Heeler": {
+    name: "Lancashire Heeler",
+    note: "A tiny, sharp black-and-tan drover's dog from north-west England, used to nip cattle along and clear rats from the farm.",
+    children: [
+      { name: "Welsh Corgi", note: "The low, heel-nipping cattle dog at its base.", img: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg", value: 55 },
+      { name: "Manchester Terrier", note: "Black-and-tan terrier blood for ratting and colour.", img: "/history/breeds/manchester-terrior.jpg", value: 45 }
+    ]
+  },
+
+  "Cavalier King Charles Spaniel": {
+    name: "Cavalier King Charles Spaniel",
+    note: "A 1920s revival of the older, longer-nosed toy spaniel of the Stuart court, bred back from the flat-faced King Charles Spaniel.",
+    children: [
+      { name: "King Charles Spaniel", note: "The modern flat-faced toy spaniel it was bred back from.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 70 },
+      { name: "Old sporting toy spaniels", note: "The longer-muzzled toy spaniels of older paintings.", img: "/history/breeds/toy-Trawler-Spaniel-painting.jpg", value: 30 }
+    ]
+  },
+
+  "Northern Inuit Dog": {
+    name: "Northern Inuit Dog",
+    note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
+    children: [
+      { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.", img: "/husky-square.jpg", value: 55 },
+      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.", img: "/german-shepard-square.jpg", value: 45 }
+    ]
+  },
+
+  "Cumberland Sheepdog": {
+    name: "Cumberland Sheepdog",
+    note: "An extinct northern working collie of Cumberland and the border hills, a close relative of the Border Collie that was largely absorbed into it.",
+    children: [
+      { name: "Old working collies", note: "The old British herding-collie stock it sprang from.", img: "/history/breeds/Border_Collie_photo.jpg", value: 60 },
+      { name: "Welsh and hill sheepdogs", note: "Related upland herding dogs of the same type.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 40 }
+    ]
+  },
+
+  "Toy Bulldog": {
+    name: "Toy Bulldog",
+    note: "An extinct miniature Bulldog of Victorian England, a small companion bull-type that helped give rise to the French Bulldog.",
+    children: [
+      { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size.", img: "/history/breeds/old-engish-bulldog.webp", value: 65 },
+      { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size.", img: "/pug-square.jpg", value: 35 }
+    ]
+  },
+
+  "Dumfriesshire Hound": {
+    name: "Dumfriesshire Hound",
+    note: "A pack of big black-and-tan foxhounds bred in Dumfriesshire after the First World War, kept working until the pack was disbanded in 2001.",
+    children: [
+      { name: "English Foxhound", note: "The foxhound base for the pack.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 50 },
+      { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan.", img: "/history/breeds/bloodhound-photo.jpg", value: 50 }
+    ]
+  },
 };
 
 
