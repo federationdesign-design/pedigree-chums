@@ -715,7 +715,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Wolfhound",
     note: "A towering ancient hound bred to hunt wolves and guard halls, and one of the tallest dogs in the world.",
     children: [
-      { name: "Celtic Hound", note: "The ancient sighthound stock the Celts brought across Europe.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 60 },
+      { name: "Celtic Hound", note: "The ancient sighthound stock the Celts brought across Europe.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
       { name: "Old Molosser war dogs", note: "Big mastiff-type blood for the bulk to bring down a wolf.", img: "/history/breeds/english-mastiff.jpg", value: 40 }
     ]
   },
@@ -733,7 +733,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Greyhound",
     note: "The fastest of all dogs, a sighthound that has hunted in Britain since antiquity.",
     children: [
-      { name: "Celtic Hound", note: "The old running hounds the Celts brought west.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 60 },
+      { name: "Celtic Hound", note: "The old running hounds the Celts brought west.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
       { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world.", img: "/italian-greyhound-square.jpg", value: 40 }
     ]
   },
@@ -769,7 +769,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Scottish Deerhound",
     note: "A tall, rough-coated sighthound bred to course red deer across the Highlands, close kin to the Irish Wolfhound.",
     children: [
-      { name: "Celtic Hound", note: "The ancient sighthound stock of the north.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 60 },
+      { name: "Celtic Hound", note: "The ancient sighthound stock of the north.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
       { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 40 }
     ]
   },
