@@ -231,6 +231,10 @@ export default function BreedTree({
   const shownShare = shown.parent
     ? Math.round(((shown.value ?? 0) / (shown.parent.value || 1)) * 100)
     : null;
+  // While a circle is hovered, hide the circles nested inside it so its own
+  // image comes clear to the front instead of being covered by its progenitors.
+  // Moving onto one of those inner circles re-hovers it and brings it back.
+  const buriedSet = hovered ? new Set(hovered.descendants()) : null;
 
   return (
     <div className={styles.tree} ref={wrapRef}>
@@ -288,6 +292,7 @@ export default function BreedTree({
                   : styles.tintB
                 : "";
               const cls = hasImg ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
+              const buried = !!buriedSet && d !== hovered && buriedSet.has(d);
               return (
                 <circle
                   key={i}
@@ -298,6 +303,7 @@ export default function BreedTree({
                   style={{
                     cursor: hidden ? "default" : "pointer",
                     pointerEvents: hidden ? "none" : "auto",
+                    opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden ? undefined : () => setHovered(d)}
                   onMouseLeave={hidden ? undefined : () => setHovered((h) => (h === d ? null : h))}

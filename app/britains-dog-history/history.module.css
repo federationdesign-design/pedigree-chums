@@ -472,6 +472,16 @@
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.16);
+  transition: visibility 0s;
+}
+/* Once the card has turned past edge-on, hide the front entirely. Its tag and
+   badge are absolutely positioned with a z-index, so backface-visibility alone
+   lets them bleed through the back mirrored; hiding the whole face stops that.
+   The delay keeps the front visible while it is still turning toward us. */
+.flipCard:hover .flipFront,
+.flipCard:focus-visible .flipFront {
+  visibility: hidden;
+  transition: visibility 0s linear 0.26s;
 }
 .nodeThumb {
   width: 100%;
@@ -521,6 +531,8 @@
   text-align: center;
   padding: 4px 0;
   z-index: 2;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .nodeTagExtinct {
   background: #d64545;
@@ -576,6 +588,8 @@
   color: var(--navy);
   z-index: 3;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .lineageBadge svg {
   width: 18px;
