@@ -260,25 +260,19 @@ export default function BreedTree({
               const visible = isChild || isLeafFocus;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               return (
-                <text
-                  key={i}
-                  style={{
-                    display: visible ? "inline" : "none",
-                    fillOpacity: visible ? 1 : 0,
-                    fill: "#ffffff",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <tspan x={0} dy={-30} style={{ fontWeight: 800, fontSize: "15px" }}>
-                    {isChild ? d.data.name : ""}
-                  </tspan>
-                  <tspan x={0} dy={46} style={{ fontWeight: 800, fontSize: "60px" }}>
+                <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
+                  {isChild && (
+                    <>
+                      <text x={0} y={-42} style={{ fill: "#ffffff", fontWeight: 800, fontSize: "15px" }}>
+                        {d.data.name}
+                      </text>
+                      <line x1={-80} x2={80} y1={-22} y2={-22} stroke="#ffffff" strokeWidth={2.5} strokeOpacity={0.85} />
+                    </>
+                  )}
+                  <text x={0} y={42} style={{ fill: "#ffffff", fontWeight: 800, fontSize: "60px" }}>
                     {pct !== null ? `${pct}%` : ""}
-                  </tspan>
-                  <tspan x={0} dy={18} style={{ fontWeight: 700, fontSize: "12px", opacity: 0.85 }}>
-                    {pct !== null ? "of the mix" : ""}
-                  </tspan>
-                </text>
+                  </text>
+                </g>
               );
             })}
           </g>
