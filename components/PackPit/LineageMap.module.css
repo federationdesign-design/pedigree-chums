@@ -2,26 +2,21 @@
   position: fixed;
   inset: 0;
   z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
   /* faint wash so the faded pack stays visible behind the diagram */
-  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.28), rgba(12, 91, 146, 0.55));
+  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.22), rgba(12, 91, 146, 0.46));
   animation: lm-fade 0.2s ease;
 }
 @keyframes lm-fade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.scroll {
-  margin: auto;
-  padding: 40px;
-}
 .svg {
-  display: block;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   overflow: visible;
+  pointer-events: none;
 }
 .close {
   position: fixed;
@@ -58,6 +53,10 @@
 
 .node {
   cursor: pointer;
+  pointer-events: auto;
+}
+.rootHit {
+  pointer-events: auto;
 }
 .disc {
   fill: var(--yellow);

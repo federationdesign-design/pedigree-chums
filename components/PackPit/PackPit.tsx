@@ -17,7 +17,9 @@ function sumLeaves(n: LineageNode): number {
 export default function PackPit() {
   const stageRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<() => void>(() => {});
-  const [activeBreed, setActiveBreed] = useState<{ name: string; image: string } | null>(null);
+  const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
+  const lineageOpenRef = useRef(false);
+  useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
   useEffect(() => {
     let disposed = false;
@@ -176,7 +178,14 @@ export default function PackPit() {
         if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop) return; // dogs only, not the toys
-        setActiveBreed({ name: hit.plugin.name, image: hit.plugin.img?.src || "" });
+        const r = render.canvas.getBoundingClientRect();
+        setActiveBreed({
+          name: hit.plugin.name,
+          image: hit.plugin.img?.src || "",
+          x: r.left + hit.position.x,
+          y: r.top + hit.position.y,
+          angle: hit.angle,
+        });
       };
       render.canvas.addEventListener("mousemove", onMove);
       render.canvas.addEventListener("mouseleave", onLeave);
@@ -260,6 +269,7 @@ export default function PackPit() {
       let hoverBody: any = null, hoverStart = 0;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
+        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); return; }
         const hov = pointer ? Query.point(bodies, pointer)[0] : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
