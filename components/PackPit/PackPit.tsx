@@ -39,11 +39,14 @@ export default function PackPit() {
         return IMG[name];
       };
 
-      // Two toys that tip in ahead of the pack. Drop the SVGs into /public and
-      // confirm these filenames; until then a placeholder shape falls instead.
+      // Three toys that tip in ahead of the pack, each larger than the biggest
+      // dog (giant half = RADIUS.giant). Drop the SVGs into /public; until they
+      // exist a placeholder shape falls in their place.
+      const BIG = RADIUS.giant;
       const PROPS = [
-        { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", radius: 40 },
-        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", radius: 34 },
+        { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", radius: BIG * 1.25 },
+        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", radius: BIG * 1.15, wide: 1.9, tall: 0.78 },
+        { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", radius: BIG * 1.35, wide: 1.25, tall: 1.0 },
       ];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
@@ -86,15 +89,15 @@ export default function PackPit() {
 
       function makeProp(prop: any, w: number) {
         const s = prop.radius;
-        const x = 60 + Math.random() * (w - 120), y = -160 - Math.random() * 160;
+        const x = 60 + Math.random() * (w - 120), y = -220 - Math.random() * 220;
         let b: any;
         if (prop.shape === "ball") {
-          b = Bodies.circle(x, y, s, { restitution: 0.55, friction: 0.22, frictionAir: 0.01, density: 0.0012, render: { visible: false } });
-          b.plugin = { name: prop.label, half: s, w: 2 * s, h: 2 * s, color: "#c7e65a", img: getImg(prop.key, prop.src), prop: prop.shape, family: null, ping: 0 };
+          b = Bodies.circle(x, y, s, { restitution: 0.5, friction: 0.22, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+          b.plugin = { name: prop.label, half: s, w: 2 * s, h: 2 * s, color: "#c7e65a", img: getImg(prop.key, prop.src), prop: "ball", family: null, ping: 0 };
         } else {
-          const bw = 2 * s * 1.9, bh = 2 * s * 0.78;
-          b = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: bh * 0.45 }, restitution: 0.32, friction: 0.3, frictionAir: 0.012, density: 0.001, render: { visible: false } });
-          b.plugin = { name: prop.label, half: s, w: bw, h: bh, color: "#f6ecd6", img: getImg(prop.key, prop.src), prop: prop.shape, family: null, ping: 0 };
+          const bw = 2 * s * prop.wide, bh = 2 * s * prop.tall;
+          b = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: Math.min(bw, bh) * 0.3 }, restitution: 0.32, friction: 0.3, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: prop.shape === "bone" ? "#f6ecd6" : "#bfe3f7", img: getImg(prop.key, prop.src), prop: prop.shape, family: null, ping: 0 };
         }
         return b;
       }
