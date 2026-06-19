@@ -84,6 +84,78 @@ const LINEAGE: Record<string, LineageNode> = {
       },
       { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/greyhound square.jpg", value: 13 }
     ]
+  },
+
+  "Cockapoo": {
+    name: "Cockapoo",
+    note: "One of the original designer crosses, around since the 1960s. Bred to pair the Cocker's friendly nature with the Poodle's low-shedding coat.",
+    children: [
+      { name: "Cocker Spaniel", note: "Brings the merry, people-loving temperament and those soft spaniel looks.", img: "/cocker-square.jpg", value: 50 },
+      { name: "Poodle", note: "Brings the curly, low-shedding coat and a lot of cleverness.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Cavapoo": {
+    name: "Cavapoo",
+    note: "A gentle lap-dog cross of the Cavalier and the Poodle, usually the toy or miniature Poodle.",
+    children: [
+      { name: "Cavalier King Charles Spaniel", note: "Brings the sweet, affectionate, easy-going nature.", img: "/Cavalier King Charles Spaniel-square.jpg", value: 50 },
+      { name: "Poodle", note: "Brings the low-shedding coat and a quick, trainable brain.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Labradoodle": {
+    name: "Labradoodle",
+    note: "Coined in Australia in the 1980s, first bred as a low-shedding guide dog by crossing the Labrador with the Poodle.",
+    children: [
+      { name: "Labrador", note: "Brings the steady, friendly working temperament.", img: "/lab-square.jpg", value: 50 },
+      { name: "Poodle", note: "Brings the low-shedding coat that started the whole idea.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Goldendoodle": {
+    name: "Goldendoodle",
+    note: "A softer, fluffier take on the doodle, crossing the Golden Retriever with the Poodle.",
+    children: [
+      { name: "Golden Retriever", note: "Brings the gentle, eager-to-please golden temperament.", img: "/golden-square.jpg", value: 50 },
+      { name: "Poodle", note: "Brings the curly, low-shedding coat and the smarts.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Maltipoo": {
+    name: "Maltipoo",
+    note: "A tiny, fluffy companion cross of the Maltese and a toy or miniature Poodle.",
+    children: [
+      { name: "Maltese", note: "Brings the small size and the gentle, devoted lap-dog nature.", img: "/matlese-square.jpg", value: 50 },
+      { name: "Poodle", note: "Brings the soft, low-shedding coat and cleverness.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Jackapoo": {
+    name: "Jackapoo",
+    note: "A lively little cross of the Jack Russell and the Poodle, full of energy and character.",
+    children: [
+      { name: "Jack Russell", note: "Brings the bold, bouncy, terrier spirit.", img: "/jack-russel-square.jpg", value: 50 },
+      { name: "Poodle", note: "Brings the low-shedding coat and the trainability.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
+
+  "Cavachon": {
+    name: "Cavachon",
+    note: "A soft, cuddly companion cross of the Cavalier and the Bichon Frise.",
+    children: [
+      { name: "Cavalier King Charles Spaniel", note: "Brings the affectionate, easy-going lap-dog nature.", img: "/Cavalier King Charles Spaniel-square.jpg", value: 50 },
+      { name: "Bichon Frise", note: "Brings the cheerful personality and the fluffy, low-shedding coat.", img: "/bichon-square.jpg", value: 50 }
+    ]
+  },
+
+  "Puggle": {
+    name: "Puggle",
+    note: "A cheeky cross of the Pug and the Beagle, with a longer muzzle than a Pug and a big nose for adventure.",
+    children: [
+      { name: "Pug", note: "Brings the comical, affectionate, people-loving side.", img: "/pug-square.jpg", value: 50 },
+      { name: "Beagle", note: "Brings the curious nose and the waggy, sociable streak.", img: "/beagle-square.jpg", value: 50 }
+    ]
   }
 };
 
