@@ -151,7 +151,7 @@ export default function PackPit() {
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (other && !other.isStatic) {
             logoHits.add(other.id);
-            if (logoHits.size >= LOGO_HITS_TO_FALL) { Body.setStatic(lg, false); break; } // knocked loose after enough touches
+            if (logoHits.size >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // released: now a normal solid body
           }
         }
       };
@@ -333,10 +333,7 @@ export default function PackPit() {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // the resting logo is static (excluded from dyn()), so draw it here until it
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
-        if (logoBody) {
-          if (logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
-          else if (logoBody.position.y > render.canvas.height + 200) { Composite.remove(engine.world, logoBody); logoBody = null; }
-        }
+        if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); return; }
         const hov = pointer ? Query.point(bodies, pointer)[0] : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
