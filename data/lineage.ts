@@ -135,7 +135,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Jackapoo",
     note: "A lively little cross of the Jack Russell and the Poodle, full of energy and character.",
     children: [
-      { name: "Jack Russell", note: "Brings the bold, bouncy, terrier spirit.", img: "/jack-russel-square.jpg", value: 50 },
+      { name: "Jack Russell", note: "Brings the bold, bouncy, terrier spirit.", img: "/jackrussel-square.jpg", value: 50 },
       { name: "Poodle", note: "Brings the low-shedding coat and the trainability.", img: "/poodle-square.jpg", value: 50 }
     ]
   },

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { breeds, type Breed } from "../../data/breeds";
 import { getLineage } from "../../data/lineage";
-import BreedTree from "../../components/BreedTree/BreedTree";
+import LineageModal from "../../components/LineageModal/LineageModal";
 import styles from "./know.module.css";
 
 const ROWS: { title: string; accent: string; names: string[] }[] = [
@@ -39,8 +39,6 @@ function ChumCard({ breed, onOpen }: { breed: Breed; onOpen: (b: Breed) => void 
 }
 
 function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
-  const [treeActive, setTreeActive] = useState(false);
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
@@ -51,8 +49,6 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
     };
   }, [onClose]);
 
-  const lineage = getLineage(breed.name);
-
   const stats: [string, string][] = [
     ["Size", cap(breed.sizeBand)],
     ["Muzzle", cap(breed.skull)],
@@ -61,64 +57,32 @@ function BreedModal({ breed, onClose }: { breed: Breed; onClose: () => void }) {
     ["Length", breed.length],
   ];
 
-  const charBlock = (
-    <>
-      <h4 className={styles.modalSubhead}>Personality</h4>
-      <p className={styles.modalChar}>{breed.character}</p>
-      {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
-    </>
-  );
-
-  const details = (
-    <>
-      <p className={styles.modalLookFor}>
-        <strong>Look for:</strong> {breed.lookFor}
-      </p>
-      <dl className={styles.modalStats}>
-        {stats.map(([k, v]) => (
-          <div key={k} className={styles.modalStatRow}>
-            <dt>{k}:</dt>
-            <dd>{v}</dd>
-          </div>
-        ))}
-      </dl>
-      {charBlock}
-    </>
-  );
-
   return (
     <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={breed.name}>
-      <div className={`${styles.modalCard} ${lineage ? styles.modalCardSolo : ""}`} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
         <button className={styles.modalClose} onClick={onClose} aria-label="Close">
           &times;
         </button>
-
-        {lineage ? (
-          <>
-            <div className={styles.familyLead}>
-              <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{breed.name}</h3>
-              <div className={`${styles.familyText} ${treeActive ? styles.familyTextDim : ""}`}>
-                <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>
-                  Where the breed comes from
-                </h4>
-                {charBlock}
+        <div className={styles.modalImgWrap}>
+          <Image src={breed.image} alt={breed.name} width={600} height={600} className={styles.modalImg} unoptimized />
+        </div>
+        <div className={styles.modalInfo}>
+          <h3 className={styles.modalName}>{breed.name}</h3>
+          <p className={styles.modalLookFor}>
+            <strong>Look for:</strong> {breed.lookFor}
+          </p>
+          <dl className={styles.modalStats}>
+            {stats.map(([k, v]) => (
+              <div key={k} className={styles.modalStatRow}>
+                <dt>{k}:</dt>
+                <dd>{v}</dd>
               </div>
-            </div>
-            <div className={styles.familyCol}>
-              <BreedTree root={lineage} rootImage={breed.image} onActiveChange={setTreeActive} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={styles.modalImgWrap}>
-              <Image src={breed.image} alt={breed.name} width={600} height={600} className={styles.modalImg} unoptimized />
-            </div>
-            <div className={styles.modalInfo}>
-              <h3 className={styles.modalName}>{breed.name}</h3>
-              {details}
-            </div>
-          </>
-        )}
+            ))}
+          </dl>
+          <h4 className={styles.modalSubhead}>Personality</h4>
+          <p className={styles.modalChar}>{breed.character}</p>
+          {breed.fact && <p className={styles.modalFact}>Did you know? {breed.fact}.</p>}
+        </div>
       </div>
     </div>
   );
@@ -182,7 +146,19 @@ export default function ChumExplorer() {
         })
       )}
 
-      {selected && <BreedModal breed={selected} onClose={() => setSelected(null)} />}
+      {selected &&
+        (getLineage(selected.name) ? (
+          <LineageModal
+            name={selected.name}
+            image={selected.image}
+            character={selected.character}
+            fact={selected.fact}
+            lineage={getLineage(selected.name)!}
+            onClose={() => setSelected(null)}
+          />
+        ) : (
+          <BreedModal breed={selected} onClose={() => setSelected(null)} />
+        ))}
     </section>
   );
 }

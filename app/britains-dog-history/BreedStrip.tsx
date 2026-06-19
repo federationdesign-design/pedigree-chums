@@ -1,8 +1,12 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { ukBreeds, type UKBreed } from "../../data/uk-breeds";
+import { breeds as packBreeds } from "../../data/breeds";
+import { getLineage, type LineageNode } from "../../data/lineage";
+import { resolveLineageName } from "../../data/lineageNames";
+import LineageModal from "../../components/LineageModal/LineageModal";
 import styles from "./history.module.css";
 
 // Bigger dog silhouette for breeds with no square art.
@@ -31,6 +35,15 @@ export default function BreedStrip({ era }: { era: string }) {
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+
+  type Active = {
+    name: string;
+    image: string;
+    character?: string;
+    fact?: string;
+    lineage: LineageNode;
+  };
+  const [active, setActive] = useState<Active | null>(null);
 
   const breeds: UKBreed[] = ukBreeds
     .filter((b) => b.strip === era)
@@ -166,46 +179,97 @@ export default function BreedStrip({ era }: { era: string }) {
 
       <div ref={wrapRef} className={styles.stripWrap}>
         <div ref={railRef} className={styles.stripRail} role="list">
-          {breeds.map((b) => (
-            <div key={b.name} data-node className={styles.node} role="listitem">
-              <span className={styles.nodeEra}>{b.era}</span>
-              <button type="button" className={styles.flipCard}>
-                <span className={styles.flipInner}>
-                  <span className={styles.flipFront}>
-                    <span className={styles.nodeThumb}>
-                      {b.image ? (
-                        <Image
-                          src={b.image}
-                          alt={b.name}
-                          width={160}
-                          height={160}
-                          unoptimized
-                          draggable={false}
-                        />
-                      ) : (
-                        <DogIcon />
+          {breeds.map((b) => {
+            const packName = resolveLineageName(b.name);
+            const lineage = getLineage(packName);
+            const pack = packBreeds.find((x) => x.name === packName);
+            const open = lineage
+              ? () =>
+                  setActive({
+                    name: b.name,
+                    image: pack?.image ?? b.image ?? "",
+                    character: pack?.character ?? b.note,
+                    fact: pack?.fact,
+                    lineage,
+                  })
+              : undefined;
+            return (
+              <div key={b.name} data-node className={styles.node} role="listitem">
+                <span className={styles.nodeEra}>{b.era}</span>
+                <button
+                  type="button"
+                  className={`${styles.flipCard} ${open ? styles.flipCardOpen : ""}`}
+                  onClick={open}
+                  aria-label={open ? `View ${b.name} family tree` : undefined}
+                >
+                  <span className={styles.flipInner}>
+                    <span className={styles.flipFront}>
+                      <span className={styles.nodeThumb}>
+                        {b.image ? (
+                          <Image
+                            src={b.image}
+                            alt={b.name}
+                            width={160}
+                            height={160}
+                            unoptimized
+                            draggable={false}
+                          />
+                        ) : (
+                          <DogIcon />
+                        )}
+                      </span>
+                      {open && (
+                        <span className={styles.lineageBadge} aria-hidden="true">
+                          <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="5" r="2.4" />
+                            <circle cx="6" cy="18" r="2.4" />
+                            <circle cx="18" cy="18" r="2.4" />
+                            <path
+                              d="M12 7v3.2M6 15.6V12h12v3.6"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.6"
+                            />
+                          </svg>
+                        </span>
+                      )}
+                      {b.tag && (
+                        <span className={`${styles.nodeTag} ${tagClass(b.tag)}`}>
+                          {tagLabel(b.tag)}
+                        </span>
                       )}
                     </span>
-                    {b.tag && (
-                      <span className={`${styles.nodeTag} ${tagClass(b.tag)}`}>
-                        {tagLabel(b.tag)}
+                    <span className={styles.flipBack}>
+                      <span className={styles.flipBackInner}>
+                        <span className={styles.flipNote}>{b.note}</span>
+                        {open && (
+                          <span className={styles.flipHint}>Tap to see the family tree</span>
+                        )}
                       </span>
-                    )}
+                    </span>
                   </span>
-                  <span className={styles.flipBack}>
-                    <span className={styles.flipNote}>{b.note}</span>
-                  </span>
-                </span>
-              </button>
-              <span className={styles.nodeName}>{b.name}</span>
-            </div>
-          ))}
+                </button>
+                <span className={styles.nodeName}>{b.name}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div ref={trackRef} className={styles.stripScrollbar} aria-hidden="true">
         <div ref={thumbRef} className={styles.stripThumb} />
       </div>
+
+      {active && (
+        <LineageModal
+          name={active.name}
+          image={active.image}
+          character={active.character}
+          fact={active.fact}
+          lineage={active.lineage}
+          onClose={() => setActive(null)}
+        />
+      )}
     </div>
   );
 }
