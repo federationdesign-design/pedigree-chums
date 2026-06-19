@@ -8,6 +8,7 @@ const links = [
   { label: "Home", href: "/" },
   { label: "Know Your Chums", href: "/know-your-chums" },
   { label: "Britain's Dog History", href: "/britains-dog-history" },
+  { label: "The Pack Pit", href: "/pack-pit" },
 ];
 
 export default function Nav() {

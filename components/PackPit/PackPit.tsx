@@ -1,0 +1,250 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { breeds } from "../../data/breeds";
+import { getLineage, type LineageNode } from "../../data/lineage";
+import styles from "./PackPit.module.css";
+
+const RADIUS: Record<string, number> = { small: 28.6, medium: 37.4, large: 44, giant: 56 };
+const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
+
+// a child's share is the sum of its leaf values (leaves total 100 across the tree)
+function sumLeaves(n: LineageNode): number {
+  return n.children && n.children.length ? n.children.reduce((s, c) => s + sumLeaves(c), 0) : n.value ?? 0;
+}
+
+export default function PackPit() {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const shakeRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    let disposed = false;
+    let dispose = () => {};
+
+    (async () => {
+      const mod: any = await import("matter-js");
+      const Matter = mod.default || mod;
+      const stage = stageRef.current;
+      if (disposed || !stage) return;
+
+      const BREEDS = breeds.map((b) => ({ name: b.name, size: b.sizeBand as string, img: b.image }));
+      const FAMILY: Record<string, { name: string; share: number }[]> = {};
+      for (const b of breeds) {
+        const lin = getLineage(b.name);
+        if (lin && lin.children) FAMILY[b.name] = lin.children.map((c) => ({ name: c.name, share: Math.round(sumLeaves(c)) }));
+      }
+      const IMG: Record<string, HTMLImageElement> = {};
+      const getImg = (name: string, src: string) => {
+        if (!IMG[name]) { const im = new Image(); im.src = src; IMG[name] = im; }
+        return IMG[name];
+      };
+
+      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
+
+      const engine = Engine.create();
+      engine.gravity.y = 1;
+      const render = Render.create({
+        element: stage, engine,
+        options: { width: stage.clientWidth, height: stage.clientHeight, background: "transparent", wireframes: false, pixelRatio: 1 },
+      });
+      Render.run(render);
+      const runner = Runner.create();
+      Runner.run(runner, engine);
+
+      let walls: any[] = [];
+      function buildWalls(w: number, h: number) {
+        if (walls.length) Composite.remove(engine.world, walls);
+        const t = 200;
+        walls = [
+          Bodies.rectangle(w / 2, h + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }),
+          Bodies.rectangle(-t / 2 + 2, h / 2, t, h * 3, { isStatic: true, restitution: 0.5, render: { visible: false } }),
+          Bodies.rectangle(w + t / 2 - 2, h / 2, t, h * 3, { isStatic: true, restitution: 0.5, render: { visible: false } }),
+        ];
+        Composite.add(engine.world, walls);
+      }
+      buildWalls(stage.clientWidth, stage.clientHeight);
+
+      const dyn = () => Composite.allBodies(engine.world).filter((b: any) => !b.isStatic);
+
+      function makeBall(breed: any, i: number, w: number) {
+        const s = (RADIUS[breed.size] || 32) + (Math.random() * 4 - 2);
+        const cr = Math.max(7, s * 0.22);
+        const color = PALETTE[i % PALETTE.length];
+        const b = Bodies.rectangle(40 + Math.random() * (w - 80), -120 - Math.random() * 600, 2 * s, 2 * s, {
+          chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
+        });
+        b.plugin = { name: breed.name, half: s, corner: cr, color, family: FAMILY[breed.name] || null, img: getImg(breed.name, breed.img), ping: 0 };
+        return b;
+      }
+
+      let dropTimer: any = null;
+      function dropAll() {
+        const ex = dyn();
+        if (ex.length) Composite.remove(engine.world, ex);
+        if (dropTimer) clearInterval(dropTimer);
+        const order = BREEDS.map((_, i) => i).sort(() => Math.random() - 0.5);
+        const w = stage.clientWidth;
+        let k = 0;
+        dropTimer = setInterval(() => {
+          if (k >= order.length) { clearInterval(dropTimer); return; }
+          Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
+          k++;
+        }, 70);
+      }
+
+      const mouse = Mouse.create(render.canvas);
+      const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+      Composite.add(engine.world, mc);
+      render.mouse = mouse;
+
+      let pointer: any = null;
+      const localPoint = (e: MouseEvent) => { const r = render.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+      const onMove = (e: MouseEvent) => { pointer = localPoint(e); };
+      const onLeave = () => { pointer = null; };
+      const onDbl = (e: MouseEvent) => {
+        const hit = Query.point(dyn(), localPoint(e))[0];
+        if (!hit) return;
+        const ang = Math.random() * Math.PI * 2, speed = 20 + Math.random() * 8;
+        Body.setVelocity(hit, { x: Math.cos(ang) * speed, y: -Math.abs(Math.sin(ang) * speed) - 10 });
+        Body.setAngularVelocity(hit, (Math.random() - 0.5) * 0.7);
+        hit.plugin.ping = performance.now();
+      };
+      render.canvas.addEventListener("mousemove", onMove);
+      render.canvas.addEventListener("mouseleave", onLeave);
+      render.canvas.addEventListener("dblclick", onDbl);
+
+      function rrect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
+        if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
+        ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+      }
+      function pill(ctx: any, x: number, y: number, w: number, h: number) {
+        const r = h / 2; ctx.beginPath();
+        if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+        ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+      }
+      function wrapName(name: string) {
+        if (name.length <= 15) return [name];
+        const words = name.split(" ");
+        if (words.length < 2) return [name];
+        let best = 1, bd = 1e9;
+        for (let k = 1; k < words.length; k++) {
+          const d = Math.abs(words.slice(0, k).join(" ").length - words.slice(k).join(" ").length);
+          if (d <= bd) { bd = d; best = k; }
+        }
+        return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
+      }
+      function drawBall(ctx: any, b: any, alpha: number, hovered: boolean) {
+        const p = b.position, s = b.plugin.half, cr = b.plugin.corner, img = b.plugin.img;
+        ctx.save(); ctx.globalAlpha = alpha;
+        ctx.translate(p.x, p.y); ctx.rotate(b.angle);
+        if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2; }
+        rrect(ctx, -s, -s, 2 * s, 2 * s, cr); ctx.fillStyle = b.plugin.color; ctx.fill();
+        ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+        if (img && img.complete && img.naturalWidth) {
+          ctx.save(); rrect(ctx, -s, -s, 2 * s, 2 * s, cr); ctx.clip();
+          const d = 2 * s * 1.04; ctx.drawImage(img, -d / 2, -d / 2, d, d); ctx.restore();
+        }
+        rrect(ctx, -s, -s, 2 * s, 2 * s, cr); ctx.lineWidth = 3; ctx.strokeStyle = hovered ? "#ffd23e" : "rgba(255,255,255,0.85)"; ctx.stroke();
+        ctx.restore();
+      }
+      function drawFamily(ctx: any, b: any, t: number) {
+        const fam = b.plugin.family, p = b.position, R = b.plugin.half, n = fam.length, ease = t * t * (3 - 2 * t);
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (i - (n - 1) / 2) * (Math.PI * 1.5 / Math.max(n, 2));
+          const dist = R + 16 + 54 * ease;
+          const sx = p.x + Math.cos(a) * dist, sy = p.y + Math.sin(a) * dist;
+          const sr = Math.max(12, 4.3 * Math.sqrt(fam[i].share)) * (0.4 + 0.6 * ease);
+          ctx.save(); ctx.globalAlpha = ease;
+          ctx.strokeStyle = "rgba(255,210,62,0.9)"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(sx, sy); ctx.stroke();
+          ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fillStyle = "#ffd23e"; ctx.fill();
+          ctx.lineWidth = 2; ctx.strokeStyle = "rgba(10,58,87,0.4)"; ctx.stroke();
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "800 11px Montserrat,sans-serif";
+          ctx.fillText(fam[i].share + "%", sx, sy);
+          ctx.font = "700 12px Montserrat,sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowColor = "rgba(10,58,87,0.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+          const nm = wrapName(fam[i].name), ny = sy + sr + 12;
+          for (let li = 0; li < nm.length; li++) ctx.fillText(nm[li], sx, ny + li * 13);
+          ctx.restore();
+        }
+      }
+
+      let hoverBody: any = null, hoverStart = 0;
+      const onAfter = () => {
+        const ctx = render.context, now = performance.now(), bodies = dyn();
+        const hov = pointer ? Query.point(bodies, pointer)[0] : null;
+        if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
+        const spotlight = hoverBody && hoverBody.plugin.family;
+
+        bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, spotlight ? 0.2 : 1, false); });
+        if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
+        if (hoverBody) drawBall(ctx, hoverBody, 1, true);
+
+        bodies.forEach((b: any) => {
+          if (!b.plugin.ping) return;
+          const dt = (now - b.plugin.ping) / 360;
+          if (dt >= 1) { b.plugin.ping = 0; return; }
+          ctx.save(); ctx.globalAlpha = (1 - dt) * ((spotlight && b !== hoverBody) ? 0.2 : 1);
+          ctx.strokeStyle = "#ffd23e"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(b.position.x, b.position.y, b.plugin.half + dt * 26, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+        });
+
+        if (hoverBody) {
+          const hp = hoverBody.position;
+          ctx.save(); ctx.font = "800 14px Montserrat,sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          const w = ctx.measureText(hoverBody.plugin.name).width + 20; const ly = hp.y + hoverBody.plugin.half + 18;
+          ctx.fillStyle = "rgba(10,58,87,0.92)"; pill(ctx, hp.x - w / 2, ly - 13, w, 26); ctx.fill();
+          ctx.fillStyle = "#fff"; ctx.fillText(hoverBody.plugin.name, hp.x, ly); ctx.restore();
+        }
+      };
+      Events.on(render, "afterRender", onAfter);
+
+      function fit() {
+        const w = stage.clientWidth, h = stage.clientHeight;
+        render.canvas.width = w; render.canvas.height = h;
+        render.options.width = w; render.options.height = h;
+        render.bounds.min.x = 0; render.bounds.min.y = 0; render.bounds.max.x = w; render.bounds.max.y = h;
+        buildWalls(w, h);
+      }
+      const ro = new ResizeObserver(() => fit());
+      ro.observe(stage);
+
+      shakeRef.current = () => {
+        dyn().forEach((b: any) => {
+          Body.setVelocity(b, { x: (Math.random() - 0.5) * 18, y: -8 - Math.random() * 14 });
+          Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.5);
+        });
+      };
+
+      dropAll();
+
+      dispose = () => {
+        if (dropTimer) clearInterval(dropTimer);
+        ro.disconnect();
+        render.canvas.removeEventListener("mousemove", onMove);
+        render.canvas.removeEventListener("mouseleave", onLeave);
+        render.canvas.removeEventListener("dblclick", onDbl);
+        Events.off(render, "afterRender", onAfter);
+        Render.stop(render);
+        Runner.stop(runner);
+        Composite.clear(engine.world, false);
+        Engine.clear(engine);
+        if (render.canvas && render.canvas.parentNode) render.canvas.parentNode.removeChild(render.canvas);
+        render.textures = {};
+        shakeRef.current = () => {};
+      };
+    })();
+
+    return () => { disposed = true; dispose(); };
+  }, []);
+
+  return (
+    <section className={styles.stage} ref={stageRef} aria-label="The Pack Pit: tip out all the chums and play">
+      <div className={styles.controls}>
+        <span className={styles.help}><b>Drag</b> to pick up</span>
+        <span className={styles.help}><b>Double-click</b> to ping</span>
+        <span className={styles.help}><b>Hover</b> for the family</span>
+        <button type="button" className={styles.shake} onClick={() => shakeRef.current()}>Shake</button>
+      </div>
+    </section>
+  );
+}
