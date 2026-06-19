@@ -5,7 +5,7 @@ import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import styles from "./PackPit.module.css";
 
-const RADIUS: Record<string, number> = { small: 42.9, medium: 56.1, large: 66, giant: 84 }; // 50% larger across the board
+const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
 
 // a child's share is the sum of its leaf values (leaves total 100 across the tree)
@@ -39,16 +39,16 @@ export default function PackPit() {
         return IMG[name];
       };
 
-      // Three toys that tip in ahead of the pack, each wider than the biggest
-      // dog (giant half = RADIUS.giant). Each body matches its SVG aspect ratio
-      // so the art fills it with no empty margin. `aspect` is just a starting
-      // guess; the real ratio is read from the loaded image and applied.
-      const BIG = RADIUS.giant;
-      const PROPS = [
-        { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5, aspect: 1 },
-        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 },
-        { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 6.7, aspect: 3.22 },
-      ];
+      // Toys tip in ahead of the pack. Their size is pinned to a fixed unit (the
+      // original giant card half) so changing the card bands never resizes them.
+      // Each body matches its SVG aspect ratio; `aspect` is a starting guess that
+      // gets corrected from the loaded image.
+      const BIG = 84;
+      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5, aspect: 1 };
+      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 };
+      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38, aspect: 3.22 };
+      const BALLS = [ball, ball, ball];
+      const HEAVY = [bone, bowl];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
 
@@ -93,7 +93,7 @@ export default function PackPit() {
         const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 240;
         if (prop.shape === "ball") {
           const r = prop.width / 2;
-          const b: any = Bodies.circle(x, y, r, { restitution: 0.5, friction: 0.22, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+          const b: any = Bodies.circle(x, y, r, { restitution: 0.85, friction: 0.18, frictionAir: 0.006, density: 0.0006, render: { visible: false } });
           b.plugin = { name: prop.label, half: r, w: prop.width, h: prop.width, color: "#c7e65a", img, prop: "ball", family: null, ping: 0 };
           return b;
         }
@@ -115,26 +115,31 @@ export default function PackPit() {
       }
 
       let dropTimer: any = null;
-      let dropDelay: any = null;
+      let waveTimers: any[] = [];
       function dropAll() {
         const ex = dyn();
         if (ex.length) Composite.remove(engine.world, ex);
         if (dropTimer) clearInterval(dropTimer);
-        if (dropDelay) clearTimeout(dropDelay);
+        waveTimers.forEach(clearTimeout); waveTimers = [];
         const w = stage.clientWidth;
-        // toys tip in first
-        PROPS.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        // then the pack spills in after a short beat
+        // wave 1: the three tennis balls bounce in
+        BALLS.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
+        // wave 2 (after 1s): the bone and bowl drop
+        waveTimers.push(setTimeout(() => {
+          if (disposed) return;
+          HEAVY.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
+        }, 1000));
+        // wave 3 (after another 1s): the pack spills in
         const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
         let k = 0;
-        dropDelay = setTimeout(() => {
+        waveTimers.push(setTimeout(() => {
           if (disposed) return;
           dropTimer = setInterval(() => {
             if (k >= order.length) { clearInterval(dropTimer); return; }
             Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
             k++;
           }, 70);
-        }, 520);
+        }, 2000));
       }
 
       const mouse = Mouse.create(render.canvas);
@@ -285,7 +290,7 @@ export default function PackPit() {
 
       dispose = () => {
         if (dropTimer) clearInterval(dropTimer);
-        if (dropDelay) clearTimeout(dropDelay);
+        waveTimers.forEach(clearTimeout);
         ro.disconnect();
         render.canvas.removeEventListener("mousemove", onMove);
         render.canvas.removeEventListener("mouseleave", onLeave);
