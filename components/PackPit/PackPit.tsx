@@ -39,14 +39,15 @@ export default function PackPit() {
         return IMG[name];
       };
 
-      // Three toys that tip in ahead of the pack, each larger than the biggest
-      // dog (giant half = RADIUS.giant). Drop the SVGs into /public; until they
-      // exist a placeholder shape falls in their place.
+      // Three toys that tip in ahead of the pack, each wider than the biggest
+      // dog (giant half = RADIUS.giant). Each body matches its SVG aspect ratio
+      // so the art fills it with no empty margin. `aspect` is just a starting
+      // guess; the real ratio is read from the loaded image and applied.
       const BIG = RADIUS.giant;
       const PROPS = [
-        { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", radius: BIG * 1.25 },
-        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", radius: BIG * 1.53, wide: 1.9, tall: 0.78 },
-        { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", radius: BIG * 2.7, wide: 1.25, tall: 1.0 },
+        { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5, aspect: 1 },
+        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5, aspect: 2.05 },
+        { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 6.7, aspect: 3.22 },
       ];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
@@ -88,16 +89,27 @@ export default function PackPit() {
       }
 
       function makeProp(prop: any, w: number) {
-        const s = prop.radius;
-        const x = 60 + Math.random() * (w - 120), y = -220 - Math.random() * 220;
-        let b: any;
+        const img = getImg(prop.key, prop.src);
+        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 240;
         if (prop.shape === "ball") {
-          b = Bodies.circle(x, y, s, { restitution: 0.5, friction: 0.22, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
-          b.plugin = { name: prop.label, half: s, w: 2 * s, h: 2 * s, color: "#c7e65a", img: getImg(prop.key, prop.src), prop: "ball", family: null, ping: 0 };
-        } else {
-          const bw = 2 * s * prop.wide, bh = 2 * s * prop.tall;
-          b = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: Math.min(bw, bh) * 0.3 }, restitution: 0.32, friction: 0.3, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
-          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: prop.shape === "bone" ? "#f6ecd6" : "#bfe3f7", img: getImg(prop.key, prop.src), prop: prop.shape, family: null, ping: 0 };
+          const r = prop.width / 2;
+          const b: any = Bodies.circle(x, y, r, { restitution: 0.5, friction: 0.22, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+          b.plugin = { name: prop.label, half: r, w: prop.width, h: prop.width, color: "#c7e65a", img, prop: "ball", family: null, ping: 0 };
+          return b;
+        }
+        const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
+        const bw = prop.width, bh = prop.width / ar;
+        const b: any = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: Math.min(bw, bh) * 0.18 }, restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008, render: { visible: false } });
+        b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: prop.shape === "bone" ? "#f6ecd6" : "#bfe3f7", img, prop: prop.shape, family: null, ping: 0 };
+        // once the SVG loads, reshape the body to its true ratio so the art fills it
+        if (!(img.complete && img.naturalWidth)) {
+          img.addEventListener("load", () => {
+            const a = img.naturalWidth / img.naturalHeight, newH = prop.width / a;
+            if (Math.abs(newH - b.plugin.h) > 1) {
+              Body.scale(b, 1, newH / b.plugin.h);
+              b.plugin.h = newH; b.plugin.half = Math.min(b.plugin.w, newH) / 2;
+            }
+          }, { once: true });
         }
         return b;
       }
