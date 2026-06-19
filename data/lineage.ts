@@ -710,6 +710,248 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan.", img: "/history/breeds/bloodhound-photo.jpg", value: 50 }
     ]
   },
+
+  "Irish Wolfhound": {
+    name: "Irish Wolfhound",
+    note: "A towering ancient hound bred to hunt wolves and guard halls, and one of the tallest dogs in the world.",
+    children: [
+      { name: "Celtic Hound", note: "The ancient sighthound stock the Celts brought across Europe.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 60 },
+      { name: "Old Molosser war dogs", note: "Big mastiff-type blood for the bulk to bring down a wolf.", img: "/history/breeds/english-mastiff.jpg", value: 40 }
+    ]
+  },
+
+  "English Mastiff": {
+    name: "English Mastiff",
+    note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
+    children: [
+      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff.", img: "/mastiff-square.jpg", value: 60 },
+      { name: "Old British bandogs", note: "The heavy chained guard dogs of early Britain.", img: "/history/breeds/bulldog-image.jpg", value: 40 }
+    ]
+  },
+
+  "Greyhound": {
+    name: "Greyhound",
+    note: "The fastest of all dogs, a sighthound that has hunted in Britain since antiquity.",
+    children: [
+      { name: "Celtic Hound", note: "The old running hounds the Celts brought west.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 60 },
+      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world.", img: "/italian-greyhound-square.jpg", value: 40 }
+    ]
+  },
+
+  "Talbot": {
+    name: "Talbot",
+    note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
+    children: [
+      { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/bloodhound-photo.jpg", value: 60 },
+      { name: "Old Norman hunting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
+    ]
+  },
+
+  "Cardigan Welsh Corgi": {
+    name: "Cardigan Welsh Corgi",
+    note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
+    children: [
+      { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.", img: "/Dachshund-square.jpg", value: 55 },
+      { name: "Old Welsh herding dogs", note: "Local working dogs that made it a nimble cattle herder.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
+    ]
+  },
+
+  "Bloodhound": {
+    name: "Bloodhound",
+    note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
+    children: [
+      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/talbot-drawing.jpg", value: 60 },
+      { name: "Old Ardennes scent hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
+    ]
+  },
+
+  "Scottish Deerhound": {
+    name: "Scottish Deerhound",
+    note: "A tall, rough-coated sighthound bred to course red deer across the Highlands, close kin to the Irish Wolfhound.",
+    children: [
+      { name: "Celtic Hound", note: "The ancient sighthound stock of the north.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 60 },
+      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 40 }
+    ]
+  },
+
+  "Celtic Hound": {
+    name: "Celtic Hound",
+    note: "An ancient running hound of the Celts, the deep root behind the Greyhound, Wolfhound and Deerhound.",
+    children: [
+      { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of Egypt and the Near East.", img: "/italian-greyhound-square.jpg", value: 55 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe.", img: "/history/breeds/greyhound-photo.jpg", value: 45 }
+    ]
+  },
+
+  "Rache": {
+    name: "Rache",
+    note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
+    children: [
+      { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-drawing.jpg", value: 60 },
+      { name: "Old running scent hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
+    ]
+  },
+
+  "Buckhound": {
+    name: "Buckhound",
+    note: "A medieval scenting hound kept to hunt buck and fallow deer, sitting between the staghound and the harrier.",
+    children: [
+      { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 60 },
+      { name: "Talbot hounds", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-drawing.jpg", value: 40 }
+    ]
+  },
+
+  "Southern Hound": {
+    name: "Southern Hound",
+    note: "A heavy, slow, deep-voiced scent hound of southern England, ancestor of the foxhound, beagle and harrier.",
+    children: [
+      { name: "Talbot hounds", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-drawing.jpg", value: 60 },
+      { name: "St Hubert Hound stock", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/bloodhound-photo.jpg", value: 40 }
+    ]
+  },
+
+  "Old English Bulldog": {
+    name: "Old English Bulldog",
+    note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
+    children: [
+      { name: "Mastiff and Alaunt war dogs", note: "The big Molossers and the extinct Alaunt that gave it bulk and a broad jaw.", img: "/history/breeds/english-mastiff.jpg", value: 60 },
+      { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England.", img: "/history/breeds/bulldog-image.jpg", value: 40 }
+    ]
+  },
+
+  "English Foxhound": {
+    name: "English Foxhound",
+    note: "The classic pack hound of the hunt, bred for stamina, voice and a relentless nose over a long day's chase.",
+    children: [
+      { name: "Southern Hound", note: "The deep-nosed scent hound at its foundation.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 50 },
+      { name: "Greyhound", note: "Added for speed and a cleaner, racier build.", img: "/history/breeds/greyhound-photo.jpg", value: 30 },
+      { name: "Talbot hound", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-drawing.jpg", value: 20 }
+    ]
+  },
+
+  "Otterhound": {
+    name: "Otterhound",
+    note: "A big, rough-coated, web-footed scent hound bred to hunt otter in cold rivers, with a magnificent nose.",
+    children: [
+      { name: "Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/bloodhound-photo.jpg", value: 45 },
+      { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 30 },
+      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 25 }
+    ]
+  },
+
+  "Turnspit Dog": {
+    name: "Turnspit Dog",
+    note: "An extinct, short-legged kitchen dog bred to trot inside a wheel and turn the roasting spit over the fire.",
+    children: [
+      { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it.", img: "/Dachshund-square.jpg", value: 60 },
+      { name: "Farm and kitchen curs", note: "The everyday working mongrels of the household.", img: "/history/breeds/Cur-dog-drawing.jpg", value: 40 }
+    ]
+  },
+
+  "Staghound": {
+    name: "Staghound",
+    note: "A large hound kept to hunt red deer, built up from the old scenting hounds and later from the foxhound packs.",
+    children: [
+      { name: "Southern Hound", note: "The heavy deer-hunting scent hound at its base.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 45 },
+      { name: "Old Foxhounds", note: "Pack-hound blood for pace and a long day's work.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 35 },
+      { name: "Buckhound", note: "The royal deer hound in its background.", img: "/history/breeds/Buckhound-illustration.jpg", value: 20 }
+    ]
+  },
+
+  "Beagle": {
+    name: "Beagle",
+    note: "A small, merry pack hound bred to hunt hare on foot, with a big voice and a busy nose.",
+    children: [
+      { name: "Talbot hound", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-drawing.jpg", value: 40 },
+      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 35 },
+      { name: "Greyhound", note: "A little sighthound for speed and a tidy build.", img: "/history/breeds/greyhound-photo.jpg", value: 25 }
+    ]
+  },
+
+  "Bearded Collie": {
+    name: "Bearded Collie",
+    note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
+    children: [
+      { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
+      { name: "Native Scottish collies", note: "The local working herding dogs they were crossed with.", img: "/history/breeds/Border_Collie_photo.jpg", value: 50 }
+    ]
+  },
+
+  "Old English Sheepdog": {
+    name: "Old English Sheepdog",
+    note: "A big, shaggy, bobtailed drover's dog of the west country, bred to drive sheep and cattle to market.",
+    children: [
+      { name: "Bearded Collie", note: "The shaggy Scottish herder in its make-up.", img: "/history/breeds/bearded-collie-photo.jpg", value: 55 },
+      { name: "Shaggy droving herders", note: "Old continental and Welsh droving dogs of the same heavy-coated type.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
+    ]
+  },
+
+  "King Charles Spaniel": {
+    name: "King Charles Spaniel",
+    note: "The flat-faced toy spaniel of the Stuart court, a lapdog favourite long before its longer-nosed Cavalier cousin.",
+    children: [
+      { name: "Old toy spaniels", note: "The small sporting and lap spaniels of Tudor and Stuart England.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 60 },
+      { name: "Asian flat-faced toys", note: "Pug and oriental toy blood that shortened the muzzle.", img: "/pug-square.jpg", value: 40 }
+    ]
+  },
+
+  "Pointer": {
+    name: "Pointer",
+    note: "A lean, fast bird dog that freezes on point to mark hidden game, refined in England from the heavy old Spanish Pointer.",
+    children: [
+      { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 30 },
+      { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/greyhound-photo.jpg", value: 25 },
+      { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/bloodhound-photo.jpg", value: 25 },
+      { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/english_setter-photo.jpg", value: 20 }
+    ]
+  },
+
+  "English Setter": {
+    name: "English Setter",
+    note: "An elegant, feathered bird dog that 'sets', crouching low when it scents game, built up from the old setting spaniels.",
+    children: [
+      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 50 },
+      { name: "Pointing dogs", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
+      { name: "Water spaniels", note: "A little water-spaniel for coat and biddability.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
+    ]
+  },
+
+  "Clumber Spaniel": {
+    name: "Clumber Spaniel",
+    note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
+    children: [
+      { name: "Old land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 55 },
+      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight.", img: "/history/breeds/bloodhound-photo.jpg", value: 45 }
+    ]
+  },
+
+  "Cur": {
+    name: "Cur",
+    note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
+    children: [
+      { name: "Herding collies", note: "Sheep- and cattle-droving blood for the work.", img: "/history/breeds/Border_Collie_photo.jpg", value: 55 },
+      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock.", img: "/history/breeds/bulldog-image.jpg", value: 45 }
+    ]
+  },
+
+  "North Country Beagle": {
+    name: "North Country Beagle",
+    note: "An extinct, faster, sharper-nosed beagle of northern England, eventually folded into the modern Beagle.",
+    children: [
+      { name: "Old Beagles", note: "The small southern hare-hounds at its core.", img: "/history/breeds/beagle-photo.jpg", value: 50 },
+      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 30 },
+      { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-drawing.jpg", value: 20 }
+    ]
+  },
+
+  "Old Welsh Grey Sheepdog": {
+    name: "Old Welsh Grey Sheepdog",
+    note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost.",
+    children: [
+      { name: "Old Welsh herding collies", note: "The native working herding stock of Wales.", img: "/history/breeds/Border_Collie_photo.jpg", value: 60 },
+      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.", img: "/history/breeds/bearded-collie-photo.jpg", value: 40 }
+    ]
+  },
 };
 
 
