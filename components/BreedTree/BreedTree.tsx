@@ -41,6 +41,7 @@ export default function BreedTree({
   const rafRef = useRef<number>(0);
 
   const [focus, setFocus] = useState<Node>(nodes[0]);
+  const [hovered, setHovered] = useState<Node | null>(null);
   const [ready, setReady] = useState(false);
   // Aspect ratio of the visible stage. The viewBox is widened to match it so
   // the diagram uses the whole available canvas: the surrounding circles spread
@@ -53,10 +54,11 @@ export default function BreedTree({
   function fillFor(d: Node): string {
     return d.depth === 0 ? "#0a3a57" : d.depth === 1 ? "#1f8fd0" : "#bfe3f7";
   }
-  // Outermost visible ring (depth 1) gets a 5-unit stroke; each level deeper
-  // loses one, down to a minimum of 1.
+  // Thinner stroke the deeper (smaller) the circle, so the ring never
+  // overpowers a tiny image several levels down: 3, 2, 1, then finer still.
   function strokeWidthFor(d: Node): number {
-    return Math.max(6 - d.depth, 1);
+    const widths = [3, 2, 1, 0.6, 0.4];
+    return widths[d.depth - 1] ?? 0.4;
   }
 
   function zoomTo(v: View) {
@@ -167,7 +169,12 @@ export default function BreedTree({
   const viewBox = `${xMin} ${-SIZE / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();
-  const share = focus.parent ? Math.round((focus.value ?? 0) / (focus.parent.value || 1) * 100) : null;
+  // The caption follows the hovered circle when there is one, so you can read a
+  // breed's note just by pointing at it, and falls back to the focused circle.
+  const shown = hovered ?? focus;
+  const shownShare = shown.parent
+    ? Math.round(((shown.value ?? 0) / (shown.parent.value || 1)) * 100)
+    : null;
 
   return (
     <div className={styles.tree} ref={wrapRef}>
@@ -236,6 +243,8 @@ export default function BreedTree({
                     cursor: hidden ? "default" : "pointer",
                     pointerEvents: hidden ? "none" : "auto",
                   }}
+                  onMouseEnter={hidden ? undefined : () => setHovered(d)}
+                  onMouseLeave={hidden ? undefined : () => setHovered((h) => (h === d ? null : h))}
                   onClick={(e) => onCircle(e, d)}
                 />
               );
@@ -292,15 +301,15 @@ export default function BreedTree({
         </div>
 
         <div className={styles.caption}>
-          <span className={styles.cName}>{focus.data.name}</span>
-          {share !== null && focus.parent && (
+          <span className={styles.cName}>{shown.data.name}</span>
+          {shownShare !== null && shown.parent && (
             <span className={styles.cShare}>
-              {share}% of {focus.parent.data.name}
+              {shownShare}% of {shown.parent.data.name}
             </span>
           )}
           <p className={styles.cNote}>
-            {focus.data.note}
-            {focus.children ? " Tap a circle inside to keep digging." : ""}
+            {shown.data.note}
+            {shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
         </div>
       </div>
