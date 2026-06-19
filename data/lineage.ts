@@ -306,8 +306,225 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
       { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
     ]
-  }
+  },
+
+  "Skye Terrier": {
+    name: "Skye Terrier",
+    note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
+    children: [
+      { name: "Ancient Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 60 },
+      { name: "Isle of Skye earth dogs", note: "Hardy island dogs bred to bolt fox, otter and badger from the rocks.", img: "/history/breeds/scottish-terrier-image.jpg", value: 40 }
+    ]
+  },
+
+  "Scottish Terrier": {
+    name: "Scottish Terrier",
+    note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
+    children: [
+      { name: "Old Highland terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 60 },
+      { name: "Skye terrier stock", note: "The long-coated island terriers from the same rootstock.", img: "/history/breeds/skye-terrier-photo.webp", value: 40 }
+    ]
+  },
+
+  "Dandie Dinmont Terrier": {
+    name: "Dandie Dinmont Terrier",
+    note: "A long-bodied terrier of the Anglo-Scottish border with a soft topknot, named after a character in a Walter Scott novel.",
+    children: [
+      { name: "Old Border terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone.", img: "/history/breeds/border-terrier-photo.jpg", value: 65 },
+      { name: "Skye terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape.", img: "/history/breeds/skye-terrier-photo.webp", value: 20 },
+      { name: "Otterhound", note: "A little hound blood is thought to have added size and the soft coat.", img: "/history/breeds/otterhound-photo.jpg", value: 15 }
+    ]
+  },
+
+  "Black and Tan Terrier": {
+    name: "Black and Tan Terrier",
+    note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
+    children: [
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named.", img: "/history/breeds/old-german-ratting-terriers-illustration.jpg", value: 60 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 40 }
+    ]
+  },
+
+  "Manchester Terrier": {
+    name: "Manchester Terrier",
+    note: "A sleek black-and-tan ratting terrier from the rat pits and rabbit-coursing fields of industrial Manchester.",
+    children: [
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier at its core.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 65 },
+      { name: "Whippet", note: "Crossed in for speed and a clean, racy outline.", img: "/history/breeds/whippet-photo.jpg", value: 35 }
+    ]
+  },
+
+  "Bedlington Terrier": {
+    name: "Bedlington Terrier",
+    note: "A lithe, lamb-like terrier from the Northumberland mining country, once called the Rothbury Terrier and prized by poachers.",
+    children: [
+      { name: "Rothbury terriers", note: "The local working terriers of the Rothbury and border country.", img: "/history/breeds/border-terrier-photo.jpg", value: 50 },
+      { name: "Whippet", note: "Brought in for speed and the arched, racy back.", img: "/history/breeds/whippet-photo.jpg", value: 30 },
+      { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 20 }
+    ]
+  },
+
+  "Welsh Terrier": {
+    name: "Welsh Terrier",
+    note: "A wiry black-and-tan terrier from Wales, bred to face fox, otter and badger underground.",
+    children: [
+      { name: "Old English Black and Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 75 },
+      { name: "Old wirehaired fell terriers", note: "Hardy broken-coated working terriers of the hills.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 25 }
+    ]
+  },
+
+  "Kerry Blue Terrier": {
+    name: "Kerry Blue Terrier",
+    note: "Ireland's blue-coated all-rounder from County Kerry, a farm dog, herder, hunter and fighter rolled into one.",
+    children: [
+      { name: "Soft-Coated Wheaten Terrier", note: "The older native Irish terrier widely held to be its parent.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
+      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 }
+    ]
+  },
+
+  "English White Terrier": {
+    name: "English White Terrier",
+    note: "A pricked-ear white terrier, a short-lived show breed drawn from Britain's old white working terriers, now extinct.",
+    children: [
+      { name: "Old white working terriers", note: "The white-bodied fox-working terriers found across Britain since the 1700s.", img: "/history/breeds/fox_terrier-img.jpg", value: 60 },
+      { name: "Old English Terrier stock", note: "The broader old black-and-tan terrier stock behind it.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
+    ]
+  },
+
+  "Airedale Terrier": {
+    name: "Airedale Terrier",
+    note: "The 'King of Terriers', the largest of them all, made in Yorkshire's Aire valley to hunt otter and water rat.",
+    children: [
+      { name: "Old English Black and Tan Terrier", note: "The broken-coated working terrier that gave its terrier grit.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 60 },
+      { name: "Otterhound", note: "Crossed in for size, a good nose and a love of water.", img: "/history/breeds/otterhound-photo.jpg", value: 40 }
+    ]
+  },
+
+  "Sealyham Terrier": {
+    name: "Sealyham Terrier",
+    note: "A stocky white terrier built in Pembrokeshire by Captain John Edwardes to draw badger and otter alongside his hounds.",
+    children: [
+      { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 35 },
+      { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/west-highland-white-terrier-photo.jpg", value: 35 },
+      { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
+    ]
+  },
+
+  "Cairn Terrier": {
+    name: "Cairn Terrier",
+    note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
+    children: [
+      { name: "Isle of Skye terriers", note: "The island working terriers it was once grouped with as a 'short-haired Skye'.", img: "/history/breeds/skye-terrier-photo.webp", value: 55 },
+      { name: "Highland mainland terriers", note: "The old Highland earth-dog stock shared with the Scottie and Westie.", img: "/history/breeds/scottish-terrier-image.jpg", value: 45 }
+    ]
+  },
+
+  "Lakeland Terrier": {
+    name: "Lakeland Terrier",
+    note: "A fell terrier from the Lake District, bred to follow fox over the crags and go to ground without flinching.",
+    children: [
+      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Bedlington Terrier", note: "A near neighbour that lent coat and line.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 25 },
+      { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
+    ]
+  },
+
+  "Fox Terrier": {
+    name: "Fox Terrier",
+    note: "The classic earth dog of the foxhunt, carried to the field to bolt the fox when it went to ground.",
+    children: [
+      { name: "Old English Black and Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 },
+      { name: "English White Terrier", note: "Lent the predominantly white, easy-to-see coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 25 },
+      { name: "Beagle", note: "A dash of hound for nose and cry.", img: "/beagle-square.jpg", value: 15 },
+      { name: "Bull Terrier", note: "A touch of bull blood for grit.", img: "/bull-terrier-square.jpg", value: 15 }
+    ]
+  },
+
+  "English Toy Terrier": {
+    name: "English Toy Terrier",
+    note: "A miniature black-and-tan, the toy version of the Manchester Terrier, once a champion rat-pit performer.",
+    children: [
+      { name: "Manchester Terrier", note: "The black-and-tan ratter it was bred down from.", img: "/history/breeds/manchester-terrior.jpg", value: 70 },
+      { name: "Black and Tan Terrier", note: "The older working terrier behind the Manchester.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 30 }
+    ]
+  },
+
+  "Paisley Terrier": {
+    name: "Paisley Terrier",
+    note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
+    children: [
+      { name: "Skye terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from.", img: "/history/breeds/skye-terrier-photo.webp", value: 65 },
+      { name: "Old Scotch terriers", note: "The working Scottish terriers behind the silky Clydeside strains.", img: "/history/breeds/scottish-terrier-image.jpg", value: 35 }
+    ]
+  },
+
+  "Irish Terrier": {
+    name: "Irish Terrier",
+    note: "The 'daredevil' of Ireland, a fiery red terrier and one of the four native Irish terrier breeds.",
+    children: [
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
+      { name: "Old black and tan terriers", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
+    ]
+  },
+
+  "Soft-Coated Wheaten Terrier": {
+    name: "Soft-Coated Wheaten Terrier",
+    note: "The oldest of Ireland's four native terriers, a soft-coated all-purpose farm dog, and the likely parent of the Kerry Blue and Irish Terrier.",
+    children: [
+      { name: "Native Irish farm terriers", note: "Ireland's old all-purpose working terriers, kept by farmers, not gentry.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
+      { name: "Old Gaelic working terriers", note: "The rugged native stock of the Irish countryside.", img: "/history/breeds/glen-of-Imaal-terrier.jpg", value: 40 }
+    ]
+  },
+
+  "Glen of Imaal Terrier": {
+    name: "Glen of Imaal Terrier",
+    note: "A low, powerful terrier from a remote Wicklow valley, one of the four native Irish terriers and quiet for its kind.",
+    children: [
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
+      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 40 }
+    ]
+  },
+
+  "Norwich Terrier": {
+    name: "Norwich Terrier",
+    note: "A tiny, sturdy red terrier from East Anglia, made famous by Cambridge students who kept them to bolt rats in the colleges. The prick-eared cousin of the Norfolk.",
+    children: [
+      { name: "Irish Terrier", note: "Small red Irish terriers in the early Trumpington stock.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 },
+      { name: "Yorkshire Terrier", note: "A bigger silky terrier said to be in the early mix.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 30 },
+      { name: "Local red ratting terriers", note: "The small working terriers of Norfolk farms and gypsy ratters.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 30 }
+    ]
+  },
+
+  "Patterdale Terrier": {
+    name: "Patterdale Terrier",
+    note: "A tough, no-nonsense black fell terrier from the Lake District, bred purely to work fox and not for the show ring.",
+    children: [
+      { name: "Old fell terriers", note: "The black-and-tan working terriers of the northern fells.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 60 },
+      { name: "Border Terrier", note: "A close fell neighbour from the same hill stock.", img: "/history/breeds/border-terrier-photo.jpg", value: 25 },
+      { name: "Bedlington Terrier", note: "A dash of Bedlington in some northern lines.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 15 }
+    ]
+  },
+
+  "Lucas Terrier": {
+    name: "Lucas Terrier",
+    note: "A small, friendly working terrier created in the 20th century by Sir Jocelyn Lucas by crossing two existing terriers.",
+    children: [
+      { name: "Sealyham Terrier", note: "Lucas's own working Sealyhams formed one half of the cross.", img: "/history/breeds/sealyham-terrier-photo.jpg", value: 50 },
+      { name: "Norfolk Terrier", note: "Crossed in to bring the size down and add hardy working drive.", img: "/history/breeds/Norfolk-Terrier-photo.jpg", value: 50 }
+    ]
+  },
+
+  "Norfolk Terrier": {
+    name: "Norfolk Terrier",
+    note: "The drop-eared twin of the Norwich, the same little red ratting terrier until the two were split by ear type in 1964.",
+    children: [
+      { name: "Norwich terrier stock", note: "The same East Anglian red terriers, before the ear-type split.", img: "/history/breeds/norwich-terrier-photo.jpg", value: 50 },
+      { name: "Irish Terrier", note: "Small red Irish terriers in the early mix.", img: "/history/breeds/irish-terrier-photo.jpg", value: 25 },
+      { name: "Yorkshire Terrier", note: "A silky terrier said to add to the early type.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 25 }
+    ]
+  },
 };
+
 
 export function getLineage(name: string): LineageNode | null {
   return LINEAGE[name] ?? null;
