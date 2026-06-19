@@ -734,7 +734,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The fastest of all dogs, a sighthound that has hunted in Britain since antiquity.",
     children: [
       { name: "Celtic Hound", note: "The old running hounds the Celts brought west.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world.", img: "/history/breeds/Ancient eastern sighthounds.jpg", value: 40 }
+      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 40 }
     ]
   },
 
@@ -778,8 +778,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Celtic Hound",
     note: "An ancient running hound of the Celts, the deep root behind the Greyhound, Wolfhound and Deerhound.",
     children: [
-      { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of Egypt and the Near East.", img: "/history/breeds/Ancient eastern sighthounds.jpg", value: 55 },
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe.", img: "/history/breeds/Old hunting dogs of the Celts.jpg", value: 45 }
+      { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of Egypt and the Near East.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 }
     ]
   },
 
