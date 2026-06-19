@@ -330,6 +330,9 @@ export default function PackPit() {
       }
 
       let hoverBody: any = null, hoverStart = 0;
+      const DIM_MIN = 0.5;   // how far the rest of the pack dims behind the hovered chum
+      const DIM_TIME = 0.5;  // seconds to ease in and out of that dim, so it never flashes
+      let dimLevel = 1, lastFrame = 0;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // the resting logo is static (excluded from dyn()), so draw it here until it
@@ -339,8 +342,14 @@ export default function PackPit() {
         const hov = pointer ? Query.point(bodies, pointer)[0] : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
+        // ease the dim toward its target rather than snapping, so sweeping across
+        // a shaken pack never flashes
+        const dimTarget = spotlight ? DIM_MIN : 1;
+        const frameDt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0; lastFrame = now;
+        const step = frameDt / DIM_TIME;
+        dimLevel = dimLevel < dimTarget ? Math.min(dimTarget, dimLevel + step) : Math.max(dimTarget, dimLevel - step);
 
-        bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, spotlight ? 0.2 : 1, false); });
+        bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
         if (hoverBody) drawBall(ctx, hoverBody, 1, true);
 
@@ -348,7 +357,7 @@ export default function PackPit() {
           if (!b.plugin.ping) return;
           const dt = (now - b.plugin.ping) / 360;
           if (dt >= 1) { b.plugin.ping = 0; return; }
-          ctx.save(); ctx.globalAlpha = (1 - dt) * ((spotlight && b !== hoverBody) ? 0.2 : 1);
+          ctx.save(); ctx.globalAlpha = (1 - dt) * (b !== hoverBody ? dimLevel : 1);
           ctx.strokeStyle = "#ffd23e"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(b.position.x, b.position.y, b.plugin.half + dt * 26, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
         });
 
