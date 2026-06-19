@@ -240,8 +240,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Corgi",
     note: "A big dog in a small body. The Pembroke is a true cattle herder, nipping at heels and ducking the kicks.",
     children: [
-      { name: "Nordic Spitz dogs", note: "Spitz-type herders thought to have arrived with Flemish weavers and Viking settlers.", img: "/husky-square.jpg", value: 55 },
-      { name: "Welsh herding dogs", note: "The local Welsh working stock that shaped it into a low, nimble cattle dog.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
+      { name: "Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.", img: "/Pomeranian-square.jpg", value: 40 },
+      { name: "Cardigan Welsh Corgi", note: "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.", img: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", value: 35 },
+      { name: "Welsh herding dogs", note: "Local Welsh working stock that shaped it into a low, nimble cattle dog.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 }
     ]
   },
 
