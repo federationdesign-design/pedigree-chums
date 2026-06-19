@@ -1,11 +1,11 @@
 .stage {
   position: relative;
   width: 100%;
-  /* taller than the viewport so the pack falls a long way and the page scrolls
-     down to the pile. Tune the 160 to make the pit deeper or shallower. */
-  height: 160vh;
-  height: 160svh;
-  min-height: 1000px;
+  /* taller than the viewport so the pack falls a way down and the page scrolls
+     to the pile, but not excessively. Tune the 122 to taste. */
+  height: 122vh;
+  height: 122svh;
+  min-height: 780px;
   overflow: hidden;
   background: linear-gradient(165deg, var(--blue-sky), var(--blue) 48%, var(--blue-deep));
 }

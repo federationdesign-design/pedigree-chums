@@ -27,7 +27,7 @@ export interface Breed {
   image: string;
 }
 
-export const breeds: Breed[] = [
+const allBreeds: Breed[] = [
   {
     name: "Irish Wolfhound",
     slug: "irish-wolfhound",
@@ -842,7 +842,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/history/breeds/border-terrier-photo.jpg",
+    image: "/border-terrier-square.png",
   },
   {
     name: "Border Collie",
@@ -949,3 +949,8 @@ export const breeds: Breed[] = [
     image: "/lab-square.png",
   },
 ];
+
+// Draft entries are placeholders, kept out of the live pack everywhere it is
+// shown (the pit and Know Your Chums). UK breeds like the Irish Setter still
+// appear on the history page, which renders from uk-breeds.ts.
+export const breeds: Breed[] = allBreeds.filter((b) => !b.draft);

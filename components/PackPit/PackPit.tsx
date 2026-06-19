@@ -175,7 +175,9 @@ export default function PackPit() {
           const pw = b.plugin.w, ph = b.plugin.h;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
           if (img && img.complete && img.naturalWidth) {
-            ctx.drawImage(img, -pw / 2, -ph / 2, pw, ph);
+            const ir = img.naturalWidth / img.naturalHeight, br = pw / ph;
+            const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
+            ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
           } else if (b.plugin.prop === "ball") {
             ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2); ctx.fillStyle = b.plugin.color; ctx.fill();
             ctx.lineWidth = 3; ctx.strokeStyle = "rgba(10,58,87,0.45)"; ctx.stroke();
