@@ -808,7 +808,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/lab-square.jpg",
+    image: "/Dachshund-square.jpg",
   },
   {
     name: "Springer Spaniel",
@@ -842,7 +842,7 @@ export const breeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/lab-square.jpg",
+    image: "/history/breeds/border-terrier-photo.jpg",
   },
   {
     name: "Border Collie",
@@ -928,7 +928,7 @@ export const breeds: Breed[] = [
     sizeBand: "large",
     skull: "long",
     draft: true,
-    image: "/lab-square.jpg",
+    image: "/history/breeds/irish-setter-photo.jpg",
   },
   {
     name: "Bernedoodle",

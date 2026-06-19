@@ -5,6 +5,7 @@ const UK_TO_LINEAGE: Record<string, string> = {
   "Labrador Retriever": "Labrador",
   "Pembroke Welsh Corgi": "Corgi",
   "West Highland White Terrier": "West Highland Terrier",
+  "English Springer Spaniel": "Springer Spaniel",
 };
 
 export function resolveLineageName(name: string): string {
