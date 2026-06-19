@@ -43,7 +43,7 @@ export default function PackPit() {
       // confirm these filenames; until then a placeholder shape falls instead.
       const PROPS = [
         { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", radius: 40 },
-        { key: "__bone", label: "Bone", src: "/bone.svg", shape: "bone", radius: 34 },
+        { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", radius: 34 },
       ];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
