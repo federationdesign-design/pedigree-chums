@@ -135,7 +135,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Jackapoo",
     note: "A lively little cross of the Jack Russell and the Poodle, full of energy and character.",
     children: [
-      { name: "Jack Russell", note: "Brings the bold, bouncy, terrier spirit.", img: "/jackrussel-square.jpg", value: 50 },
+      { name: "Jack Russell Terrier", note: "Brings the bold, bouncy, terrier spirit.", img: "/jackrussel-square.jpg", value: 50 },
       { name: "Poodle", note: "Brings the low-shedding coat and the trainability.", img: "/poodle-square.jpg", value: 50 }
     ]
   },
@@ -952,9 +952,100 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.", img: "/history/breeds/bearded-collie-photo.jpg", value: 40 }
     ]
   },
+
+  "Poodle": {
+    name: "Poodle",
+    note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
+    children: [
+      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 55 },
+      { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 45 }
+    ]
+  },
+
+  "Maltese": {
+    name: "Maltese",
+    note: "An ancient white lapdog of the Mediterranean, a favourite of Roman ladies and prized for over two thousand years.",
+    children: [
+      { name: "Ancient Spitz-type dogs", note: "The small spitz-type dogs many historians see as its oldest ancestors, bred down in size over centuries.", img: "/Pomeranian-square.jpg", value: 55 },
+      { name: "Mediterranean bichon lapdogs", note: "The old white bichon-family lapdogs spread around the Mediterranean by ancient traders.", img: "/bichon-square.jpg", value: 45 }
+    ]
+  },
+
+  "Pug": {
+    name: "Pug",
+    note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
+    children: [
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs.", img: "/pug-square.jpg", value: 60 },
+      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/Pomeranian-square.jpg", value: 40 }
+    ]
+  },
+
+  "Bichon Frise": {
+    name: "Bichon Frise",
+    note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
+    children: [
+      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 50 },
+      { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family.", img: "/maltese-squares.png", value: 50 }
+    ]
+  },
+
+  "Bernedoodle": {
+    name: "Bernedoodle",
+    note: "A modern cross of the Bernese Mountain Dog and the Poodle, bred for a gentle nature and a low-shedding coat.",
+    children: [
+      { name: "Bernese Mountain Dog", note: "Brings the calm, affectionate temperament and the striking tricolour markings.", value: 50 },
+      { name: "Poodle", note: "Brings the curly, low-shedding coat and a lot of cleverness.", img: "/poodle-square.jpg", value: 50 }
+    ]
+  },
 };
 
 
+const MAX_LINEAGE_DEPTH = 5;
+
+// Graft each child's own documented lineage into its circle, scaling the
+// grafted progenitors so they fill that child's share of the parent. An
+// internal node drops its own `value` so the pack layout sizes it from its
+// children. Groupings (no entry of their own) and cycles stop the recursion.
+function expandNode(
+  node: LineageNode,
+  depth: number,
+  visited: Set<string>,
+): LineageNode {
+  const sub = LINEAGE[node.name];
+  const canGraft =
+    !!sub &&
+    !!sub.children &&
+    sub.children.length > 0 &&
+    depth < MAX_LINEAGE_DEPTH &&
+    !visited.has(node.name) &&
+    (!node.children || node.children.length === 0);
+
+  if (canGraft && sub.children) {
+    const share = node.value ?? 0;
+    const total = sub.children.reduce((sum, c) => sum + (c.value ?? 0), 0) || 1;
+    const next = new Set(visited);
+    next.add(node.name);
+    const kids = sub.children.map((c) =>
+      expandNode({ ...c, value: ((c.value ?? 0) * share) / total }, depth + 1, next),
+    );
+    const { value: _omit, ...rest } = node;
+    return { ...rest, children: kids };
+  }
+
+  if (node.children && node.children.length) {
+    const next = new Set(visited);
+    next.add(node.name);
+    return {
+      ...node,
+      children: node.children.map((c) => expandNode(c, depth + 1, next)),
+    };
+  }
+
+  return node;
+}
+
 export function getLineage(name: string): LineageNode | null {
-  return LINEAGE[name] ?? null;
+  const root = LINEAGE[name];
+  if (!root) return null;
+  return expandNode({ ...root }, 0, new Set<string>());
 }
