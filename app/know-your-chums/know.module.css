@@ -581,6 +581,16 @@
     grid-template-columns: 1fr;
     gap: 10px;
   }
+  .factIcon {
+    width: clamp(72px, 18vw, 112px);
+    height: clamp(72px, 18vw, 112px);
+  }
+  .factHero {
+    font-size: clamp(3.6rem, 10vw, 4.4rem);
+  }
+  .factLabel {
+    font-size: clamp(1.5rem, 5vw, 1.8rem);
+  }
   .rowGrid {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -613,19 +623,21 @@
     overflow: visible;
     display: flex;
     flex-direction: column;
+    background: transparent; /* like the pack pit: just the circles over the dimmed page */
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    width: 100%;
   }
+  /* family-tree pop-up shows only the circles on mobile: no name, intro or
+     personality, matching the pack pit */
   .familyLead {
-    max-width: none;
-    margin-top: 12px;
-  }
-  .familySub {
-    white-space: normal;
+    display: none;
   }
   .familyCol {
     position: static;
-    height: 62vh;
+    height: 82vh;
     margin-top: 0;
-    order: -1; /* circles to the top, the title and text below them */
   }
 }
 
