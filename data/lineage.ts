@@ -312,7 +312,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Skye Terrier",
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
     children: [
-      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 60 },
+      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/Old Highland terriers.jpg", value: 60 },
       { name: "Isle of Skye earth dogs", note: "Hardy island dogs bred to bolt fox, otter and badger from the rocks.", img: "/history/breeds/scottish-terrier-image.jpg", value: 40 }
     ]
   },
@@ -321,7 +321,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Scottish Terrier",
     note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
     children: [
-      { name: "Old Highland terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 60 },
+      { name: "Old Highland terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers.", img: "/history/breeds/Old Highland terriers.jpg", value: 60 },
       { name: "Skye terrier stock", note: "The long-coated island terriers from the same rootstock.", img: "/history/breeds/skye-terrier-photo.webp", value: 40 }
     ]
   },
@@ -454,7 +454,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
     children: [
       { name: "Skye terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from.", img: "/history/breeds/skye-terrier-photo.webp", value: 65 },
-      { name: "Old Highland terriers", note: "The working Scottish terriers behind the silky Clydeside strains.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 35 }
+      { name: "Old Highland terriers", note: "The working Scottish terriers behind the silky Clydeside strains.", img: "/history/breeds/Old Highland terriers.jpg", value: 35 }
     ]
   },
 
@@ -490,7 +490,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Irish Terrier", note: "Small red Irish terriers in the early Trumpington stock.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 },
       { name: "Yorkshire Terrier", note: "A bigger silky terrier said to be in the early mix.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 30 },
-      { name: "Local red ratting terriers", note: "The small working terriers of Norfolk farms and gypsy ratters.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 30 }
+      { name: "Local red ratting terriers", note: "The small working terriers of Norfolk farms and gypsy ratters.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
     ]
   },
 
