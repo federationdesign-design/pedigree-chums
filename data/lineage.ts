@@ -716,7 +716,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A towering ancient hound bred to hunt wolves and guard halls, and one of the tallest dogs in the world.",
     children: [
       { name: "Celtic Hound", note: "The ancient sighthound stock the Celts brought across Europe.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Old Molosser war dogs", note: "Big mastiff-type blood for the bulk to bring down a wolf.", img: "/history/breeds/english-mastiff.jpg", value: 40 }
+      { name: "Ancient Molossers", note: "Big mastiff-type blood for the bulk to bring down a wolf.", img: "/history/breeds/Ancient-Molossers.jpg", value: 40 }
     ]
   },
 
@@ -724,7 +724,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
     children: [
-      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff.", img: "/mastiff-square.jpg", value: 60 },
+      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
       { name: "Old British bandogs", note: "The heavy chained guard dogs of early Britain.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
@@ -814,7 +814,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old English Bulldog",
     note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
     children: [
-      { name: "Mastiff and Alaunt war dogs", note: "The big Molossers and the extinct Alaunt that gave it bulk and a broad jaw.", img: "/history/breeds/english-mastiff.jpg", value: 60 },
+      { name: "Mastiff and Alaunt war dogs", note: "The big Molossers and the extinct Alaunt that gave it bulk and a broad jaw.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 60 },
       { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
@@ -992,7 +992,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Great Dane",
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
     children: [
-      { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front.", img: "/history/breeds/english-mastiff.jpg", value: 50 },
+      { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 50 },
       { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", value: 30 },
       { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed.", value: 20 }
     ]
@@ -1003,7 +1003,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Alpine mastiff farm dogs", note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.", value: 55 },
       { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 25 },
-      { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to.", img: "/mastiff-square.jpg", value: 20 }
+      { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to.", img: "/history/breeds/Ancient-Molossers.jpg", value: 20 }
     ]
   },
   "Afghan Hound": {
@@ -1036,7 +1036,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rottweiler",
     note: "The butcher's dog of Rottweil, descended from the drover mastiffs the Roman legions marched over the Alps.",
     children: [
-      { name: "Ancient Molossers", note: "The Roman drover and war mastiffs left in the region, the breed's deepest root.", img: "/mastiff-square.jpg", value: 60 },
+      { name: "Ancient Molossers", note: "The Roman drover and war mastiffs left in the region, the breed's deepest root.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
       { name: "Local German cattle dogs", note: "The herding farm dogs of the Wurttemberg valleys it was crossed with to make a steady drover.", value: 40 }
     ]
   },
