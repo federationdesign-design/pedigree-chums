@@ -106,6 +106,25 @@ export default function PackPit() {
           b.plugin = { name: prop.label, half: r, w: prop.width, h: prop.width, color: "#c7e65a", img, prop: "ball", family: null, ping: 0 };
           return b;
         }
+        if (prop.shape === "bone") {
+          // A bone is two lobed ends joined by a thin shaft, so a plain box collider
+          // leaves big empty corners. Build the collider from a central bar plus four
+          // end lobes (proportions read off the 400.2 x 195 viewBox) so objects meet
+          // the bone where the vector actually is.
+          const bw = prop.width, bh = prop.width / prop.aspect, k = bw / 400.2;
+          const R = 56 * k, dx = 143.5 * k, dy = 40.7 * k, barW = 287 * k, barH = 92 * k;
+          const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
+          const parts = [
+            Bodies.rectangle(x, y, barW, barH, po),
+            Bodies.circle(x - dx, y - dy, R, po),
+            Bodies.circle(x - dx, y + dy, R, po),
+            Bodies.circle(x + dx, y - dy, R, po),
+            Bodies.circle(x + dx, y + dy, R, po),
+          ];
+          const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#f6ecd6", img, prop: "bone", family: null, ping: 0 };
+          return b;
+        }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
         const bw = prop.width, bh = prop.width / ar;
         const b: any = Bodies.rectangle(x, y, bw, bh, { angle: prop.angle || 0, chamfer: { radius: Math.min(bw, bh) * 0.18 }, restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008, render: { visible: false } });
