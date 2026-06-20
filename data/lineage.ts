@@ -311,7 +311,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
     children: [
       { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family.", img: "/history/breeds/skye-terrier-photo.webp", value: 40 }
+      { name: "Skye terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family.", img: "/history/breeds/Isle of Skye earth dogs.jpg", value: 40 }
     ]
   },
 
@@ -320,7 +320,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
     children: [
       { name: "Old Highland terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye terrier stock", note: "The long-coated island terriers from the same rootstock.", img: "/history/breeds/skye-terrier-photo.webp", value: 40 }
+      { name: "Skye terrier stock", note: "The long-coated island terriers from the same rootstock.", img: "/history/breeds/Isle of Skye earth dogs.jpg", value: 40 }
     ]
   },
 
@@ -329,7 +329,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A long-bodied terrier of the Anglo-Scottish border with a soft topknot, named after a character in a Walter Scott novel.",
     children: [
       { name: "Old Border terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone.", img: "/history/breeds/border-terrier-photo.jpg", value: 65 },
-      { name: "Skye terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape.", img: "/history/breeds/skye-terrier-photo.webp", value: 20 },
+      { name: "Skye terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape.", img: "/history/breeds/Isle of Skye earth dogs.jpg", value: 20 },
       { name: "Otterhound", note: "A little hound blood is thought to have added size and the soft coat.", img: "/history/breeds/otterhound-photo.jpg", value: 15 }
     ]
   },
@@ -412,7 +412,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cairn Terrier",
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
-      { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'.", img: "/history/breeds/skye-terrier-photo.webp", value: 55 },
+      { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'.", img: "/history/breeds/Isle of Skye earth dogs.jpg", value: 55 },
       { name: "Highland mainland terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie.", img: "/history/breeds/scottish-terrier-image.jpg", value: 45 }
     ]
   },
@@ -452,7 +452,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Paisley Terrier",
     note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
     children: [
-      { name: "Skye terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from.", img: "/history/breeds/skye-terrier-photo.webp", value: 65 },
+      { name: "Skye terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from.", img: "/history/breeds/Isle of Skye earth dogs.jpg", value: 65 },
       { name: "Old Highland terriers", note: "The working Scottish terriers behind the silky Clydeside strains.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 35 }
     ]
   },
