@@ -311,7 +311,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
     children: [
       { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Isle of Skye earth dogs", note: "Hardy island dogs bred to bolt fox, otter and badger from the rocks.", img: "/history/breeds/scottish-terrier-image.jpg", value: 40 }
+      { name: "Skye terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family.", img: "/history/breeds/skye-terrier-photo.webp", value: 40 }
     ]
   },
 
@@ -413,7 +413,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
       { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'.", img: "/history/breeds/skye-terrier-photo.webp", value: 55 },
-      { name: "Highland mainland terriers", note: "The old Highland earth-dog stock shared with the Scottie and Westie.", img: "/history/breeds/scottish-terrier-image.jpg", value: 45 }
+      { name: "Highland mainland terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie.", img: "/history/breeds/scottish-terrier-image.jpg", value: 45 }
     ]
   },
 
