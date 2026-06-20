@@ -27,19 +27,19 @@ type Bar = {
 
 // RVC VetCompass (O'Neill et al. 2023), UK 2019 demography.
 const ALL_AGES: Bar[] = [
-  { name: "Labrador Retriever", short: "Labrador", pct: 6.9, img: "/lab-square.jpg" },
+  { name: "Labrador Retriever", short: "Labrador", pct: 6.9, img: "/lab-square.png" },
   { name: "Jack Russell Terrier", short: "Jack Russell", pct: 4.5, img: "/jack-russel-square.jpg" },
-  { name: "English Cocker Spaniel", short: "Cocker", pct: 4.3, img: "/cocker-square.jpg" },
-  { name: "Staffordshire Bull Terrier", short: "Staffy", pct: 4.2, img: "/staffy-square.jpg" },
-  { name: "Chihuahua", pct: 3.6, img: "/Chihuahua-square.jpg" },
+  { name: "English Cocker Spaniel", short: "Cocker", pct: 4.3, img: "/cocker-square.png" },
+  { name: "Staffordshire Bull Terrier", short: "Staffy", pct: 4.2, img: "/staffy-square.png" },
+  { name: "Chihuahua", pct: 3.6, img: "/Chihuahua-square.png" },
 ];
 
 const PUPPIES: Bar[] = [
-  { name: "French Bulldog", short: "Frenchies", pct: 7.0, img: "/frenchy0square.jpg" },
-  { name: "Cockapoo", pct: 6.2, img: "/Cockapoo-square.jpg" },
-  { name: "Labrador Retriever", short: "Labrador", pct: 5.8, img: "/lab-square.jpg" },
-  { name: "English Cocker Spaniel", short: "Cocker", pct: 4.7, img: "/cocker-square.jpg" },
-  { name: "Chihuahua", pct: 4.2, img: "/Chihuahua-square.jpg" },
+  { name: "French Bulldog", short: "Frenchies", pct: 7.0, img: "/frenchy-square.png" },
+  { name: "Cockapoo", pct: 6.2, img: "/cockapoo-square.png" },
+  { name: "Labrador Retriever", short: "Labrador", pct: 5.8, img: "/lab-square.png" },
+  { name: "English Cocker Spaniel", short: "Cocker", pct: 4.7, img: "/cocker-square.png" },
+  { name: "Chihuahua", pct: 4.2, img: "/Chihuahua-square.png" },
 ];
 
 // The rarest breeds in the pack, by estimated share of the UK dog population.
@@ -48,11 +48,11 @@ const PUPPIES: Bar[] = [
 // `w` is the bar width (%); the labels carry the true estimated share. Bars are
 // scaled up for legibility so the breed name sits inside the bar.
 const RARE: Bar[] = [
-  { name: "Bloodhound", pct: 0.004, label: "0.004%", w: 34, img: "/bloodhound-square.jpg" },
+  { name: "Bloodhound", pct: 0.004, label: "0.004%", w: 34, img: "/bloodhound-square.png" },
   { name: "Mastiff", pct: 0.007, label: "0.007%", w: 42, img: "/mastiff-square.jpg" },
   { name: "Irish Wolfhound", short: "Wolfhound", pct: 0.01, label: "0.01%", w: 50, img: "/Irish Wolfhound-square.jpg" },
   { name: "English Setter", pct: 0.019, label: "0.019%", w: 56, img: "/english-setter-square.jpg" },
-  { name: "Old English Sheepdog", short: "Old English", pct: 0.024, label: "0.024%", w: 70, img: "/old-english-square.jpg" },
+  { name: "Old English Sheepdog", short: "Old English", pct: 0.024, label: "0.024%", w: 70, img: "/old-english-square.png" },
 ];
 
 const MAX_PCT = 7.0; // longest common-breed bar = French Bulldog 7.0%

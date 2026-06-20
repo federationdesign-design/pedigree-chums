@@ -125,6 +125,29 @@ export default function PackPit() {
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#f6ecd6", img, prop: "bone", family: null, ping: 0 };
           return b;
         }
+        if (prop.shape === "slipper" || prop.shape === "bowl") {
+          // Same idea as the bone: trace the silhouette with a few primitives so
+          // objects meet the actual shape, not the empty corners of a box. The
+          // collider centre lands off the art box, so plugin.ox/oy nudges the
+          // drawn image back over it.
+          const bw = prop.width, bh = prop.width / prop.aspect;
+          const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
+          const VB = prop.shape === "slipper" ? { w: 1110.4, h: 411.3 } : { w: 1031.7, h: 316.8 };
+          const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
+          const R = (vx: number, vy: number, w: number, h: number) =>
+            Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, po);
+          const C = (vx: number, vy: number, r: number) =>
+            Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
+          const parts =
+            prop.shape === "slipper"
+              ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
+              : [R(549, 78, 760, 150), R(513, 222, 1010, 150)]; // narrow top, wider bottom of the tray
+          const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+          const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
+          if (prop.angle) Body.setAngle(b, prop.angle);
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox, oy };
+          return b;
+        }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
         const bw = prop.width, bh = prop.width / ar;
         const b: any = Bodies.rectangle(x, y, bw, bh, { angle: prop.angle || 0, chamfer: { radius: Math.min(bw, bh) * 0.18 }, restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008, render: { visible: false } });
@@ -305,6 +328,9 @@ export default function PackPit() {
         ctx.save(); ctx.globalAlpha = alpha;
         ctx.translate(p.x, p.y); ctx.rotate(b.angle);
         if (b.plugin.prop) {
+          // shaped colliders sit off-centre from the art box, so nudge the image
+          // back over the silhouette (defaults to 0 for the simple shapes)
+          ctx.translate(b.plugin.ox || 0, b.plugin.oy || 0);
           const pw = b.plugin.w, ph = b.plugin.h;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
           if (img && img.complete && img.naturalWidth) {
