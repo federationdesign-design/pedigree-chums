@@ -936,9 +936,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "North Country Beagle",
     note: "An extinct, faster, sharper-nosed beagle of northern England, eventually folded into the modern Beagle.",
     children: [
-      { name: "Old Beagles", note: "The small southern hare-hounds at its core.", img: "/history/breeds/beagle-photo.jpg", value: 50 },
-      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
-      { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
+      { name: "Southern Hound", note: "The deep-nosed southern hare-hound stock at its core.", img: "/history/breeds/Southern-Hound.jpg", value: 60 },
+      { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
     ]
   },
 
