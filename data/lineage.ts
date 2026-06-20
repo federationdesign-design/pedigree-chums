@@ -421,7 +421,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lakeland Terrier",
     note: "A fell terrier from the Lake District, bred to follow fox over the crags and go to ground without flinching.",
     children: [
-      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 50 },
+      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 30 },
+      { name: "Old wirehaired fell terriers", note: "The wiry-coated strain of fell terrier behind its broken jacket.", img: "/history/breeds/Old-wirehaired-fell-terrier.jpg", value: 20 },
       { name: "Bedlington Terrier", note: "A near neighbour that lent coat and line.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 25 },
       { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
     ]
@@ -840,7 +841,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct, short-legged kitchen dog bred to trot inside a wheel and turn the roasting spit over the fire.",
     children: [
       { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it.",  value: 60 },
-      { name: "Farm and kitchen curs", note: "The everyday working mongrels of the household.",  value: 40 }
+      { name: "Farm and kitchen curs", note: "The everyday kitchen curs and household mongrels it was bred down from.", img: "/history/breeds/Farm-and-kitchen-curs.jpg", value: 40 }
     ]
   },
 
