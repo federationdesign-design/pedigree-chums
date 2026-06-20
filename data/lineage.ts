@@ -328,7 +328,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dandie Dinmont Terrier",
     note: "A long-bodied terrier of the Anglo-Scottish border with a soft topknot, named after a character in a Walter Scott novel.",
     children: [
-      { name: "Old Border terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone.", img: "/history/breeds/border-terrier-photo.jpg", value: 65 },
+      { name: "Old Border terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone.", img: "/history/breeds/Old-Border-terriers.jpg", value: 65 },
       { name: "Skye terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
       { name: "Otterhound", note: "A little hound blood is thought to have added size and the soft coat.", img: "/history/breeds/otterhound-photo.jpg", value: 15 }
     ]
@@ -356,7 +356,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bedlington Terrier",
     note: "A lithe, lamb-like terrier from the Northumberland mining country, once called the Rothbury or Rodbury Terrier and prized by poachers.",
     children: [
-      { name: "Old Border terriers", note: "The local working terriers of the Rothbury and border country.", img: "/history/breeds/border-terrier-photo.jpg", value: 50 },
+      { name: "Old Border terriers", note: "The local working terriers of the Rothbury and border country.", img: "/history/breeds/Old-Border-terriers.jpg", value: 50 },
       { name: "Whippet", note: "Brought in for speed and the arched, racy back.", img: "/history/breeds/whippet-photo.jpg", value: 30 },
       { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 20 }
     ]
