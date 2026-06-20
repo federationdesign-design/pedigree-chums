@@ -123,8 +123,8 @@ export default function BreedStrip({ era }: { era: string }) {
       const hold = Math.min(holdDistance(), max);
       const rect = wrap.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      const start = vh * 0.9; // begin as the strip top passes 90% down screen
-      const end = vh * 0.4; //   finish by the time it reaches 40%
+      const start = vh * 0.5; // begin only once the strip reaches mid screen
+      const end = vh * 0.15; //  finish as it nears the top
       if (rect.top > start) return; // not entered yet, leave the rail at rest
       const p = (start - rect.top) / (start - end);
       const clamped = Math.max(0, Math.min(1, p));
