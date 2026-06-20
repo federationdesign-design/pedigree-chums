@@ -76,9 +76,9 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Black and Tan Terrier",
         note: "Gave the sleek coat, the tan points and the terrier fire. This is the Manchester Terrier line.",
-        img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg",
+        img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
         children: [
-          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 14 },
+          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 14 },
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
         ]
       },
@@ -192,7 +192,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A classic bull-and-terrier, bred in the Black Country by crossing the old bulldog with game local terriers for grip and gameness.",
     children: [
       { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 55 },
-      { name: "Old English Black and Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 }
+      { name: "Old English Black and Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 45 }
     ]
   },
 
@@ -202,7 +202,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Paisley Terrier", note: "A long-coated Scottish terrier that gave the silky, flowing coat.", img: "/history/breeds/Paisley-Terrier=photo.jpg", value: 45 },
       { name: "Skye Terrier", note: "Another Scottish terrier behind the long, fine hair.", img: "/history/breeds/skye-terrier-photo.webp", value: 30 },
-      { name: "Old English Black and Tan Terrier", note: "Local ratting terriers that brought the size down and the colour in.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 25 }
+      { name: "Old English Black and Tan Terrier", note: "Local ratting terriers that brought the size down and the colour in.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 25 }
     ]
   },
 
@@ -231,7 +231,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The poor man's racehorse. Northern miners bred a pocket-sized sighthound for weekend racing and rabbit coursing.",
     children: [
       { name: "Greyhound", note: "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.", img: "/greyhound-square.jpg", value: 62 },
-      { name: "Old English Black and Tan Terrier", note: "Added grit and gameness for the rabbit-coursing the early dogs were bred for.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 23 },
+      { name: "Old English Black and Tan Terrier", note: "Added grit and gameness for the rabbit-coursing the early dogs were bred for.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 23 },
       { name: "Italian Greyhound", note: "A later refinement for the elegant, fine-boned outline.", img: "/italian-greyhound-square.jpg", value: 15 }
     ]
   },
@@ -312,7 +312,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Skye Terrier",
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
     children: [
-      { name: "Ancient Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 60 },
+      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 60 },
       { name: "Isle of Skye earth dogs", note: "Hardy island dogs bred to bolt fox, otter and badger from the rocks.", img: "/history/breeds/scottish-terrier-image.jpg", value: 40 }
     ]
   },
@@ -368,7 +368,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Welsh Terrier",
     note: "A wiry black-and-tan terrier from Wales, bred to face fox, otter and badger underground.",
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 75 },
+      { name: "Old English Black and Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 75 },
       { name: "Old fell terriers", note: "Hardy broken-coated working terriers of the hills.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 25 }
     ]
   },
@@ -387,7 +387,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A pricked-ear white terrier, a short-lived show breed drawn from Britain's old white working terriers, now extinct.",
     children: [
       { name: "Old English White Terrier", note: "The white-bodied fox-working terriers found across Britain since the 1700s.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 60 },
-      { name: "Old English Black and Tan Terrier", note: "The broader old black-and-tan terrier stock behind it.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
+      { name: "Old English Black and Tan Terrier", note: "The broader old black-and-tan terrier stock behind it.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 40 }
     ]
   },
 
@@ -395,7 +395,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Airedale Terrier",
     note: "The 'King of Terriers', the largest of them all, made in Yorkshire's Aire valley to hunt otter and water rat.",
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The broken-coated working terrier that gave its terrier grit.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 60 },
+      { name: "Old English Black and Tan Terrier", note: "The broken-coated working terrier that gave its terrier grit.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
       { name: "Otterhound", note: "Crossed in for size, a good nose and a love of water.", img: "/history/breeds/otterhound-photo.jpg", value: 40 }
     ]
   },
@@ -433,7 +433,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Fox Terrier",
     note: "The classic earth dog of the foxhunt, carried to the field to bolt the fox when it went to ground.",
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 },
+      { name: "Old English Black and Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 45 },
       { name: "English White Terrier", note: "Lent the predominantly white, easy-to-see coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 25 },
       { name: "Beagle", note: "A dash of hound for nose and cry.", img: "/beagle-square.jpg", value: 15 },
       { name: "Bull Terrier", note: "A touch of bull blood for grit.", img: "/bull-terrier-square.jpg", value: 15 }
@@ -445,7 +445,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A miniature black-and-tan, the toy version of the Manchester Terrier, once a champion rat-pit performer.",
     children: [
       { name: "Manchester Terrier", note: "The black-and-tan ratter it was bred down from.", img: "/history/breeds/manchester-terrior.jpg", value: 70 },
-      { name: "Black and Tan Terrier", note: "The older working terrier behind the Manchester.", img: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg", value: 30 }
+      { name: "Black and Tan Terrier", note: "The older working terrier behind the Manchester.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 30 }
     ]
   },
 
@@ -463,7 +463,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The 'daredevil' of Ireland, a fiery red terrier and one of the four native Irish terrier breeds.",
     children: [
       { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
-      { name: "Old English Black and Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
+      { name: "Old English Black and Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 40 }
     ]
   },
 
@@ -538,7 +538,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
       { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability.", img: "/history/breeds/rough-collie-photo.jpg", value: 30 },
-      { name: "Old English Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 20 }
+      { name: "Old English Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 20 }
     ]
   },
 
@@ -741,7 +741,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
     children: [
       { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
+      { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old scenting hounds.jpg", value: 40 }
     ]
   },
 
@@ -759,7 +759,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
     children: [
       { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
+      { name: "Old scenting hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old scenting hounds.jpg", value: 40 }
     ]
   },
 
@@ -786,7 +786,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
     children: [
       { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
+      { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old scenting hounds.jpg", value: 40 }
     ]
   },
 
@@ -794,7 +794,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Buckhound",
     note: "A medieval scenting hound kept to hunt buck and fallow deer, sitting between the staghound and the harrier.",
     children: [
-      { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 60 },
+      { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Old scenting hounds.jpg", value: 60 },
       { name: "Talbot hounds", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
     ]
   },

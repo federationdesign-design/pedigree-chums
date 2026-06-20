@@ -42,7 +42,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "English Setter", strip: "c1700", era: "1700s", anchor: 1730, note: "Feathered bird dog that 'sets' low before the gun.", image: "/history/breeds/english_setter-photo.jpg", tag: "endangered" },
   { name: "Dandie Dinmont Terrier", strip: "c1700", era: "1700s", anchor: 1740, note: "Distinctive terrier with a soft top-knot, from the Borders.", image: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", tag: "endangered" },
   { name: "Clumber Spaniel", strip: "c1700", era: "1700s", anchor: 1750, note: "Heavy, stately gundog spaniel of the English aristocracy.", image: "/history/breeds/clumber-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped cattle heels and ducked the kick.", image: "/history/breeds/Cur-dog-drawing.jpg", tag: "extinct" },
+  { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped cattle heels and ducked the kick.", image: "/history/breeds/cur-dog.jpg", tag: "extinct" },
 
   // The early 1800s
   { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/history/breeds/beagle-photo.jpg" },
@@ -114,7 +114,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Rache", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack, an old type whose name fell from use as foxhounds and beagles emerged.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "ancient-medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck, lighter and faster than the great staghounds.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
   { name: "Southern Hound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot, absorbed into the foxhound and beagle packs that replaced it.", tag: "extinct", image: "/history/breeds/Southern-Hound.jpg" },
-  { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, the working ancestor behind the fell terriers and the Welsh Terrier.", tag: "extinct", image: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg" },
+  { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, the working ancestor behind the fell terriers and the Welsh Terrier.", tag: "extinct", image: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg" },
   { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hunting hound bred away into the modern Beagle by the early 1800s.", tag: "extinct", image: "/history/breeds/North-Country-Beagle-illustration.jpg" },
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, close kin to the Bearded Collie, lost as smooth-coated collies took the farms.", tag: "extinct", image: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg" },
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky-coated Scottish show terrier bred from the Skye Terrier, and the direct forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
