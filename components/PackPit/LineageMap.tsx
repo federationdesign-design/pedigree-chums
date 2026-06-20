@@ -26,7 +26,7 @@ const SPREADN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
-const CARD = 82;
+const CARD = 164;
 
 function sumLeaves(n: LineageNode): number {
   const c = n.children || [];

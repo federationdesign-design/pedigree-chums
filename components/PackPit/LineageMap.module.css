@@ -22,7 +22,7 @@
 }
 .close {
   position: fixed;
-  top: 28px;
+  top: 33px;
   right: clamp(18px, 4vw, 48px);
   width: 52px;
   height: 52px;
