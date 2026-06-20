@@ -31,45 +31,48 @@ function easeOutBounce(x: number): number {
 // top-level circles into a tall-screen arrangement (2 stacked, 3 a triangle, 4 a
 // grid) and scale each subtree to match, so they load far bigger and easier to
 // read. Counts above 4 keep the packed layout.
+// On mobile a square packing leaves the circles small. We keep d3's organic,
+// value-proportional, edge-touching arrangement (so the dominant breed reads
+// large and the cluster stays connected) but rotate it so its long axis runs
+// down the screen and scale it to fill the tall stage. The result is the
+// masonry look: big circles nestled together, filling the portrait.
 function relayoutMobile(nodes: Node[], aspect: number) {
   const root = nodes[0];
   const kids = root.children ?? [];
   const n = kids.length;
-  if (n < 1 || n > 4) return;
+  if (n < 1) return;
   const FW = SIZE;
-  // Use the real (tall) stage height so circles fill it rather than a fixed cap,
-  // clamped so very tall or near-square stages stay sensible.
-  const FH = SIZE / Math.min(Math.max(aspect, 0.42), 0.85);
-  const GAP = 34;
-  const LAB = 92; // room kept beyond a circle for its label
-  const WMAX = FW * 0.49; // a circle may span almost the full width, edge to edge
-  let slots: { x: number; y: number; r: number }[];
+  const FH = SIZE / Math.min(Math.max(aspect, 0.42), 0.95);
+  const ox = root.x, oy = root.y;
+  const pts = nodes.map((d) => ({ d, x: d.x - ox, y: d.y - oy }));
   if (n === 1) {
-    const r = Math.min(WMAX, (FH - 2 * LAB) / 2);
-    slots = [{ x: 0, y: 0, r }];
-  } else if (n === 2) {
-    const r = Math.min(WMAX, (FH - GAP - 2 * LAB) / 4);
-    const d = r + GAP / 2;
-    slots = [{ x: 0, y: -d, r }, { x: 0, y: d, r }];
-  } else if (n === 3) {
-    const r = Math.min((FW - GAP) / 4, (FH - 2 * LAB - GAP) / 4);
-    const dx = r + GAP / 2;
-    slots = [{ x: 0, y: -(r + LAB * 0.4), r }, { x: -dx, y: r + GAP / 2, r }, { x: dx, y: r + GAP / 2, r }];
-  } else {
-    const r = Math.min((FW - GAP) / 4, (FH - GAP - 2 * LAB) / 4);
-    const dx = r + GAP / 2;
-    const dy = r + GAP / 2 + LAB * 0.3;
-    slots = [{ x: -dx, y: -dy, r }, { x: dx, y: -dy, r }, { x: -dx, y: dy, r }, { x: dx, y: dy, r }];
-  }
-  kids.forEach((kid, i) => {
-    const slot = slots[i];
-    const s = slot.r / kid.r;
-    const ox = kid.x, oy = kid.y;
-    kid.descendants().forEach((d) => {
-      d.x = slot.x + (d.x - ox) * s;
-      d.y = slot.y + (d.y - oy) * s;
-      d.r = d.r * s;
+    const s = Math.min(FW * 0.5, FH * 0.46) / kids[0].r;
+    pts.forEach((p) => {
+      p.d.x = p.x * s;
+      p.d.y = p.y * s;
+      p.d.r = p.d.r * s;
     });
+    root.x = 0; root.y = 0; root.r = FW / (2 * PAD);
+    return;
+  }
+  const d1 = pts.filter((p) => p.d.depth === 1);
+  const w0 = Math.max(...d1.map((p) => p.x)) - Math.min(...d1.map((p) => p.x));
+  const h0 = Math.max(...d1.map((p) => p.y)) - Math.min(...d1.map((p) => p.y));
+  // turn a wide cluster on its side so the long axis runs down the portrait
+  if (w0 > h0) pts.forEach((p) => { const t = p.x; p.x = p.y; p.y = -t; });
+  const minX = Math.min(...d1.map((p) => p.x - p.d.r));
+  const maxX = Math.max(...d1.map((p) => p.x + p.d.r));
+  const minY = Math.min(...d1.map((p) => p.y - p.d.r));
+  const maxY = Math.max(...d1.map((p) => p.y + p.d.r));
+  const bw = maxX - minX, bh = maxY - minY;
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const M = 20;
+  // fill the height, but cap how far circles may spill past the side edges
+  const scale = Math.min((FH - M) / bh, (FW * 1.12) / bw);
+  pts.forEach((p) => {
+    p.d.x = (p.x - cx) * scale;
+    p.d.y = (p.y - cy) * scale;
+    p.d.r = p.d.r * scale;
   });
   root.x = 0;
   root.y = 0;
@@ -106,6 +109,8 @@ export default function BreedTree({
   const stageRef = useRef<HTMLDivElement>(null);
   const circlesRef = useRef<SVGGElement>(null);
   const labelsRef = useRef<SVGGElement>(null);
+  const isMobileRef = useRef(false);
+  isMobileRef.current = isMobile;
   const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD]);
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
@@ -147,20 +152,25 @@ export default function BreedTree({
           // The focused circle's own label sits at its centre.
           l.setAttribute("transform", "translate(0,0)");
         } else {
-          // Child labels sit above or below their circle (never to the side, so
-          // they do not run off the narrow horizontal edges), centred on the
-          // circle and clamped to stay inside the canvas.
           const childR = d.r * k;
-          const vbWl = aspect >= 1 ? SIZE * aspect : SIZE;
-          const vbHl = aspect >= 1 ? SIZE : SIZE / aspect;
-          const xMinl = aspect >= 1 ? -vbWl * SHIFT : -vbWl / 2;
-          const margin = 120;
-          const lx = Math.max(xMinl + margin, Math.min(xMinl + vbWl - margin, tx));
-          // sit the label clear of the circle (was tight enough to touch), and
-          // keep the whole label inside the canvas top and bottom
-          let ly = ty < 0 ? ty - childR - 70 : ty + childR + 70;
-          ly = Math.max(-vbHl / 2 + 60, Math.min(vbHl / 2 - 110, ly));
-          l.setAttribute("transform", `translate(${lx},${ly})`);
+          if (isMobileRef.current) {
+            // circles touch and vary in size, so the label sits centred on its
+            // circle and scales with it (small circle, small label)
+            const ls = Math.max(0.4, Math.min(1.25, childR / 250));
+            l.setAttribute("transform", `translate(${tx},${ty}) scale(${ls})`);
+          } else {
+            // Desktop: labels sit above or below their circle (never to the side,
+            // so they do not run off the narrow horizontal edges), centred and
+            // clamped to stay inside the canvas.
+            const vbWl = aspect >= 1 ? SIZE * aspect : SIZE;
+            const vbHl = aspect >= 1 ? SIZE : SIZE / aspect;
+            const xMinl = aspect >= 1 ? -vbWl * SHIFT : -vbWl / 2;
+            const margin = 120;
+            const lx = Math.max(xMinl + margin, Math.min(xMinl + vbWl - margin, tx));
+            let ly = ty < 0 ? ty - childR - 70 : ty + childR + 70;
+            ly = Math.max(-vbHl / 2 + 60, Math.min(vbHl / 2 - 110, ly));
+            l.setAttribute("transform", `translate(${lx},${ly})`);
+          }
         }
       }
     });
