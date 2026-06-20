@@ -704,7 +704,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dumfriesshire Hound",
     note: "A pack of big black-and-tan foxhounds bred in Dumfriesshire after the First World War, kept working until the pack was disbanded in 2001.",
     children: [
-      { name: "English Foxhound", note: "The foxhound base for the pack.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 50 },
+      { name: "English Foxhound", note: "The foxhound base for the pack.", img: "/history/breeds/english-foxhound.jpg", value: 50 },
       { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan.", img: "/history/breeds/bloodhound-photo.jpg", value: 50 }
     ]
   },
@@ -851,7 +851,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A large hound kept to hunt red deer, built up from the old scenting hounds and later from the foxhound packs.",
     children: [
       { name: "Southern Hound", note: "The heavy deer-hunting scent hound at its base.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 45 },
-      { name: "English Foxhound", note: "Pack-hound blood for pace and a long day's work.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 35 },
+      { name: "English Foxhound", note: "Pack-hound blood for pace and a long day's work.", img: "/history/breeds/english-foxhound.jpg", value: 35 },
       { name: "Buckhound", note: "The royal deer hound in its background.", img: "/history/breeds/Buckhound-illustration.jpg", value: 20 }
     ]
   },
@@ -897,7 +897,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pointer",
     note: "A lean, fast bird dog that freezes on point to mark hidden game, refined in England from the heavy old Spanish Pointer.",
     children: [
-      { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 30 },
+      { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/bloodhound-photo.jpg", value: 25 },
       { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/english_setter-photo.jpg", value: 20 }
@@ -928,7 +928,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
     children: [
       { name: "Herding collies", note: "Sheep- and cattle-droving blood for the work.", img: "/history/breeds/Border_Collie_photo.jpg", value: 55 },
-      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock.", img: "/history/breeds/bulldog-image.jpg", value: 45 }
+      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
     ]
   },
 
