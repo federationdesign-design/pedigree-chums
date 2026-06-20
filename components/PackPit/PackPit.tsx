@@ -411,7 +411,12 @@ export default function PackPit() {
       };
       let motionOn = false, motionAsking = false;
       const askPerm = (E: any) => (E && typeof E.requestPermission === "function") ? E.requestPermission().catch(() => "denied") : Promise.resolve("granted");
+      const lockPortrait = () => {
+        const so: any = (screen as any).orientation;
+        if (so && typeof so.lock === "function") so.lock("portrait").catch(() => {}); // works on Android / installed PWA; iOS Safari ignores it
+      };
       const enableMotion = () => {
+        lockPortrait(); // attempt the lock on the same gesture
         if (motionOn || motionAsking) return;
         motionAsking = true;
         Promise.all([askPerm((window as any).DeviceMotionEvent), askPerm((window as any).DeviceOrientationEvent)]).then(([m, o]: any[]) => {
@@ -466,15 +471,18 @@ export default function PackPit() {
       aria-label="The Pack Pit: tip out all the chums and play"
     >
       <div className={styles.controls}>
-        <span className={styles.help}><b>Drag</b> to pick up</span>
-        <span className={styles.help}><b>Click</b> for the family tree</span>
-        <span className={styles.help}><b>Double-click</b> to ping</span>
         <button type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); }} aria-label="Shake the pit">
           <span className={styles.shakeIcon} aria-hidden="true" />
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} />}
+      <div className={styles.rotateGuard} aria-hidden="true">
+        <div className={styles.rotateInner}>
+          <span className={styles.rotatePhone} />
+          <p>Turn your phone upright<br />to keep playing</p>
+        </div>
+      </div>
     </section>
   );
 }
