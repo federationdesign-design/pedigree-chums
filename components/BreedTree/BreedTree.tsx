@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { hierarchy, pack, type HierarchyCircularNode } from "d3-hierarchy";
+import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import styles from "./BreedTree.module.css";
@@ -36,6 +36,47 @@ function easeOutBounce(x: number): number {
 // large and the cluster stays connected) but rotate it so its long axis runs
 // down the screen and scale it to fill the tall stage. The result is the
 // masonry look: big circles nestled together, filling the portrait.
+// Make every top-level ancestor circle sized by its own share, not by how its
+// grafted progenitors happen to pack. d3 sizes an internal circle by enclosing
+// its children, so a branch that grafts into many small circles can swell past
+// a higher-share branch with fewer. We re-pack the top ring with radii
+// proportional to sqrt(value) and scale each subtree to match, so the 50/30/20
+// labels and the circle sizes finally agree. Runs before any mobile relayout so
+// phones inherit the corrected proportions.
+function normalizeTop(nodes: Node[]) {
+  const root = nodes[0];
+  const d1 = nodes.filter((n) => n.depth === 1);
+  if (!root || d1.length < 2) return;
+  const circles = d1.map((n) => ({
+    x: 0,
+    y: 0,
+    r: Math.sqrt(Math.max(n.value ?? 0, 0.0001)),
+    node: n,
+  }));
+  packSiblings(circles);
+  const enc = packEnclose(circles);
+  if (!enc || enc.r <= 0) return;
+  const target = SIZE / 2 - PAD;
+  const s = target / enc.r;
+  for (const c of circles) {
+    const nx = (c.x - enc.x) * s + SIZE / 2;
+    const ny = (c.y - enc.y) * s + SIZE / 2;
+    const nr = c.r * s;
+    const n = c.node;
+    const k = nr / n.r;
+    const ox = n.x;
+    const oy = n.y;
+    n.descendants().forEach((d) => {
+      d.x = (d.x - ox) * k + nx;
+      d.y = (d.y - oy) * k + ny;
+      d.r = d.r * k;
+    });
+  }
+  root.x = SIZE / 2;
+  root.y = SIZE / 2;
+  root.r = target;
+}
+
 function relayoutMobile(nodes: Node[], aspect: number) {
   const root = nodes[0];
   const kids = root.children ?? [];
@@ -103,6 +144,7 @@ export default function BreedTree({
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
+    normalizeTop(ns);
     if (isMobile) relayoutMobile(ns, aspectKey);
     return ns;
   }, [root, isMobile, aspectKey]);

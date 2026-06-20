@@ -549,7 +549,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Greyhound", note: "The foundation of nearly every running dog.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
       { name: "Whippet", note: "Added for nimble, sprinting pace.", img: "/history/breeds/whippet-photo.jpg", value: 25 },
-      { name: "Deerhound", note: "Bigger sighthound blood for stamina over rough ground.", img: "/history/breeds/ScottishDeerhound-photo.avif", value: 25 }
+      { name: "Deerhound", note: "Bigger sighthound blood for stamina over rough ground.", img: "/history/breeds/Medieval-Scottish-Deerhound.jpg", value: 25 }
     ]
   },
 

@@ -24,7 +24,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "ancient-medieval", era: "Medieval", anchor: 1250, note: "Ancient Welsh cattle dog, the older of the two corgi breeds.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
   { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/bloodhound-photo.jpg", tag: "endangered" },
-  { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/ScottishDeerhound-photo.avif", tag: "endangered" },
+  { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
   // The 1500s and 1600s
   { name: "Old English Bulldog", strip: "c1500", era: "1500s", anchor: 1550, note: "Stocky bull-baiting dog, ancestor of today's Bulldog.", image: "/history/breeds/Old-English-Bulldog.jpg", tag: "extinct" },
@@ -111,7 +111,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Goldendoodle", strip: "crosses", era: "1990s", anchor: 2010, note: "Golden Retriever crossed with a Poodle.", image: "/goldendoodle-square.png", tag: "trending" },
   { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 2012, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.png", tag: "trending" },
   { name: "Celtic Hound", strip: "ancient-medieval", era: "Ancient", anchor: 80, note: "Ancient war and hunting sighthound of the Celtic tribes, remembered as the legendary forebear of the Irish Wolfhound and Scottish Deerhound.", tag: "extinct", image: "/history/breeds/celtic-hound-remake.jpg" },
-  { name: "Rache", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack, an old type whose name fell from use as foxhounds and beagles emerged.", tag: "extinct", image: "/history/breeds/rache-illustration.jpg" },
+  { name: "Rache", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack, an old type whose name fell from use as foxhounds and beagles emerged.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "ancient-medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck, lighter and faster than the great staghounds.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
   { name: "Southern Hound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot, absorbed into the foxhound and beagle packs that replaced it.", tag: "extinct", image: "/history/breeds/Southern_Hound-drawing.jpg" },
   { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, the working ancestor behind the fell terriers and the Welsh Terrier.", tag: "extinct", image: "/history/breeds/Old_English_Black_and_Tan_Terrier-illustration.jpg" },
