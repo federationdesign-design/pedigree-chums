@@ -89,35 +89,59 @@ export default function BreedStrip({ era }: { era: string }) {
       driveRail(delta, () => e.preventDefault());
     };
 
-    // Touch devices never fire wheel, which is why the hold never ran on a
-    // phone. Mirror it from a vertical finger swipe; mostly sideways swipes
-    // fall through to the rail's own native scrolling.
-    let lastY = 0;
-    let lastX = 0;
-    const onTouchStart = (e: TouchEvent) => {
-      lastY = e.touches[0].clientY;
-      lastX = e.touches[0].clientX;
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      const y = e.touches[0].clientY;
-      const x = e.touches[0].clientX;
-      const dy = lastY - y;
-      const dx = lastX - x;
-      lastY = y;
-      lastX = x;
-      if (Math.abs(dy) <= Math.abs(dx)) return; // mostly sideways, leave it
-      driveRail(dy, () => e.preventDefault());
-    };
-
     wrap.addEventListener("wheel", onWheel, { passive: false });
-    wrap.addEventListener("touchstart", onTouchStart, { passive: true });
-    wrap.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("resize", onResize);
     return () => {
       wrap.removeEventListener("wheel", onWheel);
-      wrap.removeEventListener("touchstart", onTouchStart);
-      wrap.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  // Mobile has no wheel events, so the desktop hold never engages. Instead of
+  // fighting the touch gesture (which the browser wins), read the page's own
+  // vertical scroll and slide the rail sideways as the strip rises into view:
+  // advance the first few cards once, then release so finger swipes still work.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const el = railRef.current;
+    if (!wrap || !el) return;
+    if (!window.matchMedia("(pointer: coarse)").matches) return;
+
+    const holdDistance = () => {
+      const items = el.querySelectorAll<HTMLElement>("[data-node]");
+      if (items.length > 3) return items[3].offsetLeft - items[0].offsetLeft;
+      return el.clientWidth;
+    };
+
+    let done = false;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      if (done) return;
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 0) return; // nothing to scroll on this strip
+      const hold = Math.min(holdDistance(), max);
+      const rect = wrap.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const start = vh * 0.9; // begin as the strip top passes 90% down screen
+      const end = vh * 0.4; //   finish by the time it reaches 40%
+      if (rect.top > start) return; // not entered yet, leave the rail at rest
+      const p = (start - rect.top) / (start - end);
+      const clamped = Math.max(0, Math.min(1, p));
+      el.scrollLeft = clamped * hold;
+      if (clamped >= 1) done = true; // released, the reader owns it now
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
 
