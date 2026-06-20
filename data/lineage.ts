@@ -179,8 +179,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "West Highland Terrier",
     note: "Bred from the white pups of the Highland working terriers, kept apart on purpose so they would show up against the heather and rock.",
     children: [
-      { name: "Cairn Terrier", note: "The closest cousin, and the main source of the Westie's plucky working type.", img: "/history/breeds/cairn-terrier-photo.jpg", value: 64 },
-      { name: "Scottish Terrier", note: "Another of the old Highland terriers sharing the same rugged roots.", img: "/history/breeds/scottish-terrier-image.jpg", value: 22 },
+      { name: "Cairn Terrier", note: "The closest cousin, and the main source of the Westie's plucky working type.", img: "/history/breeds/cairns-terrier.jpg", value: 64 },
+      { name: "Scottish Terrier", note: "Another of the old Highland terriers sharing the same rugged roots.", img: "/history/breeds/Scottish-Terrier.jpg", value: 22 },
       { name: "Skye Terrier", note: "Part of the same west-coast terrier family that shaped the breed.", img: "/history/breeds/skye-terrier-photo.webp", value: 14 }
     ]
   },
