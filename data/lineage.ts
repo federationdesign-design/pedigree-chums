@@ -253,7 +253,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Wavy-Coated Retriever", note: "The yellow retriever at the heart of Tweedmouth's project.", img: "/history/breeds/flatcoated_retriever-photo.jpg", value: 45 },
       { name: "Tweed Water Spaniel", note: "A now-extinct local water dog that gave the gentle nature and love of water.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
       { name: "Irish Setter", note: "A dash of setter for the rich golden colour.", img: "/history/breeds/irish-setter-photo.jpg", value: 15 },
-      { name: "Bloodhound", note: "A little hound blood for tracking power and a good nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 10 }
+      { name: "Bloodhound", note: "A little hound blood for tracking power and a good nose.", img: "/history/breeds/modern-bloodhound.jpg", value: 10 }
     ]
   },
 
@@ -650,7 +650,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Scotland's black-and-tan setter, built up at the Duke of Gordon's kennels into a heavier, steady bird dog.",
     children: [
       { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/english_setter-photo.jpg", value: 65 },
-      { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 20 },
+      { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
       { name: "Collie", note: "A little collie for steadiness, by tradition.", img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
   },
@@ -705,7 +705,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A pack of big black-and-tan foxhounds bred in Dumfriesshire after the First World War, kept working until the pack was disbanded in 2001.",
     children: [
       { name: "English Foxhound", note: "The foxhound base for the pack.", img: "/history/breeds/english-foxhound.jpg", value: 50 },
-      { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan.", img: "/history/breeds/bloodhound-photo.jpg", value: 50 }
+      { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 50 }
     ]
   },
 
@@ -919,7 +919,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
     children: [
       { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 55 },
-      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight.", img: "/history/breeds/bloodhound-photo.jpg", value: 45 }
+      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
     ]
   },
 
@@ -1041,7 +1041,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Basset Hound",
     note: "A low set French scenthound bred short in the leg on purpose, so hunters could keep up with it on foot.",
     children: [
-      { name: "Bloodhound", note: "The St Hubert scent trailing line behind its nose, long ears and deep voice.", img: "/history/breeds/bloodhound.jpg", value: 55 },
+      { name: "Bloodhound", note: "The St Hubert scent trailing line behind its nose, long ears and deep voice.", img: "/history/breeds/modern-bloodhound.jpg", value: 55 },
       { name: "Basset Artesien Normand", note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset.", img: "/history/breeds/Basset-Artesien-Normand.jpg", value: 45 }
     ]
   },

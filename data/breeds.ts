@@ -247,7 +247,7 @@ const allBreeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/history/breeds/basset-hound.jpg",
+    image: "/basset-hound-square.png",
   },
   {
     name: "Cavalier King Charles Spaniel",
