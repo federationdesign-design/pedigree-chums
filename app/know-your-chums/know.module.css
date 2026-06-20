@@ -636,8 +636,12 @@
   }
   .familyCol {
     position: static;
-    height: 82vh;
+    height: 88vh;
     margin-top: 0;
+  }
+  /* lineage pop-up only: kill the frame padding so the circles run edge to edge */
+  .modalOverlaySolo {
+    padding: 8px 0 0;
   }
 }
 

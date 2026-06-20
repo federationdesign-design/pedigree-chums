@@ -38,7 +38,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   if (!mounted) return null;
 
   return createPortal(
-    <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={name}>
+    <div className={`${styles.modalOverlay} ${styles.modalOverlaySolo}`} onClick={onClose} role="dialog" aria-modal="true" aria-label={name}>
       <div className={`${styles.modalCard} ${styles.modalCardSolo}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.familyLead}>
           <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{name}</h3>

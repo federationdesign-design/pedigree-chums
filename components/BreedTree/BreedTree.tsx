@@ -31,21 +31,24 @@ function easeOutBounce(x: number): number {
 // top-level circles into a tall-screen arrangement (2 stacked, 3 a triangle, 4 a
 // grid) and scale each subtree to match, so they load far bigger and easier to
 // read. Counts above 4 keep the packed layout.
-function relayoutMobile(nodes: Node[]) {
+function relayoutMobile(nodes: Node[], aspect: number) {
   const root = nodes[0];
   const kids = root.children ?? [];
   const n = kids.length;
   if (n < 1 || n > 4) return;
   const FW = SIZE;
-  const FH = SIZE / 0.7; // designed for a portrait stage; labels clamp if it differs
-  const GAP = 44;
-  const LAB = 110; // room kept beyond a circle for its label
+  // Use the real (tall) stage height so circles fill it rather than a fixed cap,
+  // clamped so very tall or near-square stages stay sensible.
+  const FH = SIZE / Math.min(Math.max(aspect, 0.42), 0.85);
+  const GAP = 34;
+  const LAB = 92; // room kept beyond a circle for its label
+  const WMAX = FW * 0.49; // a circle may span almost the full width, edge to edge
   let slots: { x: number; y: number; r: number }[];
   if (n === 1) {
-    const r = Math.min(FW * 0.46, (FH - 2 * LAB) / 2);
+    const r = Math.min(WMAX, (FH - 2 * LAB) / 2);
     slots = [{ x: 0, y: 0, r }];
   } else if (n === 2) {
-    const r = Math.min(FW * 0.46, (FH - GAP - 2 * LAB) / 4);
+    const r = Math.min(WMAX, (FH - GAP - 2 * LAB) / 4);
     const d = r + GAP / 2;
     slots = [{ x: 0, y: -d, r }, { x: 0, y: d, r }];
   } else if (n === 3) {
@@ -85,14 +88,19 @@ export default function BreedTree({
   onClose?: () => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
+  const [aspect, setAspect] = useState(1);
+  // round so minor resizes (mobile address bar) don't re-pack the whole tree
+  const aspectKey = isMobile
+    ? Math.min(Math.max(Math.round(aspect * 20) / 20, 0.42), 0.85)
+    : 1;
   const nodes = useMemo<Node[]>(() => {
     const h = hierarchy<LineageNode>(root)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
-    if (isMobile) relayoutMobile(ns);
+    if (isMobile) relayoutMobile(ns, aspectKey);
     return ns;
-  }, [root, isMobile]);
+  }, [root, isMobile, aspectKey]);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -106,10 +114,6 @@ export default function BreedTree({
   const [hovered, setHovered] = useState<Node | null>(null);
   const [entered, setEntered] = useState(false);
   const [ready, setReady] = useState(false);
-  // Aspect ratio of the visible stage. The viewBox is widened to match it so
-  // the diagram uses the whole available canvas: the surrounding circles spread
-  // out into the extra space and stay in view instead of cropping at the edges.
-  const [aspect, setAspect] = useState(1);
 
   function nodeImg(d: Node): string | undefined {
     return d.depth === 0 ? rootImage ?? d.data.img : d.data.img;
