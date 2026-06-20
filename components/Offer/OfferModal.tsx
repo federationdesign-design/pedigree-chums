@@ -111,7 +111,7 @@ export default function OfferModal({
         </div>
 
         <h3 className={styles.title}>
-          Get <span className={styles.accent}>discount code</span> emailed
+          Get <span className={styles.accent}>discount code</span>
         </h3>
         {sent ? (
           <p className={styles.thanks}>
