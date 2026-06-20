@@ -253,7 +253,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Wavy-Coated Retriever", note: "The yellow retriever at the heart of Tweedmouth's project.", img: "/history/breeds/flatcoated_retriever-photo.jpg", value: 45 },
       { name: "Tweed Water Spaniel", note: "A now-extinct local water dog that gave the gentle nature and love of water.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
       { name: "Irish Setter", note: "A dash of setter for the rich golden colour.", img: "/history/breeds/irish-setter-photo.jpg", value: 15 },
-      { name: "Bloodhound", note: "A little hound blood for tracking power and a good nose.", img: "/history/breeds/bloodhound-photo.jpg", value: 10 }
+      { name: "Bloodhound", note: "A little hound blood for tracking power and a good nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 10 }
     ]
   },
 
@@ -650,7 +650,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Scotland's black-and-tan setter, built up at the Duke of Gordon's kennels into a heavier, steady bird dog.",
     children: [
       { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/english_setter-photo.jpg", value: 65 },
-      { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/bloodhound-photo.jpg", value: 20 },
+      { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 20 },
       { name: "Collie", note: "A little collie for steadiness, by tradition.", img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
   },
@@ -740,7 +740,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Talbot",
     note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
     children: [
-      { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/bloodhound-photo.jpg", value: 60 },
+      { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
       { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
     ]
   },
@@ -758,7 +758,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bloodhound",
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
     children: [
-      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/bloodhound-photo.jpg", value: 60 },
+      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
       { name: "Old scenting hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
     ]
   },
@@ -804,7 +804,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A heavy, slow, deep-voiced scent hound of southern England, ancestor of the foxhound, beagle and harrier.",
     children: [
       { name: "Talbot hounds", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
-      { name: "St Hubert Hound", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/bloodhound-photo.jpg", value: 40 }
+      { name: "St Hubert Hound", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 40 }
     ]
   },
 
@@ -821,7 +821,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Foxhound",
     note: "The classic pack hound of the hunt, bred for stamina, voice and a relentless nose over a long day's chase.",
     children: [
-      { name: "Southern Hound", note: "The deep-nosed scent hound at its foundation.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 50 },
+      { name: "Southern Hound", note: "The deep-nosed scent hound at its foundation.", img: "/history/breeds/Southern-Hound.jpg", value: 50 },
       { name: "Greyhound", note: "Added for speed and a cleaner, racier build.", img: "/history/breeds/original-greyhound.jpg", value: 30 },
       { name: "Talbot hound", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
     ]
@@ -831,8 +831,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Otterhound",
     note: "A big, rough-coated, web-footed scent hound bred to hunt otter in cold rivers, with a magnificent nose.",
     children: [
-      { name: "Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/bloodhound-photo.jpg", value: 45 },
-      { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 30 },
+      { name: "Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 },
+      { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
       { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 25 }
     ]
   },
@@ -850,7 +850,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Staghound",
     note: "A large hound kept to hunt red deer, built up from the old scenting hounds and later from the foxhound packs.",
     children: [
-      { name: "Southern Hound", note: "The heavy deer-hunting scent hound at its base.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 45 },
+      { name: "Southern Hound", note: "The heavy deer-hunting scent hound at its base.", img: "/history/breeds/Southern-Hound.jpg", value: 45 },
       { name: "English Foxhound", note: "Pack-hound blood for pace and a long day's work.", img: "/history/breeds/english-foxhound.jpg", value: 35 },
       { name: "Buckhound", note: "The royal deer hound in its background.", img: "/history/breeds/Buckhound-illustration.jpg", value: 20 }
     ]
@@ -861,7 +861,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A small, merry pack hound bred to hunt hare on foot, with a big voice and a busy nose.",
     children: [
       { name: "Talbot hound", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-hound.jpg", value: 40 },
-      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 35 },
+      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern-Hound.jpg", value: 35 },
       { name: "Greyhound", note: "A little sighthound for speed and a tidy build.", img: "/history/breeds/original-greyhound.jpg", value: 25 }
     ]
   },
@@ -899,7 +899,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
-      { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/bloodhound-photo.jpg", value: 25 },
+      { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 25 },
       { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/english_setter-photo.jpg", value: 20 }
     ]
   },
@@ -937,7 +937,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct, faster, sharper-nosed beagle of northern England, eventually folded into the modern Beagle.",
     children: [
       { name: "Old Beagles", note: "The small southern hare-hounds at its core.", img: "/history/breeds/beagle-photo.jpg", value: 50 },
-      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 30 },
+      { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
       { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
     ]
   },
