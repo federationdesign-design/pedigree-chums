@@ -78,7 +78,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Lakeland Terrier", strip: "mid1800", era: "late 1800s", anchor: 1891, note: "Fell-pack terrier from the Lake District.", image: "/history/breeds/lakeland-terrier-photo.jpg", tag: "endangered" },
   { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
   { name: "Fox Terrier", strip: "mid1800", era: "1870s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "in-decline" },
-  { name: "English Toy Terrier", strip: "mid1800", era: "1850s", anchor: 1856, note: "Tiny black-and-tan toy bred down from the ratting terriers.", image: "/history/breeds/english-toy-terrier-photo.jpg", tag: "endangered" },
+  { name: "English Toy Terrier", strip: "mid1800", era: "1850s", anchor: 1856, note: "Tiny black-and-tan toy bred down from the ratting terriers.",  tag: "endangered" },
 
   // The late 1800s
   { name: "Irish Terrier", strip: "late1800", era: "late 1800s", anchor: 1875, note: "Fiery red terrier, the 'daredevil' of Ireland.", image: "/history/breeds/irish-terrier-photo.jpg", tag: "in-decline" },
@@ -90,12 +90,12 @@ export const ukBreeds: UKBreed[] = [
   { name: "Curly-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1850, note: "The oldest retriever breed, with a coat of tight curls.", image: "/history/breeds/Curly-Coated-Retriever-photo.jpg", tag: "endangered" },
   { name: "Flat-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1854, note: "Glossy gamekeeper's retriever, ever cheerful.", image: "/history/breeds/flatcoated_retriever-photo.jpg" },
   { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/history/breeds/Labrador-retriever-photo.jpg", tag: "popular" },
-  { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", image: "/history/breeds/bearded-collie-photo.jpg", tag: "endangered" },
-  { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
+  { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.",  tag: "endangered" },
+  { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.",  tag: "in-decline" },
   { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/history/breeds/Border_Collie_photo.jpg" },
   { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/history/breeds/golden-retriever-photo.jpg", tag: "popular" },
   { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg", tag: "trending" },
-  { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
+  { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.",  tag: "endangered" },
 
   // The 1900s
   { name: "Norwich Terrier", strip: "c1900", era: "early 1900s", anchor: 1900, note: "Small, hardy red terrier with prick ears.", image: "/history/breeds/norwich-terrier-photo.jpg", tag: "endangered" },
@@ -120,7 +120,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, close kin to the Bearded Collie, lost as smooth-coated collies took the farms.", tag: "extinct", image: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg" },
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky-coated Scottish show terrier bred from the Skye Terrier, and the direct forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
   { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred down from the early King Charles and the old Sussex Spaniel.", tag: "extinct", image: "/history/breeds/toy-Trawler-Spaniel-painting.jpg" },
-  { name: "Cumberland Sheepdog", strip: "c1900", era: "Early 1900s", anchor: 1910, note: "Northern herding dog folded into the Border Collie in the early 1900s, also claimed as an Australian Shepherd ancestor.", tag: "extinct", image: "/history/breeds/cumberland-sheepdog-photo.jpg" },
-  { name: "Toy Bulldog", strip: "c1900", era: "to 1914", anchor: 1914, note: "Miniature Bulldog kept as a Victorian companion, last recorded in 1914 after the French Bulldog eclipsed it.", tag: "extinct", image: "/history/breeds/toy-bulldog-illustration.jpg" },
+  { name: "Cumberland Sheepdog", strip: "c1900", era: "Early 1900s", anchor: 1910, note: "Northern herding dog folded into the Border Collie in the early 1900s, also claimed as an Australian Shepherd ancestor.", tag: "extinct" },
+  { name: "Toy Bulldog", strip: "c1900", era: "to 1914", anchor: 1914, note: "Miniature Bulldog kept as a Victorian companion, last recorded in 1914 after the French Bulldog eclipsed it.", tag: "extinct" },
   { name: "Dumfriesshire Hound", strip: "c1900", era: "1920s", anchor: 1920, note: "Tall black-and-tan Scottish foxhound of the Galloway hills, its Lockerbie pack disbanded in 2001 with bloodlines left only in France.", tag: "extinct", image: "/history/breeds/Dumfriesshire-Hound.jpg" },
 ];
