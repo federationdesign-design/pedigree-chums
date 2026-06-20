@@ -28,6 +28,25 @@ const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
 const CARD = 164;
 
+// split a node name onto at most two lines so it fits the caption strip
+function wrapName(name: string): string[] {
+  const words = name.split(" ");
+  if (name.length <= 18 || words.length === 1) return [name];
+  const lines: string[] = [];
+  let cur = "";
+  for (const w of words) {
+    if (cur && (cur + " " + w).length > 18) {
+      lines.push(cur);
+      cur = w;
+    } else {
+      cur = cur ? cur + " " + w : w;
+    }
+  }
+  if (cur) lines.push(cur);
+  if (lines.length <= 2) return lines;
+  return [lines[0], lines.slice(1).join(" ")];
+}
+
 function sumLeaves(n: LineageNode): number {
   const c = n.children || [];
   return c.length ? c.reduce((s, x) => s + sumLeaves(x), 0) : n.value ?? 0;
@@ -77,8 +96,8 @@ export default function LineageMap({
   const [open, setOpen] = useState<Set<string>>(() => new Set(["0"]));
   useEffect(() => setOpen(new Set(["0"])), [breed.name]);
   // the circle whose breed image is currently popped out, if any
-  const [picked, setPicked] = useState<string | null>(null);
-  useEffect(() => setPicked(null), [breed.name]);
+  const [picked, setPicked] = useState<Set<string>>(() => new Set());
+  useEffect(() => setPicked(new Set()), [breed.name]);
   // pan offset so the whole diagram can be dragged to reveal off-screen parts
   const [pan, setPan] = useState({ x: 0, y: 0 });
   useEffect(() => setPan({ x: 0, y: 0 }), [breed.name]);
@@ -152,7 +171,7 @@ export default function LineageMap({
   const clip = "lm-clip-root";
 
   // only show the pop-out while its circle is actually on screen and has art
-  const pickedNode = picked ? shown.find((n) => n._id === picked && n._parent && n.img) || null : null;
+  const pickedNodes = shown.filter((n) => picked.has(n._id) && n._parent && n.img);
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => (
@@ -234,16 +253,23 @@ export default function LineageMap({
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
                       follow(n);
-                      setPicked((cur) => (cur === n._id ? null : n._id));
+                      setPicked((cur) => {
+                        const s = new Set(cur);
+                        if (s.has(n._id)) s.delete(n._id);
+                        else s.add(n._id);
+                        return s;
+                      });
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)}>
                       {share}%
                     </text>
-                    <text className={styles.nm} textAnchor="middle" y={-r - 9}>
-                      {n.name}
-                    </text>
+                    {picked.has(n._id) ? null : (
+                      <text className={styles.nm} textAnchor="middle" y={-r - 9}>
+                        {n.name}
+                      </text>
+                    )}
                     {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {n.children!.length} inside
@@ -252,42 +278,54 @@ export default function LineageMap({
                   </g>
                 );
               })}
-            {pickedNode
-              ? (() => {
-                  const share = Math.round((pickedNode._leaves / (pickedNode._parent as Node)._leaves) * 100);
-                  const r = radius(share);
-                  const d = r + 10 + CARD / 2;
-                  const cx = pickedNode._x + Math.cos(pickedNode._dir) * d;
-                  const cy = pickedNode._y + Math.sin(pickedNode._dir) * d;
-                  const ex = pickedNode._x + Math.cos(pickedNode._dir) * r;
-                  const ey = pickedNode._y + Math.sin(pickedNode._dir) * r;
-                  return (
-                    <g className={styles.rootHit} onClick={(e) => e.stopPropagation()}>
-                      <line className={`${styles.edge} ${styles.lit}`} x1={ex} y1={ey} x2={cx} y2={cy} />
-                      <clipPath id="lm-pick-clip">
-                        <rect x={cx - CARD / 2} y={cy - CARD / 2} width={CARD} height={CARD} rx={15} />
-                      </clipPath>
-                      <rect
-                        x={cx - CARD / 2 - 4}
-                        y={cy - CARD / 2 - 4}
-                        width={CARD + 8}
-                        height={CARD + 8}
-                        rx={19}
-                        className={styles.pickCard}
-                      />
-                      <image
-                        href={pickedNode.img as string}
-                        x={cx - CARD / 2}
-                        y={cy - CARD / 2}
-                        width={CARD}
-                        height={CARD}
-                        clipPath="url(#lm-pick-clip)"
-                        preserveAspectRatio="xMidYMid slice"
-                      />
-                    </g>
-                  );
-                })()
-              : null}
+            {pickedNodes.map((pn) => {
+              const share = Math.round((pn._leaves / (pn._parent as Node)._leaves) * 100);
+              const r = radius(share);
+              const d = r + 10 + CARD / 2;
+              const cx = pn._x + Math.cos(pn._dir) * d;
+              const cy = pn._y + Math.sin(pn._dir) * d;
+              const ex = pn._x + Math.cos(pn._dir) * r;
+              const ey = pn._y + Math.sin(pn._dir) * r;
+              const clipId = `lm-pick-${pn._id}`;
+              const lines = wrapName(pn.name);
+              const capH = lines.length * 16 + 14;
+              const capTop = cy + CARD / 2 - capH;
+              return (
+                <g key={`pick-${pn._id}`} className={styles.rootHit} onClick={(e) => e.stopPropagation()}>
+                  <line className={`${styles.edge} ${styles.lit}`} x1={ex} y1={ey} x2={cx} y2={cy} />
+                  <clipPath id={clipId}>
+                    <rect x={cx - CARD / 2} y={cy - CARD / 2} width={CARD} height={CARD} rx={15} />
+                  </clipPath>
+                  <rect
+                    x={cx - CARD / 2 - 4}
+                    y={cy - CARD / 2 - 4}
+                    width={CARD + 8}
+                    height={CARD + 8}
+                    rx={19}
+                    className={styles.pickCard}
+                  />
+                  <image
+                    href={pn.img as string}
+                    x={cx - CARD / 2}
+                    y={cy - CARD / 2}
+                    width={CARD}
+                    height={CARD}
+                    clipPath={`url(#${clipId})`}
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                  <g clipPath={`url(#${clipId})`}>
+                    <rect x={cx - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
+                  </g>
+                  <text className={styles.pickCaptionText} textAnchor="middle" x={cx} y={capTop + 17}>
+                    {lines.map((ln, i) => (
+                      <tspan key={i} x={cx} dy={i === 0 ? 0 : 16}>
+                        {ln}
+                      </tspan>
+                    ))}
+                  </text>
+                </g>
+              );
+            })}
             {rootCard(breed.x, breed.y)}
           </>
         ) : (
