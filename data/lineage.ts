@@ -154,7 +154,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A cheeky cross of the Pug and the Beagle, with a longer muzzle than a Pug and a big nose for adventure.",
     children: [
       { name: "Pug", note: "Brings the comical, affectionate, people-loving side.", img: "/pug-square.jpg", value: 50 },
-      { name: "Beagle", note: "Brings the curious nose and the waggy, sociable streak.", img: "/beagle-square.jpg", value: 50 }
+      { name: "Beagle", note: "Brings the curious nose and the waggy, sociable streak.", img: "/history/breeds/beagle.jpg", value: 50 }
     ]
   },
 
@@ -435,7 +435,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old English Black and Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 45 },
       { name: "English White Terrier", note: "Lent the predominantly white, easy-to-see coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 25 },
-      { name: "Beagle", note: "A dash of hound for nose and cry.", img: "/beagle-square.jpg", value: 15 },
+      { name: "Beagle", note: "A dash of hound for nose and cry.", img: "/history/breeds/beagle.jpg", value: 15 },
       { name: "Bull Terrier", note: "A touch of bull blood for grit.", img: "/bull-terrier-square.jpg", value: 15 }
     ]
   },
@@ -741,7 +741,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
     children: [
       { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old scenting hounds.jpg", value: 40 }
+      { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
     ]
   },
 
@@ -759,7 +759,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
     children: [
       { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old scenting hounds.jpg", value: 40 }
+      { name: "Old scenting hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
     ]
   },
 
@@ -786,7 +786,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
     children: [
       { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old scenting hounds.jpg", value: 40 }
+      { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
     ]
   },
 
@@ -794,7 +794,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Buckhound",
     note: "A medieval scenting hound kept to hunt buck and fallow deer, sitting between the staghound and the harrier.",
     children: [
-      { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Old scenting hounds.jpg", value: 60 },
+      { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 60 },
       { name: "Talbot hounds", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
     ]
   },
@@ -1042,7 +1042,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A low set French scenthound bred short in the leg on purpose, so hunters could keep up with it on foot.",
     children: [
       { name: "Bloodhound", note: "The St Hubert scent trailing line behind its nose, long ears and deep voice.", value: 55 },
-      { name: "Basset Artesien Normand", note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset.", img: "/basset-square.jpg", value: 45 }
+      { name: "Basset Artesien Normand", note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset.", img: "/history/breeds/Basset-Artesien-Normand.jpg", value: 45 }
     ]
   },
   "Italian Greyhound": {
