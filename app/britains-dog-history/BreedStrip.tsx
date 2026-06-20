@@ -97,42 +97,59 @@ export default function BreedStrip({ era }: { era: string }) {
     };
   }, []);
 
-  // Mobile has no wheel events, so the desktop hold never engages. Instead of
-  // fighting the touch gesture (which the browser wins), read the page's own
-  // vertical scroll and slide the rail sideways as the strip rises into view:
-  // advance the first few cards once, then release so finger swipes still work.
+  // Mobile has no wheel events, so the desktop hold never engages. Borrow the
+  // LHM scroll-driven carousel trick: a rAF loop lerps the rail toward a
+  // scroll-derived target, so it eases in with inertia instead of tracking the
+  // finger 1:1. Engages only once the strip centre reaches mid screen, advances
+  // a couple of cards, then releases so finger swipes still work.
   useEffect(() => {
     const wrap = wrapRef.current;
     const el = railRef.current;
     if (!wrap || !el) return;
     if (!window.matchMedia("(pointer: coarse)").matches) return;
 
+    // how far to auto-advance: two cards in from the start
     const holdDistance = () => {
       const items = el.querySelectorAll<HTMLElement>("[data-node]");
-      if (items.length > 3) return items[3].offsetLeft - items[0].offsetLeft;
+      if (items.length > 2) return items[2].offsetLeft - items[0].offsetLeft;
       return el.clientWidth;
     };
 
-    let done = false;
+    const EASE = 0.06; // lower = more lag and inertia, higher = more direct
+    let target = 0;
+    let current = 0;
+    let released = false;
     let raf = 0;
-    const update = () => {
-      raf = 0;
-      if (done) return;
+
+    const measure = () => {
       const max = el.scrollWidth - el.clientWidth;
-      if (max <= 0) return; // nothing to scroll on this strip
+      if (max <= 0) return 0; // nothing to scroll on this strip
       const hold = Math.min(holdDistance(), max);
       const rect = wrap.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      const start = vh * 0.5; // begin only once the strip reaches mid screen
-      const end = vh * 0.15; //  finish as it nears the top
-      if (rect.top > start) return; // not entered yet, leave the rail at rest
-      const p = (start - rect.top) / (start - end);
+      const centre = rect.top + rect.height / 2;
+      const start = vh * 0.5; // nothing happens until the centre hits mid screen
+      const end = vh * 0.0; //   finishes as the centre reaches the top
+      const p = (start - centre) / (start - end);
       const clamped = Math.max(0, Math.min(1, p));
-      el.scrollLeft = clamped * hold;
-      if (clamped >= 1) done = true; // released, the reader owns it now
+      if (clamped >= 1) released = true; // strip has passed, hand control back
+      return clamped * hold;
+    };
+
+    const tick = () => {
+      target = measure();
+      current += (target - current) * EASE;
+      if (Math.abs(target - current) < 0.5) current = target;
+      el.scrollLeft = current;
+      if (current === target) {
+        raf = 0;
+        return; // settled, wait for the next scroll (or stay put if released)
+      }
+      raf = requestAnimationFrame(tick);
     };
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
+      if (released) return; // reader owns it now, stop driving
+      if (!raf) raf = requestAnimationFrame(tick);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
