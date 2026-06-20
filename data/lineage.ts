@@ -162,7 +162,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bull Terrier",
     note: "A Victorian invention. James Hinks set out in the 1860s to build a cleaner, all-white gentleman's companion from the old bull-and-terrier dogs.",
     children: [
-      { name: "Bulldog", note: "Brought the power, the broad chest and the determined grip.", img: "/history/breeds/old-engish-bulldog.webp", value: 45 },
+      { name: "Bulldog", note: "Brought the power, the broad chest and the determined grip.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 45 },
       { name: "White English Terrier", note: "A now-extinct breed that gave the clean white coat and terrier sharpness.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 40 },
       { name: "Dalmatian", note: "Crossed in for size, substance and a pure white finish.", img: "/Dalmatian-square.jpg", value: 15 }
     ]
@@ -172,7 +172,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Boston Terrier",
     note: "An American original from 1870s Boston, traced back to a single dog, Hooper's Judge, a bulldog and terrier cross bred smaller and smarter.",
     children: [
-      { name: "Bulldog", note: "Brought the stocky frame and the easy-going, affectionate streak.", img: "/history/breeds/old-engish-bulldog.webp", value: 55 },
+      { name: "Bulldog", note: "Brought the stocky frame and the easy-going, affectionate streak.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 55 },
       { name: "White English Terrier", note: "The now-extinct terrier behind the neat build and lively mind.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 45 }
     ]
   },
@@ -191,7 +191,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Staffordshire Bull Terrier",
     note: "A classic bull-and-terrier, bred in the Black Country by crossing the old bulldog with game local terriers for grip and gameness.",
     children: [
-      { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/old-engish-bulldog.webp", value: 55 },
+      { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 55 },
       { name: "Old English Black and Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 }
     ]
   },
@@ -220,7 +220,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bulldog",
     note: "Once a fierce bull-baiting dog, then bred into the gentle, wrinkly companion we know after blood sports were banned in 1835.",
     children: [
-      { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog.", img: "/history/breeds/old-engish-bulldog.webp", value: 60 },
+      { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 60 },
       { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/mastiff-square.jpg", value: 25 },
       { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/pug-square.jpg", value: 15 }
     ]
@@ -613,7 +613,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The gamekeeper's night dog, built in Victorian England to track and pin poachers without mauling them. Mostly Mastiff, with Bulldog for grip.",
     children: [
       { name: "English Mastiff", note: "The larger share, for size, scent and a steady nerve.", img: "/history/breeds/english-mastiff-photo.jpg", value: 60 },
-      { name: "Old English Bulldog", note: "Bulldog drive and a tenacious grip.", img: "/history/breeds/old-engish-bulldog.webp", value: 40 }
+      { name: "Old English Bulldog", note: "Bulldog drive and a tenacious grip.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 40 }
     ]
   },
 
@@ -697,7 +697,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Toy Bulldog",
     note: "An extinct miniature Bulldog of Victorian England, a small companion bull-type that helped give rise to the French Bulldog.",
     children: [
-      { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size.", img: "/history/breeds/old-engish-bulldog.webp", value: 65 },
+      { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
       { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size.", img: "/pug-square.jpg", value: 35 }
     ]
   },
@@ -760,7 +760,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bloodhound",
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
     children: [
-      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/talbot-drawing.jpg", value: 60 },
+      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
       { name: "Old Ardennes scent hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
     ]
   },
@@ -787,7 +787,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rache",
     note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
     children: [
-      { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-drawing.jpg", value: 60 },
+      { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
       { name: "Old running scent hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 40 }
     ]
   },
@@ -797,7 +797,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A medieval scenting hound kept to hunt buck and fallow deer, sitting between the staghound and the harrier.",
     children: [
       { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 60 },
-      { name: "Talbot hounds", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-drawing.jpg", value: 40 }
+      { name: "Talbot hounds", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
     ]
   },
 
@@ -805,7 +805,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Southern Hound",
     note: "A heavy, slow, deep-voiced scent hound of southern England, ancestor of the foxhound, beagle and harrier.",
     children: [
-      { name: "Talbot hounds", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-drawing.jpg", value: 60 },
+      { name: "Talbot hounds", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
       { name: "St Hubert Hound stock", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/bloodhound-photo.jpg", value: 40 }
     ]
   },
@@ -825,7 +825,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Southern Hound", note: "The deep-nosed scent hound at its foundation.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 50 },
       { name: "Greyhound", note: "Added for speed and a cleaner, racier build.", img: "/history/breeds/greyhound-photo.jpg", value: 30 },
-      { name: "Talbot hound", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-drawing.jpg", value: 20 }
+      { name: "Talbot hound", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
     ]
   },
 
@@ -862,7 +862,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Beagle",
     note: "A small, merry pack hound bred to hunt hare on foot, with a big voice and a busy nose.",
     children: [
-      { name: "Talbot hound", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-drawing.jpg", value: 40 },
+      { name: "Talbot hound", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-hound.jpg", value: 40 },
       { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 35 },
       { name: "Greyhound", note: "A little sighthound for speed and a tidy build.", img: "/history/breeds/greyhound-photo.jpg", value: 25 }
     ]
@@ -940,7 +940,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Beagles", note: "The small southern hare-hounds at its core.", img: "/history/breeds/beagle-photo.jpg", value: 50 },
       { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 30 },
-      { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-drawing.jpg", value: 20 }
+      { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
     ]
   },
 
