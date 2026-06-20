@@ -1042,7 +1042,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A low set French scenthound bred short in the leg on purpose, so hunters could keep up with it on foot.",
     children: [
       { name: "Bloodhound", note: "The St Hubert scent trailing line behind its nose, long ears and deep voice.", value: 55 },
-      { name: "Old French basset hounds", note: "The short legged basset packs of France, dwarfed for slow, close hunting in cover.", value: 45 }
+      { name: "Basset Artesien Normand", note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset.", img: "/basset-square.jpg", value: 45 }
     ]
   },
   "Italian Greyhound": {
