@@ -66,26 +66,57 @@ export default function BreedStrip({ era }: { era: string }) {
       hold = holdDistance();
     };
 
-    const onWheel = (e: WheelEvent) => {
-      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    // Shared drive: move the rail sideways, holding the page for the first
+    // few cards then releasing it. delta > 0 scrolls forward. The caller
+    // passes its own preventDefault so the same logic serves wheel and touch.
+    const driveRail = (delta: number, preventDefault: () => void) => {
       if (delta === 0) return;
       const max = el.scrollWidth - el.clientWidth;
       if (max <= 0) return; // nothing to scroll, let the page move
       if (delta > 0) {
         if (el.scrollLeft >= max) return;
-        if (el.scrollLeft < hold) e.preventDefault();
+        if (el.scrollLeft < hold) preventDefault();
         el.scrollLeft = Math.min(el.scrollLeft + delta, max);
       } else {
         if (el.scrollLeft <= 0) return;
-        if (el.scrollLeft <= hold) e.preventDefault();
+        if (el.scrollLeft <= hold) preventDefault();
         el.scrollLeft = Math.max(el.scrollLeft + delta, 0);
       }
     };
 
+    const onWheel = (e: WheelEvent) => {
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      driveRail(delta, () => e.preventDefault());
+    };
+
+    // Touch devices never fire wheel, which is why the hold never ran on a
+    // phone. Mirror it from a vertical finger swipe; mostly sideways swipes
+    // fall through to the rail's own native scrolling.
+    let lastY = 0;
+    let lastX = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      lastY = e.touches[0].clientY;
+      lastX = e.touches[0].clientX;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0].clientY;
+      const x = e.touches[0].clientX;
+      const dy = lastY - y;
+      const dx = lastX - x;
+      lastY = y;
+      lastX = x;
+      if (Math.abs(dy) <= Math.abs(dx)) return; // mostly sideways, leave it
+      driveRail(dy, () => e.preventDefault());
+    };
+
     wrap.addEventListener("wheel", onWheel, { passive: false });
+    wrap.addEventListener("touchstart", onTouchStart, { passive: true });
+    wrap.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("resize", onResize);
     return () => {
       wrap.removeEventListener("wheel", onWheel);
+      wrap.removeEventListener("touchstart", onTouchStart);
+      wrap.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("resize", onResize);
     };
   }, []);
