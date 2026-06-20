@@ -339,7 +339,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
       { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named.", img: "/history/breeds/old-german-ratting-terriers-illustration.jpg", value: 60 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger.", img: "/history/breeds/Earth and hunt terrier.jpg", value: 40 }
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
 
@@ -1122,7 +1122,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The German badger dog, a scenthound bred low and long to follow its quarry straight down into the earth.",
     children: [
       { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", value: 60 },
-      { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", img: "/history/breeds/Old Earth Terriers-Dachshund-brand.jpg", value: 25 },
+      { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
       { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", value: 15 }
     ]
   },

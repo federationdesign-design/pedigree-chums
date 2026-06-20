@@ -723,7 +723,7 @@ const allBreeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/german-shepard-square.png",
+    image: "/german-shepard-square.jpg",
   },
   {
     name: "Pug",
@@ -893,7 +893,7 @@ const allBreeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "medium",
-    image: "/golden-square.png",
+    image: "/golden-square.jpg",
   },
   {
     name: "Labrador",
