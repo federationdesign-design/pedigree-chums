@@ -132,7 +132,7 @@ export default function PackPit() {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const b: any = Bodies.rectangle(w / 2, h * 0.2, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
+        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
@@ -343,7 +343,7 @@ export default function PackPit() {
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); return; }
-        const hov = pointer ? Query.point(bodies, pointer)[0] : null;
+        const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
         // ease the dim toward its target rather than snapping, so sweeping across
