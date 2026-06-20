@@ -53,7 +53,7 @@ export default function PackPit() {
       const BIG = 84 * SCALE;
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
-      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
+      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
