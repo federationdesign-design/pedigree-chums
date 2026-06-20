@@ -1,73 +1,20 @@
+import type { Metadata } from "next";
 import Nav from "../components/Nav/Nav";
-import Hero from "../components/Hero/Hero";
-import PitchPanel from "../components/PitchPanel/PitchPanel";
-import PhotoSplit from "../components/PhotoSplit/PhotoSplit";
-import PopHeading from "../components/PopHeading/PopHeading";
-import Footer from "../components/Footer/Footer";
-import ComicStrip from "../components/ComicStrip/ComicStrip";
-import SocialFeed from "../components/SocialFeed/SocialFeed";
-import styles from "./page.module.css";
+import PackPit from "../components/PackPit/PackPit";
+
+export const metadata: Metadata = {
+  title: "Pedigree Chums | The Dog Bingo Game",
+  description:
+    "Tip out all 54 dogs from the Pedigree Chums pack and play. Drag them around, ping them off the walls, and hover a chum to see the breeds it came from.",
+};
 
 export default function Home() {
   return (
     <>
       <Nav />
       <main>
-        <Hero />
-
-        <PitchPanel />
-
-        <PhotoSplit
-          photo="/how-to-play-img-resting.png"
-          hoverPhoto="/how-to-play-img-hover.png"
-          alt="A Cocker Spaniel being spotted on a walk"
-          reverse
-          xl
-          circle
-        >
-          <PopHeading className="display">
-            54 Unique <span className="display-yellow">Dog Cards</span>
-          </PopHeading>
-          <p className="lead">Each card includes:</p>
-          <ul className="points">
-            <li className="point">Breed traits and temperament</li>
-            <li className="point">Coat colours and markings</li>
-            <li className="point">Size and build</li>
-            <li className="point">Tell-tale identifiers</li>
-            <li className="point">Cute yet accurate illustrations</li>
-            <li className="point">Quick-reference stats</li>
-          </ul>
-        </PhotoSplit>
-
-        <PhotoSplit photo="/corgi.png" alt="A Corgi being spotted in the park" large>
-          <h2 className="display">
-            Who <span className="display-yellow">It&apos;s For</span>
-          </h2>
-          <ul className="points">
-            <li className="point">Dog loving Families</li>
-            <li className="point">Pooch mad Tourists</li>
-            <li className="point">Visits to the local park</li>
-            <li className="point">Trips in the car or on the train</li>
-            <li className="point">Pet owners and walkers</li>
-            <li className="point">Schools and educators</li>
-            <li className="point">Great for Gifting</li>
-            <li className="point">Great as a stocking filler</li>
-          </ul>
-        </PhotoSplit>
-
-        <ComicStrip />
-
-        <section className={styles.feedSection}>
-          <PopHeading className={`display ${styles.feedTitle}`}>
-            See it <span className="display-yellow">in action</span>
-          </PopHeading>
-          <p className={styles.feedSub}>
-            Real games, real dogs, real chaos — straight from our feed.
-          </p>
-          <SocialFeed />
-        </section>
+        <PackPit />
       </main>
-      <Footer />
     </>
   );
 }
