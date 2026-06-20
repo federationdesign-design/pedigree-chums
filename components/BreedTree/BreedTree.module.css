@@ -151,12 +151,32 @@
 }
 
 @media (max-width: 640px) {
+  .tree {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
   .aside {
-    width: 86%;
-    max-width: none;
-    left: 7%;
+    position: relative;
+    left: auto;
+    right: auto;
     top: auto;
-    bottom: clamp(12px, 3vw, 20px);
+    bottom: auto;
+    width: 100%;
+    max-width: none;
+    order: -1; /* writeup and breadcrumb sit above the circles */
+    padding: 0 2px;
+    z-index: 1;
+  }
+  .stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    z-index: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    order: 0;
   }
 }
 

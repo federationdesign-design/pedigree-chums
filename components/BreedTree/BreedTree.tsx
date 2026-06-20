@@ -27,21 +27,72 @@ function easeOutBounce(x: number): number {
   return n1 * (x -= 2.625 / d1) * x + 0.984375;
 }
 
+// On mobile the packed circles sit side by side and stay small. We re-lay the
+// top-level circles into a tall-screen arrangement (2 stacked, 3 a triangle, 4 a
+// grid) and scale each subtree to match, so they load far bigger and easier to
+// read. Counts above 4 keep the packed layout.
+function relayoutMobile(nodes: Node[]) {
+  const root = nodes[0];
+  const kids = root.children ?? [];
+  const n = kids.length;
+  if (n < 1 || n > 4) return;
+  const FW = SIZE;
+  const FH = SIZE / 0.7; // designed for a portrait stage; labels clamp if it differs
+  const GAP = 44;
+  const LAB = 110; // room kept beyond a circle for its label
+  let slots: { x: number; y: number; r: number }[];
+  if (n === 1) {
+    const r = Math.min(FW * 0.46, (FH - 2 * LAB) / 2);
+    slots = [{ x: 0, y: 0, r }];
+  } else if (n === 2) {
+    const r = Math.min(FW * 0.46, (FH - GAP - 2 * LAB) / 4);
+    const d = r + GAP / 2;
+    slots = [{ x: 0, y: -d, r }, { x: 0, y: d, r }];
+  } else if (n === 3) {
+    const r = Math.min((FW - GAP) / 4, (FH - 2 * LAB - GAP) / 4);
+    const dx = r + GAP / 2;
+    slots = [{ x: 0, y: -(r + LAB * 0.4), r }, { x: -dx, y: r + GAP / 2, r }, { x: dx, y: r + GAP / 2, r }];
+  } else {
+    const r = Math.min((FW - GAP) / 4, (FH - GAP - 2 * LAB) / 4);
+    const dx = r + GAP / 2;
+    const dy = r + GAP / 2 + LAB * 0.3;
+    slots = [{ x: -dx, y: -dy, r }, { x: dx, y: -dy, r }, { x: -dx, y: dy, r }, { x: dx, y: dy, r }];
+  }
+  kids.forEach((kid, i) => {
+    const slot = slots[i];
+    const s = slot.r / kid.r;
+    const ox = kid.x, oy = kid.y;
+    kid.descendants().forEach((d) => {
+      d.x = slot.x + (d.x - ox) * s;
+      d.y = slot.y + (d.y - oy) * s;
+      d.r = d.r * s;
+    });
+  });
+  root.x = 0;
+  root.y = 0;
+  root.r = FW / (2 * PAD);
+}
+
 export default function BreedTree({
   root,
   rootImage,
   onActiveChange,
+  onClose,
 }: {
   root: LineageNode;
   rootImage?: string;
   onActiveChange?: (active: boolean) => void;
+  onClose?: () => void;
 }) {
+  const [isMobile, setIsMobile] = useState(false);
   const nodes = useMemo<Node[]>(() => {
     const h = hierarchy<LineageNode>(root)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-    return pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
-  }, [root]);
+    const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
+    if (isMobile) relayoutMobile(ns);
+    return ns;
+  }, [root, isMobile]);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -97,10 +148,14 @@ export default function BreedTree({
           // circle and clamped to stay inside the canvas.
           const childR = d.r * k;
           const vbWl = aspect >= 1 ? SIZE * aspect : SIZE;
+          const vbHl = aspect >= 1 ? SIZE : SIZE / aspect;
           const xMinl = aspect >= 1 ? -vbWl * SHIFT : -vbWl / 2;
           const margin = 120;
           const lx = Math.max(xMinl + margin, Math.min(xMinl + vbWl - margin, tx));
-          const ly = ty < 0 ? ty - childR - 46 : ty + childR + 46;
+          // sit the label clear of the circle (was tight enough to touch), and
+          // keep the whole label inside the canvas top and bottom
+          let ly = ty < 0 ? ty - childR - 70 : ty + childR + 70;
+          ly = Math.max(-vbHl / 2 + 60, Math.min(vbHl / 2 - 110, ly));
           l.setAttribute("transform", `translate(${lx},${ly})`);
         }
       }
@@ -145,6 +200,7 @@ export default function BreedTree({
   }
   function onBackground() {
     if (focusRef.current !== nodes[0]) zoom(nodes[0]);
+    else onClose?.();
   }
 
   useEffect(() => {
@@ -215,6 +271,15 @@ export default function BreedTree({
     return () => ro.disconnect();
   }, []);
 
+  // Track the mobile breakpoint so the top-level circles can be re-laid out big.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
   // Widen (or heighten) the viewBox to the stage's aspect so the focused circle
   // still fits the short side while the long side gains room for siblings. On a
   // wide canvas we also push the origin rightwards so the diagram sits on the
@@ -222,7 +287,7 @@ export default function BreedTree({
   const vbW = aspect >= 1 ? SIZE * aspect : SIZE;
   const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
   const xMin = aspect >= 1 ? -vbW * SHIFT : -vbW / 2;
-  const viewBox = `${xMin} ${-SIZE / 2} ${vbW} ${vbH}`;
+  const viewBox = `${xMin} ${-vbH / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();
   // The caption follows the hovered circle when there is one, so you can read a

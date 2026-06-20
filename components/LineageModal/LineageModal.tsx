@@ -40,10 +40,6 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   return createPortal(
     <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={name}>
       <div className={`${styles.modalCard} ${styles.modalCardSolo}`} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.modalClose} onClick={onClose} aria-label="Close">
-          &times;
-        </button>
-
         <div className={styles.familyLead}>
           <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{name}</h3>
           <div className={`${styles.familyText} ${treeActive ? styles.familyTextDim : ""}`}>
@@ -53,7 +49,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           </div>
         </div>
         <div className={styles.familyCol}>
-          <BreedTree root={lineage} rootImage={image} onActiveChange={setTreeActive} />
+          <BreedTree root={lineage} rootImage={image} onActiveChange={setTreeActive} onClose={onClose} />
         </div>
       </div>
     </div>,
