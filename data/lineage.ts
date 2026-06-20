@@ -413,7 +413,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
       { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'.", img: "/history/breeds/Isle of Skye earth dogs.jpg", value: 55 },
-      { name: "Highland mainland terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie.", img: "/history/breeds/scottish-terrier-image.jpg", value: 45 }
+      { name: "Highland mainland terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie.", img: "/history/breeds/Highland-mainland-terrier.jpg", value: 45 }
     ]
   },
 
