@@ -43,9 +43,9 @@ const LINEAGE: Record<string, LineageNode> = {
         value: 15
       },
       {
-        name: "British Spaniels",
+        name: "Water spaniels",
         note: "A touch of spaniel for a soft mouth and real keenness in water and cover.",
-        img: "/history/breeds/english-springer-spaniel-photo.jpg",
+        img: "/history/breeds/water-spaniel-illustration.jpg",
         value: 13
       }
     ]
@@ -303,7 +303,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
     children: [
       { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 45 },
-      { name: "Old water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
+      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
       { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
     ]
   },
@@ -528,7 +528,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Tweed Water Spaniel",
     note: "An extinct liver-brown water dog from the Scottish Borders and the Tweed valley, famous as a key ancestor of the Golden and Curly-Coated Retrievers.",
     children: [
-      { name: "Old water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 55 },
+      { name: "Water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 55 },
       { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power.", img: "/history/breeds/original-Newfoundland-illustration.jpg", value: 45 }
     ]
   },
@@ -558,7 +558,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An old red-and-white Welsh gundog, known for generations as the Welsh Cocker before becoming the Welsh Springer in 1902.",
     children: [
       { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 60 },
-      { name: "Springing land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/english-springer-spaniel-photo.jpg", value: 40 }
+      { name: "Land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 40 }
     ]
   },
 
@@ -566,7 +566,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Field Spaniel",
     note: "A long, low black spaniel bred up in Victorian show rings from the larger cocking spaniels, once nearly ruined by exaggeration.",
     children: [
-      { name: "Black Cocker Spaniels", note: "The larger black cockers at its foundation.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 45 },
+      { name: "Land spaniels", note: "The old land-spaniel stock at its foundation.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 45 },
       { name: "Sussex Spaniel", note: "Lent weight, bone and a longer body.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 35 },
       { name: "Clumber Spaniel", note: "Heavier spaniel blood for substance.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 20 }
     ]
@@ -576,7 +576,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Sussex Spaniel",
     note: "An old, short-legged, golden-liver spaniel from the county of Sussex, bred to work slowly and give tongue in dense cover.",
     children: [
-      { name: "Old land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 60 },
+      { name: "Land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 60 },
       { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 40 }
     ]
   },
@@ -585,8 +585,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Norfolk Spaniel",
     note: "An extinct liver-and-white springer-type spaniel, the Victorian forerunner of the English Springer, rolled into that breed in 1903.",
     children: [
-      { name: "Old springing land spaniels", note: "The larger flushing spaniels it grew from.", img: "/history/breeds/english-springer-spaniel-photo.jpg", value: 60 },
-      { name: "Land spaniel stock", note: "The broad old land-spaniel family.", img: "/history/breeds/cocker_spaniel-photo.jpg", value: 40 }
+      { name: "Land spaniels", note: "The old land-spaniel stock it grew from.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 100 }
     ]
   },
 
@@ -920,7 +919,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Clumber Spaniel",
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
     children: [
-      { name: "Old land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 55 },
+      { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 55 },
       { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight.", img: "/history/breeds/bloodhound-photo.jpg", value: 45 }
     ]
   },
