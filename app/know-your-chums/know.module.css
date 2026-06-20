@@ -205,6 +205,17 @@
 .barRow:last-child {
   margin-bottom: 0;
 }
+.barClickable {
+  cursor: pointer;
+}
+.barClickable:hover .barName {
+  text-decoration: underline;
+}
+.barClickable:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
 
 /* big rounded-square thumbnail (like the XD) */
 .barThumb {
@@ -567,16 +578,32 @@
 }
 @media (max-width: 640px) {
   .factGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 10px;
   }
   .rowGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
   .resultGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+  }
+  /* keep the big percentage on screen: a smaller thumb and number plus the
+     shorter bars set in BreedStats mean nothing runs off the right edge */
+  .barThumb {
+    width: clamp(60px, 16vw, 96px);
+    height: clamp(60px, 16vw, 96px);
+  }
+  .barTrack {
+    gap: 8px;
+  }
+  .barName {
+    padding: 0 12px;
+    font-size: clamp(0.8rem, 3.2vw, 1.05rem);
+  }
+  .barPct {
+    font-size: clamp(1.4rem, 6vw, 2rem);
   }
   .modalCard {
     grid-template-columns: 1fr;
@@ -584,9 +611,12 @@
   .modalCardSolo {
     height: auto;
     overflow: visible;
+    display: flex;
+    flex-direction: column;
   }
   .familyLead {
     max-width: none;
+    margin-top: 12px;
   }
   .familySub {
     white-space: normal;
@@ -594,7 +624,8 @@
   .familyCol {
     position: static;
     height: 62vh;
-    margin-top: 16px;
+    margin-top: 0;
+    order: -1; /* circles to the top, the title and text below them */
   }
 }
 
