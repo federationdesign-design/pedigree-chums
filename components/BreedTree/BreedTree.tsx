@@ -13,6 +13,10 @@ const PAD = 1.4;
 // How far right of centre the diagram sits, as a fraction of the canvas width,
 // so it clears the text column on the left.
 const SHIFT = 0.66;
+// Desktop fills the circles closer to the frame edge than the default PAD, so
+// the diagram reads large beside the text column. Mobile keeps PAD (its masonry
+// layout already fills the screen).
+const ZOOM_PAD = 1.1;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
@@ -162,7 +166,7 @@ export default function BreedTree({
   const labelsRef = useRef<SVGGElement>(null);
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
-  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD]);
+  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)]);
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
 
@@ -231,7 +235,7 @@ export default function BreedTree({
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
-    const target: View = [d.x, d.y, d.r * 2 * PAD];
+    const target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD)];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
     if (reduce) {
@@ -273,7 +277,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = [nodes[0].x, nodes[0].y, nodes[0].r * 2 * PAD];
+    const v: View = [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)];
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;

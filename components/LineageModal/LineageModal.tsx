@@ -43,8 +43,6 @@ export default function LineageModal({ name, image, character, lineage, onClose 
         <div className={styles.familyLead}>
           <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{name}</h3>
           <div className={`${styles.familyText} ${treeActive ? styles.familyTextDim : ""}`}>
-            <h4 className={`${styles.modalSubhead} ${styles.familySub}`}>Where the breed comes from</h4>
-            {character && <h4 className={styles.modalSubhead}>Personality</h4>}
             {character && <p className={styles.modalChar}>{character}</p>}
           </div>
         </div>
