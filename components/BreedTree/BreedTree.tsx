@@ -92,10 +92,12 @@ export default function BreedTree({
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
-  // round so minor resizes (mobile address bar) don't re-pack the whole tree
-  const aspectKey = isMobile
-    ? Math.min(Math.max(Math.round(aspect * 20) / 20, 0.42), 0.85)
-    : 1;
+  // Freeze the stage aspect used for the mobile layout after the first measure.
+  // Drilling into a circle changes the breadcrumb/caption height, which resizes
+  // the stage; if the layout tracked that, it would re-pack and replay its
+  // entrance on every click. Capturing it once keeps the circles steady.
+  const [layoutAspect, setLayoutAspect] = useState<number | null>(null);
+  const aspectKey = isMobile ? layoutAspect ?? 0.55 : 1;
   const nodes = useMemo<Node[]>(() => {
     const h = hierarchy<LineageNode>(root)
       .sum((d) => d.value ?? 0)
@@ -104,6 +106,13 @@ export default function BreedTree({
     if (isMobile) relayoutMobile(ns, aspectKey);
     return ns;
   }, [root, isMobile, aspectKey]);
+
+  // capture the stage aspect for the layout exactly once, on the first valid read
+  useEffect(() => {
+    if (isMobile && layoutAspect === null && aspect > 0.2 && aspect < 3) {
+      setLayoutAspect(Math.min(Math.max(Math.round(aspect * 20) / 20, 0.42), 0.85));
+    }
+  }, [isMobile, aspect, layoutAspect]);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
