@@ -78,7 +78,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Lakeland Terrier", strip: "mid1800", era: "late 1800s", anchor: 1891, note: "Fell-pack terrier from the Lake District.", image: "/history/breeds/lakeland-terrier-photo.jpg", tag: "endangered" },
   { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
   { name: "Fox Terrier", strip: "mid1800", era: "1870s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "in-decline" },
-  { name: "English Toy Terrier", strip: "mid1800", era: "1850s", anchor: 1856, note: "Tiny black-and-tan toy bred down from the ratting terriers.",  tag: "endangered" },
+  { name: "English Toy Terrier", strip: "mid1800", era: "1850s", anchor: 1856, note: "Tiny black-and-tan toy bred down from the ratting terriers.", image: "/history/breeds/English-Toy-Terrier.jpg",  tag: "endangered" },
 
   // The late 1800s
   { name: "Irish Terrier", strip: "late1800", era: "late 1800s", anchor: 1875, note: "Fiery red terrier, the 'daredevil' of Ireland.", image: "/history/breeds/irish-terrier-photo.jpg", tag: "in-decline" },
