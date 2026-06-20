@@ -537,7 +537,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lurcher",
     note: "Not a breed but a type: a sighthound crossed with a working dog, long the poacher's and traveller's companion, fast and quiet.",
     children: [
-      { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/greyhound-photo.jpg", value: 50 },
+      { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/origibal-greyhound.jpg", value: 50 },
       { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability.", img: "/history/breeds/rough-collie-photo.jpg", value: 30 },
       { name: "Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/border-terrier-photo.jpg", value: 20 }
     ]
@@ -547,7 +547,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Longdog",
     note: "A sighthound crossed with another sighthound, bred purely for speed rather than the all-round craft of the lurcher.",
     children: [
-      { name: "Greyhound", note: "The foundation of nearly every running dog.", img: "/history/breeds/greyhound-photo.jpg", value: 50 },
+      { name: "Greyhound", note: "The foundation of nearly every running dog.", img: "/history/breeds/origibal-greyhound.jpg", value: 50 },
       { name: "Whippet", note: "Added for nimble, sprinting pace.", img: "/history/breeds/whippet-photo.jpg", value: 25 },
       { name: "Deerhound", note: "Bigger sighthound blood for stamina over rough ground.", img: "/history/breeds/ScottishDeerhound-photo.avif", value: 25 }
     ]
@@ -824,7 +824,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The classic pack hound of the hunt, bred for stamina, voice and a relentless nose over a long day's chase.",
     children: [
       { name: "Southern Hound", note: "The deep-nosed scent hound at its foundation.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 50 },
-      { name: "Greyhound", note: "Added for speed and a cleaner, racier build.", img: "/history/breeds/greyhound-photo.jpg", value: 30 },
+      { name: "Greyhound", note: "Added for speed and a cleaner, racier build.", img: "/history/breeds/origibal-greyhound.jpg", value: 30 },
       { name: "Talbot hound", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
     ]
   },
@@ -864,7 +864,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Talbot hound", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-hound.jpg", value: 40 },
       { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern_Hound-drawing.jpg", value: 35 },
-      { name: "Greyhound", note: "A little sighthound for speed and a tidy build.", img: "/history/breeds/greyhound-photo.jpg", value: 25 }
+      { name: "Greyhound", note: "A little sighthound for speed and a tidy build.", img: "/history/breeds/origibal-greyhound.jpg", value: 25 }
     ]
   },
 
@@ -900,7 +900,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A lean, fast bird dog that freezes on point to mark hidden game, refined in England from the heavy old Spanish Pointer.",
     children: [
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/English_Foxhound_photo.jpeg", value: 30 },
-      { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/greyhound-photo.jpg", value: 25 },
+      { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/origibal-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/bloodhound-photo.jpg", value: 25 },
       { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/english_setter-photo.jpg", value: 20 }
     ]
