@@ -161,8 +161,9 @@ export default function LineageMap({
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
   const [collecting, setCollecting] = useState(false); // my chum tapped: every card tumbles into the bottom-left
   const [collectT, setCollectT] = useState(0); // 0..1 progress of that tumble
+  const [rootShift, setRootShift] = useState(0); // 0..1: slides the main card aside when the pack is ordered
   const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
-  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); collectRef.current = null; }, [breed.name]);
+  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setRootShift(0); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -324,7 +325,7 @@ export default function LineageMap({
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
   // split into the living and the long-gone, and awards a one-off 400 points.
-  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 150; // row pitch tightened since names are hidden in the pack
+  const PACK_LEFT = 96, PACK_COL = 128, PACK_ROW = 128, PACK_RIGHT_RESERVE = 260; // tighter pitch for the 15%-smaller cards; reserve room on the right for the main card
   const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
@@ -346,7 +347,7 @@ export default function LineageMap({
     const alive: typeof pickCards = [], extinct: typeof pickCards = [];
     for (const c of uniq) (isAlive(c.status) ? alive : extinct).push(c);
     // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
-    const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
+    const cols = Math.max(2, Math.min(6, Math.floor((vp.w - PACK_LEFT - PACK_RIGHT_RESERVE) / PACK_COL)));
     const targets = new Map<string, { x: number; y: number }>();
     const place = (arr: typeof pickCards, top: number) => {
       arr.forEach((c, i) => {
@@ -370,6 +371,7 @@ export default function LineageMap({
     flashNum(160 - pan.x, 96 - pan.y, 400, FLASH_SIZE); // one-off award, fed into the pit total
     tween(460, (t) => {
       const e = 1 - Math.pow(1 - t, 3); // ease out
+      setRootShift(e); // the main square card slides off to the right strip in step with the grid
       setDragPos((prev) => {
         const m = new Map(prev);
         uniq.forEach((c) => {
@@ -379,6 +381,7 @@ export default function LineageMap({
         return m;
       });
     }, () => {
+      setRootShift(1);
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
     });
   };
@@ -513,6 +516,13 @@ export default function LineageMap({
     );
   };
 
+  // when ordered, the main card slides into a reserved strip on the right so it
+  // never sits under the grid; rootShift drives the glide
+  const rootPackX = vp.w - 140 - pan.x;
+  const rootPackY = vp.h * 0.5 - pan.y;
+  const rootX = packed ? breed.x + (rootPackX - breed.x) * rootShift : breed.x;
+  const rootY = packed ? breed.y + (rootPackY - breed.y) * rootShift : breed.y;
+
   return (
     <div
       className={styles.overlay}
@@ -525,6 +535,11 @@ export default function LineageMap({
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
+      {totalNodes > 0 && !packed && !collecting && (
+        <div className={styles.dotCount} aria-label={`${totalNodes - seen.size} of ${totalNodes} circles still to turn`}>
+          {totalNodes - seen.size}/{totalNodes}
+        </div>
+      )}
       {showPack && (
         <button
           type="button"
@@ -639,13 +654,16 @@ export default function LineageMap({
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               const clipId = `lm-pick-${c.id}`;
               const cardDeg = -(cardLean * 180) / Math.PI;
+              const packScale = packed ? 0.85 : 1; // ordered-grid cards sit 15% smaller
               const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
               const cxf = ci ? collectXf(c.cardX, c.cardY, ci.spin, cardDeg) : null; // tumble to the corner with the main card
               return (
                 <g
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
-                  transform={cxf ? `${cxf.transform} translate(${-c.cardX},${-c.cardY})` : `rotate(${cardDeg} ${c.cardX} ${c.cardY})`}
+                  transform={cxf
+                    ? `${cxf.transform} scale(${packScale}) translate(${-c.cardX},${-c.cardY})`
+                    : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) scale(${packScale}) translate(${-c.cardX},${-c.cardY})`}
                   style={cxf ? { opacity: cxf.opacity } : undefined}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
@@ -748,7 +766,7 @@ export default function LineageMap({
                 </g>
               );
             })}
-            {rootCard(breed.x, breed.y)}
+            {rootCard(rootX, rootY)}
           </>
         ) : (
           <>

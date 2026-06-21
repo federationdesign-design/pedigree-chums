@@ -152,6 +152,27 @@
 .removeBtn {
   cursor: pointer;
 }
+/* Countdown of yellow circles still to turn blue, sat top-centre of the tree. */
+.dotCount {
+  position: fixed;
+  top: 33px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 5px 18px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: #ffffff;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}
+@media (max-width: 640px) {
+  .dotCount { top: 14px; font-size: 18px; padding: 4px 13px; }
+}
 .chumPop {
   transform-box: fill-box;
   transform-origin: center;

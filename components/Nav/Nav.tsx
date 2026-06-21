@@ -27,6 +27,12 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false }: { hide
     };
   }, []);
 
+  useEffect(() => {
+    const openMenu = () => setOpen(true);
+    window.addEventListener("pc:open-menu", openMenu);
+    return () => window.removeEventListener("pc:open-menu", openMenu);
+  }, []);
+
   return (
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""}`}>
       {hideLogo ? (
@@ -36,16 +42,18 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false }: { hide
           <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
         </Link>
       )}
-      <button
-        type="button"
-        className={styles.burger}
-        onClick={() => setOpen(true)}
-        aria-label="Open menu"
-      >
-        <span />
-        <span />
-        <span />
-      </button>
+      {!dockBottomLeft && (
+        <button
+          type="button"
+          className={styles.burger}
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      )}
 
       {open && (
         <div className={styles.overlay} role="dialog" aria-modal="true">

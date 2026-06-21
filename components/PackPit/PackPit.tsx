@@ -222,6 +222,16 @@ export default function PackPit() {
         b.plugin = { name: label, label, half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind, family: null, ping: 0 };
         return b;
       }
+      // The menu is a pit object too: a yellow rounded square with three bars that
+      // can be flung around, and a tap opens the site menu.
+      function makeMenuBtn(w: number) {
+        const sz = BIG * 1.5;
+        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
+        const b: any = Bodies.rectangle(x, y, sz, sz, { chamfer: { radius: sz * 0.3 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
+        b.plugin = { name: "Menu", label: "Menu", half: sz / 2, w: sz, h: sz, color: "#ffd23e", kind: "menu", family: null, ping: 0 };
+        return b;
+      }
+      let lastMenuCheck = 0, lastMenuSpawn = 0; // respawn the menu if it is ever flung off-screen
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       function dropAll() {
@@ -236,6 +246,7 @@ export default function PackPit() {
           BALLS.forEach((bp, i) => {
             Composite.add(engine.world, makeProp(bp, w));
             if (i === 0) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // pre-order falls after the 1st ball
+            if (i === BALLS.length - 1) Composite.add(engine.world, makeMenuBtn(w)); // the menu falls in with the tennis balls
           });
         };
         // Drop the pack in, optionally landing the bowl midway through.
@@ -247,7 +258,7 @@ export default function PackPit() {
             if (disposed) return;
             dropTimer = setInterval(() => {
               if (k >= order.length) { clearInterval(dropTimer); return; }
-              if (withBowl && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
+              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuBtn(w)); } // a second menu rides in with the bowl
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
             }, 70);
@@ -256,6 +267,7 @@ export default function PackPit() {
         if (isMobile) {
           // mobile: bowl, then balls (pre-order after the 1st), then bone, then the discount-code button, then pack
           addProps([bowl]);
+          Composite.add(engine.world, makeMenuBtn(w)); // a second menu rides in with the bowl
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
@@ -297,6 +309,7 @@ export default function PackPit() {
       const tapButton = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
+        if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
         if (hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         return false;
@@ -312,8 +325,8 @@ export default function PackPit() {
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder") return false; // dogs only, not the toys, fallen circles or the buttons
-        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && !hit.plugin.collected) {
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu") return false; // dogs only, not the toys, fallen circles or the buttons
+        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && !hit.plugin.collected) {
           hit.plugin.collected = true;                                              // only the first collect of a card scores
           numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
           burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));   // pink starburst on first collect
@@ -409,6 +422,17 @@ export default function PackPit() {
             ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
             ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
           }
+          ctx.restore(); return;
+        }
+        if (b.plugin.kind === "menu") {
+          const sz = b.plugin.w, rad = sz * 0.3;
+          if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
+          rrect(ctx, -sz / 2, -sz / 2, sz, sz, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
+          ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+          rrect(ctx, -sz / 2, -sz / 2, sz, sz, rad); ctx.lineWidth = 5; ctx.strokeStyle = hovered ? "rgba(10,58,87,0.55)" : "#0a3a57"; ctx.stroke();
+          const barW = sz * 0.5, barH = Math.max(4, sz * 0.1), gap = sz * 0.22;
+          ctx.fillStyle = "#0a3a57";
+          for (let i = -1; i <= 1; i++) { rrect(ctx, -barW / 2, i * gap - barH / 2, barW, barH, barH / 2); ctx.fill(); }
           ctx.restore(); return;
         }
         if (b.plugin.kind === "reserve" || b.plugin.kind === "preorder") {
@@ -750,6 +774,17 @@ export default function PackPit() {
               const mag = f * REPEL * (1 - d / R) * o.mass;
               Body.applyForce(o, o.position, { x: (dx / d) * mag, y: (dy / d) * mag });
             }
+          }
+        }
+        // drop a fresh menu if every menu body has been flung off-screen (e.g. by a shake)
+        if (now - lastMenuCheck > 1000) {
+          lastMenuCheck = now;
+          const W = stage.clientWidth, H = stage.clientHeight;
+          const menus = all.filter((b: any) => b.plugin?.kind === "menu");
+          const onScreen = menus.some((b: any) => b.position.x > -40 && b.position.x < W + 40 && b.position.y > -40 && b.position.y < H + 40);
+          if (menus.length > 0 && menus.length < 6 && !onScreen && now - lastMenuSpawn > 2500) {
+            lastMenuSpawn = now;
+            Composite.add(engine.world, makeMenuBtn(W));
           }
         }
       });
