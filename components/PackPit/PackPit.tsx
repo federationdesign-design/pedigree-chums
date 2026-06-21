@@ -167,16 +167,14 @@ export default function PackPit() {
         return b;
       }
 
-      // The logo sits fixed in the pit on load. It is a static sensor, so falling
-      // dogs and toys pass through it but the first touch knocks it loose: it goes
-      // dynamic and, still a sensor, falls straight through the floor and pile and
-      // off the bottom of the screen, where it is removed.
-      let logoBody: any = null;
-      function makeLogo(w: number, h: number) {
+      // The logo drops into the pit last, after the whole pack has poured in, so it
+      // lands on top of the pile. It is a normal solid body like the toys.
+      function makeLogo(w: number) {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
+        const x = w / 2 + (Math.random() - 0.5) * 80;
+        const b: any = Bodies.rectangle(x, -bh - 60, bw, bh, { restitution: 0.22, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
@@ -186,24 +184,15 @@ export default function PackPit() {
         }
         return b;
       }
-      const LOGO_HITS_TO_FALL = 5;
-      const LOGO_SINK = BIG * 0.7; // how far each hit pushes it down before it finally goes
-      const LOGO_W = BIG * 6.8;    // matches logo.width
-      const LOGO_TILT = Math.asin(Math.min(1, LOGO_SINK / LOGO_W)); // tilt that drops the free edge 3x the pinned edge
-      let logoHits = 0;
-      const onCollide = (ev: any) => {
-        if (!logoBody || !logoBody.isStatic) return;
-        for (const pair of ev.pairs) {
-          const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
-          if (!lg) continue;
-          const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
-          if (!other || other.isStatic) continue;
-          logoHits++; // count every hit, including repeat knocks from the same object
-          if (logoHits >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it: now a normal solid body
-          Body.translate(lg, { x: 0, y: LOGO_SINK }); // shove the centre down a notch
-          Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
-        }
-      };
+      // The reserve "button" is a pit object: a yellow rounded box the visitor can
+      // fling around, and a tap opens the reservation popup.
+      function makeReserve(w: number) {
+        const rw = BIG * 5.2, rh = BIG * 2.0;
+        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
+        const b: any = Bodies.rectangle(x, y, rw, rh, { chamfer: { radius: rh * 0.34 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
+        b.plugin = { name: "Reserve", half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind: "reserve", family: null, ping: 0 };
+        return b;
+      }
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       function dropAll() {
@@ -221,7 +210,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => {
             if (disposed) return;
             dropTimer = setInterval(() => {
-              if (k >= order.length) { clearInterval(dropTimer); return; }
+              if (k >= order.length) { clearInterval(dropTimer); Composite.add(engine.world, makeLogo(w)); return; } // logo falls in last, landing on top
               if (withBowl && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
@@ -231,13 +220,13 @@ export default function PackPit() {
         if (isMobile) {
           // mobile: bowl first, then the two tennis balls, then the bone, then the pack
           addProps([bowl]);
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(BALLS); }, 700));
+          waveTimers.push(setTimeout(() => { if (!disposed) { addProps(BALLS); Composite.add(engine.world, makeReserve(w)); } }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           dropDogs(2100, false);
         } else {
           // desktop: tennis balls, then bone, then the pack with the bowl midway through
           addProps(BALLS);
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
+          waveTimers.push(setTimeout(() => { if (!disposed) { addProps(HEAVY); Composite.add(engine.world, makeReserve(w)); } }, 1000));
           dropDogs(2000, true);
         }
       }
@@ -266,9 +255,14 @@ export default function PackPit() {
       };
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
+      const tapReserve = (pt: { x: number; y: number }) => {
+        const hit = Query.point(dyn(), pt)[0];
+        if (hit && hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        return false;
+      };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct") return false; // dogs only, not the toys or fallen circles
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve") return false; // dogs only, not the toys, fallen circles or the reserve box
         const r = render.canvas.getBoundingClientRect();
         setActiveBreed({
           name: hit.plugin.name,
@@ -283,6 +277,7 @@ export default function PackPit() {
         const up = localPoint(e);
         // ignore drags: only a near-stationary click opens the lineage
         if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
+        if (tapReserve(up)) return;
         openLineageAt(up);
       };
       // Touch: Matter's drag constraint swallows the synthesised click, so taps
@@ -296,6 +291,7 @@ export default function PackPit() {
         if (!start || e.changedTouches.length !== 1) return;
         const up = touchLocal(e.changedTouches[0]);
         if (Math.hypot(up.x - start.x, up.y - start.y) > 10) return; // a drag, not a tap
+        if (tapReserve(up)) { e.preventDefault(); return; }
         if (openLineageAt(up)) e.preventDefault(); // opened: stop the ghost click reaching the overlay
       };
       render.canvas.addEventListener("mousemove", onMove);
@@ -358,6 +354,17 @@ export default function PackPit() {
             ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
             ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
           }
+          ctx.restore(); return;
+        }
+        if (b.plugin.kind === "reserve") {
+          const rw = b.plugin.w, rh = b.plugin.h, rad = rh * 0.34;
+          if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
+          rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
+          ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+          rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.lineWidth = 3; ctx.strokeStyle = hovered ? "#0a3a57" : "rgba(10,58,87,0.55)"; ctx.stroke();
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = `${Math.round(rh * 0.46)}px "Luckiest Guy", system-ui, sans-serif`;
+          ctx.fillText("Reserve", 0, rh * 0.05);
           ctx.restore(); return;
         }
         if (b.plugin.prop) {
@@ -484,8 +491,7 @@ export default function PackPit() {
           ctx.restore();
         }
       }
-      let patternShown = false;
-      let clearSince: number | null = null;
+      let patternHidden: boolean | null = null;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -499,22 +505,15 @@ export default function PackPit() {
           b.plugin.popAlpha = 1 - t;
         }
         if (popped.length) Composite.remove(engine.world, popped);
-        // the resting logo is static (excluded from dyn()), so draw it here until it
-        // dislodges; once dynamic it falls with everything else and is drawn via dyn()
-        if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); drawNumbers(ctx, now); return; }
-        // background pattern shows only after the floor has been clear of cards
-        // for 10s straight (so it stays off through the pour and shakes); snap, no fade
+        // background pattern shows only while no card rests on the floor; snap, no fade
         let cardAtFloor = false;
         const floorY = render.canvas.height;
         for (const b of bodies) {
           if (b.plugin.prop || b.plugin.kind || b.plugin.logo) continue; // dog cards only
           if (b.position.y + b.plugin.half >= floorY - 8) { cardAtFloor = true; break; }
         }
-        if (cardAtFloor) clearSince = null;
-        else if (clearSince === null) clearSince = now;
-        const wantPattern = !cardAtFloor && clearSince !== null && now - clearSince >= 10000;
-        if (wantPattern !== patternShown) { patternShown = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
+        if (cardAtFloor !== patternHidden) { patternHidden = cardAtFloor; stage.classList.toggle(styles.showPattern, !cardAtFloor); }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
@@ -687,12 +686,6 @@ export default function PackPit() {
       };
       if (isMobile) { motionRef.current = enableMotion; enableMotion(); } // Android grants now; iOS waits for a tap
 
-      if (!isMobile) {
-        logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
-        Composite.add(engine.world, logoBody);
-        Events.on(engine, "collisionStart", onCollide);
-      }
-
       dropAll();
 
       dispose = () => {
@@ -711,7 +704,6 @@ export default function PackPit() {
         window.removeEventListener("deviceorientation", onOrient);
         motionRef.current = () => {};
         Events.off(render, "afterRender", onAfter);
-        Events.off(engine, "collisionStart", onCollide);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);
@@ -740,13 +732,6 @@ export default function PackPit() {
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
-      <button
-        type="button"
-        className={styles.reserve}
-        onClick={() => window.dispatchEvent(new Event("pc:open-offer"))}
-      >
-        Reserve
-      </button>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => removeBreedRef.current(name)} onScatter={(c) => scatterRef.current(c)} />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>

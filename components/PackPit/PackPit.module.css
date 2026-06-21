@@ -72,31 +72,6 @@
 .shakeText {
   display: none;
 }
-.reserve {
-  position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  left: clamp(18px, 4vw, 48px);
-  z-index: 5;
-  height: 84px;
-  padding: 0 22px;
-  border: 0;
-  border-radius: 20px;
-  cursor: pointer;
-  background: var(--yellow);
-  color: var(--navy);
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.01em;
-  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
-}
-.reserve:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
-}
-.dimmed .reserve {
-  opacity: 0;
-  pointer-events: none;
-}
 .shakeIcon {
   display: block;
   width: 64px;
