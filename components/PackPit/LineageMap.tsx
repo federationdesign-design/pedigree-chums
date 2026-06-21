@@ -377,8 +377,6 @@ export default function LineageMap({
     setPackLabels(labels);
     setPackHidden(hidden);
     setPacked(true);
-    setBoxPop(true); // card-pack box flourish, removed after its one-second animation
-    window.setTimeout(() => setBoxPop(false), 1000);
     flashNum(fx ?? (160 - pan.x), fy ?? (96 - pan.y), 400, FLASH_SIZE); // one-off award, fed into the pit total
     tween(460, (t) => {
       const e = 1 - Math.pow(1 - t, 3); // ease out
@@ -401,7 +399,7 @@ export default function LineageMap({
   const startRemove = () => {
     if (removing) return;
     // snapshot where every visible card is right now, plus a tumble spin for each,
-    // so they can all fall into the bottom-left corner like the main square card
+    // so they can all fall into the bottom-right corner like the main square card
     const cards = new Map<string, { x: number; y: number; spin: number }>();
     pickCards.forEach((c) => {
       if (packed && packHidden.has(c.id)) return;
@@ -410,6 +408,7 @@ export default function LineageMap({
     collectRef.current = { cards, rootSpin: (Math.random() < 0.5 ? -1 : 1) * 220 };
     setRemoving(true);
     setCollecting(true);
+    setBoxPop(true); // the card-pack box pops in at the bottom-right as the cards are pushed into it
     burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
     onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
     tween(520, (t) => setCollectT(t), () => {
@@ -422,13 +421,13 @@ export default function LineageMap({
           const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
           return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
         });
-      onScatter?.(circles);
-      onClose();
+      // hold a beat so the bottom-right pack box can finish its pop before the overlay closes
+      window.setTimeout(() => { onScatter?.(circles); onClose(); }, 480);
     });
   };
 
   // the bottom-left tally corner, in the diagram's own (panned) coordinates
-  const cornerX = 60 - pan.x, cornerY = vp.h - 60 - pan.y;
+  const cornerX = vp.w - 60 - pan.x, cornerY = vp.h - 60 - pan.y;
   // a card's tumble-into-the-corner transform at the current collect progress
   const collectXf = (sx: number, sy: number, spin: number, baseDeg: number) => {
     const t = collectT;
@@ -482,30 +481,12 @@ export default function LineageMap({
         <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
           {breed.name}
         </text>
-        {canRemove || removing ? (
-          <g
-            className={styles.removeBtn}
-            transform={`translate(0,62)`}
-            onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + 88, 500, FLASH_SIZE); startRemove(); }}
-            role="button"
-            aria-label="Choose as pack chum"
-          >
-            <g className={styles.chumPop}>
-              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
-              <g className={removing ? styles.chumTopDown : styles.chumTop}>
-                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
-                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>pack chum</text>
-              </g>
-            </g>
-          </g>
-        ) : null}
-        {/* the 3-D Collect button sits below the green chum button; it orders the pack */}
+        {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {allBlue && !packed && !collecting ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,138)`}
-            onClick={(e) => { e.stopPropagation(); burstAt(cx, cy + ROOT + 164, ROOT * 0.9); doPack(cx, cy + ROOT + 164); }}
+            transform={`translate(0,62)`}
+            onClick={(e) => { e.stopPropagation(); burstAt(cx, cy + ROOT + 88, ROOT * 0.9); doPack(cx, cy + ROOT + 88); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
             aria-label="Collect the ancestor pack"
@@ -516,6 +497,25 @@ export default function LineageMap({
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Collect</text>
+              </g>
+            </g>
+          </g>
+        ) : null}
+        {/* the green pack chum button sits below Collect; it pushes the cards into the box */}
+        {canRemove || removing ? (
+          <g
+            className={styles.removeBtn}
+            transform={`translate(0,138)`}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + 164, 500, FLASH_SIZE); startRemove(); }}
+            role="button"
+            aria-label="Choose as pack chum"
+          >
+            <g className={styles.chumPop}>
+              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
+              <g className={removing ? styles.chumTopDown : styles.chumTop}>
+                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
+                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>pack chum</text>
               </g>
             </g>
           </g>
@@ -554,20 +554,6 @@ export default function LineageMap({
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={packed ? "Ancestor pack complete" : complete ? "Order the ancestor pack" : "Complete the ancestor pack"}
         >
-          {complete ? (
-            <img className={styles.packIcon} src="/checklist-icon-complete.svg" alt="" aria-hidden="true" />
-          ) : (
-            <svg className={styles.packIcon} viewBox="0 0 48 58" aria-hidden="true">
-              <rect className={styles.packBoard} x="6" y="8" width="36" height="46" rx="5" />
-              <rect className={styles.packClip} x="16" y="3" width="16" height="9" rx="3.5" />
-              <rect className={styles.packTick} x="13" y="20" width="5" height="5" rx="1.4" />
-              <rect className={styles.packRow} x="21" y="21" width="15" height="3" rx="1.5" />
-              <rect className={styles.packTick} x="13" y="30" width="5" height="5" rx="1.4" />
-              <rect className={styles.packRow} x="21" y="31" width="15" height="3" rx="1.5" />
-              <rect className={styles.packTick} x="13" y="40" width="5" height="5" rx="1.4" />
-              <rect className={styles.packRow} x="21" y="41" width="15" height="3" rx="1.5" />
-            </svg>
-          )}
           <span className={styles.packText}>{packed ? "Done!" : "Complete Ancestor Pack"}</span>
         </button>
       )}
@@ -639,7 +625,7 @@ export default function LineageMap({
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
-                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
+                    <text className={styles.pct} textAnchor="end" dominantBaseline="central" x={r + Math.max(7, r * 0.24)} fontSize={Math.max(16, r * 0.72)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
                     {picked.has(n._id) ? null : (
