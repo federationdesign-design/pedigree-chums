@@ -767,7 +767,7 @@ export default function LineageMap({
                       <>
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 12} y={py + ph / 2 + 1} dominantBaseline="central">
-                          {c.mix}%
+                          {c.mix < 1 ? "<1%" : `${c.mix}%`}
                         </text>
                       </>
                     );
