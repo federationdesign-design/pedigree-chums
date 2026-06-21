@@ -240,7 +240,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.",  value: 40 },
       { name: "Cardigan Welsh Corgi", note: "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.", img: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", value: 35 },
-      { name: "Welsh herding dogs", note: "Local Welsh working stock that shaped it into a low, nimble cattle dog.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 }
+      { name: "Welsh herding dogs", note: "The old Welsh hill and droving sheepdogs, the shaggy landrace stock behind the region's herding breeds.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 }
     ]
   },
 
@@ -260,7 +260,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Widely called the cleverest dog of all, bred purely for the work of gathering and moving sheep on the hills.",
     children: [
       { name: "Old Scotch Collie", note: "The hardy hill-collie stock at the heart of the breed, traced to one famous dog, Old Hemp.",  value: 50 },
-      { name: "Welsh sheepdogs", note: "Local Welsh herding dogs that fed into the working type along the border.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 },
+      { name: "Welsh herding dogs", note: "The old Welsh hill and droving sheepdogs, the shaggy landrace stock behind the region's herding breeds.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 },
       { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", value: 25 }
     ]
   },
@@ -640,7 +640,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rough Collie",
     note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
     children: [
-      { name: "Old working collies", note: "The hardy Scottish farm-collie stock at its heart.", img: "/history/breeds/Border_Collie_photo.jpg", value: 65 },
+      { name: "Old working collies", note: "The old British working-collie landrace, the common farm stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Border_Collie_photo.jpg", value: 65 },
       { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family.",  value: 35 }
     ]
   },
@@ -686,8 +686,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cumberland Sheepdog",
     note: "An extinct northern working collie of Cumberland and the border hills, a close relative of the Border Collie that was largely absorbed into it.",
     children: [
-      { name: "Old working collies", note: "The old British herding-collie stock it sprang from.", img: "/history/breeds/Border_Collie_photo.jpg", value: 60 },
-      { name: "Welsh and hill sheepdogs", note: "Related upland herding dogs of the same type.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 40 }
+      { name: "Old working collies", note: "The old British working-collie landrace, the common farm stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Border_Collie_photo.jpg", value: 60 },
+      { name: "Welsh herding dogs", note: "The old Welsh hill and droving sheepdogs, the shaggy landrace stock behind the region's herding breeds.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 40 }
     ]
   },
 
@@ -750,7 +750,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
       { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.",  value: 55 },
-      { name: "Old Welsh herding dogs", note: "Local working dogs that made it a nimble cattle herder.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
+      { name: "Welsh herding dogs", note: "The old Welsh hill and droving sheepdogs, the shaggy landrace stock behind the region's herding breeds.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
     ]
   },
 
@@ -871,7 +871,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
     children: [
       { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
-      { name: "Native Scottish collies", note: "The local working herding dogs they were crossed with.", img: "/history/breeds/Border_Collie_photo.jpg", value: 50 }
+      { name: "Old working collies", note: "The old British working-collie landrace, the common farm stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Border_Collie_photo.jpg", value: 50 }
     ]
   },
 
@@ -880,7 +880,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A big, shaggy, bobtailed drover's dog of the west country, bred to drive sheep and cattle to market.",
     children: [
       { name: "Bearded Collie", note: "The shaggy Scottish herder in its make-up.",  value: 55 },
-      { name: "Shaggy droving herders", note: "Old continental and Welsh droving dogs of the same heavy-coated type.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
+      { name: "Welsh herding dogs", note: "The old Welsh hill and droving sheepdogs, the shaggy landrace stock behind the region's herding breeds.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 45 }
     ]
   },
 
@@ -927,7 +927,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cur",
     note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
     children: [
-      { name: "Herding collies", note: "Sheep- and cattle-droving blood for the work.", img: "/history/breeds/Border_Collie_photo.jpg", value: 55 },
+      { name: "Old working collies", note: "The old British working-collie landrace, the common farm stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Border_Collie_photo.jpg", value: 55 },
       { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
     ]
   },
@@ -945,7 +945,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old Welsh Grey Sheepdog",
     note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost.",
     children: [
-      { name: "Old Welsh herding collies", note: "The native working herding stock of Wales.", img: "/history/breeds/Border_Collie_photo.jpg", value: 60 },
+      { name: "Welsh herding dogs", note: "The old Welsh hill and droving sheepdogs, the shaggy landrace stock behind the region's herding breeds.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 60 },
       { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.",  value: 40 }
     ]
   },

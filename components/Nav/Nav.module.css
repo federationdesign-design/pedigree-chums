@@ -9,6 +9,18 @@
   justify-content: space-between;
   padding: 18px clamp(18px, 4vw, 48px);
 }
+/* Home page: drop the menu out of the top header strip (which can sit under the
+   browser chrome) down to the bottom-left, above the chums tally, where it is
+   easy to reach. */
+.barDock {
+  top: auto;
+  bottom: calc(210px + env(safe-area-inset-bottom, 0px));
+  left: clamp(6px, 1.5vw, 18px);
+  right: auto;
+  width: auto;
+  padding: 0;
+  justify-content: flex-start;
+}
 
 .logo {
   display: block;

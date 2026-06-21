@@ -11,7 +11,7 @@ const links = [
   { label: "Britain's Dog History", href: "/britains-dog-history" },
 ];
 
-export default function Nav({ hideLogo = false }: { hideLogo?: boolean }) {
+export default function Nav({ hideLogo = false, dockBottomLeft = false }: { hideLogo?: boolean; dockBottomLeft?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,7 +28,7 @@ export default function Nav({ hideLogo = false }: { hideLogo?: boolean }) {
   }, []);
 
   return (
-    <header className={`pc-nav ${styles.bar} ${scrolled ? styles.scrolled : ""}`}>
+    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""}`}>
       {hideLogo ? (
         <span aria-hidden />
       ) : (

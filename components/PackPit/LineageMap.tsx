@@ -402,8 +402,8 @@ export default function LineageMap({
         {canRemove || removing ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(${tagW / 2 + 8 + 100},0)`}
-            onClick={(e) => { e.stopPropagation(); flashNum(cx + tagW / 2 + 108, cy + ROOT + 26, 500, FLASH_SIZE); startRemove(); }}
+            transform={`translate(0,62)`}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + 88, 500, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label="Choose as my chum"
           >

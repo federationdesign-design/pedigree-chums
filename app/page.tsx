@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <Nav hideLogo />
+      <Nav hideLogo dockBottomLeft />
       <main>
         <PackPit />
       </main>
