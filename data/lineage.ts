@@ -619,7 +619,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Curly-Coated Retriever",
     note: "One of the oldest retrievers, a tall water dog covered in tight curls, the gamekeeper's and poacher's choice for wildfowl.",
     children: [
-      { name: "English Water Spaniel", note: "The extinct native water spaniel at its core.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 35 },
+      { name: "English Water Spaniel", note: "The extinct native water spaniel at its core.", img: "/history/breeds/original-water-spaniel.jpg", value: 35 },
       { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood for retrieving.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 30 },
       { name: "Irish Water Spaniel", note: "Its closest relative, sharing the curly water-dog coat.", img: "/history/breeds/irish-water-spaniel.jpg", value: 20 },
       { name: "Poodle", note: "A later touch, often credited for the tight curls.", img: "/poodle-square.jpg", value: 15 }
@@ -888,7 +888,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "King Charles Spaniel",
     note: "The flat-faced toy spaniel of the Stuart court, a lapdog favourite long before its longer-nosed Cavalier cousin.",
     children: [
-      { name: "Old toy spaniels", note: "The small sporting and lap spaniels of Tudor and Stuart England.",  value: 60 },
+      { name: "Old toy spaniels", note: "The small sporting and lap spaniels of Tudor and Stuart England.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 60 },
       { name: "Asian flat-faced toys", note: "Pug and oriental toy blood that shortened the muzzle.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 40 }
     ]
   },
