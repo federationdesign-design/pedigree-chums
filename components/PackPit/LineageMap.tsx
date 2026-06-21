@@ -159,7 +159,10 @@ export default function LineageMap({
   const [packed, setPacked] = useState(false); // the ancestor pack has been ordered into its two columns
   const [packLabels, setPackLabels] = useState<{ alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ alive: null, extinct: null });
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
-  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); }, [breed.name]);
+  const [collecting, setCollecting] = useState(false); // my chum tapped: every card tumbles into the bottom-left
+  const [collectT, setCollectT] = useState(0); // 0..1 progress of that tumble
+  const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
+  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -181,6 +184,17 @@ export default function LineageMap({
   };
   // tick while a burst is alive so the spokes animate frame by frame, like the pit
   const [, setTick] = useState(0);
+  // simple requestAnimationFrame tween, used to glide the cards into the pack and to
+  // tumble them all into the corner; onStep gets eased 0..1, onDone fires at the end
+  const tween = (dur: number, onStep: (t: number) => void, onDone?: () => void) => {
+    const t0 = performance.now();
+    const loop = () => {
+      const t = Math.min(1, (performance.now() - t0) / dur);
+      onStep(t);
+      if (t < 1) requestAnimationFrame(loop); else onDone?.();
+    };
+    requestAnimationFrame(loop);
+  };
   useEffect(() => {
     if (bursts.length === 0) return;
     let raf = 0;
@@ -333,12 +347,12 @@ export default function LineageMap({
     for (const c of uniq) (isAlive(c.status) ? alive : extinct).push(c);
     // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
     const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
-    const next = new Map(dragPos);
+    const targets = new Map<string, { x: number; y: number }>();
     const place = (arr: typeof pickCards, top: number) => {
       arr.forEach((c, i) => {
         const sx = PACK_LEFT + (i % cols) * PACK_COL;
         const sy = top + Math.floor(i / cols) * PACK_ROW;
-        next.set(c.id, { x: sx - pan.x, y: sy - pan.y }); // screen target, stored in user coords
+        targets.set(c.id, { x: sx - pan.x, y: sy - pan.y }); // screen target, stored in user coords
       });
       return top + Math.ceil(arr.length / cols) * PACK_ROW;
     };
@@ -347,11 +361,26 @@ export default function LineageMap({
     // header sits 40px higher than the card row so it clears the cancel buttons
     if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
     if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y: y - 40 }; place(extinct, y + 64); }
-    setDragPos(next);
+    // where each card sits right now, so we can glide it from there to its slot
+    const starts = new Map<string, { x: number; y: number }>();
+    uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
     setPackLabels(labels);
     setPackHidden(hidden);
     setPacked(true);
     flashNum(160 - pan.x, 96 - pan.y, 400, FLASH_SIZE); // one-off award, fed into the pit total
+    tween(460, (t) => {
+      const e = 1 - Math.pow(1 - t, 3); // ease out
+      setDragPos((prev) => {
+        const m = new Map(prev);
+        uniq.forEach((c) => {
+          const s = starts.get(c.id), g = targets.get(c.id);
+          if (s && g) m.set(c.id, { x: s.x + (g.x - s.x) * e, y: s.y + (g.y - s.y) * e });
+        });
+        return m;
+      });
+    }, () => {
+      setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
+    });
   };
 
   // fully exposed = every branch that has children is open, nothing left to unfold
@@ -359,9 +388,19 @@ export default function LineageMap({
 
   const startRemove = () => {
     if (removing) return;
+    // snapshot where every visible card is right now, plus a tumble spin for each,
+    // so they can all fall into the bottom-left corner like the main square card
+    const cards = new Map<string, { x: number; y: number; spin: number }>();
+    pickCards.forEach((c) => {
+      if (packed && packHidden.has(c.id)) return;
+      cards.set(c.id, { x: c.cardX, y: c.cardY, spin: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 160) });
+    });
+    collectRef.current = { cards, rootSpin: (Math.random() < 0.5 ? -1 : 1) * 220 };
     setRemoving(true);
+    setCollecting(true);
+    burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
     onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
-    setTimeout(() => {
+    tween(520, (t) => setCollectT(t), () => {
       // hand the visible percentage circles to the pit as real falling bodies,
       // in screen coords (their user coords plus the current pan)
       const circles = shown
@@ -373,15 +412,33 @@ export default function LineageMap({
         });
       onScatter?.(circles);
       onClose();
-    }, 340);
+    });
+  };
+
+  // the bottom-left tally corner, in the diagram's own (panned) coordinates
+  const cornerX = 60 - pan.x, cornerY = vp.h - 60 - pan.y;
+  // a card's tumble-into-the-corner transform at the current collect progress
+  const collectXf = (sx: number, sy: number, spin: number, baseDeg: number) => {
+    const t = collectT;
+    const x = sx + (cornerX - sx) * t;        // x slides toward the corner
+    const y = sy + (cornerY - sy) * (t * t);  // y accelerates downward, a curved fall
+    const sc = Math.max(0.04, 1 - t);          // shrinks into the tally
+    return { transform: `translate(${x},${y}) rotate(${baseDeg + spin * t}) scale(${sc})`, opacity: t > 0.72 ? Math.max(0, (1 - t) / 0.28) : 1 };
   };
 
   // the dog card, drawn at a given point, leaning to match the pile angle
-  const rootCard = (cx: number, cy: number) => (
+  const rootCard = (cx: number, cy: number) => {
+    const baseDeg = (cardLean * 180) / Math.PI;
+    const rootXf = collecting && collectRef.current
+      ? collectXf(cx, cy, collectRef.current.rootSpin, baseDeg)
+      : { transform: `translate(${cx},${cy}) rotate(${baseDeg})`, opacity: 1 };
+    const groupFade = collecting ? Math.max(0, 1 - collectT * 1.6) : 1;
+    return (
     <>
       <g
         className={styles.rootHit}
-        transform={`translate(${cx},${cy}) rotate(${(cardLean * 180) / Math.PI})`}
+        transform={rootXf.transform}
+        style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
       >
         <clipPath id={clip}>
@@ -408,7 +465,27 @@ export default function LineageMap({
           );
         })()}
       </g>
-      <g className={styles.rootHit} transform={`translate(${cx},${cy + ROOT + 26})`} onClick={(e) => e.stopPropagation()}>
+      {/* the 3-D Complete button pops in just above the card the moment every circle is blue */}
+      {allBlue && !packed && !collecting ? (
+        <g
+          className={styles.removeBtn}
+          transform={`translate(${cx},${cy - ROOT - 56})`}
+          onClick={(e) => { e.stopPropagation(); doPack(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          role="button"
+          aria-label="Complete the ancestor pack"
+        >
+          <g className={styles.chumPop}>
+            <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
+            <g className={styles.chumTop}>
+              <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
+              <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
+              <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Complete</text>
+            </g>
+          </g>
+        </g>
+      ) : null}
+      <g className={styles.rootHit} transform={`translate(${cx},${cy + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
         <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
           {breed.name}
@@ -433,7 +510,8 @@ export default function LineageMap({
         ) : null}
       </g>
     </>
-  );
+    );
+  };
 
   return (
     <div
@@ -560,11 +638,15 @@ export default function LineageMap({
             {pickCards.map((c) => {
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               const clipId = `lm-pick-${c.id}`;
+              const cardDeg = -(cardLean * 180) / Math.PI;
+              const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
+              const cxf = ci ? collectXf(c.cardX, c.cardY, ci.spin, cardDeg) : null; // tumble to the corner with the main card
               return (
                 <g
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
-                  transform={`rotate(${-(cardLean * 180) / Math.PI} ${c.cardX} ${c.cardY})`}
+                  transform={cxf ? `${cxf.transform} translate(${-c.cardX},${-c.cardY})` : `rotate(${cardDeg} ${c.cardX} ${c.cardY})`}
+                  style={cxf ? { opacity: cxf.opacity } : undefined}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();

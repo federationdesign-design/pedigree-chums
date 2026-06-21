@@ -194,6 +194,28 @@
   fill: #ffffff;
 }
 
+/* The Complete button uses the same 3-D pill as my chum, in brand blue so the two
+   read as different actions: blue orders the pack, green picks the chum. */
+.compPill {
+  fill: #1497d6;
+  stroke: var(--navy);
+  stroke-width: 2;
+}
+.compBase {
+  fill: #0c6a9c;
+  stroke: var(--navy);
+  stroke-width: 2;
+}
+.removeBtn:hover .compPill {
+  fill: #3bb0ec;
+}
+.compText {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+  fill: #ffffff;
+}
+
 /* Little white score numbers that flash up when a node or the chum button is tapped. */
 .flashNum {
   fill: #ffffff;
