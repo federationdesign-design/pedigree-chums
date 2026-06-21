@@ -485,8 +485,8 @@ export default function PackPit() {
           const n = numbers[i], t = (now - n.born) / n.life;
           if (t >= 1) { numbers.splice(i, 1); continue; }
           ctx.save(); ctx.globalAlpha = 1 - t;
-          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.font = "800 18px Montserrat, system-ui, sans-serif";
+          ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = "400 17px Montserrat, system-ui, sans-serif";
           ctx.fillText(String(n.val), n.x, n.y - 22 - t * 34);
           ctx.restore();
         }
