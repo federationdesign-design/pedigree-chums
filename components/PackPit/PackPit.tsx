@@ -21,7 +21,7 @@ export default function PackPit() {
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
-  const scatterRef = useRef<(circles: { x: number; y: number; r: number; share: number }[]) => void>(() => {});
+  const scatterRef = useRef<(circles: { x: number; y: number; r: number; share: number; name: string }[]) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
   useEffect(() => {
@@ -399,6 +399,19 @@ export default function PackPit() {
       const DIM_MIN = 0.5;   // how far the rest of the pack dims behind the hovered chum
       const DIM_TIME = 0.5;  // seconds to ease in and out of that dim, so it never flashes
       let dimLevel = 1, lastFrame = 0;
+      const particles: any[] = [];
+      function drawParticles(ctx: any, now: number) {
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const pt = particles[i], t = (now - pt.born) / pt.life;
+          if (t >= 1) { particles.splice(i, 1); continue; }
+          pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.03; pt.vx *= 0.98;
+          ctx.save(); ctx.globalAlpha = (1 - t) * 0.6;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r * (1 + t * 1.4), 0, Math.PI * 2);
+          ctx.fillStyle = "#eaf6ff"; ctx.fill();
+          ctx.lineWidth = 1.5; ctx.strokeStyle = "rgba(20,151,214,0.5)"; ctx.stroke();
+          ctx.restore();
+        }
+      }
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -415,7 +428,7 @@ export default function PackPit() {
         // the resting logo is static (excluded from dyn()), so draw it here until it
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
-        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); return; }
+        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); return; }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
@@ -445,10 +458,23 @@ export default function PackPit() {
           ctx.fillStyle = "rgba(10,58,87,0.92)"; pill(ctx, hp.x - w / 2, ly - 13, w, 26); ctx.fill();
           ctx.fillStyle = "#fff"; ctx.fillText(hoverBody.plugin.name, hp.x, ly); ctx.restore();
         }
+        drawParticles(ctx, now);
       };
       removeBreedRef.current = (name: string) => {
-        const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo);
-        if (target && !target.plugin.pop) target.plugin.pop = performance.now();
+        const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
+        if (target && !target.plugin.pop) {
+          target.plugin.pop = performance.now();
+          // burst of little bubbles as the card pops out of existence
+          const cp = target.position, ss = target.plugin.half || 30;
+          for (let i = 0; i < 16; i++) {
+            const a = Math.random() * Math.PI * 2, sp = 0.4 + Math.random() * 2.2;
+            particles.push({
+              x: cp.x + (Math.random() - 0.5) * ss, y: cp.y + (Math.random() - 0.5) * ss,
+              vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1,
+              r: 3 + Math.random() * 6, born: performance.now(), life: 420 + Math.random() * 340,
+            });
+          }
+        }
       };
 
       scatterRef.current = (circles) => {
@@ -459,7 +485,7 @@ export default function PackPit() {
           const b: any = Bodies.circle(c.x - rect.left, c.y - rect.top, r, {
             restitution: 0.55, friction: 0.2, frictionAir: 0.008, density: 0.0008, render: { visible: false },
           });
-          b.plugin = { name: "pct", kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0 };
+          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0 };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });
           Composite.add(engine.world, b);
         }

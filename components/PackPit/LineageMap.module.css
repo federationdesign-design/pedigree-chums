@@ -157,17 +157,17 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.removeDot {
+.chumPill {
   fill: var(--yellow);
   stroke: var(--navy);
   stroke-width: 2;
 }
-.removeBtn:hover .removeDot {
+.removeBtn:hover .chumPill {
   fill: #ffffff;
 }
-.removeX {
-  stroke: var(--navy);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  fill: none;
+.chumText {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  fill: var(--navy);
 }

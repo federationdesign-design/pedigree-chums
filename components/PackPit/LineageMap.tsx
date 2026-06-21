@@ -70,7 +70,7 @@ export default function LineageMap({
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
   onRemove?: (name: string) => void;
-  onScatter?: (circles: { x: number; y: number; r: number; share: number }[]) => void;
+  onScatter?: (circles: { x: number; y: number; r: number; share: number; name: string }[]) => void;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
   useEffect(() => {
@@ -119,14 +119,14 @@ export default function LineageMap({
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
 
-  // the remove control appears 5s after opening, or as soon as the whole tree is
+  // the remove control appears 25s after opening, or as soon as the whole tree is
   // exposed. clicking it pops the card from the pit, then tips the circles in too.
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
   useEffect(() => {
     setShowRemove(false);
     setRemoving(false);
-    const t = setTimeout(() => setShowRemove(true), 5000);
+    const t = setTimeout(() => setShowRemove(true), 25000);
     return () => clearTimeout(t);
   }, [breed.name]);
 
@@ -239,7 +239,7 @@ export default function LineageMap({
         .slice(0, 60)
         .map((n) => {
           const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-          return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share };
+          return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
         });
       onScatter?.(circles);
       onClose();
@@ -278,13 +278,13 @@ export default function LineageMap({
         {canRemove ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(${tagW / 2 + 22},0)`}
+            transform={`translate(${tagW / 2 + 8 + 44},0)`}
             onClick={(e) => { e.stopPropagation(); startRemove(); }}
             role="button"
-            aria-label="Remove this dog from the pit"
+            aria-label="Choose as my chum"
           >
-            <circle r={13} className={styles.removeDot} />
-            <path d="M -4.5 -4.5 L 4.5 4.5 M 4.5 -4.5 L -4.5 4.5" className={styles.removeX} />
+            <rect x={-44} y={-15} width={88} height={30} rx={15} className={styles.chumPill} />
+            <text className={styles.chumText} textAnchor="middle" dominantBaseline="central">my chum</text>
           </g>
         ) : null}
       </g>
