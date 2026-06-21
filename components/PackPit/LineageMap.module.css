@@ -197,13 +197,26 @@
 /* Little white score numbers that flash up when a node or the chum button is tapped. */
 .flashNum {
   fill: #ffffff;
-  font-family: var(--font-pct), Montserrat, system-ui, sans-serif;
+  font-family: var(--font-pct), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 24px;
   pointer-events: none;
   animation: lm-flash 0.65s ease-out forwards;
 }
 @keyframes lm-flash {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-34px); }
+}
+/* Orange starburst that pops on a circle tap, mirroring the pit's pink one. */
+.burst {
+  stroke: #ff7a1a;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lm-burst 0.45s ease-out forwards;
+}
+@keyframes lm-burst {
+  0% { opacity: 0.9; transform: scale(0.35) rotate(0deg); }
+  100% { opacity: 0; transform: scale(1.2) rotate(8deg); }
 }

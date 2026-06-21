@@ -147,12 +147,18 @@ export default function LineageMap({
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
   // little white numbers that flash up when a node or the chum button is tapped
-  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number }[]>([]);
-  const flashId = useRef(0);
-  const flashNum = (x: number, y: number, val: number) => {
-    const id = (flashId.current += 1);
-    setFlashes((f) => [...f, { id, x, y, val }]);
+  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
+  const [bursts, setBursts] = useState<{ id: number; x: number; y: number; r: number }[]>([]);
+  const fxId = useRef(0);
+  const flashNum = (x: number, y: number, val: number, size: number) => {
+    const id = (fxId.current += 1);
+    setFlashes((f) => [...f, { id, x, y, val, size }]);
     window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
+  };
+  const burstAt = (x: number, y: number, r: number) => {
+    const id = (fxId.current += 1);
+    setBursts((b) => [...b, { id, x, y, r }]);
+    window.setTimeout(() => setBursts((b) => b.filter((n) => n.id !== id)), 450);
   };
   useEffect(() => {
     setShowRemove(false);
@@ -320,7 +326,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(${tagW / 2 + 8 + 100},0)`}
-            onClick={(e) => { e.stopPropagation(); flashNum(cx + tagW / 2 + 108, cy + ROOT + 26, 500); startRemove(); }}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx + tagW / 2 + 108, cy + ROOT + 26, 500, 18); startRemove(); }}
             role="button"
             aria-label="Choose as my chum"
           >
@@ -385,7 +391,8 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
-                      flashNum(n._x, n._y, hasKids ? 125 : 250); // has more inside scores 125, a dead-end leaf scores 250
+                      burstAt(n._x, n._y, r); // orange starburst centred on the circle
+                      flashNum(n._x, n._y - r, hasKids ? 125 : 250, Math.max(13, r * 0.5)); // number rises from the circle's top edge, sized to the % figure
                       follow(n);
                       const wasPicked = picked.has(n._id);
                       setPicked((cur) => {
@@ -538,8 +545,18 @@ export default function LineageMap({
             </g>
           </>
         )}
+        {bursts.map((b) => (
+          <g key={`b${b.id}`} transform={`translate(${b.x},${b.y})`}>
+            <g className={styles.burst}>
+              {Array.from({ length: 12 }).map((_, k) => {
+                const a = (k / 12) * Math.PI * 2;
+                return <line key={k} x1={0} y1={0} x2={Math.cos(a) * b.r} y2={Math.sin(a) * b.r} />;
+              })}
+            </g>
+          </g>
+        ))}
         {flashes.map((f) => (
-          <text key={f.id} className={styles.flashNum} x={f.x} y={f.y} textAnchor="middle">
+          <text key={`f${f.id}`} className={styles.flashNum} x={f.x} y={f.y} fontSize={f.size} textAnchor="middle">
             {f.val}
           </text>
         ))}
