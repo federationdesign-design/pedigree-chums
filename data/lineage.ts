@@ -300,7 +300,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Springer Spaniel",
     note: "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
     children: [
-      { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 45 },
+      { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/Norfolk-Spaniel.jpg", value: 45 },
       { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/original-water-spaniel.jpg", value: 30 },
       { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
     ]
@@ -583,7 +583,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Norfolk Spaniel",
     note: "An extinct liver-and-white springer-type spaniel, the Victorian forerunner of the English Springer, rolled into that breed in 1903.",
     children: [
-      { name: "Land spaniels", note: "The old land-spaniel stock it grew from.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land spaniels", note: "The old springing land-spaniel stock at its core.", img: "/history/breeds/original-land-spaniel.jpg", value: 65 },
+      { name: "Water spaniels", note: "Water-spaniel blood for the liver colour and a keenness in wet cover.", img: "/history/breeds/original-water-spaniel.jpg", value: 35 }
     ]
   },
 

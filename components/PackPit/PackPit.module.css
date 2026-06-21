@@ -16,7 +16,7 @@
   display: block;
   transition: opacity 0.25s ease, filter 0.25s ease;
 }
-/* paw pattern that snaps on only while no card rests on the floor (toggled in JS) */
+/* paw pattern that flashes on each time a square dog strikes the floor (toggled in JS) */
 .pattern {
   position: absolute;
   inset: 0;
@@ -26,6 +26,7 @@
   background-size: 144px auto;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.18s ease;
 }
 .showPattern .pattern {
   opacity: 0.5;

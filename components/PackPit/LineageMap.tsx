@@ -2,7 +2,27 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
+import { ukBreeds } from "../../data/uk-breeds";
 import styles from "./LineageMap.module.css";
+
+type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
+// Same status colours as the history page.
+const TAG_STYLE: Record<BreedTag, { bg: string; fg: string; label: string }> = {
+  extinct: { bg: "#d64545", fg: "#ffffff", label: "Extinct" },
+  trending: { bg: "#2e9e5b", fg: "#ffffff", label: "Trending" },
+  popular: { bg: "#4ade80", fg: "#0a3a57", label: "Popular" },
+  endangered: { bg: "#ff7a3c", fg: "#ffffff", label: "Endangered" },
+  "in-decline": { bg: "#ffb02e", fg: "#0a3a57", label: "In decline" },
+};
+// Work out a breed's state from its note, falling back to the history tag list.
+function nodeStatus(name: string, note: string): BreedTag | null {
+  const n = (note || "").toLowerCase();
+  if (n.includes("extinct")) return "extinct";
+  if (n.includes("in decline") || n.includes("declining")) return "in-decline";
+  if (n.includes("endangered") || n.includes("vulnerable")) return "endangered";
+  const uk = ukBreeds.find((b) => b.name === name);
+  return (uk?.tag as BreedTag) ?? null;
+}
 
 type Node = LineageNode & {
   _id: string;
@@ -116,8 +136,15 @@ export default function LineageMap({
 
   // a dragged card becomes "pinned": snapshot its art so it survives its branch
   // closing, and keep showing it at its dropped spot until breed change / close
-  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number }>>(new Map());
+  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number; status: BreedTag | null }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
+
+  // Dismiss a fixed/opened card (the X in its corner).
+  const removeCard = (id: string) => {
+    setPicked((cur) => { if (!cur.has(id)) return cur; const s = new Set(cur); s.delete(id); return s; });
+    setPinned((m) => { if (!m.has(id)) return m; const x = new Map(m); x.delete(id); return x; });
+    setDragPos((m) => { if (!m.has(id)) return m; const x = new Map(m); x.delete(id); return x; });
+  };
 
   // the remove control appears 25s after opening, or as soon as the whole tree is
   // exposed. clicking it pops the card from the pit, then tips the circles in too.
@@ -212,6 +239,7 @@ export default function LineageMap({
       const img = (live?.img ?? snap?.img) as string;
       const name = live?.name ?? snap?.name ?? "";
       const share = live ? Math.round((live._leaves / (live._parent as Node)._leaves) * 100) : snap?.share ?? 0;
+      const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
       const r = radius(share);
       const d = r + 10 + CARD / 2;
       const baseX = live ? live._x + Math.cos(live._dir) * d : 0;
@@ -219,7 +247,7 @@ export default function LineageMap({
       const pos = dragPos.get(id);
       const cardX = pos ? pos.x : baseX;
       const cardY = pos ? pos.y : baseY;
-      return { id, img, name, share, cardX, cardY };
+      return { id, img, name, share, status, cardX, cardY };
     })
     .filter((c) => c.img);
 
@@ -406,7 +434,7 @@ export default function LineageMap({
                       setPinned((m) => {
                         if (m.has(c.id)) return m;
                         const next = new Map(m);
-                        next.set(c.id, { img: c.img, name: c.name, share: c.share });
+                        next.set(c.id, { img: c.img, name: c.name, share: c.share, status: c.status });
                         return next;
                       });
                     }
@@ -450,6 +478,34 @@ export default function LineageMap({
                       </tspan>
                     ))}
                   </text>
+                  {c.status && (() => {
+                    const ts = TAG_STYLE[c.status];
+                    const bw = ts.label.length * 7.2 + 18;
+                    const bx = c.cardX - CARD / 2 + 8, by = c.cardY - CARD / 2 + 8;
+                    return (
+                      <g style={{ pointerEvents: "none" }}>
+                        <rect x={bx} y={by} width={bw} height={21} rx={10.5} style={{ fill: ts.bg, stroke: "rgba(10,58,87,0.35)", strokeWidth: 1 }} />
+                        <text x={bx + bw / 2} y={by + 11} textAnchor="middle" dominantBaseline="central" style={{ fill: ts.fg, fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "10px", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+                          {ts.label}
+                        </text>
+                      </g>
+                    );
+                  })()}
+                  <g
+                    style={{ cursor: "pointer" }}
+                    onPointerDown={(e) => { e.stopPropagation(); }}
+                    onClick={(e) => { e.stopPropagation(); removeCard(c.id); }}
+                    role="button"
+                    aria-label="Close"
+                  >
+                    <circle cx={c.cardX + CARD / 2 - 16} cy={c.cardY - CARD / 2 + 16} r={12} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2 }} />
+                    <path
+                      d={`M ${c.cardX + CARD / 2 - 20} ${c.cardY - CARD / 2 + 12} l 8 8 M ${c.cardX + CARD / 2 - 12} ${c.cardY - CARD / 2 + 12} l -8 8`}
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                    />
+                  </g>
                 </g>
               );
             })}

@@ -508,7 +508,23 @@ export default function PackPit() {
           ctx.restore();
         }
       }
-      let patternHidden: boolean | null = null;
+      // The paw pattern flashes on each time a square dog strikes the floor, so it
+      // strobes on and off through the pour and whenever the pit is shaken, then
+      // settles off once the cards stop landing.
+      let patternOn = false;
+      let patternUntil = 0;
+      const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
+      const onFloorHit = (ev: any) => {
+        const floor = walls[0];
+        for (const pair of ev.pairs) {
+          const other = pair.bodyA === floor ? pair.bodyB : pair.bodyB === floor ? pair.bodyA : null;
+          if (!other) continue;
+          if (other.plugin?.prop || other.plugin?.kind || other.plugin?.logo) continue; // dog cards only
+          patternUntil = performance.now() + PATTERN_FLASH;
+          break;
+        }
+      };
+      Events.on(engine, "collisionStart", onFloorHit);
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -523,14 +539,9 @@ export default function PackPit() {
         }
         if (popped.length) Composite.remove(engine.world, popped);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); drawNumbers(ctx, now); return; }
-        // background pattern shows only while no card rests on the floor; snap, no fade
-        let cardAtFloor = false;
-        const floorY = render.canvas.height;
-        for (const b of bodies) {
-          if (b.plugin.prop || b.plugin.kind || b.plugin.logo) continue; // dog cards only
-          if (b.position.y + b.plugin.half >= floorY - 8) { cardAtFloor = true; break; }
-        }
-        if (cardAtFloor !== patternHidden) { patternHidden = cardAtFloor; stage.classList.toggle(styles.showPattern, !cardAtFloor); }
+        // pattern is lit while a recent floor strike is still within its flash window
+        const wantPattern = now < patternUntil;
+        if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
@@ -721,6 +732,7 @@ export default function PackPit() {
         window.removeEventListener("deviceorientation", onOrient);
         motionRef.current = () => {};
         Events.off(render, "afterRender", onAfter);
+        Events.off(engine, "collisionStart", onFloorHit);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);

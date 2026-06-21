@@ -842,7 +842,7 @@ const allBreeds: Breed[] = [
     type: "classic",
     sizeBand: "small",
     skull: "medium",
-    image: "/boarder-terrier-square.jpg",
+    image: "/boarder-terrier-square2.jpg",
   },
   {
     name: "Border Collie",
