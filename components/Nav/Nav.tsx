@@ -11,7 +11,7 @@ const links = [
   { label: "Britain's Dog History", href: "/britains-dog-history" },
 ];
 
-export default function Nav() {
+export default function Nav({ hideLogo = false }: { hideLogo?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -29,9 +29,13 @@ export default function Nav() {
 
   return (
     <header className={`pc-nav ${styles.bar} ${scrolled ? styles.scrolled : ""}`}>
-      <Link href="/" className={styles.logo} aria-label="Pedigree Chums home">
-        <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
-      </Link>
+      {hideLogo ? (
+        <span aria-hidden />
+      ) : (
+        <Link href="/" className={styles.logo} aria-label="Pedigree Chums home">
+          <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
+        </Link>
+      )}
       <button
         type="button"
         className={styles.burger}

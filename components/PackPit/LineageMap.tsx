@@ -186,6 +186,18 @@ export default function LineageMap({
     const t = setTimeout(() => setShowRemove(true), 15000);
     return () => clearTimeout(t);
   }, [breed.name]);
+  // every non-root circle in the whole tree; the green button also appears once
+  // all of them have been turned blue (opened), not just after the 15s timer
+  const totalNodes = useMemo(() => {
+    if (!root) return 0;
+    let c = 0;
+    const walk = (n: Node) => { (n.children as Node[] | undefined)?.forEach((k) => { c += 1; walk(k); }); };
+    walk(root);
+    return c;
+  }, [root]);
+  useEffect(() => {
+    if (totalNodes > 0 && seen.size >= totalNodes) setShowRemove(true);
+  }, [seen, totalNodes]);
 
   const base = lean(breed.angle || 0);
   const cardLean = Math.max(-CARD_TILT, Math.min(CARD_TILT, base)); // breed cards tilt at most 2 degrees
@@ -427,6 +439,13 @@ export default function LineageMap({
                       if (wasPicked) {
                         setPinned((m) => { if (!m.has(n._id)) return m; const x = new Map(m); x.delete(n._id); return x; });
                         setDragPos((m) => { if (!m.has(n._id)) return m; const x = new Map(m); x.delete(n._id); return x; });
+                      } else if (n.img && n._parent) {
+                        // pin the opened card at its current spot so it stays on screen even after this branch closes
+                        const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+                        const rr = radius(sh), dd = rr + 10 + CARD / 2;
+                        const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
+                        setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, share: sh, status: nodeStatus(n.name, n.note) }); return x; });
+                        setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
                       }
                     }}
                   >

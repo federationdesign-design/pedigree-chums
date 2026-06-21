@@ -35,10 +35,6 @@
   opacity: 0.16;
   filter: saturate(0.7);
 }
-.dimmed > .controls {
-  opacity: 0;
-  pointer-events: none;
-}
 
 /* One shake control for every viewport: a yellow icon box pinned bottom right.
    The old text instructions are gone; the button alone carries the action. */
@@ -46,7 +42,7 @@
   position: fixed;
   bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   right: clamp(18px, 4vw, 48px);
-  z-index: 5;
+  z-index: 70;
   display: flex;
   flex-direction: column;
   align-items: center;
