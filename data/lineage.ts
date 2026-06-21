@@ -56,10 +56,10 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "German Pinscher",
         note: "The base type, and where the name comes from: a sharp German farm and ratting dog.",
-        img: "/history/breeds/german-pinscher-illustration.jpg",
+        img: "/history/breeds/working-German-Pinscher.jpg",
         children: [
           { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", img: "/history/breeds/old-german-ratting-terriers-illustration.jpg", value: 22 },
-          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 16 }
+          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/history/breeds/Schnauzer-type-farm-dogs.jpg", value: 16 }
         ]
       },
       {
@@ -219,8 +219,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once a fierce bull-baiting dog, then bred into the gentle, wrinkly companion we know after blood sports were banned in 1835.",
     children: [
       { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 60 },
-      { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/mastiff-square.jpg", value: 25 },
-      { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/pug-square.jpg", value: 15 }
+      { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
+      { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 15 }
     ]
   },
 
@@ -991,14 +991,14 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 50 },
       { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", value: 30 },
-      { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed.", value: 20 }
+      { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }
     ]
   },
   "Saint Bernard": {
     name: "Saint Bernard",
     note: "The Alpine rescue dog of the Great St Bernard hospice, grown from Roman farm mastiffs and later thickened with Newfoundland blood.",
     children: [
-      { name: "Alpine mastiff farm dogs", note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.", value: 55 },
+      { name: "Alpine mastiff farm dogs", note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.", img: "/history/breeds/Alpine-mastiff-farm-dogs.jpg", value: 55 },
       { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 25 },
       { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to.", img: "/history/breeds/Ancient-Molossers.jpg", value: 20 }
     ]
@@ -1115,7 +1115,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Standardised from Germany's regional sheep herding dogs into one clever, hard working breed in the 1890s.",
     children: [
       { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", value: 45 },
-      { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head.", value: 40 },
+      { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head.", img: "/history/breeds/Wurttemberg-sheepdogs.jpg", value: 40 },
       { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 15 }
     ]
   },
@@ -1123,7 +1123,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dachshund",
     note: "The German badger dog, a scenthound bred low and long to follow its quarry straight down into the earth.",
     children: [
-      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", value: 60 },
+      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", img: "/history/breeds/German-bracke-scenthounds.jpg", value: 60 },
       { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
       { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", value: 15 }
     ]
