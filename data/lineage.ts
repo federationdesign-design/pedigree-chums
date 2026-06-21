@@ -946,7 +946,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost.",
     children: [
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 60 },
-      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.",  value: 40 }
+      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 40 }
     ]
   },
 
