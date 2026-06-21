@@ -261,6 +261,16 @@
 .packDone .packText {
   font-size: 30px;
 }
+/* at 100% the icon becomes the green-tick "ready" button: a gentle pulse draws
+   the eye to it so it is clear this is what orders the cards */
+.packReady {
+  animation: packPulse 1.5s ease-in-out infinite;
+  transform-origin: left center;
+}
+@keyframes packPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
 .packHead {
   position: absolute;
   font-family: var(--font-body), system-ui, sans-serif;

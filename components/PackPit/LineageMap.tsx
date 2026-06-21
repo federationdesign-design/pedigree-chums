@@ -313,6 +313,8 @@ export default function LineageMap({
   const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
+  const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
+  const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   const doPack = () => {
     if (packed) return;
     const alive: typeof pickCards = [], extinct: typeof pickCards = [];
@@ -434,28 +436,26 @@ export default function LineageMap({
       {showPack && (
         <button
           type="button"
-          className={`${styles.packBtn} ${packed ? styles.packDone : ""}`.trim()}
+          className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
           style={{ opacity: packed ? 1 : packProgress }}
           onClick={(e) => { e.stopPropagation(); doPack(); }}
           onPointerDown={(e) => e.stopPropagation()}
-          aria-label={packed ? "Ancestor pack complete" : "Complete the ancestor pack"}
+          aria-label={packed ? "Ancestor pack complete" : complete ? "Order the ancestor pack" : "Complete the ancestor pack"}
         >
-          <svg className={styles.packIcon} viewBox="0 0 48 58" aria-hidden="true">
-            <rect className={styles.packBoard} x="6" y="8" width="36" height="46" rx="5" />
-            <rect className={styles.packClip} x="16" y="3" width="16" height="9" rx="3.5" />
-            {packed ? (
-              <path className={styles.packCheck} d="M15 31 l6.5 7 l12 -15" />
-            ) : (
-              <>
-                <rect className={styles.packTick} x="13" y="20" width="5" height="5" rx="1.4" />
-                <rect className={styles.packRow} x="21" y="21" width="15" height="3" rx="1.5" />
-                <rect className={styles.packTick} x="13" y="30" width="5" height="5" rx="1.4" />
-                <rect className={styles.packRow} x="21" y="31" width="15" height="3" rx="1.5" />
-                <rect className={styles.packTick} x="13" y="40" width="5" height="5" rx="1.4" />
-                <rect className={styles.packRow} x="21" y="41" width="15" height="3" rx="1.5" />
-              </>
-            )}
-          </svg>
+          {complete ? (
+            <img className={styles.packIcon} src="/checklist-icon-complete.svg" alt="" aria-hidden="true" />
+          ) : (
+            <svg className={styles.packIcon} viewBox="0 0 48 58" aria-hidden="true">
+              <rect className={styles.packBoard} x="6" y="8" width="36" height="46" rx="5" />
+              <rect className={styles.packClip} x="16" y="3" width="16" height="9" rx="3.5" />
+              <rect className={styles.packTick} x="13" y="20" width="5" height="5" rx="1.4" />
+              <rect className={styles.packRow} x="21" y="21" width="15" height="3" rx="1.5" />
+              <rect className={styles.packTick} x="13" y="30" width="5" height="5" rx="1.4" />
+              <rect className={styles.packRow} x="21" y="31" width="15" height="3" rx="1.5" />
+              <rect className={styles.packTick} x="13" y="40" width="5" height="5" rx="1.4" />
+              <rect className={styles.packRow} x="21" y="41" width="15" height="3" rx="1.5" />
+            </svg>
+          )}
           <span className={styles.packText}>{packed ? "Done!" : "Complete Ancestor Pack"}</span>
         </button>
       )}
