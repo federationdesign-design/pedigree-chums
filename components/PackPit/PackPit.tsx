@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import LineageMap from "./LineageMap";
+import { startCheckout } from "../Offer/startCheckout";
 import styles from "./PackPit.module.css";
 
 const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
@@ -186,11 +187,13 @@ export default function PackPit() {
       }
       // The reserve "button" is a pit object: a yellow rounded box the visitor can
       // fling around, and a tap opens the reservation popup.
-      function makeReserve(w: number) {
-        const rw = BIG * 5.2, rh = BIG * 2.0;
+      // The reserve / pre-order "buttons" are pit objects: small yellow rounded
+      // boxes the visitor can fling around, and a tap fires the relevant action.
+      function makeButton(kind: string, label: string, w: number) {
+        const rw = BIG * 2.6, rh = BIG * 1.0;
         const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
         const b: any = Bodies.rectangle(x, y, rw, rh, { chamfer: { radius: rh * 0.34 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
-        b.plugin = { name: "Reserve", half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind: "reserve", family: null, ping: 0 };
+        b.plugin = { name: label, label, half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind, family: null, ping: 0 };
         return b;
       }
       let dropTimer: any = null;
@@ -202,6 +205,13 @@ export default function PackPit() {
         waveTimers.forEach(clearTimeout); waveTimers = [];
         const w = stage.clientWidth;
         const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
+        // tennis balls one at a time so the pre-order button can follow the 2nd
+        const dropBalls = () => {
+          BALLS.forEach((bp, i) => {
+            Composite.add(engine.world, makeProp(bp, w));
+            if (i === 1) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // pre-order falls after the 2nd ball
+          });
+        };
         // Drop the pack in, optionally landing the bowl midway through.
         const dropDogs = (delay: number, withBowl: boolean) => {
           const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
@@ -211,22 +221,23 @@ export default function PackPit() {
             if (disposed) return;
             dropTimer = setInterval(() => {
               if (k >= order.length) { clearInterval(dropTimer); Composite.add(engine.world, makeLogo(w)); return; } // logo falls in last, landing on top
-              if (withBowl && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
+              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeButton("reserve", "Reserve", w)); } // reserve falls after the bowl
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
             }, 70);
           }, delay));
         };
         if (isMobile) {
-          // mobile: bowl first, then the two tennis balls, then the bone, then the pack
+          // mobile: bowl first (reserve right after it), then balls (pre-order after the 2nd), then bone, then pack
           addProps([bowl]);
-          waveTimers.push(setTimeout(() => { if (!disposed) { addProps(BALLS); Composite.add(engine.world, makeReserve(w)); } }, 700));
+          Composite.add(engine.world, makeButton("reserve", "Reserve", w)); // reserve falls after the bowl
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           dropDogs(2100, false);
         } else {
-          // desktop: tennis balls, then bone, then the pack with the bowl midway through
-          addProps(BALLS);
-          waveTimers.push(setTimeout(() => { if (!disposed) { addProps(HEAVY); Composite.add(engine.world, makeReserve(w)); } }, 1000));
+          // desktop: balls (pre-order after the 2nd), then bone, then pack with the bowl midway (reserve after it)
+          dropBalls();
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
           dropDogs(2000, true);
         }
       }
@@ -255,14 +266,16 @@ export default function PackPit() {
       };
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
-      const tapReserve = (pt: { x: number; y: number }) => {
+      const tapButton = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt)[0];
-        if (hit && hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (!hit) return false;
+        if (hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         return false;
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve") return false; // dogs only, not the toys, fallen circles or the reserve box
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder") return false; // dogs only, not the toys, fallen circles or the buttons
         const r = render.canvas.getBoundingClientRect();
         setActiveBreed({
           name: hit.plugin.name,
@@ -277,7 +290,7 @@ export default function PackPit() {
         const up = localPoint(e);
         // ignore drags: only a near-stationary click opens the lineage
         if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
-        if (tapReserve(up)) return;
+        if (tapButton(up)) return;
         openLineageAt(up);
       };
       // Touch: Matter's drag constraint swallows the synthesised click, so taps
@@ -291,7 +304,7 @@ export default function PackPit() {
         if (!start || e.changedTouches.length !== 1) return;
         const up = touchLocal(e.changedTouches[0]);
         if (Math.hypot(up.x - start.x, up.y - start.y) > 10) return; // a drag, not a tap
-        if (tapReserve(up)) { e.preventDefault(); return; }
+        if (tapButton(up)) { e.preventDefault(); return; }
         if (openLineageAt(up)) e.preventDefault(); // opened: stop the ghost click reaching the overlay
       };
       render.canvas.addEventListener("mousemove", onMove);
@@ -356,15 +369,18 @@ export default function PackPit() {
           }
           ctx.restore(); return;
         }
-        if (b.plugin.kind === "reserve") {
+        if (b.plugin.kind === "reserve" || b.plugin.kind === "preorder") {
           const rw = b.plugin.w, rh = b.plugin.h, rad = rh * 0.34;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
           rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
           ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-          rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.lineWidth = 3; ctx.strokeStyle = hovered ? "#0a3a57" : "rgba(10,58,87,0.55)"; ctx.stroke();
+          rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.lineWidth = 5; ctx.strokeStyle = hovered ? "#0a3a57" : "rgba(10,58,87,0.55)"; ctx.stroke();
           ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.font = `${Math.round(rh * 0.46)}px "Luckiest Guy", system-ui, sans-serif`;
-          ctx.fillText("Reserve", 0, rh * 0.05);
+          let fs = Math.round(rh * 0.5);
+          ctx.font = `${fs}px "Luckiest Guy", system-ui, sans-serif`;
+          const maxw = rw * 0.84, tw = ctx.measureText(b.plugin.label).width;
+          if (tw > maxw) { fs = Math.max(8, Math.floor((fs * maxw) / tw)); ctx.font = `${fs}px "Luckiest Guy", system-ui, sans-serif`; }
+          ctx.fillText(b.plugin.label, 0, rh * 0.05);
           ctx.restore(); return;
         }
         if (b.plugin.prop) {
