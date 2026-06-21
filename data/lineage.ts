@@ -26,7 +26,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The earlier dog it all grew from: the fishermen's water dog of Newfoundland, brought to Britain and bred up from there.",
         img: "/history/breeds/St-Johns-Water-Dog.jpg",
         children: [
-          { name: "Fishermen's water dogs", note: "The working water dogs the European fishing crews brought across the Atlantic.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 34 },
+          { name: "Fishermen's water dogs", note: "The working water dogs the European fishing crews brought across the Atlantic.", img: "/history/breeds/Fishermens-water-dogs.jpg", value: 34 },
           { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
         ]
       },
@@ -696,7 +696,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct miniature Bulldog of Victorian England, a small companion bull-type that helped give rise to the French Bulldog.",
     children: [
       { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
-      { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size.",  value: 35 }
+      { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size.", img: "/history/breeds/pug-type-toy-dog.jpg", value: 35 }
     ]
   },
 
@@ -889,7 +889,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The flat-faced toy spaniel of the Stuart court, a lapdog favourite long before its longer-nosed Cavalier cousin.",
     children: [
       { name: "Old toy spaniels", note: "The small sporting and lap spaniels of Tudor and Stuart England.",  value: 60 },
-      { name: "Asian flat-faced toys", note: "Pug and oriental toy blood that shortened the muzzle.",  value: 40 }
+      { name: "Asian flat-faced toys", note: "Pug and oriental toy blood that shortened the muzzle.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 40 }
     ]
   },
 
@@ -972,7 +972,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Poodle",
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
     children: [
-      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 55 },
+      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
       { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 45 }
     ]
   },
