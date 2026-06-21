@@ -412,6 +412,7 @@ export default function LineageMap({
     burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
     onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
     tween(520, (t) => setCollectT(t), () => {
+      burstAt(60 - pan.x, vp.h - 60 - pan.y, ROOT * 1.5); // dot explosion where the cards crash into the bottom-left corner
       // hand the visible percentage circles to the pit as real falling bodies,
       // in screen coords (their user coords plus the current pan)
       const circles = shown
