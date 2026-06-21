@@ -669,7 +669,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1920s revival of the older, longer-nosed toy spaniel of the Stuart court, bred back from the flat-faced King Charles Spaniel.",
     children: [
       { name: "King Charles Spaniel", note: "The modern flat-faced toy spaniel it was bred back from.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 70 },
-      { name: "Old sporting toy spaniels", note: "The longer-muzzled toy spaniels of older paintings.", img: "/history/breeds/toy-Trawler-Spaniel-painting.jpg", value: 30 }
+      { name: "Old sporting toy spaniels", note: "The longer-muzzled toy spaniels of older paintings.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
     ]
   },
 
@@ -1057,7 +1057,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Papillon",
     note: "The butterfly dog, a tiny continental spaniel with winged ears, a fixture of European courts for 700 years.",
     children: [
-      { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance.", value: 70 },
+      { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance.", img: "/history/breeds/Continental-toy-spaniels.jpg", value: 70 },
       { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds.", value: 30 }
     ]
   },

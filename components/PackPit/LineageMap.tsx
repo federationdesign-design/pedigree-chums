@@ -412,7 +412,7 @@ export default function LineageMap({
                 <g
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
-                  transform={`rotate(${(base * 180) / Math.PI} ${c.cardX} ${c.cardY})`}
+                  transform={`rotate(${-(base * 180) / Math.PI} ${c.cardX} ${c.cardY})`}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();
