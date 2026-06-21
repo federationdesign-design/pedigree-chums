@@ -17,6 +17,11 @@ const SHIFT = 0.66;
 // the diagram reads large beside the text column. Mobile keeps PAD (its masonry
 // layout already fills the screen).
 const ZOOM_PAD = 1.1;
+// Breed-title placement on each circle, relative to its label anchor. TITLE_DY
+// moves it up (more negative) or down toward the circle; TITLE_ANGLE tilts it
+// (negative leans the text up to the right). Tweak these two to taste.
+const TITLE_DY = -42;
+const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
 type View = [number, number, number];
 
@@ -458,12 +463,14 @@ export default function BreedTree({
               return (
                 <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
                   {isChild && (
-                    <>
-                      <text x={0} y={-42} style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "17px", letterSpacing: "0.5px" }}>
-                        {d.data.name.toUpperCase()}
-                      </text>
-                      <line x1={-80} x2={80} y1={-22} y2={-22} stroke="#ffffff" strokeWidth={2.5} strokeOpacity={0.85} />
-                    </>
+                    <text
+                      x={0}
+                      y={TITLE_DY}
+                      transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
+                      style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "17px", letterSpacing: "0.5px" }}
+                    >
+                      {d.data.name.toUpperCase()}
+                    </text>
                   )}
                   {pct !== null && (
                     <g>
