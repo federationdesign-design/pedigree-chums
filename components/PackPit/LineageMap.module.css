@@ -177,24 +177,27 @@
 .cardBox {
   position: fixed;
   left: calc(clamp(120px, 22vw, 200px) * -0.5 + 30px); /* half off the left edge, nudged 30px right */
-  bottom: calc(clamp(74px, 12vh, 130px) - 100px); /* dropped 100px lower */
+  bottom: calc(clamp(74px, 12vh, 130px) - 125px); /* dropped 125px lower */
   width: clamp(120px, 22vw, 200px);
   height: auto;
   z-index: 8;
   pointer-events: none;
   transform-origin: 50% 100%;
-  animation: cardBoxPop 1s ease-in-out forwards;
+  animation: cardBoxPop 0.7s ease-in-out 0.5s both;
   filter: drop-shadow(0 10px 16px rgba(10, 58, 87, 0.35));
 }
 @keyframes cardBoxPop {
-  0%   { transform: scale(0.2) rotate(-10deg); opacity: 0; }
-  14%  { transform: scale(1.12) rotate(5deg); opacity: 1; }
-  28%  { transform: translateY(-6px) scale(1) rotate(-6deg); }
-  42%  { transform: translateY(3px) scale(1) rotate(6deg); }
-  56%  { transform: translateY(-6px) scale(1) rotate(-5deg); }
-  70%  { transform: translateY(2px) scale(1) rotate(4deg); }
-  84%  { transform: scale(1.28) rotate(0deg); opacity: 1; }
-  100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  0%   { transform: translateX(0) scale(0.2) rotate(-12deg); opacity: 0; }
+  12%  { transform: translateX(0) scale(1.12) rotate(9deg); opacity: 1; }
+  22%  { transform: translateX(-4px) scale(1) rotate(-8deg); }
+  31%  { transform: translateX(4px) scale(1) rotate(7deg); }
+  40%  { transform: translateX(-3px) scale(1) rotate(-6deg); }
+  49%  { transform: translateX(3px) scale(1) rotate(5deg); }
+  58%  { transform: translateX(-2px) scale(1) rotate(-4deg); }
+  67%  { transform: translateX(2px) scale(1) rotate(3deg); }
+  76%  { transform: translateX(-1px) scale(1) rotate(-2deg); }
+  86%  { transform: translateX(0) scale(1.28) rotate(0deg); opacity: 1; }
+  100% { transform: translateX(0) scale(0) rotate(0deg); opacity: 0; }
 }
 /* Cumulative mix percentage shown on each ordered-grid card. */
 .mixPill {

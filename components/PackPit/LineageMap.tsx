@@ -422,7 +422,7 @@ export default function LineageMap({
           return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
         });
       // hold a beat so the bottom-right pack box can finish its pop before the overlay closes
-      window.setTimeout(() => { onScatter?.(circles); onClose(); }, 480);
+      window.setTimeout(() => { onScatter?.(circles); onClose(); }, 680);
     });
   };
 
