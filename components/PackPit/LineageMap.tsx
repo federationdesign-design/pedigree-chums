@@ -166,9 +166,10 @@ export default function LineageMap({
   const [packLabels, setPackLabels] = useState<{ alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ alive: null, extinct: null });
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
   const [collecting, setCollecting] = useState(false); // my chum tapped: every card tumbles into the bottom-left
+  const [boxPop, setBoxPop] = useState(false); // the card-pack box flourish on collect
   const [collectT, setCollectT] = useState(0); // 0..1 progress of that tumble
   const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
-  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); collectRef.current = null; }, [breed.name]);
+  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setBoxPop(false); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -376,6 +377,8 @@ export default function LineageMap({
     setPackLabels(labels);
     setPackHidden(hidden);
     setPacked(true);
+    setBoxPop(true); // card-pack box flourish, removed after its one-second animation
+    window.setTimeout(() => setBoxPop(false), 1000);
     flashNum(fx ?? (160 - pan.x), fy ?? (96 - pan.y), 400, FLASH_SIZE); // one-off award, fed into the pit total
     tween(460, (t) => {
       const e = 1 - Math.pow(1 - t, 3); // ease out
@@ -534,6 +537,9 @@ export default function LineageMap({
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
+      {boxPop && (
+        <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+      )}
       {totalNodes > 0 && !packed && !collecting && (
         <div className={styles.dotCount} aria-label={`${totalNodes - seen.size} of ${totalNodes} circles still to turn`}>
           {totalNodes - seen.size}/{totalNodes}
