@@ -470,6 +470,7 @@ export default function PackPit() {
           ctx.restore();
         }
       }
+      let patternHidden: boolean | null = null;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -487,6 +488,14 @@ export default function PackPit() {
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); return; }
+        // background pattern shows only while no card rests on the floor; snap, no fade
+        let cardAtFloor = false;
+        const floorY = render.canvas.height;
+        for (const b of bodies) {
+          if (b.plugin.prop || b.plugin.kind || b.plugin.logo) continue; // dog cards only
+          if (b.position.y + b.plugin.half >= floorY - 8) { cardAtFloor = true; break; }
+        }
+        if (cardAtFloor !== patternHidden) { patternHidden = cardAtFloor; stage.classList.toggle(styles.showPattern, !cardAtFloor); }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
@@ -703,6 +712,7 @@ export default function PackPit() {
       ref={stageRef}
       aria-label="The Pack Pit: tip out all the chums and play"
     >
+      <div className={styles.pattern} aria-hidden="true" />
       <div className={styles.controls}>
         <button type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); }} aria-label="Shake the pit">
           <span className={styles.shakeIcon} aria-hidden="true" />

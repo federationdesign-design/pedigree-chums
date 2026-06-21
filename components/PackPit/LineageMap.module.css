@@ -162,6 +162,21 @@
   stroke: var(--navy);
   stroke-width: 2;
 }
+.chumBase {
+  fill: #b9830f;
+  stroke: var(--navy);
+  stroke-width: 2;
+}
+.chumGloss {
+  fill: rgba(255, 255, 255, 0.5);
+}
+.chumTop {
+  transform: translateY(0);
+}
+.chumTopDown {
+  transform: translateY(4px);
+  transition: transform 0.1s ease;
+}
 .removeBtn:hover .chumPill {
   fill: #ffffff;
 }
