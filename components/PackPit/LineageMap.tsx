@@ -104,6 +104,12 @@ export default function LineageMap({
   const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
 
+  // custom drop positions for popped-out progenitor cards; drag to reposition,
+  // they stay where dropped until the breed changes or the map closes
+  const [dragPos, setDragPos] = useState<Map<string, { x: number; y: number }>>(new Map());
+  useEffect(() => setDragPos(new Map()), [breed.name]);
+  const cardDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
+
   const base = lean(breed.angle || 0);
 
   const shown = useMemo(() => {
@@ -284,41 +290,77 @@ export default function LineageMap({
               const d = r + 10 + CARD / 2;
               const cx = pn._x + Math.cos(pn._dir) * d;
               const cy = pn._y + Math.sin(pn._dir) * d;
-              const ex = pn._x + Math.cos(pn._dir) * r;
-              const ey = pn._y + Math.sin(pn._dir) * r;
+              const pos = dragPos.get(pn._id);
+              const cardX = pos ? pos.x : cx;
+              const cardY = pos ? pos.y : cy;
+              // tether leaves the circle pointing at wherever the card now sits
+              const ang = Math.atan2(cardY - pn._y, cardX - pn._x);
+              const ex = pn._x + Math.cos(ang) * r;
+              const ey = pn._y + Math.sin(ang) * r;
               const clipId = `lm-pick-${pn._id}`;
               const lines = wrapName(pn.name);
               const capH = lines.length * 16 + 14;
-              const capTop = cy + CARD / 2 - capH;
+              const capTop = cardY + CARD / 2 - capH;
               return (
-                <g key={`pick-${pn._id}`} className={styles.rootHit} onClick={(e) => e.stopPropagation()}>
-                  <line className={`${styles.edge} ${styles.lit}`} x1={ex} y1={ey} x2={cx} y2={cy} />
+                <g
+                  key={`pick-${pn._id}`}
+                  className={`${styles.rootHit} ${styles.grab}`}
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
+                    cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cardX, oy: cardY, moved: false };
+                  }}
+                  onPointerMove={(e) => {
+                    const cd = cardDrag.current;
+                    if (!cd || e.pointerId !== cd.id) return;
+                    const dx = e.clientX - cd.sx, dy = e.clientY - cd.sy;
+                    if (!cd.moved && Math.hypot(dx, dy) > 3) cd.moved = true;
+                    if (cd.moved) {
+                      suppressClick.current = true;
+                      setDragPos((m) => {
+                        const next = new Map(m);
+                        next.set(pn._id, { x: cd.ox + dx, y: cd.oy + dy });
+                        return next;
+                      });
+                    }
+                  }}
+                  onPointerUp={(e) => {
+                    const cd = cardDrag.current;
+                    if (cd && e.pointerId === cd.id) {
+                      try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
+                      cardDrag.current = null;
+                    }
+                  }}
+                  onPointerCancel={() => { cardDrag.current = null; }}
+                >
+                  <line className={`${styles.edge} ${styles.lit}`} x1={ex} y1={ey} x2={cardX} y2={cardY} />
                   <clipPath id={clipId}>
-                    <rect x={cx - CARD / 2} y={cy - CARD / 2} width={CARD} height={CARD} rx={15} />
+                    <rect x={cardX - CARD / 2} y={cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
                   </clipPath>
                   <image
                     href={pn.img as string}
-                    x={cx - CARD / 2}
-                    y={cy - CARD / 2}
+                    x={cardX - CARD / 2}
+                    y={cardY - CARD / 2}
                     width={CARD}
                     height={CARD}
                     clipPath={`url(#${clipId})`}
                     preserveAspectRatio="xMidYMid slice"
                   />
                   <g clipPath={`url(#${clipId})`}>
-                    <rect x={cx - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
+                    <rect x={cardX - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
                   </g>
                   <rect
-                    x={cx - CARD / 2}
-                    y={cy - CARD / 2}
+                    x={cardX - CARD / 2}
+                    y={cardY - CARD / 2}
                     width={CARD}
                     height={CARD}
                     rx={15}
                     className={styles.pickCard}
                   />
-                  <text className={styles.pickCaptionText} textAnchor="middle" x={cx} y={capTop + 17}>
+                  <text className={styles.pickCaptionText} textAnchor="middle" x={cardX} y={capTop + 17}>
                     {lines.map((ln, i) => (
-                      <tspan key={i} x={cx} dy={i === 0 ? 0 : 16}>
+                      <tspan key={i} x={cardX} dy={i === 0 ? 0 : 16}>
                         {ln}
                       </tspan>
                     ))}

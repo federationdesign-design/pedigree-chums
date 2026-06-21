@@ -141,3 +141,10 @@
 .empty strong {
   font-size: 1.4rem;
 }
+
+.grab {
+  cursor: grab;
+}
+.grab:active {
+  cursor: grabbing;
+}
