@@ -541,8 +541,8 @@ export default function LineageMap({
         <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
       )}
       {totalNodes > 0 && !packed && !collecting && (
-        <div className={styles.dotCount} aria-label={`${totalNodes - seen.size} of ${totalNodes} circles still to turn`}>
-          {totalNodes - seen.size}/{totalNodes}
+        <div className={styles.dotCount} aria-label={`${seen.size} of ${totalNodes} circles turned`}>
+          {seen.size}/{totalNodes}
         </div>
       )}
       {showPack && (
