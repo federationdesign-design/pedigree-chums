@@ -61,6 +61,9 @@ const SPREADN = Math.PI * 0.9;
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
 const CARD = 110;
+// every white flash number is this small, fixed size, matching the pit; it never
+// scales with the circle that was tapped
+const FLASH_SIZE = 15;
 // the popped breed cards lean only slightly, capped at this angle (2 degrees)
 const CARD_TILT = (2 * Math.PI) / 180;
 
@@ -343,7 +346,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(${tagW / 2 + 8 + 100},0)`}
-            onClick={(e) => { e.stopPropagation(); flashNum(cx + tagW / 2 + 108, cy + ROOT + 26, 500, 18); startRemove(); }}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx + tagW / 2 + 108, cy + ROOT + 26, 500, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label="Choose as my chum"
           >
@@ -412,7 +415,7 @@ export default function LineageMap({
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
                       setSeen((s) => { if (s.has(n._id)) return s; const x = new Set(s); x.add(n._id); return x; }); // first tap turns it blue
-                      flashNum(n._x, n._y - r, firstHit ? (hasKids ? 125 : 250) : 0, Math.max(13, r * 0.5)); // only the first tap on a node scores; later taps read 0
+                      flashNum(n._x, n._y - r, firstHit ? (hasKids ? 125 : 250) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
                       follow(n);
                       const wasPicked = picked.has(n._id);
                       setPicked((cur) => {
