@@ -554,6 +554,7 @@ export default function LineageMap({
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={packed ? "Ancestor pack complete" : complete ? "Order the ancestor pack" : "Complete the ancestor pack"}
         >
+          <img className={styles.packIcon} src="/checklist-icon-complete.svg" alt="" aria-hidden="true" />
           <span className={styles.packText}>{packed ? "Done!" : "Complete Ancestor Pack"}</span>
         </button>
       )}
@@ -625,7 +626,7 @@ export default function LineageMap({
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
-                    <text className={styles.pct} textAnchor="end" dominantBaseline="central" x={r + Math.max(7, r * 0.24)} fontSize={Math.max(16, r * 0.72)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
+                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
                     {picked.has(n._id) ? null : (
@@ -755,11 +756,12 @@ export default function LineageMap({
                     );
                   })()}
                   {packed && (() => {
-                    const pw = 52, ph = 26, py = c.cardY + CARD / 2 - ph / 2 - 6; // pill near the foot of the card
+                    const pw = 66, ph = 32, py = c.cardY + CARD / 2 - ph / 2 - 6; // pill near the foot of the card
+                    const pillRight = c.cardX + CARD / 2 + 6; // right-aligned to the card, nudged just past the edge
                     return (
                       <>
-                        <rect className={styles.mixPill} x={c.cardX - pw / 2} y={py} width={pw} height={ph} rx={ph / 2} />
-                        <text className={styles.mixText} textAnchor="middle" x={c.cardX} y={py + ph / 2 + 1} dominantBaseline="central">
+                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
+                        <text className={styles.mixText} textAnchor="end" x={pillRight - 12} y={py + ph / 2 + 1} dominantBaseline="central">
                           {c.mix}%
                         </text>
                       </>
