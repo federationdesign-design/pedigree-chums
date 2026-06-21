@@ -575,7 +575,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An old, short-legged, golden-liver spaniel from the county of Sussex, bred to work slowly and give tongue in dense cover.",
     children: [
       { name: "Land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
-      { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 40 }
+      { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build.", img: "/history/breeds/heavier-working-spaniel.jpg", value: 40 }
     ]
   },
 
