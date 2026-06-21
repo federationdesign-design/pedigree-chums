@@ -37,6 +37,10 @@ function nodeStatus(name: string, note: string): BreedTag | null {
   const uk = ukBreeds.find((b) => b.name === name);
   return (uk?.tag as BreedTag) ?? null;
 }
+// living breeds carry one of the active tags; everything else (extinct tag or no
+// tag at all, e.g. old landrace "stock") counts as gone, matching the pack split
+const ALIVE_TAGS = new Set<BreedTag>(["trending", "popular", "endangered", "in-decline"]);
+const isAlive = (s: BreedTag | null) => !!s && ALIVE_TAGS.has(s);
 
 type Node = LineageNode & {
   _id: string;
@@ -152,6 +156,9 @@ export default function LineageMap({
   // exposed. clicking it pops the card from the pit, then tips the circles in too.
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [packed, setPacked] = useState(false); // the ancestor pack has been ordered into its two columns
+  const [packLabels, setPackLabels] = useState<{ alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ alive: null, extinct: null });
+  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -244,6 +251,7 @@ export default function LineageMap({
   // Drag anywhere to pan the diagram. A drag suppresses the click that would
   // otherwise close the overlay or select a circle.
   const onPanDown = (e: React.PointerEvent) => {
+    if (packed) return; // keep the ordered pack fixed under the icon
     suppressClick.current = false;
     drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
   };
@@ -294,6 +302,34 @@ export default function LineageMap({
       return { id, img, name, share, status, cardX, cardY };
     })
     .filter((c) => c.img);
+
+  // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
+  // clipboard icon appears; tapping it gathers every open card to the top left,
+  // split into the living and the long-gone, and awards a one-off 400 points.
+  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 188, PACK_COLS = 2;
+  const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
+  const doPack = () => {
+    if (packed) return;
+    const alive: typeof pickCards = [], extinct: typeof pickCards = [];
+    for (const c of pickCards) (isAlive(c.status) ? alive : extinct).push(c);
+    const next = new Map(dragPos);
+    const place = (arr: typeof pickCards, top: number) => {
+      arr.forEach((c, i) => {
+        const sx = PACK_LEFT + (i % PACK_COLS) * PACK_COL;
+        const sy = top + Math.floor(i / PACK_COLS) * PACK_ROW;
+        next.set(c.id, { x: sx - pan.x, y: sy - pan.y }); // screen target, stored in user coords
+      });
+      return top + Math.ceil(arr.length / PACK_COLS) * PACK_ROW;
+    };
+    let y = 150;
+    const labels: { alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { alive: null, extinct: null };
+    if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y }; y = place(alive, y + 64) + 8; }
+    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y }; place(extinct, y + 64); }
+    setDragPos(next);
+    setPackLabels(labels);
+    setPacked(true);
+    flashNum(160 - pan.x, 96 - pan.y, 400, FLASH_SIZE); // one-off award, fed into the pit total
+  };
 
   // fully exposed = every branch that has children is open, nothing left to unfold
   const canRemove = showRemove && !removing;
@@ -388,6 +424,39 @@ export default function LineageMap({
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
+      {showPack && (
+        <button
+          type="button"
+          className={`${styles.packBtn} ${packed ? styles.packDone : ""}`.trim()}
+          onClick={(e) => { e.stopPropagation(); doPack(); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          aria-label={packed ? "Ancestor pack complete" : "Complete the ancestor pack"}
+        >
+          <svg className={styles.packIcon} viewBox="0 0 48 58" aria-hidden="true">
+            <rect className={styles.packBoard} x="6" y="8" width="36" height="46" rx="5" />
+            <rect className={styles.packClip} x="16" y="3" width="16" height="9" rx="3.5" />
+            {packed ? (
+              <path className={styles.packCheck} d="M15 31 l6.5 7 l12 -15" />
+            ) : (
+              <>
+                <rect className={styles.packTick} x="13" y="20" width="5" height="5" rx="1.4" />
+                <rect className={styles.packRow} x="21" y="21" width="15" height="3" rx="1.5" />
+                <rect className={styles.packTick} x="13" y="30" width="5" height="5" rx="1.4" />
+                <rect className={styles.packRow} x="21" y="31" width="15" height="3" rx="1.5" />
+                <rect className={styles.packTick} x="13" y="40" width="5" height="5" rx="1.4" />
+                <rect className={styles.packRow} x="21" y="41" width="15" height="3" rx="1.5" />
+              </>
+            )}
+          </svg>
+          <span className={styles.packText}>{packed ? "Done!" : "Complete Ancestor Pack"}</span>
+        </button>
+      )}
+      {packed && packLabels.alive && (
+        <div className={styles.packHead} style={{ left: packLabels.alive.x, top: packLabels.alive.y }}>Alive and kicking</div>
+      )}
+      {packed && packLabels.extinct && (
+        <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>Chasing balls up in the heavens</div>
+      )}
       <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
