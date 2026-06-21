@@ -578,8 +578,15 @@ export default function PackPit() {
         }
         if (popped.length) Composite.remove(engine.world, popped);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); drawNumbers(ctx, now); return; }
-        // pattern is lit while a recent floor strike is still within its flash window
-        const wantPattern = now < patternUntil;
+        // pattern stays lit while any dog card rests on the floor, with the impact
+        // window below still covering the strobe of cards bouncing during the pour
+        const floorTop = walls[0].bounds.min.y;
+        let onFloor = false;
+        for (const b of bodies) {
+          if (b.plugin?.prop || b.plugin?.kind || b.plugin?.logo) continue; // dog cards only
+          if (b.bounds.max.y >= floorTop - 4) { onFloor = true; break; }
+        }
+        const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
