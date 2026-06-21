@@ -264,7 +264,7 @@ export default function PackPit() {
         hit.plugin.ping = performance.now();
       };
       let downAt: { x: number; y: number } | null = null;
-      const onDown = (e: MouseEvent) => { downAt = localPoint(e); };
+      const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop || hit.plugin.kind === "pct") return false; // dogs only, not the toys or fallen circles
@@ -288,9 +288,10 @@ export default function PackPit() {
       // are handled directly here.
       let touchDown: { x: number; y: number } | null = null;
       const touchLocal = (t: Touch) => { const r = render.canvas.getBoundingClientRect(); return { x: t.clientX - r.left, y: t.clientY - r.top }; };
-      const onTouchStart = (e: TouchEvent) => { motionRef.current(); if (e.touches.length === 1) touchDown = touchLocal(e.touches[0]); };
+      const onTouchStart = (e: TouchEvent) => { motionRef.current(); if (e.touches.length === 1) { touchDown = touchLocal(e.touches[0]); pressPct(touchDown); } };
       const onTouchEnd = (e: TouchEvent) => {
         const start = touchDown; touchDown = null;
+        releaseHeldPct();
         if (!start || e.changedTouches.length !== 1) return;
         const up = touchLocal(e.changedTouches[0]);
         if (Math.hypot(up.x - start.x, up.y - start.y) > 10) return; // a drag, not a tap
@@ -337,11 +338,18 @@ export default function PackPit() {
         if (b.plugin.kind === "pct") {
           const rr = b.plugin.half;
           ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
-          ctx.fillStyle = "#ffd23e"; ctx.fill();
+          ctx.fillStyle = b.plugin.inert ? "#1497d6" : "#ffd23e"; ctx.fill();
           ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
-          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.font = `800 ${Math.max(12, rr * 0.7)}px Montserrat, system-ui, sans-serif`;
-          ctx.fillText(b.plugin.share + "%", 0, 0);
+          if (!b.plugin.inert) {
+            ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.font = `800 ${Math.max(12, rr * 0.7)}px Montserrat, system-ui, sans-serif`;
+            ctx.fillText(b.plugin.share + "%", 0, 0);
+          }
+          if (b.plugin.repelOn) {
+            const pulse = 1 + 0.18 * Math.sin(performance.now() / 90);
+            ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
+            ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
+          }
           ctx.restore(); return;
         }
         if (b.plugin.prop) {
@@ -485,13 +493,68 @@ export default function PackPit() {
           const b: any = Bodies.circle(c.x - rect.left, c.y - rect.top, r, {
             restitution: 0.55, friction: 0.2, frictionAir: 0.008, density: 0.0008, render: { visible: false },
           });
-          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0 };
+          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 5, repelOn: false, repelStart: 0, inert: false };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });
           Composite.add(engine.world, b);
         }
       };
 
       Events.on(render, "afterRender", onAfter);
+
+      // The fallen percentage circles double as negative-magnet buttons. Pressing
+      // one shoves nearby objects away; the percentage sets the strength (higher
+      // percent = weaker). Each circle has 5 presses, and a single hold lasts at
+      // most 5s before it auto-releases. After the fifth it goes inert and blue.
+      const REPEL = 0.05;      // master strength dial for the held force
+      const KICK = 6;          // instant outward shove on press
+      const repelRange = (b: any) => Math.max(140, b.plugin.half * 5);
+      const repelFactor = (b: any) => Math.max(0.12, 1 - b.plugin.share / 100);
+      const releasePct = (b: any) => {
+        if (!b.plugin?.repelOn) return;
+        b.plugin.repelOn = false;
+        b.plugin.charges = (b.plugin.charges ?? 5) - 1;
+        if (b.plugin.charges <= 0) b.plugin.inert = true;
+      };
+      const releaseHeldPct = () => {
+        for (const b of Composite.allBodies(engine.world)) if (b.plugin?.repelOn) releasePct(b);
+      };
+      const pressPct = (pt: { x: number; y: number }) => {
+        const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn);
+        if (!hit) return;
+        hit.plugin.repelOn = true;
+        hit.plugin.repelStart = performance.now();
+        // instant outward kick so the push reads immediately
+        const f = repelFactor(hit), R = repelRange(hit);
+        for (const o of dyn()) {
+          if (o === hit || o.plugin?.repelOn) continue;
+          const dx = o.position.x - hit.position.x, dy = o.position.y - hit.position.y;
+          const d = Math.hypot(dx, dy);
+          if (d > 0.1 && d < R) {
+            const s = f * KICK * (1 - d / R);
+            Body.setVelocity(o, { x: o.velocity.x + (dx / d) * s, y: o.velocity.y + (dy / d) * s });
+          }
+        }
+      };
+      Events.on(engine, "beforeUpdate", () => {
+        const now = performance.now();
+        const all = Composite.allBodies(engine.world);
+        for (const b of all) {
+          if (!b.plugin?.repelOn) continue;
+          if (now - b.plugin.repelStart > 5000) { releasePct(b); continue; } // auto-release after 5s
+          const f = repelFactor(b), R = repelRange(b);
+          for (const o of all) {
+            if (o === b || o.isStatic || o.plugin?.repelOn) continue;
+            const dx = o.position.x - b.position.x, dy = o.position.y - b.position.y;
+            const d = Math.hypot(dx, dy);
+            if (d > 0.1 && d < R) {
+              const mag = f * REPEL * (1 - d / R) * o.mass;
+              Body.applyForce(o, o.position, { x: (dx / d) * mag, y: (dy / d) * mag });
+            }
+          }
+        }
+      });
+      window.addEventListener("mouseup", releaseHeldPct);
+
 
       function fit() {
         const w = stage.clientWidth, h = stage.clientHeight;
@@ -561,6 +624,7 @@ export default function PackPit() {
         render.canvas.removeEventListener("mouseleave", onLeave);
         render.canvas.removeEventListener("dblclick", onDbl);
         render.canvas.removeEventListener("mousedown", onDown);
+        window.removeEventListener("mouseup", releaseHeldPct);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
