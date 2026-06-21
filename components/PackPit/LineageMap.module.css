@@ -193,3 +193,17 @@
   font-size: 30px;
   fill: #ffffff;
 }
+
+/* Little white score numbers that flash up when a node or the chum button is tapped. */
+.flashNum {
+  fill: #ffffff;
+  font-family: var(--font-pct), Montserrat, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  pointer-events: none;
+  animation: lm-flash 0.65s ease-out forwards;
+}
+@keyframes lm-flash {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-34px); }
+}

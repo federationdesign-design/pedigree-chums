@@ -146,6 +146,14 @@ export default function LineageMap({
   // exposed. clicking it pops the card from the pit, then tips the circles in too.
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
+  // little white numbers that flash up when a node or the chum button is tapped
+  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number }[]>([]);
+  const flashId = useRef(0);
+  const flashNum = (x: number, y: number, val: number) => {
+    const id = (flashId.current += 1);
+    setFlashes((f) => [...f, { id, x, y, val }]);
+    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
+  };
   useEffect(() => {
     setShowRemove(false);
     setRemoving(false);
@@ -312,7 +320,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(${tagW / 2 + 8 + 100},0)`}
-            onClick={(e) => { e.stopPropagation(); startRemove(); }}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx + tagW / 2 + 108, cy + ROOT + 26, 500); startRemove(); }}
             role="button"
             aria-label="Choose as my chum"
           >
@@ -377,6 +385,7 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
+                      flashNum(n._x, n._y, hasKids ? 125 : 250); // has more inside scores 125, a dead-end leaf scores 250
                       follow(n);
                       const wasPicked = picked.has(n._id);
                       setPicked((cur) => {
@@ -529,6 +538,11 @@ export default function LineageMap({
             </g>
           </>
         )}
+        {flashes.map((f) => (
+          <text key={f.id} className={styles.flashNum} x={f.x} y={f.y} textAnchor="middle">
+            {f.val}
+          </text>
+        ))}
         </g>
       </svg>
     </div>

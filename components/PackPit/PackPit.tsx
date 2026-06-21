@@ -64,7 +64,7 @@ export default function PackPit() {
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
-      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
+      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       const engine = Engine.create();
       engine.gravity.y = 1;
@@ -297,9 +297,13 @@ export default function PackPit() {
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         return false;
       };
+      // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
+      const numbers: any[] = [];
+      const numAt = (x: number, y: number, val: number) => numbers.push({ x, y, val, born: performance.now(), life: 650 });
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder") return false; // dogs only, not the toys, fallen circles or the buttons
+        numAt(hit.position.x, hit.position.y, 100); // the breed square that opens the family tree scores 100
         const r = render.canvas.getBoundingClientRect();
         setActiveBreed({
           name: hit.plugin.name,
@@ -517,9 +521,7 @@ export default function PackPit() {
           ctx.restore();
         }
       }
-      // little numbers (the circle's %) that flash up on each active hit
-      const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number) => numbers.push({ x, y, val, born: performance.now(), life: 650 });
+      // little white numbers that flash up on a hit or tap
       function drawNumbers(ctx: any, now: number) {
         for (let i = numbers.length - 1; i >= 0; i--) {
           const n = numbers[i], t = (now - n.born) / n.life;
@@ -765,6 +767,22 @@ export default function PackPit() {
         Events.on(engine, "collisionStart", onCollide);
       }
 
+      // Inert (blue) % circles bind to each other like atoms: the first time two
+      // touch, weld a fixed-length link between them, so clusters build up.
+      const bonded = new Set<string>();
+      const onInertBond = (ev: any) => {
+        for (const pair of ev.pairs) {
+          const a: any = pair.bodyA, b: any = pair.bodyB;
+          if (a.plugin?.kind === "pct" && a.plugin.inert && b.plugin?.kind === "pct" && b.plugin.inert) {
+            const key = a.id < b.id ? `${a.id}-${b.id}` : `${b.id}-${a.id}`;
+            if (bonded.has(key)) continue;
+            bonded.add(key);
+            Composite.add(engine.world, Constraint.create({ bodyA: a, bodyB: b, length: a.plugin.half + b.plugin.half, stiffness: 0.45, damping: 0.2, render: { visible: false } }));
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onInertBond);
+
       dropAll();
 
       dispose = () => {
@@ -785,6 +803,7 @@ export default function PackPit() {
         Events.off(render, "afterRender", onAfter);
         Events.off(engine, "collisionStart", onFloorHit);
         Events.off(engine, "collisionStart", onCollide);
+        Events.off(engine, "collisionStart", onInertBond);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);
