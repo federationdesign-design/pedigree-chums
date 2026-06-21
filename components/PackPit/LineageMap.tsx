@@ -527,6 +527,7 @@ export default function LineageMap({
   };
 
   return (
+    <>
     <div
       className={styles.overlay}
       onClick={closeIfTap}
@@ -538,9 +539,6 @@ export default function LineageMap({
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
-      {boxPop && (
-        <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
-      )}
       {totalNodes > 0 && !packed && !collecting && (() => {
         const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)
         const dotBg = `hsl(${212 - prog * 87}, ${72 + prog * 13}%, ${44 + prog * 3}%)`; // blue -> bright green
@@ -813,5 +811,9 @@ export default function LineageMap({
         </g>
       </svg>
     </div>
+    {boxPop && (
+      <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+    )}
+    </>
   );
 }

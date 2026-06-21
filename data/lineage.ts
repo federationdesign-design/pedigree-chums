@@ -1058,7 +1058,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The butterfly dog, a tiny continental spaniel with winged ears, a fixture of European courts for 700 years.",
     children: [
       { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance.", img: "/history/breeds/Continental-toy-spaniels.jpg", value: 70 },
-      { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds.", value: 30 }
+      { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 30 }
     ]
   },
   "Siberian Husky": {
