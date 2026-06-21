@@ -296,14 +296,6 @@ export default function LineageMap({
                   <clipPath id={clipId}>
                     <rect x={cx - CARD / 2} y={cy - CARD / 2} width={CARD} height={CARD} rx={15} />
                   </clipPath>
-                  <rect
-                    x={cx - CARD / 2 - 4}
-                    y={cy - CARD / 2 - 4}
-                    width={CARD + 8}
-                    height={CARD + 8}
-                    rx={19}
-                    className={styles.pickCard}
-                  />
                   <image
                     href={pn.img as string}
                     x={cx - CARD / 2}
@@ -316,6 +308,14 @@ export default function LineageMap({
                   <g clipPath={`url(#${clipId})`}>
                     <rect x={cx - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
                   </g>
+                  <rect
+                    x={cx - CARD / 2}
+                    y={cy - CARD / 2}
+                    width={CARD}
+                    height={CARD}
+                    rx={15}
+                    className={styles.pickCard}
+                  />
                   <text className={styles.pickCaptionText} textAnchor="middle" x={cx} y={capTop + 17}>
                     {lines.map((ln, i) => (
                       <tspan key={i} x={cx} dy={i === 0 ? 0 : 16}>

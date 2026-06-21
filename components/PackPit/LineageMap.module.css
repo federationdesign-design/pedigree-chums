@@ -102,9 +102,10 @@
   stroke-width: 4;
 }
 .pickCard {
-  fill: var(--navy);
+  fill: none;
   stroke: var(--yellow);
-  stroke-width: 3;
+  stroke-width: 6;
+  stroke-linejoin: round;
 }
 .pickCaption {
   fill: rgba(10, 58, 87, 0.88);
