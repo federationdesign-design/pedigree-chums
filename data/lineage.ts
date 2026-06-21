@@ -59,7 +59,7 @@ const LINEAGE: Record<string, LineageNode> = {
         img: "/history/breeds/german-pinscher-illustration.jpg",
         children: [
           { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", img: "/history/breeds/old-german-ratting-terriers-illustration.jpg", value: 22 },
-          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.",  value: 16 }
+          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 16 }
         ]
       },
       {
@@ -240,7 +240,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.",  value: 40 },
       { name: "Cardigan Welsh Corgi", note: "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.", img: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", value: 35 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs.jpg", value: 25 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 }
     ]
   },
 
@@ -259,8 +259,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Border Collie",
     note: "Widely called the cleverest dog of all, bred purely for the work of gathering and moving sheep on the hills.",
     children: [
-      { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name.",  value: 50 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs.jpg", value: 25 },
+      { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 50 },
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 },
       { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", value: 25 }
     ]
   },
@@ -640,7 +640,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rough Collie",
     note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies.jpg", value: 65 },
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
       { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family.",  value: 35 }
     ]
   },
@@ -686,8 +686,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cumberland Sheepdog",
     note: "An extinct northern working collie of Cumberland and the border hills, a close relative of the Border Collie that was largely absorbed into it.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies.jpg", value: 60 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs.jpg", value: 40 }
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 60 },
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 40 }
     ]
   },
 
@@ -750,7 +750,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
       { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.",  value: 55 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs.jpg", value: 45 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
 
@@ -871,7 +871,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
     children: [
       { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies.jpg", value: 50 }
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
 
@@ -880,7 +880,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A big, shaggy, bobtailed drover's dog of the west country, bred to drive sheep and cattle to market.",
     children: [
       { name: "Bearded Collie", note: "The shaggy Scottish herder in its make-up.",  value: 55 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs.jpg", value: 45 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
 
@@ -927,7 +927,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cur",
     note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies.jpg", value: 55 },
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 55 },
       { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
     ]
   },
@@ -945,7 +945,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old Welsh Grey Sheepdog",
     note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost.",
     children: [
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs.jpg", value: 60 },
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 60 },
       { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.",  value: 40 }
     ]
   },
@@ -955,7 +955,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An ancient white lapdog of the Mediterranean, a favourite of Roman ladies and prized for over two thousand years.",
     children: [
       { name: "Ancient Spitz-type dogs", note: "The small spitz-type dogs many historians see as its oldest ancestors, bred down in size over centuries.",  value: 55 },
-      { name: "Mediterranean bichon lapdogs", note: "The old white bichon-family lapdogs spread around the Mediterranean by ancient traders.",  value: 45 }
+      { name: "Mediterranean bichon lapdogs", note: "The old white bichon-family lapdogs spread around the Mediterranean by ancient traders.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 45 }
     ]
   },
 
@@ -964,7 +964,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
     children: [
       { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
-      { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family.",  value: 50 }
+      { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 50 }
     ]
   },
 
@@ -981,8 +981,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pug",
     note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
     children: [
-      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs.",  value: 60 },
-      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.",  value: 40 }
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
+      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/history/breeds/Eastern-lion-and-lap-dogs.jpg", value: 40 }
     ]
   },
   "Great Dane": {
@@ -1026,7 +1026,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Ancient spotted hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.", value: 55 },
       { name: "Pointer", note: "Pointing and hound blood that shaped its build and steady working head.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
-      { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for.", value: 15 }
+      { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for.", img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg", value: 15 }
     ]
   },
   "Rottweiler": {
@@ -1073,16 +1073,16 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Shih Tzu",
     note: "The lion dog of the Chinese imperial court, made by crossing Tibetan holy dogs with the palace's own toys.",
     children: [
-      { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court.", value: 55 },
-      { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls.",  value: 45 }
+      { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 55 },
+      { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 45 }
     ]
   },
   "Miniature Schnauzer": {
     name: "Miniature Schnauzer",
     note: "A small German farm ratter, the standard schnauzer shrunk with toy blood into a sharp little vermin dog.",
     children: [
-      { name: "Standard Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", value: 60 },
-      { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down.", value: 25 },
+      { name: "Standard Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 60 },
+      { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
       { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, biddable head.", value: 15 }
     ]
   },
@@ -1099,14 +1099,14 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Born when English lacemakers took their little toy bulldogs to France, where Paris fell for the bat eared result.",
     children: [
       { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", value: 65 },
-      { name: "Parisian ratters and terriers", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears.", value: 35 }
+      { name: "Parisian ratters and terriers", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears.", img: "/history/breeds/Parisian-ratters-and-terriers.jpg", value: 35 }
     ]
   },
   "Chihuahua": {
     name: "Chihuahua",
     note: "The smallest dog of all, traced to the Techichi companion dogs kept by the peoples of ancient Mexico.",
     children: [
-      { name: "Ancient Techichi dogs", note: "The small sacred companion dogs of the Toltec and Aztec, the breed's direct root.", value: 80 },
+      { name: "Ancient Techichi dogs", note: "The small sacred companion dogs of the Toltec and Aztec, the breed's direct root.", img: "/history/breeds/Ancient-Techichi-dogs.jpg", value: 80 },
       { name: "Small imported dogs", note: "Tiny dogs brought by later traders, thought to add coat and the bold, terrier like spark.", value: 20 }
     ]
   },
@@ -1116,7 +1116,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", value: 45 },
       { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head.", value: 40 },
-      { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type.", value: 15 }
+      { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 15 }
     ]
   },
   "Dachshund": {
