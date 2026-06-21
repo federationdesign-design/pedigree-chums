@@ -48,8 +48,9 @@
   right: clamp(18px, 4vw, 48px);
   z-index: 5;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 20px; /* the running total sits 20px above the shake button */
   pointer-events: none;
 }
 .shake {
@@ -72,6 +73,21 @@
 }
 .shakeText {
   display: none;
+}
+/* running total of every flashed number, centred over the shake button */
+.scoreTotal {
+  min-width: 84px;
+  box-sizing: border-box;
+  padding: 6px 14px;
+  border-radius: 16px;
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 30px;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+  pointer-events: none;
 }
 /* chums-collected tally, bottom-left, pops with a starburst each time it climbs */
 .tally {

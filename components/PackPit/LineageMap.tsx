@@ -83,11 +83,13 @@ export default function LineageMap({
   onClose,
   onRemove,
   onScatter,
+  onScore,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (circles: { x: number; y: number; r: number; share: number; name: string }[]) => void;
+  onScore?: (v: number) => void;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
   useEffect(() => {
@@ -156,6 +158,7 @@ export default function LineageMap({
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
     setFlashes((f) => [...f, { id, x, y, val, size }]);
+    onScore?.(val); // add this flash into the pit's running total
     window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
   };
   // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,

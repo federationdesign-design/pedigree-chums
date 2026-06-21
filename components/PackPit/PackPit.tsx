@@ -22,6 +22,7 @@ export default function PackPit() {
   const motionRef = useRef<() => void>(() => {});
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
+  const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(circles: { x: number; y: number; r: number; share: number; name: string }[]) => void>(() => {});
@@ -300,7 +301,7 @@ export default function PackPit() {
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number) => numbers.push({ x, y, val, born: performance.now(), life: 650 });
+      const numAt = (x: number, y: number, val: number) => { numbers.push({ x, y, val, born: performance.now(), life: 650 }); setScore((s) => s + val); };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder") return false; // dogs only, not the toys, fallen circles or the buttons
@@ -828,12 +829,13 @@ export default function PackPit() {
     >
       <div className={styles.pattern} aria-hidden="true" />
       <div className={styles.controls}>
+        <div className={styles.scoreTotal} aria-label={`Score: ${score}`}>{score}</div>
         <button type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); }} aria-label="Shake the pit">
           <span className={styles.shakeIcon} aria-hidden="true" />
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); }} onScatter={(c) => scatterRef.current(c)} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
           <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
