@@ -82,7 +82,7 @@
   width: 140px;
   height: 140px;
   display: grid;
-  place-items: center;
+  place-items: center start; /* number hugs the left edge instead of centring in the 140px box */
   pointer-events: none;
 }
 .tallyBurst {
