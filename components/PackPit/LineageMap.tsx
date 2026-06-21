@@ -429,8 +429,6 @@ export default function LineageMap({
             {pickCards.map((c) => {
               const clipId = `lm-pick-${c.id}`;
               const lines = wrapName(c.name);
-              const capH = lines.length * 16 + 14;
-              const capTop = c.cardY + CARD / 2 - capH;
               return (
                 <g
                   key={`pick-${c.id}`}
@@ -484,9 +482,6 @@ export default function LineageMap({
                     clipPath={`url(#${clipId})`}
                     preserveAspectRatio="xMidYMid slice"
                   />
-                  <g clipPath={`url(#${clipId})`}>
-                    <rect x={c.cardX - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
-                  </g>
                   <rect
                     x={c.cardX - CARD / 2}
                     y={c.cardY - CARD / 2}
@@ -495,13 +490,26 @@ export default function LineageMap({
                     rx={15}
                     className={styles.pickCard}
                   />
-                  <text className={styles.pickCaptionText} textAnchor="middle" x={c.cardX} y={capTop + 17}>
-                    {lines.map((ln, i) => (
-                      <tspan key={i} x={c.cardX} dy={i === 0 ? 0 : 16}>
-                        {ln}
-                      </tspan>
-                    ))}
-                  </text>
+                  {(() => {
+                    const lh = 18; // line height inside the pill
+                    const pillH = lines.length * lh + 14;
+                    const longest = lines.reduce((a, b) => (b.length > a.length ? b : a), "");
+                    const pillW = Math.max(64, longest.length * 9.5 + 28);
+                    const pillTop = c.cardY + CARD / 2 + 12; // sits just below the card, like the breed name pill
+                    const textCY = pillTop + pillH / 2;
+                    return (
+                      <>
+                        <rect className={styles.tag} x={c.cardX - pillW / 2} y={pillTop} width={pillW} height={pillH} rx={pillH / 2} />
+                        <text className={styles.tagText} textAnchor="middle" x={c.cardX} y={textCY} dominantBaseline="central">
+                          {lines.map((ln, i) => (
+                            <tspan key={i} x={c.cardX} dy={i === 0 ? -(lh * (lines.length - 1)) / 2 : lh}>
+                              {ln}
+                            </tspan>
+                          ))}
+                        </text>
+                      </>
+                    );
+                  })()}
                   {c.status && (() => {
                     const ts = TAG_STYLE[c.status];
                     const dx = c.cardX - CARD / 2 + 16, dy = c.cardY - CARD / 2 + 16;
