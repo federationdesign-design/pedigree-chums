@@ -158,7 +158,8 @@ export default function LineageMap({
   const [removing, setRemoving] = useState(false);
   const [packed, setPacked] = useState(false); // the ancestor pack has been ordered into its two columns
   const [packLabels, setPackLabels] = useState<{ alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ alive: null, extinct: null });
-  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); }, [breed.name]);
+  const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
+  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -309,7 +310,7 @@ export default function LineageMap({
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
   // split into the living and the long-gone, and awards a one-off 400 points.
-  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 188;
+  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 150; // row pitch tightened since names are hidden in the pack
   const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
@@ -317,8 +318,19 @@ export default function LineageMap({
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   const doPack = () => {
     if (packed) return;
+    // One card per ancestor: the same forebear is often bred in several times, so
+    // fold the repeats out and keep only the first of each in the pack.
+    const seenKey = new Set<string>();
+    const hidden = new Set<string>();
+    const uniq: typeof pickCards = [];
+    for (const c of pickCards) {
+      const key = c.name || c.img;
+      if (seenKey.has(key)) { hidden.add(c.id); continue; }
+      seenKey.add(key);
+      uniq.push(c);
+    }
     const alive: typeof pickCards = [], extinct: typeof pickCards = [];
-    for (const c of pickCards) (isAlive(c.status) ? alive : extinct).push(c);
+    for (const c of uniq) (isAlive(c.status) ? alive : extinct).push(c);
     // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
     const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
     const next = new Map(dragPos);
@@ -332,10 +344,12 @@ export default function LineageMap({
     };
     let y = 150;
     const labels: { alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { alive: null, extinct: null };
-    if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y }; y = place(alive, y + 64) + 8; }
-    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y }; place(extinct, y + 64); }
+    // header sits 40px higher than the card row so it clears the cancel buttons
+    if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
+    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y: y - 40 }; place(extinct, y + 64); }
     setDragPos(next);
     setPackLabels(labels);
+    setPackHidden(hidden);
     setPacked(true);
     flashNum(160 - pan.x, 96 - pan.y, 400, FLASH_SIZE); // one-off award, fed into the pit total
   };
@@ -544,6 +558,7 @@ export default function LineageMap({
                 );
               })}
             {pickCards.map((c) => {
+              if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               const clipId = `lm-pick-${c.id}`;
               return (
                 <g
@@ -606,7 +621,7 @@ export default function LineageMap({
                     rx={15}
                     className={styles.pickCard}
                   />
-                  {(() => {
+                  {!packed && (() => {
                     const pillH = 36;
                     const pillW = Math.max(64, c.name.length * 9.5 + 30); // one line, width grows with the name
                     const pillTop = c.cardY + CARD / 2 + 12; // sits just below the card, like the breed name pill
