@@ -261,7 +261,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Scotch Collie", note: "The hardy hill-collie stock at the heart of the breed, traced to one famous dog, Old Hemp.",  value: 50 },
       { name: "Welsh sheepdogs", note: "Local Welsh herding dogs that fed into the working type along the border.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 },
-      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", img: "/history/breeds/cumber.jpg", value: 25 }
+      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", value: 25 }
     ]
   },
 
