@@ -175,7 +175,7 @@
 /* The card-pack box that bobs, shakes and pops out of existence on collect. */
 .cardBox {
   position: fixed;
-  right: calc(clamp(120px, 22vw, 200px) * -0.5); /* half the box hangs off the right edge */
+  left: calc(clamp(120px, 22vw, 200px) * -0.5); /* half the box hangs off the left edge */
   bottom: clamp(74px, 12vh, 130px);
   width: clamp(120px, 22vw, 200px);
   height: auto;
