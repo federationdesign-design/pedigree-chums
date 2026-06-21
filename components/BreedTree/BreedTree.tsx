@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
+import { bust } from "../../data/imgVersion";
 import styles from "./BreedTree.module.css";
 
 const SIZE = 760;
@@ -407,7 +408,7 @@ export default function BreedTree({
             {nodes.map((d, i) =>
               nodeImg(d) ? (
                 <pattern key={i} id={`bt-img-${i}`} patternContentUnits="objectBoundingBox" width="1" height="1">
-                  <image href={encodeURI(nodeImg(d) as string)} width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+                  <image href={encodeURI(bust(nodeImg(d) as string))} width="1" height="1" preserveAspectRatio="xMidYMid slice" />
                 </pattern>
               ) : null
             )}

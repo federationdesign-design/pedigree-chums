@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
+import { bust } from "../../data/imgVersion";
 import LineageMap from "./LineageMap";
 import { startCheckout } from "../Offer/startCheckout";
 import styles from "./PackPit.module.css";
@@ -44,7 +45,7 @@ export default function PackPit() {
       }
       const IMG: Record<string, HTMLImageElement> = {};
       const getImg = (name: string, src: string) => {
-        if (!IMG[name]) { const im = new Image(); im.src = src; IMG[name] = im; }
+        if (!IMG[name]) { const im = new Image(); im.src = bust(src); IMG[name] = im; }
         return IMG[name];
       };
 

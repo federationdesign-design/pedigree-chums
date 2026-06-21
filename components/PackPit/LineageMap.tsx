@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
+import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
 import styles from "./LineageMap.module.css";
 
@@ -148,7 +149,8 @@ export default function LineageMap({
   const [removing, setRemoving] = useState(false);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
-  const [bursts, setBursts] = useState<{ id: number; x: number; y: number; r: number }[]>([]);
+  const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
+  const [seen, setSeen] = useState<Set<string>>(new Set()); // circles tapped at least once, recoloured blue
   const fxId = useRef(0);
   const scoredRef = useRef<Set<string>>(new Set());
   const flashNum = (x: number, y: number, val: number, size: number) => {
@@ -156,11 +158,22 @@ export default function LineageMap({
     setFlashes((f) => [...f, { id, x, y, val, size }]);
     window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
   };
-  const burstAt = (x: number, y: number, r: number) => {
+  // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,
+  // sized from the circle itself so the family tree reads the same as the pit.
+  const burstAt = (x: number, y: number, s: number) => {
     const id = (fxId.current += 1);
-    setBursts((b) => [...b, { id, x, y, r }]);
+    setBursts((b) => [...b, { id, x, y, s, born: performance.now() }]);
     window.setTimeout(() => setBursts((b) => b.filter((n) => n.id !== id)), 450);
   };
+  // tick while a burst is alive so the spokes animate frame by frame, like the pit
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (bursts.length === 0) return;
+    let raf = 0;
+    const loop = () => { setTick((n) => (n + 1) % 1e6); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [bursts.length]);
   useEffect(() => {
     setShowRemove(false);
     setRemoving(false);
@@ -300,7 +313,7 @@ export default function LineageMap({
         <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
         {breed.image ? (
           <image
-            href={breed.image}
+            href={bust(breed.image)}
             x={-ROOT}
             y={-ROOT}
             width={ROOT * 2}
@@ -392,9 +405,10 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
-                      burstAt(n._x, n._y, r); // orange starburst centred on the circle
+                      burstAt(n._x, n._y, r * 1.33); // pink starburst, 33% over the circle radius, exactly as the pit
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
+                      setSeen((s) => { if (s.has(n._id)) return s; const x = new Set(s); x.add(n._id); return x; }); // first tap turns it blue
                       flashNum(n._x, n._y - r, firstHit ? (hasKids ? 125 : 250) : 0, Math.max(13, r * 0.5)); // only the first tap on a node scores; later taps read 0
                       follow(n);
                       const wasPicked = picked.has(n._id);
@@ -410,8 +424,8 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} />
-                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)}>
+                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
                     {picked.has(n._id) ? null : (
@@ -474,7 +488,7 @@ export default function LineageMap({
                     <rect x={c.cardX - CARD / 2} y={c.cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
                   </clipPath>
                   <image
-                    href={c.img}
+                    href={bust(c.img)}
                     x={c.cardX - CARD / 2}
                     y={c.cardY - CARD / 2}
                     width={CARD}
@@ -548,16 +562,23 @@ export default function LineageMap({
             </g>
           </>
         )}
-        {bursts.map((b) => (
-          <g key={`b${b.id}`} transform={`translate(${b.x},${b.y})`}>
-            <g className={styles.burst}>
+        {bursts.map((b) => {
+          const t = Math.min(1, (performance.now() - b.born) / 420);
+          const reach = b.s * (0.35 + t * 0.85), inner = b.s * (0.12 + t * 0.4);
+          return (
+            <g key={`b${b.id}`} transform={`translate(${b.x},${b.y}) rotate(${t * 5})`} opacity={1 - t} pointerEvents="none">
               {Array.from({ length: 12 }).map((_, k) => {
                 const a = (k / 12) * Math.PI * 2;
-                return <line key={k} x1={0} y1={0} x2={Math.cos(a) * b.r} y2={Math.sin(a) * b.r} />;
+                return <line key={k} x1={Math.cos(a) * inner} y1={Math.sin(a) * inner} x2={Math.cos(a) * reach} y2={Math.sin(a) * reach} stroke="#ff2d78" strokeWidth={2.4} strokeLinecap="round" />;
+              })}
+              {Array.from({ length: 5 }).map((_, k) => {
+                const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 3 * (1 - t) + 1.5;
+                const pts = Array.from({ length: 5 }).map((_, p) => { const aa = a + (p / 5) * Math.PI * 2; return `${sx + Math.cos(aa) * sz},${sy + Math.sin(aa) * sz}`; }).join(" ");
+                return <polygon key={`s${k}`} points={pts} fill="#ff2d78" />;
               })}
             </g>
-          </g>
-        ))}
+          );
+        })}
         {flashes.map((f) => (
           <text key={`f${f.id}`} className={styles.flashNum} x={f.x} y={f.y} fontSize={f.size} textAnchor="middle">
             {f.val}
