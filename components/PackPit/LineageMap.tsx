@@ -110,6 +110,11 @@ export default function LineageMap({
   useEffect(() => setDragPos(new Map()), [breed.name]);
   const cardDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
+  // a dragged card becomes "pinned": snapshot its art so it survives its branch
+  // closing, and keep showing it at its dropped spot until breed change / close
+  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number }>>(new Map());
+  useEffect(() => setPinned(new Map()), [breed.name]);
+
   const base = lean(breed.angle || 0);
 
   const shown = useMemo(() => {
@@ -177,7 +182,31 @@ export default function LineageMap({
   const clip = "lm-clip-root";
 
   // only show the pop-out while its circle is actually on screen and has art
-  const pickedNodes = shown.filter((n) => picked.has(n._id) && n._parent && n.img);
+  // Cards to draw: nodes that are picked and currently live in the open tree,
+  // plus any pinned (dragged) card, which persists even after its branch closes.
+  // Keyed by id so a live card that gets dragged keeps the same element.
+  const liveById = new Map(shown.filter((n) => n._parent && n.img).map((n) => [n._id, n as Node]));
+  const cardIds = new Set<string>([
+    ...[...picked].filter((id) => liveById.has(id)),
+    ...pinned.keys(),
+  ]);
+  const pickCards = [...cardIds]
+    .map((id) => {
+      const live = liveById.get(id);
+      const snap = pinned.get(id);
+      const img = (live?.img ?? snap?.img) as string;
+      const name = live?.name ?? snap?.name ?? "";
+      const share = live ? Math.round((live._leaves / (live._parent as Node)._leaves) * 100) : snap?.share ?? 0;
+      const r = radius(share);
+      const d = r + 10 + CARD / 2;
+      const baseX = live ? live._x + Math.cos(live._dir) * d : 0;
+      const baseY = live ? live._y + Math.sin(live._dir) * d : 0;
+      const pos = dragPos.get(id);
+      const cardX = pos ? pos.x : baseX;
+      const cardY = pos ? pos.y : baseY;
+      return { id, img, name, share, cardX, cardY };
+    })
+    .filter((c) => c.img);
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => (
@@ -259,12 +288,17 @@ export default function LineageMap({
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
                       follow(n);
+                      const wasPicked = picked.has(n._id);
                       setPicked((cur) => {
                         const s = new Set(cur);
                         if (s.has(n._id)) s.delete(n._id);
                         else s.add(n._id);
                         return s;
                       });
+                      if (wasPicked) {
+                        setPinned((m) => { if (!m.has(n._id)) return m; const x = new Map(m); x.delete(n._id); return x; });
+                        setDragPos((m) => { if (!m.has(n._id)) return m; const x = new Map(m); x.delete(n._id); return x; });
+                      }
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} />
@@ -284,32 +318,20 @@ export default function LineageMap({
                   </g>
                 );
               })}
-            {pickedNodes.map((pn) => {
-              const share = Math.round((pn._leaves / (pn._parent as Node)._leaves) * 100);
-              const r = radius(share);
-              const d = r + 10 + CARD / 2;
-              const cx = pn._x + Math.cos(pn._dir) * d;
-              const cy = pn._y + Math.sin(pn._dir) * d;
-              const pos = dragPos.get(pn._id);
-              const cardX = pos ? pos.x : cx;
-              const cardY = pos ? pos.y : cy;
-              // tether leaves the circle pointing at wherever the card now sits
-              const ang = Math.atan2(cardY - pn._y, cardX - pn._x);
-              const ex = pn._x + Math.cos(ang) * r;
-              const ey = pn._y + Math.sin(ang) * r;
-              const clipId = `lm-pick-${pn._id}`;
-              const lines = wrapName(pn.name);
+            {pickCards.map((c) => {
+              const clipId = `lm-pick-${c.id}`;
+              const lines = wrapName(c.name);
               const capH = lines.length * 16 + 14;
-              const capTop = cardY + CARD / 2 - capH;
+              const capTop = c.cardY + CARD / 2 - capH;
               return (
                 <g
-                  key={`pick-${pn._id}`}
+                  key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();
                     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
-                    cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cardX, oy: cardY, moved: false };
+                    cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
                   }}
                   onPointerMove={(e) => {
                     const cd = cardDrag.current;
@@ -320,7 +342,14 @@ export default function LineageMap({
                       suppressClick.current = true;
                       setDragPos((m) => {
                         const next = new Map(m);
-                        next.set(pn._id, { x: cd.ox + dx, y: cd.oy + dy });
+                        next.set(c.id, { x: cd.ox + dx, y: cd.oy + dy });
+                        return next;
+                      });
+                      // snapshot once so the card outlives its branch closing
+                      setPinned((m) => {
+                        if (m.has(c.id)) return m;
+                        const next = new Map(m);
+                        next.set(c.id, { img: c.img, name: c.name, share: c.share });
                         return next;
                       });
                     }
@@ -334,33 +363,32 @@ export default function LineageMap({
                   }}
                   onPointerCancel={() => { cardDrag.current = null; }}
                 >
-                  <line className={`${styles.edge} ${styles.lit}`} x1={ex} y1={ey} x2={cardX} y2={cardY} />
                   <clipPath id={clipId}>
-                    <rect x={cardX - CARD / 2} y={cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
+                    <rect x={c.cardX - CARD / 2} y={c.cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
                   </clipPath>
                   <image
-                    href={pn.img as string}
-                    x={cardX - CARD / 2}
-                    y={cardY - CARD / 2}
+                    href={c.img}
+                    x={c.cardX - CARD / 2}
+                    y={c.cardY - CARD / 2}
                     width={CARD}
                     height={CARD}
                     clipPath={`url(#${clipId})`}
                     preserveAspectRatio="xMidYMid slice"
                   />
                   <g clipPath={`url(#${clipId})`}>
-                    <rect x={cardX - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
+                    <rect x={c.cardX - CARD / 2} y={capTop} width={CARD} height={capH} className={styles.pickCaption} />
                   </g>
                   <rect
-                    x={cardX - CARD / 2}
-                    y={cardY - CARD / 2}
+                    x={c.cardX - CARD / 2}
+                    y={c.cardY - CARD / 2}
                     width={CARD}
                     height={CARD}
                     rx={15}
                     className={styles.pickCard}
                   />
-                  <text className={styles.pickCaptionText} textAnchor="middle" x={cardX} y={capTop + 17}>
+                  <text className={styles.pickCaptionText} textAnchor="middle" x={c.cardX} y={capTop + 17}>
                     {lines.map((ln, i) => (
-                      <tspan key={i} x={cardX} dy={i === 0 ? 0 : 16}>
+                      <tspan key={i} x={c.cardX} dy={i === 0 ? 0 : 16}>
                         {ln}
                       </tspan>
                     ))}
