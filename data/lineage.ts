@@ -982,7 +982,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
     children: [
       { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
-      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/history/breeds/Eastern-lion-and-lap-dogs.jpg", value: 40 }
+      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
     ]
   },
   "Great Dane": {
@@ -1017,7 +1017,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", value: 40 },
       { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/pointer-photo.jpg", value: 40 },
-      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", value: 20 }
+      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", img: "/history/breeds/Old-German-hunting-dogs.jpg", value: 20 }
     ]
   },
   "Dalmatian": {
@@ -1123,7 +1123,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dachshund",
     note: "The German badger dog, a scenthound bred low and long to follow its quarry straight down into the earth.",
     children: [
-      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", img: "/history/breeds/German-bracke-scenthounds.jpg", value: 60 },
+      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", img: "/history/breeds/Old-German-hunting-dogs.jpg", value: 60 },
       { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
       { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", value: 15 }
     ]
