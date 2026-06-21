@@ -117,6 +117,16 @@
   color: #ffffff;
   line-height: 1;
 }
+/* Mobile: the tally moves from bottom-left to the top-right, sitting just below
+   the menu button so the big number never covers the hamburger. */
+@media (max-width: 768px) {
+  .tally {
+    top: calc(64px + env(safe-area-inset-top, 0px));
+    right: clamp(6px, 1.5vw, 18px);
+    bottom: auto;
+    left: auto;
+  }
+}
 .shakeIcon {
   display: block;
   width: 64px;
