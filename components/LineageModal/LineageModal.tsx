@@ -40,6 +40,12 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   return createPortal(
     <div className={`${styles.modalOverlay} ${styles.modalOverlaySolo}`} onClick={onClose} role="dialog" aria-modal="true" aria-label={name}>
       <div className={`${styles.modalCard} ${styles.modalCardSolo}`} onClick={(e) => e.stopPropagation()}>
+        <button type="button" className={styles.lineageClose} onClick={onClose} aria-label="Close">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <line x1="7" y1="7" x2="25" y2="25" />
+            <line x1="25" y1="7" x2="7" y2="25" />
+          </svg>
+        </button>
         <div className={styles.familyLead}>
           <h3 className={`${styles.modalName} ${styles.familyTitle}`}>{name}</h3>
           <div className={`${styles.familyText} ${treeActive ? styles.familyTextDim : ""}`}>

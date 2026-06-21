@@ -203,7 +203,10 @@ export default function LineageMap({
     return c;
   }, [root]);
   useEffect(() => {
-    if (totalNodes > 0 && seen.size >= totalNodes) setShowRemove(true);
+    if (totalNodes > 0 && seen.size >= totalNodes) {
+      const t = setTimeout(() => setShowRemove(true), 1000); // hold the green button back one second after the last circle turns blue
+      return () => clearTimeout(t);
+    }
   }, [seen, totalNodes]);
 
   const base = lean(breed.angle || 0);
@@ -306,20 +309,24 @@ export default function LineageMap({
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
   // split into the living and the long-gone, and awards a one-off 400 points.
-  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 188, PACK_COLS = 2;
+  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 188;
   const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
+  // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
+  const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const doPack = () => {
     if (packed) return;
     const alive: typeof pickCards = [], extinct: typeof pickCards = [];
     for (const c of pickCards) (isAlive(c.status) ? alive : extinct).push(c);
+    // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
+    const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
     const next = new Map(dragPos);
     const place = (arr: typeof pickCards, top: number) => {
       arr.forEach((c, i) => {
-        const sx = PACK_LEFT + (i % PACK_COLS) * PACK_COL;
-        const sy = top + Math.floor(i / PACK_COLS) * PACK_ROW;
+        const sx = PACK_LEFT + (i % cols) * PACK_COL;
+        const sy = top + Math.floor(i / cols) * PACK_ROW;
         next.set(c.id, { x: sx - pan.x, y: sy - pan.y }); // screen target, stored in user coords
       });
-      return top + Math.ceil(arr.length / PACK_COLS) * PACK_ROW;
+      return top + Math.ceil(arr.length / cols) * PACK_ROW;
     };
     let y = 150;
     const labels: { alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { alive: null, extinct: null };
@@ -428,6 +435,7 @@ export default function LineageMap({
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""}`.trim()}
+          style={{ opacity: packed ? 1 : packProgress }}
           onClick={(e) => { e.stopPropagation(); doPack(); }}
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={packed ? "Ancestor pack complete" : "Complete the ancestor pack"}
