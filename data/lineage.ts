@@ -1049,8 +1049,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Italian Greyhound",
     note: "A sighthound shrunk to a lapdog in ancient Italy, all the speed in miniature, kept for warmth and company.",
     children: [
-      { name: "Ancient eastern sighthounds", note: "The small Mediterranean coursing dogs it descends from, prized since antiquity.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 65 },
-      { name: "Companion miniaturisation", note: "Generations of breeding for the smallest, most elegant dogs as court companions.", value: 35 }
+      { name: "Ancient eastern sighthounds", note: "The small Mediterranean coursing dogs it descends from, bred down over generations into a delicate court companion.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 100 }
     ]
   },
   "Papillon": {
@@ -1090,8 +1089,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pomeranian",
     note: "A spitz shrunk to a toy in the Pomerania region, descended from big Arctic sled and herding dogs.",
     children: [
-      { name: "Large German spitz", note: "The sturdy Wolfspitz and sled type dogs it was bred down from, many times its size.", value: 75 },
-      { name: "Companion miniaturisation", note: "Generations of breeding for ever smaller lap dogs once it reached the royal courts.", value: 25 }
+      { name: "Large German spitz", note: "The sturdy Wolfspitz and sled type dogs it was bred down from over generations, many times its size.", value: 100 }
     ]
   },
   "French Bulldog": {
