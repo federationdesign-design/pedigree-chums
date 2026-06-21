@@ -291,8 +291,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The smallest of the old land spaniels, bred to flush, or 'cock', woodcock from cover. For years Cockers and Springers were born in the very same litters, sorted only by working size.",
     children: [
       { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel-photo.jpg", value: 25 },
-      { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 20 }
+      { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel.jpg", value: 25 },
+      { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 20 }
     ]
   },
 
@@ -565,7 +565,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A long, low black spaniel bred up in Victorian show rings from the larger cocking spaniels, once nearly ruined by exaggeration.",
     children: [
       { name: "Land spaniels", note: "The old land-spaniel stock at its foundation.", img: "/history/breeds/original-land-spaniel.jpg", value: 45 },
-      { name: "Sussex Spaniel", note: "Lent weight, bone and a longer body.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 35 },
+      { name: "Sussex Spaniel", note: "Lent weight, bone and a longer body.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 35 },
       { name: "Clumber Spaniel", note: "Heavier spaniel blood for substance.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 20 }
     ]
   },
@@ -592,7 +592,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct small black-and-tan toy spaniel, a sporting-bred miniature linked to the King Charles and Sussex spaniels.",
     children: [
       { name: "King Charles Spaniel", note: "The toy spaniel at its heart.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 60 },
-      { name: "Sussex Spaniel", note: "Sporting spaniel blood from the old land-spaniel side.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 40 }
+      { name: "Sussex Spaniel", note: "Sporting spaniel blood from the old land-spaniel side.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 40 }
     ]
   },
 
@@ -907,7 +907,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Setter",
     note: "An elegant, feathered bird dog that 'sets', crouching low when it scents game, built up from the old setting spaniels.",
     children: [
-      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 50 },
+      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 50 },
       { name: "Pointer", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
       { name: "Water spaniels", note: "A little water-spaniel for coat and biddability.", img: "/history/breeds/original-water-spaniel.jpg", value: 20 }
     ]
