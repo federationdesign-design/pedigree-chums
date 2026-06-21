@@ -46,7 +46,7 @@ export const ukBreeds: UKBreed[] = [
 
   // The early 1800s
   { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/history/breeds/beagle.jpg" },
-  { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/water-spaniel-illustration.jpg", tag: "extinct" },
+  { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/tweed-water-spaniel.jpg", tag: "extinct" },
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
@@ -119,8 +119,8 @@ export const ukBreeds: UKBreed[] = [
   { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hunting hound bred away into the modern Beagle by the early 1800s.", tag: "extinct", image: "/history/breeds/North-Country-Beagle.jpg" },
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, close kin to the Bearded Collie, lost as smooth-coated collies took the farms.", tag: "extinct", image: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg" },
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky-coated Scottish show terrier bred from the Skye Terrier, and the direct forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
-  { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred down from the early King Charles and the old Sussex Spaniel.", tag: "extinct", image: "/history/breeds/toy-Trawler-Spaniel-painting.jpg" },
-  { name: "Cumberland Sheepdog", strip: "c1900", era: "Early 1900s", anchor: 1910, note: "Northern herding dog folded into the Border Collie in the early 1900s, also claimed as an Australian Shepherd ancestor.", tag: "extinct" },
+  { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred down from the early King Charles and the old Sussex Spaniel.", tag: "extinct", image: "/history/breeds/Toy-Trawler-Spaniel.jpg" },
+  { name: "Cumberland Sheepdog", strip: "c1900", era: "Early 1900s", anchor: 1910, note: "Northern herding dog folded into the Border Collie in the early 1900s, also claimed as an Australian Shepherd ancestor.", image: "/history/breeds/cumber.jpg", tag: "extinct" },
   { name: "Toy Bulldog", strip: "c1900", era: "to 1914", anchor: 1914, note: "Miniature Bulldog kept as a Victorian companion, last recorded in 1914 after the French Bulldog eclipsed it.", image: "/history/breeds/toy-bulldog.jpg", tag: "extinct" },
   { name: "Dumfriesshire Hound", strip: "c1900", era: "1920s", anchor: 1920, note: "Tall black-and-tan Scottish foxhound of the Galloway hills, its Lockerbie pack disbanded in 2001 with bloodlines left only in France.", tag: "extinct", image: "/history/breeds/Dumfriesshire-Hound.jpg" },
 ];

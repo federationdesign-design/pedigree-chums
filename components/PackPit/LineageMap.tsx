@@ -14,12 +14,24 @@ const TAG_STYLE: Record<BreedTag, { bg: string; fg: string; label: string }> = {
   endangered: { bg: "#ff7a3c", fg: "#ffffff", label: "Endangered" },
   "in-decline": { bg: "#ffb02e", fg: "#0a3a57", label: "In decline" },
 };
+// Progenitor breeds whose names do not line up with the history tag list but are
+// documented extinct types. Extend this as needed.
+const PROGENITOR_STATUS: Record<string, BreedTag> = {
+  "Talbot hound": "extinct",
+  "Talbot hounds": "extinct",
+  "St Hubert Hound": "extinct",
+  "Old English Black and Tan Terrier": "extinct",
+  "White English Terrier": "extinct",
+  "Old English White Terrier": "extinct",
+  "English White Terrier": "extinct",
+};
 // Work out a breed's state from its note, falling back to the history tag list.
 function nodeStatus(name: string, note: string): BreedTag | null {
   const n = (note || "").toLowerCase();
   if (n.includes("extinct")) return "extinct";
   if (n.includes("in decline") || n.includes("declining")) return "in-decline";
   if (n.includes("endangered") || n.includes("vulnerable")) return "endangered";
+  if (PROGENITOR_STATUS[name]) return PROGENITOR_STATUS[name];
   const uk = ukBreeds.find((b) => b.name === name);
   return (uk?.tag as BreedTag) ?? null;
 }

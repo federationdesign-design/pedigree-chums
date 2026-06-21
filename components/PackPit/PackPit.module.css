@@ -76,7 +76,7 @@
 /* chums-collected tally, bottom-left, pops with a starburst each time it climbs */
 .tally {
   position: fixed;
-  bottom: calc(38px + env(safe-area-inset-bottom, 0px)); /* lifted 20px clear of the window edge */
+  bottom: calc(63px + env(safe-area-inset-bottom, 0px)); /* lifted clear of the window edge */
   left: clamp(6px, 1.5vw, 18px);
   z-index: 70; /* above the lineage overlay so the count stays visible */
   width: 140px;

@@ -249,7 +249,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A Scottish creation. Lord Tweedmouth kept careful records as he built the perfect gundog on his Highland estate from the 1860s.",
     children: [
       { name: "Wavy-Coated Retriever", note: "The yellow retriever at the heart of Tweedmouth's project.", img: "/history/breeds/flatcoated_retriever-photo.jpg", value: 45 },
-      { name: "Tweed Water Spaniel", note: "A now-extinct local water dog that gave the gentle nature and love of water.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
+      { name: "Tweed Water Spaniel", note: "A now-extinct local water dog that gave the gentle nature and love of water.", img: "/history/breeds/tweed-water-spaniel.jpg", value: 30 },
       { name: "Irish Setter", note: "A dash of setter for the rich golden colour.", img: "/history/breeds/irish-setter-photo.jpg", value: 15 },
       { name: "Bloodhound", note: "A little hound blood for tracking power and a good nose.", img: "/history/breeds/modern-bloodhound.jpg", value: 10 }
     ]
@@ -261,7 +261,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Scotch Collie", note: "The hardy hill-collie stock at the heart of the breed, traced to one famous dog, Old Hemp.",  value: 50 },
       { name: "Welsh sheepdogs", note: "Local Welsh herding dogs that fed into the working type along the border.", img: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg", value: 25 },
-      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.",  value: 25 }
+      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", img: "/history/breeds/cumber.jpg", value: 25 }
     ]
   },
 
