@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Luckiest_Guy, Montserrat, Open_Sans } from "next/font/google";
+import { Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P } from "next/font/google";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
@@ -24,6 +24,14 @@ const pct = Open_Sans({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-pct",
+  display: "swap",
+});
+
+// Press Start 2P is the arcade pixel face used for the running score.
+const score = Press_Start_2P({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-score",
   display: "swap",
 });
 
@@ -66,7 +74,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${score.variable}`}>
       <body>
         {children}
         <OfferLauncher />
