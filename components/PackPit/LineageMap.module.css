@@ -148,3 +148,26 @@
 .grab:active {
   cursor: grabbing;
 }
+
+.removeBtn {
+  cursor: pointer;
+  animation: removeIn 0.28s ease both;
+}
+@keyframes removeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.removeDot {
+  fill: var(--yellow);
+  stroke: var(--navy);
+  stroke-width: 2;
+}
+.removeBtn:hover .removeDot {
+  fill: #ffffff;
+}
+.removeX {
+  stroke: var(--navy);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  fill: none;
+}

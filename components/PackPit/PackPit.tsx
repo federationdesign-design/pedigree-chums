@@ -20,6 +20,7 @@ export default function PackPit() {
   const motionRef = useRef<() => void>(() => {});
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const lineageOpenRef = useRef(false);
+  const removeBreedRef = useRef<(name: string) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
   useEffect(() => {
@@ -327,6 +328,11 @@ export default function PackPit() {
         const p = b.position, s = b.plugin.half, cr = b.plugin.corner, img = b.plugin.img;
         ctx.save(); ctx.globalAlpha = alpha;
         ctx.translate(p.x, p.y); ctx.rotate(b.angle);
+        if (b.plugin.pop) {
+          const k = b.plugin.popScale ?? 1;
+          ctx.scale(k, k);
+          ctx.globalAlpha = alpha * (b.plugin.popAlpha ?? 1);
+        }
         if (b.plugin.prop) {
           // shaped colliders sit off-centre from the art box, so nudge the image
           // back over the silhouette (defaults to 0 for the simple shapes)
@@ -384,6 +390,17 @@ export default function PackPit() {
       let dimLevel = 1, lastFrame = 0;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
+        // advance any pop-out removals (a card hidden via the lineage remove button
+        // briefly swells then shrinks to nothing, then leaves the world)
+        const popped: any[] = [];
+        for (const b of bodies) {
+          if (!b.plugin.pop) continue;
+          const t = (now - b.plugin.pop) / 300;
+          if (t >= 1) { popped.push(b); continue; }
+          b.plugin.popScale = t < 0.22 ? 1 + (t / 0.22) * 0.12 : 1.12 * (1 - (t - 0.22) / 0.78);
+          b.plugin.popAlpha = 1 - t;
+        }
+        if (popped.length) Composite.remove(engine.world, popped);
         // the resting logo is static (excluded from dyn()), so draw it here until it
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
@@ -418,6 +435,11 @@ export default function PackPit() {
           ctx.fillStyle = "#fff"; ctx.fillText(hoverBody.plugin.name, hp.x, ly); ctx.restore();
         }
       };
+      removeBreedRef.current = (name: string) => {
+        const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo);
+        if (target && !target.plugin.pop) target.plugin.pop = performance.now();
+      };
+
       Events.on(render, "afterRender", onAfter);
 
       function fit() {
@@ -503,6 +525,7 @@ export default function PackPit() {
         if (render.canvas && render.canvas.parentNode) render.canvas.parentNode.removeChild(render.canvas);
         render.textures = {};
         shakeRef.current = () => {};
+        removeBreedRef.current = () => {};
       };
     })();
 
@@ -521,7 +544,7 @@ export default function PackPit() {
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => removeBreedRef.current(name)} />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
           <span className={styles.rotatePhone} />

@@ -64,9 +64,11 @@ function lean(a: number) {
 export default function LineageMap({
   breed,
   onClose,
+  onRemove,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
+  onRemove?: (name: string) => void;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
   useEffect(() => {
@@ -114,6 +116,31 @@ export default function LineageMap({
   // closing, and keep showing it at its dropped spot until breed change / close
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
+
+  // the remove control fades in 5s after the lineage opens; clicking it pops the
+  // card out of the pit and drops this whole diagram off the bottom of the page
+  const [showRemove, setShowRemove] = useState(false);
+  const [fall, setFall] = useState<{ y: number; rot: number } | null>(null);
+  const fallRaf = useRef<number | null>(null);
+  useEffect(() => {
+    setShowRemove(false);
+    setFall(null);
+    const t = setTimeout(() => setShowRemove(true), 5000);
+    return () => clearTimeout(t);
+  }, [breed.name]);
+  useEffect(() => () => { if (fallRaf.current) cancelAnimationFrame(fallRaf.current); }, []);
+  const startRemove = () => {
+    if (fall) return;
+    onRemove?.(breed.name); // pop the card out of the pit underneath
+    let y = 0, vy = 4, rot = 0;
+    const tick = () => {
+      vy += 1.6; y += vy; rot += 0.7;
+      setFall({ y, rot });
+      if (y > vp.h + 500) { onClose(); return; }
+      fallRaf.current = requestAnimationFrame(tick);
+    };
+    fallRaf.current = requestAnimationFrame(tick);
+  };
 
   const base = lean(breed.angle || 0);
 
@@ -237,6 +264,18 @@ export default function LineageMap({
         <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
           {breed.name}
         </text>
+        {showRemove && !fall ? (
+          <g
+            className={styles.removeBtn}
+            transform={`translate(${tagW / 2 + 22},0)`}
+            onClick={(e) => { e.stopPropagation(); startRemove(); }}
+            role="button"
+            aria-label="Remove this dog from the pit"
+          >
+            <circle r={13} className={styles.removeDot} />
+            <path d="M -4.5 -4.5 L 4.5 4.5 M 4.5 -4.5 L -4.5 4.5" className={styles.removeX} />
+          </g>
+        ) : null}
       </g>
     </>
   );
@@ -254,6 +293,10 @@ export default function LineageMap({
         &times;
       </button>
       <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+        <g
+          transform={fall ? `translate(0 ${fall.y}) rotate(${fall.rot} ${breed.x} ${breed.y})` : undefined}
+          style={fall ? { pointerEvents: "none" } : undefined}
+        >
         {hasTree ? (
           <>
             {shown
@@ -409,6 +452,7 @@ export default function LineageMap({
             </g>
           </>
         )}
+        </g>
       </svg>
     </div>
   );
