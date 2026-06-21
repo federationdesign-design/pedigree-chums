@@ -244,6 +244,7 @@ export default function PackPit() {
 
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+      mc.collisionFilter.mask = 0xffffffff & ~0x0002; // category 0x0002 (inert circles) cannot be grabbed
       Composite.add(engine.world, mc);
       render.mouse = mouse;
       // matter binds the wheel to the canvas and cancels it, which eats page
@@ -336,17 +337,24 @@ export default function PackPit() {
           ctx.globalAlpha = alpha * (b.plugin.popAlpha ?? 1);
         }
         if (b.plugin.kind === "pct") {
-          const rr = b.plugin.half;
+          ctx.rotate(-b.angle); // keep the % upright and the hop vertical regardless of spin
+          const rr = b.plugin.half, now2 = performance.now();
+          if (b.plugin.jump) {
+            const jt = (now2 - b.plugin.jump) / 300;
+            if (jt < 1) ctx.translate(0, -Math.sin(jt * Math.PI) * 14 * (1 - jt)); else b.plugin.jump = 0;
+          }
           ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
-          ctx.fillStyle = b.plugin.inert ? "#1497d6" : "#ffd23e"; ctx.fill();
+          ctx.fillStyle = b.plugin.inert ? "#0c5b92" : "#ffd23e"; ctx.fill();
           ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
           if (!b.plugin.inert) {
             ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.font = `800 ${Math.max(12, rr * 0.7)}px Montserrat, system-ui, sans-serif`;
-            ctx.fillText(b.plugin.share + "%", 0, 0);
+            const jx = b.plugin.repelOn ? (Math.random() - 0.5) * 3.2 : 0;
+            const jy = b.plugin.repelOn ? (Math.random() - 0.5) * 3.2 : 0;
+            ctx.fillText(b.plugin.share + "%", jx, jy);
           }
           if (b.plugin.repelOn) {
-            const pulse = 1 + 0.18 * Math.sin(performance.now() / 90);
+            const pulse = 1 + 0.18 * Math.sin(now2 / 90);
             ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
             ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
           }
@@ -408,6 +416,16 @@ export default function PackPit() {
       const DIM_TIME = 0.5;  // seconds to ease in and out of that dim, so it never flashes
       let dimLevel = 1, lastFrame = 0;
       const particles: any[] = [];
+      const poof = (x: number, y: number, s: number) => {
+        for (let i = 0; i < 16; i++) {
+          const a = Math.random() * Math.PI * 2, sp = 0.4 + Math.random() * 2.2;
+          particles.push({
+            x: x + (Math.random() - 0.5) * s, y: y + (Math.random() - 0.5) * s,
+            vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1,
+            r: 3 + Math.random() * 6, born: performance.now(), life: 420 + Math.random() * 340,
+          });
+        }
+      };
       function drawParticles(ctx: any, now: number) {
         for (let i = particles.length - 1; i >= 0; i--) {
           const pt = particles[i], t = (now - pt.born) / pt.life;
@@ -417,6 +435,37 @@ export default function PackPit() {
           ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r * (1 + t * 1.4), 0, Math.PI * 2);
           ctx.fillStyle = "#eaf6ff"; ctx.fill();
           ctx.lineWidth = 1.5; ctx.strokeStyle = "rgba(20,151,214,0.5)"; ctx.stroke();
+          ctx.restore();
+        }
+      }
+      // a quick pink starburst, fired only when a circle is pressed while still active
+      const bursts: any[] = [];
+      const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420 });
+      function drawBursts(ctx: any, now: number) {
+        for (let i = bursts.length - 1; i >= 0; i--) {
+          const bu = bursts[i], t = (now - bu.born) / bu.life;
+          if (t >= 1) { bursts.splice(i, 1); continue; }
+          const reach = bu.s * (1.1 + t * 2.2), inner = bu.s * (0.5 + t * 1.4);
+          ctx.save(); ctx.globalAlpha = (1 - t); ctx.translate(bu.x, bu.y);
+          ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 3; ctx.lineCap = "round";
+          for (let k = 0; k < 12; k++) {
+            const a = (k / 12) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a) * inner, Math.sin(a) * inner);
+            ctx.lineTo(Math.cos(a) * reach, Math.sin(a) * reach);
+            ctx.stroke();
+          }
+          ctx.fillStyle = "#ff2d78";
+          for (let k = 0; k < 5; k++) {
+            const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 5 * (1 - t) + 2;
+            ctx.beginPath();
+            for (let p = 0; p < 5; p++) {
+              const aa = a + (p / 5) * Math.PI * 2;
+              const px = sx + Math.cos(aa) * sz, py = sy + Math.sin(aa) * sz;
+              p === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.fill();
+          }
           ctx.restore();
         }
       }
@@ -436,7 +485,7 @@ export default function PackPit() {
         // the resting logo is static (excluded from dyn()), so draw it here until it
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
-        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); return; }
+        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); return; }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
@@ -467,21 +516,13 @@ export default function PackPit() {
           ctx.fillStyle = "#fff"; ctx.fillText(hoverBody.plugin.name, hp.x, ly); ctx.restore();
         }
         drawParticles(ctx, now);
+        drawBursts(ctx, now);
       };
       removeBreedRef.current = (name: string) => {
         const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
         if (target && !target.plugin.pop) {
           target.plugin.pop = performance.now();
-          // burst of little bubbles as the card pops out of existence
-          const cp = target.position, ss = target.plugin.half || 30;
-          for (let i = 0; i < 16; i++) {
-            const a = Math.random() * Math.PI * 2, sp = 0.4 + Math.random() * 2.2;
-            particles.push({
-              x: cp.x + (Math.random() - 0.5) * ss, y: cp.y + (Math.random() - 0.5) * ss,
-              vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1,
-              r: 3 + Math.random() * 6, born: performance.now(), life: 420 + Math.random() * 340,
-            });
-          }
+          poof(target.position.x, target.position.y, target.plugin.half || 30);
         }
       };
 
@@ -513,7 +554,11 @@ export default function PackPit() {
         if (!b.plugin?.repelOn) return;
         b.plugin.repelOn = false;
         b.plugin.charges = (b.plugin.charges ?? 5) - 1;
-        if (b.plugin.charges <= 0) b.plugin.inert = true;
+        if (b.plugin.charges <= 0) {
+          b.plugin.inert = true;
+          b.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 }; // no longer grabbable
+          if (mc.body === b) { mc.constraint.bodyB = null; mc.body = null; } // let go if currently held
+        }
       };
       const releaseHeldPct = () => {
         for (const b of Composite.allBodies(engine.world)) if (b.plugin?.repelOn) releasePct(b);
@@ -523,6 +568,9 @@ export default function PackPit() {
         if (!hit) return;
         hit.plugin.repelOn = true;
         hit.plugin.repelStart = performance.now();
+        hit.plugin.jump = performance.now();           // electrocuted jolt (render-side)
+        poof(hit.position.x, hit.position.y, hit.plugin.half); // smoke poof, same as the cards
+        burstAt(hit.position.x, hit.position.y, hit.plugin.half); // pink starburst, active presses only
         // instant outward kick so the push reads immediately
         const f = repelFactor(hit), R = repelRange(hit);
         for (const o of dyn()) {
