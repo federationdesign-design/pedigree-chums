@@ -445,9 +445,10 @@ export default function PackPit() {
         for (let i = bursts.length - 1; i >= 0; i--) {
           const bu = bursts[i], t = (now - bu.born) / bu.life;
           if (t >= 1) { bursts.splice(i, 1); continue; }
-          const reach = bu.s * (1.1 + t * 2.2), inner = bu.s * (0.5 + t * 1.4);
+          const reach = bu.s * (0.35 + t * 0.85), inner = bu.s * (0.12 + t * 0.4);
           ctx.save(); ctx.globalAlpha = (1 - t); ctx.translate(bu.x, bu.y);
-          ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 3; ctx.lineCap = "round";
+          ctx.rotate(t * 5 * Math.PI / 180); // rotate 5 degrees over the pop
+          ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 2.4; ctx.lineCap = "round";
           for (let k = 0; k < 12; k++) {
             const a = (k / 12) * Math.PI * 2;
             ctx.beginPath();
@@ -457,7 +458,7 @@ export default function PackPit() {
           }
           ctx.fillStyle = "#ff2d78";
           for (let k = 0; k < 5; k++) {
-            const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 5 * (1 - t) + 2;
+            const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 3 * (1 - t) + 1.5;
             ctx.beginPath();
             for (let p = 0; p < 5; p++) {
               const aa = a + (p / 5) * Math.PI * 2;
@@ -556,6 +557,7 @@ export default function PackPit() {
         b.plugin.charges = (b.plugin.charges ?? 5) - 1;
         if (b.plugin.charges <= 0) {
           b.plugin.inert = true;
+          poof(b.position.x, b.position.y, b.plugin.half || 21); // smoke poof only on the final fifth hit
           b.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 }; // no longer grabbable
           if (mc.body === b) { mc.constraint.bodyB = null; mc.body = null; } // let go if currently held
         }
@@ -569,8 +571,7 @@ export default function PackPit() {
         hit.plugin.repelOn = true;
         hit.plugin.repelStart = performance.now();
         hit.plugin.jump = performance.now();           // electrocuted jolt (render-side)
-        poof(hit.position.x, hit.position.y, hit.plugin.half); // smoke poof, same as the cards
-        burstAt(hit.position.x, hit.position.y, hit.plugin.half); // pink starburst, active presses only
+        burstAt(hit.position.x, hit.position.y, 21);    // starburst, fixed at a 5% circle radius, active presses only
         // instant outward kick so the push reads immediately
         const f = repelFactor(hit), R = repelRange(hit);
         for (const o of dyn()) {
