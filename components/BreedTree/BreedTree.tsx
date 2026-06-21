@@ -459,8 +459,8 @@ export default function BreedTree({
                 <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
                   {isChild && (
                     <>
-                      <text x={0} y={-42} style={{ fill: "#ffffff", fontWeight: 800, fontSize: "15px" }}>
-                        {d.data.name}
+                      <text x={0} y={-42} style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "17px", letterSpacing: "0.5px" }}>
+                        {d.data.name.toUpperCase()}
                       </text>
                       <line x1={-80} x2={80} y1={-22} y2={-22} stroke="#ffffff" strokeWidth={2.5} strokeOpacity={0.85} />
                     </>

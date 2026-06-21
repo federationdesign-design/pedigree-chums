@@ -20,6 +20,7 @@ const PROGENITOR_STATUS: Record<string, BreedTag> = {
   "Talbot hound": "extinct",
   "Talbot hounds": "extinct",
   "St Hubert Hound": "extinct",
+  "Old scenting hounds": "extinct",
   "Old English Black and Tan Terrier": "extinct",
   "White English Terrier": "extinct",
   "Old English White Terrier": "extinct",
@@ -61,25 +62,6 @@ const MAX_LEAN = 0.34;
 const CARD = 110;
 // the popped breed cards lean only slightly, capped at this angle (2 degrees)
 const CARD_TILT = (2 * Math.PI) / 180;
-
-// split a node name onto at most two lines so it fits the caption strip
-function wrapName(name: string): string[] {
-  const words = name.split(" ");
-  if (name.length <= 18 || words.length === 1) return [name];
-  const lines: string[] = [];
-  let cur = "";
-  for (const w of words) {
-    if (cur && (cur + " " + w).length > 18) {
-      lines.push(cur);
-      cur = w;
-    } else {
-      cur = cur ? cur + " " + w : w;
-    }
-  }
-  if (cur) lines.push(cur);
-  if (lines.length <= 2) return lines;
-  return [lines[0], lines.slice(1).join(" ")];
-}
 
 function sumLeaves(n: LineageNode): number {
   const c = n.children || [];
@@ -315,7 +297,7 @@ export default function LineageMap({
         {rootStatus && (() => {
           const ts = TAG_STYLE[rootStatus];
           return (
-            <circle cx={-ROOT + 16} cy={-ROOT + 16} r={11} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
+            <circle cx={-ROOT} cy={-ROOT} r={12} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
               <title>{ts.label}</title>
             </circle>
           );
@@ -428,7 +410,6 @@ export default function LineageMap({
               })}
             {pickCards.map((c) => {
               const clipId = `lm-pick-${c.id}`;
-              const lines = wrapName(c.name);
               return (
                 <g
                   key={`pick-${c.id}`}
@@ -491,30 +472,23 @@ export default function LineageMap({
                     className={styles.pickCard}
                   />
                   {(() => {
-                    const lh = 18; // line height inside the pill
-                    const pillH = lines.length * lh + 14;
-                    const longest = lines.reduce((a, b) => (b.length > a.length ? b : a), "");
-                    const pillW = Math.max(64, longest.length * 9.5 + 28);
+                    const pillH = 36;
+                    const pillW = Math.max(64, c.name.length * 9.5 + 30); // one line, width grows with the name
                     const pillTop = c.cardY + CARD / 2 + 12; // sits just below the card, like the breed name pill
-                    const textCY = pillTop + pillH / 2;
                     return (
                       <>
                         <rect className={styles.tag} x={c.cardX - pillW / 2} y={pillTop} width={pillW} height={pillH} rx={pillH / 2} />
-                        <text className={styles.tagText} textAnchor="middle" x={c.cardX} y={textCY} dominantBaseline="central">
-                          {lines.map((ln, i) => (
-                            <tspan key={i} x={c.cardX} dy={i === 0 ? -(lh * (lines.length - 1)) / 2 : lh}>
-                              {ln}
-                            </tspan>
-                          ))}
+                        <text className={styles.tagText} textAnchor="middle" x={c.cardX} y={pillTop + pillH / 2 + 2} dominantBaseline="central">
+                          {c.name}
                         </text>
                       </>
                     );
                   })()}
                   {c.status && (() => {
                     const ts = TAG_STYLE[c.status];
-                    const dx = c.cardX - CARD / 2 + 16, dy = c.cardY - CARD / 2 + 16;
+                    const dx = c.cardX - CARD / 2, dy = c.cardY - CARD / 2; // top-left corner, protruding like the close button
                     return (
-                      <circle cx={dx} cy={dy} r={10} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
+                      <circle cx={dx} cy={dy} r={12} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
                         <title>{ts.label}</title>
                       </circle>
                     );

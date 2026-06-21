@@ -24,10 +24,10 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "St John's Water Dog",
         note: "The earlier dog it all grew from: the fishermen's water dog of Newfoundland, brought to Britain and bred up from there.",
-        img: "/history/waterdog.jpg",
+        img: "/history/breeds/St-Johns-Water-Dog.jpg",
         children: [
           { name: "Fishermen's water dogs", note: "The working water dogs the European fishing crews brought across the Atlantic.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 34 },
-          { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed.",  value: 21 }
+          { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
         ]
       },
       {
@@ -527,7 +527,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct liver-brown water dog from the Scottish Borders and the Tweed valley, famous as a key ancestor of the Golden and Curly-Coated Retrievers.",
     children: [
       { name: "Water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/original-water-spaniel.jpg", value: 55 },
-      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power.",  value: 45 }
+      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 45 }
     ]
   },
 
@@ -601,8 +601,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Water Spaniel",
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
     children: [
-      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 55 },
-      { name: "Poodle and Barbet water dogs", note: "Continental curly water dogs that shaped the coat.",  value: 45 }
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
+      { name: "Poodle and Barbet water dogs", note: "Continental curly water dogs that shaped the coat.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -620,7 +620,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "One of the oldest retrievers, a tall water dog covered in tight curls, the gamekeeper's and poacher's choice for wildfowl.",
     children: [
       { name: "English Water Spaniel", note: "The extinct native water spaniel at its core.", img: "/history/breeds/englsih-Fishermen-water-dog-illustration.jpg", value: 35 },
-      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood for retrieving.",  value: 30 },
+      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood for retrieving.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 30 },
       { name: "Irish Water Spaniel", note: "Its closest relative, sharing the curly water-dog coat.", img: "/history/breeds/irish-water-spaniel.jpg", value: 20 },
       { name: "Poodle", note: "A later touch, often credited for the tight curls.", img: "/poodle-square.jpg", value: 15 }
     ]
@@ -630,7 +630,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Flat-Coated Retriever",
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
-      { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers.",  value: 50 },
+      { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
       { name: "Setter", note: "Setter blood for feathering and a good nose.", img: "/history/breeds/english_setter-photo.jpg", value: 30 },
       { name: "Water spaniel and Collie", note: "A little water-spaniel and collie for coat and brains.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
     ]
@@ -963,7 +963,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bichon Frise",
     note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
     children: [
-      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 50 },
+      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
       { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family.",  value: 50 }
     ]
   },
@@ -999,7 +999,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The Alpine rescue dog of the Great St Bernard hospice, grown from Roman farm mastiffs and later thickened with Newfoundland blood.",
     children: [
       { name: "Alpine mastiff farm dogs", note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.", value: 55 },
-      { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat.",  value: 25 },
+      { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 25 },
       { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to.", img: "/history/breeds/Ancient-Molossers.jpg", value: 20 }
     ]
   },
