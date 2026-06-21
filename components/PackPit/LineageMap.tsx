@@ -278,16 +278,18 @@ export default function LineageMap({
         {canRemove || removing ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(${tagW / 2 + 8 + 44},0)`}
+            transform={`translate(${tagW / 2 + 8 + 50},0)`}
             onClick={(e) => { e.stopPropagation(); startRemove(); }}
             role="button"
             aria-label="Choose as my chum"
           >
-            <rect x={-44} y={-11} width={88} height={30} rx={15} className={styles.chumBase} />
-            <g className={removing ? styles.chumTopDown : styles.chumTop}>
-              <rect x={-44} y={-15} width={88} height={30} rx={15} className={styles.chumPill} />
-              <rect x={-38} y={-12} width={76} height={10} rx={5} className={styles.chumGloss} />
-              <text className={styles.chumText} textAnchor="middle" dominantBaseline="central">my chum</text>
+            <g className={styles.chumPop}>
+              <rect x={-50} y={-13} width={100} height={34} rx={17} className={styles.chumBase} />
+              <g className={removing ? styles.chumTopDown : styles.chumTop}>
+                <rect x={-50} y={-17} width={100} height={34} rx={17} className={styles.chumPill} />
+                <rect x={-44} y={-14} width={88} height={11} rx={6} className={styles.chumGloss} />
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central">my chum</text>
+              </g>
             </g>
           </g>
         ) : null}

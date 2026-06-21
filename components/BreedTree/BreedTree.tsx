@@ -465,9 +465,14 @@ export default function BreedTree({
                       <line x1={-80} x2={80} y1={-22} y2={-22} stroke="#ffffff" strokeWidth={2.5} strokeOpacity={0.85} />
                     </>
                   )}
-                  <text x={0} y={42} style={{ fill: "#ffffff", fontWeight: 800, fontSize: "60px" }}>
-                    {pct !== null ? `${pct}%` : ""}
-                  </text>
+                  {pct !== null && (
+                    <g>
+                      <circle cx={0} cy={50} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
+                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-pct), system-ui, sans-serif", fontWeight: 400, fontSize: "27px" }}>
+                        {`${pct}%`}
+                      </text>
+                    </g>
+                  )}
                 </g>
               );
             })}

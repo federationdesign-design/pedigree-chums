@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Luckiest_Guy, Montserrat } from "next/font/google";
+import { Luckiest_Guy, Montserrat, Open_Sans } from "next/font/google";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
@@ -16,6 +16,14 @@ const body = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-body",
+  display: "swap",
+});
+
+// Open Sans drives the small percentage figures (pit circles and the breed-tree shares).
+const pct = Open_Sans({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-pct",
   display: "swap",
 });
 
@@ -58,7 +66,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable}`}>
       <body>
         {children}
         <OfferLauncher />

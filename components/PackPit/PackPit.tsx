@@ -54,6 +54,7 @@ export default function PackPit() {
       const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
       const SCALE = isMobile ? 0.67 : 1; // mobile shrinks cards and toys uniformly by a third
       const BIG = 84 * SCALE;
+      const pctFont = (typeof window !== "undefined" ? getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() : "") || "Montserrat"; // Open Sans for the % figures
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
@@ -357,7 +358,7 @@ export default function PackPit() {
           ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
           if (!b.plugin.inert) {
             ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-            ctx.font = `800 ${Math.max(12, rr * 0.7)}px Montserrat, system-ui, sans-serif`;
+            ctx.font = `400 ${Math.max(12, rr * 0.7)}px ${pctFont}, system-ui, sans-serif`;
             const jx = b.plugin.repelOn ? (Math.random() - 0.5) * 3.2 : 0;
             const jy = b.plugin.repelOn ? (Math.random() - 0.5) * 3.2 : 0;
             ctx.fillText(b.plugin.share + "%", jx, jy);
@@ -425,7 +426,7 @@ export default function PackPit() {
           ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(sx, sy); ctx.stroke();
           ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fillStyle = "#ffd23e"; ctx.fill();
           ctx.lineWidth = 2; ctx.strokeStyle = "rgba(10,58,87,0.4)"; ctx.stroke();
-          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "800 11px Montserrat,sans-serif";
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = `400 11px ${pctFont},sans-serif`;
           ctx.fillText(fam[i].share + "%", sx, sy);
           ctx.font = "700 12px Montserrat,sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowColor = "rgba(10,58,87,0.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
           const nm = wrapName(fam[i].name), ny = sy + sr + 12;
@@ -502,7 +503,7 @@ export default function PackPit() {
           if (t >= 1) { numbers.splice(i, 1); continue; }
           ctx.save(); ctx.globalAlpha = 1 - t;
           ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.font = "400 17px Montserrat, system-ui, sans-serif";
+          ctx.font = `400 17px ${pctFont}, system-ui, sans-serif`;
           ctx.fillText(String(n.val), n.x, n.y - 22 - t * 34);
           ctx.restore();
         }
@@ -615,7 +616,7 @@ export default function PackPit() {
         hit.plugin.repelOn = true;
         hit.plugin.repelStart = performance.now();
         hit.plugin.jump = performance.now();           // electrocuted jolt (render-side)
-        burstAt(hit.position.x, hit.position.y, 21);    // starburst, fixed at a 5% circle radius, active presses only
+        burstAt(hit.position.x, hit.position.y, 28);    // starburst, 33% bigger than a 5% circle radius, active presses only
         numAt(hit.position.x, hit.position.y, hit.plugin.share); // flash the % figure on each hit
         // instant outward kick so the push reads immediately
         const f = repelFactor(hit), R = repelRange(hit);
