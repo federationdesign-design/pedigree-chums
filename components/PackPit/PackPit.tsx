@@ -250,17 +250,17 @@ export default function PackPit() {
           }, delay));
         };
         if (isMobile) {
-          // mobile: reserve first, then bowl, then balls (pre-order after the 1st), then bone, then pack
-          Composite.add(engine.world, makeButton("reserve", "Reserve", w)); // reserve falls first
+          // mobile: bowl, then balls (pre-order after the 1st), then bone, then the discount-code button, then pack
           addProps([bowl]);
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
           dropDogs(2100, false);
         } else {
-          // desktop: reserve first, then balls (pre-order after the 1st), then bone, then pack with the bowl midway
-          Composite.add(engine.world, makeButton("reserve", "Reserve", w)); // reserve falls first
+          // desktop: balls (pre-order after the 1st), then bone, then the discount-code button, then pack with the bowl midway
           dropBalls();
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1400)); // discount code falls later, just before the pack
           dropDogs(2000, true);
         }
       }
@@ -285,7 +285,8 @@ export default function PackPit() {
         const ang = Math.random() * Math.PI * 2, speed = 20 + Math.random() * 8;
         Body.setVelocity(hit, { x: Math.cos(ang) * speed, y: -Math.abs(Math.sin(ang) * speed) - 10 });
         Body.setAngularVelocity(hit, (Math.random() - 0.5) * 0.7);
-        hit.plugin.ping = performance.now();
+        if (hit.plugin.prop) burstAt(hit.position.x, hit.position.y, Math.max(34, hit.plugin.half * 0.5)); // props get the pink starburst, like the % circles
+        else hit.plugin.ping = performance.now();
       };
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
@@ -555,7 +556,7 @@ export default function PackPit() {
         for (const b of bodies) {
           if (!b.plugin.pop) continue;
           const t = (now - b.plugin.pop) / 620; // a touch longer than before, so it lingers
-          if (t >= 1) { popped.push(b); continue; }
+          if (t >= 1) { if (b.plugin.flyTo) poof(b.plugin.flyTo.x, b.plugin.flyTo.y, b.plugin.half || 30); popped.push(b); continue; }
           if (b.plugin.flyTo) {
             // curved fall: x eases out toward the tally while y accelerates down,
             // so the card arcs in rather than dropping dead straight
@@ -633,7 +634,7 @@ export default function PackPit() {
         for (const c of circles) {
           const r = Math.max(14, c.r);
           const b: any = Bodies.circle(c.x - rect.left, c.y - rect.top, r, {
-            restitution: 0.55, friction: 0.2, frictionAir: 0.008, density: 0.0008, render: { visible: false },
+            restitution: 0.4, friction: 0.25, frictionAir: 0.004, density: 0.006, render: { visible: false },
           });
           b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 5, repelOn: false, repelStart: 0, inert: false };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });

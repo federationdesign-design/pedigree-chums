@@ -103,7 +103,7 @@
 }
 .pickCard {
   fill: none;
-  stroke: var(--yellow);
+  stroke: var(--blue-deep);
   stroke-width: 6;
   stroke-linejoin: round;
 }

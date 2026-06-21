@@ -76,19 +76,19 @@
 /* chums-collected tally, bottom-left, pops with a starburst each time it climbs */
 .tally {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(38px + env(safe-area-inset-bottom, 0px)); /* lifted 20px clear of the window edge */
   left: clamp(6px, 1.5vw, 18px);
-  z-index: 6;
-  width: 84px;
-  height: 84px;
+  z-index: 70; /* above the lineage overlay so the count stays visible */
+  width: 140px;
+  height: 140px;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
 .tallyBurst {
   grid-area: 1 / 1;
-  width: 190px;
-  height: 190px;
+  width: 320px;
+  height: 320px;
   overflow: visible;
   animation: tallyBurst 0.55s ease-out both;
 }
@@ -113,12 +113,9 @@
 }
 .tallyNum {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 70px;
+  font-size: 140px;
   color: #ffffff;
   line-height: 1;
-}
-.dimmed .tally {
-  opacity: 0;
 }
 .shakeIcon {
   display: block;

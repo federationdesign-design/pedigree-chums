@@ -46,7 +46,9 @@ const SPREADN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
-const CARD = 164;
+const CARD = 110;
+// the popped breed cards lean only slightly, capped at this angle (2 degrees)
+const CARD_TILT = (2 * Math.PI) / 180;
 
 // split a node name onto at most two lines so it fits the caption strip
 function wrapName(name: string): string[] {
@@ -153,11 +155,13 @@ export default function LineageMap({
   useEffect(() => {
     setShowRemove(false);
     setRemoving(false);
-    const t = setTimeout(() => setShowRemove(true), 25000);
+    const t = setTimeout(() => setShowRemove(true), 15000);
     return () => clearTimeout(t);
   }, [breed.name]);
 
   const base = lean(breed.angle || 0);
+  const cardLean = Math.max(-CARD_TILT, Math.min(CARD_TILT, base)); // breed cards tilt at most 2 degrees
+  const rootStatus = nodeStatus(breed.name, ""); // status dot for the main breed card
 
   const shown = useMemo(() => {
     if (!root) return [] as Node[];
@@ -252,8 +256,7 @@ export default function LineageMap({
     .filter((c) => c.img);
 
   // fully exposed = every branch that has children is open, nothing left to unfold
-  const fullyExposed = shown.every((n) => !(n.children && n.children.length) || open.has(n._id));
-  const canRemove = (showRemove || fullyExposed) && !removing;
+  const canRemove = showRemove && !removing;
 
   const startRemove = () => {
     if (removing) return;
@@ -279,7 +282,7 @@ export default function LineageMap({
     <>
       <g
         className={styles.rootHit}
-        transform={`translate(${cx},${cy}) rotate(${(base * 180) / Math.PI})`}
+        transform={`translate(${cx},${cy}) rotate(${(cardLean * 180) / Math.PI})`}
         onClick={(e) => e.stopPropagation()}
       >
         <clipPath id={clip}>
@@ -297,6 +300,14 @@ export default function LineageMap({
             preserveAspectRatio="xMidYMid slice"
           />
         ) : null}
+        {rootStatus && (() => {
+          const ts = TAG_STYLE[rootStatus];
+          return (
+            <circle cx={-ROOT + 16} cy={-ROOT + 16} r={11} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
+              <title>{ts.label}</title>
+            </circle>
+          );
+        })()}
       </g>
       <g className={styles.rootHit} transform={`translate(${cx},${cy + ROOT + 26})`} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
@@ -316,7 +327,7 @@ export default function LineageMap({
               <g className={removing ? styles.chumTopDown : styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central">my chum</text>
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>my chum</text>
               </g>
             </g>
           </g>
@@ -412,7 +423,7 @@ export default function LineageMap({
                 <g
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
-                  transform={`rotate(${-(base * 180) / Math.PI} ${c.cardX} ${c.cardY})`}
+                  transform={`rotate(${-(cardLean * 180) / Math.PI} ${c.cardX} ${c.cardY})`}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();
