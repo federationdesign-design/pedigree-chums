@@ -181,15 +181,15 @@
   transform: translateY(0);
 }
 .chumTopDown {
-  transform: translateY(4px);
+  transform: translateY(8px);
   transition: transform 0.1s ease;
 }
 .removeBtn:hover .chumPill {
   fill: #5fd07e;
 }
 .chumText {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 16px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 30px;
   fill: var(--navy);
 }

@@ -555,7 +555,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Welsh Springer Spaniel",
     note: "An old red-and-white Welsh gundog, known for generations as the Welsh Cocker before becoming the Welsh Springer in 1902.",
     children: [
-      { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales.",  value: 60 },
+      { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales.", img: "/history/breeds/Old-Welsh-land-spaniels.jpg", value: 60 },
       { name: "Land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/original-land-spaniel.jpg", value: 40 }
     ]
   },

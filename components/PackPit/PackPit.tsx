@@ -210,7 +210,7 @@ export default function PackPit() {
         const dropBalls = () => {
           BALLS.forEach((bp, i) => {
             Composite.add(engine.world, makeProp(bp, w));
-            if (i === 1) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // pre-order falls after the 2nd ball
+            if (i === 0) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // pre-order falls after the 1st ball
           });
         };
         // Drop the pack in, optionally landing the bowl midway through.
@@ -222,21 +222,22 @@ export default function PackPit() {
             if (disposed) return;
             dropTimer = setInterval(() => {
               if (k >= order.length) { clearInterval(dropTimer); Composite.add(engine.world, makeLogo(w)); return; } // logo falls in last, landing on top
-              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeButton("reserve", "Reserve", w)); } // reserve falls after the bowl
+              if (withBowl && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
             }, 70);
           }, delay));
         };
         if (isMobile) {
-          // mobile: bowl first (reserve right after it), then balls (pre-order after the 2nd), then bone, then pack
+          // mobile: reserve first, then bowl, then balls (pre-order after the 1st), then bone, then pack
+          Composite.add(engine.world, makeButton("reserve", "Reserve", w)); // reserve falls first
           addProps([bowl]);
-          Composite.add(engine.world, makeButton("reserve", "Reserve", w)); // reserve falls after the bowl
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           dropDogs(2100, false);
         } else {
-          // desktop: balls (pre-order after the 2nd), then bone, then pack with the bowl midway (reserve after it)
+          // desktop: reserve first, then balls (pre-order after the 1st), then bone, then pack with the bowl midway
+          Composite.add(engine.world, makeButton("reserve", "Reserve", w)); // reserve falls first
           dropBalls();
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
           dropDogs(2000, true);
@@ -358,7 +359,7 @@ export default function PackPit() {
           ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
           if (!b.plugin.inert) {
             ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-            ctx.font = `400 ${Math.max(12, rr * 0.7)}px ${pctFont}, system-ui, sans-serif`;
+            ctx.font = `800 ${Math.max(12, rr * 0.7)}px Montserrat, system-ui, sans-serif`;
             const jx = b.plugin.repelOn ? (Math.random() - 0.5) * 3.2 : 0;
             const jy = b.plugin.repelOn ? (Math.random() - 0.5) * 3.2 : 0;
             ctx.fillText(b.plugin.share + "%", jx, jy);
@@ -375,7 +376,7 @@ export default function PackPit() {
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
           rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
           ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-          rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.lineWidth = 5; ctx.strokeStyle = hovered ? "#0a3a57" : "rgba(10,58,87,0.55)"; ctx.stroke();
+          rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.lineWidth = 5; ctx.strokeStyle = hovered ? "rgba(10,58,87,0.55)" : "#0a3a57"; ctx.stroke();
           ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
           let fs = Math.round(rh * 0.5);
           ctx.font = `${fs}px "Luckiest Guy", system-ui, sans-serif`;
@@ -426,7 +427,7 @@ export default function PackPit() {
           ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(sx, sy); ctx.stroke();
           ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fillStyle = "#ffd23e"; ctx.fill();
           ctx.lineWidth = 2; ctx.strokeStyle = "rgba(10,58,87,0.4)"; ctx.stroke();
-          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = `400 11px ${pctFont},sans-serif`;
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "800 11px Montserrat,sans-serif";
           ctx.fillText(fam[i].share + "%", sx, sy);
           ctx.font = "700 12px Montserrat,sans-serif"; ctx.fillStyle = "#fff"; ctx.shadowColor = "rgba(10,58,87,0.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
           const nm = wrapName(fam[i].name), ny = sy + sr + 12;
@@ -503,7 +504,7 @@ export default function PackPit() {
           if (t >= 1) { numbers.splice(i, 1); continue; }
           ctx.save(); ctx.globalAlpha = 1 - t;
           ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.font = `400 17px ${pctFont}, system-ui, sans-serif`;
+          ctx.font = `400 15px ${pctFont}, system-ui, sans-serif`;
           ctx.fillText(String(n.val), n.x, n.y - 22 - t * 34);
           ctx.restore();
         }

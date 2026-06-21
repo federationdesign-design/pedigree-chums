@@ -468,7 +468,7 @@ export default function BreedTree({
                   {pct !== null && (
                     <g>
                       <circle cx={0} cy={50} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
-                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-pct), system-ui, sans-serif", fontWeight: 400, fontSize: "27px" }}>
+                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
                         {`${pct}%`}
                       </text>
                     </g>

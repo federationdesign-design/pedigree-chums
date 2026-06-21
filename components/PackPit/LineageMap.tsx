@@ -306,16 +306,16 @@ export default function LineageMap({
         {canRemove || removing ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(${tagW / 2 + 8 + 50},0)`}
+            transform={`translate(${tagW / 2 + 8 + 100},0)`}
             onClick={(e) => { e.stopPropagation(); startRemove(); }}
             role="button"
             aria-label="Choose as my chum"
           >
             <g className={styles.chumPop}>
-              <rect x={-50} y={-13} width={100} height={34} rx={17} className={styles.chumBase} />
+              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
               <g className={removing ? styles.chumTopDown : styles.chumTop}>
-                <rect x={-50} y={-17} width={100} height={34} rx={17} className={styles.chumPill} />
-                <rect x={-44} y={-14} width={88} height={11} rx={6} className={styles.chumGloss} />
+                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
+                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
                 <text className={styles.chumText} textAnchor="middle" dominantBaseline="central">my chum</text>
               </g>
             </g>
@@ -412,6 +412,7 @@ export default function LineageMap({
                 <g
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
+                  transform={`rotate(${(base * 180) / Math.PI} ${c.cardX} ${c.cardY})`}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();
@@ -480,32 +481,33 @@ export default function LineageMap({
                   </text>
                   {c.status && (() => {
                     const ts = TAG_STYLE[c.status];
-                    const bw = ts.label.length * 7.2 + 18;
-                    const bx = c.cardX - CARD / 2 + 8, by = c.cardY - CARD / 2 + 8;
+                    const dx = c.cardX - CARD / 2 + 16, dy = c.cardY - CARD / 2 + 16;
                     return (
-                      <g style={{ pointerEvents: "none" }}>
-                        <rect x={bx} y={by} width={bw} height={21} rx={10.5} style={{ fill: ts.bg, stroke: "rgba(10,58,87,0.35)", strokeWidth: 1 }} />
-                        <text x={bx + bw / 2} y={by + 11} textAnchor="middle" dominantBaseline="central" style={{ fill: ts.fg, fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "10px", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-                          {ts.label}
-                        </text>
+                      <circle cx={dx} cy={dy} r={10} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
+                        <title>{ts.label}</title>
+                      </circle>
+                    );
+                  })()}
+                  {(() => {
+                    const ccx = c.cardX + CARD / 2, ccy = c.cardY - CARD / 2; // top-right corner, button straddles it
+                    return (
+                      <g
+                        style={{ cursor: "pointer" }}
+                        onPointerDown={(e) => { e.stopPropagation(); }}
+                        onClick={(e) => { e.stopPropagation(); removeCard(c.id); }}
+                        role="button"
+                        aria-label="Close"
+                      >
+                        <circle cx={ccx} cy={ccy} r={13} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2 }} />
+                        <path
+                          d={`M ${ccx - 5} ${ccy - 5} l 10 10 M ${ccx + 5} ${ccy - 5} l -10 10`}
+                          stroke="#ffffff"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                        />
                       </g>
                     );
                   })()}
-                  <g
-                    style={{ cursor: "pointer" }}
-                    onPointerDown={(e) => { e.stopPropagation(); }}
-                    onClick={(e) => { e.stopPropagation(); removeCard(c.id); }}
-                    role="button"
-                    aria-label="Close"
-                  >
-                    <circle cx={c.cardX + CARD / 2 - 16} cy={c.cardY - CARD / 2 + 16} r={12} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2 }} />
-                    <path
-                      d={`M ${c.cardX + CARD / 2 - 20} ${c.cardY - CARD / 2 + 12} l 8 8 M ${c.cardX + CARD / 2 - 12} ${c.cardY - CARD / 2 + 12} l -8 8`}
-                      stroke="#ffffff"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                    />
-                  </g>
                 </g>
               );
             })}
