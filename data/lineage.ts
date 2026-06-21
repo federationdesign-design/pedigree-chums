@@ -43,7 +43,7 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Water spaniels",
         note: "A touch of spaniel for a soft mouth and real keenness in water and cover.",
-        img: "/history/breeds/water-spaniel-illustration.jpg",
+        img: "/history/breeds/Water-spaniels.jpg",
         value: 13
       }
     ]
