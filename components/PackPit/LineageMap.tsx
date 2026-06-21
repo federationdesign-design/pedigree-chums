@@ -27,6 +27,13 @@ const PROGENITOR_STATUS: Record<string, BreedTag> = {
   "Old English White Terrier": "extinct",
   "English White Terrier": "extinct",
 };
+// living breeds whose short tree-card name does not match the uk breed list
+// (e.g. node "Labrador" vs list "Labrador Retriever", and "Poodle" is absent),
+// so without this they fall through to no tag and wrongly show the red gone-dot
+const LIVING_STATUS: Record<string, BreedTag> = {
+  "Labrador": "popular",
+  "Poodle": "popular",
+};
 // Work out a breed's state from its note, falling back to the history tag list.
 function nodeStatus(name: string, note: string): BreedTag | null {
   const n = (note || "").toLowerCase();
@@ -34,6 +41,7 @@ function nodeStatus(name: string, note: string): BreedTag | null {
   if (n.includes("in decline") || n.includes("declining")) return "in-decline";
   if (n.includes("endangered") || n.includes("vulnerable")) return "endangered";
   if (PROGENITOR_STATUS[name]) return PROGENITOR_STATUS[name];
+  if (LIVING_STATUS[name]) return LIVING_STATUS[name];
   const uk = ukBreeds.find((b) => b.name === name);
   return (uk?.tag as BreedTag) ?? null;
 }
