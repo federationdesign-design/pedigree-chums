@@ -11,6 +11,7 @@ import { startCheckout } from "./startCheckout";
 export default function OfferCta() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPop, setShowPop] = useState(false);
 
   const preorder = async () => {
     setError("");
@@ -33,10 +34,9 @@ export default function OfferCta() {
         <button
           type="button"
           className={`${styles.btn} ${styles.btnPrimary}`}
-          onClick={preorder}
-          disabled={loading}
+          onClick={() => setShowPop(true)}
         >
-          {loading ? "Taking you to checkout..." : "Pre-order now £6.99"}
+          Pre-order now £6.99
         </button>
         <button
           type="button"
@@ -47,6 +47,25 @@ export default function OfferCta() {
         </button>
       </div>
       {error && <p className={styles.ctaError}>{error}</p>}
+
+      {showPop && (
+        <div className={styles.popOverlay} onClick={() => setShowPop(false)}>
+          <div className={styles.pop} role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className={styles.popClose} onClick={() => setShowPop(false)} aria-label="Close">
+              &times;
+            </button>
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.btnPrimary} ${styles.popCta}`}
+              onClick={preorder}
+              disabled={loading}
+            >
+              {loading ? "Taking you to checkout..." : "Visit checkout"}
+            </button>
+            {error && <p className={styles.ctaError}>{error}</p>}
+          </div>
+        </div>
+      )}
     </>
   );
 }

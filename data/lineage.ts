@@ -160,7 +160,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bull Terrier",
     note: "A Victorian invention. James Hinks set out in the 1860s to build a cleaner, all-white gentleman's companion from the old bull-and-terrier dogs.",
     children: [
-      { name: "Bulldog", note: "Brought the power, the broad chest and the determined grip.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 45 },
+      { name: "Bulldog", note: "Brought the power, the broad chest and the determined grip.", img: "/history/breeds/bulldog-photo.jpg", value: 45 },
       { name: "White English Terrier", note: "A now-extinct breed that gave the clean white coat and terrier sharpness.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 40 },
       { name: "Dalmatian", note: "Crossed in for size, substance and a pure white finish.", img: "/Dalmatian-square.jpg", value: 15 }
     ]
@@ -170,7 +170,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Boston Terrier",
     note: "An American original from 1870s Boston, traced back to a single dog, Hooper's Judge, a bulldog and terrier cross bred smaller and smarter.",
     children: [
-      { name: "Bulldog", note: "Brought the stocky frame and the easy-going, affectionate streak.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 55 },
+      { name: "Bulldog", note: "Brought the stocky frame and the easy-going, affectionate streak.", img: "/history/breeds/bulldog-photo.jpg", value: 55 },
       { name: "White English Terrier", note: "The now-extinct terrier behind the neat build and lively mind.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 45 }
     ]
   },

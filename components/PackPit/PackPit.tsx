@@ -20,6 +20,8 @@ export default function PackPit() {
   const stageRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<() => void>(() => {});
   const motionRef = useRef<() => void>(() => {});
+  const shakeBtnRef = useRef<HTMLButtonElement>(null);
+  const flashShakeRef = useRef<() => void>(() => {});
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
@@ -302,10 +304,20 @@ export default function PackPit() {
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
       const numAt = (x: number, y: number, val: number) => { numbers.push({ x, y, val, born: performance.now(), life: 650 }); setScore((s) => s + val); };
+      // the shake button flashes 75 from its own position and adds it to the running total
+      flashShakeRef.current = () => {
+        const btn = shakeBtnRef.current; if (!btn) return;
+        const cr = render.canvas.getBoundingClientRect(), br = btn.getBoundingClientRect();
+        numAt(br.left + br.width / 2 - cr.left, br.top + br.height / 2 - cr.top, 75);
+      };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder") return false; // dogs only, not the toys, fallen circles or the buttons
-        numAt(hit.position.x, hit.position.y, 100); // the breed square that opens the family tree scores 100
+        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && !hit.plugin.collected) {
+          hit.plugin.collected = true;                                              // only the first collect of a card scores
+          numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
+          burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));   // pink starburst on first collect
+        }
         const r = render.canvas.getBoundingClientRect();
         setActiveBreed({
           name: hit.plugin.name,
@@ -479,6 +491,17 @@ export default function PackPit() {
           });
         }
       };
+      // understated three-ball pop fired at the point two dragged objects connect
+      const whackAt = (x: number, y: number) => {
+        for (let i = 0; i < 3; i++) {
+          const a = Math.random() * Math.PI * 2, sp = 1 + Math.random() * 1.6;
+          particles.push({
+            x, y,
+            vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.6,
+            r: 3 + Math.random() * 3, born: performance.now(), life: 280 + Math.random() * 200,
+          });
+        }
+      };
       function drawParticles(ctx: any, now: number) {
         for (let i = particles.length - 1; i >= 0; i--) {
           const pt = particles[i], t = (now - pt.born) / pt.life;
@@ -552,6 +575,21 @@ export default function PackPit() {
         }
       };
       Events.on(engine, "collisionStart", onFloorHit);
+      // while the user drags an object, every fresh contact with another object scores
+      // 1 from the contact point and fires the small whack pop
+      const onWhack = (ev: any) => {
+        const held = mc.body; if (!held) return;
+        for (const pair of ev.pairs) {
+          const other = pair.bodyA === held ? pair.bodyB : pair.bodyB === held ? pair.bodyA : null;
+          if (!other || other.isStatic) continue; // ignore walls and pairs that do not involve the held object
+          const sup = pair.collision && pair.collision.supports && pair.collision.supports[0];
+          const cx = sup ? sup.x : (held.position.x + other.position.x) / 2;
+          const cy = sup ? sup.y : (held.position.y + other.position.y) / 2;
+          numAt(cx, cy, 1); // each hit scores 1 into the running total
+          whackAt(cx, cy);
+        }
+      };
+      Events.on(engine, "collisionStart", onWhack);
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -837,7 +875,7 @@ export default function PackPit() {
       <div className={styles.pattern} aria-hidden="true" />
       <div className={styles.controls}>
         <div className={styles.scoreTotal} aria-label={`Score: ${score}`}>{score}</div>
-        <button type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); }} aria-label="Shake the pit">
+        <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
           <span className={styles.shakeIcon} aria-hidden="true" />
           <span className={styles.shakeText}>Shake</span>
         </button>
