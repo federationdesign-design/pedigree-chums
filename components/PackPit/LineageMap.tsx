@@ -427,7 +427,7 @@ export default function LineageMap({
   };
 
   // the bottom-left tally corner, in the diagram's own (panned) coordinates
-  const cornerX = vp.w - 60 - pan.x, cornerY = vp.h - 60 - pan.y;
+  const cornerX = 60 - pan.x, cornerY = vp.h - 60 - pan.y;
   // a card's tumble-into-the-corner transform at the current collect progress
   const collectXf = (sx: number, sy: number, spin: number, baseDeg: number) => {
     const t = collectT;
@@ -730,8 +730,8 @@ export default function LineageMap({
                       </>
                     );
                   })()}
-                  {c.status && (() => {
-                    const ts = TAG_STYLE[c.status];
+                  {(() => {
+                    const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CARD / 2, dy = c.cardY - CARD / 2; // top-left corner, protruding like the close button
                     return (
                       <circle cx={dx} cy={dy} r={12} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
