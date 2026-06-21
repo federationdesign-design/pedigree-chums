@@ -170,14 +170,16 @@ export default function PackPit() {
         return b;
       }
 
-      // The logo drops into the pit last, after the whole pack has poured in, so it
-      // lands on top of the pile. It is a normal solid body like the toys.
-      function makeLogo(w: number) {
+      // The logo sits fixed in the pit on load. It is a solid static body, so the
+      // pouring pack and toys bounce off it. Each strike sinks and tilts it a notch,
+      // and on the fifth hit it finally gives: it goes dynamic and drops onto the
+      // pile to rest with everything else. Desktop only.
+      let logoBody: any = null;
+      function makeLogo(w: number, h: number) {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const x = w / 2 + (Math.random() - 0.5) * 80;
-        const b: any = Bodies.rectangle(x, -bh - 60, bw, bh, { restitution: 0.22, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
@@ -187,6 +189,24 @@ export default function PackPit() {
         }
         return b;
       }
+      const LOGO_HITS_TO_FALL = 5;
+      const LOGO_SINK = BIG * 0.7; // how far each hit pushes it down before it finally goes
+      const LOGO_W = BIG * 6.8;    // matches logo.width
+      const LOGO_TILT = Math.asin(Math.min(1, LOGO_SINK / LOGO_W)); // tilt that drops the free edge
+      let logoHits = 0;
+      const onCollide = (ev: any) => {
+        if (!logoBody || !logoBody.isStatic) return;
+        for (const pair of ev.pairs) {
+          const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
+          if (!lg) continue;
+          const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!other || other.isStatic) continue;
+          logoHits++; // count every hit, including repeat knocks from the same object
+          if (logoHits >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it
+          Body.translate(lg, { x: 0, y: LOGO_SINK }); // shove the centre down a notch
+          Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
+        }
+      };
       // The reserve "button" is a pit object: a yellow rounded box the visitor can
       // fling around, and a tap opens the reservation popup.
       // The reserve / pre-order "buttons" are pit objects: small yellow rounded
@@ -222,7 +242,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => {
             if (disposed) return;
             dropTimer = setInterval(() => {
-              if (k >= order.length) { clearInterval(dropTimer); Composite.add(engine.world, makeLogo(w)); return; } // logo falls in last, landing on top
+              if (k >= order.length) { clearInterval(dropTimer); return; }
               if (withBowl && k === bowlAt) Composite.add(engine.world, makeProp(bowl, w));
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
@@ -534,10 +554,22 @@ export default function PackPit() {
         const popped: any[] = [];
         for (const b of bodies) {
           if (!b.plugin.pop) continue;
-          const t = (now - b.plugin.pop) / 300;
+          const t = (now - b.plugin.pop) / 620; // a touch longer than before, so it lingers
           if (t >= 1) { popped.push(b); continue; }
-          b.plugin.popScale = t < 0.22 ? 1 + (t / 0.22) * 0.12 : 1.12 * (1 - (t - 0.22) / 0.78);
-          b.plugin.popAlpha = 1 - t;
+          if (b.plugin.flyTo) {
+            // curved fall: x eases out toward the tally while y accelerates down,
+            // so the card arcs in rather than dropping dead straight
+            const ex = 1 - (1 - t) * (1 - t), ey = t * t;
+            const f = b.plugin.flyFrom, g = b.plugin.flyTo;
+            Body.setPosition(b, { x: f.x + (g.x - f.x) * ex, y: f.y + (g.y - f.y) * ey });
+            Body.setVelocity(b, { x: 0, y: 0 }); // keep gravity from fighting the scripted arc
+            Body.setAngle(b, b.plugin.flyA0 + b.plugin.flySpin * t);
+            b.plugin.popScale = 1.05 - Math.max(0, (t - 0.55) / 0.45) * 0.8; // shrink into the tally near the end
+            b.plugin.popAlpha = t < 0.66 ? 1 : 1 - (t - 0.66) / 0.34;        // fade only in the final stretch
+          } else {
+            b.plugin.popScale = t < 0.22 ? 1 + (t / 0.22) * 0.12 : 1.12 * (1 - (t - 0.22) / 0.78);
+            b.plugin.popAlpha = 1 - t;
+          }
         }
         if (popped.length) Composite.remove(engine.world, popped);
         if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); drawNumbers(ctx, now); return; }
@@ -554,6 +586,7 @@ export default function PackPit() {
         const step = frameDt / DIM_TIME;
         dimLevel = dimLevel < dimTarget ? Math.min(dimTarget, dimLevel + step) : Math.max(dimTarget, dimLevel - step);
 
+        if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
         if (hoverBody) drawBall(ctx, hoverBody, 1, true);
@@ -580,7 +613,16 @@ export default function PackPit() {
       removeBreedRef.current = (name: string) => {
         const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
         if (target && !target.plugin.pop) {
+          // The chosen chum drops out of the pit and falls into the tally in the
+          // bottom-left, where the count ticks up. Translate the tally's fixed
+          // screen spot into canvas space and fly the card there on a curved fall.
+          const rect = render.canvas.getBoundingClientRect();
           target.plugin.pop = performance.now();
+          target.plugin.flyFrom = { x: target.position.x, y: target.position.y };
+          target.plugin.flyTo = { x: 60 - rect.left, y: window.innerHeight - 60 - rect.top };
+          target.plugin.flyA0 = target.angle;
+          target.plugin.flySpin = (Math.random() < 0.5 ? -1 : 1) * Math.PI * 1.4; // a tumble on the way down
+          target.isSensor = true; // pass through the pile and walls as it leaves
           poof(target.position.x, target.position.y, target.plugin.half || 30);
         }
       };
@@ -716,6 +758,12 @@ export default function PackPit() {
       };
       if (isMobile) { motionRef.current = enableMotion; enableMotion(); } // Android grants now; iOS waits for a tap
 
+      if (!isMobile) {
+        logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
+        Composite.add(engine.world, logoBody);
+        Events.on(engine, "collisionStart", onCollide);
+      }
+
       dropAll();
 
       dispose = () => {
@@ -735,6 +783,7 @@ export default function PackPit() {
         motionRef.current = () => {};
         Events.off(render, "afterRender", onAfter);
         Events.off(engine, "collisionStart", onFloorHit);
+        Events.off(engine, "collisionStart", onCollide);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);

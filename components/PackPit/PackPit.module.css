@@ -87,8 +87,8 @@
 }
 .tallyBurst {
   grid-area: 1 / 1;
-  width: 150px;
-  height: 150px;
+  width: 190px;
+  height: 190px;
   overflow: visible;
   animation: tallyBurst 0.55s ease-out both;
 }
@@ -101,18 +101,19 @@
   grid-area: 1 / 1;
   display: grid;
   place-items: center;
-  animation: tallyPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: tallyPop 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes tallyPop {
   0% { transform: scale(0); }
-  55% { transform: scale(1.35); }
-  75% { transform: scale(0.92); }
-  90% { transform: scale(1.05); }
+  42% { transform: scale(1.75); }
+  62% { transform: scale(0.8); }
+  80% { transform: scale(1.18); }
+  92% { transform: scale(0.96); }
   100% { transform: scale(1); }
 }
 .tallyNum {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 35px;
+  font-size: 70px;
   color: #ffffff;
   line-height: 1;
 }
