@@ -150,6 +150,7 @@ export default function LineageMap({
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; r: number }[]>([]);
   const fxId = useRef(0);
+  const scoredRef = useRef<Set<string>>(new Set());
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
     setFlashes((f) => [...f, { id, x, y, val, size }]);
@@ -392,7 +393,9 @@ export default function LineageMap({
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
                       burstAt(n._x, n._y, r); // orange starburst centred on the circle
-                      flashNum(n._x, n._y - r, hasKids ? 125 : 250, Math.max(13, r * 0.5)); // number rises from the circle's top edge, sized to the % figure
+                      const firstHit = !scoredRef.current.has(n._id);
+                      if (firstHit) scoredRef.current.add(n._id);
+                      flashNum(n._x, n._y - r, firstHit ? (hasKids ? 125 : 250) : 0, Math.max(13, r * 0.5)); // only the first tap on a node scores; later taps read 0
                       follow(n);
                       const wasPicked = picked.has(n._id);
                       setPicked((cur) => {

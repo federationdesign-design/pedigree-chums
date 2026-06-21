@@ -206,9 +206,9 @@
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-34px); }
 }
-/* Orange starburst that pops on a circle tap, mirroring the pit's pink one. */
+/* Pink starburst that pops on a circle tap, matching the pit's. */
 .burst {
-  stroke: #ff7a1a;
+  stroke: #ff2d78;
   stroke-width: 2.4;
   stroke-linecap: round;
   pointer-events: none;
