@@ -70,7 +70,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Longdog", strip: "early1800", era: "1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" },
   { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
   { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/history/breeds/yorkshire-terrier-photo.jpg" },
-  { name: "West Highland White Terrier", strip: "mid1800", era: "late 1800s", anchor: 1885, note: "The plucky white terrier of the Scottish Highlands.", image: "/history/breeds/west-highland-white-terrier-photo.jpg" },
+  { name: "West Highland White Terrier", strip: "mid1800", era: "late 1800s", anchor: 1885, note: "The plucky white terrier of the Scottish Highlands.", image: "/history/breeds/West-Highland-White-Terrier.jpg" },
   { name: "Airedale Terrier", strip: "mid1800", era: "1850s", anchor: 1853, note: "The 'King of Terriers', largest of the terrier breeds.", image: "/history/breeds/airedale-terrier-photo.jpg", tag: "in-decline" },
   { name: "Sealyham Terrier", strip: "mid1800", era: "1870s", anchor: 1875, note: "White Welsh terrier bred to take on badgers.", image: "/history/breeds/sealyham-terrier-photo.jpg", tag: "endangered" },
   { name: "Cairn Terrier", strip: "mid1800", era: "late 1800s", anchor: 1888, note: "Highland vermin-hunter that flushed prey from rock cairns.", image: "/history/breeds/cairn-terrier-photo.jpg", tag: "in-decline" },
@@ -121,6 +121,6 @@ export const ukBreeds: UKBreed[] = [
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky-coated Scottish show terrier bred from the Skye Terrier, and the direct forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
   { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred down from the early King Charles and the old Sussex Spaniel.", tag: "extinct", image: "/history/breeds/toy-Trawler-Spaniel-painting.jpg" },
   { name: "Cumberland Sheepdog", strip: "c1900", era: "Early 1900s", anchor: 1910, note: "Northern herding dog folded into the Border Collie in the early 1900s, also claimed as an Australian Shepherd ancestor.", tag: "extinct" },
-  { name: "Toy Bulldog", strip: "c1900", era: "to 1914", anchor: 1914, note: "Miniature Bulldog kept as a Victorian companion, last recorded in 1914 after the French Bulldog eclipsed it.", tag: "extinct" },
+  { name: "Toy Bulldog", strip: "c1900", era: "to 1914", anchor: 1914, note: "Miniature Bulldog kept as a Victorian companion, last recorded in 1914 after the French Bulldog eclipsed it.", image: "/history/breeds/toy-bulldog.jpg", tag: "extinct" },
   { name: "Dumfriesshire Hound", strip: "c1900", era: "1920s", anchor: 1920, note: "Tall black-and-tan Scottish foxhound of the Galloway hills, its Lockerbie pack disbanded in 2001 with bloodlines left only in France.", tag: "extinct", image: "/history/breeds/Dumfriesshire-Hound.jpg" },
 ];

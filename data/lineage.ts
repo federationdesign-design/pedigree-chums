@@ -68,7 +68,7 @@ const LINEAGE: Record<string, LineageNode> = {
         img: "/Rottweiler-square.jpg",
         children: [
           { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", img: "/history/breeds/Roman-drover-dog.jpg", value: 17 },
-          { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.",  value: 10 }
+          { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.",  img: "/history/breeds/Local-German-cattle-dogs.jpg", value: 10 }
         ]
       },
       {
@@ -210,7 +210,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bedlington Terrier", note: "Shares the same old Border terrier stock and a common working ancestor.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 34 },
       { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 33 },
-      { name: "Old fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 33 }
+      { name: "Old fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 33 }
     ]
   },
 
@@ -282,7 +282,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Fox Terrier", note: "The old white-bodied fox-working terriers that are the breed's direct foundation.", img: "/history/breeds/fox_terrier-img.jpg", value: 55 },
       { name: "Old English White Terrier", note: "A now-extinct terrier behind the mostly white coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 30 },
-      { name: "Working hunt terriers", note: "Hardy local terriers kept for going to ground after fox.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 15 }
+      { name: "Working hunt terriers", note: "Hardy local terriers kept for going to ground after fox.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 15 }
     ]
   },
 
@@ -290,7 +290,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cocker Spaniel",
     note: "The smallest of the old land spaniels, bred to flush, or 'cock', woodcock from cover. For years Cockers and Springers were born in the very same litters, sorted only by working size.",
     children: [
-      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 55 },
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
       { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel-photo.jpg", value: 25 },
       { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 20 }
     ]
@@ -301,7 +301,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
     children: [
       { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 45 },
-      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 30 },
+      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/original-water-spaniel.jpg", value: 30 },
       { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
     ]
   },
@@ -367,7 +367,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A wiry black-and-tan terrier from Wales, bred to face fox, otter and badger underground.",
     children: [
       { name: "Old English Black and Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 75 },
-      { name: "Old fell terriers", note: "Hardy broken-coated working terriers of the hills.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 25 }
+      { name: "Old fell terriers", note: "Hardy broken-coated working terriers of the hills.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 25 }
     ]
   },
 
@@ -403,7 +403,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A stocky white terrier built in Pembrokeshire by Captain John Edwardes to draw badger and otter alongside his hounds.",
     children: [
       { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 35 },
-      { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/west-highland-white-terrier-photo.jpg", value: 35 },
+      { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
       { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
     ]
   },
@@ -421,7 +421,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lakeland Terrier",
     note: "A fell terrier from the Lake District, bred to follow fox over the crags and go to ground without flinching.",
     children: [
-      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 30 },
+      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 30 },
       { name: "Old wirehaired fell terriers", note: "The wiry-coated strain of fell terrier behind its broken jacket.", img: "/history/breeds/Old-wirehaired-fell-terrier.jpg", value: 20 },
       { name: "Bedlington Terrier", note: "A near neighbour that lent coat and line.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 25 },
       { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
@@ -497,7 +497,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Patterdale Terrier",
     note: "A tough, no-nonsense black fell terrier from the Lake District, bred purely to work fox and not for the show ring.",
     children: [
-      { name: "Old fell terriers", note: "The black-and-tan working terriers of the northern fells.", img: "/history/breeds/Patterdale-Terrier-photo.jpg", value: 60 },
+      { name: "Old fell terriers", note: "The black-and-tan working terriers of the northern fells.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 60 },
       { name: "Border Terrier", note: "A close fell neighbour from the same hill stock.", img: "/history/breeds/border-terrier-photo.jpg", value: 25 },
       { name: "Bedlington Terrier", note: "A dash of Bedlington in some northern lines.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 15 }
     ]
@@ -526,7 +526,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Tweed Water Spaniel",
     note: "An extinct liver-brown water dog from the Scottish Borders and the Tweed valley, famous as a key ancestor of the Golden and Curly-Coated Retrievers.",
     children: [
-      { name: "Water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 55 },
+      { name: "Water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/original-water-spaniel.jpg", value: 55 },
       { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power.",  value: 45 }
     ]
   },
@@ -556,7 +556,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An old red-and-white Welsh gundog, known for generations as the Welsh Cocker before becoming the Welsh Springer in 1902.",
     children: [
       { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales.",  value: 60 },
-      { name: "Land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 40 }
+      { name: "Land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/original-land-spaniel.jpg", value: 40 }
     ]
   },
 
@@ -564,7 +564,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Field Spaniel",
     note: "A long, low black spaniel bred up in Victorian show rings from the larger cocking spaniels, once nearly ruined by exaggeration.",
     children: [
-      { name: "Land spaniels", note: "The old land-spaniel stock at its foundation.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 45 },
+      { name: "Land spaniels", note: "The old land-spaniel stock at its foundation.", img: "/history/breeds/original-land-spaniel.jpg", value: 45 },
       { name: "Sussex Spaniel", note: "Lent weight, bone and a longer body.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 35 },
       { name: "Clumber Spaniel", note: "Heavier spaniel blood for substance.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 20 }
     ]
@@ -574,7 +574,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Sussex Spaniel",
     note: "An old, short-legged, golden-liver spaniel from the county of Sussex, bred to work slowly and give tongue in dense cover.",
     children: [
-      { name: "Land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 60 },
+      { name: "Land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
       { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 40 }
     ]
   },
@@ -583,7 +583,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Norfolk Spaniel",
     note: "An extinct liver-and-white springer-type spaniel, the Victorian forerunner of the English Springer, rolled into that breed in 1903.",
     children: [
-      { name: "Land spaniels", note: "The old land-spaniel stock it grew from.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 100 }
+      { name: "Land spaniels", note: "The old land-spaniel stock it grew from.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
     ]
   },
 
@@ -909,7 +909,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/sussex-spaniel-drawing.jpg", value: 50 },
       { name: "Pointer", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
-      { name: "Water spaniels", note: "A little water-spaniel for coat and biddability.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
+      { name: "Water spaniels", note: "A little water-spaniel for coat and biddability.", img: "/history/breeds/original-water-spaniel.jpg", value: 20 }
     ]
   },
 
@@ -917,7 +917,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Clumber Spaniel",
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
     children: [
-      { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/norfolk-spaniel-painting.jpg", value: 55 },
+      { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
       { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
     ]
   },
@@ -1033,7 +1033,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The butcher's dog of Rottweil, descended from the drover mastiffs the Roman legions marched over the Alps.",
     children: [
       { name: "Ancient Molossers", note: "The Roman drover and war mastiffs left in the region, the breed's deepest root.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
-      { name: "Local German cattle dogs", note: "The herding farm dogs of the Wurttemberg valleys it was crossed with to make a steady drover.", value: 40 }
+      { name: "Local German cattle dogs", note: "The herding farm dogs of the Wurttemberg valleys it was crossed with to make a steady drover.", img: "/history/breeds/Local-German-cattle-dogs.jpg", value: 40 }
     ]
   },
   "Basset Hound": {
