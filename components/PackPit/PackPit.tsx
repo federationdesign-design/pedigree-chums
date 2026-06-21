@@ -470,7 +470,22 @@ export default function PackPit() {
           ctx.restore();
         }
       }
-      let patternHidden: boolean | null = null;
+      // little numbers (the circle's %) that flash up on each active hit
+      const numbers: any[] = [];
+      const numAt = (x: number, y: number, val: number) => numbers.push({ x, y, val, born: performance.now(), life: 650 });
+      function drawNumbers(ctx: any, now: number) {
+        for (let i = numbers.length - 1; i >= 0; i--) {
+          const n = numbers[i], t = (now - n.born) / n.life;
+          if (t >= 1) { numbers.splice(i, 1); continue; }
+          ctx.save(); ctx.globalAlpha = 1 - t;
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = "800 18px Montserrat, system-ui, sans-serif";
+          ctx.fillText(String(n.val), n.x, n.y - 22 - t * 34);
+          ctx.restore();
+        }
+      }
+      let patternShown = false;
+      let clearSince: number | null = null;
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -487,15 +502,19 @@ export default function PackPit() {
         // the resting logo is static (excluded from dyn()), so draw it here until it
         // dislodges; once dynamic it falls with everything else and is drawn via dyn()
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false);
-        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); return; }
-        // background pattern shows only while no card rests on the floor; snap, no fade
+        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); drawNumbers(ctx, now); return; }
+        // background pattern shows only after the floor has been clear of cards
+        // for 10s straight (so it stays off through the pour and shakes); snap, no fade
         let cardAtFloor = false;
         const floorY = render.canvas.height;
         for (const b of bodies) {
           if (b.plugin.prop || b.plugin.kind || b.plugin.logo) continue; // dog cards only
           if (b.position.y + b.plugin.half >= floorY - 8) { cardAtFloor = true; break; }
         }
-        if (cardAtFloor !== patternHidden) { patternHidden = cardAtFloor; stage.classList.toggle(styles.showPattern, !cardAtFloor); }
+        if (cardAtFloor) clearSince = null;
+        else if (clearSince === null) clearSince = now;
+        const wantPattern = !cardAtFloor && clearSince !== null && now - clearSince >= 10000;
+        if (wantPattern !== patternShown) { patternShown = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
@@ -527,6 +546,7 @@ export default function PackPit() {
         }
         drawParticles(ctx, now);
         drawBursts(ctx, now);
+        drawNumbers(ctx, now);
       };
       removeBreedRef.current = (name: string) => {
         const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
@@ -581,6 +601,7 @@ export default function PackPit() {
         hit.plugin.repelStart = performance.now();
         hit.plugin.jump = performance.now();           // electrocuted jolt (render-side)
         burstAt(hit.position.x, hit.position.y, 21);    // starburst, fixed at a 5% circle radius, active presses only
+        numAt(hit.position.x, hit.position.y, hit.plugin.share); // flash the % figure on each hit
         // instant outward kick so the push reads immediately
         const f = repelFactor(hit), R = repelRange(hit);
         for (const o of dyn()) {
@@ -719,6 +740,13 @@ export default function PackPit() {
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
+      <button
+        type="button"
+        className={styles.reserve}
+        onClick={() => window.dispatchEvent(new Event("pc:open-offer"))}
+      >
+        Reserve
+      </button>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => removeBreedRef.current(name)} onScatter={(c) => scatterRef.current(c)} />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
