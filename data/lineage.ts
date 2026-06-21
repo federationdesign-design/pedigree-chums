@@ -973,7 +973,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
     children: [
       { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
-      { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 45 }
+      { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 45 }
     ]
   },
 

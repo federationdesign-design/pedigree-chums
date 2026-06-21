@@ -874,7 +874,7 @@ export default function PackPit() {
     >
       <div className={styles.pattern} aria-hidden="true" />
       <div className={styles.controls}>
-        <div className={styles.scoreTotal} aria-label={`Score: ${score}`}>{score}</div>
+        <div className={styles.scoreTotal} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
         <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
           <span className={styles.shakeIcon} aria-hidden="true" />
           <span className={styles.shakeText}>Shake</span>
