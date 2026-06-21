@@ -21,6 +21,7 @@ export default function PackPit() {
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
+  const scatterRef = useRef<(circles: { x: number; y: number; r: number; share: number }[]) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
   useEffect(() => {
@@ -266,7 +267,7 @@ export default function PackPit() {
       const onDown = (e: MouseEvent) => { downAt = localPoint(e); };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop) return false; // dogs only, not the toys
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct") return false; // dogs only, not the toys or fallen circles
         const r = render.canvas.getBoundingClientRect();
         setActiveBreed({
           name: hit.plugin.name,
@@ -332,6 +333,16 @@ export default function PackPit() {
           const k = b.plugin.popScale ?? 1;
           ctx.scale(k, k);
           ctx.globalAlpha = alpha * (b.plugin.popAlpha ?? 1);
+        }
+        if (b.plugin.kind === "pct") {
+          const rr = b.plugin.half;
+          ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffd23e"; ctx.fill();
+          ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = `800 ${Math.max(12, rr * 0.7)}px Montserrat, system-ui, sans-serif`;
+          ctx.fillText(b.plugin.share + "%", 0, 0);
+          ctx.restore(); return;
         }
         if (b.plugin.prop) {
           // shaped colliders sit off-centre from the art box, so nudge the image
@@ -440,6 +451,20 @@ export default function PackPit() {
         if (target && !target.plugin.pop) target.plugin.pop = performance.now();
       };
 
+      scatterRef.current = (circles) => {
+        if (!circles || !circles.length) return;
+        const rect = render.canvas.getBoundingClientRect();
+        for (const c of circles) {
+          const r = Math.max(14, c.r);
+          const b: any = Bodies.circle(c.x - rect.left, c.y - rect.top, r, {
+            restitution: 0.55, friction: 0.2, frictionAir: 0.008, density: 0.0008, render: { visible: false },
+          });
+          b.plugin = { name: "pct", kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0 };
+          Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });
+          Composite.add(engine.world, b);
+        }
+      };
+
       Events.on(render, "afterRender", onAfter);
 
       function fit() {
@@ -526,6 +551,7 @@ export default function PackPit() {
         render.textures = {};
         shakeRef.current = () => {};
         removeBreedRef.current = () => {};
+        scatterRef.current = () => {};
       };
     })();
 
@@ -544,7 +570,7 @@ export default function PackPit() {
           <span className={styles.shakeText}>Shake</span>
         </button>
       </div>
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => removeBreedRef.current(name)} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => removeBreedRef.current(name)} onScatter={(c) => scatterRef.current(c)} />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
           <span className={styles.rotatePhone} />
