@@ -155,10 +155,9 @@
 /* Countdown of yellow circles still to turn blue, sat top-centre of the tree. */
 .dotCount {
   position: fixed;
-  top: 33px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
+  top: 26px;
+  left: clamp(16px, 3.5vw, 40px);
+  z-index: 6;
   padding: 5px 18px;
   border-radius: 20px;
   background: var(--navy);
@@ -172,6 +171,18 @@
 }
 @media (max-width: 640px) {
   .dotCount { top: 14px; font-size: 18px; padding: 4px 13px; }
+}
+/* Cumulative mix percentage shown on each ordered-grid card. */
+.mixPill {
+  fill: var(--navy);
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+.mixText {
+  fill: #ffffff;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 17px;
+  pointer-events: none;
 }
 .chumPop {
   transform-box: fill-box;
@@ -254,7 +265,7 @@
    that label the ordered cards once the pack is gathered. */
 .packBtn {
   position: absolute;
-  top: 26px;
+  top: 74px;
   left: clamp(16px, 3.5vw, 40px);
   display: flex;
   align-items: center;

@@ -225,7 +225,7 @@ export default function PackPit() {
       // The menu is a pit object too: a yellow rounded square with three bars that
       // can be flung around, and a tap opens the site menu.
       function makeMenuBtn(w: number) {
-        const sz = BIG * 1.5;
+        const sz = BIG * 1.2; // 20% smaller than before; the navy stroke stays at 5px
         const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
         const b: any = Bodies.rectangle(x, y, sz, sz, { chamfer: { radius: sz * 0.3 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
         b.plugin = { name: "Menu", label: "Menu", half: sz / 2, w: sz, h: sz, color: "#ffd23e", kind: "menu", family: null, ping: 0 };

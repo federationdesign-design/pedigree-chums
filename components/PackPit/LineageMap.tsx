@@ -75,6 +75,12 @@ function sumLeaves(n: LineageNode): number {
   const c = n.children || [];
   return c.length ? c.reduce((s, x) => s + sumLeaves(x), 0) : n.value ?? 0;
 }
+// every node nested below this one, not just the direct children, so the
+// "inside" badge reflects the true depth of the branch
+function countProgenitors(n: LineageNode): number {
+  const c = n.children || [];
+  return c.reduce((s, x) => s + 1 + countProgenitors(x), 0);
+}
 function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -142,7 +148,7 @@ export default function LineageMap({
 
   // a dragged card becomes "pinned": snapshot its art so it survives its branch
   // closing, and keep showing it at its dropped spot until breed change / close
-  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number; status: BreedTag | null }>>(new Map());
+  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
 
   // Dismiss a fixed/opened card (the X in its corner).
@@ -161,9 +167,8 @@ export default function LineageMap({
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
   const [collecting, setCollecting] = useState(false); // my chum tapped: every card tumbles into the bottom-left
   const [collectT, setCollectT] = useState(0); // 0..1 progress of that tumble
-  const [rootShift, setRootShift] = useState(0); // 0..1: slides the main card aside when the pack is ordered
   const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
-  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setRootShift(0); collectRef.current = null; }, [breed.name]);
+  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -310,6 +315,9 @@ export default function LineageMap({
       const img = (live?.img ?? snap?.img) as string;
       const name = live?.name ?? snap?.name ?? "";
       const share = live ? Math.round((live._leaves / (live._parent as Node)._leaves) * 100) : snap?.share ?? 0;
+      // cumulative share of the whole breed: a node's leaves over the root's leaves,
+      // which is the product of every parent share down the chain
+      const mix = live ? (root ? Math.round((live._leaves / root._leaves) * 100) : share) : (snap?.mix ?? snap?.share ?? 0);
       const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
       const r = radius(share);
       const d = r + 10 + CARD / 2;
@@ -318,20 +326,20 @@ export default function LineageMap({
       const pos = dragPos.get(id);
       const cardX = pos ? pos.x : baseX;
       const cardY = pos ? pos.y : baseY;
-      return { id, img, name, share, status, cardX, cardY };
+      return { id, img, name, share, mix, status, cardX, cardY };
     })
     .filter((c) => c.img);
 
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
   // split into the living and the long-gone, and awards a one-off 400 points.
-  const PACK_LEFT = 96, PACK_COL = 128, PACK_ROW = 128, PACK_RIGHT_RESERVE = 260; // tighter pitch for the 15%-smaller cards; reserve room on the right for the main card
+  const PACK_LEFT = 96, PACK_COL = 128, PACK_ROW = 128; // tighter pitch for the 15%-smaller cards
   const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
-  const doPack = () => {
+  const doPack = (fx?: number, fy?: number) => {
     if (packed) return;
     // One card per ancestor: the same forebear is often bred in several times, so
     // fold the repeats out and keep only the first of each in the pack.
@@ -347,7 +355,7 @@ export default function LineageMap({
     const alive: typeof pickCards = [], extinct: typeof pickCards = [];
     for (const c of uniq) (isAlive(c.status) ? alive : extinct).push(c);
     // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
-    const cols = Math.max(2, Math.min(6, Math.floor((vp.w - PACK_LEFT - PACK_RIGHT_RESERVE) / PACK_COL)));
+    const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
     const targets = new Map<string, { x: number; y: number }>();
     const place = (arr: typeof pickCards, top: number) => {
       arr.forEach((c, i) => {
@@ -368,10 +376,9 @@ export default function LineageMap({
     setPackLabels(labels);
     setPackHidden(hidden);
     setPacked(true);
-    flashNum(160 - pan.x, 96 - pan.y, 400, FLASH_SIZE); // one-off award, fed into the pit total
+    flashNum(fx ?? (160 - pan.x), fy ?? (96 - pan.y), 400, FLASH_SIZE); // one-off award, fed into the pit total
     tween(460, (t) => {
       const e = 1 - Math.pow(1 - t, 3); // ease out
-      setRootShift(e); // the main square card slides off to the right strip in step with the grid
       setDragPos((prev) => {
         const m = new Map(prev);
         uniq.forEach((c) => {
@@ -381,7 +388,6 @@ export default function LineageMap({
         return m;
       });
     }, () => {
-      setRootShift(1);
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
     });
   };
@@ -468,26 +474,6 @@ export default function LineageMap({
           );
         })()}
       </g>
-      {/* the 3-D Complete button pops in just above the card the moment every circle is blue */}
-      {allBlue && !packed && !collecting ? (
-        <g
-          className={styles.removeBtn}
-          transform={`translate(${cx},${cy - ROOT - 56})`}
-          onClick={(e) => { e.stopPropagation(); doPack(); }}
-          onPointerDown={(e) => e.stopPropagation()}
-          role="button"
-          aria-label="Complete the ancestor pack"
-        >
-          <g className={styles.chumPop}>
-            <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
-            <g className={styles.chumTop}>
-              <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
-              <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-              <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Complete</text>
-            </g>
-          </g>
-        </g>
-      ) : null}
       <g className={styles.rootHit} transform={`translate(${cx},${cy + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
         <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
@@ -499,14 +485,34 @@ export default function LineageMap({
             transform={`translate(0,62)`}
             onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + 88, 500, FLASH_SIZE); startRemove(); }}
             role="button"
-            aria-label="Choose as my chum"
+            aria-label="Choose as pack chum"
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
               <g className={removing ? styles.chumTopDown : styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>my chum</text>
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>pack chum</text>
+              </g>
+            </g>
+          </g>
+        ) : null}
+        {/* the 3-D Collect button sits below the green chum button; it orders the pack */}
+        {allBlue && !packed && !collecting ? (
+          <g
+            className={styles.removeBtn}
+            transform={`translate(0,138)`}
+            onClick={(e) => { e.stopPropagation(); burstAt(cx, cy + ROOT + 164, ROOT * 0.9); doPack(cx, cy + ROOT + 164); }}
+            onPointerDown={(e) => e.stopPropagation()}
+            role="button"
+            aria-label="Collect the ancestor pack"
+          >
+            <g className={styles.chumPop}>
+              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
+              <g className={styles.chumTop}>
+                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
+                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
+                <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Collect</text>
               </g>
             </g>
           </g>
@@ -515,13 +521,6 @@ export default function LineageMap({
     </>
     );
   };
-
-  // when ordered, the main card slides into a reserved strip on the right so it
-  // never sits under the grid; rootShift drives the glide
-  const rootPackX = vp.w - 140 - pan.x;
-  const rootPackY = vp.h * 0.5 - pan.y;
-  const rootX = packed ? breed.x + (rootPackX - breed.x) * rootShift : breed.x;
-  const rootY = packed ? breed.y + (rootPackY - breed.y) * rootShift : breed.y;
 
   return (
     <div
@@ -628,7 +627,7 @@ export default function LineageMap({
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                         const rr = radius(sh), dd = rr + 10 + CARD / 2;
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
-                        setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, share: sh, status: nodeStatus(n.name, n.note) }); return x; });
+                        setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
                       }
                     }}
@@ -644,7 +643,7 @@ export default function LineageMap({
                     )}
                     {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
-                        + {n.children!.length} inside
+                        + {countProgenitors(n)} inside
                       </text>
                     ) : null}
                   </g>
@@ -687,7 +686,7 @@ export default function LineageMap({
                       setPinned((m) => {
                         if (m.has(c.id)) return m;
                         const next = new Map(m);
-                        next.set(c.id, { img: c.img, name: c.name, share: c.share, status: c.status });
+                        next.set(c.id, { img: c.img, name: c.name, share: c.share, mix: c.mix, status: c.status });
                         return next;
                       });
                     }
@@ -743,7 +742,7 @@ export default function LineageMap({
                       </circle>
                     );
                   })()}
-                  {(() => {
+                  {!packed && (() => {
                     const ccx = c.cardX + CARD / 2, ccy = c.cardY - CARD / 2; // top-right corner, button straddles it
                     return (
                       <g
@@ -763,10 +762,21 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
+                  {packed && (() => {
+                    const pw = 52, ph = 26, py = c.cardY + CARD / 2 - ph / 2 - 6; // pill near the foot of the card
+                    return (
+                      <>
+                        <rect className={styles.mixPill} x={c.cardX - pw / 2} y={py} width={pw} height={ph} rx={ph / 2} />
+                        <text className={styles.mixText} textAnchor="middle" x={c.cardX} y={py + ph / 2 + 1} dominantBaseline="central">
+                          {c.mix}%
+                        </text>
+                      </>
+                    );
+                  })()}
                 </g>
               );
             })}
-            {rootCard(rootX, rootY)}
+            {rootCard(breed.x, breed.y)}
           </>
         ) : (
           <>
