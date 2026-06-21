@@ -540,11 +540,15 @@ export default function LineageMap({
       {boxPop && (
         <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
       )}
-      {totalNodes > 0 && !packed && !collecting && (
-        <div className={styles.dotCount} aria-label={`${seen.size} of ${totalNodes} circles turned`}>
-          {seen.size}/{totalNodes}
-        </div>
-      )}
+      {totalNodes > 0 && !packed && !collecting && (() => {
+        const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)
+        const dotBg = `hsl(${212 - prog * 87}, ${72 + prog * 13}%, ${44 + prog * 3}%)`; // blue -> bright green
+        return (
+          <div className={styles.dotCount} style={{ background: dotBg }} aria-label={`${seen.size} of ${totalNodes} circles turned`}>
+            {seen.size}/{totalNodes}
+          </div>
+        );
+      })()}
       {showPack && (
         <button
           type="button"
@@ -552,10 +556,10 @@ export default function LineageMap({
           style={{ opacity: packed ? 1 : packProgress }}
           onClick={(e) => { e.stopPropagation(); doPack(); }}
           onPointerDown={(e) => e.stopPropagation()}
-          aria-label={packed ? "Ancestor pack complete" : complete ? "Order the ancestor pack" : "Complete the ancestor pack"}
+          aria-label={packed ? "Ancestor pack complete" : complete ? "Collect the ancestor pack" : "Collect the ancestor pack"}
         >
           <img className={styles.packIcon} src="/checklist-icon-complete.svg" alt="" aria-hidden="true" />
-          <span className={styles.packText}>{packed ? "Done!" : "Complete Ancestor Pack"}</span>
+          <span className={styles.packText}>{packed ? "Done!" : "Collect Ancestor Pack"}</span>
         </button>
       )}
       {packed && packLabels.alive && (

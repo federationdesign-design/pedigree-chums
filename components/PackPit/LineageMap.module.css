@@ -167,6 +167,7 @@
   line-height: 1.1;
   letter-spacing: 0.5px;
   pointer-events: none;
+  transition: background 0.35s ease;
   box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
 }
 @media (max-width: 640px) {
