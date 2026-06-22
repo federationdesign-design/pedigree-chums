@@ -524,9 +524,17 @@
   100% { transform: translate(var(--tx, 0), var(--ty, 0)) scale(2.1); opacity: 0; }
 }
 
-/* Each ancestor card fades in as it is revealed; staggered by Auto, this ripples. */
-.pickPop { animation: lm-pick-pop 0.3s ease; }
-@keyframes lm-pick-pop {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Each ancestor card pops in with an overshoot and a wobble before settling;
+   staggered by Auto, the reveal ripples down the tree. */
+.pickWobble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lm-pick-wobble 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes lm-pick-wobble {
+  0%   { transform: scale(0.2) rotate(-9deg); opacity: 0; }
+  45%  { transform: scale(1.14) rotate(6deg); opacity: 1; }
+  64%  { transform: scale(0.95) rotate(-4deg); }
+  80%  { transform: scale(1.04) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }

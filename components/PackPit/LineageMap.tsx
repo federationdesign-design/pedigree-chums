@@ -167,7 +167,7 @@ export default function LineageMap({
 
   // a dragged card becomes "pinned": snapshot its art so it survives its branch
   // closing, and keep showing it at its dropped spot until breed change / close
-  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
+  const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
   // which collected card is showing its info label right now (hover only)
   const [infoHover, setInfoHover] = useState<string | null>(null);
@@ -404,6 +404,7 @@ export default function LineageMap({
       // which is the product of every parent share down the chain
       const mix = live ? (root ? Math.round((live._leaves / root._leaves) * 100) : share) : (snap?.mix ?? snap?.share ?? 0);
       const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
+      const note = live?.note ?? snap?.note ?? "";
       const r = radius(share);
       const d = r + 10 + CARD / 2;
       const baseX = live ? live._x + Math.cos(live._dir) * d : 0;
@@ -412,7 +413,7 @@ export default function LineageMap({
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
       const cardY = ff ? ff.sy - pan.y : (pos ? pos.y : baseY);
-      return { id, img, name, share, mix, status, cardX, cardY };
+      return { id, img, name, note, share, mix, status, cardX, cardY };
     })
     .filter((c) => c.img);
 
@@ -494,6 +495,7 @@ export default function LineageMap({
       });
     }, () => {
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
+      uniq.forEach((c, i) => { const g = targets.get(c.id); if (g) window.setTimeout(() => flashNum(g.x, g.y - CARD / 2, 100, FLASH_SIZE), i * 55); }); // a +100 pops from each card just after it lands
     });
   };
 
@@ -592,7 +594,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
-            onClick={(e) => { e.stopPropagation(); burstAt(cx, cy + ROOT + 88, ROOT * 0.9); doPack(cx, cy + ROOT + 88); }}
+            onClick={(e) => { e.stopPropagation(); burstAt(cx, cy + ROOT + 88, ROOT * 0.9); doPack(cx, cy + ROOT + 88, 500); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
             aria-label="Collect the ancestor pack"
@@ -673,7 +675,7 @@ export default function LineageMap({
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={packed ? "Ancestor pack complete" : complete ? "Collect the ancestor pack" : "Collect the ancestor pack"}
         >
-          <img className={styles.packIcon} src={packed ? "/checklist-icon-complete.svg" : "/checklist-icon.svg"} alt="" aria-hidden="true" />
+          <img className={styles.packIcon} src={(framesDone || packed) ? "/checklist-icon-complete.svg" : "/checklist-icon.svg"} alt="" aria-hidden="true" />
           <span className={styles.packText}>{packed ? "Done!" : "Collect Ancestor Pack"}</span>
         </button>
       )}
@@ -742,7 +744,7 @@ export default function LineageMap({
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                         const rr = radius(sh), dd = rr + 10 + CARD / 2;
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
-                        setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
+                        setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
                       }
                     }}
@@ -819,7 +821,7 @@ export default function LineageMap({
               return (
                 <g
                   key={`pick-${c.id}`}
-                  className={`${styles.rootHit} ${styles.grab} ${styles.pickPop}`}
+                  className={`${styles.rootHit} ${styles.grab}`}
                   transform={cxf
                     ? `${cxf.transform} scale(${packScale}) translate(${-c.cardX},${-c.cardY})`
                     : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) scale(${packScale}) translate(${-c.cardX},${-c.cardY})`}
@@ -851,7 +853,7 @@ export default function LineageMap({
                       setPinned((m) => {
                         if (m.has(c.id)) return m;
                         const next = new Map(m);
-                        next.set(c.id, { img: c.img, name: c.name, share: c.share, mix: c.mix, status: c.status });
+                        next.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status });
                         return next;
                       });
                     }
@@ -892,6 +894,7 @@ export default function LineageMap({
                   }}
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
+                  <g className={styles.pickWobble}>
                   <clipPath id={clipId}>
                     <rect x={c.cardX - CARD / 2} y={c.cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
                   </clipPath>
@@ -953,7 +956,7 @@ export default function LineageMap({
                       </>
                     );
                   })()}
-                  {breedInfo[c.name] ? (() => {
+                  {(breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX - CARD / 2, iy = c.cardY + CARD / 2; // bottom-left corner, mirrors the status dot up top
                     return (
                       <g
@@ -967,13 +970,14 @@ export default function LineageMap({
                       </g>
                     );
                   })() : null}
+                  </g>
                 </g>
               );
             })}
             {rootCard(breed.x, breed.y)}
             {infoHover ? (() => {
               const c = pickCards.find((x) => x.id === infoHover);
-              const text = c ? breedInfo[c.name] : null;
+              const text = c ? (breedInfo[c.name] || c.note) : null;
               if (!c || !text) return null;
               const w = 190; // small understated hover label, not a click popover
               return (
