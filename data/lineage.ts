@@ -990,7 +990,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
     children: [
       { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 50 },
-      { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", value: 30 },
+      { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 30 },
       { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }
     ]
   },
