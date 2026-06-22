@@ -186,6 +186,14 @@
   animation: cardBoxPop 0.7s ease-in-out 0.5s both;
   filter: drop-shadow(0 10px 16px rgba(10, 58, 87, 0.35));
 }
+/* Desktop only: nudge the box 10px right and 10px down from the shared base spot.
+   Below the base rule so it wins on desktop; mobile (<=768px) keeps the base spot. */
+@media (min-width: 769px) {
+  .cardBox {
+    left: calc(clamp(240px, 44vw, 400px) * -0.5 + 40px);
+    bottom: calc(clamp(74px, 12vh, 130px) - 130px);
+  }
+}
 @keyframes cardBoxPop {
   0%   { transform: translateX(0) scale(0.2) rotate(-10deg); opacity: 0; }
   12%  { transform: translateX(0) scale(1.12) rotate(11deg); opacity: 1; }
