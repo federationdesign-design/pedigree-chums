@@ -372,6 +372,10 @@
   pointer-events: none;
   z-index: 4;
 }
+/* On mobile the section titles are hidden to save room (pit treats <=768px as mobile). */
+@media (max-width: 768px) {
+  .packHead { display: none; }
+}
 
 /* First-ring hint: gently pulse the direct-child circles after a second of no
    interaction, so it reads as where to tap. Stops the moment a circle is opened. */
