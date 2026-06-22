@@ -317,6 +317,7 @@ export default function PackPit() {
       // down (180 degrees), opens the cookie notice on tap, and buzzes its neighbours
       // every 20 seconds. It is the site's main cookie message on the home page.
       let cookiesBody: any = null;
+      let acceptBody: any = null; // the Accept button squeezed out of the cookie on tap
       function makeCookies(w: number) {
         const bw = BIG * 3.0, bh = bw; // square to start; reshaped to the art's ratio on load
         const x = 80 + Math.random() * (w - 160), y = -300 - Math.random() * 220;
@@ -413,7 +414,23 @@ export default function PackPit() {
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
         if (hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
-        if (hit.plugin?.kind === "cookies") { window.dispatchEvent(new Event("pc:open-cookies")); return true; }
+        if (hit.plugin?.kind === "cookies") {
+          window.dispatchEvent(new Event("pc:open-cookies"));
+          if (!acceptBody && cookiesBody) { // squeeze an Accept button out of the cookie
+            const b: any = makeButton("cookieaccept", "Accept", stage.clientWidth);
+            Body.setPosition(b, { x: cookiesBody.position.x, y: cookiesBody.position.y });
+            Body.setVelocity(b, { x: (Math.random() - 0.5) * 6, y: -9 }); // pops out and up
+            Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.4);
+            acceptBody = b;
+            Composite.add(engine.world, b);
+          }
+          return true;
+        }
+        if (hit.plugin?.kind === "cookieaccept") {
+          window.dispatchEvent(new Event("pc:cookies-accepted"));
+          if (acceptBody) { Composite.remove(engine.world, acceptBody); acceptBody = null; }
+          return true;
+        }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
@@ -430,8 +447,8 @@ export default function PackPit() {
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu") return false; // dogs only, not the toys, fallen circles or the buttons
-        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && !hit.plugin.collected) {
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept") return false; // dogs only, not the toys, fallen circles or the buttons
+        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && !hit.plugin.collected) {
           hit.plugin.collected = true;                                              // only the first collect of a card scores
           numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
           burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));   // pink starburst on first collect
@@ -558,7 +575,7 @@ export default function PackPit() {
           for (let i = -1; i <= 1; i++) { rrect(ctx, -barW / 2, i * gap - barH / 2, barW, barH, barH / 2); ctx.fill(); }
           ctx.restore(); return;
         }
-        if (b.plugin.kind === "reserve" || b.plugin.kind === "preorder") {
+        if (b.plugin.kind === "reserve" || b.plugin.kind === "preorder" || b.plugin.kind === "cookieaccept") {
           const rw = b.plugin.w, rh = b.plugin.h, rad = rh * 0.34;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
           rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
@@ -1074,20 +1091,34 @@ export default function PackPit() {
 
       // Every 20 seconds the cookie object gives a sharp shudder and kicks every
       // object currently touching it, so it visibly buzzes its neighbours.
+      // The cookie sits quiet for 10s, then a faint tremor builds over ~20s into an
+      // erratic shake, climaxing in a buzz that nudges its neighbours and drops all
+      // its energy, before the whole cycle slowly repeats.
+      const CALM = 10000, BUILD = 20000;
+      let cycleStart = performance.now();
       buzzTimer = setInterval(() => {
         if (disposed || !cookiesBody || !cookiesBody.position) return;
-        Body.setAngularVelocity(cookiesBody, (Math.random() < 0.5 ? 1 : -1) * 0.5); // a quick twitch on the cookie itself
-        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * 0.05, y: -0.014 });
-        const others = dyn().filter((b: any) => b !== cookiesBody);
-        for (const col of Query.collides(cookiesBody, others)) {
-          const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
-          if (!other || other.isStatic) continue;
-          let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
-          const len = Math.hypot(dx, dy) || 1;
-          Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 6.5, y: other.velocity.y + (dy / len) * 6.5 - 3 });
-          Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.6);
+        const elapsed = performance.now() - cycleStart;
+        if (elapsed < CALM) return; // 10s of stillness
+        const p = Math.min(1, (elapsed - CALM) / BUILD); // 0 (mute) -> 1 (erratic)
+        const e = p * p; // eased so it stays subtle for a while then ramps up
+        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.0008 + e * 0.006), y: (Math.random() - 0.5) * (0.0008 + e * 0.005) });
+        Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.02 + e * 0.45));
+        if (elapsed >= CALM + BUILD) {
+          const others = dyn().filter((b: any) => b !== cookiesBody);
+          for (const col of Query.collides(cookiesBody, others)) {
+            const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
+            if (!other || other.isStatic) continue;
+            let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
+            const len = Math.hypot(dx, dy) || 1;
+            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 2.2, y: other.velocity.y + (dy / len) * 2.2 - 1 }); // gentler than before
+            Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.3);
+          }
+          Body.setVelocity(cookiesBody, { x: 0, y: cookiesBody.velocity.y }); // loses all energy
+          Body.setAngularVelocity(cookiesBody, 0);
+          cycleStart = performance.now(); // and slowly starts over
         }
-      }, 20000);
+      }, 50);
 
       dispose = () => {
         if (dropTimer) clearInterval(dropTimer);
