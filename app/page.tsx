@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "../components/Nav/Nav";
 import PackPit from "../components/PackPit/PackPit";
+import VideoPreload from "../components/VideoPreload/VideoPreload";
 
 export const metadata: Metadata = {
   title: "Pedigree Chums | The Dog Bingo Game",
@@ -15,6 +16,7 @@ export default function Home() {
       <main>
         <PackPit />
       </main>
+      <VideoPreload />
     </>
   );
 }

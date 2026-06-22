@@ -36,7 +36,7 @@
 .floor {
   position: absolute;
   left: 0;
-  bottom: 0;
+  bottom: -100px; /* dropped 100px below the pit floor line */
   width: 100%;
   height: auto;
   z-index: 0;

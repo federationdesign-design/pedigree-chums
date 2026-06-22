@@ -1123,7 +1123,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dachshund",
     note: "The German badger dog, a scenthound bred low and long to follow its quarry straight down into the earth.",
     children: [
-      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", img: "/history/breeds/Old-German-hunting-dogs.jpg", value: 60 },
+      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 60 },
       { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
       { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 15 }
     ]
