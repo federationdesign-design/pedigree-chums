@@ -697,11 +697,11 @@ export default function LineageMap({
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
-                    {picked.has(n._id) ? null : (
+                    {(!picked.has(n._id) || packed) ? (
                       <text className={styles.nm} textAnchor="middle" y={-r - 9}>
                         {n.name}
                       </text>
-                    )}
+                    ) : null}
                     {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside
