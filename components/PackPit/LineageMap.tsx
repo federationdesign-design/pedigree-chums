@@ -419,19 +419,20 @@ export default function LineageMap({
     setBoxPop(true); // the card-pack box pops in at the bottom-right as the cards are pushed into it
     burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
     onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
+    // hand the percentage circles straight to the pit so they drop in the instant the button is
+    // hit, instead of hanging on the overlay; screen coords are their user coords plus the pan
+    const circles = shown
+      .filter((n) => n._parent)
+      .slice(0, 60)
+      .map((n) => {
+        const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+        return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
+      });
+    onScatter?.(circles);
     tween(520, (t) => setCollectT(t), () => {
       burstAt(60 - pan.x, vp.h - 60 - pan.y, ROOT * 1.5); // dot explosion where the cards crash into the bottom-left corner
-      // hand the visible percentage circles to the pit as real falling bodies,
-      // in screen coords (their user coords plus the current pan)
-      const circles = shown
-        .filter((n) => n._parent)
-        .slice(0, 60)
-        .map((n) => {
-          const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-          return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
-        });
-      // hold a beat so the bottom-right pack box can finish its pop before the overlay closes
-      window.setTimeout(() => { onScatter?.(circles); onClose(); }, 680);
+      // hold a beat so the bottom-left pack box can finish its pop before the overlay closes
+      window.setTimeout(() => { onClose(); }, 680);
     });
   };
 
@@ -467,7 +468,7 @@ export default function LineageMap({
         <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
         {breed.image ? (
           <image
-            href={bust(breed.image)}
+            href={encodeURI(bust(breed.image))}
             x={-ROOT}
             y={-ROOT}
             width={ROOT * 2}
@@ -579,6 +580,7 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
+            <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
@@ -653,6 +655,7 @@ export default function LineageMap({
                   </g>
                 );
               })}
+            </g>
             {pickCards.map((c) => {
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               const clipId = `lm-pick-${c.id}`;
@@ -708,7 +711,7 @@ export default function LineageMap({
                     <rect x={c.cardX - CARD / 2} y={c.cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
                   </clipPath>
                   <image
-                    href={bust(c.img)}
+                    href={encodeURI(bust(c.img))}
                     x={c.cardX - CARD / 2}
                     y={c.cardY - CARD / 2}
                     width={CARD}
