@@ -188,10 +188,10 @@ export default function BreedTree({
     return d.depth === 0 ? "#0a3a57" : d.depth === 1 ? "#1f8fd0" : "#bfe3f7";
   }
   // Thinner stroke the deeper (smaller) the circle, so the ring never
-  // overpowers a tiny image several levels down: 3, 2, 1, then finer still.
+  // overpowers a tiny image several levels down: 5, 4, 3, then finer still.
   function strokeWidthFor(d: Node): number {
-    const widths = [3, 2, 1, 0.6, 0.4];
-    return widths[d.depth - 1] ?? 0.4;
+    const widths = [5, 4, 3, 2.6, 2.4];
+    return widths[d.depth - 1] ?? 2.4;
   }
 
   function zoomTo(v: View) {

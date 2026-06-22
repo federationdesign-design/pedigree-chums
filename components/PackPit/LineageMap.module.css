@@ -176,22 +176,15 @@
 /* The card-pack box that bobs, shakes and pops out of existence on collect. */
 .cardBox {
   position: fixed;
-  left: calc(clamp(120px, 22vw, 200px) * -0.5 + 30px); /* half off the left edge, nudged 30px right */
+  left: calc(clamp(240px, 44vw, 400px) * -0.5 + 30px); /* half off the left edge, nudged 30px right */
   bottom: calc(clamp(74px, 12vh, 130px) - 120px); /* dropped 120px lower */
-  width: clamp(120px, 22vw, 200px);
+  width: clamp(240px, 44vw, 400px); /* 2x size on desktop and mobile alike */
   height: auto;
   z-index: 9999;
   pointer-events: none;
   transform-origin: 50% 100%;
   animation: cardBoxPop 0.7s ease-in-out 0.5s both;
   filter: drop-shadow(0 10px 16px rgba(10, 58, 87, 0.35));
-}
-/* Mobile: twice the size, driven by the pit's own mobile flag via the .cardBoxBig
-   class. The two-class selector outranks the base .cardBox above by specificity, so
-   cascade order can never cancel it again (the bug that hid this three times). */
-.cardBox.cardBoxBig {
-  width: clamp(240px, 44vw, 400px);
-  left: calc(clamp(240px, 44vw, 400px) * -0.5 + 30px);
 }
 @keyframes cardBoxPop {
   0%   { transform: translateX(0) scale(0.2) rotate(-10deg); opacity: 0; }
