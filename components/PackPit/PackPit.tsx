@@ -215,6 +215,36 @@ export default function PackPit() {
           Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
         }
       };
+      // The hamburger menu starts fixed in the top-right corner, just like the logo.
+      // Objects pouring past knock it loose a notch at a time, and once it has taken
+      // enough hits it gives way, drops into the pit and behaves like any other object,
+      // still opening the site menu on a tap. Lives on both platforms (it is the only
+      // way into the menu from the pit).
+      let menuBody: any = null;
+      const MENU_SZ = BIG * 1.2;
+      function makeMenuFixed(w: number) {
+        const x = w - MENU_SZ / 2 - 20, y = MENU_SZ / 2 + 20; // tucked into the top-right corner
+        const b: any = Bodies.rectangle(x, y, MENU_SZ, MENU_SZ, { isStatic: true, isSensor: false, chamfer: { radius: MENU_SZ * 0.3 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
+        b.plugin = { name: "Menu", label: "Menu", half: MENU_SZ / 2, w: MENU_SZ, h: MENU_SZ, color: "#ffd23e", kind: "menu", menuFixed: true, family: null, ping: 0 };
+        return b;
+      }
+      const MENU_HITS_TO_FALL = 5;
+      const MENU_SINK = BIG * 0.5; // how far each hit nudges it down before it finally drops
+      const MENU_TILT = Math.asin(Math.min(1, MENU_SINK / MENU_SZ)); // tip it as it loosens
+      let menuHits = 0;
+      const onMenuCollide = (ev: any) => {
+        if (!menuBody || !menuBody.isStatic) return;
+        for (const pair of ev.pairs) {
+          const mn = pair.bodyA.plugin?.menuFixed ? pair.bodyA : pair.bodyB.plugin?.menuFixed ? pair.bodyB : null;
+          if (!mn) continue;
+          const other = mn === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!other || other.isStatic) continue;
+          menuHits++; // count every knock, including repeat nudges from the same object
+          if (menuHits >= MENU_HITS_TO_FALL) { mn.plugin.menuFixed = false; Body.setStatic(mn, false); break; } // it finally gives and falls into the pit
+          Body.translate(mn, { x: 0, y: MENU_SINK }); // shove it down a notch
+          Body.rotate(mn, MENU_TILT); // and tip it as one corner loosens
+        }
+      };
       // The reserve "button" is a pit object: a yellow rounded box the visitor can
       // fling around, and a tap opens the reservation popup.
       // The reserve / pre-order "buttons" are pit objects: small yellow rounded
@@ -299,6 +329,7 @@ export default function PackPit() {
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
       const tapButton = (pt: { x: number; y: number }) => {
+        if (menuBody && menuBody.isStatic && Query.point([menuBody], pt).length) { window.dispatchEvent(new Event("pc:open-menu")); return true; } // tap the fixed menu before it dislodges
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
@@ -681,6 +712,7 @@ export default function PackPit() {
         dimLevel = dimLevel < dimTarget ? Math.min(dimTarget, dimLevel + step) : Math.max(dimTarget, dimLevel - step);
 
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
+        if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
         bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
         if (hoverBody) drawBall(ctx, hoverBody, 1, true);
@@ -909,6 +941,12 @@ export default function PackPit() {
         Events.on(engine, "collisionStart", onCollide);
       }
 
+      // The menu is the only way into the site menu from the pit, so it loads on
+      // both desktop and mobile (unlike the desktop-only logo).
+      menuBody = makeMenuFixed(stage.clientWidth);
+      Composite.add(engine.world, menuBody);
+      Events.on(engine, "collisionStart", onMenuCollide);
+
       // Inert (blue) % circles bind to each other like atoms: the first time two
       // touch, weld a fixed-length link between them, so clusters build up.
       const bonded = new Set<string>();
@@ -945,6 +983,7 @@ export default function PackPit() {
         Events.off(render, "afterRender", onAfter);
         Events.off(engine, "collisionStart", onFloorHit);
         Events.off(engine, "collisionStart", onCollide);
+        Events.off(engine, "collisionStart", onMenuCollide);
         Events.off(engine, "collisionStart", onInertBond);
         Render.stop(render);
         Runner.stop(runner);

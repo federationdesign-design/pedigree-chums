@@ -238,7 +238,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Corgi",
     note: "A big dog in a small body. The Pembroke is a true cattle herder, nipping at heels and ducking the kicks.",
     children: [
-      { name: "Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.",  value: 40 },
+      { name: "Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.", img: "/history/breeds/Northern-Spitz-landraces.jpg",  value: 40 },
       { name: "Cardigan Welsh Corgi", note: "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.", img: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", value: 35 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 }
     ]
@@ -954,7 +954,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Maltese",
     note: "An ancient white lapdog of the Mediterranean, a favourite of Roman ladies and prized for over two thousand years.",
     children: [
-      { name: "Ancient Spitz-type dogs", note: "The small spitz-type dogs many historians see as its oldest ancestors, bred down in size over centuries.",  value: 55 },
+      { name: "Ancient Spitz-type dogs", note: "The small spitz-type dogs many historians see as its oldest ancestors, bred down in size over centuries.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg",  value: 55 },
       { name: "Mediterranean bichon lapdogs", note: "The old white bichon-family lapdogs spread around the Mediterranean by ancient traders.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 45 }
     ]
   },
@@ -1050,7 +1050,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A sighthound shrunk to a lapdog in ancient Italy, all the speed in miniature, kept for warmth and company.",
     children: [
       { name: "Ancient eastern sighthounds", note: "The desert coursing hounds of Egypt and the Near East, the Saluki-like deep root found mummified in the pharaohs' tombs.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
-      { name: "Mediterranean miniature sighthounds", note: "The small coursing dogs bred down as companions across Greece, Rome and Renaissance Italy.", value: 45 }
+      { name: "Mediterranean miniature sighthounds", note: "The small coursing dogs bred down as companions across Greece, Rome and Renaissance Italy.", img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg", value: 45 }
     ]
   },
   "Papillon": {
@@ -1066,7 +1066,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The sled dog of the Chukchi people of north east Siberia, bred to pull light loads vast distances in brutal cold.",
     children: [
       { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them.", img: "/history/breeds/Chukchi-sled-dogs.jpg", value: 75 },
-      { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat.", value: 25 }
+      { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 25 }
     ]
   },
   "Shih Tzu": {
