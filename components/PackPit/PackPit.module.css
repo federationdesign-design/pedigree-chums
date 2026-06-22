@@ -107,10 +107,15 @@
   pointer-events: none;
 }
 .tallyBurst {
-  grid-area: 1 / 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 320px;
   height: 320px;
+  margin-left: -160px; /* centre the 320px burst on the number, not the grid edge */
+  margin-top: -160px;
   overflow: visible;
+  pointer-events: none;
   animation: tallyBurst 0.55s ease-out both;
 }
 @keyframes tallyBurst {
@@ -120,9 +125,9 @@
 }
 .tallyChip {
   grid-area: 1 / 1;
-  display: grid;
+  position: relative; /* anchors the burst so it centres on the number */
+  display: inline-grid;
   place-items: center;
-  animation: tallyPop 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes tallyPop {
   0% { transform: scale(0); }
@@ -137,6 +142,7 @@
   font-size: 140px;
   color: #ffffff;
   line-height: 1.3; /* Luckiest Guy sits high; headroom stops 2/3/6/8/9 clipping at the top */
+  animation: tallyPop 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .shakeIcon {
   display: block;

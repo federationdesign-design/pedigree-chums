@@ -497,7 +497,7 @@ export default function LineageMap({
       });
     onScatter?.(circles);
     tween(520, (t) => setCollectT(t), () => {
-      burstAt(-40 - pan.x, vp.h - 60 - pan.y, ROOT * 1.5); // dot explosion where the cards crash into the bottom-left corner (nudged 100px left of the original)
+      burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
       // hold a beat so the bottom-left pack box can finish its pop before the overlay closes
       window.setTimeout(() => { onClose(); }, 680);
     });

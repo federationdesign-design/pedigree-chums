@@ -1066,17 +1066,17 @@ export default function PackPit() {
       <HowToPlay open={howToPlay} onClose={() => setHowToPlay(false)} />
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
-          <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
-            {Array.from({ length: 16 }).map((_, i) => {
-              const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
-              return <line key={i} x1={Math.cos(a) * r1} y1={Math.sin(a) * r1} x2={Math.cos(a) * r2} y2={Math.sin(a) * r2} stroke="#ff2d78" strokeWidth={3.5} strokeLinecap="round" />;
-            })}
-            {Array.from({ length: 5 }).map((_, i) => {
-              const a = (i / 5) * Math.PI * 2 + 0.4, rr = 46;
-              return <circle key={`s${i}`} cx={Math.cos(a) * rr} cy={Math.sin(a) * rr} r={4.5} fill="#ff5d97" />;
-            })}
-          </svg>
           <div className={styles.tallyChip}>
+            <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
+              {Array.from({ length: 16 }).map((_, i) => {
+                const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
+                return <line key={i} x1={Math.cos(a) * r1} y1={Math.sin(a) * r1} x2={Math.cos(a) * r2} y2={Math.sin(a) * r2} stroke="#ff2d78" strokeWidth={3.5} strokeLinecap="round" />;
+              })}
+              {Array.from({ length: 5 }).map((_, i) => {
+                const a = (i / 5) * Math.PI * 2 + 0.4, rr = 46;
+                return <circle key={`s${i}`} cx={Math.cos(a) * rr} cy={Math.sin(a) * rr} r={4.5} fill="#ff5d97" />;
+              })}
+            </svg>
             <span className={styles.tallyNum}>{collected}</span>
           </div>
         </div>
