@@ -524,14 +524,13 @@ export default function LineageMap({
     burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
     onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
     // hand the percentage circles straight to the pit so they drop in the instant the button is
-    // hit, instead of hanging on the overlay; screen coords are their user coords plus the pan
-    const circles = shown
-      .filter((n) => n._parent)
+    // hit; each circle launches from where its card actually sits right now (wherever you dragged
+    // it, or where the Collect grid placed it), not from the node's original layout spot. Card
+    // coords are user coords, so add the pan to get the screen position the pit expects.
+    const circles = pickCards
+      .filter((c) => !(packed && packHidden.has(c.id)))
       .slice(0, 60)
-      .map((n) => {
-        const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-        return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
-      });
+      .map((c) => ({ x: c.cardX + pan.x, y: c.cardY + pan.y, r: radius(c.share), share: c.share, name: c.name }));
     onScatter?.(circles);
     tween(520, (t) => setCollectT(t), () => {
       burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
