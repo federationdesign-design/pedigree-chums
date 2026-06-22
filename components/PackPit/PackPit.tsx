@@ -279,9 +279,13 @@ export default function PackPit() {
       // strip over the pit the way the family tree opens.
       const enterPanel = { key: "__entersite", label: "Enter site", src: "/entersite.svg", width: BIG * 3.0, aspect: 86.9 / 45.9, kind: "entersite" };
       const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
-      function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number) {
+      function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number, side?: "left" | "right") {
         const bw = cfg.width, bh = cfg.width / cfg.aspect;
-        const x = 80 + Math.random() * (w - 160), y = -280 - Math.random() * 220;
+        const margin = bw / 2 + 24; // keep the whole panel on screen at the edge
+        const x = side === "left" ? margin + Math.random() * 40
+                : side === "right" ? w - margin - Math.random() * 40
+                : 80 + Math.random() * (w - 160);
+        const y = -280 - Math.random() * 220;
         const b: any = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: bh * 0.16 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
         b.plugin = { name: cfg.label, label: cfg.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(cfg.key, cfg.src), prop: "panel", kind: cfg.kind, family: null, ping: 0 };
         return b;
@@ -312,8 +316,8 @@ export default function PackPit() {
             dropTimer = setInterval(() => {
               if (k >= order.length) { clearInterval(dropTimer); return; }
               if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); } // the bowl lands midway through the pour
-              if (k === 5) { Composite.add(engine.world, makePanel(enterPanel, w)); } // enter-site panel after the 5th card
-              if (k === 6) { Composite.add(engine.world, makePanel(howPanel, w)); }   // how-to-play panel just after
+              if (k === 5) { Composite.add(engine.world, makePanel(enterPanel, w, "left")); } // enter-site panel drops on the left edge
+              if (k === 6) { Composite.add(engine.world, makePanel(howPanel, w, "right")); }   // how-to-play panel drops on the right edge
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
             }, 70);

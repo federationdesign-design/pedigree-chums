@@ -274,10 +274,10 @@ export default function LineageMap({
   // Every unique image-bearing ancestor, split into the living and the long-gone.
   // These define how many empty frames the player drags each collected card into.
   const frameSlots = useMemo(() => {
-    const seenName = new Set<string>();
+    const seenImg = new Set<string>();
     const all: { name: string; status: BreedTag | null }[] = [];
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      if (k.img && !seenName.has(k.name)) { seenName.add(k.name); all.push({ name: k.name, status: nodeStatus(k.name, k.note) }); }
+      if (k.img && !seenImg.has(k.img)) { seenImg.add(k.img); all.push({ name: k.name, status: nodeStatus(k.name, k.note) }); }
       walk(k);
     });
     if (root) walk(root);
@@ -418,6 +418,7 @@ export default function LineageMap({
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
+  const collectShowing = allBlue && !packed && !collecting; // the blue Collect button is on screen
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
   // One tap opens every branch, turns all circles blue and pops all cards out, the
@@ -442,7 +443,7 @@ export default function LineageMap({
     const hidden = new Set<string>();
     const uniq: typeof pickCards = [];
     for (const c of pickCards) {
-      const key = c.name || c.img;
+      const key = c.img || c.name; // fold by artwork: the same forebear under two spellings is one card
       if (seenKey.has(key)) { hidden.add(c.id); continue; }
       seenKey.add(key);
       uniq.push(c);
@@ -578,7 +579,7 @@ export default function LineageMap({
           {breed.name}
         </text>
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
-        {allBlue && !packed && !collecting ? (
+        {collectShowing ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
@@ -601,8 +602,8 @@ export default function LineageMap({
         {canRemove || removing ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,138)`}
-            onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + 164, 500, FLASH_SIZE); startRemove(); }}
+            transform={`translate(0,${collectShowing ? 138 : 62})`}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + (collectShowing ? 164 : 88), 500, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label="Choose as pack chum"
           >
@@ -740,11 +741,18 @@ export default function LineageMap({
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
-                    {(!picked.has(n._id) || packed) ? (
-                      <text className={styles.nm} textAnchor="middle" y={-r - 9}>
-                        {n.name}
-                      </text>
-                    ) : null}
+                    {(hasKids || !picked.has(n._id)) ? (() => {
+                      const nmW = n.name.length * 7.4 + 22; // pill hugs the label
+                      const nmY = -r - 13;
+                      return (
+                        <g>
+                          <rect className={styles.nmPill} x={-nmW / 2} y={nmY - 11} width={nmW} height={22} rx={11} />
+                          <text className={styles.nm} textAnchor="middle" dominantBaseline="central" y={nmY}>
+                            {n.name}
+                          </text>
+                        </g>
+                      );
+                    })() : null}
                     {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside

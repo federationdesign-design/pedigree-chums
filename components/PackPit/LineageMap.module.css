@@ -85,9 +85,10 @@
   font-weight: 800;
   font-size: 13px;
   fill: var(--white);
-  paint-order: stroke;
-  stroke: rgba(10, 58, 87, 0.6);
-  stroke-width: 3px;
+}
+.nmPill {
+  fill: var(--navy);
+  filter: drop-shadow(0 2px 0 rgba(10, 58, 87, 0.35));
 }
 .plus {
   font-family: var(--font-body), system-ui, sans-serif;
