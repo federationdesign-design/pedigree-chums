@@ -468,7 +468,7 @@ export default function LineageMap({
         <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
         {breed.image ? (
           <image
-            href={encodeURI(bust(breed.image))}
+            href={bust(breed.image)}
             x={-ROOT}
             y={-ROOT}
             width={ROOT * 2}
