@@ -910,8 +910,7 @@ export default function LineageMap({
     {showAuto && (
       <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
-          <span className={styles.autoLabel}>Auto Find</span>
-          <img className={styles.autoBtn} src="/auto-collect-icon.svg" alt="" aria-hidden="true" />
+          <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />
         </div>
       </div>
     )}
