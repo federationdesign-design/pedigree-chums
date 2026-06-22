@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import styles from "./CookieBanner.module.css";
 
@@ -10,19 +11,27 @@ const KEY = "pc-cookie-consent";
 // stored value (only load when it is "accepted").
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Read + show inside a rAF callback so the state update is not made
-    // synchronously in the effect body, and so the first paint (and SSR)
-    // render the banner hidden, avoiding a hydration mismatch.
+    // On the home page the cookie message is the pit's cookie-policy object, so the
+    // banner stays hidden there. On any inner page it shows until a choice is stored.
+    const isHome = pathname === "/";
     const raf = requestAnimationFrame(() => {
       try {
-        if (!localStorage.getItem(KEY)) setVisible(true);
+        if (!localStorage.getItem(KEY) && !isHome) setVisible(true);
       } catch {
-        setVisible(true);
+        if (!isHome) setVisible(true);
       }
     });
     return () => cancelAnimationFrame(raf);
+  }, [pathname]);
+
+  useEffect(() => {
+    // Tapping the pit's cookie-policy object opens the full notice, on any page.
+    const open = () => setVisible(true);
+    window.addEventListener("pc:open-cookies", open);
+    return () => window.removeEventListener("pc:open-cookies", open);
   }, []);
 
   const choose = (value: "accepted" | "declined") => {

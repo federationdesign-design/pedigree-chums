@@ -313,8 +313,24 @@ export default function PackPit() {
         b.plugin = { name: cfg.label, label: cfg.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(cfg.key, cfg.src), prop: "panel", kind: cfg.kind, family: null, ping: 0 };
         return b;
       }
+      // The cookie-policy object: an SVG that pours in with the rest, starts upside
+      // down (180 degrees), opens the cookie notice on tap, and buzzes its neighbours
+      // every 20 seconds. It is the site's main cookie message on the home page.
+      let cookiesBody: any = null;
+      function makeCookies(w: number) {
+        const bw = BIG * 3.0, bh = bw; // square to start; reshaped to the art's ratio on load
+        const x = 80 + Math.random() * (w - 160), y = -300 - Math.random() * 220;
+        const b: any = Bodies.rectangle(x, y, bw, bh, { angle: Math.PI, chamfer: { radius: bh * 0.16 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+        const img = getImg("__cookies", "/cookies-policy.svg");
+        b.plugin = { name: "Cookie policy", label: "Cookie policy", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "panel", kind: "cookies", family: null, ping: 0 };
+        const fit = () => { const a = img.naturalWidth / img.naturalHeight, newH = bw / a; if (Math.abs(newH - b.plugin.h) > 1) { Body.scale(b, 1, newH / b.plugin.h); b.plugin.h = newH; b.plugin.half = Math.min(b.plugin.w, newH) / 2; } };
+        if (img.complete && img.naturalWidth) fit(); else img.addEventListener("load", fit, { once: true });
+        cookiesBody = b;
+        return b;
+      }
       let dropTimer: any = null;
       let waveTimers: any[] = [];
+      let buzzTimer: any = null;
       function dropAll() {
         const ex = dyn();
         if (ex.length) Composite.remove(engine.world, ex);
@@ -350,6 +366,7 @@ export default function PackPit() {
           // mobile: bowl, then balls (pre-order after the 1st), then bone, then the discount-code button, then pack
           addProps([bowl]);
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050)); // cookie policy is the 3rd thing in
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1900)); // one hamburger menu rides in with the pack
@@ -358,6 +375,7 @@ export default function PackPit() {
           // desktop: balls (pre-order after the 1st), then bone, then the discount-code button, then pack with the bowl midway
           dropBalls();
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1200)); // cookie policy is the 3rd thing in
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1400)); // discount code falls later, just before the pack
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1600)); // one hamburger menu rides in with the pack
           dropDogs(2000, true);
@@ -395,6 +413,7 @@ export default function PackPit() {
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
         if (hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "cookies") { window.dispatchEvent(new Event("pc:open-cookies")); return true; }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
@@ -1053,8 +1072,26 @@ export default function PackPit() {
 
       dropAll();
 
+      // Every 20 seconds the cookie object gives a sharp shudder and kicks every
+      // object currently touching it, so it visibly buzzes its neighbours.
+      buzzTimer = setInterval(() => {
+        if (disposed || !cookiesBody || !cookiesBody.position) return;
+        Body.setAngularVelocity(cookiesBody, (Math.random() < 0.5 ? 1 : -1) * 0.5); // a quick twitch on the cookie itself
+        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * 0.05, y: -0.014 });
+        const others = dyn().filter((b: any) => b !== cookiesBody);
+        for (const col of Query.collides(cookiesBody, others)) {
+          const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
+          if (!other || other.isStatic) continue;
+          let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
+          const len = Math.hypot(dx, dy) || 1;
+          Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 6.5, y: other.velocity.y + (dy / len) * 6.5 - 3 });
+          Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.6);
+        }
+      }, 20000);
+
       dispose = () => {
         if (dropTimer) clearInterval(dropTimer);
+        if (buzzTimer) clearInterval(buzzTimer);
         waveTimers.forEach(clearTimeout);
         ro.disconnect();
         render.canvas.removeEventListener("mousemove", onMove);
