@@ -200,10 +200,11 @@ export default function LineageMap({
   const scoredRef = useRef<Set<string>>(new Set());
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
+  const [autoPacking, setAutoPacking] = useState(false); // auto-find requested: lay the popped cards into the grid once they exist
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const interacted = useRef(false);
   useEffect(() => {
-    setAutoArmed(false); setPenalty(null);
+    setAutoArmed(false); setPenalty(null); setAutoPacking(false);
     const t = setTimeout(() => setAutoArmed(true), 5000);
     return () => clearTimeout(t);
   }, [breed.name]);
@@ -401,8 +402,9 @@ export default function LineageMap({
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
     setAutoArmed(false);
+    setAutoPacking(true); // next render has all cards popped; the effect then lays them into the grid
   };
-  const doPack = (fx?: number, fy?: number) => {
+  const doPack = (fx?: number, fy?: number, award: number = 400) => {
     if (packed) return;
     // One card per ancestor: the same forebear is often bred in several times, so
     // fold the repeats out and keep only the first of each in the pack.
@@ -439,7 +441,7 @@ export default function LineageMap({
     setPackLabels(labels);
     setPackHidden(hidden);
     setPacked(true);
-    flashNum(fx ?? (160 - pan.x), fy ?? (96 - pan.y), 400, FLASH_SIZE); // one-off award, fed into the pit total
+    if (award) flashNum(fx ?? (160 - pan.x), fy ?? (96 - pan.y), award, FLASH_SIZE); // one-off award, fed into the pit total
     tween(460, (t) => {
       const e = 1 - Math.pow(1 - t, 3); // ease out
       setDragPos((prev) => {
@@ -454,6 +456,17 @@ export default function LineageMap({
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
     });
   };
+
+  // After auto-find pops every card, lay them into the same tidy grid the Collect
+  // button uses so they do not sit on top of each other. No award here, the
+  // shortcut has already taken its 1000.
+  useEffect(() => {
+    if (autoPacking && !packed && pickCards.length > 0) {
+      doPack(undefined, undefined, 0);
+      setAutoPacking(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPacking, packed, pickCards.length]);
 
   // fully exposed = every branch that has children is open, nothing left to unfold
   const canRemove = showRemove && !removing;
@@ -484,7 +497,7 @@ export default function LineageMap({
       });
     onScatter?.(circles);
     tween(520, (t) => setCollectT(t), () => {
-      burstAt(60 - pan.x, vp.h - 60 - pan.y, ROOT * 1.5); // dot explosion where the cards crash into the bottom-left corner
+      burstAt(10 - pan.x, vp.h - 60 - pan.y, ROOT * 1.5); // dot explosion where the cards crash into the bottom-left corner (nudged 50px left)
       // hold a beat so the bottom-left pack box can finish its pop before the overlay closes
       window.setTimeout(() => { onClose(); }, 680);
     });
@@ -908,9 +921,9 @@ export default function LineageMap({
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
     {showAuto && (
-      <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto collect all breeds">
+      <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
-          <span className={styles.autoLabel}>Auto collect all breeds</span>
+          <span className={styles.autoLabel}>Auto Find</span>
           <img className={styles.autoBtn} src="/auto-collect-icon.svg" alt="" aria-hidden="true" />
         </div>
       </div>
