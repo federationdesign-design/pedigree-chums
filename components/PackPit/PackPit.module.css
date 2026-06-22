@@ -97,13 +97,13 @@
 /* chums-collected tally, bottom-left, pops with a starburst each time it climbs */
 .tally {
   position: fixed;
-  bottom: calc(63px + env(safe-area-inset-bottom, 0px)); /* lifted clear of the window edge */
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* same bottom axis as the shake/auto buttons */
   left: clamp(6px, 1.5vw, 18px);
   z-index: 70; /* above the lineage overlay so the count stays visible */
   width: 140px;
   height: 140px;
   display: grid;
-  place-items: center start; /* number hugs the left edge instead of centring in the 140px box */
+  place-items: end start; /* number sits on the bottom edge, level with the buttons */
   pointer-events: none;
 }
 .tallyBurst {

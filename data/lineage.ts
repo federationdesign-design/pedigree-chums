@@ -879,7 +879,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old English Sheepdog",
     note: "A big, shaggy, bobtailed drover's dog of the west country, bred to drive sheep and cattle to market.",
     children: [
-      { name: "Bearded Collie", note: "The shaggy Scottish herder in its make-up.",  value: 55 },
+      { name: "Bearded Collie", note: "The shaggy Scottish herder in its make-up.", img: "/history/breeds/bearded-collie-photo.jpg", value: 55 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
@@ -1017,7 +1017,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", value: 40 },
       { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/pointer-photo.jpg", value: 40 },
-      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", img: "/history/breeds/Old-German-hunting-dogs.jpg", value: 20 }
+      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 20 }
     ]
   },
   "Dalmatian": {

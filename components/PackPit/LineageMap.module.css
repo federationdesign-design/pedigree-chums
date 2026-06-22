@@ -301,7 +301,7 @@
    that label the ordered cards once the pack is gathered. */
 .packBtn {
   position: absolute;
-  top: 74px;
+  top: 49px;
   left: clamp(16px, 3.5vw, 40px);
   display: flex;
   align-items: center;
@@ -390,9 +390,8 @@
    (centred under the root). Appears 5s in while circles are still yellow. */
 .autoWrap {
   position: fixed;
-  left: 50%;
+  right: calc(clamp(18px, 4vw, 48px) + 100px); /* just left of the shake button */
   bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* same axis as the shake button */
-  transform: translateX(-50%);
   z-index: 10000;
   cursor: pointer;
 }
@@ -459,17 +458,29 @@
   stroke-dasharray: 9 8;
   opacity: 0.5;
   transition: opacity 0.18s ease, stroke 0.18s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lm-frame-idle 2.6s ease-in-out infinite; /* a slow-motion hop while empty, waiting for its card */
 }
 .frameLit {
   opacity: 1;
   stroke: var(--yellow);
+  animation: none;
 }
 .frameFilled {
   opacity: 1;
   stroke: var(--yellow);
   stroke-dasharray: none;
+  animation: none;
 }
 .frameShake { animation: lm-frame-shake 0.46s ease both; }
+@keyframes lm-frame-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  20% { transform: translateY(-4px) rotate(-1.6deg); }
+  40% { transform: translateY(0) rotate(0deg); }
+  55% { transform: translateY(-2px) rotate(1.2deg); }
+  70% { transform: translateY(0) rotate(0deg); }
+}
 @keyframes lm-frame-shake {
   0%, 100% { transform: translateX(0); }
   18% { transform: translateX(-8px); }
@@ -511,4 +522,11 @@
   0%   { transform: translate(0, 0) scale(0.2); opacity: 0; }
   12%  { transform: translate(0, 0) scale(1); opacity: 0.92; }
   100% { transform: translate(var(--tx, 0), var(--ty, 0)) scale(2.1); opacity: 0; }
+}
+
+/* Each ancestor card fades in as it is revealed; staggered by Auto, this ripples. */
+.pickPop { animation: lm-pick-pop 0.3s ease; }
+@keyframes lm-pick-pop {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -199,6 +199,7 @@ export default function LineageMap({
   const fxId = useRef(0);
   const scoredRef = useRef<Set<string>>(new Set());
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
+  const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const interacted = useRef(false);
@@ -419,7 +420,7 @@ export default function LineageMap({
   // clipboard icon appears; tapping it gathers every open card to the top left,
   // split into the living and the long-gone, and awards a one-off 400 points.
   const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 150; // full-size cards, wide enough that corner buttons never overlap
-  const showPack = packed || (totalNodes > 0 && seen.size * 2 >= totalNodes);
+  const showPack = packed || (totalNodes > 0 && seen.size >= 1); // appears the moment a node is opened or Auto is used
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
@@ -433,7 +434,9 @@ export default function LineageMap({
   const autoCollect = () => {
     setOpen(() => { const s = new Set<string>(["0"]); allNodes.forEach((n) => { if (n.hasKids) s.add(n.id); }); return s; });
     setSeen(() => new Set(allNodes.map((n) => n.id)));
-    setPicked(() => new Set(allNodes.filter((n) => n.hasImg).map((n) => n.id)));
+    setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; }); // everything auto reveals (bar what was opened by hand) hides its leaf name
+    const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
+    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); }); // pop the cards in one by one, a ripple down the tree
     allNodes.forEach((n) => scoredRef.current.add(n.id)); // counted now, so a later tap scores nothing
     onScore?.(-1000); // the shortcut costs a thousand
     const pk = (fxId.current += 1);
@@ -670,7 +673,7 @@ export default function LineageMap({
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={packed ? "Ancestor pack complete" : complete ? "Collect the ancestor pack" : "Collect the ancestor pack"}
         >
-          <img className={styles.packIcon} src="/checklist-icon-complete.svg" alt="" aria-hidden="true" />
+          <img className={styles.packIcon} src={packed ? "/checklist-icon-complete.svg" : "/checklist-icon.svg"} alt="" aria-hidden="true" />
           <span className={styles.packText}>{packed ? "Done!" : "Collect Ancestor Pack"}</span>
         </button>
       )}
@@ -748,8 +751,8 @@ export default function LineageMap({
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
-                    {hasKids ? (() => {
-                      const nmW = n.name.length * 7.4 + 22; // pill hugs the connecting-node name
+                    {(hasKids || !autoExposed.has(n._id)) ? (() => {
+                      const nmW = n.name.length * 7.4 + 22; // pill hugs the name
                       const nmY = -r - 13;
                       return (
                         <g>
@@ -769,13 +772,13 @@ export default function LineageMap({
                 );
               })}
             </g>
-            {!packed && !collecting && frames.map((f) => {
+            {!packed && !collecting && frames.map((f, fi) => {
               const filledHere = filled.has(f.id);
               const lit = dragImg === f.img && !filledHere; // only this card's own box lights up
-              let glow: { filter?: string } | undefined;
+              let glow: { filter?: string; animationDelay?: string } | undefined = { animationDelay: `${(fi % 6) * 0.28}s` }; // ripple the idle hop
               if (lit && dragXY) {
                 const g = Math.max(0, Math.min(1, 1 - Math.hypot(dragXY.x - f.sx, dragXY.y - f.sy) / 240)); // 0 far, 1 right on top
-                if (g > 0.02) glow = { filter: `drop-shadow(0 0 ${(4 + g * 22).toFixed(1)}px rgba(255, 210, 62, ${(0.25 + g * 0.6).toFixed(2)}))` };
+                if (g > 0.02) glow = { ...glow, filter: `drop-shadow(0 0 ${(4 + g * 22).toFixed(1)}px rgba(255, 210, 62, ${(0.25 + g * 0.6).toFixed(2)}))` };
               }
               return (
                 <g key={f.id} transform={`rotate(${cardDeg.toFixed(2)} ${f.sx - pan.x} ${f.sy - pan.y})`}>
@@ -816,7 +819,7 @@ export default function LineageMap({
               return (
                 <g
                   key={`pick-${c.id}`}
-                  className={`${styles.rootHit} ${styles.grab}`}
+                  className={`${styles.rootHit} ${styles.grab} ${styles.pickPop}`}
                   transform={cxf
                     ? `${cxf.transform} scale(${packScale}) translate(${-c.cardX},${-c.cardY})`
                     : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) scale(${packScale}) translate(${-c.cardX},${-c.cardY})`}
