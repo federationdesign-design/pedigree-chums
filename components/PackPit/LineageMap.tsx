@@ -198,6 +198,13 @@ export default function LineageMap({
   const [seen, setSeen] = useState<Set<string>>(new Set()); // circles tapped at least once, recoloured blue
   const fxId = useRef(0);
   const scoredRef = useRef<Set<string>>(new Set());
+  const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
+  const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
+  useEffect(() => {
+    setAutoArmed(false); setPenalty(null);
+    const t = setTimeout(() => setAutoArmed(true), 5000);
+    return () => clearTimeout(t);
+  }, [breed.name]);
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
     setFlashes((f) => [...f, { id, x, y, val, size }]);
@@ -245,6 +252,17 @@ export default function LineageMap({
     const walk = (n: Node) => { (n.children as Node[] | undefined)?.forEach((k) => { c += 1; walk(k); }); };
     walk(root);
     return c;
+  }, [root]);
+  // every non-root node in the whole tree, open branch or not, so auto-collect can
+  // reach the circles still tucked inside unopened branches
+  const allNodes = useMemo(() => {
+    const out: { id: string; hasKids: boolean; hasImg: boolean }[] = [];
+    const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
+      out.push({ id: k._id, hasKids: !!(k.children && k.children.length), hasImg: !!k.img });
+      walk(k);
+    });
+    if (root) walk(root);
+    return out;
   }, [root]);
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
@@ -362,6 +380,21 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
+  // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
+  // One tap opens every branch, turns all circles blue and pops all cards out, the
+  // same as tapping each one, but it costs a flat 1000 off the running total.
+  const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing;
+  const autoCollect = () => {
+    setOpen(() => { const s = new Set<string>(["0"]); allNodes.forEach((n) => { if (n.hasKids) s.add(n.id); }); return s; });
+    setSeen(() => new Set(allNodes.map((n) => n.id)));
+    setPicked(() => new Set(allNodes.filter((n) => n.hasImg).map((n) => n.id)));
+    allNodes.forEach((n) => scoredRef.current.add(n.id)); // counted now, so a later tap scores nothing
+    onScore?.(-1000); // the shortcut costs a thousand
+    const pk = (fxId.current += 1);
+    setPenalty(pk);
+    window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
+    setAutoArmed(false);
+  };
   const doPack = (fx?: number, fy?: number) => {
     if (packed) return;
     // One card per ancestor: the same forebear is often bred in several times, so
@@ -866,6 +899,16 @@ export default function LineageMap({
     {boxPop && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
+    {showAuto && (
+      <img
+        className={styles.autoBtn}
+        src="/auto-collect-icon.svg"
+        alt="Auto collect"
+        onClick={autoCollect}
+        onPointerDown={(e) => e.stopPropagation()}
+      />
+    )}
+    {penalty !== null && <div key={penalty} className={styles.autoPenalty}>-1000</div>}
     </>
   );
 }
