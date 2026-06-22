@@ -287,6 +287,9 @@ export default function LineageMap({
   useEffect(() => setFilled(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
+  const [puffs, setPuffs] = useState<{ id: number; sx: number; sy: number }[]>([]); // smoke poofs as a card lands in its frame
+  const puffSeq = useRef(0);
+  const [dragXY, setDragXY] = useState<{ x: number; y: number } | null>(null); // live pointer while dragging a card, for the proximity glow
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
       const t = setTimeout(() => setShowRemove(true), 1000); // hold the green button back one second after the last circle turns blue
@@ -759,10 +762,16 @@ export default function LineageMap({
             {!packed && !collecting && frames.map((f) => {
               const filledHere = filled.has(f.id);
               const lit = dragCat === f.cat && !filledHere;
+              let glow: { filter?: string } | undefined;
+              if (lit && dragXY) {
+                const g = Math.max(0, Math.min(1, 1 - Math.hypot(dragXY.x - f.sx, dragXY.y - f.sy) / 240)); // 0 far, 1 right on top
+                if (g > 0.02) glow = { filter: `drop-shadow(0 0 ${(4 + g * 22).toFixed(1)}px rgba(255, 210, 62, ${(0.25 + g * 0.6).toFixed(2)}))` };
+              }
               return (
                 <rect
                   key={f.id}
                   className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""}`.trim()}
+                  style={glow}
                   x={f.sx - pan.x - CARD / 2}
                   y={f.sy - pan.y - CARD / 2}
                   width={CARD}
@@ -771,6 +780,16 @@ export default function LineageMap({
                 />
               );
             })}
+            {!packed && !collecting && puffs.map((p) => (
+              <g key={p.id} className={styles.puff} transform={`translate(${p.sx - pan.x},${p.sy - pan.y})`} style={{ pointerEvents: "none" }}>
+                <circle className={styles.puffP} cx={0} cy={0} r={18} style={{ animationDelay: "10ms" }} />
+                <circle className={styles.puffP} cx={-15} cy={-6} r={15} style={{ animationDelay: "0ms" }} />
+                <circle className={styles.puffP} cx={15} cy={-9} r={13} style={{ animationDelay: "45ms" }} />
+                <circle className={styles.puffP} cx={0} cy={-17} r={16} style={{ animationDelay: "20ms" }} />
+                <circle className={styles.puffP} cx={-11} cy={9} r={12} style={{ animationDelay: "60ms" }} />
+                <circle className={styles.puffP} cx={13} cy={8} r={14} style={{ animationDelay: "32ms" }} />
+              </g>
+            ))}
             {pickCards.map((c) => {
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               const clipId = `lm-pick-${c.id}`;
@@ -792,6 +811,7 @@ export default function LineageMap({
                     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
                     cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
                     setDragCat(isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
+                    setDragXY({ x: e.clientX, y: e.clientY });
                     setFilled((m) => { let hit = false; const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) { x.delete(fid); hit = true; } return hit ? x : m; }); // lifting a framed card frees its frame
                   }}
                   onPointerMove={(e) => {
@@ -801,6 +821,7 @@ export default function LineageMap({
                     if (!cd.moved && Math.hypot(dx, dy) > 3) cd.moved = true;
                     if (cd.moved) {
                       suppressClick.current = true;
+                      setDragXY({ x: e.clientX, y: e.clientY });
                       setDragPos((m) => {
                         const next = new Map(m);
                         next.set(c.id, { x: cd.ox + dx, y: cd.oy + dy });
@@ -827,6 +848,9 @@ export default function LineageMap({
                             setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
                             setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
                             flashNum(hit.sx - pan.x, hit.sy - pan.y - CARD / 2, 100, FLASH_SIZE); // +100 emanates from the frame
+                            const pid = puffSeq.current++; // smoke poof where it lands
+                            setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
+                            window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 700);
                           } else {
                             setShakeFrame(hit.id);
                             window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
@@ -837,8 +861,9 @@ export default function LineageMap({
                       cardDrag.current = null;
                     }
                     setDragCat(null);
+                    setDragXY(null);
                   }}
-                  onPointerCancel={() => { cardDrag.current = null; }}
+                  onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragXY(null); }}
                 >
                   <clipPath id={clipId}>
                     <rect x={c.cardX - CARD / 2} y={c.cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
