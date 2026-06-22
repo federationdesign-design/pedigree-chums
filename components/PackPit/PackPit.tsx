@@ -84,10 +84,14 @@ export default function PackPit() {
       function buildWalls(w: number, h: number) {
         if (walls.length) Composite.remove(engine.world, walls);
         const t = 200;
+        const ceilY = Math.min(-1000, -h * 1.5); // a long way above the pour line (the pack rains in around y = -500)
+        const sideTop = ceilY - t, sideBot = h * 2; // side walls run from above the ceiling down past the floor
+        const sideH = sideBot - sideTop, sideC = (sideTop + sideBot) / 2;
         walls = [
-          Bodies.rectangle(w / 2, h + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }),
-          Bodies.rectangle(-t / 2 + 2, h / 2, t, h * 3, { isStatic: true, restitution: 0.5, render: { visible: false } }),
-          Bodies.rectangle(w + t / 2 - 2, h / 2, t, h * 3, { isStatic: true, restitution: 0.5, render: { visible: false } }),
+          Bodies.rectangle(w / 2, h + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // floor (walls[0])
+          Bodies.rectangle(-t / 2 + 2, sideC, t, sideH, { isStatic: true, restitution: 0.5, render: { visible: false } }),
+          Bodies.rectangle(w + t / 2 - 2, sideC, t, sideH, { isStatic: true, restitution: 0.5, render: { visible: false } }),
+          Bodies.rectangle(w / 2, ceilY - t / 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // ceiling, far above the pour so nothing escapes over the top
         ];
         Composite.add(engine.world, walls);
       }
@@ -407,6 +411,24 @@ export default function PackPit() {
             const jt = (now2 - b.plugin.jump) / 300;
             if (jt < 1) ctx.translate(0, -Math.sin(jt * Math.PI) * 14 * (1 - jt)); else b.plugin.jump = 0;
           }
+          if (b.plugin.bomb) {
+            const hh = b.plugin.hits || 0;
+            if (hh > 0) { // it rattles harder with every hit, furious by the fourth
+              const amp = 0.06 * hh, sp = Math.max(7, 28 - hh * 5);
+              ctx.rotate(Math.sin(now2 / sp) * amp);
+              ctx.translate(Math.sin(now2 / (sp * 0.6)) * hh * 0.9, 0);
+            }
+            const bi = b.plugin.bombImg;
+            if (bi && bi.complete && bi.naturalWidth) {
+              const ar = bi.naturalWidth / bi.naturalHeight, box = rr * 2.4;
+              const bw = ar >= 1 ? box : box * ar, bh = ar >= 1 ? box / ar : box;
+              ctx.drawImage(bi, -bw / 2, -bh / 2, bw, bh);
+            } else {
+              ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fillStyle = "#0a3a57"; ctx.fill();
+              ctx.lineWidth = 3; ctx.strokeStyle = "#ffd23e"; ctx.stroke();
+            }
+            ctx.restore(); return;
+          }
           ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
           ctx.fillStyle = b.plugin.inert ? "#0c5b92" : "#ffd23e"; ctx.fill();
           ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
@@ -709,7 +731,8 @@ export default function PackPit() {
           const b: any = Bodies.circle(c.x - rect.left, c.y - rect.top, r, {
             restitution: 0.4, friction: 0.25, frictionAir: 0.004, density: 0.006, render: { visible: false },
           });
-          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 5, repelOn: false, repelStart: 0, inert: false };
+          const isBomb = Math.random() < 1 / 35; // roughly one scattered dot in 35 arrives as a bomb
+          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 5, repelOn: false, repelStart: 0, inert: false, bomb: isBomb, hits: 0, popped: false, bombImg: isBomb ? getImg("__bomb", "/bomb.svg") : null };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });
           Composite.add(engine.world, b);
         }
@@ -739,9 +762,41 @@ export default function PackPit() {
       const releaseHeldPct = () => {
         for (const b of Composite.allBodies(engine.world)) if (b.plugin?.repelOn) releasePct(b);
       };
+      // A bomb takes five hits like a % circle, but the fifth detonates instead of
+      // going inert: every other % circle (yellow or inert blue) bursts out of the
+      // pit in a chain, nearest first, one after the next rather than all at once.
+      const detonateBomb = (bomb: any) => {
+        bomb.plugin.popped = true;
+        burstAt(bomb.position.x, bomb.position.y, (bomb.plugin.half || 21) * 1.8);
+        poof(bomb.position.x, bomb.position.y, bomb.plugin.half || 21);
+        if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
+        Composite.remove(engine.world, bomb);
+        const targets = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
+        targets.sort((a: any, b2: any) =>
+          Math.hypot(a.position.x - bomb.position.x, a.position.y - bomb.position.y) -
+          Math.hypot(b2.position.x - bomb.position.x, b2.position.y - bomb.position.y));
+        targets.forEach((o: any, i: number) => {
+          o.plugin.popped = true; // claim it now so it cannot be hit or double-popped mid-chain
+          window.setTimeout(() => {
+            if (disposed) return;
+            burstAt(o.position.x, o.position.y, (o.plugin.half || 21) * 1.33);
+            poof(o.position.x, o.position.y, o.plugin.half || 21);
+            if (mc.body === o) { mc.constraint.bodyB = null; mc.body = null; }
+            Composite.remove(engine.world, o);
+          }, 70 * (i + 1));
+        });
+      };
+      const hitBomb = (bomb: any) => {
+        if (bomb.plugin.popped) return;
+        bomb.plugin.hits = (bomb.plugin.hits || 0) + 1;
+        bomb.plugin.jump = performance.now();
+        burstAt(bomb.position.x, bomb.position.y, (bomb.plugin.half || 21) * 1.1);
+        if (bomb.plugin.hits >= 5) detonateBomb(bomb);
+      };
       const pressPct = (pt: { x: number; y: number }) => {
-        const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn);
+        const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) return;
+        if (hit.plugin.bomb) { hitBomb(hit); return; }
         hit.plugin.repelOn = true;
         hit.plugin.repelStart = performance.now();
         hit.plugin.jump = performance.now();           // electrocuted jolt (render-side)
