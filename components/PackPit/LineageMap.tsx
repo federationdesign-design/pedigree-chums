@@ -706,6 +706,7 @@ export default function LineageMap({
                     key={n._id}
                     className={styles.node}
                     transform={`translate(${n._x},${n._y})`}
+                    style={allBlue ? { pointerEvents: "none" } : undefined}
                     onMouseEnter={() => { if (!drag.current?.moved) follow(n); }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -741,18 +742,11 @@ export default function LineageMap({
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
-                    {(hasKids || !picked.has(n._id)) ? (() => {
-                      const nmW = n.name.length * 7.4 + 22; // pill hugs the label
-                      const nmY = -r - 13;
-                      return (
-                        <g>
-                          <rect className={styles.nmPill} x={-nmW / 2} y={nmY - 11} width={nmW} height={22} rx={11} />
-                          <text className={styles.nm} textAnchor="middle" dominantBaseline="central" y={nmY}>
-                            {n.name}
-                          </text>
-                        </g>
-                      );
-                    })() : null}
+                    {(!picked.has(n._id) || packed) ? (
+                      <text className={styles.nm} textAnchor="middle" y={-r - 9}>
+                        {n.name}
+                      </text>
+                    ) : null}
                     {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside

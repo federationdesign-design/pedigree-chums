@@ -85,10 +85,9 @@
   font-weight: 800;
   font-size: 13px;
   fill: var(--white);
-}
-.nmPill {
-  fill: var(--navy);
-  filter: drop-shadow(0 2px 0 rgba(10, 58, 87, 0.35));
+  paint-order: stroke;
+  stroke: rgba(10, 58, 87, 0.6);
+  stroke-width: 3px;
 }
 .plus {
   font-family: var(--font-body), system-ui, sans-serif;
@@ -178,7 +177,7 @@
 .cardBox {
   position: fixed;
   left: calc(clamp(240px, 44vw, 400px) * -0.5 + 30px); /* half off the left edge, nudged 30px right */
-  bottom: calc(clamp(74px, 12vh, 130px) - 120px); /* dropped 120px lower */
+  bottom: calc(clamp(74px, 12vh, 130px) - 170px); /* dropped 120px, then 50px lower */
   width: clamp(240px, 44vw, 400px); /* 2x size on desktop and mobile alike */
   height: auto;
   z-index: 9999;
@@ -192,7 +191,7 @@
 @media (min-width: 769px) {
   .cardBox {
     left: calc(clamp(240px, 44vw, 400px) * -0.5 + 40px);
-    bottom: calc(clamp(74px, 12vh, 130px) - 130px);
+    bottom: calc(clamp(74px, 12vh, 130px) - 180px);
   }
 }
 @keyframes cardBoxPop {
