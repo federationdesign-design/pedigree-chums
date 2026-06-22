@@ -5,6 +5,7 @@ import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
+import { breedInfo } from "../../data/breedInfo";
 import styles from "./LineageMap.module.css";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
@@ -168,6 +169,9 @@ export default function LineageMap({
   // closing, and keep showing it at its dropped spot until breed change / close
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
+  // which collected card is showing its info label right now (hover only)
+  const [infoHover, setInfoHover] = useState<string | null>(null);
+  useEffect(() => setInfoHover(null), [breed.name]);
 
   // Dismiss a fixed/opened card (the X in its corner).
   const removeCard = (id: string) => {
@@ -791,10 +795,37 @@ export default function LineageMap({
                       </>
                     );
                   })()}
+                  {packed && breedInfo[c.name] ? (() => {
+                    const ix = c.cardX - CARD / 2, iy = c.cardY + CARD / 2; // bottom-left corner, mirrors the status dot up top
+                    return (
+                      <g
+                        style={{ cursor: "help" }}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onMouseEnter={() => setInfoHover(c.id)}
+                        onMouseLeave={() => setInfoHover((h) => (h === c.id ? null : h))}
+                      >
+                        <circle cx={ix} cy={iy} r={12} style={{ fill: "var(--blue-deep)", stroke: "#ffffff", strokeWidth: 2 }} />
+                        <text x={ix} y={iy + 0.5} textAnchor="middle" dominantBaseline="central" style={{ fill: "#ffffff", font: "italic 700 14px Georgia, serif", pointerEvents: "none" }}>i</text>
+                      </g>
+                    );
+                  })() : null}
                 </g>
               );
             })}
             {rootCard(breed.x, breed.y)}
+            {packed && infoHover ? (() => {
+              const c = pickCards.find((x) => x.id === infoHover);
+              const text = c ? breedInfo[c.name] : null;
+              if (!c || !text) return null;
+              const w = 190; // small understated hover label, not a click popover
+              return (
+                <foreignObject x={c.cardX - CARD / 2} y={c.cardY + CARD / 2 + 6} width={w} height={170} style={{ overflow: "visible", pointerEvents: "none" }}>
+                  <div style={{ display: "inline-block", maxWidth: `${w}px`, background: "rgba(10, 58, 87, 0.92)", color: "#ffffff", font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px", borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)" }}>
+                    {text}
+                  </div>
+                </foreignObject>
+              );
+            })() : null}
           </>
         ) : (
           <>
