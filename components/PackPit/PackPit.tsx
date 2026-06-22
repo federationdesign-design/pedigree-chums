@@ -318,6 +318,7 @@ export default function PackPit() {
       // every 20 seconds. It is the site's main cookie message on the home page.
       let cookiesBody: any = null;
       let acceptBody: any = null; // the Accept button squeezed out of the cookie on tap
+      let rejectBody: any = null; // the Reject button squeezed out alongside it
       function makeCookies(w: number) {
         const bw = BIG * 3.0, bh = bw; // square to start; reshaped to the art's ratio on load
         const x = 80 + Math.random() * (w - 160), y = -300 - Math.random() * 220;
@@ -408,6 +409,15 @@ export default function PackPit() {
       };
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
+      // a consent choice clears every cookie object from the pit (the policy SVGs and both buttons)
+      const clearCookieObjects = () => {
+        for (const b of Composite.allBodies(engine.world)) {
+          if (b.plugin?.kind === "cookies") { poof(b.position.x, b.position.y, b.plugin.half || 40); Composite.remove(engine.world, b); }
+        }
+        cookiesBody = null;
+        if (acceptBody) { Composite.remove(engine.world, acceptBody); acceptBody = null; }
+        if (rejectBody) { Composite.remove(engine.world, rejectBody); rejectBody = null; }
+      };
       const tapButton = (pt: { x: number; y: number }) => {
         if (menuBody && menuBody.isStatic && Query.point([menuBody], pt).length) { window.dispatchEvent(new Event("pc:open-menu")); return true; } // tap the fixed menu before it dislodges
         const hit = Query.point(dyn(), pt)[0];
@@ -416,27 +426,41 @@ export default function PackPit() {
         if (hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
           window.dispatchEvent(new Event("pc:open-cookies"));
-          if (!acceptBody && cookiesBody) { // squeeze an Accept button out of the cookie
-            const b: any = makeButton("cookieaccept", "Accept", stage.clientWidth);
-            Body.setPosition(b, { x: cookiesBody.position.x, y: cookiesBody.position.y });
-            Body.setVelocity(b, { x: (Math.random() - 0.5) * 6, y: -9 }); // pops out and up
-            Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.4);
-            b.plugin.bornAt = performance.now(); b.plugin.lastOne = 0; // drives the subtle shake, the 1-stream and the 30s respawn
-            acceptBody = b;
-            Composite.add(engine.world, b);
+          hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
+          if (!acceptBody && cookiesBody) { // squeeze an Accept and a Reject button out of the cookie
+            const cx = cookiesBody.position.x, cy = cookiesBody.position.y, now0 = performance.now();
+            const ab: any = makeButton("cookieaccept", "Accept", stage.clientWidth);
+            Body.setPosition(ab, { x: cx, y: cy });
+            Body.setVelocity(ab, { x: -2 - Math.random() * 4, y: -9 }); // pops up and to the left
+            Body.setAngularVelocity(ab, (Math.random() - 0.5) * 0.4);
+            ab.plugin.bornAt = now0; ab.plugin.lastOne = 0; // drives the subtle shake, the 1-stream and the 90s respawn
+            acceptBody = ab;
+            Composite.add(engine.world, ab);
+            const rb: any = makeButton("cookiereject", "Reject", stage.clientWidth);
+            Body.setPosition(rb, { x: cx, y: cy });
+            Body.setVelocity(rb, { x: 2 + Math.random() * 4, y: -9 }); // pops up and to the right
+            Body.setAngularVelocity(rb, (Math.random() - 0.5) * 0.4);
+            rejectBody = rb;
+            Composite.add(engine.world, rb);
           }
           return true;
         }
         if (hit.plugin?.kind === "cookieaccept") {
           window.dispatchEvent(new Event("pc:cookies-accepted"));
-          if (acceptBody) {
-            const ax = acceptBody.position.x, ay = acceptBody.position.y, asz = (acceptBody.plugin.half || 40) * 1.7, bt = performance.now();
-            bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
-            bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
-            poof(ax, ay, acceptBody.plugin.half || 40);
-            numAt(ax, ay, 2000, 40); // the big payoff pops out of the starburst
-            Composite.remove(engine.world, acceptBody); acceptBody = null;
-          }
+          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
+          bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
+          bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
+          numAt(ax, ay, 2000, 40); // the big payoff pops out of the starburst
+          clearCookieObjects(); // the buttons and the cookie SVG all vanish
+          return true;
+        }
+        if (hit.plugin?.kind === "cookiereject") {
+          window.dispatchEvent(new Event("pc:cookies-rejected"));
+          const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
+          bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
+          bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 }); // grey
+          numAt(rx, ry, -990, 40); // the penalty for rejecting
+          clearCookieObjects();
           return true;
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
@@ -455,8 +479,8 @@ export default function PackPit() {
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept") return false; // dogs only, not the toys, fallen circles or the buttons
-        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && !hit.plugin.collected) {
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept" || hit.plugin.kind === "cookiereject") return false; // dogs only, not the toys, fallen circles or the buttons
+        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && hit.plugin.kind !== "cookiereject" && !hit.plugin.collected) {
           hit.plugin.collected = true;                                              // only the first collect of a card scores
           numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
           burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));   // pink starburst on first collect
@@ -583,7 +607,7 @@ export default function PackPit() {
           for (let i = -1; i <= 1; i++) { rrect(ctx, -barW / 2, i * gap - barH / 2, barW, barH, barH / 2); ctx.fill(); }
           ctx.restore(); return;
         }
-        if (b.plugin.kind === "reserve" || b.plugin.kind === "preorder" || b.plugin.kind === "cookieaccept") {
+        if (b.plugin.kind === "reserve" || b.plugin.kind === "preorder" || b.plugin.kind === "cookieaccept" || b.plugin.kind === "cookiereject") {
           const rw = b.plugin.w, rh = b.plugin.h, rad = rh * 0.34;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
           rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
@@ -1141,8 +1165,8 @@ export default function PackPit() {
             acceptBody.plugin.lastOne = now;
             numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), 1, 13, false); // streaming 1s, non-scoring lure
           }
-          if (now - (acceptBody.plugin.bornAt || now) > 30000) {
-            acceptBody.plugin.bornAt = now; // and it nags again after another 30s
+          if (now - (acceptBody.plugin.bornAt || now) > 90000) {
+            acceptBody.plugin.bornAt = now; // and it nags again after another 90s
             const nc = makeCookies(stage.clientWidth);
             Body.setPosition(nc, { x: acceptBody.position.x, y: acceptBody.position.y });
             Body.setVelocity(nc, { x: (Math.random() - 0.5) * 7, y: -10 }); // skips up out of the button
@@ -1152,7 +1176,7 @@ export default function PackPit() {
           }
         }
 
-        if (!cookiesBody || !cookiesBody.position) return;
+        if (!cookiesBody || !cookiesBody.position || cookiesBody.plugin.inert) return; // a tapped cookie has gone inert
         const elapsed = now - cycleStart;
         if (elapsed < CALM) return; // quiet start
         const t = elapsed - CALM;

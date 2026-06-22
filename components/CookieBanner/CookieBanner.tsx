@@ -18,11 +18,18 @@ export default function CookieBanner() {
       window.dispatchEvent(new CustomEvent("pc:consent", { detail: "accepted" })); // analytics gates on this
       setVisible(false);
     };
+    const rejected = () => {
+      try { localStorage.setItem(KEY, "declined"); } catch { /* private mode etc. */ }
+      window.dispatchEvent(new CustomEvent("pc:consent", { detail: "declined" })); // analytics stays off (gates on "accepted")
+      setVisible(false);
+    };
     window.addEventListener("pc:open-cookies", open);
     window.addEventListener("pc:cookies-accepted", accepted);
+    window.addEventListener("pc:cookies-rejected", rejected);
     return () => {
       window.removeEventListener("pc:open-cookies", open);
       window.removeEventListener("pc:cookies-accepted", accepted);
+      window.removeEventListener("pc:cookies-rejected", rejected);
     };
   }, []);
 

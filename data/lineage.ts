@@ -60,7 +60,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The base type, and where the name comes from: a sharp German farm and ratting dog.",
         img: "/history/breeds/working-German-Pinscher.jpg",
         children: [
-          { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", img: "/history/breeds/old-german-ratting-terriers-illustration.jpg", value: 22 },
+          { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 22 },
           { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/history/breeds/Schnauzer-type-farm-dogs.jpg", value: 16 }
         ]
       },
