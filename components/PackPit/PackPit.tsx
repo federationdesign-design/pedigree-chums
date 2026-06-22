@@ -965,6 +965,33 @@ export default function PackPit() {
         }
       };
       Events.on(engine, "collisionStart", onBombHit);
+
+      // A % circle goes inert after five hits total. Those used to be cursor presses
+      // only; now a solid knock from another pit object spends a charge too. A speed
+      // threshold and a short cooldown keep gentle resting contacts from counting.
+      const onPctHit = (ev: any) => {
+        const now = performance.now();
+        for (const pair of ev.pairs) {
+          for (const c of [pair.bodyA, pair.bodyB] as any[]) {
+            const p = c.plugin;
+            if (!p || p.kind !== "pct" || p.inert || p.bomb || p.repelOn) continue;
+            const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
+            if (!other || other.isStatic) continue; // walls, floor, ceiling do not count
+            const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
+            if (rv < 5) continue; // a real knock, not a nudge
+            if (p.lastObjHit && now - p.lastObjHit < 600) continue; // one charge per knock, not per frame
+            p.lastObjHit = now;
+            p.charges = (p.charges ?? 5) - 1;
+            if (p.charges <= 0) {
+              p.inert = true;
+              poof(c.position.x, c.position.y, p.half || 21);
+              c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
+              if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
+            }
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onPctHit);
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) return;
@@ -1141,6 +1168,7 @@ export default function PackPit() {
         Events.off(engine, "collisionStart", onCollide);
         Events.off(engine, "collisionStart", onMenuCollide);
         Events.off(engine, "collisionStart", onInertBond);
+        Events.off(engine, "collisionStart", onPctHit);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);
