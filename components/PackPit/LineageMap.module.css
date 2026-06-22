@@ -186,14 +186,12 @@
   animation: cardBoxPop 0.7s ease-in-out 0.5s both;
   filter: drop-shadow(0 10px 16px rgba(10, 58, 87, 0.35));
 }
-/* Mobile: twice the size. This block MUST stay below the base .cardBox rule above:
-   both are a single class (equal specificity), so the later rule in source order
-   wins. Placed before, it was silently overridden, which is why it never applied. */
-@media (max-width: 640px) {
-  .cardBox {
-    width: clamp(240px, 44vw, 400px);
-    left: calc(clamp(240px, 44vw, 400px) * -0.5 + 30px);
-  }
+/* Mobile: twice the size, driven by the pit's own mobile flag via the .cardBoxBig
+   class. The two-class selector outranks the base .cardBox above by specificity, so
+   cascade order can never cancel it again (the bug that hid this three times). */
+.cardBox.cardBoxBig {
+  width: clamp(240px, 44vw, 400px);
+  left: calc(clamp(240px, 44vw, 400px) * -0.5 + 30px);
 }
 @keyframes cardBoxPop {
   0%   { transform: translateX(0) scale(0.2) rotate(-10deg); opacity: 0; }

@@ -119,6 +119,9 @@ export default function LineageMap({
     window.addEventListener("resize", f);
     return () => window.removeEventListener("resize", f);
   }, []);
+  // The pit treats <=768px as mobile (matchMedia in PackPit). Mirror that here so the
+  // card-pack box grows in step with the pit, not on a separate CSS breakpoint.
+  const isMobile = vp.w <= 768;
 
   const root = useMemo(() => {
     const t = getLineage(breed.name);
@@ -823,7 +826,7 @@ export default function LineageMap({
       </svg>
     </div>
     {boxPop && (
-      <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+      <img className={`${styles.cardBox}${isMobile ? " " + styles.cardBoxBig : ""}`} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
     </>
   );
