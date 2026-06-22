@@ -373,7 +373,7 @@ export default function LineageMap({
   // sx - pan.x so they stay put while the tree pans behind them.
   const F_LEFT = 96, F_COL = 150, F_ROW = 150; // wider pitch so card corner buttons never overlap a neighbour
   const fCols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / F_COL)));
-  const aliveTop = 210; // pushed down so the rows clear the counter and Collect-pack label top-left
+  const aliveTop = 240; // rows sit clear of the top-left chrome and the section headers
   const frames: { id: string; cat: "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW }));
   const extinctTop = aliveTop + (frameSlots.alive.length ? Math.ceil(frameSlots.alive.length / fCols) * F_ROW + 72 : 0);
@@ -656,10 +656,10 @@ export default function LineageMap({
         </div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.alive.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: aliveTop - 72 }}>Alive and kicking</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: extinctTop - 72 }}>Chasing balls up in the heavens</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: extinctTop - 90 }}>Chasing balls up in the heavens</div>
       )}
       {showPack && (
         <button
@@ -748,11 +748,18 @@ export default function LineageMap({
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
-                    {(!picked.has(n._id) || packed) ? (
-                      <text className={styles.nm} textAnchor="middle" y={-r - 9}>
-                        {n.name}
-                      </text>
-                    ) : null}
+                    {hasKids ? (() => {
+                      const nmW = n.name.length * 7.4 + 22; // pill hugs the connecting-node name
+                      const nmY = -r - 13;
+                      return (
+                        <g>
+                          <rect className={styles.nmPill} x={-nmW / 2} y={nmY - 11} width={nmW} height={22} rx={11} />
+                          <text className={styles.nm} textAnchor="middle" dominantBaseline="central" y={nmY}>
+                            {n.name}
+                          </text>
+                        </g>
+                      );
+                    })() : null}
                     {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside
@@ -790,11 +797,11 @@ export default function LineageMap({
                   { cx: 0, cy: 2, r: 24, tx: 0, ty: -6, d: 0 },     // central billow
                   { cx: -20, cy: 8, r: 18, tx: -58, ty: -2, d: 0 }, // shoved out left
                   { cx: 20, cy: 8, r: 18, tx: 58, ty: -2, d: 0 },   // shoved out right
-                  { cx: -14, cy: 14, r: 15, tx: -42, ty: 26, d: 50 }, // dust skidding down-left
-                  { cx: 14, cy: 14, r: 15, tx: 42, ty: 26, d: 50 },   // dust skidding down-right
-                  { cx: -8, cy: -14, r: 16, tx: -22, ty: -40, d: 25 }, // up-left
-                  { cx: 8, cy: -14, r: 16, tx: 22, ty: -40, d: 25 },   // up-right
-                  { cx: 0, cy: 16, r: 13, tx: 0, ty: 34, d: 70 },      // straight down along the table
+                  { cx: -14, cy: 14, r: 15, tx: -42, ty: 26, d: 0 }, // dust skidding down-left
+                  { cx: 14, cy: 14, r: 15, tx: 42, ty: 26, d: 0 },   // dust skidding down-right
+                  { cx: -8, cy: -14, r: 16, tx: -22, ty: -40, d: 0 }, // up-left
+                  { cx: 8, cy: -14, r: 16, tx: 22, ty: -40, d: 0 },   // up-right
+                  { cx: 0, cy: 16, r: 13, tx: 0, ty: 34, d: 0 },      // straight down along the table
                 ].map((q, i) => (
                   <circle key={i} className={styles.puffP} cx={q.cx} cy={q.cy} r={q.r} style={{ ["--tx" as string]: `${q.tx}px`, ["--ty" as string]: `${q.ty}px`, animationDelay: `${q.d}ms` }} />
                 ))}
@@ -859,11 +866,18 @@ export default function LineageMap({
                             flashNum(hit.sx - pan.x, hit.sy - pan.y - CARD / 2, 100, FLASH_SIZE); // +100 emanates from the frame
                             const pid = puffSeq.current++; // smoke poof where it lands
                             setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
-                            window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 820);
+                            window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
                           } else {
                             setShakeFrame(hit.id);
                             window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
-                            setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: cd.ox, y: cd.oy }); return x; }); // spring the card back
+                            // a wrong box repels: bump the card just outside its edge, in the
+                            // direction it came from, rather than flinging it back to the start
+                            let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
+                            let len = Math.hypot(dx, dy);
+                            if (len < 6) { dx = 0; dy = 1; len = 1; } // dropped dead-centre: spit it out the bottom
+                            const push = CARD * 0.95 + 14; // frame centre to card centre, just clear of the edge
+                            const ox2 = hit.sx + (dx / len) * push, oy2 = hit.sy + (dy / len) * push;
+                            setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: ox2 - pan.x, y: oy2 - pan.y }); return x; });
                           }
                         }
                       }
