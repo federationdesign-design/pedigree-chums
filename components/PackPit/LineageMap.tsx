@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
+import { breeds } from "../../data/breeds";
 import styles from "./LineageMap.module.css";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
@@ -34,6 +35,12 @@ const LIVING_STATUS: Record<string, BreedTag> = {
   "Labrador": "popular",
   "Poodle": "popular",
 };
+// Every real, currently-bred breed we know of, by normalised name. A tree node
+// matching one of these is a living breed even if its short card name is absent
+// from the history list, so it must not fall through to the red gone-dot.
+const LIVING_NAMES = new Set<string>(
+  [...ukBreeds.map((b) => b.name), ...breeds.map((b) => b.name)].map((s) => s.toLowerCase().trim())
+);
 // Work out a breed's state from its note, falling back to the history tag list.
 function nodeStatus(name: string, note: string): BreedTag | null {
   const n = (note || "").toLowerCase();
@@ -42,8 +49,11 @@ function nodeStatus(name: string, note: string): BreedTag | null {
   if (n.includes("endangered") || n.includes("vulnerable")) return "endangered";
   if (PROGENITOR_STATUS[name]) return PROGENITOR_STATUS[name];
   if (LIVING_STATUS[name]) return LIVING_STATUS[name];
-  const uk = ukBreeds.find((b) => b.name === name);
-  return (uk?.tag as BreedTag) ?? null;
+  const key = name.toLowerCase().trim();
+  const uk = ukBreeds.find((b) => b.name.toLowerCase().trim() === key);
+  if (uk) return (uk.tag as BreedTag) ?? "popular";
+  if (LIVING_NAMES.has(key)) return "popular"; // a real living breed, just not in the history list
+  return null;
 }
 // living breeds carry one of the active tags; everything else (extinct tag or no
 // tag at all, e.g. old landrace "stock") counts as gone, matching the pack split
@@ -378,7 +388,7 @@ export default function LineageMap({
     const labels: { alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { alive: null, extinct: null };
     // header sits 40px higher than the card row so it clears the cancel buttons
     if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
-    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y: y - 40 }; place(extinct, y + 64); }
+    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y: y - 30 }; place(extinct, y + 64); }
     // where each card sits right now, so we can glide it from there to its slot
     const starts = new Map<string, { x: number; y: number }>();
     uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
