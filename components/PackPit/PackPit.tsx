@@ -815,12 +815,23 @@ export default function PackPit() {
         numAt(bomb.position.x, bomb.position.y, 250); // the blast itself is worth 250
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
         Composite.remove(engine.world, bomb);
-        const targets = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
-        targets.sort((a: any, b2: any) =>
-          Math.hypot(a.position.x - bomb.position.x, a.position.y - bomb.position.y) -
-          Math.hypot(b2.position.x - bomb.position.x, b2.position.y - bomb.position.y));
-        targets.forEach((o: any, i: number) => {
-          o.plugin.popped = true; // claim it now so it cannot be hit or double-popped mid-chain
+        // Only circles caught in a contact chain from the bomb go up with it: those
+        // touching the bomb, then those touching them, and so on. Anything cut off by
+        // a gap, or by a non-circle object wedged between, is spared.
+        const rad = (o: any) => o.plugin?.half || 21;
+        const touch = (a: any, b: any) =>
+          Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y) <= rad(a) + rad(b) + 10;
+        const pool = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
+        const chain: any[] = [];
+        let frontier = pool.filter((o: any) => touch(o, bomb));
+        frontier.forEach((o: any) => { o.plugin.popped = true; }); // claim now so nothing double-pops mid-chain
+        while (frontier.length) {
+          chain.push(...frontier);
+          const prev = frontier;
+          frontier = pool.filter((o: any) => !o.plugin.popped && prev.some((f: any) => touch(f, o)));
+          frontier.forEach((o: any) => { o.plugin.popped = true; });
+        }
+        chain.forEach((o: any, i: number) => {
           window.setTimeout(() => {
             if (disposed) return;
             explodeAt(o.position.x, o.position.y, blastSize(o));
