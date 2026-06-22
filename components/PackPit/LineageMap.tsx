@@ -200,11 +200,10 @@ export default function LineageMap({
   const scoredRef = useRef<Set<string>>(new Set());
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
-  const [autoPacking, setAutoPacking] = useState(false); // auto-find requested: lay the popped cards into the grid once they exist
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const interacted = useRef(false);
   useEffect(() => {
-    setAutoArmed(false); setPenalty(null); setAutoPacking(false);
+    setAutoArmed(false); setPenalty(null);
     const t = setTimeout(() => setAutoArmed(true), 5000);
     return () => clearTimeout(t);
   }, [breed.name]);
@@ -402,7 +401,6 @@ export default function LineageMap({
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
     setAutoArmed(false);
-    setAutoPacking(true); // next render has all cards popped; the effect then lays them into the grid
   };
   const doPack = (fx?: number, fy?: number, award: number = 400) => {
     if (packed) return;
@@ -456,17 +454,6 @@ export default function LineageMap({
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
     });
   };
-
-  // After auto-find pops every card, lay them into the same tidy grid the Collect
-  // button uses so they do not sit on top of each other. No award here, the
-  // shortcut has already taken its 1000.
-  useEffect(() => {
-    if (autoPacking && !packed && pickCards.length > 0) {
-      doPack(undefined, undefined, 0);
-      setAutoPacking(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoPacking, packed, pickCards.length]);
 
   // fully exposed = every branch that has children is open, nothing left to unfold
   const canRemove = showRemove && !removing;
