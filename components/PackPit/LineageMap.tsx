@@ -200,9 +200,16 @@ export default function LineageMap({
   const scoredRef = useRef<Set<string>>(new Set());
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
+  const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
+  const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
     const t = setTimeout(() => setAutoArmed(true), 5000);
+    return () => clearTimeout(t);
+  }, [breed.name]);
+  useEffect(() => {
+    setIdleHint(false); interacted.current = false;
+    const t = setTimeout(() => { if (!interacted.current) setIdleHint(true); }, 1000);
     return () => clearTimeout(t);
   }, [breed.name]);
   const flashNum = (x: number, y: number, val: number, size: number) => {
@@ -659,6 +666,7 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
+                      interacted.current = true; setIdleHint(false); // any tap stops the first-ring hint
                       burstAt(n._x, n._y, r * 1.33); // pink starburst, 33% over the circle radius, exactly as the pit
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
@@ -685,7 +693,7 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
@@ -900,13 +908,12 @@ export default function LineageMap({
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
     {showAuto && (
-      <img
-        className={styles.autoBtn}
-        src="/auto-collect-icon.svg"
-        alt="Auto collect"
-        onClick={autoCollect}
-        onPointerDown={(e) => e.stopPropagation()}
-      />
+      <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto collect all breeds">
+        <div className={styles.autoPop}>
+          <span className={styles.autoLabel}>Auto collect all breeds</span>
+          <img className={styles.autoBtn} src="/auto-collect-icon.svg" alt="" aria-hidden="true" />
+        </div>
+      </div>
     )}
     {penalty !== null && <div key={penalty} className={styles.autoPenalty}>-1000</div>}
     </>

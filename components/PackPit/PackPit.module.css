@@ -31,6 +31,18 @@
 .showPattern .pattern {
   opacity: 0.5;
 }
+/* floor graphic pinned to the bottom of the pit; sits behind the canvas so the
+   chums land and rest on top of it. The canvas (z 0, appended last) draws over it. */
+.floor {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
 .dimmed > canvas {
   opacity: 0.16;
   filter: saturate(0.7);
