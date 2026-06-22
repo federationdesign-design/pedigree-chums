@@ -1090,7 +1090,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pomeranian",
     note: "A spitz shrunk to a toy in the Pomerania region, descended from big Arctic sled and herding dogs.",
     children: [
-      { name: "Arctic sled spitz", note: "The large Nordic sled, hunting and herding spitz of Iceland and Lapland, the breed's deep northern root.", img: "/history/breeds/Large-German-Spitz.jpg", value: 55 },
+      { name: "Arctic sled spitz", note: "The large Nordic sled, hunting and herding spitz of Iceland and Lapland, the breed's deep northern root.", img: "/history/breeds/Ancient-Arctic-spitz.jpg", value: 55 },
       { name: "German farm spitz", note: "The Wolfspitz and mid-size German Spitz guard strains of the Pomerania region it was bred straight down from.", img: "/history/breeds/Continental-European-farm-watch-spitz.jpg", value: 45 }
     ]
   },
