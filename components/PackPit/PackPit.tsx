@@ -641,8 +641,8 @@ export default function PackPit() {
           pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.03; pt.vx *= 0.98;
           ctx.save(); ctx.globalAlpha = (1 - t) * 0.6;
           ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r * (1 + t * 1.4), 0, Math.PI * 2);
-          ctx.fillStyle = "#eaf6ff"; ctx.fill();
-          ctx.lineWidth = 1.5; ctx.strokeStyle = "rgba(20,151,214,0.5)"; ctx.stroke();
+          ctx.fillStyle = pt.colour || "#eaf6ff"; ctx.fill();
+          ctx.lineWidth = 1.5; ctx.strokeStyle = pt.stroke || "rgba(20,151,214,0.5)"; ctx.stroke();
           ctx.restore();
         }
       }
@@ -654,9 +654,22 @@ export default function PackPit() {
       // than a single press. Strength scales with the circle's percentage figure.
       const explodeAt = (x: number, y: number, s: number) => {
         const born = performance.now();
-        bursts.push({ x, y, s, born, life: 520, colour: "#ff2d2d", rot: 0 });
-        bursts.push({ x, y, s, born, life: 520, colour: "#ffd23e", rot: 11 });
-        bursts.push({ x, y, s, born, life: 520, colour: "#ffffff", rot: 22 });
+        bursts.push({ x, y, s, born, life: 520, colour: "#e23a0e", rot: 0 });  // outer red-orange
+        bursts.push({ x, y, s, born, life: 520, colour: "#ff7a1a", rot: 11 }); // mid orange
+        bursts.push({ x, y, s, born, life: 520, colour: "#ffc62e", rot: 22 }); // inner yellow
+      };
+      // Three different grey balls thrown out with the blast, like smoke and debris.
+      const greyPop = (x: number, y: number) => {
+        const greys: [string, string][] = [["#9a9a9a", "rgba(70,70,70,0.5)"], ["#c4c4c4", "rgba(90,90,90,0.5)"], ["#6f6f6f", "rgba(40,40,40,0.5)"]];
+        for (let i = 0; i < 3; i++) {
+          const a = (i / 3) * Math.PI * 2 + Math.random() * 0.8, sp = 1.2 + Math.random() * 1.5;
+          particles.push({
+            x, y,
+            vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.2,
+            r: 8 + Math.random() * 6, born: performance.now(), life: 540 + Math.random() * 320,
+            colour: greys[i][0], stroke: greys[i][1],
+          });
+        }
       };
       const blastSize = (b: any) => (b.plugin?.half || 21) * (1 + (b.plugin?.share || 0) / 25); // a bigger % figure = a bigger boom
       function drawBursts(ctx: any, now: number) {
@@ -867,6 +880,7 @@ export default function PackPit() {
         bomb.plugin.popped = true;
         explodeAt(bomb.position.x, bomb.position.y, blastSize(bomb) * 1.9);
         poof(bomb.position.x, bomb.position.y, (bomb.plugin.half || 21) * 1.3);
+        greyPop(bomb.position.x, bomb.position.y); // three grey debris balls
         numAt(bomb.position.x, bomb.position.y, 250); // the blast itself is worth 250
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
         Composite.remove(engine.world, bomb);

@@ -83,7 +83,8 @@ const SPREADN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
-const CARD = 110;
+const CARD = 82; // card + frame + image size (reduced 25% so more rows fit)
+const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
 // every white flash number is this small, fixed size, matching the pit; it never
 // scales with the circle that was tapped
 const FLASH_SIZE = 15;
@@ -185,13 +186,13 @@ export default function LineageMap({
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [packed, setPacked] = useState(false); // the ancestor pack has been ordered into its two columns
-  const [packLabels, setPackLabels] = useState<{ alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ alive: null, extinct: null });
+  const [packLabels, setPackLabels] = useState<{ chum: { x: number; y: number } | null; alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ chum: null, alive: null, extinct: null });
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
   const [collecting, setCollecting] = useState(false); // my chum tapped: every card tumbles into the bottom-left
   const [boxPop, setBoxPop] = useState(false); // the card-pack box flourish on collect
   const [collectT, setCollectT] = useState(0); // 0..1 progress of that tumble
   const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
-  useEffect(() => { setPacked(false); setPackLabels({ alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setBoxPop(false); collectRef.current = null; }, [breed.name]);
+  useEffect(() => { setPacked(false); setPackLabels({ chum: null, alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setBoxPop(false); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
@@ -282,11 +283,13 @@ export default function LineageMap({
       walk(k);
     });
     if (root) walk(root);
-    return { alive: all.filter((s) => isAlive(s.status)), extinct: all.filter((s) => !isAlive(s.status)) };
+    const chum = all.filter((s) => PACK_BREEDS.has(s.name)); // ancestors that are themselves one of the 54 pack dogs
+    const rest = all.filter((s) => !PACK_BREEDS.has(s.name));
+    return { chum, alive: rest.filter((s) => isAlive(s.status)), extinct: rest.filter((s) => !isAlive(s.status)) };
   }, [root]);
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
-  const [dragCat, setDragCat] = useState<"alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
+  const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
   const [dragImg, setDragImg] = useState<string | null>(null); // artwork of the card being dragged, to light its one assigned frame
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
   const [puffs, setPuffs] = useState<{ id: number; sx: number; sy: number }[]>([]); // smoke poofs as a card lands in its frame
@@ -372,10 +375,12 @@ export default function LineageMap({
   // The empty frames the player drags each collected card into: a row of living up
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
   // sx - pan.x so they stay put while the tree pans behind them.
-  const F_LEFT = 96, F_COL = 150, F_ROW = 150; // wider pitch so card corner buttons never overlap a neighbour
-  const fCols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / F_COL)));
-  const aliveTop = 240; // rows sit clear of the top-left chrome and the section headers
-  const frames: { id: string; cat: "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
+  const F_LEFT = 96, F_COL = 112, F_ROW = 112; // pitch reduced 25% with the cards, so more rows fit
+  const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
+  const chumTop = 240; // rows sit clear of the top-left chrome and the section headers
+  const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
+  frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: chumTop + Math.floor(i / fCols) * F_ROW }));
+  const aliveTop = chumTop + (frameSlots.chum.length ? Math.ceil(frameSlots.chum.length / fCols) * F_ROW + 72 : 0);
   frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW }));
   const extinctTop = aliveTop + (frameSlots.alive.length ? Math.ceil(frameSlots.alive.length / fCols) * F_ROW + 72 : 0);
   frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: extinctTop + Math.floor(i / fCols) * F_ROW }));
@@ -420,7 +425,7 @@ export default function LineageMap({
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
   // split into the living and the long-gone, and awards a one-off 400 points.
-  const PACK_LEFT = 96, PACK_COL = 150, PACK_ROW = 150; // full-size cards, wide enough that corner buttons never overlap
+  const PACK_LEFT = 96, PACK_COL = 112, PACK_ROW = 112; // reduced 25% with the cards
   const showPack = packed || (totalNodes > 0 && seen.size >= 1); // appears the moment a node is opened or Auto is used
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
@@ -458,8 +463,8 @@ export default function LineageMap({
       seenKey.add(key);
       uniq.push(c);
     }
-    const alive: typeof pickCards = [], extinct: typeof pickCards = [];
-    for (const c of uniq) (isAlive(c.status) ? alive : extinct).push(c);
+    const chum: typeof pickCards = [], alive: typeof pickCards = [], extinct: typeof pickCards = [];
+    for (const c of uniq) (PACK_BREEDS.has(c.name) ? chum : isAlive(c.status) ? alive : extinct).push(c);
     // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
     const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
     const targets = new Map<string, { x: number; y: number }>();
@@ -472,8 +477,9 @@ export default function LineageMap({
       return top + Math.ceil(arr.length / cols) * PACK_ROW;
     };
     let y = 150;
-    const labels: { alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { alive: null, extinct: null };
+    const labels: { chum: { x: number; y: number } | null; alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { chum: null, alive: null, extinct: null };
     // header sits 40px higher than the card row so it clears the cancel buttons
+    if (chum.length) { labels.chum = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(chum, y + 64) + 8; }
     if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
     if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y: y - 30 }; place(extinct, y + 64); }
     // where each card sits right now, so we can glide it from there to its slot
@@ -660,6 +666,9 @@ export default function LineageMap({
           {filled.size}/{frameTotal}
         </div>
       )}
+      {frameTotal > 0 && !packed && !collecting && frameSlots.chum.length > 0 && (
+        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: chumTop - 90 }}>A Pedigree Chum</div>
+      )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.alive.length > 0 && (
         <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
@@ -678,6 +687,9 @@ export default function LineageMap({
           <img className={styles.packIcon} src={(framesDone || packed) ? "/checklist-icon-complete.svg" : "/checklist-icon.svg"} alt="" aria-hidden="true" />
           <span className={styles.packText}>{packed ? "Done!" : "Collect Ancestor Pack"}</span>
         </button>
+      )}
+      {packed && packLabels.chum && (
+        <div className={styles.packHead} style={{ left: packLabels.chum.x, top: packLabels.chum.y }}>A Pedigree Chum</div>
       )}
       {packed && packLabels.alive && (
         <div className={styles.packHead} style={{ left: packLabels.alive.x, top: packLabels.alive.y }}>Alive and kicking</div>
@@ -831,7 +843,7 @@ export default function LineageMap({
                     e.stopPropagation();
                     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
                     cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
-                    setDragCat(isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
+                    setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
                     setDragImg(c.img);
                     setDragXY({ x: e.clientX, y: e.clientY });
                     setFilled((m) => { let hit = false; const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) { x.delete(fid); hit = true; } return hit ? x : m; }); // lifting a framed card frees its frame
