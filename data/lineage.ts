@@ -261,7 +261,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 50 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 },
-      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", value: 25 }
+      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 25 }
     ]
   },
 

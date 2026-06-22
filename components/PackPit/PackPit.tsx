@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
@@ -8,6 +8,17 @@ import LineageMap from "./LineageMap";
 import HowToPlay from "../HowToPlay/HowToPlay";
 import { startCheckout } from "../Offer/startCheckout";
 import styles from "./PackPit.module.css";
+
+// Score milestones: crossing one fires a centre-screen celebration with confetti.
+const MILESTONES: { value: number; label: string }[] = [
+  { value: 1000, label: "Nice!" },
+  { value: 2500, label: "Great!" },
+  { value: 5000, label: "Red hot!" },
+  { value: 10000, label: "On fire!" },
+  { value: 25000, label: "Unreal!" },
+  { value: 50000, label: "Legendary!" },
+  { value: 100000, label: "Untouchable!" },
+];
 
 const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
@@ -26,6 +37,22 @@ export default function PackPit() {
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
+  const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
+  const msIdx = useRef(0); // how many milestones already passed
+  const msTimer = useRef<number | null>(null);
+  useEffect(() => {
+    while (msIdx.current < MILESTONES.length && score >= MILESTONES[msIdx.current].value) {
+      const m = MILESTONES[msIdx.current];
+      msIdx.current += 1;
+      setMilestone({ value: m.value, label: m.label, id: performance.now() }); // last crossed wins if several land at once
+    }
+  }, [score]);
+  useEffect(() => {
+    if (!milestone) return;
+    if (msTimer.current) window.clearTimeout(msTimer.current);
+    msTimer.current = window.setTimeout(() => setMilestone(null), 2600); // clears after the pop-out finishes
+    return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
+  }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   useEffect(() => {
     const open = () => setHowToPlay(true);
@@ -1068,6 +1095,30 @@ export default function PackPit() {
       </div>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
       <HowToPlay open={howToPlay} onClose={() => setHowToPlay(false)} />
+      {milestone && (
+        <div className={styles.milestone} key={milestone.id} aria-hidden="true">
+          {Array.from({ length: 30 }).map((_, i) => {
+            const ang = (i / 30) * Math.PI * 2 + (i % 3) * 0.35;
+            const dist = 150 + ((i * 53) % 120);
+            const dx = Math.cos(ang) * dist;
+            const dy = Math.sin(ang) * dist + 50; // a touch of gravity in the splash
+            const colors = ["#1497d6", "#2bb4ee", "#ffd23e", "#fff8e6", "#ff5d97", "#ffffff"];
+            const st = {
+              background: colors[i % colors.length],
+              borderRadius: i % 4 === 0 ? "50%" : "2px",
+              animationDelay: `${(i % 6) * 0.03}s`,
+              "--dx": `${dx.toFixed(0)}px`,
+              "--dy": `${dy.toFixed(0)}px`,
+              "--rot": `${(i % 2 ? 1 : -1) * (180 + ((i * 47) % 360))}deg`,
+            } as CSSProperties;
+            return <span key={i} className={styles.milestoneConf} style={st} />;
+          })}
+          <div className={styles.milestoneCard}>
+            <span className={styles.milestoneLabel}>{milestone.label}</span>
+            <span className={styles.milestoneValue}>{milestone.value.toLocaleString("en-GB")}</span>
+          </div>
+        </div>
+      )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
           <div className={styles.tallyChip}>
@@ -1082,6 +1133,7 @@ export default function PackPit() {
               })}
             </svg>
             <span className={styles.tallyNum}>{collected}</span>
+            <span className={styles.tallyPlusOne} aria-hidden="true">+1</span>
           </div>
         </div>
       )}
