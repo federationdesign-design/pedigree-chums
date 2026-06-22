@@ -195,17 +195,17 @@
   }
 }
 @keyframes cardBoxPop {
-  0%   { transform: translateX(0) scale(0.2) rotate(-8deg); opacity: 0; }
-  12%  { transform: translateX(0) scale(1.12) rotate(13deg); opacity: 1; }
-  22%  { transform: translateX(-4px) scale(1) rotate(-4deg); }
-  31%  { transform: translateX(4px) scale(1) rotate(11deg); }
-  40%  { transform: translateX(-3px) scale(1) rotate(-2deg); }
-  49%  { transform: translateX(3px) scale(1) rotate(9deg); }
-  58%  { transform: translateX(-2px) scale(1) rotate(2deg); }
-  67%  { transform: translateX(2px) scale(1) rotate(7deg); }
-  76%  { transform: translateX(-1px) scale(1) rotate(3deg); }
-  86%  { transform: translateX(0) scale(1.28) rotate(4deg); opacity: 1; }
-  100% { transform: translateX(0) scale(0) rotate(4deg); opacity: 0; }
+  0%   { transform: translateX(0) scale(0.2) rotate(-10deg); opacity: 0; }
+  12%  { transform: translateX(0) scale(1.12) rotate(11deg); opacity: 1; }
+  22%  { transform: translateX(-4px) scale(1) rotate(-6deg); }
+  31%  { transform: translateX(4px) scale(1) rotate(9deg); }
+  40%  { transform: translateX(-3px) scale(1) rotate(-4deg); }
+  49%  { transform: translateX(3px) scale(1) rotate(7deg); }
+  58%  { transform: translateX(-2px) scale(1) rotate(0deg); }
+  67%  { transform: translateX(2px) scale(1) rotate(5deg); }
+  76%  { transform: translateX(-1px) scale(1) rotate(1deg); }
+  86%  { transform: translateX(0) scale(1.28) rotate(2deg); opacity: 1; }
+  100% { transform: translateX(0) scale(0) rotate(2deg); opacity: 0; }
 }
 /* Cumulative mix percentage shown on each ordered-grid card. */
 .mixPill {
@@ -390,7 +390,7 @@
 .autoWrap {
   position: fixed;
   left: 50%;
-  bottom: clamp(20px, 4vh, 44px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* same axis as the shake button */
   transform: translateX(-50%);
   z-index: 10000;
   cursor: pointer;
@@ -414,14 +414,14 @@
 }
 .autoBtn {
   display: block;
-  width: clamp(78px, 14vw, 108px);
-  height: clamp(78px, 14vw, 108px);
+  width: 84px;
+  height: 84px;
   box-sizing: border-box;
-  padding: 12px;
+  padding: 10px;
   background: var(--yellow);
-  border-radius: 24px;
+  border-radius: 20px;
   object-fit: contain;
-  box-shadow: 0 8px 16px rgba(10, 58, 87, 0.4);
+  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
 }
 .autoWrap:hover .autoBtn { transform: scale(1.06); }
@@ -498,15 +498,16 @@
   .frameCount { top: 14px; font-size: 18px; padding: 4px 13px; }
 }
 
-/* Smoke poof when a card lands in its frame: soft pale clouds that bloom and fade. */
+/* Exaggerated dust poof when a card lands, like a heavy book dropped on a table:
+   a central billow plus dust shoved outward and skidding along the surface. */
 .puffP {
-  fill: rgba(238, 244, 250, 0.85);
+  fill: rgba(235, 236, 232, 0.9);
   transform-box: fill-box;
   transform-origin: center;
-  animation: lm-puff 0.6s ease-out forwards;
+  animation: lm-puff 0.72s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
 }
 @keyframes lm-puff {
-  0%   { transform: scale(0.25); opacity: 0; }
-  25%  { opacity: 0.85; }
-  100% { transform: scale(1.9); opacity: 0; }
+  0%   { transform: translate(0, 0) scale(0.2); opacity: 0; }
+  18%  { transform: translate(0, 0) scale(1); opacity: 0.92; }
+  100% { transform: translate(var(--tx, 0), var(--ty, 0)) scale(2.1); opacity: 0; }
 }
