@@ -10,15 +10,10 @@ import { startCheckout } from "../Offer/startCheckout";
 import styles from "./PackPit.module.css";
 
 // Score milestones: crossing one fires a centre-screen celebration with confetti.
-const MILESTONES: { value: number; label: string }[] = [
-  { value: 1000, label: "Nice!" },
-  { value: 2500, label: "Great!" },
-  { value: 5000, label: "Red hot!" },
-  { value: 10000, label: "On fire!" },
-  { value: 25000, label: "Unreal!" },
-  { value: 50000, label: "Legendary!" },
-  { value: 100000, label: "Untouchable!" },
-];
+// Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
+// centre-screen celebration with confetti. Labels escalate then hold at the top.
+const MS_STEP = 5000;
+const MS_LABELS = ["Nice!", "Great!", "Red hot!", "On fire!", "Unreal!", "Legendary!", "Untouchable!"];
 
 const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
@@ -38,13 +33,14 @@ export default function PackPit() {
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
-  const msIdx = useRef(0); // how many milestones already passed
+  const msLast = useRef(0); // highest milestone already celebrated
   const msTimer = useRef<number | null>(null);
   useEffect(() => {
-    while (msIdx.current < MILESTONES.length && score >= MILESTONES[msIdx.current].value) {
-      const m = MILESTONES[msIdx.current];
-      msIdx.current += 1;
-      setMilestone({ value: m.value, label: m.label, id: performance.now() }); // last crossed wins if several land at once
+    const reached = Math.floor(score / MS_STEP) * MS_STEP; // highest 5k mark at or below the score
+    if (reached >= MS_STEP && reached > msLast.current) {
+      msLast.current = reached;
+      const label = MS_LABELS[Math.min(reached / MS_STEP - 1, MS_LABELS.length - 1)];
+      setMilestone({ value: reached, label, id: performance.now() });
     }
   }, [score]);
   useEffect(() => {

@@ -937,7 +937,7 @@ export default function LineageMap({
                     );
                   })()}
                   {!packed && (() => {
-                    const ccx = c.cardX + CARD / 2, ccy = c.cardY - CARD / 2; // top-right corner, button straddles it
+                    const ccx = c.cardX - CARD / 2, ccy = c.cardY + CARD / 2; // bottom-left corner, clear of the info icon now at top-right
                     return (
                       <g
                         style={{ cursor: "pointer" }}
@@ -969,7 +969,7 @@ export default function LineageMap({
                     );
                   })()}
                   {(breedInfo[c.name] || c.note) ? (() => {
-                    const ix = c.cardX - CARD / 2, iy = c.cardY + CARD / 2; // bottom-left corner, mirrors the status dot up top
+                    const ix = c.cardX + CARD / 2, iy = c.cardY - CARD / 2; // top-right corner
                     return (
                       <g
                         style={{ cursor: "help" }}
