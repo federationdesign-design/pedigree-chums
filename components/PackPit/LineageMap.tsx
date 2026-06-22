@@ -165,10 +165,6 @@ export default function LineageMap({
   const [dragPos, setDragPos] = useState<Map<string, { x: number; y: number }>>(new Map());
   useEffect(() => setDragPos(new Map()), [breed.name]);
   const cardDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
-  // the main square card can be dragged too, just like the ancestor cards
-  const [rootPos, setRootPos] = useState<{ x: number; y: number } | null>(null);
-  useEffect(() => setRootPos(null), [breed.name]);
-  const rootDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
   // a dragged card becomes "pinned": snapshot its art so it survives its branch
   // closing, and keep showing it at its dropped spot until breed change / close
@@ -557,33 +553,18 @@ export default function LineageMap({
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => {
-    const rx = rootPos ? rootPos.x : cx, ry = rootPos ? rootPos.y : cy; // draggable like the ancestor cards
     const baseDeg = (cardLean * 180) / Math.PI;
     const rootXf = collecting && collectRef.current
-      ? collectXf(rx, ry, collectRef.current.rootSpin, baseDeg)
-      : { transform: `translate(${rx},${ry}) rotate(${baseDeg})`, opacity: 1 };
+      ? collectXf(cx, cy, collectRef.current.rootSpin, baseDeg)
+      : { transform: `translate(${cx},${cy}) rotate(${baseDeg})`, opacity: 1 };
     const groupFade = collecting ? Math.max(0, 1 - collectT * 1.6) : 1;
     return (
     <>
       <g
-        className={`${styles.rootHit} ${styles.grab}`}
+        className={styles.rootHit}
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => {
-          if (collecting) return;
-          e.stopPropagation();
-          try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
-          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: rx, oy: ry, moved: false };
-        }}
-        onPointerMove={(e) => {
-          const d = rootDrag.current; if (!d || e.pointerId !== d.id) return;
-          const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
-          if (!d.moved && Math.hypot(dx, dy) > 3) d.moved = true;
-          if (d.moved) setRootPos({ x: d.ox + dx, y: d.oy + dy });
-        }}
-        onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
-        onPointerCancel={() => { rootDrag.current = null; }}
       >
         <clipPath id={clip}>
           <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
@@ -609,7 +590,7 @@ export default function LineageMap({
           );
         })()}
       </g>
-      <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
+      <g className={styles.rootHit} transform={`translate(${cx},${cy + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
         <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
           {breed.name}
@@ -619,7 +600,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
-            onClick={(e) => { e.stopPropagation(); burstAt(rx, ry + ROOT + 88, ROOT * 0.9); doPack(rx, ry + ROOT + 88, 500); }}
+            onClick={(e) => { e.stopPropagation(); burstAt(cx, cy + ROOT + 88, ROOT * 0.9); doPack(cx, cy + ROOT + 88, 500); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
             aria-label="Collect the ancestor pack"
@@ -639,7 +620,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,${collectShowing ? 138 : 62})`}
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 500, FLASH_SIZE); startRemove(); }}
+            onClick={(e) => { e.stopPropagation(); flashNum(cx, cy + ROOT + (collectShowing ? 164 : 88), 500, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label="Choose as pack chum"
           >
