@@ -371,7 +371,7 @@ export default function LineageMap({
   // sx - pan.x so they stay put while the tree pans behind them.
   const F_LEFT = 96, F_COL = 128, F_ROW = 128;
   const fCols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / F_COL)));
-  const aliveTop = 150;
+  const aliveTop = 210; // pushed down so the rows clear the counter and Collect-pack label top-left
   const frames: { id: string; cat: "alive" | "extinct"; sx: number; sy: number }[] = [];
   frameSlots.alive.forEach((_, i) => frames.push({ id: `fa${i}`, cat: "alive", sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW }));
   const extinctTop = aliveTop + (frameSlots.alive.length ? Math.ceil(frameSlots.alive.length / fCols) * F_ROW + 72 : 0);
@@ -421,7 +421,8 @@ export default function LineageMap({
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
-  const collectShowing = allBlue && !packed && !collecting; // the blue Collect button is on screen
+  const framesDone = frameTotal > 0 && filled.size >= frameTotal; // every dropped frame filled
+  const collectShowing = allBlue && !packed && !collecting && !framesDone; // the blue Collect button is on screen
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
   // One tap opens every branch, turns all circles blue and pops all cards out, the
@@ -768,16 +769,17 @@ export default function LineageMap({
                 if (g > 0.02) glow = { filter: `drop-shadow(0 0 ${(4 + g * 22).toFixed(1)}px rgba(255, 210, 62, ${(0.25 + g * 0.6).toFixed(2)}))` };
               }
               return (
-                <rect
-                  key={f.id}
-                  className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""}`.trim()}
-                  style={glow}
-                  x={f.sx - pan.x - CARD / 2}
-                  y={f.sy - pan.y - CARD / 2}
-                  width={CARD}
-                  height={CARD}
-                  rx={15}
-                />
+                <g key={f.id} transform={`rotate(-1 ${f.sx - pan.x} ${f.sy - pan.y})`}>
+                  <rect
+                    className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""}`.trim()}
+                    style={glow}
+                    x={f.sx - pan.x - CARD / 2}
+                    y={f.sy - pan.y - CARD / 2}
+                    width={CARD}
+                    height={CARD}
+                    rx={15}
+                  />
+                </g>
               );
             })}
             {!packed && !collecting && puffs.map((p) => (
@@ -885,19 +887,6 @@ export default function LineageMap({
                     rx={15}
                     className={styles.pickCard}
                   />
-                  {!packed && (() => {
-                    const pillH = 36;
-                    const pillW = Math.max(64, c.name.length * 9.5 + 30); // one line, width grows with the name
-                    const pillTop = c.cardY + CARD / 2 + 12; // sits just below the card, like the breed name pill
-                    return (
-                      <>
-                        <rect className={styles.tag} x={c.cardX - pillW / 2} y={pillTop} width={pillW} height={pillH} rx={pillH / 2} />
-                        <text className={styles.tagText} textAnchor="middle" x={c.cardX} y={pillTop + pillH / 2 + 2} dominantBaseline="central">
-                          {c.name}
-                        </text>
-                      </>
-                    );
-                  })()}
                   {(() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CARD / 2, dy = c.cardY - CARD / 2; // top-left corner, protruding like the close button
@@ -939,7 +928,7 @@ export default function LineageMap({
                       </>
                     );
                   })()}
-                  {packed && breedInfo[c.name] ? (() => {
+                  {breedInfo[c.name] ? (() => {
                     const ix = c.cardX - CARD / 2, iy = c.cardY + CARD / 2; // bottom-left corner, mirrors the status dot up top
                     return (
                       <g
@@ -957,7 +946,7 @@ export default function LineageMap({
               );
             })}
             {rootCard(breed.x, breed.y)}
-            {packed && infoHover ? (() => {
+            {infoHover ? (() => {
               const c = pickCards.find((x) => x.id === infoHover);
               const text = c ? breedInfo[c.name] : null;
               if (!c || !text) return null;
