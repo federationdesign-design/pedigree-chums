@@ -13,7 +13,7 @@ import styles from "./PackPit.module.css";
 // Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
 // centre-screen celebration with confetti. Labels escalate then hold at the top.
 const MS_STEP = 5000;
-const MS_LABELS = ["Nice!", "Great!", "Red hot!", "On fire!", "Unreal!", "Legendary!", "Untouchable!"];
+const MS_LABELS = ["wag", "woff", "bark", "howl", "are you done?", "maybe enter the site now?"];
 
 const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
