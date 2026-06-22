@@ -5,6 +5,7 @@ import { breeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import LineageMap from "./LineageMap";
+import HowToPlay from "../HowToPlay/HowToPlay";
 import { startCheckout } from "../Offer/startCheckout";
 import styles from "./PackPit.module.css";
 
@@ -25,6 +26,12 @@ export default function PackPit() {
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
+  const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
+  useEffect(() => {
+    const open = () => setHowToPlay(true);
+    window.addEventListener("pc:open-howtoplay", open);
+    return () => window.removeEventListener("pc:open-howtoplay", open);
+  }, []);
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(circles: { x: number; y: number; r: number; share: number; name: string }[]) => void>(() => {});
@@ -266,6 +273,19 @@ export default function PackPit() {
         b.plugin = { name: "Menu", label: "Menu", half: sz / 2, w: sz, h: sz, color: "#ffd23e", kind: "menu", family: null, ping: 0 };
         return b;
       }
+
+      // entersite.svg and howtoplay.svg ride in as draggable panels. A tap on the
+      // first jumps to the about page, a tap on the second opens the how-to-play
+      // strip over the pit the way the family tree opens.
+      const enterPanel = { key: "__entersite", label: "Enter site", src: "/entersite.svg", width: BIG * 3.0, aspect: 86.9 / 45.9, kind: "entersite" };
+      const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
+      function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number) {
+        const bw = cfg.width, bh = cfg.width / cfg.aspect;
+        const x = 80 + Math.random() * (w - 160), y = -280 - Math.random() * 220;
+        const b: any = Bodies.rectangle(x, y, bw, bh, { chamfer: { radius: bh * 0.16 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+        b.plugin = { name: cfg.label, label: cfg.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(cfg.key, cfg.src), prop: "panel", kind: cfg.kind, family: null, ping: 0 };
+        return b;
+      }
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       function dropAll() {
@@ -292,6 +312,8 @@ export default function PackPit() {
             dropTimer = setInterval(() => {
               if (k >= order.length) { clearInterval(dropTimer); return; }
               if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); } // the bowl lands midway through the pour
+              if (k === 5) { Composite.add(engine.world, makePanel(enterPanel, w)); } // enter-site panel after the 5th card
+              if (k === 6) { Composite.add(engine.world, makePanel(howPanel, w)); }   // how-to-play panel just after
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
             }, 70);
@@ -347,6 +369,8 @@ export default function PackPit() {
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
         if (hit.plugin?.kind === "reserve") { window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
+        if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
+        if (hit.plugin?.kind === "howtoplay") { window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         return false;
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
@@ -1038,6 +1062,7 @@ export default function PackPit() {
         </button>
       </div>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
+      <HowToPlay open={howToPlay} onClose={() => setHowToPlay(false)} />
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
           <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
