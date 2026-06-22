@@ -256,6 +256,16 @@ export default function PackPit() {
         b.plugin = { name: label, label, half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind, family: null, ping: 0 };
         return b;
       }
+      // A single hamburger menu also rides in with the pour as an ordinary pit object:
+      // square so the icon sits right, draggable and tumbling like the rest, and a tap
+      // opens the site menu. Separate from the fixed top-right one (no menuFixed flag).
+      function makeMenuObj(w: number) {
+        const sz = BIG * 1.2;
+        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
+        const b: any = Bodies.rectangle(x, y, sz, sz, { chamfer: { radius: sz * 0.3 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
+        b.plugin = { name: "Menu", label: "Menu", half: sz / 2, w: sz, h: sz, color: "#ffd23e", kind: "menu", family: null, ping: 0 };
+        return b;
+      }
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       function dropAll() {
@@ -293,12 +303,14 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1900)); // one hamburger menu rides in with the pack
           dropDogs(2100, false);
         } else {
           // desktop: balls (pre-order after the 1st), then bone, then the discount-code button, then pack with the bowl midway
           dropBalls();
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1400)); // discount code falls later, just before the pack
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1600)); // one hamburger menu rides in with the pack
           dropDogs(2000, true);
         }
       }
@@ -837,7 +849,7 @@ export default function PackPit() {
           if (!other || other.isStatic) continue; // the walls, floor and ceiling do not count
           bb.plugin.objHits = (bb.plugin.objHits || 0) + 1;
           setScore((s) => s + 2);
-          if (bb.plugin.objHits >= 10) detonateBomb(bb);
+          if (bb.plugin.objHits >= 100) detonateBomb(bb);
         }
       };
       Events.on(engine, "collisionStart", onBombHit);
