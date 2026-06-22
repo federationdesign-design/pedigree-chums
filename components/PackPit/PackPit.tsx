@@ -421,6 +421,7 @@ export default function PackPit() {
             Body.setPosition(b, { x: cookiesBody.position.x, y: cookiesBody.position.y });
             Body.setVelocity(b, { x: (Math.random() - 0.5) * 6, y: -9 }); // pops out and up
             Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.4);
+            b.plugin.bornAt = performance.now(); b.plugin.lastOne = 0; // drives the subtle shake, the 1-stream and the 30s respawn
             acceptBody = b;
             Composite.add(engine.world, b);
           }
@@ -428,7 +429,14 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "cookieaccept") {
           window.dispatchEvent(new Event("pc:cookies-accepted"));
-          if (acceptBody) { Composite.remove(engine.world, acceptBody); acceptBody = null; }
+          if (acceptBody) {
+            const ax = acceptBody.position.x, ay = acceptBody.position.y, asz = (acceptBody.plugin.half || 40) * 1.7, bt = performance.now();
+            bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
+            bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
+            poof(ax, ay, acceptBody.plugin.half || 40);
+            numAt(ax, ay, 2000, 40); // the big payoff pops out of the starburst
+            Composite.remove(engine.world, acceptBody); acceptBody = null;
+          }
           return true;
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
@@ -438,7 +446,7 @@ export default function PackPit() {
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number) => { numbers.push({ x, y, val, born: performance.now(), life: 650 }); setScore((s) => s + val); };
+      const numAt = (x: number, y: number, val: number, size = 15, score = true) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size }); if (score) setScore((s) => s + val); };
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
@@ -740,7 +748,7 @@ export default function PackPit() {
           if (t >= 1) { numbers.splice(i, 1); continue; }
           ctx.save(); ctx.globalAlpha = 1 - t;
           ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.font = `400 15px ${pctFont}, system-ui, sans-serif`;
+          ctx.font = `400 ${n.size || 15}px ${pctFont}, system-ui, sans-serif`;
           ctx.fillText(String(n.val), n.x, n.y - 22 - t * 34);
           ctx.restore();
         }
@@ -1116,34 +1124,54 @@ export default function PackPit() {
 
       dropAll();
 
-      // Every 20 seconds the cookie object gives a sharp shudder and kicks every
-      // object currently touching it, so it visibly buzzes its neighbours.
-      // The cookie sits quiet for 10s, then a faint tremor builds over ~20s into an
-      // erratic shake, climaxing in a buzz that nudges its neighbours and drops all
-      // its energy, before the whole cycle slowly repeats.
-      const CALM = 10000, BUILD = 20000;
+      // The cookie behaves like a kettle. It sits quiet, then a tremor rises to a
+      // steady simmer by ~15s and just holds there (no runaway bouncing off the
+      // sides), until one intense burst at ~30s flings its neighbours and it settles
+      // still again. Alongside it, the Accept button trembles faintly, leaks a
+      // steady stream of 1s, and spits another cookie policy out if ignored for 30s.
+      const CALM = 10000, RISE = 5000, SIMMER = 15000;
       let cycleStart = performance.now();
       buzzTimer = setInterval(() => {
-        if (disposed || !cookiesBody || !cookiesBody.position) return;
-        const elapsed = performance.now() - cycleStart;
-        if (elapsed < CALM) return; // 10s of stillness
-        const p = Math.min(1, (elapsed - CALM) / BUILD); // 0 (mute) -> 1 (erratic)
-        const e = p * p; // eased so it stays subtle for a while then ramps up
-        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.0008 + e * 0.006), y: (Math.random() - 0.5) * (0.0008 + e * 0.005) });
-        Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.02 + e * 0.45));
-        if (elapsed >= CALM + BUILD) {
+        if (disposed) return;
+        const now = performance.now();
+
+        if (acceptBody && acceptBody.position) {
+          Body.applyForce(acceptBody, acceptBody.position, { x: (Math.random() - 0.5) * 0.0006, y: (Math.random() - 0.5) * 0.0005 }); // very subtle tremble
+          if (now - (acceptBody.plugin.lastOne || 0) > 320) {
+            acceptBody.plugin.lastOne = now;
+            numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), 1, 13, false); // streaming 1s, non-scoring lure
+          }
+          if (now - (acceptBody.plugin.bornAt || now) > 30000) {
+            acceptBody.plugin.bornAt = now; // and it nags again after another 30s
+            const nc = makeCookies(stage.clientWidth);
+            Body.setPosition(nc, { x: acceptBody.position.x, y: acceptBody.position.y });
+            Body.setVelocity(nc, { x: (Math.random() - 0.5) * 7, y: -10 }); // skips up out of the button
+            Body.setAngularVelocity(nc, (Math.random() - 0.5) * 0.5);
+            poof(acceptBody.position.x, acceptBody.position.y, acceptBody.plugin.half || 30);
+            Composite.add(engine.world, nc);
+          }
+        }
+
+        if (!cookiesBody || !cookiesBody.position) return;
+        const elapsed = now - cycleStart;
+        if (elapsed < CALM) return; // quiet start
+        const t = elapsed - CALM;
+        const level = Math.min(1, t / RISE); // rises to the simmer, then holds at 1
+        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.0006 + level * 0.0014), y: (Math.random() - 0.5) * (0.0006 + level * 0.0012) });
+        Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.02 + level * 0.1));
+        if (t >= RISE + SIMMER) { // the one intense burst, then it settles over the calm
+          Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 5, y: -4 });
+          Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 1.2);
           const others = dyn().filter((b: any) => b !== cookiesBody);
           for (const col of Query.collides(cookiesBody, others)) {
             const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
             if (!other || other.isStatic) continue;
             let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
             const len = Math.hypot(dx, dy) || 1;
-            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 2.2, y: other.velocity.y + (dy / len) * 2.2 - 1 }); // gentler than before
-            Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.3);
+            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 2.6, y: other.velocity.y + (dy / len) * 2.6 - 1 });
+            Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.4);
           }
-          Body.setVelocity(cookiesBody, { x: 0, y: cookiesBody.velocity.y }); // loses all energy
-          Body.setAngularVelocity(cookiesBody, 0);
-          cycleStart = performance.now(); // and slowly starts over
+          cycleStart = now; // back to quiet
         }
       }, 50);
 

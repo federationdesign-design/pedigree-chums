@@ -33,11 +33,13 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "British Pointers",
         note: "Crossed in by British breeders for nose and a steady, focused drive in the field.",
+        img: "/history/breeds/pointer-photo.jpg",
         value: 17
       },
       {
         name: "British Setters",
         note: "Added biddability and a love of working close with people on the shoot.",
+        img: "/history/breeds/english_setter-photo.jpg",
         value: 15
       },
       {
