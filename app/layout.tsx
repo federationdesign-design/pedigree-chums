@@ -40,7 +40,7 @@ const SITE_URL =
 
 const TITLE = "Pedigree Chums | The Dog Bingo Game";
 const DESCRIPTION =
-  "The ultimate on-the-go dog spotting game. 54 hand-illustrated breed cards. Fun, educational and addictive, perfect for families, tourists and dog lovers.";
+  "The ultimate on-the-go dog spotting game. 54 uniquely-illustrated breed cards. Fun, educational and addictive, perfect for families, tourists and dog lovers.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
