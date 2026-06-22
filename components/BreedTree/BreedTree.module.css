@@ -167,6 +167,10 @@
     order: -1; /* writeup and breadcrumb sit above the circles */
     padding: 0 2px;
     z-index: 1;
+    gap: 18px; /* more space between the breadcrumbs and the breed info card */
+  }
+  .crumbs {
+    padding-right: 44px; /* keep the trail clear of the close button in the corner */
   }
   .stage {
     position: relative;

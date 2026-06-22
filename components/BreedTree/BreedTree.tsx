@@ -468,7 +468,7 @@ export default function BreedTree({
                       x={0}
                       y={TITLE_DY}
                       transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
-                      style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: "17px", letterSpacing: "0.5px" }}
+                      style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: isMobile ? "51px" : "17px", letterSpacing: "0.5px" }}
                     >
                       {d.data.name.toUpperCase()}
                     </text>
