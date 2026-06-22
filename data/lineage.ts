@@ -1114,7 +1114,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "German Shepherd",
     note: "Standardised from Germany's regional sheep herding dogs into one clever, hard working breed in the 1890s.",
     children: [
-      { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", value: 45 },
+      { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", img: "/history/breeds/Thuringian-herding-dogs.jpg", value: 45 },
       { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head.", img: "/history/breeds/Wurttemberg-sheepdogs.jpg", value: 40 },
       { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 15 }
     ]
