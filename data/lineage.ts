@@ -677,7 +677,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Northern Inuit Dog",
     note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
     children: [
-      { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.",  value: 55 },
+      { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.", img: "/history/breeds/Arctic-sled-dogs.jpg", value: 55 },
       { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  value: 45 }
     ]
   },
@@ -749,7 +749,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cardigan Welsh Corgi",
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
-      { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.",  value: 55 },
+      { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
@@ -841,7 +841,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Turnspit Dog",
     note: "An extinct, short-legged kitchen dog bred to trot inside a wheel and turn the roasting spit over the fire.",
     children: [
-      { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it.",  value: 60 },
+      { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it.", img: "/history/breeds/Old-short-legged-working-dogs.jpg", value: 60 },
       { name: "Farm and kitchen curs", note: "The everyday kitchen curs and household mongrels it was bred down from.", img: "/history/breeds/Farm-and-kitchen-curs.jpg", value: 40 }
     ]
   },
@@ -1008,7 +1008,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An ancient sighthound from the mountains of Afghanistan, coated long against the cold, one of the oldest coursing lines there is.",
     children: [
       { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old Silk Road, its deepest root.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 65 },
-      { name: "Mountain coursing hounds", note: "The high altitude hunting dogs that gave it the heavy coat and big feet for rough ground.", value: 35 }
+      { name: "Mountain coursing hounds", note: "The high altitude hunting dogs that gave it the heavy coat and big feet for rough ground.", img: "/history/breeds/Mountain-coursing-hounds.jpg", value: 35 }
     ]
   },
   "Weimaraner": {
@@ -1024,7 +1024,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dalmatian",
     note: "The spotted coach dog, named for Dalmatia on the Adriatic coast, bred to trot for miles beside a carriage.",
     children: [
-      { name: "Ancient spotted hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.", value: 55 },
+      { name: "Ancient spotted hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
       { name: "Pointer", note: "Pointing and hound blood that shaped its build and steady working head.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
       { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for.", img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg", value: 15 }
     ]
@@ -1065,7 +1065,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Siberian Husky",
     note: "The sled dog of the Chukchi people of north east Siberia, bred to pull light loads vast distances in brutal cold.",
     children: [
-      { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them.", value: 75 },
+      { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them.", img: "/history/breeds/Chukchi-sled-dogs.jpg", value: 75 },
       { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat.", value: 25 }
     ]
   },
@@ -1090,8 +1090,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pomeranian",
     note: "A spitz shrunk to a toy in the Pomerania region, descended from big Arctic sled and herding dogs.",
     children: [
-      { name: "Arctic sled spitz", note: "The large Nordic sled, hunting and herding spitz of Iceland and Lapland, the breed's deep northern root.", value: 55 },
-      { name: "German farm spitz", note: "The Wolfspitz and mid-size German Spitz guard strains of the Pomerania region it was bred straight down from.", value: 45 }
+      { name: "Arctic sled spitz", note: "The large Nordic sled, hunting and herding spitz of Iceland and Lapland, the breed's deep northern root.", img: "/history/breeds/Large-German-Spitz.jpg", value: 55 },
+      { name: "German farm spitz", note: "The Wolfspitz and mid-size German Spitz guard strains of the Pomerania region it was bred straight down from.", img: "/history/breeds/Continental-European-farm-watch-spitz.jpg", value: 45 }
     ]
   },
   "French Bulldog": {

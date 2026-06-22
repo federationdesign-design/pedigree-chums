@@ -226,16 +226,6 @@ export default function PackPit() {
         b.plugin = { name: label, label, half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind, family: null, ping: 0 };
         return b;
       }
-      // The menu is a pit object too: a yellow rounded square with three bars that
-      // can be flung around, and a tap opens the site menu.
-      function makeMenuBtn(w: number) {
-        const sz = BIG * 1.2; // 20% smaller than before; the navy stroke stays at 5px
-        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
-        const b: any = Bodies.rectangle(x, y, sz, sz, { chamfer: { radius: sz * 0.3 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
-        b.plugin = { name: "Menu", label: "Menu", half: sz / 2, w: sz, h: sz, color: "#ffd23e", kind: "menu", family: null, ping: 0 };
-        return b;
-      }
-      let lastMenuCheck = 0, lastMenuSpawn = 0; // respawn the menu if it is ever flung off-screen
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       function dropAll() {
@@ -250,7 +240,6 @@ export default function PackPit() {
           BALLS.forEach((bp, i) => {
             Composite.add(engine.world, makeProp(bp, w));
             if (i === 0) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // pre-order falls after the 1st ball
-            if (i === BALLS.length - 1) Composite.add(engine.world, makeMenuBtn(w)); // the menu falls in with the tennis balls
           });
         };
         // Drop the pack in, optionally landing the bowl midway through.
@@ -262,7 +251,7 @@ export default function PackPit() {
             if (disposed) return;
             dropTimer = setInterval(() => {
               if (k >= order.length) { clearInterval(dropTimer); return; }
-              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuBtn(w)); } // a second menu rides in with the bowl
+              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); } // the bowl lands midway through the pour
               Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
               k++;
             }, 70);
@@ -271,7 +260,6 @@ export default function PackPit() {
         if (isMobile) {
           // mobile: bowl, then balls (pre-order after the 1st), then bone, then the discount-code button, then pack
           addProps([bowl]);
-          Composite.add(engine.world, makeMenuBtn(w)); // a second menu rides in with the bowl
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
@@ -562,15 +550,25 @@ export default function PackPit() {
       }
       // a quick pink starburst, fired only when a circle is pressed while still active
       const bursts: any[] = [];
-      const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420 });
+      const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
+      // An explosion is three starbursts at once, red then yellow then white, each
+      // turned 11 degrees further than the last, so a detonation reads far harder
+      // than a single press. Strength scales with the circle's percentage figure.
+      const explodeAt = (x: number, y: number, s: number) => {
+        const born = performance.now();
+        bursts.push({ x, y, s, born, life: 520, colour: "#ff2d2d", rot: 0 });
+        bursts.push({ x, y, s, born, life: 520, colour: "#ffd23e", rot: 11 });
+        bursts.push({ x, y, s, born, life: 520, colour: "#ffffff", rot: 22 });
+      };
+      const blastSize = (b: any) => (b.plugin?.half || 21) * (1 + (b.plugin?.share || 0) / 25); // a bigger % figure = a bigger boom
       function drawBursts(ctx: any, now: number) {
         for (let i = bursts.length - 1; i >= 0; i--) {
           const bu = bursts[i], t = (now - bu.born) / bu.life;
           if (t >= 1) { bursts.splice(i, 1); continue; }
           const reach = bu.s * (0.35 + t * 0.85), inner = bu.s * (0.12 + t * 0.4);
           ctx.save(); ctx.globalAlpha = (1 - t); ctx.translate(bu.x, bu.y);
-          ctx.rotate(t * 5 * Math.PI / 180); // rotate 5 degrees over the pop
-          ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 2.4; ctx.lineCap = "round";
+          ctx.rotate((t * 5 + (bu.rot || 0)) * Math.PI / 180); // rotate over the pop, plus this layer's fixed offset
+          ctx.strokeStyle = bu.colour || "#ff2d78"; ctx.lineWidth = 2.4; ctx.lineCap = "round";
           for (let k = 0; k < 12; k++) {
             const a = (k / 12) * Math.PI * 2;
             ctx.beginPath();
@@ -578,7 +576,7 @@ export default function PackPit() {
             ctx.lineTo(Math.cos(a) * reach, Math.sin(a) * reach);
             ctx.stroke();
           }
-          ctx.fillStyle = "#ff2d78";
+          ctx.fillStyle = bu.colour || "#ff2d78";
           for (let k = 0; k < 5; k++) {
             const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 3 * (1 - t) + 1.5;
             ctx.beginPath();
@@ -766,9 +764,11 @@ export default function PackPit() {
       // going inert: every other % circle (yellow or inert blue) bursts out of the
       // pit in a chain, nearest first, one after the next rather than all at once.
       const detonateBomb = (bomb: any) => {
+        if (bomb.plugin.popped) return; // a user hit and an object hit could both land on the fifth/tenth
         bomb.plugin.popped = true;
-        burstAt(bomb.position.x, bomb.position.y, (bomb.plugin.half || 21) * 1.8);
-        poof(bomb.position.x, bomb.position.y, bomb.plugin.half || 21);
+        explodeAt(bomb.position.x, bomb.position.y, blastSize(bomb) * 1.9);
+        poof(bomb.position.x, bomb.position.y, (bomb.plugin.half || 21) * 1.3);
+        numAt(bomb.position.x, bomb.position.y, 250); // the blast itself is worth 250
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
         Composite.remove(engine.world, bomb);
         const targets = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
@@ -779,8 +779,9 @@ export default function PackPit() {
           o.plugin.popped = true; // claim it now so it cannot be hit or double-popped mid-chain
           window.setTimeout(() => {
             if (disposed) return;
-            burstAt(o.position.x, o.position.y, (o.plugin.half || 21) * 1.33);
+            explodeAt(o.position.x, o.position.y, blastSize(o));
             poof(o.position.x, o.position.y, o.plugin.half || 21);
+            numAt(o.position.x, o.position.y, o.plugin.share || 0); // each popped circle scores its own %
             if (mc.body === o) { mc.constraint.bodyB = null; mc.body = null; }
             Composite.remove(engine.world, o);
           }, 70 * (i + 1));
@@ -791,8 +792,23 @@ export default function PackPit() {
         bomb.plugin.hits = (bomb.plugin.hits || 0) + 1;
         bomb.plugin.jump = performance.now();
         burstAt(bomb.position.x, bomb.position.y, (bomb.plugin.half || 21) * 1.1);
+        numAt(bomb.position.x, bomb.position.y, 10); // +10 for each user hit on the bomb
         if (bomb.plugin.hits >= 5) detonateBomb(bomb);
       };
+      // A bomb also takes knocks from the pit itself: ten hits from other objects
+      // and it goes off on its own, scoring 2 for each of those knocks.
+      const onBombHit = (ev: any) => {
+        for (const pair of ev.pairs) {
+          const bb = pair.bodyA.plugin?.bomb ? pair.bodyA : pair.bodyB.plugin?.bomb ? pair.bodyB : null;
+          if (!bb || bb.plugin.popped) continue;
+          const other = bb === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!other || other.isStatic) continue; // the walls, floor and ceiling do not count
+          bb.plugin.objHits = (bb.plugin.objHits || 0) + 1;
+          setScore((s) => s + 2);
+          if (bb.plugin.objHits >= 10) detonateBomb(bb);
+        }
+      };
+      Events.on(engine, "collisionStart", onBombHit);
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) return;
@@ -829,17 +845,6 @@ export default function PackPit() {
               const mag = f * REPEL * (1 - d / R) * o.mass;
               Body.applyForce(o, o.position, { x: (dx / d) * mag, y: (dy / d) * mag });
             }
-          }
-        }
-        // drop a fresh menu if every menu body has been flung off-screen (e.g. by a shake)
-        if (now - lastMenuCheck > 1000) {
-          lastMenuCheck = now;
-          const W = stage.clientWidth, H = stage.clientHeight;
-          const menus = all.filter((b: any) => b.plugin?.kind === "menu");
-          const onScreen = menus.some((b: any) => b.position.x > -40 && b.position.x < W + 40 && b.position.y > -40 && b.position.y < H + 40);
-          if (menus.length > 0 && menus.length < 6 && !onScreen && now - lastMenuSpawn > 2500) {
-            lastMenuSpawn = now;
-            Composite.add(engine.world, makeMenuBtn(W));
           }
         }
       });
