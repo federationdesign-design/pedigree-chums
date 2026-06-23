@@ -482,6 +482,9 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal; // every dropped frame filled
+  // the main square card peels off once the grid is settled, whether by filling every frame
+  // or by hitting Collect (which packs early, leaving framesDone false but the grid laid out)
+  const canDragRoot = (framesDone || packed) && !collecting;
   const collectShowing = allBlue && !packed && !collecting && !framesDone; // the blue Collect button is on screen
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
@@ -631,12 +634,12 @@ export default function LineageMap({
     return (
     <>
       <g
-        className={framesDone ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
+        className={canDragRoot ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => {
-          if (collecting || !framesDone) return; // pinned to the tree until every frame is filled
+          if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
           try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
           rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: rx, oy: ry, moved: false };
