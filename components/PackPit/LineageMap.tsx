@@ -668,14 +668,7 @@ export default function LineageMap({
             preserveAspectRatio="xMidYMid slice"
           />
         ) : null}
-        {rootStatus && (() => {
-          const ts = TAG_STYLE[rootStatus];
-          return (
-            <circle cx={-ROOT} cy={-ROOT} r={12} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
-              <title>{ts.label}</title>
-            </circle>
-          );
-        })()}
+        {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
@@ -1055,12 +1048,12 @@ export default function LineageMap({
                     );
                   })()}
                   {packed && (() => {
-                    const pw = 66, ph = 32, py = c.cardY + CW / 2 - ph / 2 - 6; // pill near the foot of the card
+                    const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 6; // pill near the foot of the card (25% smaller)
                     const pillRight = c.cardX + CW / 2 + 6; // right-aligned to the card, nudged just past the edge
                     return (
                       <>
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
-                        <text className={styles.mixText} textAnchor="end" x={pillRight - 12} y={py + ph / 2 + 1} dominantBaseline="central">
+                        <text className={styles.mixText} textAnchor="end" x={pillRight - 9} y={py + ph / 2 + 1} dominantBaseline="central">
                           {c.mix < 1 ? "<1%" : `${c.mix}%`}
                         </text>
                       </>

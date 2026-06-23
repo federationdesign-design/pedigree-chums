@@ -212,7 +212,7 @@
 .mixText {
   fill: #ffffff;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 20px;
+  font-size: 15px;
   pointer-events: none;
 }
 .chumPop {
