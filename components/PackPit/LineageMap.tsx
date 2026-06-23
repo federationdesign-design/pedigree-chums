@@ -947,6 +947,25 @@ export default function LineageMap({
                     : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) scale(${packScale}) translate(${-c.cardX},${-c.cardY})`}
                   style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" } : undefined}
                   onClick={(e) => e.stopPropagation()}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    if (packed || placedSet.has(c.id)) return; // already framed, or in pack mode
+                    const empty = frames.find((f) => f.img === c.img && !filled.has(f.id));
+                    const target = empty || frames.find((f) => f.img === c.img && filled.get(f.id) !== c.id);
+                    if (!target) return; // no matching frame for this dog
+                    if (empty) {
+                      setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+                      setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+                      setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
+                    } else {
+                      setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
+                      setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+                    }
+                    flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 5, FLASH_SIZE); // +5 for the double-click shortcut (drag is worth more)
+                    const pid = puffSeq.current++;
+                    setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
+                    window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+                  }}
                   onPointerDown={(e) => {
                     e.stopPropagation();
                     if (placedSet.has(c.id)) { if (isMobile) startGridDrag(e); return; } // framed: fixed, not draggable; drives the grid scroll on mobile
