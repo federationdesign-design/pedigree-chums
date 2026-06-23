@@ -801,7 +801,7 @@ export default function PackPit() {
       // ---- fuse fizz: sparks that catch and build as a bomb's five-second fuse burns down ----
       const fuseSparks: any[] = [];
       const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
-      const FUSE_LIGHT_AT = 2; // a bomb's fuse lights once it has taken this many hits, then intensifies with each further hit
+      const FUSE_LIGHT_AT = 1; // a bomb's fuse lights from the first hit, then intensifies with each further hit
       const emitFuseSparks = (x: number, y: number, intensity: number) => {
         const n = 1 + Math.floor(intensity * 4); // more sparks the closer it is to going off
         for (let i = 0; i < n; i++) {
@@ -926,14 +926,21 @@ export default function PackPit() {
             hitBomb(pressedBomb); // one hit per second; the fifth detonates
             if (typeof navigator !== "undefined" && navigator.vibrate && pressedBomb && !pressedBomb.plugin.popped) navigator.vibrate(14 + (pressedBomb.plugin.heldHits || 0) * 12); // a rattle in the hand that grows as the fuse burns down
           }
-          // the fuse lights once a bomb has taken a couple of hits, then fizzes brighter
-          // and more frantic with every hit after that, right up to the fifth and detonation
+          // the fuse lights from the very first hit and fizzes brighter and more frantic
+          // with every hit after that, sparking from the wick at the top-right of the bomb
           for (const fb of bodies) {
             if (!fb.plugin?.bomb || fb.plugin.popped) continue;
             const fhits = fb.plugin.hits || 0;
             if (fhits < FUSE_LIGHT_AT) continue;
             const fInt = Math.min(1, (fhits - FUSE_LIGHT_AT + 1) / (5 - FUSE_LIGHT_AT + 1));
-            emitFuseSparks(fb.position.x, fb.position.y - (fb.plugin.half || 21) * 0.6, fInt);
+            const frr = fb.plugin.half || 21, fbi = fb.plugin.bombImg;
+            let fox = frr * 0.85, foy = -frr * 1.0; // fallback wick spot if the sprite has not loaded
+            if (fbi && fbi.naturalWidth) {
+              const far = fbi.naturalWidth / fbi.naturalHeight, fbox = frr * 2.4;
+              const fbw = far >= 1 ? fbox : fbox * far, fbh = far >= 1 ? fbox / far : fbox;
+              fox = fbw * 0.34; foy = -fbh * 0.4; // the wick tip at the top-right of the sprite
+            }
+            emitFuseSparks(fb.position.x + fox, fb.position.y + foy, fInt);
           }
         }
         // advance any pop-out removals (a card hidden via the lineage remove button
