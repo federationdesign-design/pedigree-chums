@@ -35,14 +35,25 @@ export default function PackPit() {
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
   const msLast = useRef(0); // highest milestone already celebrated
   const msTimer = useRef<number | null>(null);
+  const pendingMs = useRef<{ value: number; label: string } | null>(null); // a milestone crossed while the card overlay is open, held until it closes
   useEffect(() => {
     const reached = Math.floor(score / MS_STEP) * MS_STEP; // highest 5k mark at or below the score
     if (reached >= MS_STEP && reached > msLast.current) {
       msLast.current = reached;
       const label = MS_LABELS[Math.min(reached / MS_STEP - 1, MS_LABELS.length - 1)];
-      setMilestone({ value: reached, label, id: performance.now() });
+      if (activeBreed) {
+        pendingMs.current = { value: reached, label }; // hold it: the card is up, don't cover it (keep the highest)
+      } else {
+        setMilestone({ value: reached, label, id: performance.now() });
+      }
     }
-  }, [score]);
+  }, [score, activeBreed]);
+  useEffect(() => {
+    if (activeBreed || !pendingMs.current) return; // the card just closed and a milestone is waiting
+    const held = pendingMs.current;
+    pendingMs.current = null;
+    setMilestone({ value: held.value, label: held.label, id: performance.now() });
+  }, [activeBreed]);
   useEffect(() => {
     if (!milestone) return;
     if (msTimer.current) window.clearTimeout(msTimer.current);
