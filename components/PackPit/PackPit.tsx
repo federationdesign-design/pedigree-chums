@@ -280,7 +280,8 @@ export default function PackPit() {
       // The reserve / pre-order "buttons" are pit objects: small yellow rounded
       // boxes the visitor can fling around, and a tap fires the relevant action.
       function makeButton(kind: string, label: string, w: number) {
-        const rw = BIG * 2.6, rh = BIG * 1.0;
+        const grow = kind === "cookieaccept" ? 1.33 : 1; // the Accept button is 33% larger than the rest
+        const rw = BIG * 2.6 * grow, rh = BIG * 1.0 * grow;
         const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
         const b: any = Bodies.rectangle(x, y, rw, rh, { chamfer: { radius: rh * 0.34 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
         const tone = kind === "cookieaccept" ? "#4ade80" : kind === "cookiereject" ? "#d64545" : "#ffd23e"; // green accept, red reject, matching the breed tags
@@ -388,6 +389,7 @@ export default function PackPit() {
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
       mc.collisionFilter.mask = 0xffffffff & ~0x0002; // category 0x0002 (inert circles) cannot be grabbed
+      let pressedBomb: any = null; // the bomb currently being pressed/held, for the click-vs-hold fuse
       Composite.add(engine.world, mc);
       render.mouse = mouse;
       // matter binds the wheel to the canvas and cancels it, which eats page
@@ -430,6 +432,13 @@ export default function PackPit() {
           hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
           if (!acceptBody && cookiesBody) { // squeeze an Accept and a Reject button out of the cookie
             const cx = cookiesBody.position.x, cy = cookiesBody.position.y, now0 = performance.now();
+            // Reject is added first so the Accept button, added last, renders in front of it
+            const rb: any = makeButton("cookiereject", "Reject", stage.clientWidth);
+            Body.setPosition(rb, { x: cx, y: cy });
+            Body.setVelocity(rb, { x: 2 + Math.random() * 4, y: -9 }); // pops up and to the right
+            Body.setAngularVelocity(rb, (Math.random() - 0.5) * 0.4);
+            rejectBody = rb;
+            Composite.add(engine.world, rb);
             const ab: any = makeButton("cookieaccept", "Accept", stage.clientWidth);
             Body.setPosition(ab, { x: cx, y: cy });
             Body.setVelocity(ab, { x: -2 - Math.random() * 4, y: -9 }); // pops up and to the left
@@ -437,12 +446,6 @@ export default function PackPit() {
             ab.plugin.bornAt = now0; ab.plugin.lastOne = 0; // drives the subtle shake, the 1-stream and the 90s respawn
             acceptBody = ab;
             Composite.add(engine.world, ab);
-            const rb: any = makeButton("cookiereject", "Reject", stage.clientWidth);
-            Body.setPosition(rb, { x: cx, y: cy });
-            Body.setVelocity(rb, { x: 2 + Math.random() * 4, y: -9 }); // pops up and to the right
-            Body.setAngularVelocity(rb, (Math.random() - 0.5) * 0.4);
-            rejectBody = rb;
-            Composite.add(engine.world, rb);
           }
           return true;
         }
@@ -836,6 +839,15 @@ export default function PackPit() {
       Events.on(engine, "collisionStart", onWhack);
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
+        // holding the bomb burns its five-hit fuse: one hit per whole second held, the fifth detonates
+        if (pressedBomb && pressedBomb.plugin?.bomb && !pressedBomb.plugin.popped && pressedBomb.plugin.heldSince) {
+          const sec = Math.floor((now - pressedBomb.plugin.heldSince) / 1000);
+          while ((pressedBomb.plugin.heldHits || 0) < sec && pressedBomb && !pressedBomb.plugin.popped) {
+            pressedBomb.plugin.clickPending = false; // a sustained hold, not a quick click
+            pressedBomb.plugin.heldHits = (pressedBomb.plugin.heldHits || 0) + 1;
+            hitBomb(pressedBomb); // one hit per second; the fifth detonates
+          }
+        }
         // advance any pop-out removals (a card hidden via the lineage remove button
         // briefly swells then shrinks to nothing, then leaves the world)
         const popped: any[] = [];
@@ -978,6 +990,10 @@ export default function PackPit() {
       };
       const releaseHeldPct = () => {
         for (const b of Composite.allBodies(engine.world)) if (b.plugin?.repelOn) releasePct(b);
+        // a bomb released under a second after pressing counts as a single click hit
+        if (pressedBomb && !pressedBomb.plugin.popped && pressedBomb.plugin.clickPending) hitBomb(pressedBomb);
+        if (pressedBomb) { pressedBomb.plugin.heldSince = 0; pressedBomb.plugin.heldHits = 0; pressedBomb.plugin.clickPending = false; }
+        pressedBomb = null;
       };
       // A bomb takes five hits like a % circle, but the fifth detonates instead of
       // going inert: every other % circle (yellow or inert blue) bursts out of the
@@ -990,6 +1006,7 @@ export default function PackPit() {
         greyPop(bomb.position.x, bomb.position.y); // three grey debris balls
         numAt(bomb.position.x, bomb.position.y, 250); // the blast itself is worth 250
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
+        if (pressedBomb === bomb) pressedBomb = null;
         Composite.remove(engine.world, bomb);
         // Only circles caught in a contact chain from the bomb go up with it: those
         // touching the bomb, then those touching them, and so on. Anything cut off by
@@ -1026,8 +1043,8 @@ export default function PackPit() {
         numAt(bomb.position.x, bomb.position.y, 10); // +10 for each user hit on the bomb
         if (bomb.plugin.hits >= 5) detonateBomb(bomb);
       };
-      // A bomb also takes knocks from the pit itself: ten hits from other objects
-      // and it goes off on its own, scoring 2 for each of those knocks.
+      // A bomb also takes knocks from the pit itself, but each object knock is worth
+      // far less than a user hit: fifty knocks set it off on its own, scoring 2 each.
       const onBombHit = (ev: any) => {
         for (const pair of ev.pairs) {
           const bb = pair.bodyA.plugin?.bomb ? pair.bodyA : pair.bodyB.plugin?.bomb ? pair.bodyB : null;
@@ -1036,7 +1053,7 @@ export default function PackPit() {
           if (!other || other.isStatic) continue; // the walls, floor and ceiling do not count
           bb.plugin.objHits = (bb.plugin.objHits || 0) + 1;
           setScore((s) => s + 2);
-          if (bb.plugin.objHits >= 100) detonateBomb(bb);
+          if (bb.plugin.objHits >= 50) detonateBomb(bb);
         }
       };
       Events.on(engine, "collisionStart", onBombHit);
@@ -1079,7 +1096,15 @@ export default function PackPit() {
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) return;
-        if (hit.plugin.bomb) { hitBomb(hit); return; }
+        if (hit.plugin.bomb) {
+          // a press arms the fuse: a quick release lands as one click hit, a sustained
+          // hold ticks one hit per whole second (handled in the render loop / on release)
+          pressedBomb = hit;
+          hit.plugin.heldSince = performance.now();
+          hit.plugin.heldHits = 0;
+          hit.plugin.clickPending = true;
+          return;
+        }
         hit.plugin.repelOn = true;
         hit.plugin.repelStart = performance.now();
         hit.plugin.jump = performance.now();           // electrocuted jolt (render-side)
