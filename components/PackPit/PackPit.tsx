@@ -593,10 +593,15 @@ export default function PackPit() {
             const hh = b.plugin.hits || 0;
             const held = b.plugin.heldSince && !b.plugin.popped ? Math.min(1, (now2 - b.plugin.heldSince) / 5000) : 0;
             const inten = Math.max(hh, held * 5); // a held bomb ramps smoothly 0..5 over its five-second fuse; clicks step it by whole hits
-            if (inten > 0) { // it rattles harder the longer it is held, furious by the fifth second
+            if (inten > 0 && !b.plugin.bursting) { // it rattles harder the longer it is held, furious by the fifth second
               const amp = 0.06 * inten, sp = Math.max(6, 28 - inten * 5);
               ctx.rotate(Math.sin(now2 / sp) * amp);
               ctx.translate(Math.sin(now2 / (sp * 0.6)) * inten * 0.95, 0);
+            }
+            if (b.plugin.bursting) {
+              const bt = (now2 - b.plugin.bursting) / 180; // quick squash then ~20% overshoot, then detonateBomb removes it
+              const bsc = bt < 0.35 ? 1 - 0.1 * (bt / 0.35) : 0.9 + 0.3 * Math.min(1, (bt - 0.35) / 0.65);
+              ctx.scale(bsc, bsc);
             }
             const bi = b.plugin.bombImg;
             if (bi && bi.complete && bi.naturalWidth) {
@@ -772,7 +777,7 @@ export default function PackPit() {
       const _bolt2 = new Image(); _bolt2.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIzNzQuOTIgMTQ2MS4xMCAxMjY1LjM0IDE3NDUuODUiPgo8cGF0aCBmaWxsPSIjMjExODE2IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0gMzQ5MS42NywxNTc2Ljc1IEwgMzE0My44OCwyMDkyLjQ2IEwgMzE4NC44OCwyMTQ1LjAxIEwgMzMyOC4yMiwyMDkzLjA3IEwgMjU2MC4wNSwyOTM5LjQ3IEwgMjgwNy44MSwyMzIzLjc3IEwgMjc2Ny41OCwyMjgxLjAyIEwgMjY0MC4yNSwyMzIzLjUyIEwgMjY0MC4yMywyMzIzLjUzIEwgMjk2My4xOSwxNjkwLjAxIEwgMjk2My4yMCwxNjg5Ljk4IEwgMjk2My40MSwxNjg5Ljk0IEwgMzQ5MS42OCwxNTc2LjczIFogTSAzMDQ1LjY2LDIxNTUuOTMgTCAzMzg5LjkxLDE2NDUuNDcgTCAyOTk0LjI5LDE3MzAuMjUgTCAyNzMyLjEwLDIyNDQuNjAgTCAyODE5LjMzLDIyMTUuNDUgTCAyOTEzLjQ1LDIxODQuMDIgTCAyODc2LjQ0LDIyNzUuOTggTCAyNjk4LjIyLDI3MTguOTEgTCAzMTY5Ljk5LDIxOTkuMTQgTCAzMDk5LjM2LDIyMjQuNzQgTCAyOTY2Ljg5LDIyNzIuNzcgWiAiLz4KPHBhdGggZmlsbD0iI2ZmZmZmZiIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNIDMwNDUuNjYsMjE1NS45MyBMIDMzODkuOTEsMTY0NS40NyBMIDI5OTQuMjksMTczMC4yNSBMIDI3MzIuMTAsMjI0NC42MCBMIDI4MTkuMzMsMjIxNS40NSBMIDI5MTMuNDUsMjE4NC4wMiBMIDI4NzYuNDQsMjI3NS45OCBMIDI2OTguMjIsMjcxOC45MSBMIDMxNjkuOTksMjE5OS4xNCBMIDMwOTkuMzYsMjIyNC43NCBMIDI5NjYuODksMjI3Mi43NyBaICIvPgo8cGF0aCBmaWxsPSIjZjJlMDE1IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0gMzMxOS40NDE0MDYgMTY2MC41ODk4NDQgTCAyOTE4Ljk0MTQwNiAyMjkwLjEyODkwNiBMIDI5NjYuODkwNjI1IDIyNzIuNzY5NTMxIEwgMzA1OC44Mzk4NDQgMjIzOS40NDkyMTkgTCAzMDk5LjM1OTM3NSAyMjI0LjczODI4MSBMIDMxMjUuMjEwOTM4IDIyMTUuMzcxMDk0IEwgMjcxOS4xMjg5MDYgMjY2Ni45ODgyODEgTCAyODc2LjQ0MTQwNiAyMjc1Ljk4MDQ2OSBMIDI5MTMuNDQ5MjE5IDIxODQuMDE5NTMxIEwgMjgxOS4zMjgxMjUgMjIxNS40NDkyMTkgTCAyNzMyLjEwMTU2MiAyMjQ0LjYwMTU2MiBMIDI5OTQuMjg5MDYyIDE3MzAuMjUgTCAzMzE5LjQ0MTQwNiAxNjYwLjU4OTg0NCAiLz4KPC9zdmc+";
       const boltImgs = [_bolt1, _bolt2];
       const boltAR = [0.6356, 0.7248];
-      const boomWords = ["BOOM!", "POW!", "BANG!", "KAPOW!"];
+      const boomWords = ["EXTINCT", "DONE", "POOF", "GONE"];
       const rndb = (a: number, b: number) => a + Math.random() * (b - a);
       const eob = (t: number) => 1 - Math.pow(1 - t, 3);
       const clampb = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
@@ -793,6 +798,28 @@ export default function PackPit() {
       const makeCfB = () => { const a: any[] = []; for (let i = 0; i < 12; i++) { const type = Math.random() < 0.55 ? "star" : "bolt"; a.push({ type, ang: rndb(0, TAUb), sp: rndb(1.4, 2.7), rot: rndb(0, TAUb), spin: rndb(-7, 7), col: Math.random() < 0.5 ? "#e23a0e" : "#ffd23e", sz: type === "bolt" ? rndb(0.22, 0.42) : rndb(0.1, 0.2), delay: rndb(0, 0.14), bolt: Math.floor(Math.random() * 2) }); } return a; };
       const makeSmB = () => { const a: any[] = []; for (let i = 0; i < 6; i++) { a.push({ ang: rndb(0, TAUb), sp: rndb(0.5, 1.3), r: rndb(0.32, 0.55), g: Math.floor(rndb(0, 2)), delay: rndb(0, 0.16), puff: [[0, 0], [rndb(-0.5, 0.5), rndb(-0.4, 0.2)], [rndb(-0.4, 0.6), rndb(-0.1, 0.5)]] }); } return a; };
       const GREYB = ["#b9b9b9", "#9a9a9a"];
+      // ---- fuse fizz: sparks that catch and build as a bomb's five-second fuse burns down ----
+      const fuseSparks: any[] = [];
+      const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
+      const emitFuseSparks = (x: number, y: number, intensity: number) => {
+        const n = 1 + Math.floor(intensity * 4); // more sparks the closer it is to going off
+        for (let i = 0; i < n; i++) {
+          if (Math.random() > 0.3 + intensity * 0.65) continue; // sparse at first, near-constant by the fifth second
+          const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.9 + intensity * 1.6);
+          const sp = 0.8 + Math.random() * (1.3 + intensity * 2.4);
+          fuseSparks.push({ x: x + (Math.random() - 0.5) * 7, y: y + (Math.random() - 0.5) * 7, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: 1 + Math.random() * (1.4 + intensity * 1.8), born: performance.now(), life: 220 + Math.random() * 260, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
+        }
+      };
+      const drawFuseSparks = (ctx: any, now: number) => {
+        for (let i = fuseSparks.length - 1; i >= 0; i--) {
+          const s = fuseSparks[i], t = (now - s.born) / s.life;
+          if (t >= 1) { fuseSparks.splice(i, 1); continue; }
+          s.x += s.vx; s.y += s.vy; s.vy += 0.05; s.vx *= 0.97;
+          ctx.save(); ctx.globalAlpha = 1 - t; ctx.fillStyle = s.col;
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r * (1 - t * 0.5), 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        }
+      };
       const booms: any[] = [];
       const pushBoom = (x: number, y: number, S: number) => { booms.push({ x, y, born: performance.now(), S, b0: jaggedB(), b1: jaggedB(), b2: jaggedB(), r0: rndb(0, TAUb), r1: rndb(0, TAUb), r2: rndb(0, TAUb), cf: makeCfB(), sm: makeSmB(), brot: rndb(-0.12, 0.12), word: boomWords[Math.floor(rndb(0, boomWords.length))] }); };
       const drawBooms = (ctx: any, now: number) => {
@@ -898,6 +925,11 @@ export default function PackPit() {
             hitBomb(pressedBomb); // one hit per second; the fifth detonates
             if (typeof navigator !== "undefined" && navigator.vibrate && pressedBomb && !pressedBomb.plugin.popped) navigator.vibrate(14 + (pressedBomb.plugin.heldHits || 0) * 12); // a rattle in the hand that grows as the fuse burns down
           }
+          // the fuse visibly catches: sparks fizz from the bomb and grow more furious the closer it gets to going off
+          if (pressedBomb && pressedBomb.plugin?.bomb && !pressedBomb.plugin.popped) {
+            const heldT = Math.min(1, (now - pressedBomb.plugin.heldSince) / 5000);
+            emitFuseSparks(pressedBomb.position.x, pressedBomb.position.y - (pressedBomb.plugin.half || 21) * 0.6, heldT);
+          }
         }
         // advance any pop-out removals (a card hidden via the lineage remove button
         // briefly swells then shrinks to nothing, then leaves the world)
@@ -922,7 +954,7 @@ export default function PackPit() {
           }
         }
         if (popped.length) Composite.remove(engine.world, popped);
-        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawBursts(ctx, now); drawBooms(ctx, now); drawNumbers(ctx, now); return; }
+        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawFuseSparks(ctx, now); drawBursts(ctx, now); drawBooms(ctx, now); drawNumbers(ctx, now); return; }
         // pattern stays lit while any dog card rests on the floor, with the impact
         // window below still covering the strobe of cards bouncing during the pour
         const floorTop = walls[0].bounds.min.y;
@@ -965,6 +997,7 @@ export default function PackPit() {
           ctx.fillStyle = "#fff"; ctx.fillText(hoverBody.plugin.name, hp.x, ly); ctx.restore();
         }
         drawParticles(ctx, now);
+        drawFuseSparks(ctx, now);
         drawBursts(ctx, now);
         drawBooms(ctx, now);
         drawNumbers(ctx, now);
@@ -1053,38 +1086,47 @@ export default function PackPit() {
       const detonateBomb = (bomb: any) => {
         if (bomb.plugin.popped) return; // a user hit and an object hit could both land on the fifth/tenth
         bomb.plugin.popped = true;
-        pushBoom(bomb.position.x, bomb.position.y, blastSize(bomb) * 2.2); // pop-art comic blast: flash, jagged burst, flung stars and lightning bolts, smoke, comic word
-        numAt(bomb.position.x, bomb.position.y, 250); // the blast itself is worth 250
+        // Anticipation: before it vanishes the bomb squashes a touch then snaps ~20% bigger,
+        // so it reads as a burst rather than just blinking out. drawBall animates plugin.bursting;
+        // after the short window below the blast fires and the bomb is removed.
+        bomb.plugin.bursting = performance.now();
+        const wasHeld = pressedBomb === bomb;
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
-        if (pressedBomb === bomb && typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([25, 20, 200]); // a solid buzz when it goes off in your grip
-        if (pressedBomb === bomb) pressedBomb = null;
-        Composite.remove(engine.world, bomb);
-        // Only circles caught in a contact chain from the bomb go up with it: those
-        // touching the bomb, then those touching them, and so on. Anything cut off by
-        // a gap, or by a non-circle object wedged between, is spared.
-        const rad = (o: any) => o.plugin?.half || 21;
-        const touch = (a: any, b: any) =>
-          Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y) <= rad(a) + rad(b) + 10;
-        const pool = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
-        const chain: any[] = [];
-        let frontier = pool.filter((o: any) => touch(o, bomb));
-        frontier.forEach((o: any) => { o.plugin.popped = true; }); // claim now so nothing double-pops mid-chain
-        while (frontier.length) {
-          chain.push(...frontier);
-          const prev = frontier;
-          frontier = pool.filter((o: any) => !o.plugin.popped && prev.some((f: any) => touch(f, o)));
-          frontier.forEach((o: any) => { o.plugin.popped = true; });
-        }
-        chain.forEach((o: any, i: number) => {
-          window.setTimeout(() => {
-            if (disposed) return;
-            explodeAt(o.position.x, o.position.y, blastSize(o));
-            poof(o.position.x, o.position.y, o.plugin.half || 21);
-            numAt(o.position.x, o.position.y, o.plugin.share || 0); // each popped circle scores its own %
-            if (mc.body === o) { mc.constraint.bodyB = null; mc.body = null; }
-            Composite.remove(engine.world, o);
-          }, 70 * (i + 1));
-        });
+        if (pressedBomb === bomb) pressedBomb = null; // stop the hold loop and the fuse fizz at once
+        const bx = bomb.position.x, by = bomb.position.y, bsz = blastSize(bomb);
+        window.setTimeout(() => {
+          if (disposed) return;
+          pushBoom(bx, by, bsz * 2.2); // pop-art comic blast: flash, jagged burst, flung stars and lightning bolts, smoke, comic word
+          numAt(bx, by, 250); // the blast itself is worth 250
+          if (wasHeld && typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([25, 20, 200]); // a solid buzz when it goes off in your grip
+          Composite.remove(engine.world, bomb);
+          // Only circles caught in a contact chain from the bomb go up with it: those
+          // touching the bomb, then those touching them, and so on. Anything cut off by
+          // a gap, or by a non-circle object wedged between, is spared.
+          const rad = (o: any) => o.plugin?.half || 21;
+          const touch = (a: any, b: any) =>
+            Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y) <= rad(a) + rad(b) + 10;
+          const pool = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
+          const chain: any[] = [];
+          let frontier = pool.filter((o: any) => touch(o, bomb));
+          frontier.forEach((o: any) => { o.plugin.popped = true; }); // claim now so nothing double-pops mid-chain
+          while (frontier.length) {
+            chain.push(...frontier);
+            const prev = frontier;
+            frontier = pool.filter((o: any) => !o.plugin.popped && prev.some((f: any) => touch(f, o)));
+            frontier.forEach((o: any) => { o.plugin.popped = true; });
+          }
+          chain.forEach((o: any, i: number) => {
+            window.setTimeout(() => {
+              if (disposed) return;
+              explodeAt(o.position.x, o.position.y, blastSize(o));
+              poof(o.position.x, o.position.y, o.plugin.half || 21);
+              numAt(o.position.x, o.position.y, o.plugin.share || 0); // each popped circle scores its own %
+              if (mc.body === o) { mc.constraint.bodyB = null; mc.body = null; }
+              Composite.remove(engine.world, o);
+            }, 70 * (i + 1));
+          });
+        }, 180);
       };
       const hitBomb = (bomb: any) => {
         if (bomb.plugin.popped) return;
