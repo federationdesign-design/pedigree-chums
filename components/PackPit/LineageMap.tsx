@@ -512,22 +512,32 @@ export default function LineageMap({
     const chum: typeof pickCards = [], alive: typeof pickCards = [], extinct: typeof pickCards = [];
     for (const c of uniq) (PACK_BREEDS.has(c.name) ? chum : isAlive(c.status) ? alive : extinct).push(c);
     // as many columns as comfortably fit the screen, so a deep tree's cards stay on screen
-    const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
     const targets = new Map<string, { x: number; y: number }>();
-    const place = (arr: typeof pickCards, top: number) => {
-      arr.forEach((c, i) => {
-        const sx = PACK_LEFT + (i % cols) * PACK_COL;
-        const sy = top + Math.floor(i / cols) * PACK_ROW;
-        targets.set(c.id, { x: sx - pan.x, y: sy - pan.y }); // screen target, stored in user coords
-      });
-      return top + Math.ceil(arr.length / cols) * PACK_ROW;
-    };
-    let y = 150;
     const labels: { chum: { x: number; y: number } | null; alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { chum: null, alive: null, extinct: null };
-    // header sits 40px higher than the card row so it clears the cancel buttons
-    if (chum.length) { labels.chum = { x: PACK_LEFT - CW / 2, y: y - 40 }; y = place(chum, y + 64) + 8; }
-    if (alive.length) { labels.alive = { x: PACK_LEFT - CW / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
-    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CW / 2, y: y - 30 }; place(extinct, y + 64); }
+    if (isMobile) {
+      // mirror the live frame grid: one continuous 4-wide bunch (chum, then alive, then extinct), no labels
+      const ordered = [...chum, ...alive, ...extinct];
+      ordered.forEach((c, g) => {
+        const sx = F_LEFT + (g % MCOLS) * F_COL + gridX;
+        const sy = chumTop + Math.floor(g / MCOLS) * F_ROW;
+        targets.set(c.id, { x: sx - pan.x, y: sy - pan.y });
+      });
+    } else {
+      const cols = Math.max(2, Math.min(6, Math.floor((vp.w - 120) / PACK_COL)));
+      const place = (arr: typeof pickCards, top: number) => {
+        arr.forEach((c, i) => {
+          const sx = PACK_LEFT + (i % cols) * PACK_COL;
+          const sy = top + Math.floor(i / cols) * PACK_ROW;
+          targets.set(c.id, { x: sx - pan.x, y: sy - pan.y }); // screen target, stored in user coords
+        });
+        return top + Math.ceil(arr.length / cols) * PACK_ROW;
+      };
+      let y = 150;
+      // header sits 40px higher than the card row so it clears the cancel buttons
+      if (chum.length) { labels.chum = { x: PACK_LEFT - CW / 2, y: y - 40 }; y = place(chum, y + 64) + 8; }
+      if (alive.length) { labels.alive = { x: PACK_LEFT - CW / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
+      if (extinct.length) { labels.extinct = { x: PACK_LEFT - CW / 2, y: y - 30 }; place(extinct, y + 64); }
+    }
     // where each card sits right now, so we can glide it from there to its slot
     const starts = new Map<string, { x: number; y: number }>();
     uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
