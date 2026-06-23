@@ -957,7 +957,10 @@ export default function PackPit() {
             const fbw = far >= 1 ? fbox : fbox * far, fbh = far >= 1 ? fbox / far : fbox;
             fox = fbw * 0.34; foy = -fbh * 0.4; // the wick tip at the top-right of the sprite
           }
-          emitFuseSparks(fb.position.x + fox, fb.position.y + foy, fInt);
+          const fRattle = fhits >= 3 ? fInt * 3 : 0; // from hit 3 the emit point shakes with the bomb, harder as it climbs
+          const fjx = fRattle ? (Math.random() - 0.5) * fRattle : 0;
+          const fjy = fRattle ? (Math.random() - 0.5) * fRattle : 0;
+          emitFuseSparks(fb.position.x + fox + 5 + fjx, fb.position.y + foy + fjy, fInt); // origin nudged 5px right, plus the rattle
         }
         // advance any pop-out removals (a card hidden via the lineage remove button
         // briefly swells then shrinks to nothing, then leaves the world)
