@@ -369,7 +369,7 @@ export default function TradePage() {
       </main>
 
       {/* Shared site footer — identical to the homepage. */}
-      <Footer />
+      <Footer toySafety />
     </>
   );
 }
