@@ -13,7 +13,7 @@ import styles from "./PackPit.module.css";
 // Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
 // centre-screen celebration with confetti. Labels escalate then hold at the top.
 const MS_STEP = 5000;
-const MS_LABELS = ["wag", "woff", "bark", "howl", "are you done?", "maybe enter the site now?"];
+const MS_LABELS = ["Yapp Yapp Yapp", "Bark Bark Bark", "Woof Woof Woof", "Yapp Bark Woof", "Hoooowwwwllllllll", "Are you done?", "maybe enter the site now?"];
 
 const RADIUS: Record<string, number> = { small: 47.19, medium: 56.1, large: 66, giant: 67.2 }; // giant -20%, small +10% to tighten the spread
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
@@ -1215,7 +1215,7 @@ export default function PackPit() {
           Body.applyForce(acceptBody, acceptBody.position, { x: (Math.random() - 0.5) * 0.0006, y: (Math.random() - 0.5) * 0.0005 }); // very subtle tremble
           if (now - (acceptBody.plugin.lastOne || 0) > 320) {
             acceptBody.plugin.lastOne = now;
-            numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), 1, 13, false); // streaming 1s, non-scoring lure
+            numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), -1, 13); // streaming -1s that nibble the score
           }
           if (now - (acceptBody.plugin.bornAt || now) > 90000) {
             acceptBody.plugin.bornAt = now; // and it nags again after another 90s
