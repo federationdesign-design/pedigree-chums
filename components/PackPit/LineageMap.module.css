@@ -177,23 +177,20 @@
 /* The card-pack box that bobs, shakes and pops out of existence on collect. */
 .cardBox {
   position: fixed;
-  left: calc(clamp(240px, 44vw, 400px) * -0.5 + 130px); /* half off the left edge, then 100px right */
-  bottom: calc(clamp(74px, 12vh, 130px) - 270px); /* dropped to base, then 100px lower */
-  width: clamp(240px, 44vw, 400px); /* 2x size on desktop and mobile alike */
+  /* Three knobs to dial the corner placement. SIZE drives the other two,
+     so the box scales together on every screen. */
+  --box-size: clamp(200px, 18vw, 280px); /* overall width; height follows the art */
+  --box-off-left: -0.26;                 /* fraction of the box tucked past the left edge */
+  --box-floor: -14px;                    /* how far the base sits into the pit floor */
+  left: calc(var(--box-size) * var(--box-off-left));
+  bottom: var(--box-floor);
+  width: var(--box-size);
   height: auto;
   z-index: 9999;
   pointer-events: none;
   transform-origin: 50% 100%;
   animation: cardBoxPop 0.7s ease-in-out 0.2s both;
   filter: drop-shadow(0 10px 16px rgba(10, 58, 87, 0.35));
-}
-/* Desktop only: nudge the box 10px right and 10px down from the shared base spot.
-   Below the base rule so it wins on desktop; mobile (<=768px) keeps the base spot. */
-@media (min-width: 769px) {
-  .cardBox {
-    left: calc(clamp(240px, 44vw, 400px) * -0.5 + 140px);
-    bottom: calc(clamp(74px, 12vh, 130px) - 280px);
-  }
 }
 @keyframes cardBoxPop {
   0%   { transform: scale(0.2) rotate(35deg); opacity: 0; }
