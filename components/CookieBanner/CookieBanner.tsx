@@ -37,11 +37,21 @@ export default function CookieBanner() {
 
   return (
     <div className={styles.intro} role="dialog" aria-label="Cookie notice">
-      <p className={styles.introText}>
-        We use cookies to make the site work and to show our product video. See our{" "}
-        <Link href="/cookies" className={styles.introLink}>Cookie Policy</Link>{" "}
-        for the details.
-      </p>
+      <div className={styles.card}>
+        <button
+          type="button"
+          className={styles.close}
+          onClick={() => setVisible(false)}
+          aria-label="Close cookie notice"
+        >
+          &times;
+        </button>
+        <p className={styles.introText}>
+          We use cookies to make the site work and to show our product video. See our{" "}
+          <Link href="/cookies" className={styles.introLink}>Cookie Policy</Link>{" "}
+          for the details.
+        </p>
+      </div>
     </div>
   );
 }
