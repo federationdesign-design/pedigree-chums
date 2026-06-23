@@ -1044,7 +1044,7 @@ export default function PackPit() {
         if (bomb.plugin.hits >= 5) detonateBomb(bomb);
       };
       // A bomb also takes knocks from the pit itself, but each object knock is worth
-      // far less than a user hit: fifty knocks set it off on its own, scoring 2 each.
+      // very little next to a user hit: five hundred knocks set it off, scoring 2 each.
       const onBombHit = (ev: any) => {
         for (const pair of ev.pairs) {
           const bb = pair.bodyA.plugin?.bomb ? pair.bodyA : pair.bodyB.plugin?.bomb ? pair.bodyB : null;
@@ -1053,7 +1053,7 @@ export default function PackPit() {
           if (!other || other.isStatic) continue; // the walls, floor and ceiling do not count
           bb.plugin.objHits = (bb.plugin.objHits || 0) + 1;
           setScore((s) => s + 2);
-          if (bb.plugin.objHits >= 50) detonateBomb(bb);
+          if (bb.plugin.objHits >= 500) detonateBomb(bb);
         }
       };
       Events.on(engine, "collisionStart", onBombHit);
