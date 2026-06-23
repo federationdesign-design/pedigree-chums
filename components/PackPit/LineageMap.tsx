@@ -167,27 +167,22 @@ export default function LineageMap({
   // Mobile only: the pack grid lays each section out as one long horizontal strip
   // and the player swipes it left/right. gridX is that scroll offset (0 .. minGridXRef).
   const isMobile = vp.w <= 768;
+  const CW = isMobile ? Math.round(CARD * 0.85) : CARD; // frames + picture cards run 15% smaller on phones
   const [gridX, setGridX] = useState(0);
-  const [gridY, setGridY] = useState(0);
-  useEffect(() => { setGridX(0); setGridY(0); }, [breed.name]);
-  const gridDrag = useRef<{ id: number; sx: number; sy: number; gx: number; gy: number; moved: boolean } | null>(null);
+  useEffect(() => setGridX(0), [breed.name]);
+  const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
   const minGridXRef = useRef(0);
-  const minGridYRef = useRef(0);
   const startGridDrag = (e: React.PointerEvent) => {
     suppressClick.current = true; // a touch on the strip never closes the overlay
-    gridDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, gx: gridX, gy: gridY, moved: false };
+    gridDrag.current = { id: e.pointerId, sx: e.clientX, gx: gridX, moved: false };
     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
   };
   const moveGridDrag = (e: React.PointerEvent) => {
     const d = gridDrag.current;
     if (!d || e.pointerId !== d.id) return;
-    const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
-    if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
-    if (d.moved) {
-      suppressClick.current = true;
-      setGridX(Math.max(minGridXRef.current, Math.min(0, d.gx + dx)));
-      setGridY(Math.max(minGridYRef.current, Math.min(0, d.gy + dy)));
-    }
+    const dx = e.clientX - d.sx;
+    if (!d.moved && Math.abs(dx) > 6) d.moved = true;
+    if (d.moved) { suppressClick.current = true; setGridX(Math.max(minGridXRef.current, Math.min(0, d.gx + dx))); }
   };
   const endGridDrag = (e: React.PointerEvent) => {
     const d = gridDrag.current;
@@ -408,33 +403,31 @@ export default function LineageMap({
   // The empty frames the player drags each collected card into: a row of living up
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
   // sx - pan.x so they stay put while the tree pans behind them.
-  const F_LEFT = 96, F_COL = 112, F_ROW = 112; // pitch reduced 25% with the cards, so more rows fit
+  const F_LEFT = isMobile ? 52 : 96;
+  const F_COL = isMobile ? 92 : 112, F_ROW = isMobile ? 92 : 112; // tighter pitch on phones to match the 15% smaller cards
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
-  // Desktop wraps into fCols columns with a gap between the labelled sections.
-  // Mobile gives every category exactly two rows (frames split evenly across them),
-  // closes the gaps into one continuous grid (the headers are hidden there), and
-  // lets the player pan it in both axes via gridX / gridY.
-  const secCols = (n: number) => (isMobile ? Math.max(1, Math.ceil(n / 2)) : fCols);
-  const secRows = (n: number) => (isMobile ? Math.min(2, n) : Math.ceil(n / fCols));
-  const gap = isMobile ? 0 : 72;
-  const chumTop = 240; // rows sit clear of the top-left chrome and the section headers
+  const MCOLS = 4; // phones: one continuous grid, four frames wide before it wraps
+  const chumTop = isMobile ? 190 : 240; // rows sit clear of the top-left chrome (and the section headers on desktop)
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
-  const cCols = secCols(frameSlots.chum.length);
-  frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % cCols) * F_COL + gridX, sy: chumTop + Math.floor(i / cCols) * F_ROW + gridY }));
-  const aliveTop = chumTop + (frameSlots.chum.length ? secRows(frameSlots.chum.length) * F_ROW + gap : 0);
-  const aCols = secCols(frameSlots.alive.length);
-  frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % aCols) * F_COL + gridX, sy: aliveTop + Math.floor(i / aCols) * F_ROW + gridY }));
-  const extinctTop = aliveTop + (frameSlots.alive.length ? secRows(frameSlots.alive.length) * F_ROW + gap : 0);
-  const eCols = secCols(frameSlots.extinct.length);
-  frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % eCols) * F_COL + gridX, sy: extinctTop + Math.floor(i / eCols) * F_ROW + gridY }));
-  // how far the grid may scroll so its far edges stay reachable (mobile only)
-  const widestCols = isMobile ? Math.max(cCols, aCols, eCols) : 0;
-  const lastColEdge = widestCols > 0 ? F_LEFT + (widestCols - 1) * F_COL + CARD / 2 : 0;
-  minGridXRef.current = isMobile ? Math.min(0, vp.w - lastColEdge - 24) : 0;
-  const lastTop = frameSlots.extinct.length ? extinctTop : frameSlots.alive.length ? aliveTop : chumTop;
-  const lastRows = frameSlots.extinct.length ? secRows(frameSlots.extinct.length) : frameSlots.alive.length ? secRows(frameSlots.alive.length) : secRows(frameSlots.chum.length);
-  const gridBottom = lastTop + (lastRows > 0 ? (lastRows - 1) * F_ROW : 0) + CARD / 2;
-  minGridYRef.current = isMobile ? Math.min(0, vp.h - gridBottom - 24) : 0;
+  let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
+  if (isMobile) {
+    // chum, then alive, then extinct, flowing as one continuous bunch with no separators
+    const all = [
+      ...frameSlots.chum.map((s, i) => ({ id: `fc${i}`, cat: "chum" as const, img: s.img })),
+      ...frameSlots.alive.map((s, i) => ({ id: `fa${i}`, cat: "alive" as const, img: s.img })),
+      ...frameSlots.extinct.map((s, i) => ({ id: `fe${i}`, cat: "extinct" as const, img: s.img })),
+    ];
+    all.forEach((f, g) => frames.push({ ...f, sx: F_LEFT + (g % MCOLS) * F_COL + gridX, sy: chumTop + Math.floor(g / MCOLS) * F_ROW }));
+  } else {
+    frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: chumTop + Math.floor(i / fCols) * F_ROW }));
+    aliveTop = chumTop + (frameSlots.chum.length ? Math.ceil(frameSlots.chum.length / fCols) * F_ROW + 72 : 0);
+    frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW }));
+    extinctTop = aliveTop + (frameSlots.alive.length ? Math.ceil(frameSlots.alive.length / fCols) * F_ROW + 72 : 0);
+    frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: extinctTop + Math.floor(i / fCols) * F_ROW }));
+  }
+  // horizontal nudge only if the 4-wide grid overflows a narrow phone (otherwise it sits still)
+  const gridRight = F_LEFT + (MCOLS - 1) * F_COL + CW / 2;
+  minGridXRef.current = isMobile ? Math.min(0, vp.w - gridRight - 16) : 0;
   const frameTotal = frames.length;
   // where each filled card should sit: its frame's screen centre, kept pan-fixed
   const cardFrame = new Map<string, { sx: number; sy: number }>();
@@ -464,7 +457,7 @@ export default function LineageMap({
       const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
       const note = live?.note ?? snap?.note ?? "";
       const r = radius(share);
-      const d = r + 10 + CARD / 2;
+      const d = r + 10 + CW / 2;
       const baseX = live ? live._x + Math.cos(live._dir) * d : 0;
       const baseY = live ? live._y + Math.sin(live._dir) * d : 0;
       const pos = dragPos.get(id);
@@ -532,9 +525,9 @@ export default function LineageMap({
     let y = 150;
     const labels: { chum: { x: number; y: number } | null; alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null } = { chum: null, alive: null, extinct: null };
     // header sits 40px higher than the card row so it clears the cancel buttons
-    if (chum.length) { labels.chum = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(chum, y + 64) + 8; }
-    if (alive.length) { labels.alive = { x: PACK_LEFT - CARD / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
-    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CARD / 2, y: y - 30 }; place(extinct, y + 64); }
+    if (chum.length) { labels.chum = { x: PACK_LEFT - CW / 2, y: y - 40 }; y = place(chum, y + 64) + 8; }
+    if (alive.length) { labels.alive = { x: PACK_LEFT - CW / 2, y: y - 40 }; y = place(alive, y + 64) + 8; }
+    if (extinct.length) { labels.extinct = { x: PACK_LEFT - CW / 2, y: y - 30 }; place(extinct, y + 64); }
     // where each card sits right now, so we can glide it from there to its slot
     const starts = new Map<string, { x: number; y: number }>();
     uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
@@ -554,7 +547,7 @@ export default function LineageMap({
       });
     }, () => {
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
-      uniq.forEach((c, i) => { const g = targets.get(c.id); if (g) window.setTimeout(() => flashNum(g.x, g.y - CARD / 2, 100, FLASH_SIZE), i * 55); }); // a +100 pops from each card just after it lands
+      uniq.forEach((c, i) => { const g = targets.get(c.id); if (g) window.setTimeout(() => flashNum(g.x, g.y - CW / 2, 100, FLASH_SIZE), i * 55); }); // a +100 pops from each card just after it lands
     });
   };
 
@@ -728,13 +721,13 @@ export default function LineageMap({
         </div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.chum.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: chumTop - 90 }}>A Pedigree Chum</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: chumTop - 90 }}>A Pedigree Chum</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.alive.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: aliveTop - 90 }}>Alive and kicking</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: extinctTop - 90 }}>These dogs have had their days</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>These dogs have had their days</div>
       )}
       {showPack && (
         <button
@@ -815,7 +808,7 @@ export default function LineageMap({
                       } else if (n.img && n._parent) {
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                        const rr = radius(sh), dd = rr + 10 + CARD / 2;
+                        const rr = radius(sh), dd = rr + 10 + CW / 2;
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
@@ -868,10 +861,10 @@ export default function LineageMap({
                   <rect
                     className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""}`.trim()}
                     style={glow}
-                    x={f.sx - pan.x - CARD / 2}
-                    y={f.sy - pan.y - CARD / 2}
-                    width={CARD}
-                    height={CARD}
+                    x={f.sx - pan.x - CW / 2}
+                    y={f.sy - pan.y - CW / 2}
+                    width={CW}
+                    height={CW}
                     rx={15}
                   />
                 </g>
@@ -947,12 +940,12 @@ export default function LineageMap({
                     if (cd && e.pointerId === cd.id) {
                       try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
                       if (cd.moved) {
-                        const hit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CARD / 2 && Math.abs(e.clientY - f.sy) <= CARD / 2);
+                        const hit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
                         if (hit && !filled.has(hit.id)) {
                           if (hit.img === c.img) {
                             setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
                             setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
-                            flashNum(hit.sx - pan.x, hit.sy - pan.y - CARD / 2, 100, FLASH_SIZE); // +100 emanates from the frame
+                            flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 100, FLASH_SIZE); // +100 emanates from the frame
                             const pid = puffSeq.current++; // smoke poof where it lands
                             setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
                             window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -964,7 +957,7 @@ export default function LineageMap({
                             let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
                             let len = Math.hypot(dx, dy);
                             if (len < 6) { dx = 0; dy = 1; len = 1; } // dropped dead-centre: spit it out the bottom
-                            const push = CARD * 0.95 + 14; // frame centre to card centre, just clear of the edge
+                            const push = CW * 0.95 + 14; // frame centre to card centre, just clear of the edge
                             const ox2 = hit.sx + (dx / len) * push, oy2 = hit.sy + (dy / len) * push;
                             setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: ox2 - pan.x, y: oy2 - pan.y }); return x; });
                           }
@@ -980,28 +973,28 @@ export default function LineageMap({
                 >
                   <g className={styles.pickWobble}>
                   <clipPath id={clipId}>
-                    <rect x={c.cardX - CARD / 2} y={c.cardY - CARD / 2} width={CARD} height={CARD} rx={15} />
+                    <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} rx={15} />
                   </clipPath>
                   <image
                     href={encodeURI(bust(c.img))}
-                    x={c.cardX - CARD / 2}
-                    y={c.cardY - CARD / 2}
-                    width={CARD}
-                    height={CARD}
+                    x={c.cardX - CW / 2}
+                    y={c.cardY - CW / 2}
+                    width={CW}
+                    height={CW}
                     clipPath={`url(#${clipId})`}
                     preserveAspectRatio="xMidYMid slice"
                   />
                   <rect
-                    x={c.cardX - CARD / 2}
-                    y={c.cardY - CARD / 2}
-                    width={CARD}
-                    height={CARD}
+                    x={c.cardX - CW / 2}
+                    y={c.cardY - CW / 2}
+                    width={CW}
+                    height={CW}
                     rx={15}
                     className={styles.pickCard}
                   />
                   {(() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
-                    const dx = c.cardX - CARD / 2, dy = c.cardY - CARD / 2; // top-left corner, protruding like the close button
+                    const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
                       <circle cx={dx} cy={dy} r={12} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
                         <title>{ts.label}</title>
@@ -1009,7 +1002,7 @@ export default function LineageMap({
                     );
                   })()}
                   {!packed && (() => {
-                    const ccx = c.cardX - CARD / 2, ccy = c.cardY + CARD / 2; // bottom-left corner, clear of the info icon now at top-right
+                    const ccx = c.cardX - CW / 2, ccy = c.cardY + CW / 2; // bottom-left corner, clear of the info icon now at top-right
                     return (
                       <g
                         style={{ cursor: "pointer" }}
@@ -1029,8 +1022,8 @@ export default function LineageMap({
                     );
                   })()}
                   {packed && (() => {
-                    const pw = 66, ph = 32, py = c.cardY + CARD / 2 - ph / 2 - 6; // pill near the foot of the card
-                    const pillRight = c.cardX + CARD / 2 + 6; // right-aligned to the card, nudged just past the edge
+                    const pw = 66, ph = 32, py = c.cardY + CW / 2 - ph / 2 - 6; // pill near the foot of the card
+                    const pillRight = c.cardX + CW / 2 + 6; // right-aligned to the card, nudged just past the edge
                     return (
                       <>
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
@@ -1041,7 +1034,7 @@ export default function LineageMap({
                     );
                   })()}
                   {(breedInfo[c.name] || c.note) ? (() => {
-                    const ix = c.cardX + CARD / 2, iy = c.cardY - CARD / 2; // top-right corner
+                    const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
                         style={{ cursor: "help" }}
@@ -1065,7 +1058,7 @@ export default function LineageMap({
               if (!c || !text) return null;
               const w = 190; // small understated hover label, not a click popover
               return (
-                <foreignObject x={c.cardX - CARD / 2} y={c.cardY + CARD / 2 + 6} width={w} height={170} style={{ overflow: "visible", pointerEvents: "none" }}>
+                <foreignObject x={c.cardX - CW / 2} y={c.cardY + CW / 2 + 6} width={w} height={170} style={{ overflow: "visible", pointerEvents: "none" }}>
                   <div style={{ display: "inline-block", maxWidth: `${w}px`, background: "rgba(10, 58, 87, 0.92)", color: "#ffffff", font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px", borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)" }}>
                     {text}
                   </div>
