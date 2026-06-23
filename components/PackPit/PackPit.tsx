@@ -814,14 +814,12 @@ export default function PackPit() {
       const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
       const FUSE_LIGHT_AT = 2; // the fuse stays dark on hit 1 and catches from hit 2
       const emitFuseSparks = (x: number, y: number, intensity: number) => {
-        const TEST_LOUD = true; // TEST: force a big obvious shower regardless of intensity
-        const inten2 = TEST_LOUD ? 1 : intensity;
-        const n = TEST_LOUD ? 14 : 1 + Math.floor(inten2 * 4); // attempts per frame
+        const n = 1 + Math.floor(intensity * 5); // attempts per frame, more as it climbs
         for (let i = 0; i < n; i++) {
-          if (!TEST_LOUD && Math.random() > 0.3 + inten2 * 0.65) continue;
-          const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.9 + inten2 * 1.6);
-          const sp = 1.2 + Math.random() * (1.8 + inten2 * 2.6);
-          fuseSparks.push({ x: x + (Math.random() - 0.5) * 10, y: y + (Math.random() - 0.5) * 10, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: (TEST_LOUD ? 3 : 1) + Math.random() * (2.5 + inten2 * 2.2), born: performance.now(), life: 260 + Math.random() * 320, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
+          if (Math.random() > 0.18 + intensity * 0.78) continue; // sparse and faint at low intensity, near-constant at full
+          const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.7 + intensity * 1.7); // tighter spit when low, wider spray when high
+          const sp = 0.7 + Math.random() * (1.0 + intensity * 2.8); // slower drips low, faster shower high
+          fuseSparks.push({ x: x + (Math.random() - 0.5) * (4 + intensity * 7), y: y + (Math.random() - 0.5) * (4 + intensity * 7), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: 1 + Math.random() * (0.8 + intensity * 2.6), born: performance.now(), life: 220 + Math.random() * 280, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
         }
       };
       const drawFuseSparks = (ctx: any, now: number) => {
