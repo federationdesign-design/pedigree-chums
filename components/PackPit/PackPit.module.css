@@ -52,16 +52,19 @@
    The old text instructions are gone; the button alone carries the action. */
 .controls {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(122px + env(safe-area-inset-bottom, 0px)); /* the running total sits above the shake button's spot */
   right: clamp(18px, 4vw, 48px);
   z-index: 70;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px; /* the running total sits 20px above the shake button */
   pointer-events: none;
 }
 .shake {
+  position: fixed;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  right: clamp(18px, 4vw, 48px);
+  z-index: 50; /* below the lineage overlay (60) so it tucks behind the family tree when open */
   width: 84px;
   height: 84px;
   padding: 0;

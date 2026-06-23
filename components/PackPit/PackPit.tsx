@@ -451,7 +451,7 @@ export default function PackPit() {
           const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
           bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
           bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
-          numAt(ax, ay, 2000, 40); // the big payoff pops out of the starburst
+          numAt(ax, ay, 2000); // the big payoff pops out of the starburst
           clearCookieObjects(); // the buttons and the cookie SVG all vanish
           return true;
         }
@@ -460,7 +460,7 @@ export default function PackPit() {
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
           bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
           bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 }); // grey
-          numAt(rx, ry, -990, 40); // the penalty for rejecting
+          numAt(rx, ry, -990); // the penalty for rejecting
           clearCookieObjects();
           return true;
         }
@@ -1298,11 +1298,11 @@ export default function PackPit() {
       <img className={styles.floor} src={bust("/floor-shortened-svg.svg")} alt="" aria-hidden="true" />
       <div className={styles.controls}>
         <div className={styles.scoreTotal} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
-        <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
-          <span className={styles.shakeIcon} aria-hidden="true" />
-          <span className={styles.shakeText}>Shake</span>
-        </button>
       </div>
+      <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
+        <span className={styles.shakeIcon} aria-hidden="true" />
+        <span className={styles.shakeText}>Shake</span>
+      </button>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
       <HowToPlay open={howToPlay} onClose={() => setHowToPlay(false)} />
       {milestone && (

@@ -168,20 +168,26 @@ export default function LineageMap({
   // and the player swipes it left/right. gridX is that scroll offset (0 .. minGridXRef).
   const isMobile = vp.w <= 768;
   const [gridX, setGridX] = useState(0);
-  useEffect(() => setGridX(0), [breed.name]);
-  const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
+  const [gridY, setGridY] = useState(0);
+  useEffect(() => { setGridX(0); setGridY(0); }, [breed.name]);
+  const gridDrag = useRef<{ id: number; sx: number; sy: number; gx: number; gy: number; moved: boolean } | null>(null);
   const minGridXRef = useRef(0);
+  const minGridYRef = useRef(0);
   const startGridDrag = (e: React.PointerEvent) => {
     suppressClick.current = true; // a touch on the strip never closes the overlay
-    gridDrag.current = { id: e.pointerId, sx: e.clientX, gx: gridX, moved: false };
+    gridDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, gx: gridX, gy: gridY, moved: false };
     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
   };
   const moveGridDrag = (e: React.PointerEvent) => {
     const d = gridDrag.current;
     if (!d || e.pointerId !== d.id) return;
-    const dx = e.clientX - d.sx;
-    if (!d.moved && Math.abs(dx) > 6) d.moved = true;
-    if (d.moved) { suppressClick.current = true; setGridX(Math.max(minGridXRef.current, Math.min(0, d.gx + dx))); }
+    const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
+    if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
+    if (d.moved) {
+      suppressClick.current = true;
+      setGridX(Math.max(minGridXRef.current, Math.min(0, d.gx + dx)));
+      setGridY(Math.max(minGridYRef.current, Math.min(0, d.gy + dy)));
+    }
   };
   const endGridDrag = (e: React.PointerEvent) => {
     const d = gridDrag.current;
@@ -405,22 +411,31 @@ export default function LineageMap({
   // sx - pan.x so they stay put while the tree pans behind them.
   const F_LEFT = 96, F_COL = 112, F_ROW = 112; // pitch reduced 25% with the cards, so more rows fit
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
-  // Desktop wraps into fCols columns. Mobile lays each section as one long strip
-  // (never wraps) and the player swipes it sideways, so gridX shifts every column.
-  const colOf = (i: number) => (isMobile ? i : i % fCols);
-  const rowOf = (i: number) => (isMobile ? 0 : Math.floor(i / fCols));
-  const rowsUsed = (n: number) => (isMobile ? (n ? 1 : 0) : Math.ceil(n / fCols));
+  // Desktop wraps into fCols columns with a gap between the labelled sections.
+  // Mobile gives every category exactly two rows (frames split evenly across them),
+  // closes the gaps into one continuous grid (the headers are hidden there), and
+  // lets the player pan it in both axes via gridX / gridY.
+  const secCols = (n: number) => (isMobile ? Math.max(1, Math.ceil(n / 2)) : fCols);
+  const secRows = (n: number) => (isMobile ? Math.min(2, n) : Math.ceil(n / fCols));
+  const gap = isMobile ? 0 : 72;
   const chumTop = 240; // rows sit clear of the top-left chrome and the section headers
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
-  frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + colOf(i) * F_COL + gridX, sy: chumTop + rowOf(i) * F_ROW }));
-  const aliveTop = chumTop + (frameSlots.chum.length ? rowsUsed(frameSlots.chum.length) * F_ROW + 72 : 0);
-  frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + colOf(i) * F_COL + gridX, sy: aliveTop + rowOf(i) * F_ROW }));
-  const extinctTop = aliveTop + (frameSlots.alive.length ? rowsUsed(frameSlots.alive.length) * F_ROW + 72 : 0);
-  frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + colOf(i) * F_COL + gridX, sy: extinctTop + rowOf(i) * F_ROW }));
-  // how far left the longest strip may scroll so its tail is reachable (mobile only)
-  const widestCols = isMobile ? Math.max(frameSlots.chum.length, frameSlots.alive.length, frameSlots.extinct.length) : 0;
+  const cCols = secCols(frameSlots.chum.length);
+  frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % cCols) * F_COL + gridX, sy: chumTop + Math.floor(i / cCols) * F_ROW + gridY }));
+  const aliveTop = chumTop + (frameSlots.chum.length ? secRows(frameSlots.chum.length) * F_ROW + gap : 0);
+  const aCols = secCols(frameSlots.alive.length);
+  frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % aCols) * F_COL + gridX, sy: aliveTop + Math.floor(i / aCols) * F_ROW + gridY }));
+  const extinctTop = aliveTop + (frameSlots.alive.length ? secRows(frameSlots.alive.length) * F_ROW + gap : 0);
+  const eCols = secCols(frameSlots.extinct.length);
+  frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % eCols) * F_COL + gridX, sy: extinctTop + Math.floor(i / eCols) * F_ROW + gridY }));
+  // how far the grid may scroll so its far edges stay reachable (mobile only)
+  const widestCols = isMobile ? Math.max(cCols, aCols, eCols) : 0;
   const lastColEdge = widestCols > 0 ? F_LEFT + (widestCols - 1) * F_COL + CARD / 2 : 0;
   minGridXRef.current = isMobile ? Math.min(0, vp.w - lastColEdge - 24) : 0;
+  const lastTop = frameSlots.extinct.length ? extinctTop : frameSlots.alive.length ? aliveTop : chumTop;
+  const lastRows = frameSlots.extinct.length ? secRows(frameSlots.extinct.length) : frameSlots.alive.length ? secRows(frameSlots.alive.length) : secRows(frameSlots.chum.length);
+  const gridBottom = lastTop + (lastRows > 0 ? (lastRows - 1) * F_ROW : 0) + CARD / 2;
+  minGridYRef.current = isMobile ? Math.min(0, vp.h - gridBottom - 24) : 0;
   const frameTotal = frames.length;
   // where each filled card should sit: its frame's screen centre, kept pan-fixed
   const cardFrame = new Map<string, { sx: number; sy: number }>();
