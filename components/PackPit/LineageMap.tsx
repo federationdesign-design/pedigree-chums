@@ -320,8 +320,22 @@ export default function LineageMap({
     const rest = all.filter((s) => !PACK_BREEDS.has(s.name));
     return { chum, alive: rest.filter((s) => isAlive(s.status)), extinct: rest.filter((s) => !isAlive(s.status)) };
   }, [root]);
+
+  // how many times each image appears across the whole tree; >1 means the breed is a
+  // duplicate, so its frame becomes a stack the extra copies can be dropped onto
+  const dupTotal = useMemo(() => {
+    const m = new Map<string, number>();
+    const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
+      if (k.img) { const img = PACK_IMG.get(k.name) ?? k.img; m.set(img, (m.get(img) ?? 0) + 1); }
+      walk(k);
+    });
+    if (root) walk(root);
+    return m;
+  }, [root]);
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
+  const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
+  useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
   const [dragImg, setDragImg] = useState<string | null>(null); // artwork of the card being dragged, to light its one assigned frame
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
@@ -438,6 +452,9 @@ export default function LineageMap({
   const cardFrame = new Map<string, { sx: number; sy: number }>();
   filled.forEach((cardId, frameId) => { const f = frames.find((x) => x.id === frameId); if (f) cardFrame.set(cardId, { sx: f.sx, sy: f.sy }); });
   const placedSet = new Set(filled.values()); // cards sitting in a frame: fixed, not draggable
+  const stackedIds = new Set<string>();
+  stacked.forEach((ids) => ids.forEach((id) => stackedIds.add(id))); // duplicate cards absorbed into a stack, hidden as loose cards
+  const isDupImg = (img: string) => (dupTotal.get(img) ?? 0) > 1; // breed appears more than once: its frame is a stack target
 
   // only show the pop-out while its circle is actually on screen and has art
   // Cards to draw: nodes that are picked and currently live in the open tree,
@@ -914,6 +931,7 @@ export default function LineageMap({
             ))}
             {pickCards.map((c) => {
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
+              if (stackedIds.has(c.id)) return null; // absorbed into a frame's stack
               const clipId = `lm-pick-${c.id}`;
               const packScale = 1; // breed cards stay full size in the grid, no shrink
               const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
@@ -935,7 +953,6 @@ export default function LineageMap({
                     setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
                     setDragImg(c.img);
                     setDragXY({ x: e.clientX, y: e.clientY });
-                    setFilled((m) => { let hit = false; const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) { x.delete(fid); hit = true; } return hit ? x : m; }); // lifting a framed card frees its frame
                   }}
                   onPointerMove={(e) => {
                     if (placedSet.has(c.id)) { if (isMobile) moveGridDrag(e); return; }
@@ -967,26 +984,33 @@ export default function LineageMap({
                       try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
                       if (cd.moved) {
                         const hit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
-                        if (hit && !filled.has(hit.id)) {
-                          if (hit.img === c.img) {
-                            setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
-                            setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
-                            flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 100, FLASH_SIZE); // +100 emanates from the frame
-                            const pid = puffSeq.current++; // smoke poof where it lands
-                            setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
-                            window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
-                          } else {
-                            setShakeFrame(hit.id);
-                            window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
-                            // a wrong box repels: bump the card just outside its edge, in the
-                            // direction it came from, rather than flinging it back to the start
-                            let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
-                            let len = Math.hypot(dx, dy);
-                            if (len < 6) { dx = 0; dy = 1; len = 1; } // dropped dead-centre: spit it out the bottom
-                            const push = CW * 0.95 + 14; // frame centre to card centre, just clear of the edge
-                            const ox2 = hit.sx + (dx / len) * push, oy2 = hit.sy + (dy / len) * push;
-                            setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: ox2 - pan.x, y: oy2 - pan.y }); return x; });
-                          }
+                        if (hit && hit.img === c.img && !filled.has(hit.id)) {
+                          // first copy of this breed: it fills the frame (+100)
+                          setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
+                          setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
+                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 100, FLASH_SIZE); // +100 emanates from the frame
+                          const pid = puffSeq.current++; // smoke poof where it lands
+                          setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
+                          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+                        } else if (hit && hit.img === c.img && filled.get(hit.id) !== c.id) {
+                          // a duplicate dropped onto an already-filled matching frame: stack it on top (+500)
+                          setStacked((m) => { const x = new Map(m); const arr = x.get(hit.id) ? [...x.get(hit.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(hit.id, arr); return x; });
+                          setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 500, FLASH_SIZE); // every duplicate placed is worth 500
+                          const pid = puffSeq.current++;
+                          setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
+                          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+                        } else if (hit && hit.img !== c.img) {
+                          setShakeFrame(hit.id);
+                          window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
+                          // a wrong box repels: bump the card just outside its edge, in the
+                          // direction it came from, rather than flinging it back to the start
+                          let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
+                          let len = Math.hypot(dx, dy);
+                          if (len < 6) { dx = 0; dy = 1; len = 1; } // dropped dead-centre: spit it out the bottom
+                          const push = CW * 0.95 + 14; // frame centre to card centre, just clear of the edge
+                          const ox2 = hit.sx + (dx / len) * push, oy2 = hit.sy + (dy / len) * push;
+                          setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: ox2 - pan.x, y: oy2 - pan.y }); return x; });
                         }
                       }
                       cardDrag.current = null;
@@ -1016,7 +1040,7 @@ export default function LineageMap({
                     width={CW}
                     height={CW}
                     rx={15}
-                    className={styles.pickCard}
+                    className={placedSet.has(c.id) && isDupImg(c.img) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                   />
                   {(() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
@@ -1076,6 +1100,25 @@ export default function LineageMap({
                   </g>
                 </g>
               );
+            })}
+            {!packed && !collecting && frames.map((f) => {
+              const ids = stacked.get(f.id);
+              if (!ids || !ids.length || !filled.has(f.id)) return null;
+              // each duplicate sits a touch up and to the right of the last, cascading on top of the primary
+              return ids.map((sid, i) => {
+                const off = (i + 1) * 5;
+                const sx = f.sx - pan.x + off, sy = f.sy - pan.y - off;
+                const sClip = `lm-stack-${f.id}-${i}`;
+                return (
+                  <g key={`stk-${sid}`} transform={`rotate(${cardDeg.toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none" }}>
+                    <clipPath id={sClip}>
+                      <rect x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} rx={15} />
+                    </clipPath>
+                    <image href={encodeURI(bust(f.img))} x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} clipPath={`url(#${sClip})`} preserveAspectRatio="xMidYMid slice" />
+                    <rect x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} rx={15} className={`${styles.pickCard} ${styles.pickCardStack}`} />
+                  </g>
+                );
+              });
             })}
             {rootCard(breed.x, breed.y)}
           </>
