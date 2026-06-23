@@ -205,6 +205,7 @@ export default function LineageMap({
   useEffect(() => setPinned(new Map()), [breed.name]);
   // which collected card is showing its info label right now (toggled by tapping its i)
   const [infoHover, setInfoHover] = useState<string | null>(null);
+  const infoSeen = useRef<Set<string>>(new Set()); // cards whose info tooltip has already paid out its +2, so it pays once
   useEffect(() => setInfoHover(null), [breed.name]);
 
   // Dismiss a fixed/opened card (the X in its corner).
@@ -1084,13 +1085,21 @@ export default function LineageMap({
                       </>
                     );
                   })()}
-                  {(breedInfo[c.name] || c.note) ? (() => {
+                  {placedSet.has(c.id) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
                         style={{ cursor: "pointer" }}
                         onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => { e.stopPropagation(); setInfoHover((h) => (h === c.id ? null : c.id)); }} // tap to toggle, works on touch and mouse
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const opening = infoHover !== c.id;
+                          setInfoHover((h) => (h === c.id ? null : c.id)); // tap to toggle, works on touch and mouse
+                          if (opening && !infoSeen.current.has(c.id)) {
+                            infoSeen.current.add(c.id);
+                            flashNum(ix, iy, 2, FLASH_SIZE); // +2 the first time this card's info is exposed, white and small like the rest
+                          }
+                        }}
                       >
                         <circle cx={ix} cy={iy} r={18} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
                         <circle cx={ix} cy={iy} r={12} style={{ fill: "var(--blue-deep)", stroke: "#ffffff", strokeWidth: 2 }} />
