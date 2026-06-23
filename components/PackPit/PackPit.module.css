@@ -234,7 +234,7 @@
   font-family: var(--font-display), system-ui, sans-serif;
   color: #ffffff;
   text-align: center;
-  text-shadow: 0 5px 0 rgba(10, 58, 87, 0.4), 0 0 30px rgba(255, 210, 62, 0.55);
+  text-shadow: none;
   animation: msPop 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .milestoneLabel {
