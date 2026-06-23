@@ -382,7 +382,6 @@ export default function LineageMap({
   // Drag anywhere to pan the diagram. A drag suppresses the click that would
   // otherwise close the overlay or select a circle.
   const onPanDown = (e: React.PointerEvent) => {
-    if (packed) return; // keep the ordered pack fixed under the icon
     suppressClick.current = false;
     drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
   };
@@ -907,7 +906,7 @@ export default function LineageMap({
                   transform={cxf
                     ? `${cxf.transform} scale(${packScale}) translate(${-c.cardX},${-c.cardY})`
                     : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) scale(${packScale}) translate(${-c.cardX},${-c.cardY})`}
-                  style={cxf ? { opacity: cxf.opacity } : undefined}
+                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" } : undefined}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();
