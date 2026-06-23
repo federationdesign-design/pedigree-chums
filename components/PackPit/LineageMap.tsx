@@ -1007,7 +1007,7 @@ export default function LineageMap({
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
-                      <circle cx={dx} cy={dy} r={12} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 2, pointerEvents: "none" }}>
+                      <circle cx={dx} cy={dy} r={6} style={{ fill: ts.bg, stroke: "#ffffff", strokeWidth: 1.5, pointerEvents: "none" }}>
                         <title>{ts.label}</title>
                       </circle>
                     );
