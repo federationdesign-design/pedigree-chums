@@ -803,12 +803,14 @@ export default function PackPit() {
       const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
       const FUSE_LIGHT_AT = 1; // a bomb's fuse lights from the first hit, then intensifies with each further hit
       const emitFuseSparks = (x: number, y: number, intensity: number) => {
-        const n = 1 + Math.floor(intensity * 4); // more sparks the closer it is to going off
+        const TEST_LOUD = true; // TEST: force a big obvious shower regardless of intensity
+        const inten2 = TEST_LOUD ? 1 : intensity;
+        const n = TEST_LOUD ? 14 : 1 + Math.floor(inten2 * 4); // attempts per frame
         for (let i = 0; i < n; i++) {
-          if (Math.random() > 0.3 + intensity * 0.65) continue; // sparse at first, near-constant by the fifth second
-          const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.9 + intensity * 1.6);
-          const sp = 0.8 + Math.random() * (1.3 + intensity * 2.4);
-          fuseSparks.push({ x: x + (Math.random() - 0.5) * 7, y: y + (Math.random() - 0.5) * 7, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: 1 + Math.random() * (1.4 + intensity * 1.8), born: performance.now(), life: 220 + Math.random() * 260, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
+          if (!TEST_LOUD && Math.random() > 0.3 + inten2 * 0.65) continue;
+          const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.9 + inten2 * 1.6);
+          const sp = 1.2 + Math.random() * (1.8 + inten2 * 2.6);
+          fuseSparks.push({ x: x + (Math.random() - 0.5) * 10, y: y + (Math.random() - 0.5) * 10, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: (TEST_LOUD ? 3 : 1) + Math.random() * (2.5 + inten2 * 2.2), born: performance.now(), life: 260 + Math.random() * 320, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
         }
       };
       const drawFuseSparks = (ctx: any, now: number) => {
