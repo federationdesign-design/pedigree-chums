@@ -57,7 +57,7 @@ export default function PackPit() {
   }, []);
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
-  const scatterRef = useRef<(circles: { x: number; y: number; r: number; share: number; name: string }[]) => void>(() => {});
+  const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
   useEffect(() => {
@@ -283,7 +283,8 @@ export default function PackPit() {
         const rw = BIG * 2.6, rh = BIG * 1.0;
         const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
         const b: any = Bodies.rectangle(x, y, rw, rh, { chamfer: { radius: rh * 0.34 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
-        b.plugin = { name: label, label, half: Math.min(rw, rh) / 2, w: rw, h: rh, color: "#ffd23e", kind, family: null, ping: 0 };
+        const tone = kind === "cookieaccept" ? "#4ade80" : kind === "cookiereject" ? "#d64545" : "#ffd23e"; // green accept, red reject, matching the breed tags
+        b.plugin = { name: label, label, half: Math.min(rw, rh) / 2, w: rw, h: rh, color: tone, kind, family: null, ping: 0 };
         return b;
       }
       // A single hamburger menu also rides in with the pour as an ordinary pit object:
@@ -479,8 +480,8 @@ export default function PackPit() {
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
-        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept" || hit.plugin.kind === "cookiereject") return false; // dogs only, not the toys, fallen circles or the buttons
-        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && hit.plugin.kind !== "cookiereject" && !hit.plugin.collected) {
+        if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept" || hit.plugin.kind === "cookiereject" || hit.plugin.kind === "rod" || hit.plugin.kind === "pill") return false; // dogs only, not the toys, fallen circles or the buttons
+        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && hit.plugin.kind !== "cookiereject" && hit.plugin.kind !== "rod" && hit.plugin.kind !== "pill" && !hit.plugin.collected) {
           hit.plugin.collected = true;                                              // only the first collect of a card scores
           numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
           burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));   // pink starburst on first collect
@@ -554,6 +555,22 @@ export default function PackPit() {
           ctx.scale(k, k);
           ctx.globalAlpha = alpha * (b.plugin.popAlpha ?? 1);
         }
+        if (b.plugin.kind === "rod") {
+          const w = b.plugin.w, h = b.plugin.h;
+          rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = b.plugin.color; ctx.fill();
+          ctx.restore(); return;
+        }
+        if (b.plugin.kind === "pill") {
+          const w = b.plugin.w, h = b.plugin.h;
+          rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = "#0a3a57"; ctx.fill();
+          ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.85)"; rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.stroke();
+          ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          let fs = 12; ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`;
+          const maxw = w * 0.86, tw = ctx.measureText(b.plugin.label).width;
+          if (tw > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / tw)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
+          ctx.fillText(b.plugin.label, 0, 1);
+          ctx.restore(); return;
+        }
         if (b.plugin.kind === "pct") {
           ctx.rotate(-b.angle); // keep the % upright and the hop vertical regardless of spin
           const rr = b.plugin.half, now2 = performance.now();
@@ -613,7 +630,7 @@ export default function PackPit() {
           rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.fillStyle = b.plugin.color; ctx.fill();
           ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
           rrect(ctx, -rw / 2, -rh / 2, rw, rh, rad); ctx.lineWidth = 5; ctx.strokeStyle = hovered ? "rgba(10,58,87,0.55)" : "#0a3a57"; ctx.stroke();
-          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillStyle = b.plugin.kind === "cookiereject" ? "#ffffff" : "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
           let fs = Math.round(rh * 0.5);
           ctx.font = `${fs}px "Luckiest Guy", system-ui, sans-serif`;
           const maxw = rw * 0.84, tw = ctx.measureText(b.plugin.label).width;
@@ -897,8 +914,9 @@ export default function PackPit() {
         }
       };
 
-      scatterRef.current = (circles) => {
-        if (!circles || !circles.length) return;
+      scatterRef.current = (data) => {
+        if (!data) return;
+        const circles = data.circles || [], rods = data.rods || [], pills = data.pills || [];
         const rect = render.canvas.getBoundingClientRect();
         for (const c of circles) {
           const r = Math.max(14, c.r);
@@ -908,6 +926,23 @@ export default function PackPit() {
           const isBomb = Math.random() < 1 / 35; // roughly one scattered dot in 35 arrives as a bomb
           b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 5, repelOn: false, repelStart: 0, inert: false, bomb: isBomb, hits: 0, popped: false, bombImg: isBomb ? getImg("__bomb", "/bomb.svg") : null };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });
+          Composite.add(engine.world, b);
+        }
+        // the connecting rods tip in as thin tumbling bars: yellow if their branch was open, white if not
+        for (const rd of rods) {
+          const mx = (rd.x1 + rd.x2) / 2 - rect.left, my = (rd.y1 + rd.y2) / 2 - rect.top;
+          const dx = rd.x2 - rd.x1, dy = rd.y2 - rd.y1, len = Math.max(24, Math.hypot(dx, dy)), th = 8;
+          const b: any = Bodies.rectangle(mx, my, len, th, { angle: Math.atan2(dy, dx), chamfer: { radius: th / 2 }, restitution: 0.4, friction: 0.3, frictionAir: 0.006, density: 0.004, render: { visible: false } });
+          b.plugin = { name: "", kind: "rod", w: len, h: th, half: th / 2, color: rd.lit ? "#ffd23e" : "rgba(255,255,255,0.72)", img: null, family: null, ping: 0 };
+          Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.6 });
+          Composite.add(engine.world, b);
+        }
+        // the blue name pills drop in too, each still carrying its breed name
+        for (const pl of pills) {
+          const px = pl.x - rect.left, py = pl.y - rect.top, pw = Math.max(44, pl.w), ph = 26;
+          const b: any = Bodies.rectangle(px, py, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.35, friction: 0.4, frictionAir: 0.008, density: 0.0012, render: { visible: false } });
+          b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0 };
+          Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.4 });
           Composite.add(engine.world, b);
         }
       };

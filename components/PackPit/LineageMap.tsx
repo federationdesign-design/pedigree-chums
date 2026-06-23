@@ -121,7 +121,11 @@ export default function LineageMap({
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
   onRemove?: (name: string) => void;
-  onScatter?: (circles: { x: number; y: number; r: number; share: number; name: string }[]) => void;
+  onScatter?: (data: {
+    circles: { x: number; y: number; r: number; share: number; name: string }[];
+    rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[];
+    pills: { x: number; y: number; w: number; name: string }[];
+  }) => void;
   onScore?: (v: number) => void;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
@@ -524,14 +528,23 @@ export default function LineageMap({
     burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
     onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
     // hand the percentage circles straight to the pit so they drop in the instant the button is
-    // hit; each circle launches from where its card actually sits right now (wherever you dragged
-    // it, or where the Collect grid placed it), not from the node's original layout spot. Card
-    // coords are user coords, so add the pan to get the screen position the pit expects.
-    const circles = pickCards
-      .filter((c) => !(packed && packHidden.has(c.id)))
-      .slice(0, 60)
-      .map((c) => ({ x: c.cardX + pan.x, y: c.cardY + pan.y, r: radius(c.share), share: c.share, name: c.name }));
-    onScatter?.(circles);
+    // hit; they fall from each node's spot in the family tree, and the connecting rods and the
+    // blue name pills tip in with them. Node coords are user coords, so add the pan for the screen.
+    const vis = shown.filter((n) => n._parent);
+    const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+    const circles = vis.slice(0, 60).map((n) => {
+      const share = shareOf(n);
+      return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
+    });
+    const rods = vis.slice(0, 70).map((n) => {
+      const p = n._parent as Node;
+      return { x1: p._x + pan.x, y1: p._y + pan.y, x2: n._x + pan.x, y2: n._y + pan.y, lit: open.has(n._id) };
+    });
+    const pills = vis
+      .filter((n) => (n.children && n.children.length) || !autoExposed.has(n._id))
+      .slice(0, 50)
+      .map((n) => ({ x: n._x + pan.x, y: n._y - radius(shareOf(n)) - 13 + pan.y, w: n.name.length * 7.4 + 22, name: n.name }));
+    onScatter?.({ circles, rods, pills });
     tween(520, (t) => setCollectT(t), () => {
       burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
       // hold a beat so the bottom-left pack box can finish its pop before the overlay closes
@@ -672,7 +685,7 @@ export default function LineageMap({
         <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: extinctTop - 90 }}>Chasing balls up in the heavens</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CARD / 2, top: extinctTop - 90 }}>These dogs have had their days</div>
       )}
       {showPack && (
         <button
@@ -694,7 +707,7 @@ export default function LineageMap({
         <div className={styles.packHead} style={{ left: packLabels.alive.x, top: packLabels.alive.y }}>Alive and kicking</div>
       )}
       {packed && packLabels.extinct && (
-        <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>Chasing balls up in the heavens</div>
+        <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>These dogs have had their days</div>
       )}
       <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
