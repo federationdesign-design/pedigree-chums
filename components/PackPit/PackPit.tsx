@@ -464,6 +464,14 @@ export default function PackPit() {
           clearCookieObjects();
           return true;
         }
+        if (hit.plugin?.kind === "rod" || hit.plugin?.kind === "pill") {
+          const p = hit.plugin;
+          if (!p.gone) {
+            p.hits = (p.hits || 0) + 1;
+            if (p.hits >= (p.maxHits || 3)) { p.gone = true; poof(hit.position.x, hit.position.y, p.half || 12); Composite.remove(engine.world, hit); }
+          }
+          return true;
+        }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
@@ -933,7 +941,7 @@ export default function PackPit() {
           const mx = (rd.x1 + rd.x2) / 2 - rect.left, my = (rd.y1 + rd.y2) / 2 - rect.top;
           const dx = rd.x2 - rd.x1, dy = rd.y2 - rd.y1, len = Math.max(24, Math.hypot(dx, dy)), th = 8;
           const b: any = Bodies.rectangle(mx, my, len, th, { angle: Math.atan2(dy, dx), chamfer: { radius: th / 2 }, restitution: 0.4, friction: 0.3, frictionAir: 0.006, density: 0.004, render: { visible: false } });
-          b.plugin = { name: "", kind: "rod", w: len, h: th, half: th / 2, color: rd.lit ? "#ffd23e" : "rgba(255,255,255,0.72)", img: null, family: null, ping: 0 };
+          b.plugin = { name: "", kind: "rod", w: len, h: th, half: th / 2, color: rd.lit ? "#ffd23e" : "rgba(255,255,255,0.72)", img: null, family: null, ping: 0, hits: 0, maxHits: 2, gone: false };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.6 });
           Composite.add(engine.world, b);
         }
@@ -941,7 +949,7 @@ export default function PackPit() {
         for (const pl of pills) {
           const px = pl.x - rect.left, py = pl.y - rect.top, pw = Math.max(44, pl.w), ph = 26;
           const b: any = Bodies.rectangle(px, py, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.35, friction: 0.4, frictionAir: 0.008, density: 0.0012, render: { visible: false } });
-          b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0 };
+          b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0, hits: 0, maxHits: 3, gone: false };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.4 });
           Composite.add(engine.world, b);
         }
@@ -1041,19 +1049,28 @@ export default function PackPit() {
         for (const pair of ev.pairs) {
           for (const c of [pair.bodyA, pair.bodyB] as any[]) {
             const p = c.plugin;
-            if (!p || p.kind !== "pct" || p.inert || p.bomb || p.repelOn) continue;
+            if (!p) continue;
             const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
             if (!other || other.isStatic) continue; // walls, floor, ceiling do not count
             const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
-            if (rv < 5) continue; // a real knock, not a nudge
-            if (p.lastObjHit && now - p.lastObjHit < 600) continue; // one charge per knock, not per frame
-            p.lastObjHit = now;
-            p.charges = (p.charges ?? 5) - 1;
-            if (p.charges <= 0) {
-              p.inert = true;
-              poof(c.position.x, c.position.y, p.half || 21);
-              c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
-              if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
+            if (p.kind === "pct" && !p.inert && !p.bomb && !p.repelOn) {
+              if (rv < 5) continue; // a real knock, not a nudge
+              if (p.lastObjHit && now - p.lastObjHit < 600) continue; // one charge per knock, not per frame
+              p.lastObjHit = now;
+              p.charges = (p.charges ?? 5) - 1;
+              if (p.charges <= 0) {
+                p.inert = true;
+                poof(c.position.x, c.position.y, p.half || 21);
+                c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
+                if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
+              }
+            } else if ((p.kind === "rod" || p.kind === "pill") && !p.gone) {
+              // detritus: rods pop after 2 knocks, pills after 3, then vanish
+              if (rv < 4) continue;
+              if (p.lastObjHit && now - p.lastObjHit < 450) continue;
+              p.lastObjHit = now;
+              p.hits = (p.hits || 0) + 1;
+              if (p.hits >= (p.maxHits || 3)) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); }
             }
           }
         }
