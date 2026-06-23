@@ -932,7 +932,7 @@ export default function PackPit() {
             restitution: 0.4, friction: 0.25, frictionAir: 0.004, density: 0.006, render: { visible: false },
           });
           const isBomb = Math.random() < 1 / 35; // roughly one scattered dot in 35 arrives as a bomb
-          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 5, repelOn: false, repelStart: 0, inert: false, bomb: isBomb, hits: 0, popped: false, bombImg: isBomb ? getImg("__bomb", "/bomb.svg") : null };
+          b.plugin = { name: c.name, kind: "pct", share: c.share, half: r, color: "#ffd23e", img: null, family: null, ping: 0, charges: 20, repelOn: false, repelStart: 0, inert: false, bomb: isBomb, hits: 0, popped: false, bombImg: isBomb ? getImg("__bomb", "/bomb.svg") : null };
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 3 });
           Composite.add(engine.world, b);
         }
@@ -968,7 +968,7 @@ export default function PackPit() {
       const releasePct = (b: any) => {
         if (!b.plugin?.repelOn) return;
         b.plugin.repelOn = false;
-        b.plugin.charges = (b.plugin.charges ?? 5) - 1;
+        b.plugin.charges = (b.plugin.charges ?? 20) - 1;
         if (b.plugin.charges <= 0) {
           b.plugin.inert = true;
           poof(b.position.x, b.position.y, b.plugin.half || 21); // smoke poof only on the final fifth hit
@@ -1057,7 +1057,7 @@ export default function PackPit() {
               if (rv < 5) continue; // a real knock, not a nudge
               if (p.lastObjHit && now - p.lastObjHit < 600) continue; // one charge per knock, not per frame
               p.lastObjHit = now;
-              p.charges = (p.charges ?? 5) - 1;
+              p.charges = (p.charges ?? 20) - 1;
               if (p.charges <= 0) {
                 p.inert = true;
                 poof(c.position.x, c.position.y, p.half || 21);
