@@ -939,22 +939,22 @@ export default function PackPit() {
             hitBomb(pressedBomb); // one hit per second; the fifth detonates
             if (typeof navigator !== "undefined" && navigator.vibrate && pressedBomb && !pressedBomb.plugin.popped) navigator.vibrate(14 + (pressedBomb.plugin.heldHits || 0) * 12); // a rattle in the hand that grows as the fuse burns down
           }
-          // the fuse lights from the very first hit and fizzes brighter and more frantic
-          // with every hit after that, sparking from the wick at the top-right of the bomb
-          for (const fb of bodies) {
-            if (!fb.plugin?.bomb || fb.plugin.popped) continue;
-            const fhits = fb.plugin.hits || 0;
-            if (fhits < FUSE_LIGHT_AT) continue;
-            const fInt = Math.min(1, 0.45 + 0.55 * (fhits - FUSE_LIGHT_AT) / Math.max(1, 5 - FUSE_LIGHT_AT)); // floored so the lit fuse keeps fizzing visibly between clicks
-            const frr = fb.plugin.half || 21, fbi = fb.plugin.bombImg;
-            let fox = frr * 0.85, foy = -frr * 1.0; // fallback wick spot if the sprite has not loaded
-            if (fbi && fbi.naturalWidth) {
-              const far = fbi.naturalWidth / fbi.naturalHeight, fbox = frr * 2.4;
-              const fbw = far >= 1 ? fbox : fbox * far, fbh = far >= 1 ? fbox / far : fbox;
-              fox = fbw * 0.34; foy = -fbh * 0.4; // the wick tip at the top-right of the sprite
-            }
-            emitFuseSparks(fb.position.x + fox, fb.position.y + foy, fInt);
+        }
+        // the fuse lights from the first hit and keeps fizzing on the bomb between clicks,
+        // brighter and more frantic per hit, sparking from the wick at the top-right
+        for (const fb of bodies) {
+          if (!fb.plugin?.bomb || fb.plugin.popped) continue;
+          const fhits = fb.plugin.hits || 0;
+          if (fhits < FUSE_LIGHT_AT) continue;
+          const fInt = Math.min(1, 0.45 + 0.55 * (fhits - FUSE_LIGHT_AT) / Math.max(1, 5 - FUSE_LIGHT_AT)); // floored so the lit fuse keeps fizzing visibly between clicks
+          const frr = fb.plugin.half || 21, fbi = fb.plugin.bombImg;
+          let fox = frr * 0.85, foy = -frr * 1.0; // fallback wick spot if the sprite has not loaded
+          if (fbi && fbi.naturalWidth) {
+            const far = fbi.naturalWidth / fbi.naturalHeight, fbox = frr * 2.4;
+            const fbw = far >= 1 ? fbox : fbox * far, fbh = far >= 1 ? fbox / far : fbox;
+            fox = fbw * 0.34; foy = -fbh * 0.4; // the wick tip at the top-right of the sprite
           }
+          emitFuseSparks(fb.position.x + fox, fb.position.y + foy, fInt);
         }
         // advance any pop-out removals (a card hidden via the lineage remove button
         // briefly swells then shrinks to nothing, then leaves the world)
