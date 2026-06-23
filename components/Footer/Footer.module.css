@@ -24,6 +24,10 @@
 }
 .links {
   margin-top: clamp(20px, 3vw, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 28px;
 }
 .link {
   color: var(--white);

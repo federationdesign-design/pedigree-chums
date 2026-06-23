@@ -2,16 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./Footer.module.css";
 
-export default function Footer({ toySafety = false }: { toySafety?: boolean }) {
+export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean }) {
   return (
     <footer className={styles.footer}>
       <div className={styles.logoCol}>
         <Image src="/dogbingo.svg" alt="Pedigree Chums" width={340} height={148} />
       </div>
 
-      {toySafety && (
+      {tradeLinks && (
         <nav className={styles.links}>
           <Link href="/toy-safety" className={styles.link}>Toy Safety Technical File</Link>
+          <Link href="/evidence-register" className={styles.link}>Evidence Register</Link>
         </nav>
       )}
 

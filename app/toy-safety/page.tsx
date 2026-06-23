@@ -424,7 +424,7 @@ export default function ToySafetyPage() {
           <p className={styles.sub}>Draft v0.3, working compliance documentation, not final certification.</p>
         </div>
       </main>
-      <Footer />
+      <Footer tradeLinks />
     </>
   );
 }
