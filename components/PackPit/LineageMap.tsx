@@ -164,6 +164,29 @@ export default function LineageMap({
   useEffect(() => setPan({ x: 0, y: 0 }), [breed.name]);
   const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
+  // Mobile only: the pack grid lays each section out as one long horizontal strip
+  // and the player swipes it left/right. gridX is that scroll offset (0 .. minGridXRef).
+  const isMobile = vp.w <= 768;
+  const [gridX, setGridX] = useState(0);
+  useEffect(() => setGridX(0), [breed.name]);
+  const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
+  const minGridXRef = useRef(0);
+  const startGridDrag = (e: React.PointerEvent) => {
+    suppressClick.current = true; // a touch on the strip never closes the overlay
+    gridDrag.current = { id: e.pointerId, sx: e.clientX, gx: gridX, moved: false };
+    try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
+  };
+  const moveGridDrag = (e: React.PointerEvent) => {
+    const d = gridDrag.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.sx;
+    if (!d.moved && Math.abs(dx) > 6) d.moved = true;
+    if (d.moved) { suppressClick.current = true; setGridX(Math.max(minGridXRef.current, Math.min(0, d.gx + dx))); }
+  };
+  const endGridDrag = (e: React.PointerEvent) => {
+    const d = gridDrag.current;
+    if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} gridDrag.current = null; }
+  };
 
   // custom drop positions for popped-out progenitor cards; drag to reposition,
   // they stay where dropped until the breed changes or the map closes
@@ -382,17 +405,27 @@ export default function LineageMap({
   // sx - pan.x so they stay put while the tree pans behind them.
   const F_LEFT = 96, F_COL = 112, F_ROW = 112; // pitch reduced 25% with the cards, so more rows fit
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
+  // Desktop wraps into fCols columns. Mobile lays each section as one long strip
+  // (never wraps) and the player swipes it sideways, so gridX shifts every column.
+  const colOf = (i: number) => (isMobile ? i : i % fCols);
+  const rowOf = (i: number) => (isMobile ? 0 : Math.floor(i / fCols));
+  const rowsUsed = (n: number) => (isMobile ? (n ? 1 : 0) : Math.ceil(n / fCols));
   const chumTop = 240; // rows sit clear of the top-left chrome and the section headers
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
-  frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: chumTop + Math.floor(i / fCols) * F_ROW }));
-  const aliveTop = chumTop + (frameSlots.chum.length ? Math.ceil(frameSlots.chum.length / fCols) * F_ROW + 72 : 0);
-  frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW }));
-  const extinctTop = aliveTop + (frameSlots.alive.length ? Math.ceil(frameSlots.alive.length / fCols) * F_ROW + 72 : 0);
-  frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: extinctTop + Math.floor(i / fCols) * F_ROW }));
+  frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + colOf(i) * F_COL + gridX, sy: chumTop + rowOf(i) * F_ROW }));
+  const aliveTop = chumTop + (frameSlots.chum.length ? rowsUsed(frameSlots.chum.length) * F_ROW + 72 : 0);
+  frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + colOf(i) * F_COL + gridX, sy: aliveTop + rowOf(i) * F_ROW }));
+  const extinctTop = aliveTop + (frameSlots.alive.length ? rowsUsed(frameSlots.alive.length) * F_ROW + 72 : 0);
+  frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + colOf(i) * F_COL + gridX, sy: extinctTop + rowOf(i) * F_ROW }));
+  // how far left the longest strip may scroll so its tail is reachable (mobile only)
+  const widestCols = isMobile ? Math.max(frameSlots.chum.length, frameSlots.alive.length, frameSlots.extinct.length) : 0;
+  const lastColEdge = widestCols > 0 ? F_LEFT + (widestCols - 1) * F_COL + CARD / 2 : 0;
+  minGridXRef.current = isMobile ? Math.min(0, vp.w - lastColEdge - 24) : 0;
   const frameTotal = frames.length;
   // where each filled card should sit: its frame's screen centre, kept pan-fixed
   const cardFrame = new Map<string, { sx: number; sy: number }>();
   filled.forEach((cardId, frameId) => { const f = frames.find((x) => x.id === frameId); if (f) cardFrame.set(cardId, { sx: f.sx, sy: f.sy }); });
+  const placedSet = new Set(filled.values()); // cards sitting in a frame: fixed, not draggable
 
   // only show the pop-out while its circle is actually on screen and has art
   // Cards to draw: nodes that are picked and currently live in the open tree,
@@ -809,7 +842,15 @@ export default function LineageMap({
                 if (g > 0.02) glow = { ...glow, filter: `drop-shadow(0 0 ${(4 + g * 22).toFixed(1)}px rgba(255, 210, 62, ${(0.25 + g * 0.6).toFixed(2)}))` };
               }
               return (
-                <g key={f.id} transform={`rotate(${cardDeg.toFixed(2)} ${f.sx - pan.x} ${f.sy - pan.y})`}>
+                <g
+                  key={f.id}
+                  transform={`rotate(${cardDeg.toFixed(2)} ${f.sx - pan.x} ${f.sy - pan.y})`}
+                  onPointerDown={isMobile ? (e) => { e.stopPropagation(); startGridDrag(e); } : undefined}
+                  onPointerMove={isMobile ? moveGridDrag : undefined}
+                  onPointerUp={isMobile ? endGridDrag : undefined}
+                  onPointerCancel={isMobile ? endGridDrag : undefined}
+                  style={isMobile ? { touchAction: "none", pointerEvents: "auto" } : undefined}
+                >
                   <rect
                     className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""}`.trim()}
                     style={glow}
@@ -855,6 +896,7 @@ export default function LineageMap({
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => {
                     e.stopPropagation();
+                    if (placedSet.has(c.id)) { if (isMobile) startGridDrag(e); return; } // framed: fixed, not draggable; drives the grid scroll on mobile
                     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
                     cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
                     setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
@@ -863,6 +905,7 @@ export default function LineageMap({
                     setFilled((m) => { let hit = false; const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) { x.delete(fid); hit = true; } return hit ? x : m; }); // lifting a framed card frees its frame
                   }}
                   onPointerMove={(e) => {
+                    if (placedSet.has(c.id)) { if (isMobile) moveGridDrag(e); return; }
                     const cd = cardDrag.current;
                     if (!cd || e.pointerId !== cd.id) return;
                     const dx = e.clientX - cd.sx, dy = e.clientY - cd.sy;
@@ -885,6 +928,7 @@ export default function LineageMap({
                     }
                   }}
                   onPointerUp={(e) => {
+                    if (placedSet.has(c.id)) { if (isMobile) endGridDrag(e); return; }
                     const cd = cardDrag.current;
                     if (cd && e.pointerId === cd.id) {
                       try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
