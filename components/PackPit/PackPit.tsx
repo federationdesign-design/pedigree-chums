@@ -813,6 +813,7 @@ export default function PackPit() {
       const fuseSparks: any[] = [];
       const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
       const FUSE_LIGHT_AT = 1; // a bomb's fuse lights from the first hit, then intensifies with each further hit
+      const FUSE_RAMP_MS = 2800; // ms for a lit fuse to build from a faint catch up to the full active fizz
       const emitFuseSparks = (x: number, y: number, intensity: number) => {
         const TEST_LOUD = true; // TEST: force a big obvious shower regardless of intensity
         const inten2 = TEST_LOUD ? 1 : intensity;
@@ -946,7 +947,10 @@ export default function PackPit() {
           if (!fb.plugin?.bomb || fb.plugin.popped) continue;
           const fhits = fb.plugin.hits || 0;
           if (fhits < FUSE_LIGHT_AT) continue;
-          const fInt = Math.min(1, fhits / 5); // fuse ramps low to high: ~20% at the first hit, 100% at the fifth
+          if (!fb.plugin.litAt) fb.plugin.litAt = now; // the moment the fuse first catches
+          const fTime = Math.min(1, (now - fb.plugin.litAt) / FUSE_RAMP_MS); // pressure builds over time
+          const fHit = Math.min(1, (fhits - FUSE_LIGHT_AT) / Math.max(1, 5 - FUSE_LIGHT_AT)); // and is pushed on by each hit
+          const fInt = Math.min(1, Math.pow(Math.max(fTime, fHit), 2)); // ease-in: faint slow catch building up to the full active fizz
           const frr = fb.plugin.half || 21, fbi = fb.plugin.bombImg;
           let fox = frr * 0.85, foy = -frr * 1.0; // fallback wick spot if the sprite has not loaded
           if (fbi && fbi.naturalWidth) {
