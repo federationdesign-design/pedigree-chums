@@ -1,0 +1,77 @@
+/* Toy Safety Technical File: a plain, readable document page. No branded
+   display fonts or decorative treatment, just legible text and bordered tables. */
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: clamp(96px, 13vw, 150px) clamp(16px, 4vw, 32px) clamp(56px, 7vw, 96px);
+}
+.doc {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #d6dbe0;
+  border-radius: 6px;
+  padding: clamp(20px, 4vw, 44px);
+  font-family: var(--font-body), system-ui, sans-serif;
+  line-height: 1.6;
+}
+.doc h1 {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.sub {
+  color: #5b6670;
+  font-size: 0.9rem;
+  margin: 0 0 28px;
+}
+.doc h2 {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.45rem);
+  font-weight: 700;
+  margin: 36px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e3e7eb;
+}
+.doc h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 24px 0 8px;
+}
+.doc p {
+  margin: 0 0 12px;
+}
+.doc ul {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+.doc li {
+  margin: 0 0 4px;
+}
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 0 18px;
+  -webkit-overflow-scrolling: touch;
+}
+.doc table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 520px;
+  font-size: 0.9rem;
+}
+.doc th,
+.doc td {
+  border: 1px solid #cfd6dd;
+  padding: 8px 11px;
+  text-align: left;
+  vertical-align: top;
+}
+.doc thead th {
+  background: #f1f4f7;
+  font-weight: 700;
+}
+.doc tbody th[scope="row"] {
+  background: #f7f9fb;
+  font-weight: 600;
+  white-space: nowrap;
+}
