@@ -199,7 +199,7 @@ export default function LineageMap({
   // closing, and keep showing it at its dropped spot until breed change / close
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => setPinned(new Map()), [breed.name]);
-  // which collected card is showing its info label right now (hover only)
+  // which collected card is showing its info label right now (toggled by tapping its i)
   const [infoHover, setInfoHover] = useState<string | null>(null);
   useEffect(() => setInfoHover(null), [breed.name]);
 
@@ -378,6 +378,7 @@ export default function LineageMap({
   // otherwise close the overlay or select a circle.
   const onPanDown = (e: React.PointerEvent) => {
     suppressClick.current = false;
+    setInfoHover(null); // a tap on empty space dismisses any open info label
     drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
   };
   const onPanMove = (e: React.PointerEvent) => {
@@ -1047,11 +1048,11 @@ export default function LineageMap({
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
-                        style={{ cursor: "help" }}
+                        style={{ cursor: "pointer" }}
                         onPointerDown={(e) => e.stopPropagation()}
-                        onMouseEnter={() => setInfoHover(c.id)}
-                        onMouseLeave={() => setInfoHover((h) => (h === c.id ? null : h))}
+                        onClick={(e) => { e.stopPropagation(); setInfoHover((h) => (h === c.id ? null : c.id)); }} // tap to toggle, works on touch and mouse
                       >
+                        <circle cx={ix} cy={iy} r={18} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
                         <circle cx={ix} cy={iy} r={12} style={{ fill: "var(--blue-deep)", stroke: "#ffffff", strokeWidth: 2 }} />
                         <text x={ix} y={iy + 0.5} textAnchor="middle" dominantBaseline="central" style={{ fill: "#ffffff", font: "italic 700 14px Georgia, serif", pointerEvents: "none" }}>i</text>
                       </g>
