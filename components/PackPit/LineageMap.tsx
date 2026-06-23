@@ -1063,19 +1063,6 @@ export default function LineageMap({
               );
             })}
             {rootCard(breed.x, breed.y)}
-            {infoHover ? (() => {
-              const c = pickCards.find((x) => x.id === infoHover);
-              const text = c ? (breedInfo[c.name] || c.note) : null;
-              if (!c || !text) return null;
-              const w = 190; // small understated hover label, not a click popover
-              return (
-                <foreignObject x={c.cardX - CW / 2} y={c.cardY + CW / 2 + 6} width={w} height={170} style={{ overflow: "visible", pointerEvents: "none" }}>
-                  <div style={{ display: "inline-block", maxWidth: `${w}px`, background: "rgba(10, 58, 87, 0.92)", color: "#ffffff", font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px", borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)" }}>
-                    {text}
-                  </div>
-                </foreignObject>
-              );
-            })() : null}
           </>
         ) : (
           <>
@@ -1112,6 +1099,26 @@ export default function LineageMap({
         ))}
         </g>
       </svg>
+      {infoHover && (() => {
+        const c = pickCards.find((x) => x.id === infoHover);
+        const text = c ? (breedInfo[c.name] || c.note) : null;
+        if (!c || !text) return null;
+        // card screen position: SVG coords + pan (the viewBox offsets by -pan)
+        const left = c.cardX - CW / 2 + pan.x;
+        const top = c.cardY + CW / 2 + 6 + pan.y;
+        return (
+          <div
+            style={{
+              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "none",
+              background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
+              font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
+              borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
+            }}
+          >
+            {text}
+          </div>
+        );
+      })()}
     </div>
     {boxPop && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
