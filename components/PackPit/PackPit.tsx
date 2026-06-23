@@ -482,7 +482,7 @@ export default function PackPit() {
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number, size = 15, score = true) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size }); if (score) setScore((s) => s + val); };
+      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score) setScore((s) => s + val); };
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
@@ -591,10 +591,12 @@ export default function PackPit() {
           }
           if (b.plugin.bomb) {
             const hh = b.plugin.hits || 0;
-            if (hh > 0) { // it rattles harder with every hit, furious by the fourth
-              const amp = 0.06 * hh, sp = Math.max(7, 28 - hh * 5);
+            const held = b.plugin.heldSince && !b.plugin.popped ? Math.min(1, (now2 - b.plugin.heldSince) / 5000) : 0;
+            const inten = Math.max(hh, held * 5); // a held bomb ramps smoothly 0..5 over its five-second fuse; clicks step it by whole hits
+            if (inten > 0) { // it rattles harder the longer it is held, furious by the fifth second
+              const amp = 0.06 * inten, sp = Math.max(6, 28 - inten * 5);
               ctx.rotate(Math.sin(now2 / sp) * amp);
-              ctx.translate(Math.sin(now2 / (sp * 0.6)) * hh * 0.9, 0);
+              ctx.translate(Math.sin(now2 / (sp * 0.6)) * inten * 0.95, 0);
             }
             const bi = b.plugin.bombImg;
             if (bi && bi.complete && bi.naturalWidth) {
@@ -799,7 +801,7 @@ export default function PackPit() {
           const n = numbers[i], t = (now - n.born) / n.life;
           if (t >= 1) { numbers.splice(i, 1); continue; }
           ctx.save(); ctx.globalAlpha = 1 - t;
-          ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillStyle = n.col || "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
           ctx.font = `400 ${n.size || 15}px ${pctFont}, system-ui, sans-serif`;
           ctx.fillText(String(n.val), n.x, n.y - 22 - t * 34);
           ctx.restore();
@@ -846,6 +848,7 @@ export default function PackPit() {
             pressedBomb.plugin.clickPending = false; // a sustained hold, not a quick click
             pressedBomb.plugin.heldHits = (pressedBomb.plugin.heldHits || 0) + 1;
             hitBomb(pressedBomb); // one hit per second; the fifth detonates
+            if (typeof navigator !== "undefined" && navigator.vibrate && pressedBomb && !pressedBomb.plugin.popped) navigator.vibrate(14 + (pressedBomb.plugin.heldHits || 0) * 12); // a rattle in the hand that grows as the fuse burns down
           }
         }
         // advance any pop-out removals (a card hidden via the lineage remove button
@@ -1006,6 +1009,7 @@ export default function PackPit() {
         greyPop(bomb.position.x, bomb.position.y); // three grey debris balls
         numAt(bomb.position.x, bomb.position.y, 250); // the blast itself is worth 250
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
+        if (pressedBomb === bomb && typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([25, 20, 200]); // a solid buzz when it goes off in your grip
         if (pressedBomb === bomb) pressedBomb = null;
         Composite.remove(engine.world, bomb);
         // Only circles caught in a contact chain from the bomb go up with it: those
@@ -1240,7 +1244,7 @@ export default function PackPit() {
           Body.applyForce(acceptBody, acceptBody.position, { x: (Math.random() - 0.5) * 0.0006, y: (Math.random() - 0.5) * 0.0005 }); // very subtle tremble
           if (now - (acceptBody.plugin.lastOne || 0) > 320) {
             acceptBody.plugin.lastOne = now;
-            numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), -1, 13); // streaming -1s that nibble the score
+            numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), -1, 13, true, "#ff2d4f"); // streaming red -1s that nibble the score
           }
           if (now - (acceptBody.plugin.bornAt || now) > 90000) {
             acceptBody.plugin.bornAt = now; // and it nags again after another 90s

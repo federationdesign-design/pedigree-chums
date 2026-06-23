@@ -395,6 +395,7 @@ export default function LineageMap({
   // Drag anywhere to pan the diagram. A drag suppresses the click that would
   // otherwise close the overlay or select a circle.
   const onPanDown = (e: React.PointerEvent) => {
+    if (packed) return; // Done state: the grid is fixed, only the main card moves
     suppressClick.current = false;
     setInfoHover(null); // a tap on empty space dismisses any open info label
     drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
@@ -426,7 +427,7 @@ export default function LineageMap({
   const F_COL = isMobile ? 92 : 112, F_ROW = isMobile ? 92 : 112; // tighter pitch on phones to match the 15% smaller cards
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
   const MCOLS = 4; // phones: one continuous grid, four frames wide before it wraps
-  const chumTop = isMobile ? 190 : 240; // rows sit clear of the top-left chrome (and the section headers on desktop)
+  const chumTop = isMobile ? 170 : 240; // rows sit clear of the top-left chrome (and the section headers on desktop); mobile lifted 20px so the deepest breeds fit before Collect
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
@@ -1104,13 +1105,13 @@ export default function LineageMap({
             {!packed && !collecting && frames.map((f) => {
               const ids = stacked.get(f.id);
               if (!ids || !ids.length || !filled.has(f.id)) return null;
-              // each duplicate sits a touch up and to the right of the last, cascading on top of the primary
+              // each duplicate climbs up and a touch right of the last, sitting on top of (above) the fixed primary
               return ids.map((sid, i) => {
-                const off = (i + 1) * 5;
-                const sx = f.sx - pan.x + off, sy = f.sy - pan.y - off;
+                const off = (i + 1) * 7;
+                const sx = f.sx - pan.x + off * 0.5, sy = f.sy - pan.y - off;
                 const sClip = `lm-stack-${f.id}-${i}`;
                 return (
-                  <g key={`stk-${sid}`} transform={`rotate(${cardDeg.toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none" }}>
+                  <g key={`stk-${sid}`} transform={`rotate(${cardDeg.toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 3px 3px rgba(0,0,0,0.32))" }}>
                     <clipPath id={sClip}>
                       <rect x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} rx={15} />
                     </clipPath>
