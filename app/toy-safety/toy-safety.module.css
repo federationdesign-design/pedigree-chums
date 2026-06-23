@@ -45,6 +45,20 @@
   margin: 0 0 14px;
   padding-left: 22px;
 }
+.doc ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+.note {
+  border-left: 4px solid #1497d6;
+  background: #eef5fb;
+  padding: 12px 16px;
+  margin: 0 0 20px;
+  border-radius: 0 4px 4px 0;
+}
+.note p {
+  margin: 0;
+}
 .doc li {
   margin: 0 0 4px;
 }
