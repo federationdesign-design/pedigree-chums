@@ -946,7 +946,7 @@ export default function PackPit() {
           if (!fb.plugin?.bomb || fb.plugin.popped) continue;
           const fhits = fb.plugin.hits || 0;
           if (fhits < FUSE_LIGHT_AT) continue;
-          const fInt = Math.min(1, 0.45 + 0.55 * (fhits - FUSE_LIGHT_AT) / Math.max(1, 5 - FUSE_LIGHT_AT)); // floored so the lit fuse keeps fizzing visibly between clicks
+          const fInt = Math.min(1, fhits / 5); // fuse ramps low to high: ~20% at the first hit, 100% at the fifth
           const frr = fb.plugin.half || 21, fbi = fb.plugin.bombImg;
           let fox = frr * 0.85, foy = -frr * 1.0; // fallback wick spot if the sprite has not loaded
           if (fbi && fbi.naturalWidth) {
