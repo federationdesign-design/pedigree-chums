@@ -1131,7 +1131,12 @@ export default function PackPit() {
           const rad = (o: any) => o.plugin?.half || 21;
           const touch = (a: any, b: any) =>
             Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y) <= rad(a) + rad(b) + 10;
-          const pool = dyn().filter((o: any) => o.plugin?.kind === "pct" && !o.plugin.bomb && !o.plugin.popped);
+          const pool = dyn().filter((o: any) => {
+            const k = o.plugin?.kind;
+            if (k === "pct") return !o.plugin.bomb && !o.plugin.popped; // yellow and blue % circles
+            if (k === "rod" || k === "pill") return !o.plugin.gone && !o.plugin.popped; // connecting rods and name pills join the chain too
+            return false;
+          });
           const chain: any[] = [];
           let frontier = pool.filter((o: any) => touch(o, bomb));
           frontier.forEach((o: any) => { o.plugin.popped = true; }); // claim now so nothing double-pops mid-chain
