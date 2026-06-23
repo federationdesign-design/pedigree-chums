@@ -812,8 +812,7 @@ export default function PackPit() {
       // ---- fuse fizz: sparks that catch and build as a bomb's five-second fuse burns down ----
       const fuseSparks: any[] = [];
       const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
-      const FUSE_LIGHT_AT = 1; // a bomb's fuse lights from the first hit, then intensifies with each further hit
-      const FUSE_RAMP_MS = 2800; // ms for a lit fuse to build from a faint catch up to the full active fizz
+      const FUSE_LIGHT_AT = 2; // the fuse stays dark on hit 1 and catches from hit 2
       const emitFuseSparks = (x: number, y: number, intensity: number) => {
         const TEST_LOUD = true; // TEST: force a big obvious shower regardless of intensity
         const inten2 = TEST_LOUD ? 1 : intensity;
@@ -947,10 +946,10 @@ export default function PackPit() {
           if (!fb.plugin?.bomb || fb.plugin.popped) continue;
           const fhits = fb.plugin.hits || 0;
           if (fhits < FUSE_LIGHT_AT) continue;
-          if (!fb.plugin.litAt) fb.plugin.litAt = now; // the moment the fuse first catches
-          const fTime = Math.min(1, (now - fb.plugin.litAt) / FUSE_RAMP_MS); // pressure builds over time
-          const fHit = Math.min(1, (fhits - FUSE_LIGHT_AT) / Math.max(1, 5 - FUSE_LIGHT_AT)); // and is pushed on by each hit
-          const fInt = Math.min(1, Math.pow(Math.max(fTime, fHit), 2)); // ease-in: faint slow catch building up to the full active fizz
+          const fTarget = [0, 0, 0.22, 0.55, 0.9, 1][Math.min(fhits, 5)]; // staged: hit1 off, hit2 starts, hit3 ignites, hit4 bright and exuberant
+          fb.plugin.fuseCur = (fb.plugin.fuseCur || 0) + (fTarget - (fb.plugin.fuseCur || 0)) * 0.045; // ease up to each stage, building pressure
+          const fInt = fb.plugin.fuseCur;
+          if (fInt < 0.03) continue; // still essentially unlit
           const frr = fb.plugin.half || 21, fbi = fb.plugin.bombImg;
           let fox = frr * 0.85, foy = -frr * 1.0; // fallback wick spot if the sprite has not loaded
           if (fbi && fbi.naturalWidth) {
