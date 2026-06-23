@@ -1216,7 +1216,7 @@ export default function PackPit() {
         if (elapsed < CALM) return; // quiet start
         const t = elapsed - CALM;
         const level = Math.min(1, t / RISE); // rises to the simmer, then holds at 1
-        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.0006 + level * 0.0014), y: (Math.random() - 0.5) * (0.0006 + level * 0.0012) });
+        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.0005 + level * 0.0012), y: (Math.random() - 0.5) * (0.0005 + level * 0.001) });
         Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.02 + level * 0.1));
         if (t >= RISE + SIMMER) { // the one intense burst, then it settles over the calm
           Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 5, y: -4 });

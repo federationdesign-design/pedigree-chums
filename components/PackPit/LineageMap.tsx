@@ -85,6 +85,7 @@ const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
 const CARD = 82; // card + frame + image size (reduced 25% so more rows fit)
 const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
+const PACK_IMG = new Map(breeds.map((b) => [b.name, b.image])); // pack breed -> its square cartoon card art
 // every white flash number is this small, fixed size, matching the pit; it never
 // scales with the circle that was tapped
 const FLASH_SIZE = 15;
@@ -283,7 +284,7 @@ export default function LineageMap({
     const seenImg = new Set<string>();
     const all: { name: string; img: string; status: BreedTag | null }[] = [];
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      if (k.img && !seenImg.has(k.img)) { seenImg.add(k.img); all.push({ name: k.name, img: k.img, status: nodeStatus(k.name, k.note) }); }
+      if (k.img && !seenImg.has(k.img)) { seenImg.add(k.img); all.push({ name: k.name, img: PACK_IMG.get(k.name) ?? k.img, status: nodeStatus(k.name, k.note) }); }
       walk(k);
     });
     if (root) walk(root);
@@ -406,8 +407,9 @@ export default function LineageMap({
     .map((id) => {
       const live = liveById.get(id);
       const snap = pinned.get(id);
-      const img = (live?.img ?? snap?.img) as string;
       const name = live?.name ?? snap?.name ?? "";
+      const rawImg = (live?.img ?? snap?.img) as string;
+      const img = PACK_IMG.get(name) ?? rawImg; // pack breeds flip to their square cartoon card
       const share = live ? Math.round((live._leaves / (live._parent as Node)._leaves) * 100) : snap?.share ?? 0;
       // cumulative share of the whole breed: a node's leaves over the root's leaves,
       // which is the product of every parent share down the chain
