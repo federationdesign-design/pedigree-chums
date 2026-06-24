@@ -112,6 +112,7 @@ export default function PackPit() {
       const stage = stageRef.current;
 
       const BREEDS = breeds.map((b) => ({ name: b.name, size: b.sizeBand as string, img: b.image }));
+      const PACK_NAMES = new Set(breeds.map((b) => b.name)); // the 54 pack dogs, to flag chum pills that should survive
       const FAMILY: Record<string, { name: string; share: number }[]> = {};
       for (const b of breeds) {
         const lin = getLineage(b.name);
@@ -334,7 +335,7 @@ export default function PackPit() {
       // opens the site menu. Separate from the fixed top-right one (no menuFixed flag).
       function makeMenuObj(w: number) {
         const sz = BIG * 1.2;
-        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 200;
+        const x = sz / 2 + 24 + Math.random() * 40, y = -260 - Math.random() * 200; // drops in from the left edge
         const b: any = Bodies.rectangle(x, y, sz, sz, { chamfer: { radius: sz * 0.3 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.0011, render: { visible: false } });
         b.plugin = { name: "Menu", label: "Menu", half: sz / 2, w: sz, h: sz, color: "#ffd23e", kind: "menu", family: null, ping: 0 };
         return b;
@@ -512,7 +513,7 @@ export default function PackPit() {
           const p = hit.plugin;
           if (!p.gone) {
             p.hits = (p.hits || 0) + 1;
-            if (p.hits >= (p.maxHits || 3)) { p.gone = true; poof(hit.position.x, hit.position.y, p.half || 12); Composite.remove(engine.world, hit); }
+            if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(hit.position.x, hit.position.y, p.half || 12); Composite.remove(engine.world, hit); } // a chum pill never expires
           }
           return true;
         }
@@ -1107,7 +1108,7 @@ export default function PackPit() {
         for (const pl of pills) {
           const px = pl.x - rect.left, py = pl.y - rect.top, pw = Math.max(44, pl.w), ph = 26;
           const b: any = Bodies.rectangle(px, py, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.35, friction: 0.4, frictionAir: 0.008, density: 0.0012, render: { visible: false } });
-          b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0, hits: 0, maxHits: 3, gone: false };
+          b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0, hits: 0, maxHits: 3, gone: false, chum: PACK_NAMES.has(pl.name) }; // a pack dog: this pill never expires and the bomb ignores it
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.4 });
           Composite.add(engine.world, b);
         }
@@ -1159,7 +1160,7 @@ export default function PackPit() {
           if (disposed) return;
           pushBoom(bx, by, bsz * 2.2); // pop-art comic blast: flash, jagged burst, flung stars and lightning bolts, smoke, comic word
           numAt(bx, by, 250); // the blast itself is worth 250
-          if (wasHeld && typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([25, 20, 200]); // a solid buzz when it goes off in your grip
+          if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(wasHeld ? [25, 20, 200] : [20, 15, 120]); // a buzz when it goes off: stronger in your grip, a shorter jolt otherwise
           Composite.remove(engine.world, bomb);
           // Only circles caught in a contact chain from the bomb go up with it: those
           // touching the bomb, then those touching them, and so on. Anything cut off by
@@ -1170,7 +1171,8 @@ export default function PackPit() {
           const pool = dyn().filter((o: any) => {
             const k = o.plugin?.kind;
             if (k === "pct") return !o.plugin.bomb && !o.plugin.popped; // yellow and blue % circles
-            if (k === "rod" || k === "pill") return !o.plugin.gone && !o.plugin.popped; // connecting rods and name pills join the chain too
+            if (k === "rod") return !o.plugin.gone && !o.plugin.popped; // connecting rods join the chain
+            if (k === "pill") return !o.plugin.gone && !o.plugin.popped && !o.plugin.chum; // name pills join too, but a chum pill is spared the blast
             return false;
           });
           const chain: any[] = [];
@@ -1247,7 +1249,7 @@ export default function PackPit() {
               if (p.lastObjHit && now - p.lastObjHit < 450) continue;
               p.lastObjHit = now;
               p.hits = (p.hits || 0) + 1;
-              if (p.hits >= (p.maxHits || 3)) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); }
+              if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); } // a chum pill never expires
             }
           }
         }
