@@ -543,7 +543,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 4400));                                          // 4400 bone + slipper
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 5050)); // 5050 two feature cards
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 6000)); // 6000 bowl + menu, before the flood
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 10000));                                       // 10000 all remaining cards
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 50000));                                       // 10000 all remaining cards
         }
       }
 
