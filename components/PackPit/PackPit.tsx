@@ -286,12 +286,11 @@ export default function PackPit() {
       // Spawn one removed logo element as a tumbling pit body, near the logo centre.
       const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number) => {
         const pw = st.size, ph = st.size / st.ar;
-        const x = cx + (Math.random() - 0.5) * LOGO_W * 0.5, y = cy - 10;
-        const b: any = Bodies.rectangle(x, y, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.4, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+        // spawn where the element sat (logo centre for now) and let it simply fall
+        // straight down and bounce to rest, no outward shove, no spin
+        const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.55, friction: 0.4, frictionAir: 0.01, density: 0.0009, render: { visible: false } });
         b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", family: null, ping: 0 };
-        Body.setVelocity(b, { x: (Math.random() - 0.5) * 6, y: -2 - Math.random() * 3 }); // a little pop off the logo
-        Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.5);
-        Composite.add(engine.world, b);
+        Composite.add(engine.world, b); // no setVelocity / setAngularVelocity: it falls under gravity and bounces to settle
       };
       let logoHits = 0;
       const onCollide = (ev: any) => {
