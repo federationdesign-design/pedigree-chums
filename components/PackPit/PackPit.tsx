@@ -223,37 +223,47 @@ export default function PackPit() {
       // pouring pack and toys bounce off it. Each strike sinks and tilts it a notch,
       // and on the fifth hit it finally gives: it goes dynamic and drops onto the
       // pile to rest with everything else. Desktop only.
-      let logoBody: any = null;
-      function makeLogo(w: number, h: number) {
-        const img = getImg(logo.key, logo.src);
-        const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
-        const bw = logo.width, bh = logo.width / ar;
-        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
-        b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
-        if (!(img.complete && img.naturalWidth)) {
-          img.addEventListener("load", () => {
-            const a = img.naturalWidth / img.naturalHeight, newH = logo.width / a;
-            if (Math.abs(newH - b.plugin.h) > 1) { Body.scale(b, 1, newH / b.plugin.h); b.plugin.h = newH; b.plugin.half = Math.min(b.plugin.w, newH) / 2; }
-          }, { once: true });
-        }
-        return b;
+      let logoParts: any[] = [];
+      const LOGO_PARTS = [
+        "/PC-whitedots.svg", "/PC-yellowdots.svg", "/PC-poofs.svg", "/PC-shouts.svg",
+        "/PC-bone.svg", "/PC-tag.svg", "/PC-chums.svg", "/PC-ped.svg",
+      ]; // knocked off in this order: loose decoration first, the text words last
+      function makeLogoParts(w: number, h: number) {
+        const cx = w / 2, cy = h * 0.2 + 100;
+        // every part SVG shares the logo's 595.3x356.5 viewBox, so each body laid at the
+        // same centre and size stacks into the exact logo with no offset maths
+        return LOGO_PARTS.map((src, idx) => {
+          const img = getImg("__logo_" + idx, src);
+          const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
+          const bw = logo.width, bh = logo.width / ar;
+          const b: any = Bodies.rectangle(cx, cy, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
+          b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, part: idx, family: null, ping: 0 };
+          if (!(img.complete && img.naturalWidth)) {
+            img.addEventListener("load", () => {
+              const a = img.naturalWidth / img.naturalHeight, newH = logo.width / a;
+              if (Math.abs(newH - b.plugin.h) > 1) { Body.scale(b, 1, newH / b.plugin.h); b.plugin.h = newH; b.plugin.half = Math.min(b.plugin.w, newH) / 2; }
+            }, { once: true });
+          }
+          return b;
+        });
       }
-      const LOGO_HITS_TO_FALL = 5;
-      const LOGO_SINK = BIG * 0.7; // how far each hit pushes it down before it finally goes
-      const LOGO_W = BIG * 6.8;    // matches logo.width
-      const LOGO_TILT = Math.asin(Math.min(1, LOGO_SINK / LOGO_W)); // tilt that drops the free edge
-      let logoHits = 0;
       const onCollide = (ev: any) => {
-        if (!logoBody || !logoBody.isStatic) return;
+        if (!logoParts.some((p) => p && p.isStatic)) return; // all parts already knocked loose
         for (const pair of ev.pairs) {
           const lg = pair.bodyA.plugin?.logo ? pair.bodyA : pair.bodyB.plugin?.logo ? pair.bodyB : null;
-          if (!lg) continue;
+          if (!lg || !lg.isStatic) continue;
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
-          logoHits++; // count every hit, including repeat knocks from the same object
-          if (logoHits >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it
-          Body.translate(lg, { x: 0, y: LOGO_SINK }); // shove the centre down a notch
-          Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
+          // the parts are stacked at one spot, so one object reports many pairs in a single
+          // event; knock just the next still-attached part loose, in order, per whack
+          const next = logoParts.filter((p) => p && p.isStatic).sort((a, b) => a.plugin.part - b.plugin.part)[0];
+          if (next) {
+            next.isSensor = false;
+            Body.setStatic(next, false);
+            Body.setVelocity(next, { x: (Math.random() - 0.5) * 4, y: -2 - Math.random() * 2 }); // a little pop as it dislodges
+            Body.setAngularVelocity(next, (Math.random() - 0.5) * 0.3);
+          }
+          break; // one part per collision event
         }
       };
       // The hamburger menu starts fixed in the top-right corner, just like the logo.
@@ -1006,7 +1016,7 @@ export default function PackPit() {
         const step = frameDt / DIM_TIME;
         dimLevel = dimLevel < dimTarget ? Math.min(dimTarget, dimLevel + step) : Math.max(dimTarget, dimLevel - step);
 
-        if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
+        for (const lp of logoParts) if (lp && lp.isStatic) drawBall(ctx, lp, 1, false); // each still-attached logo part, drawn in order until knocked loose; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
         bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
@@ -1347,8 +1357,8 @@ export default function PackPit() {
       if (isMobile) { motionRef.current = enableMotion; enableMotion(); } // Android grants now; iOS waits for a tap
 
       if (!isMobile) {
-        logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
-        Composite.add(engine.world, logoBody);
+        logoParts = makeLogoParts(stage.clientWidth, stage.clientHeight);
+        Composite.add(engine.world, logoParts);
         Events.on(engine, "collisionStart", onCollide);
       }
 
