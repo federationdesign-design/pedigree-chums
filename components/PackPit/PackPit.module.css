@@ -95,17 +95,8 @@
   font-weight: 400;
   font-size: 18px;
   line-height: 1.3;
-  /* scoreOpen: the score is the sole shelf trigger, so it takes clicks and sits above floating pit objects */
-  pointer-events: auto;
-  cursor: pointer;
-  border: none;
-  background: none;
-  z-index: 80;
-  position: relative;
-  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;
 }
-.scoreTotal:hover { filter: brightness(1.12); }
-.scoreTotal:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; border-radius: 8px; }
 /* chums-collected tally, bottom-left, pops with a starburst each time it climbs */
 .tally {
   position: fixed;
@@ -136,6 +127,7 @@
   100% { transform: scale(1.6); opacity: 0; }
 }
 .tallyChip {
+  pointer-events: auto; /* parent .tally is pointer-events:none; the chip itself must take the click */
   grid-area: 1 / 1;
   position: relative; /* anchors the burst so it centres on the number */
   display: inline-grid;

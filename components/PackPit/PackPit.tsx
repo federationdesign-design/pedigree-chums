@@ -1524,7 +1524,7 @@ export default function PackPit() {
       <div className={styles.pattern} aria-hidden="true" />
       <img className={styles.floor} src={bust("/floor-shortened-svg.svg")} alt="" aria-hidden="true" />
       <div className={styles.controls}>
-        <button type="button" className={styles.scoreTotal} onClick={() => setShelfOpen(true)} aria-label={`Score: ${score.toLocaleString("en-GB")}. Open your pack`}>{score.toLocaleString("en-GB")}</button>
+        <div className={styles.scoreTotal} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
       </div>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
@@ -1558,7 +1558,7 @@ export default function PackPit() {
       )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
-          <div className={styles.tallyChip}>
+          <button type="button" className={styles.tallyChip} onClick={() => setShelfOpen(true)} aria-label="Open your collected pack">
             <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
               {Array.from({ length: 16 }).map((_, i) => {
                 const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
@@ -1571,7 +1571,7 @@ export default function PackPit() {
             </svg>
             <span className={styles.tallyNum}>{collected}</span>
             <span className={styles.tallyPlusOne} aria-hidden="true">+1</span>
-          </div>
+          </button>
         </div>
       )}
       {shelfOpen && (() => {
