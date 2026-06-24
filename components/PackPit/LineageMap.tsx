@@ -342,6 +342,8 @@ export default function LineageMap({
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
   const [puffs, setPuffs] = useState<{ id: number; sx: number; sy: number }[]>([]); // smoke poofs as a card lands in its frame
   const puffSeq = useRef(0);
+  const [bubbles, setBubbles] = useState<{ id: number; sx: number; sy: number }[]>([]); // blue bubble trail as a card glides to its frame
+  const bubbleSeq = useRef(0);
   const [dragXY, setDragXY] = useState<{ x: number; y: number } | null>(null); // live pointer while dragging a card, for the proximity glow
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
@@ -919,6 +921,9 @@ export default function LineageMap({
                 </g>
               );
             })}
+            {!packed && !collecting && bubbles.map((b) => (
+              <circle key={b.id} className={styles.bubble} cx={b.sx - pan.x} cy={b.sy - pan.y} r={7} style={{ pointerEvents: "none" }} />
+            ))}
             {!packed && !collecting && puffs.map((p) => (
               <g key={p.id} className={styles.puff} transform={`translate(${p.sx - pan.x},${p.sy - pan.y})`} style={{ pointerEvents: "none" }}>
                 {[
@@ -957,18 +962,34 @@ export default function LineageMap({
                     const empty = frames.find((f) => f.img === c.img && !filled.has(f.id));
                     const target = empty || frames.find((f) => f.img === c.img && filled.get(f.id) !== c.id);
                     if (!target) return; // no matching frame for this dog
-                    if (empty) {
-                      setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
-                      setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-                      setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
-                    } else {
-                      setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
-                      setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-                    }
-                    flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 5, FLASH_SIZE); // +5 for the double-click shortcut (drag is worth more)
-                    const pid = puffSeq.current++;
-                    setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
-                    window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+                    // pin first so the card outlives any branch closing while it glides
+                    setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
+                    const sx0 = c.cardX, sy0 = c.cardY;                    // start: the card's home, in content space
+                    const ex = target.sx - pan.x, ey = target.sy - pan.y;  // end: the frame, converted to content space
+                    let lastBub = 0;
+                    tween(460, (t) => {
+                      const e2 = 1 - Math.pow(1 - t, 3);                   // ease-out glide
+                      const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
+                      setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: gx, y: gy }); return x; });
+                      if (t - lastBub > 0.12 && t < 0.95) {               // drop a bubble every so often along the path
+                        lastBub = t;
+                        const bid = bubbleSeq.current++;
+                        setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
+                        window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
+                      }
+                    }, () => {
+                      if (empty) {
+                        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+                        setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+                      } else {
+                        setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
+                        setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+                      }
+                      flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 5, FLASH_SIZE); // +5 for the double-click shortcut (drag is worth more)
+                      const pid = puffSeq.current++;
+                      setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
+                      window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+                    });
                   }}
                   onPointerDown={(e) => {
                     e.stopPropagation();

@@ -556,3 +556,19 @@
   opacity: 0.3;
   transition: opacity 0.15s ease-out;
 }
+
+
+/* ---- blue bubble trail for the double-click glide to a frame ---- */
+.bubble {
+  fill: rgba(43, 180, 238, 0.45);
+  stroke: rgba(255, 255, 255, 0.65);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bubbleFloat 0.62s ease-out forwards;
+}
+@keyframes bubbleFloat {
+  0%   { opacity: 0; transform: translateY(2px) scale(0.5); }
+  25%  { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-20px) scale(1.15); }
+}
