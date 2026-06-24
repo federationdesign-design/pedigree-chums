@@ -1581,6 +1581,9 @@ export default function PackPit() {
           const b = breeds.find((x) => x.name === name);
           return { name, count, img: b ? b.image : "" };
         });
+        const PER_ROW = 5; // five chums to a shelf
+        const rows: typeof uniq[] = [];
+        for (let i = 0; i < uniq.length; i += PER_ROW) rows.push(uniq.slice(i, i + PER_ROW));
         return (
           <div className={styles.shelf} onClick={() => setShelfOpen(false)}>
             <div className={styles.shelfPanel} onClick={(e) => e.stopPropagation()}>
@@ -1589,15 +1592,18 @@ export default function PackPit() {
               {uniq.length === 0 ? (
                 <p className={styles.shelfEmpty}>No chums collected yet. Open a dog’s family tree and pick your chum.</p>
               ) : (
-                <div className={styles.shelfGrid}>
-                  {uniq.map((c) => (
-                    <div className={styles.shelfCell} key={c.name}>
-                      <div className={styles.shelfCard}>
-                        {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
-                        {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
+                <div className={styles.shelfRows}>
+                  {rows.map((row, ri) => (
+                    <div className={styles.shelfRow} key={ri}>
+                      <div className={styles.shelfCards}>
+                        {row.map((c) => (
+                          <div className={styles.shelfCard} key={c.name}>
+                            {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
+                            {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
+                          </div>
+                        ))}
                       </div>
                       <img className={styles.shelfLedge} src="/shelve-test.svg" alt="" aria-hidden="true" />
-                      <span className={styles.shelfName}>{c.name}</span>
                     </div>
                   ))}
                 </div>
