@@ -1164,19 +1164,22 @@ export default function LineageMap({
                   {packed && (() => {
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 6; // pill near the foot of the card (25% smaller)
                     const pillRight = c.cardX + CW / 2 + 6; // right-aligned to the card, nudged just past the edge
-                    // ADJ* tag at the badge's top-right: marks the figure as adjusted now the card is framed
+                    // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
+                    const wasAdjusted = c.share !== c.mix;
                     const ADJ_TILT = -12, aw = 30, ah = 15;
-                    const adjX = pillRight - aw / 2 + 2, adjY = py - ah / 2 + 3;
+                    const adjX = pillRight - 1, adjY = py + 2; // overlaps the corner, nudged 3px right
                     return (
                       <>
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 9} y={py + ph / 2 + 1} dominantBaseline="central">
                           {c.mix < 1 ? "<1%" : `${c.mix}%`}
                         </text>
-                        <g transform={`translate(${adjX},${adjY}) rotate(${ADJ_TILT})`} style={{ pointerEvents: "none" }}>
-                          <rect x={-aw / 2} y={-ah / 2} width={aw} height={ah} rx={ah / 2} ry={ah / 2} style={{ fill: "#9ed8f0", stroke: "#ffffff", strokeWidth: 2 }} />
-                          <text textAnchor="middle" dominantBaseline="central" style={{ fill: "#ffffff", font: "italic 800 9px system-ui, sans-serif", letterSpacing: "0.5px" }}>ADJ*</text>
-                        </g>
+                        {wasAdjusted && (
+                          <g transform={`translate(${adjX},${adjY}) rotate(${ADJ_TILT})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.3))" }}>
+                            <rect x={-aw / 2} y={-ah / 2} width={aw} height={ah} rx={ah / 2} ry={ah / 2} style={{ fill: "#9ed8f0", stroke: "#ffffff", strokeWidth: 2 }} />
+                            <text textAnchor="middle" dominantBaseline="central" style={{ fill: "var(--navy)", font: "italic 800 7.5px system-ui, sans-serif", letterSpacing: "0.3px" }}>ADJ*</text>
+                          </g>
+                        )}
                       </>
                     );
                   })()}
