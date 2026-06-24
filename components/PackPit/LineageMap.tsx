@@ -699,7 +699,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
-            onClick={(e) => { e.stopPropagation(); burstAt(rx, ry + ROOT + 88, ROOT * 0.9); doPack(rx, ry + ROOT + 88, 500); }}
+            onClick={(e) => { e.stopPropagation(); burstAt(rx, ry + ROOT + 88, ROOT * 0.9); doPack(rx, ry + ROOT + 88, -2500); }} // the blue Collect button now costs 2500
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
             aria-label="Collect the ancestor pack"
