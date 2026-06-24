@@ -1462,6 +1462,22 @@ export default function PackPit() {
         }
       });
       window.addEventListener("mouseup", releaseHeldPct);
+      // How-it-works pieces: when the popup closes it sends each piece's on-screen
+      // rect; we drop a body at that spot that falls straight down, +500 each.
+      const onHowToPlayDrop = (ev: any) => {
+        const pieces = ev?.detail?.pieces;
+        if (!Array.isArray(pieces) || !stageRef.current) return;
+        const sr = stageRef.current.getBoundingClientRect();
+        pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number }) => {
+          const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top; // screen rect -> pit centre
+          const pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
+          const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.14 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+          b.plugin = { name: "How it works", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0 };
+          Composite.add(engine.world, b); // falls straight from where it sat in the popup
+          setScore((s) => s + 500); // 500 points per piece as it drops in
+        });
+      };
+      window.addEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
 
 
       function fit() {
@@ -1607,6 +1623,7 @@ export default function PackPit() {
         render.canvas.removeEventListener("dblclick", onDbl);
         render.canvas.removeEventListener("mousedown", onDown);
         window.removeEventListener("mouseup", releaseHeldPct);
+        window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
