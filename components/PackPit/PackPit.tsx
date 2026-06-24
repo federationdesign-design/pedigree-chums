@@ -302,7 +302,7 @@ export default function PackPit() {
           collisionFilter: { category: LOGO_PIECE_CAT, mask: ~LOGO_PIECE_CAT & ~LOGO_LOGO_CAT }, // ignore the logo and each other
           render: { visible: false },
         });
-        b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", family: null, ping: 0 };
+        b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", knockPiece: true, family: null, ping: 0 };
         Composite.add(engine.world, b); // falls straight under gravity: no velocity, no spin
         if (hang) {
           const hinge = Constraint.create({
@@ -1498,7 +1498,7 @@ export default function PackPit() {
       const onLogoPieceHit = (ev: any) => {
         for (const pair of ev.pairs) {
           for (const b of [pair.bodyA, pair.bodyB] as any[]) {
-            if (b?.plugin?.prop !== "logopiece" || b.isStatic) continue;
+            if (!b?.plugin?.knockPiece || b.isStatic) continue; // only the logo knock-off pieces, not the How-it-works boxes
             b.plugin.hits = (b.plugin.hits || 0) + 1;
             numAt(b.position.x, b.position.y, 1); // +1 per hit
             if (b.plugin.hits >= 100) Composite.remove(engine.world, b); // gone after 100
