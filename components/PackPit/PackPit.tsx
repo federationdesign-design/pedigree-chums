@@ -312,18 +312,28 @@ export default function PackPit() {
           window.setTimeout(() => { if (!disposed) Composite.remove(engine.world, hinge); }, SHOUT_HANG_MS);
         }
       };
-      // half-extent fractions: place a piece at (fx, fy) of the logo box, plus an out-dent in px
-      const at = (cx: number, cy: number, fx: number, fy: number, outX = 0, outY = 0) =>
-        ({ x: cx + fx * HALF_W + outX, y: cy + fy * HALF_H + outY });
+      // half-extent fractions: place a piece at (fx, fy) of the logo box, plus an
+      // out-dent in px. The offset is rotated by the logo's current angle so the
+      // spot tracks the logo as it sinks and tilts.
+      const at = (cx: number, cy: number, fx: number, fy: number, outX = 0, outY = 0) => {
+        const ox = fx * HALF_W + outX, oy = fy * HALF_H + outY;
+        const a = logoBody ? logoBody.angle : 0;
+        const ca = Math.cos(a), sa = Math.sin(a);
+        return { x: cx + ox * ca - oy * sa, y: cy + ox * sa + oy * ca };
+      };
       const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number, hitIndex: number) => {
         if (hitIndex === 0) {
-          // 7 white dots, half size: 2 bottom-left, 2 top-right, 2 top-left, 1 bottom-right
+          // 7 white dots at their true spots on the logo (fractions of the logo box,
+          // -1..+1 from centre). Approximate by design; tracks the logo's tilt via at().
           const s = 0.5;
           const spots = [
-            [-0.7, 0.7], [-0.55, 0.85],   // bottom-left x2
-            [0.7, -0.7], [0.55, -0.85],   // top-right x2
-            [-0.7, -0.7], [-0.55, -0.85], // top-left x2
-            [0.7, 0.7],                   // bottom-right x1
+            [0.6, -0.9],    // ~80% across, ~5% down
+            [-0.94, -0.76], // ~3% across, ~12% down
+            [-0.7, -0.4],   // ~15% across, ~30% down
+            [0.56, -0.3],   // ~78% across, ~35% down
+            [-0.74, 0.1],   // ~13% across, ~55% down
+            [-0.74, 0.7],   // ~13% across, ~85% down
+            [0.6, 0.84],    // ~80% across, ~92% down
           ];
           spots.forEach(([fx, fy]) => { const p = at(cx, cy, fx, fy); spawnPiece(st, p.x, p.y, s, 0, false); });
         } else if (hitIndex === 1) {
