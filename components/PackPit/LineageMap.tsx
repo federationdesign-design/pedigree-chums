@@ -529,13 +529,19 @@ export default function LineageMap({
     if (packed) return;
     // One card per ancestor: the same forebear is often bred in several times, so
     // fold the repeats out and keep only the first of each in the pack.
-    const seenKey = new Set<string>();
+    const seenKey = new Map<string, string>(); // key -> the primary card id holding that slot
     const hidden = new Set<string>();
     const uniq: typeof pickCards = [];
+    const dups: { c: (typeof pickCards)[number]; primaryId: string; n: number }[] = [];
+    const dupCount = new Map<string, number>();
     for (const c of pickCards) {
       const key = c.img || c.name; // fold by artwork: the same forebear under two spellings is one card
-      if (seenKey.has(key)) { hidden.add(c.id); continue; }
-      seenKey.add(key);
+      if (seenKey.has(key)) {
+        const n = (dupCount.get(key) || 0) + 1; dupCount.set(key, n);
+        dups.push({ c, primaryId: seenKey.get(key)!, n }); // a duplicate: it will stack on its primary instead of vanishing
+        continue;
+      }
+      seenKey.set(key, c.id);
       uniq.push(c);
     }
     const chum: typeof pickCards = [], alive: typeof pickCards = [], extinct: typeof pickCards = [];
@@ -568,8 +574,11 @@ export default function LineageMap({
       if (extinct.length) { labels.extinct = { x: PACK_LEFT - CW / 2, y: y - 30 }; place(extinct, y + 64); }
     }
     // where each card sits right now, so we can glide it from there to its slot
+    // duplicates glide onto their primary's slot, stacked with a small cascade, instead of vanishing
+    dups.forEach(({ c, primaryId, n }) => { const pg = targets.get(primaryId); if (pg) targets.set(c.id, { x: pg.x + n * 4, y: pg.y + n * 4 }); });
     const starts = new Map<string, { x: number; y: number }>();
     uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
+    dups.forEach(({ c }) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
     setPackLabels(labels);
     setPackHidden(hidden);
     setPacked(true);
@@ -578,7 +587,7 @@ export default function LineageMap({
       const e = 1 - Math.pow(1 - t, 3); // ease out
       setDragPos((prev) => {
         const m = new Map(prev);
-        uniq.forEach((c) => {
+        [...uniq, ...dups.map((d) => d.c)].forEach((c) => {
           const s = starts.get(c.id), g = targets.get(c.id);
           if (s && g) m.set(c.id, { x: s.x + (g.x - s.x) * e, y: s.y + (g.y - s.y) * e });
         });
@@ -1158,10 +1167,10 @@ export default function LineageMap({
             {!packed && !collecting && frames.map((f) => {
               const ids = stacked.get(f.id);
               if (!ids || !ids.length || !filled.has(f.id)) return null;
-              // each duplicate climbs up and a touch right of the last, sitting on top of (above) the fixed primary
+              // each duplicate cascades down and to the right of the last, sitting on top of the fixed primary so the newest is fully visible
               return ids.map((sid, i) => {
                 const off = (i + 1) * 7;
-                const sx = f.sx - pan.x + off * 0.5, sy = f.sy - pan.y - off;
+                const sx = f.sx - pan.x + off * 0.55, sy = f.sy - pan.y + off * 0.55;
                 const sClip = `lm-stack-${f.id}-${i}`;
                 return (
                   <g key={`stk-${sid}`} transform={`rotate(${cardDeg.toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 3px 3px rgba(0,0,0,0.32))" }}>
