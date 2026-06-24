@@ -1524,7 +1524,7 @@ export default function PackPit() {
       <div className={styles.pattern} aria-hidden="true" />
       <img className={styles.floor} src={bust("/floor-shortened-svg.svg")} alt="" aria-hidden="true" />
       <div className={styles.controls}>
-        <div className={styles.scoreTotal} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
+        <button type="button" className={styles.scoreTotal} onClick={() => setShelfOpen(true)} aria-label={`Score: ${score.toLocaleString("en-GB")}. Open your pack`}>{score.toLocaleString("en-GB")}</button>
       </div>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
@@ -1558,7 +1558,7 @@ export default function PackPit() {
       )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
-          <button type="button" className={styles.tallyChip} onClick={() => setShelfOpen(true)} aria-label="Open your collected pack">
+          <div className={styles.tallyChip}>
             <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
               {Array.from({ length: 16 }).map((_, i) => {
                 const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
@@ -1571,18 +1571,9 @@ export default function PackPit() {
             </svg>
             <span className={styles.tallyNum}>{collected}</span>
             <span className={styles.tallyPlusOne} aria-hidden="true">+1</span>
-          </button>
+          </div>
         </div>
       )}
-      {/* a permanent pack-box handle: peeks up from the bottom-right on approach, opens the shelf */}
-      <button
-        type="button"
-        className={styles.packBox}
-        onClick={() => setShelfOpen(true)}
-        aria-label="Open your pack"
-      >
-        <img src="/card-pack-box.svg" alt="" aria-hidden="true" />
-      </button>
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
