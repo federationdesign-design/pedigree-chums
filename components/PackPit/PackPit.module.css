@@ -338,8 +338,8 @@
 /* the cards sit in a five-up row, resting on the continuous ledge below */
 .shelfCards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   padding: 0 1.5%;
   align-items: end;
   position: relative;
@@ -349,13 +349,16 @@
 .shelfCard {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 300 / 430; /* the physical card is portrait */
   border-radius: 14px;
   overflow: hidden;
   background: #07293f;
-  border: 3px solid #ffffff;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
 }
+/* the real card art already carries its own border/rounding, so no white frame */
+.shelfCardReal { border: none; }
+/* the cartoon fallback keeps the white-framed look of the pit cards */
+.shelfCardCartoon { border: 3px solid #ffffff; }
 .shelfCard img {
   width: 100%;
   height: 100%;
@@ -384,6 +387,6 @@
   pointer-events: none;
 }
 @media (max-width: 768px) {
-  .shelfCards { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .shelfCards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .shelfPanel { padding: 24px 16px 18px; }
 }

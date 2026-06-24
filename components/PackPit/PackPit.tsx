@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { breeds } from "../../data/breeds";
+import { breeds, breedCard } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import LineageMap from "./LineageMap";
@@ -1579,9 +1579,11 @@ export default function PackPit() {
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
         const uniq = [...counts.entries()].map(([name, count]) => {
           const b = breeds.find((x) => x.name === name);
-          return { name, count, img: b ? b.image : "" };
+          const cartoon = b ? b.image : "";
+          const card = b && breedCard[b.slug] ? breedCard[b.slug] : null; // the real physical card, when we have art for it
+          return { name, count, img: card ?? cartoon, isCard: !!card };
         });
-        const PER_ROW = 5; // five chums to a shelf
+        const PER_ROW = 4; // four chums to a shelf (portrait cards need the room)
         const rows: typeof uniq[] = [];
         for (let i = 0; i < uniq.length; i += PER_ROW) rows.push(uniq.slice(i, i + PER_ROW));
         return (
@@ -1597,7 +1599,7 @@ export default function PackPit() {
                     <div className={styles.shelfRow} key={ri}>
                       <div className={styles.shelfCards}>
                         {row.map((c) => (
-                          <div className={styles.shelfCard} key={c.name}>
+                          <div className={`${styles.shelfCard} ${c.isCard ? styles.shelfCardReal : styles.shelfCardCartoon}`} key={c.name}>
                             {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
                             {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
                           </div>
