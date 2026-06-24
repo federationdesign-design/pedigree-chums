@@ -283,25 +283,26 @@ export default function PackPit() {
         { bgKey: "__logoS4", bg: "/PC-logo-5th-hit.svg", dropKey: "__logoD4", drop: "/poofs-for-logofall.svg", ar: 50.6 / 64.5, size: BIG * 0.75 },
         { bgKey: "__logoS5", bg: "/PC-logo-6th-hit.svg", dropKey: "__logoD5", drop: "/tagline-dot-for-logofall.svg", ar: 174.1 / 23.9, size: BIG * 2.0 },
       ];
-      LOGO_STAGES.forEach((st) => { getImg(st.bgKey, st.bg); getImg(st.dropKey, st.drop); }); // preload so swaps and drops do not flash
+      LOGO_STAGES.forEach((st) => { getImg(st.bgKey, st.bg); const di = getImg(st.dropKey, st.drop); if (di && (di as any).decode) (di as any).decode().catch(() => {}); }); // preload + force-decode so pieces (esp. shouts) paint the instant they spawn
       // Spawn one removed logo element as a tumbling pit body, near the logo centre.
       const SHOUT_HANG_MS = 350;  // how long the shouts piece hangs before releasing (min for a visible swing)
       const SHOUT_SWING_DEG = 3;  // pendulum arc of the hang
-      // How many of each element leave at each hit, and how varied their sizes are.
-      const LOGO_COUNTS = [7, 3, 8, 4, 1];      // hit 1..5: white balls, yellow balls, shouts, poofs, tag
-      const LOGO_VARY = [0.5, 0.25, 0.3, 0.3, 0]; // +/- size jitter per group (white balls vary most)
-      const LOGO_PIECE_CAT = 0x0010;            // collision category for logo pieces
-      const spawnPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, x: number, y: number, scale: number, hang: boolean) => {
+      // Each hit drops a specific set of elements at named spots on the logo.
+      // Positions are fractions of the logo half-extents from its centre:
+      //   x: -1 = left edge, +1 = right edge;  y: -1 = top, +1 = bottom.
+      const LOGO_PIECE_CAT = 0x0010; // collision category for logo pieces
+      const HALF_W = LOGO_W / 2, HALF_H = (LOGO_W / (150 / 64)) / 2;
+      const spawnPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, x: number, y: number, scale: number, angleDeg: number, hang: boolean) => {
         const pw = st.size * scale, ph = (st.size / st.ar) * scale;
         const b: any = Bodies.rectangle(x, y, pw, ph, {
+          angle: (angleDeg * Math.PI) / 180,
           chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.45, friction: 0.4, frictionAir: 0.01, density: 0.0009,
-          collisionFilter: { category: LOGO_PIECE_CAT, mask: ~LOGO_PIECE_CAT & ~LOGO_LOGO_CAT }, // collide with everything EXCEPT the logo (and not each other)
+          collisionFilter: { category: LOGO_PIECE_CAT, mask: ~LOGO_PIECE_CAT & ~LOGO_LOGO_CAT }, // ignore the logo and each other
           render: { visible: false },
         });
         b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", family: null, ping: 0 };
         Composite.add(engine.world, b); // falls straight under gravity: no velocity, no spin
         if (hang) {
-          // shouts: hang from the top-right corner, swing a touch, then release.
           const hinge = Constraint.create({
             pointA: { x: x + pw / 2, y: y - ph / 2 }, bodyB: b, pointB: { x: pw / 2, y: -ph / 2 },
             length: 0, stiffness: 1, render: { visible: false },
@@ -311,17 +312,48 @@ export default function PackPit() {
           window.setTimeout(() => { if (!disposed) Composite.remove(engine.world, hinge); }, SHOUT_HANG_MS);
         }
       };
-      // Drop the whole batch for this hit, scattered around the logo, each falling straight.
+      // half-extent fractions: place a piece at (fx, fy) of the logo box, plus an out-dent in px
+      const at = (cx: number, cy: number, fx: number, fy: number, outX = 0, outY = 0) =>
+        ({ x: cx + fx * HALF_W + outX, y: cy + fy * HALF_H + outY });
       const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number, hitIndex: number) => {
-        const n = LOGO_COUNTS[hitIndex] ?? 1;
-        const vary = LOGO_VARY[hitIndex] ?? 0;
-        const hang = st.dropKey === "__logoD3"; // only the shouts hang
-        const spread = LOGO_W * 0.42; // how wide across the logo they scatter
-        for (let i = 0; i < n; i++) {
-          const fx = cx + (n === 1 ? 0 : ((i / (n - 1)) - 0.5) * spread) + (Math.random() - 0.5) * 24;
-          const fy = cy + (Math.random() - 0.5) * (st.size / st.ar) * 0.6;
-          const scale = 1 + (Math.random() - 0.5) * 2 * vary; // size jitter
-          spawnPiece(st, fx, fy, scale, hang);
+        if (hitIndex === 0) {
+          // 7 white dots, half size: 2 bottom-left, 2 top-right, 2 top-left, 1 bottom-right
+          const s = 0.5;
+          const spots = [
+            [-0.7, 0.7], [-0.55, 0.85],   // bottom-left x2
+            [0.7, -0.7], [0.55, -0.85],   // top-right x2
+            [-0.7, -0.7], [-0.55, -0.85], // top-left x2
+            [0.7, 0.7],                   // bottom-right x1
+          ];
+          spots.forEach(([fx, fy]) => { const p = at(cx, cy, fx, fy); spawnPiece(st, p.x, p.y, s, 0, false); });
+        } else if (hitIndex === 1) {
+          // 3 yellow dots, half size: bottom-left, top-right, bottom-right
+          const s = 0.5;
+          const spots = [[-0.7, 0.7], [0.7, -0.7], [0.7, 0.7]];
+          spots.forEach(([fx, fy]) => { const p = at(cx, cy, fx, fy); spawnPiece(st, p.x, p.y, s, 0, false); });
+        } else if (hitIndex === 2) {
+          // 8 shouts: a dyad at each corner, the pair splayed ~33 degrees apart; each hangs
+          const corners: [number, number, number][] = [
+            [-0.8, -0.8, 225], [0.8, -0.8, 315], [0.8, 0.8, 45], [-0.8, 0.8, 135], // base angle points outward from centre
+          ];
+          corners.forEach(([fx, fy, base]) => {
+            const p = at(cx, cy, fx, fy);
+            spawnPiece(st, p.x, p.y, 1, base - 16.5, true); // one half of the dyad
+            spawnPiece(st, p.x, p.y, 1, base + 16.5, true); // the other, 33 degrees apart
+          });
+        } else if (hitIndex === 3) {
+          // 4 poofs: 1 per side, 100px out from the central axis
+          const OUT = 100;
+          const sides = [
+            at(cx, cy, 0, -1, 0, -OUT), // top
+            at(cx, cy, 0, 1, 0, OUT),   // bottom
+            at(cx, cy, -1, 0, -OUT, 0), // left
+            at(cx, cy, 1, 0, OUT, 0),   // right
+          ];
+          sides.forEach((p) => spawnPiece(st, p.x, p.y, 1, 0, false));
+        } else {
+          // tagline: single, centred below
+          spawnPiece(st, cx, cy + HALF_H * 0.2, 1, 0, false);
         }
       };
       let logoHits = 0;
@@ -758,8 +790,9 @@ export default function PackPit() {
           ctx.translate(b.plugin.ox || 0, b.plugin.oy || 0);
           const pw = b.plugin.w, ph = b.plugin.h;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
-          if (img && img.complete && img.naturalWidth) {
-            const ir = img.naturalWidth / img.naturalHeight, br = pw / ph;
+          if (img && img.complete && (img.naturalWidth || b.plugin.prop === "logopiece")) {
+            const iw = img.naturalWidth || pw, ih = img.naturalHeight || ph; // viewBox-only SVGs report 0; fall back to the body box
+            const ir = iw / ih, br = pw / ph;
             const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
             ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
           } else if (b.plugin.prop === "ball") {
