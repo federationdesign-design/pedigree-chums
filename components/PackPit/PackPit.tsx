@@ -254,12 +254,13 @@ export default function PackPit() {
       // pouring pack and toys bounce off it. Each strike sinks and tilts it a notch,
       // and on the fifth hit it finally gives: it goes dynamic and drops onto the
       // pile to rest with everything else. Desktop only.
+      const LOGO_LOGO_CAT = 0x0008; // collision category for the logo body, so dropped pieces can ignore it
       let logoBody: any = null;
       function makeLogo(w: number, h: number) {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, render: { visible: false } });
+        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, collisionFilter: { category: LOGO_LOGO_CAT }, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
@@ -276,40 +277,51 @@ export default function PackPit() {
       // Swap-and-drop: each hit swaps the logo art to the next backdrop (one
       // element removed) and drops that element into the pit as its own body.
       const LOGO_STAGES = [
-        { bgKey: "__logoS1", bg: "/PC-logo-2nd-hit.svg", dropKey: "__logoD1", drop: "/why-dot-for-logofall.svg", ar: 19.7 / 19.6, size: BIG * 0.9 },
-        { bgKey: "__logoS2", bg: "/PC-logo-3rd-hit.svg", dropKey: "__logoD2", drop: "/yellow-dot-for-logofall.svg", ar: 19.7 / 19.6, size: BIG * 0.9 },
-        { bgKey: "__logoS3", bg: "/PC-logo-4th-hit.svg", dropKey: "__logoD3", drop: "/shouts-for-logofall.svg", ar: 69 / 71.4, size: BIG * 1.6 },
-        { bgKey: "__logoS4", bg: "/PC-logo-5th-hit.svg", dropKey: "__logoD4", drop: "/poofs-for-logofall.svg", ar: 50.6 / 64.5, size: BIG * 1.5 },
-        { bgKey: "__logoS5", bg: "/PC-logo-6th-hit.svg", dropKey: "__logoD5", drop: "/tagline-dot-for-logofall.svg", ar: 174.1 / 23.9, size: BIG * 4.0 },
+        { bgKey: "__logoS1", bg: "/PC-logo-2nd-hit.svg", dropKey: "__logoD1", drop: "/why-dot-for-logofall.svg", ar: 19.7 / 19.6, size: BIG * 0.45 },
+        { bgKey: "__logoS2", bg: "/PC-logo-3rd-hit.svg", dropKey: "__logoD2", drop: "/yellow-dot-for-logofall.svg", ar: 19.7 / 19.6, size: BIG * 0.45 },
+        { bgKey: "__logoS3", bg: "/PC-logo-4th-hit.svg", dropKey: "__logoD3", drop: "/shouts-for-logofall.svg", ar: 69 / 71.4, size: BIG * 0.8 },
+        { bgKey: "__logoS4", bg: "/PC-logo-5th-hit.svg", dropKey: "__logoD4", drop: "/poofs-for-logofall.svg", ar: 50.6 / 64.5, size: BIG * 0.75 },
+        { bgKey: "__logoS5", bg: "/PC-logo-6th-hit.svg", dropKey: "__logoD5", drop: "/tagline-dot-for-logofall.svg", ar: 174.1 / 23.9, size: BIG * 2.0 },
       ];
       LOGO_STAGES.forEach((st) => { getImg(st.bgKey, st.bg); getImg(st.dropKey, st.drop); }); // preload so swaps and drops do not flash
       // Spawn one removed logo element as a tumbling pit body, near the logo centre.
       const SHOUT_HANG_MS = 350;  // how long the shouts piece hangs before releasing (min for a visible swing)
       const SHOUT_SWING_DEG = 3;  // pendulum arc of the hang
-      const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number) => {
-        const pw = st.size, ph = st.size / st.ar;
-        // spawn where the element sat (logo centre for now) and let it simply fall
-        // straight down and bounce to rest, no outward shove, no spin
-        const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.55, friction: 0.4, frictionAir: 0.01, density: 0.0009, render: { visible: false } });
+      // How many of each element leave at each hit, and how varied their sizes are.
+      const LOGO_COUNTS = [7, 3, 8, 4, 1];      // hit 1..5: white balls, yellow balls, shouts, poofs, tag
+      const LOGO_VARY = [0.5, 0.25, 0.3, 0.3, 0]; // +/- size jitter per group (white balls vary most)
+      const LOGO_PIECE_CAT = 0x0010;            // collision category for logo pieces
+      const spawnPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, x: number, y: number, scale: number, hang: boolean) => {
+        const pw = st.size * scale, ph = (st.size / st.ar) * scale;
+        const b: any = Bodies.rectangle(x, y, pw, ph, {
+          chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.45, friction: 0.4, frictionAir: 0.01, density: 0.0009,
+          collisionFilter: { category: LOGO_PIECE_CAT, mask: ~LOGO_PIECE_CAT & ~LOGO_LOGO_CAT }, // collide with everything EXCEPT the logo (and not each other)
+          render: { visible: false },
+        });
         b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", family: null, ping: 0 };
-        Composite.add(engine.world, b);
-        if (st.dropKey === "__logoD3") {
-          // shouts: hang from the top-right corner and swing a touch, then release and fall.
-          const cornerX = cx + pw / 2, cornerY = cy - ph / 2; // top-right corner in world space
+        Composite.add(engine.world, b); // falls straight under gravity: no velocity, no spin
+        if (hang) {
+          // shouts: hang from the top-right corner, swing a touch, then release.
           const hinge = Constraint.create({
-            pointA: { x: cornerX, y: cornerY },           // fixed anchor at the corner
-            bodyB: b,
-            pointB: { x: pw / 2, y: -ph / 2 },             // the body's own top-right corner
-            length: 0,
-            stiffness: 1,
-            render: { visible: false },
+            pointA: { x: x + pw / 2, y: y - ph / 2 }, bodyB: b, pointB: { x: pw / 2, y: -ph / 2 },
+            length: 0, stiffness: 1, render: { visible: false },
           });
           Composite.add(engine.world, hinge);
-          Body.setAngularVelocity(b, (SHOUT_SWING_DEG * Math.PI / 180) * 0.4); // a small nudge so it swings pendulum-style
-          window.setTimeout(() => {
-            if (disposed) return;
-            Composite.remove(engine.world, hinge); // let go: it now falls and bounces like the rest
-          }, SHOUT_HANG_MS);
+          Body.setAngularVelocity(b, (SHOUT_SWING_DEG * Math.PI / 180) * 0.4);
+          window.setTimeout(() => { if (!disposed) Composite.remove(engine.world, hinge); }, SHOUT_HANG_MS);
+        }
+      };
+      // Drop the whole batch for this hit, scattered around the logo, each falling straight.
+      const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number, hitIndex: number) => {
+        const n = LOGO_COUNTS[hitIndex] ?? 1;
+        const vary = LOGO_VARY[hitIndex] ?? 0;
+        const hang = st.dropKey === "__logoD3"; // only the shouts hang
+        const spread = LOGO_W * 0.42; // how wide across the logo they scatter
+        for (let i = 0; i < n; i++) {
+          const fx = cx + (n === 1 ? 0 : ((i / (n - 1)) - 0.5) * spread) + (Math.random() - 0.5) * 24;
+          const fy = cy + (Math.random() - 0.5) * (st.size / st.ar) * 0.6;
+          const scale = 1 + (Math.random() - 0.5) * 2 * vary; // size jitter
+          spawnPiece(st, fx, fy, scale, hang);
         }
       };
       let logoHits = 0;
@@ -320,9 +332,10 @@ export default function PackPit() {
           if (!lg) continue;
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
+          if (other.plugin?.prop === "logopiece") continue; // a falling logo piece must not count as a hit
           logoHits++; // count every hit, including repeat knocks from the same object
           const st = LOGO_STAGES[Math.min(logoHits, LOGO_STAGES.length) - 1]; // this hit's backdrop + dropped piece
-          if (st) { lg.plugin.img = getImg(st.bgKey, st.bg); dropLogoPiece(st, lg.position.x, lg.position.y); } // swap art, drop the removed element
+          if (st) { lg.plugin.img = getImg(st.bgKey, st.bg); dropLogoPiece(st, lg.position.x, lg.position.y, logoHits - 1); } // swap art, drop the removed element
           if (logoHits >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it
           Body.translate(lg, { x: 0, y: LOGO_SINK }); // shove the centre down a notch
           Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
