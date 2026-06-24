@@ -284,13 +284,33 @@ export default function PackPit() {
       ];
       LOGO_STAGES.forEach((st) => { getImg(st.bgKey, st.bg); getImg(st.dropKey, st.drop); }); // preload so swaps and drops do not flash
       // Spawn one removed logo element as a tumbling pit body, near the logo centre.
+      const SHOUT_HANG_MS = 350;  // how long the shouts piece hangs before releasing (min for a visible swing)
+      const SHOUT_SWING_DEG = 3;  // pendulum arc of the hang
       const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number) => {
         const pw = st.size, ph = st.size / st.ar;
         // spawn where the element sat (logo centre for now) and let it simply fall
         // straight down and bounce to rest, no outward shove, no spin
         const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.55, friction: 0.4, frictionAir: 0.01, density: 0.0009, render: { visible: false } });
         b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", family: null, ping: 0 };
-        Composite.add(engine.world, b); // no setVelocity / setAngularVelocity: it falls under gravity and bounces to settle
+        Composite.add(engine.world, b);
+        if (st.dropKey === "__logoD3") {
+          // shouts: hang from the top-right corner and swing a touch, then release and fall.
+          const cornerX = cx + pw / 2, cornerY = cy - ph / 2; // top-right corner in world space
+          const hinge = Constraint.create({
+            pointA: { x: cornerX, y: cornerY },           // fixed anchor at the corner
+            bodyB: b,
+            pointB: { x: pw / 2, y: -ph / 2 },             // the body's own top-right corner
+            length: 0,
+            stiffness: 1,
+            render: { visible: false },
+          });
+          Composite.add(engine.world, hinge);
+          Body.setAngularVelocity(b, (SHOUT_SWING_DEG * Math.PI / 180) * 0.4); // a small nudge so it swings pendulum-style
+          window.setTimeout(() => {
+            if (disposed) return;
+            Composite.remove(engine.world, hinge); // let go: it now falls and bounces like the rest
+          }, SHOUT_HANG_MS);
+        }
       };
       let logoHits = 0;
       const onCollide = (ev: any) => {
