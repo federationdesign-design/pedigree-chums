@@ -517,7 +517,7 @@ export default function LineageMap({
     const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
     imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); }); // pop the cards in one by one, a ripple down the tree
     allNodes.forEach((n) => scoredRef.current.add(n.id)); // counted now, so a later tap scores nothing
-    onScore?.(-1000); // the shortcut costs a thousand
+    onScore?.(-2500); // the shortcut costs 2500
     const pk = (fxId.current += 1);
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
@@ -1221,7 +1221,7 @@ export default function LineageMap({
         </div>
       </div>
     )}
-    {penalty !== null && <div key={penalty} className={styles.autoPenalty}>-1000</div>}
+    {penalty !== null && <div key={penalty} className={styles.autoPenalty}>-2500</div>}
     </>
   );
 }

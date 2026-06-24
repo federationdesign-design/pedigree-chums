@@ -38,24 +38,52 @@ export default function PackPit() {
   const msLast = useRef(0); // highest milestone already celebrated
   const msTimer = useRef<number | null>(null);
   const pendingMs = useRef<{ value: number; label: string } | null>(null); // a milestone crossed while the card overlay is open, held until it closes
+  const cookiesOpenRef = useRef(false); // the cookies banner is up, tracked via its own window events
+  useEffect(() => {
+    const open = () => { cookiesOpenRef.current = true; };
+    const shut = () => { cookiesOpenRef.current = false; };
+    window.addEventListener("pc:open-cookies", open);
+    window.addEventListener("pc:cookies-accepted", shut);
+    window.addEventListener("pc:cookies-rejected", shut);
+    return () => {
+      window.removeEventListener("pc:open-cookies", open);
+      window.removeEventListener("pc:cookies-accepted", shut);
+      window.removeEventListener("pc:cookies-rejected", shut);
+    };
+  }, []);
+  // a milestone must wait for the family tree, the pre-order form (a modal dialog
+  // in the DOM) and the cookies banner to clear before it pops over the pit
+  const msBlocked = () => !!activeBreed
+    || cookiesOpenRef.current
+    || (typeof document !== "undefined" && !!document.querySelector('[role="dialog"][aria-modal="true"]'));
   useEffect(() => {
     const reached = Math.floor(score / MS_STEP) * MS_STEP; // highest 5k mark at or below the score
     if (reached >= MS_STEP && reached > msLast.current) {
       msLast.current = reached;
       const label = MS_LABELS[Math.min(reached / MS_STEP - 1, MS_LABELS.length - 1)];
-      if (activeBreed) {
-        pendingMs.current = { value: reached, label }; // hold it: the card is up, don't cover it (keep the highest)
+      if (msBlocked()) {
+        pendingMs.current = { value: reached, label }; // hold it: something is on screen, don't cover it (keep the highest)
       } else {
         setMilestone({ value: reached, label, id: performance.now() });
       }
     }
   }, [score, activeBreed]);
+  // release a held milestone the moment every blocker is clear; the offer modal has
+  // no close event, so poll briefly rather than wait on a dependency
   useEffect(() => {
-    if (activeBreed || !pendingMs.current) return; // the card just closed and a milestone is waiting
-    const held = pendingMs.current;
-    pendingMs.current = null;
-    setMilestone({ value: held.value, label: held.label, id: performance.now() });
-  }, [activeBreed]);
+    if (!pendingMs.current) return;
+    const tryFlush = () => {
+      if (!pendingMs.current) return true;
+      if (msBlocked()) return false;
+      const held = pendingMs.current;
+      pendingMs.current = null;
+      setMilestone({ value: held.value, label: held.label, id: performance.now() });
+      return true;
+    };
+    if (tryFlush()) return;
+    const iv = window.setInterval(() => { if (tryFlush()) window.clearInterval(iv); }, 400);
+    return () => window.clearInterval(iv);
+  }, [activeBreed, score]);
   useEffect(() => {
     if (!milestone) return;
     if (msTimer.current) window.clearTimeout(msTimer.current);
