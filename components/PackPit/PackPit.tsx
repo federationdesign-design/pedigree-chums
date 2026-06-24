@@ -1195,6 +1195,24 @@ export default function PackPit() {
               Composite.remove(engine.world, o);
             }, 70 * (i + 1));
           });
+          // Shockwave: everything else in range that is NOT a popping circle (cards,
+          // toys, menu, buttons, plus any rods/pills not caught in the chain) gets
+          // flung outward, harder the closer it sat to the blast. The % circles are
+          // left out entirely, so their chain-pop behaviour with the bomb is unchanged.
+          const claimed = new Set<any>(chain);
+          const SHOVE_RADIUS = bsz * 5.5; // how far the blast reaches
+          const SHOVE_FORCE = 0.9 * (bomb.plugin.half || 21); // overall push strength
+          for (const o of dyn()) {
+            if (o === bomb || claimed.has(o) || o.isStatic) continue;
+            if (o.plugin?.kind === "pct") continue; // circles are untouched by the shove
+            const dx = o.position.x - bx, dy = o.position.y - by;
+            const dist = Math.hypot(dx, dy) || 1;
+            if (dist > SHOVE_RADIUS) continue;
+            const falloff = 1 - dist / SHOVE_RADIUS; // 1 at the centre, 0 at the edge
+            const mag = SHOVE_FORCE * falloff * falloff * (o.mass || 1); // applyForce scales with mass, so multiply it back in
+            Body.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 }); // outward, with a slight upward kick
+            Body.setAngularVelocity(o, (Math.random() - 0.5) * 0.6 * (falloff + 0.2)); // a bit of spin from the blast
+          }
         }, 180);
       };
       const hitBomb = (bomb: any) => {
