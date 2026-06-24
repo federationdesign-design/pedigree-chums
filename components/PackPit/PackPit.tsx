@@ -556,6 +556,7 @@ export default function PackPit() {
       // near it) makes the two drift together. Symmetrical shapes, so position
       // only. Gentle pull you can still fight; tune with the dials below.
       const FUSE_MAGNET_RADIUS = 240; // px, centre-to-centre, when the pull starts
+      const FUSE_SNAP_DIST = 90;       // px, centre-to-centre, when they snap and fuse
       const FUSE_PULL = 0.0016;       // pull strength (force per px of closeness)
       const isBone = (b: any) => b?.plugin?.prop === "bone";
       const nearestBone = (to: any) => {
@@ -583,6 +584,24 @@ export default function PackPit() {
         const closeness = (FUSE_MAGNET_RADIUS - dist); // stronger as they near
         const f = FUSE_PULL * closeness;
         Body.applyForce(other, other.position, { x: (tx / dist) * f * other.mass, y: (ty / dist) * f * other.mass });
+        // close enough? snap, goo, fuse.
+        if (!fused && dist <= FUSE_SNAP_DIST) {
+          fused = true;
+          const jx = logo.position.x, jy = logo.position.y; // join point = logo centre
+          Body.setPosition(bone, { x: jx, y: jy });          // snap bone onto the logo
+          Body.setVelocity(bone, { x: 0, y: 0 });
+          Body.setAngularVelocity(bone, 0);
+          // gooey join: a clutch of soft blobs that swell then fade over the join
+          const t0 = performance.now();
+          const R = Math.max(logo.plugin?.half || 60, bone.plugin?.half || 60);
+          for (let i = 0; i < 9; i++) {
+            const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
+            gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
+          }
+          numAt(jx, jy, 2000); // the payoff pops out of the goo and scores
+          Composite.remove(engine.world, logoBody); // the logo vanishes under the goo
+          logoBody = null;
+        }
       };
       Events.on(engine, "beforeUpdate", onFuseMagnet);
       // --------------------------------------------------------------------
@@ -946,6 +965,8 @@ export default function PackPit() {
       }
       // a quick pink starburst, fired only when a circle is pressed while still active
       const bursts: any[] = [];
+      const gooBlobs: any[] = []; // soft white blobs for the gooey logo+bone fuse
+      let fused = false;          // the logo+bone fuse fires once
       const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
       // An explosion is three starbursts at once, red then yellow then white, each
       // turned 11 degrees further than the last, so a detonation reads far harder
@@ -1116,6 +1137,26 @@ export default function PackPit() {
       Events.on(engine, "collisionStart", onWhack);
       const onAfter = () => {
         const ctx = render.context, now = performance.now(), bodies = dyn();
+        // gooey fuse blobs: soft white radial gradients that swell then fade, so
+        // overlapping blobs melt together into a gooey join
+        for (let i = gooBlobs.length - 1; i >= 0; i--) {
+          const g = gooBlobs[i], gt = (now - g.born) / g.life;
+          if (gt < 0) continue;            // staggered start
+          if (gt >= 1) { gooBlobs.splice(i, 1); continue; }
+          const swell = 0.6 + Math.sin(Math.min(gt, 1) * Math.PI) * 0.8; // swell out then in
+          const rad = g.s * swell, al = (1 - gt) * 0.9;
+          const grad = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, rad);
+          grad.addColorStop(0, "rgba(255,255,255," + al + ")");
+          grad.addColorStop(0.6, "rgba(255,255,255," + (al * 0.7) + ")");
+          grad.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter"; // overlapping blobs reinforce, reads gooey
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(g.x, g.y, rad, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
         // holding the bomb burns its five-hit fuse: one hit per whole second held, the fifth detonates
         if (pressedBomb && pressedBomb.plugin?.bomb && !pressedBomb.plugin.popped && pressedBomb.plugin.heldSince) {
           const sec = Math.floor((now - pressedBomb.plugin.heldSince) / 1000);
