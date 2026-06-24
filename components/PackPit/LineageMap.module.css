@@ -540,3 +540,19 @@
   80%  { transform: scale(1.04) rotate(2deg); }
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
+
+
+/* ---- duplicate-stack feedback: the matching filled frame jiggles, others recede ---- */
+@keyframes frameExpect {
+  0%, 100% { transform: rotate(-3.5deg) scale(1.05); }
+  50%      { transform: rotate(3.5deg) scale(1.09); }
+}
+.frameExpect {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: frameExpect 0.42s ease-in-out infinite;
+}
+.frameDim {
+  opacity: 0.3;
+  transition: opacity 0.15s ease-out;
+}

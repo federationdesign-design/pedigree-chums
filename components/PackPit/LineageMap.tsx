@@ -887,6 +887,10 @@ export default function LineageMap({
             </g>
             {!packed && !collecting && frames.map((f, fi) => {
               const filledHere = filled.has(f.id);
+              // a duplicate is being held when the dragged image already fills some frame
+              const dupDrag = dragImg != null && frames.some((ff) => ff.img === dragImg && filled.has(ff.id));
+              const wobbleHere = dragImg != null && dragImg === f.img && filledHere; // this filled frame matches the held duplicate: jiggle in welcome
+              const dimHere = dupDrag && filledHere && dragImg !== f.img; // the other filled frames step back so the match stands out
               const lit = dragImg === f.img && !filledHere; // only this card's own box lights up
               let glow: { filter?: string; animationDelay?: string } | undefined = { animationDelay: `${(fi % 6) * 0.28}s` }; // ripple the idle hop
               if (lit && dragXY) {
@@ -904,7 +908,7 @@ export default function LineageMap({
                   style={isMobile ? { touchAction: "none", pointerEvents: "auto" } : undefined}
                 >
                   <rect
-                    className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""}`.trim()}
+                    className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""} ${wobbleHere ? styles.frameExpect : ""} ${dimHere ? styles.frameDim : ""}`.trim()}
                     style={glow}
                     x={f.sx - pan.x - CW / 2}
                     y={f.sy - pan.y - CW / 2}
