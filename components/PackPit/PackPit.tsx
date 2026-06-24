@@ -549,6 +549,41 @@ export default function PackPit() {
 
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+      // --- Fuse magnetism (Phase 2) ---------------------------------------
+      // Once the logo has been knocked loose, dragging it near a bone (or a bone
+      // near it) makes the two drift together. Symmetrical shapes, so position
+      // only. Gentle pull you can still fight; tune with the dials below.
+      const FUSE_MAGNET_RADIUS = 240; // px, centre-to-centre, when the pull starts
+      const FUSE_PULL = 0.0016;       // pull strength (force per px of closeness)
+      const isBone = (b: any) => b?.plugin?.prop === "bone";
+      const nearestBone = (to: any) => {
+        let best: any = null, bestD = Infinity;
+        for (const b of Composite.allBodies(engine.world)) {
+          if (!isBone(b)) continue;
+          const dx = b.position.x - to.position.x, dy = b.position.y - to.position.y, d = Math.hypot(dx, dy);
+          if (d < bestD) { bestD = d; best = b; }
+        }
+        return best;
+      };
+      const onFuseMagnet = () => {
+        if (!logoBody || logoBody.isStatic) return; // only once the logo has fallen loose
+        const held = mc.body;
+        if (!held) return;
+        let logo: any = null, bone: any = null;
+        if (held === logoBody) { logo = logoBody; bone = nearestBone(logoBody); }
+        else if (isBone(held)) { logo = logoBody; bone = held; }
+        if (!logo || !bone) return;
+        // pull the OTHER (non-dragged) piece toward the dragged one
+        const other = held === logoBody ? bone : logo;
+        const tx = held.position.x - other.position.x, ty = held.position.y - other.position.y;
+        const dist = Math.hypot(tx, ty);
+        if (dist > FUSE_MAGNET_RADIUS || dist < 1) return;
+        const closeness = (FUSE_MAGNET_RADIUS - dist); // stronger as they near
+        const f = FUSE_PULL * closeness;
+        Body.applyForce(other, other.position, { x: (tx / dist) * f * other.mass, y: (ty / dist) * f * other.mass });
+      };
+      Events.on(engine, "beforeUpdate", onFuseMagnet);
+      // --------------------------------------------------------------------
       mc.collisionFilter.mask = 0xffffffff & ~0x0002; // category 0x0002 (inert circles) cannot be grabbed
       let pressedBomb: any = null; // the bomb currently being pressed/held, for the click-vs-hold fuse
       Composite.add(engine.world, mc);
