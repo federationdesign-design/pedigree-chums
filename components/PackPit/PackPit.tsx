@@ -31,6 +31,8 @@ export default function PackPit() {
   const flashShakeRef = useRef<() => void>(() => {});
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
+  const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
+  const [shelfOpen, setShelfOpen] = useState(false); // the collection shelf overlay, opened from the tally
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
   const msLast = useRef(0); // highest milestone already celebrated
@@ -1490,7 +1492,7 @@ export default function PackPit() {
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
       <HowToPlay open={howToPlay} onClose={() => setHowToPlay(false)} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
@@ -1518,7 +1520,7 @@ export default function PackPit() {
       )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
-          <div className={styles.tallyChip}>
+          <button type="button" className={styles.tallyChip} onClick={() => setShelfOpen(true)} aria-label="Open your collected pack">
             <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
               {Array.from({ length: 16 }).map((_, i) => {
                 const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
@@ -1531,9 +1533,41 @@ export default function PackPit() {
             </svg>
             <span className={styles.tallyNum}>{collected}</span>
             <span className={styles.tallyPlusOne} aria-hidden="true">+1</span>
-          </div>
+          </button>
         </div>
       )}
+      {shelfOpen && (() => {
+        const counts = new Map<string, number>();
+        for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
+        const uniq = [...counts.entries()].map(([name, count]) => {
+          const b = breeds.find((x) => x.name === name);
+          return { name, count, img: b ? b.image : "" };
+        });
+        return (
+          <div className={styles.shelf} onClick={() => setShelfOpen(false)}>
+            <div className={styles.shelfPanel} onClick={(e) => e.stopPropagation()}>
+              <button type="button" className={styles.shelfClose} onClick={() => setShelfOpen(false)} aria-label="Close">&times;</button>
+              <h2 className={styles.shelfTitle}>Your Pack</h2>
+              {uniq.length === 0 ? (
+                <p className={styles.shelfEmpty}>No chums collected yet. Open a dog’s family tree and pick your chum.</p>
+              ) : (
+                <div className={styles.shelfGrid}>
+                  {uniq.map((c) => (
+                    <div className={styles.shelfCell} key={c.name}>
+                      <div className={styles.shelfCard}>
+                        {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
+                        {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
+                      </div>
+                      <img className={styles.shelfLedge} src="/shelve-test.svg" alt="" aria-hidden="true" />
+                      <span className={styles.shelfName}>{c.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
           <span className={styles.rotatePhone} />
