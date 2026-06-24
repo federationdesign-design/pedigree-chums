@@ -1152,14 +1152,8 @@ export default function PackPit() {
             frontier = pool.filter((o: any) => !o.plugin.popped && prev.some((f: any) => touch(f, o)));
             frontier.forEach((o: any) => { o.plugin.popped = true; });
           }
-          // circles earn a doubling bonus by their order in the chain (10, 20, 40 ... capped
-          // at 1280), so detonating into a big touching cluster pays off; rods and pills pop
-          // for show but score nothing. A tiered completion bonus lands when the dust settles.
-          let circleRank = 0;
           chain.forEach((o: any, i: number) => {
-            const isCircle = o.plugin?.kind === "pct";
-            const rankVal = isCircle ? 10 * Math.pow(2, Math.min(circleRank, 7)) : 0; // 10,20,40...1280 then capped
-            if (isCircle) circleRank += 1;
+            const rankVal = o.plugin?.kind === "pct" ? 12 : 0; // flat +12 per circle; rods and pills score nothing
             window.setTimeout(() => {
               if (disposed) return;
               explodeAt(o.position.x, o.position.y, blastSize(o));
@@ -1169,10 +1163,6 @@ export default function PackPit() {
               Composite.remove(engine.world, o);
             }, 70 * (i + 1));
           });
-          // completion bonus for clearing a big cluster, paid once just after the last pop
-          const circleCount = chain.filter((o: any) => o.plugin?.kind === "pct").length;
-          const tierBonus = circleCount >= 20 ? 10000 : circleCount >= 15 ? 4000 : circleCount >= 10 ? 1500 : circleCount >= 5 ? 500 : 0;
-          if (tierBonus) window.setTimeout(() => { if (!disposed) numAt(bx, by, tierBonus); }, 70 * (chain.length + 1) + 40);
         }, 180);
       };
       const hitBomb = (bomb: any) => {
