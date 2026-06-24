@@ -480,12 +480,28 @@ export default function PackPit() {
         waveTimers.forEach(clearTimeout); waveTimers = [];
         const w = stage.clientWidth;
         const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        // tennis balls one at a time so the pre-order button can follow the 2nd
+        // tennis balls only; the pre-order button now drops on its own beat (desktop)
         const dropBalls = () => {
           BALLS.forEach((bp, i) => {
             Composite.add(engine.world, makeProp(bp, w));
-            if (i === 0) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // pre-order falls after the 1st ball
+            if (i === 0 && isMobile) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // mobile keeps pre-order with the 1st ball
           });
+        };
+        // scripted desktop pour helpers
+        const idxByName = (name: string) => BREEDS.findIndex((b: any) => b.name === name);
+        const pickName = (a: string, b: string) => (Math.random() < 0.5 ? a : b); // alternate per load
+        const dropCardNamed = (name: string, dropped: Set<number>) => {
+          const i = idxByName(name);
+          if (i >= 0 && !dropped.has(i)) { dropped.add(i); Composite.add(engine.world, makeBall(BREEDS[i], i, w)); }
+        };
+        const dropRest = (dropped: Set<number>) => {
+          const rest = [...BREEDS.keys()].filter((i) => !dropped.has(i)).sort(() => Math.random() - 0.5);
+          let k = 0;
+          dropTimer = setInterval(() => {
+            if (k >= rest.length) { clearInterval(dropTimer); return; }
+            const i = rest[k]; Composite.add(engine.world, makeBall(BREEDS[i], i, w));
+            k++;
+          }, 70);
         };
         // Drop the pack in, optionally landing the bowl midway through.
         const dropDogs = (delay: number, withBowl: boolean) => {
@@ -514,13 +530,20 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1900)); // one hamburger menu rides in with the pack
           dropDogs(2100, false);
         } else {
-          // desktop: balls (pre-order after the 1st), then bone, then the discount-code button, then pack with the bowl midway
-          dropBalls();
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1000));
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1200)); // cookie policy is the 3rd thing in
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1400)); // discount code falls later, just before the pack
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1600)); // one hamburger menu rides in with the pack
-          dropDogs(2000, true);
+          // desktop: a scripted, slower pour. Feature cards land on set beats (each
+          // picked from a pair, alternating per load); everything else floods at 10s.
+          const dropped = new Set<number>();
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  tennis balls
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies (random side)
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
+          waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Labrador", "Golden Retriever"), dropped); }, 2750));       // 2750 feature card
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
+          waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 4050));             // 4050 feature card
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 4400));                                          // 4400 bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 5050)); // 5050 two feature cards
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 6000)); // 6000 bowl + menu, before the flood
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 10000));                                       // 10000 all remaining cards
         }
       }
 
