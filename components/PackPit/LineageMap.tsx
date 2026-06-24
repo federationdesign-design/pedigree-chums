@@ -525,6 +525,40 @@ export default function LineageMap({
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
     setAutoArmed(false);
   };
+  // Double-clicking the root card walks the tree open one generation at a time,
+  // then once everything is exposed folds it back deepest-first. Rings only: any
+  // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
+  // than a manual tap (125/250) so hand-exploration stays the rewarding route.
+  const revealStep = () => {
+    const frontier = shown.filter((n) => n.children && n.children.length && !open.has(n._id));
+    if (frontier.length) {
+      setOpen((prev) => { const s = new Set(prev); frontier.forEach((n) => s.add(n._id)); return s; });
+      const pops: { x: number; y: number }[] = [];
+      frontier.forEach((n) => {
+        const kids = n.children as Node[];
+        kids.forEach((k, ci) => {
+          if (!scoredRef.current.has(k._id)) {
+            scoredRef.current.add(k._id);
+            pops.push({ x: n._x + (ci - (kids.length - 1) / 2) * 14, y: n._y - 8 }); // a +50 pops around the expanding parent
+          }
+        });
+      });
+      setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
+      pops.forEach((p) => flashNum(p.x, p.y, 50, FLASH_SIZE)); // +50 per newly revealed node
+      interacted.current = true; setIdleHint(false);
+      return;
+    }
+    // fully open: fold the deepest ring, leaving the first ring and any placed cards
+    const openIds = [...open].filter((id) => id !== "0");
+    if (!openIds.length) return; // back at the first ring, nothing more to fold
+    const deepest = openIds.filter((id) => {
+      const node = shown.find((n) => n._id === id);
+      if (!node || !node.children) return true;
+      return !(node.children as Node[]).some((k) => open.has(k._id)); // none of its children are open -> it is a deepest ring
+    });
+    setOpen((prev) => { const s = new Set(prev); deepest.forEach((id) => s.delete(id)); return s; });
+  };
+
   const doPack = (fx?: number, fy?: number, award: number = 400) => {
     if (packed) return;
     // One card per ancestor: the same forebear is often bred in several times, so
@@ -668,6 +702,7 @@ export default function LineageMap({
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => { e.stopPropagation(); revealStep(); }}
         onPointerDown={(e) => {
           if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
