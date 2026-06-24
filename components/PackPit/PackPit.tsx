@@ -207,6 +207,7 @@ export default function PackPit() {
             Bodies.circle(x + dx, y + dy, R, po),
           ];
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+          b.collisionFilter = { ...(b.collisionFilter || {}), group: FUSE_GROUP }; // bones pass through the logo (and each other) so they can fuse
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#f6ecd6", img, prop: "bone", family: null, ping: 0 };
           return b;
         }
@@ -254,13 +255,14 @@ export default function PackPit() {
       // pouring pack and toys bounce off it. Each strike sinks and tilts it a notch,
       // and on the fifth hit it finally gives: it goes dynamic and drops onto the
       // pile to rest with everything else. Desktop only.
-      const LOGO_LOGO_CAT = 0x0008; // collision category for the logo body, so dropped pieces can ignore it
+      const LOGO_LOGO_CAT = 0x0008;
+      const FUSE_GROUP = -3; // logo + bones share this negative group so they pass through each other (to fuse) // collision category for the logo body, so dropped pieces can ignore it
       let logoBody: any = null;
       function makeLogo(w: number, h: number) {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, collisionFilter: { category: LOGO_LOGO_CAT }, render: { visible: false } });
+        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, collisionFilter: { category: LOGO_LOGO_CAT, group: FUSE_GROUP }, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
