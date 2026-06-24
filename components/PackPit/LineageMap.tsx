@@ -1162,7 +1162,7 @@ export default function LineageMap({
                     );
                   })()}
                   {packed && (() => {
-                    const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 6; // pill near the foot of the card (25% smaller)
+                    const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 4; // pill near the foot of the card (nudged 2px down)
                     const pillRight = c.cardX + CW / 2 + 6; // right-aligned to the card, nudged just past the edge
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
                     const wasAdjusted = c.share !== c.mix;
@@ -1171,13 +1171,13 @@ export default function LineageMap({
                     return (
                       <>
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
-                        <text className={styles.mixText} textAnchor="end" x={pillRight - 9} y={py + ph / 2 + 1} dominantBaseline="central">
+                        <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
                           {c.mix < 1 ? "<1%" : `${c.mix}%`}
                         </text>
                         {wasAdjusted && (
                           <g transform={`translate(${adjX},${adjY}) rotate(${ADJ_TILT})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.3))" }}>
                             <rect x={-aw / 2} y={-ah / 2} width={aw} height={ah} rx={ah / 2} ry={ah / 2} style={{ fill: "#9ed8f0", stroke: "#ffffff", strokeWidth: 2 }} />
-                            <text textAnchor="middle" dominantBaseline="central" style={{ fill: "var(--navy)", font: "italic 800 7.5px system-ui, sans-serif", letterSpacing: "0.3px" }}>ADJ*</text>
+                            <text textAnchor="middle" dominantBaseline="central" style={{ fill: "var(--navy)", font: "italic 800 7.5px system-ui, sans-serif", letterSpacing: "0.3px" }}>ADJ</text>
                           </g>
                         )}
                       </>
