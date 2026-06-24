@@ -1492,6 +1492,20 @@ export default function PackPit() {
         }
       };
       Events.on(engine, "collisionStart", onKnockScore);
+      // Logo pieces (shouts, poofs, white + yellow circles) score +1 each time they
+      // are knocked, and pop out after 100 hits. Collisions are frequent, so they
+      // are designed to rack up fast and expire.
+      const onLogoPieceHit = (ev: any) => {
+        for (const pair of ev.pairs) {
+          for (const b of [pair.bodyA, pair.bodyB] as any[]) {
+            if (b?.plugin?.prop !== "logopiece" || b.isStatic) continue;
+            b.plugin.hits = (b.plugin.hits || 0) + 1;
+            numAt(b.position.x, b.position.y, 1); // +1 per hit
+            if (b.plugin.hits >= 100) Composite.remove(engine.world, b); // gone after 100
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onLogoPieceHit);
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) return;
@@ -1673,18 +1687,18 @@ export default function PackPit() {
         if (elapsed < CALM) return; // quiet start
         const t = elapsed - CALM;
         const level = Math.min(1, t / RISE); // rises to the simmer, then holds at 1
-        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.0005 + level * 0.0012), y: (Math.random() - 0.5) * (0.0005 + level * 0.001) });
-        Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.02 + level * 0.1));
+        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.00025 + level * 0.0006), y: (Math.random() - 0.5) * (0.00025 + level * 0.0005) }); // wobble halved
+        Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.01 + level * 0.05)); // wobble spin halved
         if (t >= RISE + SIMMER) { // the one intense burst, then it settles over the calm
-          Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 5, y: -4 });
-          Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 1.2);
+          Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 2.5, y: -2 }); // end buzz halved
+          Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 0.6); // end buzz spin halved
           const others = dyn().filter((b: any) => b !== cookiesBody);
           for (const col of Query.collides(cookiesBody, others)) {
             const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
             if (!other || other.isStatic) continue;
             let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
             const len = Math.hypot(dx, dy) || 1;
-            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 2.6, y: other.velocity.y + (dy / len) * 2.6 - 1 });
+            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 1.3, y: other.velocity.y + (dy / len) * 1.3 - 0.5 }); // neighbour shove halved
             Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.4);
           }
           cycleStart = now; // back to quiet
