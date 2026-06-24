@@ -273,6 +273,26 @@ export default function PackPit() {
       const LOGO_SINK = BIG * 0.7; // how far each hit pushes it down before it finally goes
       const LOGO_W = BIG * 6.8;    // matches logo.width
       const LOGO_TILT = Math.asin(Math.min(1, LOGO_SINK / LOGO_W)); // tilt that drops the free edge
+      // Swap-and-drop: each hit swaps the logo art to the next backdrop (one
+      // element removed) and drops that element into the pit as its own body.
+      const LOGO_STAGES = [
+        { bgKey: "__logoS1", bg: "/PC-logo-2nd-hit.svg", dropKey: "__logoD1", drop: "/why-dot-for-logofall.svg", ar: 19.7 / 19.6, size: BIG * 0.9 },
+        { bgKey: "__logoS2", bg: "/PC-logo-3rd-hit.svg", dropKey: "__logoD2", drop: "/yellow-dot-for-logofall.svg", ar: 19.7 / 19.6, size: BIG * 0.9 },
+        { bgKey: "__logoS3", bg: "/PC-logo-4th-hit.svg", dropKey: "__logoD3", drop: "/shouts-for-logofall.svg", ar: 69 / 71.4, size: BIG * 1.6 },
+        { bgKey: "__logoS4", bg: "/PC-logo-5th-hit.svg", dropKey: "__logoD4", drop: "/poofs-for-logofall.svg", ar: 50.6 / 64.5, size: BIG * 1.5 },
+        { bgKey: "__logoS5", bg: "/PC-logo-6th-hit.svg", dropKey: "__logoD5", drop: "/tagline-dot-for-logofall.svg", ar: 174.1 / 23.9, size: BIG * 4.0 },
+      ];
+      LOGO_STAGES.forEach((st) => { getImg(st.bgKey, st.bg); getImg(st.dropKey, st.drop); }); // preload so swaps and drops do not flash
+      // Spawn one removed logo element as a tumbling pit body, near the logo centre.
+      const dropLogoPiece = (st: { dropKey: string; drop: string; ar: number; size: number }, cx: number, cy: number) => {
+        const pw = st.size, ph = st.size / st.ar;
+        const x = cx + (Math.random() - 0.5) * LOGO_W * 0.5, y = cy - 10;
+        const b: any = Bodies.rectangle(x, y, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.18 }, restitution: 0.4, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+        b.plugin = { name: "Logo piece", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffd23e", img: getImg(st.dropKey, st.drop), prop: "logopiece", family: null, ping: 0 };
+        Body.setVelocity(b, { x: (Math.random() - 0.5) * 6, y: -2 - Math.random() * 3 }); // a little pop off the logo
+        Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.5);
+        Composite.add(engine.world, b);
+      };
       let logoHits = 0;
       const onCollide = (ev: any) => {
         if (!logoBody || !logoBody.isStatic) return;
@@ -282,6 +302,8 @@ export default function PackPit() {
           const other = lg === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
           logoHits++; // count every hit, including repeat knocks from the same object
+          const st = LOGO_STAGES[Math.min(logoHits, LOGO_STAGES.length) - 1]; // this hit's backdrop + dropped piece
+          if (st) { lg.plugin.img = getImg(st.bgKey, st.bg); dropLogoPiece(st, lg.position.x, lg.position.y); } // swap art, drop the removed element
           if (logoHits >= LOGO_HITS_TO_FALL) { lg.isSensor = false; Body.setStatic(lg, false); break; } // the straw that breaks it
           Body.translate(lg, { x: 0, y: LOGO_SINK }); // shove the centre down a notch
           Body.rotate(lg, LOGO_TILT); // and tip it so one side sinks while the other stays almost pinned
