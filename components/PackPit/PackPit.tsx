@@ -1223,6 +1223,27 @@ export default function PackPit() {
         }
       };
       Events.on(engine, "collisionStart", onPctHit);
+      // A yellow circle knocked loose by a user-flung toy (or the dragged body) scores as it
+      // tumbles: every fresh yellow circle it strikes flashes +1 at each (two points a hit),
+      // so a good scatter racks up points. Only direct knock-ons score, no runaway cascade.
+      const KNOCK_WINDOW = 1600; // ms a knocked circle stays live and scores its onward hits
+      const isUserObj = (b: any) => !!b && ((b.plugin?.prop && !b.plugin.logo) || b === mc.body);
+      const liveCircle = (b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.popped && !b.plugin.bomb && !b.isStatic;
+      const onKnockScore = (ev: any) => {
+        const now = performance.now();
+        for (const pair of ev.pairs) {
+          const A: any = pair.bodyA, B: any = pair.bodyB;
+          const aP = liveCircle(A), bP = liveCircle(B);
+          if (isUserObj(A) && bP) B.plugin.knockAt = now; // a toy knocks a circle: it goes live (the activation itself does not score)
+          if (isUserObj(B) && aP) A.plugin.knockAt = now;
+          if (aP && bP) {
+            const aLive = A.plugin.knockAt && now - A.plugin.knockAt < KNOCK_WINDOW;
+            const bLive = B.plugin.knockAt && now - B.plugin.knockAt < KNOCK_WINDOW;
+            if (aLive || bLive) { numAt(A.position.x, A.position.y, 1); numAt(B.position.x, B.position.y, 1); } // +1 emanates from each
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onKnockScore);
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) return;
@@ -1428,6 +1449,7 @@ export default function PackPit() {
         Events.off(engine, "collisionStart", onMenuCollide);
         Events.off(engine, "collisionStart", onInertBond);
         Events.off(engine, "collisionStart", onPctHit);
+        Events.off(engine, "collisionStart", onKnockScore);
         Render.stop(render);
         Runner.stop(runner);
         Composite.clear(engine.world, false);
