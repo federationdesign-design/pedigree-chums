@@ -868,7 +868,6 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const mix = root ? Math.round((n._leaves / root._leaves) * 100) : share; // adjusted cumulative figure
                 const r = radius(share);
                 return (
                   <g
@@ -909,20 +908,8 @@ export default function LineageMap({
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
-                      {mix}%
+                      {share}%
                     </text>
-                    {(() => {
-                      // ADJ* tag: light-blue, white-outlined, italic, tilted, tucked at the top-right
-                      const ADJ_TILT = -12;            // tag tilt in degrees (tunable)
-                      const aw = 30, ah = 16;          // tag pill size
-                      const ax = r * 0.62, ay = -r * 0.66; // top-right of the circle
-                      return (
-                        <g transform={`translate(${ax},${ay}) rotate(${ADJ_TILT})`} style={{ pointerEvents: "none" }}>
-                          <rect x={-aw / 2} y={-ah / 2} width={aw} height={ah} rx={ah / 2} ry={ah / 2} style={{ fill: "#9ed8f0", stroke: "#ffffff", strokeWidth: 2 }} />
-                          <text textAnchor="middle" dominantBaseline="central" style={{ fill: "#ffffff", font: "italic 800 9px system-ui, sans-serif", letterSpacing: "0.5px" }}>ADJ*</text>
-                        </g>
-                      );
-                    })()}
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
                       const nmY = -r - 13;
