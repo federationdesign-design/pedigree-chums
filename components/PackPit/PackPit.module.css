@@ -380,3 +380,37 @@
   .shelfGrid { grid-template-columns: repeat(3, 1fr); }
   .shelfPanel { padding: 24px 16px 18px; }
 }
+
+/* ---- card-pack box: a permanent handle in the bottom-right that peeks up on approach and opens the shelf ---- */
+.packBox {
+  position: fixed;
+  right: 18px;
+  bottom: 0;
+  width: 132px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transform: translateY(72%); /* tucked below the fold, only a sliver peeks */
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+  z-index: 11000; /* above the pit, below the shelf overlay (12000) */
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+  -webkit-tap-highlight-color: transparent;
+}
+.packBox img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+.packBox:hover,
+.packBox:focus-visible {
+  transform: translateY(0%); /* slides fully into view as the cursor reaches the corner */
+  outline: none;
+}
+@media (hover: none) {
+  /* touch has no cursor to approach with, so leave a clearer, tappable tab */
+  .packBox { transform: translateY(58%); }
+  .packBox:active { transform: translateY(0%); }
+}

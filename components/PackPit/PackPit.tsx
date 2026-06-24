@@ -1574,6 +1574,15 @@ export default function PackPit() {
           </button>
         </div>
       )}
+      {/* a permanent pack-box handle: peeks up from the bottom-right on approach, opens the shelf */}
+      <button
+        type="button"
+        className={styles.packBox}
+        onClick={() => setShelfOpen(true)}
+        aria-label="Open your pack"
+      >
+        <img src="/card-pack-box.svg" alt="" aria-hidden="true" />
+      </button>
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
