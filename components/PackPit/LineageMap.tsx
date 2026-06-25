@@ -206,6 +206,9 @@ export default function LineageMap({
   // which collected card is showing its info label right now (toggled by tapping its i)
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
+  const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
+  const pctClose = () => { if (pctTimer.current) window.clearTimeout(pctTimer.current); pctTimer.current = window.setTimeout(() => { setPctHover(null); pctTimer.current = null; }, 600); };
+  const pctKeep = () => { if (pctTimer.current) { window.clearTimeout(pctTimer.current); pctTimer.current = null; } };
   useEffect(() => setPctHover(null), [breed.name]);
   const infoSeen = useRef<Set<string>>(new Set()); // cards whose info tooltip has already paid out its +2, so it pays once
   useEffect(() => setInfoHover(null), [breed.name]);
@@ -1462,8 +1465,10 @@ export default function LineageMap({
         const multi = apps.length > 1;
         return (
           <div
+            onMouseEnter={pctKeep}
+            onMouseLeave={pctClose}
             style={{
-              position: "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "none", /* box-tweak: 25% wider */
+              position: "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
