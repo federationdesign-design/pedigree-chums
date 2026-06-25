@@ -541,11 +541,11 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Labrador", "Golden Retriever"), dropped); }, 2750));       // 2750 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
-          waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 4050));             // 4050 feature card
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 4400));                                          // 4400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 5050)); // 5050 two feature cards
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 6000)); // 6000 bowl + menu, before the flood
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 50000));                                       // 10000 all remaining cards
+          waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 8050)); // 5050 two feature cards
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 6000 bowl + menu, before the flood
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                      // 150000 all remaining cards
         }
       }
 
