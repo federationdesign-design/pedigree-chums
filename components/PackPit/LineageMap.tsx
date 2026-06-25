@@ -273,6 +273,15 @@ export default function LineageMap({
   };
   // tick while a burst is alive so the spokes animate frame by frame, like the pit
   const [, setTick] = useState(0);
+  const rollStart = useRef<Map<string, number>>(new Map()); // card id -> first time its pill appeared /* pct-roll */
+  const rolledMix = (id: string, mix: number) => {
+    if (mix < 1) return mix; // <1% has nothing to roll
+    let t0 = rollStart.current.get(id);
+    if (t0 == null) { t0 = performance.now(); rollStart.current.set(id, t0); }
+    const p = Math.min(1, (performance.now() - t0) / 700); // 0.7s
+    const eased = 1 - Math.pow(1 - p, 3); // ease-out
+    return Math.round(mix * eased);
+  };
   // simple requestAnimationFrame tween, used to glide the cards into the pack and to
   // tumble them all into the corner; onStep gets eased 0..1, onDone fires at the end
   const tween = (dur: number, onStep: (t: number) => void, onDone?: () => void) => {
@@ -1279,7 +1288,7 @@ export default function LineageMap({
                         <rect x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
-                          {(c.mix < 1 ? "<1%" : `${c.mix}%`) + (wasAdjusted ? "*" : "")}
+                          {(c.mix < 1 ? "<1%" : `${rolledMix(c.id, c.mix)}%`) + (wasAdjusted ? "*" : "")}
                         </text>
                       </g>
                     );
