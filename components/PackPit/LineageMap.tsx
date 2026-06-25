@@ -914,6 +914,8 @@ export default function LineageMap({
                       setSeen((s) => { if (s.has(n._id)) return s; const x = new Set(s); x.add(n._id); return x; }); // first tap turns it blue
                       flashNum(n._x, n._y - r, firstHit ? (hasKids ? 125 : 250) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
                       follow(n);
+                      // a card placed in a frame is protected: a node click won't remove it
+                      if (placedSet.has(n._id) || cardFrame.has(n._id)) { return; }
                       const wasPicked = picked.has(n._id);
                       setPicked((cur) => {
                         const s = new Set(cur);
