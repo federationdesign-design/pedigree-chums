@@ -211,9 +211,11 @@ export default function LineageMap({
   useEffect(() => setInfoHover(null), [breed.name]);
   // hold-to-magnify: which collected card is enlarged right now, and the release timer
   const [zoomedId, setZoomedId] = useState<string | null>(null);
+  const [zoomOff, setZoomOff] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); // drag offset of the enlarged image /* zoom-overlay */
+  const zoomDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
   const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
-  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomedId(id); };
+  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); };
   const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks
 
   // Dismiss a fixed/opened card (the X in its corner).
@@ -1023,7 +1025,7 @@ export default function LineageMap({
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               if (stackedIds.has(c.id)) return null; // absorbed into a frame's stack
               const clipId = `lm-pick-${c.id}`;
-              const packScale = zoomedId === c.id ? 3 : 1; // held magnifier blows the card up to 3x, centred
+              const packScale = 1; // the zoom is now a draggable overlay, not an in-place scale /* zoom-overlay */
               const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
               const cxf = ci ? collectXf(c.cardX, c.cardY, ci.spin, cardDeg) : null; // tumble to the corner with the main card
               return (
@@ -1348,28 +1350,27 @@ export default function LineageMap({
       {zoomedId && (() => {
         const c = pickCards.find((x) => x.id === zoomedId);
         if (!c) return null;
-        // the enlarged image is anchored at its bottom-right corner, then shifted +100,+100;
-        // sit the close on that corner, protruding like the small-card icons
-        const sz = 30;
-        // top-left of the card is the zoom anchor; the 3x image's bottom-right is anchor + 3*CW
-        const cornerX = c.cardX - CW / 2 + pan.x + CW * 3;
-        const cornerY = c.cardY - CW / 2 + pan.y + CW * 3;
-        const left = cornerX - sz / 2;
-        const top = cornerY - sz / 2;
+        const big = CW * 3; // 3x enlarged
+        // start at the card's on-screen top-left, then grow down-right, plus any drag offset
+        const left = c.cardX - CW / 2 + pan.x + zoomOff.x;
+        const top = c.cardY - CW / 2 + pan.y + zoomOff.y;
         return (
-          <button
-            type="button"
-            onClick={() => setZoomedId(null)}
-            aria-label="Close zoom"
+          <img
+            src={encodeURI(bust(c.img))}
+            alt={c.name}
+            draggable={false}
+            onMouseEnter={() => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } }}
+            onMouseLeave={() => { if (!zoomDrag.current) magnifyRelease(); }}
+            onPointerDown={(e) => { e.stopPropagation(); try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {} zoomDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: zoomOff.x, oy: zoomOff.y }; if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } }}
+            onPointerMove={(e) => { const d = zoomDrag.current; if (!d || e.pointerId !== d.id) return; setZoomOff({ x: d.ox + (e.clientX - d.sx), y: d.oy + (e.clientY - d.sy) }); }}
+            onPointerUp={(e) => { const d = zoomDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} zoomDrag.current = null; magnifyRelease(); } }}
+            onPointerCancel={() => { zoomDrag.current = null; magnifyRelease(); }}
             style={{
-              position: "fixed", left, top, zIndex: 120, width: sz, height: sz,
-              borderRadius: "50%", border: "2px solid #ffffff", background: "var(--navy)",
-              color: "#ffffff", fontSize: 18, lineHeight: `${sz - 6}px`, cursor: "pointer", padding: 0,
-              boxShadow: "0 3px 9px rgba(0,0,0,0.35)",
+              position: "fixed", left, top, width: big, height: big, zIndex: 120,
+              objectFit: "cover", borderRadius: 18, border: "5px solid var(--blue-deep)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.45)", cursor: "grab", touchAction: "none", userSelect: "none",
             }}
-          >
-            &times;
-          </button>
+          />
         );
       })()}
       {pctHover && (() => {
