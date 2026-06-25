@@ -1021,7 +1021,7 @@ export default function LineageMap({
                 ))}
               </g>
             ))}
-            {(zoomedId ? [...pickCards.filter((c) => c.id !== zoomedId), ...pickCards.filter((c) => c.id === zoomedId)] : pickCards).map((c) => {
+            {pickCards.map((c) => { /* stable card order: the zoom is a separate overlay, so no reordering (which used to remount + re-wobble every card) */
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               if (stackedIds.has(c.id)) return null; // absorbed into a frame's stack
               const clipId = `lm-pick-${c.id}`;
