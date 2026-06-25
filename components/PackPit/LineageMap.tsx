@@ -1256,7 +1256,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {packed && isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
+                  {packed && isTopOfStack(c) && zoomedId !== c.id && (() => { /* chum-pill: the % pill shows on Pedigree Chums too */
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
