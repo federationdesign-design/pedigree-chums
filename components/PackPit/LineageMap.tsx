@@ -1236,9 +1236,10 @@ export default function LineageMap({
               return ids.map((sid, i) => {
                 const off = (i + 1) * 7;
                 const sx = f.sx - pan.x + off * 0.55, sy = f.sy - pan.y + off * 0.55;
+                const stackTilt = (i % 2 ? 1 : -1) * (5 + (i % 3) * 2); // fan each card so the pile is visible
                 const sClip = `lm-stack-${f.id}-${i}`;
                 return (
-                  <g key={`stk-${sid}`} transform={`rotate(${cardDeg.toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 3px 3px rgba(0,0,0,0.32))" }}>
+                  <g key={`stk-${sid}`} transform={`rotate(${(cardDeg + stackTilt).toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 3px 3px rgba(0,0,0,0.32))" }}>
                     <clipPath id={sClip}>
                       <rect x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} rx={15} />
                     </clipPath>
