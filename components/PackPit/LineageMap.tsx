@@ -564,6 +564,17 @@ export default function LineageMap({
       interacted.current = true; setIdleHint(false);
       return;
     }
+    // nothing left to reveal: if any shown node still hasn't popped its ancestor
+    // card, pop them all (a staggered ripple, +50 each) before any collapse begins.
+    const toPop = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
+    if (toPop.length) {
+      toPop.forEach((n, i) => {
+        window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, 50, FLASH_SIZE); }
+      });
+      interacted.current = true; setIdleHint(false);
+      return;
+    }
     // fully open: fold the deepest ring, leaving the first ring and any placed cards
     const openIds = [...open].filter((id) => id !== "0");
     if (!openIds.length) return; // back at the first ring, nothing more to fold
