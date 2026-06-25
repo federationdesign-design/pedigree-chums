@@ -967,6 +967,89 @@ export default function PackPit() {
       const bursts: any[] = [];
       const gooBlobs: any[] = []; // soft white blobs for the gooey logo+bone fuse
       let fused = false;          // the logo+bone fuse fires once
+      // arrow-autofuse: when the logo and a LANDED bone come within 500px, a yellow
+      // arrow pops out between them and super-magnetism eases the pair together to
+      // fuse, then the arrow pops away. Automatic, no dragging. Separate from the
+      // drag-driven onFuseMagnet above, so both can coexist.
+      let arrowBody: any = null;          // the live arrow, null when none
+      let arrowFusing = false;            // the ease-together is running
+      const ARROW_RANGE = 500;            // px, centre-to-centre, to trigger
+      const ARROW_EASE = 0.18;            // position-ease per frame (super-magnet)
+      const spawnArrow = (mx: number, my: number) => {
+        const img = getImg("__arrowmid", "/arrow-yellow-mid.svg");
+        const half = BIG * 1.1;
+        const b: any = Bodies.circle(mx, my, half, { isStatic: true, isSensor: true, render: { visible: false } });
+        b.plugin = { name: "Fuse", half, w: half * 2, h: half * 2, color: "#ffd23e", img, prop: "arrowmid", kind: "arrowmid", family: null, ping: 0, pop: true, popScale: 0.01, popAlpha: 0, born: performance.now() };
+        Composite.add(engine.world, b);
+        return b;
+      };
+      const easePop = (b: any, now: number, into: boolean) => {
+        // pop in (0->1) over 220ms, or pop away (1->0) over 200ms
+        const t = Math.min(1, (now - (b.plugin.popStart || b.plugin.born)) / (into ? 220 : 200));
+        const k = into ? t : 1 - t;
+        b.plugin.popScale = 0.01 + k * 0.99;
+        b.plugin.popAlpha = k;
+        return t >= 1;
+      };
+      const onArrowFuse = () => {
+        if (disposed || fused) { if (arrowBody) { Composite.remove(engine.world, arrowBody); arrowBody = null; } return; }
+        if (!logoBody) return;
+        const bone = nearestBone(logoBody);
+        const now = performance.now();
+        if (!arrowBody) {
+          if (!bone) return;
+          // bone must have LANDED: low vertical speed (settled on the pile)
+          const landed = Math.abs(bone.velocity.y) < 0.5 && Math.abs(bone.velocity.x) < 0.8;
+          const dx = bone.position.x - logoBody.position.x, dy = bone.position.y - logoBody.position.y;
+          const dist = Math.hypot(dx, dy);
+          if (landed && dist <= ARROW_RANGE) {
+            const mx = (bone.position.x + logoBody.position.x) / 2, my = (bone.position.y + logoBody.position.y) / 2;
+            arrowBody = spawnArrow(mx, my);
+            arrowBody.plugin.popStart = now;
+            arrowFusing = false;
+          }
+          return;
+        }
+        // an arrow is live: finish the pop-in, then ease the pair together
+        if (!arrowFusing) {
+          const popped = easePop(arrowBody, now, true);
+          if (popped) arrowFusing = true;
+        }
+        if (arrowFusing && bone && logoBody) {
+          // super-magnet: ease the bone (and the loose logo) toward the midpoint
+          const mx = (bone.position.x + logoBody.position.x) / 2, my = (bone.position.y + logoBody.position.y) / 2;
+          Body.setPosition(bone, { x: bone.position.x + (mx - bone.position.x) * ARROW_EASE, y: bone.position.y + (my - bone.position.y) * ARROW_EASE });
+          Body.setVelocity(bone, { x: 0, y: 0 });
+          if (!logoBody.isStatic) {
+            Body.setPosition(logoBody, { x: logoBody.position.x + (mx - logoBody.position.x) * ARROW_EASE, y: logoBody.position.y + (my - logoBody.position.y) * ARROW_EASE });
+            Body.setVelocity(logoBody, { x: 0, y: 0 });
+          }
+          Body.setPosition(arrowBody, { x: mx, y: my });
+          const d = Math.hypot(bone.position.x - logoBody.position.x, bone.position.y - logoBody.position.y);
+          if (d <= FUSE_SNAP_DIST && !fused) {
+            // reuse the existing fuse: snap the bone onto the logo, goo, score, remove logo
+            fused = true;
+            const jx = logoBody.position.x, jy = logoBody.position.y;
+            Body.setPosition(bone, { x: jx, y: jy });
+            Body.setVelocity(bone, { x: 0, y: 0 }); Body.setAngularVelocity(bone, 0);
+            const t0 = performance.now();
+            const R = Math.max(logoBody.plugin?.half || 60, bone.plugin?.half || 60);
+            for (let i = 0; i < 9; i++) {
+              const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
+              gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
+            }
+            numAt(jx, jy, 2000);
+            Composite.remove(engine.world, logoBody); logoBody = null;
+            // pop the arrow away
+            arrowBody.plugin.popStart = now; arrowBody.plugin.popping = true;
+          }
+        }
+        if (arrowBody && arrowBody.plugin.popping) {
+          const gone = easePop(arrowBody, now, false);
+          if (gone) { Composite.remove(engine.world, arrowBody); arrowBody = null; }
+        }
+      };
+      Events.on(engine, "beforeUpdate", onArrowFuse);
       const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
       // An explosion is three starbursts at once, red then yellow then white, each
       // turned 11 degrees further than the last, so a detonation reads far harder
