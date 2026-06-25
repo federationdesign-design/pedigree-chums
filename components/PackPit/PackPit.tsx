@@ -528,7 +528,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050)); // cookie policy is the 3rd thing in
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
-          waveTimers.push(setTimeout(() => { fireDragHint(); }, 2800)); // DRAG hint, 1400ms after the bone settles /* drag-hint */
+          waveTimers.push(setTimeout(() => { fireDragHint(); }, 2400)); // DRAG hint, 1000ms after the bone settles /* drag-hint */
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1900)); // one hamburger menu rides in with the pack
           dropDogs(2100, false);
@@ -544,7 +544,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { fireDragHint(); }, 7800)); // DRAG hint, 1400ms after the bone settles /* drag-hint */
+          waveTimers.push(setTimeout(() => { fireDragHint(); }, 7400)); // DRAG hint, 1000ms after the bone settles /* drag-hint */
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 8050)); // 5050 two feature cards
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 6000 bowl + menu, before the flood
           waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                      // 150000 all remaining cards
