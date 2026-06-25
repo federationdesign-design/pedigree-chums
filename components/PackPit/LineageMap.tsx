@@ -205,6 +205,8 @@ export default function LineageMap({
   useEffect(() => setPinned(new Map()), [breed.name]);
   // which collected card is showing its info label right now (toggled by tapping its i)
   const [infoHover, setInfoHover] = useState<string | null>(null);
+  const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
+  useEffect(() => setPctHover(null), [breed.name]);
   const infoSeen = useRef<Set<string>>(new Set()); // cards whose info tooltip has already paid out its +2, so it pays once
   useEffect(() => setInfoHover(null), [breed.name]);
   // hold-to-magnify: which collected card is enlarged right now, and the release timer
@@ -1195,12 +1197,17 @@ export default function LineageMap({
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
                     const wasAdjusted = c.share !== c.mix; // adjusted cards get a * in the pill
                     return (
-                      <>
-                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))" }} />
+                      <g
+                        style={{ cursor: "pointer" }}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => { e.stopPropagation(); setPctHover((h) => (h === c.id ? null : c.id)); }}
+                      >
+                        <rect x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
+                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
                           {(c.mix < 1 ? "<1%" : `${c.mix}%`) + (wasAdjusted ? "*" : "")}
                         </text>
-                      </>
+                      </g>
                     );
                   })()}
                   {isTopOfStack(c) && placedSet.has(c.id) && (breedInfo[c.name] || c.note) ? (() => {
@@ -1303,6 +1310,30 @@ export default function LineageMap({
             }}
           >
             {text}
+          </div>
+        );
+      })()}
+      {pctHover && (() => {
+        const c = pickCards.find((x) => x.id === pctHover);
+        if (!c) return null;
+        const left = c.cardX - CW / 2 + pan.x;
+        const top = c.cardY + CW / 2 + 6 + pan.y;
+        const mixTxt = c.mix < 1 ? "<1%" : `${c.mix}%`;
+        const adjusted = c.share !== c.mix;
+        return (
+          <div
+            style={{
+              position: "fixed", left, top, maxWidth: 200, zIndex: 100, pointerEvents: "none",
+              background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
+              font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "8px 11px",
+              borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
+            }}
+          >
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>Our best guess, not hard science.</div>
+            <div>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
+            <div style={{ marginTop: 5, fontWeight: 600 }}>
+              {adjusted ? `${c.share}% of its own line, carried down to ${mixTxt} of the breed.` : `Makes up ${mixTxt} of the breed.`}
+            </div>
           </div>
         );
       })()}
