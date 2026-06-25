@@ -637,7 +637,7 @@ export default function LineageMap({
     }
     // where each card sits right now, so we can glide it from there to its slot
     // duplicates glide onto their primary's slot, stacked with a small cascade, instead of vanishing
-    dups.forEach(({ c, primaryId, n }) => { const pg = targets.get(primaryId); if (pg) targets.set(c.id, { x: pg.x + n * 4, y: pg.y + n * 4 }); });
+    dups.forEach(({ c, primaryId, n }) => { if (PACK_BREEDS.has(c.name)) { hidden.add(c.id); return; } const pg = targets.get(primaryId); if (pg) targets.set(c.id, { x: pg.x + n * 4, y: pg.y + n * 4 }); }); /* chum-dedup: a pack breed shows once; only ancestors stack */
     const starts = new Map<string, { x: number; y: number }>();
     uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
     dups.forEach(({ c }) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
@@ -1235,7 +1235,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
@@ -1342,22 +1342,23 @@ export default function LineageMap({
       {zoomedId && (() => {
         const c = pickCards.find((x) => x.id === zoomedId);
         if (!c) return null;
-        // the enlarged image grows from the bottom-right corner, shifted +100,+100;
-        // place the close just past its top-right on screen
+        // the enlarged image is anchored at its bottom-right corner, then shifted +100,+100;
+        // sit the close on that corner, protruding like the small-card icons
+        const sz = 30;
         const cornerX = c.cardX + CW / 2 + pan.x + 100;
         const cornerY = c.cardY + CW / 2 + pan.y + 100;
-        const left = cornerX - CW * 3 + 6;   // top-left of the 3x image is corner - 3*CW
-        const top = cornerY - CW * 3 + 6;
+        const left = cornerX - sz / 2;
+        const top = cornerY - sz / 2;
         return (
           <button
             type="button"
             onClick={() => setZoomedId(null)}
             aria-label="Close zoom"
             style={{
-              position: "fixed", left, top, zIndex: 120, width: 34, height: 34,
-              borderRadius: "50%", border: "2px solid #ffffff", background: "rgba(10, 58, 87, 0.95)",
-              color: "#ffffff", fontSize: 20, lineHeight: "30px", cursor: "pointer", padding: 0,
-              boxShadow: "0 4px 12px rgba(10, 58, 87, 0.4)",
+              position: "fixed", left, top, zIndex: 120, width: sz, height: sz,
+              borderRadius: "50%", border: "2px solid #ffffff", background: "var(--navy)",
+              color: "#ffffff", fontSize: 18, lineHeight: `${sz - 6}px`, cursor: "pointer", padding: 0,
+              boxShadow: "0 3px 9px rgba(0,0,0,0.35)",
             }}
           >
             &times;
