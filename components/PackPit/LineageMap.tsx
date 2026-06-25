@@ -374,6 +374,13 @@ export default function LineageMap({
     });
     return out;
   }, [root]);
+  // top-3 breeds by share get a click-score multiplier when first tapped /* top3-mult */
+  const topBonus = useMemo(() => {
+    const ranked = [...breedMix.entries()].sort((a, b) => b[1].norm - a[1].norm);
+    const m = new Map<string, number>();
+    [1.3, 1.2, 1.1].forEach((mult, i) => { if (ranked[i]) m.set(ranked[i][0], mult); });
+    return m;
+  }, [breedMix]);
   // (Stage 1 console diagnostic removed) /* mix-box */
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
@@ -951,7 +958,9 @@ export default function LineageMap({
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
                       setSeen((s) => { if (s.has(n._id)) return s; const x = new Set(s); x.add(n._id); return x; }); // first tap turns it blue
-                      flashNum(n._x, n._y - r, firstHit ? (hasKids ? 125 : 250) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
+                      const baseVal = hasKids ? 125 : 250;
+                      const mult = topBonus.get(PACK_IMG.get(n.name) ?? (n.img as string)) ?? 1; // top-3 breeds score more
+                      flashNum(n._x, n._y - r, firstHit ? Math.round(baseVal * mult) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
                       follow(n);
                       // a card placed in a frame is protected: a node click won't remove it
                       if (placedSet.has(n._id) || cardFrame.has(n._id)) { return; }
