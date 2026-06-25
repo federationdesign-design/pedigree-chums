@@ -557,7 +557,13 @@ export default function LineageMap({
   // Duplicate cards of one breed stack at the same spot; only the top of each
   // stack (the last in order) shows its status dot, % pill and info icon.
   const topByImg = new Map<string, string>();
-  pickCards.forEach((c) => topByImg.set(c.img, c.id));
+  // the front of a stack is the last card of that image that actually renders
+  // (skip folded-out duplicates and absorbed cards), so its pill always shows /* top-visible */
+  pickCards.forEach((c) => {
+    if (packed && packHidden.has(c.id)) return;
+    if (stackedIds.has(c.id)) return;
+    topByImg.set(c.img, c.id);
+  });
   const isTopOfStack = (c: { id: string; img: string }) => topByImg.get(c.img) === c.id;
   // order cards within each image group so the underneath ones can fan slightly /* stack-pack */
   const stackOrder = new Map<string, number>();
