@@ -642,7 +642,7 @@ export default function LineageMap({
     }
     // where each card sits right now, so we can glide it from there to its slot
     // duplicates glide onto their primary's slot, stacked with a small cascade, instead of vanishing
-    dups.forEach(({ c, primaryId, n }) => { if (PACK_BREEDS.has(c.name)) { hidden.add(c.id); return; } const pg = targets.get(primaryId); if (pg) targets.set(c.id, { x: pg.x + n * 4, y: pg.y + n * 4 }); }); /* chum-dedup: a pack breed shows once; only ancestors stack */
+    dups.forEach(({ c, primaryId, n }) => { if (PACK_BREEDS.has(c.name)) { hidden.add(c.id); return; } const pg = targets.get(primaryId); if (pg) targets.set(c.id, { x: pg.x + n * 11, y: pg.y + n * 11 }); }); /* chum-dedup + stack-stroke: a pack breed shows once; ancestors cascade enough to peek */
     const starts = new Map<string, { x: number; y: number }>();
     uniq.forEach((c) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
     dups.forEach(({ c }) => starts.set(c.id, { x: c.cardX, y: c.cardY }));
@@ -1175,7 +1175,7 @@ export default function LineageMap({
                     height={CW}
                     rx={15}
                     vectorEffect="non-scaling-stroke"
-                    className={placedSet.has(c.id) && isDupImg(c.img) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
+                    className={isDupImg(c.img) && !isTopOfStack(c) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                   />
                   {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
