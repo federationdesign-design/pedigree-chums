@@ -1025,11 +1025,18 @@ export default function LineageMap({
                 <g
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
-                  transform={cxf
-                    ? `${cxf.transform} scale(${packScale}) translate(${-c.cardX},${-c.cardY})`
-                    : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) scale(${packScale}) translate(${-c.cardX},${-c.cardY})`}
+                  transform={(() => {
+                    const crx = c.cardX + CW / 2, cry = c.cardY + CW / 2; // bottom-right corner: the zoom pivot /* magnify-redesign */
+                    const zoom = `translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
+                    return cxf
+                      ? `${cxf.transform} ${zoom}`
+                      : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
+                  })()}
                   style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" } : undefined}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (placedSet.has(c.id) || packed) setZoomedId((z) => (z === c.id ? null : c.id)); // click the image to toggle zoom
+                  }}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
                     if (packed || placedSet.has(c.id)) return; // already framed, or in pack mode
@@ -1162,7 +1169,7 @@ export default function LineageMap({
                     rx={15}
                     className={placedSet.has(c.id) && isDupImg(c.img) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                   />
-                  {isTopOfStack(c) && (() => {
+                  {isTopOfStack(c) && zoomedId !== c.id && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1191,25 +1198,23 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {(placedSet.has(c.id) || packed) && (() => {
-                    const mx = c.cardX - CW / 2, my = c.cardY + CW / 2; // bottom-left corner /* icons-10pct */
+                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && (() => {
+                    const mx = c.cardX - CW / 2 + 11, my = c.cardY + CW / 2 - 11; // inside the box, bottom-left
                     return (
                       <g
                         style={{ cursor: "zoom-in" }}
-                        transform={`translate(${mx},${my}) scale(0.9) translate(${-mx},${-my})`}
-                        onPointerDown={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
-                        onPointerUp={(e) => { e.stopPropagation(); magnifyRelease(); }}
-                        onPointerLeave={() => magnifyRelease()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => { e.stopPropagation(); setZoomedId((z) => (z === c.id ? null : c.id)); }}
                         role="button"
                         aria-label="Magnify"
                       >
-                        <circle cx={mx} cy={my} r={13} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2, pointerEvents: "all" }} />
-                        <circle cx={mx - 1.5} cy={my - 1.5} r={4.5} style={{ fill: "none", stroke: "#ffffff", strokeWidth: 1.8, pointerEvents: "none" }} />
-                        <path d={`M ${mx + 2} ${my + 2} l 4 4`} stroke="#ffffff" strokeWidth={2} strokeLinecap="round" style={{ pointerEvents: "none" }} />
+                        <circle cx={mx} cy={my} r={11} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
+                        <circle cx={mx - 1.4} cy={my - 1.4} r={4.2} style={{ fill: "none", stroke: "#ffffff", strokeWidth: 1.8, pointerEvents: "none" }} />
+                        <path d={`M ${mx + 1.9} ${my + 1.9} l 4 4`} stroke="#ffffff" strokeWidth={2} strokeLinecap="round" style={{ pointerEvents: "none" }} />
                       </g>
                     );
                   })()}
-                  {packed && isTopOfStack(c) && (() => {
+                  {packed && isTopOfStack(c) && zoomedId !== c.id && (() => {
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
@@ -1228,7 +1233,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
