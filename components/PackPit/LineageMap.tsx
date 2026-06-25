@@ -1091,7 +1091,7 @@ export default function LineageMap({
                       ? `${cxf.transform} ${zoom}`
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
-                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none", ...(isDupImg(c.img) && !isTopOfStack(c) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : undefined}
+                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none", ...(isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : undefined}
                   onClick={(e) => {
                     e.stopPropagation();
                     if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click the image to toggle zoom (not Pedigree Chums)
@@ -1227,7 +1227,7 @@ export default function LineageMap({
                     height={CW}
                     rx={15}
                     vectorEffect="non-scaling-stroke"
-                    className={isDupImg(c.img) && !isTopOfStack(c) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
+                    className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} /* chum-fix */
                   />
                   {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
@@ -1274,7 +1274,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {packed && isTopOfStack(c) && zoomedId !== c.id && (() => { /* chum-pill: the % pill shows on Pedigree Chums too */
+                  {packed && (isTopOfStack(c) || PACK_BREEDS.has(c.name)) && zoomedId !== c.id && (() => { /* chum-fix: chums always show their pill */
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
