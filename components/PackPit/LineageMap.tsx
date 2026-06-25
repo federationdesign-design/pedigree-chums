@@ -568,6 +568,7 @@ export default function LineageMap({
     // card, pop them all (a staggered ripple, +50 each) before any collapse begins.
     const toPop = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
     if (toPop.length) {
+      setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; }); // turns popped nodes blue, like a manual tap
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
         if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, 50, FLASH_SIZE); }
