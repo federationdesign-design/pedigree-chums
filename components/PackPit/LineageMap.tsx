@@ -1185,15 +1185,15 @@ export default function LineageMap({
                     );
                   })()}
                   {packed && (() => {
-                    const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 4; // pill near the foot of the card (nudged 2px down)
-                    const pillRight = c.cardX + CW / 2 + 6; // right-aligned to the card, nudged just past the edge
+                    const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
+                    const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
                     const wasAdjusted = c.share !== c.mix;
                     const ADJ_TILT = -12, aw = 30, ah = 15;
                     const adjX = pillRight - 1, adjY = py + 2; // overlaps the corner, nudged 3px right
                     return (
                       <>
-                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} />
+                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
                           {c.mix < 1 ? "<1%" : `${c.mix}%`}
                         </text>
