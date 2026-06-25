@@ -424,8 +424,11 @@ export default function LineageMap({
     if (d && d.moved) suppressClick.current = true;
   };
   const closeIfTap = () => {
+    // tap-to-close disabled: the family tree closes only via the X button, so a
+    // stray tap can't wipe out a built tree (and can't swallow the root card's
+    // double-click). A plain tap still just clears any open info label.
     if (suppressClick.current) { suppressClick.current = false; return; }
-    onClose();
+    setInfoHover(null);
   };
 
   const tagW = breed.name.length * 9.5 + 28;
