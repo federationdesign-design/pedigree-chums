@@ -1439,14 +1439,14 @@ export default function LineageMap({
         return (
           <div
             style={{
-              position: "fixed", left, top, maxWidth: 230, zIndex: 100, pointerEvents: "none",
+              position: "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "none", /* box-tweak: 25% wider */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
             <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
-              {pctTxt(norm)} of the whole dog
+              {pctTxt(norm)} of your chum
             </div>
             {apps.length > 0 && (
               <div style={{ fontWeight: 600, marginBottom: 6 }}>
@@ -1456,7 +1456,7 @@ export default function LineageMap({
                 {multi && (
                   <div style={{ marginTop: 2 }}>Combined: {apps.map((a) => pctTxt(a.pct)).join(" + ")} = {pctTxt(sum)}</div>
                 )}
-                <div style={{ marginTop: 2 }}>Share of the whole dog: {pctTxt(norm)}</div>
+                <div style={{ marginTop: 2 }}>Share of your chum: {pctTxt(norm)}</div>
               </div>
             )}
             <div style={{ fontWeight: 700, marginBottom: 3 }}>{TITLES[ti]}</div>
