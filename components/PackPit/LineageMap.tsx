@@ -343,6 +343,38 @@ export default function LineageMap({
     if (root) walk(root);
     return m;
   }, [root]);
+  // Stage 1: genetic-mix model. Walk the whole tree; each appearance of a breed
+  // contributes its cumulative share (leaves / root leaves, which already honours
+  // non-binary splits). Sum a breed's appearances, then normalise so every breed
+  // totals 100% across the whole dog. /* breedMix */
+  const breedMix = useMemo(() => {
+    type App = { depth: number; pct: number };
+    const apps = new Map<string, App[]>(); // breed key -> appearances
+    const rootLeaves = root ? root._leaves : 0;
+    const walk = (n: Node, depth: number) => {
+      (n.children as Node[] | undefined)?.forEach((k) => {
+        if (k.img && rootLeaves > 0) {
+          const key = PACK_IMG.get(k.name) ?? k.img;
+          const pct = (k._leaves / rootLeaves) * 100; // cumulative contribution of this appearance
+          const a = apps.get(key) || []; a.push({ depth, pct }); apps.set(key, a);
+        }
+        walk(k, depth + 1);
+      });
+    };
+    if (root) walk(root, 1); // root's direct children are 1 generation back
+    // raw sum per breed
+    const sums = new Map<string, number>();
+    apps.forEach((list, key) => sums.set(key, list.reduce((s, a) => s + a.pct, 0)));
+    const total = [...sums.values()].reduce((s, v) => s + v, 0); // normalisation denominator
+    const out = new Map<string, { apps: App[]; sum: number; norm: number }>();
+    apps.forEach((list, key) => {
+      const sum = sums.get(key) || 0;
+      const norm = total > 0 ? (sum / total) * 100 : 0;
+      out.set(key, { apps: [...list].sort((a, b) => a.depth - b.depth), sum, norm });
+    });
+    return out;
+  }, [root]);
+  // (Stage 1 console diagnostic removed) /* mix-box */
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
   const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
@@ -1378,22 +1410,57 @@ export default function LineageMap({
         if (!c) return null;
         const left = c.cardX - CW / 2 + pan.x;
         const top = c.cardY + CW / 2 + 6 + pan.y;
-        const mixTxt = c.mix < 1 ? "<1%" : `${c.mix}%`;
-        const adjusted = c.share !== c.mix;
+        const info = breedMix.get(c.img);
+        const genLabel = (d: number) => {
+          if (d <= 0) return "the breed itself";
+          if (d === 1) return "parent";
+          if (d === 2) return "grandparent";
+          const greats = d - 2;
+          return `${"great-".repeat(greats)}grandparent`;
+        };
+        const TITLES = [
+          "Our best guess, not hard science.",
+          "An educated guess, not gospel.",
+          "Informed estimate, not exact science.",
+          "Our reckoning, not the final word.",
+          "A considered guess, not cold fact.",
+          "Best judgement, not laboratory proof.",
+          "Our read on it, not a certainty.",
+          "A fair estimate, not a fixed figure.",
+          "Studied guesswork, not hard data.",
+          "Our interpretation, not established fact.",
+        ];
+        const ti = Math.abs([...c.id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)) % TITLES.length;
+        const pctTxt = (v: number) => (v < 1 ? "<1%" : `${Math.round(v)}%`);
+        const apps = info ? info.apps : [];
+        const sum = info ? info.sum : c.mix;
+        const norm = info ? info.norm : c.mix;
+        const multi = apps.length > 1;
         return (
           <div
             style={{
-              position: "fixed", left, top, maxWidth: 200, zIndex: 100, pointerEvents: "none",
+              position: "fixed", left, top, maxWidth: 230, zIndex: 100, pointerEvents: "none",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
-              font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "8px 11px",
+              font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
-            <div style={{ fontWeight: 700, marginBottom: 4 }}>Our best guess, not hard science.</div>
-            <div>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
-            <div style={{ marginTop: 5, fontWeight: 600 }}>
-              {adjusted ? `${c.share}% of its own line, carried down to ${mixTxt} of the breed.` : `Makes up ${mixTxt} of the breed.`}
+            <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
+              {pctTxt(norm)} of the whole dog
             </div>
+            {apps.length > 0 && (
+              <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                {apps.map((a, i) => (
+                  <div key={i}>As {genLabel(a.depth)}: {pctTxt(a.pct)}</div>
+                ))}
+                {multi && (
+                  <div style={{ marginTop: 2 }}>Combined: {apps.map((a) => pctTxt(a.pct)).join(" + ")} = {pctTxt(sum)}</div>
+                )}
+                <div style={{ marginTop: 2 }}>Share of the whole dog: {pctTxt(norm)}</div>
+              </div>
+            )}
+            <div style={{ fontWeight: 700, marginBottom: 3 }}>{TITLES[ti]}</div>
+            <div style={{ opacity: 0.92 }}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
           </div>
         );
       })()}
