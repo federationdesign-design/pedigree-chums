@@ -303,7 +303,7 @@ export default function LineageMap({
   useEffect(() => {
     setShowRemove(false);
     setRemoving(false);
-    const t = setTimeout(() => setShowRemove(true), 15000);
+    const t = setTimeout(() => setShowRemove(true), 30000); // auto-show the green button after 30s
     return () => clearTimeout(t);
   }, [breed.name]);
   // every non-root circle in the whole tree; the green button also appears once
@@ -844,7 +844,7 @@ export default function LineageMap({
               <g className={styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Collect</text>
+                <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
               </g>
             </g>
           </g>
@@ -863,7 +863,7 @@ export default function LineageMap({
               <g className={removing ? styles.chumTopDown : styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>pack chum</text>
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>Collect</text>
               </g>
             </g>
           </g>
