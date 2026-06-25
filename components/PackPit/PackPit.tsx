@@ -528,7 +528,6 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050)); // cookie policy is the 3rd thing in
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
-          waveTimers.push(setTimeout(() => { fireDragHint(); }, 2400)); // DRAG hint, 1000ms after the bone settles /* drag-hint */
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1900)); // one hamburger menu rides in with the pack
           dropDogs(2100, false);
@@ -544,7 +543,6 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { fireDragHint(); }, 7400)); // DRAG hint, 1000ms after the bone settles /* drag-hint */
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 8050)); // 5050 two feature cards
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 6000 bowl + menu, before the flood
           waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                      // 150000 all remaining cards
@@ -606,12 +604,6 @@ export default function PackPit() {
         }
       };
       Events.on(engine, "beforeUpdate", onFuseMagnet);
-      Events.on(engine, "beforeUpdate", () => { /* drag-hint wobble */
-        const now = performance.now();
-        const wob = (until: number, b: any) => { if (!b || now > until) return; const a = Math.sin(now / 60) * 0.05; Body.setAngularVelocity(b, (b.angularVelocity || 0) * 0.7 + a); };
-        if (dragWobbleUntil.bone) wob(dragWobbleUntil.bone, findBody((b) => b?.plugin?.prop === "bone"));
-        if (dragWobbleUntil.logo) wob(dragWobbleUntil.logo, findBody((b) => b?.plugin?.prop === "logo" || b?.plugin?.logo));
-      });
       // --------------------------------------------------------------------
       mc.collisionFilter.mask = 0xffffffff & ~0x0002; // category 0x0002 (inert circles) cannot be grabbed
       let pressedBomb: any = null; // the bomb currently being pressed/held, for the click-vs-hold fuse
@@ -708,26 +700,42 @@ export default function PackPit() {
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
       const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score) setScore((s) => s + val); };
-      // one-time DRAG hint: wobble the bone + logo and float five "DRAG" words up /* drag-hint */
-      const dragWobbleUntil: { bone: number; logo: number } = { bone: 0, logo: 0 };
+      // DRAG hint: poll until BOTH the bone and the logo exist, then fire once. /* drag-rebuild */
       const findBody = (pred: (b: any) => boolean) => { for (const b of Composite.allBodies(engine.world)) { if (pred(b)) return b; } return null; };
-      const fireDragHint = () => {
-        if (disposed) return;
-        const bone = findBody((b) => b?.plugin?.prop === "bone");
-        const logo = findBody((b) => b?.plugin?.prop === "logo" || b?.plugin?.logo);
-        const targets = [bone, logo].filter(Boolean) as any[];
-        if (!targets.length) return;
-        const now = performance.now();
-        targets.forEach((bd) => { if (bd === bone) dragWobbleUntil.bone = now + 1300; else dragWobbleUntil.logo = now + 1300; });
-        targets.forEach((bd) => {
+      let dragHintDone = false;
+      const wobbleBody = (b: any) => {
+        if (!b) return;
+        const t0 = performance.now();
+        const iv = window.setInterval(() => {
+          if (disposed || !b.position) { window.clearInterval(iv); return; }
+          const el = performance.now() - t0;
+          if (el > 1300) { window.clearInterval(iv); return; }
+          const a = Math.sin(el / 55) * 0.06; // small shiver
+          Body.setAngularVelocity(b, (b.angularVelocity || 0) * 0.6 + a);
+        }, 25);
+      };
+      const fireDragHint = (bone: any, logo: any) => {
+        [bone, logo].filter(Boolean).forEach((bd: any) => {
+          wobbleBody(bd);
           for (let k = 0; k < 5; k++) {
             window.setTimeout(() => {
               if (disposed || !bd.position) return;
-              numAt(bd.position.x, bd.position.y - (bd.plugin?.half || 40), "DRAG" as unknown as number, 18, false, "#ffd23e"); // rises + fades like the score numbers
-            }, k * 190); // staggered, an echo
+              numAt(bd.position.x, bd.position.y - (bd.plugin?.half || 40), "DRAG" as unknown as number, 20, false, "#ffd23e"); // proven number-draw path
+            }, k * 190); // staggered echo
           }
         });
       };
+      {
+        let tries = 0;
+        const poll = window.setInterval(() => {
+          if (disposed || dragHintDone) { window.clearInterval(poll); return; }
+          tries++;
+          if (tries > 60) { window.clearInterval(poll); return; } // give up after ~18s
+          const bone = findBody((b) => b?.plugin?.prop === "bone");
+          const logo = findBody((b) => b?.plugin?.prop === "logo" || b?.plugin?.logo);
+          if (bone && logo) { dragHintDone = true; window.clearInterval(poll); window.setTimeout(() => fireDragHint(bone, logo), 1000); } // 1s after both are in
+        }, 300);
+      }
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
