@@ -1031,9 +1031,8 @@ export default function LineageMap({
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
                   transform={(() => {
-                    const crx = c.cardX + CW / 2, cry = c.cardY + CW / 2; // bottom-right corner: the zoom pivot /* magnify-redesign zoom-refine */
-                    const zShift = packScale !== 1 ? "translate(100,100) " : ""; // nudge the enlarged image down-right
-                    const zoom = `${zShift}translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
+                    const crx = c.cardX - CW / 2, cry = c.cardY - CW / 2; // top-left corner: the zoom pivot, so it grows down-right /* zoom-topleft */
+                    const zoom = `translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
                     const underneath = packed && isDupImg(c.img) && !isTopOfStack(c); // a card with others on top of it
                     const fan = underneath ? (((stackOrder.get(c.id) ?? 0) % 2) ? 1 : -1) * (2 + ((stackOrder.get(c.id) ?? 0) % 2)) : 0; // small alternating splay
                     return cxf
@@ -1352,8 +1351,9 @@ export default function LineageMap({
         // the enlarged image is anchored at its bottom-right corner, then shifted +100,+100;
         // sit the close on that corner, protruding like the small-card icons
         const sz = 30;
-        const cornerX = c.cardX + CW / 2 + pan.x + 100;
-        const cornerY = c.cardY + CW / 2 + pan.y + 100;
+        // top-left of the card is the zoom anchor; the 3x image's bottom-right is anchor + 3*CW
+        const cornerX = c.cardX - CW / 2 + pan.x + CW * 3;
+        const cornerY = c.cardY - CW / 2 + pan.y + CW * 3;
         const left = cornerX - sz / 2;
         const top = cornerY - sz / 2;
         return (
