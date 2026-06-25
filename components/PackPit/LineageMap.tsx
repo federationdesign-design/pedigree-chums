@@ -1474,6 +1474,7 @@ export default function LineageMap({
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#ffd23e", marginBottom: 1 }}>{c.name}</div> {/* pct-name */}
             <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
               {pctTxt(norm)} of your chum
             </div>
