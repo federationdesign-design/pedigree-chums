@@ -207,6 +207,12 @@ export default function LineageMap({
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const infoSeen = useRef<Set<string>>(new Set()); // cards whose info tooltip has already paid out its +2, so it pays once
   useEffect(() => setInfoHover(null), [breed.name]);
+  // hold-to-magnify: which collected card is enlarged right now, and the release timer
+  const [zoomedId, setZoomedId] = useState<string | null>(null);
+  const zoomTimer = useRef<number | null>(null);
+  useEffect(() => setZoomedId(null), [breed.name]);
+  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomedId(id); };
+  const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks
 
   // Dismiss a fixed/opened card (the X in its corner).
   const removeCard = (id: string) => {
@@ -984,11 +990,11 @@ export default function LineageMap({
                 ))}
               </g>
             ))}
-            {pickCards.map((c) => {
+            {(zoomedId ? [...pickCards.filter((c) => c.id !== zoomedId), ...pickCards.filter((c) => c.id === zoomedId)] : pickCards).map((c) => {
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               if (stackedIds.has(c.id)) return null; // absorbed into a frame's stack
               const clipId = `lm-pick-${c.id}`;
-              const packScale = 1; // breed cards stay full size in the grid, no shrink
+              const packScale = zoomedId === c.id ? 3 : 1; // held magnifier blows the card up to 3x, centred
               const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
               const cxf = ci ? collectXf(c.cardX, c.cardY, ci.spin, cardDeg) : null; // tumble to the corner with the main card
               return (
@@ -1141,8 +1147,8 @@ export default function LineageMap({
                       </circle>
                     );
                   })()}
-                  {!packed && (() => {
-                    const ccx = c.cardX - CW / 2, ccy = c.cardY + CW / 2; // bottom-left corner, clear of the info icon now at top-right
+                  {!packed && !placedSet.has(c.id) && (() => {
+                    const ccx = c.cardX - CW / 2, ccy = c.cardY + CW / 2; // bottom-left corner, on loose cards only (placed cards show the magnifier)
                     return (
                       <g
                         style={{ cursor: "pointer" }}
@@ -1158,6 +1164,23 @@ export default function LineageMap({
                           strokeWidth={2}
                           strokeLinecap="round"
                         />
+                      </g>
+                    );
+                  })()}
+                  {placedSet.has(c.id) && (() => {
+                    const mx = c.cardX - CW / 2, my = c.cardY + CW / 2; // bottom-left corner
+                    return (
+                      <g
+                        style={{ cursor: "zoom-in" }}
+                        onPointerDown={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
+                        onPointerUp={(e) => { e.stopPropagation(); magnifyRelease(); }}
+                        onPointerLeave={() => magnifyRelease()}
+                        role="button"
+                        aria-label="Magnify"
+                      >
+                        <circle cx={mx} cy={my} r={13} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2 }} />
+                        <circle cx={mx - 1.5} cy={my - 1.5} r={4.5} style={{ fill: "none", stroke: "#ffffff", strokeWidth: 1.8 }} />
+                        <path d={`M ${mx + 2} ${my + 2} l 4 4`} stroke="#ffffff" strokeWidth={2} strokeLinecap="round" />
                       </g>
                     );
                   })()}
