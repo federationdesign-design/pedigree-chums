@@ -509,6 +509,11 @@ export default function LineageMap({
   const topByImg = new Map<string, string>();
   pickCards.forEach((c) => topByImg.set(c.img, c.id));
   const isTopOfStack = (c: { id: string; img: string }) => topByImg.get(c.img) === c.id;
+  // order cards within each image group so the underneath ones can fan slightly /* stack-pack */
+  const stackOrder = new Map<string, number>();
+  { const byImg = new Map<string, string[]>();
+    pickCards.forEach((c) => { const a = byImg.get(c.img) || []; a.push(c.id); byImg.set(c.img, a); });
+    byImg.forEach((ids) => ids.forEach((id, i) => stackOrder.set(id, i))); }
 
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
@@ -1029,11 +1034,13 @@ export default function LineageMap({
                     const crx = c.cardX + CW / 2, cry = c.cardY + CW / 2; // bottom-right corner: the zoom pivot /* magnify-redesign zoom-refine */
                     const zShift = packScale !== 1 ? "translate(100,100) " : ""; // nudge the enlarged image down-right
                     const zoom = `${zShift}translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
+                    const underneath = packed && isDupImg(c.img) && !isTopOfStack(c); // a card with others on top of it
+                    const fan = underneath ? (((stackOrder.get(c.id) ?? 0) % 2) ? 1 : -1) * (2 + ((stackOrder.get(c.id) ?? 0) % 2)) : 0; // small alternating splay
                     return cxf
                       ? `${cxf.transform} ${zoom}`
-                      : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
+                      : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
-                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" } : undefined}
+                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none", ...(isDupImg(c.img) && !isTopOfStack(c) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : undefined}
                   onClick={(e) => {
                     e.stopPropagation();
                     if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click the image to toggle zoom (not Pedigree Chums)
