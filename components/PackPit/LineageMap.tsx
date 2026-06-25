@@ -1029,7 +1029,7 @@ export default function LineageMap({
               return (
                 <g
                   key={`pick-${c.id}`}
-                  className={`${styles.rootHit} ${styles.grab}`}
+                  className={(placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? styles.rootHit : `${styles.rootHit} ${styles.grab}`} /* zoom-cursor: fixed images get the magnifier cursor, loose cards grab */
                   transform={(() => {
                     const crx = c.cardX - CW / 2, cry = c.cardY - CW / 2; // top-left corner: the zoom pivot, so it grows down-right /* zoom-topleft */
                     const zoom = `translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
@@ -1039,7 +1039,7 @@ export default function LineageMap({
                       ? `${cxf.transform} ${zoom}`
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
-                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none", ...(isDupImg(c.img) && !isTopOfStack(c) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : undefined}
+                  style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none", ...(isDupImg(c.img) && !isTopOfStack(c) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : undefined}
                   onClick={(e) => {
                     e.stopPropagation();
                     if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click the image to toggle zoom (not Pedigree Chums)
