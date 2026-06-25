@@ -1,8 +1,8 @@
 .stage {
   position: relative;
   width: 100%;
-  /* a touch taller than the viewport so there is a small scroll to the pile.
-     ~50px of scroll regardless of viewport height. /* scroll-50 */ */
+  /* a touch taller than the viewport so there is a small scroll to the pile;
+     about 50px of scroll regardless of viewport height */
   height: calc(100vh + 50px);
   height: calc(100svh + 50px);
   min-height: 780px;
