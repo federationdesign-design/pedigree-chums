@@ -1026,8 +1026,9 @@ export default function LineageMap({
                   key={`pick-${c.id}`}
                   className={`${styles.rootHit} ${styles.grab}`}
                   transform={(() => {
-                    const crx = c.cardX + CW / 2, cry = c.cardY + CW / 2; // bottom-right corner: the zoom pivot /* magnify-redesign */
-                    const zoom = `translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
+                    const crx = c.cardX + CW / 2, cry = c.cardY + CW / 2; // bottom-right corner: the zoom pivot /* magnify-redesign zoom-refine */
+                    const zShift = packScale !== 1 ? "translate(100,100) " : ""; // nudge the enlarged image down-right
+                    const zoom = `${zShift}translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
                     return cxf
                       ? `${cxf.transform} ${zoom}`
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
@@ -1035,7 +1036,7 @@ export default function LineageMap({
                   style={cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" } : undefined}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (placedSet.has(c.id) || packed) setZoomedId((z) => (z === c.id ? null : c.id)); // click the image to toggle zoom
+                    if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click the image to toggle zoom (not Pedigree Chums)
                   }}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
@@ -1167,9 +1168,10 @@ export default function LineageMap({
                     width={CW}
                     height={CW}
                     rx={15}
+                    vectorEffect="non-scaling-stroke"
                     className={placedSet.has(c.id) && isDupImg(c.img) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                   />
-                  {isTopOfStack(c) && zoomedId !== c.id && (() => {
+                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1198,8 +1200,8 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && (() => {
-                    const mx = c.cardX - CW / 2 + 11, my = c.cardY + CW / 2 - 11; // inside the box, bottom-left
+                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
+                    const mx = c.cardX - CW / 2 + 15, my = c.cardY + CW / 2 - 13; // inside the box, bottom-left (nudged +4 right, 2 up)
                     return (
                       <g
                         style={{ cursor: "zoom-in" }}
@@ -1214,7 +1216,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {packed && isTopOfStack(c) && zoomedId !== c.id && (() => {
+                  {packed && isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
@@ -1335,6 +1337,31 @@ export default function LineageMap({
           >
             {text}
           </div>
+        );
+      })()}
+      {zoomedId && (() => {
+        const c = pickCards.find((x) => x.id === zoomedId);
+        if (!c) return null;
+        // the enlarged image grows from the bottom-right corner, shifted +100,+100;
+        // place the close just past its top-right on screen
+        const cornerX = c.cardX + CW / 2 + pan.x + 100;
+        const cornerY = c.cardY + CW / 2 + pan.y + 100;
+        const left = cornerX - CW * 3 + 6;   // top-left of the 3x image is corner - 3*CW
+        const top = cornerY - CW * 3 + 6;
+        return (
+          <button
+            type="button"
+            onClick={() => setZoomedId(null)}
+            aria-label="Close zoom"
+            style={{
+              position: "fixed", left, top, zIndex: 120, width: 34, height: 34,
+              borderRadius: "50%", border: "2px solid #ffffff", background: "rgba(10, 58, 87, 0.95)",
+              color: "#ffffff", fontSize: 20, lineHeight: "30px", cursor: "pointer", padding: 0,
+              boxShadow: "0 4px 12px rgba(10, 58, 87, 0.4)",
+            }}
+          >
+            &times;
+          </button>
         );
       })()}
       {pctHover && (() => {
