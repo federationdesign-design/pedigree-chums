@@ -1174,20 +1174,21 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {placedSet.has(c.id) && (() => {
-                    const mx = c.cardX - CW / 2, my = c.cardY + CW / 2; // bottom-left corner
+                  {(placedSet.has(c.id) || packed) && (() => {
+                    const mx = c.cardX - CW / 2, my = c.cardY + CW / 2; // bottom-left corner /* icons-10pct */
                     return (
                       <g
                         style={{ cursor: "zoom-in" }}
+                        transform={`translate(${mx},${my}) scale(0.9) translate(${-mx},${-my})`}
                         onPointerDown={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
                         onPointerUp={(e) => { e.stopPropagation(); magnifyRelease(); }}
                         onPointerLeave={() => magnifyRelease()}
                         role="button"
                         aria-label="Magnify"
                       >
-                        <circle cx={mx} cy={my} r={13} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2 }} />
-                        <circle cx={mx - 1.5} cy={my - 1.5} r={4.5} style={{ fill: "none", stroke: "#ffffff", strokeWidth: 1.8 }} />
-                        <path d={`M ${mx + 2} ${my + 2} l 4 4`} stroke="#ffffff" strokeWidth={2} strokeLinecap="round" />
+                        <circle cx={mx} cy={my} r={13} style={{ fill: "var(--navy)", stroke: "#ffffff", strokeWidth: 2, pointerEvents: "all" }} />
+                        <circle cx={mx - 1.5} cy={my - 1.5} r={4.5} style={{ fill: "none", stroke: "#ffffff", strokeWidth: 1.8, pointerEvents: "none" }} />
+                        <path d={`M ${mx + 2} ${my + 2} l 4 4`} stroke="#ffffff" strokeWidth={2} strokeLinecap="round" style={{ pointerEvents: "none" }} />
                       </g>
                     );
                   })()}
@@ -1210,11 +1211,12 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && placedSet.has(c.id) && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
                         style={{ cursor: "pointer" }}
+                        transform={`translate(${ix},${iy}) scale(0.9) translate(${-ix},${-iy})`}
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1297,9 +1299,9 @@ export default function LineageMap({
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
         if (!c || !text) return null;
-        // card screen position: SVG coords + pan (the viewBox offsets by -pan)
-        const left = c.cardX - CW / 2 + pan.x;
-        const top = c.cardY + CW / 2 + 6 + pan.y;
+        // next to the i (top-right corner of the card), not the bottom
+        const left = c.cardX + CW / 2 + 14 + pan.x;
+        const top = c.cardY - CW / 2 - 6 + pan.y;
         return (
           <div
             style={{
