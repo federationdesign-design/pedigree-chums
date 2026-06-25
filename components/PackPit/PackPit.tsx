@@ -700,42 +700,6 @@ export default function PackPit() {
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
       const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score) setScore((s) => s + val); };
-      // DRAG hint: poll until BOTH the bone and the logo exist, then fire once. /* drag-rebuild */
-      const findBody = (pred: (b: any) => boolean) => { for (const b of Composite.allBodies(engine.world)) { if (pred(b)) return b; } return null; };
-      let dragHintDone = false;
-      const wobbleBody = (b: any) => {
-        if (!b) return;
-        const t0 = performance.now();
-        const iv = window.setInterval(() => {
-          if (disposed || !b.position) { window.clearInterval(iv); return; }
-          const el = performance.now() - t0;
-          if (el > 1300) { window.clearInterval(iv); return; }
-          const a = Math.sin(el / 55) * 0.06; // small shiver
-          Body.setAngularVelocity(b, (b.angularVelocity || 0) * 0.6 + a);
-        }, 25);
-      };
-      const fireDragHint = (bone: any, logo: any) => {
-        [bone, logo].filter(Boolean).forEach((bd: any) => {
-          wobbleBody(bd);
-          for (let k = 0; k < 5; k++) {
-            window.setTimeout(() => {
-              if (disposed || !bd.position) return;
-              numAt(bd.position.x, bd.position.y - (bd.plugin?.half || 40), "DRAG" as unknown as number, 20, false, "#ffd23e"); // proven number-draw path
-            }, k * 190); // staggered echo
-          }
-        });
-      };
-      {
-        let tries = 0;
-        const poll = window.setInterval(() => {
-          if (disposed || dragHintDone) { window.clearInterval(poll); return; }
-          tries++;
-          if (tries > 60) { window.clearInterval(poll); return; } // give up after ~18s
-          const bone = findBody((b) => b?.plugin?.prop === "bone");
-          const logo = findBody((b) => b?.plugin?.prop === "logo" || b?.plugin?.logo);
-          if (bone && logo) { dragHintDone = true; window.clearInterval(poll); window.setTimeout(() => fireDragHint(bone, logo), 1000); } // 1s after both are in
-        }, 300);
-      }
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
