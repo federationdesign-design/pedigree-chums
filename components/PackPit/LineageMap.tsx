@@ -400,6 +400,7 @@ export default function LineageMap({
   useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
   const [dragImg, setDragImg] = useState<string | null>(null); // artwork of the card being dragged, to light its one assigned frame
+  const [dragName, setDragName] = useState<string | null>(null); // name of the card being dragged, shown on its lit target frame /* pickup-name */
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
   const [puffs, setPuffs] = useState<{ id: number; sx: number; sy: number }[]>([]); // smoke poofs as a card lands in its frame
   const puffSeq = useRef(0);
@@ -1058,6 +1059,16 @@ export default function LineageMap({
                     height={CW}
                     rx={15}
                   />
+                  {lit && dragName && ( /* pickup-name: the breed name labels the target frame */
+                    <text
+                      x={f.sx - pan.x}
+                      y={f.sy - pan.y - CW / 2 - 8}
+                      textAnchor="middle"
+                      style={{ fill: "#ffd23e", font: "700 13px Montserrat, system-ui, sans-serif", paintOrder: "stroke", stroke: "rgba(10,58,87,0.9)", strokeWidth: 4, pointerEvents: "none" }}
+                    >
+                      {dragName}
+                    </text>
+                  )}
                 </g>
               );
             })}
@@ -1147,6 +1158,7 @@ export default function LineageMap({
                     cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
                     setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
                     setDragImg(c.img);
+                    setDragName(c.name); /* pickup-name */
                     setDragXY({ x: e.clientX, y: e.clientY });
                   }}
                   onPointerMove={(e) => {
@@ -1212,6 +1224,7 @@ export default function LineageMap({
                     }
                     setDragCat(null);
                     setDragImg(null);
+                    setDragName(null); /* pickup-name */
                     setDragXY(null);
                   }}
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
