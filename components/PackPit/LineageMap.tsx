@@ -499,6 +499,11 @@ export default function LineageMap({
       return { id, img, name, note, share, mix, status, cardX, cardY };
     })
     .filter((c) => c.img);
+  // Duplicate cards of one breed stack at the same spot; only the top of each
+  // stack (the last in order) shows its status dot, % pill and info icon.
+  const topByImg = new Map<string, string>();
+  pickCards.forEach((c) => topByImg.set(c.img, c.id));
+  const isTopOfStack = (c: { id: string; img: string }) => topByImg.get(c.img) === c.id;
 
   // The "Complete Ancestor Pack" cleanup. Once half the tree has been opened the
   // clipboard icon appears; tapping it gathers every open card to the top left,
@@ -1138,7 +1143,7 @@ export default function LineageMap({
                     rx={15}
                     className={placedSet.has(c.id) && isDupImg(c.img) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                   />
-                  {(() => {
+                  {isTopOfStack(c) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1184,21 +1189,21 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {packed && (() => {
+                  {packed && isTopOfStack(c) && (() => {
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
                     const wasAdjusted = c.share !== c.mix; // adjusted cards get a * in the pill
                     return (
                       <>
-                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }} />
+                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))" }} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
                           {(c.mix < 1 ? "<1%" : `${c.mix}%`) + (wasAdjusted ? "*" : "")}
                         </text>
                       </>
                     );
                   })()}
-                  {placedSet.has(c.id) && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && placedSet.has(c.id) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
