@@ -470,7 +470,8 @@ export default function PackPit() {
           angle, chamfer: { radius: bh * 0.12 }, restitution: 0.55,
           friction: 0.25, frictionAir: 0.008, density: 0.0008, render: { visible: false },
         });
-        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: which === "yellow" ? "arrow-yellow" : "arrow-green", family: null, ping: 0 }; // patch_yellowmagnet_v1
+        // yellow arrow: bottom-left corner is the pivot/collision point
+        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: which === "yellow" ? "arrow-yellow" : "arrow-green", family: null, ping: 0, ox: isYellow ? bw / 2 : 0, oy: isYellow ? -bh / 2 : 0 }; // patch_yellowmagnet_v1
         // fire inward with spin
         Body.setVelocity(b, { x: isYellow ? 14 + Math.random() * 4 : -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
         Body.setAngularVelocity(b, isYellow ? -(0.18 + Math.random() * 0.14) : (0.18 + Math.random() * 0.14));
@@ -904,7 +905,9 @@ export default function PackPit() {
             const iw = img.naturalWidth || pw, ih = img.naturalHeight || ph; // viewBox-only SVGs report 0; fall back to the body box
             const ir = iw / ih, br = pw / ph;
             const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
-            ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+            // ox/oy shifts draw origin so a custom pivot point sits at body centre
+            const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
+            ctx.drawImage(img, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
           } else if (b.plugin.prop === "ball") {
             ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2); ctx.fillStyle = b.plugin.color; ctx.fill();
             ctx.lineWidth = 3; ctx.strokeStyle = "rgba(10,58,87,0.45)"; ctx.stroke();
