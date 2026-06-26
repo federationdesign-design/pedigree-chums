@@ -427,6 +427,7 @@ export default function LineageMap({
   const [dragName, setDragName] = useState<string | null>(null); // name of the card being dragged, shown on its lit target frame /* pickup-name */
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
   const [wrongDog, setWrongDog] = useState<{ frameId: string; x: number; y: number } | null>(null); // flash "Wrong dog" on bad drop
+  const [correctFlash, setCorrectFlash] = useState<string | null>(null); // frameId of the correct frame to flash yellow on wrong drop
   const [puffs, setPuffs] = useState<{ id: number; sx: number; sy: number }[]>([]); // smoke poofs as a card lands in its frame
   const puffSeq = useRef(0);
   const [bubbles, setBubbles] = useState<{ id: number; sx: number; sy: number }[]>([]); // blue bubble trail as a card glides to its frame
@@ -1113,7 +1114,7 @@ export default function LineageMap({
                   style={isMobile ? { touchAction: "none", pointerEvents: "auto" } : undefined}
                 >
                   <rect
-                    className={`${styles.frame} ${lit ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""} ${wobbleHere ? styles.frameExpect : ""} ${dimHere ? styles.frameDim : ""}`.trim()}
+                    className={`${styles.frame} ${lit || correctFlash === f.id ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""} ${wobbleHere ? styles.frameExpect : ""} ${dimHere ? styles.frameDim : ""}`.trim()}
                     style={glow}
                     x={f.sx - pan.x - CW / 2}
                     y={f.sy - pan.y - CW / 2}
@@ -1121,14 +1122,15 @@ export default function LineageMap({
                     height={CW}
                     rx={15}
                   />
-                  {lit && dragName && ( /* pickup-name: the breed name labels the target frame */
+                  {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame */
                     <text
                       x={f.sx - pan.x}
-                      y={f.sy - pan.y - CW / 2 - 8}
+                      y={f.sy - pan.y + 5}
                       textAnchor="middle"
-                      style={{ fill: "#ffd23e", font: "700 13px Montserrat, system-ui, sans-serif", paintOrder: "stroke", stroke: "rgba(10,58,87,0.9)", strokeWidth: 4, pointerEvents: "none" }}
+                      dominantBaseline="middle"
+                      style={{ fill: wrongDog?.frameId === f.id ? "#ff2d4f" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 14 : 13}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, paintOrder: "stroke", stroke: "rgba(10,58,87,0.9)", strokeWidth: 4, pointerEvents: "none" }}
                     >
-                      {dragName}
+                      {wrongDog?.frameId === f.id ? "WRONG DOG" : dragName}
                     </text>
                   )}
                 </g>
@@ -1274,10 +1276,12 @@ export default function LineageMap({
                         } else if (hit && hit.img !== c.img) {
                           setShakeFrame(hit.id);
                           window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
-                          // wrong dog: flash label on frame, subtract 5 points
+                          // wrong dog: flash label on frame, subtract 5 points, flash correct frame
                           flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, -5, FLASH_SIZE);
                           setWrongDog({ frameId: hit.id, x: hit.sx - pan.x, y: hit.sy - pan.y });
                           window.setTimeout(() => setWrongDog((w) => w?.frameId === hit.id ? null : w), 800);
+                          const correctFrame = frames.find((f) => f.img === c.img && !filled.has(f.id));
+                          if (correctFrame) { setCorrectFlash(correctFrame.id); window.setTimeout(() => setCorrectFlash((cf) => cf === correctFrame.id ? null : cf), 800); }
                           // a wrong box repels: bump the card just outside its edge, in the
                           // direction it came from, rather than flinging it back to the start
                           let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
