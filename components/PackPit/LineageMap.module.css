@@ -556,6 +556,20 @@
   color: var(--navy, #0a3a57); text-align: center; line-height: 1.1;
 }
 .closeLarge { padding: 18px !important; margin: -10px !important; }
+.collectPulse {
+  animation: lm-collect-pulse 1.5s ease-in-out infinite;
+}
+@keyframes lm-collect-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
+}
+.collectPulse {
+  animation: lm-collect-pulse 1.5s ease-in-out infinite;
+}
+@keyframes lm-collect-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
+}
 .flashNeg {
   fill: #ff2d4f;
   font-family: 'Luckiest Guy', var(--font-display), system-ui, sans-serif;
