@@ -1593,7 +1593,7 @@ export default function LineageMap({
               justifyContent: "center",
               gap: "4px",
             }}>
-              <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "40%", height: "40%", objectFit: "contain" }} />
+              <img src="/double-tap-icon-blue.svg" alt="" className={styles.dtIcon} style={{ width: "40%", height: "40%", objectFit: "contain" }} />
               <span style={{ fontFamily: "Luckiest Guy, system-ui", fontSize: "13px", color: "#0a3a57", textAlign: "center" }}>double tap</span>
             </div>
           </div>

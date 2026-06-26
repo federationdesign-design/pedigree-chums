@@ -643,3 +643,11 @@
   0%, 100% { stroke-opacity: 1; }
   50% { stroke-opacity: 0.2; }
 }
+.dtIcon {
+  animation: lm-dt-bounce 0.8s ease-in-out infinite;
+}
+@keyframes lm-dt-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-8px) scale(1.1); }
+  60% { transform: translateY(-4px) scale(1.05); }
+}
