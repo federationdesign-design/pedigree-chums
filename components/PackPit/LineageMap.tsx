@@ -446,6 +446,14 @@ export default function LineageMap({
   // (Stage 1 console diagnostic removed) /* mix-box */
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
+  // start idle flip timer when a card lands in a frame
+  useEffect(() => {
+    filled.forEach((cardId) => {
+      if (!cardFlipTimers.current.has(cardId)) {
+        cardFlipTimers.current.set(cardId, setTimeout(() => startCardFlip(cardId), 2000));
+      }
+    });
+  }, [filled]);
   const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
   useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
