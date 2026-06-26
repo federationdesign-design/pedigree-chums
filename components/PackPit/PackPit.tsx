@@ -598,7 +598,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); Composite.add(engine.world, makeArrow(w)); } }, 10050)); // 10050 pair 4 + green arrow
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5: easy (3 nodes each)
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6: easy (3/5 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                                              // 150000 all remaining cards
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 270000));                                                              // 270000 all remaining cards
         }
       }
 
