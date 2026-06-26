@@ -426,6 +426,7 @@ export default function LineageMap({
   const [dragImg, setDragImg] = useState<string | null>(null); // artwork of the card being dragged, to light its one assigned frame
   const [dragName, setDragName] = useState<string | null>(null); // name of the card being dragged, shown on its lit target frame /* pickup-name */
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
+  const [wrongDog, setWrongDog] = useState<{ frameId: string; x: number; y: number } | null>(null); // flash "Wrong dog" on bad drop
   const [puffs, setPuffs] = useState<{ id: number; sx: number; sy: number }[]>([]); // smoke poofs as a card lands in its frame
   const puffSeq = useRef(0);
   const [bubbles, setBubbles] = useState<{ id: number; sx: number; sy: number }[]>([]); // blue bubble trail as a card glides to its frame
@@ -1271,6 +1272,10 @@ export default function LineageMap({
                         } else if (hit && hit.img !== c.img) {
                           setShakeFrame(hit.id);
                           window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
+                          // wrong dog: flash label on frame, subtract 5 points
+                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, -5, FLASH_SIZE);
+                          setWrongDog({ frameId: hit.id, x: hit.sx - pan.x, y: hit.sy - pan.y });
+                          window.setTimeout(() => setWrongDog((w) => w?.frameId === hit.id ? null : w), 800);
                           // a wrong box repels: bump the card just outside its edge, in the
                           // direction it came from, rather than flinging it back to the start
                           let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
@@ -1453,6 +1458,18 @@ export default function LineageMap({
             </g>
           );
         })}
+        {wrongDog && (
+          <text
+            key={wrongDog.frameId}
+            x={wrongDog.x}
+            y={wrongDog.y}
+            textAnchor="middle"
+            style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(CW * 0.22)}px`, fill: "#ff2d4f", pointerEvents: "none" }}
+            className={styles.wrongDogFlash}
+          >
+            Wrong dog
+          </text>
+        )}
         {flashes.map((f) => (
           <text key={`f${f.id}`} className={styles.flashNum} x={f.x} y={f.y} fontSize={f.size} textAnchor="middle">
             {f.val}
