@@ -443,8 +443,6 @@ export default function PackPit() {
       // first jumps to the about page, a tap on the second opens the how-to-play
       // strip over the pit the way the family tree opens.
       const enterPanel = { key: "__entersite", label: "Enter site", src: "/entersite.svg", width: BIG * 3.0, aspect: 86.9 / 45.9, kind: "entersite" };
-      let enterSiteLandedAt: number | null = null; // timestamp of first floor hit
-      let yellowArrowPopped = false; // only pop once per session
       const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
       function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number, side?: "left" | "right") {
         const bw = cfg.width, bh = cfg.width / cfg.aspect;
@@ -458,31 +456,17 @@ export default function PackPit() {
         return b;
       }
       // Arrows: fired in from off-screen sides with spin, bounce off walls
-      function makeArrow(which: "yellow" | "green", w: number) {
-        const isYellow = which === "yellow";
-        const key = isYellow ? "__arrow_yellow_pit" : "__arrow_green_pit";
-        const src = isYellow ? "/arrow-yellow-mid.svg" : "/green-arrow-short.svg";
-        const ar = isYellow ? (670.3 / 720) : (704.2 / 720);
+      function makeArrow(w: number) {
+        const ar = 704.2 / 720;
         const bw = BIG * 1.1, bh = bw / ar;
-        // start well off-screen on the correct side, mid-height
-        const x = isYellow ? -bw : w + bw;
-        const y = -180 - Math.random() * 120;
-        const angle = isYellow ? -0.3 : 0.3; // slight inward lean
+        const x = w + bw, y = -180 - Math.random() * 120;
         const b: any = Bodies.rectangle(x, y, bw, bh, {
-          angle, chamfer: { radius: bh * 0.12 }, restitution: 0.55,
+          angle: 0.3, chamfer: { radius: bh * 0.12 }, restitution: 0.55,
           friction: 0.25, frictionAir: 0.008, density: 0.0008, render: { visible: false },
         });
-        // yellow arrow: bottom-left corner is the pivot/collision point
-        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: which === "yellow" ? "arrow-yellow" : "arrow-green", family: null, ping: 0, ox: isYellow ? bw / 2 : 0, oy: isYellow ? -bh / 2 : 0 };
-        // green fires in with spin; yellow drops near enter-site spawn (left edge, 100px above)
-        if (isYellow) {
-          const eMargin = (BIG * 3.0) / 2 + 24; // matches makePanel left margin for entersite
-          Body.setPosition(b, { x: eMargin + 20, y: -bh - 10 });
-          Body.setAngle(b, 0);
-        } else {
-          Body.setVelocity(b, { x: -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
-          Body.setAngularVelocity(b, 0.18 + Math.random() * 0.14);
-        }
+        b.plugin = { name: "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg("__arrow_green_pit", "/green-arrow-short.svg"), prop: "panel", kind: "arrow-green", family: null, ping: 0 };
+        Body.setVelocity(b, { x: -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
+        Body.setAngularVelocity(b, 0.18 + Math.random() * 0.14);
         return b;
       }
       // The cookie-policy object: an SVG that pours in with the rest, starts upside
