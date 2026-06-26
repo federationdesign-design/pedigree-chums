@@ -864,9 +864,9 @@ export default function LineageMap({
         onDoubleClick={(e) => {
           e.stopPropagation();
           // hop the card right+up away from the frames grid
-          setRootPos((prev) => ({
-            x: (prev?.x ?? breed.x) + 28 + Math.random() * 12,
-            y: (prev?.y ?? breed.y) - 18 - Math.random() * 8,
+          setPan((prev) => ({
+            x: prev.x + 28 + Math.random() * 12,
+            y: prev.y - 18 - Math.random() * 8,
           }));
           revealStep();
         }}
