@@ -1047,14 +1047,17 @@ export default function PackPit() {
           if (popped) arrowFusing = true;
         }
         if (arrowFusing && bone && logoBody) {
-          // super-magnet: ease the bone (and the loose logo) toward the midpoint
-          const mx = (bone.position.x + logoBody.position.x) / 2, my = (bone.position.y + logoBody.position.y) / 2;
-          Body.setPosition(bone, { x: bone.position.x + (mx - bone.position.x) * ARROW_EASE, y: bone.position.y + (my - bone.position.y) * ARROW_EASE });
-          Body.setVelocity(bone, { x: 0, y: 0 });
+          // scissor attraction: applyForce pulls bone and logo toward each other
+          // objects between them get pushed aside naturally by physics
+          const dx2 = logoBody.position.x - bone.position.x, dy2 = logoBody.position.y - bone.position.y;
+          const dist2 = Math.hypot(dx2, dy2) || 1;
+          const pull = Math.min(0.08, dist2 * 0.00015) * bone.mass;
+          Body.applyForce(bone, bone.position, { x: (dx2 / dist2) * pull, y: (dy2 / dist2) * pull });
           if (!logoBody.isStatic) {
-            Body.setPosition(logoBody, { x: logoBody.position.x + (mx - logoBody.position.x) * ARROW_EASE, y: logoBody.position.y + (my - logoBody.position.y) * ARROW_EASE });
-            Body.setVelocity(logoBody, { x: 0, y: 0 });
+            const pullL = Math.min(0.08, dist2 * 0.00015) * logoBody.mass;
+            Body.applyForce(logoBody, logoBody.position, { x: -(dx2 / dist2) * pullL, y: -(dy2 / dist2) * pullL });
           }
+          const mx = (bone.position.x + logoBody.position.x) / 2, my = (bone.position.y + logoBody.position.y) / 2;
           Body.setPosition(arrowBody, { x: mx, y: my });
           const d = Math.hypot(bone.position.x - logoBody.position.x, bone.position.y - logoBody.position.y);
           if (d <= FUSE_SNAP_DIST && !fused) {
