@@ -470,7 +470,7 @@ export default function PackPit() {
           angle, chamfer: { radius: bh * 0.12 }, restitution: 0.55,
           friction: 0.25, frictionAir: 0.008, density: 0.0008, render: { visible: false },
         });
-        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: "arrow", family: null, ping: 0 };
+        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: which === "yellow" ? "arrow-yellow" : "arrow-green", family: null, ping: 0 }; // patch_yellowmagnet_v1
         // fire inward with spin
         Body.setVelocity(b, { x: isYellow ? 14 + Math.random() * 4 : -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
         Body.setAngularVelocity(b, isYellow ? -(0.18 + Math.random() * 0.14) : (0.18 + Math.random() * 0.14));
@@ -1654,6 +1654,46 @@ export default function PackPit() {
               const mag = f * REPEL * (1 - d / R) * o.mass;
               Body.applyForce(o, o.position, { x: (dx / d) * mag, y: (dy / d) * mag });
             }
+          }
+        }
+      });
+      // yellow arrow magnetises toward enter-site, sticks on contact
+      let yellowStuck = false; // true once the arrow has settled on the panel
+      Events.on(engine, "beforeUpdate", () => {
+        const all = Composite.allBodies(engine.world);
+        const yArrow = all.find((b: any) => b.plugin?.kind === "arrow-yellow");
+        const enterSite = all.find((b: any) => b.plugin?.kind === "entersite");
+        if (!yArrow || !enterSite) return;
+        const dx = enterSite.position.x - yArrow.position.x;
+        const dy = enterSite.position.y - yArrow.position.y;
+        const dist = Math.hypot(dx, dy);
+        const touchDist = (yArrow.plugin?.half || 40) + (enterSite.plugin?.half || 60);
+        if (!yellowStuck) {
+          // pull toward enter-site
+          if (dist > touchDist * 0.9) {
+            const speed = Math.min(5, dist * 0.035);
+            Body.setVelocity(yArrow, {
+              x: yArrow.velocity.x * 0.85 + (dx / dist) * speed,
+              y: yArrow.velocity.y * 0.85 + (dy / dist) * speed,
+            });
+          } else {
+            // contact: stick it - high friction, low restitution, damp velocity
+            yellowStuck = true;
+            yArrow.friction = 0.98;
+            yArrow.restitution = 0.05;
+            Body.setVelocity(yArrow, { x: 0, y: 0 });
+            Body.setAngularVelocity(yArrow, 0);
+          }
+        } else {
+          // stuck: check if a big impact has knocked it loose
+          const spd = Math.hypot(yArrow.velocity.x, yArrow.velocity.y);
+          if (spd > 6 || dist > touchDist * 1.5) {
+            yellowStuck = false; // knocked off - will re-attract
+            yArrow.friction = 0.25;
+            yArrow.restitution = 0.55;
+          } else {
+            // gently damp while stuck so it wobbles but stays close
+            Body.setVelocity(yArrow, { x: yArrow.velocity.x * 0.7, y: yArrow.velocity.y * 0.7 });
           }
         }
       });
