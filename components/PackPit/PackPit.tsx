@@ -1688,7 +1688,10 @@ export default function PackPit() {
         const es = all.find((b: any) => b.plugin?.kind === "entersite");
         if (!es) return;
         const arrow = makeArrow("yellow", pitW());
-        Body.setPosition(arrow, { x: es.position.x, y: es.position.y - (es.plugin?.h || 80) / 2 - (arrow.plugin?.h || 80) / 2 });
+        // use known entersite aspect (86.9/45.9) for reliable height; plugin.h may be stale
+        const esH = (es.plugin?.w || BIG * 3.0) / (86.9 / 45.9);
+        const arH = arrow.plugin?.h || BIG * 1.1;
+        Body.setPosition(arrow, { x: es.position.x, y: es.position.y - esH / 2 - arH / 2 - 4 });
         Body.setVelocity(arrow, { x: (Math.random() - 0.5) * 3, y: -10 }); // pops upward
         Body.setAngularVelocity(arrow, (Math.random() - 0.5) * 0.3);
         Composite.add(engine.world, arrow);
