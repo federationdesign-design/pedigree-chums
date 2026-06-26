@@ -297,6 +297,7 @@ export default function LineageMap({
     return () => window.removeEventListener("resize", measure);
   }, [breed.name, pan.x, pan.y]);
   const startFlipLoop = () => {
+    if (interacted.current) return; // user has interacted, no more flipping
     if (flipTimer.current) clearTimeout(flipTimer.current);
     setFlipPhase("back");
     flipTimer.current = setTimeout(() => {
