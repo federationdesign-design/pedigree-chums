@@ -1644,7 +1644,7 @@ export default function PackPit() {
             if (!b?.plugin?.knockPiece || b.isStatic) continue; // only the logo knock-off pieces, not the How-it-works boxes
             b.plugin.hits = (b.plugin.hits || 0) + 1;
             numAt(b.position.x, b.position.y, 1); // +1 per hit
-            if (b.plugin.hits >= 100) Composite.remove(engine.world, b); // gone after 100
+            if (b.plugin.hits >= 100) { poof(b.position.x, b.position.y, b.plugin.half || 14); Composite.remove(engine.world, b); } // poof then gone after 100
           }
         }
       };
