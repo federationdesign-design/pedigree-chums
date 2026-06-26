@@ -94,6 +94,14 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
+  useEffect(() => {
+    const handler = () => window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 0.15 } }));
+    window.addEventListener("pc:open-howtoplay", handler);
+    return () => window.removeEventListener("pc:open-howtoplay", handler);
+  }, []);
+  useEffect(() => {
+    if (!howToPlay) window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 1 } }));
+  }, [howToPlay]);
   // score drain: -1 every 2s while pit is active and no overlays open
   useEffect(() => {
     const interval = setInterval(() => {
@@ -153,6 +161,8 @@ export default function PackPit() {
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       const engine = Engine.create();
+      const onTimeScale = (e: Event) => { engine.timing.timeScale = (e as CustomEvent).detail?.scale ?? 1; };
+      window.addEventListener("pc:timescale", onTimeScale);
       engine.gravity.y = 1;
       const render = Render.create({
         element: stage, engine,
