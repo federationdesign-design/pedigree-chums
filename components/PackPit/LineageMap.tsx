@@ -875,12 +875,7 @@ export default function LineageMap({
           )}
         </g>
         {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
-{idleHint && !interacted.current && (
-          <g style={{ pointerEvents: "none" }}>
-            <rect x={-ROOT * 0.72} y={ROOT * 0.42} width={ROOT * 1.44} height={ROOT * 0.52} rx={ROOT * 0.13}
-              fill="rgba(0,0,0,0.52)" />
-          </g>
-        )}
+
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
