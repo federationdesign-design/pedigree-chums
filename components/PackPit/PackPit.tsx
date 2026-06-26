@@ -1101,6 +1101,11 @@ export default function PackPit() {
               gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
             }
             numAt(jx, jy, 2000);
+            // fuse celebration: starbursts + delayed bursts
+            explodeAt(jx, jy, R * 1.2);
+            setTimeout(() => { burstAt(jx - R * 0.4, jy + R * 0.2, R * 0.8); }, 120);
+            setTimeout(() => { burstAt(jx + R * 0.5, jy - R * 0.3, R * 0.9); }, 220);
+            setTimeout(() => { burstAt(jx, jy, R * 1.4); }, 350);
             bone.plugin.img = imgOhYea; // ohyea SVG on fuse
             bone.plugin.fuseAt = performance.now(); // drives the cross-fade
             Composite.remove(engine.world, logoBody); logoBody = null;
@@ -2005,6 +2010,42 @@ export default function PackPit() {
           </button>
         </div>
       )}
+      {dockOpen && collectedChums.length > 0 && (() => {
+        const dockBreeds = [...collectedChums].reverse().map((name, i) => {
+          const b = breeds.find((x) => x.name === name);
+          return { name, img: b ? b.image : "", idx: i };
+        });
+        return (
+          <div className={styles.chumDock} onClick={() => setDockOpen(false)}>
+            <div className={styles.chumDockInner} onClick={(e) => e.stopPropagation()}>
+              {dockBreeds.map((c, i) => {
+                const isHov = dockHover === i;
+                const isFlipped = dockFlipped.has(i);
+                const offset = i * 48;
+                const scale = isHov ? 1.5 : 1;
+                const lift = isHov ? -60 : 0;
+                return (
+                  <div
+                    key={c.idx}
+                    className={`${styles.chumDockCard} ${isFlipped ? styles.chumDockCardFlipped : ""}`}
+                    style={{ transform: `translateX(${offset}px) translateY(${lift}px) scale(${scale})`, zIndex: isHov ? 10 : i, transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)", marginRight: "-24px" }}
+                    onMouseEnter={() => setDockHover(i)}
+                    onMouseLeave={() => setDockHover(null)}
+                    onClick={(e) => { e.stopPropagation(); setDockFlipped((s) => { const x = new Set(s); x.has(i) ? x.delete(i) : x.add(i); return x; }); }}
+                  >
+                    <div className={styles.chumDockFront}>
+                      {c.img ? <img src={bust(c.img)} alt={c.name} /> : <div style={{ width: "100%", height: "100%", background: "#0a3a57" }} />}
+                    </div>
+                    <div className={styles.chumDockBack}>
+                      <span>{c.name}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
