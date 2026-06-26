@@ -1734,7 +1734,7 @@ export default function PackPit() {
         if (now2 - greenSettledSince < GREEN_SETTLE_MS) return;
         if (now2 - greenLastHop < GREEN_HOP_EVERY) return;
         greenLastHop = now2;
-        Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.008 });
+        Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.06 });
       });
       // bone drag-me hint: swap SVG when bone is within 300px of logo
       const DRAGME_RANGE = 300;
