@@ -1122,16 +1122,22 @@ export default function LineageMap({
                     height={CW}
                     rx={15}
                   />
-                  {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame */
-                    <text
-                      x={f.sx - pan.x}
-                      y={f.sy - pan.y + 5}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      style={{ fill: wrongDog?.frameId === f.id ? "#ff2d4f" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 14 : 13}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, paintOrder: "stroke", stroke: "rgba(10,58,87,0.9)", strokeWidth: 4, pointerEvents: "none" }}
-                    >
-                      {wrongDog?.frameId === f.id ? "WRONG DOG" : dragName}
-                    </text>
+                  {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame, clipped */
+                    <>
+                      <clipPath id={`lbl-clip-${f.id}`}>
+                        <rect x={f.sx - pan.x - CW / 2 + 4} y={f.sy - pan.y - CW / 2 + 4} width={CW - 8} height={CW - 8} />
+                      </clipPath>
+                      <text
+                        x={f.sx - pan.x}
+                        y={f.sy - pan.y + 5}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        clipPath={`url(#lbl-clip-${f.id})`}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 13 : 11}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                      >
+                        {wrongDog?.frameId === f.id ? "WRONG DOG" : dragName}
+                      </text>
+                    </>
                   )}
                 </g>
               );
