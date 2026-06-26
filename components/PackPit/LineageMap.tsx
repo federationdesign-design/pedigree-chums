@@ -708,12 +708,29 @@ export default function LineageMap({
       const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
       if (!target) return;
       window.setTimeout(() => {
-        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
-        setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-        flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE); // auto-place costs 50
-        const pid = puffSeq.current++;
-        setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
-        window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+        // pin card so it survives branch closing during tween
+        setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
+        const sx0 = c.cardX, sy0 = c.cardY;
+        const ex = target.sx - pan.x, ey = target.sy - pan.y;
+        let lastBub = 0;
+        tween(460, (t) => {
+          const e2 = 1 - Math.pow(1 - t, 3);
+          const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
+          setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: gx, y: gy }); return x; });
+          if (t - lastBub > 0.03 && t < 0.95) {
+            lastBub = t;
+            const bid = bubbleSeq.current++;
+            setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
+            window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
+          }
+        }, () => {
+          setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+          setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
+          const pid = puffSeq.current++;
+          setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
+          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+        });
       }, i * 80);
     });
   };
