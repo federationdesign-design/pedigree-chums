@@ -848,11 +848,21 @@ export default function LineageMap({
             // back face: yellow with breed name
             <>
               <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} fill="var(--yellow, #ffd23e)" />
-              <text textAnchor="middle" dominantBaseline="central"
-                style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(ROOT * 0.28)}px`, fill: "var(--navy, #0a3a57)", lineHeight: 1.05 }}>
-                {breed.name.split(" ").map((w: string, i: number) => (
-                  <tspan key={i} x={0} dy={i === 0 ? `-${Math.round(ROOT * 0.15)}px` : `${Math.round(ROOT * 0.32)}px`}>{w}</tspan>
-                ))}
+              {/* tap icon: finger + wifi arcs */}
+              <g fill="var(--navy, #0a3a57)">
+                {/* finger shape */}
+                <ellipse cx={0} cy={-ROOT * 0.08} rx={ROOT * 0.22} ry={ROOT * 0.28} />
+                {/* wifi arc 1 */}
+                <path d={`M ${-ROOT*0.38} ${-ROOT*0.42} A ${ROOT*0.46} ${ROOT*0.46} 0 0 1 ${ROOT*0.38} ${-ROOT*0.42}`}
+                  fill="none" stroke="var(--navy, #0a3a57)" strokeWidth={ROOT*0.09} strokeLinecap="round" />
+                {/* wifi arc 2 */}
+                <path d={`M ${-ROOT*0.55} ${-ROOT*0.6} A ${ROOT*0.66} ${ROOT*0.66} 0 0 1 ${ROOT*0.55} ${-ROOT*0.6}`}
+                  fill="none" stroke="var(--navy, #0a3a57)" strokeWidth={ROOT*0.09} strokeLinecap="round" />
+              </g>
+              {/* double tap label */}
+              <text textAnchor="middle" y={ROOT * 0.72}
+                style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(ROOT * 0.26)}px`, fill: "var(--navy, #0a3a57)" }}>
+                double tap
               </text>
             </>
           ) : (
