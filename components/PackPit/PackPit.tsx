@@ -1572,6 +1572,7 @@ export default function PackPit() {
           if (!bb || bb.plugin.popped) continue;
           const other = bb === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue; // the walls, floor and ceiling do not count
+          if (!bb.plugin.hits || bb.plugin.hits < 1) continue; // forcefield: ignore until user ignites
           bb.plugin.objHits = (bb.plugin.objHits || 0) + 1;
           setScore((s) => s + 2);
           if (bb.plugin.objHits >= 500) detonateBomb(bb);
