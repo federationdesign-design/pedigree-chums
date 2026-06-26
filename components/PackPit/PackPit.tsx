@@ -443,6 +443,8 @@ export default function PackPit() {
       // first jumps to the about page, a tap on the second opens the how-to-play
       // strip over the pit the way the family tree opens.
       const enterPanel = { key: "__entersite", label: "Enter site", src: "/entersite.svg", width: BIG * 3.0, aspect: 86.9 / 45.9, kind: "entersite" };
+      let enterSiteLandedAt: number | null = null; // timestamp of first floor hit
+      let yellowArrowPopped = false; // only pop once per session
       const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
       function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number, side?: "left" | "right") {
         const bw = cfg.width, bh = cfg.width / cfg.aspect;
@@ -1232,6 +1234,16 @@ export default function PackPit() {
           break;
         }
       };
+      // detect enter-site first floor landing to trigger yellow arrow pop
+      Events.on(engine, "collisionStart", (ev: any) => {
+        if (enterSiteLandedAt || yellowArrowPopped) return;
+        for (const pair of ev.pairs) {
+          const a = pair.bodyA, b = pair.bodyB;
+          const es = (a.plugin?.kind === "entersite" && b.isStatic) ? a
+                   : (b.plugin?.kind === "entersite" && a.isStatic) ? b : null;
+          if (es) { enterSiteLandedAt = performance.now(); break; }
+        }
+      });
       Events.on(engine, "collisionStart", onFloorHit);
       // while the user drags an object, every fresh contact with another object scores
       // 1 from the contact point and fires the small whack pop
@@ -1665,6 +1677,20 @@ export default function PackPit() {
             }
           }
         }
+      });
+      // yellow arrow pops out of enter-site top 10s after it lands
+      Events.on(engine, "beforeUpdate", () => {
+        if (yellowArrowPopped || !enterSiteLandedAt) return;
+        if (performance.now() - enterSiteLandedAt < 10000) return;
+        yellowArrowPopped = true;
+        const all = Composite.allBodies(engine.world);
+        const es = all.find((b: any) => b.plugin?.kind === "entersite");
+        if (!es) return;
+        const arrow = makeArrow("yellow", w);
+        Body.setPosition(arrow, { x: es.position.x, y: es.position.y - (es.plugin?.h || 80) / 2 - (arrow.plugin?.h || 80) / 2 });
+        Body.setVelocity(arrow, { x: (Math.random() - 0.5) * 3, y: -10 }); // pops upward
+        Body.setAngularVelocity(arrow, (Math.random() - 0.5) * 0.3);
+        Composite.add(engine.world, arrow);
       });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
