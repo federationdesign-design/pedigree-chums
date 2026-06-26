@@ -1551,8 +1551,10 @@ export default function LineageMap({
         const size = ROOT * 2 + 10;
         // root card screen position: content coords + pan offset
         // breed.x/y are screen coords (canvas offset + physics pos), no pan needed
-        const ox = rootPos ? rootPos.x + pan.x : breed.x;
-        const oy = rootPos ? rootPos.y + pan.y : breed.y;
+        // breed.x/y are screen coords; SVG draws card at content pos breed.x,breed.y
+        // screen pos = content pos + pan (since viewBox shifts by -pan)
+        const ox = (rootPos ? rootPos.x : breed.x) + pan.x;
+        const oy = (rootPos ? rootPos.y : breed.y) + pan.y;
         return (
           <div
             className={`${styles.rootFlipCard} ${(flipPhase === "back" || flipPhase === "opening") ? styles.rootFlipCardFlipped : ""}`}
