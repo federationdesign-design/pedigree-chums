@@ -1679,6 +1679,7 @@ export default function PackPit() {
         }
       });
       // yellow arrow pops out of enter-site top 10s after it lands
+      const pitW = () => stageRef.current ? stageRef.current.clientWidth : 800;
       Events.on(engine, "beforeUpdate", () => {
         if (yellowArrowPopped || !enterSiteLandedAt) return;
         if (performance.now() - enterSiteLandedAt < 10000) return;
@@ -1686,7 +1687,7 @@ export default function PackPit() {
         const all = Composite.allBodies(engine.world);
         const es = all.find((b: any) => b.plugin?.kind === "entersite");
         if (!es) return;
-        const arrow = makeArrow("yellow", w);
+        const arrow = makeArrow("yellow", pitW());
         Body.setPosition(arrow, { x: es.position.x, y: es.position.y - (es.plugin?.h || 80) / 2 - (arrow.plugin?.h || 80) / 2 });
         Body.setVelocity(arrow, { x: (Math.random() - 0.5) * 3, y: -10 }); // pops upward
         Body.setAngularVelocity(arrow, (Math.random() - 0.5) * 0.3);
