@@ -564,7 +564,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); Composite.add(engine.world, makeArrow("yellow", w)); Composite.add(engine.world, makeArrow("green", w)); } }, 8050)); // 8050 two feature cards + arrows from sides (patch_arrows_hint_v1)
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); Composite.add(engine.world, makeArrow("yellow", w)); Composite.add(engine.world, makeArrow("green", w)); } }, 10050)); // 10050 two feature cards + arrows from sides (delayed +2s)
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 6000 bowl + menu, before the flood
           waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                      // 150000 all remaining cards
         }
