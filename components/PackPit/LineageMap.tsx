@@ -291,7 +291,6 @@ export default function LineageMap({
   // 2-minute idle flip attractor - loops until the user interacts
   useEffect(() => {
     const measure = () => {
-      if (rootCardGRef.current) setRootRect(rootCardGRef.current.getBoundingClientRect());
     };
     measure();
     window.addEventListener("resize", measure);
@@ -880,7 +879,7 @@ export default function LineageMap({
     <>
       <g
         className={canDragRoot ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
-        ref={rootCardGRef}
+        ref={rootCardRectRef}
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
