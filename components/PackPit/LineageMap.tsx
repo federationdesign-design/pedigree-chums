@@ -196,8 +196,7 @@ export default function LineageMap({
   const cardDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
   // the main square card peels off and drags like an ancestor card, but only once every frame is filled
   const [rootPos, setRootPos] = useState<{ x: number; y: number } | null>(null);
-  const rootCardGRef = useRef<SVGGElement | null>(null);
-  const [rootRect, setRootRect] = useState<DOMRect | null>(null);
+  const rootCardRectRef = useRef<SVGRectElement | null>(null);
   useEffect(() => setRootPos(null), [breed.name]);
   const rootDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
@@ -914,7 +913,7 @@ export default function LineageMap({
         </clipPath>
         {/* front face only - hide dog image when flip overlay shows back face */}
         <>
-          <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard + (flipPhase === "back" ? " " + styles.rootCardPulse : "")} />
+          <rect ref={rootCardRectRef} x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard + (flipPhase === "back" ? " " + styles.rootCardPulse : "")} />
           {breed.image ? (
             <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
           ) : null}
@@ -1554,13 +1553,16 @@ export default function LineageMap({
         {/* flashes rendered in fixed overlay below for correct z-order */}
         </g>
       </svg>
-      {flipPhase === "back" && (
+      {flipPhase === "back" && (() => {
+        const r = rootCardRectRef.current?.getBoundingClientRect();
+        if (!r) return null;
+        return (
         <div style={{
           position: "fixed",
-          left: breed.x + pan.x - 63,
-          top: breed.y + pan.y - 63,
-          width: 126,
-          height: 126,
+          left: r.left,
+          top: r.top,
+          width: r.width,
+          height: r.height,
           perspective: "900px",
           zIndex: 52,
           pointerEvents: "none",
@@ -1597,7 +1599,8 @@ export default function LineageMap({
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
       {/* flash number overlay - above all SVG content */}
       {flashes.length > 0 && (
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
