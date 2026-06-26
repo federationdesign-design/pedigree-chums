@@ -919,6 +919,44 @@ export default function LineageMap({
             <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
           ) : null}
         </>
+        {/* CSS 3D flip via foreignObject */}
+        <foreignObject x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10}>
+          <div
+            style={{
+              width: "100%", height: "100%",
+              perspective: "900px",
+            }}
+          >
+            <div style={{
+              width: "100%", height: "100%",
+              position: "relative",
+              transformStyle: "preserve-3d",
+              transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+              transform: flipPhase === "back" ? "rotateY(180deg)" : "rotateY(0deg)",
+            }}>
+              <div style={{
+                position: "absolute", inset: 0,
+                backfaceVisibility: "hidden",
+                borderRadius: "24px",
+              }} />
+              <div style={{
+                position: "absolute", inset: 0,
+                backfaceVisibility: "hidden",
+                transform: "rotateY(180deg)",
+                background: "var(--yellow, #ffd23e)",
+                borderRadius: "24px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}>
+                <img src="/double-tap-icon-blue.svg" style={{ width: "35%", height: "35%", objectFit: "contain" }} alt="" />
+                <span style={{ fontFamily: "var(--font-display, 'Luckiest Guy')", fontSize: "18px", color: "var(--navy, #0a3a57)", textAlign: "center" }}>double tap</span>
+              </div>
+            </div>
+          </div>
+        </foreignObject>
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
@@ -1553,43 +1591,6 @@ export default function LineageMap({
         {/* flashes rendered in fixed overlay below for correct z-order */}
         </g>
       </svg>
-      {/* HTML flip overlay - real CSS rotateY over root card */}
-      {(() => {
-        const size = ROOT * 2 + 10;
-        if (!rootRect) {
-          // fallback position while rect not measured
-          const ox2 = (rootPos ? rootPos.x : breed.x) + pan.x;
-          const oy2 = (rootPos ? rootPos.y : breed.y) + pan.y;
-          return (
-            <div className={`${styles.rootFlipCard} ${flipPhase === "back" ? styles.rootFlipCardFlipped : ""}`}
-              style={{ position: "fixed", left: ox2 - size / 2, top: oy2 - size / 2, width: size, height: size, zIndex: 51, pointerEvents: "none" }}>
-              <div className={styles.rootFlipInner}>
-                <div className={styles.rootFlipFront} />
-                <div className={styles.rootFlipBack}>
-                  <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "32%", height: "32%", objectFit: "contain" }} />
-                  <span className={styles.rootFlipName}>double tap</span>
-                </div>
-              </div>
-            </div>
-          );
-        }
-        const ox = rootRect.left + rootRect.width / 2;
-        const oy = rootRect.top + rootRect.height / 2;
-        return (
-          <div
-            className={`${styles.rootFlipCard} ${(flipPhase === "back" || flipPhase === "opening") ? styles.rootFlipCardFlipped : ""}`}
-            style={{ position: "fixed", left: ox - size / 2, top: oy - size / 2, width: size, height: size, zIndex: 51, pointerEvents: "none" }}
-          >
-            <div className={styles.rootFlipInner}>
-              <div className={styles.rootFlipFront} />
-              <div className={styles.rootFlipBack}>
-                <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "32%", height: "32%", objectFit: "contain" }} />
-                <span className={styles.rootFlipName}>double tap</span>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
       {/* flash number overlay - above all SVG content */}
       {flashes.length > 0 && (
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
