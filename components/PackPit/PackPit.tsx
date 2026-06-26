@@ -1673,8 +1673,8 @@ export default function PackPit() {
           if (dist > touchDist * 0.9) {
             const speed = Math.min(5, dist * 0.035);
             Body.setVelocity(yArrow, {
-              x: yArrow.velocity.x * 0.85 + (dx / dist) * speed,
-              y: yArrow.velocity.y * 0.85 + (dy / dist) * speed,
+              x: yArrow.velocity.x * 0.85 + (dx / dist) * speed * 10,
+              y: yArrow.velocity.y * 0.85 + (dy / dist) * speed * 10,
             });
           } else {
             // contact: stick it - high friction, low restitution, damp velocity
