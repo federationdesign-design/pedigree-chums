@@ -889,41 +889,13 @@ export default function LineageMap({
         <clipPath id={clip}>
           <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
         </clipPath>
-        {/* flip wrapper: opacity crossfade (scaleX unreliable on SVG g elements) */}
-        <g style={{
-          opacity: flipPhase === "closing" || flipPhase === "opening" ? 0 : 1,
-          transition: "opacity 0.26s ease-in-out",
-        }}>
-          {flipPhase === "back" || flipPhase === "opening" ? (
-            // back face: yellow with breed name
-            <>
-              <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} fill="var(--yellow, #ffd23e)" />
-              {/* double-tap icon SVG */}
-              <image href="/double-tap-icon-blue.svg"
-                x={-ROOT * 0.72} y={-ROOT * 0.82}
-                width={ROOT * 1.44} height={ROOT * 1.44} />
-
-            </>
-          ) : (
-            // front face: dog image
-            <>
-              <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
-              {breed.image ? (
-                <image
-                  href={bust(breed.image)}
-                  x={-ROOT}
-                  y={-ROOT}
-                  width={ROOT * 2}
-                  height={ROOT * 2}
-                  clipPath={`url(#${clip})`}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-              ) : null}
-            </>
-          )}
-        </g>
-        {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
-
+        {/* front face only - flip handled by HTML overlay below */}
+        <>
+          <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
+          {breed.image ? (
+            <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
+          ) : null}
+        </>
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
@@ -1558,6 +1530,28 @@ export default function LineageMap({
         {/* flashes rendered in fixed overlay below for correct z-order */}
         </g>
       </svg>
+      {/* HTML flip overlay - real CSS rotateY over root card */}
+      {(() => {
+        const size = ROOT * 2 + 10;
+        const cx = typeof window !== "undefined" ? window.innerWidth / 2 : 400;
+        const cy = typeof window !== "undefined" ? window.innerHeight * 0.42 : 300;
+        const ox = (rootPos ? rootPos.x : cx) + pan.x;
+        const oy = (rootPos ? rootPos.y : cy) + pan.y;
+        return (
+          <div
+            className={`${styles.rootFlipCard} ${flipPhase === "back" ? styles.rootFlipCardFlipped : ""}`}
+            style={{ position: "fixed", left: ox - size / 2, top: oy - size / 2, width: size, height: size, zIndex: 51, pointerEvents: "none" }}
+          >
+            <div className={styles.rootFlipInner}>
+              <div className={styles.rootFlipFront} />
+              <div className={styles.rootFlipBack}>
+                <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "65%", height: "65%", objectFit: "contain" }} />
+                <span className={styles.rootFlipName}>{breed.name}</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {/* flash number overlay - above all SVG content */}
       {flashes.length > 0 && (
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
