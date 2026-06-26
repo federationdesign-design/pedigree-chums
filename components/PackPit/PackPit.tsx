@@ -557,7 +557,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); Composite.add(engine.world, makeArrow("yellow", w)); Composite.add(engine.world, makeArrow("green", w)); } }, 10050)); // 10050 two feature cards + arrows from sides (delayed +2s)
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); Composite.add(engine.world, makeArrow(w)); } }, 10050)); // 10050 two feature cards + arrows from sides (delayed +2s)
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 6000 bowl + menu, before the flood
           waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                      // 150000 all remaining cards
         }
@@ -1218,16 +1218,6 @@ export default function PackPit() {
           break;
         }
       };
-      // detect enter-site first floor landing to trigger yellow arrow pop
-      Events.on(engine, "collisionStart", (ev: any) => {
-        if (enterSiteLandedAt || yellowArrowPopped) return;
-        for (const pair of ev.pairs) {
-          const a = pair.bodyA, b = pair.bodyB;
-          const es = (a.plugin?.kind === "entersite" && b.isStatic) ? a
-                   : (b.plugin?.kind === "entersite" && a.isStatic) ? b : null;
-          if (es) { enterSiteLandedAt = performance.now(); break; }
-        }
-      });
       Events.on(engine, "collisionStart", onFloorHit);
       // while the user drags an object, every fresh contact with another object scores
       // 1 from the contact point and fires the small whack pop
