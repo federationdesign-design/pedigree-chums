@@ -669,15 +669,21 @@ export default function LineageMap({
       interacted.current = true; setIdleHint(false);
       return;
     }
-    // fully open: fold the deepest ring, leaving the first ring and any placed cards
-    const openIds = [...open].filter((id) => id !== "0");
-    if (!openIds.length) return; // back at the first ring, nothing more to fold
-    const deepest = openIds.filter((id) => {
-      const node = shown.find((n) => n._id === id);
-      if (!node || !node.children) return true;
-      return !(node.children as Node[]).some((k) => open.has(k._id)); // none of its children are open -> it is a deepest ring
+    // fully open: auto-place all unplaced images into their correct frames
+    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed);
+    if (unplaced.length === 0) return;
+    unplaced.forEach((c, i) => {
+      const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
+      if (!target) return;
+      window.setTimeout(() => {
+        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+        setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+        flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE); // auto-place costs 50
+        const pid = puffSeq.current++;
+        setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
+        window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+      }, i * 80);
     });
-    setOpen((prev) => { const s = new Set(prev); deepest.forEach((id) => s.delete(id)); return s; });
   };
 
   const doPack = (fx?: number, fy?: number, award: number = 400) => {
@@ -823,7 +829,15 @@ export default function LineageMap({
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => { e.stopPropagation(); revealStep(); }}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          // hop the card right+up away from the frames grid
+          setRootPos((prev) => ({
+            x: (prev?.x ?? breed.x) + 28 + Math.random() * 12,
+            y: (prev?.y ?? breed.y) - 18 - Math.random() * 8,
+          }));
+          revealStep();
+        }}
         onPointerDown={(e) => {
           if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
@@ -1484,16 +1498,24 @@ export default function LineageMap({
             Wrong dog
           </text>
         )}
-        {flashes.map((f) => (
-          <text key={`f${f.id}`}
-            className={f.neg ? styles.flashNeg : styles.flashNum}
-            x={f.x} y={f.y} fontSize={f.size} textAnchor="middle"
-            style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
-            {f.val}
-          </text>
-        ))}
+        {/* flashes rendered in fixed overlay below for correct z-order */}
         </g>
       </svg>
+      {/* flash number overlay - above all SVG content */}
+      {flashes.length > 0 && (
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
+          <svg width="100%" height="100%">
+            {flashes.map((f) => (
+              <text key={`f${f.id}`}
+                className={f.neg ? styles.flashNeg : styles.flashNum}
+                x={f.x + pan.x} y={f.y + pan.y} fontSize={f.size} textAnchor="middle"
+                style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
+                {f.val}
+              </text>
+            ))}
+          </svg>
+        </div>
+      )}
       {infoHover && (() => {
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
