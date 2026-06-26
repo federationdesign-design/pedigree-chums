@@ -2081,28 +2081,45 @@ export default function PackPit() {
         });
         return (
           <div className={styles.chumDock} onClick={() => setDockOpen(false)}>
-            <div className={styles.chumDockInner} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.chumDockInner} style={{ perspective: "900px" }} onClick={(e) => e.stopPropagation()}>
               {dockBreeds.map((c, i) => {
-                const isHov = dockHover === i;
-                const isFlipped = dockFlipped.has(i);
-                const offset = i * 48;
-                const scale = isHov ? 1.5 : 1;
-                const lift = isHov ? -60 : 0;
+                const isTop = i === dockBreeds.length - 1;
+                const isOpened = dockFlipped.has(i);
+                const isRemoved = dockFlipped.has(i + 1000);
+                const randomRot = -43 + ((i * 7) % 4);
+                const baseTransform = `rotateX(60deg) rotateY(0deg) rotateZ(${randomRot}deg) translateZ(${i * 3}px)`;
+                const openTransform = "scale(1.5) rotateX(0) rotateY(180deg) rotateZ(0) translateY(0)";
+                const removeTransform = "translateY(100%)";
                 return (
                   <div
                     key={c.idx}
-                    className={`${styles.chumDockCard} ${isFlipped ? styles.chumDockCardFlipped : ""}`}
-                    style={{ transform: `translateX(${offset}px) translateY(${lift}px) scale(${scale})`, zIndex: isHov ? 10 : i, transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)", marginRight: "-24px" }}
-                    onMouseEnter={() => setDockHover(i)}
-                    onMouseLeave={() => setDockHover(null)}
-                    onClick={(e) => { e.stopPropagation(); setDockFlipped((s) => { const x = new Set(s); x.has(i) ? x.delete(i) : x.add(i); return x; }); }}
+                    className={styles.chumDockCard}
+                    style={{
+                      transform: isRemoved ? removeTransform : isOpened ? openTransform : baseTransform,
+                      zIndex: i,
+                      boxShadow: i === 0 ? "12px 12px 0px 12px rgba(0,0,0,0.3)" : undefined,
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isOpened) {
+                        setDockFlipped((s) => { const x = new Set(s); x.add(i + 1000); return x; });
+                      } else {
+                        setDockFlipped((s) => { const x = new Set(s); x.add(i); return x; });
+                      }
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isTop && !isOpened && !isRemoved) {
+                        (e.currentTarget as HTMLElement).style.transform = `rotateX(60deg) rotateY(0deg) rotateZ(${randomRot}deg) translateZ(50px)`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isTop && !isOpened && !isRemoved) {
+                        (e.currentTarget as HTMLElement).style.transform = baseTransform;
+                      }
+                    }}
                   >
-                    <div className={styles.chumDockFront}>
-                      {c.img ? <img src={bust(c.img)} alt={c.name} /> : <div style={{ width: "100%", height: "100%", background: "#0a3a57" }} />}
-                    </div>
-                    <div className={styles.chumDockBack}>
-                      <span>{c.name}</span>
-                    </div>
+                    {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
+                    <div className={styles.chumDockBack}><span>{c.name}</span></div>
                   </div>
                 );
               })}

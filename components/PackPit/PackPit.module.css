@@ -121,6 +121,65 @@
   pointer-events: none;
   animation: tallyBurst 0.55s ease-out both;
 }
+.chumDock {
+  position: fixed;
+  bottom: 80px;
+  left: 44%;
+  pointer-events: none;
+  z-index: 300;
+}
+.chumDockInner {
+  position: relative;
+  width: 200px;
+  height: 300px;
+  pointer-events: auto;
+}
+.chumDockCard {
+  background-color: #fff;
+  position: absolute;
+  width: 200px;
+  height: 300px;
+  border-radius: 10px;
+  transition: all 700ms;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-bottom-color: #933;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+.chumDockCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.chumDockCard:last-child:hover {
+  box-shadow: -10px 40px 20px 2px rgba(0,0,0,0.2);
+}
+.chumDockCardOpened {
+  transform: scale(1.5) rotateX(0) rotateY(180deg) rotateZ(0) translateY(0) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+}
+.chumDockCardRemoved {
+  transform: translateY(100%) !important;
+}
+.chumDockBack {
+  position: absolute;
+  inset: 0;
+  background: var(--yellow, #ffd23e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  border-radius: 10px;
+}
+.chumDockBack span {
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 16px;
+  color: #0a3a57;
+  text-align: center;
+  padding: 8px;
+}
 @keyframes tallyBurst {
   0% { transform: scale(0.35); opacity: 0; }
   25% { opacity: 1; }
