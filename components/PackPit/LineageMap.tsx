@@ -919,44 +919,24 @@ export default function LineageMap({
             <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
           ) : null}
         </>
-        {/* CSS 3D flip via foreignObject */}
-        <foreignObject x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} style={{ display: flipPhase ? "block" : "none" }}>
-          <div
-            style={{
-              width: "100%", height: "100%",
-              perspective: "900px",
-            }}
-          >
-            <div style={{
-              width: "100%", height: "100%",
-              position: "relative",
-              transformStyle: "preserve-3d",
-              transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
-              transform: flipPhase === "back" ? "rotateY(180deg)" : "rotateY(0deg)",
-            }}>
-              <div style={{
-                position: "absolute", inset: 0,
-                backfaceVisibility: "hidden",
-                borderRadius: "24px",
-              }} />
-              <div style={{
-                position: "absolute", inset: 0,
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
-                background: "var(--yellow, #ffd23e)",
-                borderRadius: "24px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}>
-                <img src="/double-tap-icon-blue.svg" style={{ width: "35%", height: "35%", objectFit: "contain" }} alt="" />
-                <span style={{ fontFamily: "var(--font-display, 'Luckiest Guy')", fontSize: "18px", color: "var(--navy, #0a3a57)", textAlign: "center" }}>double tap</span>
-              </div>
-            </div>
-          </div>
-        </foreignObject>
+        {/* idle hint: pulsing double-tap text above card */}
+        {flipPhase === "back" && (
+          <g style={{ pointerEvents: "none" }}>
+            <rect x={-ROOT * 0.7} y={-ROOT - 52} width={ROOT * 1.4} height={44} rx={22} fill="var(--yellow, #ffd23e)" />
+            <text
+              x={0} y={-ROOT - 22}
+              textAnchor="middle" dominantBaseline="central"
+              style={{
+                fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)",
+                fontSize: "20px",
+                fill: "var(--navy, #0a3a57)",
+              }}
+            >
+              double tap
+            </text>
+            <polygon points="0,{-ROOT - 6} -12,{-ROOT - 20} 12,{-ROOT - 20}" fill="var(--yellow, #ffd23e)" />
+          </g>
+        )}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
