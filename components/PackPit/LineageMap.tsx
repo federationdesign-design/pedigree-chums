@@ -291,10 +291,13 @@ export default function LineageMap({
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
   useEffect(() => {
-    if (flipPhase === "back" && rootCardGRef.current) {
-      setRootRect(rootCardGRef.current.getBoundingClientRect());
-    }
-  }, [flipPhase]);
+    const measure = () => {
+      if (rootCardGRef.current) setRootRect(rootCardGRef.current.getBoundingClientRect());
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [breed.name, pan.x, pan.y]);
   const startFlipLoop = () => {
     if (flipTimer.current) clearTimeout(flipTimer.current);
     setFlipPhase("back");
@@ -1553,7 +1556,23 @@ export default function LineageMap({
       {/* HTML flip overlay - real CSS rotateY over root card */}
       {(() => {
         const size = ROOT * 2 + 10;
-        if (!rootRect) return null;
+        if (!rootRect) {
+          // fallback position while rect not measured
+          const ox2 = (rootPos ? rootPos.x : breed.x) + pan.x;
+          const oy2 = (rootPos ? rootPos.y : breed.y) + pan.y;
+          return (
+            <div className={`${styles.rootFlipCard} ${flipPhase === "back" ? styles.rootFlipCardFlipped : ""}`}
+              style={{ position: "fixed", left: ox2 - size / 2, top: oy2 - size / 2, width: size, height: size, zIndex: 51, pointerEvents: "none" }}>
+              <div className={styles.rootFlipInner}>
+                <div className={styles.rootFlipFront} />
+                <div className={styles.rootFlipBack}>
+                  <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "32%", height: "32%", objectFit: "contain" }} />
+                  <span className={styles.rootFlipName}>double tap</span>
+                </div>
+              </div>
+            </div>
+          );
+        }
         const ox = rootRect.left + rootRect.width / 2;
         const oy = rootRect.top + rootRect.height / 2;
         return (
