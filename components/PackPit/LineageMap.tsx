@@ -196,6 +196,8 @@ export default function LineageMap({
   const cardDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
   // the main square card peels off and drags like an ancestor card, but only once every frame is filled
   const [rootPos, setRootPos] = useState<{ x: number; y: number } | null>(null);
+  const rootCardGRef = useRef<SVGGElement | null>(null);
+  const [rootRect, setRootRect] = useState<DOMRect | null>(null);
   useEffect(() => setRootPos(null), [breed.name]);
   const rootDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
@@ -288,6 +290,11 @@ export default function LineageMap({
     return () => clearTimeout(t);
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
+  useEffect(() => {
+    if (flipPhase === "back" && rootCardGRef.current) {
+      setRootRect(rootCardGRef.current.getBoundingClientRect());
+    }
+  }, [flipPhase]);
   const startFlipLoop = () => {
     if (flipTimer.current) clearTimeout(flipTimer.current);
     setFlipPhase("back");
@@ -871,6 +878,7 @@ export default function LineageMap({
     <>
       <g
         className={canDragRoot ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
+        ref={rootCardGRef}
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
@@ -1545,12 +1553,9 @@ export default function LineageMap({
       {/* HTML flip overlay - real CSS rotateY over root card */}
       {(() => {
         const size = ROOT * 2 + 10;
-        // root card screen position: content coords + pan offset
-        // breed.x/y are screen coords (canvas offset + physics pos), no pan needed
-        // breed.x/y are screen coords; SVG draws card at content pos breed.x,breed.y
-        // screen pos = content pos + pan (since viewBox shifts by -pan)
-        const ox = (rootPos ? rootPos.x : breed.x) + pan.x;
-        const oy = (rootPos ? rootPos.y : breed.y) + pan.y;
+        if (!rootRect) return null;
+        const ox = rootRect.left + rootRect.width / 2;
+        const oy = rootRect.top + rootRect.height / 2;
         return (
           <div
             className={`${styles.rootFlipCard} ${(flipPhase === "back" || flipPhase === "opening") ? styles.rootFlipCardFlipped : ""}`}
