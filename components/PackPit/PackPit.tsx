@@ -1780,7 +1780,7 @@ export default function PackPit() {
         const now = performance.now();
 
         if (acceptBody && acceptBody.position) {
-          Body.applyForce(acceptBody, acceptBody.position, { x: (Math.random() - 0.5) * 0.0006, y: (Math.random() - 0.5) * 0.0005 }); // very subtle tremble
+          Body.applyForce(acceptBody, acceptBody.position, { x: (Math.random() - 0.5) * 0.00006, y: (Math.random() - 0.5) * 0.00005 }); // patch_quickfixes_v1: 0.1 power tremble
           if (now - (acceptBody.plugin.lastOne || 0) > 320) {
             acceptBody.plugin.lastOne = now;
             numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), -1, 13, true, "#ff2d4f"); // streaming red -1s that nibble the score

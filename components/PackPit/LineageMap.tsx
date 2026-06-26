@@ -879,7 +879,7 @@ export default function LineageMap({
           )}
         </g>
         {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
-        {idleHint && open.size === 0 && (
+        {idleHint && !interacted.current && (
           <g style={{ pointerEvents: "none" }}>
             <rect x={-ROOT * 0.72} y={ROOT * 0.42} width={ROOT * 1.44} height={ROOT * 0.52} rx={ROOT * 0.13}
               fill="rgba(0,0,0,0.52)" />
@@ -1201,6 +1201,7 @@ export default function LineageMap({
                     e.stopPropagation();
                     if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click still toggles zoom
                   }}
+                  style={{ ...(cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" as const } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : {}), pointerEvents: (placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? "all" as const : undefined }}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
                     if (packed || placedSet.has(c.id)) return; // already framed, or in pack mode
