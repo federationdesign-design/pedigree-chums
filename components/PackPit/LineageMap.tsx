@@ -1133,9 +1133,14 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 13 : 11}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 11}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
-                        {wrongDog?.frameId === f.id ? "WRONG DOG" : dragName}
+                        {wrongDog?.frameId === f.id ? (
+                          <>
+                            <tspan x={f.sx - pan.x} dy={-10}>WRONG</tspan>
+                            <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
+                          </>
+                        ) : dragName}
                       </text>
                     </>
                   )}
