@@ -328,16 +328,16 @@ export default function PackPit() {
           // 7 white dots at their true spots on the logo (fractions of the logo box,
           // -1..+1 from centre). Approximate by design; tracks the logo's tilt via at().
           const s = 0.5;
-          const spots = [
-            [0.6, -0.9],    // ~80% across, ~5% down
-            [-0.94, -0.76], // ~3% across, ~12% down
-            [-0.7, -0.4],   // ~15% across, ~30% down
-            [0.56, -0.3],   // ~78% across, ~35% down
-            [-0.74, 0.1],   // ~13% across, ~55% down
-            [-0.74, 0.7],   // ~13% across, ~85% down
-            [0.6, 0.84],    // ~80% across, ~92% down
+          const spots: [number, number, number][] = [
+            [0.6, -0.9,    1],    // ~80% across, ~5% down
+            [-0.94, -0.76, 1],    // ~3% across, ~12% down
+            [-0.7, -0.4,   1],    // ~15% across, ~30% down
+            [0.56, -0.3,   1],    // ~78% across, ~35% down
+            [-0.74, 0.1,   1],    // ~13% across, ~55% down
+            [-0.74, 0.7,   1],    // ~13% across, ~85% down
+            [0.6, 0.84,    0.6],  // ~80% across, ~92% down -- 40% smaller (patch_dots_v1)
           ];
-          spots.forEach(([fx, fy]) => { const p = at(cx, cy, fx, fy); spawnPiece(st, p.x, p.y, s, 0, false); });
+          spots.forEach(([fx, fy, sc]) => { const p = at(cx, cy, fx, fy); spawnPiece(st, p.x, p.y, s * sc, 0, false); });
         } else if (hitIndex === 1) {
           // 3 yellow dots, half size: bottom-left, top-right, bottom-right
           const s = 0.5;
