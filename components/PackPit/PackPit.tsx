@@ -657,10 +657,10 @@ export default function PackPit() {
       const onDbl = (e: MouseEvent) => {
         const hit = Query.point(dyn(), localPoint(e))[0];
         if (!hit) {
-          const anyHit = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), pt)[0];
+          const anyHit = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), localPoint(e))[0];
           if (anyHit) {
             Body.applyForce(anyHit, anyHit.position, { x: (Math.random() - 0.5) * anyHit.mass * 0.015, y: -anyHit.mass * 0.02 });
-            numAt(pt.x, pt.y, 1, 12);
+            numAt(localPoint(e).x, localPoint(e).y, 1, 12);
           }
           return;
         }
@@ -1669,10 +1669,10 @@ export default function PackPit() {
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
         if (!hit) {
-          const anyHit = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), pt)[0];
+          const anyHit = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), localPoint(e))[0];
           if (anyHit) {
             Body.applyForce(anyHit, anyHit.position, { x: (Math.random() - 0.5) * anyHit.mass * 0.015, y: -anyHit.mass * 0.02 });
-            numAt(pt.x, pt.y, 1, 12);
+            numAt(localPoint(e).x, localPoint(e).y, 1, 12);
           }
           return;
         }
