@@ -297,11 +297,10 @@ export default function LineageMap({
         setFlipPhase("opening");
         flipTimer.current = setTimeout(() => {
           setFlipPhase(null);
-          // loop: flip again after 8s
           flipTimer.current = setTimeout(startFlipLoop, 8000);
-        }, 260);
+        }, 600);
       }, 3000);
-    }, 260);
+    }, 600);
   };
   useEffect(() => {
     setFlipPhase(null);
@@ -1539,7 +1538,7 @@ export default function LineageMap({
         const oy = rootPos ? rootPos.y + pan.y : breed.y;
         return (
           <div
-            className={`${styles.rootFlipCard} ${flipPhase === "back" ? styles.rootFlipCardFlipped : ""}`}
+            className={`${styles.rootFlipCard} ${(flipPhase === "back" || flipPhase === "opening") ? styles.rootFlipCardFlipped : ""}`}
             style={{ position: "fixed", left: ox - size / 2, top: oy - size / 2, width: size, height: size, zIndex: 51, pointerEvents: "none" }}
           >
             <div className={styles.rootFlipInner}>
