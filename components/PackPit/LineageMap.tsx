@@ -920,7 +920,7 @@ export default function LineageMap({
           ) : null}
         </>
         {/* CSS 3D flip via foreignObject */}
-        <foreignObject x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10}>
+        <foreignObject x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} style={{ display: flipPhase ? "block" : "none" }}>
           <div
             style={{
               width: "100%", height: "100%",
