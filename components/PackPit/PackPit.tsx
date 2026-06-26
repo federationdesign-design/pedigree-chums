@@ -1666,46 +1666,6 @@ export default function PackPit() {
           }
         }
       });
-      // yellow arrow magnetises toward enter-site, sticks on contact
-      let yellowStuck = false; // true once the arrow has settled on the panel
-      Events.on(engine, "beforeUpdate", () => {
-        const all = Composite.allBodies(engine.world);
-        const yArrow = all.find((b: any) => b.plugin?.kind === "arrow-yellow");
-        const enterSite = all.find((b: any) => b.plugin?.kind === "entersite");
-        if (!yArrow || !enterSite) return;
-        const dx = enterSite.position.x - yArrow.position.x;
-        const dy = enterSite.position.y - yArrow.position.y;
-        const dist = Math.hypot(dx, dy);
-        const touchDist = (yArrow.plugin?.half || 40) + (enterSite.plugin?.half || 60);
-        if (!yellowStuck) {
-          // pull toward enter-site
-          if (dist > touchDist * 0.9) {
-            const speed = Math.min(5, dist * 0.035);
-            Body.setVelocity(yArrow, {
-              x: yArrow.velocity.x * 0.1 + (dx / dist) * speed * 5.5,
-              y: yArrow.velocity.y * 0.1 + (dy / dist) * speed * 5.5,
-            });
-          } else {
-            // contact: stick it - high friction, low restitution, damp velocity
-            yellowStuck = true;
-            yArrow.friction = 0.90;
-            yArrow.restitution = 0.05;
-            Body.setVelocity(yArrow, { x: 0, y: 0 });
-            Body.setAngularVelocity(yArrow, 0);
-          }
-        } else {
-          // stuck: check if a big impact has knocked it loose
-          const spd = Math.hypot(yArrow.velocity.x, yArrow.velocity.y);
-          if (spd > 6 || dist > touchDist * 1.5) {
-            yellowStuck = false; // knocked off - will re-attract
-            yArrow.friction = 0.25;
-            yArrow.restitution = 0.55;
-          } else {
-            // gently damp while stuck so it wobbles but stays close
-            Body.setVelocity(yArrow, { x: yArrow.velocity.x * 0.7, y: yArrow.velocity.y * 0.7 });
-          }
-        }
-      });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
       // rect; we drop a body at that spot that falls straight down, +500 each.
