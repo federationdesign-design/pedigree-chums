@@ -634,3 +634,12 @@
   25%  { opacity: 0.85; }
   100% { opacity: 0; transform: translateY(-20px) scale(1.15); }
 }
+.rootCardPulse {
+  animation: lm-root-pulse 1s ease-in-out infinite;
+  stroke: var(--yellow, #ffd23e) !important;
+  stroke-width: 4px !important;
+}
+@keyframes lm-root-pulse {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.2; }
+}
