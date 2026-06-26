@@ -218,8 +218,8 @@ export default function LineageMap({
   const zoomDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
   const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
-  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); };
-  const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks
+  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); }; // patch_hoverfix_v1: info opens with zoom
+  const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); setInfoHover(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks; patch_hoverfix_v1: info closes with zoom
 
   // Dismiss a fixed/opened card (the X in its corner).
   const removeCard = (id: string) => {
