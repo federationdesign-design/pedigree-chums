@@ -262,10 +262,7 @@ export default function PackPit() {
         const img = getImg(logo.key, logo.src);
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : logo.aspect;
         const bw = logo.width, bh = logo.width / ar;
-        const lx = w / 2, ly = h * 0.2 + 100;
-        const b: any = makeLogoCollider(lx, ly, bw, bh);
-        Body.setStatic(b, true); b.isSensor = false;
-        b.collisionFilter = { category: LOGO_LOGO_CAT, group: FUSE_GROUP };
+        const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw, bh, { isStatic: true, isSensor: false, collisionFilter: { category: LOGO_LOGO_CAT, group: FUSE_GROUP }, render: { visible: false } });
         b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
