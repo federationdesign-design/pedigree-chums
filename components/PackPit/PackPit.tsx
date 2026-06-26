@@ -1688,11 +1688,17 @@ export default function PackPit() {
       const imgBone = getImg("__bone", "/big-bone.svg");
       const imgDragMe = getImg("__bone_dragme", "/big-bone-dragme.svg");
       Events.on(engine, "beforeUpdate", () => {
-        if (!logoBody || fused) return;
+        const allB = Composite.allBodies(engine.world);
+        const bones = allB.filter((b: any) => b.plugin?.prop === "bone");
+        if (!logoBody || fused) {
+          // revert all bones to plain SVG when logo is gone or fused
+          bones.forEach((b: any) => { b.plugin.img = imgBone; });
+          return;
+        }
         const bone = nearestBone(logoBody);
         if (!bone) return;
         const dist = Math.hypot(bone.position.x - logoBody.position.x, bone.position.y - logoBody.position.y);
-        bone.plugin.img = dist <= DRAGME_RANGE ? imgDragMe : imgBone;
+        bones.forEach((b: any) => { b.plugin.img = (b === bone && dist <= DRAGME_RANGE) ? imgDragMe : imgBone; });
       });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
