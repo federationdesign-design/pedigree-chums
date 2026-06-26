@@ -471,10 +471,16 @@ export default function PackPit() {
           friction: 0.25, frictionAir: 0.008, density: 0.0008, render: { visible: false },
         });
         // yellow arrow: bottom-left corner is the pivot/collision point
-        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: which === "yellow" ? "arrow-yellow" : "arrow-green", family: null, ping: 0, ox: isYellow ? bw / 2 : 0, oy: isYellow ? -bh / 2 : 0 }; // patch_yellowmagnet_v1
-        // fire inward with spin
-        Body.setVelocity(b, { x: isYellow ? 14 + Math.random() * 4 : -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
-        Body.setAngularVelocity(b, isYellow ? -(0.18 + Math.random() * 0.14) : (0.18 + Math.random() * 0.14));
+        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: which === "yellow" ? "arrow-yellow" : "arrow-green", family: null, ping: 0, ox: isYellow ? bw / 2 : 0, oy: isYellow ? -bh / 2 : 0 };
+        // green fires in with spin; yellow drops near enter-site spawn (left edge, 100px above)
+        if (isYellow) {
+          const eMargin = (BIG * 3.0) / 2 + 24; // matches makePanel left margin for entersite
+          Body.setPosition(b, { x: eMargin + 20, y: -bh - 100 });
+          Body.setAngle(b, 0);
+        } else {
+          Body.setVelocity(b, { x: -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
+          Body.setAngularVelocity(b, 0.18 + Math.random() * 0.14);
+        }
         return b;
       }
       // The cookie-policy object: an SVG that pours in with the rest, starts upside
