@@ -287,9 +287,11 @@ export default function LineageMap({
   }, [breed.name]);
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
-    setFlashes((f) => [...f, { id, x, y, val, size }]);
-    onScore?.(val); // add this flash into the pit's running total
-    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
+    const isNeg = val < 0;
+    const flashSize = isNeg ? size * 1.8 : size; // negative = bigger
+    setFlashes((f) => [...f, { id, x, y, val, size: flashSize, neg: isNeg }]);
+    onScore?.(val);
+    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), isNeg ? 1200 : 650); // neg stays longer
   };
   // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,
   // sized from the circle itself so the family tree reads the same as the pit.
@@ -1483,7 +1485,10 @@ export default function LineageMap({
           </text>
         )}
         {flashes.map((f) => (
-          <text key={`f${f.id}`} className={styles.flashNum} x={f.x} y={f.y} fontSize={f.size} textAnchor="middle">
+          <text key={`f${f.id}`}
+            className={f.neg ? styles.flashNeg : styles.flashNum}
+            x={f.x} y={f.y} fontSize={f.size} textAnchor="middle"
+            style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
             {f.val}
           </text>
         ))}

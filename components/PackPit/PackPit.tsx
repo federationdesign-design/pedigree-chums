@@ -1695,16 +1695,38 @@ export default function PackPit() {
       });
       // green arrow compass: arrowhead (bottom-left) always faces how-to-play
       const GREEN_BASE_ANGLE = 2.3450; // offset from SVG centre to arrowhead tip
+      let greenSettledSince: number | null = null;
+      let greenLastHop = 0;
+      const GREEN_SETTLE_MS = 2000;
+      const GREEN_HOP_EVERY = 3000;
       Events.on(engine, "beforeUpdate", () => {
         const all = Composite.allBodies(engine.world);
         const gArrow = all.find((b: any) => b.plugin?.kind === "arrow-green");
         const howTo = all.find((b: any) => b.plugin?.kind === "howtoplay");
-        if (!gArrow || !howTo) return;
-        const dx = howTo.position.x - gArrow.position.x;
-        const dy = howTo.position.y - gArrow.position.y;
+        const enterS = all.find((b: any) => b.plugin?.kind === "entersite");
+        if (!gArrow) return;
+        // dual-north: track whichever target is closer
+        const targets = [howTo, enterS].filter(Boolean);
+        if (!targets.length) return;
+        const target = targets.reduce((nearest: any, t: any) => {
+          const d = Math.hypot(t.position.x - gArrow.position.x, t.position.y - gArrow.position.y);
+          const dn = Math.hypot(nearest.position.x - gArrow.position.x, nearest.position.y - gArrow.position.y);
+          return d < dn ? t : nearest;
+        });
+        const dx = target.position.x - gArrow.position.x;
+        const dy = target.position.y - gArrow.position.y;
         const targetAngle = Math.atan2(dy, dx) - GREEN_BASE_ANGLE;
         Body.setAngle(gArrow, targetAngle);
         Body.setAngularVelocity(gArrow, 0);
+        // hop when settled
+        const spd = Math.hypot(gArrow.velocity.x, gArrow.velocity.y);
+        const now2 = performance.now();
+        if (spd > 1.5) { greenSettledSince = null; return; }
+        if (!greenSettledSince) greenSettledSince = now2;
+        if (now2 - greenSettledSince < GREEN_SETTLE_MS) return;
+        if (now2 - greenLastHop < GREEN_HOP_EVERY) return;
+        greenLastHop = now2;
+        Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.008 });
       });
       // bone drag-me hint: swap SVG when bone is within 300px of logo
       const DRAGME_RANGE = 300;
