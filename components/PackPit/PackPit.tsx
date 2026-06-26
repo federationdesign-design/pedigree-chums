@@ -1686,7 +1686,7 @@ export default function PackPit() {
       // bone drag-me hint: swap SVG when bone is within 300px of logo
       const DRAGME_RANGE = 300;
       const imgBone = getImg("__bone", "/big-bone.svg");
-      const imgDragMe = getImg("__bone_dragme", "/big-bone dragme.svg");
+      const imgDragMe = getImg("__bone_dragme", "/big-bone-dragme.svg");
       Events.on(engine, "beforeUpdate", () => {
         if (!logoBody || fused) return;
         const bone = nearestBone(logoBody);
