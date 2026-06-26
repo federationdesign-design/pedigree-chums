@@ -854,11 +854,7 @@ export default function LineageMap({
               <image href="/double-tap-icon-blue.svg"
                 x={-ROOT * 0.72} y={-ROOT * 0.82}
                 width={ROOT * 1.44} height={ROOT * 1.44} />
-              {/* double tap label */}
-              <text textAnchor="middle" y={ROOT * 0.72}
-                style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(ROOT * 0.26)}px`, fill: "var(--navy, #0a3a57)" }}>
-                double tap
-              </text>
+
             </>
           ) : (
             // front face: dog image
@@ -879,14 +875,10 @@ export default function LineageMap({
           )}
         </g>
         {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
-        {idleHint && !interacted.current && (
+{idleHint && !interacted.current && (
           <g style={{ pointerEvents: "none" }}>
             <rect x={-ROOT * 0.72} y={ROOT * 0.42} width={ROOT * 1.44} height={ROOT * 0.52} rx={ROOT * 0.13}
               fill="rgba(0,0,0,0.52)" />
-            <text textAnchor="middle" dominantBaseline="central" y={ROOT * 0.68}
-              style={{ font: `bold ${Math.round(ROOT * 0.18)}px Montserrat, sans-serif`, fill: "#ffd23e", letterSpacing: 0.5 }}>
-              double tap
-            </text>
           </g>
         )}
         {/* the root card carries no status dot; only the ancestor cards show one */}
@@ -1506,9 +1498,11 @@ export default function LineageMap({
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
         if (!c || !text) return null;
-        // next to the i (top-right corner of the card), not the bottom
-        const left = c.cardX + CW / 2 + 14 + pan.x;
-        const top = c.cardY - CW / 2 - 6 + pan.y;
+        // if zoom is open for same card, sit right of the zoomed image; otherwise right of the card
+        const zoomOpen = zoomedId === c.id;
+        const zoomSize = CW * 3;
+        const left = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + 14 + pan.x;
+        const top = zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y : c.cardY - CW / 2 - 6 + pan.y;
         return (
           <div
             onMouseLeave={() => setInfoHover(null)}
