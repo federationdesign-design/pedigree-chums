@@ -908,7 +908,7 @@ export default function LineageMap({
         {/* front face only - hide dog image when flip overlay shows back face */}
         <>
           <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
-          {breed.image && flipPhase !== "back" ? (
+          {breed.image ? (
             <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
           ) : null}
         </>
