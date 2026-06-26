@@ -555,6 +555,7 @@
   font-size: clamp(0.9rem, 2vw, 1.4rem);
   color: var(--navy, #0a3a57); text-align: center; line-height: 1.1;
 }
+.closeLarge { padding: 18px !important; margin: -10px !important; }
 .flashNeg {
   fill: #ff2d4f;
   font-family: 'Luckiest Guy', var(--font-display), system-ui, sans-serif;

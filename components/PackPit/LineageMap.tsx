@@ -957,7 +957,7 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
+      <button type="button" className={`${styles.close} ${styles.closeLarge}`} onClick={onClose} aria-label="Close">
         &times;
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {

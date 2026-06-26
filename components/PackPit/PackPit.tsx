@@ -1778,7 +1778,8 @@ export default function PackPit() {
         const bone = nearestBone(logoBody);
         if (!bone) return;
         const dist = Math.hypot(bone.position.x - logoBody.position.x, bone.position.y - logoBody.position.y);
-        bones.forEach((b: any) => { b.plugin.img = (b === bone && dist <= DRAGME_RANGE) ? imgDragMe : imgBone; });
+        const showHint = dist <= DRAGME_RANGE;
+        bones.forEach((b: any) => { b.plugin.img = (b === bone && showHint) ? imgDragMe : imgBone; });
       });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
