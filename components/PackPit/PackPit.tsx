@@ -455,6 +455,27 @@ export default function PackPit() {
         b.plugin = { name: cfg.label, label: cfg.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(cfg.key, cfg.src), prop: "panel", kind: cfg.kind, family: null, ping: 0 };
         return b;
       }
+      // Arrows: fired in from off-screen sides with spin, bounce off walls
+      function makeArrow(which: "yellow" | "green", w: number) {
+        const isYellow = which === "yellow";
+        const key = isYellow ? "__arrow_yellow_pit" : "__arrow_green_pit";
+        const src = isYellow ? "/arrow-yellow-mid.svg" : "/green-arrow-short.svg";
+        const ar = isYellow ? (670.3 / 720) : (704.2 / 720);
+        const bw = BIG * 1.1, bh = bw / ar;
+        // start well off-screen on the correct side, mid-height
+        const x = isYellow ? -bw : w + bw;
+        const y = -180 - Math.random() * 120;
+        const angle = isYellow ? -0.3 : 0.3; // slight inward lean
+        const b: any = Bodies.rectangle(x, y, bw, bh, {
+          angle, chamfer: { radius: bh * 0.12 }, restitution: 0.55,
+          friction: 0.25, frictionAir: 0.008, density: 0.0008, render: { visible: false },
+        });
+        b.plugin = { name: which === "yellow" ? "Yellow arrow" : "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg(key, src), prop: "panel", kind: "arrow", family: null, ping: 0 };
+        // fire inward with spin
+        Body.setVelocity(b, { x: isYellow ? 14 + Math.random() * 4 : -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
+        Body.setAngularVelocity(b, isYellow ? -(0.18 + Math.random() * 0.14) : (0.18 + Math.random() * 0.14));
+        return b;
+      }
       // The cookie-policy object: an SVG that pours in with the rest, starts upside
       // down (180 degrees), opens the cookie notice on tap, and buzzes its neighbours
       // every 20 seconds. It is the site's main cookie message on the home page.
@@ -543,7 +564,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); } }, 8050)); // 5050 two feature cards
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Mastiff"), dropped); dropCardNamed(pickName("Great Dane", "Beagle"), dropped); Composite.add(engine.world, makeArrow("yellow", w)); Composite.add(engine.world, makeArrow("green", w)); } }, 8050)); // 8050 two feature cards + arrows from sides (patch_arrows_hint_v1)
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 6000 bowl + menu, before the flood
           waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                      // 150000 all remaining cards
         }

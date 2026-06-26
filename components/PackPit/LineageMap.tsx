@@ -826,6 +826,17 @@ export default function LineageMap({
             preserveAspectRatio="xMidYMid slice"
           />
         ) : null}
+        {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
+        {idleHint && open.size === 0 && (
+          <g style={{ pointerEvents: "none" }}>
+            <rect x={-ROOT * 0.72} y={ROOT * 0.42} width={ROOT * 1.44} height={ROOT * 0.52} rx={ROOT * 0.13}
+              fill="rgba(0,0,0,0.52)" />
+            <text textAnchor="middle" dominantBaseline="central" y={ROOT * 0.68}
+              style={{ font: `bold ${Math.round(ROOT * 0.18)}px Montserrat, sans-serif`, fill: "#ffd23e", letterSpacing: 0.5 }}>
+              double tap
+            </text>
+          </g>
+        )}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
