@@ -1168,7 +1168,7 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 14}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : (() => { const wc = (dragName || "").split(" ").length; return wc <= 2 ? 14 : wc <= 3 ? 12 : wc <= 4 ? 10 : 8; })()}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -1176,12 +1176,18 @@ export default function LineageMap({
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
                         ) : (() => {
-                          // split breed name into words, up to 3 lines
+                          // split breed name into words, up to 3 lines, font shrinks with word count
                           const words = (dragName || "").split(" ");
-                          const lineH = 14;
-                          const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
-                          return words.map((w, i) => (
-                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
+                          const fs = words.length <= 2 ? 14 : words.length <= 3 ? 12 : words.length <= 4 ? 10 : 8;
+                          const lineH = fs * 1.3;
+                          // group into max 3 lines of ~2 words each
+                          const lines: string[] = [];
+                          for (let i = 0; i < words.length; i += Math.ceil(words.length / 3)) {
+                            lines.push(words.slice(i, i + Math.ceil(words.length / 3)).join(" "));
+                          }
+                          const startY = lines.length === 1 ? 0 : lines.length === 2 ? -lineH / 2 : -lineH;
+                          return lines.map((l, i) => (
+                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{l}</tspan>
                           ));
                         })()}
                       </text>
