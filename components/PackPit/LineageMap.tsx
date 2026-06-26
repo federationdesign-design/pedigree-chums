@@ -889,11 +889,10 @@ export default function LineageMap({
         <clipPath id={clip}>
           <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
         </clipPath>
-        {/* flip wrapper: scaleX animates 1->0->1; content swaps at midpoint */}
+        {/* flip wrapper: opacity crossfade (scaleX unreliable on SVG g elements) */}
         <g style={{
-          animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards`
-                   : flipPhase === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards`
-                   : undefined,
+          opacity: flipPhase === "closing" || flipPhase === "opening" ? 0 : 1,
+          transition: "opacity 0.26s ease-in-out",
         }}>
           {flipPhase === "back" || flipPhase === "opening" ? (
             // back face: yellow with breed name

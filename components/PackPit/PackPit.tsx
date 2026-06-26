@@ -94,6 +94,13 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
+  // score drain: -1 every 2s while pit is active and no overlays open
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!howToPlay && !activeBreed) setScore((s) => s - 1);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [howToPlay, activeBreed]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
     window.addEventListener("pc:open-howtoplay", open);
