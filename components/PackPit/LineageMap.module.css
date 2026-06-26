@@ -645,6 +645,7 @@
 }
 .dtIcon {
   animation: lm-dt-bounce 0.8s ease-in-out infinite;
+  will-change: transform;
 }
 @keyframes lm-dt-bounce {
   0%, 100% { transform: translateY(0) scale(1); }
