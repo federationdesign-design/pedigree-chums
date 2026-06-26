@@ -1534,8 +1534,9 @@ export default function LineageMap({
       {(() => {
         const size = ROOT * 2 + 10;
         // root card screen position: content coords + pan offset
-        const ox = (rootPos ? rootPos.x : breed.x) + pan.x;
-        const oy = (rootPos ? rootPos.y : breed.y) + pan.y;
+        // breed.x/y are screen coords (canvas offset + physics pos), no pan needed
+        const ox = rootPos ? rootPos.x + pan.x : breed.x;
+        const oy = rootPos ? rootPos.y + pan.y : breed.y;
         return (
           <div
             className={`${styles.rootFlipCard} ${flipPhase === "back" ? styles.rootFlipCardFlipped : ""}`}
