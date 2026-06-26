@@ -1680,6 +1680,17 @@ export default function PackPit() {
         Body.setAngle(gArrow, targetAngle);
         Body.setAngularVelocity(gArrow, 0);
       });
+      // bone drag-me hint: swap SVG when bone is within 300px of logo
+      const DRAGME_RANGE = 300;
+      const imgBone = getImg("__bone", "/big-bone.svg");
+      const imgDragMe = getImg("__bone_dragme", "/big-bone dragme.svg");
+      Events.on(engine, "beforeUpdate", () => {
+        if (!logoBody || fused) return;
+        const bone = nearestBone(logoBody);
+        if (!bone) return;
+        const dist = Math.hypot(bone.position.x - logoBody.position.x, bone.position.y - logoBody.position.y);
+        bone.plugin.img = dist <= DRAGME_RANGE ? imgDragMe : imgBone;
+      });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
       // rect; we drop a body at that spot that falls straight down, +500 each.
