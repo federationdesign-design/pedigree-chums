@@ -625,7 +625,7 @@ export default function LineageMap({
         });
       });
       setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
-      pops.forEach((p) => flashNum(p.x, p.y, 50, FLASH_SIZE)); // +50 per newly revealed node
+      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
       interacted.current = true; setIdleHint(false);
       return;
     }
@@ -636,7 +636,7 @@ export default function LineageMap({
       setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; }); // turns popped nodes blue, like a manual tap
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
-        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, 50, FLASH_SIZE); }
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); } // -100 patch_revealscore_v1
       });
       interacted.current = true; setIdleHint(false);
       return;
