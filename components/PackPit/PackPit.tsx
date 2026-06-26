@@ -1989,7 +1989,7 @@ export default function PackPit() {
       )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
-          <button type="button" className={styles.tallyChip} onClick={() => setShelfOpen(true)} aria-label="Open your collected pack">
+          <button type="button" className={styles.tallyChip} onClick={() => setDockOpen((o) => !o)} aria-label="Open your collected pack">
             <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
               {Array.from({ length: 16 }).map((_, i) => {
                 const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;

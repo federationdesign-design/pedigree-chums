@@ -219,7 +219,7 @@ export default function LineageMap({
   const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
   useEffect(() => { setCardFlip(new Map()); cardFlipTimers.current.forEach(clearTimeout); cardFlipTimers.current.clear(); }, [breed.name]);
-  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); }; // patch_hoverfix_v1: info opens with zoom
+  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); setPctHover(id); }; // patch_hoverfix_v1: info+pct open with zoom
   const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); setInfoHover(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks; patch_hoverfix_v1: info closes with zoom
   const startCardFlip = (id: string) => {
     const t = cardFlipTimers.current;
