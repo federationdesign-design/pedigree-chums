@@ -2031,7 +2031,7 @@ export default function PackPit() {
           </button>
         </div>
       )}
-      {dockOpen && collectedChums.length > 0 && (() => {
+      {dockOpen && (() => {
         const dockBreeds = [...collectedChums].reverse().map((name, i) => {
           const b = breeds.find((x) => x.name === name);
           return { name, img: b ? b.image : "", idx: i };
