@@ -2109,7 +2109,7 @@ export default function PackPit() {
                     }}
                     onMouseEnter={(e) => {
                       if (isTop && !isOpened && !isRemoved) {
-                        (e.currentTarget as HTMLElement).style.transform = `rotateX(60deg) rotateY(0deg) rotateZ(${randomRot}deg) translateZ(50px)`;
+                        (e.currentTarget as HTMLElement).style.transform = 'rotateX(0) rotateY(0) rotateZ(0) scale(1.3) translateY(-20px)';
                       }
                     }}
                     onMouseLeave={(e) => {
