@@ -1073,6 +1073,7 @@ export default function PackPit() {
               gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
             }
             numAt(jx, jy, 2000);
+            bone.plugin.img = imgBone; // reset to plain bone on fuse
             Composite.remove(engine.world, logoBody); logoBody = null;
             // pop the arrow away
             arrowBody.plugin.popStart = now; arrowBody.plugin.popping = true;
