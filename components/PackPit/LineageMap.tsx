@@ -1408,8 +1408,9 @@ export default function LineageMap({
         const top = c.cardY - CW / 2 - 6 + pan.y;
         return (
           <div
+            onMouseLeave={() => setInfoHover(null)}
             style={{
-              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "none",
+              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "auto", /* patch_bits_v1: hoverable so it self-dismisses */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",

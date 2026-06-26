@@ -187,7 +187,7 @@ export default function PackPit() {
         const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 240;
         if (prop.shape === "ball") {
           const r = prop.width / 2;
-          const b: any = Bodies.circle(x, y, r, { restitution: 0.85, friction: 0.18, frictionAir: 0.006, density: 0.0006, render: { visible: false } });
+          const b: any = Bodies.circle(x, y, r, { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006, render: { visible: false } }); // patch_bits_v1: super bouncy
           b.plugin = { name: prop.label, half: r, w: prop.width, h: prop.width, color: "#c7e65a", img, prop: "ball", family: null, ping: 0 };
           return b;
         }
@@ -1770,8 +1770,9 @@ export default function PackPit() {
         if (elapsed < CALM) return; // quiet start
         const t = elapsed - CALM;
         const level = Math.min(1, t / RISE); // rises to the simmer, then holds at 1
-        Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.00025 + level * 0.0006), y: (Math.random() - 0.5) * (0.00025 + level * 0.0005) }); // wobble halved
-        Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.01 + level * 0.05)); // wobble spin halved
+        // wobble removed (patch_bits_v1): shake/rattle disabled
+        // Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.00025 + level * 0.0006), y: (Math.random() - 0.5) * (0.00025 + level * 0.0005) });
+        // Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.01 + level * 0.05));
         if (t >= RISE + SIMMER) { // the one intense burst, then it settles over the calm
           Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 2.5, y: -2 }); // end buzz halved
           Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 0.6); // end buzz spin halved
