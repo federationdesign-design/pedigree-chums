@@ -1565,7 +1565,7 @@ export default function LineageMap({
             <div className={styles.rootFlipInner}>
               <div className={styles.rootFlipFront} />
               <div className={styles.rootFlipBack}>
-                <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "65%", height: "65%", objectFit: "contain" }} />
+                <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "32%", height: "32%", objectFit: "contain" }} />
                 <span className={styles.rootFlipName}>double tap</span>
               </div>
             </div>
