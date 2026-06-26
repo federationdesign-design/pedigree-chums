@@ -1133,14 +1133,22 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 11}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 14}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
                             <tspan x={f.sx - pan.x} dy={-10}>WRONG</tspan>
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
-                        ) : dragName}
+                        ) : (() => {
+                          // split breed name into words, up to 3 lines
+                          const words = (dragName || "").split(" ");
+                          const lineH = 14;
+                          const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
+                          return words.map((w, i) => (
+                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
+                          ));
+                        })()}
                       </text>
                     </>
                   )}

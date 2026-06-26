@@ -443,6 +443,21 @@ export default function PackPit() {
       // first jumps to the about page, a tap on the second opens the how-to-play
       // strip over the pit the way the family tree opens.
       const enterPanel = { key: "__entersite", label: "Enter site", src: "/entersite.svg", width: BIG * 3.0, aspect: 86.9 / 45.9, kind: "entersite" };
+      // PC-logo-6th-hit collider: dumbbell shape traced from 595.3x356.5 viewBox
+      // Left circle ~cx105,cy178,r105; right circle ~cx490,cy178,r105; bar ~cx297,cy178,w400,h120 at ~8deg
+      const makeLogoCollider = (x: number, y: number, bw: number, bh: number) => {
+        const VBW = 595.3, VBH = 356.5, k = bw / VBW;
+        const cx0 = VBW / 2, cy0 = VBH / 2;
+        const po = { restitution: 0.45, friction: 0.3, density: 0.0009, render: { visible: false } };
+        const C = (vx: number, vy: number, r: number) => Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
+        const R = (vx: number, vy: number, w: number, h: number, a = 0) => Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, { ...po, angle: a });
+        const parts = [
+          C(105, 178, 105),   // left circle
+          C(490, 178, 105),   // right circle
+          R(297, 178, 380, 110, 0.14), // connecting bar, slight angle
+        ];
+        return Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+      };
       const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
       function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number, side?: "left" | "right") {
         const bw = cfg.width, bh = cfg.width / cfg.aspect;
