@@ -282,7 +282,7 @@ export default function LineageMap({
   useEffect(() => {
     setFlipPhase(null);
     if (flipTimer.current) clearTimeout(flipTimer.current);
-    flipTimer.current = setTimeout(startFlipLoop, 120000); // 2 minutes
+    flipTimer.current = setTimeout(startFlipLoop, 2000); // 2 seconds
     return () => { if (flipTimer.current) clearTimeout(flipTimer.current); };
   }, [breed.name]);
   const flashNum = (x: number, y: number, val: number, size: number) => {
