@@ -539,7 +539,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies (random side)
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
-          waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Labrador", "Golden Retriever"), dropped); }, 2750));       // 2750 feature card
+          waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); }, 2750));       // 2750 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
           waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pickName("Corgi", "Border Collie"), dropped); }, 5050));             // 5050 feature card
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                          // 6400 bone + slipper
