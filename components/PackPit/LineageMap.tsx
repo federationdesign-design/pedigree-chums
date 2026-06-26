@@ -1368,9 +1368,8 @@ export default function LineageMap({
                   </clipPath>
                   {/* idle flip wrapper for Pedigree Chums cards */}
                   <g style={{
-                    animation: cardFlip.get(c.id) === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards`
-                             : cardFlip.get(c.id) === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards`
-                             : undefined,
+                    opacity: cardFlip.get(c.id) === "closing" || cardFlip.get(c.id) === "opening" ? 0 : 1,
+                    transition: "opacity 0.26s ease-in-out",
                   }}>
                     {cardFlip.get(c.id) === "back" || cardFlip.get(c.id) === "opening" ? (
                       <>
