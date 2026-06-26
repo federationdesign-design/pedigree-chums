@@ -1166,7 +1166,7 @@ export default function LineageMap({
                         ) : (() => {
                           // split breed name into words, up to 3 lines, font shrinks with word count
                           const words = (dragName || "").split(" ");
-                          const fs = words.length <= 2 ? 14 : words.length <= 3 ? 12 : words.length <= 4 ? 10 : 8;
+                          const fs = words.length <= 2 ? 12 : words.length <= 3 ? 10 : words.length <= 4 ? 8 : 6;
                           const lineH = fs * 1.3;
                           // group into max 3 lines of ~2 words each
                           const lines: string[] = [];
