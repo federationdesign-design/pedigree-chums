@@ -475,7 +475,7 @@ export default function PackPit() {
         // green fires in with spin; yellow drops near enter-site spawn (left edge, 100px above)
         if (isYellow) {
           const eMargin = (BIG * 3.0) / 2 + 24; // matches makePanel left margin for entersite
-          Body.setPosition(b, { x: eMargin + 20, y: -bh - 100 });
+          Body.setPosition(b, { x: eMargin + 20, y: -bh - 10 });
           Body.setAngle(b, 0);
         } else {
           Body.setVelocity(b, { x: -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
