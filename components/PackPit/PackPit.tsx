@@ -104,7 +104,9 @@ export default function PackPit() {
   }, [howToPlay]);
   // score drain: -1 every 2s while pit is active and no overlays open
   useEffect(() => {
+    let started = false; window.setTimeout(() => { started = true; }, 10000);
     const interval = setInterval(() => {
+      if (!started) return;
       if (!howToPlay && !activeBreed) setScore((s) => s - 1);
     }, 2000);
     return () => clearInterval(interval);
