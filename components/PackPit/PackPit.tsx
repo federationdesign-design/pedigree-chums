@@ -33,6 +33,9 @@ export default function PackPit() {
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
   const [shelfOpen, setShelfOpen] = useState(false); // the collection shelf overlay, opened from the tally
+  const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
+  const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
+  const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
   const msLast = useRef(0); // highest milestone already celebrated
