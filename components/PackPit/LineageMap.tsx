@@ -454,6 +454,7 @@ export default function LineageMap({
       }
     });
   }, [filled]);
+  useEffect(() => { if (packed) { pickCards.filter((c) => PACK_BREEDS.has(c.name)).forEach((c) => { if (!cardFlipTimers.current.has(c.id)) { cardFlipTimers.current.set(c.id, setTimeout(() => startCardFlip(c.id), 2000)); } }); } }, [packed]);
   const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
   useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames

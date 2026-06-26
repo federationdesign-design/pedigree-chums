@@ -1724,8 +1724,8 @@ export default function PackPit() {
         const dx = target.position.x - gArrow.position.x;
         const dy = target.position.y - gArrow.position.y;
         const targetAngle = Math.atan2(dy, dx) - GREEN_BASE_ANGLE;
-        Body.setAngle(gArrow, targetAngle);
-        Body.setAngularVelocity(gArrow, 0);
+        if (!gArrow.plugin.hoppingUntil || performance.now() > gArrow.plugin.hoppingUntil) { Body.setAngle(gArrow, targetAngle);
+  Body.setAngularVelocity(gArrow, 0); }
         // hop when settled
         const spd = Math.hypot(gArrow.velocity.x, gArrow.velocity.y);
         const now2 = performance.now();
@@ -1733,7 +1733,7 @@ export default function PackPit() {
         if (!greenSettledSince) greenSettledSince = now2;
         if (now2 - greenSettledSince < GREEN_SETTLE_MS) return;
         if (now2 - greenLastHop < GREEN_HOP_EVERY) return;
-        greenLastHop = now2;
+        greenLastHop = now2; gArrow.plugin.hoppingUntil = now2 + 600;
         Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.06 });
       });
       // bone drag-me hint: swap SVG when bone is within 300px of logo
