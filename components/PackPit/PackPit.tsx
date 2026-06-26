@@ -107,7 +107,7 @@ export default function PackPit() {
     let started = false; window.setTimeout(() => { started = true; }, 10000);
     const interval = setInterval(() => {
       if (!started) return;
-      if (!howToPlay && !activeBreed) setScore((s) => s - 1);
+      if (!howToPlay && !activeBreed) setScore((s) => s - 3);
     }, 2000);
     return () => clearInterval(interval);
   }, [howToPlay, activeBreed]);
