@@ -1625,8 +1625,11 @@ export default function LineageMap({
       {pctHover && (() => {
         const c = pickCards.find((x) => x.id === pctHover);
         if (!c) return null;
-        const left = c.cardX - CW / 2 + pan.x;
-        const top = c.cardY + CW / 2 + 6 + pan.y;
+        // if zoom open for same card, sit right of zoomed image; otherwise below card
+        const zoomOpenPct = zoomedId === c.id;
+        const zoomSizePct = CW * 3;
+        const left = zoomOpenPct ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSizePct + 10 : c.cardX - CW / 2 + pan.x;
+        const top = zoomOpenPct ? c.cardY - CW / 2 + pan.y + zoomOff.y + zoomSizePct / 2 : c.cardY + CW / 2 + 6 + pan.y;
         const info = breedMix.get(c.img);
         const genLabel = (d: number) => {
           if (d <= 0) return "the breed itself";
