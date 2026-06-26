@@ -916,7 +916,7 @@ export default function PackPit() {
             const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
             // fuse cross-fade: ohyea -> plain bone over 1.5s after 1s hold
             if (b.plugin.fuseAt) {
-              const ft = (now - b.plugin.fuseAt) / 1000; // seconds since fuse
+              const ft = (performance.now() - b.plugin.fuseAt) / 1000; // seconds since fuse
               if (ft < 1) {
                 // hold ohyea at full alpha
                 ctx.drawImage(imgOhYea, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
