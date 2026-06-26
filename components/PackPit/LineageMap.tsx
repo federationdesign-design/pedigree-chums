@@ -290,17 +290,11 @@ export default function LineageMap({
   // 2-minute idle flip attractor - loops until the user interacts
   const startFlipLoop = () => {
     if (flipTimer.current) clearTimeout(flipTimer.current);
-    setFlipPhase("closing");
+    setFlipPhase("back");
     flipTimer.current = setTimeout(() => {
-      setFlipPhase("back");
-      flipTimer.current = setTimeout(() => {
-        setFlipPhase("opening");
-        flipTimer.current = setTimeout(() => {
-          setFlipPhase(null);
-          flipTimer.current = setTimeout(() => startFlipLoop(), 8000);
-        }, 600);
-      }, 3000);
-    }, 600);
+      setFlipPhase(null);
+      flipTimer.current = setTimeout(() => startFlipLoop(), 8000);
+    }, 3000);
   };
   useEffect(() => {
     setFlipPhase(null);
