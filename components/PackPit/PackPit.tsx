@@ -1652,24 +1652,6 @@ export default function PackPit() {
           }
         }
       });
-      // yellow arrow pops out of enter-site top 10s after it lands
-      const pitW = () => stageRef.current ? stageRef.current.clientWidth : 800;
-      Events.on(engine, "beforeUpdate", () => {
-        if (yellowArrowPopped || !enterSiteLandedAt) return;
-        if (performance.now() - enterSiteLandedAt < 10000) return;
-        yellowArrowPopped = true;
-        const all = Composite.allBodies(engine.world);
-        const es = all.find((b: any) => b.plugin?.kind === "entersite");
-        if (!es) return;
-        const arrow = makeArrow("yellow", pitW());
-        // use known entersite aspect (86.9/45.9) for reliable height; plugin.h may be stale
-        const esH = (es.plugin?.w || BIG * 3.0) / (86.9 / 45.9);
-        const arH = arrow.plugin?.h || BIG * 1.1;
-        Body.setPosition(arrow, { x: es.position.x, y: es.position.y - esH / 2 - arH / 2 - 4 });
-        Body.setVelocity(arrow, { x: (Math.random() - 0.5) * 3, y: -10 }); // pops upward
-        Body.setAngularVelocity(arrow, (Math.random() - 0.5) * 0.3);
-        Composite.add(engine.world, arrow);
-      });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
       // rect; we drop a body at that spot that falls straight down, +500 each.
