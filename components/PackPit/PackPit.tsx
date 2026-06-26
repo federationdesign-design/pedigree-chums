@@ -1617,6 +1617,21 @@ export default function PackPit() {
           Body.applyForce(other, other.position, { x: (ddx / dd) * other.mass * 0.04, y: (ddy / dd) * other.mass * 0.04 - other.mass * 0.02 });
         }
       });
+      Events.on(engine, "collisionStart", (ev: any) => {
+        for (const pair of ev.pairs) {
+          const ga = pair.bodyA.plugin?.kind === "arrow-green" ? pair.bodyA : pair.bodyB.plugin?.kind === "arrow-green" ? pair.bodyB : null;
+          if (!ga) continue;
+          const other = ga === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!other || other.isStatic) continue;
+          if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite") continue;
+          const cx2 = (ga.position.x + other.position.x) / 2;
+          const cy2 = (ga.position.y + other.position.y) / 2;
+          burstAt(cx2, cy2, 18);
+          const ddx = other.position.x - ga.position.x, ddy = other.position.y - ga.position.y;
+          const dd = Math.hypot(ddx, ddy) || 1;
+          Body.applyForce(other, other.position, { x: (ddx / dd) * other.mass * 0.04, y: (ddy / dd) * other.mass * 0.04 - other.mass * 0.02 });
+        }
+      });
 
       // A % circle goes inert after five hits total. Those used to be cursor presses
       // only; now a solid knock from another pit object spends a charge too. A speed
