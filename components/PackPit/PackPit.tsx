@@ -1667,6 +1667,19 @@ export default function PackPit() {
           }
         }
       });
+      // green arrow compass: arrowhead (bottom-left) always faces how-to-play
+      const GREEN_BASE_ANGLE = 2.3450; // offset from SVG centre to arrowhead tip
+      Events.on(engine, "beforeUpdate", () => {
+        const all = Composite.allBodies(engine.world);
+        const gArrow = all.find((b: any) => b.plugin?.kind === "arrow-green");
+        const howTo = all.find((b: any) => b.plugin?.kind === "howtoplay");
+        if (!gArrow || !howTo) return;
+        const dx = howTo.position.x - gArrow.position.x;
+        const dy = howTo.position.y - gArrow.position.y;
+        const targetAngle = Math.atan2(dy, dx) - GREEN_BASE_ANGLE;
+        Body.setAngle(gArrow, targetAngle);
+        Body.setAngularVelocity(gArrow, 0);
+      });
       window.addEventListener("mouseup", releaseHeldPct);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
       // rect; we drop a body at that spot that falls straight down, +500 each.
