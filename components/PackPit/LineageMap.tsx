@@ -1554,6 +1554,50 @@ export default function LineageMap({
         {/* flashes rendered in fixed overlay below for correct z-order */}
         </g>
       </svg>
+      {flipPhase === "back" && (
+        <div style={{
+          position: "fixed",
+          left: breed.x + pan.x - 63,
+          top: breed.y + pan.y - 63,
+          width: 126,
+          height: 126,
+          perspective: "900px",
+          zIndex: 52,
+          pointerEvents: "none",
+          borderRadius: "24px",
+        }}>
+          <div style={{
+            width: "100%",
+            height: "100%",
+            position: "relative",
+            transformStyle: "preserve-3d",
+            transform: "rotateY(180deg)",
+            transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}>
+            <div style={{
+              position: "absolute", inset: 0,
+              backfaceVisibility: "hidden",
+              borderRadius: "24px",
+              background: "transparent",
+            }} />
+            <div style={{
+              position: "absolute", inset: 0,
+              backfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              background: "var(--yellow, #ffd23e)",
+              borderRadius: "24px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4px",
+            }}>
+              <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "40%", height: "40%", objectFit: "contain" }} />
+              <span style={{ fontFamily: "Luckiest Guy, system-ui", fontSize: "13px", color: "#0a3a57", textAlign: "center" }}>double tap</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* flash number overlay - above all SVG content */}
       {flashes.length > 0 && (
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
