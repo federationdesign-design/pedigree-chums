@@ -648,6 +648,8 @@ export default function LineageMap({
   // or by hitting Collect (which packs early, leaving framesDone false but the grid laid out)
   const canDragRoot = (framesDone || packed) && !collecting;
   const collectShowing = allBlue && !packed && !collecting && !framesDone; // the blue Collect button is on screen
+  const [collectPulse, setCollectPulse] = useState(false);
+  useEffect(() => { if (!collectShowing) { setCollectPulse(false); return; } const t = setTimeout(() => setCollectPulse(true), 7000); return () => clearTimeout(t); }, [collectShowing]);
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
   // One tap opens every branch, turns all circles blue and pops all cards out, the
