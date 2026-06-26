@@ -914,7 +914,28 @@ export default function PackPit() {
             const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
             // ox/oy shifts draw origin so a custom pivot point sits at body centre
             const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
-            ctx.drawImage(img, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
+            // fuse cross-fade: ohyea -> plain bone over 1.5s after 1s hold
+            if (b.plugin.fuseAt) {
+              const ft = (now - b.plugin.fuseAt) / 1000; // seconds since fuse
+              if (ft < 1) {
+                // hold ohyea at full alpha
+                ctx.drawImage(imgOhYea, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
+              } else if (ft < 2.5) {
+                // cross-fade: ohyea fades out, plain bone fades in
+                const fade = (ft - 1) / 1.5; // 0->1 over 1.5s
+                ctx.globalAlpha = (ctx.globalAlpha ?? 1) * (1 - fade);
+                ctx.drawImage(imgOhYea, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
+                ctx.globalAlpha = (ctx.globalAlpha ?? 1) / (1 - fade) * fade;
+                ctx.drawImage(imgBone, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
+                ctx.globalAlpha = (ctx.globalAlpha ?? 1) / fade;
+              } else {
+                // fade done: lock to plain bone
+                b.plugin.img = imgBone; delete b.plugin.fuseAt;
+                ctx.drawImage(imgBone, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
+              }
+            } else {
+              ctx.drawImage(img, -dw / 2 + dox, -dh / 2 + doy, dw, dh);
+            }
           } else if (b.plugin.prop === "ball") {
             ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2); ctx.fillStyle = b.plugin.color; ctx.fill();
             ctx.lineWidth = 3; ctx.strokeStyle = "rgba(10,58,87,0.45)"; ctx.stroke();
@@ -1073,7 +1094,8 @@ export default function PackPit() {
               gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
             }
             numAt(jx, jy, 2000);
-            bone.plugin.img = imgBone; // reset to plain bone on fuse
+            bone.plugin.img = imgOhYea; // ohyea SVG on fuse
+            bone.plugin.fuseAt = performance.now(); // drives the cross-fade
             Composite.remove(engine.world, logoBody); logoBody = null;
             // pop the arrow away
             arrowBody.plugin.popStart = now; arrowBody.plugin.popping = true;
@@ -1688,6 +1710,7 @@ export default function PackPit() {
       const DRAGME_RANGE = 300;
       const imgBone = getImg("__bone", "/big-bone.svg");
       const imgDragMe = getImg("__bone_dragme", "/big-bone-dragme.svg");
+      const imgOhYea = getImg("__bone_ohyea", "/big-bone-ohyea.svg");
       Events.on(engine, "beforeUpdate", () => {
         const allB = Composite.allBodies(engine.world);
         const bones = allB.filter((b: any) => b.plugin?.prop === "bone");
