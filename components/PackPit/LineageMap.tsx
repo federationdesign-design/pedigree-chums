@@ -1533,10 +1533,10 @@ export default function LineageMap({
       {/* HTML flip overlay - real CSS rotateY over root card */}
       {(() => {
         const size = ROOT * 2 + 10;
-        const cx = typeof window !== "undefined" ? window.innerWidth / 2 : 400;
-        const cy = typeof window !== "undefined" ? window.innerHeight * 0.42 : 300;
-        const ox = (rootPos ? rootPos.x : cx) + pan.x;
-        const oy = (rootPos ? rootPos.y : cy) + pan.y;
+        const cx = vp.w / 2;
+        const cy = vp.h * 0.42;
+        const ox = rootPos ? rootPos.x + pan.x : cx;
+        const oy = rootPos ? rootPos.y + pan.y : cy;
         return (
           <div
             className={`${styles.rootFlipCard} ${flipPhase === "back" ? styles.rootFlipCardFlipped : ""}`}
