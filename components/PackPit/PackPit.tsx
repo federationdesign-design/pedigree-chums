@@ -1711,6 +1711,7 @@ export default function PackPit() {
       const imgBone = getImg("__bone", "/big-bone.svg");
       const imgDragMe = getImg("__bone_dragme", "/big-bone-dragme.svg");
       const imgOhYea = getImg("__bone_ohyea", "/big-bone-ohyea.svg");
+      const imgOhYea = getImg("__bone_ohyea", "/big-bone-ohyea.svg");
       Events.on(engine, "beforeUpdate", () => {
         const allB = Composite.allBodies(engine.world);
         const bones = allB.filter((b: any) => b.plugin?.prop === "bone");
