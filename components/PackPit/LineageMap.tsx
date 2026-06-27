@@ -1033,7 +1033,7 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <g className={removing ? styles.removingFade : styles.removingVisible}>
+            <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
             <g>
             {shown
               .filter((n) => n._parent)
