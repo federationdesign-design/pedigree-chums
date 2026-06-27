@@ -2167,6 +2167,24 @@ export default function PackPit() {
           </div>
         );
       })()}
+      {britainMsg !== null && (() => {
+        const msgs = [
+          { title: "Printed in Britain", body: "Every card in the Pedigree Chums deck is printed right here in Britain, using sustainable inks on premium card stock." },
+          { title: "Designed in Britain", body: "Conceived, illustrated and crafted by a British creative team with a passion for dogs and great design." },
+          { title: "Tested for British Pooches", body: "Every breed, every fact, every illustration has been checked and approved by British dog lovers and experts." },
+        ];
+        const m = msgs[britainMsg];
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "clamp(30px,7vh,96px)", pointerEvents: "none" }} onClick={() => setBritainMsg(null)}>
+            <div style={{ pointerEvents: "auto", maxWidth: "760px", width: "90%", padding: "clamp(18px,3vw,34px) clamp(28px,4.5vw,52px)", borderRadius: "26px", background: "transparent", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "2px solid rgba(255,255,255,0.4)", boxShadow: "0 12px 32px rgba(10,58,87,0.32)", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+              <img src="/uk-icon.jpg" alt="" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", marginBottom: "12px" }} />
+              <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "clamp(17px,3.7vw,41px)", color: "#ffffff", margin: "0 0 8px", textShadow: "0 4px 0 rgba(10,58,87,0.45)" }}>{m.title}</p>
+              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(13px,1.8vw,18px)", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.5, opacity: 0.9 }}>{m.body}</p>
+              <button onClick={() => setBritainMsg(null)} style={{ background: "#ffd23e", border: "none", borderRadius: "40px", padding: "10px 28px", fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "16px", color: "#0a3a57", cursor: "pointer" }}>Brilliant!</button>
+            </div>
+          </div>
+        );
+      })()}
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
