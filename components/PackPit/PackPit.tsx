@@ -657,7 +657,7 @@ export default function PackPit() {
             const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
             gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
           }
-          numAt(jx, jy, 2000); // the payoff pops out of the goo and scores
+          numAt(jx, jy, 500); // the payoff pops out of the goo and scores
           Composite.remove(engine.world, logoBody); // the logo vanishes under the goo
           logoBody = null;
         }
@@ -709,7 +709,7 @@ export default function PackPit() {
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
-        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 300); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
           window.dispatchEvent(new Event("pc:open-cookies"));
           hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
@@ -760,7 +760,7 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
-        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
+        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 300); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         return false;
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
@@ -1130,7 +1130,7 @@ export default function PackPit() {
               const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
               gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
             }
-            numAt(jx, jy, 2000);
+            numAt(jx, jy, 500);
             // fuse celebration: starbursts + delayed bursts
             explodeAt(jx, jy, R * 1.2);
             setTimeout(() => { burstAt(jx - R * 0.4, jy + R * 0.2, R * 0.8); }, 120);

@@ -701,7 +701,7 @@ export default function LineageMap({
       setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; }); // turns popped nodes blue, like a manual tap
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
-        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); } // -100 patch_revealscore_v1
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -250, FLASH_SIZE); } // -250 per node
       });
       interacted.current = true; setIdleHint(false);
       return;
@@ -951,7 +951,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,${collectShowing ? 138 : 62})`}
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 500, FLASH_SIZE); startRemove(); }}
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 200, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label="Choose as pack chum"
           >
