@@ -94,6 +94,7 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
+  useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
     window.addEventListener("pc:open-howtoplay", open);
