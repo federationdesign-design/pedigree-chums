@@ -412,8 +412,9 @@
   aspect-ratio: 300 / 430; /* the physical card is portrait */
   border-radius: 14px;
   overflow: hidden;
-  background: #07293f;
+  background: transparent;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
+  perspective: 900px;
 }
 /* the real card art already carries its own border/rounding, so no white frame */
 .shelfCardReal { border: none; }
