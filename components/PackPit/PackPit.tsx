@@ -41,7 +41,7 @@ export default function PackPit() {
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
   const [score, setScore] = useState(0);
   const [scorePulse, setScorePulse] = useState(false);
-  const prevScoreRef = React.useRef(0);
+  const prevScoreRef = useRef(0);
   useEffect(() => { if (score !== prevScoreRef.current) { prevScoreRef.current = score; setScorePulse(true); setTimeout(() => setScorePulse(false), 400); } }, [score]); // running total of every flashed number, shown above the shake button
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
   const msLast = useRef(0); // highest milestone already celebrated
