@@ -865,11 +865,13 @@ export default function LineageMap({
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => {
           e.stopPropagation();
-          // hop the card right+up away from the frames grid
-          setPan((prev) => ({
-            x: prev.x + 28 + Math.random() * 12,
-            y: prev.y - 18 - Math.random() * 8,
-          }));
+          // hop only while frames still need filling
+          if (!framesDone && !packed) {
+            setPan((prev) => ({
+              x: prev.x + 28 + Math.random() * 12,
+              y: prev.y - 18 - Math.random() * 8,
+            }));
+          }
           revealStep();
         }}
         onPointerDown={(e) => {
