@@ -26,16 +26,12 @@ type CardInfo = {
 type Props = {
   step: StepData;
   onClose: () => void;
-  onPrev?: () => void;
-  onNext?: () => void;
-  totalSteps: number;
-  onStepSelect: (i: number) => void;
   cardPos?: CardInfo | null;
 };
 
 const RADIUS = 16;
 
-export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, onStepSelect, cardPos }: Props) {
+export default function StepCard({ step, onClose, cardPos }: Props) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean; onCard: boolean } | null>(null);
   const suppressClick = useRef(false);
@@ -48,10 +44,8 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
   const image = cardPos?.image ?? "";
   const angleDeg = (angle * 180) / Math.PI;
 
-  // Check if a pointer event hit the card (rough AABB, good enough)
   const hitCard = (e: React.PointerEvent) => {
     const dx = e.clientX - cx, dy = e.clientY - cy;
-    // rotate point into card local space to account for card angle
     const cos = Math.cos(-angle), sin = Math.sin(-angle);
     const lx = dx * cos - dy * sin, ly = dx * sin + dy * cos;
     return Math.abs(lx) <= cw / 2 + 8 && Math.abs(ly) <= ch / 2 + 8;
@@ -65,10 +59,10 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
 
   const onOverlayMove = (e: React.PointerEvent) => {
     const d = dragRef.current;
-    if (!d || e.pointerId !== d.id) return;
+    if (!d || e.pointerId !== d.id || !d.onCard) return;
     const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
     if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
-    if (d.moved && d.onCard) setPos({ x: d.ox + dx, y: d.oy + dy });
+    if (d.moved) setPos({ x: d.ox + dx, y: d.oy + dy });
   };
 
   const onOverlayUp = () => {
@@ -82,7 +76,7 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
     onClose();
   };
 
-  // Panel position -- opposite side from the card
+  // Panel sits on whichever side has more room
   const panelStyle: React.CSSProperties = (() => {
     if (typeof window === "undefined") return {};
     const vw = window.innerWidth;
@@ -104,11 +98,8 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
       onPointerCancel={onOverlayUp}
       onClick={onOverlayClick}
     >
-      {/* The physical card -- SVG at its pit position */}
-      <svg
-        style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
-        aria-hidden="true"
-      >
+      {/* The card -- SVG at its pit position, no pointer events (overlay handles drag) */}
+      <svg style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }} aria-hidden="true">
         <defs>
           <clipPath id="htp-card-clip">
             <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} />
@@ -117,22 +108,9 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
         <g transform={`translate(${cx},${cy}) rotate(${angleDeg})`}>
           <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} fill="#ffffff" />
           {image && (
-            <image
-              href={image}
-              x={-cw / 2} y={-ch / 2}
-              width={cw} height={ch}
-              clipPath="url(#htp-card-clip)"
-              preserveAspectRatio="xMidYMid slice"
-            />
+            <image href={image} x={-cw / 2} y={-ch / 2} width={cw} height={ch} clipPath="url(#htp-card-clip)" preserveAspectRatio="xMidYMid slice" />
           )}
-          <rect
-            x={-cw / 2 - 4} y={-ch / 2 - 4}
-            width={cw + 8} height={ch + 8}
-            rx={RADIUS + 4}
-            fill="none"
-            stroke="var(--yellow, #ffd23e)"
-            strokeWidth={5}
-          />
+          <rect x={-cw / 2 - 4} y={-ch / 2 - 4} width={cw + 8} height={ch + 8} rx={RADIUS + 4} fill="none" stroke="var(--yellow, #ffd23e)" strokeWidth={5} />
         </g>
       </svg>
 
@@ -141,15 +119,12 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
         &times;
       </button>
 
-      {/* Content panel */}
+      {/* Text panel -- radiates from the card like the family tree */}
       <div className={styles.panel} style={panelStyle} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <div className={styles.header}>
-          <div className={styles.headingGroup}>
-            <p className={styles.overline}>HOW TO PLAY...</p>
-            <h2 className={styles.heading}>{step.heading}</h2>
-          </div>
+          <p className={styles.overline}>HOW TO PLAY...</p>
+          <h2 className={styles.heading}>{step.heading}</h2>
         </div>
-
         <div className={styles.rows}>
           {step.rows.map((row, i) => (
             <div key={i} className={styles.row}>
@@ -164,26 +139,6 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
               {i < step.rows.length - 1 && <div className={styles.divider} />}
             </div>
           ))}
-        </div>
-
-        <div className={styles.navRow}>
-          <button type="button" className={styles.nav} onClick={(e: React.MouseEvent) => { e.stopPropagation(); onPrev && onPrev(); }} disabled={!onPrev} aria-label="Previous step">
-            &#8592;
-          </button>
-          <div className={styles.dots}>
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`${styles.dot} ${i === step.number - 1 ? styles.dotActive : ""}`}
-                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onStepSelect(i); }}
-                aria-label={`Go to step ${i + 1}`}
-              />
-            ))}
-          </div>
-          <button type="button" className={styles.nav} onClick={(e: React.MouseEvent) => { e.stopPropagation(); onNext && onNext(); }} disabled={!onNext} aria-label="Next step">
-            &#8594;
-          </button>
         </div>
       </div>
     </div>
