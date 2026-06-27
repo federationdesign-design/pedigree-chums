@@ -222,19 +222,27 @@ export default function PackPit() {
           const bw = prop.width, bh = prop.width / prop.aspect;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
           const VB = prop.shape === "slipper" ? { w: 1110.4, h: 411.3 } : { w: 1031.7, h: 316.8 };
+          const po2 = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
           const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
-          const R = (vx: number, vy: number, w: number, h: number) =>
-            Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, po);
+          // parts at origin so centroid is predictable
+          const R = (vx: number, vy: number, w: number, h: number, opts = po) =>
+            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, opts);
           const C = (vx: number, vy: number, r: number) =>
-            Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
+            Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
-              : [R(549, 78, 760, 150), R(513, 222, 1010, 150)]; // narrow top, wider bottom of the tray
+              : [
+                R(250, 260, 340, 120, po2),  // left floor thick
+                R(515, 280, 340, 120, po2),  // middle floor thick
+                R(780, 255, 340, 120, po2),  // right floor thick
+                R(130, 135, 80, 210),         // left wall
+                R(900, 135, 80, 210),         // right wall
+              ];
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-          const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
+          Body.setPosition(b, { x, y });
           if (prop.angle) Body.setAngle(b, prop.angle);
-          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox, oy };
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
         }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
@@ -1462,6 +1470,26 @@ export default function PackPit() {
         }
       };
 
+      // bowl scoring: bone=500, ball=100, pin in place
+      Events.on(engine, "collisionStart", (ev: any) => {
+        for (const pair of ev.pairs) {
+          const bowl2 = pair.bodyA.plugin?.isBowl ? pair.bodyA : pair.bodyB.plugin?.isBowl ? pair.bodyB : null;
+          if (!bowl2) continue;
+          const obj = bowl2 === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!obj?.plugin) continue;
+          if (bowl2.plugin.bowlScored.has(obj.id)) continue;
+          const isBoneObj = obj.plugin.prop === "bone";
+          const isBallObj = obj.plugin.prop === "ball";
+          if (!isBoneObj && !isBallObj) continue;
+          const a = ((bowl2.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          if (a > 0.5 && a < Math.PI * 2 - 0.5) continue; // only when roughly upright
+          bowl2.plugin.bowlScored.add(obj.id);
+          const pts = isBoneObj ? 500 : 100;
+          numAt(obj.position.x, obj.position.y, pts);
+          burstAt(obj.position.x, obj.position.y, 20);
+          Body.setStatic(obj, true);
+        }
+      });
       Events.on(render, "afterRender", onAfter);
 
       // The fallen percentage circles double as negative-magnet buttons. Pressing
