@@ -605,7 +605,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
-              const ujR = BIG * 1.2;
+              const ujR = BIG * 0.6;
               const ujB: any = Bodies.circle(w * 0.7, -ujR, ujR, { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006, render: { visible: false } });
               ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 10, popped: false };
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
