@@ -1609,7 +1609,8 @@ export default function LineageMap({
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-end",
+              paddingBottom: "14px",
               gap: "4px",
             }}>
               <img src="/double-tap-icon-blue.svg" alt="" className={styles.dtIcon} style={{ width: "36%", height: "36%", objectFit: "contain" }} />
