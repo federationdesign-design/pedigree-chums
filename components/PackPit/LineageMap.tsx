@@ -883,6 +883,7 @@ export default function LineageMap({
         className={canDragRoot ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
         ref={rootCardRectRef}
         transform={rootXf.transform}
+        style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => {
           e.stopPropagation();
@@ -913,10 +914,9 @@ export default function LineageMap({
         </clipPath>
         {/* front face only - hide dog image when flip overlay shows back face */}
         <>
-          <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} fill="#1497d6" opacity={rootXf.opacity} />
-          <rect ref={rootCardRectRef} x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard + (flipPhase === "back" ? " " + styles.rootCardPulse : "")} style={{ opacity: rootXf.opacity }} />
+          <rect ref={rootCardRectRef} x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard + (flipPhase === "back" ? " " + styles.rootCardPulse : "")} />
           {breed.image ? (
-            <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" style={{ opacity: rootXf.opacity }} />
+            <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
           ) : null}
         </>
         {/* idle hint: pulsing double-tap text above card */}
@@ -1034,14 +1034,21 @@ export default function LineageMap({
         {hasTree ? (
           <>
             <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
-            <g>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
                 const p = n._parent as Node;
-                return <line key={`e${n._id}`} className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()} x1={p._x} y1={p._y} x2={n._x} y2={n._y} />;
+                return (
+                  <line
+                    key={`e${n._id}`}
+                    className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()}
+                    x1={p._x}
+                    y1={p._y}
+                    x2={n._x}
+                    y2={n._y}
+                  />
+                );
               })}
-            </g>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
@@ -1165,21 +1172,16 @@ export default function LineageMap({
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
                         ) : (() => {
-                          // optimal split: find break that minimises line length difference
+                          // split breed name into words, up to 3 lines, font shrinks with word count
                           const words = (dragName || "").split(" ");
-                          let lines: string[] = [dragName || ""];
-                          if (words.length > 1) {
-                            let bestDiff = Infinity;
-                            for (let sp = 1; sp < words.length; sp++) {
-                              const l1 = words.slice(0, sp).join(" ");
-                              const l2 = words.slice(sp).join(" ");
-                              const diff = Math.abs(l1.length - l2.length);
-                              if (diff < bestDiff) { bestDiff = diff; lines = [l1, l2]; }
-                            }
+                          const fs = words.length <= 2 ? 12 : words.length <= 3 ? 10 : words.length <= 4 ? 8 : 6;
+                          const lineH = fs * 1.3;
+                          // group into max 3 lines of ~2 words each
+                          const lines: string[] = [];
+                          for (let i = 0; i < words.length; i += Math.ceil(words.length / 3)) {
+                            lines.push(words.slice(i, i + Math.ceil(words.length / 3)).join(" "));
                           }
-                          const fs = lines.length === 1 ? 9 : 8;
-                          const lineH = fs * 1.4;
-                          const startY = lines.length === 1 ? 0 : -lineH / 2;
+                          const startY = lines.length === 1 ? 0 : lines.length === 2 ? -lineH / 2 : -lineH;
                           return lines.map((l, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{l}</tspan>
                           ));
@@ -1596,8 +1598,7 @@ export default function LineageMap({
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "flex-end",
-              paddingBottom: "14px",
+              justifyContent: "center",
               gap: "4px",
             }}>
               <img src="/double-tap-icon-blue.svg" alt="" className={styles.dtIcon} style={{ width: "36%", height: "36%", objectFit: "contain" }} />
