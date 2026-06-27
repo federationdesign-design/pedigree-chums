@@ -2231,23 +2231,10 @@ export default function PackPit() {
         );
       })()}
       {flyingCard && (
-        <div style={{
-          position: "fixed",
-          left: flyingCard.rect.left,
-          top: flyingCard.rect.top,
-          width: flyingCard.rect.width,
-          height: flyingCard.rect.height,
-          zIndex: 600,
-          pointerEvents: "none",
-          transition: "all 700ms cubic-bezier(0.22,1,0.36,1)",
-          transform: "translateY(calc(100vh - " + flyingCard.rect.top + "px)) scale(0.3)",
-          opacity: 0,
-          background: "var(--yellow, #ffd23e)",
-          borderRadius: "8px",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "var(--font-display, 'Luckiest Guy')",
-          fontSize: "13px", color: "#0a3a57", textAlign: "center", padding: "8px",
-        }}>
+        <div
+          className={styles.flyingCard}
+          style={{ left: flyingCard.rect.left, top: flyingCard.rect.top, width: flyingCard.rect.width, height: flyingCard.rect.height }}
+        >
           {flyingCard.name}
         </div>
       )}
