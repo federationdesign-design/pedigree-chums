@@ -486,6 +486,7 @@ export default function LineageMap({
     const list: Node[] = [];
     root._x = breed.x;
     root._y = breed.y;
+    if (rootPos) { root._x = rootPos.x; root._y = rootPos.y; }
     root._dir = -Math.PI / 2 + base;
     list.push(root);
     const walk = (n: Node, depth: number) => {
