@@ -587,30 +587,52 @@ export default function PackPit() {
             }, 70);
           }, delay));
         };
+        // Scripted pairs shared by both mobile and desktop
+        const PAIRS = [
+          ["Labrador",       "Border Collie"],
+          ["Maltese",        "Saint Bernard"],
+          ["Chihuahua",      "Dachshund"],
+          ["German Shepherd","Basset Hound"],
+          ["Beagle",         "Old English Sheepdog"],
+          ["Siberian Husky", "Pomeranian"],
+        ];
+        const dropped = new Set<number>();
+        const pairChoice: string[] = PAIRS.map(([a, b]) => Math.random() < 0.5 ? a : b);
+        const pairPartner: string[] = PAIRS.map(([a, b], i) => pairChoice[i] === a ? b : a);
         if (isMobile) {
-          // mobile: bowl, then balls (pre-order after the 1st), then bone, then the discount-code button, then pack
-          addProps([bowl]);
-          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050)); // cookie policy is the 3rd thing in
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // discount code falls later, just before the pack
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 1900)); // one hamburger menu rides in with the pack
-          dropDogs(2100, false);
+          // mobile: same scripted pairs as desktop, bowl first, 2 balls (kept), partners rotate
+          addProps([bowl]); // bowl drops immediately on mobile
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  2 tennis balls (mobile keeps 2)
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));                                         // 1400 bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 2400));             // 2400 menu
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 3000));   // 3000 pair 1
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8000));   // 8000 pair 2
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6
+          // Partners drop in rotation same as desktop
+          const mobilePartnerOrder = [0, 1, 2, 3, 4, 5];
+          mobilePartnerOrder.sort(() => Math.random() - 0.5);
+          mobilePartnerOrder.forEach((pairIdx, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pairPartner[pairIdx], dropped); }, 35000 + i * 5000));
+          });
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                         // 150000 all remaining
         } else {
           // desktop: a scripted, slower pour. Feature cards land on set beats (each
-          // picked from a pair, alternating per load); everything else floods at 10s.
-          const dropped = new Set<number>();
+          // picked from a pair, alternating per load); everything else floods at 150s.
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700   tennis balls
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050  cookies
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); } }, 2750));        // 2750 pair 1
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 2750));   // 2750 pair 1 first
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                                                  // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000));                                      // 9000 hamburger menu
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); } }, 10050));           // 10050 pair 4
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                             // 6400 bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8050));   // 8050 pair 2 first
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000)); // 9000 hamburger menu
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -620,11 +642,20 @@ export default function PackPit() {
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
-          }, 15000));                                                                                                                                      // 15000 Union Jack
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000));                              // 70000 bowl
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                                              // 150000 all remaining cards
+          }, 15000));                                                                                                 // 15000 Union Jack
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6 first
+          // Partners drop in rotation: cycle through pairs 1-6, dropping the unchosen partner
+          // Each pair's partner drops ~8s after its first, staggered so they arrive in waves
+          const partnerOrder = [0, 1, 2, 3, 4, 5]; // rotate each load
+          partnerOrder.sort(() => Math.random() - 0.5); // shuffle for variety
+          partnerOrder.forEach((pairIdx, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pairPartner[pairIdx], dropped); }, 35000 + i * 5000));
+          });
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000));   // 70000 bowl
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                   // 150000 all remaining cards
         }
       }
 
