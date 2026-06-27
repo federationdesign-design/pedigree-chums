@@ -1040,21 +1040,16 @@ export default function LineageMap({
               .filter((n) => n._parent)
               .map((n) => {
                 const p = n._parent as Node;
-                return (
-                  {(() => {
-                    const dx = n._x - p._x, dy = n._y - p._y;
-                    const dist = Math.hypot(dx, dy) || 1;
-                    const pShare = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                    const pR = radius(pShare);
-                    // shorten end of line by rootCard radius so it stops at card edge
-                    const nR = (!n.children || n.children.length === 0) ? ROOT + 10 : radius(pShare);
-                    const x1 = p._x + (dx / dist) * pR;
-                    const y1 = p._y + (dy / dist) * pR;
-                    const x2 = n._x - (dx / dist) * nR;
-                    const y2 = n._y - (dy / dist) * nR;
-                    return <line key={`e${n._id}`} className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()} x1={x1} y1={y1} x2={x2} y2={y2} />;
-                  })()}
-                );
+                const dx = n._x - p._x, dy = n._y - p._y;
+                const dist = Math.hypot(dx, dy) || 1;
+                const pShare = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+                const pR = radius(pShare);
+                const nR = (!n.children || n.children.length === 0) ? ROOT + 10 : radius(pShare);
+                const x1 = p._x + (dx / dist) * pR;
+                const y1 = p._y + (dy / dist) * pR;
+                const x2 = n._x - (dx / dist) * nR;
+                const y2 = n._y - (dy / dist) * nR;
+                return <line key={`e${n._id}`} className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()} x1={x1} y1={y1} x2={x2} y2={y2} />;
               })}
             </g>
             {shown
