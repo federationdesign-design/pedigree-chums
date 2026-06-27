@@ -1041,8 +1041,8 @@ export default function LineageMap({
                 const p = n._parent as Node;
                 const dx = n._x - p._x, dy = n._y - p._y, dist = Math.hypot(dx, dy) || 1;
                 const fromRoot = p._id === "0";
-                const ex1 = fromRoot ? p._x + (dx / dist) * (ROOT + 6) : p._x;
-                const ey1 = fromRoot ? p._y + (dy / dist) * (ROOT + 6) : p._y;
+                const ex1 = fromRoot ? p._x + (dx / dist) * (ROOT + 15) : p._x;
+                const ey1 = fromRoot ? p._y + (dy / dist) * (ROOT + 15) : p._y;
                 return (
                   <line
                     key={`e${n._id}`}
