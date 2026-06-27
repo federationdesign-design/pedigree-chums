@@ -1895,15 +1895,15 @@ export default function PackPit() {
         // Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.00025 + level * 0.0006), y: (Math.random() - 0.5) * (0.00025 + level * 0.0005) });
         // Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.01 + level * 0.05));
         if (t >= RISE + SIMMER) { // the one intense burst, then it settles over the calm
-          Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 2.5, y: -2 }); // end buzz halved
-          Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 0.6); // end buzz spin halved
+          Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 0.5, y: -0.4 }); // minimal end buzz
+          Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 0.1); // minimal spin
           const others = dyn().filter((b: any) => b !== cookiesBody);
           for (const col of Query.collides(cookiesBody, others)) {
             const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
             if (!other || other.isStatic) continue;
             let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
             const len = Math.hypot(dx, dy) || 1;
-            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 1.3, y: other.velocity.y + (dy / len) * 1.3 - 0.5 }); // neighbour shove halved
+            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 0.2, y: other.velocity.y + (dy / len) * 0.2 - 0.1 }); // minimal neighbour shove
             Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.4);
           }
           cycleStart = now; // back to quiet
