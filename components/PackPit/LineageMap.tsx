@@ -1040,18 +1040,7 @@ export default function LineageMap({
               .filter((n) => n._parent)
               .map((n) => {
                 const p = n._parent as Node;
-                const dx = n._x - p._x, dy = n._y - p._y;
-                const dist = Math.hypot(dx, dy) || 1;
-                const pShare = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const pR = radius(pShare);
-                // if this node is the root card, shorten edge to stop at card boundary
-                const isRoot = n._x === root._x && n._y === root._y;
-                const nR = isRoot ? ROOT + 10 : radius(pShare);
-                const x1 = p._x + (dx / dist) * pR;
-                const y1 = p._y + (dy / dist) * pR;
-                const x2 = n._x - (dx / dist) * nR;
-                const y2 = n._y - (dy / dist) * nR;
-                return <line key={`e${n._id}`} className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()} x1={x1} y1={y1} x2={x2} y2={y2} />;
+                return <line key={`e${n._id}`} className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()} x1={p._x} y1={p._y} x2={n._x} y2={n._y} />;
               })}
             </g>
             {shown
