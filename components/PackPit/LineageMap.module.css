@@ -155,6 +155,8 @@
 
 .removeBtn {
   cursor: pointer;
+  padding: 20px;
+  margin: -20px;
 }
 /* Countdown of yellow circles still to turn blue, sat top-centre of the tree. */
 .dotCount {
