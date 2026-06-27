@@ -34,6 +34,12 @@ export default function PackPit() {
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
   const [shelfOpen, setShelfOpen] = useState(false);
   const [britainMsg, setBritainMsg] = useState<number | null>(null);
+  const britainTimer = useRef<any>(null);
+  const showBritainMsg = (idx: number) => {
+    if (britainTimer.current) clearTimeout(britainTimer.current);
+    setBritainMsg(idx);
+    britainTimer.current = setTimeout(() => setBritainMsg(null), 2500);
+  };
   const [shelfCardStates, setShelfCardStates] = useState<Map<string, "opened" | "removed">>(new Map());
   const [flyingCard, setFlyingCard] = useState<{ name: string; img: string; rect: DOMRect } | null>(null); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
@@ -807,7 +813,7 @@ export default function PackPit() {
           numAt(hit.position.x, hit.position.y, 50);
           burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
           const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
-          setBritainMsg(msgIdx);
+          showBritainMsg(msgIdx);
           if (hit.plugin.hits >= hit.plugin.maxHits) {
             hit.plugin.popped = true;
             poof(hit.position.x, hit.position.y, hit.plugin.half);
