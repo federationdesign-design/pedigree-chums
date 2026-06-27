@@ -280,7 +280,7 @@ export default function LineageMap({
   const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
-    const t = setTimeout(() => setAutoArmed(true), 5000);
+    const t = setTimeout(() => setAutoArmed(true), 1000);
     return () => clearTimeout(t);
   }, [breed.name]);
   useEffect(() => {
