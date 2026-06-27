@@ -1636,6 +1636,12 @@ export default function LineageMap({
             }}
           >
             {text}
+            {(() => {
+              const key = c.name.toLowerCase().trim();
+              const uk = ukBreeds.find((b) => b.name.toLowerCase().trim() === key);
+              if (!uk) return null;
+              return <div style={{ marginTop: "5px", fontSize: "10px", opacity: 0.7 }}>{uk.era}{uk.anchor ? ` · c.${uk.anchor}` : ""}</div>;
+            })()}
           </div>
         );
       })()}
