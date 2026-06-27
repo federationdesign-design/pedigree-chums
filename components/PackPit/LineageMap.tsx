@@ -889,39 +889,19 @@ export default function LineageMap({
         <clipPath id={clip}>
           <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
         </clipPath>
-        {/* flip wrapper: only add g wrapper when actually animating to avoid compositing issues */}
-        <g style={{ animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards` : flipPhase === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards` : undefined, }}>
-          {flipPhase === "back" || flipPhase === "opening" ? (
-            // back face: yellow with breed name
-            <>
-              <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} fill="var(--yellow, #ffd23e)" />
-              {/* double-tap icon SVG */}
-              <image href="/double-tap-icon-blue.svg"
-                x={-ROOT * 0.72} y={-ROOT * 0.82}
-                width={ROOT * 1.44} height={ROOT * 1.44} />
-
-            </>
-          ) : (
-            // front face: dog image
-            <>
-              <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
-              {breed.image ? (
-                <image
-                  href={bust(breed.image)}
-                  x={-ROOT}
-                  y={-ROOT}
-                  width={ROOT * 2}
-                  height={ROOT * 2}
-                  clipPath={`url(#${clip})`}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-              ) : null}
-            </>
-          )}
-        </g>
-        {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
-
-        {/* the root card carries no status dot; only the ancestor cards show one */}
+        {/* front face only - flip removed */}
+        <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
+        {breed.image ? (
+          <image
+            href={bust(breed.image)}
+            x={-ROOT}
+            y={-ROOT}
+            width={ROOT * 2}
+            height={ROOT * 2}
+            clipPath={"url(#" + clip + ")"}
+            preserveAspectRatio="xMidYMid slice"
+          />
+        ) : null}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
