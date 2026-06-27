@@ -1728,38 +1728,68 @@ export default function PackPit() {
       // A % circle goes inert after five hits total. Those used to be cursor presses
       // only; now a solid knock from another pit object spends a charge too. A speed
       // threshold and a short cooldown keep gentle resting contacts from counting.
+      // pct circles lose a charge on hard collision
       const onPctHit = (ev: any) => {
         const now = performance.now();
         for (const pair of ev.pairs) {
           for (const c of [pair.bodyA, pair.bodyB] as any[]) {
             const p = c.plugin;
-            if (!p) continue;
+            if (!p || p.kind !== "pct" || p.inert || p.bomb || p.repelOn) continue;
             const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
-            if (!other || other.isStatic) continue; // walls, floor, ceiling do not count
+            if (!other || other.isStatic) continue;
             const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
-            if (p.kind === "pct" && !p.inert && !p.bomb && !p.repelOn) {
-              if (rv < 5) continue; // a real knock, not a nudge
-              if (p.lastObjHit && now - p.lastObjHit < 600) continue; // one charge per knock, not per frame
-              p.lastObjHit = now;
-              p.charges = (p.charges ?? 20) - 1;
-              if (p.charges <= 0) {
-                p.inert = true;
-                poof(c.position.x, c.position.y, p.half || 21);
-                c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
-                if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
-              }
-            } else if ((p.kind === "rod" || p.kind === "pill") && !p.gone) {
-              // detritus: rods pop after 2 knocks, pills after 3, then vanish
-              if (rv < 4) continue;
-              if (p.lastObjHit && now - p.lastObjHit < 450) continue;
-              p.lastObjHit = now;
-              p.hits = (p.hits || 0) + 1;
-              if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); } // a chum pill never expires
+            if (rv < 5) continue;
+            if (p.lastObjHit && now - p.lastObjHit < 600) continue;
+            p.lastObjHit = now;
+            p.charges = (p.charges ?? 20) - 1;
+            if (p.charges <= 0) {
+              p.inert = true;
+              poof(c.position.x, c.position.y, p.half || 21);
+              c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
+              if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
             }
           }
         }
       };
       Events.on(engine, "collisionStart", onPctHit);
+      // rods lose hits on hard collision - pop after 20 knocks
+      const onRodHit = (ev: any) => {
+        const now = performance.now();
+        for (const pair of ev.pairs) {
+          for (const c of [pair.bodyA, pair.bodyB] as any[]) {
+            const p = c.plugin;
+            if (!p || p.kind !== "rod" || p.gone) continue;
+            const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
+            if (!other || other.isStatic) continue;
+            const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
+            if (rv < 4) continue;
+            if (p.lastObjHit && now - p.lastObjHit < 450) continue;
+            p.lastObjHit = now;
+            p.hits = (p.hits || 0) + 1;
+            if (p.hits >= 20) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); }
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onRodHit);
+      // pills lose hits on hard collision - pop after 3 knocks (chum pills never expire)
+      const onPillHit = (ev: any) => {
+        const now = performance.now();
+        for (const pair of ev.pairs) {
+          for (const c of [pair.bodyA, pair.bodyB] as any[]) {
+            const p = c.plugin;
+            if (!p || p.kind !== "pill" || p.gone || p.chum) continue;
+            const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
+            if (!other || other.isStatic) continue;
+            const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
+            if (rv < 4) continue;
+            if (p.lastObjHit && now - p.lastObjHit < 450) continue;
+            p.lastObjHit = now;
+            p.hits = (p.hits || 0) + 1;
+            if (p.hits >= (p.maxHits || 3)) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); }
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onPillHit);
       // A yellow circle knocked loose by a user-flung toy (or the dragged body) scores as it
       // tumbles: every fresh yellow circle it strikes flashes +1 at each (two points a hit),
       // so a good scatter racks up points. Only direct knock-ons score, no runaway cascade.
