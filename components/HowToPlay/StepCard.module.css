@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.72), rgba(10, 58, 140, 0.85));
+  background: rgba(3, 87, 245, 0.88);
   animation: scFade 0.2s ease;
   touch-action: none;
   cursor: grab;
