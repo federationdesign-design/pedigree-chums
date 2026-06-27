@@ -31,7 +31,7 @@ type Props = {
 
 const RADIUS = 16;
 const PANEL_W = 480;
-const PANEL_GAP = 32;
+const PANEL_GAP = 64;
 
 // Simple word wrapper for SVG text -- splits into lines of max ~charLimit chars
 function wrapText(text: string, charLimit = 48): string[] {
@@ -117,7 +117,6 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
 
           {/* Card (rotated to match pit angle) */}
           <g transform={`rotate(${angleDeg})`}>
-            <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} fill="#ffffff" />
             {image && (
               <image href={image} x={-cw / 2} y={-ch / 2} width={cw} height={ch} clipPath="url(#htp-card-clip)" preserveAspectRatio="xMidYMid slice" />
             )}
