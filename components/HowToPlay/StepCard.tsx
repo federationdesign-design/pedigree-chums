@@ -27,17 +27,19 @@ type Props = {
 };
 
 export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, onStepSelect, cardPos }: Props) {
-  // Position the content panel to the right of the card if we know where it is,
-  // otherwise fall back to the right side of the screen like before.
-  const panelStyle: React.CSSProperties = cardPos
-    ? {
-        position: "fixed",
-        left: Math.min(cardPos.x + cardPos.w / 2 + 24, window.innerWidth - 520),
-        top: "50%",
-        transform: "translateY(-50%)",
-        right: "auto",
-      }
-    : {};
+  const panelStyle: React.CSSProperties = (() => {
+    if (!cardPos || typeof window === "undefined") return {};
+    const vw = window.innerWidth;
+    const panelW = Math.min(520, vw * 0.44);
+    const cardCentreX = cardPos.x;
+    const margin = 32;
+    // if card is in the right half, put panel on the left; otherwise right
+    if (cardCentreX > vw / 2) {
+      return { position: "fixed", right: vw - cardCentreX + cardPos.w / 2 + margin, left: "auto", top: "50%", transform: "translateY(-50%)", width: panelW };
+    } else {
+      return { position: "fixed", left: cardCentreX + cardPos.w / 2 + margin, right: "auto", top: "50%", transform: "translateY(-50%)", width: panelW };
+    }
+  })();
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -49,7 +51,6 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
       <div className={styles.panel} style={panelStyle} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
 
         <div className={styles.header}>
-          <div className={styles.badge}>{step.number}</div>
           <div className={styles.headingGroup}>
             <p className={styles.overline}>HOW TO PLAY...</p>
             <h2 className={styles.heading}>{step.heading}</h2>

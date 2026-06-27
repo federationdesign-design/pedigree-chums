@@ -33,13 +33,13 @@
 }
 .close:hover { filter: brightness(0.95); }
 
-/* Content panel -- floats to the right of the tapped card */
+/* Content panel -- positioned dynamically via inline style beside the card */
 .panel {
   position: fixed;
   top: 50%;
   right: clamp(24px, 4vw, 60px);
   transform: translateY(-50%);
-  width: min(480px, 44vw);
+  width: min(520px, 44vw);
   animation: scSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes scSlide {
@@ -48,37 +48,19 @@
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  gap: clamp(10px, 1.5vw, 18px);
-  margin-bottom: clamp(12px, 2vw, 22px);
-}
-.badge {
-  flex: 0 0 clamp(52px, 5.5vw, 76px);
-  height: clamp(52px, 5.5vw, 76px);
-  border-radius: 50%;
-  background: var(--blue, #1497d6);
-  border: 3px solid rgba(255, 255, 255, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1.6rem, 3vw, 2.8rem);
-  color: var(--yellow, #ffd23e);
-  line-height: 1;
-  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.25);
+  margin-bottom: clamp(14px, 2vw, 26px);
 }
 .headingGroup { display: flex; flex-direction: column; }
 .overline {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(0.85rem, 1.4vw, 1.2rem);
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
   color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.06em;
   margin: 0;
 }
 .heading {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2rem, 4.5vw, 4rem);
+  font-size: clamp(2.7rem, 6vw, 5.3rem);
   color: var(--yellow, #ffd23e);
   margin: 0;
   line-height: 1;
@@ -90,8 +72,8 @@
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: clamp(10px, 1.5vw, 18px);
-  padding: clamp(8px, 1.2vw, 14px) 0;
+  gap: clamp(12px, 1.8vw, 22px);
+  padding: clamp(10px, 1.4vw, 18px) 0;
 }
 .divider {
   position: absolute;
@@ -99,8 +81,8 @@
   border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
 }
 .iconWrap {
-  flex: 0 0 clamp(40px, 4.5vw, 64px);
-  height: clamp(40px, 4.5vw, 64px);
+  flex: 0 0 clamp(52px, 6vw, 80px);
+  height: clamp(52px, 6vw, 80px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,14 +92,14 @@
 .rowTitle {
   font-family: var(--font-body, Montserrat, system-ui);
   font-weight: 700;
-  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
   color: #ffffff;
-  margin: 0 0 2px;
+  margin: 0 0 3px;
 }
 .rowBody {
   font-family: var(--font-body, Montserrat, system-ui);
   font-weight: 400;
-  font-size: clamp(0.78rem, 1.1vw, 0.95rem);
+  font-size: clamp(1rem, 1.4vw, 1.26rem);
   color: rgba(255, 255, 255, 0.85);
   margin: 0;
   line-height: 1.45;
@@ -127,14 +109,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: clamp(14px, 2vw, 24px);
+  margin-top: clamp(16px, 2.5vw, 28px);
 }
 .nav {
-  width: 48px; height: 48px;
+  width: 52px; height: 52px;
   border: 0; border-radius: 14px;
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
-  font-size: 1.5rem; line-height: 1; font-weight: 800;
+  font-size: 1.6rem; line-height: 1; font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.25);
   transition: filter 0.15s;
@@ -142,9 +124,9 @@
 .nav:hover { filter: brightness(0.95); }
 .nav:disabled { opacity: 0.3; cursor: default; filter: none; }
 
-.dots { display: flex; gap: 8px; align-items: center; }
+.dots { display: flex; gap: 10px; align-items: center; }
 .dot {
-  width: 10px; height: 10px;
+  width: 12px; height: 12px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.35);
   transition: background 0.2s, transform 0.2s;
@@ -155,15 +137,15 @@
 
 @media (max-width: 640px) {
   .panel {
-    top: auto; bottom: 0; right: 0; left: 0;
-    width: 100%; transform: none;
+    top: auto; bottom: 0; right: 0; left: 0 !important;
+    width: 100% !important; transform: none;
     border-radius: 24px 24px 0 0;
-    background: rgba(12, 58, 87, 0.88);
+    background: rgba(12, 58, 87, 0.92);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 20px 20px 32px;
+    padding: 24px 20px 36px;
     animation: scUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    max-height: 70vh; overflow-y: auto;
+    max-height: 72vh; overflow-y: auto;
   }
   @keyframes scUp {
     from { opacity: 0; transform: translateY(40px); }
