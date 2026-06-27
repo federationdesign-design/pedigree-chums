@@ -488,11 +488,11 @@ export default function PackPit() {
         const bw = BIG * 1.1, bh = bw / ar;
         const x = w + bw, y = -180 - Math.random() * 120;
         const b: any = Bodies.rectangle(x, y, bw, bh, {
-          angle: 0.3, chamfer: { radius: bh * 0.12 }, restitution: 0.55,
-          friction: 0.25, frictionAir: 0.008, density: 0.0008, render: { visible: false },
+          angle: 0.3, chamfer: { radius: bh * 0.12 }, restitution: 0.15,
+          friction: 0.25, frictionAir: 0.2, density: 0.0008, render: { visible: false },
         });
         b.plugin = { name: "Green arrow", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img: getImg("__arrow_green_pit", "/green-arrow-short.svg"), prop: "panel", kind: "arrow-green", family: null, ping: 0 };
-        Body.setVelocity(b, { x: -(14 + Math.random() * 4), y: 2 + Math.random() * 3 });
+        Body.setVelocity(b, { x: -(7 + Math.random() * 4), y: 2 + Math.random() * 3 });
         Body.setAngularVelocity(b, 0.18 + Math.random() * 0.14);
         return b;
       }
@@ -1802,6 +1802,13 @@ export default function PackPit() {
         });
       };
       window.addEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
+      // poof the howtoplay object when the overlay closes
+      const onHowToPlayClose = () => {
+        const all = Composite.allBodies(engine.world);
+        const howTo = all.find((b: any) => b.plugin?.kind === "howtoplay");
+        if (howTo) { poof(howTo.position.x, howTo.position.y, howTo.plugin.half || 30); Composite.remove(engine.world, howTo); }
+      };
+      window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
 
 
       function fit() {
