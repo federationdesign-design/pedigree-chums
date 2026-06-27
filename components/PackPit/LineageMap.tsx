@@ -1172,7 +1172,7 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : (() => { const wc = (dragName || "").split(" ").length; return wc <= 2 ? 14 : wc <= 3 ? 12 : wc <= 4 ? 10 : 8; })()}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 9 : (() => { const wc = (dragName || "").split(" ").length; return wc <= 2 ? 9 : 8; })()}px Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
