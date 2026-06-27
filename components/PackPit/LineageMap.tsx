@@ -277,7 +277,6 @@ export default function LineageMap({
   const [cardFlip, setCardFlip] = useState<Map<string, "closing" | "back" | "opening">>(new Map()); // per-card idle flip
   const cardFlipTimers = useRef<Map<string, any>>(new Map()); // per-card idle timers
   const interacted = useRef(false);
-  const interactedBreeds = useRef(new Set<string>());
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
     const t = setTimeout(() => setAutoArmed(true), 5000);
@@ -688,7 +687,7 @@ export default function LineageMap({
       });
       setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
       pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
-      interacted.current = true; interactedBreeds.current.add(breed.name); setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
+      interacted.current = true; setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
       return;
     }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
@@ -865,13 +864,11 @@ export default function LineageMap({
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => {
           e.stopPropagation();
-          // hop only while frames still need filling
-          if (!framesDone && !packed) {
-            setPan((prev) => ({
-              x: prev.x + 28 + Math.random() * 12,
-              y: prev.y - 18 - Math.random() * 8,
-            }));
-          }
+          // hop the card right+up away from the frames grid
+          setPan((prev) => ({
+            x: prev.x + 28 + Math.random() * 12,
+            y: prev.y - 18 - Math.random() * 8,
+          }));
           revealStep();
         }}
         onPointerDown={(e) => {
@@ -1180,20 +1177,16 @@ export default function LineageMap({
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
                         ) : (() => {
-                          // optimal split - minimise line length difference
+                          // split breed name into words, up to 3 lines, font shrinks with word count
                           const words = (dragName || "").split(" ");
-                          let lines: string[] = [dragName || ""];
-                          if (words.length > 1) {
-                            let bestDiff = Infinity;
-                            for (let sp = 1; sp < words.length; sp++) {
-                              const l1 = words.slice(0, sp).join(" "), l2 = words.slice(sp).join(" ");
-                              const diff = Math.abs(l1.length - l2.length);
-                              if (diff < bestDiff) { bestDiff = diff; lines = [l1, l2]; }
-                            }
+                          const fs = words.length <= 2 ? 14 : words.length <= 3 ? 12 : words.length <= 4 ? 10 : 8;
+                          const lineH = fs * 1.3;
+                          // group into max 3 lines of ~2 words each
+                          const lines: string[] = [];
+                          for (let i = 0; i < words.length; i += Math.ceil(words.length / 3)) {
+                            lines.push(words.slice(i, i + Math.ceil(words.length / 3)).join(" "));
                           }
-                          const fs = lines.length === 1 ? 9 : 8;
-                          const lineH = fs * 1.4;
-                          const startY = lines.length === 1 ? 0 : -lineH / 2;
+                          const startY = lines.length === 1 ? 0 : lines.length === 2 ? -lineH / 2 : -lineH;
                           return lines.map((l, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{l}</tspan>
                           ));
