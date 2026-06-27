@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
+import ScrollDog from "./ScrollDog";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -42,6 +43,9 @@ export default function HotDogs() {
             </nav>
           </div>
         </section>
+
+        {/* ── Scroll-driven cerberus video ─────────────────────────── */}
+        <ScrollDog />
 
         {/* ── Disambiguation note ───────────────────────────────────── */}
         <section className={styles.noteSection}>
