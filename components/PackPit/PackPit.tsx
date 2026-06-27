@@ -1717,7 +1717,7 @@ export default function PackPit() {
           if (!ga) continue;
           const other = ga === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
-          if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite") continue;
+          if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite" || other.plugin?.isBowl) continue;
           // burst at arrowhead tip - green and yellow
           const tipDist = ga.plugin.half || 30;
           const tipX = ga.position.x + Math.cos(ga.angle + 2.3450) * tipDist;
