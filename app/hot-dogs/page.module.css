@@ -398,3 +398,20 @@
   filter: hue-rotate(200deg) saturate(1.4) brightness(0.85);
   display: block;
 }
+
+/* ── Fixed cerberus dog ─────────────────────────────────────────────────── */
+.fixedDog {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: clamp(180px, 22vw, 340px);
+  z-index: 10;
+  pointer-events: none;
+}
+.fixedDogVideo {
+  width: 100%;
+  height: auto;
+  display: block;
+  mix-blend-mode: multiply;
+  filter: hue-rotate(200deg) saturate(1.4) brightness(0.85);
+}

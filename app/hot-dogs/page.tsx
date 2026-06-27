@@ -44,9 +44,6 @@ export default function HotDogs() {
           </div>
         </section>
 
-        {/* ── Scroll-driven cerberus video ─────────────────────────── */}
-        <ScrollDog />
-
         {/* ── Disambiguation note ───────────────────────────────────── */}
         <section className={styles.noteSection}>
           <div className={styles.noteInner}>
@@ -293,6 +290,7 @@ export default function HotDogs() {
           </div>
         </section>
 
+        <ScrollDog />
       </main>
     </>
   );
