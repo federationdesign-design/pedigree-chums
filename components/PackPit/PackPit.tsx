@@ -32,7 +32,8 @@ export default function PackPit() {
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
-  const [shelfOpen, setShelfOpen] = useState(false); // the collection shelf overlay, opened from the tally
+  const [shelfOpen, setShelfOpen] = useState(false);
+  const [britainOpen, setBritainOpen] = useState(false); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
@@ -600,7 +601,17 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2: easy (3/4 nodes)
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                                                  // 6400 bone + slipper
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3: easy (4/5 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 9000 bowl + menu
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000));
+          waveTimers.push(setTimeout(() => {
+            if (!disposed) {
+              const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
+              const ujR = BIG * 1.2;
+              const ujB: any = Bodies.circle(w * 0.7, -ujR, ujR, { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006, render: { visible: false } });
+              ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 10, popped: false };
+              Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
+              Composite.add(engine.world, ujB);
+            }
+          }, 15000)); // 9000 bowl + menu
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); Composite.add(engine.world, makeArrow(w)); } }, 10050)); // 10050 pair 4 + green arrow
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5: easy (3 nodes each)
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6: easy (3/5 nodes)
@@ -760,6 +771,18 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
+        if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
+          hit.plugin.hits = (hit.plugin.hits || 0) + 1;
+          numAt(hit.position.x, hit.position.y, 50);
+          burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
+          if (hit.plugin.hits >= hit.plugin.maxHits) {
+            hit.plugin.popped = true;
+            poof(hit.position.x, hit.position.y, hit.plugin.half);
+            Composite.remove(engine.world, hit);
+            setBritainOpen(true);
+          }
+          return true;
+        }
         if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 300); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         return false;
       };
@@ -2131,6 +2154,16 @@ export default function PackPit() {
           </div>
         );
       })()}
+      {britainOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(10,58,87,0.85)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setBritainOpen(false)}>
+          <div style={{ background: "#fff", borderRadius: "24px", padding: "40px", maxWidth: "480px", width: "90%", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+            <img src="/uk-icon.jpg" alt="Made in Britain" style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", marginBottom: "16px" }} />
+            <h2 style={{ fontFamily: "var(--font-display, 'Luckiest Guy')", color: "#0a3a57", fontSize: "28px", margin: "0 0 12px" }}>Made in Britain</h2>
+            <p style={{ fontFamily: "Montserrat, sans-serif", color: "#0a3a57", fontSize: "15px", lineHeight: 1.6, margin: "0 0 24px" }}>Pedigree Chums is designed, illustrated and printed right here in Britain. Every card, every breed, every detail crafted with pride on British soil.</p>
+            <button onClick={() => setBritainOpen(false)} style={{ background: "#ffd23e", border: "none", borderRadius: "40px", padding: "12px 32px", fontFamily: "var(--font-display, 'Luckiest Guy')", fontSize: "18px", color: "#0a3a57", cursor: "pointer" }}>Brilliant!</button>
+          </div>
+        </div>
+      )}
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
