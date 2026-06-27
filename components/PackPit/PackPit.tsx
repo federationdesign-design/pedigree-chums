@@ -130,26 +130,23 @@ export default function PackPit() {
     return () => { if (drainRef.current) clearInterval(drainRef.current); };
   }, []); // runs once; lineageOpenRef is checked inside the interval callback
 
-  // Game over detection: if 3+ bodies have been above the pit top (y < 0) for 2s, the pit is full.
-  // We track when each body first appeared above the line; if it stays there 2s it counts.
+  // Game over detection: physics loop watches newly added bodies.
+  // If a body spawns and is still in the top 10% of the pit after 3s, the pit is full.
+  // Cannot fire before 30s to avoid triggering during the opening cascade.
   const gameOverRef = useRef(false);
   useEffect(() => {
-    const stuck = new Map<number, number>(); // bodyId -> timestamp first seen above pit top
-    const iv = setInterval(() => {
-      if (gameOverRef.current) { clearInterval(iv); return; }
-      // dispatch a check event that PackPit physics loop handles
-      window.dispatchEvent(new Event("pc:check-gameover"));
-    }, 1000);
+    const startTime = Date.now();
     const onResult = (e: Event) => {
-      const count = (e as CustomEvent).detail?.stuckCount ?? 0;
-      if (count >= 2 && !gameOverRef.current) {
+      if (gameOverRef.current) return;
+      if (Date.now() - startTime < 30000) return; // 30s minimum
+      const stuck = (e as CustomEvent).detail?.stuck ?? false;
+      if (stuck) {
         gameOverRef.current = true;
         setGameOver(true);
       }
     };
     window.addEventListener("pc:gameover-result", onResult as EventListener);
     return () => {
-      clearInterval(iv);
       window.removeEventListener("pc:gameover-result", onResult as EventListener);
     };
   }, []);
@@ -2015,21 +2012,38 @@ export default function PackPit() {
         if (uj) { uj.plugin.popped = true; poof(uj.position.x, uj.position.y, uj.plugin.half); Composite.remove(engine.world, uj); }
       };
       window.addEventListener("pc:britain-dismiss", onBritainDismiss);
-      // Game over: if 3+ non-static bodies have their centre above y=0 (pit top),
-      // the pit is full. Single check -- no consecutive requirement.
-      const onCheckGameover = () => {
-        const all = Composite.allBodies(engine.world);
-        let stuckCount = 0;
-        for (const b of all) {
-          if (b.isStatic) continue;
-          if (!b.plugin) continue;
-          if (b.plugin.kind === "pct" || b.plugin.prop || b.plugin.kind === "menu") continue;
-          if (b.plugin.kind === "unionjack") continue;
-          if (b.position.y < 0) stuckCount++;
+      // Game over: tag each new body with its spawn time.
+      // In afterUpdate, check if any body spawned >3s ago is still in the top 10% of the pit.
+      // Top 10% = y < pitTop + pitHeight * 0.1. pitTop ~ 0, pitHeight ~ h (canvas height).
+      const spawnTimes = new Map<number, number>();
+      const onAfterAdd = (event: any) => {
+        const bodies = event.object?.bodies || (event.object ? [event.object] : []);
+        const now = performance.now();
+        for (const b of bodies) {
+          if (!b.isStatic && b.plugin) spawnTimes.set(b.id, now);
         }
-        window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuckCount } }));
       };
-      window.addEventListener("pc:check-gameover", onCheckGameover);
+      const onAfterUpdateGO = () => {
+        const now = performance.now();
+        const pitH = render.canvas.height;
+        const threshold = pitH * 0.1; // top 10% of pit height
+        for (const [id, spawnT] of spawnTimes.entries()) {
+          if (now - spawnT < 3000) continue; // give body 3s to settle
+          const b = Composite.allBodies(engine.world).find((x: any) => x.id === id);
+          if (!b) { spawnTimes.delete(id); continue; } // already removed
+          if (b.isStatic) { spawnTimes.delete(id); continue; }
+          if (b.position.y < threshold) {
+            // still in top 10% after 3s -- pit is full
+            window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
+            spawnTimes.clear();
+            return;
+          }
+          // settled fine -- stop watching it
+          spawnTimes.delete(id);
+        }
+      };
+      Events.on(engine.world, "afterAdd", onAfterAdd);
+      Events.on(engine, "afterUpdate", onAfterUpdateGO);
       window.addEventListener("pc:offer-success", onOfferSuccess);
 
 
@@ -2180,7 +2194,8 @@ export default function PackPit() {
         window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
         window.removeEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
         window.removeEventListener("pc:britain-dismiss", onBritainDismiss);
-        window.removeEventListener("pc:check-gameover", onCheckGameover);
+        Events.off(engine.world, "afterAdd", onAfterAdd);
+        Events.off(engine, "afterUpdate", onAfterUpdateGO);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
