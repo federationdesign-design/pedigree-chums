@@ -263,10 +263,21 @@ export default function PackPit() {
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
               : [
-                R(515, 235, 1010, 80),   // floor - wide bottom (raised 50px)
+                // jagged floor - 4 angled peaks so objects sit unevenly
+                Bodies.fromVertices(0, 0, [
+                  { x: (60 - cx0) * k,  y: (260 - cy0) * k },
+                  { x: (200 - cx0) * k, y: (200 - cy0) * k },
+                  { x: (340 - cx0) * k, y: (260 - cy0) * k },
+                  { x: (480 - cx0) * k, y: (195 - cy0) * k },
+                  { x: (620 - cx0) * k, y: (260 - cy0) * k },
+                  { x: (760 - cx0) * k, y: (200 - cy0) * k },
+                  { x: (900 - cx0) * k, y: (260 - cy0) * k },
+                  { x: (970 - cx0) * k, y: (280 - cy0) * k },
+                  { x: (60 - cx0) * k,  y: (280 - cy0) * k },
+                ], po),
                 R(130, 135, 80, 210),    // left wall
                 R(900, 135, 80, 210),    // right wall
-              ]; // open-top trapezoid bowl
+              ]; // open-top trapezoid bowl with jagged floor
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
           const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
           if (prop.angle) Body.setAngle(b, prop.angle);
