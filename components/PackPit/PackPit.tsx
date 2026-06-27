@@ -255,25 +255,27 @@ export default function PackPit() {
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
           const VB = prop.shape === "slipper" ? { w: 1110.4, h: 411.3 } : { w: 1031.7, h: 316.8 };
           const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
+          // create parts at origin (0,0) so centroid is predictable, then position after
           const R = (vx: number, vy: number, w: number, h: number) =>
-            Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, po);
+            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, po);
           const C = (vx: number, vy: number, r: number) =>
-            Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
+            Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
               : [
-                // angled floor pieces - zigzag so objects sit unevenly
                 R(250, 255, 340, 50),   // left floor section - slightly high
                 R(515, 270, 340, 50),   // middle floor section - low
                 R(780, 250, 340, 50),   // right floor section - slightly high
                 R(130, 135, 80, 210),   // left wall
                 R(900, 135, 80, 210),   // right wall
-              ]; // open-top trapezoid bowl with stepped floor
+              ];
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-          const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
+          // now place the body at spawn point - centroid is now at origin so this is exact
+          Body.setPosition(b, { x, y });
           if (prop.angle) Body.setAngle(b, prop.angle);
-          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox, oy, isBowl: prop.shape === "bowl", bowlScored: new Set() };
+          // ox/oy is 0 because centroid matches visual centre
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
         }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
