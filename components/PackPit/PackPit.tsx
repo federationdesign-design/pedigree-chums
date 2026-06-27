@@ -591,9 +591,9 @@ export default function PackPit() {
       // Once the logo has been knocked loose, dragging it near a bone (or a bone
       // near it) makes the two drift together. Symmetrical shapes, so position
       // only. Gentle pull you can still fight; tune with the dials below.
-      const FUSE_MAGNET_RADIUS = 240; // px, centre-to-centre, when the pull starts
-      const FUSE_SNAP_DIST = 90;       // px, centre-to-centre, when they snap and fuse
-      const FUSE_PULL = 0.0016;       // pull strength (force per px of closeness)
+      const FUSE_MAGNET_RADIUS = 80; // px, centre-to-centre, when the pull starts
+      const FUSE_SNAP_DIST = 30;       // px, centre-to-centre, when they snap and fuse
+      const FUSE_PULL = 0.0002;       // pull strength (force per px of closeness)
       const isBone = (b: any) => b?.plugin?.prop === "bone";
       const nearestBone = (to: any) => {
         let best: any = null, bestD = Infinity;
