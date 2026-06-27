@@ -17,7 +17,8 @@ const STEPS = [
   "The player with the most pedigree chums wins",
 ];
 
-const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
+const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"]; // pit card assets -- used in overview scroll
+const INSTRUCTION_IMAGES = ["/instruction1.jpg", "/instruction2.jpg", "/instruction3.jpg", "/instruction4.jpg", "/instruction5.jpg"]; // full landscape instruction pages for lightbox
 
 export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") { onCloseRef.current(); return; }
       if (step !== null) {
-        if (e.key === "ArrowRight" || e.key === "ArrowDown") setStep((s: number | null) => Math.min((s ?? 0) + 1, STEP_IMAGES.length - 1));
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") setStep((s: number | null) => Math.min((s ?? 0) + 1, INSTRUCTION_IMAGES.length - 1));
         if (e.key === "ArrowLeft" || e.key === "ArrowUp") setStep((s: number | null) => Math.max((s ?? 0) - 1, 0));
       }
     };
@@ -96,7 +97,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={STEP_IMAGES[step]}
+          src={INSTRUCTION_IMAGES[step]}
           alt={`How to play, step ${step + 1}`}
           className={styles.lightboxImg}
         />
@@ -112,11 +113,11 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
           </button>
         )}
 
-        {step < STEP_IMAGES.length - 1 && (
+        {step < INSTRUCTION_IMAGES.length - 1 && (
           <button
             type="button"
             className={`${styles.lightboxNav} ${styles.lightboxNext}`}
-            onClick={() => setStep((s: number | null) => Math.min((s ?? 0) + 1, STEP_IMAGES.length - 1))}
+            onClick={() => setStep((s: number | null) => Math.min((s ?? 0) + 1, INSTRUCTION_IMAGES.length - 1))}
             aria-label="Next step"
           >
             &#8594;
@@ -124,7 +125,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
         )}
 
         <div className={styles.lightboxDots}>
-          {STEP_IMAGES.map((_, i) => (
+          {INSTRUCTION_IMAGES.map((_, i) => (
             <button
               key={i}
               type="button"
