@@ -256,11 +256,15 @@ export default function PackPit() {
           const parts =
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
-              : [R(549, 78, 760, 150), R(513, 222, 1010, 150)]; // narrow top, wider bottom of the tray
+              : [
+                R(515, 285, 1010, 80),   // floor - wide bottom
+                R(130, 160, 80, 260),    // left wall - angled inward
+                R(900, 160, 80, 260),    // right wall - angled inward
+              ]; // open-top trapezoid bowl
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
           const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
           if (prop.angle) Body.setAngle(b, prop.angle);
-          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox, oy };
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox, oy, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
         }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
@@ -1533,6 +1537,28 @@ export default function PackPit() {
         }
       };
 
+      // bowl scoring: bone=500, ball=100, pin in place
+      Events.on(engine, "collisionStart", (ev: any) => {
+        for (const pair of ev.pairs) {
+          const bowl2 = pair.bodyA.plugin?.isBowl ? pair.bodyA : pair.bodyB.plugin?.isBowl ? pair.bodyB : null;
+          if (!bowl2) continue;
+          const obj = bowl2 === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!obj?.plugin) continue;
+          if (bowl2.plugin.bowlScored.has(obj.id)) continue;
+          const isBone = obj.plugin.prop === "bone";
+          const isBall = obj.plugin.prop === "ball";
+          if (!isBone && !isBall) continue;
+          // only score if bowl is roughly upright
+          const a = ((bowl2.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          if (a > 0.5 && a < Math.PI * 2 - 0.5) continue;
+          bowl2.plugin.bowlScored.add(obj.id);
+          const pts = isBone ? 500 : 100;
+          numAt(obj.position.x, obj.position.y, pts);
+          burstAt(obj.position.x, obj.position.y, 40);
+          // pin the object in place inside the bowl
+          Body.setStatic(obj, true);
+        }
+      });
       Events.on(render, "afterRender", onAfter);
 
       // The fallen percentage circles double as negative-magnet buttons. Pressing
