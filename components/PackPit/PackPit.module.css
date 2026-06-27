@@ -391,32 +391,3 @@
   .shelfCards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .shelfPanel { padding: 24px 16px 18px; }
 }
-
-.scorePulse {
-  animation: score-pulse 0.4s cubic-bezier(0.22,1,0.36,1);
-}
-@keyframes score-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-  100% { transform: scale(1); }
-}
-.flyingCard {
-  position: fixed;
-  z-index: 600;
-  pointer-events: none;
-  background: #ffd23e;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
-  color: #0a3a57;
-  text-align: center;
-  padding: 8px;
-  animation: flyToBottom 700ms cubic-bezier(0.22,1,0.36,1) forwards;
-}
-@keyframes flyToBottom {
-  0% { transform: translateY(0) scale(1); opacity: 1; }
-  100% { transform: translateY(calc(100vh - var(--fly-top, 0px) + 100px)) scale(0.3); opacity: 0; }
-}
