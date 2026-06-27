@@ -121,6 +121,67 @@
   pointer-events: none;
   animation: tallyBurst 0.55s ease-out both;
 }
+.chumDock {
+  position: fixed;
+  bottom: 80px;
+  left: 44%;
+  pointer-events: none;
+  z-index: 300;
+}
+.chumDockInner {
+  position: relative;
+  width: 200px;
+  height: 300px;
+  pointer-events: auto;
+}
+.chumDockCard {
+  background-color: #fff;
+  position: absolute;
+  width: 200px;
+  height: 300px;
+  border-radius: 10px;
+  transition: all 700ms;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-bottom-color: #933;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transform-style: flat;
+  isolation: isolate;
+}
+.chumDockCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.chumDockCard:last-child:hover {
+  box-shadow: -10px 40px 20px 2px rgba(0,0,0,0.2);
+}
+.chumDockCardOpened {
+  transform: scale(1.5) rotateX(0) rotateY(180deg) rotateZ(0) translateY(0) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+}
+.chumDockCardRemoved {
+  transform: translateY(100%) !important;
+}
+.chumDockBack {
+  position: absolute;
+  inset: 0;
+  background: var(--yellow, #ffd23e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  border-radius: 10px;
+}
+.chumDockBack span {
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: 16px;
+  color: #0a3a57;
+  text-align: center;
+  padding: 8px;
+}
 @keyframes tallyBurst {
   0% { transform: scale(0.35); opacity: 0; }
   25% { opacity: 1; }
@@ -352,8 +413,7 @@
   width: 100%;
   aspect-ratio: 300 / 430; /* the physical card is portrait */
   border-radius: 14px;
-  overflow: hidden;
-  background: #07293f;
+  background: transparent;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
 }
 /* the real card art already carries its own border/rounding, so no white frame */
@@ -391,7 +451,46 @@
   .shelfCards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .shelfPanel { padding: 24px 16px 18px; }
 }
-
+.flyingCard {
+  position: fixed;
+  z-index: 600;
+  pointer-events: none;
+  background: #ffd23e;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 13px;
+  color: #0a3a57;
+  text-align: center;
+  padding: 8px;
+  animation: flyToBottom 700ms cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes flyToBottom {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(calc(100vh - var(--fly-top, 0px) + 100px)) scale(0.3); opacity: 0; }
+}
+.flyingCard {
+  position: fixed;
+  z-index: 600;
+  pointer-events: none;
+  background: #ffd23e;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 13px;
+  color: #0a3a57;
+  text-align: center;
+  padding: 8px;
+  animation: flyToBottom 700ms cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes flyToBottom {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(110vh) scale(0.3); opacity: 0; }
+}
 .scorePulse {
   animation: score-pulse 0.4s cubic-bezier(0.22,1,0.36,1);
 }
