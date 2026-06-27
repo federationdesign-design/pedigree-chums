@@ -36,6 +36,13 @@ export default function PackPit() {
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
+  const [britainMsg, setBritainMsg] = useState<number | null>(null);
+  const britainTimer = useRef<any>(null);
+  const showBritainMsg = (idx: number) => {
+    if (britainTimer.current) clearTimeout(britainTimer.current);
+    setBritainMsg(idx);
+    britainTimer.current = setTimeout(() => setBritainMsg(null), 2500);
+  };
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [scorePulse, setScorePulse] = useState(false);
   const prevScoreRef = useRef(0);
@@ -589,7 +596,17 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2: easy (3/4 nodes)
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                                                  // 6400 bone + slipper
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3: easy (4/5 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 9000 bowl + menu
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000));
+          waveTimers.push(setTimeout(() => {
+            if (!disposed) {
+              const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
+              const ujR = BIG * 0.6;
+              const ujB: any = Bodies.circle(w * 0.7, -ujR, ujR, { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006, render: { visible: false } });
+              ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 10, popped: false };
+              Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
+              Composite.add(engine.world, ujB);
+            }
+          }, 15000)); // 9000 bowl + menu
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); Composite.add(engine.world, makeArrow(w)); } }, 10050)); // 10050 pair 4 + green arrow
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5: easy (3 nodes each)
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6: easy (3/5 nodes)
@@ -738,6 +755,15 @@ export default function PackPit() {
             p.hits = (p.hits || 0) + 1;
             if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(hit.position.x, hit.position.y, p.half || 12); Composite.remove(engine.world, hit); } // a chum pill never expires
           }
+          return true;
+        }
+        if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
+          hit.plugin.hits = (hit.plugin.hits || 0) + 1;
+          numAt(hit.position.x, hit.position.y, 50);
+          burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
+          const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
+          showBritainMsg(msgIdx);
+          if (hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
           return true;
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
@@ -893,6 +919,19 @@ export default function PackPit() {
             const pulse = 1 + 0.18 * Math.sin(now2 / 90);
             ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
             ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
+          }
+          ctx.restore(); return;
+        }
+        if (b.plugin.kind === "unionjack") {
+          const rr = b.plugin.half;
+          ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff"; ctx.fill();
+          const ujImg = b.plugin.img;
+          if (ujImg && ujImg.complete && ujImg.naturalWidth) {
+            ctx.save();
+            ctx.beginPath(); ctx.arc(0, 0, rr - 2, 0, Math.PI * 2); ctx.clip();
+            ctx.drawImage(ujImg, -rr, -rr, rr * 2, rr * 2);
+            ctx.restore();
           }
           ctx.restore(); return;
         }
