@@ -94,7 +94,7 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
   // Panel sits to the right of the card (in SVG space, unrotated)
   const panelX = cw / 2 + PANEL_GAP;
   const panelY = -ch / 2;
-  const headerH = 100;
+  const headerH = 130;
 
   return (
     <div
@@ -129,16 +129,16 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
             <text
               y={0}
               fontFamily="var(--font-display,'Luckiest Guy',system-ui)"
-              fontSize={18}
+              fontSize={23}
               fill="rgba(255,255,255,0.8)"
               letterSpacing="1"
             >
               HOW TO PLAY...
             </text>
             <text
-              y={52}
+              y={68}
               fontFamily="var(--font-display,'Luckiest Guy',system-ui)"
-              fontSize={52}
+              fontSize={65}
               fill="var(--yellow,#ffd23e)"
             >
               {step.heading}
@@ -148,16 +148,16 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
             {step.rows.map((row, i) => {
               const bodyLines = wrapText(row.body);
               const prevRows = step.rows.slice(0, i);
-              const ry = headerH + prevRows.reduce((acc, r) => acc + 36 + wrapText(r.body).length * 18 + 16, 0);
+              const ry = headerH + prevRows.reduce((acc, r) => acc + 48 + wrapText(r.body).length * 22 + 20, 0);
               return (
                 <g key={i} transform={`translate(0, ${ry})`}>
                   {i > 0 && (
-                    <line x1={0} y1={-8} x2={PANEL_W} y2={-8} stroke="rgba(255,255,255,0.3)" strokeWidth={2} strokeDasharray="5 10" />
+                    <line x1={0} y1={-10} x2={PANEL_W} y2={-10} stroke="rgba(255,255,255,0.3)" strokeWidth={2} strokeDasharray="5 10" />
                   )}
-                  <image href={row.icon} x={0} y={0} width={44} height={44} />
-                  <text x={56} y={16} fontFamily="Montserrat,sans-serif" fontSize={16} fontWeight="700" fill="#ffffff">{row.title}</text>
+                  <image href={row.icon} x={0} y={0} width={59} height={59} />
+                  <text x={74} y={20} fontFamily="Montserrat,sans-serif" fontSize={20} fontWeight="700" fill="#ffffff">{row.title}</text>
                   {bodyLines.map((line, li) => (
-                    <text key={li} x={56} y={36 + li * 18} fontFamily="Montserrat,sans-serif" fontSize={13} fontWeight="600" fill="rgba(255,255,255,0.88)">{line}</text>
+                    <text key={li} x={74} y={42 + li * 22} fontFamily="Montserrat,sans-serif" fontSize={16} fontWeight="600" fill="rgba(255,255,255,0.88)">{line}</text>
                   ))}
                 </g>
               );
