@@ -125,7 +125,10 @@ export default function PackPit() {
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
-  useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
+  useEffect(() => {
+    lineageOpenRef.current = !!activeBreed;
+    window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: activeBreed ? 0.015 : 1 } }));
+  }, [activeBreed]);
 
   useEffect(() => {
     let disposed = false;
