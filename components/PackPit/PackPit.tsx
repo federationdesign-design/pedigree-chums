@@ -922,7 +922,7 @@ export default function PackPit() {
           // back over the silhouette (defaults to 0 for the simple shapes)
           ctx.translate(b.plugin.ox || 0, b.plugin.oy || 0);
           const pw = b.plugin.w, ph = b.plugin.h;
-          if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
+          if (hovered && b.plugin.prop !== "logopiece") { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
           if (img && img.complete && (img.naturalWidth || b.plugin.prop === "logopiece")) {
             const iw = img.naturalWidth || pw, ih = img.naturalHeight || ph; // viewBox-only SVGs report 0; fall back to the body box
             const ir = iw / ih, br = pw / ph;
@@ -1796,7 +1796,7 @@ export default function PackPit() {
           const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top; // screen rect -> pit centre
           const pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
           const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.14 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
-          b.plugin = { name: "How it works", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0 };
+          b.plugin = { name: ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"][Math.min(pieces.indexOf(pc), 4)] || "How it works", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0 };
           Composite.add(engine.world, b); // falls straight from where it sat in the popup
           setScore((s) => s + 500); // 500 points per piece as it drops in
         });
