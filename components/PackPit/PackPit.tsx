@@ -103,7 +103,7 @@ export default function PackPit() {
     return () => window.removeEventListener("pc:open-howtoplay", handler);
   }, []);
   useEffect(() => {
-    if (!howToPlay) { window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 1 } })); window.dispatchEvent(new CustomEvent("pc:close-howtoplay")); }
+    if (howToPlay) { window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 0.015 } })); } else { window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 1 } })); window.dispatchEvent(new CustomEvent("pc:close-howtoplay")); }
   }, [howToPlay]);
   // score drain: -1 every 2s while pit is active and no overlays open
   useEffect(() => {
