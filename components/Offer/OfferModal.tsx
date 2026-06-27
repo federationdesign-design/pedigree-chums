@@ -61,6 +61,7 @@ export default function OfferModal({
         return;
       }
       setSent(true);
+      window.dispatchEvent(new Event("pc:offer-success"));
     } catch {
       setError("Sorry, something went wrong. Please try again.");
       setLoading(false);

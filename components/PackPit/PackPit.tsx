@@ -1810,6 +1810,11 @@ export default function PackPit() {
         if (howTo) { poof(howTo.position.x, howTo.position.y, howTo.plugin.half || 30); Composite.remove(engine.world, howTo); }
       };
       window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
+      const onOfferSuccess = () => {
+        const reserve = Composite.allBodies(engine.world).find((b: any) => b.plugin?.kind === "reserve");
+        if (reserve) { numAt(reserve.position.x, reserve.position.y, 250); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
+      };
+      window.addEventListener("pc:offer-success", onOfferSuccess);
 
 
       function fit() {
