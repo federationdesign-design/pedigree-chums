@@ -234,6 +234,7 @@ export default function PackPit() {
           const bw = prop.width, bh = prop.width / prop.aspect, k = bw / 400.2;
           const R = 56 * k, dx = 143.5 * k, dy = 40.7 * k, barW = 287 * k, barH = 92 * k;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
+          const poHeavy = { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } }; // heavier floor keeps bowl upright
           const parts = [
             Bodies.rectangle(x, y, barW, barH, po),
             Bodies.circle(x - dx, y - dy, R, po),
@@ -264,11 +265,11 @@ export default function PackPit() {
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
               : [
-                R(250, 255, 340, 50),   // left floor section - slightly high
-                R(515, 270, 340, 50),   // middle floor section - low
-                R(780, 250, 340, 50),   // right floor section - slightly high
-                R(130, 135, 80, 210),   // left wall
-                R(900, 135, 80, 210),   // right wall
+                Bodies.rectangle(  (250 - cx0) * k, (255 - cy0) * k, 340 * k, 50 * k, poHeavy),
+                Bodies.rectangle(  (515 - cx0) * k, (270 - cy0) * k, 340 * k, 50 * k, poHeavy),
+                Bodies.rectangle(  (780 - cx0) * k, (250 - cy0) * k, 340 * k, 50 * k, poHeavy),
+                Bodies.rectangle(  (130 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po),
+                Bodies.rectangle(  (900 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po)
               ];
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
           // now place the body at spawn point - centroid is now at origin so this is exact
@@ -909,7 +910,7 @@ export default function PackPit() {
           const maxw = w * 0.86;
           const widest = Math.max(...lines2.map((l) => ctx.measureText(l).width));
           if (widest > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / widest)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
-          const lh = fs * 1.25;
+          const lh = fs * 1.5;
           const startY = -(lines2.length - 1) * lh / 2;
           lines2.forEach((line, li) => ctx.fillText(line, 0, startY + li * lh));
           ctx.restore(); return;
