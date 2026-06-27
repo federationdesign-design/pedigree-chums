@@ -1465,10 +1465,11 @@ export default function PackPit() {
         const bowlBodies2 = bodies.filter((b: any) => b.plugin?.prop === "bowl");
         const nonBowl = bodies.filter((b: any) => b.plugin?.prop !== "bowl");
         nonBowl.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        // draw hover body before bowl so bowl rim always stays on top
+        if (hoverBody && hoverBody.plugin?.prop !== "bowl") drawBall(ctx, hoverBody, dimLevel, true);
         // draw bowl last so its rim appears on top of contained objects
-        bowlBodies2.forEach((b: any) => { drawBall(ctx, b, dimLevel, false); });
+        bowlBodies2.forEach((b: any) => { drawBall(ctx, b, dimLevel, b === hoverBody); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
-        if (hoverBody) drawBall(ctx, hoverBody, 1, true);
 
         bodies.forEach((b: any) => {
           if (!b.plugin.ping) return;
