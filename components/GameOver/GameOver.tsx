@@ -20,8 +20,6 @@ export default function GameOver({ chums }: Props) {
   return (
     <div ref={overlayRef} className={styles.overlay}>
       <div className={styles.inner}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hot-dog-ouroboros.png" alt="" className={styles.dog} aria-hidden="true" />
         <h1 className={styles.title}>Game Over</h1>
         <p className={styles.sub}>
           {chums === 1 ? "You got 1 chum." : `You got ${chums} chums.`}
