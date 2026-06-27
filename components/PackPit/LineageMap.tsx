@@ -277,6 +277,7 @@ export default function LineageMap({
   const [cardFlip, setCardFlip] = useState<Map<string, "closing" | "back" | "opening">>(new Map()); // per-card idle flip
   const cardFlipTimers = useRef<Map<string, any>>(new Map()); // per-card idle timers
   const interacted = useRef(false);
+  const interactedBreeds = useRef(new Set<string>());
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
     const t = setTimeout(() => setAutoArmed(true), 5000);
@@ -687,7 +688,7 @@ export default function LineageMap({
       });
       setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
       pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
-      interacted.current = true; setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
+      interacted.current = true; interactedBreeds.current.add(breed.name); setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
       return;
     }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
