@@ -937,6 +937,25 @@ export default function PackPit() {
           }
           ctx.restore(); return;
         }
+        if (b.plugin.kind === "unionjack") {
+          const rr = b.plugin.half;
+          ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff"; ctx.fill();
+          ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+          const ujImg = b.plugin.img;
+          if (ujImg && ujImg.complete && ujImg.naturalWidth) {
+            ctx.save();
+            ctx.beginPath(); ctx.arc(0, 0, rr - 2, 0, Math.PI * 2); ctx.clip();
+            ctx.drawImage(ujImg, -rr, -rr, rr * 2, rr * 2);
+            ctx.restore();
+          }
+          // hits remaining indicator
+          const hitsLeft = (b.plugin.maxHits || 10) - (b.plugin.hits || 0);
+          ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = `700 ${Math.max(10, rr * 0.35)}px Montserrat, system-ui`;
+          ctx.fillText(hitsLeft + "x", 0, rr * 0.65);
+          ctx.restore(); return;
+        }
         if (b.plugin.kind === "menu") {
           const sz = b.plugin.w, rad = sz * 0.3;
           if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3; }
