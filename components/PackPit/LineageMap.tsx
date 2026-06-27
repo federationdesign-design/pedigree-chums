@@ -890,7 +890,7 @@ export default function LineageMap({
           <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
         </clipPath>
         {/* flip wrapper: only add g wrapper when actually animating to avoid compositing issues */}
-        <g style={flipPhase === "closing" || flipPhase === "opening" ? { animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards` : `${styles.lmFlipOpen} 0.26s ease-out forwards` } : undefined}>
+        <g style={{ animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards` : flipPhase === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards` : undefined, }}>
           {flipPhase === "back" || flipPhase === "opening" ? (
             // back face: yellow with breed name
             <>
