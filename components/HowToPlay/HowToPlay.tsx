@@ -24,9 +24,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  // When opened from a pit card, show that step; user can navigate prev/next from there.
   const [step, setStep] = useState<number | null>(activeStep ?? null);
-  // Sync if the prop changes (e.g. a second card tap while modal is already open)
   useEffect(() => { setStep(activeStep ?? null); }, [activeStep, open]);
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") { onCloseRef.current(); return; }
       if (step !== null) {
-        if (e.key === "ArrowRight" || e.key === "ArrowDown") setStep((s: number | null) => Math.min((s ?? 0) + 1, STEPS.length - 1));
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") setStep((s: number | null) => Math.min((s ?? 0) + 1, STEP_IMAGES.length - 1));
         if (e.key === "ArrowLeft" || e.key === "ArrowUp") setStep((s: number | null) => Math.max((s ?? 0) - 1, 0));
       }
     };
@@ -74,72 +72,66 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
       }
       if (pieces.length) window.dispatchEvent(new CustomEvent("pc:howtoplay-drop", { detail: { pieces } }));
     } catch {
-      /* if capture fails, close cleanly */
+      /* close cleanly on any error */
     }
     onClose();
   };
 
-  // Step detail view (when a pit card was tapped)
+  // --- Step lightbox (opened from a pit card) ---
   const stepView = step !== null ? (
-    <div className={styles.overlay} onClick={dropPiecesThenClose}>
-      <div className={styles.stage} ref={stageElRef} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-        <button type="button" className={styles.close} onClick={dropPiecesThenClose} aria-label="Close">
+    <div className={styles.lightboxOverlay} onClick={dropPiecesThenClose}>
+      <div className={styles.lightboxStage} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+
+        <button type="button" className={styles.lightboxClose} onClick={dropPiecesThenClose} aria-label="Close">
           &times;
         </button>
-
-        <h3 className={styles.title}>
-          Step <span className={styles.accent}>{step + 1}</span> of {STEPS.length}
-        </h3>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={STEP_IMAGES[step]}
           alt={`How to play, step ${step + 1}`}
-          className={styles.strip}
-          style={{ borderRadius: 18, marginBottom: "clamp(20px, 2.8vw, 38px)" }}
+          className={styles.lightboxImg}
         />
 
-        <p className={styles.text} style={{ fontSize: "clamp(1.3rem, 2.8vw, 2rem)", marginBottom: "clamp(24px, 3vw, 48px)" }}>
-          {STEPS[step]}
-        </p>
-
-        <div className={styles.stepNav}>
+        {step > 0 && (
           <button
             type="button"
-            className={styles.navBtn}
+            className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
             onClick={() => setStep((s: number | null) => Math.max((s ?? 0) - 1, 0))}
-            disabled={step === 0}
             aria-label="Previous step"
           >
-            &larr; Prev
+            &#8592;
           </button>
+        )}
+
+        {step < STEP_IMAGES.length - 1 && (
           <button
             type="button"
-            className={styles.navBtn}
-            onClick={() => setStep(null)}
-            aria-label="See all steps"
-          >
-            All steps
-          </button>
-          <button
-            type="button"
-            className={styles.navBtn}
-            onClick={() => setStep((s: number | null) => Math.min((s ?? 0) + 1, STEPS.length - 1))}
-            disabled={step === STEPS.length - 1}
+            className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+            onClick={() => setStep((s: number | null) => Math.min((s ?? 0) + 1, STEP_IMAGES.length - 1))}
             aria-label="Next step"
           >
-            Next &rarr;
+            &#8594;
           </button>
+        )}
+
+        <div className={styles.lightboxDots}>
+          {STEP_IMAGES.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`${styles.lightboxDot} ${i === step ? styles.lightboxDotActive : ""}`}
+              onClick={() => setStep(i)}
+              aria-label={`Go to step ${i + 1}`}
+            />
+          ))}
         </div>
 
-        <span className={styles.logo} data-htp="logo" aria-hidden="true" />
-        <span className={`${styles.deco} ${styles.decoA}`} data-htp="deco" aria-hidden="true" />
-        <span className={`${styles.deco} ${styles.decoB}`} data-htp="deco" aria-hidden="true" />
       </div>
     </div>
   ) : null;
 
-  // Full overview view (original)
+  // --- Full overview (opened from the howtoplay panel object) ---
   const overviewView = step === null ? (
     <div className={styles.overlay} onClick={dropPiecesThenClose}>
       <div className={styles.stage} ref={stageElRef} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
@@ -177,7 +169,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
         </p>
 
         <ol className={styles.steps}>
-          {STEPS.map((s, i) => (
+          {STEPS.map((s) => (
             <li key={s} className={styles.step}>
               <span className={styles.num} data-htp="num" aria-hidden="true" />
               <span className={styles.text}>{s}</span>
