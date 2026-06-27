@@ -1939,6 +1939,18 @@ export default function PackPit() {
         if (howTo) { poof(howTo.position.x, howTo.position.y, howTo.plugin.half || 30); Composite.remove(engine.world, howTo); }
       };
       window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
+      // poof the specific HTP step card when the user closes the lightbox after viewing it
+      const HTP_STEP_NAMES = ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"];
+      const onHtpStepViewed = (ev: any) => {
+        const idx = ev?.detail?.stepIdx;
+        if (idx == null) return;
+        const name = HTP_STEP_NAMES[idx];
+        if (!name) return;
+        const all = Composite.allBodies(engine.world);
+        const card = all.find((b: any) => b.plugin?.prop === "logopiece" && b.plugin?.name === name);
+        if (card) { poof(card.position.x, card.position.y, card.plugin.half || 30); Composite.remove(engine.world, card); }
+      };
+      window.addEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
       const onOfferSuccess = () => {
         const reserve = Composite.allBodies(engine.world).find((b: any) => b.plugin?.kind === "reserve");
         if (reserve) { numAt(reserve.position.x, reserve.position.y, 250); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
@@ -2091,6 +2103,7 @@ export default function PackPit() {
         render.canvas.removeEventListener("mousedown", onDown);
         window.removeEventListener("mouseup", releaseHeldPct);
         window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
+        window.removeEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);

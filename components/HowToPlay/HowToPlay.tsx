@@ -47,6 +47,14 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
 
   if (!open || typeof document === "undefined") return null;
 
+  // Lightbox close: fire the step-viewed event so PackPit can poof the matching card
+  const closeLightbox = () => {
+    if (step !== null) {
+      window.dispatchEvent(new CustomEvent("pc:howtoplay-step-viewed", { detail: { stepIdx: step } }));
+    }
+    onClose();
+  };
+
   const dropPiecesThenClose = () => {
     try {
       const pieces: { src: string; x: number; y: number; w: number; h: number }[] = [];
@@ -79,10 +87,10 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
 
   // --- Step lightbox (opened from a pit card) ---
   const stepView = step !== null ? (
-    <div className={styles.lightboxOverlay} onClick={dropPiecesThenClose}>
+    <div className={styles.lightboxOverlay} onClick={closeLightbox}>
       <div className={styles.lightboxStage} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
 
-        <button type="button" className={styles.lightboxClose} onClick={dropPiecesThenClose} aria-label="Close">
+        <button type="button" className={styles.lightboxClose} onClick={closeLightbox} aria-label="Close">
           &times;
         </button>
 
