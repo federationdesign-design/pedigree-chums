@@ -907,10 +907,17 @@ export default function PackPit() {
           rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = "#0a3a57"; ctx.fill();
           ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.85)"; rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.stroke();
           ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          let fs = 12; ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`;
-          const maxw = w * 0.86, tw = ctx.measureText(b.plugin.label).width;
-          if (tw > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / tw)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
-          ctx.fillText(b.plugin.label, 0, 1);
+          // wrap label at 2 words per line
+          const words = b.plugin.label.split(" ");
+          const lines2: string[] = [];
+          for (let wi = 0; wi < words.length; wi += 2) lines2.push(words.slice(wi, wi + 2).join(" "));
+          let fs = 11; ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`;
+          const maxw = w * 0.86;
+          const widest = Math.max(...lines2.map((l) => ctx.measureText(l).width));
+          if (widest > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / widest)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
+          const lh = fs * 1.25;
+          const startY = -(lines2.length - 1) * lh / 2;
+          lines2.forEach((line, li) => ctx.fillText(line, 0, startY + li * lh));
           ctx.restore(); return;
         }
         if (b.plugin.kind === "pct") {
