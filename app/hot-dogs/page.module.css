@@ -1,0 +1,371 @@
+/* ── Hot/Dogs page ──────────────────────────────────────────────────────── */
+
+.main {
+  min-height: 100vh;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(80px, 12vw, 140px) clamp(24px, 6vw, 80px) clamp(48px, 8vw, 96px);
+  text-align: center;
+  position: relative;
+}
+
+.heroInner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 16px;
+}
+
+.heroTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(5rem, 18vw, 14rem);
+  line-height: 0.9;
+  color: var(--yellow, #ffd23e);
+  text-shadow: 0 8px 0 rgba(10,58,87,0.4);
+  margin: 0 0 clamp(16px, 3vw, 32px);
+  letter-spacing: 0.02em;
+}
+
+.slash {
+  color: #ffffff;
+  opacity: 0.5;
+}
+
+.heroSub {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.6;
+  margin: 0 0 clamp(32px, 5vw, 56px);
+}
+
+/* Wordplay block */
+.wordplay {
+  margin: 0 auto clamp(40px, 6vw, 64px);
+  max-width: 520px;
+  border-left: 3px solid rgba(255,255,255,0.25);
+  padding-left: clamp(16px, 3vw, 28px);
+  text-align: left;
+}
+.wordplay p {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+.wordplay em { font-style: normal; color: var(--yellow, #ffd23e); font-weight: 700; }
+.wordplayWarning {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  margin-top: 12px !important;
+}
+
+/* Anchor pills */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(8px, 1.5vw, 16px);
+  justify-content: center;
+}
+.pill {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+  padding: clamp(10px, 1.2vw, 14px) clamp(20px, 3vw, 36px);
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  text-decoration: none;
+  box-shadow: 0 5px 0 rgba(10,58,87,0.28);
+  transition: filter 0.15s, transform 0.15s;
+  letter-spacing: 0.03em;
+}
+.pill:hover { filter: brightness(0.95); transform: translateY(-2px); }
+
+/* ── Shared section layout ───────────────────────────────────────────────── */
+.section,
+.noteSection,
+.safetySection,
+.faqSection,
+.endSection {
+  padding: clamp(56px, 8vw, 112px) clamp(24px, 6vw, 80px);
+}
+.sectionInner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.sectionEyebrow {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 10px;
+}
+.sectionTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(2rem, 5.5vw, 4.5rem);
+  color: var(--yellow, #ffd23e);
+  text-shadow: 0 4px 0 rgba(10,58,87,0.3);
+  margin: 0 0 clamp(20px, 3vw, 36px);
+  line-height: 1.05;
+}
+.subTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  color: #ffffff;
+  margin: clamp(32px, 4vw, 48px) 0 clamp(10px, 1.5vw, 16px);
+  line-height: 1.1;
+}
+.lead {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0 0 clamp(16px, 2vw, 24px);
+}
+.sectionInner p {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  color: rgba(255,255,255,0.88);
+  line-height: 1.7;
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+}
+.sectionInner em { font-style: italic; color: var(--yellow, #ffd23e); }
+.sectionInner strong { color: #ffffff; }
+
+/* ── Note section ────────────────────────────────────────────────────────── */
+.noteSection {
+  background: rgba(10,58,87,0.35);
+  border-top: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.noteTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  color: #ffffff;
+  margin: 0 0 clamp(16px, 2.5vw, 28px);
+}
+.rule { border: none; border-top: 1px dashed rgba(255,255,255,0.2); margin: clamp(20px, 3vw, 32px) 0; }
+.legal {
+  font-size: clamp(0.78rem, 1.1vw, 0.88rem) !important;
+  color: rgba(255,255,255,0.5) !important;
+  line-height: 1.6 !important;
+}
+
+/* ── Cooking section extras ──────────────────────────────────────────────── */
+.conga {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
+  background: rgba(10,58,87,0.3);
+  border-radius: 12px;
+  padding: clamp(12px, 1.8vw, 20px) clamp(16px, 2.5vw, 28px);
+  margin: clamp(16px, 2.5vw, 28px) 0;
+}
+.rule2 {
+  border-left: 4px solid var(--yellow, #ffd23e);
+  padding-left: clamp(16px, 2.5vw, 28px);
+  margin: clamp(24px, 3.5vw, 40px) 0;
+}
+
+/* ── Safety section ─────────────────────────────────────────────────────── */
+.safetySection {
+  background: rgba(10,20,50,0.45);
+  border-top: 2px solid rgba(255,210,62,0.3);
+  border-bottom: 2px solid rgba(255,210,62,0.3);
+}
+
+.safetyCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+  margin: clamp(24px, 4vw, 40px) 0;
+}
+.safetyCard {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 16px;
+  padding: clamp(16px, 2.5vw, 28px);
+}
+.safetyCard h3 {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+.safetyCard p {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  color: rgba(255,255,255,0.82);
+  margin: 0;
+}
+
+.signsList {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  color: rgba(255,255,255,0.88);
+  line-height: 2;
+  margin: 0 0 clamp(16px, 2vw, 24px);
+  padding-left: clamp(20px, 3vw, 32px);
+}
+
+.heatAlerts {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.5vw, 16px);
+  margin: clamp(24px, 4vw, 40px) 0;
+}
+.alert {
+  border-radius: 14px;
+  padding: clamp(14px, 2vw, 22px) clamp(18px, 2.5vw, 28px);
+  border-left: 5px solid transparent;
+}
+.alert[data-level="yellow"] { background: rgba(255,210,62,0.12); border-color: #ffd23e; }
+.alert[data-level="amber"]  { background: rgba(255,140,0,0.12);  border-color: #ff8c00; }
+.alert[data-level="red"]    { background: rgba(220,50,50,0.12);  border-color: #dc3232; }
+.alertLabel {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+.alert p {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.safetyNote {
+  font-size: clamp(0.78rem, 1.1vw, 0.9rem) !important;
+  color: rgba(255,255,255,0.5) !important;
+}
+.safetyNote a { color: rgba(255,255,255,0.7); }
+.safetyNote a:hover { color: #ffffff; }
+
+/* ── Game rules section ─────────────────────────────────────────────────── */
+.ruleSteps {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 20px);
+  margin: clamp(24px, 4vw, 40px) 0;
+}
+.ruleStep {
+  display: flex;
+  gap: clamp(14px, 2.5vw, 24px);
+  align-items: flex-start;
+  background: rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: clamp(14px, 2vw, 22px) clamp(16px, 2.5vw, 26px);
+}
+.ruleNum {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--yellow, #ffd23e);
+  line-height: 1;
+  flex: 0 0 auto;
+  min-width: 36px;
+}
+.ruleStep strong {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 4px;
+}
+.ruleStep p {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  color: rgba(255,255,255,0.8);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── FAQ ────────────────────────────────────────────────────────────────── */
+.faqSection {
+  background: rgba(10,58,87,0.25);
+}
+.faqList { display: flex; flex-direction: column; gap: 4px; margin-top: clamp(20px, 3vw, 36px); }
+.faqItem {
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+  transition: background 0.15s;
+}
+.faqItem[open] { background: rgba(255,255,255,0.1); }
+.faqQ {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-weight: 700;
+  color: #ffffff;
+  padding: clamp(14px, 2vw, 20px) clamp(16px, 2.5vw, 24px);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.faqQ::-webkit-details-marker { display: none; }
+.faqQ::after {
+  content: "+";
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 1.4rem;
+  color: var(--yellow, #ffd23e);
+  flex: 0 0 auto;
+  transition: transform 0.2s;
+}
+.faqItem[open] .faqQ::after { transform: rotate(45deg); }
+.faqA {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  color: rgba(255,255,255,0.82);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0 clamp(16px, 2.5vw, 24px) clamp(14px, 2vw, 20px);
+}
+
+/* ── End section ────────────────────────────────────────────────────────── */
+.endSection { text-align: center; }
+.endLine {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+  color: rgba(255,255,255,0.75);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+.endBig {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui) !important;
+  font-size: clamp(2rem, 6vw, 4.5rem) !important;
+  color: var(--yellow, #ffd23e) !important;
+  text-shadow: 0 5px 0 rgba(10,58,87,0.35);
+  margin-top: clamp(20px, 3vw, 32px) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill { transition: none; }
+}
