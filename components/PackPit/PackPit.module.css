@@ -156,7 +156,7 @@
   box-shadow: -10px 40px 20px 2px rgba(0,0,0,0.2);
 }
 .chumDockCardOpened {
-  transform: scale(1.5) rotateX(0) rotateY(180deg) rotateZ(0) translateY(0) !important;
+  transform: scale(1.5) translateY(0) !important;
   box-shadow: 0 10px 24px rgba(0,0,0,0.2);
 }
 .chumDockCardRemoved {
