@@ -391,3 +391,12 @@
   .shelfCards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .shelfPanel { padding: 24px 16px 18px; }
 }
+
+.scorePulse {
+  animation: score-pulse 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes score-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
