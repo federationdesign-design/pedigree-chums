@@ -45,6 +45,13 @@ export default function PackPit() {
   };
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [scorePulse, setScorePulse] = useState(false);
+  const [britainMsg, setBritainMsg] = useState<number | null>(null);
+  const britainTimer = useRef<any>(null);
+  const showBritainMsg = (idx: number) => {
+    if (britainTimer.current) clearTimeout(britainTimer.current);
+    setBritainMsg(idx);
+    britainTimer.current = setTimeout(() => setBritainMsg(null), 2500);
+  };
   const prevScoreRef = useRef(0);
   useEffect(() => { if (score !== prevScoreRef.current) { prevScoreRef.current = score; setScorePulse(true); setTimeout(() => setScorePulse(false), 400); } }, [score]);
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
@@ -766,6 +773,15 @@ export default function PackPit() {
           if (hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
           return true;
         }
+        if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
+          hit.plugin.hits = (hit.plugin.hits || 0) + 1;
+          numAt(hit.position.x, hit.position.y, 50);
+          burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
+          const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
+          showBritainMsg(msgIdx);
+          if (hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
+          return true;
+        }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
@@ -919,6 +935,19 @@ export default function PackPit() {
             const pulse = 1 + 0.18 * Math.sin(now2 / 90);
             ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
             ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
+          }
+          ctx.restore(); return;
+        }
+        if (b.plugin.kind === "unionjack") {
+          const rr = b.plugin.half;
+          ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff"; ctx.fill();
+          const ujImg = b.plugin.img;
+          if (ujImg && ujImg.complete && ujImg.naturalWidth) {
+            ctx.save();
+            ctx.beginPath(); ctx.arc(0, 0, rr - 2, 0, Math.PI * 2); ctx.clip();
+            ctx.drawImage(ujImg, -rr, -rr, rr * 2, rr * 2);
+            ctx.restore();
           }
           ctx.restore(); return;
         }
