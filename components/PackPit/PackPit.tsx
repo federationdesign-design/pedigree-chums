@@ -1593,8 +1593,8 @@ export default function PackPit() {
       // one shoves nearby objects away; the percentage sets the strength (higher
       // percent = weaker). Each circle has 5 presses, and a single hold lasts at
       // most 5s before it auto-releases. After the fifth it goes inert and blue.
-      const REPEL = 0.05;      // master strength dial for the held force
-      const KICK = 6;          // instant outward shove on press
+      const REPEL = 0.01;      // master strength dial for the held force
+      const KICK = 1.2;          // instant outward shove on press
       const repelRange = (b: any) => Math.max(140, b.plugin.half * 5);
       const repelFactor = (b: any) => Math.max(0.12, 1 - b.plugin.share / 100);
       const releasePct = (b: any) => {
