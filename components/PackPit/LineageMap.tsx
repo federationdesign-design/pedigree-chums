@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
@@ -196,7 +196,6 @@ export default function LineageMap({
   const cardDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
   // the main square card peels off and drags like an ancestor card, but only once every frame is filled
   const [rootPos, setRootPos] = useState<{ x: number; y: number } | null>(null);
-  const rootCardRectRef = useRef<SVGRectElement | null>(null);
   useEffect(() => setRootPos(null), [breed.name]);
   const rootDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
@@ -219,30 +218,8 @@ export default function LineageMap({
   const zoomDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
   const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
-  useEffect(() => { setCardFlip(new Map()); cardFlipTimers.current.forEach(clearTimeout); cardFlipTimers.current.clear(); }, [breed.name]);
-  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); setPctHover(id); }; // patch_hoverfix_v1: info+pct open with zoom
+  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); }; // patch_hoverfix_v1: info opens with zoom
   const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); setInfoHover(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks; patch_hoverfix_v1: info closes with zoom
-  const startCardFlip = (id: string) => {
-    const t = cardFlipTimers.current;
-    if (t.get(id)) clearTimeout(t.get(id));
-    setCardFlip((m) => { const x = new Map(m); x.set(id, "closing"); return x; });
-    t.set(id, setTimeout(() => {
-      setCardFlip((m) => { const x = new Map(m); x.set(id, "back"); return x; });
-      t.set(id, setTimeout(() => {
-        setCardFlip((m) => { const x = new Map(m); x.set(id, "opening"); return x; });
-        t.set(id, setTimeout(() => {
-          setCardFlip((m) => { const x = new Map(m); x.delete(id); return x; });
-          t.set(id, setTimeout(() => startCardFlip(id), 6000)); // loop every 6s
-        }, 260));
-      }, 3000));
-    }, 260));
-  };
-  const resetCardFlip = (id: string) => {
-    const t = cardFlipTimers.current;
-    if (t.get(id)) { clearTimeout(t.get(id)); t.delete(id); }
-    setCardFlip((m) => { const x = new Map(m); x.delete(id); return x; });
-    t.set(id, setTimeout(() => startCardFlip(id), 2000)); // restart 2s idle
-  };
 
   // Dismiss a fixed/opened card (the X in its corner).
   const removeCard = (id: string) => {
@@ -264,7 +241,7 @@ export default function LineageMap({
   const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
   useEffect(() => { setPacked(false); setPackLabels({ chum: null, alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setBoxPop(false); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
-  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number; neg?: boolean }[]>([]);
+  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
   const [seen, setSeen] = useState<Set<string>>(new Set()); // circles tapped at least once, recoloured blue
   const fxId = useRef(0);
@@ -275,8 +252,6 @@ export default function LineageMap({
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const [flipPhase, setFlipPhase] = useState<null | "closing" | "back" | "opening">(null); // SVG fake-flip idle attractor
   const flipTimer = useRef<any>(null); // holds the 2min idle + loop timers
-  const [cardFlip, setCardFlip] = useState<Map<string, "closing" | "back" | "opening">>(new Map()); // per-card idle flip
-  const cardFlipTimers = useRef<Map<string, any>>(new Map()); // per-card idle timers
   const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
@@ -289,21 +264,20 @@ export default function LineageMap({
     return () => clearTimeout(t);
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
-  useEffect(() => {
-    const measure = () => {
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [breed.name, pan.x, pan.y]);
   const startFlipLoop = () => {
-    if (interacted.current) return; // user has interacted, no more flipping
     if (flipTimer.current) clearTimeout(flipTimer.current);
-    setFlipPhase("back");
+    setFlipPhase("closing");
     flipTimer.current = setTimeout(() => {
-      setFlipPhase(null);
-      flipTimer.current = setTimeout(() => startFlipLoop(), 8000);
-    }, 3000);
+      setFlipPhase("back");
+      flipTimer.current = setTimeout(() => {
+        setFlipPhase("opening");
+        flipTimer.current = setTimeout(() => {
+          setFlipPhase(null);
+          // loop: flip again after 8s
+          flipTimer.current = setTimeout(startFlipLoop, 8000);
+        }, 260);
+      }, 3000);
+    }, 260);
   };
   useEffect(() => {
     setFlipPhase(null);
@@ -313,11 +287,9 @@ export default function LineageMap({
   }, [breed.name]);
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
-    const isNeg = val < 0;
-    const flashSize = isNeg ? size * 1.8 : size; // negative = bigger
-    setFlashes((f) => [...f, { id, x, y, val, size: flashSize, neg: isNeg }]);
-    onScore?.(val);
-    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), isNeg ? 1200 : 650); // neg stays longer
+    setFlashes((f) => [...f, { id, x, y, val, size }]);
+    onScore?.(val); // add this flash into the pit's running total
+    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
   };
   // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,
   // sized from the circle itself so the family tree reads the same as the pit.
@@ -448,15 +420,6 @@ export default function LineageMap({
   // (Stage 1 console diagnostic removed) /* mix-box */
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
-  // start idle flip timer when a card lands in a frame
-  useEffect(() => {
-    filled.forEach((cardId) => {
-      if (!cardFlipTimers.current.has(cardId)) {
-        cardFlipTimers.current.set(cardId, setTimeout(() => startCardFlip(cardId), 2000));
-      }
-    });
-  }, [filled]);
-  useEffect(() => { if (packed) { pickCards.filter((c) => PACK_BREEDS.has(c.name)).forEach((c) => { if (!cardFlipTimers.current.has(c.id)) { cardFlipTimers.current.set(c.id, setTimeout(() => startCardFlip(c.id), 2000)); } }); } }, [packed]);
   const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
   useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
@@ -651,8 +614,6 @@ export default function LineageMap({
   // or by hitting Collect (which packs early, leaving framesDone false but the grid laid out)
   const canDragRoot = (framesDone || packed) && !collecting;
   const collectShowing = allBlue && !packed && !collecting && !framesDone; // the blue Collect button is on screen
-  const [collectPulse, setCollectPulse] = useState(false);
-  useEffect(() => { if (!collectShowing) { setCollectPulse(false); return; } const t = setTimeout(() => setCollectPulse(true), 7000); return () => clearTimeout(t); }, [collectShowing]);
   const complete = allBlue || packed; // swap to the green-tick icon and make it the obvious button
   // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
   // One tap opens every branch, turns all circles blue and pops all cards out, the
@@ -706,38 +667,15 @@ export default function LineageMap({
       interacted.current = true; setIdleHint(false);
       return;
     }
-    // fully open: auto-place all unplaced images into their correct frames
-    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed);
-    if (unplaced.length === 0) return;
-    unplaced.forEach((c, i) => {
-      const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
-      if (!target) return;
-      window.setTimeout(() => {
-        // pin card so it survives branch closing during tween
-        setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
-        const sx0 = c.cardX, sy0 = c.cardY;
-        const ex = target.sx - pan.x, ey = target.sy - pan.y;
-        let lastBub = 0;
-        tween(460, (t) => {
-          const e2 = 1 - Math.pow(1 - t, 3);
-          const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
-          setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: gx, y: gy }); return x; });
-          if (t - lastBub > 0.03 && t < 0.95) {
-            lastBub = t;
-            const bid = bubbleSeq.current++;
-            setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
-            window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
-          }
-        }, () => {
-          setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
-          setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
-          const pid = puffSeq.current++;
-          setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
-          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
-        });
-      }, i * 80);
+    // fully open: fold the deepest ring, leaving the first ring and any placed cards
+    const openIds = [...open].filter((id) => id !== "0");
+    if (!openIds.length) return; // back at the first ring, nothing more to fold
+    const deepest = openIds.filter((id) => {
+      const node = shown.find((n) => n._id === id);
+      if (!node || !node.children) return true;
+      return !(node.children as Node[]).some((k) => open.has(k._id)); // none of its children are open -> it is a deepest ring
     });
+    setOpen((prev) => { const s = new Set(prev); deepest.forEach((id) => s.delete(id)); return s; });
   };
 
   const doPack = (fx?: number, fy?: number, award: number = 400) => {
@@ -880,19 +818,10 @@ export default function LineageMap({
     <>
       <g
         className={canDragRoot ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
-        ref={rootCardRectRef}
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          // hop the card right+up away from the frames grid
-          setPan((prev) => ({
-            x: prev.x + 28 + Math.random() * 12,
-            y: prev.y - 18 - Math.random() * 8,
-          }));
-          revealStep();
-        }}
+        onDoubleClick={(e) => { e.stopPropagation(); revealStep(); }}
         onPointerDown={(e) => {
           if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
@@ -911,14 +840,42 @@ export default function LineageMap({
         <clipPath id={clip}>
           <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
         </clipPath>
-        {/* front face only - hide dog image when flip overlay shows back face */}
-        <>
-          <rect ref={rootCardRectRef} x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard + (flipPhase === "back" ? " " + styles.rootCardPulse : "")} />
-          {breed.image ? (
-            <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />
-          ) : null}
-        </>
-        {/* idle hint: pulsing double-tap text above card */}
+        {/* flip wrapper: scaleX animates 1->0->1; content swaps at midpoint */}
+        <g style={{
+          animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards`
+                   : flipPhase === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards`
+                   : undefined,
+        }}>
+          {flipPhase === "back" || flipPhase === "opening" ? (
+            // back face: yellow with breed name
+            <>
+              <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} fill="var(--yellow, #ffd23e)" />
+              {/* double-tap icon SVG */}
+              <image href="/double-tap-icon-blue.svg"
+                x={-ROOT * 0.72} y={-ROOT * 0.82}
+                width={ROOT * 1.44} height={ROOT * 1.44} />
+
+            </>
+          ) : (
+            // front face: dog image
+            <>
+              <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
+              {breed.image ? (
+                <image
+                  href={bust(breed.image)}
+                  x={-ROOT}
+                  y={-ROOT}
+                  width={ROOT * 2}
+                  height={ROOT * 2}
+                  clipPath={`url(#${clip})`}
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              ) : null}
+            </>
+          )}
+        </g>
+        {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
+
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
@@ -980,7 +937,7 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={`${styles.close} ${styles.closeLarge}`} onClick={onClose} aria-label="Close">
+      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
@@ -1163,7 +1120,7 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : (() => { const wc = (dragName || "").split(" ").length; return wc <= 2 ? 14 : wc <= 3 ? 12 : wc <= 4 ? 10 : 8; })()}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 14}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -1171,18 +1128,12 @@ export default function LineageMap({
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
                         ) : (() => {
-                          // split breed name into words, up to 3 lines, font shrinks with word count
+                          // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const fs = words.length <= 2 ? 12 : words.length <= 3 ? 10 : words.length <= 4 ? 8 : 6;
-                          const lineH = fs * 1.3;
-                          // group into max 3 lines of ~2 words each
-                          const lines: string[] = [];
-                          for (let i = 0; i < words.length; i += Math.ceil(words.length / 3)) {
-                            lines.push(words.slice(i, i + Math.ceil(words.length / 3)).join(" "));
-                          }
-                          const startY = lines.length === 1 ? 0 : lines.length === 2 ? -lineH / 2 : -lineH;
-                          return lines.map((l, i) => (
-                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{l}</tspan>
+                          const lineH = 14;
+                          const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
+                          return words.map((w, i) => (
+                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
                           ));
                         })()}
                       </text>
@@ -1280,7 +1231,6 @@ export default function LineageMap({
                     setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
                     setDragImg(c.img);
                     setDragName(c.name); /* pickup-name */
-                    resetCardFlip(c.id); // reset idle flip on interaction
                     setDragXY({ x: e.clientX, y: e.clientY });
                   }}
                   onPointerMove={(e) => {
@@ -1361,33 +1311,15 @@ export default function LineageMap({
                   <clipPath id={clipId}>
                     <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} rx={15} />
                   </clipPath>
-                  {/* idle flip wrapper for Pedigree Chums cards */}
-                  <g style={{
-                    opacity: cardFlip.get(c.id) === "closing" || cardFlip.get(c.id) === "opening" ? 0 : 1,
-                    transition: "opacity 0.26s ease-in-out",
-                  }}>
-                    {cardFlip.get(c.id) === "back" || cardFlip.get(c.id) === "opening" ? (
-                      <>
-                        <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} rx={15} fill="var(--yellow, #ffd23e)" />
-                        <text x={c.cardX} y={c.cardY} textAnchor="middle" dominantBaseline="central"
-                          style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(CW * 0.22)}px`, fill: "var(--navy, #0a3a57)" }}>
-                          {c.name.split(" ").map((w: string, i: number) => (
-                            <tspan key={i} x={c.cardX} dy={i === 0 ? `-${Math.round(CW * 0.12)}px` : `${Math.round(CW * 0.26)}px`}>{w}</tspan>
-                          ))}
-                        </text>
-                      </>
-                    ) : (
-                      <image
-                        href={encodeURI(bust(c.img))}
-                        x={c.cardX - CW / 2}
-                        y={c.cardY - CW / 2}
-                        width={CW}
-                        height={CW}
-                        clipPath={`url(#${clipId})`}
-                        preserveAspectRatio="xMidYMid slice"
-                      />
-                    )}
-                  </g>
+                  <image
+                    href={encodeURI(bust(c.img))}
+                    x={c.cardX - CW / 2}
+                    y={c.cardY - CW / 2}
+                    width={CW}
+                    height={CW}
+                    clipPath={`url(#${clipId})`}
+                    preserveAspectRatio="xMidYMid slice"
+                  />
                   <rect
                     x={c.cardX - CW / 2}
                     y={c.cardY - CW / 2}
@@ -1550,72 +1482,13 @@ export default function LineageMap({
             Wrong dog
           </text>
         )}
-        {/* flashes rendered in fixed overlay below for correct z-order */}
+        {flashes.map((f) => (
+          <text key={`f${f.id}`} className={styles.flashNum} x={f.x} y={f.y} fontSize={f.size} textAnchor="middle">
+            {f.val}
+          </text>
+        ))}
         </g>
       </svg>
-      {flipPhase === "back" && (() => {
-        const r = rootCardRectRef.current?.getBoundingClientRect();
-        if (!r) return null;
-        return (
-        <div style={{
-          position: "fixed",
-          left: r.left,
-          top: r.top,
-          width: r.width,
-          height: r.height,
-          perspective: "900px",
-          zIndex: 52,
-          pointerEvents: "none",
-          borderRadius: "24px",
-        }}>
-          <div style={{
-            width: "100%",
-            height: "100%",
-            position: "relative",
-            transformStyle: "preserve-3d",
-            transform: "rotateY(180deg)",
-            transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
-          }}>
-            <div style={{
-              position: "absolute", inset: 0,
-              backfaceVisibility: "hidden",
-              borderRadius: "24px",
-              background: "transparent",
-            }} />
-            <div style={{
-              position: "absolute", inset: 0,
-              backfaceVisibility: "hidden",
-              transform: "rotateY(180deg)",
-              background: "var(--yellow, #ffd23e)",
-              borderRadius: "24px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "4px",
-            }}>
-              <img src="/double-tap-icon-blue.svg" alt="" className={styles.dtIcon} style={{ width: "40%", height: "40%", objectFit: "contain" }} />
-              <span style={{ fontFamily: "Luckiest Guy, system-ui", fontSize: "13px", color: "#0a3a57", textAlign: "center" }}>double tap</span>
-            </div>
-          </div>
-        </div>
-        );
-      })()}
-      {/* flash number overlay - above all SVG content */}
-      {flashes.length > 0 && (
-        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
-          <svg width="100%" height="100%">
-            {flashes.map((f) => (
-              <text key={`f${f.id}`}
-                className={f.neg ? styles.flashNeg : styles.flashNum}
-                x={f.x + pan.x} y={f.y + pan.y} fontSize={f.size} textAnchor="middle"
-                style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
-                {f.val}
-              </text>
-            ))}
-          </svg>
-        </div>
-      )}
       {infoHover && (() => {
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
@@ -1668,11 +1541,8 @@ export default function LineageMap({
       {pctHover && (() => {
         const c = pickCards.find((x) => x.id === pctHover);
         if (!c) return null;
-        // if zoom open for same card, sit right of zoomed image; otherwise below card
-        const zoomOpenPct = zoomedId === c.id;
-        const zoomSizePct = CW * 3;
-        const left = zoomOpenPct ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSizePct + 10 : c.cardX - CW / 2 + pan.x;
-        const top = zoomOpenPct ? c.cardY - CW / 2 + pan.y + zoomOff.y + zoomSizePct / 2 : c.cardY + CW / 2 + 6 + pan.y;
+        const left = c.cardX - CW / 2 + pan.x;
+        const top = c.cardY + CW / 2 + 6 + pan.y;
         const info = breedMix.get(c.img);
         const genLabel = (d: number) => {
           if (d <= 0) return "the breed itself";
