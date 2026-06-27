@@ -1465,8 +1465,11 @@ export default function PackPit() {
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
         const bowlBodies2 = bodies.filter((b: any) => b.plugin?.prop === "bowl");
-        const nonBowl = bodies.filter((b: any) => b.plugin?.prop !== "bowl");
-        nonBowl.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        const rods = bodies.filter((b: any) => b.plugin?.kind === "rod" || b.plugin?.kind === "pill");
+        const nonBowlNonRod = bodies.filter((b: any) => b.plugin?.prop !== "bowl" && b.plugin?.kind !== "rod" && b.plugin?.kind !== "pill");
+        // rods and pills drawn first so they appear behind everything
+        rods.forEach((b: any) => { drawBall(ctx, b, dimLevel, false); });
+        nonBowlNonRod.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         // draw hover body before bowl so bowl rim always stays on top
         if (hoverBody && hoverBody.plugin?.prop !== "bowl") drawBall(ctx, hoverBody, dimLevel, true);
         // draw bowl last so its rim appears on top of contained objects
