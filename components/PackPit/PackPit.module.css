@@ -411,7 +411,6 @@
   width: 100%;
   aspect-ratio: 300 / 430; /* the physical card is portrait */
   border-radius: 14px;
-  overflow: hidden;
   background: transparent;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
   perspective: 900px;
