@@ -25,10 +25,9 @@ export default function GameOver({ chums }: Props) {
   return (
     <div ref={overlayRef} className={styles.overlay}>
       <div className={styles.inner}>
-        <h1 className={styles.title}>Game Over</h1>
-        <p className={styles.sub}>
-          {chums === 1 ? "You got 1 chum." : `You got ${chums} chums.`}
-        </p>
+        <h1 className={styles.title}>
+          You have {chums} dog{chums === 1 ? "" : "s"} in your hand
+        </h1>
       </div>
     </div>
   );
