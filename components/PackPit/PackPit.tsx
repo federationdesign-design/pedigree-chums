@@ -36,13 +36,6 @@ export default function PackPit() {
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
-  const [britainMsg, setBritainMsg] = useState<number | null>(null);
-  const britainTimer = useRef<any>(null);
-  const showBritainMsg = (idx: number) => {
-    if (britainTimer.current) clearTimeout(britainTimer.current);
-    setBritainMsg(idx);
-    britainTimer.current = setTimeout(() => setBritainMsg(null), 2500);
-  };
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [scorePulse, setScorePulse] = useState(false);
   const [britainMsg, setBritainMsg] = useState<number | null>(null);
