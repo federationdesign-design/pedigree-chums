@@ -1034,16 +1034,8 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <defs>
-          <clipPath id="lm-edge-clip">
-            <rect x={-9999} y={-9999} width={19998} height={9999 + breed.y - ROOT - 8} />
-            <rect x={-9999} y={breed.y + ROOT + 8} width={19998} height={9999} />
-            <rect x={-9999} y={breed.y - ROOT - 8} width={breed.x - ROOT - 8} height={(ROOT + 8) * 2} />
-            <rect x={breed.x + ROOT + 8} y={breed.y - ROOT - 8} width={9999} height={(ROOT + 8) * 2} />
-          </clipPath>
-        </defs>
-        <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
-            <g clipPath="url(#lm-edge-clip)">
+            <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
+            <g>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
