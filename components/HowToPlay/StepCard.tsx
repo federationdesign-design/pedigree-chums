@@ -30,6 +30,25 @@ type Props = {
 };
 
 const RADIUS = 16;
+const PANEL_W = 480;
+const PANEL_GAP = 32;
+
+// Simple word wrapper for SVG text -- splits into lines of max ~charLimit chars
+function wrapText(text: string, charLimit = 48): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    if ((current + " " + word).trim().length > charLimit) {
+      if (current) lines.push(current);
+      current = word;
+    } else {
+      current = current ? current + " " + word : word;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
 
 export default function StepCard({ step, onClose, cardPos }: Props) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
@@ -56,7 +75,6 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
     const onCard = hitCard(e);
     dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cx, oy: cy, moved: false, onCard };
   };
-
   const onOverlayMove = (e: React.PointerEvent) => {
     const d = dragRef.current;
     if (!d || e.pointerId !== d.id || !d.onCard) return;
@@ -64,30 +82,19 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
     if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
     if (d.moved) setPos({ x: d.ox + dx, y: d.oy + dy });
   };
-
   const onOverlayUp = () => {
-    const d = dragRef.current;
-    dragRef.current = null;
+    const d = dragRef.current; dragRef.current = null;
     if (d && d.moved) suppressClick.current = true;
   };
-
   const onOverlayClick = () => {
     if (suppressClick.current) { suppressClick.current = false; return; }
     onClose();
   };
 
-  // Panel sits on whichever side has more room
-  const panelStyle: React.CSSProperties = (() => {
-    if (typeof window === "undefined") return {};
-    const vw = window.innerWidth;
-    const panelW = Math.min(620, vw * 0.52);
-    const margin = 32;
-    if (cx > vw / 2) {
-      return { position: "fixed" as const, left: Math.max(margin, cx - cw / 2 - panelW - margin), top: "50%", transform: "translateY(-50%)", width: panelW };
-    } else {
-      return { position: "fixed" as const, left: Math.min(cx + cw / 2 + margin, vw - panelW - margin), top: "50%", transform: "translateY(-50%)", width: panelW };
-    }
-  })();
+  // Panel sits to the right of the card (in SVG space, unrotated)
+  const panelX = cw / 2 + PANEL_GAP;
+  const panelY = -ch / 2;
+  const headerH = 100;
 
   return (
     <div
@@ -98,49 +105,73 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
       onPointerCancel={onOverlayUp}
       onClick={onOverlayClick}
     >
-      {/* The card -- SVG at its pit position, no pointer events (overlay handles drag) */}
       <svg style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }} aria-hidden="true">
         <defs>
           <clipPath id="htp-card-clip">
             <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} />
           </clipPath>
         </defs>
-        <g transform={`translate(${cx},${cy}) rotate(${angleDeg})`}>
-          <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} fill="#ffffff" />
-          {image && (
-            <image href={image} x={-cw / 2} y={-ch / 2} width={cw} height={ch} clipPath="url(#htp-card-clip)" preserveAspectRatio="xMidYMid slice" />
-          )}
-          <rect x={-cw / 2 - 4} y={-ch / 2 - 4} width={cw + 8} height={ch + 8} rx={RADIUS + 4} fill="none" stroke="var(--yellow, #ffd23e)" strokeWidth={5} />
+
+        {/* Everything in one group -- card + panel -- translates together */}
+        <g transform={`translate(${cx},${cy})`}>
+
+          {/* Card (rotated to match pit angle) */}
+          <g transform={`rotate(${angleDeg})`}>
+            <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} fill="#ffffff" />
+            {image && (
+              <image href={image} x={-cw / 2} y={-ch / 2} width={cw} height={ch} clipPath="url(#htp-card-clip)" preserveAspectRatio="xMidYMid slice" />
+            )}
+            <rect x={-cw / 2 - 4} y={-ch / 2 - 4} width={cw + 8} height={ch + 8} rx={RADIUS + 4} fill="none" stroke="var(--yellow, #ffd23e)" strokeWidth={5} />
+          </g>
+
+          {/* Text panel -- always upright, offset to the right of the card */}
+          <g transform={`translate(${panelX}, ${panelY})`} style={{ pointerEvents: "none" }}>
+            {/* Heading */}
+            <text
+              y={0}
+              fontFamily="var(--font-display,'Luckiest Guy',system-ui)"
+              fontSize={18}
+              fill="rgba(255,255,255,0.8)"
+              letterSpacing="1"
+            >
+              HOW TO PLAY...
+            </text>
+            <text
+              y={52}
+              fontFamily="var(--font-display,'Luckiest Guy',system-ui)"
+              fontSize={52}
+              fill="var(--yellow,#ffd23e)"
+            >
+              {step.heading}
+            </text>
+
+            {/* Rows */}
+            {step.rows.map((row, i) => {
+              const bodyLines = wrapText(row.body);
+              const prevRows = step.rows.slice(0, i);
+              const ry = headerH + prevRows.reduce((acc, r) => acc + 36 + wrapText(r.body).length * 18 + 16, 0);
+              return (
+                <g key={i} transform={`translate(0, ${ry})`}>
+                  {i > 0 && (
+                    <line x1={0} y1={-8} x2={PANEL_W} y2={-8} stroke="rgba(255,255,255,0.3)" strokeWidth={2} strokeDasharray="5 10" />
+                  )}
+                  <image href={row.icon} x={0} y={0} width={44} height={44} />
+                  <text x={56} y={16} fontFamily="Montserrat,sans-serif" fontSize={16} fontWeight="700" fill="#ffffff">{row.title}</text>
+                  {bodyLines.map((line, li) => (
+                    <text key={li} x={56} y={36 + li * 18} fontFamily="Montserrat,sans-serif" fontSize={13} fontWeight="600" fill="rgba(255,255,255,0.88)">{line}</text>
+                  ))}
+                </g>
+              );
+            })}
+          </g>
+
         </g>
       </svg>
 
-      {/* Close */}
+      {/* Close button -- fixed top right like LineageMap */}
       <button type="button" className={styles.close} onClick={(e: React.MouseEvent) => { e.stopPropagation(); onClose(); }} aria-label="Close">
         &times;
       </button>
-
-      {/* Text panel -- radiates from the card like the family tree */}
-      <div className={styles.panel} style={panelStyle} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-        <div className={styles.header}>
-          <p className={styles.overline}>HOW TO PLAY...</p>
-          <h2 className={styles.heading}>{step.heading}</h2>
-        </div>
-        <div className={styles.rows}>
-          {step.rows.map((row, i) => (
-            <div key={i} className={styles.row}>
-              <div className={styles.iconWrap}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={row.icon} alt="" className={styles.icon} aria-hidden="true" />
-              </div>
-              <div className={styles.rowText}>
-                <p className={styles.rowTitle}>{row.title}</p>
-                <p className={styles.rowBody}>{row.body}</p>
-              </div>
-              {i < step.rows.length - 1 && <div className={styles.divider} />}
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
