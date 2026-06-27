@@ -8,7 +8,8 @@ import STEPS from "./steps";
 type Props = {
   open: boolean;
   onClose: () => void;
-  activeStep?: number | null; // 0-4 when opened from a pit card; null = show full overview
+  activeStep?: number | null;
+  cardPos?: { x: number; y: number; w: number; h: number } | null;
 };
 
 const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
@@ -21,7 +22,7 @@ const OVERVIEW_STEPS = [
   "The player with the most pedigree chums wins",
 ];
 
-export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
+export default function HowToPlay({ open, onClose, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -98,6 +99,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
         onNext={step < STEPS.length - 1 ? () => setStep((s: number | null) => Math.min((s ?? 0) + 1, STEPS.length - 1)) : undefined}
         totalSteps={STEPS.length}
         onStepSelect={(i: number) => setStep(i)}
+        cardPos={cardPos}
       />,
       document.body
     );

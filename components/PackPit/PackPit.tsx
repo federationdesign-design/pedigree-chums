@@ -105,6 +105,7 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
+  const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
@@ -840,7 +841,11 @@ export default function PackPit() {
           // HTP step cards tapped in the pit -- open the overlay at the matching step
           const HTP_NAMES = ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"];
           const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
-          if (stepIdx !== -1) { setHowToPlayStep(stepIdx); setHowToPlay(true); return true; }
+          if (stepIdx !== -1) {
+            const r = render.canvas.getBoundingClientRect();
+            setHowToPlayCardPos({ x: r.left + hit.position.x, y: r.top + hit.position.y, w: hit.plugin.w || 120, h: hit.plugin.h || 120 });
+            setHowToPlayStep(stepIdx); setHowToPlay(true); return true;
+          }
         }
         return false;
       };
@@ -2147,7 +2152,7 @@ export default function PackPit() {
         <span className={styles.shakeText}>Shake</span>
       </button>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
-      <HowToPlay open={howToPlay} activeStep={howToPlayStep} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); }} />
+      <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
           {Array.from({ length: 30 }).map((_, i) => {
