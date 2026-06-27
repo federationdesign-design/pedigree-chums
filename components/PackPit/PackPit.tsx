@@ -1585,7 +1585,21 @@ export default function PackPit() {
         }
         // the blue name pills drop in too, each still carrying its breed name
         for (const pl of pills) {
-          const px = pl.x - rect.left, py = pl.y - rect.top, pw = Math.max(44, pl.w), ph = 26;
+          // optimal split to find balanced line lengths
+          const plWords = pl.name.split(" ");
+          let plLines: string[] = [pl.name];
+          if (plWords.length > 1) {
+            let plBestDiff = Infinity;
+            for (let sp = 1; sp < plWords.length; sp++) {
+              const l1 = plWords.slice(0, sp).join(" "), l2 = plWords.slice(sp).join(" ");
+              const diff = Math.abs(l1.length - l2.length);
+              if (diff < plBestDiff) { plBestDiff = diff; plLines = [l1, l2]; }
+            }
+          }
+          const plLongest = Math.max(...plLines.map((l) => l.length));
+          const pw = Math.max(50, plLongest * 7 + 24);
+          const ph = Math.max(28, plLines.length * 15 + 14);
+          const px = pl.x - rect.left, py = pl.y - rect.top;
           const b: any = Bodies.rectangle(px, py, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.35, friction: 0.4, frictionAir: 0.008, density: 0.0012, render: { visible: false } });
           b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0, hits: 0, maxHits: 3, gone: false, chum: PACK_NAMES.has(pl.name) }; // a pack dog: this pill never expires and the bomb ignores it
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.4 });
