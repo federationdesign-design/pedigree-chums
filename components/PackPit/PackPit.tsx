@@ -668,6 +668,24 @@ export default function PackPit() {
           logoBody = null;
         }
       };
+      // pill magnet: each breed name pill gently attracts its matching dog card
+      const PILL_MAGNET_RADIUS = 200;
+      const PILL_PULL = 0.00008;
+      Events.on(engine, "beforeUpdate", () => {
+        const all = Composite.allBodies(engine.world);
+        const pills = all.filter((b: any) => b.plugin?.kind === "pill" && !b.plugin.gone);
+        for (const pill of pills) {
+          const card = all.find((b: any) => !b.plugin?.kind && !b.plugin?.prop && !b.isStatic && b.plugin?.name === pill.plugin.name);
+          if (!card) continue;
+          const dx = card.position.x - pill.position.x;
+          const dy = card.position.y - pill.position.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > PILL_MAGNET_RADIUS || dist < 1) continue;
+          const closeness = PILL_MAGNET_RADIUS - dist;
+          const f = PILL_PULL * closeness;
+          Body.applyForce(pill, pill.position, { x: (dx / dist) * f, y: (dy / dist) * f });
+        }
+      });
       Events.on(engine, "beforeUpdate", onFuseMagnet);
       // --------------------------------------------------------------------
       mc.collisionFilter.mask = 0xffffffff & ~0x0002; // category 0x0002 (inert circles) cannot be grabbed
