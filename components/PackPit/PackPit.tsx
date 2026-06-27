@@ -234,7 +234,7 @@ export default function PackPit() {
           const bw = prop.width, bh = prop.width / prop.aspect, k = bw / 400.2;
           const R = 56 * k, dx = 143.5 * k, dy = 40.7 * k, barW = 287 * k, barH = 92 * k;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const poHeavy = { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } }; // heavier floor keeps bowl upright
+          const poFloor = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
           const parts = [
             Bodies.rectangle(x, y, barW, barH, po),
             Bodies.circle(x - dx, y - dy, R, po),
@@ -265,9 +265,9 @@ export default function PackPit() {
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
               : [
-                Bodies.rectangle(  (250 - cx0) * k, (255 - cy0) * k, 340 * k, 50 * k, poHeavy),
-                Bodies.rectangle(  (515 - cx0) * k, (270 - cy0) * k, 340 * k, 50 * k, poHeavy),
-                Bodies.rectangle(  (780 - cx0) * k, (250 - cy0) * k, 340 * k, 50 * k, poHeavy),
+                Bodies.rectangle(  (250 - cx0) * k, (255 - cy0) * k, 340 * k, 50 * k, poFloor),
+                Bodies.rectangle(  (515 - cx0) * k, (270 - cy0) * k, 340 * k, 50 * k, poFloor),
+                Bodies.rectangle(  (780 - cx0) * k, (250 - cy0) * k, 340 * k, 50 * k, poFloor),
                 Bodies.rectangle(  (130 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po),
                 Bodies.rectangle(  (900 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po)
               ];
