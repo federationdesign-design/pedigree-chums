@@ -139,10 +139,10 @@ export default function PackPit() {
       if (gameOverRef.current) { clearInterval(iv); return; }
       // dispatch a check event that PackPit physics loop handles
       window.dispatchEvent(new Event("pc:check-gameover"));
-    }, 2000);
+    }, 1000);
     const onResult = (e: Event) => {
       const count = (e as CustomEvent).detail?.stuckCount ?? 0;
-      if (count >= 3 && !gameOverRef.current) {
+      if (count >= 2 && !gameOverRef.current) {
         gameOverRef.current = true;
         setGameOver(true);
       }
@@ -2015,25 +2015,18 @@ export default function PackPit() {
         if (uj) { uj.plugin.popped = true; poof(uj.position.x, uj.position.y, uj.plugin.half); Composite.remove(engine.world, uj); }
       };
       window.addEventListener("pc:britain-dismiss", onBritainDismiss);
-      // Game over: if 3+ bodies have more than 50% of themselves above the pit top on
-      // TWO consecutive checks (2s apart), the pit is full and game is over.
-      const aboveOnLastCheck = new Set<number>();
+      // Game over: if 3+ non-static bodies have their centre above y=0 (pit top),
+      // the pit is full. Single check -- no consecutive requirement.
       const onCheckGameover = () => {
         const all = Composite.allBodies(engine.world);
-        const aboveNow = new Set<number>();
+        let stuckCount = 0;
         for (const b of all) {
           if (b.isStatic) continue;
           if (!b.plugin) continue;
           if (b.plugin.kind === "pct" || b.plugin.prop || b.plugin.kind === "menu") continue;
-          // 50% above pit top: centre Y < -(half the body)
-          const half = b.plugin.half || 30;
-          if (b.position.y < -half) aboveNow.add(b.id);
+          if (b.plugin.kind === "unionjack") continue;
+          if (b.position.y < 0) stuckCount++;
         }
-        // count bodies above on BOTH this check AND the last check
-        let stuckCount = 0;
-        for (const id of aboveNow) { if (aboveOnLastCheck.has(id)) stuckCount++; }
-        aboveOnLastCheck.clear();
-        for (const id of aboveNow) aboveOnLastCheck.add(id);
         window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuckCount } }));
       };
       window.addEventListener("pc:check-gameover", onCheckGameover);
