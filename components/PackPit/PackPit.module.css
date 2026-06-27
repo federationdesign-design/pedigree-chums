@@ -145,8 +145,6 @@
   cursor: pointer;
   border-bottom-color: #933;
   overflow: hidden;
-  backface-visibility: hidden;
-  transform-style: flat;
   isolation: isolate;
 }
 .chumDockCard img {
@@ -171,8 +169,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: rotateY(180deg);
-  backface-visibility: hidden;
   border-radius: 10px;
 }
 .chumDockBack span {
