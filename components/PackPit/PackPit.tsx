@@ -1101,7 +1101,7 @@ export default function PackPit() {
       }
 
       let hoverBody: any = null, hoverStart = 0;
-      const DIM_MIN = 0.5;   // how far the rest of the pack dims behind the hovered chum
+      const DIM_MIN = 1;   // no dimming - all cards always full opacity
       const DIM_TIME = 0.5;  // seconds to ease in and out of that dim, so it never flashes
       let dimLevel = 1, lastFrame = 0;
       const particles: any[] = [];
