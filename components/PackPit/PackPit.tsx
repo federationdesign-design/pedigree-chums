@@ -624,7 +624,7 @@ export default function PackPit() {
         const pairPartner: string[] = PAIRS.map(([a, b], i) => pairChoice[i] === a ? b : a);
         if (isMobile) {
           // mobile: same scripted pairs as desktop, bowl first, 2 balls (kept), partners rotate
-          addProps([bowl]); // bowl drops immediately on mobile
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl (matches desktop)
           waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  2 tennis balls (mobile keeps 2)
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));                                         // 1400 bone + slipper
@@ -632,8 +632,19 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 2400));             // 2400 menu
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 3000));   // 3000 pair 1
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3500)); // 3500 panels + arrow
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8000));   // 8000 pair 2
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3
+          waveTimers.push(setTimeout(() => {
+            if (!disposed) {
+              const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
+              const ujR = BIG * 0.6;
+              const ujB: any = Bodies.circle(w * 0.7, -ujR, ujR, { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006, render: { visible: false } });
+              ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 8, popped: false };
+              Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
+              Composite.add(engine.world, ujB);
+            }
+          }, 15500));                                                                                                 // 15500 Union Jack mobile
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6
