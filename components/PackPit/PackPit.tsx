@@ -615,7 +615,7 @@ export default function PackPit() {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
               const ujR = BIG * 0.6;
               const ujB: any = Bodies.circle(w * 0.7, -ujR, ujR, { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006, render: { visible: false } });
-              ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 10, popped: false };
+              ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 8, popped: false };
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
@@ -823,16 +823,8 @@ export default function PackPit() {
           burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
           const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
           showBritainMsg(msgIdx);
-          if (hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
-          return true;
-        }
-        if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
-          hit.plugin.hits = (hit.plugin.hits || 0) + 1;
-          numAt(hit.position.x, hit.position.y, 50);
-          burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
-          const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
-          showBritainMsg(msgIdx);
-          if (hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
+          // poof once the last message (index 2) has been revealed
+          if (msgIdx >= 2 || hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
           return true;
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
