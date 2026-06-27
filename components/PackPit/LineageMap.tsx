@@ -1292,9 +1292,14 @@ export default function LineageMap({
                     if (cd.moved) {
                       suppressClick.current = true;
                       setDragXY({ x: e.clientX, y: e.clientY });
+                      // magnet: snap toward nearest matching frame within 200px
+                      const SNAP2 = 200;
+                      const nearFrame = frames.find((f) => f.img === c.img && !filled.has(f.id) && Math.hypot(e.clientX - f.sx, e.clientY - f.sy) <= SNAP2);
+                      const dragX = nearFrame ? nearFrame.sx - pan.x : cd.ox + dx;
+                      const dragY = nearFrame ? nearFrame.sy - pan.y : cd.oy + dy;
                       setDragPos((m) => {
                         const next = new Map(m);
-                        next.set(c.id, { x: cd.ox + dx, y: cd.oy + dy });
+                        next.set(c.id, { x: dragX, y: dragY });
                         return next;
                       });
                       // snapshot once so the card outlives its branch closing
@@ -1312,7 +1317,8 @@ export default function LineageMap({
                     if (cd && e.pointerId === cd.id) {
                       try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
                       if (cd.moved) {
-                        const hit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
+                        const SNAP = 200;
+                        const hit = frames.find((f) => f.img === c.img && Math.hypot(e.clientX - f.sx, e.clientY - f.sy) <= SNAP);
                         if (hit && hit.img === c.img && !filled.has(hit.id)) {
                           // first copy of this breed: it fills the frame (+100)
                           setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
