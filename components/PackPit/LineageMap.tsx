@@ -1034,12 +1034,14 @@ export default function LineageMap({
         {hasTree ? (
           <>
             <g className={removing ? styles.removingFade : styles.removingVisible}>
+            <g>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
                 const p = n._parent as Node;
                 return <line key={`e${n._id}`} className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()} x1={p._x} y1={p._y} x2={n._x} y2={n._y} />;
               })}
+            </g>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
