@@ -34,7 +34,8 @@ export default function PackPit() {
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
   const [shelfOpen, setShelfOpen] = useState(false);
   const [britainOpen, setBritainOpen] = useState(false);
-  const [shelfCardStates, setShelfCardStates] = useState<Map<string, "opened" | "removed">>(new Map()); // the collection shelf overlay, opened from the tally
+  const [shelfCardStates, setShelfCardStates] = useState<Map<string, "opened" | "removed">>(new Map());
+  const [flyingCard, setFlyingCard] = useState<{ name: string; img: string; rect: DOMRect } | null>(null); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
@@ -2179,6 +2180,27 @@ export default function PackPit() {
           </div>
         </div>
       )}
+      {flyingCard && (
+        <div style={{
+          position: "fixed",
+          left: flyingCard.rect.left,
+          top: flyingCard.rect.top,
+          width: flyingCard.rect.width,
+          height: flyingCard.rect.height,
+          zIndex: 600,
+          pointerEvents: "none",
+          transition: "all 700ms cubic-bezier(0.22,1,0.36,1)",
+          transform: "translateY(calc(100vh - " + flyingCard.rect.top + "px)) scale(0.3)",
+          opacity: 0,
+          background: "var(--yellow, #ffd23e)",
+          borderRadius: "8px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: "var(--font-display, 'Luckiest Guy')",
+          fontSize: "13px", color: "#0a3a57", textAlign: "center", padding: "8px",
+        }}>
+          {flyingCard.name}
+        </div>
+      )}
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
@@ -2215,13 +2237,15 @@ export default function PackPit() {
                                 perspective: "900px",
                                 cursor: "pointer",
                               }}
-                              onClick={() => {
-                                setShelfCardStates((m) => {
-                                  const x = new Map(m);
-                                  if (!cardState) x.set(c.name, "opened");
-                                  else if (cardState === "opened") x.set(c.name, "removed");
-                                  return x;
-                                });
+                              onClick={(e) => {
+                                if (!cardState) {
+                                  setShelfCardStates((m) => { const x = new Map(m); x.set(c.name, "opened"); return x; });
+                                } else if (cardState === "opened") {
+                                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                                  setFlyingCard({ name: c.name, img: c.img, rect });
+                                  setShelfCardStates((m) => { const x = new Map(m); x.set(c.name, "removed"); return x; });
+                                  setTimeout(() => setFlyingCard(null), 800);
+                                }
                               }}
                             >
                               <div style={{
