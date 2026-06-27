@@ -32,23 +32,11 @@ export default function PackPit() {
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
-  const [shelfOpen, setShelfOpen] = useState(false);
-  const [britainMsg, setBritainMsg] = useState<number | null>(null);
-  const britainTimer = useRef<any>(null);
-  const showBritainMsg = (idx: number) => {
-    if (britainTimer.current) clearTimeout(britainTimer.current);
-    setBritainMsg(idx);
-    britainTimer.current = setTimeout(() => setBritainMsg(null), 2500);
-  };
-  const [shelfCardStates, setShelfCardStates] = useState<Map<string, "opened" | "removed">>(new Map());
-  const [flyingCard, setFlyingCard] = useState<{ name: string; img: string; rect: DOMRect } | null>(null); // the collection shelf overlay, opened from the tally
+  const [shelfOpen, setShelfOpen] = useState(false); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
-  const [score, setScore] = useState(0);
-  const [scorePulse, setScorePulse] = useState(false);
-  const prevScoreRef = useRef(0);
-  useEffect(() => { if (score !== prevScoreRef.current) { prevScoreRef.current = score; setScorePulse(true); setTimeout(() => setScorePulse(false), 400); } }, [score]); // running total of every flashed number, shown above the shake button
+  const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
   const msLast = useRef(0); // highest milestone already celebrated
   const msTimer = useRef<number | null>(null);
@@ -107,23 +95,6 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   useEffect(() => {
-    const handler = () => window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 0.15 } }));
-    window.addEventListener("pc:open-howtoplay", handler);
-    return () => window.removeEventListener("pc:open-howtoplay", handler);
-  }, []);
-  useEffect(() => {
-    if (howToPlay) { window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 0.015 } })); } else { window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: 1 } })); window.dispatchEvent(new CustomEvent("pc:close-howtoplay")); }
-  }, [howToPlay]);
-  // score drain: -1 every 2s while pit is active and no overlays open
-  useEffect(() => {
-    let started = false; window.setTimeout(() => { started = true; }, 10000);
-    const interval = setInterval(() => {
-      if (!started) return;
-      if (!howToPlay && !activeBreed) setScore((s) => s - 3);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [howToPlay, activeBreed]);
-  useEffect(() => {
     const open = () => setHowToPlay(true);
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
@@ -131,10 +102,7 @@ export default function PackPit() {
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
-  useEffect(() => {
-    lineageOpenRef.current = !!activeBreed;
-    window.dispatchEvent(new CustomEvent("pc:timescale", { detail: { scale: activeBreed ? 0.015 : 1 } }));
-  }, [activeBreed]);
+  useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
   useEffect(() => {
     let disposed = false;
@@ -169,7 +137,7 @@ export default function PackPit() {
       const pctFont = (typeof window !== "undefined" ? getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() : "") || "Montserrat"; // Open Sans for the % figures
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
-      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (30 * Math.PI) / 180 };
+      const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
@@ -178,22 +146,6 @@ export default function PackPit() {
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       const engine = Engine.create();
-      const onTimeScale = (e: Event) => { engine.timing.timeScale = (e as CustomEvent).detail?.scale ?? 1; };
-      window.addEventListener("pc:timescale", onTimeScale);
-      const onHowToPlayOpen = () => { engine.timing.timeScale = 0.015; };
-      const onHowToPlayClose = () => {
-        // ease back to normal speed over 500ms to prevent explosion on resume
-        const start = performance.now();
-        const startScale = engine.timing.timeScale;
-        const easeBack = () => {
-          const t = Math.min(1, (performance.now() - start) / 500);
-          engine.timing.timeScale = startScale + (1 - startScale) * t;
-          if (t < 1) requestAnimationFrame(easeBack);
-        };
-        requestAnimationFrame(easeBack);
-      };
-      window.addEventListener("pc:open-howtoplay", onHowToPlayOpen);
-      window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
       engine.gravity.y = 1;
       const render = Render.create({
         element: stage, engine,
@@ -250,7 +202,6 @@ export default function PackPit() {
           const bw = prop.width, bh = prop.width / prop.aspect, k = bw / 400.2;
           const R = 56 * k, dx = 143.5 * k, dy = 40.7 * k, barW = 287 * k, barH = 92 * k;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const poFloor = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
           const parts = [
             Bodies.rectangle(x, y, barW, barH, po),
             Bodies.circle(x - dx, y - dy, R, po),
@@ -270,31 +221,20 @@ export default function PackPit() {
           // drawn image back over it.
           const bw = prop.width, bh = prop.width / prop.aspect;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const poFloor = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
           const VB = prop.shape === "slipper" ? { w: 1110.4, h: 411.3 } : { w: 1031.7, h: 316.8 };
           const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
-          // create parts at origin (0,0) so centroid is predictable, then position after
           const R = (vx: number, vy: number, w: number, h: number) =>
-            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, po);
+            Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, po);
           const C = (vx: number, vy: number, r: number) =>
-            Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
+            Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
-              : [
-                // thick jagged floor - 3 offset sections create uneven surface
-                Bodies.rectangle(  (250 - cx0) * k, (260 - cy0) * k, 340 * k, 120 * k, poFloor),
-                Bodies.rectangle(  (515 - cx0) * k, (280 - cy0) * k, 340 * k, 120 * k, poFloor),
-                Bodies.rectangle(  (780 - cx0) * k, (255 - cy0) * k, 340 * k, 120 * k, poFloor),
-                Bodies.rectangle(  (130 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po),
-                Bodies.rectangle(  (900 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po)
-              ];
+              : [R(549, 78, 760, 150), R(513, 222, 1010, 150)]; // narrow top, wider bottom of the tray
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-          // now place the body at spawn point - centroid is now at origin so this is exact
-          Body.setPosition(b, { x, y });
+          const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
           if (prop.angle) Body.setAngle(b, prop.angle);
-          // ox/oy is 0 because centroid matches visual centre
-          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
+          b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox, oy };
           return b;
         }
         const ar = img.complete && img.naturalWidth ? img.naturalWidth / img.naturalHeight : prop.aspect;
@@ -637,21 +577,11 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2: easy (3/4 nodes)
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                                                  // 6400 bone + slipper
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3: easy (4/5 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000));
-          waveTimers.push(setTimeout(() => {
-            if (!disposed) {
-              const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
-              const ujR = BIG * 0.6;
-              const ujB: any = Bodies.circle(w * 0.7, -ujR, ujR, { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006, render: { visible: false } });
-              ujB.plugin = { name: "Made in Britain", kind: "unionjack", half: ujR, color: "#ffffff", img: ujImg, family: null, ping: 0, hits: 0, maxHits: 10, popped: false };
-              Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
-              Composite.add(engine.world, ujB);
-            }
-          }, 15000)); // 9000 bowl + menu
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000)); // 9000 bowl + menu
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); Composite.add(engine.world, makeArrow(w)); } }, 10050)); // 10050 pair 4 + green arrow
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5: easy (3 nodes each)
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6: easy (3/5 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 270000));                                                              // 270000 all remaining cards
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                                              // 150000 all remaining cards
         }
       }
 
@@ -704,7 +634,7 @@ export default function PackPit() {
             const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
             gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
           }
-          numAt(jx, jy, 500); // the payoff pops out of the goo and scores
+          numAt(jx, jy, 2000); // the payoff pops out of the goo and scores
           Composite.remove(engine.world, logoBody); // the logo vanishes under the goo
           logoBody = null;
         }
@@ -726,17 +656,9 @@ export default function PackPit() {
       const onLeave = () => { pointer = null; };
       const onDbl = (e: MouseEvent) => {
         const hit = Query.point(dyn(), localPoint(e))[0];
-        if (!hit) {
-          const _hitBodies = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), localPoint(e));
-        const anyHit = _hitBodies.find((b: any) => b.plugin?.prop === "bowl") || _hitBodies[0];
-          if (anyHit) {
-            Body.applyForce(anyHit, anyHit.position, { x: (Math.random() - 0.5) * anyHit.mass * 0.015, y: -anyHit.mass * 0.02 });
-            numAt(localPoint(e).x, localPoint(e).y, 1, 12);
-          }
-          return;
-        }
-        const ang = Math.random() * Math.PI * 2, speed = (13 + Math.random() * 5) / 50;
-        Body.setVelocity(hit, { x: Math.cos(ang) * speed, y: -Math.abs(Math.sin(ang) * speed) - 7 });
+        if (!hit) return;
+        const ang = Math.random() * Math.PI * 2, speed = 20 + Math.random() * 8;
+        Body.setVelocity(hit, { x: Math.cos(ang) * speed, y: -Math.abs(Math.sin(ang) * speed) - 10 });
         Body.setAngularVelocity(hit, (Math.random() - 0.5) * 0.7);
         if (hit.plugin.prop) burstAt(hit.position.x, hit.position.y, Math.max(34, hit.plugin.half * 0.5)); // props get the pink starburst, like the % circles
         else hit.plugin.ping = performance.now();
@@ -757,7 +679,7 @@ export default function PackPit() {
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
-        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 300); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
           window.dispatchEvent(new Event("pc:open-cookies"));
           hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
@@ -808,20 +730,7 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
-        if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
-          hit.plugin.hits = (hit.plugin.hits || 0) + 1;
-          numAt(hit.position.x, hit.position.y, 50);
-          burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
-          const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
-          showBritainMsg(msgIdx);
-          if (hit.plugin.hits >= hit.plugin.maxHits) {
-            hit.plugin.popped = true;
-            poof(hit.position.x, hit.position.y, hit.plugin.half);
-            Composite.remove(engine.world, hit);
-          }
-          return true;
-        }
-        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 300); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
+        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         return false;
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
@@ -920,27 +829,10 @@ export default function PackPit() {
           rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = "#0a3a57"; ctx.fill();
           ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.85)"; rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.stroke();
           ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          // optimal line split - minimise length difference between lines
-          const drawWords = b.plugin.label.split(" ");
-          let drawLines: string[] = [b.plugin.label];
-          if (drawWords.length > 1) {
-            let bestDiff2 = Infinity;
-            for (let sp = 1; sp < drawWords.length; sp++) {
-              const l1 = drawWords.slice(0, sp).join(" ");
-              const l2 = drawWords.slice(sp).join(" ");
-              const diff2 = Math.abs(l1.length - l2.length);
-              if (diff2 < bestDiff2) { bestDiff2 = diff2; drawLines = [l1, l2]; }
-            }
-          }
-          let fs = 11; ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`;
-          const maxw = w * 0.82;
-          const widest = Math.max(...drawLines.map((l) => ctx.measureText(l).width));
-          if (widest > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / widest)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
-          const lh = fs * 1.5;
-          // vertically centre all lines within pill
-          const totalH = drawLines.length * lh;
-          const startY = -totalH / 2 + lh / 2;
-          drawLines.forEach((line, li) => ctx.fillText(line, 0, startY + li * lh));
+          let fs = 12; ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`;
+          const maxw = w * 0.86, tw = ctx.measureText(b.plugin.label).width;
+          if (tw > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / tw)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
+          ctx.fillText(b.plugin.label, 0, 1);
           ctx.restore(); return;
         }
         if (b.plugin.kind === "pct") {
@@ -989,20 +881,6 @@ export default function PackPit() {
             const pulse = 1 + 0.18 * Math.sin(now2 / 90);
             ctx.globalAlpha = 0.5; ctx.lineWidth = 3; ctx.strokeStyle = "#1497d6";
             ctx.beginPath(); ctx.arc(0, 0, rr * 1.28 * pulse, 0, Math.PI * 2); ctx.stroke();
-          }
-          ctx.restore(); return;
-        }
-        if (b.plugin.kind === "unionjack") {
-          const rr = b.plugin.half;
-          ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2);
-          ctx.fillStyle = "#ffffff"; ctx.fill();
-          ctx.lineWidth = 3; ctx.strokeStyle = "#ffffff"; ctx.stroke();
-          const ujImg = b.plugin.img;
-          if (ujImg && ujImg.complete && ujImg.naturalWidth) {
-            ctx.save();
-            ctx.beginPath(); ctx.arc(0, 0, rr - 2, 0, Math.PI * 2); ctx.clip();
-            ctx.drawImage(ujImg, -rr, -rr, rr * 2, rr * 2);
-            ctx.restore();
           }
           ctx.restore(); return;
         }
@@ -1107,7 +985,7 @@ export default function PackPit() {
       }
 
       let hoverBody: any = null, hoverStart = 0;
-      const DIM_MIN = 1;   // no dimming - all cards always full opacity
+      const DIM_MIN = 0.5;   // how far the rest of the pack dims behind the hovered chum
       const DIM_TIME = 0.5;  // seconds to ease in and out of that dim, so it never flashes
       let dimLevel = 1, lastFrame = 0;
       const particles: any[] = [];
@@ -1222,12 +1100,12 @@ export default function PackPit() {
               const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
               gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
             }
-            numAt(jx, jy, 500);
+            numAt(jx, jy, 2000);
             // fuse celebration: starbursts + delayed bursts
-            explodeAt(jx, jy, R * 0.9);
-            setTimeout(() => { burstAt(jx - R * 0.4, jy + R * 0.2, R * 0.6); }, 120);
-            setTimeout(() => { burstAt(jx + R * 0.5, jy - R * 0.3, R * 0.7); }, 220);
-            setTimeout(() => { burstAt(jx, jy, R * 1.1); }, 350);
+            explodeAt(jx, jy, R * 1.2);
+            setTimeout(() => { burstAt(jx - R * 0.4, jy + R * 0.2, R * 0.8); }, 120);
+            setTimeout(() => { burstAt(jx + R * 0.5, jy - R * 0.3, R * 0.9); }, 220);
+            setTimeout(() => { burstAt(jx, jy, R * 1.4); }, 350);
             bone.plugin.img = imgOhYea; // ohyea SVG on fuse
             bone.plugin.fuseAt = performance.now(); // drives the cross-fade
             Composite.remove(engine.world, logoBody); logoBody = null;
@@ -1505,22 +1383,15 @@ export default function PackPit() {
         // ease the dim toward its target rather than snapping, so sweeping across
         // a shaken pack never flashes
         const dimTarget = spotlight ? DIM_MIN : 1;
-        // build a set of family IDs for the hovered body so related cards stay brighter
-        const familySet: Set<number> = new Set(spotlight ? hoverBody!.plugin.family.map((f: any) => f.id ?? f) : []);
         const frameDt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0; lastFrame = now;
         const step = frameDt / DIM_TIME;
         dimLevel = dimLevel < dimTarget ? Math.min(dimTarget, dimLevel + step) : Math.max(dimTarget, dimLevel - step);
 
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
-        const bowlBodies2 = bodies.filter((b: any) => b.plugin?.prop === "bowl");
-        const nonBowl = bodies.filter((b: any) => b.plugin?.prop !== "bowl");
-        nonBowl.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
-        // draw hover body before bowl so bowl rim always stays on top
-        if (hoverBody && hoverBody.plugin?.prop !== "bowl") drawBall(ctx, hoverBody, dimLevel, true);
-        // draw bowl last so its rim appears on top of contained objects
-        bowlBodies2.forEach((b: any) => { drawBall(ctx, b, dimLevel, b === hoverBody); });
+        bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
+        if (hoverBody) drawBall(ctx, hoverBody, 1, true);
 
         bodies.forEach((b: any) => {
           if (!b.plugin.ping) return;
@@ -1585,21 +1456,7 @@ export default function PackPit() {
         }
         // the blue name pills drop in too, each still carrying its breed name
         for (const pl of pills) {
-          // optimal split to find balanced line lengths
-          const plWords = pl.name.split(" ");
-          let plLines: string[] = [pl.name];
-          if (plWords.length > 1) {
-            let plBestDiff = Infinity;
-            for (let sp = 1; sp < plWords.length; sp++) {
-              const l1 = plWords.slice(0, sp).join(" "), l2 = plWords.slice(sp).join(" ");
-              const diff = Math.abs(l1.length - l2.length);
-              if (diff < plBestDiff) { plBestDiff = diff; plLines = [l1, l2]; }
-            }
-          }
-          const plLongest = Math.max(...plLines.map((l) => l.length));
-          const pw = Math.max(50, plLongest * 7 + 24);
-          const ph = Math.max(28, plLines.length * 15 + 14);
-          const px = pl.x - rect.left, py = pl.y - rect.top;
+          const px = pl.x - rect.left, py = pl.y - rect.top, pw = Math.max(44, pl.w), ph = 26;
           const b: any = Bodies.rectangle(px, py, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.35, friction: 0.4, frictionAir: 0.008, density: 0.0012, render: { visible: false } });
           b.plugin = { name: pl.name, kind: "pill", w: pw, h: ph, half: Math.min(pw, ph) / 2, color: "#0a3a57", label: pl.name, img: null, family: null, ping: 0, hits: 0, maxHits: 3, gone: false, chum: PACK_NAMES.has(pl.name) }; // a pack dog: this pill never expires and the bomb ignores it
           Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 2.4 });
@@ -1607,36 +1464,14 @@ export default function PackPit() {
         }
       };
 
-      // bowl scoring: bone=500, ball=100, pin in place
-      Events.on(engine, "collisionStart", (ev: any) => {
-        for (const pair of ev.pairs) {
-          const bowl2 = pair.bodyA.plugin?.isBowl ? pair.bodyA : pair.bodyB.plugin?.isBowl ? pair.bodyB : null;
-          if (!bowl2) continue;
-          const obj = bowl2 === pair.bodyA ? pair.bodyB : pair.bodyA;
-          if (!obj?.plugin) continue;
-          if (bowl2.plugin.bowlScored.has(obj.id)) continue;
-          const isBone = obj.plugin.prop === "bone";
-          const isBall = obj.plugin.prop === "ball";
-          if (!isBone && !isBall) continue;
-          // only score if bowl is roughly upright
-          const a = ((bowl2.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-          if (a > 0.5 && a < Math.PI * 2 - 0.5) continue;
-          bowl2.plugin.bowlScored.add(obj.id);
-          const pts = isBone ? 500 : 100;
-          numAt(obj.position.x, obj.position.y, pts);
-          burstAt(obj.position.x, obj.position.y, 40);
-          // pin the object in place inside the bowl
-          Body.setStatic(obj, true);
-        }
-      });
       Events.on(render, "afterRender", onAfter);
 
       // The fallen percentage circles double as negative-magnet buttons. Pressing
       // one shoves nearby objects away; the percentage sets the strength (higher
       // percent = weaker). Each circle has 5 presses, and a single hold lasts at
       // most 5s before it auto-releases. After the fifth it goes inert and blue.
-      const REPEL = 0.01;      // master strength dial for the held force
-      const KICK = 1.2;          // instant outward shove on press
+      const REPEL = 0.05;      // master strength dial for the held force
+      const KICK = 6;          // instant outward shove on press
       const repelRange = (b: any) => Math.max(140, b.plugin.half * 5);
       const repelFactor = (b: any) => Math.max(0.12, 1 - b.plugin.share / 100);
       const releasePct = (b: any) => {
@@ -1753,97 +1588,42 @@ export default function PackPit() {
         }
       };
       Events.on(engine, "collisionStart", onBombHit);
-      Events.on(engine, "collisionStart", (ev: any) => {
-        for (const pair of ev.pairs) {
-          const ga = pair.bodyA.plugin?.kind === "arrow-green" ? pair.bodyA : pair.bodyB.plugin?.kind === "arrow-green" ? pair.bodyB : null;
-          if (!ga) continue;
-          const other = ga === pair.bodyA ? pair.bodyB : pair.bodyA;
-          if (!other || other.isStatic) continue;
-          if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite" || other.plugin?.isBowl) continue;
-          // burst at arrowhead tip - only if not inside a bowl
-          const tipDist = ga.plugin.half || 30;
-          const tipX = ga.position.x + Math.cos(ga.angle + 2.3450) * tipDist;
-          const tipY = ga.position.y + Math.sin(ga.angle + 2.3450) * tipDist;
-          const insideBowl = Composite.allBodies(engine.world).some((bb: any) => {
-            if (!bb.plugin?.isBowl) return false;
-            const dx = tipX - bb.position.x, dy = tipY - bb.position.y;
-            return Math.hypot(dx, dy) < bb.plugin.w * 0.4;
-          });
-          if (!insideBowl) {
-            bursts.push({ x: tipX, y: tipY, s: 18, born: performance.now(), life: 420, colour: "#22c55e", rot: 0 });
-            bursts.push({ x: tipX, y: tipY, s: 12, born: performance.now(), life: 420, colour: "#ffd23e", rot: 18 });
-          }
-          const ddx = other.position.x - ga.position.x, ddy = other.position.y - ga.position.y;
-          const dd = Math.hypot(ddx, ddy) || 1;
-          Body.applyForce(other, other.position, { x: (ddx / dd) * other.mass * 0.04, y: (ddy / dd) * other.mass * 0.04 - other.mass * 0.02 });
-        }
-      });
 
       // A % circle goes inert after five hits total. Those used to be cursor presses
       // only; now a solid knock from another pit object spends a charge too. A speed
       // threshold and a short cooldown keep gentle resting contacts from counting.
-      // pct circles lose a charge on hard collision
       const onPctHit = (ev: any) => {
         const now = performance.now();
         for (const pair of ev.pairs) {
           for (const c of [pair.bodyA, pair.bodyB] as any[]) {
             const p = c.plugin;
-            if (!p || p.kind !== "pct" || p.inert || p.bomb || p.repelOn) continue;
+            if (!p) continue;
             const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
-            if (!other || other.isStatic) continue;
+            if (!other || other.isStatic) continue; // walls, floor, ceiling do not count
             const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
-            if (rv < 5) continue;
-            if (p.lastObjHit && now - p.lastObjHit < 600) continue;
-            p.lastObjHit = now;
-            p.charges = (p.charges ?? 20) - 1;
-            if (p.charges <= 0) {
-              p.inert = true;
-              poof(c.position.x, c.position.y, p.half || 21);
-              c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
-              if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
+            if (p.kind === "pct" && !p.inert && !p.bomb && !p.repelOn) {
+              if (rv < 5) continue; // a real knock, not a nudge
+              if (p.lastObjHit && now - p.lastObjHit < 600) continue; // one charge per knock, not per frame
+              p.lastObjHit = now;
+              p.charges = (p.charges ?? 20) - 1;
+              if (p.charges <= 0) {
+                p.inert = true;
+                poof(c.position.x, c.position.y, p.half || 21);
+                c.collisionFilter = { category: 0x0002, mask: 0xffffffff, group: 0 };
+                if (mc.body === c) { mc.constraint.bodyB = null; mc.body = null; }
+              }
+            } else if ((p.kind === "rod" || p.kind === "pill") && !p.gone) {
+              // detritus: rods pop after 2 knocks, pills after 3, then vanish
+              if (rv < 4) continue;
+              if (p.lastObjHit && now - p.lastObjHit < 450) continue;
+              p.lastObjHit = now;
+              p.hits = (p.hits || 0) + 1;
+              if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); } // a chum pill never expires
             }
           }
         }
       };
       Events.on(engine, "collisionStart", onPctHit);
-      // rods lose hits on hard collision - pop after 20 knocks
-      const onRodHit = (ev: any) => {
-        const now = performance.now();
-        for (const pair of ev.pairs) {
-          for (const c of [pair.bodyA, pair.bodyB] as any[]) {
-            const p = c.plugin;
-            if (!p || p.kind !== "rod" || p.gone) continue;
-            const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
-            if (!other || other.isStatic) continue;
-            const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
-            if (rv < 4) continue;
-            if (p.lastObjHit && now - p.lastObjHit < 450) continue;
-            p.lastObjHit = now;
-            p.hits = (p.hits || 0) + 1;
-            if (p.hits >= 20) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); }
-          }
-        }
-      };
-      Events.on(engine, "collisionStart", onRodHit);
-      // pills lose hits on hard collision - pop after 3 knocks (chum pills never expire)
-      const onPillHit = (ev: any) => {
-        const now = performance.now();
-        for (const pair of ev.pairs) {
-          for (const c of [pair.bodyA, pair.bodyB] as any[]) {
-            const p = c.plugin;
-            if (!p || p.kind !== "pill" || p.gone || p.chum) continue;
-            const other = c === pair.bodyA ? pair.bodyB : pair.bodyA;
-            if (!other || other.isStatic) continue;
-            const rv = Math.hypot(c.velocity.x - other.velocity.x, c.velocity.y - other.velocity.y);
-            if (rv < 4) continue;
-            if (p.lastObjHit && now - p.lastObjHit < 450) continue;
-            p.lastObjHit = now;
-            p.hits = (p.hits || 0) + 1;
-            if (p.hits >= (p.maxHits || 3)) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); }
-          }
-        }
-      };
-      Events.on(engine, "collisionStart", onPillHit);
       // A yellow circle knocked loose by a user-flung toy (or the dragged body) scores as it
       // tumbles: every fresh yellow circle it strikes flashes +1 at each (two points a hit),
       // so a good scatter racks up points. Only direct knock-ons score, no runaway cascade.
@@ -1881,14 +1661,7 @@ export default function PackPit() {
       Events.on(engine, "collisionStart", onLogoPieceHit);
       const pressPct = (pt: { x: number; y: number }) => {
         const hit = Query.point(dyn(), pt).find((b: any) => b.plugin?.kind === "pct" && !b.plugin.inert && !b.plugin.repelOn && !b.plugin.popped);
-        if (!hit) {
-          const anyHit = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), pt)[0];
-          if (anyHit) {
-            Body.applyForce(anyHit, anyHit.position, { x: (Math.random() - 0.5) * anyHit.mass * 0.015, y: -anyHit.mass * 0.02 });
-            numAt(pt.x, pt.y, 1, 12);
-          }
-          return;
-        }
+        if (!hit) return;
         if (hit.plugin.bomb) {
           // a press arms the fuse: a quick release lands as one click hit, a sustained
           // hold ticks one hit per whole second (handled in the render loop / on release)
@@ -1966,7 +1739,7 @@ export default function PackPit() {
         if (now2 - greenSettledSince < GREEN_SETTLE_MS) return;
         if (now2 - greenLastHop < GREEN_HOP_EVERY) return;
         greenLastHop = now2; gArrow.plugin.hoppingUntil = now2 + 600;
-        Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.02 });
+        Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.06 });
       });
       // bone drag-me hint: swap SVG when bone is within 300px of logo
       const DRAGME_RANGE = 300;
@@ -1984,18 +1757,9 @@ export default function PackPit() {
         const bone = nearestBone(logoBody);
         if (!bone) return;
         const dist = Math.hypot(bone.position.x - logoBody.position.x, bone.position.y - logoBody.position.y);
-        const showHint = dist <= DRAGME_RANGE;
-        bones.forEach((b: any) => { b.plugin.img = (b === bone && showHint) ? imgDragMe : imgBone; });
+        bones.forEach((b: any) => { b.plugin.img = (b === bone && dist <= DRAGME_RANGE) ? imgDragMe : imgBone; });
       });
       window.addEventListener("mouseup", releaseHeldPct);
-      const onWindowLeave = (e: MouseEvent) => {
-        if (e.relatedTarget === null) {
-          releaseHeldPct();
-          mc.mouse.button = -1;
-          MouseConstraint.clearSourceEvents(mc);
-        }
-      };
-      window.addEventListener("mouseout", onWindowLeave);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
       // rect; we drop a body at that spot that falls straight down, +500 each.
       const onHowToPlayDrop = (ev: any) => {
@@ -2158,7 +1922,6 @@ export default function PackPit() {
         render.canvas.removeEventListener("dblclick", onDbl);
         render.canvas.removeEventListener("mousedown", onDown);
         window.removeEventListener("mouseup", releaseHeldPct);
-        window.removeEventListener("mouseout", onWindowLeave);
         window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
@@ -2197,7 +1960,7 @@ export default function PackPit() {
       <div className={styles.pattern} aria-hidden="true" />
       <img className={styles.floor} src={bust("/floor-shortened-svg.svg")} alt="" aria-hidden="true" />
       <div className={styles.controls}>
-        <div className={styles.scoreTotal + (scorePulse ? " " + styles.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
+        <div className={styles.scoreTotal} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
       </div>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
@@ -2231,7 +1994,7 @@ export default function PackPit() {
       )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
-          <button type="button" className={styles.tallyChip} onClick={() => setShelfOpen(true)} aria-label="Open your collected pack">
+          <button type="button" className={styles.tallyChip} onClick={() => setDockOpen((o) => !o)} aria-label="Open your collected pack">
             <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
               {Array.from({ length: 16 }).map((_, i) => {
                 const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
@@ -2247,52 +2010,35 @@ export default function PackPit() {
           </button>
         </div>
       )}
-      {dockOpen && (() => {
+      {dockOpen && collectedChums.length > 0 && (() => {
         const dockBreeds = [...collectedChums].reverse().map((name, i) => {
           const b = breeds.find((x) => x.name === name);
           return { name, img: b ? b.image : "", idx: i };
         });
         return (
           <div className={styles.chumDock} onClick={() => setDockOpen(false)}>
-            <div className={styles.chumDockInner} style={{ perspective: "900px" }} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.chumDockInner} onClick={(e) => e.stopPropagation()}>
               {dockBreeds.map((c, i) => {
-                const isTop = i === dockBreeds.length - 1;
-                const isOpened = dockFlipped.has(i);
-                const isRemoved = dockFlipped.has(i + 1000);
-                const randomRot = -43 + ((i * 7) % 4);
-                const baseTransform = `rotateX(60deg) rotateY(0deg) rotateZ(${randomRot}deg) translateZ(${i * 3}px)`;
-                const openTransform = "scale(1.5) rotateX(0) rotateY(180deg) rotateZ(0) translateY(0)";
-                const removeTransform = "translateY(100%)";
+                const isHov = dockHover === i;
+                const isFlipped = dockFlipped.has(i);
+                const offset = i * 48;
+                const scale = isHov ? 1.5 : 1;
+                const lift = isHov ? -60 : 0;
                 return (
                   <div
                     key={c.idx}
-                    className={styles.chumDockCard}
-                    style={{
-                      transform: isRemoved ? removeTransform : isOpened ? openTransform : baseTransform,
-                      zIndex: i,
-                      boxShadow: i === 0 ? "12px 12px 0px 12px rgba(0,0,0,0.3)" : undefined,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isOpened) {
-                        setDockFlipped((s) => { const x = new Set(s); x.add(i + 1000); return x; });
-                      } else {
-                        setDockFlipped((s) => { const x = new Set(s); x.add(i); return x; });
-                      }
-                    }}
-                    onMouseEnter={(e) => {
-                      if (isTop && !isOpened && !isRemoved) {
-                        (e.currentTarget as HTMLElement).style.transform = 'rotateX(0) rotateY(0) rotateZ(0) scale(1.3) translateY(-20px)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (isTop && !isOpened && !isRemoved) {
-                        (e.currentTarget as HTMLElement).style.transform = baseTransform;
-                      }
-                    }}
+                    className={`${styles.chumDockCard} ${isFlipped ? styles.chumDockCardFlipped : ""}`}
+                    style={{ transform: `translateX(${offset}px) translateY(${lift}px) scale(${scale})`, zIndex: isHov ? 10 : i, transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)", marginRight: "-24px" }}
+                    onMouseEnter={() => setDockHover(i)}
+                    onMouseLeave={() => setDockHover(null)}
+                    onClick={(e) => { e.stopPropagation(); setDockFlipped((s) => { const x = new Set(s); x.has(i) ? x.delete(i) : x.add(i); return x; }); }}
                   >
-                    {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
-                    <div className={styles.chumDockBack}><span>{c.name}</span></div>
+                    <div className={styles.chumDockFront}>
+                      {c.img ? <img src={bust(c.img)} alt={c.name} /> : <div style={{ width: "100%", height: "100%", background: "#0a3a57" }} />}
+                    </div>
+                    <div className={styles.chumDockBack}>
+                      <span>{c.name}</span>
+                    </div>
                   </div>
                 );
               })}
@@ -2300,32 +2046,6 @@ export default function PackPit() {
           </div>
         );
       })()}
-      {britainMsg !== null && (() => {
-        const msgs = [
-          { title: "Printed in Britain", body: "Every card in the Pedigree Chums deck is printed right here in Britain, using sustainable inks on premium card stock." },
-          { title: "Designed in Britain", body: "Conceived, illustrated and crafted by a British creative team with a passion for dogs and great design." },
-          { title: "Tested for British Pooches", body: "Every breed, every fact, every illustration has been checked and approved by British dog lovers and experts." },
-        ];
-        const m = msgs[britainMsg];
-        return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "clamp(30px,7vh,96px)", pointerEvents: "none" }} onClick={() => setBritainMsg(null)}>
-            <div style={{ pointerEvents: "auto", maxWidth: "760px", width: "90%", padding: "clamp(18px,3vw,34px) clamp(28px,4.5vw,52px)", borderRadius: "26px", background: "transparent", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "2px solid rgba(255,255,255,0.4)", boxShadow: "0 12px 32px rgba(10,58,87,0.32)", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-              <img src="/uk-icon.jpg" alt="" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", marginBottom: "12px" }} />
-              <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "clamp(17px,3.7vw,41px)", color: "#ffffff", margin: "0 0 8px", textShadow: "0 4px 0 rgba(10,58,87,0.45)" }}>{m.title}</p>
-              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(13px,1.8vw,18px)", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.5, opacity: 0.9 }}>{m.body}</p>
-              <button onClick={() => setBritainMsg(null)} style={{ background: "#ffd23e", border: "none", borderRadius: "40px", padding: "10px 28px", fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "16px", color: "#0a3a57", cursor: "pointer" }}>Brilliant!</button>
-            </div>
-          </div>
-        );
-      })()}
-      {flyingCard && (
-        <div
-          className={styles.flyingCard}
-          style={{ left: flyingCard.rect.left, top: flyingCard.rect.top, width: flyingCard.rect.width, height: flyingCard.rect.height, "--fly-top": flyingCard.rect.top + "px" } as React.CSSProperties}
-        >
-          {flyingCard.name}
-        </div>
-      )}
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);
@@ -2350,55 +2070,12 @@ export default function PackPit() {
                   {rows.map((row, ri) => (
                     <div className={styles.shelfRow} key={ri}>
                       <div className={styles.shelfCards}>
-                        {row.map((c) => {
-                          const cardState = shelfCardStates.get(c.name);
-                          const isOpened = cardState === "opened";
-                          const isRemoved = cardState === "removed";
-                          return (
-                            <div
-                              key={c.name}
-                              className={`${styles.shelfCard} ${c.isCard ? styles.shelfCardReal : styles.shelfCardCartoon}`}
-                              style={{
-                                perspective: "900px",
-                                cursor: "pointer",
-                              }}
-                              onClick={(e) => {
-                                if (!cardState) {
-                                  setShelfCardStates((m) => { const x = new Map(m); x.set(c.name, "opened"); return x; });
-                                } else if (cardState === "opened") {
-                                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                                  setFlyingCard({ name: c.name, img: c.img, rect });
-                                  setShelfCardStates((m) => { const x = new Map(m); x.set(c.name, "removed"); return x; });
-                                  setTimeout(() => setFlyingCard(null), 800);
-                                }
-                              }}
-                            >
-                              <div style={{
-                                width: "100%", height: "100%",
-                                position: "relative",
-                                transformStyle: "preserve-3d",
-                                transition: "all 700ms",
-                                transform: isRemoved ? "translateY(100%)" : isOpened ? "scale(1.5) rotateY(180deg)" : "rotateY(0deg)",
-                              }}>
-                                <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: "8px", overflow: "hidden" }}>
-                                  {c.img ? <img src={bust(c.img)} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null}
-                                  {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
-                                </div>
-                                <div style={{
-                                  position: "absolute", inset: 0,
-                                  backfaceVisibility: "hidden",
-                                  transform: "rotateY(180deg)",
-                                  background: "var(--yellow, #ffd23e)",
-                                  borderRadius: "8px",
-                                  display: "flex", alignItems: "center", justifyContent: "center",
-                                  padding: "8px",
-                                }}>
-                                  <span style={{ fontFamily: "var(--font-display, 'Luckiest Guy')", fontSize: "13px", color: "#0a3a57", textAlign: "center", lineHeight: 1.2 }}>{c.name}</span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                        {row.map((c) => (
+                          <div className={`${styles.shelfCard} ${c.isCard ? styles.shelfCardReal : styles.shelfCardCartoon}`} key={c.name}>
+                            {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
+                            {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
+                          </div>
+                        ))}
                       </div>
                       <img className={styles.shelfLedge} src="/shelve-test.svg" alt="" aria-hidden="true" />
                     </div>
