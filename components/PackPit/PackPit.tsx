@@ -254,7 +254,6 @@ export default function PackPit() {
           // drawn image back over it.
           const bw = prop.width, bh = prop.width / prop.aspect;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const poFloor = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
           const VB = prop.shape === "slipper" ? { w: 1110.4, h: 411.3 } : { w: 1031.7, h: 316.8 };
           const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
           // create parts at origin (0,0) so centroid is predictable, then position after
@@ -266,9 +265,10 @@ export default function PackPit() {
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
               : [
-                Bodies.rectangle(  (250 - cx0) * k, (255 - cy0) * k, 340 * k, 50 * k, poFloor),
-                Bodies.rectangle(  (515 - cx0) * k, (270 - cy0) * k, 340 * k, 50 * k, poFloor),
-                Bodies.rectangle(  (780 - cx0) * k, (250 - cy0) * k, 340 * k, 50 * k, poFloor),
+                // thick jagged floor - 3 offset sections create uneven surface
+                Bodies.rectangle(  (250 - cx0) * k, (260 - cy0) * k, 340 * k, 120 * k, poFloor),
+                Bodies.rectangle(  (515 - cx0) * k, (280 - cy0) * k, 340 * k, 120 * k, poFloor),
+                Bodies.rectangle(  (780 - cx0) * k, (255 - cy0) * k, 340 * k, 120 * k, poFloor),
                 Bodies.rectangle(  (130 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po),
                 Bodies.rectangle(  (900 - cx0) * k, (135 - cy0) * k, 80 * k, 210 * k, po)
               ];
