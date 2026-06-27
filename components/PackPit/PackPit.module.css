@@ -146,6 +146,8 @@
   border-bottom-color: #933;
   overflow: hidden;
   backface-visibility: hidden;
+  transform-style: flat;
+  isolation: isolate;
 }
 .chumDockCard img {
   width: 100%;
