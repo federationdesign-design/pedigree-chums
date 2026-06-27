@@ -1177,16 +1177,20 @@ export default function LineageMap({
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
                         ) : (() => {
-                          // split breed name into words, up to 3 lines, font shrinks with word count
+                          // optimal split - minimise line length difference
                           const words = (dragName || "").split(" ");
-                          const fs = words.length <= 2 ? 14 : words.length <= 3 ? 12 : words.length <= 4 ? 10 : 8;
-                          const lineH = fs * 1.3;
-                          // group into max 3 lines of ~2 words each
-                          const lines: string[] = [];
-                          for (let i = 0; i < words.length; i += Math.ceil(words.length / 3)) {
-                            lines.push(words.slice(i, i + Math.ceil(words.length / 3)).join(" "));
+                          let lines: string[] = [dragName || ""];
+                          if (words.length > 1) {
+                            let bestDiff = Infinity;
+                            for (let sp = 1; sp < words.length; sp++) {
+                              const l1 = words.slice(0, sp).join(" "), l2 = words.slice(sp).join(" ");
+                              const diff = Math.abs(l1.length - l2.length);
+                              if (diff < bestDiff) { bestDiff = diff; lines = [l1, l2]; }
+                            }
                           }
-                          const startY = lines.length === 1 ? 0 : lines.length === 2 ? -lineH / 2 : -lineH;
+                          const fs = lines.length === 1 ? 9 : 8;
+                          const lineH = fs * 1.4;
+                          const startY = lines.length === 1 ? 0 : -lineH / 2;
                           return lines.map((l, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{l}</tspan>
                           ));
