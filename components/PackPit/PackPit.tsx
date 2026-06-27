@@ -104,6 +104,7 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
+  const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
@@ -114,6 +115,17 @@ export default function PackPit() {
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
+
+  // Score drain: -1 per second while score > 0, paused whenever the LineageMap overlay is open.
+  const drainRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (drainRef.current) clearInterval(drainRef.current);
+    drainRef.current = setInterval(() => {
+      if (lineageOpenRef.current) return; // paused while family-tree overlay is open
+      setScore((s: number) => Math.max(0, s - 1));
+    }, 1000);
+    return () => { if (drainRef.current) clearInterval(drainRef.current); };
+  }, []); // runs once; lineageOpenRef is checked inside the interval callback
 
   useEffect(() => {
     let disposed = false;
@@ -675,6 +687,7 @@ export default function PackPit() {
         const all = Composite.allBodies(engine.world);
         const pills = all.filter((b: any) => b.plugin?.kind === "pill" && !b.plugin.gone);
         for (const pill of pills) {
+          if (pill.plugin.stuck) continue; // already latched to its card, skip magnet
           const card = all.find((b: any) => !b.plugin?.kind && !b.plugin?.prop && !b.isStatic && b.plugin?.name === pill.plugin.name);
           if (!card) continue;
           const dx = card.position.x - pill.position.x;
@@ -684,6 +697,34 @@ export default function PackPit() {
           const closeness = PILL_MAGNET_RADIUS - dist;
           const f = PILL_PULL * closeness;
           Body.applyForce(pill, pill.position, { x: (dx / dist) * f, y: (dy / dist) * f });
+        }
+      });
+      // pill-stick: when a breed-name pill touches its matching dog card, latch it on
+      Events.on(engine, "collisionStart", (ev: any) => {
+        for (const pair of ev.pairs) {
+          const pill = pair.bodyA.plugin?.kind === "pill" ? pair.bodyA : pair.bodyB.plugin?.kind === "pill" ? pair.bodyB : null;
+          if (!pill || pill.plugin.gone || pill.plugin.stuck) continue;
+          const card = pill === pair.bodyA ? pair.bodyB : pair.bodyA;
+          if (!card?.plugin || card.plugin.kind || card.plugin.prop || card.isStatic) continue;
+          if (card.plugin.name !== pill.plugin.name) continue;
+          // matching pair -- snap and latch
+          pill.plugin.stuck = true;
+          pill.plugin.chum = true; // treat as chum: survive bomb, no decay
+          Body.setVelocity(pill, { x: 0, y: 0 });
+          Body.setAngularVelocity(pill, 0);
+          const constraint = Constraint.create({
+            bodyA: card,
+            bodyB: pill,
+            pointA: { x: 0, y: -(card.plugin.half || 40) - (pill.plugin.half || 13) - 2 },
+            pointB: { x: 0, y: 0 },
+            length: 0,
+            stiffness: 1,
+            damping: 1,
+            render: { visible: false },
+          });
+          Composite.add(engine.world, constraint);
+          burstAt(pill.position.x, pill.position.y, 10);
+          numAt(pill.position.x, pill.position.y, 50); // small bonus for the match
         }
       });
       Events.on(engine, "beforeUpdate", onFuseMagnet);
@@ -771,7 +812,7 @@ export default function PackPit() {
           const p = hit.plugin;
           if (!p.gone) {
             p.hits = (p.hits || 0) + 1;
-            if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(hit.position.x, hit.position.y, p.half || 12); Composite.remove(engine.world, hit); } // a chum pill never expires
+            if (p.hits >= (p.maxHits || 3) && !p.chum && !p.stuck) { p.gone = true; poof(hit.position.x, hit.position.y, p.half || 12); Composite.remove(engine.world, hit); } // a chum pill or a stuck pill never expires
           }
           return true;
         }
@@ -796,6 +837,12 @@ export default function PackPit() {
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
+        if (hit.plugin?.prop === "logopiece" && !hit.plugin.knockPiece) {
+          // HTP step cards tapped in the pit -- open the overlay at the matching step
+          const HTP_NAMES = ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"];
+          const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
+          if (stepIdx !== -1) { setHowToPlayStep(stepIdx); setHowToPlay(true); return true; }
+        }
         return false;
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
@@ -1727,7 +1774,7 @@ export default function PackPit() {
               if (p.lastObjHit && now - p.lastObjHit < 450) continue;
               p.lastObjHit = now;
               p.hits = (p.hits || 0) + 1;
-              if (p.hits >= (p.maxHits || 3) && !p.chum) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); } // a chum pill never expires
+              if (p.hits >= (p.maxHits || 3) && !p.chum && !p.stuck) { p.gone = true; poof(c.position.x, c.position.y, p.half || 12); Composite.remove(engine.world, c); } // a chum pill or a stuck pill never expires
             }
           }
         }
@@ -2088,7 +2135,7 @@ export default function PackPit() {
         <span className={styles.shakeText}>Shake</span>
       </button>
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
-      <HowToPlay open={howToPlay} onClose={() => setHowToPlay(false)} />
+      <HowToPlay open={howToPlay} activeStep={howToPlayStep} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
           {Array.from({ length: 30 }).map((_, i) => {

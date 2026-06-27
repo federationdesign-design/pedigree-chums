@@ -1,65 +1,65 @@
 "use client";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./HowToPlay.module.css";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  activeStep?: number | null; // 0-4 when opened from a pit card; null = show full overview
 };
 
 const STEPS = [
-  "Deal 3–6 cards per player",
+  "Deal 3\u20136 cards per player",
   "Go for a walk, visit a park, or explore your town or city",
   "Spot real dogs and match with your cards",
   "Try and spot all your chums",
   "The player with the most pedigree chums wins",
 ];
 
-// Individual step images, shown on mobile as a user-scrollable horizontal row
-// in place of the single wide comic strip.
 const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
 
-// Controlled "How it works" popup. The trigger (the feature card) lives in
-// CardRail and drives this via open/onClose. The panel pops in with the same
-// 3D effect as the video lightbox: the stage is a DIRECT child of the overlay,
-// so the overlay's perspective reaches it (a nested wrapper would flatten it).
-export default function HowToPlay({ open, onClose }: Props) {
+export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  // When opened from a pit card, show that step; user can navigate prev/next from there.
+  const [step, setStep] = useState<number | null>(activeStep ?? null);
+  // Sync if the prop changes (e.g. a second card tap while modal is already open)
+  useEffect(() => { setStep(activeStep ?? null); }, [activeStep, open]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
+      if (e.key === "Escape") { onCloseRef.current(); return; }
+      if (step !== null) {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") setStep((s: number | null) => Math.min((s ?? 0) + 1, STEPS.length - 1));
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") setStep((s: number | null) => Math.max((s ?? 0) - 1, 0));
+      }
     };
     document.addEventListener("keydown", onKey);
-    // Freeze the page behind the popup so a swipe scrolls the cards, not the page.
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, onClose]);
+  }, [open, step]);
 
   if (!open || typeof document === "undefined") return null;
 
-  // On close, send each visible piece's on-screen rect to the pit so it can drop
-  // them where they sit. The strip is one wide image on desktop, so we slice its
-  // rect into 5 columns, one per step. Hidden pieces (rect of 0) are skipped.
   const dropPiecesThenClose = () => {
     try {
       const pieces: { src: string; x: number; y: number; w: number; h: number }[] = [];
       const push = (el: Element | null, src: string) => {
         if (!el) return;
         const r = el.getBoundingClientRect();
-        if (r.width < 2 || r.height < 2) return; // not visible (e.g. display:none on this breakpoint)
+        if (r.width < 2 || r.height < 2) return;
         pieces.push({ src, x: r.left, y: r.top, w: r.width, h: r.height });
       };
       const root = stageElRef.current;
       if (root) {
-        // strip -> 5 step columns
         const strip = root.querySelector("img[alt='How to play, step by step']") as HTMLElement | null;
         if (strip) {
           const r = strip.getBoundingClientRect();
@@ -68,28 +68,82 @@ export default function HowToPlay({ open, onClose }: Props) {
             for (let i = 0; i < 5; i++) pieces.push({ src: `/step${i + 1}.png`, x: r.left + i * colW, y: r.top, w: colW, h: r.height });
           }
         }
-        // logo + two triangles
         push(root.querySelector("[data-htp='logo']"), "/dogbingo.svg");
-        root.querySelectorAll("[data-htp='deco']").forEach((el) => push(el, "/yellow-triangle.svg"));
-        // five numbers
-        root.querySelectorAll("[data-htp='num']").forEach((el, i) => push(el, `/${i + 1}object.svg`));
+        root.querySelectorAll("[data-htp='deco']").forEach((el: Element) => push(el, "/yellow-triangle.svg"));
+        root.querySelectorAll("[data-htp='num']").forEach((el: Element, i: number) => push(el, `/${i + 1}object.svg`));
       }
       if (pieces.length) window.dispatchEvent(new CustomEvent("pc:howtoplay-drop", { detail: { pieces } }));
     } catch {
-      /* if capture fails for any reason, still close cleanly */
+      /* if capture fails, close cleanly */
     }
     onClose();
   };
 
-  const modal = (
+  // Step detail view (when a pit card was tapped)
+  const stepView = step !== null ? (
     <div className={styles.overlay} onClick={dropPiecesThenClose}>
-      <div className={styles.stage} ref={stageElRef} onClick={(e) => e.stopPropagation()}>
-        <button
-          type="button"
-          className={styles.close}
-          onClick={dropPiecesThenClose}
-          aria-label="Close"
-        >
+      <div className={styles.stage} ref={stageElRef} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <button type="button" className={styles.close} onClick={dropPiecesThenClose} aria-label="Close">
+          &times;
+        </button>
+
+        <h3 className={styles.title}>
+          Step <span className={styles.accent}>{step + 1}</span> of {STEPS.length}
+        </h3>
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={STEP_IMAGES[step]}
+          alt={`How to play, step ${step + 1}`}
+          className={styles.strip}
+          style={{ borderRadius: 18, marginBottom: "clamp(20px, 2.8vw, 38px)" }}
+        />
+
+        <p className={styles.text} style={{ fontSize: "clamp(1.3rem, 2.8vw, 2rem)", marginBottom: "clamp(24px, 3vw, 48px)" }}>
+          {STEPS[step]}
+        </p>
+
+        <div className={styles.stepNav}>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => setStep((s: number | null) => Math.max((s ?? 0) - 1, 0))}
+            disabled={step === 0}
+            aria-label="Previous step"
+          >
+            &larr; Prev
+          </button>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => setStep(null)}
+            aria-label="See all steps"
+          >
+            All steps
+          </button>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => setStep((s: number | null) => Math.min((s ?? 0) + 1, STEPS.length - 1))}
+            disabled={step === STEPS.length - 1}
+            aria-label="Next step"
+          >
+            Next &rarr;
+          </button>
+        </div>
+
+        <span className={styles.logo} data-htp="logo" aria-hidden="true" />
+        <span className={`${styles.deco} ${styles.decoA}`} data-htp="deco" aria-hidden="true" />
+        <span className={`${styles.deco} ${styles.decoB}`} data-htp="deco" aria-hidden="true" />
+      </div>
+    </div>
+  ) : null;
+
+  // Full overview view (original)
+  const overviewView = step === null ? (
+    <div className={styles.overlay} onClick={dropPiecesThenClose}>
+      <div className={styles.stage} ref={stageElRef} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <button type="button" className={styles.close} onClick={dropPiecesThenClose} aria-label="Close">
           &times;
         </button>
 
@@ -107,17 +161,15 @@ export default function HowToPlay({ open, onClose }: Props) {
         </div>
 
         <div className={styles.stepScroll}>
-          {STEP_IMAGES.map((src, i) => {
-            return (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={src}
-                src={src}
-                alt={`How to play, step ${i + 1}`}
-                className={styles.stepImg}
-              />
-            );
-          })}
+          {STEP_IMAGES.map((src, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={src}
+              src={src}
+              alt={`How to play, step ${i + 1}`}
+              className={styles.stepImg}
+            />
+          ))}
         </div>
 
         <p className={styles.swipeHint} aria-hidden="true">
@@ -125,10 +177,10 @@ export default function HowToPlay({ open, onClose }: Props) {
         </p>
 
         <ol className={styles.steps}>
-          {STEPS.map((step) => (
-            <li key={step} className={styles.step}>
+          {STEPS.map((s, i) => (
+            <li key={s} className={styles.step}>
               <span className={styles.num} data-htp="num" aria-hidden="true" />
-              <span className={styles.text}>{step}</span>
+              <span className={styles.text}>{s}</span>
             </li>
           ))}
         </ol>
@@ -138,7 +190,7 @@ export default function HowToPlay({ open, onClose }: Props) {
         <span className={`${styles.deco} ${styles.decoB}`} data-htp="deco" aria-hidden="true" />
       </div>
     </div>
-  );
+  ) : null;
 
-  return createPortal(modal, document.body);
+  return createPortal(stepView ?? overviewView, document.body);
 }

@@ -246,3 +246,32 @@
     animation: none;
   }
 }
+
+/* Step detail view: prev / all steps / next navigation */
+.stepNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 24px);
+  margin-top: clamp(8px, 1.5vw, 20px);
+}
+.navBtn {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  color: var(--navy, #0a3a57);
+  background: var(--yellow, #ffd23e);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45em 1.2em;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+}
+.navBtn:not(:disabled):hover {
+  transform: scale(1.06);
+}
