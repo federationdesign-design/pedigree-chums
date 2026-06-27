@@ -914,17 +914,27 @@ export default function PackPit() {
           rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = "#0a3a57"; ctx.fill();
           ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.85)"; rrect(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.stroke();
           ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          // wrap label at 2 words per line
-          const words = b.plugin.label.split(" ");
-          const lines2: string[] = [];
-          for (let wi = 0; wi < words.length; wi += 2) lines2.push(words.slice(wi, wi + 2).join(" "));
+          // optimal line split - minimise length difference between lines
+          const drawWords = b.plugin.label.split(" ");
+          let drawLines: string[] = [b.plugin.label];
+          if (drawWords.length > 1) {
+            let bestDiff2 = Infinity;
+            for (let sp = 1; sp < drawWords.length; sp++) {
+              const l1 = drawWords.slice(0, sp).join(" ");
+              const l2 = drawWords.slice(sp).join(" ");
+              const diff2 = Math.abs(l1.length - l2.length);
+              if (diff2 < bestDiff2) { bestDiff2 = diff2; drawLines = [l1, l2]; }
+            }
+          }
           let fs = 11; ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`;
-          const maxw = w * 0.86;
-          const widest = Math.max(...lines2.map((l) => ctx.measureText(l).width));
+          const maxw = w * 0.82;
+          const widest = Math.max(...drawLines.map((l) => ctx.measureText(l).width));
           if (widest > maxw) { fs = Math.max(7, Math.floor((fs * maxw) / widest)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
           const lh = fs * 1.5;
-          const startY = -(lines2.length - 1) * lh / 2;
-          lines2.forEach((line, li) => ctx.fillText(line, 0, startY + li * lh));
+          // vertically centre all lines within pill
+          const totalH = drawLines.length * lh;
+          const startY = -totalH / 2 + lh / 2;
+          drawLines.forEach((line, li) => ctx.fillText(line, 0, startY + li * lh));
           ctx.restore(); return;
         }
         if (b.plugin.kind === "pct") {
