@@ -43,7 +43,7 @@ export default function PackPit() {
   const showBritainMsg = (idx: number) => {
     if (britainTimer.current) clearTimeout(britainTimer.current);
     setBritainMsg(idx);
-    britainTimer.current = setTimeout(() => setBritainMsg(null), 2500);
+    // no auto-dismiss -- tap 2 on the flag closes it
   };
   const prevScoreRef = useRef(0);
   useEffect(() => { if (score !== prevScoreRef.current) { prevScoreRef.current = score; setScorePulse(true); setTimeout(() => setScorePulse(false), 400); } }, [score]);
@@ -821,10 +821,16 @@ export default function PackPit() {
           hit.plugin.hits = (hit.plugin.hits || 0) + 1;
           numAt(hit.position.x, hit.position.y, 50);
           burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
-          const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
-          showBritainMsg(msgIdx);
-          // poof once the last message (index 2) has been revealed
-          if (msgIdx >= 2 || hit.plugin.hits >= hit.plugin.maxHits) { hit.plugin.popped = true; poof(hit.position.x, hit.position.y, hit.plugin.half); Composite.remove(engine.world, hit); }
+          if (hit.plugin.hits === 1) {
+            // tap 1: open the combined facts popup
+            showBritainMsg(0);
+          } else {
+            // tap 2: close popup and poof
+            setBritainMsg(null);
+            hit.plugin.popped = true;
+            poof(hit.position.x, hit.position.y, hit.plugin.half);
+            Composite.remove(engine.world, hit);
+          }
           return true;
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
@@ -2127,7 +2133,7 @@ export default function PackPit() {
 
   return (
     <section
-      className={`${styles.stage}${activeBreed ? " " + styles.dimmed : ""}`}
+      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}`}
       ref={stageRef}
       aria-label="The Pack Pit: tip out all the chums and play"
     >
@@ -2221,18 +2227,13 @@ export default function PackPit() {
         );
       })()}
       {britainMsg !== null && (() => {
-        const msgs = [
-          { title: "Printed in Britain", body: "Every card in the Pedigree Chums deck is printed right here in Britain, using sustainable inks on premium card stock." },
-          { title: "Designed in Britain", body: "Conceived, illustrated and crafted by a British creative team with a passion for dogs." },
-          { title: "Tested for British Pooches", body: "Every breed, every fact, every illustration has been checked and approved by British dog lovers and experts." },
-        ];
-        const m = msgs[britainMsg];
         return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "clamp(30px,7vh,96px)", pointerEvents: "none" }} onClick={() => setBritainMsg(null)}>
-            <div style={{ pointerEvents: "auto", maxWidth: "510px", width: "90%", padding: "clamp(12px,2vw,22px) clamp(18px,3vw,34px)", borderRadius: "20px", background: "transparent", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "2px solid rgba(255,255,255,0.4)", boxShadow: "0 12px 32px rgba(10,58,87,0.32)", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-              <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "clamp(14px,2.8vw,28px)", color: "#ffffff", margin: "0 0 6px", textShadow: "0 4px 0 rgba(10,58,87,0.45)" }}>{m.title}</p>
-              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(11px,1.4vw,14px)", color: "#ffffff", margin: "0 0 12px", lineHeight: 1.5, opacity: 0.9 }}>{m.body}</p>
-              <button onClick={() => setBritainMsg(null)} style={{ background: "#ffd23e", border: "none", borderRadius: "40px", padding: "8px 22px", fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "13px", color: "#0a3a57", cursor: "pointer" }}>Brilliant!</button>
+          <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "clamp(30px,7vh,96px)", pointerEvents: "none" }}>
+            <div style={{ pointerEvents: "none", maxWidth: "510px", width: "90%", padding: "clamp(12px,2vw,22px) clamp(18px,3vw,34px)", borderRadius: "20px", background: "transparent", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "2px solid rgba(255,255,255,0.4)", boxShadow: "0 12px 32px rgba(10,58,87,0.32)", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "clamp(14px,2.8vw,28px)", color: "#ffffff", margin: "0 0 10px", textShadow: "0 4px 0 rgba(10,58,87,0.45)" }}>Printed &amp; Designed in Britain</p>
+              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(11px,1.4vw,14px)", color: "#ffffff", margin: "0 0 6px", lineHeight: 1.5, opacity: 0.9 }}>Every card in the Pedigree Chums deck is printed right here in Britain, using sustainable inks on premium card stock.</p>
+              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(11px,1.4vw,14px)", color: "#ffffff", margin: "0", lineHeight: 1.5, opacity: 0.9 }}>Conceived, illustrated and crafted by a British creative team with a passion for dogs.</p>
+              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(10px,1.1vw,12px)", color: "rgba(255,255,255,0.55)", margin: "12px 0 0", lineHeight: 1.4 }}>Tap the flag again to dismiss</p>
             </div>
           </div>
         );
