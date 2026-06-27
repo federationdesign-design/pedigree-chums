@@ -33,12 +33,12 @@ type Props = {
   cardPos?: CardInfo | null;
 };
 
-const RADIUS = 16; // card corner radius in px
+const RADIUS = 16;
 
 export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, onStepSelect, cardPos }: Props) {
-  // Draggable card position
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-  const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean; onCard: boolean } | null>(null);
+  const suppressClick = useRef(false);
 
   const cx = pos?.x ?? cardPos?.x ?? (typeof window !== "undefined" ? window.innerWidth / 2 : 400);
   const cy = pos?.y ?? cardPos?.y ?? (typeof window !== "undefined" ? window.innerHeight / 2 : 300);
@@ -48,45 +48,63 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
   const image = cardPos?.image ?? "";
   const angleDeg = (angle * 180) / Math.PI;
 
-  // Position content panel to the side of the card that has more space
+  // Check if a pointer event hit the card (rough AABB, good enough)
+  const hitCard = (e: React.PointerEvent) => {
+    const dx = e.clientX - cx, dy = e.clientY - cy;
+    // rotate point into card local space to account for card angle
+    const cos = Math.cos(-angle), sin = Math.sin(-angle);
+    const lx = dx * cos - dy * sin, ly = dx * sin + dy * cos;
+    return Math.abs(lx) <= cw / 2 + 8 && Math.abs(ly) <= ch / 2 + 8;
+  };
+
+  const onOverlayDown = (e: React.PointerEvent) => {
+    suppressClick.current = false;
+    const onCard = hitCard(e);
+    dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cx, oy: cy, moved: false, onCard };
+  };
+
+  const onOverlayMove = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
+    if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
+    if (d.moved && d.onCard) setPos({ x: d.ox + dx, y: d.oy + dy });
+  };
+
+  const onOverlayUp = () => {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (d && d.moved) suppressClick.current = true;
+  };
+
+  const onOverlayClick = () => {
+    if (suppressClick.current) { suppressClick.current = false; return; }
+    onClose();
+  };
+
+  // Panel position -- opposite side from the card
   const panelStyle: React.CSSProperties = (() => {
     if (typeof window === "undefined") return {};
     const vw = window.innerWidth;
-    const panelW = Math.min(520, vw * 0.44);
+    const panelW = Math.min(620, vw * 0.52);
     const margin = 32;
-    const cardRight = cx + cw / 2;
-    const cardLeft = cx - cw / 2;
-    if (cardRight > vw / 2) {
-      // card is right of centre -- panel goes left
-      const left = Math.max(margin, cardLeft - panelW - margin);
-      return { position: "fixed" as const, left, top: "50%", transform: "translateY(-50%)", width: panelW };
+    if (cx > vw / 2) {
+      return { position: "fixed" as const, left: Math.max(margin, cx - cw / 2 - panelW - margin), top: "50%", transform: "translateY(-50%)", width: panelW };
     } else {
-      // card is left of centre -- panel goes right
-      const left = Math.min(cardRight + margin, vw - panelW - margin);
-      return { position: "fixed" as const, left, top: "50%", transform: "translateY(-50%)", width: panelW };
+      return { position: "fixed" as const, left: Math.min(cx + cw / 2 + margin, vw - panelW - margin), top: "50%", transform: "translateY(-50%)", width: panelW };
     }
   })();
 
-  const onPointerDown = (e: React.PointerEvent) => {
-    e.stopPropagation();
-    try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
-    dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cx, oy: cy };
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
-    const d = dragRef.current; if (!d || e.pointerId !== d.id) return;
-    setPos({ x: d.ox + (e.clientX - d.sx), y: d.oy + (e.clientY - d.sy) });
-  };
-  const onPointerUp = (e: React.PointerEvent) => {
-    const d = dragRef.current; if (d && e.pointerId === d.id) {
-      try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
-      dragRef.current = null;
-    }
-  };
-
   return (
-    <div className={styles.overlay} onClick={onClose}>
-
-      {/* The physical card -- SVG rendered at its pit position, draggable */}
+    <div
+      className={styles.overlay}
+      onPointerDown={onOverlayDown}
+      onPointerMove={onOverlayMove}
+      onPointerUp={onOverlayUp}
+      onPointerCancel={onOverlayUp}
+      onClick={onOverlayClick}
+    >
+      {/* The physical card -- SVG at its pit position */}
       <svg
         style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
         aria-hidden="true"
@@ -96,30 +114,17 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
             <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} />
           </clipPath>
         </defs>
-        <g
-          transform={`translate(${cx},${cy}) rotate(${angleDeg})`}
-          style={{ pointerEvents: "all", cursor: dragRef.current ? "grabbing" : "grab" }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Card background */}
+        <g transform={`translate(${cx},${cy}) rotate(${angleDeg})`}>
           <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} fill="#ffffff" />
-          {/* Card image */}
           {image && (
             <image
               href={image}
-              x={-cw / 2}
-              y={-ch / 2}
-              width={cw}
-              height={ch}
+              x={-cw / 2} y={-ch / 2}
+              width={cw} height={ch}
               clipPath="url(#htp-card-clip)"
               preserveAspectRatio="xMidYMid slice"
             />
           )}
-          {/* Yellow border */}
           <rect
             x={-cw / 2 - 4} y={-ch / 2 - 4}
             width={cw + 8} height={ch + 8}
@@ -131,14 +136,13 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
         </g>
       </svg>
 
-      {/* Close button */}
-      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
+      {/* Close */}
+      <button type="button" className={styles.close} onClick={(e: React.MouseEvent) => { e.stopPropagation(); onClose(); }} aria-label="Close">
         &times;
       </button>
 
       {/* Content panel */}
       <div className={styles.panel} style={panelStyle} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-
         <div className={styles.header}>
           <div className={styles.headingGroup}>
             <p className={styles.overline}>HOW TO PLAY...</p>
@@ -163,7 +167,7 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
         </div>
 
         <div className={styles.navRow}>
-          <button type="button" className={styles.nav} onClick={onPrev} disabled={!onPrev} aria-label="Previous step">
+          <button type="button" className={styles.nav} onClick={(e: React.MouseEvent) => { e.stopPropagation(); onPrev && onPrev(); }} disabled={!onPrev} aria-label="Previous step">
             &#8592;
           </button>
           <div className={styles.dots}>
@@ -172,16 +176,15 @@ export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, on
                 key={i}
                 type="button"
                 className={`${styles.dot} ${i === step.number - 1 ? styles.dotActive : ""}`}
-                onClick={() => onStepSelect(i)}
+                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onStepSelect(i); }}
                 aria-label={`Go to step ${i + 1}`}
               />
             ))}
           </div>
-          <button type="button" className={styles.nav} onClick={onNext} disabled={!onNext} aria-label="Next step">
+          <button type="button" className={styles.nav} onClick={(e: React.MouseEvent) => { e.stopPropagation(); onNext && onNext(); }} disabled={!onNext} aria-label="Next step">
             &#8594;
           </button>
         </div>
-
       </div>
     </div>
   );
