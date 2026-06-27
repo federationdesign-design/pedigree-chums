@@ -1039,16 +1039,12 @@ export default function LineageMap({
               .filter((n) => n._parent)
               .map((n) => {
                 const p = n._parent as Node;
-                const dx = n._x - p._x, dy = n._y - p._y, dist = Math.hypot(dx, dy) || 1;
-                const fromRoot = p._id === "0";
-                const ex1 = fromRoot ? p._x + (dx / dist) * (ROOT + 15) : p._x;
-                const ey1 = fromRoot ? p._y + (dy / dist) * (ROOT + 15) : p._y;
                 return (
                   <line
                     key={`e${n._id}`}
                     className={`${styles.edge} ${open.has(n._id) ? styles.lit : ""}`.trim()}
-                    x1={ex1}
-                    y1={ey1}
+                    x1={p._x}
+                    y1={p._y}
                     x2={n._x}
                     y2={n._y}
                   />
