@@ -1898,6 +1898,14 @@ export default function PackPit() {
         bones.forEach((b: any) => { b.plugin.img = (b === bone && showHint) ? imgDragMe : imgBone; });
       });
       window.addEventListener("mouseup", releaseHeldPct);
+      const onWindowLeave = (e: MouseEvent) => {
+        if (e.relatedTarget === null) {
+          releaseHeldPct();
+          mc.mouse.button = -1;
+          MouseConstraint.clearSourceEvents(mc);
+        }
+      };
+      window.addEventListener("mouseout", onWindowLeave);
       // How-it-works pieces: when the popup closes it sends each piece's on-screen
       // rect; we drop a body at that spot that falls straight down, +500 each.
       const onHowToPlayDrop = (ev: any) => {
@@ -2060,6 +2068,7 @@ export default function PackPit() {
         render.canvas.removeEventListener("dblclick", onDbl);
         render.canvas.removeEventListener("mousedown", onDown);
         window.removeEventListener("mouseup", releaseHeldPct);
+        window.removeEventListener("mouseout", onWindowLeave);
         window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
