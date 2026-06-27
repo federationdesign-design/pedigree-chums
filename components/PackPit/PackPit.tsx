@@ -2321,7 +2321,7 @@ export default function PackPit() {
       {flyingCard && (
         <div
           className={styles.flyingCard}
-          style={{ left: flyingCard.rect.left, top: flyingCard.rect.top, width: flyingCard.rect.width, height: flyingCard.rect.height }}
+          style={{ left: flyingCard.rect.left, top: flyingCard.rect.top, width: flyingCard.rect.width, height: flyingCard.rect.height, "--fly-top": flyingCard.rect.top + "px" } as React.CSSProperties}
         >
           {flyingCard.name}
         </div>

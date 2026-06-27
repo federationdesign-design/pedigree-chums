@@ -468,7 +468,7 @@
 }
 @keyframes flyToBottom {
   0% { transform: translateY(0) scale(1); opacity: 1; }
-  100% { transform: translateY(110vh) scale(0.3); opacity: 0; }
+  100% { transform: translateY(calc(100vh - var(--fly-top, 0px) + 100px)) scale(0.3); opacity: 0; }
 }
 .flyingCard {
   position: fixed;
