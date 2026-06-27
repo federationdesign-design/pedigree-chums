@@ -1044,7 +1044,9 @@ export default function LineageMap({
                 const dist = Math.hypot(dx, dy) || 1;
                 const pShare = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                 const pR = radius(pShare);
-                const nR = (!n.children || n.children.length === 0) ? ROOT + 10 : radius(pShare);
+                // if this node is the root card, shorten edge to stop at card boundary
+                const isRoot = n._x === root._x && n._y === root._y;
+                const nR = isRoot ? ROOT + 10 : radius(pShare);
                 const x1 = p._x + (dx / dist) * pR;
                 const y1 = p._y + (dy / dist) * pR;
                 const x2 = n._x - (dx / dist) * nR;
