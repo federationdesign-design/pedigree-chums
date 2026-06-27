@@ -175,7 +175,17 @@ export default function PackPit() {
       const onTimeScale = (e: Event) => { engine.timing.timeScale = (e as CustomEvent).detail?.scale ?? 1; };
       window.addEventListener("pc:timescale", onTimeScale);
       const onHowToPlayOpen = () => { engine.timing.timeScale = 0.015; };
-      const onHowToPlayClose = () => { engine.timing.timeScale = 1; };
+      const onHowToPlayClose = () => {
+        // ease back to normal speed over 500ms to prevent explosion on resume
+        const start = performance.now();
+        const startScale = engine.timing.timeScale;
+        const easeBack = () => {
+          const t = Math.min(1, (performance.now() - start) / 500);
+          engine.timing.timeScale = startScale + (1 - startScale) * t;
+          if (t < 1) requestAnimationFrame(easeBack);
+        };
+        requestAnimationFrame(easeBack);
+      };
       window.addEventListener("pc:open-howtoplay", onHowToPlayOpen);
       window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
       engine.gravity.y = 1;
