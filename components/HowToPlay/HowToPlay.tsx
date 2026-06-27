@@ -76,6 +76,14 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
           if (r.width > 2 && r.height > 2) {
             const colW = r.width / 5;
             for (let i = 0; i < 5; i++) pieces.push({ src: `/step${i + 1}.png`, x: r.left + i * colW, y: r.top, w: colW, h: r.height });
+          } else {
+            // strip hidden on mobile -- drop 5 step cards from top centre with spacing
+            const vw = window.innerWidth;
+            const cardW = Math.round(vw * 0.28);
+            const cardH = Math.round(cardW * 1.35);
+            for (let i = 0; i < 5; i++) {
+              pieces.push({ src: `/step${i + 1}.png`, x: vw * 0.1 + (i % 3) * (cardW + 8), y: -cardH * Math.floor(i / 3) - 20, w: cardW, h: cardH });
+            }
           }
         }
         push(root.querySelector("[data-htp='logo']"), "/dogbingo.svg");
