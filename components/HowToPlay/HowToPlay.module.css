@@ -95,21 +95,7 @@
 .swipeHint {
   display: none;
 }
-.stepImg {
-  flex: 0 0 auto;
-  width: 18%;
-  max-width: 200px;
-  height: auto;
-  border-radius: 12px;
-}
 .stepScroll {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  margin-bottom: 16px;
-}
-.stripWrap {
   display: none;
 }
 @media (max-width: 900px) {

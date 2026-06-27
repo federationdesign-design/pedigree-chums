@@ -60,17 +60,13 @@ export default function HowToPlay({ open, onClose }: Props) {
       const root = stageElRef.current;
       if (root) {
         // strip -> 5 step columns
-        // try single strip first, then individual step images
         const strip = root.querySelector("img[alt='How to play, step by step']") as HTMLElement | null;
-        const stripR = strip?.getBoundingClientRect();
-        if (strip && stripR && stripR.width > 2 && stripR.height > 2) {
-          const colW = stripR.width / 5;
-          for (let i = 0; i < 5; i++) pieces.push({ src: `/step${i + 1}.png`, x: stripR.left + i * colW, y: stripR.top, w: colW, h: stripR.height });
-        } else {
-          // individual step images - always try these as fallback
-          root.querySelectorAll("img[alt^='How to play, step']").forEach((el, i) => {
-            push(el, `/step${i + 1}.png`);
-          });
+        if (strip) {
+          const r = strip.getBoundingClientRect();
+          if (r.width > 2 && r.height > 2) {
+            const colW = r.width / 5;
+            for (let i = 0; i < 5; i++) pieces.push({ src: `/step${i + 1}.png`, x: r.left + i * colW, y: r.top, w: colW, h: r.height });
+          }
         }
         // logo + two triangles
         push(root.querySelector("[data-htp='logo']"), "/dogbingo.svg");
