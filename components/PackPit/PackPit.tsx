@@ -37,6 +37,9 @@ export default function PackPit() {
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
   const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
+  const [scorePulse, setScorePulse] = useState(false);
+  const prevScoreRef = useRef(0);
+  useEffect(() => { if (score !== prevScoreRef.current) { prevScoreRef.current = score; setScorePulse(true); setTimeout(() => setScorePulse(false), 400); } }, [score]);
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null); // current celebration
   const msLast = useRef(0); // highest milestone already celebrated
   const msTimer = useRef<number | null>(null);
@@ -1999,7 +2002,7 @@ export default function PackPit() {
       <div className={styles.pattern} aria-hidden="true" />
       <img className={styles.floor} src={bust("/floor-shortened-svg.svg")} alt="" aria-hidden="true" />
       <div className={styles.controls}>
-        <div className={styles.scoreTotal} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
+        <div className={styles.scoreTotal + (scorePulse ? " " + styles.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
       </div>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
