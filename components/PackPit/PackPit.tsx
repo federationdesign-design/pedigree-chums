@@ -257,9 +257,9 @@ export default function PackPit() {
             prop.shape === "slipper"
               ? [R(557, 315, 1075, 170), C(300, 205, 200), C(560, 230, 180), C(810, 280, 120)] // sole bar, toe, instep, heel back
               : [
-                R(515, 285, 1010, 80),   // floor - wide bottom
-                R(130, 160, 80, 260),    // left wall - angled inward
-                R(900, 160, 80, 260),    // right wall - angled inward
+                R(515, 235, 1010, 80),   // floor - wide bottom (raised 50px)
+                R(130, 135, 80, 210),    // left wall
+                R(900, 135, 80, 210),    // right wall
               ]; // open-top trapezoid bowl
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
           const ox = x - b.position.x, oy = y - b.position.y; // box centre relative to the collider centroid (at angle 0)
@@ -1708,9 +1708,6 @@ export default function PackPit() {
           const other = ga === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
           if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite") continue;
-          const cx2 = (ga.position.x + other.position.x) / 2;
-          const cy2 = (ga.position.y + other.position.y) / 2;
-          burstAt(cx2, cy2, 18);
           const ddx = other.position.x - ga.position.x, ddy = other.position.y - ga.position.y;
           const dd = Math.hypot(ddx, ddy) || 1;
           Body.applyForce(other, other.position, { x: (ddx / dd) * other.mass * 0.04, y: (ddy / dd) * other.mass * 0.04 - other.mass * 0.02 });
