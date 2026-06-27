@@ -697,7 +697,8 @@ export default function PackPit() {
       const onDbl = (e: MouseEvent) => {
         const hit = Query.point(dyn(), localPoint(e))[0];
         if (!hit) {
-          const anyHit = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), localPoint(e))[0];
+          const _hitBodies = Query.point(Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin?.prop !== "logo"), localPoint(e));
+        const anyHit = _hitBodies.find((b: any) => b.plugin?.prop === "bowl") || _hitBodies[0];
           if (anyHit) {
             Body.applyForce(anyHit, anyHit.position, { x: (Math.random() - 0.5) * anyHit.mass * 0.015, y: -anyHit.mass * 0.02 });
             numAt(localPoint(e).x, localPoint(e).y, 1, 12);
