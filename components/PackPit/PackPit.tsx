@@ -105,7 +105,7 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
-  const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
@@ -843,7 +843,7 @@ export default function PackPit() {
           const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
           if (stepIdx !== -1) {
             const r = render.canvas.getBoundingClientRect();
-            setHowToPlayCardPos({ x: r.left + hit.position.x, y: r.top + hit.position.y, w: hit.plugin.w || 120, h: hit.plugin.h || 120 });
+            setHowToPlayCardPos({ x: r.left + hit.position.x, y: r.top + hit.position.y, w: hit.plugin.w || 120, h: hit.plugin.h || 120, angle: hit.angle || 0, image: hit.plugin.img?.src || "" });
             setHowToPlayStep(stepIdx); setHowToPlay(true); return true;
           }
         }

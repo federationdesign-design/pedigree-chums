@@ -9,7 +9,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   activeStep?: number | null;
-  cardPos?: { x: number; y: number; w: number; h: number } | null;
+  cardPos?: { x: number; y: number; w: number; h: number; angle: number; image: string } | null;
 };
 
 const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];

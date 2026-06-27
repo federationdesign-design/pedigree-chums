@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useState } from "react";
 import styles from "./StepCard.module.css";
 
 export type StepRow = {
@@ -16,6 +16,13 @@ export type StepData = {
   rows: StepRow[];
 };
 
+type CardInfo = {
+  x: number; y: number;
+  w: number; h: number;
+  angle: number;
+  image: string;
+};
+
 type Props = {
   step: StepData;
   onClose: () => void;
@@ -23,31 +30,113 @@ type Props = {
   onNext?: () => void;
   totalSteps: number;
   onStepSelect: (i: number) => void;
-  cardPos?: { x: number; y: number; w: number; h: number } | null;
+  cardPos?: CardInfo | null;
 };
 
+const RADIUS = 16; // card corner radius in px
+
 export default function StepCard({ step, onClose, onPrev, onNext, totalSteps, onStepSelect, cardPos }: Props) {
+  // Draggable card position
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
+
+  const cx = pos?.x ?? cardPos?.x ?? (typeof window !== "undefined" ? window.innerWidth / 2 : 400);
+  const cy = pos?.y ?? cardPos?.y ?? (typeof window !== "undefined" ? window.innerHeight / 2 : 300);
+  const cw = cardPos?.w ?? 120;
+  const ch = cardPos?.h ?? 120;
+  const angle = cardPos?.angle ?? 0;
+  const image = cardPos?.image ?? "";
+  const angleDeg = (angle * 180) / Math.PI;
+
+  // Position content panel to the side of the card that has more space
   const panelStyle: React.CSSProperties = (() => {
-    if (!cardPos || typeof window === "undefined") return {};
+    if (typeof window === "undefined") return {};
     const vw = window.innerWidth;
     const panelW = Math.min(520, vw * 0.44);
-    const cardCentreX = cardPos.x;
     const margin = 32;
-    // if card is in the right half, put panel on the left; otherwise right
-    if (cardCentreX > vw / 2) {
-      return { position: "fixed", right: vw - cardCentreX + cardPos.w / 2 + margin, left: "auto", top: "50%", transform: "translateY(-50%)", width: panelW };
+    const cardRight = cx + cw / 2;
+    const cardLeft = cx - cw / 2;
+    if (cardRight > vw / 2) {
+      // card is right of centre -- panel goes left
+      const left = Math.max(margin, cardLeft - panelW - margin);
+      return { position: "fixed" as const, left, top: "50%", transform: "translateY(-50%)", width: panelW };
     } else {
-      return { position: "fixed", left: cardCentreX + cardPos.w / 2 + margin, right: "auto", top: "50%", transform: "translateY(-50%)", width: panelW };
+      // card is left of centre -- panel goes right
+      const left = Math.min(cardRight + margin, vw - panelW - margin);
+      return { position: "fixed" as const, left, top: "50%", transform: "translateY(-50%)", width: panelW };
     }
   })();
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
+    dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cx, oy: cy };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current; if (!d || e.pointerId !== d.id) return;
+    setPos({ x: d.ox + (e.clientX - d.sx), y: d.oy + (e.clientY - d.sy) });
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    const d = dragRef.current; if (d && e.pointerId === d.id) {
+      try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
+      dragRef.current = null;
+    }
+  };
 
   return (
     <div className={styles.overlay} onClick={onClose}>
 
+      {/* The physical card -- SVG rendered at its pit position, draggable */}
+      <svg
+        style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
+        aria-hidden="true"
+      >
+        <defs>
+          <clipPath id="htp-card-clip">
+            <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} />
+          </clipPath>
+        </defs>
+        <g
+          transform={`translate(${cx},${cy}) rotate(${angleDeg})`}
+          style={{ pointerEvents: "all", cursor: dragRef.current ? "grabbing" : "grab" }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Card background */}
+          <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={RADIUS} fill="#ffffff" />
+          {/* Card image */}
+          {image && (
+            <image
+              href={image}
+              x={-cw / 2}
+              y={-ch / 2}
+              width={cw}
+              height={ch}
+              clipPath="url(#htp-card-clip)"
+              preserveAspectRatio="xMidYMid slice"
+            />
+          )}
+          {/* Yellow border */}
+          <rect
+            x={-cw / 2 - 4} y={-ch / 2 - 4}
+            width={cw + 8} height={ch + 8}
+            rx={RADIUS + 4}
+            fill="none"
+            stroke="var(--yellow, #ffd23e)"
+            strokeWidth={5}
+          />
+        </g>
+      </svg>
+
+      {/* Close button */}
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
 
+      {/* Content panel */}
       <div className={styles.panel} style={panelStyle} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
 
         <div className={styles.header}>
