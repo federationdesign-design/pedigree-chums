@@ -1198,10 +1198,10 @@ export default function PackPit() {
             }
             numAt(jx, jy, 500);
             // fuse celebration: starbursts + delayed bursts
-            explodeAt(jx, jy, R * 2.4);
-            setTimeout(() => { burstAt(jx - R * 0.4, jy + R * 0.2, R * 1.6); }, 120);
-            setTimeout(() => { burstAt(jx + R * 0.5, jy - R * 0.3, R * 1.8); }, 220);
-            setTimeout(() => { burstAt(jx, jy, R * 2.8); }, 350);
+            explodeAt(jx, jy, R * 0.9);
+            setTimeout(() => { burstAt(jx - R * 0.4, jy + R * 0.2, R * 0.6); }, 120);
+            setTimeout(() => { burstAt(jx + R * 0.5, jy - R * 0.3, R * 0.7); }, 220);
+            setTimeout(() => { burstAt(jx, jy, R * 1.1); }, 350);
             bone.plugin.img = imgOhYea; // ohyea SVG on fuse
             bone.plugin.fuseAt = performance.now(); // drives the cross-fade
             Composite.remove(engine.world, logoBody); logoBody = null;
