@@ -599,16 +599,17 @@ export default function PackPit() {
           // desktop: a scripted, slower pour. Feature cards land on set beats (each
           // picked from a pair, alternating per load); everything else floods at 10s.
           const dropped = new Set<number>();
-          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  tennis balls
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies (random side)
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700   tennis balls
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050  cookies
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); } }, 2750));        // 2750 pair 1: easy (5/7 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); } }, 3050)); // 3050 panels
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2: easy (3/4 nodes)
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); } }, 2750));        // 2750 pair 1
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2
           waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                                                                  // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3: easy (4/5 nodes)
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); Composite.add(engine.world, makeMenuObj(w)); } }, 9000));
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000));                                      // 9000 hamburger menu
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); } }, 10050));           // 10050 pair 4
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -618,10 +619,10 @@ export default function PackPit() {
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
-          }, 15000)); // 9000 bowl + menu
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); Composite.add(engine.world, makeArrow(w)); } }, 10050)); // 10050 pair 4 + green arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5: easy (3 nodes each)
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6: easy (3/5 nodes)
+          }, 15000));                                                                                                                                      // 15000 Union Jack
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000));                              // 70000 bowl
           waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                                              // 150000 all remaining cards
         }
       }
