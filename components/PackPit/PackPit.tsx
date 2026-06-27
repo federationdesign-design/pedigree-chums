@@ -1462,7 +1462,11 @@ export default function PackPit() {
 
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
-        bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        const bowlBodies2 = bodies.filter((b: any) => b.plugin?.prop === "bowl");
+        const nonBowl = bodies.filter((b: any) => b.plugin?.prop !== "bowl");
+        nonBowl.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        // draw bowl last so its rim appears on top of contained objects
+        bowlBodies2.forEach((b: any) => { drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
         if (hoverBody) drawBall(ctx, hoverBody, 1, true);
 
