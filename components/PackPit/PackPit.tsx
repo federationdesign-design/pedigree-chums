@@ -735,7 +735,7 @@ export default function PackPit() {
           }
           return;
         }
-        const ang = Math.random() * Math.PI * 2, speed = 13 + Math.random() * 5;
+        const ang = Math.random() * Math.PI * 2, speed = (13 + Math.random() * 5) / 50;
         Body.setVelocity(hit, { x: Math.cos(ang) * speed, y: -Math.abs(Math.sin(ang) * speed) - 7 });
         Body.setAngularVelocity(hit, (Math.random() - 0.5) * 0.7);
         if (hit.plugin.prop) burstAt(hit.position.x, hit.position.y, Math.max(34, hit.plugin.half * 0.5)); // props get the pink starburst, like the % circles
