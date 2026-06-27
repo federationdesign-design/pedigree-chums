@@ -1480,14 +1480,13 @@ export default function PackPit() {
 
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
-        const isBowl3 = (b: any) => b.plugin?.prop === "bowl";
-        const isBomb3 = (b: any) => b.plugin?.bomb;
-        const isRod3 = (b: any) => b.plugin?.kind === "rod" || b.plugin?.kind === "pill";
-        bodies.filter(isRod3).forEach((b: any) => drawBall(ctx, b, dimLevel, false));
-        bodies.filter((b: any) => !isBowl3(b) && !isBomb3(b) && !isRod3(b)).forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
-        if (hoverBody && !isBowl3(hoverBody) && !isBomb3(hoverBody) && !isRod3(hoverBody)) drawBall(ctx, hoverBody, dimLevel, true);
-        bodies.filter(isBomb3).forEach((b: any) => drawBall(ctx, b, dimLevel, b === hoverBody));
-        bodies.filter(isBowl3).forEach((b: any) => drawBall(ctx, b, dimLevel, b === hoverBody));
+        const bowlBodies2 = bodies.filter((b: any) => b.plugin?.prop === "bowl");
+        const nonBowl = bodies.filter((b: any) => b.plugin?.prop !== "bowl");
+        nonBowl.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        // draw hover body before bowl so bowl rim always stays on top
+        if (hoverBody && hoverBody.plugin?.prop !== "bowl") drawBall(ctx, hoverBody, dimLevel, true);
+        // draw bowl last so its rim appears on top of contained objects
+        bowlBodies2.forEach((b: any) => { drawBall(ctx, b, dimLevel, b === hoverBody); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
 
         bodies.forEach((b: any) => {
