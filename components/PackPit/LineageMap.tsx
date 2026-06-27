@@ -271,9 +271,6 @@ export default function LineageMap({
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
   const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
-  const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
-  const [flipPhase, setFlipPhase] = useState<null | "closing" | "back" | "opening">(null); // SVG fake-flip idle attractor
-  const flipTimer = useRef<any>(null); // holds the 2min idle + loop timers
   const [cardFlip, setCardFlip] = useState<Map<string, "closing" | "back" | "opening">>(new Map()); // per-card idle flip
   const cardFlipTimers = useRef<Map<string, any>>(new Map()); // per-card idle timers
   const interacted = useRef(false);
@@ -283,32 +280,11 @@ export default function LineageMap({
     return () => clearTimeout(t);
   }, [breed.name]);
   useEffect(() => {
-    setIdleHint(false); interacted.current = false;
-    const t = setTimeout(() => { if (!interacted.current) setIdleHint(true); }, 1000);
+    interacted.current = false;
     return () => clearTimeout(t);
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
-  const startFlipLoop = () => {
-    if (flipTimer.current) clearTimeout(flipTimer.current);
-    setFlipPhase("closing");
-    flipTimer.current = setTimeout(() => {
-      setFlipPhase("back");
-      flipTimer.current = setTimeout(() => {
-        setFlipPhase("opening");
-        flipTimer.current = setTimeout(() => {
-          setFlipPhase(null);
-          // loop: flip again after 8s
-          flipTimer.current = setTimeout(startFlipLoop, 8000);
-        }, 260);
-      }, 3000);
-    }, 260);
-  };
-  useEffect(() => {
-    setFlipPhase(null);
-    if (flipTimer.current) clearTimeout(flipTimer.current);
-    flipTimer.current = setTimeout(startFlipLoop, 2000); // 2 seconds
-    return () => { if (flipTimer.current) clearTimeout(flipTimer.current); };
-  }, [breed.name]);
+
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
     const isNeg = val < 0;
@@ -687,7 +663,7 @@ export default function LineageMap({
       });
       setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
       pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
-      interacted.current = true; setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
+      interacted.current = true;
       return;
     }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
@@ -699,7 +675,7 @@ export default function LineageMap({
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
         if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); } // -100 patch_revealscore_v1
       });
-      interacted.current = true; setIdleHint(false);
+      interacted.current = true;
       return;
     }
     // fully open: auto-place all unplaced images into their correct frames
@@ -1047,7 +1023,7 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
-                      interacted.current = true; setIdleHint(false); // any tap stops the first-ring hint
+                      interacted.current = true; // any tap stops the first-ring hint
                       burstAt(n._x, n._y, r * 1.33); // pink starburst, 33% over the circle radius, exactly as the pit
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
@@ -1078,7 +1054,7 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {share}%
                     </text>
