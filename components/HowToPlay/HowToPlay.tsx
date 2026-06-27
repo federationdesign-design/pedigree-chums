@@ -97,6 +97,7 @@ export default function HowToPlay({ open, onClose, activeStep = null }: Props) {
         onPrev={step > 0 ? () => setStep((s: number | null) => Math.max((s ?? 0) - 1, 0)) : undefined}
         onNext={step < STEPS.length - 1 ? () => setStep((s: number | null) => Math.min((s ?? 0) + 1, STEPS.length - 1)) : undefined}
         totalSteps={STEPS.length}
+        onStepSelect={(i: number) => setStep(i)}
       />,
       document.body
     );
