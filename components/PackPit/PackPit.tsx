@@ -6,6 +6,7 @@ import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import LineageMap from "./LineageMap";
 import HowToPlay from "../HowToPlay/HowToPlay";
+import GameOver from "../GameOver/GameOver";
 import { startCheckout } from "../Offer/startCheckout";
 import styles from "./PackPit.module.css";
 
@@ -105,6 +106,7 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
+  const [gameOver, setGameOver] = useState(false);
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
@@ -127,6 +129,30 @@ export default function PackPit() {
     }, 1000);
     return () => { if (drainRef.current) clearInterval(drainRef.current); };
   }, []); // runs once; lineageOpenRef is checked inside the interval callback
+
+  // Game over detection: if 3+ bodies have been above the pit top (y < 0) for 2s, the pit is full.
+  // We track when each body first appeared above the line; if it stays there 2s it counts.
+  const gameOverRef = useRef(false);
+  useEffect(() => {
+    const stuck = new Map<number, number>(); // bodyId -> timestamp first seen above pit top
+    const iv = setInterval(() => {
+      if (gameOverRef.current) { clearInterval(iv); return; }
+      // dispatch a check event that PackPit physics loop handles
+      window.dispatchEvent(new Event("pc:check-gameover"));
+    }, 2000);
+    const onResult = (e: Event) => {
+      const count = (e as CustomEvent).detail?.stuckCount ?? 0;
+      if (count >= 3 && !gameOverRef.current) {
+        gameOverRef.current = true;
+        setGameOver(true);
+      }
+    };
+    window.addEventListener("pc:gameover-result", onResult as EventListener);
+    return () => {
+      clearInterval(iv);
+      window.removeEventListener("pc:gameover-result", onResult as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     let disposed = false;
@@ -1989,6 +2015,28 @@ export default function PackPit() {
         if (uj) { uj.plugin.popped = true; poof(uj.position.x, uj.position.y, uj.plugin.half); Composite.remove(engine.world, uj); }
       };
       window.addEventListener("pc:britain-dismiss", onBritainDismiss);
+      // Game over: if 3+ bodies have more than 50% of themselves above the pit top on
+      // TWO consecutive checks (2s apart), the pit is full and game is over.
+      const aboveOnLastCheck = new Set<number>();
+      const onCheckGameover = () => {
+        const all = Composite.allBodies(engine.world);
+        const aboveNow = new Set<number>();
+        for (const b of all) {
+          if (b.isStatic) continue;
+          if (!b.plugin) continue;
+          if (b.plugin.kind === "pct" || b.plugin.prop || b.plugin.kind === "menu") continue;
+          // 50% above pit top: centre Y < -(half the body)
+          const half = b.plugin.half || 30;
+          if (b.position.y < -half) aboveNow.add(b.id);
+        }
+        // count bodies above on BOTH this check AND the last check
+        let stuckCount = 0;
+        for (const id of aboveNow) { if (aboveOnLastCheck.has(id)) stuckCount++; }
+        aboveOnLastCheck.clear();
+        for (const id of aboveNow) aboveOnLastCheck.add(id);
+        window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuckCount } }));
+      };
+      window.addEventListener("pc:check-gameover", onCheckGameover);
       window.addEventListener("pc:offer-success", onOfferSuccess);
 
 
@@ -2139,6 +2187,7 @@ export default function PackPit() {
         window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
         window.removeEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
         window.removeEventListener("pc:britain-dismiss", onBritainDismiss);
+        window.removeEventListener("pc:check-gameover", onCheckGameover);
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
@@ -2328,6 +2377,7 @@ export default function PackPit() {
           </div>
         );
       })()}
+      {gameOver && <GameOver chums={collected} />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
           <span className={styles.rotatePhone} />
