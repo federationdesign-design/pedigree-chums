@@ -533,6 +533,13 @@
 .wrongDogFlash {
   animation: lm-wrong-dog 0.8s ease-out forwards;
 }
+.flashNeg {
+  fill: #ff2d4f;
+  font-family: 'Luckiest Guy', var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  pointer-events: none;
+  animation: lm-flash 0.65s ease-out forwards;
+}
 @keyframes lm-wrong-dog {
   0%   { transform: scale(0.5); opacity: 1; }
   60%  { transform: scale(1.15); opacity: 1; }
