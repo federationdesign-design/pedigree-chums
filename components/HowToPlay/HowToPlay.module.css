@@ -96,6 +96,13 @@
   display: none;
 }
 .stepScroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin-bottom: 16px;
+}
+.stripWrap {
   display: none;
 }
 @media (max-width: 900px) {
