@@ -1740,12 +1740,19 @@ export default function PackPit() {
           const other = ga === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
           if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite" || other.plugin?.isBowl) continue;
-          // burst at arrowhead tip - green and yellow
+          // burst at arrowhead tip - only if not inside a bowl
           const tipDist = ga.plugin.half || 30;
           const tipX = ga.position.x + Math.cos(ga.angle + 2.3450) * tipDist;
           const tipY = ga.position.y + Math.sin(ga.angle + 2.3450) * tipDist;
-          bursts.push({ x: tipX, y: tipY, s: 18, born: performance.now(), life: 420, colour: "#22c55e", rot: 0 });
-          bursts.push({ x: tipX, y: tipY, s: 12, born: performance.now(), life: 420, colour: "#ffd23e", rot: 18 });
+          const insideBowl = Composite.allBodies(engine.world).some((bb: any) => {
+            if (!bb.plugin?.isBowl) return false;
+            const dx = tipX - bb.position.x, dy = tipY - bb.position.y;
+            return Math.hypot(dx, dy) < bb.plugin.w * 0.4;
+          });
+          if (!insideBowl) {
+            bursts.push({ x: tipX, y: tipY, s: 18, born: performance.now(), life: 420, colour: "#22c55e", rot: 0 });
+            bursts.push({ x: tipX, y: tipY, s: 12, born: performance.now(), life: 420, colour: "#ffd23e", rot: 18 });
+          }
           const ddx = other.position.x - ga.position.x, ddy = other.position.y - ga.position.y;
           const dd = Math.hypot(ddx, ddy) || 1;
           Body.applyForce(other, other.position, { x: (ddx / dd) * other.mass * 0.04, y: (ddy / dd) * other.mass * 0.04 - other.mass * 0.02 });
