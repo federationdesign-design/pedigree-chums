@@ -33,7 +33,8 @@ export default function PackPit() {
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
   const [shelfOpen, setShelfOpen] = useState(false);
-  const [britainOpen, setBritainOpen] = useState(false); // the collection shelf overlay, opened from the tally
+  const [britainOpen, setBritainOpen] = useState(false);
+  const [shelfCardStates, setShelfCardStates] = useState<Map<string, "opened" | "removed">>(new Map()); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
@@ -2202,12 +2203,53 @@ export default function PackPit() {
                   {rows.map((row, ri) => (
                     <div className={styles.shelfRow} key={ri}>
                       <div className={styles.shelfCards}>
-                        {row.map((c) => (
-                          <div className={`${styles.shelfCard} ${c.isCard ? styles.shelfCardReal : styles.shelfCardCartoon}`} key={c.name}>
-                            {c.img ? <img src={bust(c.img)} alt={c.name} /> : null}
-                            {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
-                          </div>
-                        ))}
+                        {row.map((c) => {
+                          const cardState = shelfCardStates.get(c.name);
+                          const isOpened = cardState === "opened";
+                          const isRemoved = cardState === "removed";
+                          return (
+                            <div
+                              key={c.name}
+                              className={`${styles.shelfCard} ${c.isCard ? styles.shelfCardReal : styles.shelfCardCartoon}`}
+                              style={{
+                                perspective: "900px",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => {
+                                setShelfCardStates((m) => {
+                                  const x = new Map(m);
+                                  if (!cardState) x.set(c.name, "opened");
+                                  else if (cardState === "opened") x.set(c.name, "removed");
+                                  return x;
+                                });
+                              }}
+                            >
+                              <div style={{
+                                width: "100%", height: "100%",
+                                position: "relative",
+                                transformStyle: "preserve-3d",
+                                transition: "all 700ms",
+                                transform: isRemoved ? "translateY(100%)" : isOpened ? "scale(1.5) rotateY(180deg)" : "rotateY(0deg)",
+                              }}>
+                                <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: "8px", overflow: "hidden" }}>
+                                  {c.img ? <img src={bust(c.img)} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null}
+                                  {c.count > 1 ? <span className={styles.shelfBadge}>×{c.count}</span> : null}
+                                </div>
+                                <div style={{
+                                  position: "absolute", inset: 0,
+                                  backfaceVisibility: "hidden",
+                                  transform: "rotateY(180deg)",
+                                  background: "var(--yellow, #ffd23e)",
+                                  borderRadius: "8px",
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  padding: "8px",
+                                }}>
+                                  <span style={{ fontFamily: "var(--font-display, 'Luckiest Guy')", fontSize: "13px", color: "#0a3a57", textAlign: "center", lineHeight: 1.2 }}>{c.name}</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                       <img className={styles.shelfLedge} src="/shelve-test.svg" alt="" aria-hidden="true" />
                     </div>
