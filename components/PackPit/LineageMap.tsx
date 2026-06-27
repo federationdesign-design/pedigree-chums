@@ -1601,7 +1601,7 @@ export default function LineageMap({
               gap: "4px",
             }}>
               <img src="/double-tap-icon-blue.svg" alt="" className={styles.dtIcon} style={{ width: "40%", height: "40%", objectFit: "contain" }} />
-              <span style={{ fontFamily: "Luckiest Guy, system-ui", fontSize: "13px", color: "#0a3a57", textAlign: "center" }}>double tap</span>
+              <span className={styles.dtText} style={{ fontFamily: "Luckiest Guy, system-ui", fontSize: "13px", color: "#0a3a57", textAlign: "center" }}>double tap</span>
             </div>
           </div>
         </div>

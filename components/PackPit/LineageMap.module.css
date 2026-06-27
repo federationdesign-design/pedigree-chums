@@ -549,6 +549,7 @@
   transform: rotateY(180deg);
   background: var(--yellow, #ffd23e);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 12px;
+  padding-top: 40%;
 }
 .rootFlipName {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -646,6 +647,11 @@
 .dtIcon {
   animation: lm-dt-bounce 0.8s ease-in-out infinite;
   will-change: transform;
+}
+.dtText {
+  animation: lm-dt-bounce 0.8s ease-in-out infinite;
+  will-change: transform;
+  animation-delay: 0.1s;
 }
 @keyframes lm-dt-bounce {
   0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
