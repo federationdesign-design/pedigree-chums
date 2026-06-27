@@ -33,7 +33,7 @@ export default function PackPit() {
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
   const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
   const [shelfOpen, setShelfOpen] = useState(false);
-  const [britainOpen, setBritainOpen] = useState(false);
+  const [britainMsg, setBritainMsg] = useState<number | null>(null);
   const [shelfCardStates, setShelfCardStates] = useState<Map<string, "opened" | "removed">>(new Map());
   const [flyingCard, setFlyingCard] = useState<{ name: string; img: string; rect: DOMRect } | null>(null); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
@@ -782,11 +782,12 @@ export default function PackPit() {
           hit.plugin.hits = (hit.plugin.hits || 0) + 1;
           numAt(hit.position.x, hit.position.y, 50);
           burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
+          const msgIdx = hit.plugin.hits <= 3 ? 0 : hit.plugin.hits <= 7 ? 1 : 2;
+          setBritainMsg(msgIdx);
           if (hit.plugin.hits >= hit.plugin.maxHits) {
             hit.plugin.popped = true;
             poof(hit.position.x, hit.position.y, hit.plugin.half);
             Composite.remove(engine.world, hit);
-            setBritainOpen(true);
           }
           return true;
         }
@@ -2211,16 +2212,24 @@ export default function PackPit() {
           </div>
         );
       })()}
-      {britainOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(10,58,87,0.85)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setBritainOpen(false)}>
-          <div style={{ background: "#fff", borderRadius: "24px", padding: "40px", maxWidth: "480px", width: "90%", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-            <img src="/uk-icon.jpg" alt="Made in Britain" style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", marginBottom: "16px" }} />
-            <h2 style={{ fontFamily: "var(--font-display, 'Luckiest Guy')", color: "#0a3a57", fontSize: "28px", margin: "0 0 12px" }}>Made in Britain</h2>
-            <p style={{ fontFamily: "Montserrat, sans-serif", color: "#0a3a57", fontSize: "15px", lineHeight: 1.6, margin: "0 0 24px" }}>Pedigree Chums is designed, illustrated and printed right here in Britain. Every card, every breed, every detail crafted with pride on British soil.</p>
-            <button onClick={() => setBritainOpen(false)} style={{ background: "#ffd23e", border: "none", borderRadius: "40px", padding: "12px 32px", fontFamily: "var(--font-display, 'Luckiest Guy')", fontSize: "18px", color: "#0a3a57", cursor: "pointer" }}>Brilliant!</button>
+      {britainMsg !== null && (() => {
+        const msgs = [
+          { title: "Printed in Britain", body: "Every card in the Pedigree Chums deck is printed right here in Britain, using sustainable inks on premium card stock." },
+          { title: "Designed in Britain", body: "Conceived, illustrated and crafted by a British creative team with a passion for dogs and great design." },
+          { title: "Tested for British Pooches", body: "Every breed, every fact, every illustration has been checked and approved by British dog lovers and experts." },
+        ];
+        const m = msgs[britainMsg];
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "clamp(30px,7vh,96px)", pointerEvents: "none" }} onClick={() => setBritainMsg(null)}>
+            <div style={{ pointerEvents: "auto", maxWidth: "760px", width: "90%", padding: "clamp(18px,3vw,34px) clamp(28px,4.5vw,52px)", borderRadius: "26px", background: "transparent", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "2px solid rgba(255,255,255,0.4)", boxShadow: "0 12px 32px rgba(10,58,87,0.32)", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+              <img src="/uk-icon.jpg" alt="" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", marginBottom: "12px" }} />
+              <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "clamp(17px,3.7vw,41px)", color: "#ffffff", margin: "0 0 8px", textShadow: "0 4px 0 rgba(10,58,87,0.45)" }}>{m.title}</p>
+              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(13px,1.8vw,18px)", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.5, opacity: 0.9 }}>{m.body}</p>
+              <button onClick={() => setBritainMsg(null)} style={{ background: "#ffd23e", border: "none", borderRadius: "40px", padding: "10px 28px", fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "16px", color: "#0a3a57", cursor: "pointer" }}>Brilliant!</button>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {flyingCard && (
         <div style={{
           position: "fixed",
