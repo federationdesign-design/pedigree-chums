@@ -277,11 +277,9 @@ export default function LineageMap({
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
     const t = setTimeout(() => setAutoArmed(true), 5000);
-    return () => clearTimeout(t);
   }, [breed.name]);
   useEffect(() => {
     interacted.current = false;
-    return () => clearTimeout(t);
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
 
@@ -333,7 +331,6 @@ export default function LineageMap({
     setShowRemove(false);
     setRemoving(false);
     const t = setTimeout(() => setShowRemove(true), 30000); // auto-show the green button after 30s
-    return () => clearTimeout(t);
   }, [breed.name]);
   // every non-root circle in the whole tree; the green button also appears once
   // all of them have been turned blue (opened), not just after the 15s timer
@@ -447,8 +444,7 @@ export default function LineageMap({
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
       const t = setTimeout(() => setShowRemove(true), 1000); // hold the green button back one second after the last circle turns blue
-      return () => clearTimeout(t);
-    }
+      }
   }, [seen, totalNodes]);
 
   const base = lean(breed.angle || 0);
