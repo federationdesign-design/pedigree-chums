@@ -711,6 +711,14 @@ export default function LineageMap({
       const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
       if (!target) return;
       window.setTimeout(() => {
+        // bubble trail: emit 4 bubbles staggered toward the target frame
+        for (let b = 0; b < 4; b++) {
+          window.setTimeout(() => {
+            const bid = puffSeq.current++;
+            setBubbles((bubs) => [...bubs, { id: bid, sx: target.sx, sy: target.sy }]);
+            window.setTimeout(() => setBubbles((bubs) => bubs.filter((x) => x.id !== bid)), 620);
+          }, b * 60);
+        }
         setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
         setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
         flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE); // auto-place costs 50
