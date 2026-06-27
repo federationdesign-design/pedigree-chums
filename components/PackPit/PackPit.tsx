@@ -1664,11 +1664,12 @@ export default function PackPit() {
           const other = ga === pair.bodyA ? pair.bodyB : pair.bodyA;
           if (!other || other.isStatic) continue;
           if (other.plugin?.kind === "howtoplay" || other.plugin?.kind === "entersite") continue;
-          // burst at arrowhead tip (bottom-left of SVG, offset from centre along arrow angle)
+          // burst at arrowhead tip - green and yellow
           const tipDist = ga.plugin.half || 30;
           const tipX = ga.position.x + Math.cos(ga.angle + 2.3450) * tipDist;
           const tipY = ga.position.y + Math.sin(ga.angle + 2.3450) * tipDist;
-          burstAt(tipX, tipY, 18);
+          bursts.push({ x: tipX, y: tipY, s: 18, born: performance.now(), life: 420, colour: "#22c55e", rot: 0 });
+          bursts.push({ x: tipX, y: tipY, s: 12, born: performance.now(), life: 420, colour: "#ffd23e", rot: 18 });
           const ddx = other.position.x - ga.position.x, ddy = other.position.y - ga.position.y;
           const dd = Math.hypot(ddx, ddy) || 1;
           Body.applyForce(other, other.position, { x: (ddx / dd) * other.mass * 0.04, y: (ddy / dd) * other.mass * 0.04 - other.mass * 0.02 });
