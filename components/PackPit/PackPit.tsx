@@ -1499,6 +1499,8 @@ export default function PackPit() {
         // ease the dim toward its target rather than snapping, so sweeping across
         // a shaken pack never flashes
         const dimTarget = spotlight ? DIM_MIN : 1;
+        // build a set of family IDs for the hovered body so related cards stay brighter
+        const familySet: Set<number> = new Set(spotlight ? hoverBody!.plugin.family.map((f: any) => f.id ?? f) : []);
         const frameDt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0; lastFrame = now;
         const step = frameDt / DIM_TIME;
         dimLevel = dimLevel < dimTarget ? Math.min(dimTarget, dimLevel + step) : Math.max(dimTarget, dimLevel - step);
