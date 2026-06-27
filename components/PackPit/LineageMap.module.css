@@ -667,3 +667,6 @@
   50% { transform: translateY(-6px) scale(1.08) rotate(0deg); }
   70% { transform: translateY(-3px) scale(1.04) rotate(0deg); }
 }
+
+.removingVisible { opacity: 1; }
+.removingFade { opacity: 0; transition: opacity 0.12s ease-out; }
