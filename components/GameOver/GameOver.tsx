@@ -66,7 +66,7 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
 
 export default function GameOver({ chums, score }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const idleTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetIdleTimer = () => {
     if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
     idleTimerRef.current = window.setTimeout(() => window.location.assign("/about"), 10000);
