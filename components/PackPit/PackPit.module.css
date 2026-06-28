@@ -16,7 +16,7 @@
   display: block;
   transition: opacity 0.25s ease, filter 0.25s ease;
 }
-/* paw pattern that flashes on each time a square dog strikes the floor (toggled in JS) */
+/* paw pattern -- opacity driven by pit fullness (0 = empty, 0.5 = full) via --fill-opacity */
 .pattern {
   position: absolute;
   inset: 0;
@@ -24,12 +24,13 @@
   background-image: url("/paw-pattern2.svg");
   background-repeat: repeat;
   background-size: 144px auto;
-  opacity: 0;
+  opacity: var(--fill-opacity, 0);
   pointer-events: none;
-  transition: opacity 0.18s ease;
+  transition: opacity 0.5s ease;
 }
+/* floor-hit flash still works -- temporarily bumps opacity higher */
 .showPattern .pattern {
-  opacity: 0.5;
+  opacity: max(var(--fill-opacity, 0), 0.5);
 }
 /* floor graphic pinned to the bottom of the pit; sits behind the canvas so the
    chums land and rest on top of it. The canvas (z 0, appended last) draws over it. */
@@ -446,4 +447,14 @@
   background: var(--navy);
   color: var(--yellow);
   box-shadow: 0 5px 0 rgba(3, 87, 245, 0.4);
+}
+
+/* Fill warning flash -- brief yellow tint at 90/95/99% full */
+.fillWarn {
+  animation: fillWarnFlash 0.6s ease-out forwards;
+}
+@keyframes fillWarnFlash {
+  0%   { background-color: rgba(255, 210, 62, 0); }
+  20%  { background-color: rgba(255, 210, 62, 0.22); }
+  100% { background-color: rgba(255, 210, 62, 0); }
 }

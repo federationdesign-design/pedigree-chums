@@ -1522,6 +1522,8 @@ export default function PackPit() {
       // settles off once the cards stop landing.
       let patternOn = false;
       let patternUntil = 0;
+      let lastFillCheck = 0;
+      let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
       const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
       const onFloorHit = (ev: any) => {
         const floor = walls[0];
@@ -1639,6 +1641,29 @@ export default function PackPit() {
         }
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
+
+        // Fill indicator: measure every 2s, drive --fill-opacity on stage, flash yellow at thresholds
+        if (now - lastFillCheck > 2000) {
+          lastFillCheck = now;
+          const pitH = render.canvas.height;
+          const pitW = render.canvas.width;
+          const pitArea = pitH * pitW;
+          let coveredArea = 0;
+          for (const b of Composite.allBodies(engine.world)) {
+            if (b.isStatic) continue;
+            if (!b.plugin) continue;
+            const bw = b.bounds.max.x - b.bounds.min.x;
+            const bh = b.bounds.max.y - b.bounds.min.y;
+            coveredArea += bw * bh;
+          }
+          // cap at 1 -- 60% coverage = pit feels full (bodies overlap)
+          const fill = Math.min(1, coveredArea / (pitArea * 0.6));
+          stage.style.setProperty("--fill-opacity", (fill * 0.5).toFixed(3));
+          // yellow warning flashes at 90, 95, 99%
+          if (fill >= 0.9 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
+          if (fill >= 0.95 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
+          if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
+        }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
         const spotlight = hoverBody && hoverBody.plugin.family;
