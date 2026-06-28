@@ -142,6 +142,10 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
       <StepCard
         step={STEPS[step]}
         onClose={closeStepCard}
+        onPrev={() => setStep((s) => Math.max((s ?? 0) - 1, 0))}
+        onNext={() => setStep((s) => Math.min((s ?? 0) + 1, STEPS.length - 1))}
+        hasPrev={step > 0}
+        hasNext={step < STEPS.length - 1}
         cardPos={cardPos}
       />,
       document.body

@@ -2,8 +2,8 @@
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: rgba(3, 87, 245, 0.88);
-  animation: scFade 0.2s ease;
+  background: rgba(3, 87, 245, 0.82);
+  animation: scFade 0.22s ease;
   touch-action: none;
   cursor: grab;
 }
@@ -13,6 +13,7 @@
   to   { opacity: 1; }
 }
 
+/* X button -- top right, identical to LineageMap */
 .close {
   position: fixed;
   top: 33px;
@@ -24,16 +25,55 @@
   justify-content: center;
   border: 0;
   border-radius: 14px;
-  background: var(--yellow, #ffd23e);
+  background: var(--yellow, #ffed00);
   color: var(--navy, #0a3a57);
   font-size: 2rem;
   line-height: 1;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
-  z-index: 2;
+  z-index: 10;
 }
 .close:hover { filter: brightness(0.95); }
+
+/* Prev / Next nav -- bottom centre */
+.nav {
+  position: fixed;
+  bottom: clamp(20px, 4vw, 40px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+  pointer-events: auto;
+}
+.navBtn {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--yellow, #ffed00);
+  color: var(--navy, #0a3a57);
+  font-size: 1.4rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+  transition: filter 0.15s, transform 0.15s;
+}
+.navBtn:hover { filter: brightness(0.95); transform: translateY(-1px); }
+.navBtnHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.navStep {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+  min-width: 48px;
+  text-align: center;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .overlay { animation: none; }
