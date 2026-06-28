@@ -174,15 +174,17 @@ export default function PackPit() {
         // Wait for activity to settle before showing game over -- check every 500ms
         // until average body speed drops below threshold, then wait an extra 1.5s
         const checkQuiet = () => {
-          const all = Composite.allBodies(engine.world).filter((b: any) => !b.isStatic);
+          const eng = engineRef.current;
+          if (!eng) { window.setTimeout(() => setGameOver(true), 1500); return; }
+          const all = (eng.world.bodies as any[]).filter((b: any) => !b.isStatic);
           const avgSpeed = all.length ? all.reduce((s: number, b: any) => s + Math.hypot(b.velocity.x, b.velocity.y), 0) / all.length : 0;
           if (avgSpeed < 2) {
-            window.setTimeout(() => setGameOver(true), 1500); // 1.5s pause after settling
+            window.setTimeout(() => setGameOver(true), 1500);
           } else {
-            window.setTimeout(checkQuiet, 500); // check again in 500ms
+            window.setTimeout(checkQuiet, 500);
           }
         };
-        window.setTimeout(checkQuiet, 1000); // start checking after 1s minimum
+        window.setTimeout(checkQuiet, 1000);
       }
     };
     window.addEventListener("pc:gameover-result", onResult as EventListener);
@@ -2367,7 +2369,7 @@ export default function PackPit() {
 
   return (
     <section
-      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}`}
+      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}${paused ? " " + styles.pitPaused : ""}`}
       ref={stageRef}
       aria-label="The Pack Pit: tip out all the chums and play"
     >
@@ -2406,6 +2408,11 @@ export default function PackPit() {
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
+      {paused && (
+        <div className={styles.pausedOverlay} aria-live="polite">
+          PAUSED
+        </div>
+      )}
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
