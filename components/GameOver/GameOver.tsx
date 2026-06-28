@@ -122,10 +122,10 @@ export default function GameOver({ chums, score }: Props) {
         <p className={styles.scoreDisplay}>{score.toLocaleString()} pts</p>
         <h1 className={styles.title}>
           {chums === 0
-            ? "Ah deer, you were meant to grab some chums."
+            ? "Ah deer, you were meant to grab some chums!"
             : chums === 1
-            ? "You had 1 chum!"
-            : `You had ${chums} chums!`}
+            ? "Well done, you found 1 chum!"
+            : `Well done, you found ${chums} chums!`}
         </h1>
 
         {/* Name entry */}

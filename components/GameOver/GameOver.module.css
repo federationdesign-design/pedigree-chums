@@ -47,7 +47,7 @@
 
 .title {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(3.5rem, 12vw, 9rem);
+  font-size: clamp(2.6rem, 9vw, 6.75rem);
   color: var(--yellow, #ffd23e);
   margin: 0 0 6px;
   line-height: 1;

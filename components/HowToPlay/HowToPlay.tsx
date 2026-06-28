@@ -80,36 +80,40 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
 
       if (root) {
         // Drop each step card using its actual rendered bounds
+        // Cards scrolled out of view have width=0 -- use a fallback position above the pit
+        const vw = window.innerWidth;
         cardRefs.current.forEach((el, i) => {
           if (!el) return;
           const r = el.getBoundingClientRect();
-          if (r.width < 2 || r.height < 2) return;
           const num = i + 1;
           const stepSrc = num === 1 ? `/step1-redue.jpg` : num === 2 ? `/step2-redue.jpg` : num === 3 ? `/step3-redue.jpg` : num === 4 ? `/step4-redue.jpg` : num === 5 ? `/step5-redue.jpg` : `/step6-redue.jpg`;
-          pieces.push({
-            src: stepSrc,
-            x: r.left, y: r.top,
-            w: r.width, h: r.height,
-            kind: "stepcard",
-          });
+          // If off-screen (scrolled), use a staggered position above the pit
+          const x = r.width > 2 ? r.left : vw * 0.1 + (i % 3) * (vw * 0.28 + 8);
+          const y = r.width > 2 ? r.top : -200 - Math.floor(i / 3) * 220;
+          const w = r.width > 2 ? r.width : Math.round(vw * 0.28);
+          const h = r.width > 2 ? r.height : Math.round(w * 1.35);
+          pieces.push({ src: stepSrc, x, y, w, h, kind: "stepcard" });
         });
 
-        // Drop each blue circle separately
+        // Drop each blue circle separately -- same fallback for off-screen
         circleRefs.current.forEach((el, i) => {
           if (!el) return;
           const r = el.getBoundingClientRect();
-          if (r.width < 2 || r.height < 2) return;
+          const cardEl = cardRefs.current[i];
+          const cr = cardEl ? cardEl.getBoundingClientRect() : r;
+          const x = r.width > 2 ? r.left : vw * 0.1 + (i % 3) * (vw * 0.28 + 8) - 14;
+          const y = r.width > 2 ? r.top : -200 - Math.floor(i / 3) * 220 - 14;
+          const w = r.width > 2 ? r.width : 48;
+          const h = r.width > 2 ? r.height : 48;
           pieces.push({
             src: "/blue-circle.svg",
-            x: r.left, y: r.top,
-            w: r.width, h: r.height,
+            x, y, w, h,
             kind: "circle",
           });
           // Yellow number drops from same position as circle
           pieces.push({
             src: `/${i + 1}object.svg`,
-            x: r.left, y: r.top,
-            w: r.width, h: r.height,
+            x, y, w, h,
             kind: "number",
           });
         });

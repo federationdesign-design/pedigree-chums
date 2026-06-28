@@ -155,6 +155,7 @@ export default function PackPit() {
     if (drainRef.current) clearInterval(drainRef.current);
     drainRef.current = setInterval(() => {
       if (lineageOpenRef.current) return; // paused while family-tree overlay is open
+      if (gameOverRef.current) return; // score frozen on game over
       const drain = slowmoActiveRef.current ? 4 : 1; // 4x drain in slow motion
       setScore((s: number) => Math.max(0, s - drain));
     }, 1000);
@@ -1036,7 +1037,7 @@ export default function PackPit() {
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score) setScore((s) => s + val); };
+      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score && !gameOverRef.current) setScore((s) => s + val); };
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
