@@ -3,7 +3,7 @@ import { StepData } from "./StepCard";
 const STEPS: StepData[] = [
   {
     number: 1,
-    illustration: "/step1.png",
+    illustration: "/step1-redue.jpg",
     caption: "Deal 3–6 chums each",
     heading: "Step 1",
     rows: [
@@ -20,7 +20,7 @@ const STEPS: StepData[] = [
       {
         icon: "/shuffle-icon.svg",
         title: "Shuffle well",
-        body: "Give the deck a good shuffle. The more random the better.",
+        body: "Give the deck a good shuffle. The more random, the better.",
       },
       {
         icon: "/deal-icon.svg",
@@ -31,14 +31,14 @@ const STEPS: StepData[] = [
   },
   {
     number: 2,
-    illustration: "/step2.png",
-    caption: "Go for a walk or explore your town",
+    illustration: "/step2-redue.jpg",
+    caption: "Go for a walk",
     heading: "Step 2",
     rows: [
       {
-        icon: "/find-pack-icon.svg",
+        icon: "/dog-walk-icon.svg",
         title: "Head outside",
-        body: "Go for a walk somewhere dogs are likely -- parks, streets, beaches.",
+        body: "Go somewhere dogs are likely -- parks, high streets, beaches.",
       },
       {
         icon: "/deal-icon.svg",
@@ -48,23 +48,23 @@ const STEPS: StepData[] = [
       {
         icon: "/friends-icon.svg",
         title: "Eyes open",
-        body: "Watch for dogs on leads, in cars, in gardens -- anywhere they might appear.",
+        body: "Watch for dogs on leads, in cars, in gardens -- anywhere they appear.",
       },
       {
-        icon: "/shuffle-icon.svg",
+        icon: "/find-pack-icon.svg",
         title: "Spot and check",
-        body: "When you see a real dog, quietly check your hand. Does it match a card?",
+        body: "When you see a real dog, quietly check your hand. Does it match?",
       },
     ],
   },
   {
     number: 3,
-    illustration: "/step3.png",
+    illustration: "/step3-redue.jpg",
     caption: "Look out for real dogs",
     heading: "Step 3",
     rows: [
       {
-        icon: "/find-pack-icon.svg",
+        icon: "/dog-show-icon.svg",
         title: "Look carefully",
         body: "Study the dog's shape, coat, size and markings before you call it.",
       },
@@ -74,25 +74,25 @@ const STEPS: StepData[] = [
         body: "Match what you see to the breed name and illustration on your card.",
       },
       {
-        icon: "/shuffle-icon.svg",
+        icon: "/famil-icon.svg",
         title: "Mixed breeds count",
         body: "If the dog is a mix, see if it closely resembles any card in your hand.",
       },
       {
         icon: "/friends-icon.svg",
-        title: "Call it",
-        body: "Say the breed name out loud. Other players can challenge if they disagree.",
+        title: "Call it out loud",
+        body: "Say the breed name. Other players can challenge if they disagree.",
       },
     ],
   },
   {
     number: 4,
-    illustration: "/step4.png",
+    illustration: "/step4-redue.jpg",
     caption: "Match to your chum",
     heading: "Step 4",
     rows: [
       {
-        icon: "/deal-icon.svg",
+        icon: "/PC-chums.svg",
         title: "Claim your chum",
         body: "A matched card is yours. Set it aside face up -- that is your chum.",
       },
@@ -104,40 +104,40 @@ const STEPS: StepData[] = [
       {
         icon: "/shuffle-icon.svg",
         title: "One dog, one card",
-        body: "Each real dog can only match one card. First to call it correctly wins it.",
+        body: "Each real dog can only match one card. First to call it wins.",
       },
       {
-        icon: "/find-pack-icon.svg",
+        icon: "/dog-walk-icon.svg",
         title: "Keep going",
-        body: "Keep spotting until your walk ends or all cards in play have been matched.",
+        body: "Keep spotting until your walk ends or all cards are matched.",
       },
     ],
   },
   {
     number: 5,
-    illustration: "/step5.png",
+    illustration: "/step5-redue.jpg",
     caption: "Find more chums",
     heading: "Step 5",
     rows: [
       {
-        icon: "/deal-icon.svg",
-        title: "Count up",
-        body: "When the walk ends, everyone counts their matched Pedigree Chums.",
-      },
-      {
-        icon: "/friends-icon.svg",
-        title: "Most chums wins",
-        body: "The player with the most matched cards is the winner.",
-      },
-      {
-        icon: "/shuffle-icon.svg",
-        title: "Play again",
-        body: "Shuffle, re-deal and go again -- same walk or somewhere new.",
-      },
-      {
         icon: "/find-pack-icon.svg",
-        title: "Collect them all",
-        body: "There are 54 Pedigree Chums to find. How many can your pack spot?",
+        title: "Explore further",
+        body: "The more ground you cover, the more breeds you are likely to spot.",
+      },
+      {
+        icon: "/trend-icon.svg",
+        title: "Some breeds are rare",
+        body: "Labradors appear often. Wolfhounds and Setters take patience.",
+      },
+      {
+        icon: "/famil-icon.svg",
+        title: "Use the family tree",
+        body: "Tap any chum card to open its breed history and learn its story.",
+      },
+      {
+        icon: "/PC-tag.svg",
+        title: "54 chums to collect",
+        body: "There are 54 Pedigree Chums in the full deck. How many can you find?",
       },
     ],
   },
@@ -153,23 +153,22 @@ const STEPS: StepData[] = [
         body: "When the walk ends, everyone counts their matched Pedigree Chums.",
       },
       {
-        icon: "/friends-icon.svg",
-        title: "Most matches wins",
-        body: "The player with the most matched cards is the winner.",
+        icon: "/PC-chums.svg",
+        title: "Most chums wins",
+        body: "The player with the most matched cards takes the round.",
       },
       {
         icon: "/shuffle-icon.svg",
         title: "Play again",
-        body: "Shuffle, re-deal and go again -- same walk or somewhere new.",
+        body: "Shuffle, re-deal and head out again -- same walk or somewhere new.",
       },
       {
-        icon: "/find-pack-icon.svg",
-        title: "Collect them all",
-        body: "There are 54 Pedigree Chums to find. How many can your pack spot?",
+        icon: "/queen-icon.svg",
+        title: "Crown the champion",
+        body: "Play best of three rounds to find your ultimate Pedigree Chums champion.",
       },
     ],
   },
 ];
 
 export default STEPS;
-
