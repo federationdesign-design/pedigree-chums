@@ -9,7 +9,7 @@ const RING1 = 340;
 const SPREAD1 = Math.PI * 1.6;
 const ROW_PTS = 400;
 const BONUS_PTS = 1000;
-const CARD_SCALE = 2;
+const CARD_SCALE = 1; // not used directly -- card sized to viewport below
 
 const seenRows = new Set<string>();
 
@@ -35,8 +35,12 @@ export default function StepMap({
     return () => window.removeEventListener("resize", f);
   }, []);
 
-  const cw = (cardPos?.w ?? 120) * CARD_SCALE;
-  const ch = (cardPos?.h ?? 140) * CARD_SCALE;
+  // Card in overlay: preserve pit aspect ratio, cap to sensible overlay size
+  const pitW = cardPos?.w ?? 120;
+  const pitH = cardPos?.h ?? 140;
+  const ar = pitH / pitW;
+  const cw = Math.max(180, Math.min(vp.w * 0.28, 260));
+  const ch = Math.round(cw * ar);
   const cx = vp.w / 2;
   const cy = vp.h * 0.42;
   const cardImg = cardPos?.image ?? "";
@@ -223,58 +227,81 @@ export default function StepMap({
           left: cx + pan.x - cw / 2,
           top: cy + pan.y - ch / 2,
           width: cw, height: ch,
-          borderRadius: cw * 0.08,
+          borderRadius: Math.round(cw * 0.1),
           overflow: "hidden",
           pointerEvents: "all",
           cursor: "pointer",
           zIndex: 3,
-          border: "5px solid #ffed00",
+          background: "#ffed00",
           userSelect: "none",
           WebkitUserSelect: "none" as any,
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-          display: "flex",
-          flexDirection: "column",
         }}
       >
-        <video
-          ref={(el) => { videoRef.current = el; if (el) { el.muted = true; el.volume = 0; } }}
-          src={`/step${step.number}-video-animation.mp4`}
-          autoPlay muted playsInline
-          onCanPlay={(e) => { const v = e.target as HTMLVideoElement; v.muted = true; v.volume = 0; setVideoReady(true); }}
-          onEnded={(e) => { (e.target as HTMLVideoElement).pause(); }}
-          style={{ flex: 1, width: "100%", objectFit: "cover", display: "block", minHeight: 0 }}
-        />
-        {!videoReady && cardImg && (
-          <img src={cardImg} alt=""
-            draggable={false}
-            onDragStart={(e) => e.preventDefault()}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
-          />
-        )}
-        <div style={{
-          flexShrink: 0,
-          padding: "10px 12px 12px",
-          background: "#ffed00",
-          fontFamily: "'Luckiest Guy', system-ui",
-          fontSize: "clamp(14px, 2vw, 22px)",
-          color: "#0a3a57",
-          textAlign: "center",
-          letterSpacing: "0.02em",
-          lineHeight: 1.1,
-          pointerEvents: "none",
-          position: "relative",
-          zIndex: 2,
-        }}>{step.caption}</div>
-        {!allUnlocked && (
-          <div style={{
-            position: "absolute", bottom: 52, left: 0, right: 0,
-            textAlign: "center",
-            fontFamily: "'Luckiest Guy', system-ui",
-            fontSize: 14, color: "rgba(255,255,255,0.95)",
-            pointerEvents: "none",
-            textShadow: "0 1px 4px rgba(0,0,0,0.9)",
-          }}>double-tap to reveal</div>
-        )}
+        {/* Matches pit canvas exactly: BORDER=3%, FOOTER=18%, RADIUS=10% */}
+        {(() => {
+          const B = Math.round(cw * 0.03);
+          const FOOTER = Math.round(ch * 0.18);
+          const illoW = cw - B * 2;
+          const illoH = ch - FOOTER - B * 2;
+          const illoR = Math.round(cw * 0.07);
+          const footerFs = Math.max(10, Math.round(FOOTER * 0.35));
+          return (
+            <>
+              {/* Inset image area */}
+              <div style={{
+                position: "absolute",
+                left: B, top: B,
+                width: illoW, height: illoH,
+                borderRadius: illoR,
+                overflow: "hidden",
+              }}>
+                <video
+                  ref={(el) => { videoRef.current = el; if (el) { el.muted = true; el.volume = 0; } }}
+                  src={`/step${step.number}-video-animation.mp4`}
+                  autoPlay muted playsInline
+                  onCanPlay={(e) => { const v = e.target as HTMLVideoElement; v.muted = true; v.volume = 0; setVideoReady(true); }}
+                  onEnded={(e) => { (e.target as HTMLVideoElement).pause(); }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+                {!videoReady && cardImg && (
+                  <img src={cardImg} alt=""
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+                  />
+                )}
+                {!allUnlocked && (
+                  <div style={{
+                    position: "absolute", bottom: 0, left: 0, right: 0,
+                    padding: "18px 8px 8px",
+                    background: "linear-gradient(transparent, rgba(0,0,0,0.55))",
+                    textAlign: "center",
+                    fontFamily: "'Luckiest Guy', system-ui",
+                    fontSize: Math.max(9, Math.round(illoH * 0.08)),
+                    color: "rgba(255,255,255,0.95)",
+                    pointerEvents: "none",
+                  }}>double-tap to reveal</div>
+                )}
+              </div>
+              {/* Footer caption -- same as pit */}
+              <div style={{
+                position: "absolute",
+                left: 0, bottom: 0, right: 0,
+                height: FOOTER,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "'Luckiest Guy', system-ui",
+                fontSize: footerFs,
+                color: "#0a3a57",
+                textAlign: "center",
+                letterSpacing: "0.02em",
+                lineHeight: 1.1,
+                pointerEvents: "none",
+                padding: "0 6px",
+              }}>{step.caption}</div>
+            </>
+          );
+        })()}
       </div>
 
       {/* ── LAYER 3: nodes and text ABOVE card ── */}

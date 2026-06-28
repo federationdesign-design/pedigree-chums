@@ -1328,7 +1328,7 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
                   b.plugin.cycleAt = t + 3000;
                 }
               }
-              const BORDER = Math.round(pw * 0.05), FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
+              const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
               // Outer yellow rounded rect
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
               ctx.fillStyle = "#ffed00"; ctx.fill();
