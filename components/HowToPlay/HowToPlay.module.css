@@ -1,4 +1,4 @@
-/* Full-screen overlay matching LineageMap/StepMap style */
+/* Full-screen overlay matching LineageMap/StepMap exactly */
 .overlay {
   position: fixed;
   inset: 0;
@@ -12,10 +12,9 @@
 }
 @keyframes htpFade { from { opacity: 0; } to { opacity: 1; } }
 
-/* No panel -- content sits directly on the backdrop */
 .stage {
   position: relative;
-  width: min(94vw, 860px);
+  width: min(96vw, 900px);
   max-height: 90vh;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -52,40 +51,18 @@
   color: #ffffff;
   font-size: clamp(2rem, 5vw, 4rem);
   line-height: 1;
-  margin: 0 0 clamp(16px, 2.5vw, 32px);
+  margin: 0 0 clamp(12px, 2vw, 24px);
   letter-spacing: 0.02em;
 }
 .accent { color: #ffed00; }
 
-/* Step image horizontal scroll */
-.stepScroll {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  margin: 0 calc(0px - clamp(20px, 3vw, 48px)) clamp(20px, 3vw, 36px);
-  padding: 0 clamp(20px, 3vw, 48px) 14px;
-  scrollbar-width: none;
-}
-.stepScroll::-webkit-scrollbar { display: none; }
-
-.stepImg {
-  flex: 0 0 auto;
-  width: clamp(140px, 28vw, 240px);
-  height: auto;
-  border-radius: 14px;
-  scroll-snap-align: center;
-  box-shadow: 0 4px 20px rgba(10, 58, 87, 0.4);
-}
-
+/* Swipe hint ABOVE the scroll */
 .swipeHint {
   font-family: 'Luckiest Guy', system-ui;
   color: #ffed00;
-  font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+  font-size: clamp(0.85rem, 1.6vw, 1.1rem);
   letter-spacing: 0.06em;
-  margin: 0 0 clamp(12px, 2vw, 24px);
+  margin: 0 0 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -99,7 +76,33 @@
   50% { transform: translateX(7px); }
 }
 
-/* Steps list */
+/* Step image scroll */
+.stepScroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  margin: 0 calc(0px - clamp(20px, 3vw, 48px)) clamp(20px, 3vw, 32px);
+  padding: 0 clamp(20px, 3vw, 48px) 14px;
+  scrollbar-width: none;
+}
+.stepScroll::-webkit-scrollbar { display: none; }
+
+/* Step image with yellow frame */
+.stepImg {
+  flex: 0 0 auto;
+  width: clamp(140px, 26vw, 220px);
+  height: auto;
+  border-radius: 14px;
+  scroll-snap-align: center;
+  border: 4px solid #ffed00;
+  box-shadow: 0 4px 20px rgba(10, 58, 87, 0.4);
+  display: block;
+}
+
+/* Steps list -- wider, text on one line where possible */
 .steps {
   counter-reset: step;
   list-style: none;
@@ -107,13 +110,13 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1.8vw, 20px);
+  gap: clamp(8px, 1.5vw, 16px);
 }
 .step {
   counter-increment: step;
   display: flex;
   align-items: flex-start;
-  gap: clamp(14px, 2vw, 28px);
+  gap: clamp(12px, 1.8vw, 24px);
 }
 .num {
   flex: none;
@@ -121,7 +124,7 @@
   text-align: center;
   font-family: 'Luckiest Guy', system-ui;
   color: #ffed00;
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
   line-height: 0.9;
 }
 .num::before { content: counter(step); }
@@ -130,11 +133,12 @@
   font-family: Montserrat, system-ui;
   font-weight: 700;
   color: #ffffff;
-  font-size: clamp(1rem, 2vw, 1.55rem);
+  font-size: clamp(0.95rem, 1.8vw, 1.4rem);
   line-height: 1.3;
+  white-space: nowrap;
 }
 
-/* Decorative -- captured by dropPiecesThenClose for pit drop */
+/* Logo and decos */
 .logo {
   position: absolute;
   right: clamp(20px, 3vw, 56px);
@@ -143,13 +147,13 @@
   aspect-ratio: 230 / 150;
   background: url("/dogbingo.svg") center / contain no-repeat;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 1;
 }
 .deco {
   position: absolute;
   background: url("/yellow-triangle.svg") center / contain no-repeat;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 1;
 }
 .decoA {
   width: clamp(24px, 2.5vw, 40px);
@@ -168,6 +172,7 @@
 
 @media (max-width: 760px) {
   .logo, .deco { display: none; }
+  .text { white-space: normal; }
 }
 @media (prefers-reduced-motion: reduce) {
   .overlay { animation: none; }

@@ -259,6 +259,8 @@ export default function StepMap({
           letterSpacing: "0.02em",
           lineHeight: 1.1,
           pointerEvents: "none",
+          position: "relative",
+          zIndex: 2,
         }}>{step.caption}</div>
         {!allUnlocked && (
           <div style={{
@@ -301,15 +303,15 @@ export default function StepMap({
                       : "none",
                   }}
                 />
-                <circle cx={NODE_R * 0.72} cy={-NODE_R * 0.72} r={14}
+                <circle cx={NODE_R * 0.72} cy={-NODE_R * 0.72} r={22}
                   fill={unlocked ? "#ffed00" : "rgba(255,255,255,0.9)"}
                   stroke={unlocked ? "#0a3a57" : "rgba(0,0,0,0.15)"}
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                 />
                 <text
                   x={NODE_R * 0.72} y={-NODE_R * 0.72}
                   textAnchor="middle" dominantBaseline="central"
-                  fontFamily="'Luckiest Guy',system-ui" fontSize={13}
+                  fontFamily="'Luckiest Guy',system-ui" fontSize={18}
                   fill={unlocked ? "#0a3a57" : "#666"}
                 >{n.row + 1}</text>
               </g>

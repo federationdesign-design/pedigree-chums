@@ -28,6 +28,11 @@ const STEP_IMAGES = [
 
 export default function HowToPlay({ open, onClose, onScore, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
+  // Pause pit while overview is open
+  useEffect(() => {
+    if (open && step === null) window.dispatchEvent(new Event("pc:overlay-opened"));
+    if (!open) window.dispatchEvent(new Event("pc:overlay-closed"));
+  }, [open, step]);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -56,24 +61,22 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
 
   const dropPiecesThenClose = () => {
     try {
-      const vw = window.innerWidth;
       const STEP_SRCS = [
         "/step1-redue.jpg", "/step2-redue.jpg", "/step3-redue.jpg",
         "/step4-redue.jpg", "/step5-redue.jpg", "/step6-redue.jpg",
       ];
-      const cardW = Math.round(Math.min(vw * 0.16, 140));
-      const cardH = Math.round(cardW * 1.35);
       const pieces: { src: string; x: number; y: number; w: number; h: number; kind?: string }[] = [];
-      STEP_SRCS.forEach((src, i) => {
-        const col = i % 3, row = Math.floor(i / 3);
-        const x = vw * 0.08 + col * (cardW + vw * 0.05) + (Math.random() * 20 - 10);
-        const y = -cardH * 1.5 - row * (cardH + 20) - Math.random() * 40;
-        pieces.push({ src, x, y, w: cardW, h: cardH, kind: "stepcard" });
-        pieces.push({ src: "/blue-circle.svg", x: x - 8, y: y - 8, w: 30, h: 30, kind: "circle" });
-        pieces.push({ src: `/${i + 1}object.svg`, x: x - 8, y: y - 8, w: 30, h: 30, kind: "number" });
-      });
       const root = stageElRef.current;
       if (root) {
+        // Read actual DOM positions of step images so cards drop from where they appear
+        const imgs = root.querySelectorAll("[data-htp-step]");
+        imgs.forEach((el: Element, i) => {
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) return;
+          pieces.push({ src: STEP_SRCS[i] || "", x: r.left, y: r.top, w: r.width, h: r.height, kind: "stepcard" });
+          // Number SVG drops from same spot (no blue circle)
+          pieces.push({ src: `/${i + 1}object.svg`, x: r.left - 10, y: r.top - 10, w: 36, h: 36, kind: "number" });
+        });
         const push = (el: Element | null, s: string) => {
           if (!el) return;
           const r = el.getBoundingClientRect();
@@ -85,6 +88,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
       }
       if (pieces.length) window.dispatchEvent(new CustomEvent("pc:howtoplay-drop", { detail: { pieces } }));
     } catch {}
+    window.dispatchEvent(new Event("pc:overlay-closed"));
     onClose();
   };
 
@@ -114,7 +118,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <div className={styles.stepScroll}>
           {STEP_IMAGES.map((src, i) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} />
+            <img key={src} src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} data-htp-step={i} />
           ))}
         </div>
         <p className={styles.swipeHint} aria-hidden="true">
