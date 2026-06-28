@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styles from "./StepMap.module.css";
 import { type StepData } from "./StepCard";
 
-const NODE_R = 56;
+const NODE_R = 34;
 const RING1 = 340;
 const SPREAD1 = Math.PI * 1.6;
 const ROW_PTS = 400;
@@ -36,11 +36,9 @@ export default function StepMap({
   }, []);
 
   // Card in overlay: preserve pit aspect ratio, cap to sensible overlay size
-  const pitW = cardPos?.w ?? 120;
-  const pitH = cardPos?.h ?? 140;
-  const ar = pitH / pitW;
-  const cw = Math.max(180, Math.min(vp.w * 0.28, 260));
-  const ch = Math.round(cw * ar);
+  // Exact pit card size -- same w/h as the physics body
+  const cw = cardPos?.w ?? 120;
+  const ch = cardPos?.h ?? 140;
   // Card appears where it was tapped, clamped so it stays fully on screen
   const cx = cardPos
     ? Math.max(cw / 2 + 16, Math.min(vp.w - cw / 2 - 16, cardPos.x))
@@ -397,9 +395,7 @@ export default function StepMap({
         ))}
       </svg>
 
-      <button type="button" className={styles.close}
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
-        style={{ zIndex: 20 }} aria-label="Close">&times;</button>
+      {/* No X button -- overlay closes automatically once all nodes are opened */}
 
       {/* Prev/next arrows only -- no dots, no step counter */}
       <div style={{

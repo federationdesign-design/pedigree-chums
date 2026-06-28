@@ -14,7 +14,7 @@
 
 .stage {
   position: relative;
-  width: min(96vw, 900px);
+  width: min(98vw, 1100px);
   max-height: 90vh;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -84,8 +84,8 @@
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  margin: 0 calc(0px - clamp(20px, 3vw, 48px)) clamp(20px, 3vw, 32px);
-  padding: 0 clamp(20px, 3vw, 48px) 14px;
+  margin: 0 calc(0px - clamp(16px, 2vw, 40px)) clamp(20px, 3vw, 32px);
+  padding: 0 clamp(16px, 2vw, 40px) 14px;
   scrollbar-width: none;
 }
 .stepScroll::-webkit-scrollbar { display: none; }
@@ -97,6 +97,7 @@
   border-radius: 14px;
   scroll-snap-align: center;
   background: #ffed00;
+  border: 4px solid #ffed00;
   box-shadow: 0 4px 20px rgba(10, 58, 87, 0.4);
   overflow: hidden;
   display: flex;

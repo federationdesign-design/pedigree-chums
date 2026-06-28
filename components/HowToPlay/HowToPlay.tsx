@@ -114,6 +114,9 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
         </h3>
+        <p className={styles.swipeHint} aria-hidden="true">
+          Swipe to view <span className={styles.swipeArrow}>&rarr;</span>
+        </p>
         <div className={styles.stepScroll}>
           {STEP_IMAGES.map((src, i) => (
             <div key={src} className={styles.stepCard} data-htp-step={i}>
@@ -123,9 +126,6 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
             </div>
           ))}
         </div>
-        <p className={styles.swipeHint} aria-hidden="true">
-          Swipe to view <span className={styles.swipeArrow}>&rarr;</span>
-        </p>
         <ol className={styles.steps}>
           {STEPS.map((s) => (
             <li key={s} className={styles.step}>
