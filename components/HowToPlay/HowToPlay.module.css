@@ -411,7 +411,7 @@
 .stepCard {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(140px, 18vw, 200px);
+  width: clamp(200px, 28vw, 416px);
   border-radius: 16px;
   background: #0357f5;
   overflow: visible;
@@ -446,6 +446,8 @@
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 16px 16px 0 0;
+  image-rendering: auto;
+  min-height: 0;
 }
 
 /* Footer caption bar */
@@ -468,6 +470,6 @@
     gap: 10px;
   }
   .stepCard {
-    width: clamp(130px, 42vw, 180px);
+    width: clamp(180px, 72vw, 320px);
   }
 }
