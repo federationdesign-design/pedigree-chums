@@ -1276,6 +1276,15 @@ export default function PackPit() {
 
             // Step card: draw yellow frame + illustration + footer caption
             if (b.plugin.kind === "stepcard") {
+              // Advance cycle for step 5
+              if (b.plugin.cycleImgs) {
+                const t = performance.now();
+                if (t > b.plugin.cycleAt) {
+                  b.plugin.cycleIdx = (b.plugin.cycleIdx + 1) % b.plugin.cycleImgs.length;
+                  b.plugin.img = b.plugin.cycleImgs[b.plugin.cycleIdx];
+                  b.plugin.cycleAt = t + 3000;
+                }
+              }
               const BORDER = 6, FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
               // Outer yellow rounded rect
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
@@ -2239,7 +2248,22 @@ export default function PackPit() {
             // Step card -- tight rectangle body sized to actual rendered card frame
             b = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.12 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
             const name = pc.kind === "stepcard" ? (HTP_NAMES[stepcardIdx++] || "How it works") : (HTP_NAMES[Math.min(stepcardIdx, 4)] || "How it works");
-            b.plugin = { name, label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "stepcard" };
+            const isStep5 = pc.src.includes("step5-redue");
+            b.plugin = {
+              name, label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph,
+              color: "#ffffff", img: getImg("htp:" + pc.src, pc.src),
+              prop: "logopiece", family: null, ping: 0, kind: "stepcard",
+              // Step 5 cycles through 3 images
+              ...(isStep5 ? {
+                cycleImgs: [
+                  getImg("htp:/step5-redue.jpg", "/step5-redue.jpg"),
+                  getImg("htp:/step5-redue-slide1.jpg", "/step5-redue-slide1.jpg"),
+                  getImg("htp:/step5-redue-slide2.jpg", "/step5-redue-slide2.jpg"),
+                ],
+                cycleIdx: 0,
+                cycleAt: performance.now() + 3000,
+              } : {}),
+            };
           }
           Composite.add(engine.world, b);
           setScore((s) => s + 500);

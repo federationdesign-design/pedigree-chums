@@ -84,8 +84,9 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
           const r = el.getBoundingClientRect();
           if (r.width < 2 || r.height < 2) return;
           const num = i + 1;
+          const stepSrc = num === 1 ? `/raw-step1.jpg` : num === 2 ? `/step2-redue.jpg` : num === 3 ? `/step3-redue.jpg` : num === 4 ? `/raw-step4.jpg` : `/step5-redue.jpg`;
           pieces.push({
-            src: num === 1 ? `/raw-step${num}.jpg` : num === 2 ? `/step2-redue.jpg` : `/raw-step${num}.jpg`,
+            src: stepSrc,
             x: r.left, y: r.top,
             w: r.width, h: r.height,
             kind: "stepcard",
@@ -180,7 +181,7 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
               {/* Card illustration */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={n === 1 ? `/raw-step${n}.jpg` : n === 2 ? `/step2-redue.jpg` : `/raw-step${n}.jpg`}
+                src={n === 1 ? `/raw-step1.jpg` : n === 2 ? `/step2-redue.jpg` : n === 3 ? `/step3-redue.jpg` : n === 4 ? `/raw-step4.jpg` : `/step5-redue.jpg`}
                 alt={`Step ${n}`}
                 className={styles.stepIllo}
               />
