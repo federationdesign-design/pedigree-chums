@@ -119,8 +119,6 @@ export default function LineageMap({
   onScatter,
   onScore,
   currentScore = 0,
-  paused,
-  onPauseToggle,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
@@ -132,8 +130,6 @@ export default function LineageMap({
   }) => void;
   onScore?: (v: number) => void;
   currentScore?: number;
-  paused?: boolean;
-  onPauseToggle?: () => void;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
   useEffect(() => {
@@ -938,23 +934,6 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      {onPauseToggle && (
-        <button
-          type="button"
-          className={styles.pauseBtn}
-          onClick={onPauseToggle}
-          aria-label={paused ? "Resume" : "Pause"}
-        >
-          {paused ? (
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-          ) : (
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-              <rect x="5" y="3" width="4.5" height="18" rx="2.25"/>
-              <rect x="14.5" y="3" width="4.5" height="18" rx="2.25"/>
-            </svg>
-          )}
-        </button>
-      )}
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>

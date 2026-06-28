@@ -127,6 +127,27 @@ export default function PackPit() {
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
+  // Auto slow motion at zero drain cost when any overlay is open
+  const autoSlowmoRef = useRef(false);
+  useEffect(() => {
+    const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null;
+    if (overlayOpen && !autoSlowmoRef.current) {
+      autoSlowmoRef.current = true;
+      // Engage slowmo without flagging slowmoActiveRef (so drain stays normal)
+      if (slowmoRef.current) {
+        const engine = engineRef.current;
+        if (engine && engine.timing.timeScale === 1) engine.timing.timeScale = 0.25;
+      }
+    } else if (!overlayOpen && autoSlowmoRef.current) {
+      autoSlowmoRef.current = false;
+      // Only restore if user hasn't manually engaged slowmo
+      if (!slowmoActiveRef.current) {
+        const engine = engineRef.current;
+        if (engine) engine.timing.timeScale = 1;
+      }
+    }
+  }, [activeBreed, shelfOpen, howToPlay, britainMsg]);
+
   // When Learn completes, auto-open the first chum's lineage after a short delay
   useEffect(() => {
     const onPackComplete = (e: Event) => {
@@ -2612,7 +2633,7 @@ export default function PackPit() {
           PAUSED
         </div>
       )}
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
