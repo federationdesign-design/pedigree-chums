@@ -1245,6 +1245,43 @@ export default function PackPit() {
             const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
             // ox/oy shifts draw origin so a custom pivot point sits at body centre
             const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
+
+            // Step card: draw yellow frame + illustration + footer caption
+            if (b.plugin.kind === "stepcard") {
+              const BORDER = 6, FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
+              // Outer yellow rounded rect
+              rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
+              ctx.fillStyle = "#ffd23e"; ctx.fill();
+              // Inner illustration area (above footer)
+              const illoH = ph - FOOTER - BORDER * 2;
+              rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, pw - BORDER * 2, illoH, RADIUS * 0.7);
+              ctx.save(); ctx.clip();
+              ctx.drawImage(img, -pw / 2 + BORDER, -ph / 2 + BORDER, pw - BORDER * 2, illoH);
+              ctx.restore();
+              // Footer caption text
+              const caption = b.plugin.name || "";
+              const maxFontSize = Math.max(8, Math.round(FOOTER * 0.32));
+              ctx.fillStyle = "#0a3a57";
+              ctx.textAlign = "center"; ctx.textBaseline = "middle";
+              ctx.font = `700 ${maxFontSize}px Montserrat, system-ui, sans-serif`;
+              const maxTw = pw * 0.88, tw = ctx.measureText(caption).width;
+              let fs = maxFontSize;
+              if (tw > maxTw) { fs = Math.max(6, Math.floor(maxFontSize * maxTw / tw)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
+              // Wrap to 2 lines if needed
+              const words = caption.split(" "); let line1 = "", line2 = "";
+              for (const w2 of words) {
+                if (ctx.measureText(line1 + " " + w2).width < maxTw) line1 = (line1 ? line1 + " " : "") + w2;
+                else line2 = (line2 ? line2 + " " : "") + w2;
+              }
+              const footerY = ph / 2 - FOOTER / 2;
+              if (line2) {
+                ctx.fillText(line1, 0, footerY - fs * 0.6);
+                ctx.fillText(line2, 0, footerY + fs * 0.6);
+              } else {
+                ctx.fillText(line1, 0, footerY);
+              }
+              ctx.restore(); return;
+            }
             // fuse cross-fade: ohyea -> plain bone over 1.5s after 1s hold
             if (b.plugin.fuseAt) {
               const ft = (performance.now() - b.plugin.fuseAt) / 1000; // seconds since fuse
