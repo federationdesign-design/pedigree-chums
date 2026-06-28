@@ -469,6 +469,7 @@ export default function LineageMap({
   const [bubbles, setBubbles] = useState<{ id: number; sx: number; sy: number }[]>([]); // blue bubble trail as a card glides to its frame
   const bubbleSeq = useRef(0);
   const [dragXY, setDragXY] = useState<{ x: number; y: number } | null>(null); // live pointer while dragging a card, for the proximity glow
+  const isDraggingCardRef = useRef(false); // synchronous flag -- state updates are async and miss the onMouseEnter window
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
       const t = setTimeout(() => setShowRemove(true), 1000); // hold the green button back one second after the last circle turns blue
@@ -1259,7 +1260,7 @@ export default function LineageMap({
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
                   style={{ ...(cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" as const, ...(isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : {}), ...((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? { pointerEvents: "all" as const } : {}) }}
-                  onMouseEnter={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) && !dragXY) magnifyHold(c.id); }}
+                  onMouseEnter={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) && !isDraggingCardRef.current) magnifyHold(c.id); }}
                   onMouseLeave={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) magnifyRelease(); }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1309,7 +1310,7 @@ export default function LineageMap({
                     setDragImg(c.img);
                     setDragName(c.name); /* pickup-name */
                     resetCardFlip(c.id); // reset idle flip on interaction
-                    setDragXY({ x: e.clientX, y: e.clientY });
+                    isDraggingCardRef.current = true; setDragXY({ x: e.clientX, y: e.clientY });
                   }}
                   onPointerMove={(e) => {
                     if (placedSet.has(c.id)) { if (isMobile) moveGridDrag(e); return; }
@@ -1381,9 +1382,9 @@ export default function LineageMap({
                     setDragCat(null);
                     setDragImg(null);
                     setDragName(null); /* pickup-name */
-                    setDragXY(null);
+                    isDraggingCardRef.current = false; setDragXY(null);
                   }}
-                  onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
+                  onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); isDraggingCardRef.current = false; setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
                   <clipPath id={clipId}>
