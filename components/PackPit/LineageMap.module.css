@@ -292,6 +292,13 @@
   pointer-events: none;
   animation: lm-flash 0.65s ease-out forwards;
 }
+.flashBig {
+  fill: #22c55e;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-weight: 700;
+  pointer-events: none;
+  animation: lm-flash 0.9s ease-out forwards;
+}
 @keyframes lm-flash {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-34px); }

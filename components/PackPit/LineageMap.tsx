@@ -118,6 +118,7 @@ export default function LineageMap({
   onRemove,
   onScatter,
   onScore,
+  currentScore = 0,
   paused,
   onPauseToggle,
 }: {
@@ -130,6 +131,7 @@ export default function LineageMap({
     pills: { x: number; y: number; w: number; name: string }[];
   }) => void;
   onScore?: (v: number) => void;
+  currentScore?: number;
   paused?: boolean;
   onPauseToggle?: () => void;
 }) {
@@ -270,10 +272,11 @@ export default function LineageMap({
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
     const isNeg = val < 0;
-    const flashSize = isNeg ? size * 1.8 : size; // negative = bigger
-    setFlashes((f) => [...f, { id, x, y, val, size: flashSize, neg: isNeg }]);
+    const isBig = val >= 400; // green for big positive rewards
+    const flashSize = isNeg ? size * 1.8 : isBig ? size * 1.4 : size;
+    setFlashes((f) => [...f, { id, x, y, val, size: flashSize, neg: isNeg, big: isBig }]);
     onScore?.(val);
-    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), isNeg ? 1200 : 650); // neg stays longer
+    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), isNeg ? 1200 : isBig ? 900 : 650);
   };
   // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,
   // sized from the circle itself so the family tree reads the same as the pit.
@@ -614,7 +617,9 @@ export default function LineageMap({
     const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
     imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); }); // pop the cards in one by one, a ripple down the tree
     allNodes.forEach((n) => scoredRef.current.add(n.id)); // counted now, so a later tap scores nothing
-    onScore?.(-2500); // the shortcut costs 2500
+    // Auto penalty scales with score earned -- the more you had to earn, the more it costs to skip
+    const ap = currentScore < 500 ? -500 : currentScore < 2000 ? -1000 : currentScore < 5000 ? -2500 : -5000;
+    onScore?.(ap);
     const pk = (fxId.current += 1);
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
@@ -639,7 +644,7 @@ export default function LineageMap({
         });
       });
       setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
-      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
+      pops.forEach((p) => flashNum(p.x, p.y, -25, FLASH_SIZE)); // -25 per auto-revealed node
       interacted.current = true; setIdleHint(false);
       return;
     }
@@ -650,7 +655,7 @@ export default function LineageMap({
       setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; }); // turns popped nodes blue, like a manual tap
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
-        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); } // -100 patch_revealscore_v1
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -25, FLASH_SIZE); } // -25 per collapse-reveal
       });
       interacted.current = true; setIdleHint(false);
       return;
@@ -672,7 +677,7 @@ export default function LineageMap({
         }
         setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; }); placedAtRef.current.set(c.id, Date.now());
         setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-        flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE); // auto-place costs 50
+        flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -10, FLASH_SIZE); // auto-place costs 10
         const pid = puffSeq.current++;
         setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
         window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -1314,7 +1319,7 @@ export default function LineageMap({
                           setShakeFrame(hit.id);
                           window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
                           // wrong dog: flash label on frame, subtract 5 points, flash correct frame
-                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, -5, FLASH_SIZE);
+                          // no penalty for wrong frame drop (was -5)
                           setWrongDog({ frameId: hit.id, x: hit.sx - pan.x, y: hit.sy - pan.y });
                           window.setTimeout(() => setWrongDog((w) => w?.frameId === hit.id ? null : w), 800);
                           const correctFrame = frames.find((f) => f.img === c.img && !filled.has(f.id));
@@ -1522,10 +1527,10 @@ export default function LineageMap({
           <svg width="100%" height="100%">
             {flashes.map((f) => (
               <text key={`f${f.id}`}
-                className={f.neg ? styles.flashNeg : styles.flashNum}
+                className={f.neg ? styles.flashNeg : (f as any).big ? styles.flashBig : styles.flashNum}
                 x={f.x + pan.x} y={f.y + pan.y} fontSize={f.size} textAnchor="middle"
-                style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
-                {f.val}
+                style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : (f as any).big ? { fill: "#22c55e", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
+                {f.val > 0 ? `+${f.val}` : f.val}
               </text>
             ))}
           </svg>

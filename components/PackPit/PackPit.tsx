@@ -142,6 +142,12 @@ export default function PackPit() {
     return () => window.removeEventListener("pc:pack-complete", onPackComplete as EventListener);
   }, [activeBreed]);
 
+  // Score-based reward/penalty scaling
+  // Pre-order reward: more score earned = more valuable (you showed up and played)
+  const preorderReward = (s: number) => s < 500 ? 25 : s < 2000 ? 100 : s < 5000 ? 250 : 500;
+  // Auto penalty: more score earned = steeper cost (you had more opportunity to earn it yourself)
+  const autoPenalty = (s: number) => s < 500 ? -500 : s < 2000 ? -1000 : s < 5000 ? -2500 : -5000;
+
   // Score drain: -1 per second while score > 0, paused whenever the LineageMap overlay is open.
   const drainRef = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => {
@@ -901,7 +907,7 @@ export default function PackPit() {
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
-        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; const rv = preorderReward(score); numAt(hit.position.x, hit.position.y, rv); setScore((s) => s + rv); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
           window.dispatchEvent(new Event("pc:open-cookies"));
           hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
@@ -938,7 +944,7 @@ export default function PackPit() {
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
           bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
           bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 }); // grey
-          numAt(rx, ry, -990); // the penalty for rejecting
+          // no score penalty for rejecting cookies
           clearCookieObjects();
           return true;
         }
@@ -2119,7 +2125,7 @@ export default function PackPit() {
       window.addEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
       const onOfferSuccess = () => {
         const reserve = Composite.allBodies(engine.world).find((b: any) => b.plugin?.kind === "reserve");
-        if (reserve) { numAt(reserve.position.x, reserve.position.y, 250); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
+        if (reserve) { const ov = preorderReward(score) * 4; numAt(reserve.position.x, reserve.position.y, ov); setScore((s) => s + ov); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
       };
       // poof the union jack when the tick button is pressed on the popup
       const onBritainDismiss = () => {
@@ -2389,7 +2395,7 @@ export default function PackPit() {
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
