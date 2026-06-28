@@ -633,3 +633,8 @@
   z-index: 2;
 }
 .pauseBtn:hover { filter: brightness(0.95); }
+
+.pauseBtnActive {
+  background: var(--navy);
+  color: var(--yellow);
+}

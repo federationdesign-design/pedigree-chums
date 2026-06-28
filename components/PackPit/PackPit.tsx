@@ -1266,7 +1266,11 @@ export default function PackPit() {
             if (b.plugin.kind === "htpnumber") {
               const r = b.plugin.half;
               if (img && img.complete && img.naturalWidth) {
-                ctx.drawImage(img, -r, -r, r * 2, r * 2);
+                // Preserve natural aspect ratio -- number SVGs are tall portrait
+                const ar = img.naturalWidth / img.naturalHeight;
+                const dw = ar >= 1 ? r * 2 : r * 2 * ar;
+                const dh = ar >= 1 ? r * 2 / ar : r * 2;
+                ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
               } else {
                 ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
                 ctx.fillStyle = "#ffed00"; ctx.fill();
@@ -1285,19 +1289,26 @@ export default function PackPit() {
                   b.plugin.cycleAt = t + 3000;
                 }
               }
-              const BORDER = 6, FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
+              const BORDER = 6, FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
               // Outer yellow rounded rect
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
               ctx.fillStyle = "#ffed00"; ctx.fill();
-              // Inner illustration area (above footer)
+              // Inner illustration -- use natural image aspect ratio if available
               const illoH = ph - FOOTER - BORDER * 2;
-              rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, pw - BORDER * 2, illoH, RADIUS * 0.7);
+              const illoW = pw - BORDER * 2;
+              // fit image within illo area preserving aspect ratio
+              const imgAr = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1;
+              const fitW = imgAr > illoW / illoH ? illoW : illoH * imgAr;
+              const fitH = imgAr > illoW / illoH ? illoW / imgAr : illoH;
+              const fitX = -pw / 2 + BORDER + (illoW - fitW) / 2;
+              const fitY = -ph / 2 + BORDER + (illoH - fitH) / 2;
+              rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
               ctx.save(); ctx.clip();
-              ctx.drawImage(img, -pw / 2 + BORDER, -ph / 2 + BORDER, pw - BORDER * 2, illoH);
+              ctx.drawImage(img, fitX, fitY, fitW, fitH);
               ctx.restore();
               // Footer caption text
               const caption = b.plugin.name || "";
-              const maxFontSize = Math.max(8, Math.round(FOOTER * 0.32));
+              const maxFontSize = Math.max(11, Math.round(FOOTER * 0.38));
               ctx.fillStyle = "#0a3a57";
               ctx.textAlign = "center"; ctx.textBaseline = "middle";
               ctx.font = `700 ${maxFontSize}px Montserrat, system-ui, sans-serif`;
@@ -2236,12 +2247,12 @@ export default function PackPit() {
           let b: any;
           if (pc.kind === "circle") {
             // Scale circle to match card size proportionally
-            const r = Math.min(pw / 2, MAX_CARD * 0.18);
+            const r = Math.min(pw / 2, MAX_CARD * 0.24); // 33% bigger than before
             b = Bodies.circle(cx, cy, r, { restitution: 0.5, friction: 0.3, frictionAir: 0.006, density: 0.0007, render: { visible: false } });
             b.plugin = { name: "How to play", label: "", half: r, w: r * 2, h: r * 2, color: "#009fe0", img: getImg("htp:blue-circle", "/blue-circle.svg"), prop: "logopiece", family: null, ping: 0, kind: "htpcircle" };
           } else if (pc.kind === "number") {
             // Yellow number SVG -- small circle body
-            const r = Math.min(pw / 2, MAX_CARD * 0.12);
+            const r = Math.min(pw / 2, MAX_CARD * 0.08); // 33% smaller than before
             b = Bodies.circle(cx, cy, r, { restitution: 0.6, friction: 0.2, frictionAir: 0.005, density: 0.0005, render: { visible: false } });
             b.plugin = { name: "How to play number", label: "", half: r, w: r * 2, h: r * 2, color: "#ffed00", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "htpnumber" };
           } else {
@@ -2566,7 +2577,7 @@ export default function PackPit() {
           PAUSED
         </div>
       )}
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} slowmo={slowmo} onSlowmoToggle={() => { slowmoRef.current(); setSlowmo((s) => !s); }} />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">

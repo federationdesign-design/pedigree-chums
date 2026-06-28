@@ -121,6 +121,8 @@ export default function LineageMap({
   currentScore = 0,
   paused,
   onPauseToggle,
+  slowmo,
+  onSlowmoToggle,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
@@ -134,6 +136,8 @@ export default function LineageMap({
   currentScore?: number;
   paused?: boolean;
   onPauseToggle?: () => void;
+  slowmo?: boolean;
+  onSlowmoToggle?: () => void;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
   useEffect(() => {
@@ -260,7 +264,7 @@ export default function LineageMap({
   const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
-    const t = setTimeout(() => setAutoArmed(true), 5000);
+    const t = setTimeout(() => setAutoArmed(true), 0); // arm immediately on open
     return () => clearTimeout(t);
   }, [breed.name]);
   useEffect(() => {
@@ -938,6 +942,17 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
+      {onSlowmoToggle && (
+        <button
+          type="button"
+          className={`${styles.pauseBtn}${slowmo ? " " + styles.pauseBtnActive : ""}`}
+          onClick={onSlowmoToggle}
+          aria-label={slowmo ? "Normal speed" : "Slow motion"}
+          style={{ top: "calc(33px + 52px + 10px + 52px + 10px)" }}
+        >
+          <img src="/svg-snail-icon.svg" width="32" height="32" alt="" aria-hidden="true" />
+        </button>
+      )}
       {onPauseToggle && (
         <button
           type="button"
