@@ -13,19 +13,20 @@ type Props = {
 };
 
 const CAPTIONS = [
-  "Deal a few cards evenly among the players",
-  "The game starts right away",
-  "Look for a real life dog",
-  "See if they match your cards",
-  "Find the most to win",
+  "Deal 3–6 cards to each player",
+  "Go for a walk in a park, or explore your town",
+  "Look for and spot real dogs",
+  "Match the dog to your chum",
+  "Find as many as you can!",
 ];
 
 const OVERVIEW_STEPS = [
-  "Deal 3\u20136 cards per player",
-  "Go for a walk, visit a park, or explore your town or city",
-  "Spot real dogs and match with your cards",
-  "Try and spot all your chums",
-  "The player with the most pedigree chums wins",
+  "Deal 3\u20136 cards to each player",
+  "Go for a walk in a park, or explore your town",
+  "Look for and spot real dogs",
+  "Match the dog to your chum",
+  "Check off and find as many as you can!",
+  "The player with the most matches wins!",
 ];
 
 // Card dimensions -- physics body will use these exact values
