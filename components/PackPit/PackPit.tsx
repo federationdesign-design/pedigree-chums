@@ -27,6 +27,11 @@ function sumLeaves(n: LineageNode): number {
 export default function PackPit() {
   const stageRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<() => void>(() => {});
+  const runnerRef = useRef<any>(null);
+  const engineRef = useRef<any>(null);
+  const pauseRef = useRef<() => void>(() => {});
+  const resumeRef = useRef<() => void>(() => {});
+  const [paused, setPaused] = useState(false);
   const motionRef = useRef<() => void>(() => {});
   const shakeBtnRef = useRef<HTMLButtonElement>(null);
   const flashShakeRef = useRef<() => void>(() => {});
@@ -158,7 +163,7 @@ export default function PackPit() {
       const stuck = (e as CustomEvent).detail?.stuck ?? false;
       if (stuck) {
         gameOverRef.current = true;
-        setGameOver(true);
+        window.setTimeout(() => setGameOver(true), 2500); // 2.5s delay -- let player see the full pit before overlay
       }
     };
     window.addEventListener("pc:gameover-result", onResult as EventListener);
@@ -209,6 +214,7 @@ export default function PackPit() {
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       const engine = Engine.create();
+      engineRef.current = engine;
       engine.gravity.y = 1;
       const render = Render.create({
         element: stage, engine,
@@ -216,6 +222,9 @@ export default function PackPit() {
       });
       Render.run(render);
       const runner = Runner.create();
+      runnerRef.current = runner;
+      pauseRef.current = () => Runner.stop(runner);
+      resumeRef.current = () => Runner.run(runner, engine);
       Runner.run(runner, engine);
 
       let walls: any[] = [];
@@ -2173,8 +2182,17 @@ export default function PackPit() {
 
       if (!isMobile) {
         logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
-        Composite.add(engine.world, logoBody);
-        Events.on(engine, "collisionStart", onCollide);
+        const logoImg = logoBody.plugin.img;
+        const addLogo = () => {
+          if (disposed) return;
+          Composite.add(engine.world, logoBody);
+          Events.on(engine, "collisionStart", onCollide);
+        };
+        if (logoImg.complete && logoImg.naturalWidth) {
+          addLogo(); // already loaded -- add immediately, no flash
+        } else {
+          logoImg.addEventListener("load", addLogo, { once: true });
+        }
       }
 
       // The menu is the only way into the site menu from the pit, so it loads on
@@ -2307,6 +2325,21 @@ export default function PackPit() {
       <div className={styles.controls}>
         <div className={styles.scoreTotal + (scorePulse ? " " + styles.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
       </div>
+      <button
+        type="button"
+        className={styles.pause}
+        onClick={() => {
+          if (paused) { resumeRef.current(); setPaused(false); }
+          else { pauseRef.current(); setPaused(true); }
+        }}
+        aria-label={paused ? "Resume" : "Pause"}
+      >
+        {paused ? (
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        ) : (
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+        )}
+      </button>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
