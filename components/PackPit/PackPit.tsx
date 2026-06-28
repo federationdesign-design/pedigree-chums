@@ -2597,7 +2597,7 @@ export default function PackPit() {
           PAUSED
         </div>
       )}
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} slowmo={slowmo} onSlowmoToggle={() => { slowmoRef.current(); setSlowmo((s) => !s); }} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
