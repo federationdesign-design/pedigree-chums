@@ -310,7 +310,7 @@ export default function StepMap({
       {/* ── LAYER 3: nodes and text ABOVE card ── */}
       <svg style={{ ...svgStyle, zIndex: 4 }}>
         {nodes.map((n) => {
-          const unlocked = true;
+          const unlocked = n.row < openCount;
           const isOpen = openNodes.has(n.row);
           const isActive = activeText === n.row;
           const row = step.rows[n.row];
@@ -336,42 +336,35 @@ export default function StepMap({
                       : "none",
                   }}
                 />
-                <circle cx={NODE_R * 0.72} cy={-NODE_R * 0.72} r={22}
-                  fill={unlocked ? "#ffed00" : "rgba(255,255,255,0.9)"}
-                  stroke={unlocked ? "#0a3a57" : "rgba(0,0,0,0.15)"}
-                  strokeWidth={2}
+                <circle cx={NODE_R * 0.95} cy={-NODE_R * 0.95} r={22}
+                  fill={n.row === 0 ? "#ffed00" : unlocked ? "#ffed00" : "transparent"}
+                  stroke={n.row === 0 ? "#0a3a57" : unlocked ? "#0a3a57" : "#ffffff"}
+                  strokeWidth={2.5}
                 />
                 <text
-                  x={NODE_R * 0.72} y={-NODE_R * 0.72}
+                  x={NODE_R * 0.95} y={-NODE_R * 0.95}
                   textAnchor="middle" dominantBaseline="central"
                   fontFamily="'Luckiest Guy',system-ui" fontSize={18}
-                  fill={unlocked ? "#0a3a57" : "#666"}
+                  fill={n.row === 0 ? "#0a3a57" : unlocked ? "#0a3a57" : "#ffffff"}
                 >{n.row + 1}</text>
               </g>
 
               {isActive && unlocked && (
-                <g style={{ pointerEvents: "none" }}>
-                  <text x={tx} y={ty}
-                    fontFamily="'Luckiest Guy', system-ui"
-                    fontSize={36} fill="#ffffff"
-                    dominantBaseline="hanging"
-                  >{row.title}</text>
-                  {row.body.split(/\s+/).reduce((lines: string[], word: string) => {
-                    if (!lines.length) return [word];
-                    const last = lines[lines.length - 1];
-                    return last.length + word.length < 22
-                      ? [...lines.slice(0, -1), last + " " + word]
-                      : [...lines, word];
-                  }, []).map((line: string, li: number) => (
-                    <text key={li}
-                      x={tx} y={ty + 44 + li * 29}
-                      fontFamily="Montserrat, sans-serif"
-                      fontSize={20} fontWeight="700"
-                      fill="rgba(255,255,255,0.95)"
-                      dominantBaseline="hanging"
-                    >{line}</text>
-                  ))}
-                </g>
+                <foreignObject x={nx + NODE_R + 10} y={ny - 36} width={200} height={140} style={{ overflow: "visible", pointerEvents: "none" }}>
+                  <div style={{
+                    background: "rgba(10,58,87,0.92)",
+                    color: "#ffffff",
+                    font: "500 11px/1.4 Montserrat, system-ui, sans-serif",
+                    padding: "7px 10px",
+                    borderRadius: 8,
+                    boxShadow: "0 4px 12px rgba(10,58,87,0.35)",
+                    maxWidth: 190,
+                    pointerEvents: "none",
+                  }}>
+                    <div style={{ fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, color: "#ffed00", marginBottom: 3 }}>{row.title}</div>
+                    {row.body}
+                  </div>
+                </foreignObject>
               )}
             </g>
           );
@@ -395,6 +388,17 @@ export default function StepMap({
         ))}
       </svg>
 
+      {/* 0/N counter pill -- matches LineageMap frameCount style exactly */}
+      <div style={{
+        position: "fixed", top: 26, left: "clamp(16px, 3.5vw, 40px)",
+        zIndex: 20, padding: "5px 18px", borderRadius: 20,
+        background: "#0a3a57", color: "#ffffff",
+        fontFamily: "'Luckiest Guy', system-ui", fontSize: 24, lineHeight: 1.1,
+        letterSpacing: "0.5px", pointerEvents: "none",
+        boxShadow: "0 3px 0 rgba(10,58,87,0.3)",
+      }}>
+        {openCount}/{step.rows.length}
+      </div>
       {/* No X button -- overlay closes automatically once all nodes are opened */}
 
       {/* Prev/next arrows only -- no dots, no step counter */}
