@@ -119,7 +119,6 @@ export default function PackPit() {
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
-    useEffect(() => {
     const open = () => setHowToPlay(true);
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
