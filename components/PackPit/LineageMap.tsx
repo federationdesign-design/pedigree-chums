@@ -1271,7 +1271,10 @@ export default function LineageMap({
                   onMouseLeave={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) magnifyRelease(); }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click still toggles zoom
+                    if (!(placedSet.has(c.id) || packed) || PACK_BREEDS.has(c.name)) return;
+                    const placedAt = placedAtRef.current.get(c.id);
+                    if (placedAt && Date.now() - placedAt < 1000) return; // 1s cooldown after placement
+                    setZoomedId((z) => (z === c.id ? null : c.id));
                   }}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
