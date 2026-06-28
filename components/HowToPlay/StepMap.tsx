@@ -69,6 +69,16 @@ export default function StepMap({
   const [activeText, setActiveText] = useState<number | null>(null);
   useEffect(() => setActiveText(null), [step.number]);
 
+  // Flash numbers -- float up and fade like the pit
+  type FlashNum = { id: number; x: number; y: number; val: number; born: number; };
+  const [flashNums, setFlashNums] = useState<FlashNum[]>([]);
+  const flashIdRef = useRef(0);
+  const addFlash = (x: number, y: number, val: number) => {
+    const id = flashIdRef.current++;
+    setFlashNums((prev) => [...prev, { id, x, y, val, born: Date.now() }]);
+    setTimeout(() => setFlashNums((prev) => prev.filter((f) => f.id !== id)), 900);
+  };
+
   const [videoReady, setVideoReady] = useState(false);
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -87,7 +97,14 @@ export default function StepMap({
           setActiveText(row);
           setOpenNodes((prev) => { const s = new Set(prev); s.add(row); return s; });
           const key = `${step.number}:${row}`;
-          if (!seenRows.has(key)) { seenRows.add(key); onScore?.(ROW_PTS); }
+          if (!seenRows.has(key)) {
+            seenRows.add(key);
+            onScore?.(ROW_PTS);
+            // flash at card centre
+            const cardX = cx + pan.x;
+            const cardY = cy + pan.y - ch / 2 - 20;
+            addFlash(cardX, cardY, ROW_PTS);
+          }
         }
         return next;
       });
@@ -106,8 +123,12 @@ export default function StepMap({
     if (!seenRows.has(key)) {
       seenRows.add(key);
       onScore?.(ROW_PTS);
+      addFlash(n.x + pan.x, n.y + pan.y - NODE_R, ROW_PTS);
       const allSeen = step.rows.every((_, i) => seenRows.has(`${step.number}:${i}`));
-      if (allSeen) onScore?.(BONUS_PTS);
+      if (allSeen) {
+        onScore?.(BONUS_PTS);
+        addFlash(n.x + pan.x, n.y + pan.y - NODE_R - 40, BONUS_PTS);
+      }
     }
   }, [step, onScore]);
 
@@ -320,6 +341,23 @@ export default function StepMap({
             </g>
           );
         })}
+        {/* Flash numbers -- CSS animation so they actually move */}
+        {flashNums.map((f) => (
+          <text
+            key={f.id}
+            x={f.x}
+            y={f.y}
+            textAnchor="middle"
+            fontFamily="Montserrat, sans-serif"
+            fontSize={28}
+            fontWeight="800"
+            fill="#ffffff"
+            style={{
+              pointerEvents: "none",
+              animation: "smFlashNum 0.9s ease-out forwards",
+            }}
+          >+{f.val}</text>
+        ))}
       </svg>
 
       <button type="button" className={styles.close}
