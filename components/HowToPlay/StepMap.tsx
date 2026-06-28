@@ -308,7 +308,7 @@ export default function StepMap({
                       : [...lines, word];
                   }, []).map((line: string, li: number) => (
                     <text key={li}
-                      x={tx} y={ty + 50 + li * 34}
+                      x={tx} y={ty + 72 + li * 36}
                       fontFamily="Montserrat, sans-serif"
                       fontSize={22} fontWeight="700"
                       fill="rgba(255,255,255,0.95)"
@@ -326,24 +326,33 @@ export default function StepMap({
         onClick={(e) => { e.stopPropagation(); onClose(); }}
         style={{ zIndex: 20 }} aria-label="Close">&times;</button>
 
-      {(hasPrev || hasNext) && (
-        <div className={styles.nav} style={{ zIndex: 20 }}>
-          <button type="button"
-            className={`${styles.navBtn}${!hasPrev ? " " + styles.navBtnHidden : ""}`}
-            onClick={(e) => { e.stopPropagation(); onPrev?.(); }}>&#8592;</button>
-          <div className={styles.navMid}>
-            <span className={styles.navStep}>Step {step.number} of 6</span>
-            <div className={styles.progressDots}>
-              {step.rows.map((_, i) => (
-                <div key={i} className={`${styles.dot}${i < openCount ? " " + styles.dotFilled : ""}`} />
-              ))}
-            </div>
-          </div>
-          <button type="button"
-            className={`${styles.navBtn}${!hasNext ? " " + styles.navBtnHidden : ""}`}
-            onClick={(e) => { e.stopPropagation(); onNext?.(); }}>&#8594;</button>
-        </div>
-      )}
+      {/* Prev/next arrows only -- no dots, no step counter */}
+      <div style={{
+        position: "fixed", bottom: 32, left: 0, right: 0,
+        display: "flex", justifyContent: "space-between",
+        padding: "0 32px", zIndex: 20, pointerEvents: "none",
+      }}>
+        <button type="button"
+          onClick={(e) => { e.stopPropagation(); onPrev?.(); }}
+          style={{
+            pointerEvents: hasPrev ? "all" : "none", opacity: hasPrev ? 1 : 0,
+            width: 56, height: 56, borderRadius: 14, border: "none",
+            background: "#ffed00", fontFamily: "'Luckiest Guy', system-ui",
+            fontSize: 26, color: "#0a3a57", cursor: "pointer",
+            boxShadow: "0 4px 0 rgba(10,58,87,0.3)",
+          }}
+          aria-label="Previous step">&#8592;</button>
+        <button type="button"
+          onClick={(e) => { e.stopPropagation(); onNext?.(); }}
+          style={{
+            pointerEvents: hasNext ? "all" : "none", opacity: hasNext ? 1 : 0,
+            width: 56, height: 56, borderRadius: 14, border: "none",
+            background: "#ffed00", fontFamily: "'Luckiest Guy', system-ui",
+            fontSize: 26, color: "#0a3a57", cursor: "pointer",
+            boxShadow: "0 4px 0 rgba(10,58,87,0.3)",
+          }}
+          aria-label="Next step">&#8594;</button>
+      </div>
     </div>
   );
 }
