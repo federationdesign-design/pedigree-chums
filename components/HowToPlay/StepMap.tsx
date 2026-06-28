@@ -5,7 +5,7 @@ import styles from "./StepMap.module.css";
 import { type StepData } from "./StepCard";
 
 const NODE_R = 56;
-const RING1 = 240;
+const RING1 = 340;
 const SPREAD1 = Math.PI * 1.6;
 const ROW_PTS = 400;
 const BONUS_PTS = 1000;
@@ -35,14 +35,12 @@ export default function StepMap({
     return () => window.removeEventListener("resize", f);
   }, []);
 
-  // Card is 2x pit size, centred on screen
   const cw = (cardPos?.w ?? 120) * CARD_SCALE;
   const ch = (cardPos?.h ?? 140) * CARD_SCALE;
   const cx = vp.w / 2;
   const cy = vp.h * 0.42;
   const cardImg = cardPos?.image ?? "";
 
-  // Pan -- same as LineageMap
   const [pan, setPan] = useState({ x: 0, y: 0 });
   useEffect(() => setPan({ x: 0, y: 0 }), [step.number]);
   const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
@@ -64,7 +62,6 @@ export default function StepMap({
     drag.current = null;
   };
 
-  // Node open state
   const [openCount, setOpenCount] = useState(0);
   useEffect(() => setOpenCount(0), [step.number]);
   const [openNodes, setOpenNodes] = useState<Set<number>>(new Set());
@@ -72,12 +69,10 @@ export default function StepMap({
   const [activeText, setActiveText] = useState<number | null>(null);
   useEffect(() => setActiveText(null), [step.number]);
 
-  // Video
   const [videoReady, setVideoReady] = useState(false);
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Double-tap card -- same suppressClick check as LineageMap onClick
   const lastCardTap = useRef(0);
   const handleCardClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,7 +96,6 @@ export default function StepMap({
     }
   }, [step.number, step.rows.length, onScore]);
 
-  // Node click -- exact LineageMap pattern
   const handleNodeClick = useCallback((e: React.MouseEvent, n: StepNode, unlocked: boolean) => {
     e.stopPropagation();
     if (suppressClick.current) { suppressClick.current = false; return; }
@@ -147,6 +141,13 @@ export default function StepMap({
     return { tx, ty };
   };
 
+  const svgStyle: React.CSSProperties = {
+    position: "fixed", inset: 0,
+    width: "100%", height: "100%",
+    overflow: "visible",
+    pointerEvents: "none",
+  };
+
   return (
     <div
       className={styles.overlay}
@@ -163,21 +164,32 @@ export default function StepMap({
         <div style={{
           fontFamily: "'Luckiest Guy', system-ui",
           fontSize: "clamp(24px, 3.5vw, 48px)",
-          color: "#ffffff",
-          letterSpacing: "0.04em",
-          lineHeight: 1.1,
+          color: "#ffffff", letterSpacing: "0.04em", lineHeight: 1.1,
         }}>HOW TO PLAY...</div>
         <div style={{
           fontFamily: "'Luckiest Guy', system-ui",
           fontSize: "clamp(36px, 5.5vw, 72px)",
-          color: "#ffed00",
-          letterSpacing: "0.04em",
-          lineHeight: 1,
-          marginTop: 2,
+          color: "#ffed00", letterSpacing: "0.04em", lineHeight: 1, marginTop: 2,
         }}>STEP {step.number}</div>
       </div>
 
-      {/* Card -- HTML so img/video render reliably, no SVG image issues */}
+      {/* ── LAYER 1: edge lines BELOW the card ── */}
+      <svg style={{ ...svgStyle, zIndex: 2 }}>
+        {nodes.map((n) => {
+          const unlocked = n.row < openCount;
+          return (
+            <line key={`e-${n.id}`}
+              x1={cx + pan.x} y1={cy + pan.y}
+              x2={n.x + pan.x} y2={n.y + pan.y}
+              stroke={unlocked ? "#ffed00" : "#ffffff"}
+              strokeWidth={unlocked ? 3 : 2}
+              strokeDasharray={unlocked ? undefined : "7 9"}
+            />
+          );
+        })}
+      </svg>
+
+      {/* ── LAYER 2: card HTML -- above edges, below nodes ── */}
       <div
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
@@ -186,16 +198,15 @@ export default function StepMap({
           position: "fixed",
           left: cx + pan.x - cw / 2,
           top: cy + pan.y - ch / 2,
-          width: cw,
-          height: ch,
+          width: cw, height: ch,
           borderRadius: cw * 0.08,
           overflow: "hidden",
           pointerEvents: "all",
           cursor: "pointer",
-          zIndex: 4,
+          zIndex: 3,
           border: "5px solid #ffed00",
           userSelect: "none",
-          WebkitUserSelect: "none",
+          WebkitUserSelect: "none" as any,
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
           display: "flex",
           flexDirection: "column",
@@ -210,14 +221,12 @@ export default function StepMap({
           style={{ flex: 1, width: "100%", objectFit: "cover", display: "block", minHeight: 0 }}
         />
         {!videoReady && cardImg && (
-          <img
-            src={cardImg} alt=""
+          <img src={cardImg} alt=""
             draggable={false}
             onDragStart={(e) => e.preventDefault()}
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
           />
         )}
-        {/* Caption bar */}
         <div style={{
           flexShrink: 0,
           padding: "10px 12px 12px",
@@ -229,41 +238,21 @@ export default function StepMap({
           letterSpacing: "0.02em",
           lineHeight: 1.1,
           pointerEvents: "none",
-        }}>
-          {step.caption}
-        </div>
-        {/* Double-tap hint */}
+        }}>{step.caption}</div>
         {!allUnlocked && (
           <div style={{
-            position: "absolute",
-            bottom: 52, left: 0, right: 0,
+            position: "absolute", bottom: 52, left: 0, right: 0,
             textAlign: "center",
             fontFamily: "'Luckiest Guy', system-ui",
-            fontSize: 14,
-            color: "rgba(255,255,255,0.95)",
+            fontSize: 14, color: "rgba(255,255,255,0.95)",
             pointerEvents: "none",
             textShadow: "0 1px 4px rgba(0,0,0,0.9)",
           }}>double-tap to reveal</div>
         )}
       </div>
 
-      {/* SVG: edges then nodes -- z above card */}
-      <svg style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none", zIndex: 5 }}>
-        {/* Edges */}
-        {nodes.map((n) => {
-          const unlocked = n.row < openCount;
-          return (
-            <line key={`e-${n.id}`}
-              x1={cx + pan.x} y1={cy + pan.y}
-              x2={n.x + pan.x} y2={n.y + pan.y}
-              stroke={unlocked ? "#ffed00" : "#ffffff"}
-              strokeWidth={unlocked ? 3 : 2}
-              strokeDasharray={unlocked ? undefined : "7 9"}
-            />
-          );
-        })}
-
-        {/* Nodes */}
+      {/* ── LAYER 3: nodes and text ABOVE card ── */}
+      <svg style={{ ...svgStyle, zIndex: 4 }}>
         {nodes.map((n) => {
           const unlocked = n.row < openCount;
           const isOpen = openNodes.has(n.row);
@@ -286,7 +275,6 @@ export default function StepMap({
                   x={-NODE_R} y={-NODE_R}
                   width={NODE_R * 2} height={NODE_R * 2}
                   style={{
-                    opacity: 1,
                     filter: isOpen
                       ? "brightness(0) saturate(100%) invert(93%) sepia(67%) saturate(600%) hue-rotate(0deg)"
                       : "none",
@@ -338,7 +326,6 @@ export default function StepMap({
         onClick={(e) => { e.stopPropagation(); onClose(); }}
         style={{ zIndex: 20 }} aria-label="Close">&times;</button>
 
-      {/* Prev/next -- only shown if caller passes them */}
       {(hasPrev || hasNext) && (
         <div className={styles.nav} style={{ zIndex: 20 }}>
           <button type="button"
