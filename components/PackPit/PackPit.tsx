@@ -1006,8 +1006,7 @@ export default function PackPit() {
           }
           return true;
         }
-if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;          window.dispatchEvent(new Event("pc:cookies-accepted"));
-          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
+if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
           bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
           bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
           numAt(ax, ay, 2000); // the big payoff pops out of the starburst
