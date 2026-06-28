@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./HowToPlay.module.css";
-import StepCard from "./StepCard";
+import StepMap from "./StepMap";
 import STEP_DATA from "./steps";
 
 type Props = {
@@ -81,7 +81,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
 
   if (step !== null && STEP_DATA[step]) {
     return createPortal(
-      <StepCard
+      <StepMap
         step={STEP_DATA[step]}
         onClose={() => {
           window.dispatchEvent(new CustomEvent("pc:howtoplay-step-viewed", { detail: { stepIdx: step } }));
