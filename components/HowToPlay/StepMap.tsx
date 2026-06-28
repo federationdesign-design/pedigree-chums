@@ -69,14 +69,17 @@ export default function StepMap({
   const [activeText, setActiveText] = useState<number | null>(null);
   useEffect(() => setActiveText(null), [step.number]);
 
-  // Flash numbers -- float up and fade like the pit
-  type FlashNum = { id: number; x: number; y: number; val: number; born: number; };
+  // Flash numbers -- exact LineageMap style
+  type FlashNum = { id: number; x: number; y: number; val: number; size: number; neg: boolean; big: boolean; };
   const [flashNums, setFlashNums] = useState<FlashNum[]>([]);
   const flashIdRef = useRef(0);
   const addFlash = (x: number, y: number, val: number) => {
     const id = flashIdRef.current++;
-    setFlashNums((prev) => [...prev, { id, x, y, val, born: Date.now() }]);
-    setTimeout(() => setFlashNums((prev) => prev.filter((f) => f.id !== id)), 900);
+    const isNeg = val < 0;
+    const isBig = val >= 400;
+    const size = isNeg ? 21 : isBig ? 21 : 15;
+    setFlashNums((prev) => [...prev, { id, x, y, val, size, neg: isNeg, big: isBig }]);
+    setTimeout(() => setFlashNums((prev) => prev.filter((f) => f.id !== id)), isNeg ? 1200 : isBig ? 900 : 650);
   };
 
   const [videoReady, setVideoReady] = useState(false);
@@ -250,14 +253,14 @@ export default function StepMap({
         )}
         <div style={{
           flexShrink: 0,
-          padding: "10px 12px 10px",
+          padding: "10px 12px 12px",
           background: "#ffed00",
           fontFamily: "'Luckiest Guy', system-ui",
-          fontSize: "clamp(12px, 1.8vw, 20px)",
+          fontSize: "clamp(14px, 2vw, 22px)",
           color: "#0a3a57",
           textAlign: "center",
           letterSpacing: "0.02em",
-          lineHeight: 1.15,
+          lineHeight: 1.1,
           pointerEvents: "none",
           position: "relative",
           zIndex: 2,
@@ -343,22 +346,22 @@ export default function StepMap({
             </g>
           );
         })}
-        {/* Flash numbers -- CSS animation so they actually move */}
+        {/* Flash numbers -- LineageMap style: green big, red neg, white default */}
         {flashNums.map((f) => (
           <text
             key={f.id}
             x={f.x}
             y={f.y}
             textAnchor="middle"
-            fontFamily="Montserrat, sans-serif"
-            fontSize={15}
-            fontWeight="800"
-            fill="#ffffff"
+            fontSize={f.size}
+            fontFamily="'Luckiest Guy', system-ui"
+            fontWeight="700"
             style={{
+              fill: f.neg ? "#ff2d4f" : f.big ? "#22c55e" : "#ffffff",
               pointerEvents: "none",
               animation: "smFlashNum 0.9s ease-out forwards",
             }}
-          >+{f.val}</text>
+          >{f.val > 0 ? `+${f.val}` : f.val}</text>
         ))}
       </svg>
 
