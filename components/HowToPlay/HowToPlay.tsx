@@ -207,13 +207,24 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
                   className={styles.stepNum}
                 />
               </div>
-              {/* Card illustration */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={n === 1 ? `/step1-redue.jpg` : n === 2 ? `/step2-redue.jpg` : n === 3 ? `/step3-redue.jpg` : n === 4 ? `/step4-redue.jpg` : n === 5 ? `/step5-redue.jpg` : `/step6-redue.jpg`}
-                alt={`Step ${n}`}
-                className={styles.stepIllo}
-              />
+              {/* Card illustration -- step 1 uses video, others use image */}
+              {n === 1 ? (
+                <video
+                  src="/step1-video-animation.mp4"
+                  className={styles.stepIllo}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={n === 2 ? `/step2-redue.jpg` : n === 3 ? `/step3-redue.jpg` : n === 4 ? `/step4-redue.jpg` : n === 5 ? `/step5-redue.jpg` : `/step6-redue.jpg`}
+                  alt={`Step ${n}`}
+                  className={styles.stepIllo}
+                />
+              )}
               {/* Footer caption */}
               <div className={styles.stepFooter}>
                 {CAPTIONS[i]}

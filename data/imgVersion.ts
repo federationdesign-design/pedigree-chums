@@ -2,7 +2,7 @@
 // picture). Browsers and Vercel's CDN cache images by their full URL, so a
 // replaced file keeps serving the old cached version until the URL changes.
 // Adding ?v=<this> makes every image a fresh URL, forcing a clean refetch.
-export const IMG_VERSION = 2;
+export const IMG_VERSION = 3;
 
 // Append the version query to a site-relative image path. Idempotent, and it
 // leaves data URLs and already-versioned URLs untouched.
