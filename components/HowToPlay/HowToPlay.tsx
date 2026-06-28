@@ -103,6 +103,13 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
             w: r.width, h: r.height,
             kind: "circle",
           });
+          // Yellow number drops from same position as circle
+          pieces.push({
+            src: `/${i + 1}object.svg`,
+            x: r.left, y: r.top,
+            w: r.width, h: r.height,
+            kind: "number",
+          });
         });
 
         // Logo and deco only -- circles and numbers already dispatched above as separate bodies

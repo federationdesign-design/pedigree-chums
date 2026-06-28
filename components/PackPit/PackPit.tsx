@@ -1262,6 +1262,18 @@ export default function PackPit() {
               ctx.restore(); return;
             }
 
+            // Yellow number from HTP overlay
+            if (b.plugin.kind === "htpnumber") {
+              const r = b.plugin.half;
+              if (img && img.complete && img.naturalWidth) {
+                ctx.drawImage(img, -r, -r, r * 2, r * 2);
+              } else {
+                ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffed00"; ctx.fill();
+              }
+              ctx.restore(); return;
+            }
+
             // Step card: draw yellow frame + illustration + footer caption
             if (b.plugin.kind === "stepcard") {
               const BORDER = 6, FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
@@ -1769,18 +1781,20 @@ export default function PackPit() {
             const bh = b.bounds.max.y - b.bounds.min.y;
             coveredArea += bw * bh;
           }
-          // Three-stop opacity curve: 1.0x coverage = 50%, 1.5x = 80%, 2.0x = 100%
+          // Revised curve: starts at 1.5x coverage (later), hits full at 3.0x (stronger ramp)
+          // 0→1.5x = 0% opacity, 1.5x→2.25x = 0→50%, 2.25x→3.0x = 50→100%
           const ratio = coveredArea / pitArea;
           let fill: number;
-          if (ratio <= 1.0) fill = ratio * 0.5;
-          else if (ratio <= 1.5) fill = 0.5 + (ratio - 1.0) / 0.5 * 0.3;
-          else fill = 0.8 + (ratio - 1.5) / 0.5 * 0.2;
+          if (ratio <= 1.5) fill = 0;
+          else if (ratio <= 2.25) fill = (ratio - 1.5) / 0.75 * 0.5;
+          else fill = 0.5 + (ratio - 2.25) / 0.75 * 0.5;
           fill = Math.min(1, fill);
-          stage.style.setProperty("--fill-opacity", (fill * 0.5).toFixed(3));
-          // yellow warning flashes at 90, 95, 99%
-          if (fill >= 0.9 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
-          if (fill >= 0.95 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
-          if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
+          stage.style.setProperty("--fill-opacity", fill.toFixed(3)); // removed *0.5 -- use full opacity
+          // TEST: flash at 10% fill so it's visible
+          if (fill >= 0.1 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          // yellow warning flashes at 60, 80, 95%
+          if (fill >= 0.6 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          if (fill >= 0.95 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
         }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
@@ -2216,6 +2230,11 @@ export default function PackPit() {
             const r = Math.min(pw / 2, MAX_CARD * 0.18);
             b = Bodies.circle(cx, cy, r, { restitution: 0.5, friction: 0.3, frictionAir: 0.006, density: 0.0007, render: { visible: false } });
             b.plugin = { name: "How to play", label: "", half: r, w: r * 2, h: r * 2, color: "#009fe0", img: getImg("htp:blue-circle", "/blue-circle.svg"), prop: "logopiece", family: null, ping: 0, kind: "htpcircle" };
+          } else if (pc.kind === "number") {
+            // Yellow number SVG -- small circle body
+            const r = Math.min(pw / 2, MAX_CARD * 0.12);
+            b = Bodies.circle(cx, cy, r, { restitution: 0.6, friction: 0.2, frictionAir: 0.005, density: 0.0005, render: { visible: false } });
+            b.plugin = { name: "How to play number", label: "", half: r, w: r * 2, h: r * 2, color: "#ffed00", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "htpnumber" };
           } else {
             // Step card -- tight rectangle body sized to actual rendered card frame
             b = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.12 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
