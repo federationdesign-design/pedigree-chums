@@ -1656,12 +1656,15 @@ export default function LineageMap({
     )}
     {showAuto && (
       <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
-        <div className={styles.autoPop}>
+        <div className={styles.autoPop} style={{ position: "relative" }}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />
+          <div className={styles.autoCost}>
+            {currentScore < 500 ? "-500" : currentScore < 2000 ? "-1,000" : currentScore < 5000 ? "-2,500" : "-5,000"}
+          </div>
         </div>
       </div>
     )}
-    {penalty !== null && <div key={penalty} className={styles.autoPenalty}>-2500</div>}
+    {penalty !== null && <div key={penalty} className={styles.autoPenalty}>{currentScore < 500 ? "-500" : currentScore < 2000 ? "-1,000" : currentScore < 5000 ? "-2,500" : "-5,000"}</div>}
     </>
   );
 }
