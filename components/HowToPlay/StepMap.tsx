@@ -93,6 +93,8 @@ export default function StepMap({
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
   const lastCardTap = useRef(0);
   const handleCardClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -100,11 +102,10 @@ export default function StepMap({
     const now = Date.now();
     if (now - lastCardTap.current < 450) {
       lastCardTap.current = 0;
-      // Check allUnlocked BEFORE state setter -- call onClose directly if all open
       setOpenCount((c: number) => {
         if (c >= step.rows.length) {
-          // Schedule close outside of state setter
-          window.setTimeout(() => onClose(), 0);
+          // All nodes open -- close on next double-tap via ref (always fresh)
+          window.setTimeout(() => onCloseRef.current(), 0);
           return c;
         }
         const next = Math.min(c + 1, step.rows.length);
@@ -116,9 +117,7 @@ export default function StepMap({
           if (!seenRows.has(key)) {
             seenRows.add(key);
             onScore?.(ROW_PTS);
-            const cardX = cx + pan.x;
-            const cardY = cy + pan.y - ch / 2 - 20;
-            addFlash(cardX, cardY, ROW_PTS);
+            addFlash(cx + pan.x, cy + pan.y - ch / 2 - 20, ROW_PTS);
           }
         }
         return next;
@@ -126,7 +125,7 @@ export default function StepMap({
     } else {
       lastCardTap.current = now;
     }
-  }, [step.number, step.rows.length, onScore]);
+  }, [step.number, step.rows.length, onScore, cx, pan, cy, ch]);
 
   const handleNodeClick = useCallback((e: React.MouseEvent, n: StepNode, unlocked: boolean) => {
     e.stopPropagation();
@@ -191,7 +190,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
-      onClick={(e) => { suppressClick.current = false; if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => { suppressClick.current = false; if (e.target === e.currentTarget) onCloseRef.current(); }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
