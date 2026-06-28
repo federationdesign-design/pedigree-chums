@@ -70,7 +70,7 @@ export default function StepMap({
   const [activeText, setActiveText] = useState<number | null>(null);
   useEffect(() => setActiveText(null), [step.number]);
 
-  // videoReady: whether the card has been opened (show video)
+  // videoReady: true once the video canplay event fires
   const [videoReady, setVideoReady] = useState(false);
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -83,11 +83,9 @@ export default function StepMap({
     const now = Date.now();
     if (now - lastCardTap.current < 400) {
       lastCardTap.current = 0;
-      if (!videoReady) setVideoReady(true);
       setOpenCount((c: number) => {
         const next = Math.min(c + 1, step.rows.length);
         if (next > c) {
-          // auto-show the newly unlocked node text
           setActiveText(next - 1);
           awardRowImmediate(next - 1);
         }
@@ -96,7 +94,7 @@ export default function StepMap({
     } else {
       lastCardTap.current = now;
     }
-  }, [step.rows.length, videoReady]);
+  }, [step.rows.length]);
 
   const awardRowImmediate = (rowIdx: number) => {
     const key = `${step.number}:${rowIdx}`;
@@ -191,53 +189,78 @@ export default function StepMap({
       onPointerCancel={onPanUp}
       onClick={() => { if (suppressClick.current) suppressClick.current = false; }}
     >
-      {/* Video card -- rendered in HTML so it actually plays */}
-      {videoReady && (
-        <div style={{
-          position: "fixed",
-          left: cx + pan.x - cw / 2,
-          top: cy + pan.y - ch / 2,
-          width: cw,
-          height: ch,
-          borderRadius: cw * 0.1,
-          overflow: "hidden",
-          pointerEvents: "all",
-          cursor: "pointer",
-          zIndex: 2,
-          border: "4px solid #ffed00",
-        }}
-          onClick={handleCardTap}
-        >
-          <video
-            ref={videoRef}
-            src={`/step${step.number}-video-animation.mp4`}
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          {/* step number badge */}
+      {/* Card: video loads in background, image shows until ready */}
+      <div style={{
+        position: "fixed",
+        left: cx + pan.x - cw / 2,
+        top: cy + pan.y - ch / 2,
+        width: cw,
+        height: ch,
+        borderRadius: cw * 0.1,
+        overflow: "hidden",
+        pointerEvents: "all",
+        cursor: "pointer",
+        zIndex: 2,
+        border: "4px solid #ffed00",
+      }}
+        onClick={handleCardTap}
+      >
+        {/* video -- always mounted, plays as soon as browser is ready */}
+        <video
+          ref={videoRef}
+          src={`/step${step.number}-video-animation.mp4`}
+          autoPlay
+          loop
+          muted
+          playsInline
+          onCanPlay={() => setVideoReady(true)}
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+        {/* image placeholder sits on top until video is ready */}
+        {!videoReady && cardImg && (
           <div style={{
-            position: "absolute", top: 8, right: 8,
-            width: 26, height: 26, borderRadius: "50%",
-            background: "#009fe0", display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, color: "#fff",
+            position: "absolute", inset: 0,
+            background: "#ffed00",
+            display: "flex", flexDirection: "column",
           }}>
-            {step.number}
-          </div>
-          {/* double-tap hint while not all unlocked */}
-          {!allUnlocked && (
+            <img
+              src={cardImg}
+              alt={step.caption}
+              style={{ flex: 1, width: "100%", objectFit: "cover", display: "block" }}
+            />
             <div style={{
-              position: "absolute", bottom: 6, left: 0, right: 0,
-              textAlign: "center", fontFamily: "Montserrat, sans-serif",
-              fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.8)",
+              padding: "4px 6px",
+              fontFamily: "'Luckiest Guy', system-ui",
+              fontSize: Math.max(8, Math.round(FOOTER * 0.28)),
+              color: "#0a3a57",
+              textAlign: "center",
             }}>
-              double-tap to reveal
+              {step.caption}
             </div>
-          )}
+          </div>
+        )}
+        {/* step number badge */}
+        <div style={{
+          position: "absolute", top: 8, right: 8,
+          width: 26, height: 26, borderRadius: "50%",
+          background: "#009fe0", display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, color: "#fff",
+          pointerEvents: "none",
+        }}>
+          {step.number}
         </div>
-      )}
+        {/* double-tap hint */}
+        {!allUnlocked && (
+          <div style={{
+            position: "absolute", bottom: 6, left: 0, right: 0,
+            textAlign: "center", fontFamily: "Montserrat, sans-serif",
+            fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.85)",
+            pointerEvents: "none",
+          }}>
+            double-tap to reveal
+          </div>
+        )}
+      </div>
 
       <svg
         style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
