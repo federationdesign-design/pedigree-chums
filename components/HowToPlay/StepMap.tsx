@@ -93,39 +93,29 @@ export default function StepMap({
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const onCloseRef = useRef(onClose);
-  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
-  const lastCardTap = useRef(0);
-  const handleCardClick = useCallback((e: React.MouseEvent) => {
+  // Card double-click handler -- matches LineageMap pattern exactly (native onDoubleClick)
+  const handleCardDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (suppressClick.current) { suppressClick.current = false; return; }
-    const now = Date.now();
-    if (now - lastCardTap.current < 450) {
-      lastCardTap.current = 0;
-      setOpenCount((c: number) => {
-        if (c >= step.rows.length) {
-          // All nodes open -- close on next double-tap via ref (always fresh)
-          window.setTimeout(() => onCloseRef.current(), 0);
-          return c;
-        }
-        const next = Math.min(c + 1, step.rows.length);
-        if (next > c) {
-          const row = next - 1;
-          setActiveText(row);
-          setOpenNodes((prev) => { const s = new Set(prev); s.add(row); return s; });
-          const key = `${step.number}:${row}`;
-          if (!seenRows.has(key)) {
-            seenRows.add(key);
-            onScore?.(ROW_PTS);
-            addFlash(cx + pan.x, cy + pan.y - ch / 2 - 20, ROW_PTS);
-          }
-        }
-        return next;
-      });
-    } else {
-      lastCardTap.current = now;
+    if (allUnlocked) {
+      onClose();
+      return;
     }
-  }, [step.number, step.rows.length, onScore, cx, pan, cy, ch]);
+    setOpenCount((c) => {
+      const next = Math.min(c + 1, step.rows.length);
+      if (next > c) {
+        const row = next - 1;
+        setActiveText(row);
+        setOpenNodes((prev) => { const s = new Set(prev); s.add(row); return s; });
+        const key = `${step.number}:${row}`;
+        if (!seenRows.has(key)) {
+          seenRows.add(key);
+          onScore?.(ROW_PTS);
+          addFlash(cx + pan.x, cy + pan.y - ch / 2 - 20, ROW_PTS);
+        }
+      }
+      return next;
+    });
+  };
 
   const handleNodeClick = useCallback((e: React.MouseEvent, n: StepNode, unlocked: boolean) => {
     e.stopPropagation();
@@ -190,7 +180,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
-      onClick={(e) => { suppressClick.current = false; if (e.target === e.currentTarget) onCloseRef.current(); }}
+      onClick={(e) => { if (suppressClick.current) { suppressClick.current = false; return; } if (e.target === e.currentTarget) onClose(); }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
@@ -229,7 +219,8 @@ export default function StepMap({
       <div
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
-        onClick={handleCardClick}
+        onClick={(e) => e.stopPropagation()}
+          onDoubleClick={handleCardDoubleClick}
         style={{
           position: "fixed",
           left: cx + pan.x - cw / 2,
