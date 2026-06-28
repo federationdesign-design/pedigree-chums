@@ -210,7 +210,7 @@ export default function PackPit() {
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
-      const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
+      const BALLS = isMobile ? [ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
@@ -651,17 +651,19 @@ export default function PackPit() {
         const pairChoice: string[] = PAIRS.map(([a, b]) => Math.random() < 0.5 ? a : b);
         const pairPartner: string[] = PAIRS.map(([a, b], i) => pairChoice[i] === a ? b : a);
         if (isMobile) {
-          // mobile: same scripted pairs as desktop, bowl first, 2 balls (kept), partners rotate
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl (matches desktop)
-          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  2 tennis balls (mobile keeps 2)
+          // mobile: 1 tennis ball, logo falls, bone + slipper split by 10s, HTP + enter split by 10s
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  1 tennis ball
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));                                         // 1400 bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 1400));                                        // 1400 bone only
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 2400));             // 2400 menu
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 3000));   // 3000 pair 1
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3500)); // 3500 panels + arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8000));   // 8000 pair 2
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 5000));   // 5000 pair 1 (more breathing room)
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makeArrow(w)); } }, 5500));   // 5500 HTP panel + arrow
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 11400));                                    // 11400 slipper (10s after bone)
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 15500)); // 15500 enter site (10s after HTP)
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 18000));  // 18000 pair 2 (more space)
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
@@ -2213,19 +2215,18 @@ export default function PackPit() {
       };
       if (isMobile) { motionRef.current = enableMotion; enableMotion(); } // Android grants now; iOS waits for a tap
 
-      if (!isMobile) {
-        logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
-        const logoImg = logoBody.plugin.img;
-        const addLogo = () => {
-          if (disposed) return;
-          Composite.add(engine.world, logoBody);
-          Events.on(engine, "collisionStart", onCollide);
-        };
-        if (logoImg.complete && logoImg.naturalWidth) {
-          addLogo(); // already loaded -- add immediately, no flash
-        } else {
-          logoImg.addEventListener("load", addLogo, { once: true });
-        }
+      // Logo drops on both desktop and mobile -- wait for image to load to avoid white flash
+      logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
+      const logoImg = logoBody.plugin.img;
+      const addLogo = () => {
+        if (disposed) return;
+        Composite.add(engine.world, logoBody);
+        Events.on(engine, "collisionStart", onCollide);
+      };
+      if (logoImg.complete && logoImg.naturalWidth) {
+        addLogo();
+      } else {
+        logoImg.addEventListener("load", addLogo, { once: true });
       }
 
       // The menu is the only way into the site menu from the pit, so it loads on
