@@ -411,9 +411,9 @@
 .stepCard {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(200px, 28vw, 416px);
-  border-radius: 16px;
-  background: #0357f5;
+  width: clamp(200px, 28vw, 380px);
+  border-radius: clamp(12px, 2vw, 20px);
+  background: #ffed00;
   overflow: visible;
   scroll-snap-align: center;
   box-shadow: 0 6px 20px rgba(10, 58, 87, 0.35);
@@ -424,8 +424,8 @@
   position: absolute;
   top: -14px;
   left: -14px;
-  width: clamp(36px, 5vw, 48px);
-  height: clamp(36px, 5vw, 48px);
+  width: clamp(36px, 5vw, 52px);
+  height: clamp(36px, 5vw, 52px);
   background: url('/blue-circle.svg') center / contain no-repeat;
   display: flex;
   align-items: center;
@@ -439,23 +439,23 @@
   display: block;
 }
 
-/* Illustration -- square, fills card top */
+/* Illustration -- fills card top, square crop */
 .stepIllo {
   display: block;
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 16px 16px 0 0;
+  border-radius: clamp(10px, 1.8vw, 16px) clamp(10px, 1.8vw, 16px) 0 0;
   image-rendering: auto;
   min-height: 0;
 }
 
-/* Footer caption bar */
+/* Footer caption bar -- navy text on yellow, Luckiest Guy */
 .stepFooter {
-  padding: 8px 10px 10px;
+  padding: 10px 10px;
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(9px, 1.1vw, 13px);
-  color: var(--yellow, #ffd23e);
+  font-size: clamp(9px, 1.2vw, 14px);
+  color: #0a3a57;
   text-align: center;
   line-height: 1.2;
   letter-spacing: 0.02em;
@@ -463,6 +463,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-transform: uppercase;
 }
 
 @media (max-width: 900px) {
