@@ -41,8 +41,13 @@ export default function StepMap({
   const ar = pitH / pitW;
   const cw = Math.max(180, Math.min(vp.w * 0.28, 260));
   const ch = Math.round(cw * ar);
-  const cx = vp.w / 2;
-  const cy = vp.h * 0.42;
+  // Card appears where it was tapped, clamped so it stays fully on screen
+  const cx = cardPos
+    ? Math.max(cw / 2 + 16, Math.min(vp.w - cw / 2 - 16, cardPos.x))
+    : vp.w / 2;
+  const cy = cardPos
+    ? Math.max(ch / 2 + 80, Math.min(vp.h - ch / 2 - 40, cardPos.y))
+    : vp.h * 0.42;
   const cardImg = cardPos?.image ?? "";
 
   const [pan, setPan] = useState({ x: 0, y: 0 });
