@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./GameOver.module.css";
 
@@ -7,8 +7,11 @@ type Props = { chums: number; score: number };
 
 const DANCE_MS = 10000;
 const FADE_MS  = 600;
+const MAX_NAME = 8;
+const STORAGE_KEY = "pc_scores";
 
-// Dog leaderboard -- seeded by date so it changes daily but is consistent within a day
+interface StoredEntry { name: string; score: number; date: string; }
+
 const DOG_POOL = [
   { name: "Rover",   scores: [28400, 34200, 19800, 42100, 31500] },
   { name: "Max",     scores: [22100, 38700, 15600, 29300, 44800] },
@@ -20,32 +23,86 @@ const DOG_POOL = [
   { name: "Bonnie",  scores: [11300, 24800, 37600, 20100, 29400] },
 ];
 
-function getDailyLeaderboard() {
-  // seed by date string -- same result all day, different each day
-  const seed = new Date().toDateString().split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+function todayStr() { return new Date().toDateString(); }
+
+function getDogLeaderboard() {
+  const seed = todayStr().split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const rng = (n: number) => { const x = Math.sin(seed + n) * 10000; return x - Math.floor(x); };
-  // shuffle pool with seeded rng
   const shuffled = [...DOG_POOL].sort((a, b) => rng(a.name.charCodeAt(0)) - rng(b.name.charCodeAt(0)));
   return shuffled.slice(0, 3).map((dog, i) => ({
     name: dog.name,
     score: dog.scores[Math.floor(rng(i + 10) * dog.scores.length)],
+    isDog: true,
   })).sort((a, b) => b.score - a.score);
+}
+
+function getStoredScores(): StoredEntry[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const entries: StoredEntry[] = JSON.parse(raw);
+    // Daily reset -- remove entries from previous days
+    return entries.filter(e => e.date === todayStr());
+  } catch { return []; }
+}
+
+function saveScore(name: string, score: number) {
+  try {
+    const existing = getStoredScores();
+    existing.push({ name, score, date: todayStr() });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+  } catch {}
+}
+
+function buildLeaderboard(playerScore: number, playerName: string | null) {
+  const dogs = getDogLeaderboard();
+  const stored = getStoredScores();
+  const humanEntries = stored.map(e => ({ name: e.name, score: e.score, isDog: false }));
+  // Add current player if named
+  if (playerName) humanEntries.push({ name: playerName, score: playerScore, isDog: false });
+  // Merge dogs + humans, sort, take top 3
+  const all = [...dogs, ...humanEntries].sort((a, b) => b.score - a.score);
+  // Deduplicate same name+score
+  const seen = new Set<string>();
+  return all.filter(e => { const k = `${e.name}:${e.score}`; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 3);
 }
 
 export default function GameOver({ chums, score }: Props) {
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
-  const leaders = getDailyLeaderboard();
+  const [name, setName] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [leaders, setLeaders] = useState(() => buildLeaderboard(score, null));
+  const [showLeaders, setShowLeaders] = useState(false);
 
   useEffect(() => {
+    // Show leaderboard after 1s
+    const lt = window.setTimeout(() => setShowLeaders(true), 1000);
     const fadeTimer = window.setTimeout(() => {
       if (overlayRef.current) overlayRef.current.classList.add(styles.fadeOut);
     }, DANCE_MS);
     const navTimer = window.setTimeout(() => {
       router.push("/about");
     }, DANCE_MS + FADE_MS);
-    return () => { clearTimeout(fadeTimer); clearTimeout(navTimer); };
+    return () => { clearTimeout(lt); clearTimeout(fadeTimer); clearTimeout(navTimer); };
   }, [router]);
+
+  const handleSubmit = () => {
+    if (!name.trim()) return;
+    const trimmed = name.trim().slice(0, MAX_NAME);
+    saveScore(trimmed, score);
+    setLeaders(buildLeaderboard(score, trimmed));
+    setSubmitted(true);
+  };
+
+  const handleShare = async () => {
+    const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
+    if (navigator.share) {
+      try { await navigator.share({ title: "Pedigree Chums", text, url: "https://pedigreechums.co.uk" }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(text); } catch {}
+    }
+  };
 
   return (
     <div ref={overlayRef} className={styles.overlay}>
@@ -58,15 +115,54 @@ export default function GameOver({ chums, score }: Props) {
             ? "You had 1 chum!"
             : `You had ${chums} chums!`}
         </h1>
-        <div className={styles.leaderboard} style={{ animationDelay: "1s" }}>
-          <p className={styles.leaderTitle}>Today&rsquo;s top chums</p>
-          {leaders.map((dog, i) => (
-            <div key={dog.name} className={styles.leaderRow} style={{ animationDelay: `${(2 - i) * 0.4}s` }}>
-              <span className={styles.leaderPos}>{i + 1}</span>
-              <span className={styles.leaderName}>{dog.name}</span>
-              <span className={styles.leaderScore}>{dog.score.toLocaleString()}</span>
-            </div>
-          ))}
+
+        {/* Name entry */}
+        {!submitted ? (
+          <div className={styles.nameEntry}>
+            <input
+              className={styles.nameInput}
+              type="text"
+              maxLength={MAX_NAME}
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+              autoComplete="off"
+            />
+            <button className={styles.nameSubmit} onClick={handleSubmit} type="button">
+              Add score
+            </button>
+          </div>
+        ) : (
+          <p className={styles.nameConfirm}>Score saved, {name.trim().slice(0, MAX_NAME)}!</p>
+        )}
+
+        {/* Leaderboard */}
+        {showLeaders && (
+          <div className={styles.leaderboard}>
+            <p className={styles.leaderTitle}>Today&rsquo;s top chums</p>
+            {leaders.map((dog, i) => (
+              <div
+                key={`${dog.name}${dog.score}`}
+                className={`${styles.leaderRow}${!dog.isDog ? " " + styles.leaderRowHuman : ""}`}
+                style={{ animationDelay: `${(2 - i) * 0.4}s` }}
+              >
+                <span className={styles.leaderPos}>{i + 1}</span>
+                <span className={styles.leaderName}>{dog.name}</span>
+                <span className={styles.leaderScore}>{dog.score.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className={styles.actions}>
+          <button className={styles.shareBtn} onClick={handleShare} type="button">
+            Share score
+          </button>
+          <a href="/about" className={styles.continueBtn}>
+            Continue &rarr;
+          </a>
         </div>
       </div>
     </div>

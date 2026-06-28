@@ -416,6 +416,11 @@
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
 }
+.pauseActive {
+  background: var(--navy);
+  color: var(--yellow);
+  box-shadow: 0 5px 0 rgba(3, 87, 245, 0.4);
+}
 /* Slow motion button -- sits above pause */
 .slowmo {
   position: fixed;
@@ -516,7 +521,7 @@
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(48px, 10vw, 96px);
   color: var(--yellow, #ffd23e);
-  text-shadow: 0 6px 0 rgba(10, 58, 87, 0.5), 0 0 40px rgba(10, 58, 87, 0.3);
+  text-shadow: none;
   letter-spacing: 0.06em;
   pointer-events: none;
   z-index: 55;
@@ -547,4 +552,14 @@
 .dimmed .pattern {
   opacity: min(calc(var(--fill-opacity, 0) * 2 + 0.2), 0.9) !important;
   transition: opacity 0.3s ease;
+}
+
+/* Shake/jelly button flash -- brief yellow burst on press, not persistent */
+.shakeFlash {
+  animation: shakeFlash 0.3s ease-out forwards;
+}
+@keyframes shakeFlash {
+  0%   { filter: brightness(1); }
+  30%  { filter: brightness(1.5); }
+  100% { filter: brightness(1); }
 }

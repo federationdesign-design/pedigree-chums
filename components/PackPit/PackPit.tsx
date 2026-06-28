@@ -2586,7 +2586,7 @@ export default function PackPit() {
       </button>
       <button
         type="button"
-        className={styles.pause}
+        className={`${styles.pause}${paused ? " " + styles.pauseActive : ""}`}
         onClick={() => {
           if (paused) { resumeRef.current(); setPaused(false); }
           else { pauseRef.current(); setPaused(true); }
@@ -2602,7 +2602,7 @@ export default function PackPit() {
           </svg>
         )}
       </button>
-      <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
+      <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={(e) => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); const el = e.currentTarget; el.classList.add(styles.shakeFlash); setTimeout(() => el.classList.remove(styles.shakeFlash), 300); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
