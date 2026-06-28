@@ -240,25 +240,14 @@ export default function StepMap({
         />
         {/* image placeholder sits on top until video is ready */}
         {!videoReady && cardImg && (
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "#ffed00",
-            display: "flex", flexDirection: "column",
-          }}>
+          <div style={{ position: "absolute", inset: 0 }}>
             <img
               src={cardImg}
               alt={step.caption}
-              style={{ flex: 1, width: "100%", objectFit: "cover", display: "block" }}
+              draggable={false}
+              onDragStart={(e) => e.preventDefault()}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }}
             />
-            <div style={{
-              padding: "4px 6px",
-              fontFamily: "'Luckiest Guy', system-ui",
-              fontSize: Math.max(8, Math.round(FOOTER * 0.28)),
-              color: "#0a3a57",
-              textAlign: "center",
-            }}>
-              {step.caption}
-            </div>
           </div>
         )}
         {/* step number badge */}
@@ -306,7 +295,7 @@ export default function StepMap({
               y1={cy + pan.y}
               x2={n.x + pan.x}
               y2={n.y + pan.y}
-              stroke={unlocked ? "rgba(255,237,0,0.8)" : "rgba(255,255,255,0.3)"}
+              stroke={unlocked ? "#ffed00" : "#ffffff"}
               strokeWidth={unlocked ? 3 : 1.5}
               strokeDasharray={unlocked ? undefined : "6 8"}
             />
@@ -369,6 +358,7 @@ export default function StepMap({
               <g
                 transform={`translate(${nx},${ny})`}
                 style={{ pointerEvents: unlocked ? "all" : "none", cursor: unlocked ? "pointer" : "default" }}
+                onPointerDown={(e) => { if (unlocked) e.stopPropagation(); }}
                 onClick={(e) => { e.stopPropagation(); tapNode(n, unlocked); }}
               >
                 {/* icon -- full opacity always, yellow tint when open */}
@@ -403,7 +393,7 @@ export default function StepMap({
                 {/* locked indicator ring */}
                 {!unlocked && (
                   <circle r={NODE_R + 4} fill="none"
-                    stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} strokeDasharray="4 5" />
+                    stroke="rgba(255,255,255,0.9)" strokeWidth={1.5} strokeDasharray="4 5" />
                 )}
               </g>
 
