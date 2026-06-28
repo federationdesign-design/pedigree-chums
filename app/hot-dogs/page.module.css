@@ -415,6 +415,4 @@
   height: auto;
   display: block;
   background: transparent;
-  mix-blend-mode: multiply;
-  filter: hue-rotate(200deg) saturate(1.6) contrast(1.1);
 }

@@ -56,14 +56,16 @@ export default function ScrollDog() {
     <div className={styles.fixedDog}>
       <video
         ref={videoRef}
-        src="/cerberous%20dog%20video.mp4"
         poster="/cerberous%20dog.png"
         muted
         playsInline
         preload="auto"
         className={styles.fixedDogVideo}
         style={{ background: "transparent" }}
-      />
+      >
+        <source src="/cerberous%20dog%20video.webm" type="video/webm" />
+        <source src="/cerberous%20dog%20video.mp4" type="video/mp4" />
+      </video>
     </div>
   );
 }
