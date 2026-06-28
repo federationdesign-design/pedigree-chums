@@ -6,7 +6,9 @@ import styles from "./HowToPlay.module.css";
 type Props = {
   open: boolean;
   onClose: () => void;
-  activeStep?: number | null; // 0-4 when opened from a pit card; null = show full overview
+  onScore?: (pts: number) => void;
+  activeStep?: number | null;
+  cardPos?: { x: number; y: number; w: number; h: number; angle: number; image: string } | null;
 };
 
 const STEPS = [
