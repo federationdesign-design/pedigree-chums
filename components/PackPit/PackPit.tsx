@@ -821,6 +821,32 @@ export default function PackPit() {
       mouse.element.removeEventListener("mousewheel", (mouse as any).mousewheel);
       mouse.element.removeEventListener("DOMMouseScroll", (mouse as any).mousewheel);
 
+      // Tennis ball escape: if the user flings a ball out the top with upward velocity,
+      // it's gone for good and scores 250 pts. Physics-ejected balls (no recent drag) return normally.
+      const userThrownBalls = new Set<number>(); // body IDs of balls the user has thrown upward
+      let lastDraggedBall: any = null;
+      Events.on(mc, "enddrag", (ev: any) => {
+        const b = ev.body;
+        if (!b || b.plugin?.prop !== "ball") return;
+        // only count it as thrown if released with meaningful upward velocity
+        if (b.velocity.y < -4) lastDraggedBall = b;
+        else lastDraggedBall = null;
+      });
+      Events.on(engine, "afterUpdate", () => {
+        if (!lastDraggedBall) return;
+        const b = lastDraggedBall;
+        if (!Composite.allBodies(engine.world).includes(b)) { lastDraggedBall = null; return; }
+        // if still moving upward and exits top of canvas, remove permanently
+        if (b.position.y < -b.plugin.half) {
+          userThrownBalls.add(b.id);
+          lastDraggedBall = null;
+          poof(b.position.x, 0, b.plugin.half * 1.5);
+          numAt(b.position.x, 20, 250);
+          setScore((s) => s + 250);
+          Composite.remove(engine.world, b);
+        }
+      });
+
       let pointer: any = null;
       const localPoint = (e: MouseEvent) => { const r = render.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
       const onMove = (e: MouseEvent) => { pointer = localPoint(e); };
