@@ -100,10 +100,11 @@ export default function StepMap({
     const now = Date.now();
     if (now - lastCardTap.current < 450) {
       lastCardTap.current = 0;
+      // Check allUnlocked BEFORE state setter -- call onClose directly if all open
       setOpenCount((c: number) => {
         if (c >= step.rows.length) {
-          // All nodes already open -- double-tap closes
-          onClose();
+          // Schedule close outside of state setter
+          window.setTimeout(() => onClose(), 0);
           return c;
         }
         const next = Math.min(c + 1, step.rows.length);
@@ -190,7 +191,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
-      onClick={() => { if (!suppressClick.current) onClose(); suppressClick.current = false; }}
+      onClick={(e) => { suppressClick.current = false; if (e.target === e.currentTarget) onClose(); }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
