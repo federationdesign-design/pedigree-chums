@@ -1818,7 +1818,21 @@ export default function PackPit() {
           if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
           if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
         }
-        // Pulse the paw pattern -- rate increases as pit fills
+        // Bone proximity: slow to 50% when two bones are within 100px of each other
+        // Restores to normal when they move apart (or if user has set slow motion)
+        if (!slowmoActiveRef.current) {
+          const bones = bodies.filter((b: any) => b.plugin?.prop === "bone" && !b.isStatic);
+          let bonesNear = false;
+          for (let i = 0; i < bones.length && !bonesNear; i++) {
+            for (let j = i + 1; j < bones.length && !bonesNear; j++) {
+              const dx = bones[i].position.x - bones[j].position.x;
+              const dy = bones[i].position.y - bones[j].position.y;
+              if (Math.hypot(dx, dy) < 100) bonesNear = true;
+            }
+          }
+          if (bonesNear && engine.timing.timeScale === 1) engine.timing.timeScale = 0.5;
+          else if (!bonesNear && engine.timing.timeScale === 0.5) engine.timing.timeScale = 1;
+        }
         const fillLevel = (stage as any).__fillLevel ?? 0;
         const pulseInterval = fillLevel < 0.25 ? 10000 : fillLevel < 0.5 ? 5000 : fillLevel < 0.75 ? 2000 : 1000;
         if (fillLevel > 0.1 && now - lastPulse > pulseInterval) {
