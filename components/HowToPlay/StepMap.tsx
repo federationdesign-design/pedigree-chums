@@ -263,7 +263,7 @@ export default function StepMap({
       </div>
 
       <svg
-        style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
+        style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "all", zIndex: 3 }}
         aria-hidden="true"
       >
         <defs>
