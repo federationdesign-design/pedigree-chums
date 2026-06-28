@@ -1,14 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./GameOver.module.css";
 
 type Props = { chums: number; score: number };
 
-const DANCE_MS = 10000;
-const FADE_MS  = 600;
-const MAX_NAME = 8;
+const MAX_NAME = 6;
 const STORAGE_KEY = "pc_scores";
+const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ".split("");
 
 interface StoredEntry { name: string; score: number; date: string; }
 
@@ -40,9 +38,7 @@ function getStoredScores(): StoredEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const entries: StoredEntry[] = JSON.parse(raw);
-    // Daily reset -- remove entries from previous days
-    return entries.filter(e => e.date === todayStr());
+    return (JSON.parse(raw) as StoredEntry[]).filter(e => e.date === todayStr());
   } catch { return []; }
 }
 
@@ -57,54 +53,72 @@ function saveScore(name: string, score: number) {
 function buildLeaderboard(playerScore: number, playerName: string | null) {
   const dogs = getDogLeaderboard();
   const stored = getStoredScores();
-  const humanEntries = stored.map(e => ({ name: e.name, score: e.score, isDog: false }));
-  // Add current player if named
-  if (playerName) humanEntries.push({ name: playerName, score: playerScore, isDog: false });
-  // Merge dogs + humans, sort, take top 3
-  const all = [...dogs, ...humanEntries].sort((a, b) => b.score - a.score);
-  // Deduplicate same name+score
+  const humans = stored.map(e => ({ name: e.name, score: e.score, isDog: false }));
+  if (playerName) humans.push({ name: playerName, score: playerScore, isDog: false });
+  const all = [...dogs, ...humans].sort((a, b) => b.score - a.score);
   const seen = new Set<string>();
-  return all.filter(e => { const k = `${e.name}:${e.score}`; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 3);
+  return all.filter(e => {
+    const k = `${e.name}:${e.score}`;
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  }).slice(0, 3);
 }
 
 export default function GameOver({ chums, score }: Props) {
-  const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+
+  // Arcade name entry: array of char indices, one active column
+  const [chars, setChars] = useState<number[]>(Array(MAX_NAME).fill(0));
+  const [activeCol, setActiveCol] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [leaders, setLeaders] = useState(() => buildLeaderboard(score, null));
-  const [showLeaders, setShowLeaders] = useState(false);
 
+  const getName = () => chars.map(i => CHARS[i]).join("").trimEnd();
+
+  const nudge = useCallback((dir: 1 | -1) => {
+    setChars(prev => {
+      const next = [...prev];
+      next[activeCol] = (next[activeCol] + dir + CHARS.length) % CHARS.length;
+      return next;
+    });
+  }, [activeCol]);
+
+  const advance = useCallback(() => {
+    if (activeCol < MAX_NAME - 1) setActiveCol(c => c + 1);
+  }, [activeCol]);
+
+  const back = useCallback(() => {
+    if (activeCol > 0) setActiveCol(c => c - 1);
+  }, [activeCol]);
+
+  // Keyboard support
   useEffect(() => {
-    // Show leaderboard after 1s
-    const lt = window.setTimeout(() => setShowLeaders(true), 1000);
-    const fadeTimer = window.setTimeout(() => {
-      if (overlayRef.current) overlayRef.current.classList.add(styles.fadeOut);
-    }, DANCE_MS);
-    const navTimer = window.setTimeout(() => {
-      router.push("/about");
-    }, DANCE_MS + FADE_MS);
-    return () => { clearTimeout(lt); clearTimeout(fadeTimer); clearTimeout(navTimer); };
-  }, [router]);
+    const onKey = (e: KeyboardEvent) => {
+      if (submitted) return;
+      if (e.key === "ArrowUp") { e.preventDefault(); nudge(-1); }
+      if (e.key === "ArrowDown") { e.preventDefault(); nudge(1); }
+      if (e.key === "ArrowRight" || e.key === "Tab") { e.preventDefault(); advance(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); back(); }
+      if (e.key === "Enter") handleSubmit();
+      // Letter keys jump to that char
+      if (e.key.length === 1) {
+        const idx = CHARS.indexOf(e.key.toUpperCase());
+        if (idx !== -1) {
+          setChars(prev => { const n = [...prev]; n[activeCol] = idx; return n; });
+          advance();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [nudge, advance, back, activeCol, submitted]);
 
-  const handleSubmit = async () => {
-    if (!name.trim()) return;
-    const trimmed = name.trim().slice(0, MAX_NAME);
-    saveScore(trimmed, score);
-    setLeaders(buildLeaderboard(score, trimmed));
+  const handleSubmit = () => {
+    const n = getName();
+    if (!n.trim()) return;
+    saveScore(n, score);
+    setLeaders(buildLeaderboard(score, n));
     setSubmitted(true);
-    // Submit email to MailerLite/Resend if provided
-    const trimEmail = email.trim();
-    if (trimEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimEmail)) {
-      try {
-        await fetch("/api/subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: trimEmail, consent: true }),
-        });
-      } catch {}
-    }
   };
 
   const handleShare = async () => {
@@ -118,72 +132,78 @@ export default function GameOver({ chums, score }: Props) {
 
   return (
     <div ref={overlayRef} className={styles.overlay}>
+      {/* X close */}
+      <button className={styles.closeBtn} onClick={() => window.location.reload()} type="button" aria-label="Close">
+        &times;
+      </button>
+
+      {/* Score top-left */}
+      <div className={styles.scoreDisplay}>
+        <span className={styles.scoreNum}>{score.toLocaleString()}</span>
+        <span className={styles.scorePts}> points</span>
+      </div>
+
       <div className={styles.inner}>
-        <p className={styles.scoreDisplay}>{score.toLocaleString()} pts</p>
+        {/* Title */}
         <h1 className={styles.title}>
           {chums === 0
-            ? "Ah deer, you were meant to grab some chums!"
+            ? "Ah deer, grab some chums next time!"
             : chums === 1
             ? "Well done, you found 1 chum!"
             : `Well done, you found ${chums} chums!`}
         </h1>
 
-        {/* Name entry */}
+        {/* Leaderboard */}
+        <div className={styles.leaderboard}>
+          <p className={styles.leaderTitle}>Today&rsquo;s High Scores</p>
+          {leaders.map((entry, i) => (
+            <div key={`${entry.name}${entry.score}`}
+              className={`${styles.leaderRow}${!entry.isDog ? " " + styles.leaderRowHuman : ""}`}>
+              <span className={styles.leaderPos}>{i + 1}</span>
+              <span className={styles.leaderName}>{entry.name}</span>
+              <span className={styles.leaderScore}>{entry.score.toLocaleString()}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Arcade name entry */}
         {!submitted ? (
-          <div className={styles.nameEntry}>
-            <input
-              className={styles.nameInput}
-              type="text"
-              maxLength={MAX_NAME}
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-              autoComplete="off"
-            />
-            <input
-              className={`${styles.nameInput} ${styles.emailInput}`}
-              type="email"
-              placeholder="Email (optional)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-              autoComplete="email"
-            />
+          <div className={styles.nameSection}>
+            <p className={styles.nameLabel}>Enter Name</p>
+            <div className={styles.arcadeEntry}>
+              {chars.map((ci, col) => (
+                <div key={col} className={styles.arcadeCol}
+                  onClick={() => setActiveCol(col)}>
+                  <button type="button" className={styles.arcadeArrow}
+                    onClick={(e) => { e.stopPropagation(); nudge(-1); }}>
+                    ▲
+                  </button>
+                  <div className={`${styles.arcadeChar}${col === activeCol ? " " + styles.arcadeCharActive : ""}`}>
+                    {CHARS[ci]}
+                  </div>
+                  <button type="button" className={styles.arcadeArrow}
+                    onClick={(e) => { e.stopPropagation(); nudge(1); }}>
+                    ▼
+                  </button>
+                </div>
+              ))}
+            </div>
             <button className={styles.nameSubmit} onClick={handleSubmit} type="button">
-              Add score
+              Save Score
             </button>
           </div>
         ) : (
-          <p className={styles.nameConfirm}>Score saved, {name.trim().slice(0, MAX_NAME)}!</p>
-        )}
-
-        {/* Leaderboard */}
-        {showLeaders && (
-          <div className={styles.leaderboard}>
-            <p className={styles.leaderTitle}>Today&rsquo;s top chums</p>
-            {leaders.map((dog, i) => (
-              <div
-                key={`${dog.name}${dog.score}`}
-                className={`${styles.leaderRow}${!dog.isDog ? " " + styles.leaderRowHuman : ""}`}
-                style={{ animationDelay: `${(2 - i) * 0.4}s` }}
-              >
-                <span className={styles.leaderPos}>{i + 1}</span>
-                <span className={styles.leaderName}>{dog.name}</span>
-                <span className={styles.leaderScore}>{dog.score.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
+          <p className={styles.nameConfirm}>Score saved, {getName()}!</p>
         )}
 
         {/* Actions */}
         <div className={styles.actions}>
           <button className={styles.shareBtn} onClick={handleShare} type="button">
-            Share score
+            Share Score
           </button>
-          <a href="/about" className={styles.continueBtn}>
+          <button className={styles.continueBtn} onClick={() => window.location.reload()} type="button">
             Continue &rarr;
-          </a>
+          </button>
         </div>
       </div>
     </div>
