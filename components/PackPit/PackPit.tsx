@@ -119,6 +119,22 @@ export default function PackPit() {
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
+  // When Learn completes, auto-open the first chum's lineage after a short delay
+  useEffect(() => {
+    const onPackComplete = (e: Event) => {
+      const name = (e as CustomEvent).detail?.name;
+      if (!name || activeBreed) return;
+      const breed = breeds.find((b) => b.name === name);
+      if (!breed) return;
+      // position roughly centre-screen since the card is now in a frame
+      const cx = typeof window !== "undefined" ? window.innerWidth / 2 : 400;
+      const cy = typeof window !== "undefined" ? window.innerHeight / 2 : 300;
+      setActiveBreed({ name: breed.name, image: breed.image || "", x: cx, y: cy, angle: 0 });
+    };
+    window.addEventListener("pc:pack-complete", onPackComplete as EventListener);
+    return () => window.removeEventListener("pc:pack-complete", onPackComplete as EventListener);
+  }, [activeBreed]);
+
   // Score drain: -1 per second while score > 0, paused whenever the LineageMap overlay is open.
   const drainRef = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => {

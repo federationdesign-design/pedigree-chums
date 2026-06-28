@@ -787,6 +787,13 @@ export default function LineageMap({
     setPackHidden(hidden);
     setPacked(true);
     if (award) flashNum(fx ?? (160 - pan.x), fy ?? (96 - pan.y), award, FLASH_SIZE); // one-off award, fed into the pit total
+    // after cards settle, auto-open the first chum's lineage
+    const firstChum = chum[0];
+    if (firstChum) {
+      window.setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("pc:pack-complete", { detail: { name: firstChum.name } }));
+      }, 600); // give cards time to land
+    }
     tween(460, (t) => {
       const e = 1 - Math.pow(1 - t, 3); // ease out
       setDragPos((prev) => {
