@@ -250,14 +250,14 @@ export default function StepMap({
         )}
         <div style={{
           flexShrink: 0,
-          padding: "10px 12px 12px",
+          padding: "10px 12px 10px",
           background: "#ffed00",
           fontFamily: "'Luckiest Guy', system-ui",
-          fontSize: "clamp(14px, 2vw, 22px)",
+          fontSize: "clamp(12px, 1.8vw, 20px)",
           color: "#0a3a57",
           textAlign: "center",
           letterSpacing: "0.02em",
-          lineHeight: 1.1,
+          lineHeight: 1.15,
           pointerEvents: "none",
           position: "relative",
           zIndex: 2,
@@ -351,7 +351,7 @@ export default function StepMap({
             y={f.y}
             textAnchor="middle"
             fontFamily="Montserrat, sans-serif"
-            fontSize={28}
+            fontSize={15}
             fontWeight="800"
             fill="#ffffff"
             style={{

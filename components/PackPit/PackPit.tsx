@@ -1328,7 +1328,7 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
                   b.plugin.cycleAt = t + 3000;
                 }
               }
-              const BORDER = 6, FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
+              const BORDER = Math.round(pw * 0.05), FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
               // Outer yellow rounded rect
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
               ctx.fillStyle = "#ffed00"; ctx.fill();
@@ -1347,13 +1347,13 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
               ctx.restore();
               // Footer caption text
               const caption = b.plugin.name || "";
-              const maxFontSize = Math.max(11, Math.round(FOOTER * 0.38));
+              const maxFontSize = Math.max(10, Math.round(FOOTER * 0.35));
               ctx.fillStyle = "#0a3a57";
               ctx.textAlign = "center"; ctx.textBaseline = "middle";
-              ctx.font = `700 ${maxFontSize}px Montserrat, system-ui, sans-serif`;
-              const maxTw = pw * 0.88, tw = ctx.measureText(caption).width;
+              ctx.font = `400 ${maxFontSize}px "Luckiest Guy", system-ui, sans-serif`;
+              const maxTw = pw * 0.86, tw = ctx.measureText(caption).width;
               let fs = maxFontSize;
-              if (tw > maxTw) { fs = Math.max(6, Math.floor(maxFontSize * maxTw / tw)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
+              if (tw > maxTw) { fs = Math.max(6, Math.floor(maxFontSize * maxTw / tw)); ctx.font = `400 ${fs}px "Luckiest Guy", system-ui, sans-serif`; }
               // Wrap to 2 lines if needed
               const words = caption.split(" "); let line1 = "", line2 = "";
               for (const w2 of words) {
@@ -1367,17 +1367,29 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
               } else {
                 ctx.fillText(line1, 0, footerY);
               }
-              // Hover: draw large yellow step number centred in the image area
+              // Hover state
               if (hovered) {
                 const HTP_NAMES_H = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
                 const sIdx = HTP_NAMES_H.indexOf(b.plugin.name);
                 if (sIdx !== -1) {
+                  // Check if this card is locked (previous not opened)
+                  const isLocked = sIdx > 0 && !b.plugin.opened;
+                  const iloMidY = -ph / 2 + BORDER + illoH / 2;
+                  if (isLocked) {
+                    // Dark navy overlay + greyscale filter on image
+                    ctx.save();
+                    ctx.globalCompositeOperation = "multiply";
+                    ctx.fillStyle = "rgba(10,30,60,0.7)";
+                    rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
+                    ctx.fill();
+                    ctx.restore();
+                  }
+                  // Number centred in image -- yellow if unlocked, white if locked
                   const numSize = Math.round(Math.max(illoH, illoW) * 0.5);
                   ctx.font = `400 ${numSize}px "Luckiest Guy", system-ui, sans-serif`;
-                  ctx.fillStyle = "#ffed00";
+                  ctx.fillStyle = isLocked ? "rgba(255,255,255,0.9)" : "#ffed00";
                   ctx.textAlign = "center";
                   ctx.textBaseline = "middle";
-                  const iloMidY = -ph / 2 + BORDER + illoH / 2;
                   ctx.fillText(String(sIdx + 1), 0, iloMidY);
                 }
               }
