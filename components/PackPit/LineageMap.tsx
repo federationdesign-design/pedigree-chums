@@ -470,6 +470,7 @@ export default function LineageMap({
   const bubbleSeq = useRef(0);
   const [dragXY, setDragXY] = useState<{ x: number; y: number } | null>(null); // live pointer while dragging a card, for the proximity glow
   const isDraggingCardRef = useRef(false); // synchronous flag -- state updates are async and miss the onMouseEnter window
+  const placedAtRef = useRef<Map<string, number>>(new Map()); // cardId -> timestamp when placed in frame
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
       const t = setTimeout(() => setShowRemove(true), 1000); // hold the green button back one second after the last circle turns blue
@@ -720,7 +721,7 @@ export default function LineageMap({
             window.setTimeout(() => setBubbles((bubs) => bubs.filter((x) => x.id !== bid)), 620);
           }, b * 60);
         }
-        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; }); placedAtRef.current.set(c.id, Date.now());
         setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
         flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE); // auto-place costs 50
         const pid = puffSeq.current++;
@@ -1260,7 +1261,13 @@ export default function LineageMap({
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
                   style={{ ...(cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" as const, ...(isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : {}), ...((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? { pointerEvents: "all" as const } : {}) }}
-                  onMouseEnter={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) && !isDraggingCardRef.current) magnifyHold(c.id); }}
+                  onMouseEnter={() => {
+                    if (!(placedSet.has(c.id) || packed) || PACK_BREEDS.has(c.name)) return;
+                    if (isDraggingCardRef.current) return;
+                    const placedAt = placedAtRef.current.get(c.id);
+                    if (placedAt && Date.now() - placedAt < 1000) return; // 1s cooldown after placement
+                    magnifyHold(c.id);
+                  }}
                   onMouseLeave={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) magnifyRelease(); }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1289,7 +1296,7 @@ export default function LineageMap({
                       }
                     }, () => {
                       if (empty) {
-                        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+                        setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; }); placedAtRef.current.set(c.id, Date.now());
                         setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
                       } else {
                         setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
@@ -1344,7 +1351,7 @@ export default function LineageMap({
                         const hit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
                         if (hit && hit.img === c.img && !filled.has(hit.id)) {
                           // first copy of this breed: it fills the frame (+100)
-                          setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
+                          setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; }); placedAtRef.current.set(c.id, Date.now());
                           setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
                           flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 100, FLASH_SIZE); // +100 emanates from the frame
                           const pid = puffSeq.current++; // smoke poof where it lands
