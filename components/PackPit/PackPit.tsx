@@ -2365,7 +2365,7 @@ export default function PackPit() {
         onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
         aria-label={slowmo ? "Normal speed" : "Slow motion"}
       >
-        {slowmo ? "1x" : "0.25x"}
+        <img src="/snail-icon.svg" width="38" height="28" alt="" aria-hidden="true" style={{ display: "block" }} />
       </button>
       <button
         type="button"
@@ -2379,14 +2379,17 @@ export default function PackPit() {
         {paused ? (
           <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
         ) : (
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor">
+            <rect x="5" y="3" width="4.5" height="18" rx="2.25"/>
+            <rect x="14.5" y="3" width="4.5" height="18" rx="2.25"/>
+          </svg>
         )}
       </button>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} paused={paused} onPauseToggle={() => { if (paused) { resumeRef.current(); setPaused(false); } else { pauseRef.current(); setPaused(true); } }} />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">

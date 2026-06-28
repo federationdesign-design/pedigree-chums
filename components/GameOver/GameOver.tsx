@@ -5,19 +5,19 @@ import styles from "./GameOver.module.css";
 
 type Props = { chums: number; score: number };
 
-const DANCE_MS = 4000;
+const DANCE_MS = 10000;
 const FADE_MS  = 600;
 
 // Dog leaderboard -- seeded by date so it changes daily but is consistent within a day
 const DOG_POOL = [
-  { name: "Rover",   scores: [1840, 2210, 1650, 1990, 2340] },
-  { name: "Max",     scores: [1420, 1780, 2050, 1600, 1920] },
-  { name: "Rolo",    scores: [1100, 1380, 1560, 1240, 1700] },
-  { name: "Biscuit", scores: [980,  1200, 1450, 1080, 1310] },
-  { name: "Scruff",  scores: [2100, 1760, 2400, 1880, 2250] },
-  { name: "Pickle",  scores: [760,  940,  1120, 850,  1050] },
-  { name: "Monty",   scores: [1650, 1920, 1430, 1780, 2100] },
-  { name: "Bonnie",  scores: [1300, 1550, 1180, 1420, 1640] },
+  { name: "Rover",   scores: [28400, 34200, 19800, 42100, 31500] },
+  { name: "Max",     scores: [22100, 38700, 15600, 29300, 44800] },
+  { name: "Rolo",    scores: [18500, 27900, 41200, 33600, 12400] },
+  { name: "Biscuit", scores: [9800,  16200, 24500, 38100, 21700] },
+  { name: "Scruff",  scores: [47300, 31800, 22600, 39500, 14900] },
+  { name: "Pickle",  scores: [7600,  13400, 19200, 28500, 35700] },
+  { name: "Monty",   scores: [26500, 43100, 17800, 32400, 48200] },
+  { name: "Bonnie",  scores: [11300, 24800, 37600, 20100, 29400] },
 ];
 
 function getDailyLeaderboard() {
@@ -58,10 +58,10 @@ export default function GameOver({ chums, score }: Props) {
             ? "You have 1 dog in your hand."
             : `You have ${chums} dogs in your hand.`}
         </h1>
-        <div className={styles.leaderboard}>
+        <div className={styles.leaderboard} style={{ animationDelay: "1s" }}>
           <p className={styles.leaderTitle}>Today&rsquo;s top chums</p>
           {leaders.map((dog, i) => (
-            <div key={dog.name} className={styles.leaderRow}>
+            <div key={dog.name} className={styles.leaderRow} style={{ animationDelay: `${(2 - i) * 0.4}s` }}>
               <span className={styles.leaderPos}>{i + 1}</span>
               <span className={styles.leaderName}>{dog.name}</span>
               <span className={styles.leaderScore}>{dog.score.toLocaleString()}</span>
