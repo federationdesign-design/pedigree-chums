@@ -1246,6 +1246,17 @@ export default function PackPit() {
             // ox/oy shifts draw origin so a custom pivot point sits at body centre
             const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
 
+            // Blue circle from HTP overlay -- draw as filled circle with image
+            if (b.plugin.kind === "htpcircle") {
+              const r = b.plugin.half;
+              ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+              ctx.fillStyle = "#009fe0"; ctx.fill();
+              if (img && img.complete && img.naturalWidth) {
+                ctx.drawImage(img, -r, -r, r * 2, r * 2);
+              }
+              ctx.restore(); return;
+            }
+
             // Step card: draw yellow frame + illustration + footer caption
             if (b.plugin.kind === "stepcard") {
               const BORDER = 6, FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;

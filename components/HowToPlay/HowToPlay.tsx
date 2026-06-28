@@ -104,7 +104,7 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
           });
         });
 
-        // Logo and deco
+        // Logo and deco only -- circles and numbers already dispatched above as separate bodies
         const push = (el: Element | null, src: string) => {
           if (!el) return;
           const r = el.getBoundingClientRect();
@@ -113,8 +113,6 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
         };
         push(root.querySelector("[data-htp='logo']"), "/dogbingo.svg");
         root.querySelectorAll("[data-htp='deco']").forEach((el: Element) => push(el, "/yellow-triangle.svg"));
-        // Yellow numbers -- now rendered on the circle, drop separately
-        root.querySelectorAll("[data-htp='num']").forEach((el: Element, i: number) => push(el, `/${i + 1}object.svg`));
       }
 
       if (pieces.length) window.dispatchEvent(new CustomEvent("pc:howtoplay-drop", { detail: { pieces } }));
