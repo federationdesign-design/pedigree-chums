@@ -1669,6 +1669,7 @@ export default function PackPit() {
       let patternUntil = 0;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
+      let lastPulse = 0;
       const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
       const onFloorHit = (ev: any) => {
         const floor = walls[0];
@@ -1809,12 +1810,21 @@ export default function PackPit() {
           else if (ratio <= 2.25) fill = (ratio - 1.5) / 0.75 * 0.5;
           else fill = 0.5 + (ratio - 2.25) / 0.75 * 0.5;
           fill = Math.min(1, fill);
-          stage.style.setProperty("--fill-opacity", fill.toFixed(3)); // removed *0.5 -- use full opacity
-          // TEST: flash at 10% fill so it's visible
-          if (fill >= 0.1 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          // yellow warning flashes at 60, 80, 95%
-          if (fill >= 0.6 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (fill >= 0.95 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          stage.style.setProperty("--fill-opacity", fill.toFixed(3));
+          // Store fill for pulse interval
+          (stage as any).__fillLevel = fill;
+          // Yellow warning flashes at 40%, 70%, 90%, 99%
+          if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+        }
+        // Pulse the paw pattern -- rate increases as pit fills
+        const fillLevel = (stage as any).__fillLevel ?? 0;
+        const pulseInterval = fillLevel < 0.25 ? 10000 : fillLevel < 0.5 ? 5000 : fillLevel < 0.75 ? 2000 : 1000;
+        if (fillLevel > 0.1 && now - lastPulse > pulseInterval) {
+          lastPulse = now;
+          stage.classList.add(styles.patternPulse);
+          setTimeout(() => stage.classList.remove(styles.patternPulse), 500);
         }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
@@ -1965,6 +1975,16 @@ export default function PackPit() {
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
         if (pressedBomb === bomb) pressedBomb = null; // stop the hold loop and the fuse fizz at once
         const bx = bomb.position.x, by = bomb.position.y, bsz = blastSize(bomb);
+        // Strobe the paw pattern on bomb detonation: 4 quick flashes then one long
+        if (stageRef.current) {
+          const el = stageRef.current;
+          const strobeDelays = [0, 80, 160, 240, 380];
+          const strobeDurs  = [60, 60, 60, 60, 400];
+          strobeDelays.forEach((d, i) => {
+            window.setTimeout(() => { el.classList.add(styles.patternStrobe); }, d);
+            window.setTimeout(() => { el.classList.remove(styles.patternStrobe); }, d + strobeDurs[i]);
+          });
+        }
         window.setTimeout(() => {
           if (disposed) return;
           pushBoom(bx, by, bsz * 2.2); // pop-art comic blast: flash, jagged burst, flung stars and lightning bolts, smoke, comic word

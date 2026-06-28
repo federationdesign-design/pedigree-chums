@@ -526,3 +526,25 @@
   from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
+
+/* Bomb strobe -- pattern flashes bright on detonation */
+.patternStrobe .pattern {
+  opacity: 1 !important;
+  transition: none;
+}
+
+/* Pulse -- pattern briefly brightens based on fill level */
+.patternPulse .pattern {
+  animation: patternPulseAnim 0.5s ease-out forwards;
+}
+@keyframes patternPulseAnim {
+  0%   { opacity: var(--fill-opacity, 0); }
+  30%  { opacity: min(calc(var(--fill-opacity, 0) + 0.35), 1); }
+  100% { opacity: var(--fill-opacity, 0); }
+}
+
+/* Stronger pattern when overlay is open */
+.dimmed .pattern {
+  opacity: min(calc(var(--fill-opacity, 0) * 2 + 0.2), 0.9) !important;
+  transition: opacity 0.3s ease;
+}
