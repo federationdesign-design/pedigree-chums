@@ -113,7 +113,7 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
-  const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null || cookieBannerOpen;
+  const cookieBannerOpenRef = useRef(true);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
@@ -131,7 +131,7 @@ export default function PackPit() {
   // Auto slow motion at zero drain cost when any overlay is open
   const autoSlowmoRef = useRef(false);
   useEffect(() => {
-    const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null;
+    const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null || cookieBannerOpenRef.current;
     if (overlayOpen && !autoSlowmoRef.current) {
       autoSlowmoRef.current = true;
       // Engage slowmo without flagging slowmoActiveRef (so drain stays normal)
@@ -1006,8 +1006,7 @@ export default function PackPit() {
           }
           return true;
         }
-        if (hit.plugin?.kind === "cookieaccept") { setCookieBannerOpen(false);
-          window.dispatchEvent(new Event("pc:cookies-accepted"));
+if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;          window.dispatchEvent(new Event("pc:cookies-accepted"));
           const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
           bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
           bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
