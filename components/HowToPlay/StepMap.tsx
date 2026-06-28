@@ -254,7 +254,7 @@ export default function StepMap({
       {/* ── LAYER 3: nodes and text ABOVE card ── */}
       <svg style={{ ...svgStyle, zIndex: 4 }}>
         {nodes.map((n) => {
-          const unlocked = n.row < openCount;
+          const unlocked = true;
           const isOpen = openNodes.has(n.row);
           const isActive = activeText === n.row;
           const row = step.rows[n.row];
@@ -308,9 +308,9 @@ export default function StepMap({
                       : [...lines, word];
                   }, []).map((line: string, li: number) => (
                     <text key={li}
-                      x={tx} y={ty + 72 + li * 36}
+                      x={tx} y={ty + 44 + li * 29}
                       fontFamily="Montserrat, sans-serif"
-                      fontSize={22} fontWeight="700"
+                      fontSize={20} fontWeight="700"
                       fill="rgba(255,255,255,0.95)"
                       dominantBaseline="hanging"
                     >{line}</text>

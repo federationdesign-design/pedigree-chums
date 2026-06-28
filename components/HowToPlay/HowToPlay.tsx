@@ -96,11 +96,6 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           window.dispatchEvent(new CustomEvent("pc:howtoplay-step-viewed", { detail: { stepIdx: step } }));
           onClose();
         }}
-        onScore={onScore}
-        onPrev={() => setStep((s) => Math.max((s ?? 0) - 1, 0))}
-        onNext={() => setStep((s) => Math.min((s ?? 0) + 1, STEP_DATA.length - 1))}
-        hasPrev={step > 0}
-        hasNext={step < STEP_DATA.length - 1}
         cardPos={cardPos}
       />,
       document.body

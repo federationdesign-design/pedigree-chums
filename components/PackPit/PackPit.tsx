@@ -119,9 +119,17 @@ export default function PackPit() {
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
+    useEffect(() => {
     const open = () => setHowToPlay(true);
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
+  }, []);
+  useEffect(() => {
+    const pause = () => { const e = engineRef.current; if (e && e.timing.timeScale === 1) e.timing.timeScale = 0.25; };
+    const resume = () => { const e = engineRef.current; if (e && !slowmoActiveRef.current) e.timing.timeScale = 1; };
+    window.addEventListener("pc:overlay-opened", pause);
+    window.addEventListener("pc:overlay-closed", resume);
+    return () => { window.removeEventListener("pc:overlay-opened", pause); window.removeEventListener("pc:overlay-closed", resume); };
   }, []);
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
