@@ -71,7 +71,11 @@ export default function GameOver({ chums, score }: Props) {
   const [chars, setChars] = useState<number[]>(Array(MAX_NAME).fill(0));
   const [activeCol, setActiveCol] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailSaved, setEmailSaved] = useState(false);
   const [leaders, setLeaders] = useState(() => buildLeaderboard(score, null));
+  const thirdPlaceScore = leaders[2]?.score ?? 0;
+  const qualifies = score > thirdPlaceScore;
 
   const getName = () => chars.map(i => CHARS[i]).join("").trimEnd();
 
@@ -121,6 +125,19 @@ export default function GameOver({ chums, score }: Props) {
     setSubmitted(true);
   };
 
+  const handleEmailSubmit = async () => {
+    const trimEmail = email.trim();
+    if (!trimEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimEmail)) return;
+    try {
+      await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimEmail, consent: true }),
+      });
+    } catch {}
+    setEmailSaved(true);
+  };
+
   const handleShare = async () => {
     const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
     if (navigator.share) {
@@ -132,9 +149,11 @@ export default function GameOver({ chums, score }: Props) {
 
   return (
     <div ref={overlayRef} className={styles.overlay}>
-      {/* X close */}
-      <button className={styles.closeBtn} onClick={() => window.location.reload()} type="button" aria-label="Close">
-        &times;
+      {/* Replay button */}
+      <button className={styles.closeBtn} onClick={() => window.location.reload()} type="button" aria-label="Play again">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+        </svg>
       </button>
 
       {/* Score top-left */}
@@ -166,8 +185,8 @@ export default function GameOver({ chums, score }: Props) {
           ))}
         </div>
 
-        {/* Arcade name entry */}
-        {!submitted ? (
+        {/* Arcade name entry -- only if score beats 3rd place */}
+        {qualifies && !submitted ? (
           <div className={styles.nameSection}>
             <p className={styles.nameLabel}>Enter Name</p>
             <div className={styles.arcadeEntry}>
@@ -192,9 +211,29 @@ export default function GameOver({ chums, score }: Props) {
               Save Score
             </button>
           </div>
-        ) : (
-          <p className={styles.nameConfirm}>Score saved, {getName()}!</p>
-        )}
+        ) : qualifies && submitted ? (
+          <div className={styles.emailSection}>
+            <p className={styles.nameConfirm}>Score saved, {getName()}!</p>
+            {!emailSaved ? (
+              <div className={styles.emailPill}>
+                <input
+                  className={styles.emailInput}
+                  type="email"
+                  placeholder="Add email to keep your score"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleEmailSubmit(); }}
+                  autoComplete="email"
+                />
+                <button className={styles.emailSubmit} onClick={handleEmailSubmit} type="button">
+                  ✓
+                </button>
+              </div>
+            ) : (
+              <p className={styles.emailConfirm}>Email saved!</p>
+            )}
+          </div>
+        ) : null}
 
         {/* Actions */}
         <div className={styles.actions}>

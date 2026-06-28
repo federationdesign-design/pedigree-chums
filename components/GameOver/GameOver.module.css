@@ -230,3 +230,53 @@
   transition: filter 0.15s, transform 0.1s;
 }
 .continueBtn:hover { filter: brightness(0.95); transform: translateY(-1px); }
+/* Email pill after score saved */
+.emailSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.emailPill {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  overflow: hidden;
+  width: min(380px, 90vw);
+}
+.emailInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 12px 18px;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(13px, 1.6vw, 16px);
+  font-weight: 600;
+  color: #ffffff;
+}
+.emailInput::placeholder { color: rgba(255,255,255,0.5); }
+.emailSubmit {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: #ffed00;
+  border: none;
+  color: #0a3a57;
+  font-size: 1.3rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.emailConfirm {
+  font-family: 'Luckiest Guy', system-ui;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: #22c55e;
+  margin: 0;
+  letter-spacing: 0.04em;
+}

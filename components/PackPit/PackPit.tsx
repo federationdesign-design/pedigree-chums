@@ -1013,19 +1013,20 @@ export default function PackPit() {
           }
           return true;
         }
-if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
-          bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
-          bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
-          numAt(ax, ay, 2000); // the big payoff pops out of the starburst
-          clearCookieObjects(true); // keep reject in pit as inert with 20 hit life
+if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
+          window.dispatchEvent(new Event("pc:cookies-accepted"));
+          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
+          bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });
+          bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 });
+          numAt(ax, ay, 2000);
+          clearCookieObjects(true);
           return true;
         }
         if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new Event("pc:cookies-rejected"));
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
-          bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
-          bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 }); // grey
-          // no score penalty for rejecting cookies
+          bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });
+          bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 });
           clearCookieObjects();
           return true;
         }
