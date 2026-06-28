@@ -240,7 +240,7 @@ export default function GameOver({ chums, score }: Props) {
           <button className={styles.shareBtn} onClick={handleShare} type="button">
             Share Score
           </button>
-          <button className={styles.continueBtn} onClick={() => window.location.reload()} type="button">
+          <button className={styles.continueBtn} onClick={() => window.location.assign("/about")} type="button">
             Continue &rarr;
           </button>
         </div>

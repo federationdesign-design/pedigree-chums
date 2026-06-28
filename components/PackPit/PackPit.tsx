@@ -124,11 +124,8 @@ export default function PackPit() {
     return () => window.removeEventListener("pc:open-howtoplay", open);
   }, []);
   useEffect(() => {
-    const pause = () => { const e = engineRef.current; if (e && e.timing.timeScale === 1) e.timing.timeScale = 0.25; };
-    const resume = () => { const e = engineRef.current; if (e && !slowmoActiveRef.current) e.timing.timeScale = 1; };
-    window.addEventListener("pc:overlay-opened", pause);
-    window.addEventListener("pc:overlay-closed", resume);
-    return () => { window.removeEventListener("pc:overlay-opened", pause); window.removeEventListener("pc:overlay-closed", resume); };
+    // overlay-opened/closed handled by the overlayOpen effect below -- no duplicate listener needed
+    return () => {};
   }, []);
   const lineageOpenRef = useRef(false);
   const removeBreedRef = useRef<(name: string) => void>(() => {});
@@ -138,23 +135,16 @@ export default function PackPit() {
   // Auto slow motion at zero drain cost when any overlay is open
   const autoSlowmoRef = useRef(false);
   useEffect(() => {
-    const htpOpen = howToPlay; // HowToPlay overview OR step card -- full pause
-    const otherOpen = !!activeBreed || shelfOpen || britainMsg !== null || cookieBannerOpenRef.current;
-    const overlayOpen = htpOpen || otherOpen;
+    // ALL overlays fully pause the pit -- no slowmo, no ambiguity
+    const overlayOpen = howToPlay || !!activeBreed || shelfOpen || britainMsg !== null || cookieBannerOpenRef.current;
+    const engine = engineRef.current;
+    if (!engine) return;
     if (overlayOpen && !autoSlowmoRef.current) {
       autoSlowmoRef.current = true;
-      const engine = engineRef.current;
-      if (engine) engine.timing.timeScale = htpOpen ? 0 : 0.25; // full pause for HTP, slowmo for others
+      if (!slowmoActiveRef.current) engine.timing.timeScale = 0;
     } else if (!overlayOpen && autoSlowmoRef.current) {
       autoSlowmoRef.current = false;
-      if (!slowmoActiveRef.current) {
-        const engine = engineRef.current;
-        if (engine) engine.timing.timeScale = 1;
-      }
-    } else if (overlayOpen && autoSlowmoRef.current) {
-      // Update timeScale if HTP state changed while overlay already open
-      const engine = engineRef.current;
-      if (engine && !slowmoActiveRef.current) engine.timing.timeScale = htpOpen ? 0 : 0.25;
+      if (!slowmoActiveRef.current) engine.timing.timeScale = 1;
     }
   }, [activeBreed, shelfOpen, howToPlay, britainMsg]);
 
@@ -2457,11 +2447,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       const isDogCard = (b: any) =>
         !b.isStatic &&
         b.plugin &&
-        !b.plugin.prop &&
-        !b.plugin.logo &&
-        !b.plugin.kind &&          // breed cards have no kind
-        b.plugin.family !== null && // breed cards have a family
-        b.plugin.half > 20;        // exclude tiny bodies
+        !b.plugin.prop &&       // excludes balls, bones, bowls, logoPieces
+        !b.plugin.logo &&       // excludes logo panels
+        !b.plugin.kind &&       // excludes menu, buttons, cookies, htpX, stepcard etc
+        b.plugin.half > 20;     // excludes tiny scraps
 
       const spawnTimes = new Map<number, number>(); // kept but only used for dog cards now
       const onAfterAdd = (event: any) => {
@@ -2478,14 +2467,14 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         lastFullCheck = now;
         const pitH = render.canvas.height;
         const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
-        if (allDogs.length < 8) return; // need at least 8 dog cards in pit before checking
+        if (allDogs.length < 6) return; // need at least 6 dog cards in pit before checking
         // Only count settled dogs (low velocity)
         const settled = allDogs.filter((b: any) => Math.hypot(b.velocity.x, b.velocity.y) < 1.5);
-        if (settled.length < 6) return; // need 6 settled
+        if (settled.length < 5) return; // need 5 settled
         // Average Y of settled dogs -- lower Y = higher up in pit
         const avgY = settled.reduce((s: number, b: any) => s + b.position.y, 0) / settled.length;
-        // If average resting position is in the top 35% of the pit, it is full
-        if (avgY < pitH * 0.35) {
+        // If average resting position is in the top 40% of the pit, it is full
+        if (avgY < pitH * 0.40) {
           window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
       };

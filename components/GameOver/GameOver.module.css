@@ -16,21 +16,22 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  border: 2px solid rgba(255,255,255,0.5);
-  background: transparent;
-  color: #ffffff;
-  font-size: 1.8rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: none;
+  background: #ffed00;
+  color: #0a3a57;
+  font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+  box-shadow: 0 4px 0 rgba(10,58,87,0.3);
 }
-.closeBtn:hover { background: rgba(255,255,255,0.15); }
+.closeBtn:hover { filter: brightness(0.95); transform: translateY(-1px); }
 
 .scoreDisplay {
   position: fixed;
