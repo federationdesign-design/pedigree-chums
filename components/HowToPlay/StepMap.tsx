@@ -75,19 +75,34 @@ export default function StepMap({
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // double-tap detection on the card
+  // double-tap detection -- uses pointerUp so pan suppression never interferes
   const lastCardTap = useRef(0);
-  const handleCardTap = useCallback((e: React.MouseEvent | React.PointerEvent) => {
+  const cardTapMoved = useRef(false);
+
+  const handleCardPointerDown = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
-    if (suppressClick.current) return;
+    cardTapMoved.current = false;
+    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+  }, []);
+
+  const handleCardPointerMove = useCallback((e: React.PointerEvent) => {
+    e.stopPropagation();
+    if (Math.abs(e.movementX) > 4 || Math.abs(e.movementY) > 4) cardTapMoved.current = true;
+  }, []);
+
+  const handleCardPointerUp = useCallback((e: React.PointerEvent) => {
+    e.stopPropagation();
+    if (cardTapMoved.current) return;
     const now = Date.now();
-    if (now - lastCardTap.current < 400) {
+    if (now - lastCardTap.current < 450) {
       lastCardTap.current = 0;
       setOpenCount((c: number) => {
         const next = Math.min(c + 1, step.rows.length);
         if (next > c) {
-          setActiveText(next - 1);
-          awardRowImmediate(next - 1);
+          const newRow = next - 1;
+          setActiveText(newRow);
+          setOpenNodes((prev) => { const s = new Set(prev); s.add(newRow); return s; });
+          awardRowImmediate(newRow);
         }
         return next;
       });
@@ -95,6 +110,10 @@ export default function StepMap({
       lastCardTap.current = now;
     }
   }, [step.rows.length]);
+
+  const handleCardTap = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
   const awardRowImmediate = (rowIdx: number) => {
     const key = `${step.number}:${rowIdx}`;
@@ -203,6 +222,9 @@ export default function StepMap({
         zIndex: 2,
         border: "4px solid #ffed00",
       }}
+        onPointerDown={handleCardPointerDown}
+        onPointerMove={handleCardPointerMove}
+        onPointerUp={handleCardPointerUp}
         onClick={handleCardTap}
       >
         {/* video -- always mounted, plays as soon as browser is ready */}
