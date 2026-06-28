@@ -1024,7 +1024,7 @@ export default function PackPit() {
         if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 2000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         if (hit.plugin?.prop === "logopiece" && !hit.plugin.knockPiece) {
           // HTP step cards tapped in the pit -- open the overlay at the matching step
-          const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match the dog","Find as many as you can","Most matches wins"];
+          const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
           const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
           if (stepIdx !== -1) {
             const r = render.canvas.getBoundingClientRect();
@@ -2222,7 +2222,7 @@ export default function PackPit() {
         const pieces = ev?.detail?.pieces;
         if (!Array.isArray(pieces) || !stageRef.current) return;
         const sr = stageRef.current.getBoundingClientRect();
-        const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match the dog","Find as many as you can","Most matches wins"];
+        const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
         const MAX_CARD = BIG * 2.2; // cap cards to a sensible pit size regardless of overlay dimensions
         let stepcardIdx = 0;
         pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number; kind?: string }) => {
@@ -2278,7 +2278,7 @@ export default function PackPit() {
       };
       window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
       // poof the specific HTP step card when the user closes the lightbox after viewing it
-      const HTP_STEP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match the dog","Find as many as you can","Most matches wins"];
+      const HTP_STEP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
       const onHtpStepViewed = (ev: any) => {
         const idx = ev?.detail?.stepIdx;
         if (idx == null) return;
