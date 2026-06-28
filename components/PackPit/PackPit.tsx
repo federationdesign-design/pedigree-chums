@@ -1013,7 +1013,7 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
           clearCookieObjects(true); // keep reject in pit as inert with 20 hit life
           return true;
         }
-        if (hit.plugin?.kind === "cookiereject") { setCookieBannerOpen(false);
+        if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new Event("pc:cookies-rejected"));
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
           bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
