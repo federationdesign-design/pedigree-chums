@@ -66,6 +66,12 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
 
 export default function GameOver({ chums, score }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const idleTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const resetIdleTimer = () => {
+    if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = window.setTimeout(() => window.location.assign("/about"), 10000);
+  };
+  useEffect(() => { resetIdleTimer(); return () => { if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current); }; }, []);
 
   // Arcade name entry: array of char indices, one active column
   const [chars, setChars] = useState<number[]>(Array(MAX_NAME).fill(0));
@@ -138,17 +144,28 @@ export default function GameOver({ chums, score }: Props) {
     setEmailSaved(true);
   };
 
+  const [shareState, setShareState] = useState<"idle" | "copied" | "options">("idle");
+
   const handleShare = async () => {
     const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
+    const url = "https://pedigreechums.co.uk";
     if (navigator.share) {
-      try { await navigator.share({ title: "Pedigree Chums", text, url: "https://pedigreechums.co.uk" }); } catch {}
-    } else {
-      try { await navigator.clipboard.writeText(text); } catch {}
+      try { await navigator.share({ title: "Pedigree Chums", text, url }); return; } catch {}
     }
+    setShareState("options");
+    window.setTimeout(() => setShareState("idle"), 8000);
+  };
+
+  const shareVia = (method: "twitter" | "email" | "copy") => {
+    const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
+    const url = "https://pedigreechums.co.uk";
+    if (method === "twitter") window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank");
+    if (method === "email") window.open(`mailto:?subject=Pedigree Chums&body=${encodeURIComponent(text)}`, "_blank");
+    if (method === "copy") { navigator.clipboard.writeText(text).catch(() => {}); setShareState("copied"); window.setTimeout(() => setShareState("idle"), 2500); }
   };
 
   return (
-    <div ref={overlayRef} className={styles.overlay}>
+    <div ref={overlayRef} className={styles.overlay} onClick={resetIdleTimer} onKeyDown={resetIdleTimer}>
       {/* Replay button */}
       <button className={styles.closeBtn} onClick={() => window.location.reload()} type="button" aria-label="Play again">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
@@ -166,7 +183,7 @@ export default function GameOver({ chums, score }: Props) {
         {/* Title */}
         <h1 className={styles.title}>
           {chums === 0
-            ? "Ah deer, grab some chums next time!"
+            ? "You have no chums and your... tell you what, grab some chums next time!"
             : chums === 1
             ? "Well done, you found 1 chum!"
             : `Well done, you found ${chums} chums!`}
@@ -237,9 +254,19 @@ export default function GameOver({ chums, score }: Props) {
 
         {/* Actions */}
         <div className={styles.actions}>
-          <button className={styles.shareBtn} onClick={handleShare} type="button">
-            Share Score
-          </button>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <button className={styles.shareBtn} onClick={handleShare} type="button">
+              Share Score
+            </button>
+            {shareState === "options" && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className={styles.shareOption} onClick={() => shareVia("twitter")} type="button">X / Twitter</button>
+                <button className={styles.shareOption} onClick={() => shareVia("email")} type="button">Email</button>
+                <button className={styles.shareOption} onClick={() => shareVia("copy")} type="button">Copy link</button>
+              </div>
+            )}
+            {shareState === "copied" && <p style={{ color: "#22c55e", fontFamily: "'Luckiest Guy', system-ui", fontSize: 14, margin: 0 }}>Copied!</p>}
+          </div>
           <button className={styles.continueBtn} onClick={() => window.location.assign("/about")} type="button">
             Continue &rarr;
           </button>

@@ -5,7 +5,7 @@ import styles from "./StepMap.module.css";
 import { type StepData } from "./StepCard";
 
 const NODE_R = 34;
-const RING1 = 340;
+const RING1 = 228;
 const SPREAD1 = Math.PI * 1.6;
 const ROW_PTS = 400;
 const BONUS_PTS = 1000;

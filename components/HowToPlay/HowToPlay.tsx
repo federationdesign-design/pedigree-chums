@@ -119,7 +119,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         </p>
         <div className={styles.stepScroll}>
           {STEP_IMAGES.map((src, i) => (
-            <div key={src} className={styles.stepCard} data-htp-step={i}>
+            <div key={src} className={styles.stepCard} data-htp-step={i} onClick={(e) => { e.stopPropagation(); dropPiecesThenClose(); }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} />
               <div className={styles.stepCaption}>{"DEAL 3–6 CHUMS EACH,HEAD OUTSIDE,SPOT REAL DOGS,MATCH TO YOUR CHUM,FIND MORE CHUMS,MOST CHUMS WINS".split(",")[i]}</div>

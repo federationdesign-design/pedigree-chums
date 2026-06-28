@@ -71,50 +71,56 @@
 
 /* Leaderboard */
 .leaderboard {
-  width: 100%;
+  width: min(440px, 100%);
+  align-self: center;
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 .leaderTitle {
-  font-family: 'Luckiest Guy', system-ui;
-  font-size: clamp(13px, 1.8vw, 18px);
-  color: rgba(255,255,255,0.75);
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(11px, 1.4vw, 14px);
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
   text-align: center;
-  letter-spacing: 0.08em;
-  margin: 0 0 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
 }
 .leaderRow {
   display: grid;
-  grid-template-columns: 44px 1fr auto;
+  grid-template-columns: 28px 1fr auto;
   align-items: center;
-  padding: 12px 20px;
-  background: rgba(255,255,255,0.08);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  gap: 12px;
+  padding: 6px 12px;
+  background: rgba(0,0,0,0.35);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 8px;
 }
-.leaderRow:first-of-type { border-radius: 10px 10px 0 0; }
-.leaderRow:last-of-type { border-radius: 0 0 10px 10px; border-bottom: none; }
-.leaderRowHuman { background: rgba(255,237,0,0.12); }
+.leaderRow:first-of-type { border-radius: 6px 6px 0 0; }
+.leaderRow:last-of-type { border-radius: 0 0 6px 6px; border-bottom: none; }
+.leaderRowHuman { background: rgba(255,237,0,0.1); }
 .leaderPos {
-  font-family: 'Luckiest Guy', system-ui;
-  font-size: clamp(18px, 2.5vw, 26px);
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 700;
   color: #ffed00;
   text-align: center;
 }
 .leaderName {
-  font-family: Montserrat, sans-serif;
-  font-size: clamp(14px, 1.8vw, 18px);
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(13px, 1.6vw, 16px);
   font-weight: 700;
   color: #ffffff;
-  text-align: center;
+  text-align: left;
+  letter-spacing: 0.05em;
 }
 .leaderScore {
-  font-family: Montserrat, sans-serif;
-  font-size: clamp(14px, 1.8vw, 18px);
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(13px, 1.6vw, 16px);
   font-weight: 700;
-  color: rgba(255,255,255,0.8);
+  color: #ffed00;
   text-align: right;
+  letter-spacing: 0.05em;
 }
 
 /* Arcade name entry */
@@ -281,3 +287,18 @@
   margin: 0;
   letter-spacing: 0.04em;
 }
+
+.shareOption {
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(12px, 1.4vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0a3a57;
+  background: #ffed00;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(10,58,87,0.3);
+}
+.shareOption:hover { filter: brightness(0.95); }
