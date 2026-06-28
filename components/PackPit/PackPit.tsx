@@ -1049,10 +1049,23 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 2000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         if (hit.plugin?.prop === "logopiece" && !hit.plugin.knockPiece) {
-          // HTP step cards tapped in the pit -- open the overlay at the matching step
+          // HTP step cards tapped in the pit -- open in sequential order only
           const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
           const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
           if (stepIdx !== -1) {
+            // Check all previous steps have been opened
+            const allBodiesNow = dyn();
+            const prevBlocked = HTP_NAMES.slice(0, stepIdx).some(prevName => {
+              const prevCard = allBodiesNow.find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.name === prevName && !b.plugin?.opened);
+              return !!prevCard;
+            });
+            if (prevBlocked) {
+              // Flash the number of the step they need to open first
+              const firstLocked = HTP_NAMES.findIndex(n => allBodiesNow.find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.name === n && !b.plugin?.opened));
+              numAt(hit.position.x, hit.position.y, firstLocked + 1, 22, false);
+              return true;
+            }
+            hit.plugin.opened = true;
             const r = render.canvas.getBoundingClientRect();
             setHowToPlayCardPos({ x: r.left + hit.position.x, y: r.top + hit.position.y, w: hit.plugin.w || 120, h: hit.plugin.h || 120, angle: hit.angle || 0, image: hit.plugin.img?.src || "" });
             setHowToPlayStep(stepIdx); setHowToPlay(true); return true;
@@ -1353,6 +1366,20 @@ if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false; 
                 ctx.fillText(line2, 0, footerY + fs * 0.6);
               } else {
                 ctx.fillText(line1, 0, footerY);
+              }
+              // Hover: draw large yellow step number centred in the image area
+              if (hovered) {
+                const HTP_NAMES_H = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
+                const sIdx = HTP_NAMES_H.indexOf(b.plugin.name);
+                if (sIdx !== -1) {
+                  const numSize = Math.round(Math.max(illoH, illoW) * 0.5);
+                  ctx.font = `400 ${numSize}px "Luckiest Guy", system-ui, sans-serif`;
+                  ctx.fillStyle = "#ffed00";
+                  ctx.textAlign = "center";
+                  ctx.textBaseline = "middle";
+                  const iloMidY = -ph / 2 + BORDER + illoH / 2;
+                  ctx.fillText(String(sIdx + 1), 0, iloMidY);
+                }
               }
               ctx.restore(); return;
             }

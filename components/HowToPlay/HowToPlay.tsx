@@ -28,16 +28,17 @@ const STEP_IMAGES = [
 
 export default function HowToPlay({ open, onClose, onScore, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
-  // Pause pit while overview is open
-  useEffect(() => {
-    if (open && step === null) window.dispatchEvent(new Event("pc:overlay-opened"));
-    if (!open) window.dispatchEvent(new Event("pc:overlay-closed"));
-  }, [open, step]);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
   const [step, setStep] = useState<number | null>(activeStep ?? null);
   useEffect(() => { setStep(activeStep ?? null); }, [activeStep, open]);
+
+  // Pause pit while overview is open
+  useEffect(() => {
+    if (open && step === null) window.dispatchEvent(new Event("pc:overlay-opened"));
+    if (!open) window.dispatchEvent(new Event("pc:overlay-closed"));
+  }, [open, step]);
 
   useEffect(() => {
     if (!open) return;
