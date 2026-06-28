@@ -2441,41 +2441,42 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       };
       window.addEventListener("pc:britain-dismiss", onBritainDismiss);
       // Game over: tag each new body with its spawn time.
-      // In afterUpdate, check if any body spawned >3s ago is still in the top 10% of the pit.
-      // Top 10% = y < pitTop + pitHeight * 0.1. pitTop ~ 0, pitHeight ~ h (canvas height).
-      const spawnTimes = new Map<number, number>();
+      // Game over: only dog breed cards count (no props, logo, buttons, pills)
+      // Fires when the average resting Y of dog cards is above 35% of pit height
+      // meaning the pile is stacked more than a third of the way up.
+      const isDogCard = (b: any) =>
+        !b.isStatic &&
+        b.plugin &&
+        !b.plugin.prop &&
+        !b.plugin.logo &&
+        !b.plugin.kind &&          // breed cards have no kind
+        b.plugin.family !== null && // breed cards have a family
+        b.plugin.half > 20;        // exclude tiny bodies
+
+      const spawnTimes = new Map<number, number>(); // kept but only used for dog cards now
       const onAfterAdd = (event: any) => {
         const bodies = event.object?.bodies || (event.object ? [event.object] : []);
         const now = performance.now();
         for (const b of bodies) {
-          if (!b.isStatic && b.plugin) spawnTimes.set(b.id, now);
+          if (isDogCard(b)) spawnTimes.set(b.id, now);
         }
       };
       let lastFullCheck = 0;
       const onAfterUpdateGO = () => {
         const now = performance.now();
+        if (now - lastFullCheck < 10000) return; // check every 10s only
+        lastFullCheck = now;
         const pitH = render.canvas.height;
-        const threshold = pitH * 0.15; // top 15% of pit height (was 10%)
-        // Check newly spawned bodies
-        for (const [id, spawnT] of spawnTimes.entries()) {
-          if (now - spawnT < 3000) continue;
-          const b = Composite.allBodies(engine.world).find((x: any) => x.id === id);
-          if (!b) { spawnTimes.delete(id); continue; }
-          if (b.isStatic) { spawnTimes.delete(id); continue; }
-          if (b.position.y < threshold) {
-            window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
-            spawnTimes.clear(); return;
-          }
-          spawnTimes.delete(id);
-        }
-        // ALSO check all existing bodies every 5s -- catches full pit after drops stop
-        if (now - lastFullCheck > 5000) {
-          lastFullCheck = now;
-          const allB = Composite.allBodies(engine.world).filter((b: any) => !b.isStatic && b.plugin);
-          const inTop = allB.filter((b: any) => b.position.y < threshold);
-          if (inTop.length >= 3) {
-            window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
-          }
+        const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
+        if (allDogs.length < 8) return; // need at least 8 dog cards in pit before checking
+        // Only count settled dogs (low velocity)
+        const settled = allDogs.filter((b: any) => Math.hypot(b.velocity.x, b.velocity.y) < 1.5);
+        if (settled.length < 6) return; // need 6 settled
+        // Average Y of settled dogs -- lower Y = higher up in pit
+        const avgY = settled.reduce((s: number, b: any) => s + b.position.y, 0) / settled.length;
+        // If average resting position is in the top 35% of the pit, it is full
+        if (avgY < pitH * 0.35) {
+          window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
       };
       Events.on(engine.world, "afterAdd", onAfterAdd);
