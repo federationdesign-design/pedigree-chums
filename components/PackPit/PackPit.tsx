@@ -31,7 +31,9 @@ export default function PackPit() {
   const engineRef = useRef<any>(null);
   const pauseRef = useRef<() => void>(() => {});
   const resumeRef = useRef<() => void>(() => {});
+  const slowmoRef = useRef<() => void>(() => {});
   const [paused, setPaused] = useState(false);
+  const [slowmo, setSlowmo] = useState(false);
   const motionRef = useRef<() => void>(() => {});
   const shakeBtnRef = useRef<HTMLButtonElement>(null);
   const flashShakeRef = useRef<() => void>(() => {});
@@ -225,6 +227,7 @@ export default function PackPit() {
       runnerRef.current = runner;
       pauseRef.current = () => Runner.stop(runner);
       resumeRef.current = () => Runner.run(runner, engine);
+      slowmoRef.current = () => { engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1; };
       Runner.run(runner, engine);
 
       let walls: any[] = [];
@@ -2327,6 +2330,14 @@ export default function PackPit() {
       </div>
       <button
         type="button"
+        className={`${styles.slowmo}${slowmo ? " " + styles.slowmoActive : ""}`}
+        onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
+        aria-label={slowmo ? "Normal speed" : "Slow motion"}
+      >
+        {slowmo ? "1x" : "0.25x"}
+      </button>
+      <button
+        type="button"
         className={styles.pause}
         onClick={() => {
           if (paused) { resumeRef.current(); setPaused(false); }
@@ -2335,9 +2346,9 @@ export default function PackPit() {
         aria-label={paused ? "Resume" : "Pause"}
       >
         {paused ? (
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
         ) : (
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
         )}
       </button>
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">

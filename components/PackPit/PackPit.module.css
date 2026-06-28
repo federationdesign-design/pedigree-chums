@@ -52,7 +52,7 @@
    The old text instructions are gone; the button alone carries the action. */
 .controls {
   position: fixed;
-  bottom: calc(122px + env(safe-area-inset-bottom, 0px)); /* the running total sits above the shake button's spot */
+  top: clamp(16px, 3vw, 28px);
   right: clamp(18px, 4vw, 48px);
   z-index: 70;
   display: flex;
@@ -392,7 +392,7 @@
   .shelfPanel { padding: 24px 16px 18px; }
 }
 
-/* Pause button -- same shape as shake, sits above it */
+/* Pause button -- sits above shake */
 .pause {
   position: fixed;
   bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 84px + 12px);
@@ -414,4 +414,36 @@
 .pause:active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
+}
+/* Slow motion button -- sits above pause */
+.slowmo {
+  position: fixed;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 84px + 12px + 84px + 12px);
+  right: clamp(18px, 4vw, 48px);
+  z-index: 50;
+  width: 84px;
+  height: 84px;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: var(--yellow);
+  color: var(--navy);
+  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
+  pointer-events: auto;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+.slowmo:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
+}
+.slowmoActive {
+  background: var(--navy);
+  color: var(--yellow);
+  box-shadow: 0 5px 0 rgba(3, 87, 245, 0.4);
 }
