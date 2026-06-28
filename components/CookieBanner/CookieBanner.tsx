@@ -47,9 +47,10 @@ export default function CookieBanner() {
           &times;
         </button>
         <p className={styles.introText}>
-          We use cookies to make the site work and to show our product video. See our{" "}
+          We use cookies to make the site work and to show our product video. Tap the{" "}
+          <strong style={{ color: "#22b422" }}>green tick</strong> in the pit to accept, or see our{" "}
           <Link href="/cookies" className={styles.introLink}>Cookie Policy</Link>{" "}
-          for the details.
+          for the details. You can also reject cookies using the red button in the pit.
         </p>
       </div>
     </div>

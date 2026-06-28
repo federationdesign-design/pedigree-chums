@@ -821,13 +821,24 @@ export default function PackPit() {
       let downAt: { x: number; y: number } | null = null;
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
       // a consent choice clears every cookie object from the pit (the policy SVGs and both buttons)
-      const clearCookieObjects = () => {
+      const clearCookieObjects = (keepReject = false) => {
         for (const b of Composite.allBodies(engine.world)) {
           if (b.plugin?.kind === "cookies") { poof(b.position.x, b.position.y, b.plugin.half || 40); Composite.remove(engine.world, b); }
         }
         cookiesBody = null;
         if (acceptBody) { Composite.remove(engine.world, acceptBody); acceptBody = null; }
-        if (rejectBody) { Composite.remove(engine.world, rejectBody); rejectBody = null; }
+        if (rejectBody) {
+          if (keepReject) {
+            // leave reject in pit but make it inert with 20 hit life like yellow circles
+            rejectBody.plugin.inert = true;
+            rejectBody.plugin.hits = 0;
+            rejectBody.plugin.maxHits = 20;
+            rejectBody.plugin.kind = "cookiereject-inert";
+            rejectBody = null; // stop tracking -- it will poof naturally on hits
+          } else {
+            Composite.remove(engine.world, rejectBody); rejectBody = null;
+          }
+        }
       };
       const tapButton = (pt: { x: number; y: number }) => {
         if (menuBody && menuBody.isStatic && Query.point([menuBody], pt).length) { window.dispatchEvent(new Event("pc:open-menu")); return true; } // tap the fixed menu before it dislodges
@@ -863,7 +874,7 @@ export default function PackPit() {
           bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
           bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
           numAt(ax, ay, 2000); // the big payoff pops out of the starburst
-          clearCookieObjects(); // the buttons and the cookie SVG all vanish
+          clearCookieObjects(true); // keep reject in pit as inert with 20 hit life
           return true;
         }
         if (hit.plugin?.kind === "cookiereject") {
@@ -1868,10 +1879,18 @@ export default function PackPit() {
       const onLogoPieceHit = (ev: any) => {
         for (const pair of ev.pairs) {
           for (const b of [pair.bodyA, pair.bodyB] as any[]) {
-            if (!b?.plugin?.knockPiece || b.isStatic) continue; // only the logo knock-off pieces, not the How-it-works boxes
-            b.plugin.hits = (b.plugin.hits || 0) + 1;
-            numAt(b.position.x, b.position.y, 1); // +1 per hit
-            if (b.plugin.hits >= 10) { poof(b.position.x, b.position.y, b.plugin.half || 14); Composite.remove(engine.world, b); } // poof then gone after 10
+            // logo knock-off pieces poof after 10 hits
+            if (b?.plugin?.knockPiece && !b.isStatic) {
+              b.plugin.hits = (b.plugin.hits || 0) + 1;
+              numAt(b.position.x, b.position.y, 1);
+              if (b.plugin.hits >= 10) { poof(b.position.x, b.position.y, b.plugin.half || 14); Composite.remove(engine.world, b); }
+            }
+            // inert reject button poofs after 20 hits
+            if (b?.plugin?.kind === "cookiereject-inert" && !b.isStatic) {
+              b.plugin.hits = (b.plugin.hits || 0) + 1;
+              numAt(b.position.x, b.position.y, 1);
+              if (b.plugin.hits >= 20) { poof(b.position.x, b.position.y, b.plugin.half || 30); Composite.remove(engine.world, b); }
+            }
           }
         }
       };
