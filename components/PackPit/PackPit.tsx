@@ -1251,7 +1251,7 @@ export default function PackPit() {
               const BORDER = 6, FOOTER = Math.round(ph * 0.2), RADIUS = pw * 0.1;
               // Outer yellow rounded rect
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
-              ctx.fillStyle = "#ffd23e"; ctx.fill();
+              ctx.fillStyle = "#ffed00"; ctx.fill();
               // Inner illustration area (above footer)
               const illoH = ph - FOOTER - BORDER * 2;
               rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, pw - BORDER * 2, illoH, RADIUS * 0.7);
@@ -2184,16 +2184,22 @@ export default function PackPit() {
         if (!Array.isArray(pieces) || !stageRef.current) return;
         const sr = stageRef.current.getBoundingClientRect();
         const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match the dog","Find as many as you can"];
+        const MAX_CARD = BIG * 2.2; // cap cards to a sensible pit size regardless of overlay dimensions
         let stepcardIdx = 0;
         pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number; kind?: string }) => {
           const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top;
-          const pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
+          let pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
+          // Scale step cards down if they're coming from a large overlay
+          if (pc.kind === "stepcard" && pw > MAX_CARD) {
+            const scale = MAX_CARD / pw;
+            pw = MAX_CARD; ph = ph * scale;
+          }
           let b: any;
           if (pc.kind === "circle") {
-            // Blue circle -- circular body for accurate physics
-            const r = pw / 2;
+            // Scale circle to match card size proportionally
+            const r = Math.min(pw / 2, MAX_CARD * 0.18);
             b = Bodies.circle(cx, cy, r, { restitution: 0.5, friction: 0.3, frictionAir: 0.006, density: 0.0007, render: { visible: false } });
-            b.plugin = { name: "How to play", label: "", half: r, w: pw, h: ph, color: "#009fe0", img: getImg("htp:blue-circle", "/blue-circle.svg"), prop: "logopiece", family: null, ping: 0, kind: "htpcircle" };
+            b.plugin = { name: "How to play", label: "", half: r, w: r * 2, h: r * 2, color: "#009fe0", img: getImg("htp:blue-circle", "/blue-circle.svg"), prop: "logopiece", family: null, ping: 0, kind: "htpcircle" };
           } else {
             // Step card -- tight rectangle body sized to actual rendered card frame
             b = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.12 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
