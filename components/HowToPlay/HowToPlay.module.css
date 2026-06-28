@@ -390,3 +390,84 @@
   .lightboxNext { right: 8px; }
   .lightboxClose { top: 8px; right: 8px; }
 }
+
+/* ------------------------------------------------------------------ */
+/* New CSS-built step cards -- replaces old image strip                */
+/* ------------------------------------------------------------------ */
+.cardRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: clamp(20px, 3vw, 36px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin-left: calc(0px - clamp(28px, 4vw, 64px));
+  margin-right: calc(0px - clamp(28px, 4vw, 64px));
+  padding: 28px clamp(28px, 4vw, 64px) 12px;
+}
+.cardRow::-webkit-scrollbar { display: none; }
+
+.stepCard {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(140px, 18vw, 200px);
+  border-radius: 16px;
+  background: #0357f5;
+  overflow: visible;
+  scroll-snap-align: center;
+  box-shadow: 0 6px 20px rgba(10, 58, 87, 0.35);
+}
+
+/* Blue circle + number -- sits top-left, overlaps the card corner */
+.stepCircle {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
+  background: url('/blue-circle.svg') center / contain no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.stepNum {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Illustration -- square, fills card top */
+.stepIllo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+}
+
+/* Footer caption bar */
+.stepFooter {
+  padding: 8px 10px 10px;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(9px, 1.1vw, 13px);
+  color: var(--yellow, #ffd23e);
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .cardRow {
+    gap: 10px;
+  }
+  .stepCard {
+    width: clamp(130px, 42vw, 180px);
+  }
+}

@@ -2146,13 +2146,25 @@ export default function PackPit() {
         const pieces = ev?.detail?.pieces;
         if (!Array.isArray(pieces) || !stageRef.current) return;
         const sr = stageRef.current.getBoundingClientRect();
-        pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number }) => {
-          const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top; // screen rect -> pit centre
+        const HTP_NAMES = ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"];
+        let stepcardIdx = 0;
+        pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number; kind?: string }) => {
+          const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top;
           const pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
-          const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.14 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
-          b.plugin = { name: ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"][Math.min(pieces.indexOf(pc), 4)] || "How it works", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0 };
-          Composite.add(engine.world, b); // falls straight from where it sat in the popup
-          setScore((s) => s + 500); // 500 points per piece as it drops in
+          let b: any;
+          if (pc.kind === "circle") {
+            // Blue circle -- circular body for accurate physics
+            const r = pw / 2;
+            b = Bodies.circle(cx, cy, r, { restitution: 0.5, friction: 0.3, frictionAir: 0.006, density: 0.0007, render: { visible: false } });
+            b.plugin = { name: "How to play", label: "", half: r, w: pw, h: ph, color: "#009fe0", img: getImg("htp:blue-circle", "/blue-circle.svg"), prop: "logopiece", family: null, ping: 0, kind: "htpcircle" };
+          } else {
+            // Step card -- tight rectangle body sized to actual rendered card frame
+            b = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.12 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+            const name = pc.kind === "stepcard" ? (HTP_NAMES[stepcardIdx++] || "How it works") : (HTP_NAMES[Math.min(stepcardIdx, 4)] || "How it works");
+            b.plugin = { name, label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "stepcard" };
+          }
+          Composite.add(engine.world, b);
+          setScore((s) => s + 500);
         });
       };
       window.addEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);

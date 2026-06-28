@@ -12,7 +12,13 @@ type Props = {
   cardPos?: { x: number; y: number; w: number; h: number; angle: number; image: string } | null;
 };
 
-const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
+const CAPTIONS = [
+  "Deal a few cards evenly among the players",
+  "The game starts right away",
+  "Look for a real life dog",
+  "See if they match your cards",
+  "Find the most to win",
+];
 
 const OVERVIEW_STEPS = [
   "Deal 3\u20136 cards per player",
@@ -22,8 +28,16 @@ const OVERVIEW_STEPS = [
   "The player with the most pedigree chums wins",
 ];
 
+// Card dimensions -- physics body will use these exact values
+const CARD_W = 200;  // px in the overlay (scales with CSS)
+const CARD_ASPECT = 1.35; // height / width ratio
+const CARD_H = Math.round(CARD_W * CARD_ASPECT);
+const FOOTER_H = 44; // caption footer height
+
 export default function HowToPlay({ open, onClose, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const circleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -50,7 +64,6 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
 
   if (!open || typeof document === "undefined") return null;
 
-  // Close from step card -- fire poof event then close
   const closeStepCard = () => {
     if (step !== null) {
       window.dispatchEvent(new CustomEvent("pc:howtoplay-step-viewed", { detail: { stepIdx: step } }));
@@ -58,38 +71,51 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
     onClose();
   };
 
-  // Close from overview -- drop pieces into pit
   const dropPiecesThenClose = () => {
     try {
-      const pieces: { src: string; x: number; y: number; w: number; h: number }[] = [];
-      const push = (el: Element | null, src: string) => {
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        if (r.width < 2 || r.height < 2) return;
-        pieces.push({ src, x: r.left, y: r.top, w: r.width, h: r.height });
-      };
+      const pieces: { src: string; x: number; y: number; w: number; h: number; kind?: string }[] = [];
       const root = stageElRef.current;
+
       if (root) {
-        const strip = root.querySelector("img[alt='How to play, step by step']") as HTMLElement | null;
-        if (strip) {
-          const r = strip.getBoundingClientRect();
-          if (r.width > 2 && r.height > 2) {
-            const colW = r.width / 5;
-            for (let i = 0; i < 5; i++) pieces.push({ src: `/step${i + 1}.png`, x: r.left + i * colW, y: r.top, w: colW, h: r.height });
-          } else {
-            // strip hidden on mobile -- drop 5 step cards from top centre with spacing
-            const vw = window.innerWidth;
-            const cardW = Math.round(vw * 0.28);
-            const cardH = Math.round(cardW * 1.35);
-            for (let i = 0; i < 5; i++) {
-              pieces.push({ src: `/step${i + 1}.png`, x: vw * 0.1 + (i % 3) * (cardW + 8), y: -cardH * Math.floor(i / 3) - 20, w: cardW, h: cardH });
-            }
-          }
-        }
+        // Drop each step card using its actual rendered bounds
+        cardRefs.current.forEach((el, i) => {
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) return;
+          pieces.push({
+            src: `/raw-step${i + 1}.jpg`,
+            x: r.left, y: r.top,
+            w: r.width, h: r.height,
+            kind: "stepcard",
+          });
+        });
+
+        // Drop each blue circle separately
+        circleRefs.current.forEach((el, i) => {
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) return;
+          pieces.push({
+            src: "/blue-circle.svg",
+            x: r.left, y: r.top,
+            w: r.width, h: r.height,
+            kind: "circle",
+          });
+        });
+
+        // Logo and deco
+        const push = (el: Element | null, src: string) => {
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) return;
+          pieces.push({ src, x: r.left, y: r.top, w: r.width, h: r.height });
+        };
         push(root.querySelector("[data-htp='logo']"), "/dogbingo.svg");
         root.querySelectorAll("[data-htp='deco']").forEach((el: Element) => push(el, "/yellow-triangle.svg"));
+        // Yellow numbers -- now rendered on the circle, drop separately
         root.querySelectorAll("[data-htp='num']").forEach((el: Element, i: number) => push(el, `/${i + 1}object.svg`));
       }
+
       if (pieces.length) window.dispatchEvent(new CustomEvent("pc:howtoplay-drop", { detail: { pieces } }));
     } catch {
       /* close cleanly */
@@ -121,24 +147,41 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
           How <span className={styles.accent}>it works</span>
         </h3>
 
-        <div className={styles.stripWrap}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/how-to-play-comic-strip.png"
-            alt="How to play, step by step"
-            className={styles.strip}
-          />
-        </div>
-
-        <div className={styles.stepScroll}>
-          {STEP_IMAGES.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={src}
-              src={src}
-              alt={`How to play, step ${i + 1}`}
-              className={styles.stepImg}
-            />
+        {/* New CSS-built step cards -- replace old image strip */}
+        <div className={styles.cardRow}>
+          {[1, 2, 3, 4, 5].map((n, i) => (
+            <div
+              key={n}
+              className={styles.stepCard}
+              ref={(el) => { cardRefs.current[i] = el; }}
+            >
+              {/* Blue circle + yellow number -- separate physics body */}
+              <div
+                className={styles.stepCircle}
+                ref={(el) => { circleRefs.current[i] = el; }}
+                data-htp="num"
+                aria-hidden="true"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/${n}object.svg`}
+                  alt=""
+                  aria-hidden="true"
+                  className={styles.stepNum}
+                />
+              </div>
+              {/* Card illustration */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/raw-step${n}.jpg`}
+                alt={`Step ${n}`}
+                className={styles.stepIllo}
+              />
+              {/* Footer caption */}
+              <div className={styles.stepFooter}>
+                {CAPTIONS[i]}
+              </div>
+            </div>
           ))}
         </div>
 
@@ -149,7 +192,7 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
         <ol className={styles.steps}>
           {OVERVIEW_STEPS.map((s) => (
             <li key={s} className={styles.step}>
-              <span className={styles.num} data-htp="num" aria-hidden="true" />
+              <span className={styles.num} aria-hidden="true" />
               <span className={styles.text}>{s}</span>
             </li>
           ))}
