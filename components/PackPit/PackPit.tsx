@@ -134,10 +134,8 @@ export default function PackPit() {
     if (overlayOpen && !autoSlowmoRef.current) {
       autoSlowmoRef.current = true;
       // Engage slowmo without flagging slowmoActiveRef (so drain stays normal)
-      if (slowmoRef.current) {
-        const engine = engineRef.current;
-        if (engine && engine.timing.timeScale === 1) engine.timing.timeScale = 0.25;
-      }
+         const engine = engineRef.current;
+      if (engine && engine.timing.timeScale === 1) engine.timing.timeScale = 0.25;
     } else if (!overlayOpen && autoSlowmoRef.current) {
       autoSlowmoRef.current = false;
       // Only restore if user hasn't manually engaged slowmo
