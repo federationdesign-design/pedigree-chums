@@ -5,8 +5,8 @@ import styles from "./StepMap.module.css";
 import { type StepData } from "./StepCard";
 
 const ROOT_HALF = 58;
-const RING1 = ROOT_HALF + 110;
-const SPREAD1 = Math.PI * 1.5;
+const RING1 = ROOT_HALF + 120;
+const SPREAD1 = Math.PI * 1.6;
 const NODE_R = 44;
 const ROW_PTS = 400;
 const BONUS_PTS = 1000;
@@ -58,31 +58,51 @@ export default function StepMap({
   const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
 
-  // openCount drives sequential unlocking: node i unlocks when openCount > i
-  // double-tap the card increments openCount
+  // openCount: each double-tap on card unlocks the next node
   const [openCount, setOpenCount] = useState(0);
   useEffect(() => setOpenCount(0), [step.number]);
 
-  // track which node's text is currently shown (null = none)
-  const [shownNode, setShownNode] = useState<number | null>(null);
-  useEffect(() => setShownNode(null), [step.number]);
+  // openNodes: set of permanently opened node rows (never closes)
+  const [openNodes, setOpenNodes] = useState<Set<number>>(new Set());
+  useEffect(() => setOpenNodes(new Set()), [step.number]);
+
+  // activeText: which node's text is currently displayed (only one at a time)
+  const [activeText, setActiveText] = useState<number | null>(null);
+  useEffect(() => setActiveText(null), [step.number]);
+
+  // videoReady: whether the card has been opened (show video)
+  const [videoReady, setVideoReady] = useState(false);
+  useEffect(() => setVideoReady(false), [step.number]);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // double-tap detection on the card
   const lastCardTap = useRef(0);
-  const handleCardDoubleTap = useCallback((e: React.MouseEvent | React.PointerEvent) => {
+  const handleCardTap = useCallback((e: React.MouseEvent | React.PointerEvent) => {
     e.stopPropagation();
+    if (suppressClick.current) return;
     const now = Date.now();
     if (now - lastCardTap.current < 400) {
       lastCardTap.current = 0;
+      if (!videoReady) setVideoReady(true);
       setOpenCount((c: number) => {
         const next = Math.min(c + 1, step.rows.length);
-        if (next > c) setShownNode(next - 1);
+        if (next > c) {
+          // auto-show the newly unlocked node text
+          setActiveText(next - 1);
+          awardRowImmediate(next - 1);
+        }
         return next;
       });
     } else {
       lastCardTap.current = now;
     }
-  }, [step.rows.length]);
+  }, [step.rows.length, videoReady]);
+
+  const awardRowImmediate = (rowIdx: number) => {
+    const key = `${step.number}:${rowIdx}`;
+    if (seenRows.has(key)) return;
+    seenRows.add(key);
+  };
 
   const awardRow = useCallback((rowIdx: number) => {
     const key = `${step.number}:${rowIdx}`;
@@ -96,7 +116,10 @@ export default function StepMap({
   const tapNode = useCallback((n: StepNode, unlocked: boolean) => {
     if (suppressClick.current) { suppressClick.current = false; return; }
     if (!unlocked) return;
-    setShownNode((prev: number | null) => prev === n.row ? null : n.row);
+    // mark permanently open
+    setOpenNodes((prev) => { const next = new Set(prev); next.add(n.row); return next; });
+    // show this node's text (toggle off if already showing, but keep node open)
+    setActiveText((prev: number | null) => prev === n.row ? null : n.row);
     awardRow(n.row);
   }, [awardRow]);
 
@@ -120,8 +143,8 @@ export default function StepMap({
       const rng = (n: number) => ((Math.sin(seed + n * 91.7) + 1) / 2);
       const baseAngle = Math.PI / 2;
       const a = baseAngle + (i - (cnt - 1) / 2) * (SPREAD1 / Math.max(cnt, 2));
-      const jitter = (rng(i) - 0.5) * 0.45;
-      const dist = RING1 + rng(i + 10) * 60;
+      const jitter = (rng(i) - 0.5) * 0.3;
+      const dist = RING1 + rng(i + 10) * 50;
       const angle = a + jitter;
       return {
         id: `${step.number}:${i}`,
@@ -137,6 +160,28 @@ export default function StepMap({
   const illoH = ch - FOOTER - BORDER * 2;
   const allUnlocked = openCount >= step.rows.length;
 
+  // Work out safe text position: keep text away from the card rect
+  const cardLeft = cx + pan.x - cw / 2;
+  const cardRight = cx + pan.x + cw / 2;
+  const cardTop = cy + pan.y - ch / 2;
+  const cardBottom = cy + pan.y + ch / 2;
+
+  const getTextPos = (nx: number, ny: number) => {
+    const textW = 300;
+    const textH = 120;
+    // prefer right of node
+    let tx = nx + NODE_R + 24;
+    let ty = ny - 20;
+    // if right side overlaps card, try left
+    if (tx < cardRight && tx + textW > cardLeft && ty < cardBottom && ty + textH > cardTop) {
+      tx = nx - NODE_R - 24 - textW;
+    }
+    // clamp to viewport
+    tx = Math.max(12, Math.min(vp.w - textW - 12, tx));
+    ty = Math.max(12, Math.min(vp.h - textH - 80, ty));
+    return { tx, ty };
+  };
+
   return (
     <div
       className={styles.overlay}
@@ -146,19 +191,67 @@ export default function StepMap({
       onPointerCancel={onPanUp}
       onClick={() => { if (suppressClick.current) suppressClick.current = false; }}
     >
+      {/* Video card -- rendered in HTML so it actually plays */}
+      {videoReady && (
+        <div style={{
+          position: "fixed",
+          left: cx + pan.x - cw / 2,
+          top: cy + pan.y - ch / 2,
+          width: cw,
+          height: ch,
+          borderRadius: cw * 0.1,
+          overflow: "hidden",
+          pointerEvents: "all",
+          cursor: "pointer",
+          zIndex: 2,
+          border: "4px solid #ffed00",
+        }}
+          onClick={handleCardTap}
+        >
+          <video
+            ref={videoRef}
+            src={`/step${step.number}-video-animation.mp4`}
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+          {/* step number badge */}
+          <div style={{
+            position: "absolute", top: 8, right: 8,
+            width: 26, height: 26, borderRadius: "50%",
+            background: "#009fe0", display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, color: "#fff",
+          }}>
+            {step.number}
+          </div>
+          {/* double-tap hint while not all unlocked */}
+          {!allUnlocked && (
+            <div style={{
+              position: "absolute", bottom: 6, left: 0, right: 0,
+              textAlign: "center", fontFamily: "Montserrat, sans-serif",
+              fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.8)",
+            }}>
+              double-tap to reveal
+            </div>
+          )}
+        </div>
+      )}
+
       <svg
         style={{ position: "fixed", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
         aria-hidden="true"
       >
         <defs>
-          {cardImg && (
+          {!videoReady && cardImg && (
             <clipPath id="sm-card-clip">
               <rect x={-cw / 2 + BORDER} y={-ch / 2 + BORDER} width={cw - BORDER * 2} height={illoH} rx={cw * 0.07} />
             </clipPath>
           )}
         </defs>
 
-        {/* Edge lines -- only to unlocked nodes */}
+        {/* Edge lines */}
         {nodes.map((n) => {
           const unlocked = n.row < openCount;
           return (
@@ -168,123 +261,138 @@ export default function StepMap({
               y1={cy + pan.y}
               x2={n.x + pan.x}
               y2={n.y + pan.y}
-              stroke={unlocked ? "rgba(255,237,0,0.7)" : "rgba(255,255,255,0.2)"}
+              stroke={unlocked ? "rgba(255,237,0,0.8)" : "rgba(255,255,255,0.3)"}
               strokeWidth={unlocked ? 3 : 1.5}
               strokeDasharray={unlocked ? undefined : "6 8"}
             />
           );
         })}
 
-        {/* Root card -- double-tap to unlock nodes */}
-        <g
-          transform={`translate(${cx + pan.x},${cy + pan.y})`}
-          style={{ pointerEvents: "all", cursor: "pointer" }}
-          onClick={handleCardDoubleTap}
-        >
-          <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} fill="transparent" />
-          <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={cw * 0.1} fill="#ffed00" />
-          {cardImg && (
-            <>
-              <image
-                href={cardImg}
-                x={-cw / 2 + BORDER} y={-ch / 2 + BORDER}
-                width={cw - BORDER * 2} height={illoH}
-                clipPath="url(#sm-card-clip)"
-                preserveAspectRatio="xMidYMid slice"
-              />
-              <text
-                x={0} y={ch / 2 - FOOTER / 2}
-                textAnchor="middle" dominantBaseline="central"
-                fontFamily="'Luckiest Guy', system-ui"
-                fontSize={Math.max(8, Math.round(FOOTER * 0.28))}
-                fill="#0a3a57"
-              >
-                {step.caption}
-              </text>
-            </>
-          )}
-          <circle cx={cw / 2 - 14} cy={-ch / 2 + 14} r={13} fill="#009fe0" />
-          <text x={cw / 2 - 14} y={-ch / 2 + 14} textAnchor="middle" dominantBaseline="central"
-            fontFamily="'Luckiest Guy',system-ui" fontSize={12} fill="#ffffff">
-            {step.number}
-          </text>
-          {!allUnlocked && (
-            <circle cx={0} cy={0} r={Math.max(cw, ch) * 0.6}
-              fill="none" stroke="rgba(255,237,0,0.25)" strokeWidth={2} strokeDasharray="4 6" />
-          )}
-        </g>
+        {/* Static card (before video) */}
+        {!videoReady && (
+          <g
+            transform={`translate(${cx + pan.x},${cy + pan.y})`}
+            style={{ pointerEvents: "all", cursor: "pointer" }}
+            onClick={handleCardTap}
+          >
+            <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={cw * 0.1} fill="#ffed00" />
+            {cardImg && (
+              <>
+                <image
+                  href={cardImg}
+                  x={-cw / 2 + BORDER} y={-ch / 2 + BORDER}
+                  width={cw - BORDER * 2} height={illoH}
+                  clipPath="url(#sm-card-clip)"
+                  preserveAspectRatio="xMidYMid slice"
+                />
+                <text
+                  x={0} y={ch / 2 - FOOTER / 2}
+                  textAnchor="middle" dominantBaseline="central"
+                  fontFamily="'Luckiest Guy', system-ui"
+                  fontSize={Math.max(8, Math.round(FOOTER * 0.28))}
+                  fill="#0a3a57"
+                >
+                  {step.caption}
+                </text>
+              </>
+            )}
+            <circle cx={cw / 2 - 14} cy={-ch / 2 + 14} r={13} fill="#009fe0" />
+            <text x={cw / 2 - 14} y={-ch / 2 + 14} textAnchor="middle" dominantBaseline="central"
+              fontFamily="'Luckiest Guy',system-ui" fontSize={12} fill="#ffffff">
+              {step.number}
+            </text>
+            {/* pulse ring hint */}
+            <circle cx={0} cy={0} r={Math.max(cw, ch) * 0.62}
+              fill="none" stroke="rgba(255,237,0,0.3)" strokeWidth={2} strokeDasharray="5 7" />
+          </g>
+        )}
 
-        {/* Nodes */}
+        {/* Nodes -- always fully visible, numbers always shown */}
         {nodes.map((n) => {
-          const nx = n.x + pan.x;
-          const ny = n.y + pan.y;
           const unlocked = n.row < openCount;
-          const isShown = shownNode === n.row;
+          const isOpen = openNodes.has(n.row);
+          const isActive = activeText === n.row;
           const row = step.rows[n.row];
           const nodeNum = n.row + 1;
-          const textW = 320;
-          const textX = nx + NODE_R + 20 + textW < vp.w ? NODE_R + 20 : -(NODE_R + 20 + textW);
+          const nx = n.x + pan.x;
+          const ny = n.y + pan.y;
+          const { tx, ty } = getTextPos(nx, ny);
 
           return (
             <g key={n.id}>
+              {/* Node */}
               <g
                 transform={`translate(${nx},${ny})`}
                 style={{ pointerEvents: unlocked ? "all" : "none", cursor: unlocked ? "pointer" : "default" }}
                 onClick={(e) => { e.stopPropagation(); tapNode(n, unlocked); }}
               >
-                {!unlocked && (
-                  <circle r={NODE_R} fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} strokeDasharray="4 5" />
-                )}
+                {/* icon -- full opacity always, yellow tint when open */}
                 <image
                   href={row.icon}
-                  x={-NODE_R * 0.75} y={-NODE_R * 0.75}
-                  width={NODE_R * 1.5} height={NODE_R * 1.5}
+                  x={-NODE_R * 0.8} y={-NODE_R * 0.8}
+                  width={NODE_R * 1.6} height={NODE_R * 1.6}
                   style={{
-                    opacity: unlocked ? 1 : 0.3,
-                    filter: isShown ? "brightness(0) saturate(100%) invert(93%) sepia(67%) saturate(500%) hue-rotate(0deg)" : "none",
+                    filter: isOpen
+                      ? "brightness(0) saturate(100%) invert(93%) sepia(67%) saturate(600%) hue-rotate(0deg) drop-shadow(0 0 6px rgba(255,237,0,0.8))"
+                      : unlocked
+                        ? "drop-shadow(0 2px 4px rgba(0,0,0,0.4))"
+                        : "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
                   }}
                 />
-                <circle cx={NODE_R * 0.65} cy={-NODE_R * 0.65} r={12}
-                  fill={unlocked ? "#ffed00" : "rgba(255,255,255,0.2)"}
-                  stroke={unlocked ? "#0a3a57" : "rgba(255,255,255,0.3)"}
-                  strokeWidth={1.5} />
+                {/* number badge -- always visible */}
+                <circle
+                  cx={NODE_R * 0.7} cy={-NODE_R * 0.7} r={13}
+                  fill={unlocked ? "#ffed00" : "rgba(255,255,255,0.85)"}
+                  stroke={unlocked ? "#0a3a57" : "rgba(0,0,0,0.2)"}
+                  strokeWidth={1.5}
+                />
                 <text
-                  x={NODE_R * 0.65} y={-NODE_R * 0.65}
+                  x={NODE_R * 0.7} y={-NODE_R * 0.7}
                   textAnchor="middle" dominantBaseline="central"
                   fontFamily="'Luckiest Guy',system-ui"
-                  fontSize={11}
-                  fill={unlocked ? "#0a3a57" : "rgba(255,255,255,0.5)"}
+                  fontSize={12}
+                  fill={unlocked ? "#0a3a57" : "#555"}
                 >
                   {nodeNum}
                 </text>
+                {/* locked indicator ring */}
+                {!unlocked && (
+                  <circle r={NODE_R + 4} fill="none"
+                    stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} strokeDasharray="4 5" />
+                )}
               </g>
 
-              {isShown && unlocked && (
-                <g transform={`translate(${nx},${ny})`} style={{ pointerEvents: "none" }}>
+              {/* Text -- large, naked, positioned away from card */}
+              {isActive && unlocked && (
+                <g style={{ pointerEvents: "none" }}>
+                  {/* title */}
                   <text
-                    x={textX} y={-NODE_R * 0.5}
+                    x={tx} y={ty}
                     fontFamily="'Luckiest Guy', system-ui"
-                    fontSize={32}
+                    fontSize={34}
                     fill="#ffffff"
-                    style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.6))" }}
+                    dominantBaseline="hanging"
+                    style={{ filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.7))" }}
                   >
                     {row.title}
                   </text>
+                  {/* body lines */}
                   {row.body.split(/\s+/).reduce((lines: string[], word: string) => {
                     if (lines.length === 0) return [word];
                     const last = lines[lines.length - 1];
-                    return last.length + word.length < 22
+                    return last.length + word.length < 20
                       ? [...lines.slice(0, -1), last + " " + word]
                       : [...lines, word];
                   }, []).map((line: string, li: number) => (
                     <text
                       key={li}
-                      x={textX} y={-NODE_R * 0.5 + 38 + li * 30}
+                      x={tx} y={ty + 46 + li * 32}
                       fontFamily="Montserrat, sans-serif"
                       fontSize={22}
-                      fontWeight="600"
-                      fill="rgba(255,255,255,0.92)"
-                      style={{ filter: "drop-shadow(0 1px 4px rgba(0,0,0,0.7))" }}
+                      fontWeight="700"
+                      fill="rgba(255,255,255,0.95)"
+                      dominantBaseline="hanging"
+                      style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.8))" }}
                     >
                       {line}
                     </text>
@@ -295,16 +403,17 @@ export default function StepMap({
           );
         })}
 
-        {!allUnlocked && (
+        {/* Double-tap hint below card when not yet started */}
+        {!videoReady && (
           <text
-            x={cx + pan.x} y={cy + pan.y + ch / 2 + 28}
+            x={cx + pan.x} y={cy + pan.y + ch / 2 + 26}
             textAnchor="middle"
             fontFamily="Montserrat, sans-serif"
-            fontSize={14}
+            fontSize={13}
             fontWeight="600"
-            fill="rgba(255,255,255,0.55)"
+            fill="rgba(255,255,255,0.6)"
           >
-            double-tap card to reveal
+            double-tap to reveal
           </text>
         )}
       </svg>
