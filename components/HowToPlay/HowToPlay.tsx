@@ -144,9 +144,33 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
   }
 
   // --- Full overview ---
+  // Position the panel so it expands from the HTP card's location in the pit
+  const stageStyle: React.CSSProperties = (() => {
+    if (!cardPos) return {};
+    const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
+    const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+    const panelW = Math.min(vw * 0.94, 1180);
+    const panelH = Math.min(vh * 0.9, 900);
+    // Anchor to card position, clamp so panel stays on screen
+    let left = cardPos.x - panelW * 0.15; // slight offset left so card is near top-left of panel
+    let top = cardPos.y - panelH * 0.1;
+    left = Math.max(12, Math.min(vw - panelW - 12, left));
+    top = Math.max(12, Math.min(vh - panelH - 12, top));
+    // transform-origin relative to the panel so animation expands from card point
+    const ox = cardPos.x - left;
+    const oy = cardPos.y - top;
+    return {
+      position: "fixed" as const,
+      left,
+      top,
+      width: panelW,
+      transformOrigin: `${ox}px ${oy}px`,
+    };
+  })();
+
   return createPortal(
     <div className={styles.overlay} onClick={dropPiecesThenClose}>
-      <div className={styles.stage} ref={stageElRef} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+      <div className={styles.stage} ref={stageElRef} style={stageStyle} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <button type="button" className={styles.close} onClick={dropPiecesThenClose} aria-label="Close">
           &times;
         </button>
