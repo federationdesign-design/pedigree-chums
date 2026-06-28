@@ -101,6 +101,11 @@ export default function StepMap({
     if (now - lastCardTap.current < 450) {
       lastCardTap.current = 0;
       setOpenCount((c: number) => {
+        if (c >= step.rows.length) {
+          // All nodes already open -- double-tap closes
+          onClose();
+          return c;
+        }
         const next = Math.min(c + 1, step.rows.length);
         if (next > c) {
           const row = next - 1;
@@ -110,7 +115,6 @@ export default function StepMap({
           if (!seenRows.has(key)) {
             seenRows.add(key);
             onScore?.(ROW_PTS);
-            // flash at card centre
             const cardX = cx + pan.x;
             const cardY = cy + pan.y - ch / 2 - 20;
             addFlash(cardX, cardY, ROW_PTS);
@@ -186,6 +190,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
+      onClick={() => { if (!suppressClick.current) onClose(); suppressClick.current = false; }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
@@ -308,7 +313,7 @@ export default function StepMap({
       </div>
 
       {/* ── LAYER 3: nodes and text ABOVE card ── */}
-      <svg style={{ ...svgStyle, zIndex: 4 }}>
+      <svg style={{ ...svgStyle, zIndex: 4, pointerEvents: "all" }}>
         {nodes.map((n) => {
           const unlocked = n.row < openCount;
           const isOpen = openNodes.has(n.row);
