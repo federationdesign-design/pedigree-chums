@@ -644,7 +644,7 @@ export default function LineageMap({
         });
       });
       setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
-      pops.forEach((p) => flashNum(p.x, p.y, -25, FLASH_SIZE)); // -25 per auto-revealed node
+      pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
       interacted.current = true; setIdleHint(false);
       return;
     }
@@ -655,7 +655,7 @@ export default function LineageMap({
       setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; }); // turns popped nodes blue, like a manual tap
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
-        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -25, FLASH_SIZE); } // -25 per collapse-reveal
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -50, FLASH_SIZE); } // -50 per collapse-reveal
       });
       interacted.current = true; setIdleHint(false);
       return;
@@ -685,7 +685,7 @@ export default function LineageMap({
     });
   };
 
-  const doPack = (fx?: number, fy?: number, award: number = 400) => {
+  const doPack = (fx?: number, fy?: number, award: number = 600) => {
     if (packed) return;
     // One card per ancestor: the same forebear is often bred in several times, so
     // fold the repeats out and keep only the first of each in the pack.
@@ -909,7 +909,7 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,${collectShowing ? 138 : 62})`}
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 500, FLASH_SIZE); startRemove(); }}
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 750, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label="Choose as pack chum"
           >
@@ -1045,7 +1045,7 @@ export default function LineageMap({
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
                       setSeen((s) => { if (s.has(n._id)) return s; const x = new Set(s); x.add(n._id); return x; }); // first tap turns it blue
-                      const baseVal = hasKids ? 125 : 250;
+                      const baseVal = hasKids ? 200 : 400;
                       const mult = topBonus.get(PACK_IMG.get(n.name) ?? (n.img as string)) ?? 1; // top-3 breeds score more
                       flashNum(n._x, n._y - r, firstHit ? Math.round(baseVal * mult) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
                       follow(n);
@@ -1253,7 +1253,7 @@ export default function LineageMap({
                         setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
                         setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
                       }
-                      flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 5, FLASH_SIZE); // +5 for the double-click shortcut (drag is worth more)
+                      flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 50, FLASH_SIZE); // +50 for the double-click shortcut (drag is worth more)
                       const pid = puffSeq.current++;
                       setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
                       window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -1303,7 +1303,7 @@ export default function LineageMap({
                           // first copy of this breed: it fills the frame (+100)
                           setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; }); placedAtRef.current.set(c.id, Date.now());
                           setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
-                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 100, FLASH_SIZE); // +100 emanates from the frame
+                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 150, FLASH_SIZE); // +150 emanates from the frame
                           const pid = puffSeq.current++; // smoke poof where it lands
                           setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
                           window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -1442,7 +1442,7 @@ export default function LineageMap({
                           setInfoHover((h) => (h === c.id ? null : c.id)); // tap to toggle, works on touch and mouse
                           if (opening && !infoSeen.current.has(c.id)) {
                             infoSeen.current.add(c.id);
-                            flashNum(ix, iy, 2, FLASH_SIZE); // +2 the first time this card's info is exposed, white and small like the rest
+                            flashNum(ix, iy, 25, FLASH_SIZE); // +25 the first time this card's info is exposed, white and small like the rest
                           }
                         }}
                       >

@@ -32,6 +32,7 @@ export default function PackPit() {
   const pauseRef = useRef<() => void>(() => {});
   const resumeRef = useRef<() => void>(() => {});
   const slowmoRef = useRef<() => void>(() => {});
+  const slowmoActiveRef = useRef(false);
   const [paused, setPaused] = useState(false);
   const [slowmo, setSlowmo] = useState(false);
   const motionRef = useRef<() => void>(() => {});
@@ -144,7 +145,7 @@ export default function PackPit() {
 
   // Score-based reward/penalty scaling
   // Pre-order reward: more score earned = more valuable (you showed up and played)
-  const preorderReward = (s: number) => s < 500 ? 25 : s < 2000 ? 100 : s < 5000 ? 250 : 500;
+  const preorderReward = (s: number) => s < 500 ? 50 : s < 2000 ? 150 : s < 5000 ? 350 : 750;
   // Auto penalty: more score earned = steeper cost (you had more opportunity to earn it yourself)
   const autoPenalty = (s: number) => s < 500 ? -500 : s < 2000 ? -1000 : s < 5000 ? -2500 : -5000;
 
@@ -154,7 +155,8 @@ export default function PackPit() {
     if (drainRef.current) clearInterval(drainRef.current);
     drainRef.current = setInterval(() => {
       if (lineageOpenRef.current) return; // paused while family-tree overlay is open
-      setScore((s: number) => Math.max(0, s - 1));
+      const drain = slowmoActiveRef.current ? 4 : 1; // 4x drain in slow motion
+      setScore((s: number) => Math.max(0, s - drain));
     }, 1000);
     return () => { if (drainRef.current) clearInterval(drainRef.current); };
   }, []); // runs once; lineageOpenRef is checked inside the interval callback
@@ -171,6 +173,7 @@ export default function PackPit() {
       const stuck = (e as CustomEvent).detail?.stuck ?? false;
       if (stuck) {
         gameOverRef.current = true;
+        if (drainRef.current) { clearInterval(drainRef.current); drainRef.current = null; } // stop drain on game over
         // Wait for activity to settle before showing game over -- check every 500ms
         // until average body speed drops below threshold, then wait an extra 1.5s
         const checkQuiet = () => {
@@ -246,7 +249,7 @@ export default function PackPit() {
       runnerRef.current = runner;
       pauseRef.current = () => Runner.stop(runner);
       resumeRef.current = () => Runner.run(runner, engine);
-      slowmoRef.current = () => { engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1; };
+      slowmoRef.current = () => { if (engine.timing.timeScale === 1) { engine.timing.timeScale = 0.25; slowmoActiveRef.current = true; } else { engine.timing.timeScale = 1; slowmoActiveRef.current = false; } };
       Runner.run(runner, engine);
 
       let walls: any[] = [];
@@ -914,7 +917,7 @@ export default function PackPit() {
           lastDraggedBall = null;
           poof(b.position.x, 0, b.plugin.half * 1.5);
           numAt(b.position.x, 20, 250);
-          setScore((s) => s + 250);
+          setScore((s) => s + 500);
           Composite.remove(engine.world, b);
         }
       });
@@ -959,7 +962,7 @@ export default function PackPit() {
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
-        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; const rv = preorderReward(score); numAt(hit.position.x, hit.position.y, rv); setScore((s) => s + rv); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; const rv = preorderReward(score); numAt(hit.position.x, hit.position.y, rv); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
           window.dispatchEvent(new Event("pc:open-cookies"));
           hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
@@ -1010,7 +1013,7 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
           hit.plugin.hits = (hit.plugin.hits || 0) + 1;
-          numAt(hit.position.x, hit.position.y, 50);
+          numAt(hit.position.x, hit.position.y, 200);
           burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
           // any tap opens the popup; the green tick button closes it and poofs the flag
           showBritainMsg(0);
@@ -1018,7 +1021,7 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
-        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
+        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 2000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         if (hit.plugin?.prop === "logopiece" && !hit.plugin.knockPiece) {
           // HTP step cards tapped in the pit -- open the overlay at the matching step
           const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match the dog","Find as many as you can"];
@@ -1038,7 +1041,7 @@ export default function PackPit() {
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
         const cr = render.canvas.getBoundingClientRect(), br = btn.getBoundingClientRect();
-        numAt(br.left + br.width / 2 - cr.left, br.top + br.height / 2 - cr.top, 75);
+        numAt(br.left + br.width / 2 - cr.left, br.top + br.height / 2 - cr.top, 5);
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
@@ -2243,7 +2246,7 @@ export default function PackPit() {
       window.addEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
       const onOfferSuccess = () => {
         const reserve = Composite.allBodies(engine.world).find((b: any) => b.plugin?.kind === "reserve");
-        if (reserve) { const ov = preorderReward(score) * 4; numAt(reserve.position.x, reserve.position.y, ov); setScore((s) => s + ov); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
+        if (reserve) { const ov = preorderReward(score) * 4; numAt(reserve.position.x, reserve.position.y, ov); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
       };
       // poof the union jack when the tick button is pressed on the popup
       const onBritainDismiss = () => {
