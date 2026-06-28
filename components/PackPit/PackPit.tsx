@@ -2492,14 +2492,7 @@ export default function PackPit() {
         onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
         aria-label={slowmo ? "Normal speed" : "Slow motion"}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" width="54" height="40" fill="currentColor" aria-hidden="true">
-          <ellipse cx="42" cy="62" rx="38" ry="13"/>
-          <ellipse cx="78" cy="54" rx="11" ry="9"/>
-          <ellipse cx="82" cy="46" rx="10" ry="9"/>
-          <path d="M14,42 C14,20 28,8 48,8 C68,8 82,22 82,40 C82,56 70,66 54,66 C38,66 28,56 28,44 C28,34 36,26 46,26 C56,26 62,34 62,42 C62,48 58,52 52,52 C46,52 42,48 42,44 C42,40 46,38 48,38"/>
-          <line x1="80" y1="38" x2="72" y2="20" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"/>
-          <line x1="88" y1="40" x2="84" y2="22" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"/>
-        </svg>
+        <img src="/svg-snail-icon.svg" width="52" height="52" alt="" aria-hidden="true" style={{ display: "block" }} />
       </button>
       <button
         type="button"

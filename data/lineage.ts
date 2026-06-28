@@ -1109,7 +1109,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The smallest dog of all, traced to the Techichi companion dogs kept by the peoples of ancient Mexico.",
     children: [
       { name: "Ancient Techichi dogs", note: "The small sacred companion dogs of the Toltec and Aztec, the breed's direct root.", img: "/history/breeds/Ancient-Techichi-dogs.jpg", value: 80 },
-      { name: "Small imported dogs", note: "Tiny dogs brought by later traders, thought to add coat and the bold, terrier like spark.", value: 20 }
+      { name: "Small imported dogs", note: "Tiny dogs brought by later traders, thought to add coat and the bold, terrier like spark.", img: "/history/breeds/Ancient-Techichi-dogs.jpg", value: 20 }
     ]
   },
   "German Shepherd": {
