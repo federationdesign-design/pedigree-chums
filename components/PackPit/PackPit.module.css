@@ -448,6 +448,9 @@
   color: var(--yellow);
   box-shadow: 0 5px 0 rgba(3, 87, 245, 0.4);
 }
+.slowmoActive img {
+  filter: brightness(0) saturate(100%) invert(91%) sepia(44%) saturate(800%) hue-rotate(5deg) brightness(105%);
+}
 /* Mobile: all three pit buttons 25% smaller */
 @media (max-width: 768px) {
   .shake {
