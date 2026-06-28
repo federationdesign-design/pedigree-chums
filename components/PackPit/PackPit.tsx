@@ -138,19 +138,23 @@ export default function PackPit() {
   // Auto slow motion at zero drain cost when any overlay is open
   const autoSlowmoRef = useRef(false);
   useEffect(() => {
-    const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null || cookieBannerOpenRef.current;
+    const htpOpen = howToPlay; // HowToPlay overview OR step card -- full pause
+    const otherOpen = !!activeBreed || shelfOpen || britainMsg !== null || cookieBannerOpenRef.current;
+    const overlayOpen = htpOpen || otherOpen;
     if (overlayOpen && !autoSlowmoRef.current) {
       autoSlowmoRef.current = true;
-      // Engage slowmo without flagging slowmoActiveRef (so drain stays normal)
-         const engine = engineRef.current;
-      if (engine && engine.timing.timeScale === 1) engine.timing.timeScale = 0.25;
+      const engine = engineRef.current;
+      if (engine) engine.timing.timeScale = htpOpen ? 0 : 0.25; // full pause for HTP, slowmo for others
     } else if (!overlayOpen && autoSlowmoRef.current) {
       autoSlowmoRef.current = false;
-      // Only restore if user hasn't manually engaged slowmo
       if (!slowmoActiveRef.current) {
         const engine = engineRef.current;
         if (engine) engine.timing.timeScale = 1;
       }
+    } else if (overlayOpen && autoSlowmoRef.current) {
+      // Update timeScale if HTP state changed while overlay already open
+      const engine = engineRef.current;
+      if (engine && !slowmoActiveRef.current) engine.timing.timeScale = htpOpen ? 0 : 0.25;
     }
   }, [activeBreed, shelfOpen, howToPlay, britainMsg]);
 
@@ -1013,20 +1017,19 @@ export default function PackPit() {
           }
           return true;
         }
-if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
-          window.dispatchEvent(new Event("pc:cookies-accepted"));
-          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
-          bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });
-          bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 });
-          numAt(ax, ay, 2000);
-          clearCookieObjects(true);
+if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;          const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
+          bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
+          bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 }); // yellow
+          numAt(ax, ay, 2000); // the big payoff pops out of the starburst
+          clearCookieObjects(true); // keep reject in pit as inert with 20 hit life
           return true;
         }
         if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new Event("pc:cookies-rejected"));
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
-          bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });
-          bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 });
+          bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
+          bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 }); // grey
+          // no score penalty for rejecting cookies
           clearCookieObjects();
           return true;
         }
@@ -1336,15 +1339,16 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               // Inner illustration -- use natural image aspect ratio if available
               const illoH = ph - FOOTER - BORDER * 2;
               const illoW = pw - BORDER * 2;
-              // fit image within illo area preserving aspect ratio
+              // Slice (cover) -- fills illo area, no letterbox yellow
               const imgAr = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1;
-              const fitW = imgAr > illoW / illoH ? illoW : illoH * imgAr;
-              const fitH = imgAr > illoW / illoH ? illoW / imgAr : illoH;
-              const fitX = -pw / 2 + BORDER + (illoW - fitW) / 2;
-              const fitY = -ph / 2 + BORDER + (illoH - fitH) / 2;
+              const illoAr = illoW / illoH;
+              const sliceW = imgAr > illoAr ? illoH * imgAr : illoW;
+              const sliceH = imgAr > illoAr ? illoH : illoW / imgAr;
+              const fitX = -pw / 2 + BORDER - (sliceW - illoW) / 2;
+              const fitY = -ph / 2 + BORDER - (sliceH - illoH) / 2;
               rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
               ctx.save(); ctx.clip();
-              ctx.drawImage(img, fitX, fitY, fitW, fitH);
+              ctx.drawImage(img, fitX, fitY, sliceW, sliceH);
               ctx.restore();
               // Footer caption text
               const caption = b.plugin.name || "";
