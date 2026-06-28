@@ -437,11 +437,9 @@
 .stepIllo {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   border-radius: clamp(10px, 1.8vw, 16px) clamp(10px, 1.8vw, 16px) 0 0;
-  image-rendering: auto;
-  min-height: 0;
 }
 
 /* Footer caption bar -- navy text on yellow, Luckiest Guy */
