@@ -277,15 +277,15 @@ export default function PackPit() {
       let walls: any[] = [];
       function buildWalls(w: number, h: number) {
         if (walls.length) Composite.remove(engine.world, walls);
-        const t = 200;
-        const ceilY = Math.min(-1000, -h * 1.5); // a long way above the pour line (the pack rains in around y = -500)
-        const sideTop = ceilY - t, sideBot = h * 2; // side walls run from above the ceiling down past the floor
+        const t = 600; // thick walls prevent tunnelling at high velocity
+        const ceilY = -400; // just above the spawn zone (~y=-200 to y=-350)
+        const sideTop = ceilY - t, sideBot = h * 2;
         const sideH = sideBot - sideTop, sideC = (sideTop + sideBot) / 2;
         walls = [
-          Bodies.rectangle(w / 2, h + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // floor (walls[0])
+          Bodies.rectangle(w / 2, h + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // floor
           Bodies.rectangle(-t / 2 + 2, sideC, t, sideH, { isStatic: true, restitution: 0.5, render: { visible: false } }),
           Bodies.rectangle(w + t / 2 - 2, sideC, t, sideH, { isStatic: true, restitution: 0.5, render: { visible: false } }),
-          Bodies.rectangle(w / 2, ceilY - t / 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // ceiling, far above the pour so nothing escapes over the top
+          Bodies.rectangle(w / 2, ceilY - t / 2, w + t * 2, t, { isStatic: true, restitution: 0.2, render: { visible: false } }), // ceiling -- low restitution kills upward energy
         ];
         Composite.add(engine.world, walls);
       }
@@ -2461,7 +2461,17 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       };
       let lastFullCheck = 0;
+      const MAX_SPEED = 80; // cap velocity to prevent ceiling tunnelling
       const onAfterUpdateGO = () => {
+        // Clamp extreme velocities -- prevents fast bodies tunnelling through walls
+        Composite.allBodies(engine.world).forEach((b: any) => {
+          if (b.isStatic) return;
+          const spd = Math.hypot(b.velocity.x, b.velocity.y);
+          if (spd > MAX_SPEED) {
+            const scale = MAX_SPEED / spd;
+            Body.setVelocity(b, { x: b.velocity.x * scale, y: b.velocity.y * scale });
+          }
+        });
         const now = performance.now();
         if (now - lastFullCheck < 10000) return; // check every 10s only
         lastFullCheck = now;
