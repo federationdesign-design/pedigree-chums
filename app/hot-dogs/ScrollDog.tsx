@@ -43,6 +43,7 @@ export default function ScrollDog() {
         playsInline
         preload="auto"
         className={styles.fixedDogVideo}
+        style={{ background: "transparent" }}
       />
     </div>
   );

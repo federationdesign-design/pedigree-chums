@@ -407,11 +407,13 @@
   width: clamp(180px, 22vw, 340px);
   z-index: 10;
   pointer-events: none;
+  background: transparent;
 }
 .fixedDogVideo {
   width: 100%;
   height: auto;
   display: block;
+  background: transparent;
   mix-blend-mode: multiply;
-  filter: hue-rotate(200deg) saturate(1.4) brightness(0.85);
+  filter: hue-rotate(200deg) saturate(1.6) contrast(1.1);
 }
