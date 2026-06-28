@@ -141,6 +141,35 @@ const STEPS: StepData[] = [
       },
     ],
   },
+  {
+    number: 6,
+    illustration: "/step6-redue.jpg",
+    caption: "The player with the most matches wins!",
+    heading: "Step 6",
+    rows: [
+      {
+        icon: "/deal-icon.svg",
+        title: "Count up",
+        body: "When the walk ends, everyone counts their matched Pedigree Chums.",
+      },
+      {
+        icon: "/friends-icon.svg",
+        title: "Most matches wins",
+        body: "The player with the most matched cards is the winner.",
+      },
+      {
+        icon: "/shuffle-icon.svg",
+        title: "Play again",
+        body: "Shuffle, re-deal and go again -- same walk or somewhere new.",
+      },
+      {
+        icon: "/find-pack-icon.svg",
+        title: "Collect them all",
+        body: "There are 54 Pedigree Chums to find. How many can your pack spot?",
+      },
+    ],
+  },
 ];
 
 export default STEPS;
+

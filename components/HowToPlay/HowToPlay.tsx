@@ -18,6 +18,7 @@ const CAPTIONS = [
   "Look for and spot real dogs",
   "Match the dog to your chum",
   "Find as many as you can!",
+  "The player with the most matches wins!",
 ];
 
 const OVERVIEW_STEPS = [
@@ -84,7 +85,7 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
           const r = el.getBoundingClientRect();
           if (r.width < 2 || r.height < 2) return;
           const num = i + 1;
-          const stepSrc = num === 1 ? `/raw-step1.jpg` : num === 2 ? `/step2-redue.jpg` : num === 3 ? `/step3-redue.jpg` : num === 4 ? `/raw-step4.jpg` : `/step5-redue.jpg`;
+          const stepSrc = num === 1 ? `/step1-redue.jpg` : num === 2 ? `/step2-redue.jpg` : num === 3 ? `/step3-redue.jpg` : num === 4 ? `/step4-redue.jpg` : num === 5 ? `/step5-redue.jpg` : `/step6-redue.jpg`;
           pieces.push({
             src: stepSrc,
             x: r.left, y: r.top,
@@ -181,7 +182,7 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
 
         {/* New CSS-built step cards -- replace old image strip */}
         <div className={styles.cardRow}>
-          {[1, 2, 3, 4, 5].map((n, i) => (
+          {[1, 2, 3, 4, 5, 6].map((n, i) => (
             <div
               key={n}
               className={styles.stepCard}
@@ -205,7 +206,7 @@ export default function HowToPlay({ open, onClose, activeStep = null, cardPos = 
               {/* Card illustration */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={n === 1 ? `/raw-step1.jpg` : n === 2 ? `/step2-redue.jpg` : n === 3 ? `/step3-redue.jpg` : n === 4 ? `/raw-step4.jpg` : `/step5-redue.jpg`}
+                src={n === 1 ? `/step1-redue.jpg` : n === 2 ? `/step2-redue.jpg` : n === 3 ? `/step3-redue.jpg` : n === 4 ? `/step4-redue.jpg` : n === 5 ? `/step5-redue.jpg` : `/step6-redue.jpg`}
                 alt={`Step ${n}`}
                 className={styles.stepIllo}
               />
