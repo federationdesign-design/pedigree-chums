@@ -171,7 +171,18 @@ export default function PackPit() {
       const stuck = (e as CustomEvent).detail?.stuck ?? false;
       if (stuck) {
         gameOverRef.current = true;
-        window.setTimeout(() => setGameOver(true), 2500); // 2.5s delay -- let player see the full pit before overlay
+        // Wait for activity to settle before showing game over -- check every 500ms
+        // until average body speed drops below threshold, then wait an extra 1.5s
+        const checkQuiet = () => {
+          const all = Composite.allBodies(engine.world).filter((b: any) => !b.isStatic);
+          const avgSpeed = all.length ? all.reduce((s: number, b: any) => s + Math.hypot(b.velocity.x, b.velocity.y), 0) / all.length : 0;
+          if (avgSpeed < 2) {
+            window.setTimeout(() => setGameOver(true), 1500); // 1.5s pause after settling
+          } else {
+            window.setTimeout(checkQuiet, 500); // check again in 500ms
+          }
+        };
+        window.setTimeout(checkQuiet, 1000); // start checking after 1s minimum
       }
     };
     window.addEventListener("pc:gameover-result", onResult as EventListener);

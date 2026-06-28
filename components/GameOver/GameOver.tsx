@@ -55,8 +55,8 @@ export default function GameOver({ chums, score }: Props) {
           {chums === 0
             ? "Ah deer, you were meant to grab some chums."
             : chums === 1
-            ? "You have 1 dog in your hand."
-            : `You have ${chums} dogs in your hand.`}
+            ? "You had 1 chum!"
+            : `You had ${chums} chums!`}
         </h1>
         <div className={styles.leaderboard} style={{ animationDelay: "1s" }}>
           <p className={styles.leaderTitle}>Today&rsquo;s top chums</p>
