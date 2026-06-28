@@ -115,11 +115,40 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
         {/* Everything in one group -- card + panel -- translates together */}
         <g transform={`translate(${cx},${cy})`}>
 
-          {/* Card (rotated to match pit angle) */}
+          {/* Card (rotated to match pit angle) -- yellow frame + illustration + footer */}
           <g transform={`rotate(${angleDeg})`}>
-            {image && (
-              <image href={image} x={-cw / 2} y={-ch / 2} width={cw} height={ch} clipPath="url(#htp-card-clip)" preserveAspectRatio="xMidYMid slice" />
-            )}
+            {/* Yellow outer frame */}
+            <rect x={-cw / 2} y={-ch / 2} width={cw} height={ch} rx={cw * 0.1} fill="#ffed00" />
+            {image && (() => {
+              const BORDER = Math.round(cw * 0.04);
+              const FOOTER = Math.round(ch * 0.2);
+              const illoH = ch - FOOTER - BORDER * 2;
+              const illoRx = cw * 0.07;
+              return (
+                <>
+                  <clipPath id="htp-illo-clip">
+                    <rect x={-cw / 2 + BORDER} y={-ch / 2 + BORDER} width={cw - BORDER * 2} height={illoH} rx={illoRx} />
+                  </clipPath>
+                  <image
+                    href={image}
+                    x={-cw / 2 + BORDER} y={-ch / 2 + BORDER}
+                    width={cw - BORDER * 2} height={illoH}
+                    clipPath="url(#htp-illo-clip)"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                  <text
+                    x={0} y={ch / 2 - FOOTER / 2}
+                    textAnchor="middle" dominantBaseline="central"
+                    fontFamily="'Luckiest Guy', system-ui"
+                    fontSize={Math.max(8, Math.round(FOOTER * 0.28))}
+                    fill="#0a3a57"
+                    style={{ textTransform: "uppercase" } as React.CSSProperties}
+                  >
+                    {step.caption}
+                  </text>
+                </>
+              );
+            })()}
           </g>
 
           {/* Text panel -- always upright, offset to the right of the card */}

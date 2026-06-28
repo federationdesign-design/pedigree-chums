@@ -1254,8 +1254,10 @@ export default function PackPit() {
               const r = b.plugin.half;
               ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
               ctx.fillStyle = "#009fe0"; ctx.fill();
+              ctx.lineWidth = Math.max(2, r * 0.08);
+              ctx.strokeStyle = "#0a3a57"; ctx.stroke();
               if (img && img.complete && img.naturalWidth) {
-                ctx.drawImage(img, -r, -r, r * 2, r * 2);
+                ctx.drawImage(img, -r * 0.7, -r * 0.7, r * 1.4, r * 1.4);
               }
               ctx.restore(); return;
             }

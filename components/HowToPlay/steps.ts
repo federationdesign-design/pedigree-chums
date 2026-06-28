@@ -4,7 +4,7 @@ const STEPS: StepData[] = [
   {
     number: 1,
     illustration: "/step1.png",
-    caption: "Deal a few cards evenly among the players",
+    caption: "Deal 3-6 cards to each player",
     heading: "Step 1",
     rows: [
       {
@@ -32,7 +32,7 @@ const STEPS: StepData[] = [
   {
     number: 2,
     illustration: "/step2.png",
-    caption: "Head out and start spotting dogs",
+    caption: "Go for a walk in a park, or explore your town",
     heading: "Step 2",
     rows: [
       {
@@ -60,7 +60,7 @@ const STEPS: StepData[] = [
   {
     number: 3,
     illustration: "/step3.png",
-    caption: "Match the dog you see to your cards",
+    caption: "Look for and spot real dogs",
     heading: "Step 3",
     rows: [
       {
@@ -88,7 +88,7 @@ const STEPS: StepData[] = [
   {
     number: 4,
     illustration: "/step4.png",
-    caption: "Collect your chums and keep going",
+    caption: "Match the dog to your chum",
     heading: "Step 4",
     rows: [
       {
@@ -116,7 +116,7 @@ const STEPS: StepData[] = [
   {
     number: 5,
     illustration: "/step5.png",
-    caption: "Count your chums and find the winner",
+    caption: "Find as many as you can!",
     heading: "Step 5",
     rows: [
       {
