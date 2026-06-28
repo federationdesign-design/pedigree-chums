@@ -71,6 +71,7 @@ export default function GameOver({ chums, score }: Props) {
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [leaders, setLeaders] = useState(() => buildLeaderboard(score, null));
   const [showLeaders, setShowLeaders] = useState(false);
@@ -87,12 +88,23 @@ export default function GameOver({ chums, score }: Props) {
     return () => { clearTimeout(lt); clearTimeout(fadeTimer); clearTimeout(navTimer); };
   }, [router]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) return;
     const trimmed = name.trim().slice(0, MAX_NAME);
     saveScore(trimmed, score);
     setLeaders(buildLeaderboard(score, trimmed));
     setSubmitted(true);
+    // Submit email to MailerLite/Resend if provided
+    const trimEmail = email.trim();
+    if (trimEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimEmail)) {
+      try {
+        await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimEmail, consent: true }),
+        });
+      } catch {}
+    }
   };
 
   const handleShare = async () => {
@@ -128,6 +140,15 @@ export default function GameOver({ chums, score }: Props) {
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
               autoComplete="off"
+            />
+            <input
+              className={`${styles.nameInput} ${styles.emailInput}`}
+              type="email"
+              placeholder="Email (optional)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+              autoComplete="email"
             />
             <button className={styles.nameSubmit} onClick={handleSubmit} type="button">
               Add score
