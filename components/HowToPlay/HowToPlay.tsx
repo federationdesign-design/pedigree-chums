@@ -75,8 +75,6 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           const r = el.getBoundingClientRect();
           if (r.width < 2 || r.height < 2) return;
           pieces.push({ src: STEP_SRCS[i] || "", x: r.left, y: r.top, w: r.width, h: r.height, kind: "stepcard" });
-          // Number SVG drops from same spot (no blue circle)
-          pieces.push({ src: `/${i + 1}object.svg`, x: r.left - 10, y: r.top - 10, w: 36, h: 36, kind: "number" });
         });
         const push = (el: Element | null, s: string) => {
           if (!el) return;
