@@ -1308,7 +1308,15 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
             // Yellow number from HTP overlay
             if (b.plugin.kind === "htplogopiece") {
-              if (img) { ctx.drawImage(img, -pw / 2, -ph / 2, pw, ph); }
+              if (img && img.naturalWidth && img.naturalHeight) {
+                const ar = img.naturalWidth / img.naturalHeight;
+                // Draw at natural aspect ratio centred on body
+                const drawW = Math.max(pw, ph * ar);
+                const drawH = drawW / ar;
+                ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+              } else if (img) {
+                ctx.drawImage(img, -pw / 2, -ph / 2, pw, ph);
+              }
               ctx.restore(); return;
             }
             if (b.plugin.kind === "htpnumber") {
@@ -2400,10 +2408,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               } : {}),
             };
           } else {
-            // Logo, triangles -- small circle body with image, no stepcard rendering
-            const r = Math.min(pw, ph) * 0.4;
-            b = Bodies.circle(cx, cy, r, { restitution: 0.5, friction: 0.3, frictionAir: 0.008, density: 0.0006, render: { visible: false } });
-            b.plugin = { name: "How to play", label: "", half: r, w: r * 2, h: r * 2, color: "#ffed00", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "htplogopiece" };
+            // Logo / triangles -- rectangle body preserving natural image size
+            const isLogo = pc.src.includes("dogbingo");
+            const bw = isLogo ? Math.min(pw, 120) : Math.min(pw, 48);
+            const bh = isLogo ? Math.round(bw * 0.65) : bw; // dogbingo ~3:2, triangles square
+            b = Bodies.rectangle(cx, cy, bw, bh, { chamfer: { radius: 6 }, restitution: 0.5, friction: 0.3, frictionAir: 0.01, density: 0.0005, render: { visible: false } });
+            b.plugin = { name: "How to play", label: "", half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffed00", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "htplogopiece" };
           }
           Composite.add(engine.world, b);
           setScore((s) => s + 500);
