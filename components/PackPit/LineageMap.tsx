@@ -639,7 +639,14 @@ export default function LineageMap({
           }
         });
       });
-      setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
+      setSeen((prev) => {
+        const s = new Set(prev);
+        frontier.forEach((n) => {
+          s.add(n._id); // mark the opened node itself as seen (turns blue)
+          (n.children as Node[]).forEach((k) => s.add(k._id)); // mark children as seen too
+        });
+        return s;
+      });
       pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
       interacted.current = true; setIdleHint(false);
       return;
