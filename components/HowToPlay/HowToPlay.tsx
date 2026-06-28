@@ -21,7 +21,10 @@ const STEPS = [
   "The player with the most pedigree chums wins",
 ];
 
-const STEP_IMAGES = ["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"];
+const STEP_IMAGES = [
+  "/step1-redue.jpg", "/step2-redue.jpg", "/step3-redue.jpg",
+  "/step4-redue.jpg", "/step5-redue.jpg", "/step6-redue.jpg",
+];
 
 export default function HowToPlay({ open, onClose, onScore, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
@@ -53,26 +56,32 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
 
   const dropPiecesThenClose = () => {
     try {
-      const pieces: { src: string; x: number; y: number; w: number; h: number }[] = [];
-      const push = (el: Element | null, src: string) => {
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        if (r.width < 2 || r.height < 2) return;
-        pieces.push({ src, x: r.left, y: r.top, w: r.width, h: r.height });
-      };
+      const vw = window.innerWidth;
+      const STEP_SRCS = [
+        "/step1-redue.jpg", "/step2-redue.jpg", "/step3-redue.jpg",
+        "/step4-redue.jpg", "/step5-redue.jpg", "/step6-redue.jpg",
+      ];
+      const cardW = Math.round(Math.min(vw * 0.16, 140));
+      const cardH = Math.round(cardW * 1.35);
+      const pieces: { src: string; x: number; y: number; w: number; h: number; kind?: string }[] = [];
+      STEP_SRCS.forEach((src, i) => {
+        const col = i % 3, row = Math.floor(i / 3);
+        const x = vw * 0.08 + col * (cardW + vw * 0.05) + (Math.random() * 20 - 10);
+        const y = -cardH * 1.5 - row * (cardH + 20) - Math.random() * 40;
+        pieces.push({ src, x, y, w: cardW, h: cardH, kind: "stepcard" });
+        pieces.push({ src: "/blue-circle.svg", x: x - 8, y: y - 8, w: 30, h: 30, kind: "circle" });
+        pieces.push({ src: `/${i + 1}object.svg`, x: x - 8, y: y - 8, w: 30, h: 30, kind: "number" });
+      });
       const root = stageElRef.current;
       if (root) {
-        const strip = root.querySelector("img[alt='How to play, step by step']") as HTMLElement | null;
-        if (strip) {
-          const r = strip.getBoundingClientRect();
-          if (r.width > 2 && r.height > 2) {
-            const colW = r.width / 5;
-            for (let i = 0; i < 5; i++) pieces.push({ src: `/step${i + 1}.png`, x: r.left + i * colW, y: r.top, w: colW, h: r.height });
-          }
-        }
+        const push = (el: Element | null, s: string) => {
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) return;
+          pieces.push({ src: s, x: r.left, y: r.top, w: r.width, h: r.height });
+        };
         push(root.querySelector("[data-htp='logo']"), "/dogbingo.svg");
         root.querySelectorAll("[data-htp='deco']").forEach((el: Element) => push(el, "/yellow-triangle.svg"));
-        root.querySelectorAll("[data-htp='num']").forEach((el: Element, i: number) => push(el, `/${i + 1}object.svg`));
       }
       if (pieces.length) window.dispatchEvent(new CustomEvent("pc:howtoplay-drop", { detail: { pieces } }));
     } catch {}
@@ -107,10 +116,6 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
         </h3>
-        <div className={styles.stripWrap}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/how-to-play-comic-strip.png" alt="How to play, step by step" className={styles.strip} />
-        </div>
         <div className={styles.stepScroll}>
           {STEP_IMAGES.map((src, i) => (
             // eslint-disable-next-line @next/next/no-img-element

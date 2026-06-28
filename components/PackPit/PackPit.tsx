@@ -113,6 +113,7 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
+  const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null || cookieBannerOpen;
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
@@ -1005,7 +1006,7 @@ export default function PackPit() {
           }
           return true;
         }
-        if (hit.plugin?.kind === "cookieaccept") {
+        if (hit.plugin?.kind === "cookieaccept") { setCookieBannerOpen(false);
           window.dispatchEvent(new Event("pc:cookies-accepted"));
           const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
           bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });        // pink
@@ -1014,7 +1015,7 @@ export default function PackPit() {
           clearCookieObjects(true); // keep reject in pit as inert with 20 hit life
           return true;
         }
-        if (hit.plugin?.kind === "cookiereject") {
+        if (hit.plugin?.kind === "cookiereject") { setCookieBannerOpen(false);
           window.dispatchEvent(new Event("pc:cookies-rejected"));
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
           bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop

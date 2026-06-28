@@ -7,7 +7,7 @@ import { type StepData } from "./StepCard";
 const ROOT_HALF = 58;
 const RING1 = ROOT_HALF + 110;
 const SPREAD1 = Math.PI * 1.5;
-const NODE_R = 32;
+const NODE_R = 44;
 const ROW_PTS = 400;
 const BONUS_PTS = 1000;
 
@@ -151,9 +151,9 @@ export default function StepMap({
             y1={cy + pan.y}
             x2={n.x + pan.x}
             y2={n.y + pan.y}
-            stroke={open.has(n.row) ? "rgba(255,237,0,0.5)" : "rgba(255,255,255,0.2)"}
-            strokeWidth={open.has(n.row) ? 2 : 1.5}
-            strokeDasharray={open.has(n.row) ? undefined : "4 6"}
+            stroke={open.has(n.row) ? "rgba(255,237,0,0.7)" : "rgba(255,255,255,0.45)"}
+            strokeWidth={open.has(n.row) ? 3 : 2}
+            strokeDasharray={open.has(n.row) ? undefined : "6 8"}
           />
         ))}
 
@@ -213,7 +213,7 @@ export default function StepMap({
                 x={-NODE_R * 0.65} y={-NODE_R * 0.65}
                 width={NODE_R * 1.3} height={NODE_R * 1.3}
                 clipPath={`url(#sm-node-clip-${n.id})`}
-                style={{ opacity: isOpen ? 1 : 0.6 }}
+                style={{ opacity: 1 }}
               />
               {isOpen && (() => {
                 const cardW = 200;
