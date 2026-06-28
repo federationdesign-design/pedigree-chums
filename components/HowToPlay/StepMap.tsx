@@ -53,6 +53,7 @@ export default function StepMap({
   const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
 
+  // Pan -- exact LineageMap copy
   const onPanDown = (e: React.PointerEvent) => {
     suppressClick.current = false;
     drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
@@ -62,11 +63,12 @@ export default function StepMap({
     if (!d || e.pointerId !== d.id) return;
     const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
     if (!d.moved && Math.hypot(dx, dy) > 6) d.moved = true;
-    if (d.moved) { suppressClick.current = true; setPan({ x: d.px + dx, y: d.py + dy }); }
+    if (d.moved) setPan({ x: d.px + dx, y: d.py + dy }); // suppressClick set in onPanUp only
   };
   const onPanUp = () => {
-    if (drag.current?.moved) suppressClick.current = true;
+    const d = drag.current;
     drag.current = null;
+    if (d && d.moved) suppressClick.current = true; // only after confirmed drag
   };
 
   const [openCount, setOpenCount] = useState(0);
@@ -180,7 +182,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
-      onClick={(e) => { if (suppressClick.current) { suppressClick.current = false; return; } if (e.target === e.currentTarget) onClose(); }}
+      onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } onClose(); }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
