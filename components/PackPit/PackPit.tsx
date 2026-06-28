@@ -224,8 +224,8 @@ export default function PackPit() {
       const SCALE = isMobile ? 0.67 : 1; // mobile shrinks cards and toys uniformly by a third
       const BIG = 84 * SCALE;
       const pctFont = (typeof window !== "undefined" ? getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() : "") || "Montserrat"; // Open Sans for the % figures
-      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
-      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
+      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.25 * (isMobile ? 0.9 : 1), aspect: 1 };
+      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 4.95 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
@@ -2423,7 +2423,7 @@ export default function PackPit() {
         onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
         aria-label={slowmo ? "Normal speed" : "Slow motion"}
       >
-        <img src="/snail-icon.svg" width="38" height="28" alt="" aria-hidden="true" style={{ display: "block" }} />
+        <img src="/snail-icon.svg" width="54" height="40" alt="" aria-hidden="true" style={{ display: "block", color: "inherit" }} />
       </button>
       <button
         type="button"
@@ -2435,7 +2435,7 @@ export default function PackPit() {
         aria-label={paused ? "Resume" : "Pause"}
       >
         {paused ? (
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
         ) : (
           <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor">
             <rect x="5" y="3" width="4.5" height="18" rx="2.25"/>
