@@ -1656,8 +1656,13 @@ export default function PackPit() {
             const bh = b.bounds.max.y - b.bounds.min.y;
             coveredArea += bw * bh;
           }
-          // cap at 1 -- 60% coverage = pit feels full (bodies overlap)
-          const fill = Math.min(1, coveredArea / (pitArea * 0.6));
+          // Three-stop opacity curve: 1.0x coverage = 50%, 1.5x = 80%, 2.0x = 100%
+          const ratio = coveredArea / pitArea;
+          let fill: number;
+          if (ratio <= 1.0) fill = ratio * 0.5;
+          else if (ratio <= 1.5) fill = 0.5 + (ratio - 1.0) / 0.5 * 0.3;
+          else fill = 0.8 + (ratio - 1.5) / 0.5 * 0.2;
+          fill = Math.min(1, fill);
           stage.style.setProperty("--fill-opacity", (fill * 0.5).toFixed(3));
           // yellow warning flashes at 90, 95, 99%
           if (fill >= 0.9 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
