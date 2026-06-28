@@ -156,7 +156,7 @@
 }
 .arcadeArrow:hover { color: #14d2b4; }
 .arcadeChar {
-  font-family: 'Courier New', monospace;
+  font-family: 'Luckiest Guy', system-ui;
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
   color: rgba(20,210,180,0.45);
