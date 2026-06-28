@@ -1,468 +1,175 @@
+/* Full-screen overlay matching LineageMap/StepMap style */
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
-  background: rgba(10, 58, 87, 0.55);
-  overflow: hidden;
+  z-index: 60;
+  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.22), rgba(12, 91, 146, 0.46));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: htpFade 0.2s ease;
+  cursor: pointer;
 }
+@keyframes htpFade { from { opacity: 0; } to { opacity: 1; } }
 
-/* Blue panel -- position driven by inline style from cardPos, expands from card location */
+/* No panel -- content sits directly on the backdrop */
 .stage {
-  position: fixed;
-  width: min(94vw, 1180px);
-  overflow: visible;
-  border-radius: 30px;
-  padding: clamp(26px, 3.5vw, 56px) clamp(28px, 4vw, 64px) clamp(30px, 4vw, 60px);
-  background: linear-gradient(to top right, #00e2ff, #008eff);
-  box-shadow: 0 48px 110px rgba(10, 58, 87, 0.55),
-    inset 0 0 0 8px rgba(255, 255, 255, 0.18);
-  transform-style: preserve-3d;
-  animation: pop3d 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  position: relative;
+  width: min(94vw, 860px);
   max-height: 90vh;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding: clamp(20px, 3vw, 48px) clamp(20px, 3vw, 48px) clamp(28px, 4vw, 56px);
+  scrollbar-width: none;
+  cursor: default;
 }
-
-@keyframes pop3d {
-  0% {
-    opacity: 0;
-    transform: scale(0.15);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
+.stage::-webkit-scrollbar { display: none; }
 
 .close {
-  position: absolute;
-  top: 18px;
-  right: 20px;
-  z-index: 5;
+  position: fixed;
+  top: 24px;
+  right: clamp(16px, 3vw, 40px);
   width: 52px;
   height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
-  border-radius: 50%;
-  background: var(--yellow, #ffd23e);
-  color: var(--navy, #0a3a57);
+  border-radius: 14px;
+  background: #ffed00;
+  color: #0a3a57;
   font-size: 2rem;
   line-height: 1;
+  font-weight: 800;
   cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+  z-index: 10;
 }
+.close:hover { filter: brightness(0.95); }
 
 .title {
-  position: relative;
-  z-index: 2;
-  font-family: var(--font-display), system-ui, sans-serif;
+  font-family: 'Luckiest Guy', system-ui;
   color: #ffffff;
-  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+  font-size: clamp(2rem, 5vw, 4rem);
   line-height: 1;
-  margin: 0 0 clamp(16px, 2.2vw, 30px);
+  margin: 0 0 clamp(16px, 2.5vw, 32px);
+  letter-spacing: 0.02em;
 }
-.accent {
-  color: var(--yellow, #ffd23e);
-}
+.accent { color: #ffed00; }
 
-/* Comic strip breaks OUT of the panel: pulled past the text padding AND beyond
-   the panel edges (padding + breakout), making it ~10% wider than the panel.
-   Robust subtraction, no calc multiplication. The overlay clips the excess at
-   the screen edge; the image fills the wrapper 100% so it stays centered. */
-.stripWrap {
-  margin-left: calc(0px - clamp(28px, 4vw, 64px) - clamp(20px, 3.4vw, 60px));
-  margin-right: calc(0px - clamp(28px, 4vw, 64px) - clamp(20px, 3.4vw, 60px));
-  margin-bottom: clamp(20px, 2.8vw, 38px);
-}
-.strip {
-  position: relative;
-  z-index: 2;
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* Mobile: user-scrollable horizontal row of the individual step images,
-   replacing the single wide comic strip. */
-.swipeHint {
-  display: none;
-}
+/* Step image horizontal scroll */
 .stepScroll {
-  display: none;
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  margin: 0 calc(0px - clamp(20px, 3vw, 48px)) clamp(20px, 3vw, 36px);
+  padding: 0 clamp(20px, 3vw, 48px) 14px;
+  scrollbar-width: none;
 }
-@media (max-width: 900px) {
-  .swipeHint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 0 0 12px;
-    font-family: var(--font-display), system-ui, sans-serif;
-    color: var(--yellow, #ffd23e);
-    font-size: 1.1rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-shadow: 0 2px 0 rgba(10, 58, 87, 0.25);
-  }
-  .swipeArrow {
-    display: inline-block;
-    font-size: 1.3rem;
-    animation: swipeNudge 1.1s ease-in-out infinite;
-  }
-  .stripWrap {
-    display: none;
-  }
-  .stepScroll {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    margin-left: calc(0px - clamp(20px, 5vw, 40px));
-    margin-right: calc(0px - clamp(20px, 5vw, 40px));
-    padding: 0 clamp(20px, 5vw, 40px) 14px;
-    margin-bottom: clamp(16px, 4vw, 26px);
-    scrollbar-width: none;
-  }
-  .stepScroll::-webkit-scrollbar {
-    display: none;
-  }
-  .stepImg {
-    flex: 0 0 auto;
-    width: 76%;
-    max-width: 340px;
-    height: auto;
-    border-radius: 16px;
-    scroll-snap-align: center;
-  }
-  .logo {
-    display: none;
-  }
+.stepScroll::-webkit-scrollbar { display: none; }
+
+.stepImg {
+  flex: 0 0 auto;
+  width: clamp(140px, 28vw, 240px);
+  height: auto;
+  border-radius: 14px;
+  scroll-snap-align: center;
+  box-shadow: 0 4px 20px rgba(10, 58, 87, 0.4);
+}
+
+.swipeHint {
+  font-family: 'Luckiest Guy', system-ui;
+  color: #ffed00;
+  font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+  letter-spacing: 0.06em;
+  margin: 0 0 clamp(12px, 2vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.swipeArrow {
+  display: inline-block;
+  animation: swipeNudge 1.1s ease-in-out infinite;
 }
 @keyframes swipeNudge {
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(7px); }
 }
 
+/* Steps list */
 .steps {
-  position: relative;
-  z-index: 2;
   counter-reset: step;
   list-style: none;
   margin: 0;
   padding: 0;
-  max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.4vw, 18px);
+  gap: clamp(10px, 1.8vw, 20px);
 }
 .step {
   counter-increment: step;
   display: flex;
   align-items: flex-start;
-  gap: clamp(16px, 2vw, 30px);
+  gap: clamp(14px, 2vw, 28px);
 }
 .num {
   flex: none;
   min-width: 1.1em;
   text-align: center;
-  font-family: var(--font-display), system-ui, sans-serif;
-  color: var(--yellow, #ffd23e);
-  font-size: clamp(2rem, 4vw, 3.4rem);
-  line-height: 0.85;
+  font-family: 'Luckiest Guy', system-ui;
+  color: #ffed00;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  line-height: 0.9;
 }
-.num::before {
-  content: counter(step);
-}
+.num::before { content: counter(step); }
 .text {
-  padding-top: 0.18em;
-  font-family: var(--font-body), system-ui, sans-serif;
+  padding-top: 0.15em;
+  font-family: Montserrat, system-ui;
   font-weight: 700;
   color: #ffffff;
-  font-size: clamp(1.15rem, 2.3vw, 1.7rem);
-  line-height: 1.25;
+  font-size: clamp(1rem, 2vw, 1.55rem);
+  line-height: 1.3;
 }
 
+/* Decorative -- captured by dropPiecesThenClose for pit drop */
 .logo {
   position: absolute;
-  right: clamp(28px, 4vw, 72px);
-  bottom: clamp(22px, 3vw, 56px);
-  z-index: 2;
-  width: clamp(160px, 18vw, 300px);
+  right: clamp(20px, 3vw, 56px);
+  bottom: clamp(20px, 3vw, 48px);
+  width: clamp(120px, 15vw, 240px);
   aspect-ratio: 230 / 150;
   background: url("/dogbingo.svg") center / contain no-repeat;
   pointer-events: none;
+  opacity: 0.6;
 }
-
-/* Playful yellow triangles, tucked into empty areas of the panel. */
 .deco {
   position: absolute;
-  z-index: 1;
   background: url("/yellow-triangle.svg") center / contain no-repeat;
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.5;
 }
 .decoA {
-  width: clamp(28px, 3vw, 46px);
-  height: clamp(28px, 3vw, 46px);
-  top: clamp(18px, 3vw, 40px);
-  right: clamp(90px, 14vw, 230px);
+  width: clamp(24px, 2.5vw, 40px);
+  height: clamp(24px, 2.5vw, 40px);
+  top: clamp(16px, 2vw, 32px);
+  right: clamp(80px, 12vw, 200px);
   transform: rotate(-14deg);
 }
 .decoB {
-  width: clamp(48px, 6vw, 78px);
-  height: clamp(48px, 6vw, 78px);
-  right: clamp(48px, 8vw, 150px);
-  top: 54%;
+  width: clamp(36px, 5vw, 64px);
+  height: clamp(36px, 5vw, 64px);
+  right: clamp(40px, 6vw, 120px);
+  top: 50%;
   transform: rotate(10deg);
 }
 
 @media (max-width: 760px) {
-  .steps {
-    max-width: 100%;
-  }
-  .logo {
-    display: none;
-  }
-  .deco {
-    display: none;
-  }
+  .logo, .deco { display: none; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .stage {
-    animation: none;
-  }
-  .swipeArrow {
-    animation: none;
-  }
-}
-
-/* Step detail view: prev / all steps / next navigation */
-.stepNav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 2vw, 24px);
-  margin-top: clamp(8px, 1.5vw, 20px);
-}
-.navBtn {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1rem, 2vw, 1.4rem);
-  color: var(--navy, #0a3a57);
-  background: var(--yellow, #ffd23e);
-  border: 0;
-  border-radius: 999px;
-  padding: 0.45em 1.2em;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: opacity 0.15s, transform 0.15s;
-}
-.navBtn:disabled {
-  opacity: 0.35;
-  cursor: default;
-  transform: none;
-}
-.navBtn:not(:disabled):hover {
-  transform: scale(1.06);
-}
-
-/* ------------------------------------------------------------------ */
-/* Step lightbox -- fullscreen overlay with the instruction page image */
-/* ------------------------------------------------------------------ */
-.lightboxOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(10, 58, 87, 0.82);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.lightboxStage {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(96vw, 1100px);
-  max-height: 92vh;
-}
-
-.lightboxImg {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 88vh;
-  object-fit: contain;
-  border-radius: 20px;
-  box-shadow: 0 32px 80px rgba(10, 58, 87, 0.6);
-  animation: pop3d 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-.lightboxClose {
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  z-index: 10;
-  width: 52px;
-  height: 52px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--yellow, #ffd23e);
-  color: var(--navy, #0a3a57);
-  font-size: 2rem;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(10, 58, 87, 0.35);
-  transition: transform 0.15s;
-}
-.lightboxClose:hover {
-  transform: scale(1.1);
-}
-
-.lightboxNav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 52px;
-  height: 52px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--yellow, #ffd23e);
-  color: var(--navy, #0a3a57);
-  font-size: 1.6rem;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(10, 58, 87, 0.35);
-  transition: transform 0.15s;
-}
-.lightboxNav:hover {
-  transform: translateY(-50%) scale(1.1);
-}
-.lightboxPrev {
-  left: -26px;
-}
-.lightboxNext {
-  right: -26px;
-}
-
-.lightboxDots {
-  position: absolute;
-  bottom: -36px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-}
-.lightboxDot {
-  width: 10px;
-  height: 10px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.2s, transform 0.2s;
-}
-.lightboxDot:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
-.lightboxDotActive {
-  background: var(--yellow, #ffd23e);
-  transform: scale(1.3);
-}
-
-@media (max-width: 600px) {
-  .lightboxPrev { left: 8px; }
-  .lightboxNext { right: 8px; }
-  .lightboxClose { top: 8px; right: 8px; }
-}
-
-/* ------------------------------------------------------------------ */
-/* New CSS-built step cards -- replaces old image strip                */
-/* ------------------------------------------------------------------ */
-.cardRow {
-  display: flex;
-  gap: 12px;
-  margin-bottom: clamp(20px, 3vw, 36px);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  margin-left: calc(0px - clamp(28px, 4vw, 64px));
-  margin-right: calc(0px - clamp(28px, 4vw, 64px));
-  padding: 28px clamp(28px, 4vw, 64px) 12px;
-}
-.cardRow::-webkit-scrollbar { display: none; }
-
-.stepCard {
-  position: relative;
-  flex: 0 0 auto;
-  width: clamp(200px, 28vw, 380px);
-  border-radius: clamp(12px, 2vw, 20px);
-  background: #ffed00;
-  overflow: visible;
-  scroll-snap-align: center;
-  box-shadow: 0 6px 20px rgba(10, 58, 87, 0.35);
-}
-
-/* Blue circle + number -- sits top-left, overlaps the card corner */
-.stepCircle {
-  position: absolute;
-  top: -14px;
-  left: -14px;
-  width: clamp(36px, 5vw, 52px);
-  height: clamp(36px, 5vw, 52px);
-  background: url('/blue-circle.svg') center / contain no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-.stepNum {
-  width: 55%;
-  height: 55%;
-  object-fit: contain;
-  display: block;
-}
-
-/* Illustration -- fills card top, square crop */
-.stepIllo {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  border-radius: clamp(10px, 1.8vw, 16px) clamp(10px, 1.8vw, 16px) 0 0;
-}
-
-/* Footer caption bar -- navy text on yellow, Luckiest Guy */
-.stepFooter {
-  padding: 10px 10px;
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(9px, 1.2vw, 14px);
-  color: #0a3a57;
-  text-align: center;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-}
-
-@media (max-width: 900px) {
-  .cardRow {
-    gap: 10px;
-  }
-  .stepCard {
-    width: clamp(180px, 72vw, 320px);
-  }
+  .overlay { animation: none; }
+  .swipeArrow { animation: none; }
 }
