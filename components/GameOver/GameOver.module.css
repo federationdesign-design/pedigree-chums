@@ -102,3 +102,12 @@
   .dog, .title, .sub, .pills { animation: none; }
   .overlay.fadeOut { transition: none; }
 }
+
+.scoreDisplay {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1.2rem, 3vw, 2.2rem);
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 8px;
+  letter-spacing: 0.05em;
+  animation: goBounce 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+}

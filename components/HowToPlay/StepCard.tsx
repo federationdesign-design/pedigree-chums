@@ -120,7 +120,6 @@ export default function StepCard({ step, onClose, cardPos }: Props) {
             {image && (
               <image href={image} x={-cw / 2} y={-ch / 2} width={cw} height={ch} clipPath="url(#htp-card-clip)" preserveAspectRatio="xMidYMid slice" />
             )}
-            <rect x={-cw / 2 - 4} y={-ch / 2 - 4} width={cw + 8} height={ch + 8} rx={RADIUS + 4} fill="none" stroke="var(--yellow, #ffd23e)" strokeWidth={5} />
           </g>
 
           {/* Text panel -- always upright, offset to the right of the card */}
