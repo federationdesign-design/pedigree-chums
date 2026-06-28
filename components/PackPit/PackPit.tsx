@@ -658,17 +658,34 @@ export default function PackPit() {
           }, delay));
         };
         // Scripted pairs shared by both mobile and desktop
-        const PAIRS = [
-          ["Labrador",       "Border Collie"],
-          ["Maltese",        "Saint Bernard"],
-          ["Chihuahua",      "Dachshund"],
-          ["German Shepherd","Basset Hound"],
-          ["Beagle",         "Old English Sheepdog"],
-          ["Siberian Husky", "Pomeranian"],
+        // Batch 1: 6 trios. One dog drops first (trioFirst), the other two drop later as partners.
+        // Each trio has one from each difficulty tier where possible, and contrasting sizes/coats.
+        const TRIOS: [string, string, string][] = [
+          ["Labrador",                  "Pug",              "Great Dane"],           // T1: easy/simple/simple -- Britain's fav, pocket wrinkle, gentle giant
+          ["West Highland Terrier",     "Labradoodle",      "Chihuahua"],            // T2: easy/easy/simple  -- highland scruff, shaggy doodle, world's smallest
+          ["Staffordshire Bull Terrier","Afghan Hound",     "Cavachon"],             // T3: easy/simple/easy  -- street tough, silk aristocrat, fluffy companion
+          ["Cocker Spaniel",            "Corgi",            "Bichon Frise"],         // T4: easy/simple/simple -- silky hunter, royal low-rider, powder-puff
+          ["Puggle",                    "Irish Wolfhound",  "Papillon"],             // T5: easy/simple/simple -- cheeky cross, tallest breed, butterfly ears
+          ["French Bulldog",            "Whippet",          "Mastiff"],              // T6: easy/easy/simple  -- bat-ears, racing shadow, ancient titan
+          ["Bulldog",                   "Yorkshire Terrier","Shih Tzu"],             // T7: easy/easy/simple  -- waddling bruiser, silk rat-catcher, temple lion
+          ["Springer Spaniel",          "Lurcher",          "Cavalier King Charles Spaniel"], // T8: easy/easy/simple -- field dog, poacher's runner, regal lap spaniel
+          ["Cockapoo",                  "Cavapoo",          "Greyhound"],            // T9: medium/easy/simple -- fluffy cross, teddy doodle, lean racer
+          ["Jackapoo",                  "Maltipoo",         "Italian Greyhound"],    // T10: medium/easy/simple -- bouncy cross, micro fluff, Roman palace wisp
+          ["Weimaraner",                "Dalmatian",        "Rottweiler"],           // T11: medium/medium/simple -- silver ghost, spotted carriage, black-tan block
+          ["Doberman Pinscher",         "Boston Terrier",   "Bloodhound"],           // T12: medium/easy/simple -- precision guard, tuxedo bat-ears, droopy detective
+          ["Golden Retriever",          "Goldendoodle",     "Border Terrier"],       // T13: hard/hard/hard -- boss level, all deep trees
         ];
+        // Flood breeds -- drop at 150s
+        const FLOOD_BREEDS = ["Bull Terrier", "Miniature Schnauzer", "Poodle"];
         const dropped = new Set<number>();
-        const pairChoice: string[] = PAIRS.map(([a, b]) => Math.random() < 0.5 ? a : b);
-        const pairPartner: string[] = PAIRS.map(([a, b], i) => pairChoice[i] === a ? b : a);
+        // Each load picks one dog from each trio to drop first; the other two drop as partners
+        const trioFirst: string[] = TRIOS.map(([a, b, c]) => {
+          const r = Math.random();
+          return r < 0.333 ? a : r < 0.667 ? b : c;
+        });
+        const trioPartners: string[][] = TRIOS.map(([a, b, c], i) =>
+          [a, b, c].filter(x => x !== trioFirst[i])
+        );
         if (isMobile) {
           // mobile: 1 tennis ball, logo falls, bone + slipper split by 10s, HTP + enter split by 10s
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl
@@ -678,12 +695,11 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 2400));             // 2400 menu
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 5000));   // 5000 pair 1 (more breathing room)
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makeArrow(w)); } }, 5500));   // 5500 HTP panel + arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 11400));                                    // 11400 slipper (10s after bone)
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 15500)); // 15500 enter site (10s after HTP)
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 18000));  // 18000 pair 2 (more space)
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[0], dropped); } }, 5000));    // 5000  T1 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makeArrow(w)); } }, 5500));   // 5500 HTP + arrow
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 11400));                        // 11400 slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[1], dropped); } }, 15000));   // 15000 T2 first
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 15500)); // 15500 enter site
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -693,29 +709,42 @@ export default function PackPit() {
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
-          }, 15500));                                                                                                 // 15500 Union Jack mobile
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6
-          // Partners drop in rotation same as desktop
-          const mobilePartnerOrder = [0, 1, 2, 3, 4, 5];
-          mobilePartnerOrder.sort(() => Math.random() - 0.5);
-          mobilePartnerOrder.forEach((pairIdx, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pairPartner[pairIdx], dropped); }, 35000 + i * 5000));
+          }, 15500));                                                                                                // 15500 Union Jack mobile
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[2], dropped); } }, 20000));   // 20000 T3 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[3], dropped); } }, 25000));   // 25000 T4
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[4], dropped); } }, 30000));   // 30000 T5
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[5], dropped); } }, 35000));   // 35000 T6
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[6], dropped); } }, 40000));   // 40000 T7
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[7], dropped); } }, 45000));   // 45000 T8
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[8], dropped); } }, 50000));   // 50000 T9
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[9], dropped); } }, 55000));   // 55000 T10
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[10], dropped); } }, 60000));  // 60000 T11
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[11], dropped); } }, 65000));  // 65000 T12
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[12], dropped); } }, 70000));  // 70000 T13
+          // Partners: shuffled, staggered from 80s
+          const mobileAllPartners: string[] = [];
+          const mobilePTOrder = [...Array(13).keys()];
+          mobilePTOrder.sort(() => Math.random() - 0.5);
+          mobilePTOrder.forEach(ti => trioPartners[ti].forEach(p => mobileAllPartners.push(p)));
+          mobileAllPartners.forEach((breed, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 80000 + i * 3000));
           });
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                         // 150000 all remaining
+          // Flood at 170s on mobile (slightly later than desktop)
+          FLOOD_BREEDS.forEach((breed, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 170000 + i * 1000));
+          });
         } else {
-          // desktop: a scripted, slower pour. Feature cards land on set beats (each
-          // picked from a pair, alternating per load); everything else floods at 150s.
-          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700   tennis balls
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050  cookies
+          // desktop: scripted trios. One from each trio drops first, partners follow in waves.
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                   // 700   tennis balls (3)
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050)); // 1050  cookies
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 2750));   // 2750 pair 1 first
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));    // 2050 pre-order
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[0], dropped); } }, 2750));    // 2750  T1 first dog
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                             // 6400 bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8050));   // 8050 pair 2 first
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000)); // 9000 hamburger menu
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                             // 6400  bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[1], dropped); } }, 8050));    // 8050  T2 first dog
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000)); // 9000  menu
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[2], dropped); } }, 13000));   // 13000 T3 first dog
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -725,20 +754,30 @@ export default function PackPit() {
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
-          }, 15000));                                                                                                 // 15000 Union Jack
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3 first
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4 first
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5 first
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6 first
-          // Partners drop in rotation: cycle through pairs 1-6, dropping the unchosen partner
-          // Each pair's partner drops ~8s after its first, staggered so they arrive in waves
-          const partnerOrder = [0, 1, 2, 3, 4, 5]; // rotate each load
-          partnerOrder.sort(() => Math.random() - 0.5); // shuffle for variety
-          partnerOrder.forEach((pairIdx, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pairPartner[pairIdx], dropped); }, 35000 + i * 5000));
+          }, 15000));                                                                                                // 15000 Union Jack
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[3], dropped); } }, 18000));   // 18000 T4
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[4], dropped); } }, 23000));   // 23000 T5
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[5], dropped); } }, 28000));   // 28000 T6
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[6], dropped); } }, 33000));   // 33000 T7
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[7], dropped); } }, 38000));   // 38000 T8
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[8], dropped); } }, 43000));   // 43000 T9
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[9], dropped); } }, 48000));   // 48000 T10
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[10], dropped); } }, 53000));  // 53000 T11
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[11], dropped); } }, 58000));  // 58000 T12
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[12], dropped); } }, 63000));  // 63000 T13
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl
+          // Partners: all 13 trios, 2 partners each, staggered 5s apart from 75s
+          const allPartners: string[] = [];
+          const partnerTrioOrder = [...Array(13).keys()];
+          partnerTrioOrder.sort(() => Math.random() - 0.5);
+          partnerTrioOrder.forEach(ti => trioPartners[ti].forEach(p => allPartners.push(p)));
+          allPartners.forEach((breed, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 75000 + i * 3000));
           });
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000));   // 70000 bowl
-          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                   // 150000 all remaining cards
+          // Flood: 3 hard breeds at 150s
+          FLOOD_BREEDS.forEach((breed, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 150000 + i * 1000));
+          });
         }
       }
 
