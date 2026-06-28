@@ -657,7 +657,8 @@ export default function LineageMap({
       return;
     }
     // fully open: auto-place all unplaced images into their correct frames
-    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed);
+    // Only place the top-of-stack card per image -- duplicates stack visually on top
+    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && isTopOfStack(c));
     if (unplaced.length === 0) return;
     unplaced.forEach((c, i) => {
       const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
