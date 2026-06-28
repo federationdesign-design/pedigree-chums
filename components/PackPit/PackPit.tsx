@@ -32,7 +32,6 @@ export default function PackPit() {
   const pauseRef = useRef<() => void>(() => {});
   const resumeRef = useRef<() => void>(() => {});
   const slowmoRef = useRef<() => void>(() => {});
-  const slowmoActiveRef = useRef(false);
   const [paused, setPaused] = useState(false);
   const [slowmo, setSlowmo] = useState(false);
   const motionRef = useRef<() => void>(() => {});
@@ -127,27 +126,6 @@ export default function PackPit() {
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
 
-  // Auto slow motion at zero drain cost when any overlay is open
-  const autoSlowmoRef = useRef(false);
-  useEffect(() => {
-    const overlayOpen = !!activeBreed || shelfOpen || howToPlay || britainMsg !== null;
-    if (overlayOpen && !autoSlowmoRef.current) {
-      autoSlowmoRef.current = true;
-      // Engage slowmo without flagging slowmoActiveRef (so drain stays normal)
-      if (slowmoRef.current) {
-        const engine = engineRef.current;
-        if (engine && engine.timing.timeScale === 1) engine.timing.timeScale = 0.25;
-      }
-    } else if (!overlayOpen && autoSlowmoRef.current) {
-      autoSlowmoRef.current = false;
-      // Only restore if user hasn't manually engaged slowmo
-      if (!slowmoActiveRef.current) {
-        const engine = engineRef.current;
-        if (engine) engine.timing.timeScale = 1;
-      }
-    }
-  }, [activeBreed, shelfOpen, howToPlay, britainMsg]);
-
   // When Learn completes, auto-open the first chum's lineage after a short delay
   useEffect(() => {
     const onPackComplete = (e: Event) => {
@@ -164,21 +142,13 @@ export default function PackPit() {
     return () => window.removeEventListener("pc:pack-complete", onPackComplete as EventListener);
   }, [activeBreed]);
 
-  // Score-based reward/penalty scaling
-  // Pre-order reward: more score earned = more valuable (you showed up and played)
-  const preorderReward = (s: number) => s < 500 ? 50 : s < 2000 ? 150 : s < 5000 ? 350 : 750;
-  // Auto penalty: more score earned = steeper cost (you had more opportunity to earn it yourself)
-  const autoPenalty = (s: number) => s < 500 ? -500 : s < 2000 ? -1000 : s < 5000 ? -2500 : -5000;
-
   // Score drain: -1 per second while score > 0, paused whenever the LineageMap overlay is open.
   const drainRef = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => {
     if (drainRef.current) clearInterval(drainRef.current);
     drainRef.current = setInterval(() => {
       if (lineageOpenRef.current) return; // paused while family-tree overlay is open
-      if (gameOverRef.current) return; // score frozen on game over
-      const drain = slowmoActiveRef.current ? 4 : 1; // 4x drain in slow motion
-      setScore((s: number) => Math.max(0, s - drain));
+      setScore((s: number) => Math.max(0, s - 1));
     }, 1000);
     return () => { if (drainRef.current) clearInterval(drainRef.current); };
   }, []); // runs once; lineageOpenRef is checked inside the interval callback
@@ -195,21 +165,7 @@ export default function PackPit() {
       const stuck = (e as CustomEvent).detail?.stuck ?? false;
       if (stuck) {
         gameOverRef.current = true;
-        if (drainRef.current) { clearInterval(drainRef.current); drainRef.current = null; } // stop drain on game over
-        // Wait for activity to settle before showing game over -- check every 500ms
-        // until average body speed drops below threshold, then wait an extra 1.5s
-        const checkQuiet = () => {
-          const eng = engineRef.current;
-          if (!eng) { window.setTimeout(() => setGameOver(true), 1500); return; }
-          const all = (eng.world.bodies as any[]).filter((b: any) => !b.isStatic);
-          const avgSpeed = all.length ? all.reduce((s: number, b: any) => s + Math.hypot(b.velocity.x, b.velocity.y), 0) / all.length : 0;
-          if (avgSpeed < 2) {
-            window.setTimeout(() => setGameOver(true), 1500);
-          } else {
-            window.setTimeout(checkQuiet, 500);
-          }
-        };
-        window.setTimeout(checkQuiet, 1000);
+        window.setTimeout(() => setGameOver(true), 2500); // 2.5s delay -- let player see the full pit before overlay
       }
     };
     window.addEventListener("pc:gameover-result", onResult as EventListener);
@@ -249,12 +205,12 @@ export default function PackPit() {
       const SCALE = isMobile ? 0.67 : 1; // mobile shrinks cards and toys uniformly by a third
       const BIG = 84 * SCALE;
       const pctFont = (typeof window !== "undefined" ? getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() : "") || "Montserrat"; // Open Sans for the % figures
-      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.25 * (isMobile ? 0.9 : 1), aspect: 1 };
-      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 4.95 * (isMobile ? 0.9 : 1), aspect: 2.05 };
+      const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.5 * (isMobile ? 0.9 : 1), aspect: 1 };
+      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.5 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
-      const BALLS = isMobile ? [ball] : [ball, ball, ball];
+      const BALLS = isMobile ? [ball, ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
       const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
@@ -271,7 +227,7 @@ export default function PackPit() {
       runnerRef.current = runner;
       pauseRef.current = () => Runner.stop(runner);
       resumeRef.current = () => Runner.run(runner, engine);
-      slowmoRef.current = () => { if (engine.timing.timeScale === 1) { engine.timing.timeScale = 0.25; slowmoActiveRef.current = true; } else { engine.timing.timeScale = 1; slowmoActiveRef.current = false; } };
+      slowmoRef.current = () => { engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1; };
       Runner.run(runner, engine);
 
       let walls: any[] = [];
@@ -683,48 +639,30 @@ export default function PackPit() {
           }, delay));
         };
         // Scripted pairs shared by both mobile and desktop
-        // Batch 1: 6 trios. One dog drops first (trioFirst), the other two drop later as partners.
-        // Each trio has one from each difficulty tier where possible, and contrasting sizes/coats.
-        const TRIOS: [string, string, string][] = [
-          ["Labrador",                  "Pug",              "Great Dane"],           // T1: easy/simple/simple -- Britain's fav, pocket wrinkle, gentle giant
-          ["West Highland Terrier",     "Labradoodle",      "Chihuahua"],            // T2: easy/easy/simple  -- highland scruff, shaggy doodle, world's smallest
-          ["Staffordshire Bull Terrier","Afghan Hound",     "Cavachon"],             // T3: easy/simple/easy  -- street tough, silk aristocrat, fluffy companion
-          ["Cocker Spaniel",            "Corgi",            "Bichon Frise"],         // T4: easy/simple/simple -- silky hunter, royal low-rider, powder-puff
-          ["Puggle",                    "Irish Wolfhound",  "Papillon"],             // T5: easy/simple/simple -- cheeky cross, tallest breed, butterfly ears
-          ["French Bulldog",            "Whippet",          "Mastiff"],              // T6: easy/easy/simple  -- bat-ears, racing shadow, ancient titan
-          ["Bulldog",                   "Yorkshire Terrier","Shih Tzu"],             // T7: easy/easy/simple  -- waddling bruiser, silk rat-catcher, temple lion
-          ["Springer Spaniel",          "Lurcher",          "Cavalier King Charles Spaniel"], // T8: easy/easy/simple -- field dog, poacher's runner, regal lap spaniel
-          ["Cockapoo",                  "Cavapoo",          "Greyhound"],            // T9: medium/easy/simple -- fluffy cross, teddy doodle, lean racer
-          ["Jackapoo",                  "Maltipoo",         "Italian Greyhound"],    // T10: medium/easy/simple -- bouncy cross, micro fluff, Roman palace wisp
-          ["Weimaraner",                "Dalmatian",        "Rottweiler"],           // T11: medium/medium/simple -- silver ghost, spotted carriage, black-tan block
-          ["Doberman Pinscher",         "Boston Terrier",   "Bloodhound"],           // T12: medium/easy/simple -- precision guard, tuxedo bat-ears, droopy detective
-          ["Golden Retriever",          "Goldendoodle",     "Border Terrier"],       // T13: hard/hard/hard -- boss level, all deep trees
+        const PAIRS = [
+          ["Labrador",       "Border Collie"],
+          ["Maltese",        "Saint Bernard"],
+          ["Chihuahua",      "Dachshund"],
+          ["German Shepherd","Basset Hound"],
+          ["Beagle",         "Old English Sheepdog"],
+          ["Siberian Husky", "Pomeranian"],
         ];
-        // Flood breeds -- drop at 150s
-        const FLOOD_BREEDS = ["Bull Terrier", "Miniature Schnauzer", "Poodle"];
         const dropped = new Set<number>();
-        // Each load picks one dog from each trio to drop first; the other two drop as partners
-        const trioFirst: string[] = TRIOS.map(([a, b, c]) => {
-          const r = Math.random();
-          return r < 0.333 ? a : r < 0.667 ? b : c;
-        });
-        const trioPartners: string[][] = TRIOS.map(([a, b, c], i) =>
-          [a, b, c].filter(x => x !== trioFirst[i])
-        );
+        const pairChoice: string[] = PAIRS.map(([a, b]) => Math.random() < 0.5 ? a : b);
+        const pairPartner: string[] = PAIRS.map(([a, b], i) => pairChoice[i] === a ? b : a);
         if (isMobile) {
-          // mobile: 1 tennis ball, logo falls, bone + slipper split by 10s, HTP + enter split by 10s
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl
-          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  1 tennis ball
+          // mobile: same scripted pairs as desktop, bowl first, 2 balls (kept), partners rotate
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl (matches desktop)
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700  2 tennis balls (mobile keeps 2)
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050 cookies
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 1400));                                        // 1400 bone only
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 1400));                                         // 1400 bone + slipper
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 2400));             // 2400 menu
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[0], dropped); } }, 5000));    // 5000  T1 first
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makeArrow(w)); } }, 5500));   // 5500 HTP + arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 11400));                        // 11400 slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[1], dropped); } }, 15000));   // 15000 T2 first
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 15500)); // 15500 enter site
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 3000));   // 3000 pair 1
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3500)); // 3500 panels + arrow
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8000));   // 8000 pair 2
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -734,42 +672,29 @@ export default function PackPit() {
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
-          }, 15500));                                                                                                // 15500 Union Jack mobile
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[2], dropped); } }, 20000));   // 20000 T3 first
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[3], dropped); } }, 25000));   // 25000 T4
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[4], dropped); } }, 30000));   // 30000 T5
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[5], dropped); } }, 35000));   // 35000 T6
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[6], dropped); } }, 40000));   // 40000 T7
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[7], dropped); } }, 45000));   // 45000 T8
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[8], dropped); } }, 50000));   // 50000 T9
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[9], dropped); } }, 55000));   // 55000 T10
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[10], dropped); } }, 60000));  // 60000 T11
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[11], dropped); } }, 65000));  // 65000 T12
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[12], dropped); } }, 70000));  // 70000 T13
-          // Partners: shuffled, staggered from 80s
-          const mobileAllPartners: string[] = [];
-          const mobilePTOrder = [...Array(13).keys()];
-          mobilePTOrder.sort(() => Math.random() - 0.5);
-          mobilePTOrder.forEach(ti => trioPartners[ti].forEach(p => mobileAllPartners.push(p)));
-          mobileAllPartners.forEach((breed, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 80000 + i * 3000));
+          }, 15500));                                                                                                 // 15500 Union Jack mobile
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6
+          // Partners drop in rotation same as desktop
+          const mobilePartnerOrder = [0, 1, 2, 3, 4, 5];
+          mobilePartnerOrder.sort(() => Math.random() - 0.5);
+          mobilePartnerOrder.forEach((pairIdx, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pairPartner[pairIdx], dropped); }, 35000 + i * 5000));
           });
-          // Flood at 170s on mobile (slightly later than desktop)
-          FLOOD_BREEDS.forEach((breed, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 170000 + i * 1000));
-          });
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                         // 150000 all remaining
         } else {
-          // desktop: scripted trios. One from each trio drops first, partners follow in waves.
-          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                   // 700   tennis balls (3)
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050)); // 1050  cookies
+          // desktop: a scripted, slower pour. Feature cards land on set beats (each
+          // picked from a pair, alternating per load); everything else floods at 150s.
+          waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700   tennis balls
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050  cookies
           waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));    // 2050 pre-order
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[0], dropped); } }, 2750));    // 2750  T1 first dog
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[0], dropped); } }, 2750));   // 2750 pair 1 first
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
-          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                             // 6400  bone + slipper
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[1], dropped); } }, 8050));    // 8050  T2 first dog
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000)); // 9000  menu
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[2], dropped); } }, 13000));   // 13000 T3 first dog
+          waveTimers.push(setTimeout(() => { if (!disposed) addProps(HEAVY); }, 6400));                             // 6400 bone + slipper
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[1], dropped); } }, 8050));   // 8050 pair 2 first
+          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000)); // 9000 hamburger menu
           waveTimers.push(setTimeout(() => {
             if (!disposed) {
               const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -779,30 +704,20 @@ export default function PackPit() {
               Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
               Composite.add(engine.world, ujB);
             }
-          }, 15000));                                                                                                // 15000 Union Jack
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[3], dropped); } }, 18000));   // 18000 T4
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[4], dropped); } }, 23000));   // 23000 T5
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[5], dropped); } }, 28000));   // 28000 T6
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[6], dropped); } }, 33000));   // 33000 T7
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[7], dropped); } }, 38000));   // 38000 T8
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[8], dropped); } }, 43000));   // 43000 T9
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[9], dropped); } }, 48000));   // 48000 T10
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[10], dropped); } }, 53000));  // 53000 T11
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[11], dropped); } }, 58000));  // 58000 T12
-          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[12], dropped); } }, 63000));  // 63000 T13
-          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl
-          // Partners: all 13 trios, 2 partners each, staggered 5s apart from 75s
-          const allPartners: string[] = [];
-          const partnerTrioOrder = [...Array(13).keys()];
-          partnerTrioOrder.sort(() => Math.random() - 0.5);
-          partnerTrioOrder.forEach(ti => trioPartners[ti].forEach(p => allPartners.push(p)));
-          allPartners.forEach((breed, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 75000 + i * 3000));
+          }, 15000));                                                                                                 // 15000 Union Jack
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[2], dropped); } }, 15000));  // 15000 pair 3 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[3], dropped); } }, 20000));  // 20000 pair 4 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[4], dropped); } }, 24000));  // 24000 pair 5 first
+          waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pairChoice[5], dropped); } }, 30000));  // 30000 pair 6 first
+          // Partners drop in rotation: cycle through pairs 1-6, dropping the unchosen partner
+          // Each pair's partner drops ~8s after its first, staggered so they arrive in waves
+          const partnerOrder = [0, 1, 2, 3, 4, 5]; // rotate each load
+          partnerOrder.sort(() => Math.random() - 0.5); // shuffle for variety
+          partnerOrder.forEach((pairIdx, i) => {
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(pairPartner[pairIdx], dropped); }, 35000 + i * 5000));
           });
-          // Flood: 3 hard breeds at 150s
-          FLOOD_BREEDS.forEach((breed, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 150000 + i * 1000));
-          });
+          waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000));   // 70000 bowl
+          waveTimers.push(setTimeout(() => { if (!disposed) dropRest(dropped); }, 150000));                                   // 150000 all remaining cards
         }
       }
 
@@ -939,7 +854,7 @@ export default function PackPit() {
           lastDraggedBall = null;
           poof(b.position.x, 0, b.plugin.half * 1.5);
           numAt(b.position.x, 20, 250);
-          setScore((s) => s + 500);
+          setScore((s) => s + 250);
           Composite.remove(engine.world, b);
         }
       });
@@ -984,7 +899,7 @@ export default function PackPit() {
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
-        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; const rv = preorderReward(score); numAt(hit.position.x, hit.position.y, rv); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
+        if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
           window.dispatchEvent(new Event("pc:open-cookies"));
           hit.plugin.inert = true; // the tapped cookie settles and stops buzzing
@@ -1021,7 +936,7 @@ export default function PackPit() {
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
           bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });        // deep blue, a colder pop
           bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 }); // grey
-          // no score penalty for rejecting cookies
+          numAt(rx, ry, -990); // the penalty for rejecting
           clearCookieObjects();
           return true;
         }
@@ -1035,7 +950,7 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "unionjack" && !hit.plugin.popped) {
           hit.plugin.hits = (hit.plugin.hits || 0) + 1;
-          numAt(hit.position.x, hit.position.y, 200);
+          numAt(hit.position.x, hit.position.y, 50);
           burstAt(hit.position.x, hit.position.y, hit.plugin.half * 0.8);
           // any tap opens the popup; the green tick button closes it and poofs the flag
           showBritainMsg(0);
@@ -1043,10 +958,10 @@ export default function PackPit() {
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
         if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
-        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 2000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
+        if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 1000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         if (hit.plugin?.prop === "logopiece" && !hit.plugin.knockPiece) {
           // HTP step cards tapped in the pit -- open the overlay at the matching step
-          const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
+          const HTP_NAMES = ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"];
           const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
           if (stepIdx !== -1) {
             const r = render.canvas.getBoundingClientRect();
@@ -1058,12 +973,12 @@ export default function PackPit() {
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score && !gameOverRef.current) setScore((s) => s + val); };
+      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score) setScore((s) => s + val); };
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
         const cr = render.canvas.getBoundingClientRect(), br = btn.getBoundingClientRect();
-        numAt(br.left + br.width / 2 - cr.left, br.top + br.height / 2 - cr.top, 5);
+        numAt(br.left + br.width / 2 - cr.left, br.top + br.height / 2 - cr.top, 75);
       };
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
@@ -1270,88 +1185,6 @@ export default function PackPit() {
             const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
             // ox/oy shifts draw origin so a custom pivot point sits at body centre
             const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
-
-            // Blue circle from HTP overlay -- draw as filled circle with image
-            if (b.plugin.kind === "htpcircle") {
-              const r = b.plugin.half;
-              ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
-              ctx.fillStyle = "#009fe0"; ctx.fill();
-              ctx.lineWidth = Math.max(2, r * 0.08);
-              ctx.strokeStyle = "#0a3a57"; ctx.stroke();
-              if (img && img.complete && img.naturalWidth) {
-                ctx.drawImage(img, -r * 0.7, -r * 0.7, r * 1.4, r * 1.4);
-              }
-              ctx.restore(); return;
-            }
-
-            // Yellow number from HTP overlay
-            if (b.plugin.kind === "htpnumber") {
-              const r = b.plugin.half;
-              if (img && img.complete && img.naturalWidth) {
-                // Preserve natural aspect ratio -- number SVGs are tall portrait
-                const ar = img.naturalWidth / img.naturalHeight;
-                const dw = ar >= 1 ? r * 2 : r * 2 * ar;
-                const dh = ar >= 1 ? r * 2 / ar : r * 2;
-                ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
-              } else {
-                ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
-                ctx.fillStyle = "#ffed00"; ctx.fill();
-              }
-              ctx.restore(); return;
-            }
-
-            // Step card: draw yellow frame + illustration + footer caption
-            if (b.plugin.kind === "stepcard") {
-              // Advance cycle for step 5
-              if (b.plugin.cycleImgs) {
-                const t = performance.now();
-                if (t > b.plugin.cycleAt) {
-                  b.plugin.cycleIdx = (b.plugin.cycleIdx + 1) % b.plugin.cycleImgs.length;
-                  b.plugin.img = b.plugin.cycleImgs[b.plugin.cycleIdx];
-                  b.plugin.cycleAt = t + 3000;
-                }
-              }
-              const BORDER = 6, FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
-              // Outer yellow rounded rect
-              rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
-              ctx.fillStyle = "#ffed00"; ctx.fill();
-              // Inner illustration -- use natural image aspect ratio if available
-              const illoH = ph - FOOTER - BORDER * 2;
-              const illoW = pw - BORDER * 2;
-              // fit image within illo area preserving aspect ratio
-              const imgAr = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1;
-              const fitW = imgAr > illoW / illoH ? illoW : illoH * imgAr;
-              const fitH = imgAr > illoW / illoH ? illoW / imgAr : illoH;
-              const fitX = -pw / 2 + BORDER + (illoW - fitW) / 2;
-              const fitY = -ph / 2 + BORDER + (illoH - fitH) / 2;
-              rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
-              ctx.save(); ctx.clip();
-              ctx.drawImage(img, fitX, fitY, fitW, fitH);
-              ctx.restore();
-              // Footer caption text
-              const caption = b.plugin.name || "";
-              const maxFontSize = Math.max(11, Math.round(FOOTER * 0.38));
-              ctx.fillStyle = "#0a3a57";
-              ctx.textAlign = "center"; ctx.textBaseline = "middle";
-              ctx.font = `700 ${maxFontSize}px Montserrat, system-ui, sans-serif`;
-              const maxTw = pw * 0.88, tw = ctx.measureText(caption).width;
-              let fs = maxFontSize;
-              if (tw > maxTw) { fs = Math.max(6, Math.floor(maxFontSize * maxTw / tw)); ctx.font = `700 ${fs}px Montserrat, system-ui, sans-serif`; }
-              // Wrap to 2 lines if needed
-              const words = caption.split(" "); let line1 = "", line2 = "";
-              for (const w2 of words) {
-                if (ctx.measureText(line1 + " " + w2).width < maxTw) line1 = (line1 ? line1 + " " : "") + w2;
-                else line2 = (line2 ? line2 + " " : "") + w2;
-              }
-              const footerY = ph / 2 - FOOTER / 2;
-              if (line2) {
-                ctx.fillText(line1, 0, footerY - fs * 0.6);
-                ctx.fillText(line2, 0, footerY + fs * 0.6);
-              } else {
-                ctx.fillText(line1, 0, footerY);
-              }
-              ctx.restore(); return;
-            }
             // fuse cross-fade: ohyea -> plain bone over 1.5s after 1s hold
             if (b.plugin.fuseAt) {
               const ft = (performance.now() - b.plugin.fuseAt) / 1000; // seconds since fuse
@@ -1691,7 +1524,6 @@ export default function PackPit() {
       let patternUntil = 0;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
-      let lastPulse = 0;
       const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
       const onFloorHit = (ev: any) => {
         const floor = walls[0];
@@ -1824,43 +1656,18 @@ export default function PackPit() {
             const bh = b.bounds.max.y - b.bounds.min.y;
             coveredArea += bw * bh;
           }
-          // Revised curve: starts at 1.5x coverage (later), hits full at 3.0x (stronger ramp)
-          // 0→1.5x = 0% opacity, 1.5x→2.25x = 0→50%, 2.25x→3.0x = 50→100%
+          // Three-stop opacity curve: 1.0x coverage = 50%, 1.5x = 80%, 2.0x = 100%
           const ratio = coveredArea / pitArea;
           let fill: number;
-          if (ratio <= 1.5) fill = 0;
-          else if (ratio <= 2.25) fill = (ratio - 1.5) / 0.75 * 0.5;
-          else fill = 0.5 + (ratio - 2.25) / 0.75 * 0.5;
+          if (ratio <= 1.0) fill = ratio * 0.5;
+          else if (ratio <= 1.5) fill = 0.5 + (ratio - 1.0) / 0.5 * 0.3;
+          else fill = 0.8 + (ratio - 1.5) / 0.5 * 0.2;
           fill = Math.min(1, fill);
-          stage.style.setProperty("--fill-opacity", fill.toFixed(3));
-          // Store fill for pulse interval
-          (stage as any).__fillLevel = fill;
-          // Yellow warning flashes at 40%, 70%, 90%, 99%
-          if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-        }
-        // Bone proximity: slow to 50% when two bones are within 100px of each other
-        // Restores to normal when they move apart (or if user has set slow motion)
-        if (!slowmoActiveRef.current) {
-          const bones = bodies.filter((b: any) => b.plugin?.prop === "bone" && !b.isStatic);
-          let bonesNear = false;
-          for (let i = 0; i < bones.length && !bonesNear; i++) {
-            for (let j = i + 1; j < bones.length && !bonesNear; j++) {
-              const dx = bones[i].position.x - bones[j].position.x;
-              const dy = bones[i].position.y - bones[j].position.y;
-              if (Math.hypot(dx, dy) < 100) bonesNear = true;
-            }
-          }
-          if (bonesNear && engine.timing.timeScale === 1) engine.timing.timeScale = 0.5;
-          else if (!bonesNear && engine.timing.timeScale === 0.5) engine.timing.timeScale = 1;
-        }
-        const fillLevel = (stage as any).__fillLevel ?? 0;
-        const pulseInterval = fillLevel < 0.25 ? 10000 : fillLevel < 0.5 ? 5000 : fillLevel < 0.75 ? 2000 : 1000;
-        if (fillLevel > 0.1 && now - lastPulse > pulseInterval) {
-          lastPulse = now;
-          stage.classList.add(styles.patternPulse);
-          setTimeout(() => stage.classList.remove(styles.patternPulse), 500);
+          stage.style.setProperty("--fill-opacity", (fill * 0.5).toFixed(3));
+          // yellow warning flashes at 90, 95, 99%
+          if (fill >= 0.9 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
+          if (fill >= 0.95 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
+          if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 600); }
         }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
@@ -2011,16 +1818,6 @@ export default function PackPit() {
         if (mc.body === bomb) { mc.constraint.bodyB = null; mc.body = null; }
         if (pressedBomb === bomb) pressedBomb = null; // stop the hold loop and the fuse fizz at once
         const bx = bomb.position.x, by = bomb.position.y, bsz = blastSize(bomb);
-        // Strobe the paw pattern on bomb detonation: 4 quick flashes then one long
-        if (stageRef.current) {
-          const el = stageRef.current;
-          const strobeDelays = [0, 80, 160, 240, 380];
-          const strobeDurs  = [60, 60, 60, 60, 400];
-          strobeDelays.forEach((d, i) => {
-            window.setTimeout(() => { el.classList.add(styles.patternStrobe); }, d);
-            window.setTimeout(() => { el.classList.remove(styles.patternStrobe); }, d + strobeDurs[i]);
-          });
-        }
         window.setTimeout(() => {
           if (disposed) return;
           pushBoom(bx, by, bsz * 2.2); // pop-art comic blast: flash, jagged burst, flung stars and lightning bolts, smoke, comic word
@@ -2289,51 +2086,13 @@ export default function PackPit() {
         const pieces = ev?.detail?.pieces;
         if (!Array.isArray(pieces) || !stageRef.current) return;
         const sr = stageRef.current.getBoundingClientRect();
-        const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
-        const MAX_CARD = BIG * 2.2; // cap cards to a sensible pit size regardless of overlay dimensions
-        let stepcardIdx = 0;
-        pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number; kind?: string }) => {
-          const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top;
-          let pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
-          // Scale step cards down if they're coming from a large overlay
-          if (pc.kind === "stepcard" && pw > MAX_CARD) {
-            const scale = MAX_CARD / pw;
-            pw = MAX_CARD; ph = ph * scale;
-          }
-          let b: any;
-          if (pc.kind === "circle") {
-            // Scale circle to match card size proportionally
-            const r = Math.min(pw / 2, MAX_CARD * 0.24); // 33% bigger than before
-            b = Bodies.circle(cx, cy, r, { restitution: 0.5, friction: 0.3, frictionAir: 0.006, density: 0.0007, render: { visible: false } });
-            b.plugin = { name: "How to play", label: "", half: r, w: r * 2, h: r * 2, color: "#009fe0", img: getImg("htp:blue-circle", "/blue-circle.svg"), prop: "logopiece", family: null, ping: 0, kind: "htpcircle" };
-          } else if (pc.kind === "number") {
-            // Yellow number SVG -- small circle body
-            const r = Math.min(pw / 2, MAX_CARD * 0.08); // 33% smaller than before
-            b = Bodies.circle(cx, cy, r, { restitution: 0.6, friction: 0.2, frictionAir: 0.005, density: 0.0005, render: { visible: false } });
-            b.plugin = { name: "How to play number", label: "", half: r, w: r * 2, h: r * 2, color: "#ffed00", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "htpnumber" };
-          } else {
-            // Step card -- tight rectangle body sized to actual rendered card frame
-            b = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.12 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
-            const name = pc.kind === "stepcard" ? (HTP_NAMES[stepcardIdx++] || "How it works") : (HTP_NAMES[Math.min(stepcardIdx, 4)] || "How it works");
-            const isStep5 = pc.src.includes("step5-redue");
-            b.plugin = {
-              name, label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph,
-              color: "#ffffff", img: getImg("htp:" + pc.src, pc.src),
-              prop: "logopiece", family: null, ping: 0, kind: "stepcard",
-              // Step 5 cycles through 3 images
-              ...(isStep5 ? {
-                cycleImgs: [
-                  getImg("htp:/step5-redue.jpg", "/step5-redue.jpg"),
-                  getImg("htp:/step5-redue-slide1.jpg", "/step5-redue-slide1.jpg"),
-                  getImg("htp:/step5-redue-slide2.jpg", "/step5-redue-slide2.jpg"),
-                ],
-                cycleIdx: 0,
-                cycleAt: performance.now() + 3000,
-              } : {}),
-            };
-          }
-          Composite.add(engine.world, b);
-          setScore((s) => s + 500);
+        pieces.forEach((pc: { src: string; x: number; y: number; w: number; h: number }) => {
+          const cx = pc.x + pc.w / 2 - sr.left, cy = pc.y + pc.h / 2 - sr.top; // screen rect -> pit centre
+          const pw = Math.max(20, pc.w), ph = Math.max(20, pc.h);
+          const b: any = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.14 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
+          b.plugin = { name: ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"][Math.min(pieces.indexOf(pc), 4)] || "How it works", label: "", half: Math.min(pw, ph) / 2, w: pw, h: ph, color: "#ffffff", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0 };
+          Composite.add(engine.world, b); // falls straight from where it sat in the popup
+          setScore((s) => s + 500); // 500 points per piece as it drops in
         });
       };
       window.addEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
@@ -2345,7 +2104,7 @@ export default function PackPit() {
       };
       window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
       // poof the specific HTP step card when the user closes the lightbox after viewing it
-      const HTP_STEP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
+      const HTP_STEP_NAMES = ["Deal the cards","The game starts","Look for dogs","See if they match","Find most to win"];
       const onHtpStepViewed = (ev: any) => {
         const idx = ev?.detail?.stepIdx;
         if (idx == null) return;
@@ -2358,7 +2117,7 @@ export default function PackPit() {
       window.addEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
       const onOfferSuccess = () => {
         const reserve = Composite.allBodies(engine.world).find((b: any) => b.plugin?.kind === "reserve");
-        if (reserve) { const ov = preorderReward(score) * 4; numAt(reserve.position.x, reserve.position.y, ov); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
+        if (reserve) { numAt(reserve.position.x, reserve.position.y, 250); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
       };
       // poof the union jack when the tick button is pressed on the popup
       const onBritainDismiss = () => {
@@ -2454,18 +2213,19 @@ export default function PackPit() {
       };
       if (isMobile) { motionRef.current = enableMotion; enableMotion(); } // Android grants now; iOS waits for a tap
 
-      // Logo drops on both desktop and mobile -- wait for image to load to avoid white flash
-      logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
-      const logoImg = logoBody.plugin.img;
-      const addLogo = () => {
-        if (disposed) return;
-        Composite.add(engine.world, logoBody);
-        Events.on(engine, "collisionStart", onCollide);
-      };
-      if (logoImg.complete && logoImg.naturalWidth) {
-        addLogo();
-      } else {
-        logoImg.addEventListener("load", addLogo, { once: true });
+      if (!isMobile) {
+        logoBody = makeLogo(stage.clientWidth, stage.clientHeight);
+        const logoImg = logoBody.plugin.img;
+        const addLogo = () => {
+          if (disposed) return;
+          Composite.add(engine.world, logoBody);
+          Events.on(engine, "collisionStart", onCollide);
+        };
+        if (logoImg.complete && logoImg.naturalWidth) {
+          addLogo(); // already loaded -- add immediately, no flash
+        } else {
+          logoImg.addEventListener("load", addLogo, { once: true });
+        }
       }
 
       // The menu is the only way into the site menu from the pit, so it loads on
@@ -2589,7 +2349,7 @@ export default function PackPit() {
 
   return (
     <section
-      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}${paused ? " " + styles.pitPaused : ""}`}
+      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}`}
       ref={stageRef}
       aria-label="The Pack Pit: tip out all the chums and play"
     >
@@ -2604,11 +2364,11 @@ export default function PackPit() {
         onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
         aria-label={slowmo ? "Normal speed" : "Slow motion"}
       >
-        <img src="/svg-snail-icon.svg" width="52" height="52" alt="" aria-hidden="true" style={{ display: "block" }} />
+        {slowmo ? "1x" : "0.25x"}
       </button>
       <button
         type="button"
-        className={`${styles.pause}${paused ? " " + styles.pauseActive : ""}`}
+        className={styles.pause}
         onClick={() => {
           if (paused) { resumeRef.current(); setPaused(false); }
           else { pauseRef.current(); setPaused(true); }
@@ -2616,24 +2376,16 @@ export default function PackPit() {
         aria-label={paused ? "Resume" : "Pause"}
       >
         {paused ? (
-          <svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
         ) : (
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor">
-            <rect x="5" y="3" width="4.5" height="18" rx="2.25"/>
-            <rect x="14.5" y="3" width="4.5" height="18" rx="2.25"/>
-          </svg>
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
         )}
       </button>
-      <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={(e) => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); const el = e.currentTarget; el.classList.add(styles.shakeFlash); setTimeout(() => el.classList.remove(styles.shakeFlash), 300); }} aria-label="Shake the pit">
+      <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={() => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
-      {paused && (
-        <div className={styles.pausedOverlay} aria-live="polite">
-          PAUSED
-        </div>
-      )}
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => c + 1); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
