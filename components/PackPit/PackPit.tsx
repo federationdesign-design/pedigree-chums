@@ -2487,7 +2487,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (allDogs.length < 3) return; // barely any dogs -- don't trigger
         const settled = allDogs.filter((b: any) => Math.hypot(b.velocity.x, b.velocity.y) < 1.5);
         const avgY = settled.length > 0 ? settled.reduce((s: number, b: any) => s + b.position.y, 0) / settled.length : pitH;
-        if (avgY < pitH * 0.65) { // more lenient threshold at the forced check
+        if (avgY < pitH * 0.50) { // more lenient threshold at the forced check
           window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
       }, MIN_GAME_MS);
@@ -2510,14 +2510,14 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (now - startTime < MIN_GAME_MS) return; // never trigger before 120s
         const pitH = render.canvas.height;
         const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
-        if (allDogs.length < 6) return; // need at least 6 dog cards in pit before checking
+        if (allDogs.length < 10) return; // need at least 6 dog cards in pit before checking
         // Only count settled dogs (low velocity)
         const settled = allDogs.filter((b: any) => Math.hypot(b.velocity.x, b.velocity.y) < 1.5);
-        if (settled.length < 5) return; // need 5 settled
+        if (settled.length < 8) return; // need 5 settled
         // Average Y of settled dogs -- lower Y = higher up in pit
         const avgY = settled.reduce((s: number, b: any) => s + b.position.y, 0) / settled.length;
         // If average resting position is in the top 40% of the pit, it is full
-        if (avgY < pitH * 0.40) {
+        if (avgY < pitH * 0.25) {
           window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
         // Refill: if fewer than 8 dog cards in pit and not all breeds have been dropped, drop 3 more
