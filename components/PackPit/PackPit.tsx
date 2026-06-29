@@ -1893,19 +1893,19 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         drawNumbers(ctx, now);
       };
       removeBreedRef.current = (name: string) => {
-        const target = dyn().find((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
-        if (target && !target.plugin.pop) {
-          // The chosen chum drops out of the pit and falls into the tally in the
-          // bottom-left, where the count ticks up. Translate the tally's fixed
-          // screen spot into canvas space and fly the card there on a curved fall.
+        const all = dyn().filter((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
+        const target = all.find((b: any) => !b.plugin.pop);
+        if (target) {
           const rect = render.canvas.getBoundingClientRect();
           target.plugin.pop = performance.now();
           target.plugin.flyFrom = { x: target.position.x, y: target.position.y };
           target.plugin.flyTo = { x: 60 - rect.left, y: window.innerHeight - 60 - rect.top };
           target.plugin.flyA0 = target.angle;
-          target.plugin.flySpin = (Math.random() < 0.5 ? -1 : 1) * Math.PI * 1.4; // a tumble on the way down
-          target.isSensor = true; // pass through the pile and walls as it leaves
+          target.plugin.flySpin = (Math.random() < 0.5 ? -1 : 1) * Math.PI * 1.4;
+          target.isSensor = true;
           poof(target.position.x, target.position.y, target.plugin.half || 30);
+          // Mark any duplicate bodies with the same name so they can't be re-opened
+          all.forEach((b: any) => { if (b !== target) { b.plugin.pop = performance.now(); b.isSensor = true; } });
         }
       };
 
