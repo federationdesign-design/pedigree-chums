@@ -1908,7 +1908,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
-        bodies.forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        [...bodies].sort((a: any, b: any) => a.position.y - b.position.y).forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
         if (hoverBody) drawBall(ctx, hoverBody, 1, true);
 
