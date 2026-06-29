@@ -279,7 +279,7 @@ export default function PackPit() {
       function buildWalls(w: number, h: number) {
         if (walls.length) Composite.remove(engine.world, walls);
         const t = 600; // thick walls prevent tunnelling at high velocity
-        const ceilY = -400; // just above the spawn zone (~y=-200 to y=-350)
+        const ceilY = -800; // higher ceiling -- gives bowl and objects more room to fall in
         const sideTop = ceilY - t, sideBot = h * 2;
         const sideH = sideBot - sideTop, sideC = (sideTop + sideBot) / 2;
         walls = [
