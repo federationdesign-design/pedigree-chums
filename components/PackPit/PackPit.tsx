@@ -654,39 +654,6 @@ export default function PackPit() {
             if (i === 0 && isMobile) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // mobile keeps pre-order with the 1st ball
           });
         };
-        // scripted desktop pour helpers
-        const idxByName = (name: string) => BREEDS.findIndex((b: any) => b.name === name);
-        const pickName = (a: string, b: string) => (Math.random() < 0.5 ? a : b); // alternate per load
-        const dropCardNamed = (name: string, dropped: Set<number>) => {
-          const i = idxByName(name);
-          if (i >= 0 && !dropped.has(i)) { dropped.add(i); Composite.add(engine.world, makeBall(BREEDS[i], i, w)); }
-        };
-        const dropRest = (dropped: Set<number>) => {
-          const rest = [...BREEDS.keys()].filter((i) => !dropped.has(i)).sort(() => Math.random() - 0.5);
-          let k = 0;
-          dropTimer = setInterval(() => {
-            if (k >= rest.length) { clearInterval(dropTimer); return; }
-            const i = rest[k]; Composite.add(engine.world, makeBall(BREEDS[i], i, w));
-            k++;
-          }, 70);
-        };
-        // Drop the pack in, optionally landing the bowl midway through.
-        const dropDogs = (delay: number, withBowl: boolean) => {
-          const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
-          const bowlAt = Math.floor(order.length / 2);
-          let k = 0;
-          waveTimers.push(setTimeout(() => {
-            if (disposed) return;
-            dropTimer = setInterval(() => {
-              if (k >= order.length) { clearInterval(dropTimer); return; }
-              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); } // the bowl lands midway through the pour
-              if (k === 5) { Composite.add(engine.world, makePanel(enterPanel, w, "left")); } // enter-site panel drops on the left edge
-              if (k === 6) { Composite.add(engine.world, makePanel(howPanel, w, "right")); }   // how-to-play panel drops on the right edge
-              Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
-              k++;
-            }, 70);
-          }, delay));
-        };
         // Simple pair drop -- 2 random dogs every 4 seconds
         // All breeds shuffled, drop in pairs continuously
         const dropped = new Set<number>();
