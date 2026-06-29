@@ -265,12 +265,12 @@ export default function PackPit() {
 
       const engine = Engine.create();
       engineRef.current = engine;
-      renderRef.current = render;
       engine.gravity.y = 1;
       const render = Render.create({
         element: stage, engine,
         options: { width: stage.clientWidth, height: stage.clientHeight, background: "transparent", wireframes: false, pixelRatio: 1 },
       });
+      renderRef.current = render;
       Render.run(render);
       const runner = Runner.create();
       runnerRef.current = runner;
