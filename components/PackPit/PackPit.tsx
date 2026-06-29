@@ -2173,8 +2173,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             const falloff = 1 - dist / SHOVE_RADIUS;
             // Gentler shove for dogs and props -- enough to scatter, not escape
             const isDog = !o.plugin?.prop && !o.plugin?.kind && (o.plugin?.half || 0) > 20;
+            const isBowlOrBone = o.plugin?.prop === "bowl" || o.plugin?.prop === "bone";
             const isProp = !!o.plugin?.prop;
-            const forceMult = isDog ? 0.08 : isProp ? 0.15 : 1.0;
+            const forceMult = isDog ? 0.08 : isBowlOrBone ? 0.04 : isProp ? 0.15 : 1.0;
             const mag = SHOVE_FORCE * falloff * falloff * (o.mass || 1) * forceMult;
             Body.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 });
             Body.setAngularVelocity(o, (Math.random() - 0.5) * 0.6 * (falloff + 0.2));
