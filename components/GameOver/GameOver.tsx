@@ -187,7 +187,7 @@ export default function GameOver({ chums, score, collectedBreeds = [] }: Props) 
             {collectedBreeds.slice().reverse().map((c, i) => {
               const isHov = deckHover === i;
               const total = collectedBreeds.length;
-              const spread = Math.min(32, 180 / Math.max(total, 1));
+              const spread = Math.min(96, 540 / Math.max(total, 1));
               const offset = i * spread;
               return (
                 <div
