@@ -757,7 +757,7 @@ export default function PackPit() {
           mobilePTOrder.sort(() => Math.random() - 0.5);
           mobilePTOrder.forEach(ti => trioPartners[ti].forEach(p => mobileAllPartners.push(p)));
           mobileAllPartners.forEach((breed, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 80000 + i * 3000));
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 40000 + i * 3000));
           });
           // Flood at 170s on mobile (slightly later than desktop)
           FLOOD_BREEDS.forEach((breed, i) => {
@@ -2515,7 +2515,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const now = performance.now();
         if (now - lastFullCheck < 10000) return; // check every 10s only
         lastFullCheck = now;
-        if (now - startTime < MIN_GAME_MS) return; // never trigger before 120s
+        if (now - startTime < 30_000) return; // never trigger game over before 30s
         const pitH = render.canvas.height;
         const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
         if (allDogs.length < 10) return; // need at least 6 dog cards in pit before checking
@@ -2529,10 +2529,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
         // Refill: if fewer than 8 dog cards in pit and not all breeds have been dropped, drop 3 more
-        if (allDogs.length < 8) {
+        if (allDogs.length < 5) {
           const inWorld = new Set(Composite.allBodies(engine.world).map((b: any) => b.plugin?.name).filter(Boolean));
           const undrawn = BREEDS.filter((b: any) => !inWorld.has(b.name));
-          const toAdd = undrawn.sort(() => Math.random() - 0.5).slice(0, 3);
+          const toAdd = undrawn.sort(() => Math.random() - 0.5).slice(0, 5);
           toAdd.forEach((b: any, i: number) => {
             window.setTimeout(() => {
               if (!disposed) Composite.add(engine.world, makeBall(b, BREEDS.indexOf(b), stage.clientWidth));
