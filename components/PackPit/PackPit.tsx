@@ -2477,6 +2477,20 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       };
       let lastFullCheck = 0;
+      const startTime = performance.now();
+      const MIN_GAME_MS = 120_000; // never trigger game over before 120s
+      // Auto game-over at exactly 120s if pit is meaningfully full
+      const autoGameOverTimer = window.setTimeout(() => {
+        if (disposed || gameOverRef.current) return;
+        const pitH = render.canvas.height;
+        const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
+        if (allDogs.length < 3) return; // barely any dogs -- don't trigger
+        const settled = allDogs.filter((b: any) => Math.hypot(b.velocity.x, b.velocity.y) < 1.5);
+        const avgY = settled.length > 0 ? settled.reduce((s: number, b: any) => s + b.position.y, 0) / settled.length : pitH;
+        if (avgY < pitH * 0.65) { // more lenient threshold at the forced check
+          window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
+        }
+      }, MIN_GAME_MS);
       const MAX_SPEED = 40; // cap velocity to prevent ceiling tunnelling
       const onAfterUpdateGO = () => {
         // Clamp extreme velocities -- prevents fast bodies tunnelling through walls
@@ -2493,6 +2507,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const now = performance.now();
         if (now - lastFullCheck < 10000) return; // check every 10s only
         lastFullCheck = now;
+        if (now - startTime < MIN_GAME_MS) return; // never trigger before 120s
         const pitH = render.canvas.height;
         const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
         if (allDogs.length < 6) return; // need at least 6 dog cards in pit before checking
