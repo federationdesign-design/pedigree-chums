@@ -137,16 +137,8 @@ export default function PackPit() {
   const autoSlowmoRef = useRef(false);
   useEffect(() => {
     // ALL overlays fully pause the pit -- no slowmo, no ambiguity
-    const overlayOpen = howToPlay || !!activeBreed || shelfOpen || britainMsg !== null;
-    const engine = engineRef.current;
-    if (!engine) return;
-    if (overlayOpen && !autoSlowmoRef.current) {
-      autoSlowmoRef.current = true;
-      if (!slowmoActiveRef.current) engine.timing.timeScale = 0;
-    } else if (!overlayOpen && autoSlowmoRef.current) {
-      autoSlowmoRef.current = false;
-      if (!slowmoActiveRef.current) engine.timing.timeScale = 1;
-    }
+    // Pit runs continuously -- no pause on overlay open
+    void howToPlay; void activeBreed; void shelfOpen; void britainMsg;
   }, [activeBreed, shelfOpen, howToPlay, britainMsg]);
 
   // When Learn completes, auto-open the first chum's lineage after a short delay
