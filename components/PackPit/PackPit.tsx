@@ -2018,7 +2018,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             render: { visible: false },
           });
           Composite.add(engine.world, joint);
-          // Goo animation at join point
+          // Goo + fuse spark animation at join point
           const jx = bowlBody.position.x, jy = bowlBody.position.y - bowlBody.plugin.h * 0.2;
           const R2 = bowlBody.plugin.half * 0.4;
           const t0 = performance.now();
@@ -2026,6 +2026,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             const ang = (i / 7) * Math.PI * 2, r = i === 0 ? 0 : R2 * (0.3 + Math.random() * 0.4);
             gooBlobs.push({ x: jx + Math.cos(ang) * r, y: jy + Math.sin(ang) * r, s: R2 * (0.4 + Math.random() * 0.4), born: t0 + i * 15, life: 500 });
           }
+          // Fuse spark burst -- same as bone+logo
+          for (let i = 0; i < 3; i++) emitFuseSparks(jx, jy, 0.8 + i * 0.3);
           numAt(jx, jy, 1000);
           burstAt(jx, jy, bowlBody.plugin.half * 0.3);
         }
