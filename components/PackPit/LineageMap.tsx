@@ -607,19 +607,25 @@ export default function LineageMap({
   // same as tapping each one, but it costs a flat 1000 off the running total.
   const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing;
   const autoCollect = () => {
+    // Auto = reveal all + pack into grid + collect -- full sequence with penalty
     setOpen(() => { const s = new Set<string>(["0"]); allNodes.forEach((n) => { if (n.hasKids) s.add(n.id); }); return s; });
     setSeen(() => new Set(allNodes.map((n) => n.id)));
-    setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; }); // everything auto reveals (bar what was opened by hand) hides its leaf name
+    setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; });
     const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
-    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); }); // pop the cards in one by one, a ripple down the tree
-    allNodes.forEach((n) => scoredRef.current.add(n.id)); // counted now, so a later tap scores nothing
-    // Auto penalty scales with score earned -- the more you had to earn, the more it costs to skip
+    const revealMs = imgNodes.length * 45;
+    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); });
+    allNodes.forEach((n) => scoredRef.current.add(n.id));
     const ap = currentScore < 500 ? -500 : currentScore < 2000 ? -1000 : currentScore < 5000 ? -2500 : -5000;
     onScore?.(ap);
     const pk = (fxId.current += 1);
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
     setAutoArmed(false);
+    // After cards pop out, pack them then collect
+    window.setTimeout(() => {
+      doPack(undefined, undefined, 0); // pack with no score award (Auto already penalised)
+      window.setTimeout(() => { startRemove(); }, 900); // collect after pack animation
+    }, revealMs + 300);
   };
   // Double-clicking the root card walks the tree open one generation at a time,
   // then once everything is exposed folds it back deepest-first. Rings only: any
@@ -889,14 +895,15 @@ export default function LineageMap({
           {breed.name}
         </text>
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
-        {collectShowing ? (
+        {/* Learn button -- blue -- auto-reveals tree ring by ring (was mislabelled, called doPack) */}
+        {!allBlue && !packed && !collecting && !removing ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
-            onClick={(e) => { e.stopPropagation(); burstAt(rx, ry + ROOT + 88, ROOT * 0.9); doPack(rx, ry + ROOT + 88, 500); }}
+            onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
-            aria-label="Collect the ancestor pack"
+            aria-label="Auto-reveal the family tree"
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
@@ -908,14 +915,15 @@ export default function LineageMap({
             </g>
           </g>
         ) : null}
-        {/* the green pack chum button sits below Collect; it pushes the cards into the box */}
-        {canRemove || removing ? (
+        {/* Collect button -- green -- skips packing, collects immediately */}
+        {!collecting ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${collectShowing ? 138 : 62})`}
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 750, FLASH_SIZE); startRemove(); }}
+            transform={`translate(0,${!allBlue && !packed ? 138 : 62})`}
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 750, FLASH_SIZE); startRemove(); }}
+            onPointerDown={(e) => e.stopPropagation()}
             role="button"
-            aria-label="Choose as pack chum"
+            aria-label="Collect this chum"
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
