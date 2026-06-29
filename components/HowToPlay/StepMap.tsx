@@ -210,7 +210,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
-      onClick={(e) => { if (suppressClick.current) { suppressClick.current = false; return; } if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => { if (suppressClick.current) { suppressClick.current = false; return; } onClose(); }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
@@ -323,7 +323,7 @@ export default function StepMap({
       </div>
 
       {/* ── LAYER 3: nodes and text ABOVE card ── */}
-      <svg style={{ ...svgStyle, zIndex: 4, pointerEvents: "all" }}>
+      <svg style={{ ...svgStyle, zIndex: 4, pointerEvents: "none" }}>
         {nodes.map((n) => {
           const unlocked = n.row < openCount;
           const isOpen = openNodes.has(n.row);
