@@ -2923,7 +2923,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           const ren = renderRef.current;
           if (eng && ren) {
             const rect = ren.canvas.getBoundingClientRect();
-            const dog = (Composite as any).allBodies(eng.world).find((b: any) =>
+            const dog = ((eng.world as any).bodies as any[]).filter((b:any)=>!b.isStatic).find((b: any) =>
               b.plugin && !b.plugin.prop && !b.plugin.logo && !b.plugin.kind && b.plugin.half > 20 && !b.plugin.pop
             );
             if (dog) {
