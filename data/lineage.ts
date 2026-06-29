@@ -538,7 +538,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Not a breed but a type: a sighthound crossed with a working dog, long the poacher's and traveller's companion, fast and quiet.",
     children: [
       { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
-      { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability.",  value: 30 },
+      { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 30 },
       { name: "Old English Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 20 }
     ]
   },
@@ -643,7 +643,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
     children: [
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
-      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family.",  value: 35 }
+      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family.",  img: "/history/breeds/bearded-collie-photo.jpg", value: 35 }
     ]
   },
 
@@ -653,7 +653,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/english_setter-photo.jpg", value: 65 },
       { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
-      { name: "Collie", note: "A little collie for steadiness, by tradition.",  value: 15 }
+      { name: "Collie", note: "A little collie for steadiness, by tradition.",  img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
   },
 
@@ -680,7 +680,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
     children: [
       { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.", img: "/history/breeds/Arctic-sled-dogs.jpg", value: 55 },
-      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  value: 45 }
+      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  img: "/history/breeds/Old-working-collies-cluster.jpg", value: 45 }
     ]
   },
 
@@ -1017,7 +1017,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Weimaraner",
     note: "The grey ghost, a noble gun dog from the Weimar court of Germany, built on old scent trailing and pointing stock.",
     children: [
-      { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", value: 40 },
+      { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 },
       { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/pointer-photo.jpg", value: 40 },
       { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 20 }
     ]
@@ -1085,7 +1085,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Standard Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 60 },
       { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
-      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, biddable head.", value: 15 }
+      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, biddable head.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 15 }
     ]
   },
   "Pomeranian": {
@@ -1100,7 +1100,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "French Bulldog",
     note: "Born when English lacemakers took their little toy bulldogs to France, where Paris fell for the bat eared result.",
     children: [
-      { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", value: 65 },
+      { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
       { name: "Parisian ratters and terriers", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears.", img: "/history/breeds/Parisian-ratters-and-terriers.jpg", value: 35 }
     ]
   },
