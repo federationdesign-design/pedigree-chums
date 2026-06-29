@@ -2155,13 +2155,14 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (o.plugin?.kind === "pct") continue; // circles untouched by shove
             if (dist > SHOVE_RADIUS) continue;
             const falloff = 1 - dist / SHOVE_RADIUS;
-            // Dog cards get a gentler shove -- enough to tumble, not enough to escape
+            // Gentler shove for dogs and props -- enough to scatter, not escape
             const isDog = !o.plugin?.prop && !o.plugin?.kind && (o.plugin?.half || 0) > 20;
-            const forceMult = isDog ? 0.08 : 1.0;
+            const isProp = !!o.plugin?.prop;
+            const forceMult = isDog ? 0.08 : isProp ? 0.15 : 1.0;
             const mag = SHOVE_FORCE * falloff * falloff * (o.mass || 1) * forceMult;
             Body.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 });
             Body.setAngularVelocity(o, (Math.random() - 0.5) * 0.6 * (falloff + 0.2));
-            // Immediately clamp velocity so dogs can't tunnel through ceiling
+            // Immediately clamp ALL bodies after force application
             const spd = Math.hypot(o.velocity.x, o.velocity.y);
             if (spd > 40) { const sc = 40 / spd; Body.setVelocity(o, { x: o.velocity.x * sc, y: o.velocity.y * sc }); }
             if (o.velocity.y < -20) Body.setVelocity(o, { x: o.velocity.x, y: -20 });
