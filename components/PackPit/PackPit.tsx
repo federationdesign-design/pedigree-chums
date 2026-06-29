@@ -741,7 +741,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(trioFirst[12], dropped); } }, 70000));  // 70000 T13
           // Partners: shuffled, staggered from 80s
           const mobileAllPartners: string[] = [];
-          const mobilePTOrder = [...Array(13).keys()];
+          const mobilePTOrder = [...Array(14).keys()];
           mobilePTOrder.sort(() => Math.random() - 0.5);
           mobilePTOrder.forEach(ti => trioPartners[ti].forEach(p => mobileAllPartners.push(p)));
           mobileAllPartners.forEach((breed, i) => {
@@ -786,7 +786,7 @@ export default function PackPit() {
           waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makeProp(bowl, w)); } }, 70000)); // 70000 bowl
           // Partners: all 13 trios, 2 partners each, staggered 5s apart from 75s
           const allPartners: string[] = [];
-          const partnerTrioOrder = [...Array(13).keys()];
+          const partnerTrioOrder = [...Array(14).keys()];
           partnerTrioOrder.sort(() => Math.random() - 0.5);
           partnerTrioOrder.forEach(ti => trioPartners[ti].forEach(p => allPartners.push(p)));
           allPartners.forEach((breed, i) => {
@@ -1073,6 +1073,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       const openLineageAt = (up: { x: number; y: number }) => {
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept" || hit.plugin.kind === "cookiereject" || hit.plugin.kind === "rod" || hit.plugin.kind === "pill") return false; // dogs only, not the toys, fallen circles or the buttons
+        if (hit.plugin.pop) return false; // already flying away -- don't re-open
         if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && hit.plugin.kind !== "cookiereject" && hit.plugin.kind !== "rod" && hit.plugin.kind !== "pill" && !hit.plugin.collected) {
           hit.plugin.collected = true;                                              // only the first collect of a card scores
           numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
@@ -2462,16 +2463,18 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       };
       let lastFullCheck = 0;
-      const MAX_SPEED = 80; // cap velocity to prevent ceiling tunnelling
+      const MAX_SPEED = 40; // cap velocity to prevent ceiling tunnelling
       const onAfterUpdateGO = () => {
         // Clamp extreme velocities -- prevents fast bodies tunnelling through walls
         Composite.allBodies(engine.world).forEach((b: any) => {
-          if (b.isStatic) return;
+          if (b.isStatic || b.plugin?.pop) return;
           const spd = Math.hypot(b.velocity.x, b.velocity.y);
           if (spd > MAX_SPEED) {
             const scale = MAX_SPEED / spd;
             Body.setVelocity(b, { x: b.velocity.x * scale, y: b.velocity.y * scale });
           }
+          // Extra: clamp extreme upward velocity specifically (ceiling escapes)
+          if (b.velocity.y < -30) Body.setVelocity(b, { x: b.velocity.x, y: -30 });
         });
         const now = performance.now();
         if (now - lastFullCheck < 10000) return; // check every 10s only
