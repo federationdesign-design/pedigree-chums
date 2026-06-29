@@ -20,8 +20,8 @@ const STEPS: StepData[] = [
     heading: "Step 2",
     rows: [
       { icon: "/dog-walk-icon.svg", title: "Head outside", body: "Explore your town or city." },
-      { icon: "/deal-icon.svg", title: "Keep your cards close", body: "Keep somewhere easy to pull out." },
-      { icon: "/friends-icon.svg", title: "Eyes peeled", body: "Chums could be in places you wouldn't expect." },
+      { icon: "/PC-chums.svg", title: "Keep your cards close", body: "Keep somewhere easy to pull out." },
+      { icon: "/famil-icon.svg", title: "Eyes peeled", body: "Chums could be in places you wouldn't expect." },
     ],
   },
   {
@@ -31,7 +31,7 @@ const STEPS: StepData[] = [
     heading: "Step 3",
     rows: [
       { icon: "/dog-show-icon.svg", title: "Look carefully", body: "Study the dog's coat, size and markings." },
-      { icon: "/deal-icon.svg", title: "Check the card", body: "Does it match?" },
+      { icon: "/checklist-icon.svg", title: "Check the card", body: "Does it match?" },
       { icon: "/friends-icon.svg", title: "Call it out loud", body: "Say the breed name. Other players can challenge if they disagree." },
     ],
   },
@@ -42,7 +42,7 @@ const STEPS: StepData[] = [
     heading: "Step 4",
     rows: [
       { icon: "/PC-chums.svg", title: "Claim your chum", body: "Separate the found chum card." },
-      { icon: "/friends-icon.svg", title: "Help each other", body: "Playing as a team? Call out dogs that match another player's hand too." },
+      { icon: "/famil-icon.svg", title: "Help each other", body: "Playing as a team? Call out dogs that match another player's hand too." },
     ],
   },
   {
@@ -51,7 +51,7 @@ const STEPS: StepData[] = [
     caption: "Find more chums",
     heading: "Step 5",
     rows: [
-      { icon: "/find-pack-icon.svg", title: "Explore more", body: "The more ground you cover," },
+      { icon: "/dog-walk-icon.svg", title: "Explore more", body: "The more ground you cover," },
       { icon: "/trend-icon.svg", title: "Find more", body: "the more chums you find." },
     ],
   },
@@ -61,7 +61,7 @@ const STEPS: StepData[] = [
     caption: "Most chums wins",
     heading: "Step 6",
     rows: [
-      { icon: "/deal-icon.svg", title: "Finished exploring", body: "When the walk ends or your day out is done." },
+      { icon: "/dog-walk-icon.svg", title: "Finished exploring", body: "When the walk ends or your day out is done." },
       { icon: "/PC-chums.svg", title: "Count up chums", body: "Tot up who has the most chums." },
       { icon: "/queen-icon.svg", title: "The most wins", body: "The player with the most matched chums wins." },
     ],

@@ -76,8 +76,8 @@ export default function StepMap({
   useEffect(() => { setOpenCount(step.rows.length); }, [step.number, step.rows.length]);
   const [openNodes, setOpenNodes] = useState<Set<number>>(new Set());
   useEffect(() => setOpenNodes(new Set()), [step.number]);
-  const [activeText, setActiveText] = useState<number | null>(null);
-  useEffect(() => setActiveText(null), [step.number]);
+  const [activeTexts, setActiveTexts] = useState<Set<number>>(new Set());
+  useEffect(() => setActiveTexts(new Set()), [step.number]);
 
   // Flash numbers -- exact LineageMap style
   type FlashNum = { id: number; x: number; y: number; val: number; size: number; neg: boolean; big: boolean; };
@@ -126,7 +126,7 @@ export default function StepMap({
     if (suppressClick.current) { suppressClick.current = false; return; }
     if (!unlocked) return;
     setOpenNodes((prev) => { const s = new Set(prev); s.add(n.row); return s; });
-    setActiveText((prev: number | null) => prev === n.row ? null : n.row);
+    setActiveTexts((prev) => { const s = new Set(prev); if (s.has(n.row)) s.delete(n.row); else s.add(n.row); return s; });
     const key = `${step.number}:${n.row}`;
     if (!seenRows.has(key)) {
       seenRows.add(key);
@@ -327,7 +327,7 @@ export default function StepMap({
         {nodes.map((n) => {
           const unlocked = n.row < openCount;
           const isOpen = openNodes.has(n.row);
-          const isActive = activeText === n.row;
+          const isActive = activeTexts.has(n.row);
           const row = step.rows[n.row];
           const nx = n.x + pan.x;
           const ny = n.y + pan.y;

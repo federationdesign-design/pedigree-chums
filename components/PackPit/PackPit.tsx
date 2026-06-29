@@ -2496,6 +2496,17 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (avgY < pitH * 0.40) {
           window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
+        // Refill: if fewer than 8 dog cards in pit and not all breeds have been dropped, drop 3 more
+        if (allDogs.length < 8) {
+          const inWorld = new Set(Composite.allBodies(engine.world).map((b: any) => b.plugin?.name).filter(Boolean));
+          const undrawn = BREEDS.filter((b: any) => !inWorld.has(b.name));
+          const toAdd = undrawn.sort(() => Math.random() - 0.5).slice(0, 3);
+          toAdd.forEach((b: any, i: number) => {
+            window.setTimeout(() => {
+              if (!disposed) Composite.add(engine.world, makeBall(b, BREEDS.indexOf(b), stage.clientWidth));
+            }, i * 800);
+          });
+        }
       };
       Events.on(engine.world, "afterAdd", onAfterAdd);
       Events.on(engine, "afterUpdate", onAfterUpdateGO);
