@@ -108,7 +108,7 @@ export default function StepMap({
       const next = Math.min(c + 1, step.rows.length);
       if (next > c) {
         const row = next - 1;
-        setActiveText(row);
+        setActiveTexts((prev) => { const s = new Set(prev); s.add(row); return s; });
         setOpenNodes((prev) => { const s = new Set(prev); s.add(row); return s; });
         const key = `${step.number}:${row}`;
         if (!seenRows.has(key)) {
@@ -172,7 +172,7 @@ export default function StepMap({
         const next = Math.min(prev + 1, step.rows.length);
         if (next > prev) {
           const row = next - 1;
-          setActiveText(row);
+          setActiveTexts((prev) => { const s = new Set(prev); s.add(row); return s; });
           setOpenNodes((s) => { const ns = new Set(s); ns.add(row); return ns; });
           const key = `${step.number}:${row}`;
           if (!seenRows.has(key)) { seenRows.add(key); onScore?.(ROW_PTS); }
