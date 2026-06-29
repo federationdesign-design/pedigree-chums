@@ -1343,6 +1343,21 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 ctx.font = `900 ${bfs}px "Luckiest Guy", system-ui, sans-serif`;
                 ctx.fillText(String(b.plugin.seq), bx, by + bfs * 0.06);
               }
+              // Numbered badge -- top-left corner like the physical card
+              if (b.plugin.seq) {
+                const bR = Math.max(14, pw * 0.14);
+                const bx = -pw / 2 + bR * 0.6;
+                const by = -ph / 2 + bR * 0.6;
+                ctx.beginPath(); ctx.arc(bx, by, bR, 0, Math.PI * 2);
+                ctx.fillStyle = "#1497d6"; ctx.fill();
+                ctx.lineWidth = Math.max(2, bR * 0.15);
+                ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+                ctx.fillStyle = "#ffed00";
+                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                const bfs = Math.max(9, Math.round(bR * 0.85));
+                ctx.font = `900 ${bfs}px "Luckiest Guy", system-ui, sans-serif`;
+                ctx.fillText(String(b.plugin.seq), bx, by + bfs * 0.06);
+              }
               // Hover state
               if (hovered) {
                 const HTP_NAMES_H = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
