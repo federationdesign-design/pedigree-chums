@@ -1983,6 +1983,34 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       };
 
+      // Bowl settling: when bowl reaches the floor upright and slow, snap to centre and lock
+      let bowlLocked = false;
+      Events.on(engine, "afterUpdate", () => {
+        if (bowlLocked) return;
+        const bowlB = Composite.allBodies(engine.world).find((b: any) => b.plugin?.isBowl && !b.isStatic);
+        if (!bowlB) return;
+        const floorY = walls[0] ? walls[0].position.y - (walls[0].bounds.max.y - walls[0].bounds.min.y) / 2 : render.canvas.height;
+        const distToFloor = floorY - bowlB.position.y;
+        // Check upright -- angle within 0.4 rad of 0
+        const a = ((bowlB.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const upright = a < 0.4 || a > Math.PI * 2 - 0.4;
+        const slow = Math.hypot(bowlB.velocity.x, bowlB.velocity.y) < 3;
+        const nearFloor = distToFloor < bowlB.plugin.h * 0.8;
+        if (!upright || !slow || !nearFloor) return;
+        // Snap to centre floor, zero angle, make static
+        bowlLocked = true;
+        const cx = render.canvas.width / 2;
+        const cy = floorY - bowlB.plugin.h * 0.35;
+        Body.setPosition(bowlB, { x: cx, y: cy });
+        Body.setAngle(bowlB, 0);
+        Body.setVelocity(bowlB, { x: 0, y: 0 });
+        Body.setAngularVelocity(bowlB, 0);
+        Body.setStatic(bowlB, true);
+        // Small celebration
+        burstAt(cx, cy, bowlB.plugin.half * 0.3);
+        numAt(cx, cy, 250);
+      });
+
       // bone+bowl magnetism -- much weaker than bone+logo, only when bowl is upright
       let bowlFused = false;
       const BOWL_MAGNET_RADIUS = 180; // px -- shorter range than logo (was 40 but logo is tiny; bowl is huge)
