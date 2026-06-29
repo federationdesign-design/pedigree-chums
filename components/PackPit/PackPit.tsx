@@ -307,7 +307,9 @@ export default function PackPit() {
 
       function makeProp(prop: any, w: number) {
         const img = getImg(prop.key, prop.src);
-        const x = 80 + Math.random() * (w - 160), y = -260 - Math.random() * 240;
+        // Bowl spawns low and centred -- it's very wide and gets caught on ceiling otherwise
+        const x = prop.shape === "bowl" ? w / 2 + (Math.random() - 0.5) * w * 0.3 : 80 + Math.random() * (w - 160);
+        const y = prop.shape === "bowl" ? -80 : -60 - Math.random() * 60;
         if (prop.shape === "ball") {
           const r = prop.width / 2;
           const b: any = Bodies.circle(x, y, r, { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006, render: { visible: false } }); // patch_bits_v1: super bouncy
