@@ -645,27 +645,7 @@ export default function PackPit() {
         if (ex.length) Composite.remove(engine.world, ex);
         if (dropTimer) clearInterval(dropTimer);
         waveTimers.forEach(clearTimeout); waveTimers = [];
-        const w = stage.clientWidth;
-        const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        // tennis balls only; the pre-order button now drops on its own beat (desktop)
-        const dropBalls = () => {
-          BALLS.forEach((bp, i) => {
-            Composite.add(engine.world, makeProp(bp, w));
-            if (i === 0 && isMobile) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // mobile keeps pre-order with the 1st ball
-          });
-        };
-        // Simple pair drop -- 2 random dogs every 4 seconds
-        // All breeds shuffled, drop in pairs continuously
-        const dropped = new Set<number>();
-        const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
-        const w = stage.clientWidth;
-        const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
-        const dropBalls = () => {
-          BALLS.forEach((bp, i) => {
-            Composite.add(engine.world, makeProp(bp, w));
-            if (i === 0 && isMobile) Composite.add(engine.world, makeButton("preorder", "Pre-order", w));
-          });
-        };
+    
 
         // Props and UI objects
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
