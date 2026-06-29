@@ -113,7 +113,8 @@ export default function PackPit() {
     return () => { if (msTimer.current) window.clearTimeout(msTimer.current); };
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
-  const cookieBannerOpenRef = useRef(true);
+  // Start false if cookies already accepted/rejected in a previous session
+  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookies") ? true : false);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
@@ -136,7 +137,7 @@ export default function PackPit() {
   const autoSlowmoRef = useRef(false);
   useEffect(() => {
     // ALL overlays fully pause the pit -- no slowmo, no ambiguity
-    const overlayOpen = howToPlay || !!activeBreed || shelfOpen || britainMsg !== null || cookieBannerOpenRef.current;
+    const overlayOpen = howToPlay || !!activeBreed || shelfOpen || britainMsg !== null;
     const engine = engineRef.current;
     if (!engine) return;
     if (overlayOpen && !autoSlowmoRef.current) {
