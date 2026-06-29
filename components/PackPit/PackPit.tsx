@@ -117,6 +117,16 @@ export default function PackPit() {
   const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookies") ? true : false);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  useEffect(() => {
+    try { if (localStorage.getItem("pc-onboard-hint")) return; } catch {}
+    const t = window.setTimeout(() => setShowHint(true), 8000);
+    return () => window.clearTimeout(t);
+  }, []);
+  const dismissHint = () => {
+    setShowHint(false);
+    try { localStorage.setItem("pc-onboard-hint", "1"); } catch {}
+  };
   const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
@@ -1090,6 +1100,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         return true;
       };
       const onClick = (e: MouseEvent) => {
+        setShowHint(false);
+        try { localStorage.setItem("pc-onboard-hint", "1"); } catch {}
         const up = localPoint(e);
         // ignore drags: only a near-stationary click opens the lineage
         if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
@@ -2885,6 +2897,52 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           </div>
         );
       })()}
+      {showHint && (
+        <div
+          onClick={dismissHint}
+          style={{
+            position: "fixed", inset: 0, zIndex: 999,
+            pointerEvents: "all",
+          }}
+        >
+          {/* Speech bubble */}
+          <div style={{
+            position: "fixed",
+            bottom: "clamp(200px, 35vh, 320px)",
+            left: "clamp(20px, 8vw, 80px)",
+            background: "#0a3a57",
+            color: "#ffffff",
+            borderRadius: 12,
+            padding: "10px 14px",
+            maxWidth: 200,
+            fontFamily: "'Luckiest Guy', system-ui",
+            fontSize: "clamp(13px, 1.8vw, 16px)",
+            lineHeight: 1.4,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+            pointerEvents: "none",
+          }}>
+            Tap a dog to explore its family tree!
+            <div style={{
+              position: "absolute", bottom: -10, left: 24,
+              width: 0, height: 0,
+              borderLeft: "10px solid transparent",
+              borderRight: "10px solid transparent",
+              borderTop: "10px solid #0a3a57",
+            }} />
+          </div>
+          {/* Bouncing hand */}
+          <div style={{
+            position: "fixed",
+            bottom: "clamp(140px, 24vh, 240px)",
+            left: "clamp(30px, 6vw, 60px)",
+            fontSize: "clamp(36px, 6vw, 52px)",
+            transform: "rotate(20deg)",
+            animation: "pcHandHint 1.8s ease-in-out infinite",
+            pointerEvents: "none",
+          }}>👆</div>
+          <style>{`@keyframes pcHandHint { 0%,100%{transform:rotate(20deg) translateY(0)} 50%{transform:rotate(20deg) translateY(-14px)} }`}</style>
+        </div>
+      )}
       {gameOver && <GameOver
         chums={collected}
         score={score}
