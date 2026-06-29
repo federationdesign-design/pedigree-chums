@@ -158,6 +158,32 @@ export default function StepMap({
 
   const allUnlocked = openCount >= step.rows.length;
 
+  // Auto button -- reveal all nodes one by one with 400ms gaps
+  const [autoRunning, setAutoRunning] = useState(false);
+  const handleAuto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (autoRunning || allUnlocked) return;
+    setAutoRunning(true);
+    let c = openCount;
+    const tick = () => {
+      if (c >= step.rows.length) { setAutoRunning(false); return; }
+      setOpenCount((prev) => {
+        const next = Math.min(prev + 1, step.rows.length);
+        if (next > prev) {
+          const row = next - 1;
+          setActiveText(row);
+          setOpenNodes((s) => { const ns = new Set(s); ns.add(row); return ns; });
+          const key = `${step.number}:${row}`;
+          if (!seenRows.has(key)) { seenRows.add(key); onScore?.(ROW_PTS); }
+        }
+        return next;
+      });
+      c++;
+      window.setTimeout(tick, 500);
+    };
+    window.setTimeout(tick, 0);
+  };
+
   const getTextPos = (nx: number, ny: number) => {
     const textW = 320;
     const cardL = cx + pan.x - cw / 2 - 20;
@@ -333,8 +359,11 @@ export default function StepMap({
                     filter: isOpen
                       ? "brightness(0) saturate(100%) invert(93%) sepia(67%) saturate(600%) hue-rotate(0deg)"
                       : "none",
+                    pointerEvents: "none",
                   }}
                 />
+                {/* Transparent hit rect -- SVG image elements are unreliable for pointer events */}
+                <rect x={-NODE_R} y={-NODE_R} width={NODE_R * 2} height={NODE_R * 2} fill="transparent" />
                 <circle cx={NODE_R * 0.95} cy={-NODE_R * 0.95} r={22}
                   fill={n.row === 0 ? "#ffed00" : unlocked ? "#ffed00" : "transparent"}
                   stroke={n.row === 0 ? "#0a3a57" : unlocked ? "#0a3a57" : "#ffffff"}
@@ -398,6 +427,31 @@ export default function StepMap({
       }}>
         {openCount}/{step.rows.length}
       </div>
+      {/* Auto button -- bottom right, same style as LineageMap */}
+      {!allUnlocked && (
+        <div
+          onClick={handleAuto}
+          onPointerDown={(e) => e.stopPropagation()}
+          role="button"
+          aria-label="Auto reveal"
+          style={{
+            position: "fixed", right: "clamp(18px, 4vw, 48px)", bottom: "clamp(18px, 4vw, 48px)",
+            zIndex: 20, cursor: autoRunning ? "default" : "pointer",
+            opacity: autoRunning ? 0.6 : 1,
+          }}
+        >
+          <img
+            src="/auto-icon-redux.svg"
+            alt="Auto"
+            style={{
+              display: "block", width: 84, height: 84, padding: 10,
+              background: "#ffed00", borderRadius: 20,
+              boxShadow: "0 5px 0 rgba(10,58,87,0.3)",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+      )}
       {/* No X button -- overlay closes automatically once all nodes are opened */}
 
       {/* Prev/next arrows only -- no dots, no step counter */}
