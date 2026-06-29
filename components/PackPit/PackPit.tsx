@@ -725,9 +725,9 @@ export default function PackPit() {
 
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
-            const inWorld = new Set(Composite.allBodies(engine.world).map((b: any) => b.plugin?.name).filter(Boolean));
+            // Only drop breeds never scheduled -- dropped set tracks everything ever queued
             BREEDS.forEach((b: any, idx: number) => {
-              if (!inWorld.has(b.name) && !dropped.has(idx)) {
+              if (!dropped.has(idx)) {
                 dropped.add(idx);
                 waveTimers.push(setTimeout(() => {
                   if (!disposed) Composite.add(engine.world, makeBall(b, idx, w));
