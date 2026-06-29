@@ -1340,7 +1340,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               // Work out if this card is locked (a lower-numbered card not yet opened)
               const HTP_ORDER = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
               const scIdx = HTP_ORDER.indexOf(b.plugin.name);
-              const scLocked = scIdx > 0 && bodies.some((ob: any) => ob.plugin?.kind === "stepcard" && HTP_ORDER.indexOf(ob.plugin?.name) < scIdx && !ob.plugin?.opened);
+              const scLocked = scIdx > 0 && dyn().some((ob: any) => ob.plugin?.kind === "stepcard" && HTP_ORDER.indexOf(ob.plugin?.name) < scIdx && !ob.plugin?.opened);
               // Outer border -- yellow if unlocked/opened, grey if locked
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
               ctx.fillStyle = scLocked ? "#888888" : "#ffed00"; ctx.fill();
