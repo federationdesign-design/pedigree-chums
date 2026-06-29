@@ -71,8 +71,9 @@ export default function StepMap({
     if (d && d.moved) suppressClick.current = true; // only after confirmed drag
   };
 
+  // All nodes unlocked from the start -- tapping shows text, double-tap on card closes
   const [openCount, setOpenCount] = useState(0);
-  useEffect(() => setOpenCount(0), [step.number]);
+  useEffect(() => { setOpenCount(step.rows.length); }, [step.number, step.rows.length]);
   const [openNodes, setOpenNodes] = useState<Set<number>>(new Set());
   useEffect(() => setOpenNodes(new Set()), [step.number]);
   const [activeText, setActiveText] = useState<number | null>(null);
@@ -299,18 +300,7 @@ export default function StepMap({
                     style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
                   />
                 )}
-                {!allUnlocked && (
-                  <div style={{
-                    position: "absolute", bottom: 0, left: 0, right: 0,
-                    padding: "18px 8px 8px",
-                    background: "linear-gradient(transparent, rgba(0,0,0,0.55))",
-                    textAlign: "center",
-                    fontFamily: "'Luckiest Guy', system-ui",
-                    fontSize: Math.max(9, Math.round(illoH * 0.08)),
-                    color: "rgba(255,255,255,0.95)",
-                    pointerEvents: "none",
-                  }}>double-tap to reveal</div>
-                )}
+
               </div>
               {/* Footer caption -- same as pit */}
               <div style={{
@@ -428,7 +418,7 @@ export default function StepMap({
         {openCount}/{step.rows.length}
       </div>
       {/* Auto button -- bottom right, same style as LineageMap */}
-      {!allUnlocked && (
+      {false && (
         <div
           onClick={handleAuto}
           onPointerDown={(e) => e.stopPropagation()}
