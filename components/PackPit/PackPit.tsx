@@ -802,7 +802,7 @@ export default function PackPit() {
           partnerTrioOrder.sort(() => Math.random() - 0.5);
           partnerTrioOrder.forEach(ti => trioPartners[ti].forEach(p => allPartners.push(p)));
           allPartners.forEach((breed, i) => {
-            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 75000 + i * 3000));
+            waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(breed, dropped); }, 8000 + i * 2000));
           });
           // Flood: 3 hard breeds at 150s
           FLOOD_BREEDS.forEach((breed, i) => {
