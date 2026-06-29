@@ -691,13 +691,13 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 3000));
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 5000));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 4000));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(howPanel, w, "right")); }, 3500));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 4500));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeArrow(w)); }, 5000));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 20000));
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 4000));
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 14000));
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 5000));
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(howPanel, w, "right")); }, 4500));
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 6500));
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeArrow(w)); }, 8000));
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 30000));
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
             const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -710,7 +710,7 @@ export default function PackPit() {
         }, 12000));
 
         pairOrder.forEach((idx: number, i: number) => {
-          const delay = 2000 + Math.floor(i / 2) * 4000 + (i % 2) * 400;
+          const delay = 2000 + Math.floor(i / 2) * 10000 + (i % 2) * 800;
           waveTimers.push(setTimeout(() => {
             if (!disposed && !dropped.has(idx)) {
               dropped.add(idx);
