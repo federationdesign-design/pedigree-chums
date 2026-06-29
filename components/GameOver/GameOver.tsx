@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./GameOver.module.css";
 
-type Props = { chums: number; score: number };
+type Props = { chums: number; score: number; collectedBreeds?: { name: string; img: string }[] };
 
 const MAX_NAME = 6;
 const STORAGE_KEY = "pc_scores";
@@ -64,7 +64,7 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
   }).slice(0, 3);
 }
 
-export default function GameOver({ chums, score }: Props) {
+export default function GameOver({ chums, score, collectedBreeds = [] }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const idleTimerRef = useRef<number | null>(null);
   const resetIdleTimer = () => {
@@ -145,6 +145,7 @@ export default function GameOver({ chums, score }: Props) {
   };
 
   const [shareState, setShareState] = useState<"idle" | "copied" | "options">("idle");
+  const [deckHover, setDeckHover] = useState<number | null>(null);
 
   const handleShare = async () => {
     const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
@@ -180,6 +181,40 @@ export default function GameOver({ chums, score }: Props) {
       </div>
 
       <div className={styles.inner}>
+        {/* Collected chums deck */}
+        {collectedBreeds.length > 0 && (
+          <div className={styles.chumDeck}>
+            {collectedBreeds.slice().reverse().map((c, i) => {
+              const isHov = deckHover === i;
+              const total = collectedBreeds.length;
+              const spread = Math.min(32, 180 / Math.max(total, 1));
+              const offset = i * spread;
+              return (
+                <div
+                  key={i}
+                  className={styles.chumDeckCard}
+                  style={{
+                    left: offset,
+                    zIndex: isHov ? total + 1 : i,
+                    transform: isHov ? "translateY(-20px) scale(1.15)" : "translateY(0) scale(1)",
+                    transition: "transform 0.2s cubic-bezier(0.22,1,0.36,1)",
+                  }}
+                  onMouseEnter={() => setDeckHover(i)}
+                  onMouseLeave={() => setDeckHover(null)}
+                >
+                  {c.img
+                    ? <img src={c.img} alt={c.name} />
+                    : <div style={{ width: "100%", height: "100%", background: "#0a3a57", borderRadius: "inherit" }} />
+                  }
+                  {isHov && (
+                    <div className={styles.chumDeckLabel}>{c.name}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {/* Title */}
         <h1 className={styles.title}>
           {chums === 0

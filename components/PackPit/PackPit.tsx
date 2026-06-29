@@ -2882,7 +2882,14 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           </div>
         );
       })()}
-      {gameOver && <GameOver chums={collected} score={score} />}
+      {gameOver && <GameOver
+        chums={collected}
+        score={score}
+        collectedBreeds={collectedChums.map((name) => {
+          const b = breeds.find((x) => x.name === name);
+          return { name, img: b ? b.image : "" };
+        })}
+      />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
           <span className={styles.rotatePhone} />
