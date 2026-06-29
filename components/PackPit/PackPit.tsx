@@ -30,11 +30,8 @@ export default function PackPit() {
   const runnerRef = useRef<any>(null);
   const engineRef = useRef<any>(null);
   const renderRef = useRef<any>(null);
-  const pauseRef = useRef<() => void>(() => {});
-  const resumeRef = useRef<() => void>(() => {});
   const slowmoRef = useRef<() => void>(() => {});
   const slowmoActiveRef = useRef(false);
-  const [paused, setPaused] = useState(false);
   const [slowmo, setSlowmo] = useState(false);
   const motionRef = useRef<() => void>(() => {});
   const shakeBtnRef = useRef<HTMLButtonElement>(null);
@@ -275,8 +272,6 @@ export default function PackPit() {
       Render.run(render);
       const runner = Runner.create();
       runnerRef.current = runner;
-      pauseRef.current = () => { engine.timing.timeScale = 0; };
-      resumeRef.current = () => { engine.timing.timeScale = slowmoActiveRef.current ? 0.25 : 1; };
       slowmoRef.current = () => { if (engine.timing.timeScale === 1) { engine.timing.timeScale = 0.25; slowmoActiveRef.current = true; } else { engine.timing.timeScale = 1; slowmoActiveRef.current = false; } };
       Runner.run(runner, engine);
 
@@ -2659,7 +2654,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
   return (
     <section
-      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}${paused ? " " + styles.pitPaused : ""}`}
+      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}`}
       ref={stageRef}
       aria-label="The Pack Pit: tip out all the chums and play"
     >
@@ -2676,33 +2671,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       >
         <img src="/svg-snail-icon.svg" width="52" height="52" alt="" aria-hidden="true" style={{ display: "block" }} />
       </button>
-      <button
-        type="button"
-        className={`${styles.pause}${paused ? " " + styles.pauseActive : ""}`}
-        onClick={() => {
-          if (paused) { resumeRef.current(); setPaused(false); }
-          else { pauseRef.current(); setPaused(true); }
-        }}
-        aria-label={paused ? "Resume" : "Pause"}
-      >
-        {paused ? (
-          <svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-        ) : (
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor">
-            <rect x="5" y="3" width="4.5" height="18" rx="2.25"/>
-            <rect x="14.5" y="3" width="4.5" height="18" rx="2.25"/>
-          </svg>
-        )}
-      </button>
+
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={(e) => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); const el = e.currentTarget; el.classList.add(styles.shakeFlash); setTimeout(() => el.classList.remove(styles.shakeFlash), 300); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />
         <span className={styles.shakeText}>Shake</span>
       </button>
-      {paused && (
-        <div className={styles.pausedOverlay} aria-live="polite">
-          PAUSED
-        </div>
-      )}
+
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setAllChumsCollected(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
