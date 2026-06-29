@@ -645,9 +645,52 @@ export default function PackPit() {
         if (ex.length) Composite.remove(engine.world, ex);
         if (dropTimer) clearInterval(dropTimer);
         waveTimers.forEach(clearTimeout); waveTimers = [];
-    
+        const w = stage.clientWidth;
+        const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
+        // tennis balls only; the pre-order button now drops on its own beat (desktop)
+        const dropBalls = () => {
+          BALLS.forEach((bp, i) => {
+            Composite.add(engine.world, makeProp(bp, w));
+            if (i === 0 && isMobile) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); // mobile keeps pre-order with the 1st ball
+          });
+        };
+        // scripted desktop pour helpers
+        const idxByName = (name: string) => BREEDS.findIndex((b: any) => b.name === name);
+        const pickName = (a: string, b: string) => (Math.random() < 0.5 ? a : b); // alternate per load
+        const dropCardNamed = (name: string, dropped: Set<number>) => {
+          const i = idxByName(name);
+          if (i >= 0 && !dropped.has(i)) { dropped.add(i); Composite.add(engine.world, makeBall(BREEDS[i], i, w)); }
+        };
+        const dropRest = (dropped: Set<number>) => {
+          const rest = [...BREEDS.keys()].filter((i) => !dropped.has(i)).sort(() => Math.random() - 0.5);
+          let k = 0;
+          dropTimer = setInterval(() => {
+            if (k >= rest.length) { clearInterval(dropTimer); return; }
+            const i = rest[k]; Composite.add(engine.world, makeBall(BREEDS[i], i, w));
+            k++;
+          }, 70);
+        };
+        // Drop the pack in, optionally landing the bowl midway through.
+        const dropDogs = (delay: number, withBowl: boolean) => {
+          const order = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
+          const bowlAt = Math.floor(order.length / 2);
+          let k = 0;
+          waveTimers.push(setTimeout(() => {
+            if (disposed) return;
+            dropTimer = setInterval(() => {
+              if (k >= order.length) { clearInterval(dropTimer); return; }
+              if (withBowl && k === bowlAt) { Composite.add(engine.world, makeProp(bowl, w)); } // the bowl lands midway through the pour
+              if (k === 5) { Composite.add(engine.world, makePanel(enterPanel, w, "left")); } // enter-site panel drops on the left edge
+              if (k === 6) { Composite.add(engine.world, makePanel(howPanel, w, "right")); }   // how-to-play panel drops on the right edge
+              Composite.add(engine.world, makeBall(BREEDS[order[k]], order[k], w));
+              k++;
+            }, 70);
+          }, delay));
+        };
+        // Simple pair drop -- 2 random dogs every 4 seconds
+        const dropped = new Set<number>();
+        const pairOrder = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
 
-        // Props and UI objects
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750));
@@ -659,8 +702,6 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 4500));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeArrow(w)); }, 5000));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 20000));
-
-        // Union Jack
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
             const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -672,8 +713,7 @@ export default function PackPit() {
           }
         }, 12000));
 
-        // Drop dogs in pairs every 4s
-        order.forEach((idx, i) => {
+        pairOrder.forEach((idx: number, i: number) => {
           const delay = 2000 + Math.floor(i / 2) * 4000 + (i % 2) * 400;
           waveTimers.push(setTimeout(() => {
             if (!disposed && !dropped.has(idx)) {
@@ -683,7 +723,6 @@ export default function PackPit() {
           }, delay));
         });
 
-        // Refill wave at 180s with any missed breeds
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
             const inWorld = new Set(Composite.allBodies(engine.world).map((b: any) => b.plugin?.name).filter(Boolean));
@@ -697,7 +736,7 @@ export default function PackPit() {
             });
           }
         }, 180000));
-
+      }
       const isBone = (b: any) => b?.plugin?.prop === "bone";
       const nearestBone = (to: any) => {
         let best: any = null, bestD = Infinity;
@@ -2393,7 +2432,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const now = performance.now();
         if (now - lastFullCheck < 10000) return; // check every 10s only
         lastFullCheck = now;
-        if (now - startTime < 30_000) return; // never trigger game over before 30s
+        if (now - startTime < MIN_GAME_MS) return; // never trigger before 120s
         const pitH = render.canvas.height;
         const allDogs = Composite.allBodies(engine.world).filter(isDogCard);
         if (allDogs.length < 10) return; // need at least 6 dog cards in pit before checking
@@ -2407,10 +2446,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new CustomEvent("pc:gameover-result", { detail: { stuck: true } }));
         }
         // Refill: if fewer than 8 dog cards in pit and not all breeds have been dropped, drop 3 more
-        if (allDogs.length < 5) {
+        if (allDogs.length < 8) {
           const inWorld = new Set(Composite.allBodies(engine.world).map((b: any) => b.plugin?.name).filter(Boolean));
           const undrawn = BREEDS.filter((b: any) => !inWorld.has(b.name));
-          const toAdd = undrawn.sort(() => Math.random() - 0.5).slice(0, 5);
+          const toAdd = undrawn.sort(() => Math.random() - 0.5).slice(0, 3);
           toAdd.forEach((b: any, i: number) => {
             window.setTimeout(() => {
               if (!disposed) Composite.add(engine.world, makeBall(b, BREEDS.indexOf(b), stage.clientWidth));
