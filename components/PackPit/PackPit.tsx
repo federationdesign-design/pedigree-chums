@@ -1982,6 +1982,54 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       };
 
+      // bone+bowl magnetism -- much weaker than bone+logo, only when bowl is upright
+      let bowlFused = false;
+      const BOWL_MAGNET_RADIUS = 180; // px -- shorter range than logo (was 40 but logo is tiny; bowl is huge)
+      const BOWL_MAGNET_PULL = 0.000008; // ~6x weaker than bone+logo FUSE_PULL
+      const BOWL_SNAP_DIST = 40;
+      Events.on(engine, "beforeUpdate", () => {
+        if (bowlFused) return;
+        const all = Composite.allBodies(engine.world);
+        const bowlBody = all.find((b: any) => b.plugin?.isBowl && !b.isStatic);
+        const boneBody = all.find((b: any) => b.plugin?.prop === "bone" && !b.isStatic);
+        if (!bowlBody || !boneBody) return;
+        // Only activate when bowl is roughly upright (open side up)
+        const a = ((bowlBody.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const upright = a < 0.5 || a > Math.PI * 2 - 0.5;
+        if (!upright) return;
+        const dx = boneBody.position.x - bowlBody.position.x;
+        const dy = boneBody.position.y - bowlBody.position.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > BOWL_MAGNET_RADIUS || dist < 1) return;
+        // Gentle pull -- only pull the bone toward the bowl, not vice versa
+        const closeness = BOWL_MAGNET_RADIUS - dist;
+        const f = BOWL_MAGNET_PULL * closeness;
+        Body.applyForce(boneBody, boneBody.position, { x: -(dx / dist) * f * boneBody.mass, y: -(dy / dist) * f * boneBody.mass });
+        // Snap and fuse when close enough
+        if (dist <= BOWL_SNAP_DIST) {
+          bowlFused = true;
+          // Join them with a rigid constraint
+          const joint = Constraint.create({
+            bodyA: bowlBody, bodyB: boneBody,
+            pointA: { x: 0, y: -bowlBody.plugin.h * 0.15 }, // anchor slightly above bowl centre
+            pointB: { x: 0, y: 0 },
+            stiffness: 0.8, damping: 0.3, length: 0,
+            render: { visible: false },
+          });
+          Composite.add(engine.world, joint);
+          // Goo animation at join point
+          const jx = bowlBody.position.x, jy = bowlBody.position.y - bowlBody.plugin.h * 0.2;
+          const R2 = bowlBody.plugin.half * 0.4;
+          const t0 = performance.now();
+          for (let i = 0; i < 7; i++) {
+            const ang = (i / 7) * Math.PI * 2, r = i === 0 ? 0 : R2 * (0.3 + Math.random() * 0.4);
+            gooBlobs.push({ x: jx + Math.cos(ang) * r, y: jy + Math.sin(ang) * r, s: R2 * (0.4 + Math.random() * 0.4), born: t0 + i * 15, life: 500 });
+          }
+          numAt(jx, jy, 1000);
+          burstAt(jx, jy, bowlBody.plugin.half * 0.3);
+        }
+      });
+
       // bowl scoring: bone=500, ball=100, pin in place
       Events.on(engine, "collisionStart", (ev: any) => {
         for (const pair of ev.pairs) {
