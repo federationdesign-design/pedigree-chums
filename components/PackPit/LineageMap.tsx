@@ -647,10 +647,9 @@ export default function LineageMap({
       });
       setSeen((prev) => {
         const s = new Set(prev);
-        frontier.forEach((n) => {
-          s.add(n._id); // mark the opened node itself as seen (turns blue)
-          (n.children as Node[]).forEach((k) => s.add(k._id)); // mark children as seen too
-        });
+        // Only the opened node itself turns blue. Its children stay yellow --
+        // they haven't been tapped or popped yet, even though they're now visible.
+        frontier.forEach((n) => s.add(n._id));
         return s;
       });
       pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node

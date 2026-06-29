@@ -73,6 +73,8 @@
 .disc.has {
   /* round dot-dash -- purely structural signal: this node has unopened children */
   stroke-dasharray: 0.1 7;
+  stroke: rgba(255, 237, 0, 0.9);
+  stroke-width: 4;
 }
 .node:hover .disc {
   stroke-width: 5;
