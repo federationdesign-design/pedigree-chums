@@ -274,8 +274,8 @@ export default function PackPit() {
       Render.run(render);
       const runner = Runner.create();
       runnerRef.current = runner;
-      pauseRef.current = () => Runner.stop(runner);
-      resumeRef.current = () => Runner.run(runner, engine);
+      pauseRef.current = () => { engine.timing.timeScale = 0; };
+      resumeRef.current = () => { engine.timing.timeScale = slowmoActiveRef.current ? 0.25 : 1; };
       slowmoRef.current = () => { if (engine.timing.timeScale === 1) { engine.timing.timeScale = 0.25; slowmoActiveRef.current = true; } else { engine.timing.timeScale = 1; slowmoActiveRef.current = false; } };
       Runner.run(runner, engine);
 
