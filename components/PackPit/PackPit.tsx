@@ -353,11 +353,10 @@ export default function PackPit() {
             prop.shape === "slipper"
               ? [R(555, 365, 1060, 95), R(330, 195, 600, 300), C(130, 280, 140), C(460, 160, 210), C(490, 55, 70), R(820, 340, 320, 120)] // sole, upper-left bulk, toe, upper slope, tongue, right bridge
               : [
-                R(250, 260, 340, 120, po2),  // left floor thick
-                R(515, 280, 340, 120, po2),  // middle floor thick
-                R(780, 255, 340, 120, po2),  // right floor thick
-                R(130, 135, 80, 210),         // left wall
-                R(900, 135, 80, 210),         // right wall
+                R(515, 295, 820, 30, po2),   // floor -- full inner width, thin
+                R(515, 265, 120, 80, po2),   // centre bump -- uneven floor stops stacking
+                Bodies.rectangle((90 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: 0.349 }),  // left wall angled
+                Bodies.rectangle((940 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: -0.349 }) // right wall angled
               ];
           const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
           Body.setPosition(b, { x, y });
