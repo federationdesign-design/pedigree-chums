@@ -183,7 +183,7 @@ export default function StepMap({
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
-      onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } onClose(); }}
+      onClick={(e) => { if (suppressClick.current) { suppressClick.current = false; return; } if (e.target === e.currentTarget) onClose(); }}
     >
       {/* HOW TO PLAY header */}
       <div style={{
