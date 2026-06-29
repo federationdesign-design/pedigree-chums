@@ -95,14 +95,15 @@ export default function StepMap({
   useEffect(() => setVideoReady(false), [step.number]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Card double-click handler -- matches LineageMap pattern exactly (native onDoubleClick)
+  // Card double-click handler -- uses setOpenCount functional form so c is always fresh
   const handleCardDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (allUnlocked) {
-      onClose();
-      return;
-    }
     setOpenCount((c) => {
+      if (c >= step.rows.length) {
+        // All nodes already open -- close
+        window.setTimeout(() => onClose(), 0);
+        return c;
+      }
       const next = Math.min(c + 1, step.rows.length);
       if (next > c) {
         const row = next - 1;
