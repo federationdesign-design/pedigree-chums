@@ -301,7 +301,7 @@ export default function PackPit() {
         const b = Bodies.rectangle(40 + Math.random() * (w - 80), -120 - Math.random() * 600, 2 * s, 2 * s, {
           chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
         });
-        b.plugin = { name: breed.name, half: s, corner: cr, color, family: FAMILY[breed.name] || null, img: getImg(breed.name, breed.img), ping: 0 };
+        b.plugin = { name: breed.name, half: s, corner: cr, color, family: FAMILY[breed.name] || null, img: getImg(breed.name, breed.img), ping: 0, seq: i + 1 };
         return b;
       }
 
@@ -351,7 +351,7 @@ export default function PackPit() {
             Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
-              ? [R(557, 330, 1075, 160), R(880, 220, 280, 200), C(260, 190, 210), C(530, 210, 175), C(760, 260, 140), C(940, 280, 130)] // sole, heel body, toe, instep, mid, heel
+              ? [R(555, 365, 1060, 95), R(330, 195, 600, 300), C(130, 280, 140), C(460, 160, 210), C(490, 55, 70), R(820, 340, 320, 120)] // sole, upper-left bulk, toe, upper slope, tongue, right bridge
               : [
                 R(250, 260, 340, 120, po2),  // left floor thick
                 R(515, 280, 340, 120, po2),  // middle floor thick
@@ -1312,6 +1312,21 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 ctx.fillText(line2, 0, footerY + fs * 0.6);
               } else {
                 ctx.fillText(line1, 0, footerY);
+              }
+              // Numbered badge -- top-left corner like the physical card
+              if (b.plugin.seq) {
+                const bR = Math.max(14, pw * 0.14);
+                const bx = -pw / 2 + bR * 0.6;
+                const by = -ph / 2 + bR * 0.6;
+                ctx.beginPath(); ctx.arc(bx, by, bR, 0, Math.PI * 2);
+                ctx.fillStyle = "#1497d6"; ctx.fill();
+                ctx.lineWidth = Math.max(2, bR * 0.15);
+                ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+                ctx.fillStyle = "#ffed00";
+                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                const bfs = Math.max(9, Math.round(bR * 0.85));
+                ctx.font = `900 ${bfs}px "Luckiest Guy", system-ui, sans-serif`;
+                ctx.fillText(String(b.plugin.seq), bx, by + bfs * 0.06);
               }
               // Hover state
               if (hovered) {
