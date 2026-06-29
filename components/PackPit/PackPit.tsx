@@ -29,6 +29,7 @@ export default function PackPit() {
   const shakeRef = useRef<() => void>(() => {});
   const runnerRef = useRef<any>(null);
   const engineRef = useRef<any>(null);
+  const renderRef = useRef<any>(null);
   const pauseRef = useRef<() => void>(() => {});
   const resumeRef = useRef<() => void>(() => {});
   const slowmoRef = useRef<() => void>(() => {});
@@ -264,6 +265,7 @@ export default function PackPit() {
 
       const engine = Engine.create();
       engineRef.current = engine;
+      renderRef.current = render;
       engine.gravity.y = 1;
       const render = Render.create({
         element: stage, engine,
@@ -2897,52 +2899,57 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           </div>
         );
       })()}
-      {showHint && (
-        <div
-          onClick={dismissHint}
-          style={{
-            position: "fixed", inset: 0, zIndex: 999,
-            pointerEvents: "all",
-          }}
-        >
-          {/* Speech bubble */}
-          <div style={{
-            position: "fixed",
-            bottom: "clamp(200px, 35vh, 320px)",
-            left: "clamp(20px, 8vw, 80px)",
-            background: "#0a3a57",
-            color: "#ffffff",
-            borderRadius: 12,
-            padding: "10px 14px",
-            maxWidth: 200,
-            fontFamily: "'Luckiest Guy', system-ui",
-            fontSize: "clamp(13px, 1.8vw, 16px)",
-            lineHeight: 1.4,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-            pointerEvents: "none",
-          }}>
-            Tap a dog to explore its family tree!
+      {showHint && (() => {
+        // Find first dog card screen position
+        let cardX = window.innerWidth * 0.2;
+        let cardY = window.innerHeight * 0.6;
+        try {
+          const eng = engineRef.current;
+          const ren = renderRef.current;
+          if (eng && ren) {
+            const rect = ren.canvas.getBoundingClientRect();
+            const dog = (Composite as any).allBodies(eng.world).find((b: any) =>
+              b.plugin && !b.plugin.prop && !b.plugin.logo && !b.plugin.kind && b.plugin.half > 20 && !b.plugin.pop
+            );
+            if (dog) {
+              cardX = rect.left + dog.position.x;
+              cardY = rect.top + dog.position.y;
+            }
+          }
+        } catch {}
+        // Hand sits just below-left of card, bubble above hand
+        const handX = Math.max(20, cardX - 20);
+        const handY = Math.max(100, cardY + 20);
+        const bubbleX = Math.max(10, handX - 60);
+        const bubbleY = Math.max(10, handY - 100);
+        return (
+          <div onClick={dismissHint} style={{ position: "fixed", inset: 0, zIndex: 999, pointerEvents: "all" }}>
             <div style={{
-              position: "absolute", bottom: -10, left: 24,
-              width: 0, height: 0,
-              borderLeft: "10px solid transparent",
-              borderRight: "10px solid transparent",
-              borderTop: "10px solid #0a3a57",
-            }} />
+              position: "fixed", left: bubbleX, top: bubbleY,
+              background: "#0a3a57", color: "#ffffff",
+              borderRadius: 12, padding: "10px 14px", maxWidth: 200,
+              fontFamily: "'Luckiest Guy', system-ui",
+              fontSize: "clamp(13px, 1.8vw, 16px)", lineHeight: 1.4,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.4)", pointerEvents: "none",
+            }}>
+              Tap a dog to explore its family tree!
+              <div style={{
+                position: "absolute", bottom: -10, left: 24, width: 0, height: 0,
+                borderLeft: "10px solid transparent", borderRight: "10px solid transparent",
+                borderTop: "10px solid #0a3a57",
+              }} />
+            </div>
+            <div style={{
+              position: "fixed", left: handX, top: handY,
+              fontSize: "clamp(36px, 6vw, 52px)",
+              transform: "rotate(20deg)",
+              animation: "pcHandHint 1.8s ease-in-out infinite",
+              pointerEvents: "none",
+            }}>👆</div>
+            <style>{`@keyframes pcHandHint { 0%,100%{transform:rotate(20deg) translateY(0)} 50%{transform:rotate(20deg) translateY(-14px)} }`}</style>
           </div>
-          {/* Bouncing hand */}
-          <div style={{
-            position: "fixed",
-            bottom: "clamp(140px, 24vh, 240px)",
-            left: "clamp(30px, 6vw, 60px)",
-            fontSize: "clamp(36px, 6vw, 52px)",
-            transform: "rotate(20deg)",
-            animation: "pcHandHint 1.8s ease-in-out infinite",
-            pointerEvents: "none",
-          }}>👆</div>
-          <style>{`@keyframes pcHandHint { 0%,100%{transform:rotate(20deg) translateY(0)} 50%{transform:rotate(20deg) translateY(-14px)} }`}</style>
-        </div>
-      )}
+        );
+      })()}
       {gameOver && <GameOver
         chums={collected}
         score={score}
