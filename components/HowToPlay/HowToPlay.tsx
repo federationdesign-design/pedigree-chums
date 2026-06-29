@@ -28,6 +28,8 @@ const STEP_IMAGES = [
 
 export default function HowToPlay({ open, onClose, onScore, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollFraction, setScrollFraction] = React.useState(0);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -114,12 +116,14 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
         </h3>
-        <p className={styles.swipeHint} aria-hidden="true">
-          Swipe to view <span className={styles.swipeArrow}>&rarr;</span>
+        <p className={styles.swipeHint} aria-hidden="true" style={{ opacity: scrollFraction > 0.95 ? 0 : 1, transition: "opacity 0.3s" }}>
+          {scrollFraction < 0.05 ? "Swipe to view" : scrollFraction > 0.85 ? "You're all caught up!" : `Step ${Math.round(scrollFraction * 5) + 1} of 6`}
+          {scrollFraction < 0.85 && <span className={styles.swipeArrow}>&rarr;</span>}
         </p>
-        <div className={styles.stepScroll}>
+        <div className={styles.stepScroll} ref={scrollRef} onScroll={(e) => { const el = e.currentTarget; setScrollFraction(el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)); }}>
           {STEP_IMAGES.map((src, i) => (
             <div key={src} className={styles.stepCard} data-htp-step={i} onClick={(e) => { e.stopPropagation(); dropPiecesThenClose(); }}>
+              <div className={styles.stepBadge}>{i + 1}</div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} />
               <div className={styles.stepCaption}>{"DEAL 3–6 CHUMS EACH,HEAD OUTSIDE,SPOT REAL DOGS,MATCH TO YOUR CHUM,FIND MORE CHUMS,MOST CHUMS WINS".split(",")[i]}</div>

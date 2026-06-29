@@ -1989,28 +1989,24 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (bowlLocked) return;
         const bowlB = Composite.allBodies(engine.world).find((b: any) => b.plugin?.isBowl && !b.isStatic);
         if (!bowlB) return;
-        const pitH = render.canvas.height;
         const pitW = render.canvas.width;
-        // Check upright -- angle within 0.4 rad of 0
+        const floorY = walls[0] ? walls[0].bounds.min.y : render.canvas.height;
         const a = ((bowlB.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
         const upright = a < 0.4 || a > Math.PI * 2 - 0.4;
         const slow = Math.hypot(bowlB.velocity.x, bowlB.velocity.y) < 3;
-        const nearFloor = bowlB.position.y > pitH * 0.6;
+        const nearFloor = bowlB.bounds.max.y > floorY - 20;
         if (!upright || !slow || !nearFloor) return;
-        // Snap to centre floor, zero angle
         bowlLocked = true;
         const cx = pitW / 2;
-        const cy = pitH - bowlB.plugin.h * 0.38;
+        const cy = floorY - bowlB.plugin.h * 0.32;
         Body.setPosition(bowlB, { x: cx, y: cy });
         Body.setAngle(bowlB, 0);
         Body.setVelocity(bowlB, { x: 0, y: 0 });
         Body.setAngularVelocity(bowlB, 0);
-        // Pin with two constraints to floor -- keeps it drawable (not static) but immovable
-        const pinL = Constraint.create({ pointA: { x: cx - bowlB.plugin.w * 0.3, y: pitH + 10 }, bodyB: bowlB, pointB: { x: -bowlB.plugin.w * 0.3, y: bowlB.plugin.h * 0.4 }, stiffness: 1, length: 0, render: { visible: false } });
-        const pinR = Constraint.create({ pointA: { x: cx + bowlB.plugin.w * 0.3, y: pitH + 10 }, bodyB: bowlB, pointB: { x: bowlB.plugin.w * 0.3, y: bowlB.plugin.h * 0.4 }, stiffness: 1, length: 0, render: { visible: false } });
-        const pinC = Constraint.create({ pointA: { x: cx, y: pitH + 10 }, bodyB: bowlB, pointB: { x: 0, y: bowlB.plugin.h * 0.4 }, stiffness: 1, length: 0, render: { visible: false } });
+        const pinL = Constraint.create({ pointA: { x: cx - bowlB.plugin.w * 0.3, y: floorY - 5 }, bodyB: bowlB, pointB: { x: -bowlB.plugin.w * 0.3, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
+        const pinR = Constraint.create({ pointA: { x: cx + bowlB.plugin.w * 0.3, y: floorY - 5 }, bodyB: bowlB, pointB: { x: bowlB.plugin.w * 0.3, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
+        const pinC = Constraint.create({ pointA: { x: cx, y: floorY - 5 }, bodyB: bowlB, pointB: { x: 0, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         Composite.add(engine.world, [pinL, pinR, pinC]);
-        // Make very high density so explosions barely move it
         Body.set(bowlB, { frictionAir: 0.5, density: 1 });
         burstAt(cx, cy, bowlB.plugin.half * 0.3);
         numAt(cx, cy, 250);

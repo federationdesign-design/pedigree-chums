@@ -92,6 +92,7 @@
 
 /* Step image with yellow frame */
 .stepCard {
+  position: relative;
   flex: 0 0 auto;
   width: clamp(130px, 24vw, 200px);
   border-radius: 14px;
@@ -196,4 +197,23 @@
 @media (prefers-reduced-motion: reduce) {
   .overlay { animation: none; }
   .swipeArrow { animation: none; }
+}
+
+.stepBadge {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1497d6;
+  border: 3px solid #0a3a57;
+  color: #ffed00;
+  font-family: "Luckiest Guy", system-ui;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(10,58,87,0.4);
 }
