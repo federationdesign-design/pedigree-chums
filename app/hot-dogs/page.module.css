@@ -185,10 +185,10 @@
   background: rgba(10,58,87,0.35);
   border-top: 1px solid rgba(255,255,255,0.12);
   border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding: clamp(56px, 8vw, 112px) 50px;
 }
 .noteInner {
-  max-width: 720px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* Two-column layout: image left, text right. Stacks to one column on narrow screens. */
@@ -216,11 +216,6 @@
   .noteImg {
     width: clamp(140px, 50vw, 220px);
   }
-}
-
-.noteInner {
-  max-width: 720px;
-  margin: 0 auto;
 }
 
 /* Two-column layout: image left, text right. Stacks to one column on narrow screens. */
