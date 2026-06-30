@@ -118,13 +118,13 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           How <span className={styles.accent}>it works</span>
         </h3>
         </div>
-        <p className={styles.swipeHint} aria-hidden="true"
+        <p className={styles.swipeHint} role="slider" aria-label="Scroll through how to play steps"
           style={{ opacity: scrollFraction > 0.92 ? 0 : 1, transition: "opacity 0.4s", cursor: "ew-resize", userSelect: "none" }}
           onPointerDown={(e) => {
             const el = scrollRef.current; if (!el) return;
             const startX = e.clientX, startL = el.scrollLeft;
             try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
-            const onMove = (ev: PointerEvent) => { el.scrollLeft = startL - (ev.clientX - startX) * 3; };
+            const onMove = (ev: PointerEvent) => { el.scrollLeft = startL - (ev.clientX - startX); };
             const onUp = () => { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
             window.addEventListener("pointermove", onMove);
             window.addEventListener("pointerup", onUp);
