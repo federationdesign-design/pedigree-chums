@@ -1277,7 +1277,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 const HTP_ORDER = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
                 const scIdx = HTP_ORDER.indexOf(b.plugin.name);
                 const scLocked = scIdx > 0 && dyn().some((ob: any) => ob.plugin?.kind === "stepcard" && HTP_ORDER.indexOf(ob.plugin?.name) < scIdx && !ob.plugin?.opened);
-                if (scLocked) ctx.fillStyle = "#888888";
+                if (scLocked) {
+                  ctx.fillStyle = "#888888";
+                } else if (!b.plugin.opened) {
+                  // Next card the player should open -- highlight green on hover
+                  ctx.fillStyle = "#3cb24a";
+                }
               }
               ctx.fill();
               // Inner illustration -- use natural image aspect ratio if available
