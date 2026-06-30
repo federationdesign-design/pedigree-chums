@@ -30,6 +30,7 @@ export default function HotDogs() {
             {/* 3 anchor pills, moved up directly below the subtitle */}
             <nav className={styles.pills} aria-label="Jump to section">
               <a href="#cooking" className={styles.pill}>Cooking hot dogs</a>
+              <a href="#sausage-names" className={styles.pill}>Sausage dog name</a>
               <a href="#safety" className={styles.pill}>Keeping dogs cool</a>
               <a href="#game" className={styles.pill}>Flavour rules</a>
             </nav>
@@ -122,6 +123,19 @@ export default function HotDogs() {
                 &ldquo;fresh from the volcano.&rdquo;
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* ── Sausage dog name (placeholder) ──────────────────────── */}
+        <section id="sausage-names" className={styles.section}>
+          <div className={styles.sectionInner}>
+            <p className={styles.sectionEyebrow}>Coming soon</p>
+            <h2 className={styles.sectionTitle}>What&rsquo;s your sausage dog name?</h2>
+            <p className={styles.lead}>This section is on its way.</p>
+            <p>
+              We&rsquo;re putting together a proper sausage dog name generator.
+              Check back soon to find out yours.
+            </p>
           </div>
         </section>
 
