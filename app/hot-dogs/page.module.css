@@ -310,15 +310,17 @@
 }
 .safetyCard p {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.85rem, 1.3vw, 1rem);
-  color: rgba(255,255,255,0.82);
+  font-size: clamp(0.97rem, 1.5vw, 1.125rem);
+  font-weight: 500;
+  color: rgba(255,255,255,0.92);
   margin: 0;
 }
 
 .signsList {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
-  color: rgba(255,255,255,0.88);
+  font-size: clamp(1.02rem, 1.8vw, 1.2rem);
+  font-weight: 500;
+  color: rgba(255,255,255,0.95);
   line-height: 2;
   margin: 0 0 clamp(16px, 2vw, 24px);
   padding-left: clamp(20px, 3vw, 32px);
@@ -336,6 +338,7 @@
   min-width: 220px;
 }
 .alert {
+  padding: clamp(20px,3vw,36px) clamp(20px,3vw,36px) clamp(20px,3vw,36px);
   border-radius: 14px;
   padding: clamp(14px, 2vw, 22px) clamp(18px, 2.5vw, 28px);
   border-left: 5px solid transparent;
@@ -345,10 +348,10 @@
 .alert[data-level="red"]    { background: #dc3232; border-color: #dc3232; color: #ffffff; }
 .alertLabel {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
   letter-spacing: 0.06em;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: #ffffff;
 }
 .alert p {
@@ -505,11 +508,11 @@
 .safetyInner .lead,
 .safetyInner > p { font-size: 1.2rem; }
 
-.alert p { font-weight: 500; line-height: 1.3em; }
+.alert p { font-weight: 500; line-height: 1.5; font-size: clamp(0.95rem, 1.5vw, 1.1rem); margin: 8px 0; }
 
 .urgentNote {
   text-align: center;
-  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
   font-weight: 500;
   margin: clamp(24px, 4vw, 40px) 0;
   color: #ffffff;
@@ -552,12 +555,10 @@
 .alertTemp {
   display: block;
   font-family: Montserrat, sans-serif;
-  font-size: 0.8rem;
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.75;
-  margin: 2px 0 10px;
+  letter-spacing: 0.04em;
+  margin: 4px 0 14px;
 }
 
 .cookingTwoCols {
@@ -579,12 +580,14 @@
   margin-bottom: 12px;
 }
 .tinWarning {
-  background: rgba(255,255,255,0.07);
-  border-left: 3px solid rgba(255,210,62,0.5);
-  padding: 10px 14px;
-  border-radius: 0 8px 8px 0;
-  font-size: 0.9rem;
-  margin-top: 16px;
+  background: #ffffff;
+  color: var(--navy, #0a3a57);
+  border-radius: 12px;
+  padding: clamp(20px, 3vw, 36px);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-top: 24px;
+  line-height: 1.6;
 }
 
 .congaFeature {
@@ -612,16 +615,17 @@
 }
 .congaStep strong {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
   color: var(--yellow, #ffd23e);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .congaStep em {
   font-style: normal;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.65);
-  line-height: 1.3;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-weight: 500;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.4;
 }
 .congaArrow {
   font-size: 1.5rem;
@@ -638,4 +642,58 @@
   margin: 0;
   border-top: 1px solid rgba(255,255,255,0.1);
   padding-top: 16px;
+}
+
+.safetyCol p:not(.lead) { font-size: 1.125rem; font-weight: 500; }
+
+.alertIcon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 8px;
+  filter: saturate(0) brightness(10);
+}
+
+.foodFaqCols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(24px, 4vw, 48px);
+  margin: clamp(24px, 4vw, 40px) 0;
+}
+.foodCol {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.miniAccordion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+.miniItem {
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  overflow: hidden;
+}
+.miniQ {
+  font-family: Montserrat, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.miniQ::after { content: "+"; opacity: 0.6; }
+details[open] .miniQ::after { content: "−"; }
+.miniA {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.82);
+  padding: 0 16px 14px;
+  margin: 0;
+  line-height: 1.6;
 }

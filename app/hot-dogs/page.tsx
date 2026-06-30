@@ -87,19 +87,19 @@ export default function HotDogs() {
             <div className={styles.safetyCards}>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/A dog never died from missing a walk.jpg" alt="" className={styles.safetyCardImg} />
+                <img src="/a-dog-never-died-from-missing-a-walk.jpg" alt="" className={styles.safetyCardImg} />
                 <h3>A dog never died from missing a walk.</h3>
                 <p>Dogs do die from being too hot.</p>
               </div>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/A car is not a kennel.jpg" alt="" className={styles.safetyCardImg} />
+                <img src="/a-car-is-not-a-kennel.jpg" alt="" className={styles.safetyCardImg} />
                 <h3>A car is not a kennel.</h3>
                 <p>It is an oven with cup holders.</p>
               </div>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/If the pavement is too hot for your hand.jpg" alt="" className={styles.safetyCardImg} />
+                <img src="/if-the-pavement-is-too-hot-for-your-hand.jpg" alt="" className={styles.safetyCardImg} />
                 <h3>If the pavement is too hot for your hand,</h3>
                 <p>it is too hot for paws.</p>
               </div>
@@ -135,21 +135,27 @@ export default function HotDogs() {
 
             <div className={styles.heatAlerts}>
               <div className={styles.alert} data-level="yellow">
+                <span className={styles.alertIcon}>🌡️</span>
                 <span className={styles.alertLabel}>Yellow alert</span>
                 <span className={styles.alertTemp}>28°C – 30°C</span>
                 <p>Conditions are unlikely to affect most people, but pose real risks to dogs, who cannot sweat and cannot tell you they are struggling.</p>
+                <br />
                 <p>Walk earlier. Walk later. Carry water. Find shade. Keep the day boring. Boring dogs are alive dogs.</p>
               </div>
               <div className={styles.alert} data-level="amber">
+                <span className={styles.alertIcon}>🌡️</span>
                 <span className={styles.alertLabel}>Amber alert</span>
                 <span className={styles.alertTemp}>30°C – 36°C</span>
                 <p>The whole population is potentially at risk. Dogs even more so. You can skip the midday walk. Your dog does not need a nice day out. Your dog needs not to become soup.</p>
+                <br />
                 <p>Avoid ball games, hot pavements, and the words &ldquo;they&rsquo;ll be fine.&rdquo;</p>
               </div>
               <div className={styles.alert} data-level="red">
+                <span className={styles.alertIcon}>🌡️</span>
                 <span className={styles.alertLabel}>Red alert</span>
                 <span className={styles.alertTemp}>36°C – 38°C+</span>
                 <p>A severe risk to life, even for healthy individuals. For dogs, this is not a heat warning. It is an emergency.</p>
+                <br />
                 <p>No unnecessary walks. No hot cars. No quick errands. Keep your dog cool, shaded, watered, watched, and indoors. If you are worried, call a vet now.</p>
               </div>
             </div>
@@ -203,8 +209,7 @@ export default function HotDogs() {
 
               <div className={styles.cookingCol}>
                 <h3 className={styles.subTitle}>Instructions for tinned hot dogs</h3>
-                <p className={styles.tinLabel}>Full Product Name: Hot Dogs</p>
-                <p>Store in a cool, dry place. Preferably not on the floor where the dog can reach it.</p>
+                <p>Where do you store your dogs? Store in a cool, dry place. Preferably not on the floor where the dog can reach them. The hot dogs, that is. Not the dogs. Although arguably both.</p>
                 <p>
                   Once opened, empty unused hot dogs into a bowl, cover, and refrigerate.
                   Consume within 2 days of opening.
@@ -219,11 +224,11 @@ export default function HotDogs() {
                   The can end is the round bit. Yes, there are two of them. Check both if you are worried.
                   One is a lid. One is a question.
                 </p>
-                <p className={styles.tinWarning}>
+                <div className={styles.tinWarning}>
                   🐶 Note: None of this advice applies to actual dogs. Do not store your dog in a can.
                   Do not refrigerate your dog. Your dog has a best before end of approximately forever,
                   as far as you are concerned.
-                </p>
+                </div>
               </div>
             </div>
 
@@ -260,19 +265,41 @@ export default function HotDogs() {
               </p>
             </div>
 
-            <h3 className={styles.subTitle}>Do dogs prefer hot food or cold food?</h3>
-            <p>
-              Some dogs like dinner slightly warmed because it smells more interesting.
-              This is not because they are restaurant critics. It is because their nose is in charge
-              and their nose has strong opinions.
-            </p>
-            <div className={styles.rule2}>
-              <p><strong>Warm is fine. Hot is not.</strong></p>
-              <p>
-                If you warm your dog&rsquo;s food, warm it gently, stir it, check it,
-                and let it cool before serving. The aim is &ldquo;smells nice,&rdquo; not
-                &ldquo;fresh from the volcano.&rdquo;
-              </p>
+            <div className={styles.foodFaqCols}>
+              <div className={styles.foodCol}>
+                <h3 className={styles.subTitle}>Do dogs prefer hot food or cold food?</h3>
+                <p>
+                  Some dogs like dinner slightly warmed because it smells more interesting.
+                  This is not because they are restaurant critics. It is because their nose is in charge
+                  and their nose has strong opinions.
+                </p>
+                <div className={styles.rule2}>
+                  <p><strong>Warm is fine. Hot is not.</strong></p>
+                  <p>
+                    If you warm your dog&rsquo;s food, warm it gently, stir it, check it,
+                    and let it cool before serving. The aim is &ldquo;smells nice,&rdquo; not
+                    &ldquo;fresh from the volcano.&rdquo;
+                  </p>
+                </div>
+              </div>
+              <div className={styles.foodCol}>
+                <h3 className={styles.subTitle}>A few more questions</h3>
+                <div className={styles.miniAccordion}>
+                  {[
+                    ["Why were sausages called dogs before hot dogs were called hot dogs?", "Nobody is entirely sure, which is reassuring if you were worried etymology was an exact science. The best theory: in the 1800s, cheap sausages were sometimes suspected of containing dog meat. Rather than addressing the rumour, the name stuck. The sausage became the dog. Then someone warmed it up and we were off."],
+                    ["What food smells nicest to dogs?", "Meat, fish, and anything you are currently eating. Dogs are not subtle. Their sense of smell is roughly 10,000 times stronger than ours, which means a tin of hot dogs from the next room smells, to a dog, approximately as loud as a brass band."],
+                    ["Can dogs eat the hot dogs I have left?", "A tiny plain bit may not cause immediate disaster. But hot dogs are salty, processed, and made for humans. The dog looking at you wants them very much. The dog looking at you also wanted to eat a sock last Tuesday. Use your judgement."],
+                    ["Can dogs eat the hot, hot dogs?", "No. Hot food is genuinely dangerous for dogs. Their mouths and throats are not built for heat the way ours are. Let the hot dog cool completely first. Or just eat it yourself. There are plenty of actual dog treats available, and none of them are called hot dogs."],
+                    ["What are Hot Dogs made from?", "The game? Dogs. Specifically: 54 unique dog breeds illustrated on playing cards. Also some rules, a lot of shouting, and one person who insists they saw the Golden Retriever in someone else's hand and cannot let it go."],
+                    ["Should I keep my dogs in the fridge?", "The cards? No. They will go damp. The dogs? Also no. They will go unhappy. Fridge temperature for a dog is approximately the same as a walk in November without a coat. Technically survivable. Not recommended."],
+                  ].map(([q, a], i) => (
+                    <details key={i} className={styles.miniItem}>
+                      <summary className={styles.miniQ}>{q}</summary>
+                      <p className={styles.miniA}>{a}</p>
+                    </details>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
