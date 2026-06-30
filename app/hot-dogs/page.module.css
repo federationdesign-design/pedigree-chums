@@ -493,19 +493,4 @@
 }
 
 /* ── Fixed cerberus dog ─────────────────────────────────────────────────── */
-.fixedDog {
-  position: fixed;
-  bottom: 0;
-  right: 25%;
-  width: clamp(180px, 22vw, 340px);
-  z-index: 10;
-  pointer-events: none;
-  background: transparent;
-  will-change: transform;
-}
-.fixedDogVideo {
-  width: 100%;
-  height: auto;
-  display: block;
-  background: transparent;
-}
+

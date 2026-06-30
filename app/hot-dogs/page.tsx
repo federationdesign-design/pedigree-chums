@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
-import ScrollDog from "./ScrollDog";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -312,7 +311,6 @@ export default function HotDogs() {
           </div>
         </section>
 
-        <ScrollDog />
       </main>
     </>
   );
