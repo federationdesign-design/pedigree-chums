@@ -102,6 +102,16 @@
   gap: clamp(8px, 1.5vw, 16px);
   justify-content: center;
   margin-bottom: clamp(32px, 5vw, 56px);
+  width: 100vw;
+  max-width: 1200px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+@media (min-width: 1200px) {
+  .pills {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 .pill {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);

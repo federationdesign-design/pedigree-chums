@@ -23,8 +23,8 @@ export default function HotDogs() {
               Hot<span className={styles.slash}>/</span>Dogs
             </h1>
             <p className={styles.heroSub}>
-              Some come in buns. Some come with paws.<br />
-              Some should not be hot at all.
+              Some come with sauce. Some come with paws.<br />
+              Some are part of a game flavour. Only one should be eaten.
             </p>
 
             {/* 3 anchor pills, moved up directly below the subtitle */}
@@ -38,10 +38,11 @@ export default function HotDogs() {
             {/* Wordplay stack */}
             <div className={styles.wordplay}>
               <p>A hot dog is a sausage.</p>
-              <p>A sausage dog is a dog.</p>
+              <p>A dog can be a sausage dog.</p>
               <p>A dog can be hot.</p>
-              <p>A <em>hot, dog</em> can be a compliment.</p>
-              <p className={styles.wordplayWarning}>A hot dog in a car is not funny at all.</p>
+              <p>Hot dogs are fun.</p>
+              <p>A hot dog is not a good state, for any canine.</p>
+              <p className={styles.wordplayWarning}>Dogs die in hot cars.</p>
             </div>
           </div>
         </section>
