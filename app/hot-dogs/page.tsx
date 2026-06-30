@@ -146,6 +146,79 @@ export default function HotDogs() {
           </div>
         </section>
 
+        {/* ── Keeping dogs cool ────────────────────────────────────── */}
+        <section id="safety" className={styles.safetySection}>
+          <div className={styles.safetyInner}>
+            <p className={styles.sectionEyebrow}>The serious bit</p>
+            <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about hot dogs</h2>
+            <p className={styles.lead}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
+
+            <p>
+              This is where the joke stops being a joke.
+            </p>
+
+            <div className={styles.safetyCards}>
+              <div className={styles.safetyCard}>
+                <h3>A dog never died from missing a walk.</h3>
+                <p>Dogs do die from being too hot.</p>
+              </div>
+              <div className={styles.safetyCard}>
+                <h3>A car is not a kennel.</h3>
+                <p>It is an oven with cup holders.</p>
+              </div>
+              <div className={styles.safetyCard}>
+                <h3>If the pavement is too hot for your hand,</h3>
+                <p>it is too hot for paws.</p>
+              </div>
+            </div>
+
+            <h3 className={styles.subTitle}>What do I do if my dog is hot?</h3>
+            <p className={styles.lead}>Stop.</p>
+            <p>That is not a punchline. That is the answer.</p>
+            <p>
+              Stop walking. Stop playing. Stop throwing the ball. Stop the errand.
+              Stop assuming they are probably fine.
+            </p>
+            <p>
+              Move them somewhere cooler. Offer water. Get them off hot ground. Keep them calm.
+              If you are worried, call a vet.
+            </p>
+
+            <h3 className={styles.subTitle}>Signs of heatstroke in dogs</h3>
+            <ul className={styles.signsList}>
+              <li>Heavy panting</li>
+              <li>Drooling</li>
+              <li>Weakness or confusion</li>
+              <li>Vomiting</li>
+              <li>Collapse</li>
+              <li>Breathing that looks or sounds wrong</li>
+            </ul>
+            <p>A hot dog on the floor, panting hard and not acting right, is urgent.</p>
+
+            <div className={styles.heatAlerts}>
+              <div className={styles.alert} data-level="yellow">
+                <span className={styles.alertLabel}>Yellow alert</span>
+                <p>Walk earlier. Walk later. Carry water. Find shade. Keep the day boring. Boring dogs are alive dogs.</p>
+              </div>
+              <div className={styles.alert} data-level="amber">
+                <span className={styles.alertLabel}>Amber alert</span>
+                <p>Skip the midday walk. Avoid ball games and hot pavements. Your dog does not need a nice day out. Your dog needs not to become soup.</p>
+              </div>
+              <div className={styles.alert} data-level="red">
+                <span className={styles.alertLabel}>Red alert</span>
+                <p>No unnecessary walks. No hot cars. No quick errands. Keep your dog cool, shaded, watered, watched, and indoors as much as possible.</p>
+              </div>
+            </div>
+
+            <p className={styles.safetyNote}>
+              For official guidance, see the{" "}
+              <a href="https://www.rspca.org.uk" target="_blank" rel="noopener noreferrer">RSPCA</a>,{" "}
+              <a href="https://www.dogstrust.org.uk" target="_blank" rel="noopener noreferrer">Dogs Trust</a>, and{" "}
+              <a href="https://www.bluecross.org.uk" target="_blank" rel="noopener noreferrer">Blue Cross</a>.
+            </p>
+          </div>
+        </section>
+
         {/* ── Cooking sausages ─────────────────────────────────────── */}
         <section id="cooking" className={styles.section}>
           <div className={styles.sectionInner}>
@@ -215,6 +288,65 @@ export default function HotDogs() {
               We&rsquo;re putting together a proper sausage dog name generator.
               Check back soon to find out yours.
             </p>
+          </div>
+        </section>
+
+        {/* ── Cooking sausages ─────────────────────────────────────── */}
+        <section id="cooking" className={styles.section}>
+          <div className={styles.sectionInner}>
+            <p className={styles.sectionEyebrow}>The edible kind</p>
+            <h2 className={styles.sectionTitle}>How do I cook hot dogs?</h2>
+            <p className={styles.lead}>Carefully. And preferably without involving a dachshund.</p>
+            <p>
+              Boil them, grill them, fry them, air-fry them, barbecue them, or warm them gently
+              while staring into the middle distance wondering why dinner sounds like a pet emergency.
+            </p>
+            <p>
+              The important thing is that a hot dog should be hot all the way through.
+              This is the first kind of hot dog. It is food. It may involve mustard.
+              It should not involve an actual dog.
+            </p>
+
+            <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
+            <p>
+              Not because dogs are hot. Disappointing, perhaps.
+            </p>
+            <p>
+              Hot dogs are called hot dogs because sausages were once jokingly called dogs.
+              A hot sausage became a hot dog. Then a dog shaped like a sausage became a sausage dog.
+              Then language stood back and pretended this was normal.
+            </p>
+
+            <h3 className={styles.subTitle}>What is a sausage dog?</h3>
+            <p>
+              A sausage dog is a dachshund. A dachshund is not a sausage.
+              A sausage is not a dachshund. But put them in the same sentence
+              and the English language starts chasing its tail.
+            </p>
+            <p>
+              Their real name is dachshund, from German meaning badger dog.
+              They were bred with short legs and long bodies for going into burrows.
+              Then Britain saw the shape and thought: <em>sausage.</em>
+            </p>
+            <p className={styles.conga}>
+              badger dog &rarr; dachshund &rarr; sausage dog &rarr; hot dog &rarr; Hot/Dogs
+            </p>
+            <p>This is not etymology anymore. It is a conga line.</p>
+
+            <h3 className={styles.subTitle}>Do dogs prefer hot food or cold food?</h3>
+            <p>
+              Some dogs like dinner slightly warmed because it smells more interesting.
+              This is not because they are restaurant critics. It is because their nose is in charge
+              and their nose has strong opinions.
+            </p>
+            <div className={styles.rule2}>
+              <p><strong>Warm is fine. Hot is not.</strong></p>
+              <p>
+                If you warm your dog&rsquo;s food, warm it gently, stir it, check it,
+                and let it cool before serving. The aim is &ldquo;smells nice,&rdquo; not
+                &ldquo;fresh from the volcano.&rdquo;
+              </p>
+            </div>
           </div>
         </section>
 
