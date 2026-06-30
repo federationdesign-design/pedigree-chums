@@ -149,17 +149,8 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           {STEP_IMAGES.map((src, i) => (
             <div key={src} className={styles.stepCard} data-htp-step={i} onClick={(e) => { e.stopPropagation(); dropPiecesThenClose(); }}>
               <div className={styles.stepBadge}>{i + 1}</div>
-              {i < 3 ? (
-                <video
-                  src={`/step${i + 1}-video-animation.mp4`}
-                  autoPlay muted playsInline
-                  onEnded={(e) => { const v = e.currentTarget; v.pause(); v.currentTime = Math.max(0, v.duration - 0.05); }}
-                  className={styles.stepImg}
-                />
-              ) : (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} />
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} />
               <div className={styles.stepCaption}>{"DEAL 3–6 CHUMS EACH,HEAD OUTSIDE,SPOT REAL DOGS,MATCH TO YOUR CHUM,FIND MORE CHUMS,MOST CHUMS WINS".split(",")[i]}</div>
             </div>
           ))}
