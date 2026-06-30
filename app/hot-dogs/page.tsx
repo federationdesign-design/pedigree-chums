@@ -16,6 +16,8 @@ export default function HotDogs() {
 
         {/* ── Hero ─────────────────────────────────────────────────── */}
         <section className={styles.hero}>
+          <div className={styles.heroImg} aria-hidden="true" />
+          <div className={styles.heroTint} aria-hidden="true" />
           <div className={styles.heroInner}>
             <p className={styles.eyebrow}>Pedigree Chums presents</p>
             <h1 className={styles.heroTitle}>

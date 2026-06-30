@@ -13,9 +13,27 @@
   padding: clamp(80px, 12vw, 140px) clamp(24px, 6vw, 80px) clamp(48px, 8vw, 96px);
   text-align: center;
   position: relative;
+  overflow: hidden;
+}
+
+/* Full-bleed hero image, same pattern as the know-your-chums and other pages */
+.heroImg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--blue-sky) url("/hot-dog-hearo-img.jpg") center / cover no-repeat;
+}
+.heroTint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10, 58, 87, 0.35) 0%, rgba(10, 58, 87, 0.55) 100%);
 }
 
 .heroInner {
+  position: relative;
+  z-index: 2;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -35,7 +53,7 @@
   font-size: clamp(5rem, 18vw, 14rem);
   line-height: 0.9;
   color: var(--yellow, #ffd23e);
-  text-shadow: 0 8px 0 rgba(10,58,87,0.4);
+  text-shadow: 0 8px 0 rgba(10,58,87,0.5), 0 2px 24px rgba(10,58,87,0.6);
   margin: 0 0 clamp(16px, 3vw, 32px);
   letter-spacing: 0.02em;
 }
