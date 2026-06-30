@@ -2048,7 +2048,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             render: { visible: false },
           });
           // Also increase bone air friction to damp oscillation
-          Body.set(boneBody, { frictionAir: 0.99, density: 1 }); // near-static: very heavy and damped
+          Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 }); // no gravity, heavily damped after fusion
           Composite.add(engine.world, joint);
           // Goo + fuse spark animation at join point
           const jx = bowlBody.position.x, jy = bowlBody.position.y - bowlBody.plugin.h * 0.2;
