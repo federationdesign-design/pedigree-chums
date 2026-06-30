@@ -61,8 +61,7 @@
 
 .slash {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  color: #ffffff;
-  opacity: 0.5;
+  color: var(--yellow, #ffd23e);
 }
 
 .heroSub {
