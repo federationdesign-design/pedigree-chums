@@ -122,12 +122,12 @@ export default function HotDogs() {
               <div className={styles.safetyCol}>
                 <h3 className={styles.subTitle}>Signs of heatstroke in dogs</h3>
                 <ul className={styles.signsList}>
-                  <li>🐾 Heavy panting</li>
-                  <li>🐾 Drooling</li>
-                  <li>🐾 Weakness or confusion</li>
-                  <li>🐾 Vomiting</li>
-                  <li>🐾 Collapse</li>
-                  <li>🐾 Breathing that looks or sounds wrong</li>
+                  <li>🥵 Heavy panting</li>
+                  <li>🤤 Drooling</li>
+                  <li>🫤 Weakness or confusion</li>
+                  <li>🤮 Vomiting</li>
+                  <li>⬇️ Collapse</li>
+                  <li>😮‍💨 Breathing that looks or sounds wrong</li>
                 </ul>
               </div>
             </div>
