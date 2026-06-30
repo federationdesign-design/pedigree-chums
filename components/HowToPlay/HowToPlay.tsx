@@ -152,7 +152,8 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
               {i < 3 ? (
                 <video
                   src={`/step${i + 1}-video-animation.mp4`}
-                  autoPlay muted loop playsInline
+                  autoPlay muted playsInline
+                  onEnded={(e) => { const v = e.currentTarget; v.pause(); v.currentTime = Math.max(0, v.duration - 0.05); }}
                   className={styles.stepImg}
                 />
               ) : (
