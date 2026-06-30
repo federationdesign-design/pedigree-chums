@@ -654,7 +654,7 @@ export default function LineageMap({
         return s;
       });
       pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
-      interacted.current = true; setIdleHint(false); dismissTapHint();
+      interacted.current = true; setIdleHint(false); setShowTapHint(false); try { localStorage.setItem("pc-lm-hint", "1"); } catch {}
       return;
     }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
