@@ -736,6 +736,7 @@ export default function PackPit() {
       }
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+      const LOCKED_CAT = 0x0004; // bowl + fused bone, once locked, excluded from drag
       // --- Fuse magnetism (Phase 2) ---------------------------------------
       // Once the logo has been knocked loose, dragging it near a bone (or a bone
       // near it) makes the two drift together. Symmetrical shapes, so position
@@ -837,7 +838,7 @@ export default function PackPit() {
       });
       Events.on(engine, "beforeUpdate", onFuseMagnet);
       // --------------------------------------------------------------------
-      mc.collisionFilter.mask = 0xffffffff & ~0x0002; // category 0x0002 (inert circles) cannot be grabbed
+      mc.collisionFilter.mask = 0xffffffff & ~0x0002 & ~LOCKED_CAT; // inert circles and locked bowl/bone cannot be grabbed
       let pressedBomb: any = null; // the bomb currently being pressed/held, for the click-vs-hold fuse
       Composite.add(engine.world, mc);
       render.mouse = mouse;
@@ -2019,6 +2020,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Composite.add(engine.world, [pinL, pinR, pinC]);
         // Make bowl a sensor -- no contact forces, stops wobble from other objects
         bowlB.isSensor = true;
+        bowlB.collisionFilter = { ...bowlB.collisionFilter, category: LOCKED_CAT };
         Body.set(bowlB, { frictionAir: 0.99, density: 1, gravityScale: 0 });
         bowlB.plugin.lockedBowl = true; // flag for draw order
         burstAt(cx, cy, bowlB.plugin.half * 0.3);
@@ -2061,6 +2063,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           });
           // Also increase bone air friction to damp oscillation
           boneBody.isSensor = true;
+          boneBody.collisionFilter = { ...boneBody.collisionFilter, category: LOCKED_CAT };
           Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 });
           Body.setVelocity(boneBody, { x: 0, y: 0 });
           Body.setAngularVelocity(boneBody, 0);
@@ -2099,6 +2102,27 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           burstAt(jx, jy, R2 * 0.6);
           burstAt(jx, jy - R2 * 0.4, R2 * 0.4);
           burstAt(boneX, boneY, 60);
+        }
+      });
+
+      // Absolute freeze: every frame, re-pin locked bowl and fused bone to their
+      // exact resting spot. Belt and braces against any residual contact nudge.
+      Events.on(engine, "afterUpdate", () => {
+        const all2 = Composite.allBodies(engine.world);
+        const lb = all2.find((b: any) => b.plugin?.lockedBowl);
+        if (lb) {
+          Body.setVelocity(lb, { x: 0, y: 0 });
+          Body.setAngularVelocity(lb, 0);
+          if (Math.abs(lb.angle) > 0.001) Body.setAngle(lb, 0);
+        }
+        const fb2 = all2.find((b: any) => b.plugin?.prop === "bone" && b.isSensor);
+        if (fb2 && lb) {
+          const targetX = lb.position.x, targetY = lb.position.y - lb.plugin.h * 0.15;
+          if (Math.hypot(fb2.position.x - targetX, fb2.position.y - targetY) > 0.5) {
+            Body.setPosition(fb2, { x: targetX, y: targetY });
+          }
+          Body.setVelocity(fb2, { x: 0, y: 0 });
+          Body.setAngularVelocity(fb2, 0);
         }
       });
 
