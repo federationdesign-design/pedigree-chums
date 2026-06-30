@@ -1910,10 +1910,13 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
         // Locked bowl draws first (behind everything), then rest sorted by Y
+        // Locked bowl and its fused bone draw first (furthest back), then rest sorted by Y
         const lockedBowl = bodies.find((b: any) => b.plugin?.lockedBowl);
+        const fusedBone = bodies.find((b: any) => b.plugin?.prop === "bone" && b.isSensor);
         if (lockedBowl) drawBall(ctx, lockedBowl, dimLevel, false);
+        if (fusedBone) drawBall(ctx, fusedBone, dimLevel, false);
         [...bodies].sort((a: any, b: any) => a.position.y - b.position.y).forEach((b: any) => {
-          if (b === hoverBody || b === lockedBowl) return;
+          if (b === hoverBody || b === lockedBowl || b === fusedBone) return;
           drawBall(ctx, b, dimLevel, false);
         });;
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
