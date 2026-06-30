@@ -136,15 +136,21 @@ export default function HotDogs() {
             <div className={styles.heatAlerts}>
               <div className={styles.alert} data-level="yellow">
                 <span className={styles.alertLabel}>Yellow alert</span>
+                <span className={styles.alertTemp}>28°C – 30°C</span>
+                <p>Conditions are unlikely to affect most people, but pose real risks to dogs, who cannot sweat and cannot tell you they are struggling.</p>
                 <p>Walk earlier. Walk later. Carry water. Find shade. Keep the day boring. Boring dogs are alive dogs.</p>
               </div>
               <div className={styles.alert} data-level="amber">
                 <span className={styles.alertLabel}>Amber alert</span>
-                <p>Skip the midday walk. Avoid ball games and hot pavements. Your dog does not need a nice day out. Your dog needs not to become soup.</p>
+                <span className={styles.alertTemp}>30°C – 36°C</span>
+                <p>The whole population is potentially at risk. Dogs even more so. You can skip the midday walk. Your dog does not need a nice day out. Your dog needs not to become soup.</p>
+                <p>Avoid ball games, hot pavements, and the words &ldquo;they&rsquo;ll be fine.&rdquo;</p>
               </div>
               <div className={styles.alert} data-level="red">
                 <span className={styles.alertLabel}>Red alert</span>
-                <p>No unnecessary walks. No hot cars. No quick errands. Keep your dog cool, shaded, watered, watched, and indoors as much as possible.</p>
+                <span className={styles.alertTemp}>36°C – 38°C+</span>
+                <p>A severe risk to life, even for healthy individuals. For dogs, this is not a heat warning. It is an emergency.</p>
+                <p>No unnecessary walks. No hot cars. No quick errands. Keep your dog cool, shaded, watered, watched, and indoors. If you are worried, call a vet now.</p>
               </div>
             </div>
 
@@ -153,19 +159,6 @@ export default function HotDogs() {
               <a href="https://www.rspca.org.uk" target="_blank" rel="noopener noreferrer">RSPCA</a>,{" "}
               <a href="https://www.dogstrust.org.uk" target="_blank" rel="noopener noreferrer">Dogs Trust</a>, and{" "}
               <a href="https://www.bluecross.org.uk" target="_blank" rel="noopener noreferrer">Blue Cross</a>.
-            </p>
-          </div>
-        </section>
-
-        {/* ── Sausage dog name (placeholder) ──────────────────────── */}
-        <section id="sausage-names" className={styles.section}>
-          <div className={styles.sectionInner}>
-            <p className={styles.sectionEyebrow}>Coming soon</p>
-            <h2 className={styles.sectionTitle}>What&rsquo;s your sausage dog name?</h2>
-            <p className={styles.lead}>This section is on its way.</p>
-            <p>
-              We&rsquo;re putting together a proper sausage dog name generator.
-              Check back soon to find out yours.
             </p>
           </div>
         </section>
@@ -179,38 +172,93 @@ export default function HotDogs() {
             <p>
               Boil them, grill them, fry them, air-fry them, barbecue them, or warm them gently
               while staring into the middle distance wondering why dinner sounds like a pet emergency.
-            </p>
-            <p>
-              The important thing is that a hot dog should be hot all the way through.
               This is the first kind of hot dog. It is food. It may involve mustard.
               It should not involve an actual dog.
             </p>
 
-            <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
-            <p>
-              Not because dogs are hot. Disappointing, perhaps.
-            </p>
-            <p>
-              Hot dogs are called hot dogs because sausages were once jokingly called dogs.
-              A hot sausage became a hot dog. Then a dog shaped like a sausage became a sausage dog.
-              Then language stood back and pretended this was normal.
-            </p>
+            <div className={styles.cookingTwoCols}>
+              <div className={styles.cookingCol}>
+                <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
+                <p>
+                  Not because dogs are hot. Disappointing, perhaps.
+                </p>
+                <p>
+                  Hot dogs are called hot dogs because sausages were once jokingly called dogs.
+                  A hot sausage became a hot dog. Then a dog shaped like a sausage became a sausage dog.
+                  Then language stood back and pretended this was normal.
+                </p>
 
-            <h3 className={styles.subTitle}>What is a sausage dog?</h3>
-            <p>
-              A sausage dog is a dachshund. A dachshund is not a sausage.
-              A sausage is not a dachshund. But put them in the same sentence
-              and the English language starts chasing its tail.
-            </p>
-            <p>
-              Their real name is dachshund, from German meaning badger dog.
-              They were bred with short legs and long bodies for going into burrows.
-              Then Britain saw the shape and thought: <em>sausage.</em>
-            </p>
-            <p className={styles.conga}>
-              badger dog &rarr; dachshund &rarr; sausage dog &rarr; hot dog &rarr; Hot/Dogs
-            </p>
-            <p>This is not etymology anymore. It is a conga line.</p>
+                <h3 className={styles.subTitle}>What is a sausage dog?</h3>
+                <p>
+                  A sausage dog is a dachshund. A dachshund is not a sausage.
+                  A sausage is not a dachshund. But put them in the same sentence
+                  and the English language starts chasing its tail.
+                </p>
+                <p>
+                  Their real name is dachshund, from German meaning badger dog.
+                  They were bred with short legs and long bodies for going into burrows.
+                  Then Britain saw the shape and thought: <em>sausage.</em>
+                </p>
+              </div>
+
+              <div className={styles.cookingCol}>
+                <h3 className={styles.subTitle}>Instructions for tinned hot dogs</h3>
+                <p className={styles.tinLabel}>Full Product Name: Hot Dogs</p>
+                <p>Store in a cool, dry place. Preferably not on the floor where the dog can reach it.</p>
+                <p>
+                  Once opened, empty unused hot dogs into a bowl, cover, and refrigerate.
+                  Consume within 2 days of opening.
+                  Do not refrigerate in the can. The can has done its job. Let it go.
+                </p>
+                <p>
+                  Unused hot dogs can be frozen and consumed within 3 months.
+                  This is longer than most people keep leftovers and shorter than a dachshund grudge.
+                </p>
+                <p>
+                  <strong>For best before end:</strong> See date on can end.
+                  The can end is the round bit. Yes, there are two of them. Check both if you are worried.
+                  One is a lid. One is a question.
+                </p>
+                <p className={styles.tinWarning}>
+                  🐶 Note: None of this advice applies to actual dogs. Do not store your dog in a can.
+                  Do not refrigerate your dog. Your dog has a best before end of approximately forever,
+                  as far as you are concerned.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.congaFeature}>
+              <div className={styles.congaChain}>
+                <span className={styles.congaStep}>
+                  <strong>Dachs</strong> (German: badger)
+                  <em>+ Hund (dog)</em>
+                </span>
+                <span className={styles.congaArrow}>&rarr;</span>
+                <span className={styles.congaStep}>
+                  <strong>Dachshund</strong>
+                  <em>Badger dog. Built for burrows.</em>
+                </span>
+                <span className={styles.congaArrow}>&rarr;</span>
+                <span className={styles.congaStep}>
+                  <strong>Sausage dog</strong>
+                  <em>Britain sees the shape. Language gives up.</em>
+                </span>
+                <span className={styles.congaArrow}>&rarr;</span>
+                <span className={styles.congaStep}>
+                  <strong>Hot dog</strong>
+                  <em>A sausage in a bun, named after a dog named after a sausage.</em>
+                </span>
+                <span className={styles.congaArrow}>&rarr;</span>
+                <span className={styles.congaStep}>
+                  <strong>Hot/Dogs</strong>
+                  <em>A card game. Not a sausage. Not a temperature warning. Both.</em>
+                </span>
+              </div>
+              <p className={styles.congaCaption}>
+                This is not etymology anymore. It is a conga line. The dachshund started it.
+                The English language was too polite to say no.
+              </p>
+            </div>
 
             <h3 className={styles.subTitle}>Do dogs prefer hot food or cold food?</h3>
             <p>
