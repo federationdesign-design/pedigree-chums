@@ -28,10 +28,10 @@ export default function HotDogs() {
 
             {/* 3 anchor pills, moved up directly below the subtitle */}
             <nav className={styles.pills} aria-label="Jump to section">
-              <a href="#cooking" className={styles.pill}>Cooking hot dogs</a>
-              <a href="#sausage-names" className={styles.pill}>Sausage dog name</a>
-              <a href="#safety" className={styles.pill}>Keeping dogs cool</a>
-              <a href="#game" className={styles.pill}>Flavour rules</a>
+              <a href="#safety" className={styles.pill}>Keeping Dogs Cool</a>
+              <a href="#cooking" className={styles.pill}>Making Dogs Hot</a>
+              <a href="#sausage-names" className={styles.pill}>Why the funny name</a>
+              <a href="#game" className={styles.pill}>Game Flavour Rules</a>
             </nav>
 
             {/* Wordplay stack */}
