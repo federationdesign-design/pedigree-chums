@@ -102,7 +102,7 @@
 .stepCard {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(163px, 30vw, 250px);
+  width: clamp(122px, 22.5vw, 188px);
   border-radius: 14px;
   scroll-snap-align: center;
   background: #ffed00;
