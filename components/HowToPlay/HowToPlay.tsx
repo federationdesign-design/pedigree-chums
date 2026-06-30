@@ -113,9 +113,11 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <button type="button" className={styles.close} onClick={dropPiecesThenClose} aria-label="Close">
           &times;
         </button>
+        <div className={styles.inner}>
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
         </h3>
+        </div>
         <p className={styles.swipeHint} aria-hidden="true"
           style={{ opacity: scrollFraction > 0.92 ? 0 : 1, transition: "opacity 0.4s", cursor: "ew-resize", userSelect: "none" }}
           onPointerDown={(e) => {

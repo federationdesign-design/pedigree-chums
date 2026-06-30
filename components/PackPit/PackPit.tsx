@@ -1909,7 +1909,13 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
         if (logoBody && logoBody.isStatic) drawBall(ctx, logoBody, 1, false); // fixed logo, drawn until it dislodges; after that dyn() draws it
         if (menuBody && menuBody.isStatic) drawBall(ctx, menuBody, 1, false); // fixed menu in the top-right, drawn until it dislodges; after that dyn() draws it
-        [...bodies].sort((a: any, b: any) => a.position.y - b.position.y).forEach((b: any) => { if (b === hoverBody) return; drawBall(ctx, b, dimLevel, false); });
+        // Locked bowl draws first (behind everything), then rest sorted by Y
+        const lockedBowl = bodies.find((b: any) => b.plugin?.lockedBowl);
+        if (lockedBowl) drawBall(ctx, lockedBowl, dimLevel, false);
+        [...bodies].sort((a: any, b: any) => a.position.y - b.position.y).forEach((b: any) => {
+          if (b === hoverBody || b === lockedBowl) return;
+          drawBall(ctx, b, dimLevel, false);
+        });;
         if (hoverBody && hoverBody.plugin.family) { const tt = Math.min(1, (now - hoverStart) / 240); drawFamily(ctx, hoverBody, tt); }
         if (hoverBody) drawBall(ctx, hoverBody, 1, true);
 
@@ -2008,7 +2014,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const pinR = Constraint.create({ pointA: { x: cx + bowlB.plugin.w * 0.3, y: floorY - 5 }, bodyB: bowlB, pointB: { x: bowlB.plugin.w * 0.3, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         const pinC = Constraint.create({ pointA: { x: cx, y: floorY - 5 }, bodyB: bowlB, pointB: { x: 0, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         Composite.add(engine.world, [pinL, pinR, pinC]);
-        Body.set(bowlB, { frictionAir: 0.99, density: 1, gravityScale: 0 }); // no gravity once locked
+        // Make bowl a sensor -- no contact forces, stops wobble from other objects
+        bowlB.isSensor = true;
+        Body.set(bowlB, { frictionAir: 0.99, density: 1, gravityScale: 0 });
+        bowlB.plugin.lockedBowl = true; // flag for draw order
         burstAt(cx, cy, bowlB.plugin.half * 0.3);
         numAt(cx, cy, 250);
       });
@@ -2048,14 +2057,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             render: { visible: false },
           });
           // Also increase bone air friction to damp oscillation
+          boneBody.isSensor = true;
           Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 });
-          // Freeze bone completely every frame after fusion
-          const freezeBone = () => {
-            if (!bowlFused || !boneBody) return;
-            Body.setVelocity(boneBody, { x: 0, y: 0 });
-            Body.setAngularVelocity(boneBody, 0);
-          };
-          Events.on(engine, "afterUpdate", freezeBone);
+          Body.setVelocity(boneBody, { x: 0, y: 0 });
+          Body.setAngularVelocity(boneBody, 0);
           Composite.add(engine.world, joint);
           // Goo erupts from bowl rim upward and around the bone
           const jx = bowlBody.position.x;
