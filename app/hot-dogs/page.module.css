@@ -230,10 +230,6 @@
   border-radius: 16px;
   display: block;
 }
-.noteText {
-  flex: 1 1 0%;
-  min-width: 0;
-}
 @media (max-width: 640px) {
   .noteRow {
     flex-direction: column;
@@ -252,9 +248,7 @@
 }
 .rule { border: none; border-top: 1px dashed rgba(255,255,255,0.2); margin: clamp(20px, 3vw, 32px) 0; }
 .legal {
-  font-size: clamp(0.78rem, 1.1vw, 0.88rem) !important;
-  color: rgba(255,255,255,0.5) !important;
-  line-height: 1.6 !important;
+  line-height: 1.6;
 }
 
 /* ── Cooking section extras ──────────────────────────────────────────────── */
@@ -279,6 +273,10 @@
   background: rgba(10,20,50,0.45);
   border-top: 2px solid rgba(255,210,62,0.3);
   border-bottom: 2px solid rgba(255,210,62,0.3);
+  padding: clamp(56px, 8vw, 112px) 50px;
+}
+.safetyInner {
+  width: 100%;
 }
 
 .safetyCards {
@@ -318,9 +316,14 @@
 
 .heatAlerts {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: clamp(10px, 1.5vw, 16px);
   margin: clamp(24px, 4vw, 40px) 0;
+}
+.heatAlerts .alert {
+  flex: 1 1 0;
+  min-width: 220px;
 }
 .alert {
   border-radius: 14px;

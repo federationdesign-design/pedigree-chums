@@ -23,7 +23,7 @@ export default function HotDogs() {
             </h1>
             <p className={styles.heroSub}>
               Some come with sauce. Some come with paws.<br />
-              Some are part of a game flavour. Only one should be eaten.
+              Some are a flavour. Only one should be eaten.
             </p>
 
             {/* 3 anchor pills, moved up directly below the subtitle */}
@@ -37,10 +37,10 @@ export default function HotDogs() {
             {/* Wordplay stack */}
             <div className={styles.wordplay}>
               <p>A hot dog is a sausage.</p>
-              <p>A dog can be a sausage dog.</p>
+              <p>A sausage can be a dog.</p>
               <p>A dog can be hot.</p>
-              <p>Hot dogs are fun.</p>
-              <p>A hot dog is not a good state, for any canine.</p>
+              <p>Hot dogs is a game.</p>
+              <p>Being a hot dog is not good for any canine.</p>
               <p className={styles.wordplayWarning}>Dogs die in hot cars.</p>
             </div>
           </div>
@@ -55,21 +55,94 @@ export default function HotDogs() {
               <div className={styles.noteText}>
                 <h2 className={styles.noteTitle}>A note about hot dogs</h2>
                 <p>Sometimes we mean human food: sausages in buns.</p>
-                <p>Sometimes we mean dogs who are too hot and need shade, water, and common sense.</p>
+                <p>Sometimes we mean dogs who are too hot and need shade, water and probably some ice.</p>
                 <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums game flavour.</p>
-                <p>We do not mean dog food.</p>
+                <p>We do not mean heating up your dog&rsquo;s food.</p>
                 <hr className={styles.rule} />
                 <p className={styles.legal}>
-                  Pedigree Chums is an independent dog card game. It is not pet food, not dog food, not a dog treat,
-                  and is not connected with or endorsed by any dog-food brand.
+                  Pedigree Chums is an dog spotting card game. It is not food or pet food, not dog food, not a dog treat,
+                  There are not nuts in Pedigree Chums.
                 </p>
                 <p className={styles.legal}>
-                  The cards may contain dogs. Your dog may show interest in the dogs.
-                  This does not make the dogs food. Please do not feed the cards to your dog,
+                  The cards may contain dogs. Your dog may show interest in the dogs like it does with your hotdogs.
+                  This does not make them the dogs food. Please do not feed the cards to your dog,
                   even if your dog appears to have understood the rules.
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ── Keeping dogs cool ────────────────────────────────────── */}
+        <section id="safety" className={styles.safetySection}>
+          <div className={styles.safetyInner}>
+            <p className={styles.sectionEyebrow}>The serious bit</p>
+            <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about hot dogs</h2>
+            <p className={styles.lead}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
+
+            <p>
+              This is where the joke stops being a joke.
+            </p>
+
+            <div className={styles.safetyCards}>
+              <div className={styles.safetyCard}>
+                <h3>A dog never died from missing a walk.</h3>
+                <p>Dogs do die from being too hot.</p>
+              </div>
+              <div className={styles.safetyCard}>
+                <h3>A car is not a kennel.</h3>
+                <p>It is an oven with cup holders.</p>
+              </div>
+              <div className={styles.safetyCard}>
+                <h3>If the pavement is too hot for your hand,</h3>
+                <p>it is too hot for paws.</p>
+              </div>
+            </div>
+
+            <h3 className={styles.subTitle}>What do I do if my dog is hot?</h3>
+            <p className={styles.lead}>Stop.</p>
+            <p>That is not a punchline. That is the answer.</p>
+            <p>
+              Stop walking. Stop playing. Stop throwing the ball. Stop the errand.
+              Stop assuming they are probably fine.
+            </p>
+            <p>
+              Move them somewhere cooler. Offer water. Get them off hot ground. Keep them calm.
+              If you are worried, call a vet.
+            </p>
+
+            <h3 className={styles.subTitle}>Signs of heatstroke in dogs</h3>
+            <ul className={styles.signsList}>
+              <li>Heavy panting</li>
+              <li>Drooling</li>
+              <li>Weakness or confusion</li>
+              <li>Vomiting</li>
+              <li>Collapse</li>
+              <li>Breathing that looks or sounds wrong</li>
+            </ul>
+            <p>A hot dog on the floor, panting hard and not acting right, is urgent.</p>
+
+            <div className={styles.heatAlerts}>
+              <div className={styles.alert} data-level="yellow">
+                <span className={styles.alertLabel}>Yellow alert</span>
+                <p>Walk earlier. Walk later. Carry water. Find shade. Keep the day boring. Boring dogs are alive dogs.</p>
+              </div>
+              <div className={styles.alert} data-level="amber">
+                <span className={styles.alertLabel}>Amber alert</span>
+                <p>Skip the midday walk. Avoid ball games and hot pavements. Your dog does not need a nice day out. Your dog needs not to become soup.</p>
+              </div>
+              <div className={styles.alert} data-level="red">
+                <span className={styles.alertLabel}>Red alert</span>
+                <p>No unnecessary walks. No hot cars. No quick errands. Keep your dog cool, shaded, watered, watched, and indoors as much as possible.</p>
+              </div>
+            </div>
+
+            <p className={styles.safetyNote}>
+              For official guidance, see the{" "}
+              <a href="https://www.rspca.org.uk" target="_blank" rel="noopener noreferrer">RSPCA</a>,{" "}
+              <a href="https://www.dogstrust.org.uk" target="_blank" rel="noopener noreferrer">Dogs Trust</a>, and{" "}
+              <a href="https://www.bluecross.org.uk" target="_blank" rel="noopener noreferrer">Blue Cross</a>.
+            </p>
           </div>
         </section>
 
@@ -141,79 +214,6 @@ export default function HotDogs() {
             <p>
               We&rsquo;re putting together a proper sausage dog name generator.
               Check back soon to find out yours.
-            </p>
-          </div>
-        </section>
-
-        {/* ── Keeping dogs cool ────────────────────────────────────── */}
-        <section id="safety" className={styles.safetySection}>
-          <div className={styles.sectionInner}>
-            <p className={styles.sectionEyebrow}>The serious bit</p>
-            <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about hot dogs</h2>
-            <p className={styles.lead}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
-
-            <p>
-              This is where the joke stops being a joke.
-            </p>
-
-            <div className={styles.safetyCards}>
-              <div className={styles.safetyCard}>
-                <h3>A dog never died from missing a walk.</h3>
-                <p>Dogs do die from being too hot.</p>
-              </div>
-              <div className={styles.safetyCard}>
-                <h3>A car is not a kennel.</h3>
-                <p>It is an oven with cup holders.</p>
-              </div>
-              <div className={styles.safetyCard}>
-                <h3>If the pavement is too hot for your hand,</h3>
-                <p>it is too hot for paws.</p>
-              </div>
-            </div>
-
-            <h3 className={styles.subTitle}>What do I do if my dog is hot?</h3>
-            <p className={styles.lead}>Stop.</p>
-            <p>That is not a punchline. That is the answer.</p>
-            <p>
-              Stop walking. Stop playing. Stop throwing the ball. Stop the errand.
-              Stop assuming they are probably fine.
-            </p>
-            <p>
-              Move them somewhere cooler. Offer water. Get them off hot ground. Keep them calm.
-              If you are worried, call a vet.
-            </p>
-
-            <h3 className={styles.subTitle}>Signs of heatstroke in dogs</h3>
-            <ul className={styles.signsList}>
-              <li>Heavy panting</li>
-              <li>Drooling</li>
-              <li>Weakness or confusion</li>
-              <li>Vomiting</li>
-              <li>Collapse</li>
-              <li>Breathing that looks or sounds wrong</li>
-            </ul>
-            <p>A hot dog on the floor, panting hard and not acting right, is urgent.</p>
-
-            <div className={styles.heatAlerts}>
-              <div className={styles.alert} data-level="yellow">
-                <span className={styles.alertLabel}>Yellow alert</span>
-                <p>Walk earlier. Walk later. Carry water. Find shade. Keep the day boring. Boring dogs are alive dogs.</p>
-              </div>
-              <div className={styles.alert} data-level="amber">
-                <span className={styles.alertLabel}>Amber alert</span>
-                <p>Skip the midday walk. Avoid ball games and hot pavements. Your dog does not need a nice day out. Your dog needs not to become soup.</p>
-              </div>
-              <div className={styles.alert} data-level="red">
-                <span className={styles.alertLabel}>Red alert</span>
-                <p>No unnecessary walks. No hot cars. No quick errands. Keep your dog cool, shaded, watered, watched, and indoors as much as possible.</p>
-              </div>
-            </div>
-
-            <p className={styles.safetyNote}>
-              For official guidance, see the{" "}
-              <a href="https://www.rspca.org.uk" target="_blank" rel="noopener noreferrer">RSPCA</a>,{" "}
-              <a href="https://www.dogstrust.org.uk" target="_blank" rel="noopener noreferrer">Dogs Trust</a>, and{" "}
-              <a href="https://www.bluecross.org.uk" target="_blank" rel="noopener noreferrer">Blue Cross</a>.
             </p>
           </div>
         </section>
