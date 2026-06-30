@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./GameOver.module.css";
 
-type Props = { chums: number; score: number; collectedBreeds?: { name: string; img: string }[] };
+type Props = { chums: number; score: number; collectedBreeds?: { name: string; img: string }[]; allCollected?: boolean };
 
 const MAX_NAME = 6;
 const STORAGE_KEY = "pc_scores";
@@ -64,7 +64,7 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
   }).slice(0, 3);
 }
 
-export default function GameOver({ chums, score, collectedBreeds = [] }: Props) {
+export default function GameOver({ chums, score, collectedBreeds = [], allCollected = false }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const idleTimerRef = useRef<number | null>(null);
   const resetIdleTimer = () => {
@@ -216,13 +216,21 @@ export default function GameOver({ chums, score, collectedBreeds = [] }: Props) 
         )}
 
         {/* Title */}
+        {allCollected && (
+          <div className={styles.allCollectedPaw} aria-hidden="true">🐾</div>
+        )}
         <h1 className={styles.title}>
-          {chums === 0
+          {allCollected
+            ? "YOU GOT 'EM ALL!"
+            : chums === 0
             ? "You have no chums and your... tell you what, grab some chums next time!"
             : chums === 1
             ? "Well done, you found 1 chum!"
             : `Well done, you found ${chums} chums!`}
         </h1>
+        {allCollected && (
+          <p className={styles.allCollectedSub}>ALL 54 CHUMS COLLECTED</p>
+        )}
 
         {/* Leaderboard */}
         <div className={styles.leaderboard}>

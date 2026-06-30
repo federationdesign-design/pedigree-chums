@@ -115,7 +115,8 @@ export default function PackPit() {
   const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookies") ? true : false);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
-  const [allChumsCollected, setAllChumsCollected] = useState(false);
+  // true only when the game-over trigger fired because all 54 were collected
+  // (rather than the pit filling up) -- passed to GameOver for the celebration variant
   const [showHint, setShowHint] = useState(false);
   useEffect(() => {
     try { if (localStorage.getItem("pc-onboard-hint")) return; } catch {}
@@ -2845,7 +2846,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         <span className={styles.shakeText}>Shake</span>
       </button>
 
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setAllChumsCollected(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
       <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
@@ -3042,62 +3043,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           </div>
         );
       })()}
-      {allChumsCollected && !gameOver && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 1000,
-          background: "linear-gradient(135deg, #0c5b92 0%, #0a3a57 100%)",
-          display: "flex", flexDirection: "column", alignItems: "center",
-          justifyContent: "center", padding: "2rem",
-        }}>
-          <div style={{ fontSize: 64, marginBottom: 12, animation: "pcAllBounce 1s ease-in-out infinite" }}>🐾</div>
-          <div style={{
-            fontFamily: "'Luckiest Guy', system-ui",
-            fontSize: "clamp(28px, 5vw, 52px)",
-            color: "#ffed00", textAlign: "center", lineHeight: 1.1,
-            textShadow: "0 4px 0 rgba(10,58,87,0.4)", marginBottom: 8,
-          }}>YOU GOT &apos;EM ALL!</div>
-          <div style={{
-            fontFamily: "Montserrat, sans-serif", fontSize: 16,
-            color: "rgba(255,255,255,0.85)", textAlign: "center",
-            marginBottom: 24, fontWeight: 600, letterSpacing: "0.05em",
-          }}>ALL 54 CHUMS COLLECTED</div>
-          <div style={{ position: "relative", width: 220, height: 80, marginBottom: 28 }}>
-            {[0,1,2,3,4,5].map((i) => (
-              <div key={i} style={{
-                position: "absolute", left: i * 28,
-                width: 54, height: 72, background: "#ffed00",
-                borderRadius: 8, border: "3px solid #fff",
-                transform: `rotate(${(i-2.5)*6}deg)`,
-                boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-              }} />
-            ))}
-          </div>
-          <div style={{
-            background: "rgba(255,255,255,0.1)",
-            border: "2px solid rgba(255,237,0,0.4)",
-            borderRadius: 12, padding: "12px 32px", marginBottom: 24, textAlign: "center",
-          }}>
-            <div style={{ fontFamily: "Montserrat,sans-serif", fontSize: 12, color: "rgba(255,255,255,0.6)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Final Score</div>
-            <div style={{ fontFamily: "'Luckiest Guy',system-ui", fontSize: 36, color: "#ffed00", lineHeight: 1 }}>{score.toLocaleString()}</div>
-          </div>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-            <button
-              type="button"
-              style={{ fontFamily: "'Luckiest Guy',system-ui", fontSize: 16, color: "#0a3a57", background: "#ffed00", border: "none", borderRadius: 999, padding: "12px 28px", cursor: "pointer", boxShadow: "0 5px 0 rgba(10,58,87,0.4)" }}
-              onClick={() => { setAllChumsCollected(false); setGameOver(true); }}
-            >Share Score</button>
-            <button
-              type="button"
-              style={{ fontFamily: "'Luckiest Guy',system-ui", fontSize: 16, color: "#fff", background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.4)", borderRadius: 999, padding: "12px 28px", cursor: "pointer" }}
-              onClick={() => window.location.assign("/about")}
-            >Continue</button>
-          </div>
-          <style>{`@keyframes pcAllBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
-        </div>
-      )}
       {gameOver && <GameOver
         chums={collected}
         score={score}
+        allCollected={collected >= 54}
         collectedBreeds={collectedChums.map((name) => {
           const b = breeds.find((x) => x.name === name);
           const card = b ? breedCard[b.slug] : undefined;
