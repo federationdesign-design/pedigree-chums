@@ -50,15 +50,17 @@
 
 .heroTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(5rem, 18vw, 14rem);
+  font-size: clamp(3rem, 9vw, 7.5rem);
   line-height: 0.9;
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(16px, 3vw, 32px);
   text-align: center;
   width: 100%;
+  max-width: 100%;
 }
 
 .slash {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
   color: #ffffff;
   opacity: 0.5;
 }

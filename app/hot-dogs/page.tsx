@@ -29,9 +29,9 @@ export default function HotDogs() {
 
             {/* 3 anchor pills, moved up directly below the subtitle */}
             <nav className={styles.pills} aria-label="Jump to section">
-              <a href="#cooking" className={styles.pill}>Cooking sausages</a>
+              <a href="#cooking" className={styles.pill}>Cooking hot dogs</a>
               <a href="#safety" className={styles.pill}>Keeping dogs cool</a>
-              <a href="#game" className={styles.pill}>Game flavour rules</a>
+              <a href="#game" className={styles.pill}>Flavour rules</a>
             </nav>
 
             {/* Wordplay stack */}
