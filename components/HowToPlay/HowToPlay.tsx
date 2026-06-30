@@ -29,7 +29,7 @@ const STEP_IMAGES = [
 export default function HowToPlay({ open, onClose, onScore, activeStep = null, cardPos = null }: Props) {
   const stageElRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollFraction, setScrollFraction] = React.useState(0);
+  const [scrollFraction, setScrollFraction] = useState(0);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -116,9 +116,9 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
         </h3>
-        <p className={styles.swipeHint} aria-hidden="true" style={{ opacity: scrollFraction > 0.95 ? 0 : 1, transition: "opacity 0.3s" }}>
-          {scrollFraction < 0.05 ? "Swipe to view" : scrollFraction > 0.85 ? "You're all caught up!" : `Step ${Math.round(scrollFraction * 5) + 1} of 6`}
-          {scrollFraction < 0.85 && <span className={styles.swipeArrow}>&rarr;</span>}
+        <p className={styles.swipeHint} aria-hidden="true" style={{ opacity: scrollFraction > 0.92 ? 0 : 1, transition: "opacity 0.4s" }}>
+          {scrollFraction > 0.85 ? "You're all caught up!" : scrollFraction > 0.05 ? `Step ${Math.min(6, Math.round(scrollFraction * 5) + 1)} of 6` : "Swipe to view"}
+          {scrollFraction <= 0.85 && <span className={styles.swipeArrow}>&rarr;</span>}
         </p>
         <div className={styles.stepScroll} ref={scrollRef} onScroll={(e) => { const el = e.currentTarget; setScrollFraction(el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)); }}>
           {STEP_IMAGES.map((src, i) => (

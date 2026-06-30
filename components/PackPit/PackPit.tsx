@@ -941,6 +941,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });
           bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 });
           numAt(ax, ay, 2000);
+          Composite.remove(engine.world, hit); acceptBody = null;
           clearCookieObjects(true);
           return true;
         }

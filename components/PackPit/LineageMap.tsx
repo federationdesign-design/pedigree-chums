@@ -252,7 +252,8 @@ export default function LineageMap({
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
   const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
-  const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
+  const [idleHint, setIdleHint] = useState(false);
+  const [showTapHint, setShowTapHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
@@ -653,7 +654,7 @@ export default function LineageMap({
         return s;
       });
       pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
-      interacted.current = true; setIdleHint(false);
+      interacted.current = true; setIdleHint(false); dismissTapHint();
       return;
     }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
