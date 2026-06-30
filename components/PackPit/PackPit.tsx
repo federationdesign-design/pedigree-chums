@@ -2050,21 +2050,40 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           // Also increase bone air friction to damp oscillation
           Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 }); // no gravity, heavily damped after fusion
           Composite.add(engine.world, joint);
-          // Goo + fuse spark animation at join point
-          const jx = bowlBody.position.x, jy = bowlBody.position.y - bowlBody.plugin.h * 0.2;
-          const R2 = Math.max(80, bowlBody.plugin.half * 0.5);
+          // Goo erupts from bowl rim upward and around the bone
+          const jx = bowlBody.position.x;
+          // jy at bowl rim -- top edge of bowl
+          const jy = bowlBody.position.y - bowlBody.plugin.h * 0.45;
+          const boneX = boneBody.position.x, boneY = boneBody.position.y;
+          const R2 = Math.max(120, bowlBody.plugin.w * 0.35);
           const t0 = performance.now();
-          for (let i = 0; i < 12; i++) {
-            const ang = (i / 12) * Math.PI * 2, r = i === 0 ? 0 : R2 * (0.3 + Math.random() * 0.7);
-            gooBlobs.push({ x: jx + Math.cos(ang) * r, y: jy + Math.sin(ang) * r, s: R2 * (0.5 + Math.random() * 0.6), born: t0 + i * 12, life: 700 });
+          // Ring of blobs at bowl rim level
+          for (let i = 0; i < 16; i++) {
+            const ang = (i / 16) * Math.PI * 2;
+            const r = R2 * (0.4 + Math.random() * 0.6);
+            // Bias upward -- blobs above rim go further out, below go less far
+            const yBias = Math.sin(ang) < 0 ? 1.4 : 0.6;
+            gooBlobs.push({
+              x: jx + Math.cos(ang) * r,
+              y: jy + Math.sin(ang) * r * yBias,
+              s: R2 * (0.4 + Math.random() * 0.7),
+              born: t0 + i * 10, life: 900
+            });
           }
-          emitFuseSparks(jx, jy, 1.5);
+          // Extra blobs around the bone itself
+          for (let i = 0; i < 8; i++) {
+            const ang = (i / 8) * Math.PI * 2, r = 60 + Math.random() * 80;
+            gooBlobs.push({ x: boneX + Math.cos(ang) * r, y: boneY + Math.sin(ang) * r, s: 50 + Math.random() * 60, born: t0 + 80 + i * 15, life: 700 });
+          }
+          // Sparks from rim
           emitFuseSparks(jx, jy, 2.0);
-          emitFuseSparks(jx, jy, 2.5);
+          emitFuseSparks(jx - R2 * 0.3, jy, 1.8);
+          emitFuseSparks(jx + R2 * 0.3, jy, 1.8);
+          emitFuseSparks(boneX, boneY, 1.5);
           numAt(jx, jy, 1000);
-          burstAt(jx, jy, R2 * 0.8);
-          burstAt(jx + R2 * 0.4, jy - R2 * 0.3, R2 * 0.5);
-          burstAt(jx - R2 * 0.4, jy - R2 * 0.3, R2 * 0.5);
+          burstAt(jx, jy, R2 * 0.6);
+          burstAt(jx, jy - R2 * 0.4, R2 * 0.4);
+          burstAt(boneX, boneY, 60);
         }
       });
 
