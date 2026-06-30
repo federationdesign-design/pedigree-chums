@@ -670,10 +670,13 @@ export default function LineageMap({
     }
     // fully open: auto-place all unplaced images into their correct frames
     // Only place the top-of-stack card per image -- duplicates stack visually on top
-    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && isTopOfStack(c));
+    // Place top-of-stack cards into unfilled frames, then stack duplicates on top
+    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed);
     if (unplaced.length === 0) return;
     unplaced.forEach((c, i) => {
-      const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
+      // Find an unfilled frame first, then fall back to any frame with matching image
+      const target = frames.find((f) => f.img === c.img && !filled.has(f.id))
+        ?? frames.find((f) => f.img === c.img);
       if (!target) return;
       window.setTimeout(() => {
         // bubble trail: emit 4 bubbles staggered toward the target frame
