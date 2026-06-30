@@ -3127,7 +3127,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         score={score}
         collectedBreeds={collectedChums.map((name) => {
           const b = breeds.find((x) => x.name === name);
-          return { name, img: b ? b.image : "" };
+          const card = b ? breedCard[b.slug] : undefined;
+          return { name, img: card ?? (b ? b.image : "") };
         })}
       />}
       <div className={styles.rotateGuard} aria-hidden="true">
