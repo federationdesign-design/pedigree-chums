@@ -895,7 +895,7 @@ export default function LineageMap({
         </text>
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Learn button -- blue -- auto-reveals tree ring by ring (was mislabelled, called doPack) */}
-        {!allBlue && !packed && !collecting && !removing ? (
+        {!packed && !collecting && !removing ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
@@ -918,7 +918,7 @@ export default function LineageMap({
         {!collecting ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${!allBlue && !packed ? 138 : 62})`}
+            transform={`translate(0,${!packed ? 138 : 62})`}
             onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 750, FLASH_SIZE); startRemove(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
