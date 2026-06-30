@@ -50,21 +50,27 @@ export default function HotDogs() {
         {/* ── Disambiguation note ───────────────────────────────────── */}
         <section className={styles.noteSection}>
           <div className={styles.noteInner}>
-            <h2 className={styles.noteTitle}>A note about hot dogs</h2>
-            <p>Sometimes we mean human food: sausages in buns.</p>
-            <p>Sometimes we mean dogs who are too hot and need shade, water, and common sense.</p>
-            <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums game flavour.</p>
-            <p>We do not mean dog food.</p>
-            <hr className={styles.rule} />
-            <p className={styles.legal}>
-              Pedigree Chums is an independent dog card game. It is not pet food, not dog food, not a dog treat,
-              and is not connected with or endorsed by any dog-food brand.
-            </p>
-            <p className={styles.legal}>
-              The cards may contain dogs. Your dog may show interest in the dogs.
-              This does not make the dogs food. Please do not feed the cards to your dog,
-              even if your dog appears to have understood the rules.
-            </p>
+            <div className={styles.noteRow}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/eatinghotdog.png" alt="" className={styles.noteImg} />
+              <div className={styles.noteText}>
+                <h2 className={styles.noteTitle}>A note about hot dogs</h2>
+                <p>Sometimes we mean human food: sausages in buns.</p>
+                <p>Sometimes we mean dogs who are too hot and need shade, water, and common sense.</p>
+                <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums game flavour.</p>
+                <p>We do not mean dog food.</p>
+                <hr className={styles.rule} />
+                <p className={styles.legal}>
+                  Pedigree Chums is an independent dog card game. It is not pet food, not dog food, not a dog treat,
+                  and is not connected with or endorsed by any dog-food brand.
+                </p>
+                <p className={styles.legal}>
+                  The cards may contain dogs. Your dog may show interest in the dogs.
+                  This does not make the dogs food. Please do not feed the cards to your dog,
+                  even if your dog appears to have understood the rules.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
