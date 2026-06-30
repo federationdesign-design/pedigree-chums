@@ -285,22 +285,33 @@ export default function StepMap({
                 borderRadius: illoR,
                 overflow: "hidden",
               }}>
-                <video
-                  ref={(el) => { videoRef.current = el; if (el) { el.muted = true; el.volume = 0; } }}
-                  src={`/step${step.number}-video-animation.mp4`}
-                  autoPlay muted playsInline
-                  onCanPlay={(e) => { const v = e.target as HTMLVideoElement; v.muted = true; v.volume = 0; setVideoReady(true); }}
-                  onEnded={(e) => { (e.target as HTMLVideoElement).pause(); }}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                />
-                {!videoReady && cardImg && (
-                  <img src={cardImg} alt=""
-                    draggable={false}
-                    onDragStart={(e) => e.preventDefault()}
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
-                  />
+                {step.number <= 3 ? (
+                  <>
+                    <video
+                      ref={(el) => { videoRef.current = el; if (el) { el.muted = true; el.volume = 0; } }}
+                      src={`/step${step.number}-video-animation.mp4`}
+                      autoPlay muted playsInline
+                      onCanPlay={(e) => { const v = e.target as HTMLVideoElement; v.muted = true; v.volume = 0; setVideoReady(true); }}
+                      onEnded={(e) => { (e.target as HTMLVideoElement).pause(); }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                    {!videoReady && cardImg && (
+                      <img src={cardImg} alt=""
+                        draggable={false}
+                        onDragStart={(e) => e.preventDefault()}
+                        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  cardImg && (
+                    <img src={cardImg} alt=""
+                      draggable={false}
+                      onDragStart={(e) => e.preventDefault()}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  )
                 )}
-
               </div>
               {/* Footer caption -- same as pit */}
               <div style={{
