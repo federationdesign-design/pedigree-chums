@@ -181,9 +181,6 @@
 
 /* ── Note section ────────────────────────────────────────────────────────── */
 .noteSection {
-  background: rgba(10,58,87,0.35);
-  border-top: 1px solid rgba(255,255,255,0.12);
-  border-bottom: 1px solid rgba(255,255,255,0.12);
   padding: clamp(56px, 8vw, 112px) 50px;
 }
 .noteInner {
@@ -206,6 +203,9 @@
 .noteText {
   flex: 1 1 0%;
   min-width: 0;
+}
+.noteText p {
+  font-size: 1.125rem;
 }
 @media (max-width: 640px) {
   .noteRow {
@@ -242,7 +242,7 @@
 
 .noteTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1.6rem, 4vw, 3rem);
+  font-size: clamp(2rem, 5vw, 3.6rem);
   color: #ffffff;
   margin: 0 0 clamp(16px, 2.5vw, 28px);
 }
@@ -330,9 +330,9 @@
   padding: clamp(14px, 2vw, 22px) clamp(18px, 2.5vw, 28px);
   border-left: 5px solid transparent;
 }
-.alert[data-level="yellow"] { background: rgba(255,210,62,0.12); border-color: #ffd23e; }
-.alert[data-level="amber"]  { background: rgba(255,140,0,0.12);  border-color: #ff8c00; }
-.alert[data-level="red"]    { background: rgba(220,50,50,0.12);  border-color: #dc3232; }
+.alert[data-level="yellow"] { background: #ffd23e; border-color: #ffd23e; color: #0a3a57; }
+.alert[data-level="amber"]  { background: #ff8c00; border-color: #ff8c00; color: #ffffff; }
+.alert[data-level="red"]    { background: #dc3232; border-color: #dc3232; color: #ffffff; }
 .alertLabel {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(0.85rem, 1.4vw, 1.05rem);
@@ -399,7 +399,7 @@
 .faqSection {
   background: rgba(10,58,87,0.25);
 }
-.faqList { display: flex; flex-direction: column; gap: 4px; margin-top: clamp(20px, 3vw, 36px); }
+.faqList { display: flex; flex-direction: column; gap: 4px; margin-top: clamp(20px, 3vw, 36px); columns: 2; column-gap: clamp(24px,4vw,48px); }
 .faqItem {
   border-radius: 12px;
   background: rgba(255,255,255,0.06);
@@ -491,3 +491,50 @@
 
 /* ── Fixed cerberus dog ─────────────────────────────────────────────────── */
 
+
+.safetyInner .lead,
+.safetyInner > p { font-size: 1.2rem; }
+
+.alert p { font-weight: 500; line-height: 1.3em; }
+
+.urgentNote {
+  text-align: center;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 500;
+  margin: clamp(24px, 4vw, 40px) 0;
+  color: #ffffff;
+}
+
+.safetyCardImg {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.safetyTwoCols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(24px, 4vw, 48px);
+  margin: clamp(24px, 4vw, 40px) 0;
+}
+.safetyCol {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.cookingSection {
+  padding: clamp(56px, 8vw, 112px) 50px;
+}
+.cookingInner {
+  width: 100%;
+}
+
+.gameSection {
+  padding: clamp(56px, 8vw, 112px) 50px;
+}
+.gameInner {
+  width: 100%;
+}
