@@ -1918,7 +1918,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         // Locked bowl draws first (behind everything), then rest sorted by Y
         // Locked bowl and its fused bone draw first (furthest back), then rest sorted by Y
         const lockedBowl = bodies.find((b: any) => b.plugin?.lockedBowl);
-        const fusedBone = bodies.find((b: any) => b.plugin?.prop === "bone" && b.isSensor);
+        const fusedBone = bodies.find((b: any) => b.plugin?.fusedToBowl);
         if (lockedBowl) drawBall(ctx, lockedBowl, dimLevel, false);
         if (fusedBone) drawBall(ctx, fusedBone, dimLevel, false);
         [...bodies].sort((a: any, b: any) => a.position.y - b.position.y).forEach((b: any) => {
@@ -2024,9 +2024,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const pinC = Constraint.create({ pointA: { x: cx, y: floorY - 5 }, bodyB: bowlB, pointB: { x: 0, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         Composite.add(engine.world, [pinL, pinR, pinC]);
         // Make bowl a sensor -- no contact forces, stops wobble from other objects
-        bowlB.isSensor = true;
         bowlB.collisionFilter = { ...bowlB.collisionFilter, category: LOCKED_CAT };
-        Body.set(bowlB, { frictionAir: 0.99, density: 1, gravityScale: 0 });
+        Body.set(bowlB, { frictionAir: 0.99, density: 10, gravityScale: 0, inertia: Infinity, inverseInertia: 0 });
         bowlB.plugin.lockedBowl = true; // flag for draw order
         burstAt(cx, cy, bowlB.plugin.half * 0.3);
         numAt(cx, cy, 250);
@@ -2067,9 +2066,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             render: { visible: false },
           });
           // Also increase bone air friction to damp oscillation
-          boneBody.isSensor = true;
           boneBody.collisionFilter = { ...boneBody.collisionFilter, category: LOCKED_CAT };
-          Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 });
+          Body.set(boneBody, { frictionAir: 0.99, density: 10, gravityScale: 0, inertia: Infinity, inverseInertia: 0 });
           Body.setVelocity(boneBody, { x: 0, y: 0 });
           Body.setAngularVelocity(boneBody, 0);
           Composite.add(engine.world, joint);
@@ -2110,22 +2108,22 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       });
 
-      // Absolute freeze: every frame, re-pin locked bowl and fused bone to their
-      // exact resting spot. Belt and braces against any residual contact nudge.
+      // Damp (never teleport) the locked bowl and fused bone every frame.
+      // A hard position snap mid-simulation is what was injecting energy into
+      // anything resting on the bone -- Matter's solver sees a body that moved
+      // impossibly fast and reacts by flinging contacting bodies. Zeroing
+      // velocity is enough since both bodies are now true static-weight props;
+      // we only correct position if it has drifted by more than a few px,
+      // and even then via velocity nudging rather than Body.setPosition.
       Events.on(engine, "afterUpdate", () => {
         const all2 = Composite.allBodies(engine.world);
         const lb = all2.find((b: any) => b.plugin?.lockedBowl);
         if (lb) {
           Body.setVelocity(lb, { x: 0, y: 0 });
           Body.setAngularVelocity(lb, 0);
-          if (Math.abs(lb.angle) > 0.001) Body.setAngle(lb, 0);
         }
-        const fb2 = all2.find((b: any) => b.plugin?.prop === "bone" && b.isSensor);
+        const fb2 = all2.find((b: any) => b.plugin?.prop === "bone" && b.plugin?.fusedToBowl);
         if (fb2 && lb) {
-          const targetX = lb.position.x, targetY = lb.position.y - lb.plugin.h * 0.15;
-          if (Math.hypot(fb2.position.x - targetX, fb2.position.y - targetY) > 0.5) {
-            Body.setPosition(fb2, { x: targetX, y: targetY });
-          }
           Body.setVelocity(fb2, { x: 0, y: 0 });
           Body.setAngularVelocity(fb2, 0);
         }
