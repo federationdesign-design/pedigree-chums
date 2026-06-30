@@ -638,6 +638,8 @@ export default function PackPit() {
       let dropTimer: any = null;
       let waveTimers: any[] = [];
       let buzzTimer: any = null;
+      const dropped = new Set<number>(); // every breed index ever spawned, including collected ones --
+                                          // shared between dropAll's pair-drop and the refill check below
       function dropAll() {
         const ex = dyn();
         if (ex.length) Composite.remove(engine.world, ex);
@@ -654,7 +656,6 @@ export default function PackPit() {
         };
         // scripted desktop pour helpers
         // Simple pair drop -- 2 random dogs every 4 seconds
-        const dropped = new Set<number>();
         const pairOrder = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
 
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
