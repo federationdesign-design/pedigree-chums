@@ -19,7 +19,6 @@ export default function HotDogs() {
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
           <div className={styles.heroInner}>
-            <p className={styles.eyebrow}>Pedigree Chums presents</p>
             <h1 className={styles.heroTitle}>
               Hot<span className={styles.slash}>/</span>Dogs
             </h1>
@@ -27,6 +26,13 @@ export default function HotDogs() {
               Some come in buns. Some come with paws.<br />
               Some should not be hot at all.
             </p>
+
+            {/* 3 anchor pills, moved up directly below the subtitle */}
+            <nav className={styles.pills} aria-label="Jump to section">
+              <a href="#cooking" className={styles.pill}>Cooking sausages</a>
+              <a href="#safety" className={styles.pill}>Keeping dogs cool</a>
+              <a href="#game" className={styles.pill}>Game flavour rules</a>
+            </nav>
 
             {/* Wordplay stack */}
             <div className={styles.wordplay}>
@@ -36,13 +42,6 @@ export default function HotDogs() {
               <p>A <em>hot, dog</em> can be a compliment.</p>
               <p className={styles.wordplayWarning}>A hot dog in a car is not funny at all.</p>
             </div>
-
-            {/* 3 anchor pills */}
-            <nav className={styles.pills} aria-label="Jump to section">
-              <a href="#cooking" className={styles.pill}>Cooking sausages</a>
-              <a href="#safety" className={styles.pill}>Keeping dogs cool</a>
-              <a href="#game" className={styles.pill}>Game rules</a>
-            </nav>
           </div>
         </section>
 

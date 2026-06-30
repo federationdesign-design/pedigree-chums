@@ -53,9 +53,9 @@
   font-size: clamp(5rem, 18vw, 14rem);
   line-height: 0.9;
   color: var(--yellow, #ffd23e);
-  text-shadow: 0 8px 0 rgba(10,58,87,0.5), 0 2px 24px rgba(10,58,87,0.6);
   margin: 0 0 clamp(16px, 3vw, 32px);
-  letter-spacing: 0.02em;
+  text-align: center;
+  width: 100%;
 }
 
 .slash {
@@ -100,6 +100,7 @@
   flex-wrap: wrap;
   gap: clamp(8px, 1.5vw, 16px);
   justify-content: center;
+  margin-bottom: clamp(32px, 5vw, 56px);
 }
 .pill {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -109,7 +110,6 @@
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
   text-decoration: none;
-  box-shadow: 0 5px 0 rgba(10,58,87,0.28);
   transition: filter 0.15s, transform 0.15s;
   letter-spacing: 0.03em;
 }
