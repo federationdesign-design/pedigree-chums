@@ -9,6 +9,7 @@
   justify-content: center;
   animation: htpFade 0.2s ease;
   cursor: pointer;
+  overflow: hidden;
 }
 @keyframes htpFade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -16,6 +17,7 @@
   position: relative;
   width: min(98vw, 1100px);
   max-height: 90vh;
+  overflow-x: visible;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: clamp(20px, 3vw, 48px) clamp(20px, 3vw, 48px) clamp(28px, 4vw, 56px);

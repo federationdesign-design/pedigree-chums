@@ -2008,7 +2008,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const pinR = Constraint.create({ pointA: { x: cx + bowlB.plugin.w * 0.3, y: floorY - 5 }, bodyB: bowlB, pointB: { x: bowlB.plugin.w * 0.3, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         const pinC = Constraint.create({ pointA: { x: cx, y: floorY - 5 }, bodyB: bowlB, pointB: { x: 0, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         Composite.add(engine.world, [pinL, pinR, pinC]);
-        Body.set(bowlB, { frictionAir: 0.5, density: 1 });
+        Body.set(bowlB, { frictionAir: 0.99, density: 1, gravityScale: 0 }); // no gravity once locked
         burstAt(cx, cy, bowlB.plugin.half * 0.3);
         numAt(cx, cy, 250);
       });
@@ -2048,7 +2048,14 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             render: { visible: false },
           });
           // Also increase bone air friction to damp oscillation
-          Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 }); // no gravity, heavily damped after fusion
+          Body.set(boneBody, { frictionAir: 0.99, density: 1, gravityScale: 0 });
+          // Freeze bone completely every frame after fusion
+          const freezeBone = () => {
+            if (!bowlFused || !boneBody) return;
+            Body.setVelocity(boneBody, { x: 0, y: 0 });
+            Body.setAngularVelocity(boneBody, 0);
+          };
+          Events.on(engine, "afterUpdate", freezeBone);
           Composite.add(engine.world, joint);
           // Goo erupts from bowl rim upward and around the bone
           const jx = bowlBody.position.x;
