@@ -14,11 +14,11 @@
 
 .stage {
   position: relative;
-  width: min(98vw, 1100px);
+  width: 100vw;
   max-height: 90vh;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: clamp(20px, 3vw, 48px) clamp(20px, 3vw, 48px) clamp(28px, 4vw, 56px);
+  padding: clamp(20px, 3vw, 48px) 0 clamp(28px, 4vw, 56px);
   scrollbar-width: none;
   cursor: default;
 }
@@ -81,6 +81,7 @@
   display: flex;
   gap: 14px;
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
@@ -210,7 +211,7 @@
   height: 72px;
   border-radius: 50%;
   background: #1497d6;
-  border: 4px solid #0a3a57;
+  border: none;
   color: #ffed00;
   font-family: "Luckiest Guy", system-ui;
   font-size: 32px;

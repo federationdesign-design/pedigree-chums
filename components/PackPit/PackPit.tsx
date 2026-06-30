@@ -2036,24 +2036,29 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           // Join them with a rigid constraint
           const joint = Constraint.create({
             bodyA: bowlBody, bodyB: boneBody,
-            pointA: { x: 0, y: -bowlBody.plugin.h * 0.15 }, // anchor slightly above bowl centre
+            pointA: { x: 0, y: -bowlBody.plugin.h * 0.15 },
             pointB: { x: 0, y: 0 },
-            stiffness: 0.8, damping: 0.3, length: 0,
+            stiffness: 1, damping: 1, length: 0,
             render: { visible: false },
           });
+          // Also increase bone air friction to damp oscillation
+          Body.set(boneBody, { frictionAir: 0.3 });
           Composite.add(engine.world, joint);
           // Goo + fuse spark animation at join point
           const jx = bowlBody.position.x, jy = bowlBody.position.y - bowlBody.plugin.h * 0.2;
-          const R2 = bowlBody.plugin.half * 0.4;
+          const R2 = Math.max(80, bowlBody.plugin.half * 0.5);
           const t0 = performance.now();
-          for (let i = 0; i < 7; i++) {
-            const ang = (i / 7) * Math.PI * 2, r = i === 0 ? 0 : R2 * (0.3 + Math.random() * 0.4);
-            gooBlobs.push({ x: jx + Math.cos(ang) * r, y: jy + Math.sin(ang) * r, s: R2 * (0.4 + Math.random() * 0.4), born: t0 + i * 15, life: 500 });
+          for (let i = 0; i < 12; i++) {
+            const ang = (i / 12) * Math.PI * 2, r = i === 0 ? 0 : R2 * (0.3 + Math.random() * 0.7);
+            gooBlobs.push({ x: jx + Math.cos(ang) * r, y: jy + Math.sin(ang) * r, s: R2 * (0.5 + Math.random() * 0.6), born: t0 + i * 12, life: 700 });
           }
-          // Fuse spark burst -- same as bone+logo
-          for (let i = 0; i < 3; i++) emitFuseSparks(jx, jy, 0.8 + i * 0.3);
+          emitFuseSparks(jx, jy, 1.5);
+          emitFuseSparks(jx, jy, 2.0);
+          emitFuseSparks(jx, jy, 2.5);
           numAt(jx, jy, 1000);
-          burstAt(jx, jy, bowlBody.plugin.half * 0.3);
+          burstAt(jx, jy, R2 * 0.8);
+          burstAt(jx + R2 * 0.4, jy - R2 * 0.3, R2 * 0.5);
+          burstAt(jx - R2 * 0.4, jy - R2 * 0.3, R2 * 0.5);
         }
       });
 

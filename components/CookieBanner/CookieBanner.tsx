@@ -39,18 +39,11 @@ export default function CookieBanner() {
     <div className={styles.intro} role="dialog" aria-label="Cookie notice">
       <div className={styles.card}>
         <p className={styles.introText}>
-          We use cookies to make the site work and to show our product video. Tap the green tick to accept, or see our{" "}
+          We use cookies to make the site work and to show our product video. Accept via the green button in the pit, or see our{" "}
           <Link href="/cookies" className={styles.introLink}>Cookie Policy</Link>{" "}
           for the details. You can also reject cookies using the red button in the pit.
         </p>
-        <button
-          type="button"
-          className={styles.tick}
-          onClick={() => window.dispatchEvent(new Event("pc:cookies-accepted"))}
-          aria-label="Accept cookies"
-        >
-          &#10003;
-        </button>
+        {/* Accept via the green pill in the pit -- no tick button here */}
       </div>
     </div>
   );

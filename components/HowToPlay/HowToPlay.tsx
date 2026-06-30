@@ -116,7 +116,18 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <h3 className={styles.title}>
           How <span className={styles.accent}>it works</span>
         </h3>
-        <p className={styles.swipeHint} aria-hidden="true" style={{ opacity: scrollFraction > 0.92 ? 0 : 1, transition: "opacity 0.4s" }}>
+        <p className={styles.swipeHint} aria-hidden="true"
+          style={{ opacity: scrollFraction > 0.92 ? 0 : 1, transition: "opacity 0.4s", cursor: "ew-resize", userSelect: "none" }}
+          onPointerDown={(e) => {
+            const el = scrollRef.current; if (!el) return;
+            const startX = e.clientX, startL = el.scrollLeft;
+            (e.target as Element).setPointerCapture(e.pointerId);
+            const onMove = (ev: PointerEvent) => { el.scrollLeft = startL - (ev.clientX - startX) * 3; };
+            const onUp = () => { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
+            window.addEventListener("pointermove", onMove);
+            window.addEventListener("pointerup", onUp);
+          }}
+        >
           {scrollFraction > 0.85 ? "You're all caught up!" : scrollFraction > 0.05 ? `Step ${Math.min(6, Math.round(scrollFraction * 5) + 1)} of 6` : "Swipe to view"}
           {scrollFraction <= 0.85 && <span className={styles.swipeArrow}>&rarr;</span>}
         </p>
