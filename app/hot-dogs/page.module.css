@@ -218,6 +218,38 @@
   }
 }
 
+.noteInner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Two-column layout: image left, text right. Stacks to one column on narrow screens. */
+.noteRow {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(20px, 4vw, 40px);
+}
+.noteImg {
+  flex: 0 0 auto;
+  width: clamp(120px, 22vw, 220px);
+  height: auto;
+  border-radius: 16px;
+  display: block;
+}
+.noteText {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .noteRow {
+    flex-direction: column;
+    align-items: center;
+  }
+  .noteImg {
+    width: clamp(140px, 50vw, 220px);
+  }
+}
+
 .noteTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1.6rem, 4vw, 3rem);
