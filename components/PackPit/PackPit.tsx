@@ -925,7 +925,13 @@ export default function PackPit() {
             Body.setAngularVelocity(rb, (Math.random() - 0.5) * 0.4);
             rejectBody = rb;
             Composite.add(engine.world, rb);
-            // Accept button removed -- no physics body spawned for accept
+            const ab: any = makeButton("cookieaccept", "Accept", stage.clientWidth);
+            Body.setPosition(ab, { x: cx, y: cy });
+            Body.setVelocity(ab, { x: -2 - Math.random() * 4, y: -9 });
+            Body.setAngularVelocity(ab, (Math.random() - 0.5) * 0.4);
+            ab.plugin.bornAt = now0; ab.plugin.lastOne = 0;
+            acceptBody = ab;
+            Composite.add(engine.world, ab);
           }
           return true;
         }
@@ -2042,7 +2048,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             render: { visible: false },
           });
           // Also increase bone air friction to damp oscillation
-          Body.set(boneBody, { frictionAir: 0.3 });
+          Body.set(boneBody, { frictionAir: 0.99, density: 1 }); // near-static: very heavy and damped
           Composite.add(engine.world, joint);
           // Goo + fuse spark animation at join point
           const jx = bowlBody.position.x, jy = bowlBody.position.y - bowlBody.plugin.h * 0.2;

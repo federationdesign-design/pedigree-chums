@@ -121,7 +121,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           onPointerDown={(e) => {
             const el = scrollRef.current; if (!el) return;
             const startX = e.clientX, startL = el.scrollLeft;
-            (e.target as Element).setPointerCapture(e.pointerId);
+            try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
             const onMove = (ev: PointerEvent) => { el.scrollLeft = startL - (ev.clientX - startX) * 3; };
             const onUp = () => { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
             window.addEventListener("pointermove", onMove);
