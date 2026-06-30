@@ -120,7 +120,19 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           {scrollFraction > 0.85 ? "You're all caught up!" : scrollFraction > 0.05 ? `Step ${Math.min(6, Math.round(scrollFraction * 5) + 1)} of 6` : "Swipe to view"}
           {scrollFraction <= 0.85 && <span className={styles.swipeArrow}>&rarr;</span>}
         </p>
-        <div className={styles.stepScroll} ref={scrollRef} onScroll={(e) => { const el = e.currentTarget; setScrollFraction(el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)); }}>
+        <div
+          className={styles.stepScroll}
+          ref={scrollRef}
+          onScroll={(e) => { const el = e.currentTarget; setScrollFraction(el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)); }}
+          onPointerDown={(e) => {
+            const el = scrollRef.current; if (!el) return;
+            const startX = e.clientX, startL = el.scrollLeft;
+            const onMove = (ev: PointerEvent) => { el.scrollLeft = startL - (ev.clientX - startX); };
+            const onUp = () => { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
+            window.addEventListener("pointermove", onMove);
+            window.addEventListener("pointerup", onUp);
+          }}
+        >
           {STEP_IMAGES.map((src, i) => (
             <div key={src} className={styles.stepCard} data-htp-step={i} onClick={(e) => { e.stopPropagation(); dropPiecesThenClose(); }}>
               <div className={styles.stepBadge}>{i + 1}</div>

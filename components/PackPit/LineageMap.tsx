@@ -677,7 +677,8 @@ export default function LineageMap({
     unplaced.forEach((c, i) => {
       // Find an unfilled frame first, then fall back to any frame with matching image
       const target = frames.find((f) => f.img === c.img && !filled.has(f.id))
-        ?? frames.find((f) => f.img === c.img);
+        ?? frames.find((f) => f.img === c.img)
+        ?? frames.find((f) => !filled.has(f.id)); // last resort: any empty frame
       if (!target) return;
       window.setTimeout(() => {
         // bubble trail: emit 4 bubbles staggered toward the target frame
@@ -1207,14 +1208,8 @@ export default function LineageMap({
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
                   style={{ ...(cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" as const, ...(isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : {}), ...((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? { pointerEvents: "all" as const } : {}) }}
-                  onMouseEnter={() => {
-                    if (!(placedSet.has(c.id) || packed) || PACK_BREEDS.has(c.name)) return;
-                    if (isDraggingCardRef.current) return;
-                    const placedAt = placedAtRef.current.get(c.id);
-                    if (placedAt && Date.now() - placedAt < 1000) return; // 1s cooldown after placement
-                    magnifyHold(c.id);
-                  }}
-                  onMouseLeave={() => { if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) magnifyRelease(); }}
+                  onMouseEnter={() => { /* frame hover magnify removed */ }}
+                  onMouseLeave={() => { /* frame hover magnify removed */ }}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!(placedSet.has(c.id) || packed) || PACK_BREEDS.has(c.name)) return;

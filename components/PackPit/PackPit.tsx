@@ -925,13 +925,7 @@ export default function PackPit() {
             Body.setAngularVelocity(rb, (Math.random() - 0.5) * 0.4);
             rejectBody = rb;
             Composite.add(engine.world, rb);
-            const ab: any = makeButton("cookieaccept", "Accept", stage.clientWidth);
-            Body.setPosition(ab, { x: cx, y: cy });
-            Body.setVelocity(ab, { x: -2 - Math.random() * 4, y: -9 }); // pops up and to the left
-            Body.setAngularVelocity(ab, (Math.random() - 0.5) * 0.4);
-            ab.plugin.bornAt = now0; ab.plugin.lastOne = 0; // drives the subtle shake, the 1-stream and the 90s respawn
-            acceptBody = ab;
-            Composite.add(engine.world, ab);
+            // Accept button removed -- no physics body spawned for accept
           }
           return true;
         }
@@ -2015,9 +2009,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
       // bone+bowl magnetism -- much weaker than bone+logo, only when bowl is upright
       let bowlFused = false;
-      const BOWL_MAGNET_RADIUS = 180; // px -- shorter range than logo (was 40 but logo is tiny; bowl is huge)
+      const BOWL_MAGNET_RADIUS = 350;
       const BOWL_MAGNET_PULL = 0.000008; // ~6x weaker than bone+logo FUSE_PULL
-      const BOWL_SNAP_DIST = 40;
+      const BOWL_SNAP_DIST = 180;
       Events.on(engine, "beforeUpdate", () => {
         if (bowlFused) return;
         const all = Composite.allBodies(engine.world);
