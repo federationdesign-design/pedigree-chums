@@ -235,28 +235,28 @@ export default function HotDogs() {
             <div className={styles.congaFeature}>
               <div className={styles.congaChain}>
                 <span className={styles.congaStep}>
-                  <strong>Dachs</strong> (German: badger)
-                  <em>+ Hund (dog)</em>
+                  <strong>Dachs + Hund</strong>
+                  <em>German. Dachs means badger. Hund means dog. Together: a dog bred to dig into badger burrows, low to the ground, long in the body, short in the leg. The Germans named it for its job. Sensible people, the Germans.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
                   <strong>Dachshund</strong>
-                  <em>Badger dog. Built for burrows.</em>
+                  <em>1700s. British troops returning from Europe brought the breed home. The name came with it. &ldquo;Dachshund&rdquo; proved difficult to say after a long day, and British English was already looking for a way out.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
                   <strong>Sausage dog</strong>
-                  <em>Britain sees the shape. Language gives up.</em>
+                  <em>Britain looked at the dachshund and thought: sausage. Long body. Short legs. Slightly startled expression. The name stuck. The dachshund has not fully forgiven us. Their official name is still dachshund. We have not taken the hint.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
                   <strong>Hot dog</strong>
-                  <em>A sausage in a bun, named after a dog named after a sausage.</em>
+                  <em>1890s, New York. Street vendors sold warm sausages in rolls. Cartoonists drew them as dachshunds. The joke became the name. A hot sausage became a hot dog. No actual dogs were harmed. Several were confused.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
                   <strong>Hot/Dogs</strong>
-                  <em>A card game. Not a sausage. Not a temperature warning. Both.</em>
+                  <em>2024, Britain. A card game about spotting dog breeds. Named after sausages named after dogs named after badger holes. The dachshund appears on card 14. It looks like it knows exactly what happened.</em>
                 </span>
               </div>
               <p className={styles.congaCaption}>
