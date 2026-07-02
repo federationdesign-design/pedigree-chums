@@ -666,7 +666,7 @@ export default function PackPit() {
             const instrB: any = Bodies.rectangle(w / 2, -120, 2 * s, 2 * s, {
               chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
             });
-            instrB.plugin = { name: "DEAL 3\u20136 CHUMS EACH", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
+            instrB.plugin = { name: "Instructions", label: "DEAL 3\u20136 CHUMS EACH", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
             Composite.add(engine.world, instrB);
           }
         }, 300));
