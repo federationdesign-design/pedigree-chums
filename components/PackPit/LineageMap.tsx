@@ -158,14 +158,7 @@ export default function LineageMap({
   // the open set is the single line currently being followed (root..node)
   const [open, setOpen] = useState<Set<string>>(() => new Set(["0"]));
   useEffect(() => setOpen(new Set(["0"])), [breed.name]);
-  // For Instructions: auto-open the first node so the icon pops immediately
-  useEffect(() => {
-    if (breed.name === "Instructions") {
-      const t = window.setTimeout(() => revealStep(), 400);
-      return () => window.clearTimeout(t);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [breed.name]);
+
   // the circle whose breed image is currently popped out, if any
   const [picked, setPicked] = useState<Set<string>>(() => new Set());
   useEffect(() => setPicked(new Set()), [breed.name]);
@@ -1135,6 +1128,11 @@ export default function LineageMap({
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
+                        // For Instructions: also open the next node in the chain
+                        // simultaneously with the icon pop-out
+                        if (isInstructions && hasKids) {
+                          setOpen((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+                        }
                       }
                     }}
                   >
