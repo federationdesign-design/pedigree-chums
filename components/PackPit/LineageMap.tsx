@@ -649,9 +649,12 @@ export default function LineageMap({
   const revealStep = () => {
     const frontier = shown.filter((n) => n.children && n.children.length && !open.has(n._id));
     if (frontier.length) {
-      setOpen((prev) => { const s = new Set(prev); frontier.forEach((n) => s.add(n._id)); return s; });
+      // For Instructions (chain): open only the first frontier node so the user
+      // taps Learn once per step. For normal breeds open all at once as before.
+      const toOpen = breed.name === "Instructions" ? [frontier[0]] : frontier;
+      setOpen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; });
       const pops: { x: number; y: number }[] = [];
-      frontier.forEach((n) => {
+      toOpen.forEach((n) => {
         const kids = n.children as Node[];
         kids.forEach((k, ci) => {
           if (!scoredRef.current.has(k._id)) {
@@ -664,7 +667,7 @@ export default function LineageMap({
         const s = new Set(prev);
         // Only the opened node itself turns blue. Its children stay yellow --
         // they haven't been tapped or popped yet, even though they're now visible.
-        frontier.forEach((n) => s.add(n._id));
+        toOpen.forEach((n) => s.add(n._id));
         return s;
       });
       pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
@@ -891,8 +894,10 @@ export default function LineageMap({
       >
         {breed.name === "Instructions" ? (() => {
           // Yellow stepcard-style frame: yellow outer rect, image inset, yellow footer with caption
-          const IW = Math.round(ROOT * 2 * 1.33);
-          const IH = Math.round(IW * 1.36);
+          // Match pit card size exactly: pit is 48*SCALE*1.33*2 wide on desktop
+          // ROOT=58, so ROOT*2=116. Pit desktop w=128. Use 128 directly.
+          const IW = 128;
+          const IH = Math.round(IW * 1.36); // same portrait ratio as pit
           const BORDER = Math.round(IW * 0.03);
           const FOOTER = Math.round(IH * 0.18);
           const RADIUS = IW * 0.1;
