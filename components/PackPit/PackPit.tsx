@@ -952,8 +952,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (hit.plugin.zoomed) {
               // Already zoomed -- check if they tapped the "Got it" button
               const btn = hit.plugin.zoomBtnBounds;
-              const localPt = up; // up is already in canvas coords
-              if (btn && Math.abs(localPt.x - btn.cx) < btn.w / 2 && Math.abs(localPt.y - btn.cy) < btn.h / 2) {
+              if (btn && Math.abs(pt.x - btn.cx) < btn.w / 2 && Math.abs(pt.y - btn.cy) < btn.h / 2) {
                 // "Got it!" tapped -- collect this step card same as a dog card
                 hit.plugin.zoomed = false;
                 hit.plugin.opened = true;
