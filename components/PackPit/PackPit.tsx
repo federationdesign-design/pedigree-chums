@@ -2623,7 +2623,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             b = Bodies.circle(cx, cy, r, { restitution: 0.6, friction: 0.2, frictionAir: 0.005, density: 0.0005, render: { visible: false } });
             b.plugin = { name: "How to play number", label: "", half: r, w: r * 2, h: r * 2, color: "#ffed00", img: getImg("htp:" + pc.src, pc.src), prop: "logopiece", family: null, ping: 0, kind: "htpnumber" };
           } else if (pc.kind === "stepcard") {
-            // Step card -- tight rectangle body
+            // Step cards are now replaced by instruction cards -- skip
+            return;
+            // eslint-disable-next-line no-unreachable
             b = Bodies.rectangle(cx, cy, pw, ph, { chamfer: { radius: Math.min(pw, ph) * 0.12 }, restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.0009, render: { visible: false } });
             const name = HTP_NAMES[stepcardIdx++] || "How it works";
             const isStep5 = pc.src.includes("step5-redue");
