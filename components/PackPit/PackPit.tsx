@@ -2578,6 +2578,11 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           { name: "Most chums wins",   label: "MOST CHUMS WINS",   img: "/step6-redue.jpg" },
         ];
         const stepPieces = pieces.filter((pc: any) => pc.kind === "stepcard");
+        // Remove old HowToPlay step cards from the pit -- they're replaced by instruction cards
+        Composite.allBodies(engine.world)
+          .filter((b: any) => b.plugin?.kind === "stepcard")
+          .forEach((b: any) => { Composite.remove(engine.world, b); });
+
         stepPieces.forEach((pc: any, idx: number) => {
           const meta = INSTR_META[idx];
           if (!meta) return;
@@ -2965,7 +2970,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         <span className={styles.shakeText}>Shake</span>
       </button>
 
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (name !== "Instructions") { setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (!["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"].includes(name)) { setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
       <HowToPlay open={howToPlay} onClose={() => { setHowToPlay(false); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">

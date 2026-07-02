@@ -72,6 +72,7 @@ type Node = LineageNode & {
 
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
+const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
 // distance added at each deeper generation
@@ -455,7 +456,7 @@ export default function LineageMap({
         const side = depth % 2 === 1 ? 1 : -1;
         center = n._dir + side * (Math.PI * 0.38);
       }
-      const dist = depth === 0 ? RING1 : (breed.name === "Instructions" ? RSTEP * 1.2 : RSTEP);
+      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
@@ -611,7 +612,7 @@ export default function LineageMap({
   // Instructions: auto-close overlay and poof pit card 2s after all icons placed in frames
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (breed.name !== "Instructions" || !framesDone) return;
+    if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => {
       onRemove?.(breed.name);
       window.setTimeout(() => onClose(), 400);
@@ -658,7 +659,7 @@ export default function LineageMap({
     if (frontier.length) {
       // For Instructions (chain): open only the first frontier node so the user
       // taps Learn once per step. For normal breeds open all at once as before.
-      const toOpen = breed.name === "Instructions" ? [frontier[0]] : frontier;
+      const toOpen = INSTR_NAMES.has(breed.name) ? [frontier[0]] : frontier;
       setOpen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; });
       const pops: { x: number; y: number }[] = [];
       toOpen.forEach((n) => {
@@ -679,7 +680,7 @@ export default function LineageMap({
       });
       // For Instructions: when opening a node that has an img, pop its icon
       // immediately rather than waiting for all nodes to open first.
-      if (breed.name === "Instructions") {
+      if (INSTR_NAMES.has(breed.name)) {
         toOpen.forEach((n) => {
           if (n.img && n._parent && !picked.has(n._id)) {
             setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
@@ -843,7 +844,7 @@ export default function LineageMap({
     // blue name pills tip in with them. Node coords are user coords, so add the pan for the screen.
     const vis = shown.filter((n) => n._parent);
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-    const circles = breed.name === "Instructions" ? [] : vis.slice(0, 60).map((n) => {
+    const circles = INSTR_NAMES.has(breed.name) ? [] : vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
       return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
     });
@@ -915,7 +916,7 @@ export default function LineageMap({
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
       >
-        {breed.name === "Instructions" ? (() => {
+        {INSTR_NAMES.has(breed.name) ? (() => {
           // Yellow stepcard-style frame: yellow outer rect, image inset, yellow footer with caption
           // Match pit card size exactly: pit is 48*SCALE*1.33*2 wide on desktop
           // ROOT=58, so ROOT*2=116. Pit desktop w=128. Use 128 directly.
@@ -980,7 +981,7 @@ export default function LineageMap({
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        {breed.name !== "Instructions" && (
+        {!INSTR_NAMES.has(breed.name) && (
           <>
             <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
             <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
@@ -990,7 +991,7 @@ export default function LineageMap({
         )}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Learn button -- blue -- auto-reveals tree ring by ring (was mislabelled, called doPack) */}
-        {!packed && !collecting && !removing && !(breed.name === "Instructions" && framesDone) ? (
+        {!packed && !collecting && !removing && !(INSTR_NAMES.has(breed.name) && framesDone) ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
@@ -1010,7 +1011,7 @@ export default function LineageMap({
           </g>
         ) : null}
         {/* Collect button -- green -- hidden for Instructions breed */}
-        {!collecting && breed.name !== "Instructions" ? (
+        {!collecting && !INSTR_NAMES.has(breed.name) ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${!packed ? 138 : 62})`}
@@ -1068,9 +1069,9 @@ export default function LineageMap({
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{breed.name === "Instructions" ? "How it works" : "These dogs have had their days"}</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      {showPack && breed.name !== "Instructions" && (
+      {showPack && !INSTR_NAMES.has(breed.name) && (
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
@@ -1118,7 +1119,7 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const isInstructions = breed.name === "Instructions";
+                const isInstructions = INSTR_NAMES.has(breed.name);
                 const r = radius(isInstructions ? 25 : share); // fixed radius for Instructions nodes
                 return (
                   <g
@@ -1434,7 +1435,7 @@ export default function LineageMap({
                 >
                   <g className={styles.pickWobble}>
                   {(() => {
-                    const imgPad = breed.name === "Instructions" ? CW * 0.12 : 0;
+                    const imgPad = INSTR_NAMES.has(breed.name) ? CW * 0.12 : 0;
                     return (
                       <>
                         <clipPath id={clipId}>
@@ -1452,7 +1453,7 @@ export default function LineageMap({
                       </>
                     );
                   })()}
-                  {breed.name !== "Instructions" && (
+                  {!INSTR_NAMES.has(breed.name) && (
                   <rect
                     x={c.cardX - CW / 2}
                     y={c.cardY - CW / 2}
@@ -1463,7 +1464,7 @@ export default function LineageMap({
                     className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} /* chum-fix */
                   />
                   )}
-                  {breed.name === "Instructions" && placedSet.has(c.id) && (
+                  {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (
                     <text
                       x={c.cardX}
                       y={c.cardY + CW / 2 + 16}
@@ -1472,7 +1473,7 @@ export default function LineageMap({
                       style={{ fill: "#ffffff", fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 13, fontWeight: 400, pointerEvents: "none" }}
                     >{c.name}</text>
                   )}
-                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && breed.name !== "Instructions" && (() => {
+                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1501,7 +1502,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && breed.name !== "Instructions" && (() => {
+                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
                     const mx = c.cardX - CW / 2 + 15, my = c.cardY + CW / 2 - 13; // inside the box, bottom-left (nudged +4 right, 2 up)
                     return (
                       <g
@@ -1536,7 +1537,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && breed.name !== "Instructions" && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
