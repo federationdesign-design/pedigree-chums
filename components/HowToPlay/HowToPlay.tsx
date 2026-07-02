@@ -149,7 +149,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
           {STEP_IMAGES.map((src, i) => (
             <div key={src} className={styles.stepCard} data-htp-step={i} onClick={(e) => { e.stopPropagation(); dropPiecesThenClose(); }}>
               <div className={styles.stepBadge}>{i + 1}</div>
-              {i < 3 ? (
+              {(i < 3 || i === 5) ? (
                 <video
                   src={`/step${i + 1}-video-animation.mp4`}
                   autoPlay muted playsInline

@@ -1188,7 +1188,15 @@ export default function LineageMap({
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : isInstructions ? { stroke: "none" } : undefined} />
-                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.75)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
+                    <text
+                      className={styles.pct}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize={Math.max(13, r * 0.75)}
+                      style={seen.has(n._id)
+                        ? { fill: "#ffffff", ...(isInstructions ? { fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontWeight: 400 } : {}) }
+                        : isInstructions ? { fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontWeight: 400 } : undefined}
+                    >
                       {isInstructions ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
