@@ -974,6 +974,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             // Single tap opens -- same as dogs
             hit.plugin.zoomed = true;
             hit.plugin.opened = true;
+            hit.plugin.zoomedAt = performance.now();
+            hit.plugin.zoomedFrom = { x: hit.position.x, y: hit.position.y };
             return true;
           }
         }
@@ -1263,19 +1265,30 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               }
 
               if (b.plugin.zoomed) {
-                // ── Zoomed state: draw centred, smaller than full-screen ─────
+                // ── Zoomed state: fly from pit position to screen centre ──────
                 ctx.restore();
                 ctx.save();
                 const CX = render.canvas.width / 2, CY = render.canvas.height / 2;
-                // Smaller than before -- shows enough pit context so the player
-                // can see they're still in the game, not in a separate UI
                 const ZW = Math.min(render.canvas.width * 0.55, 300);
                 const ZH = ZW / (b.plugin.w / b.plugin.h);
                 const ZBORDER = Math.round(ZW * 0.04);
                 const ZFOOTER = Math.round(ZH * 0.16);
                 const ZRADIUS = ZW * 0.07;
-                // Sit in upper half of screen so "Got it" button is always visible
-                ctx.translate(CX, CY - ZH * 0.15);
+                // Animate from pit position to screen centre over 350ms
+                const ANIM_DUR = 350;
+                const rawT = b.plugin.zoomedAt ? Math.min(1, (performance.now() - b.plugin.zoomedAt) / ANIM_DUR) : 1;
+                // Ease out cubic: fast start, gentle landing
+                const easedT = 1 - Math.pow(1 - rawT, 3);
+                const fromX = b.plugin.zoomedFrom?.x ?? CX;
+                const fromY = b.plugin.zoomedFrom?.y ?? CY;
+                const destX = CX, destY = CY - ZH * 0.15;
+                const drawX = fromX + (destX - fromX) * easedT;
+                const drawY = fromY + (destY - fromY) * easedT;
+                // Also scale from 1× (pit size) to full zoom size
+                const fromScale = b.plugin.w / ZW;
+                const scale = fromScale + (1 - fromScale) * easedT;
+                ctx.translate(drawX, drawY);
+                ctx.scale(scale, scale);
 
                 // Drop shadow
                 ctx.shadowColor = "rgba(0,0,0,0.55)";
@@ -1317,8 +1330,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 // "Got it!" collect button -- same green as the Collect button on dog cards
                 const btnW = ZW * 0.72, btnH = 44, btnY = ZH / 2 + 18;
                 const btnRadius = btnH / 2;
-                // store button bounds on plugin so tap handler can detect it
-                b.plugin.zoomBtnBounds = { cx: CX, cy: CY - ZH * 0.15 + btnY, w: btnW, h: btnH };
+                // Only register button hit area once animation is complete
+                if (rawT >= 1) b.plugin.zoomBtnBounds = { cx: CX, cy: CY - ZH * 0.15 + btnY * scale, w: btnW, h: btnH };
                 // Button shadow
                 ctx.shadowColor = "rgba(10,58,87,0.4)";
                 ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
