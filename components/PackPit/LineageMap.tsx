@@ -663,6 +663,21 @@ export default function LineageMap({
         toOpen.forEach((n) => s.add(n._id));
         return s;
       });
+      // For Instructions: when opening a node that has an img, pop its icon
+      // immediately rather than waiting for all nodes to open first.
+      if (breed.name === "Instructions") {
+        toOpen.forEach((n) => {
+          if (n.img && n._parent && !picked.has(n._id)) {
+            setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+            setSeen((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+            const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+            const rr = radius(sh), dd = rr + 10 + CW / 2;
+            const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
+            setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
+            setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
+          }
+        });
+      }
       pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
       interacted.current = true; setIdleHint(false); setShowTapHint(false); try { localStorage.setItem("pc-lm-hint", "1"); } catch {}
       return;
