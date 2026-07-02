@@ -1028,7 +1028,8 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const r = radius(share);
+                const isInstructions = breed.name === "Instructions";
+                const r = radius(isInstructions ? 25 : share); // fixed radius for Instructions nodes
                 return (
                   <g
                     key={n._id}
@@ -1072,7 +1073,7 @@ export default function LineageMap({
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
-                      {share}%
+                      {isInstructions ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
