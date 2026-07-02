@@ -19,31 +19,37 @@ export interface LineageNode {
 const LINEAGE: Record<string, LineageNode> = {
   "Instructions": {
     name: "Instructions",
-    note: "How to play Pedigree Chums. Spot the dogs. Collect the cards. Most chums wins.",
+    note: "How to play Pedigree Chums in four steps.",
     children: [
       {
         name: "Deal the cards",
         note: "Deal 3 to 6 Pedigree Chums cards to each player. These are your chums. Keep them secret.",
-        img: "/step1-redue.jpg",
-        value: 25,
-      },
-      {
-        name: "Head outside",
-        note: "Go somewhere dogs are. A park, a street, a beach. Anywhere real dogs might actually be.",
-        img: "/step2-redue.jpg",
-        value: 25,
-      },
-      {
-        name: "Spot real dogs",
-        note: "When you spot a dog in real life that matches one of your cards, show your card and claim the chum.",
-        img: "/step3-redue.jpg",
-        value: 25,
-      },
-      {
-        name: "Most chums wins",
-        note: "Keep spotting until the cards run out. The player who collected the most chums wins.",
-        img: "/step6-redue.jpg",
-        value: 25,
+        img: "/deal-icon.svg",
+        value: 1,
+        children: [
+          {
+            name: "Find your pack",
+            note: "Go somewhere dogs are. A park, a street, a beach. Anywhere real dogs might actually be.",
+            img: "/find-pack-icon.svg",
+            value: 2,
+            children: [
+              {
+                name: "Spot real dogs",
+                note: "When you spot a dog in real life that matches one of your cards, show your card and claim the chum.",
+                img: "/friends-icon.svg",
+                value: 3,
+                children: [
+                  {
+                    name: "Most chums wins",
+                    note: "Keep spotting until the cards run out. The player who collected the most chums wins.",
+                    img: "/shuffle-icon.svg",
+                    value: 4,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     ],
   },
