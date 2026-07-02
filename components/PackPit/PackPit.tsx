@@ -657,19 +657,7 @@ export default function PackPit() {
         // Simple pair drop -- 2 random dogs every 4 seconds
         const pairOrder = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
 
-        // Instructions test card -- drops first, yellow frame, real dog-card interaction
-        waveTimers.push(setTimeout(() => {
-          if (!disposed) {
-            const instrImg = getImg("__instructions", "/step1-redue.jpg");
-            const s = 85 * SCALE; // Instructions card: matches overlay size (170px wide on desktop)
-            const cr = Math.max(7, s * 0.22);
-            const instrB: any = Bodies.rectangle(w / 2, -120, 2 * s, 2 * s, {
-              chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
-            });
-            instrB.plugin = { name: "Instructions", label: "DEAL 3\u20136 CHUMS EACH", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
-            Composite.add(engine.world, instrB);
-          }
-        }, 300));
+
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750));
@@ -2579,6 +2567,25 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const pieces = ev?.detail?.pieces;
         if (!Array.isArray(pieces) || !stageRef.current) return;
         const sr = stageRef.current.getBoundingClientRect();
+        // Spawn the Instructions card at the step1 card's screen position
+        // so it falls from where the first step card was in the overlay
+        const step1Piece = pieces.find((pc: any) => pc.kind === "stepcard");
+        if (step1Piece) {
+          const alreadyExists = Composite.allBodies(engine.world).find((b: any) => b.plugin?.name === "Instructions");
+          if (!alreadyExists) {
+            const instrImg = getImg("__instructions", "/step1-redue.jpg");
+            const s = 85 * SCALE;
+            const cr = Math.max(7, s * 0.22);
+            const icx = step1Piece.x + step1Piece.w / 2 - sr.left;
+            const icy = step1Piece.y + step1Piece.h / 2 - sr.top;
+            const instrB: any = Bodies.rectangle(icx, icy, 2 * s, 2 * s, {
+              chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
+            });
+            instrB.plugin = { name: "Instructions", label: "DEAL 3–6 CHUMS EACH", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
+            Body.setVelocity(instrB, { x: 0, y: 3 });
+            Composite.add(engine.world, instrB);
+          }
+        }
         const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
         const MAX_CARD = BIG * 2.2; // cap cards to a sensible pit size regardless of overlay dimensions
         let stepcardIdx = 0;
