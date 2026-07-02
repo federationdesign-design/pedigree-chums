@@ -809,7 +809,7 @@ export default function LineageMap({
     // blue name pills tip in with them. Node coords are user coords, so add the pan for the screen.
     const vis = shown.filter((n) => n._parent);
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-    const circles = vis.slice(0, 60).map((n) => {
+    const circles = breed.name === "Instructions" ? [] : vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
       return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
     });
@@ -902,7 +902,7 @@ export default function LineageMap({
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
         <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
-          {breed.name}
+          {breed.name === "Instructions" ? "Deal 3–6 Chums Each" : breed.name}
         </text>
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Learn button -- blue -- auto-reveals tree ring by ring (was mislabelled, called doPack) */}
@@ -925,8 +925,8 @@ export default function LineageMap({
             </g>
           </g>
         ) : null}
-        {/* Collect button -- green -- skips packing, collects immediately */}
-        {!collecting ? (
+        {/* Collect button -- green -- hidden for Instructions breed */}
+        {!collecting && breed.name !== "Instructions" ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${!packed ? 138 : 62})`}
@@ -984,9 +984,9 @@ export default function LineageMap({
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>These dogs have had their days</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{breed.name === "Instructions" ? "How it works" : "These dogs have had their days"}</div>
       )}
-      {showPack && (
+      {showPack && breed.name !== "Instructions" && (
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
