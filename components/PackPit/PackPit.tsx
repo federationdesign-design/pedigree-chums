@@ -971,18 +971,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             }
             // Dismiss any other zoomed step card first
             dyn().forEach((b: any) => { if (b.plugin?.kind === "stepcard" && b.plugin?.zoomed) b.plugin.zoomed = false; });
-            // Require double-tap to open -- same deliberate gesture as dogs on mobile
-            const now2 = performance.now();
-            if (lastStepTapId === hit.id && now2 - lastStepTapTime < 600) {
-              // Second tap within 600ms on same card -- zoom it
-              hit.plugin.zoomed = true;
-              hit.plugin.opened = true;
-              lastStepTapTime = 0; lastStepTapId = -1;
-            } else {
-              // First tap -- record it, pulse the card border so player knows it registered
-              lastStepTapTime = now2; lastStepTapId = hit.id;
-              hit.plugin.ping = now2;
-            }
+            // Single tap opens -- same as dogs
+            hit.plugin.zoomed = true;
+            hit.plugin.opened = true;
             return true;
           }
         }
