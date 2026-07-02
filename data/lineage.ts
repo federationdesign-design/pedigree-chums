@@ -60,19 +60,19 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Head outside",
         note: "Explore your town or city.",
-        img: "/dog-walk-icon.svg",
+        img: "/go-outside-icon.svg",
         value: 1,
         children: [
           {
             name: "Keep your cards close",
             note: "Keep somewhere easy to pull out.",
-            img: "/find-pack-icon.svg",
+            img: "/cards-close-icon.svg",
             value: 2,
             children: [
               {
                 name: "Eyes peeled",
                 note: "Chums could be in places you wouldn't expect.",
-                img: "/famil-icon.svg",
+                img: "/look-icon.svg",
                 value: 3,
               },
             ],
@@ -83,27 +83,19 @@ const LINEAGE: Record<string, LineageNode> = {
   },
   "Spot real dogs": {
     name: "Spot real dogs",
-    note: "Study the dog, check your card, and call it out loud.",
+    note: "Study the dog and check your card.",
     children: [
       {
         name: "Look carefully",
         note: "Study the dog's coat, size and markings.",
-        img: "/dog-show-icon.svg",
+        img: "/dogfind-icon.svg",
         value: 1,
         children: [
           {
             name: "Check the card",
             note: "Does it match?",
-            img: "/checklist-icon.svg",
+            img: "/check.svg",
             value: 2,
-            children: [
-              {
-                name: "Call it out loud",
-                note: "Say the breed name. Other players can challenge if they disagree.",
-                img: "/friends-icon.svg",
-                value: 3,
-              },
-            ],
           },
         ],
       },
@@ -111,18 +103,18 @@ const LINEAGE: Record<string, LineageNode> = {
   },
   "Match to your chum": {
     name: "Match to your chum",
-    note: "Claim your matched card and help your team find theirs.",
+    note: "Call it out, claim your matched card and help your team.",
     children: [
       {
-        name: "Claim your chum",
-        note: "Separate the found chum card.",
-        img: "/find-pack-icon.svg",
+        name: "Call it out loud",
+        note: "Say the breed name. Other players can challenge if they disagree.",
+        img: "/shout-icon.svg",
         value: 1,
         children: [
           {
-            name: "Help each other",
-            note: "Playing as a team? Call out dogs that match another player's hand too.",
-            img: "/famil-icon.svg",
+            name: "Claim your chum",
+            note: "Separate the found chum card.",
+            img: "/trun-card-icon.svg",
             value: 2,
           },
         ],
@@ -136,13 +128,13 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Explore more",
         note: "The more ground you cover,",
-        img: "/dog-walk-icon.svg",
+        img: "/explore-more-icon.svg",
         value: 1,
         children: [
           {
             name: "Find more",
             note: "the more chums you find.",
-            img: "/trend-icon.svg",
+            img: "/more-dogs.svg",
             value: 2,
           },
         ],
@@ -156,19 +148,19 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Finished exploring",
         note: "When the walk ends or your day out is done.",
-        img: "/dog-walk-icon.svg",
+        img: "/finish-icon.svg",
         value: 1,
         children: [
           {
             name: "Count up chums",
             note: "Tot up who has the most chums.",
-            img: "/find-pack-icon.svg",
+            img: "/count-icon.svg",
             value: 2,
             children: [
               {
                 name: "The most wins",
                 note: "The player with the most matched chums wins.",
-                img: "/queen-icon.svg",
+                img: "/winner-icon.svg",
                 value: 3,
               },
             ],
