@@ -657,6 +657,19 @@ export default function PackPit() {
         // Simple pair drop -- 2 random dogs every 4 seconds
         const pairOrder = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
 
+        // Instructions test card -- drops first, yellow frame, real dog-card interaction
+        waveTimers.push(setTimeout(() => {
+          if (!disposed) {
+            const instrImg = getImg("__instructions", "/step1-redue.jpg");
+            const s = 48 * SCALE; // same size as a regular dog card
+            const cr = Math.max(7, s * 0.22);
+            const instrB: any = Bodies.rectangle(w / 2, -120, 2 * s, 2 * s, {
+              chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
+            });
+            instrB.plugin = { name: "Instructions", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0 };
+            Composite.add(engine.world, instrB);
+          }
+        }, 300));
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750));
