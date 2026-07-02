@@ -1935,16 +1935,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             const bh = b.bounds.max.y - b.bounds.min.y;
             coveredArea += bw * bh;
           }
-          // Curve: 0→0.9x = 0%, 0.9x→1.5x = 0→50%, 1.5x→2.0x = 50→100%
+          // Pattern shows only when pit is 90%+ full, instant on/off, no fade
           const ratio = coveredArea / pitArea;
-          let fill: number;
-          if (ratio <= 0.9) fill = 0;
-          else if (ratio <= 1.5) fill = (ratio - 0.9) / 0.6 * 0.5;
-          else fill = 0.5 + (ratio - 1.5) / 0.5 * 0.5;
-          fill = Math.min(1, fill);
+          const fill = ratio >= 0.9 ? 1 : 0;
           stage.style.setProperty("--fill-opacity", fill.toFixed(3));
           // Store fill for pulse interval
-          (stage as any).__fillLevel = fill;
+          (stage as any).__fillLevel = ratio;
           // Yellow warning flashes at 40%, 70%, 90%, 99%
           if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
           if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }

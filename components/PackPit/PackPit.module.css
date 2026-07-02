@@ -14,7 +14,7 @@
   display: block;
   transition: opacity 0.25s ease, filter 0.25s ease;
 }
-/* paw pattern -- opacity driven by pit fullness (0 = empty, 0.5 = full) via --fill-opacity */
+/* paw pattern -- appears instantly when pit is 90%+ full, no fade */
 .pattern {
   position: absolute;
   inset: 0;
@@ -24,11 +24,9 @@
   background-size: 144px auto;
   opacity: var(--fill-opacity, 0);
   pointer-events: none;
-  transition: opacity 0.5s ease;
 }
-/* floor-hit flash still works -- temporarily bumps opacity higher */
 .showPattern .pattern {
-  opacity: max(var(--fill-opacity, 0), 0.5);
+  opacity: var(--fill-opacity, 0);
 }
 /* floor graphic pinned to the bottom of the pit; sits behind the canvas so the
    chums land and rest on top of it. The canvas (z 0, appended last) draws over it. */
@@ -546,10 +544,9 @@
   100% { opacity: var(--fill-opacity, 0); }
 }
 
-/* Stronger pattern when overlay is open */
+/* Pattern unchanged when overlay is open */
 .dimmed .pattern {
-  opacity: min(calc(var(--fill-opacity, 0) * 2 + 0.2), 0.9) !important;
-  transition: opacity 0.3s ease;
+  opacity: var(--fill-opacity, 0);
 }
 
 /* Shake/jelly button flash -- brief yellow burst on press, not persistent */
