@@ -727,10 +727,14 @@ export default function LineageMap({
       return;
     }
     // fully open: auto-place all unplaced images into their correct frames
-    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed);
+    // Primary cards fill empty frames; duplicates stack on the already-filled frame
+    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
     if (unplaced.length === 0) return;
     unplaced.forEach((c, i) => {
-      const target = frames.find((f) => f.img === c.img && !filled.has(f.id));
+      const emptyTarget = frames.find((f) => f.img === c.img && !filled.has(f.id));
+      const stackTarget = emptyTarget ?? frames.find((f) => f.img === c.img && filled.get(f.id) !== c.id);
+      const target = stackTarget;
+      const isDup = !emptyTarget && !!stackTarget;
       if (!target) return;
       window.setTimeout(() => {
         // pin card so it survives branch closing during tween
@@ -749,7 +753,12 @@ export default function LineageMap({
             window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
           }
         }, () => {
-          setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+          if (isDup) {
+            // duplicate: stack on top of the filled frame
+            setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
+          } else {
+            setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+          }
           setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
           flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
           const pid = puffSeq.current++;
