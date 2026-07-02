@@ -2581,7 +2581,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             const instrB: any = Bodies.rectangle(icx, icy, 2 * s, 2 * s, {
               chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
             });
-            instrB.plugin = { name: "Instructions", label: "DEAL 3–6 CHUMS EACH", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
+            instrB.plugin = { name: "Instructions", label: "DEAL THE CARDS", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
             Body.setVelocity(instrB, { x: 0, y: 3 });
             Composite.add(engine.world, instrB);
           }
@@ -2956,7 +2956,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         <span className={styles.shakeText}>Shake</span>
       </button>
 
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (name !== "Instructions") { setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
       <HowToPlay open={howToPlay} onClose={() => { setHowToPlay(false); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
