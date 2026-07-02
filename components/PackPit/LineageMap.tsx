@@ -453,7 +453,7 @@ export default function LineageMap({
         const side = depth % 2 === 1 ? 1 : -1;
         center = n._dir + side * (Math.PI * 0.38);
       }
-      const dist = depth === 0 ? RING1 : RSTEP;
+      const dist = depth === 0 ? RING1 : (breed.name === "Instructions" ? RSTEP * 1.2 : RSTEP);
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
@@ -1418,18 +1418,25 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); isDraggingCardRef.current = false; setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  <clipPath id={clipId}>
-                    <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} rx={15} />
-                  </clipPath>
-                  <image
-                        href={encodeURI(bust(c.img))}
-                        x={c.cardX - CW / 2}
-                        y={c.cardY - CW / 2}
-                        width={CW}
-                        height={CW}
-                        clipPath={`url(#${clipId})`}
-                        preserveAspectRatio="xMidYMid slice"
-                      />
+                  {(() => {
+                    const imgPad = breed.name === "Instructions" ? CW * 0.12 : 0;
+                    return (
+                      <>
+                        <clipPath id={clipId}>
+                          <rect x={c.cardX - CW / 2 + imgPad} y={c.cardY - CW / 2 + imgPad} width={CW - imgPad * 2} height={CW - imgPad * 2} rx={15} />
+                        </clipPath>
+                        <image
+                          href={encodeURI(bust(c.img))}
+                          x={c.cardX - CW / 2 + imgPad}
+                          y={c.cardY - CW / 2 + imgPad}
+                          width={CW - imgPad * 2}
+                          height={CW - imgPad * 2}
+                          clipPath={`url(#${clipId})`}
+                          preserveAspectRatio="xMidYMid meet"
+                        />
+                      </>
+                    );
+                  })()}
                   {breed.name !== "Instructions" && (
                   <rect
                     x={c.cardX - CW / 2}
@@ -1441,7 +1448,16 @@ export default function LineageMap({
                     className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} /* chum-fix */
                   />
                   )}
-                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
+                  {breed.name === "Instructions" && placedSet.has(c.id) && (
+                    <text
+                      x={c.cardX}
+                      y={c.cardY + CW / 2 + 16}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      style={{ fill: "#ffffff", fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 13, fontWeight: 400, pointerEvents: "none" }}
+                    >{c.name}</text>
+                  )}
+                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && breed.name !== "Instructions" && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1470,7 +1486,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
+                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && breed.name !== "Instructions" && (() => {
                     const mx = c.cardX - CW / 2 + 15, my = c.cardY + CW / 2 - 13; // inside the box, bottom-left (nudged +4 right, 2 up)
                     return (
                       <g
@@ -1505,7 +1521,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && breed.name !== "Instructions" && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g

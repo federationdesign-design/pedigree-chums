@@ -661,7 +661,7 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
             const instrImg = getImg("__instructions", "/step1-redue.jpg");
-            const s = 48 * SCALE * 1.33; // 33% bigger than a regular dog card
+            const s = 85 * SCALE; // Instructions card: matches overlay size (170px wide on desktop)
             const cr = Math.max(7, s * 0.22);
             const instrB: any = Bodies.rectangle(w / 2, -120, 2 * s, 2 * s, {
               chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
