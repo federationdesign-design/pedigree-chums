@@ -22,25 +22,25 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "How to play Pedigree Chums in four steps.",
     children: [
       {
-        name: "Find your pack",
+        name: "Find your deck",
         note: "Get your Pedigree Chums cards together and gather your players. You need at least two people and somewhere to go.",
         img: "/find-pack-icon.svg",
         value: 1,
         children: [
           {
-            name: "Head outside",
+            name: "Gather players",
             note: "Go somewhere dogs are. A park, a street, a beach. Anywhere real dogs might actually be.",
             img: "/friends-icon.svg",
             value: 2,
             children: [
               {
-                name: "Shuffle and deal",
+                name: "Shuffle well",
                 note: "Shuffle the deck and deal 3 to 6 Pedigree Chums cards to each player. These are your chums. Keep them secret.",
                 img: "/shuffle-icon.svg",
                 value: 3,
                 children: [
                   {
-                    name: "Most chums wins",
+                    name: "Deal cards",
                     note: "Spot real dogs that match your cards. Show the card when you spot a match and claim the chum. Most chums wins.",
                     img: "/deal-icon.svg",
                     value: 4,

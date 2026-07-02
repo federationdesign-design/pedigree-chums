@@ -1072,31 +1072,9 @@ export default function LineageMap({
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : isInstructions ? { stroke: "none" } : undefined} />
-                    {isInstructions && n.img ? (() => {
-                      // Show step icon inside circle with padding, no stroke
-                      const pad = r * 0.2;
-                      const sz = (r - pad) * 2;
-                      return (
-                        <>
-                          <clipPath id={`instr-clip-${n._id}`}>
-                            <circle r={r - pad} />
-                          </clipPath>
-                          <image
-                            href={n.img}
-                            x={-(r - pad)}
-                            y={-(r - pad)}
-                            width={sz}
-                            height={sz}
-                            clipPath={`url(#instr-clip-${n._id})`}
-                            preserveAspectRatio="xMidYMid meet"
-                          />
-                        </>
-                      );
-                    })() : (
-                      <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
-                        {`${share}%`}
-                      </text>
-                    )}
+                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
+                      {isInstructions ? (n.value ?? "") : `${share}%`}
+                    </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
                       const nmY = -r - 13;

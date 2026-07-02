@@ -666,7 +666,7 @@ export default function PackPit() {
             const instrB: any = Bodies.rectangle(w / 2, -120, 2 * s, 2 * s, {
               chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
             });
-            instrB.plugin = { name: "Instructions", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0 };
+            instrB.plugin = { name: "DEAL 3\u20136 CHUMS EACH", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
             Composite.add(engine.world, instrB);
           }
         }, 300));
@@ -1216,6 +1216,25 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           // back over the silhouette (defaults to 0 for the simple shapes)
           ctx.translate(b.plugin.ox || 0, b.plugin.oy || 0);
           const pw = b.plugin.w, ph = b.plugin.h;
+          // Instructions card: thick yellow frame, text overlaid, no footer strip
+          if (b.plugin.isInstructions) {
+            const iw = pw, ih = ph, ir = Math.min(iw, ih) * 0.1;
+            const iBorder = Math.round(iw * 0.06);
+            rrect(ctx, -iw / 2, -ih / 2, iw, ih, ir);
+            ctx.fillStyle = "#ffed00"; ctx.fill();
+            if (img && img.complete && img.naturalWidth) {
+              rrect(ctx, -iw / 2 + iBorder, -ih / 2 + iBorder, iw - iBorder * 2, ih - iBorder * 2, ir * 0.7);
+              ctx.save(); ctx.clip();
+              ctx.drawImage(img, -iw / 2 + iBorder, -ih / 2 + iBorder, iw - iBorder * 2, ih - iBorder * 2);
+              ctx.restore();
+            }
+            const iFs = Math.max(9, Math.round(pw * 0.11));
+            ctx.font = `700 ${iFs}px "Luckiest Guy", system-ui, sans-serif`;
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillStyle = "#0a3a57";
+            ctx.fillText(b.plugin.name, 0, ih / 2 - iBorder - iFs * 0.7);
+            ctx.restore(); continue;
+          }
           if (hovered && b.plugin.prop !== "logopiece") { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
           if (img && img.complete && (img.naturalWidth || b.plugin.prop === "logopiece")) {
             const iw = img.naturalWidth || pw, ih = img.naturalHeight || ph; // viewBox-only SVGs report 0; fall back to the body box
