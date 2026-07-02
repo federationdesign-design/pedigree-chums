@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
@@ -221,30 +221,8 @@ export default function LineageMap({
   const zoomDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
   const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
-  useEffect(() => { setCardFlip(new Map()); cardFlipTimers.current.forEach(clearTimeout); cardFlipTimers.current.clear(); }, [breed.name]);
-  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); setPctHover(id); }; // patch_hoverfix_v1: info+pct open with zoom
+  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); }; // patch_hoverfix_v1: info opens with zoom
   const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); setInfoHover(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks; patch_hoverfix_v1: info closes with zoom
-  const startCardFlip = (id: string) => {
-    const t = cardFlipTimers.current;
-    if (t.get(id)) clearTimeout(t.get(id));
-    setCardFlip((m) => { const x = new Map(m); x.set(id, "closing"); return x; });
-    t.set(id, setTimeout(() => {
-      setCardFlip((m) => { const x = new Map(m); x.set(id, "back"); return x; });
-      t.set(id, setTimeout(() => {
-        setCardFlip((m) => { const x = new Map(m); x.set(id, "opening"); return x; });
-        t.set(id, setTimeout(() => {
-          setCardFlip((m) => { const x = new Map(m); x.delete(id); return x; });
-          t.set(id, setTimeout(() => startCardFlip(id), 6000)); // loop every 6s
-        }, 260));
-      }, 3000));
-    }, 260));
-  };
-  const resetCardFlip = (id: string) => {
-    const t = cardFlipTimers.current;
-    if (t.get(id)) { clearTimeout(t.get(id)); t.delete(id); }
-    setCardFlip((m) => { const x = new Map(m); x.delete(id); return x; });
-    t.set(id, setTimeout(() => startCardFlip(id), 2000)); // restart 2s idle
-  };
 
   // Dismiss a fixed/opened card (the X in its corner).
   const removeCard = (id: string) => {
@@ -266,7 +244,7 @@ export default function LineageMap({
   const collectRef = useRef<{ cards: Map<string, { x: number; y: number; spin: number }>; rootSpin: number } | null>(null);
   useEffect(() => { setPacked(false); setPackLabels({ chum: null, alive: null, extinct: null }); setPackHidden(new Set()); setCollecting(false); setCollectT(0); setBoxPop(false); collectRef.current = null; }, [breed.name]);
   // little white numbers that flash up when a node or the chum button is tapped
-  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number; neg?: boolean }[]>([]);
+  const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
   const [seen, setSeen] = useState<Set<string>>(new Set()); // circles tapped at least once, recoloured blue
   const fxId = useRef(0);
@@ -277,8 +255,6 @@ export default function LineageMap({
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const [flipPhase, setFlipPhase] = useState<null | "closing" | "back" | "opening">(null); // SVG fake-flip idle attractor
   const flipTimer = useRef<any>(null); // holds the 2min idle + loop timers
-  const [cardFlip, setCardFlip] = useState<Map<string, "closing" | "back" | "opening">>(new Map()); // per-card idle flip
-  const cardFlipTimers = useRef<Map<string, any>>(new Map()); // per-card idle timers
   const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
@@ -291,7 +267,7 @@ export default function LineageMap({
     return () => clearTimeout(t);
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
-  const startFlipLoop = useCallback(() => {
+  const startFlipLoop = () => {
     if (flipTimer.current) clearTimeout(flipTimer.current);
     setFlipPhase("closing");
     flipTimer.current = setTimeout(() => {
@@ -300,11 +276,12 @@ export default function LineageMap({
         setFlipPhase("opening");
         flipTimer.current = setTimeout(() => {
           setFlipPhase(null);
-          flipTimer.current = window.setTimeout(startFlipLoop, 8000);
-        }, 600);
+          // loop: flip again after 8s
+          flipTimer.current = setTimeout(startFlipLoop, 8000);
+        }, 260);
       }, 3000);
-    }, 600);
-  }, []);
+    }, 260);
+  };
   useEffect(() => {
     setFlipPhase(null);
     if (flipTimer.current) clearTimeout(flipTimer.current);
@@ -313,11 +290,9 @@ export default function LineageMap({
   }, [breed.name]);
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
-    const isNeg = val < 0;
-    const flashSize = isNeg ? size * 1.8 : size; // negative = bigger
-    setFlashes((f) => [...f, { id, x, y, val, size: flashSize, neg: isNeg }]);
-    onScore?.(val);
-    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), isNeg ? 1200 : 650); // neg stays longer
+    setFlashes((f) => [...f, { id, x, y, val, size }]);
+    onScore?.(val); // add this flash into the pit's running total
+    window.setTimeout(() => setFlashes((f) => f.filter((n) => n.id !== id)), 650);
   };
   // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,
   // sized from the circle itself so the family tree reads the same as the pit.
@@ -448,15 +423,6 @@ export default function LineageMap({
   // (Stage 1 console diagnostic removed) /* mix-box */
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
   useEffect(() => setFilled(new Map()), [breed.name]);
-  // start idle flip timer when a card lands in a frame
-  useEffect(() => {
-    filled.forEach((cardId) => {
-      if (!cardFlipTimers.current.has(cardId)) {
-        cardFlipTimers.current.set(cardId, setTimeout(() => startCardFlip(cardId), 2000));
-      }
-    });
-  }, [filled]);
-  useEffect(() => { if (packed) { pickCards.filter((c) => PACK_BREEDS.has(c.name)).forEach((c) => { if (!cardFlipTimers.current.has(c.id)) { cardFlipTimers.current.set(c.id, setTimeout(() => startCardFlip(c.id), 2000)); } }); } }, [packed]);
   const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
   useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
@@ -647,7 +613,7 @@ export default function LineageMap({
   // icon fades in with progress: half-transparent at 50% opened, fully white at 100%
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
-  const framesDone = frameTotal > 0 && filled.size >= frameTotal; // every dropped frame filled
+  const framesDone = frameTotal > 0 && filled.size >= frameTotal;
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
@@ -685,7 +651,7 @@ export default function LineageMap({
       const toOpen = INSTR_NAMES.has(breed.name) ? [frontier[0]] : frontier;
       setOpen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; });
       const pops: { x: number; y: number }[] = [];
-      toOpen.forEach((n) => {
+      frontier.forEach((n) => {
         const kids = n.children as Node[];
         kids.forEach((k, ci) => {
           if (!scoredRef.current.has(k._id)) {
@@ -694,23 +660,8 @@ export default function LineageMap({
           }
         });
       });
-      setSeen((prev) => { const s = new Set(prev); frontier.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
-      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE));
-      if (INSTR_NAMES.has(breed.name)) {
-        toOpen.forEach((n: Node) => {
-          if (n.img && n._parent && !picked.has(n._id)) {
-            setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
-            setSeen((prev) => { const s = new Set(prev); s.add(n._id); return s; });
-            const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-            const rr = radius(sh), dd = rr + 10 + CW / 2;
-            const INSTR_OFFSETS: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
-            const iOff = INSTR_OFFSETS[n.value as number] ?? {dx:0,dy:0};
-            const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
-            setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
-            setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
-          }
-        });
-      }
+      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
+      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
       interacted.current = true; setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
       return;
     }
@@ -718,10 +669,19 @@ export default function LineageMap({
     // card, pop them all (a staggered ripple, +50 each) before any collapse begins.
     const toPop = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
     if (toPop.length) {
-      setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; }); // turns popped nodes blue, like a manual tap
+      setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; });
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
-        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); } // -100 patch_revealscore_v1
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); }
+        if (INSTR_NAMES.has(breed.name) && n.img && n._parent) {
+          const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+          const rr = radius(sh), dd = rr + 10 + CW / 2;
+          const INSTR_OFFSETS: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
+          const iOff = INSTR_OFFSETS[n.value as number] ?? {dx:0,dy:0};
+          const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
+          setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
+          setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
+        }
       });
       interacted.current = true; setIdleHint(false);
       return;
@@ -880,15 +840,7 @@ export default function LineageMap({
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          // hop the card right+up away from the frames grid
-          setPan((prev) => ({
-            x: prev.x + 28 + Math.random() * 12,
-            y: prev.y - 18 - Math.random() * 8,
-          }));
-          revealStep();
-        }}
+        onDoubleClick={(e) => { e.stopPropagation(); revealStep(); }}
         onPointerDown={(e) => {
           if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
@@ -904,7 +856,7 @@ export default function LineageMap({
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
       >
-        {INSTR_NAMES.has(breed.name) ? (() => {
+                {INSTR_NAMES.has(breed.name) ? (() => {
           const IW = Math.round(128 * 1.33), IH = Math.round(IW * 1.36);
           const BORDER = Math.round(IW * 0.03), FOOTER = Math.round(IH * 0.18), RADIUS = IW * 0.1;
           const illoH = IH - FOOTER - BORDER * 2, illoW = IW - BORDER * 2;
@@ -919,9 +871,16 @@ export default function LineageMap({
           </>);
         })() : (<>
           <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={20} /></clipPath>
-          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />
-          {breed.image && flipPhase !== "back" ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          <g style={{ animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards` : flipPhase === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards` : undefined }}>
+            {flipPhase === "back" || flipPhase === "opening" ? (
+              <><rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} fill="var(--yellow, #ffd23e)" /><image href="/double-tap-icon-blue.svg" x={-ROOT*0.72} y={-ROOT*0.82} width={ROOT*1.44} height={ROOT*1.44} /></>
+            ) : (
+              <><rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />{breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}</>
+            )}
+          </g>
         </>)}
+        {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
+
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
@@ -946,12 +905,6 @@ export default function LineageMap({
             </g>
           </g>
         ) : null}
-        {/* Learn button for Instructions */}
-        {!packed && !collecting && !removing && !(INSTR_NAMES.has(breed.name) && framesDone) && (
-          <g className={styles.removeBtn} transform={`translate(0,62)`} onClick={(e) => { e.stopPropagation(); revealStep(); }} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Learn">
-            <g className={styles.chumPop}><rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} /><g className={styles.chumTop}><rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} /><rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} /><text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text></g></g>
-          </g>
-        )}
         {/* the green pack chum button sits below Collect; it pushes the cards into the box */}
         {canRemove || removing ? (
           <g
@@ -986,7 +939,7 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={`${styles.close} ${styles.closeLarge}`} onClick={onClose} aria-label="Close">
+      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
@@ -1060,7 +1013,6 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const isInstructions = INSTR_NAMES.has(breed.name);
                 const r = radius(share);
                 return (
                   <g
@@ -1097,20 +1049,17 @@ export default function LineageMap({
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                         const rr = radius(sh), dd = rr + 10 + CW / 2;
-                        const INSTR_OFF2: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
-                        const iOff2 = isInstructions ? (INSTR_OFF2[n.value as number] ?? {dx:0,dy:0}) : {dx:0,dy:0};
-                        const px = n._x + Math.cos(n._dir) * dd + iOff2.dx, py = n._y + Math.sin(n._dir) * dd + iOff2.dy;
+                        const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
-                        if (isInstructions && hasKids) { setOpen((prev) => { const s = new Set(prev); s.add(n._id); return s; }); }
                       }
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
-                      fontSize={isInstructions ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
-                      style={seen.has(n._id) ? {fill:"#ffffff",...(isInstructions?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : isInstructions?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
-                      {isInstructions ? (n.value ?? "") : `${share}%`}
+                      fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
+                      style={seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
+                      {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
@@ -1124,7 +1073,7 @@ export default function LineageMap({
                         </g>
                       );
                     })() : null}
-                    {hasKids && !isOpen && !isInstructions ? (
+                    {hasKids && !isOpen && !INSTR_NAMES.has(breed.name) ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside
                       </text>
@@ -1175,7 +1124,7 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : (() => { const wc = (dragName || "").split(" ").length; return wc <= 2 ? 14 : wc <= 3 ? 12 : wc <= 4 ? 10 : 8; })()}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 14}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -1183,18 +1132,12 @@ export default function LineageMap({
                             <tspan x={f.sx - pan.x} dy={22}>DOG</tspan>
                           </>
                         ) : (() => {
-                          // split breed name into words, up to 3 lines, font shrinks with word count
+                          // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const fs = words.length <= 2 ? 12 : words.length <= 3 ? 10 : words.length <= 4 ? 8 : 6;
-                          const lineH = fs * 1.3;
-                          // group into max 3 lines of ~2 words each
-                          const lines: string[] = [];
-                          for (let i = 0; i < words.length; i += Math.ceil(words.length / 3)) {
-                            lines.push(words.slice(i, i + Math.ceil(words.length / 3)).join(" "));
-                          }
-                          const startY = lines.length === 1 ? 0 : lines.length === 2 ? -lineH / 2 : -lineH;
-                          return lines.map((l, i) => (
-                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{l}</tspan>
+                          const lineH = 14;
+                          const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
+                          return words.map((w, i) => (
+                            <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
                           ));
                         })()}
                       </text>
@@ -1292,7 +1235,6 @@ export default function LineageMap({
                     setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
                     setDragImg(c.img);
                     setDragName(c.name); /* pickup-name */
-                    resetCardFlip(c.id); // reset idle flip on interaction
                     setDragXY({ x: e.clientX, y: e.clientY });
                   }}
                   onPointerMove={(e) => {
@@ -1370,26 +1312,7 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  {(() => { const imgPad = INSTR_NAMES.has(breed.name) ? CW*0.12 : 0; return <clipPath id={clipId}><rect x={c.cardX-CW/2+imgPad} y={c.cardY-CW/2+imgPad} width={CW-imgPad*2} height={CW-imgPad*2} rx={15} /></clipPath>; })()}
-                  {/* idle flip wrapper for Pedigree Chums cards */}
-                  <g style={{
-                    opacity: cardFlip.get(c.id) === "closing" || cardFlip.get(c.id) === "opening" ? 0 : 1,
-                    transition: "opacity 0.26s ease-in-out",
-                  }}>
-                    {cardFlip.get(c.id) === "back" || cardFlip.get(c.id) === "opening" ? (
-                      <>
-                        <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} rx={15} fill="var(--yellow, #ffd23e)" />
-                        <text x={c.cardX} y={c.cardY} textAnchor="middle" dominantBaseline="central"
-                          style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(CW * 0.22)}px`, fill: "var(--navy, #0a3a57)" }}>
-                          {c.name.split(" ").map((w: string, i: number) => (
-                            <tspan key={i} x={c.cardX} dy={i === 0 ? `-${Math.round(CW * 0.12)}px` : `${Math.round(CW * 0.26)}px`}>{w}</tspan>
-                          ))}
-                        </text>
-                      </>
-                    ) : (
-                      <>{(() => { const imgPad2 = INSTR_NAMES.has(breed.name) ? CW*0.12 : 0; return <image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+imgPad2} y={c.cardY-CW/2+imgPad2} width={CW-imgPad2*2} height={CW-imgPad2*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name) ? "xMidYMid meet" : "xMidYMid slice"} />; })()}</>
-                    )}
-                  </g>
+                  {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.12 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
                   {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
                   {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:13,fontWeight:400,pointerEvents:"none" as const}; const by=c.cardY+CW/2+16; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by}>{l1}</tspan><tspan x={c.cardX} dy={16}>{l2}</tspan></text>):(<text x={c.cardX} y={by} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
                   {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
@@ -1545,46 +1468,13 @@ export default function LineageMap({
             Wrong dog
           </text>
         )}
-        {/* flashes rendered in fixed overlay below for correct z-order */}
+        {flashes.map((f) => (
+          <text key={`f${f.id}`} className={styles.flashNum} x={f.x} y={f.y} fontSize={f.size} textAnchor="middle">
+            {f.val}
+          </text>
+        ))}
         </g>
       </svg>
-      {/* HTML flip overlay - real CSS rotateY over root card */}
-      {(() => {
-        const size = ROOT * 2 + 10;
-        // root card screen position: content coords + pan offset
-        // breed.x/y are screen coords (canvas offset + physics pos), no pan needed
-        const ox = rootPos ? rootPos.x + pan.x : breed.x;
-        const oy = rootPos ? rootPos.y + pan.y : breed.y;
-        return (
-          <div
-            className={`${styles.rootFlipCard} ${(flipPhase === "back" || flipPhase === "opening") ? styles.rootFlipCardFlipped : ""}`}
-            style={{ position: "fixed", left: ox - size / 2, top: oy - size / 2, width: size, height: size, zIndex: 51, pointerEvents: "none" }}
-          >
-            <div className={styles.rootFlipInner}>
-              <div className={styles.rootFlipFront} />
-              <div className={styles.rootFlipBack}>
-                <img src="/double-tap-icon-blue.svg" alt="" style={{ width: "65%", height: "65%", objectFit: "contain" }} />
-                <span className={styles.rootFlipName}>double tap</span>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-      {/* flash number overlay - above all SVG content */}
-      {flashes.length > 0 && (
-        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 200 }}>
-          <svg width="100%" height="100%">
-            {flashes.map((f) => (
-              <text key={`f${f.id}`}
-                className={f.neg ? styles.flashNeg : styles.flashNum}
-                x={f.x + pan.x} y={f.y + pan.y} fontSize={f.size} textAnchor="middle"
-                style={f.neg ? { fill: "#ff2d4f", fontFamily: "'Luckiest Guy', system-ui", fontWeight: 700 } : undefined}>
-                {f.val}
-              </text>
-            ))}
-          </svg>
-        </div>
-      )}
       {infoHover && (() => {
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
@@ -1637,11 +1527,8 @@ export default function LineageMap({
       {pctHover && (() => {
         const c = pickCards.find((x) => x.id === pctHover);
         if (!c) return null;
-        // if zoom open for same card, sit right of zoomed image; otherwise below card
-        const zoomOpenPct = zoomedId === c.id;
-        const zoomSizePct = CW * 3;
-        const left = zoomOpenPct ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSizePct + 10 : c.cardX - CW / 2 + pan.x;
-        const top = zoomOpenPct ? c.cardY - CW / 2 + pan.y + zoomOff.y + zoomSizePct / 2 : c.cardY + CW / 2 + 6 + pan.y;
+        const left = c.cardX - CW / 2 + pan.x;
+        const top = c.cardY + CW / 2 + 6 + pan.y;
         const info = breedMix.get(c.img);
         const genLabel = (d: number) => {
           if (d <= 0) return "the breed itself";
