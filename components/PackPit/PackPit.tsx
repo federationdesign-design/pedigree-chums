@@ -1472,6 +1472,40 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           }
           ctx.restore(); return;
         }
+        // Instructions card: exact stepcard pit style (yellow frame + footer strip)
+        if (b.plugin.isInstructions) {
+          const pw = s * 2, ph = s * 2;
+          const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = cr;
+          rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
+          ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";
+          ctx.fill();
+          const illoH = ph - FOOTER - BORDER * 2, illoW = pw - BORDER * 2;
+          if (img && img.complete && img.naturalWidth) {
+            const imgAr = img.naturalWidth / img.naturalHeight, illoAr = illoW / illoH;
+            const sliceW = imgAr > illoAr ? illoH * imgAr : illoW;
+            const sliceH = imgAr > illoAr ? illoH : illoW / imgAr;
+            rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
+            ctx.save(); ctx.clip();
+            ctx.drawImage(img, -pw / 2 + BORDER - (sliceW - illoW) / 2, -ph / 2 + BORDER - (sliceH - illoH) / 2, sliceW, sliceH);
+            ctx.restore();
+          }
+          const caption = b.plugin.label || b.plugin.name;
+          const maxFontSize = Math.max(10, Math.round(FOOTER * 0.35));
+          ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = `400 ${maxFontSize}px "Luckiest Guy", system-ui, sans-serif`;
+          const maxTw = pw * 0.86;
+          let tw2 = ctx.measureText(caption).width, fs2 = maxFontSize;
+          if (tw2 > maxTw) { fs2 = Math.max(6, Math.floor(maxFontSize * maxTw / tw2)); ctx.font = `400 ${fs2}px "Luckiest Guy", system-ui, sans-serif`; }
+          const words2 = caption.split(" "); let line1 = "", line2 = "";
+          for (const w3 of words2) {
+            if (ctx.measureText(line1 + " " + w3).width < maxTw) line1 = (line1 ? line1 + " " : "") + w3;
+            else line2 = (line2 ? line2 + " " : "") + w3;
+          }
+          const footerY = ph / 2 - FOOTER / 2;
+          if (line2) { ctx.fillText(line1, 0, footerY - fs2 * 0.6); ctx.fillText(line2, 0, footerY + fs2 * 0.6); }
+          else ctx.fillText(line1, 0, footerY);
+          ctx.restore(); return;
+        }
         if (hovered) { ctx.shadowColor = "rgba(10,58,87,0.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2; }
         rrect(ctx, -s, -s, 2 * s, 2 * s, cr); ctx.fillStyle = b.plugin.color; ctx.fill();
         ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
