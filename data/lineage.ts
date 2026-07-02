@@ -17,35 +17,159 @@ export interface LineageNode {
 }
 
 const LINEAGE: Record<string, LineageNode> = {
-  "Instructions": {
-    name: "Instructions",
-    note: "How to play Pedigree Chums in four steps.",
+  "Deal the cards": {
+    name: "Deal the cards",
+    note: "Find your pack, gather players, shuffle and deal 3 to 6 cards each.",
     children: [
       {
-        name: "Find your deck",
-        note: "Get your Pedigree Chums cards together and gather your players. You need at least two people and somewhere to go.",
-        img: "/find-pack-icon.svg",
+        name: "Find your pack",
+        note: "Dig out your Pedigree Chums deck.",
+        img: "/shuffle-icon.svg",
         value: 1,
         children: [
           {
-            name: "Gather players",
-            note: "Go somewhere dogs are. A park, a street, a beach. Anywhere real dogs might actually be.",
-            img: "/friends-icon.svg",
+            name: "Gather your players",
+            note: "No limit on players. You can even go solo.",
+            img: "/deal-icon.svg",
             value: 2,
             children: [
               {
                 name: "Shuffle well",
-                note: "Shuffle the deck and deal 3 to 6 Pedigree Chums cards to each player. These are your chums. Keep them secret.",
-                img: "/shuffle-icon.svg",
+                note: "Give the deck a good shuffle.",
+                img: "/friends-icon.svg",
                 value: 3,
                 children: [
                   {
-                    name: "Deal cards",
-                    note: "Spot real dogs that match your cards. Show the card when you spot a match and claim the chum. Most chums wins.",
-                    img: "/deal-icon.svg",
+                    name: "Deal 3 to 6 cards",
+                    note: "Hand out 3 to 6 cards each. Show your hand to the other players, then hide it.",
+                    img: "/find-pack-icon.svg",
                     value: 4,
                   },
                 ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  "Head outside": {
+    name: "Head outside",
+    note: "Go for a walk and explore your town or city.",
+    children: [
+      {
+        name: "Head outside",
+        note: "Explore your town or city.",
+        img: "/dog-walk-icon.svg",
+        value: 1,
+        children: [
+          {
+            name: "Keep your cards close",
+            note: "Keep somewhere easy to pull out.",
+            img: "/find-pack-icon.svg",
+            value: 2,
+            children: [
+              {
+                name: "Eyes peeled",
+                note: "Chums could be in places you wouldn't expect.",
+                img: "/famil-icon.svg",
+                value: 3,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  "Spot real dogs": {
+    name: "Spot real dogs",
+    note: "Study the dog, check your card, and call it out loud.",
+    children: [
+      {
+        name: "Look carefully",
+        note: "Study the dog's coat, size and markings.",
+        img: "/dog-show-icon.svg",
+        value: 1,
+        children: [
+          {
+            name: "Check the card",
+            note: "Does it match?",
+            img: "/checklist-icon.svg",
+            value: 2,
+            children: [
+              {
+                name: "Call it out loud",
+                note: "Say the breed name. Other players can challenge if they disagree.",
+                img: "/friends-icon.svg",
+                value: 3,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  "Match to your chum": {
+    name: "Match to your chum",
+    note: "Claim your matched card and help your team find theirs.",
+    children: [
+      {
+        name: "Claim your chum",
+        note: "Separate the found chum card.",
+        img: "/find-pack-icon.svg",
+        value: 1,
+        children: [
+          {
+            name: "Help each other",
+            note: "Playing as a team? Call out dogs that match another player's hand too.",
+            img: "/famil-icon.svg",
+            value: 2,
+          },
+        ],
+      },
+    ],
+  },
+  "Find more chums": {
+    name: "Find more chums",
+    note: "The more ground you cover, the more chums you find.",
+    children: [
+      {
+        name: "Explore more",
+        note: "The more ground you cover,",
+        img: "/dog-walk-icon.svg",
+        value: 1,
+        children: [
+          {
+            name: "Find more",
+            note: "the more chums you find.",
+            img: "/trend-icon.svg",
+            value: 2,
+          },
+        ],
+      },
+    ],
+  },
+  "Most chums wins": {
+    name: "Most chums wins",
+    note: "When the walk ends, count up and the most chums wins.",
+    children: [
+      {
+        name: "Finished exploring",
+        note: "When the walk ends or your day out is done.",
+        img: "/dog-walk-icon.svg",
+        value: 1,
+        children: [
+          {
+            name: "Count up chums",
+            note: "Tot up who has the most chums.",
+            img: "/find-pack-icon.svg",
+            value: 2,
+            children: [
+              {
+                name: "The most wins",
+                note: "The player with the most matched chums wins.",
+                img: "/queen-icon.svg",
+                value: 3,
               },
             ],
           },
