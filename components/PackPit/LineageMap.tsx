@@ -119,6 +119,7 @@ export default function LineageMap({
   onRemove,
   onScatter,
   onScore,
+  currentScore = 0,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   onClose: () => void;
@@ -129,6 +130,7 @@ export default function LineageMap({
     pills: { x: number; y: number; w: number; name: string }[];
   }) => void;
   onScore?: (v: number) => void;
+  currentScore?: number;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
   useEffect(() => {
@@ -1408,7 +1410,7 @@ export default function LineageMap({
                         </text>
                       </>
                     ) : (
-                      {(() => { const imgPad2 = INSTR_NAMES.has(breed.name) ? CW*0.12 : 0; return <image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+imgPad2} y={c.cardY-CW/2+imgPad2} width={CW-imgPad2*2} height={CW-imgPad2*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name) ? "xMidYMid meet" : "xMidYMid slice"} />; })()}
+                      <>{(() => { const imgPad2 = INSTR_NAMES.has(breed.name) ? CW*0.12 : 0; return <image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+imgPad2} y={c.cardY-CW/2+imgPad2} width={CW-imgPad2*2} height={CW-imgPad2*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name) ? "xMidYMid meet" : "xMidYMid slice"} />; })()}</>
                     )}
                   </g>
                   {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
