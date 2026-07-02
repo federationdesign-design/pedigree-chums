@@ -687,9 +687,18 @@ export default function LineageMap({
             setSeen((prev) => { const s = new Set(prev); s.add(n._id); return s; });
             const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
             const rr = radius(sh), dd = rr + 10 + CW / 2;
-            const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
+
+          // Per-icon offsets for Instructions (value = step number 1-4)
+          const INSTR_OFFSETS: Record<number, { dx: number; dy: number }> = {
+            1: { dx: -25, dy: 25 },
+            2: { dx: 25,  dy: -5 },
+            3: { dx: -25, dy: 25 },
+            4: { dx: 25,  dy: -5 },
+          };
+          const iOff = isInstructions ? (INSTR_OFFSETS[n.value as number] ?? { dx: 0, dy: 0 }) : { dx: 0, dy: 0 };
+          const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
             setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
-            setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
+            setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
           }
         });
       }
@@ -1164,7 +1173,9 @@ export default function LineageMap({
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                         const rr = radius(sh), dd = rr + 10 + CW / 2;
-                        const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
+                        const INSTR_OFF2: Record<number, {dx:number;dy:number}> = {1:{dx:-25,dy:25},2:{dx:25,dy:-5},3:{dx:-25,dy:25},4:{dx:25,dy:-5}};
+                        const iOff2 = isInstructions ? (INSTR_OFF2[n.value as number] ?? {dx:0,dy:0}) : {dx:0,dy:0};
+                        const px = n._x + Math.cos(n._dir) * dd + iOff2.dx, py = n._y + Math.sin(n._dir) * dd + iOff2.dy;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
                         // For Instructions: also open the next node in the chain
