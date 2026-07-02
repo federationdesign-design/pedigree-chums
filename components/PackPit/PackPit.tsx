@@ -856,6 +856,7 @@ export default function PackPit() {
         else hit.plugin.ping = performance.now();
       };
       let downAt: { x: number; y: number } | null = null;
+      let lastStepTapTime = 0, lastStepTapId = -1; // double-tap tracking for step cards
       const onDown = (e: MouseEvent) => { const p = localPoint(e); downAt = p; pressPct(p); };
       // a consent choice clears every cookie object from the pit (the policy SVGs and both buttons)
       const clearCookieObjects = (keepReject = false) => {
@@ -949,16 +950,40 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           if (stepIdx !== -1) {
             // If already zoomed, dismiss it
             if (hit.plugin.zoomed) {
-              hit.plugin.zoomed = false;
-              hit.plugin.opened = true;
+              // Already zoomed -- check if they tapped the "Got it" button
+              const btn = hit.plugin.zoomBtnBounds;
+              const localPt = up; // up is already in canvas coords
+              if (btn && Math.abs(localPt.x - btn.cx) < btn.w / 2 && Math.abs(localPt.y - btn.cy) < btn.h / 2) {
+                // "Got it!" tapped -- collect this step card same as a dog card
+                hit.plugin.zoomed = false;
+                hit.plugin.opened = true;
+                const rect = render.canvas.getBoundingClientRect();
+                hit.plugin.pop = performance.now();
+                hit.plugin.flyFrom = { x: hit.position.x, y: hit.position.y };
+                hit.plugin.flyTo = { x: 60 - rect.left, y: window.innerHeight - 60 - rect.top };
+                hit.plugin.flyA0 = hit.angle;
+                hit.plugin.flySpin = (Math.random() < 0.5 ? -1 : 1) * Math.PI * 1.2;
+                hit.isSensor = true;
+                numAt(hit.position.x, hit.position.y, 500);
+                burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));
+              }
+              // Tapped the card but not the button -- do nothing (keep it open)
               return true;
             }
             // Dismiss any other zoomed step card first
             dyn().forEach((b: any) => { if (b.plugin?.kind === "stepcard" && b.plugin?.zoomed) b.plugin.zoomed = false; });
-            // Zoom this card in place -- no sequential lock, no separate overlay
-            hit.plugin.zoomed = true;
-            hit.plugin.opened = true;
-            numAt(hit.position.x, hit.position.y, 500);
+            // Require double-tap to open -- same deliberate gesture as dogs on mobile
+            const now2 = performance.now();
+            if (lastStepTapId === hit.id && now2 - lastStepTapTime < 400) {
+              // Second tap within 400ms on same card -- zoom it
+              hit.plugin.zoomed = true;
+              hit.plugin.opened = true;
+              lastStepTapTime = 0; lastStepTapId = -1;
+            } else {
+              // First tap -- record it, give the card a gentle pulse so player knows it registered
+              lastStepTapTime = now2; lastStepTapId = hit.id;
+              hit.plugin.ping = now2; // reuse the existing ping highlight mechanism
+            }
             return true;
           }
         }
@@ -1248,28 +1273,31 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               }
 
               if (b.plugin.zoomed) {
-                // ── Zoomed state: draw large and centred on screen ──────────
-                ctx.restore(); // undo the per-body translate/rotate from drawBall caller
+                // ── Zoomed state: draw centred, smaller than full-screen ─────
+                ctx.restore();
                 ctx.save();
                 const CX = render.canvas.width / 2, CY = render.canvas.height / 2;
-                const ZW = Math.min(render.canvas.width * 0.8, 480);
+                // Smaller than before -- shows enough pit context so the player
+                // can see they're still in the game, not in a separate UI
+                const ZW = Math.min(render.canvas.width * 0.55, 300);
                 const ZH = ZW / (b.plugin.w / b.plugin.h);
-                const ZBORDER = Math.round(ZW * 0.03);
-                const ZFOOTER = Math.round(ZH * 0.14);
-                const ZRADIUS = ZW * 0.06;
-                ctx.translate(CX, CY);
+                const ZBORDER = Math.round(ZW * 0.04);
+                const ZFOOTER = Math.round(ZH * 0.16);
+                const ZRADIUS = ZW * 0.07;
+                // Sit in upper half of screen so "Got it" button is always visible
+                ctx.translate(CX, CY - ZH * 0.15);
 
                 // Drop shadow
-                ctx.shadowColor = "rgba(0,0,0,0.5)";
-                ctx.shadowBlur = 40;
-                ctx.shadowOffsetY = 8;
+                ctx.shadowColor = "rgba(0,0,0,0.55)";
+                ctx.shadowBlur = 32;
+                ctx.shadowOffsetY = 6;
 
                 // Card body
                 rrect(ctx, -ZW / 2, -ZH / 2, ZW, ZH, ZRADIUS);
                 ctx.fillStyle = "#ffed00"; ctx.fill();
                 ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
-                // Image fills most of the card
+                // Image
                 const zIlloH = ZH - ZFOOTER - ZBORDER * 2;
                 const zIlloW = ZW - ZBORDER * 2;
                 if (img && img.complete && img.naturalWidth) {
@@ -1283,23 +1311,33 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
                 // Caption
                 ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                const zfs = Math.max(14, Math.round(ZFOOTER * 0.4));
+                const zfs = Math.max(12, Math.round(ZFOOTER * 0.38));
                 ctx.font = `600 ${zfs}px "Luckiest Guy", system-ui, sans-serif`;
                 ctx.fillText(b.plugin.name || "", 0, ZH / 2 - ZFOOTER / 2);
 
                 // Numbered badge
-                const zbR = Math.max(18, ZW * 0.1);
+                const zbR = Math.max(14, ZW * 0.09);
                 ctx.beginPath(); ctx.arc(-ZW / 2 + zbR * 0.7, -ZH / 2 + zbR * 0.7, zbR, 0, Math.PI * 2);
                 ctx.fillStyle = "#1497d6"; ctx.fill();
-                ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+                ctx.lineWidth = 2; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
                 ctx.fillStyle = "#ffed00"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.font = `900 ${Math.round(zbR * 0.9)}px "Luckiest Guy", system-ui, sans-serif`;
-                ctx.fillText(String(b.plugin.seq || ""), -ZW / 2 + zbR * 0.7, -ZH / 2 + zbR * 0.7 + Math.round(zbR * 0.06));
+                ctx.font = `900 ${Math.round(zbR * 0.85)}px "Luckiest Guy", system-ui, sans-serif`;
+                ctx.fillText(String(b.plugin.seq || ""), -ZW / 2 + zbR * 0.7, -ZH / 2 + zbR * 0.7 + Math.round(zbR * 0.05));
 
-                // "Tap to close" hint
-                ctx.fillStyle = "rgba(255,255,255,0.55)";
-                ctx.font = `500 12px Montserrat, system-ui, sans-serif`;
-                ctx.fillText("Tap anywhere to close", 0, ZH / 2 + 22);
+                // "Got it!" collect button -- same green as the Collect button on dog cards
+                const btnW = ZW * 0.72, btnH = 44, btnY = ZH / 2 + 18;
+                const btnRadius = btnH / 2;
+                // store button bounds on plugin so tap handler can detect it
+                b.plugin.zoomBtnBounds = { cx: CX, cy: CY - ZH * 0.15 + btnY, w: btnW, h: btnH };
+                // Button shadow
+                ctx.shadowColor = "rgba(10,58,87,0.4)";
+                ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
+                rrect(ctx, -btnW / 2, btnY - btnH / 2, btnW, btnH, btnRadius);
+                ctx.fillStyle = "#3cb24a"; ctx.fill();
+                ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+                ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.font = `700 16px "Luckiest Guy", system-ui, sans-serif`;
+                ctx.fillText("GOT IT!", 0, btnY);
 
                 ctx.restore();
                 return;
