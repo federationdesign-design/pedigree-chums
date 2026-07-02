@@ -67,14 +67,10 @@
   fill: var(--yellow);
   stroke: var(--navy);
   stroke-width: 3;
-  stroke-linecap: round;
   transition: r 0.18s ease;
 }
 .disc.has {
-  /* round dot-dash -- purely structural signal: this node has unopened children */
-  stroke-dasharray: 0.1 7;
-  stroke: rgba(255, 237, 0, 0.9);
-  stroke-width: 4;
+  stroke-dasharray: 5 5;
 }
 .node:hover .disc {
   stroke-width: 5;

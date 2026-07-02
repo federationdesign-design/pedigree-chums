@@ -72,7 +72,6 @@ type Node = LineageNode & {
 
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
-const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
 // distance added at each deeper generation
@@ -445,9 +444,8 @@ export default function LineageMap({
       if (!kids) return;
       const cnt = kids.length;
       const spread = depth === 0 ? SPREAD1 : SPREADN;
-      let center = depth === 0 ? -Math.PI / 2 + base : n._dir;
-      if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
-      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
+      const center = depth === 0 ? -Math.PI / 2 + base : n._dir;
+      const dist = depth === 0 ? RING1 : RSTEP;
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
@@ -599,11 +597,6 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal; // every dropped frame filled
-  useEffect(() => {
-    if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
-    const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
-    return () => window.clearTimeout(t);
-  }, [framesDone, breed.name]); // eslint-disable-line react-hooks/exhaustive-deps
   // the main square card peels off once the grid is settled, whether by filling every frame
   // or by hitting Collect (which packs early, leaving framesDone false but the grid laid out)
   const canDragRoot = (framesDone || packed) && !collecting;
@@ -635,10 +628,9 @@ export default function LineageMap({
   const revealStep = () => {
     const frontier = shown.filter((n) => n.children && n.children.length && !open.has(n._id));
     if (frontier.length) {
-      const toOpen = INSTR_NAMES.has(breed.name) ? [frontier[0]] : frontier;
-      setOpen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; });
+      setOpen((prev) => { const s = new Set(prev); frontier.forEach((n) => s.add(n._id)); return s; });
       const pops: { x: number; y: number }[] = [];
-      toOpen.forEach((n) => {
+      frontier.forEach((n) => {
         const kids = n.children as Node[];
         kids.forEach((k, ci) => {
           if (!scoredRef.current.has(k._id)) {
@@ -649,28 +641,13 @@ export default function LineageMap({
       });
       setSeen((prev) => {
         const s = new Set(prev);
-        toOpen.forEach((n) => {
-          s.add(n._id);
-          (n.children as Node[]).forEach((k) => s.add(k._id));
+        frontier.forEach((n) => {
+          s.add(n._id); // mark the opened node itself as seen (turns blue)
+          (n.children as Node[]).forEach((k) => s.add(k._id)); // mark children as seen too
         });
         return s;
       });
-      pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE));
-      if (INSTR_NAMES.has(breed.name)) {
-        toOpen.forEach((n: Node) => {
-          if (n.img && n._parent && !picked.has(n._id)) {
-            setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
-            setSeen((prev) => { const s = new Set(prev); s.add(n._id); return s; });
-            const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-            const rr = radius(sh), dd = rr + 10 + CW / 2;
-            const INSTR_OFFSETS: Record<number, { dx: number; dy: number }> = { 1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5} };
-            const iOff = INSTR_OFFSETS[n.value as number] ?? { dx: 0, dy: 0 };
-            const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
-            setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
-            setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
-          }
-        });
-      }
+      pops.forEach((p) => flashNum(p.x, p.y, -50, FLASH_SIZE)); // -50 per auto-revealed node
       interacted.current = true; setIdleHint(false);
       return;
     }
@@ -816,7 +793,7 @@ export default function LineageMap({
     // blue name pills tip in with them. Node coords are user coords, so add the pan for the screen.
     const vis = shown.filter((n) => n._parent);
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-    const circles = INSTR_NAMES.has(breed.name) ? [] : vis.slice(0, 60).map((n) => {
+    const circles = vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
       return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
     });
@@ -888,30 +865,31 @@ export default function LineageMap({
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
       >
-        {INSTR_NAMES.has(breed.name) ? (() => {
-          const IW = Math.round(128 * 1.33), IH = Math.round(IW * 1.36);
-          const BORDER = Math.round(IW * 0.03), FOOTER = Math.round(IH * 0.18), RADIUS = IW * 0.1;
-          const illoH = IH - FOOTER - BORDER * 2, illoW = IW - BORDER * 2;
-          const INSTR_LABELS: Record<string,string> = {"Deal the cards":"DEAL THE CARDS","Head outside":"HEAD OUTSIDE","Spot real dogs":"SPOT REAL DOGS","Match to your chum":"MATCH YOUR CHUM","Find more chums":"FIND MORE CHUMS","Most chums wins":"MOST CHUMS WINS"};
-          const caption = INSTR_LABELS[breed.name] ?? breed.name.toUpperCase();
-          const fs = Math.max(10, Math.round(FOOTER * 0.32));
-          return (<>
-            <rect x={-IW/2} y={-IH/2} width={IW} height={IH} rx={RADIUS} fill="#ffed00" />
-            <clipPath id={clip}><rect x={-IW/2+BORDER} y={-IH/2+BORDER} width={illoW} height={illoH} rx={RADIUS*0.7} /></clipPath>
-            {breed.image && <image href={bust(breed.image)} x={-IW/2+BORDER} y={-IH/2+BORDER} width={illoW} height={illoH} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" />}
-            <text x={0} y={IH/2-FOOTER/2} textAnchor="middle" dominantBaseline="central" style={{fill:"#0a3a57",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:fs,fontWeight:400}}>{caption}</text>
-          </>);
-        })() : (<>
-          <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={20} /></clipPath>
-          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />
-          {breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
-        </>)}
+        <clipPath id={clip}>
+          <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
+        </clipPath>
+        {/* front face: dog image */}
+        <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
+        {breed.image ? (
+          <image
+            href={bust(breed.image)}
+            x={-ROOT}
+            y={-ROOT}
+            width={ROOT * 2}
+            height={ROOT * 2}
+            clipPath={`url(#${clip})`}
+            preserveAspectRatio="xMidYMid slice"
+          />
+        ) : null}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
+        <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
+        <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
+          {breed.name}
+        </text>
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
-        {collectShowing && !INSTR_NAMES.has(breed.name) ? (
+        {collectShowing ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
@@ -930,19 +908,6 @@ export default function LineageMap({
             </g>
           </g>
         ) : null}
-        {/* Learn button for Instructions */}
-        {!packed && !collecting && !removing && !(INSTR_NAMES.has(breed.name) && framesDone) && (
-          <g className={styles.removeBtn} transform={`translate(0,62)`} onClick={(e) => { e.stopPropagation(); revealStep(); }} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Learn">
-            <g className={styles.chumPop}>
-              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
-              <g className={styles.chumTop}>
-                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
-                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
-              </g>
-            </g>
-          </g>
-        )}
         {/* the green pack chum button sits below Collect; it pushes the cards into the box */}
         {canRemove || removing ? (
           <g
@@ -1001,9 +966,9 @@ export default function LineageMap({
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: aliveTop - 90 }}>Alive and kicking</div>
       )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
-        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
+        <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>These dogs have had their days</div>
       )}
-      {showPack && !INSTR_NAMES.has(breed.name) && (
+      {showPack && (
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
@@ -1023,7 +988,7 @@ export default function LineageMap({
         <div className={styles.packHead} style={{ left: packLabels.alive.x, top: packLabels.alive.y }}>Alive and kicking</div>
       )}
       {packed && packLabels.extinct && (
-        <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
+        <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>These dogs have had their days</div>
       )}
       <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
@@ -1051,7 +1016,6 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const isInstructions = INSTR_NAMES.has(breed.name);
                 const r = radius(share);
                 return (
                   <g
@@ -1088,20 +1052,15 @@ export default function LineageMap({
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                         const rr = radius(sh), dd = rr + 10 + CW / 2;
-                        const INSTR_OFF2: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
-                        const iOff2 = isInstructions ? (INSTR_OFF2[n.value as number] ?? {dx:0,dy:0}) : {dx:0,dy:0};
-                        const px = n._x + Math.cos(n._dir) * dd + iOff2.dx, py = n._y + Math.sin(n._dir) * dd + iOff2.dy;
+                        const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
-                        if (isInstructions && hasKids) { setOpen((prev) => { const s = new Set(prev); s.add(n._id); return s; }); }
                       }
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
-                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
-                      fontSize={isInstructions ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
-                      style={seen.has(n._id) ? {fill:"#ffffff",...(isInstructions?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : isInstructions?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
-                      {isInstructions ? (n.value ?? "") : `${share}%`}
+                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
+                      {share}%
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
@@ -1115,7 +1074,7 @@ export default function LineageMap({
                         </g>
                       );
                     })() : null}
-                    {hasKids && !isOpen && !isInstructions ? (
+                    {hasKids && !isOpen ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside
                       </text>
@@ -1372,10 +1331,28 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); isDraggingCardRef.current = false; setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  {(() => { const imgPad = INSTR_NAMES.has(breed.name) ? CW*0.12 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+imgPad} y={c.cardY-CW/2+imgPad} width={CW-imgPad*2} height={CW-imgPad*2} rx={15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+imgPad} y={c.cardY-CW/2+imgPad} width={CW-imgPad*2} height={CW-imgPad*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name) ? "xMidYMid meet" : "xMidYMid slice"} /></>); })()}
-                  {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
-                  {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:13,fontWeight:400,pointerEvents:"none" as const}; const by=c.cardY+CW/2+16; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by}>{l1}</tspan><tspan x={c.cardX} dy={16}>{l2}</tspan></text>):(<text x={c.cardX} y={by} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
-                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+                  <clipPath id={clipId}>
+                    <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} rx={15} />
+                  </clipPath>
+                  <image
+                        href={encodeURI(bust(c.img))}
+                        x={c.cardX - CW / 2}
+                        y={c.cardY - CW / 2}
+                        width={CW}
+                        height={CW}
+                        clipPath={`url(#${clipId})`}
+                        preserveAspectRatio="xMidYMid slice"
+                      />
+                  <rect
+                    x={c.cardX - CW / 2}
+                    y={c.cardY - CW / 2}
+                    width={CW}
+                    height={CW}
+                    rx={15}
+                    vectorEffect="non-scaling-stroke"
+                    className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} /* chum-fix */
+                  />
+                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1404,7 +1381,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const mx = c.cardX - CW / 2 + 15, my = c.cardY + CW / 2 - 13; // inside the box, bottom-left (nudged +4 right, 2 up)
                     return (
                       <g
@@ -1439,7 +1416,7 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) ? (() => {
+                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
