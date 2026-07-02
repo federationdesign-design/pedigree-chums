@@ -2567,25 +2567,34 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const pieces = ev?.detail?.pieces;
         if (!Array.isArray(pieces) || !stageRef.current) return;
         const sr = stageRef.current.getBoundingClientRect();
-        // Spawn the Instructions card at the step1 card's screen position
-        // so it falls from where the first step card was in the overlay
-        const step1Piece = pieces.find((pc: any) => pc.kind === "stepcard");
-        if (step1Piece) {
-          const alreadyExists = Composite.allBodies(engine.world).find((b: any) => b.plugin?.name === "Instructions");
-          if (!alreadyExists) {
-            const instrImg = getImg("__instructions", "/step1-redue.jpg");
-            const s = 85 * SCALE;
-            const cr = Math.max(7, s * 0.22);
-            const icx = step1Piece.x + step1Piece.w / 2 - sr.left;
-            const icy = step1Piece.y + step1Piece.h / 2 - sr.top;
-            const instrB: any = Bodies.rectangle(icx, icy, 2 * s, 2 * s, {
-              chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
-            });
-            instrB.plugin = { name: "Instructions", label: "DEAL THE CARDS", half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: 0, isInstructions: true };
-            Body.setVelocity(instrB, { x: 0, y: 3 });
-            Composite.add(engine.world, instrB);
-          }
-        }
+        // Spawn one Instructions card per step card, at each step card's screen position.
+        // Each card uses the step's image and links to its lineage entry by name.
+        const INSTR_META: { name: string; label: string; img: string }[] = [
+          { name: "Deal the cards",    label: "DEAL THE CARDS",    img: "/step1-redue.jpg" },
+          { name: "Head outside",      label: "HEAD OUTSIDE",      img: "/step2-redue.jpg" },
+          { name: "Spot real dogs",    label: "SPOT REAL DOGS",    img: "/step3-redue.jpg" },
+          { name: "Match to your chum",label: "MATCH YOUR CHUM",   img: "/step4-redue.jpg" },
+          { name: "Find more chums",   label: "FIND MORE CHUMS",   img: "/step5-redue.jpg" },
+          { name: "Most chums wins",   label: "MOST CHUMS WINS",   img: "/step6-redue.jpg" },
+        ];
+        const stepPieces = pieces.filter((pc: any) => pc.kind === "stepcard");
+        stepPieces.forEach((pc: any, idx: number) => {
+          const meta = INSTR_META[idx];
+          if (!meta) return;
+          const alreadyExists = Composite.allBodies(engine.world).find((b: any) => b.plugin?.name === meta.name && b.plugin?.isInstructions);
+          if (alreadyExists) return;
+          const instrImg = getImg("__instr_" + idx, meta.img);
+          const s = 85 * SCALE;
+          const cr = Math.max(7, s * 0.22);
+          const icx = pc.x + pc.w / 2 - sr.left;
+          const icy = pc.y + pc.h / 2 - sr.top;
+          const instrB: any = Bodies.rectangle(icx, icy, 2 * s, 2 * s, {
+            chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
+          });
+          instrB.plugin = { name: meta.name, label: meta.label, half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: idx + 1, isInstructions: true };
+          Body.setVelocity(instrB, { x: (Math.random() - 0.5) * 2, y: 3 });
+          Composite.add(engine.world, instrB);
+        });
         const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
         const MAX_CARD = BIG * 2.2; // cap cards to a sensible pit size regardless of overlay dimensions
         let stepcardIdx = 0;
