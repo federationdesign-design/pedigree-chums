@@ -1472,9 +1472,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           }
           ctx.restore(); return;
         }
-        // Instructions card: exact stepcard pit style (yellow frame + footer strip)
+        // Instructions card: portrait rectangle matching overlay card exactly
         if (b.plugin.isInstructions) {
-          const pw = s * 2, ph = s * 2;
+          const pw = s * 2;
+          const ph = Math.round(pw * 1.36); // portrait -- same ratio as overlay
           const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = cr;
           rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
           ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";

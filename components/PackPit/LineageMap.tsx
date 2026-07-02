@@ -889,7 +889,7 @@ export default function LineageMap({
           // Yellow stepcard-style frame: yellow outer rect, image inset, yellow footer with caption
           // Match pit card size exactly: pit is 48*SCALE*1.33*2 wide on desktop
           // ROOT=58, so ROOT*2=116. Pit desktop w=128. Use 128 directly.
-          const IW = 128;
+          const IW = Math.round(128 * 1.33); // 33% bigger, matches pit
           const IH = Math.round(IW * 1.36); // same portrait ratio as pit
           const BORDER = Math.round(IW * 0.03);
           const FOOTER = Math.round(IH * 0.18);
