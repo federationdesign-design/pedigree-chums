@@ -428,16 +428,7 @@ export default function LineageMap({
     }
   }, [seen, totalNodes]);
 
-  // Instructions: auto-close overlay and poof pit card 2s after all icons placed in frames
-  useEffect(() => {
-    if (breed.name !== "Instructions" || !framesDone) return;
-    const t = window.setTimeout(() => {
-      onRemove?.(breed.name); // poof the Instructions card out of the pit
-      window.setTimeout(() => onClose(), 400); // close overlay shortly after
-    }, 2000);
-    return () => window.clearTimeout(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [framesDone, breed.name]);
+
 
   const base = lean(breed.angle || 0);
   const cardLean = Math.max(-CARD_TILT, Math.min(CARD_TILT, base)); // breed cards tilt at most 2 degrees
@@ -616,6 +607,18 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal; // every dropped frame filled
+
+  // Instructions: auto-close overlay and poof pit card 2s after all icons placed in frames
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (breed.name !== "Instructions" || !framesDone) return;
+    const t = window.setTimeout(() => {
+      onRemove?.(breed.name);
+      window.setTimeout(() => onClose(), 400);
+    }, 2000);
+    return () => window.clearTimeout(t);
+  }, [framesDone, breed.name]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // the main square card peels off once the grid is settled, whether by filling every frame
   // or by hitting Collect (which packs early, leaving framesDone false but the grid laid out)
   const canDragRoot = (framesDone || packed) && !collecting;
