@@ -695,7 +695,8 @@ export default function LineageMap({
             3: { dx: -25, dy: 25 },
             4: { dx: 25,  dy: -5 },
           };
-          const iOff = isInstructions ? (INSTR_OFFSETS[n.value as number] ?? { dx: 0, dy: 0 }) : { dx: 0, dy: 0 };
+          const isInstrBreed = INSTR_NAMES.has(breed.name);
+          const iOff = isInstrBreed ? (INSTR_OFFSETS[n.value as number] ?? { dx: 0, dy: 0 }) : { dx: 0, dy: 0 };
           const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
             setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
             setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
@@ -1187,7 +1188,7 @@ export default function LineageMap({
                     }}
                   >
                     <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : isInstructions ? { stroke: "none" } : undefined} />
-                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.5)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
+                    <text className={styles.pct} textAnchor="middle" dominantBaseline="central" fontSize={Math.max(13, r * 0.75)} style={seen.has(n._id) ? { fill: "#ffffff" } : undefined}>
                       {isInstructions ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
@@ -1202,7 +1203,7 @@ export default function LineageMap({
                         </g>
                       );
                     })() : null}
-                    {hasKids && !isOpen ? (
+                    {hasKids && !isOpen && !isInstructions ? (
                       <text className={styles.plus} textAnchor="middle" y={r + 15}>
                         + {countProgenitors(n)} inside
                       </text>
