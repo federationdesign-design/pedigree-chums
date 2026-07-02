@@ -428,6 +428,17 @@ export default function LineageMap({
     }
   }, [seen, totalNodes]);
 
+  // Instructions: auto-close overlay and poof pit card 2s after all icons placed in frames
+  useEffect(() => {
+    if (breed.name !== "Instructions" || !framesDone) return;
+    const t = window.setTimeout(() => {
+      onRemove?.(breed.name); // poof the Instructions card out of the pit
+      window.setTimeout(() => onClose(), 400); // close overlay shortly after
+    }, 2000);
+    return () => window.clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [framesDone, breed.name]);
+
   const base = lean(breed.angle || 0);
   const cardLean = Math.max(-CARD_TILT, Math.min(CARD_TILT, base)); // breed cards tilt at most 2 degrees
   const cardDeg = -(cardLean * 180) / Math.PI; // the exact tilt every popped card uses; frames match it
