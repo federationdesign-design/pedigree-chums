@@ -690,9 +690,9 @@ export default function LineageMap({
 
           // Per-icon offsets for Instructions (value = step number 1-4)
           const INSTR_OFFSETS: Record<number, { dx: number; dy: number }> = {
-            1: { dx: -25, dy: 25 },
+            1: { dx: -50, dy: -5 },
             2: { dx: 25,  dy: -5 },
-            3: { dx: -25, dy: 25 },
+            3: { dx: -50, dy: -5 },
             4: { dx: 25,  dy: -5 },
           };
           const isInstrBreed = INSTR_NAMES.has(breed.name);
@@ -1174,7 +1174,7 @@ export default function LineageMap({
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
                         const rr = radius(sh), dd = rr + 10 + CW / 2;
-                        const INSTR_OFF2: Record<number, {dx:number;dy:number}> = {1:{dx:-25,dy:25},2:{dx:25,dy:-5},3:{dx:-25,dy:25},4:{dx:25,dy:-5}};
+                        const INSTR_OFF2: Record<number, {dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
                         const iOff2 = isInstructions ? (INSTR_OFF2[n.value as number] ?? {dx:0,dy:0}) : {dx:0,dy:0};
                         const px = n._x + Math.cos(n._dir) * dd + iOff2.dx, py = n._y + Math.sin(n._dir) * dd + iOff2.dy;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
