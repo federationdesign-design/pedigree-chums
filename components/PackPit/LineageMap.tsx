@@ -881,22 +881,64 @@ export default function LineageMap({
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
       >
-        <clipPath id={clip}>
-          <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
-        </clipPath>
-        {/* front face: dog image */}
-        <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
-        {breed.image ? (
-          <image
-            href={bust(breed.image)}
-            x={-ROOT}
-            y={-ROOT}
-            width={ROOT * 2}
-            height={ROOT * 2}
-            clipPath={`url(#${clip})`}
-            preserveAspectRatio="xMidYMid slice"
-          />
-        ) : null}
+        {breed.name === "Instructions" ? (() => {
+          // Yellow stepcard-style frame: yellow outer rect, image inset, yellow footer with caption
+          const BORDER = Math.round(ROOT * 2 * 0.03);
+          const FOOTER = Math.round(ROOT * 2 * 0.18);
+          const RADIUS = ROOT * 0.12;
+          const illoH = ROOT * 2 - FOOTER - BORDER * 2;
+          const illoW = ROOT * 2 - BORDER * 2;
+          const caption = "DEAL 3–6 CHUMS EACH";
+          const fs = Math.max(10, Math.round(FOOTER * 0.32));
+          return (
+            <>
+              {/* Yellow outer frame */}
+              <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={RADIUS} fill="#ffed00" />
+              {/* Image inset */}
+              <clipPath id={clip}>
+                <rect x={-ROOT + BORDER} y={-ROOT + BORDER} width={illoW} height={illoH} rx={RADIUS * 0.7} />
+              </clipPath>
+              {breed.image && (
+                <image
+                  href={bust(breed.image)}
+                  x={-ROOT + BORDER}
+                  y={-ROOT + BORDER}
+                  width={illoW}
+                  height={illoH}
+                  clipPath={`url(#${clip})`}
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              )}
+              {/* Footer caption */}
+              <text
+                x={0}
+                y={ROOT - FOOTER / 2}
+                textAnchor="middle"
+                dominantBaseline="central"
+                style={{ fill: "#0a3a57", fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400 }}
+              >{caption}</text>
+            </>
+          );
+        })() : (
+          <>
+            <clipPath id={clip}>
+              <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={20} />
+            </clipPath>
+            {/* front face: dog image */}
+            <rect x={-ROOT - 5} y={-ROOT - 5} width={ROOT * 2 + 10} height={ROOT * 2 + 10} rx={24} className={styles.rootCard} />
+            {breed.image ? (
+              <image
+                href={bust(breed.image)}
+                x={-ROOT}
+                y={-ROOT}
+                width={ROOT * 2}
+                height={ROOT * 2}
+                clipPath={`url(#${clip})`}
+                preserveAspectRatio="xMidYMid slice"
+              />
+            ) : null}
+          </>
+        )}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
@@ -1356,6 +1398,7 @@ export default function LineageMap({
                         clipPath={`url(#${clipId})`}
                         preserveAspectRatio="xMidYMid slice"
                       />
+                  {breed.name !== "Instructions" && (
                   <rect
                     x={c.cardX - CW / 2}
                     y={c.cardY - CW / 2}
@@ -1365,6 +1408,7 @@ export default function LineageMap({
                     vectorEffect="non-scaling-stroke"
                     className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} /* chum-fix */
                   />
+                  )}
                   {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
