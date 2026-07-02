@@ -158,6 +158,14 @@ export default function LineageMap({
   // the open set is the single line currently being followed (root..node)
   const [open, setOpen] = useState<Set<string>>(() => new Set(["0"]));
   useEffect(() => setOpen(new Set(["0"])), [breed.name]);
+  // For Instructions: auto-open the first node so the icon pops immediately
+  useEffect(() => {
+    if (breed.name === "Instructions") {
+      const t = window.setTimeout(() => revealStep(), 400);
+      return () => window.clearTimeout(t);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [breed.name]);
   // the circle whose breed image is currently popped out, if any
   const [picked, setPicked] = useState<Set<string>>(() => new Set());
   useEffect(() => setPicked(new Set()), [breed.name]);
@@ -883,26 +891,28 @@ export default function LineageMap({
       >
         {breed.name === "Instructions" ? (() => {
           // Yellow stepcard-style frame: yellow outer rect, image inset, yellow footer with caption
-          const BORDER = Math.round(ROOT * 2 * 0.03);
-          const FOOTER = Math.round(ROOT * 2 * 0.18);
-          const RADIUS = ROOT * 0.12;
-          const illoH = ROOT * 2 - FOOTER - BORDER * 2;
-          const illoW = ROOT * 2 - BORDER * 2;
+          const IW = Math.round(ROOT * 2 * 1.33);
+          const IH = Math.round(IW * 1.36);
+          const BORDER = Math.round(IW * 0.03);
+          const FOOTER = Math.round(IH * 0.18);
+          const RADIUS = IW * 0.1;
+          const illoH = IH - FOOTER - BORDER * 2;
+          const illoW = IW - BORDER * 2;
           const caption = "DEAL 3–6 CHUMS EACH";
           const fs = Math.max(10, Math.round(FOOTER * 0.32));
           return (
             <>
-              {/* Yellow outer frame */}
-              <rect x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2} rx={RADIUS} fill="#ffed00" />
+              {/* Yellow outer frame -- portrait aspect ratio like pit step cards */}
+              <rect x={-IW / 2} y={-IH / 2} width={IW} height={IH} rx={RADIUS} fill="#ffed00" />
               {/* Image inset */}
               <clipPath id={clip}>
-                <rect x={-ROOT + BORDER} y={-ROOT + BORDER} width={illoW} height={illoH} rx={RADIUS * 0.7} />
+                <rect x={-IW / 2 + BORDER} y={-IH / 2 + BORDER} width={illoW} height={illoH} rx={RADIUS * 0.7} />
               </clipPath>
               {breed.image && (
                 <image
                   href={bust(breed.image)}
-                  x={-ROOT + BORDER}
-                  y={-ROOT + BORDER}
+                  x={-IW / 2 + BORDER}
+                  y={-IH / 2 + BORDER}
                   width={illoW}
                   height={illoH}
                   clipPath={`url(#${clip})`}
@@ -912,7 +922,7 @@ export default function LineageMap({
               {/* Footer caption */}
               <text
                 x={0}
-                y={ROOT - FOOTER / 2}
+                y={IH / 2 - FOOTER / 2}
                 textAnchor="middle"
                 dominantBaseline="central"
                 style={{ fill: "#0a3a57", fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400 }}
@@ -942,10 +952,14 @@ export default function LineageMap({
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
-        <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
-          {breed.name === "Instructions" ? "Deal 3–6 Chums Each" : breed.name}
-        </text>
+        {breed.name !== "Instructions" && (
+          <>
+            <rect className={styles.tag} x={-tagW / 2} y={-16} width={tagW} height={32} rx={16} />
+            <text className={styles.tagText} textAnchor="middle" dominantBaseline="central">
+              {breed.name}
+            </text>
+          </>
+        )}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Learn button -- blue -- auto-reveals tree ring by ring (was mislabelled, called doPack) */}
         {!packed && !collecting && !removing ? (
