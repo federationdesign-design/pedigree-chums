@@ -1233,7 +1233,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.fillStyle = "#0a3a57";
             ctx.fillText(b.plugin.name, 0, ih / 2 - iBorder - iFs * 0.7);
-            ctx.restore(); continue;
+            ctx.restore(); return;
           }
           if (hovered && b.plugin.prop !== "logopiece") { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
           if (img && img.complete && (img.naturalWidth || b.plugin.prop === "logopiece")) {
