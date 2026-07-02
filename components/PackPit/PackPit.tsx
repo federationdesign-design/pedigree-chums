@@ -1216,23 +1216,37 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           // back over the silhouette (defaults to 0 for the simple shapes)
           ctx.translate(b.plugin.ox || 0, b.plugin.oy || 0);
           const pw = b.plugin.w, ph = b.plugin.h;
-          // Instructions card: thick yellow frame, text overlaid, no footer strip
+          // Instructions card: same visual style as HowToPlay step cards in pit
           if (b.plugin.isInstructions) {
-            const iw = pw, ih = ph, ir = Math.min(iw, ih) * 0.1;
-            const iBorder = Math.round(iw * 0.06);
-            rrect(ctx, -iw / 2, -ih / 2, iw, ih, ir);
-            ctx.fillStyle = "#ffed00"; ctx.fill();
+            const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
+            rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
+            ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";
+            ctx.fill();
+            const illoH = ph - FOOTER - BORDER * 2, illoW = pw - BORDER * 2;
             if (img && img.complete && img.naturalWidth) {
-              rrect(ctx, -iw / 2 + iBorder, -ih / 2 + iBorder, iw - iBorder * 2, ih - iBorder * 2, ir * 0.7);
+              const imgAr = img.naturalWidth / img.naturalHeight, illoAr = illoW / illoH;
+              const sliceW = imgAr > illoAr ? illoH * imgAr : illoW;
+              const sliceH = imgAr > illoAr ? illoH : illoW / imgAr;
+              rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
               ctx.save(); ctx.clip();
-              ctx.drawImage(img, -iw / 2 + iBorder, -ih / 2 + iBorder, iw - iBorder * 2, ih - iBorder * 2);
+              ctx.drawImage(img, -pw / 2 + BORDER - (sliceW - illoW) / 2, -ph / 2 + BORDER - (sliceH - illoH) / 2, sliceW, sliceH);
               ctx.restore();
             }
-            const iFs = Math.max(9, Math.round(pw * 0.11));
-            ctx.font = `700 ${iFs}px "Luckiest Guy", system-ui, sans-serif`;
-            ctx.textAlign = "center"; ctx.textBaseline = "middle";
-            ctx.fillStyle = "#0a3a57";
-            ctx.fillText(b.plugin.label || b.plugin.name, 0, ih / 2 - iBorder - iFs * 0.7);
+            const caption = b.plugin.label || b.plugin.name;
+            const maxFontSize = Math.max(10, Math.round(FOOTER * 0.35));
+            ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.font = `400 ${maxFontSize}px "Luckiest Guy", system-ui, sans-serif`;
+            const maxTw = pw * 0.86, tw = ctx.measureText(caption).width;
+            let fs = maxFontSize;
+            if (tw > maxTw) { fs = Math.max(6, Math.floor(maxFontSize * maxTw / tw)); ctx.font = `400 ${fs}px "Luckiest Guy", system-ui, sans-serif`; }
+            const words = caption.split(" "); let line1 = "", line2 = "";
+            for (const w2 of words) {
+              if (ctx.measureText(line1 + " " + w2).width < maxTw) line1 = (line1 ? line1 + " " : "") + w2;
+              else line2 = (line2 ? line2 + " " : "") + w2;
+            }
+            const footerY = ph / 2 - FOOTER / 2;
+            if (line2) { ctx.fillText(line1, 0, footerY - fs * 0.6); ctx.fillText(line2, 0, footerY + fs * 0.6); }
+            else ctx.fillText(line1, 0, footerY);
             ctx.restore(); return;
           }
           if (hovered && b.plugin.prop !== "logopiece") { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
