@@ -726,47 +726,15 @@ export default function LineageMap({
       interacted.current = true; setIdleHint(false);
       return;
     }
-    // fully open: auto-place all unplaced images into their correct frames
-    // Primary cards fill empty frames; duplicates stack on the already-filled frame
-    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
-    if (unplaced.length === 0) return;
-    unplaced.forEach((c, i) => {
-      const emptyTarget = frames.find((f) => f.img === c.img && !filled.has(f.id));
-      const stackTarget = emptyTarget ?? frames.find((f) => f.img === c.img && filled.get(f.id) !== c.id);
-      const target = stackTarget;
-      const isDup = !emptyTarget && !!stackTarget;
-      if (!target) return;
-      window.setTimeout(() => {
-        // pin card so it survives branch closing during tween
-        setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
-        const sx0 = c.cardX, sy0 = c.cardY;
-        const ex = target.sx - pan.x, ey = target.sy - pan.y;
-        let lastBub = 0;
-        tween(460, (t) => {
-          const e2 = 1 - Math.pow(1 - t, 3);
-          const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
-          setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: gx, y: gy }); return x; });
-          if (t - lastBub > 0.03 && t < 0.95) {
-            lastBub = t;
-            const bid = bubbleSeq.current++;
-            setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
-            window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
-          }
-        }, () => {
-          if (isDup) {
-            // duplicate: stack on top of the filled frame
-            setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
-          } else {
-            setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
-          }
-          setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
-          const pid = puffSeq.current++;
-          setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
-          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
-        });
-      }, i * 80);
+    // fully open: fold the deepest ring, leaving the first ring and any placed cards
+    const openIds = [...open].filter((id) => id !== "0");
+    if (!openIds.length) return; // back at the first ring, nothing more to fold
+    const deepest = openIds.filter((id) => {
+      const node = shown.find((n) => n._id === id);
+      if (!node || !node.children) return true;
+      return !(node.children as Node[]).some((k) => open.has(k._id)); // none of its children are open -> it is a deepest ring
     });
+    setOpen((prev) => { const s = new Set(prev); deepest.forEach((id) => s.delete(id)); return s; });
   };
 
   const doPack = (fx?: number, fy?: number, award: number = 400) => {
