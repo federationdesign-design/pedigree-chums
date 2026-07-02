@@ -445,7 +445,13 @@ export default function LineageMap({
       if (!kids) return;
       const cnt = kids.length;
       const spread = depth === 0 ? SPREAD1 : SPREADN;
-      const center = depth === 0 ? -Math.PI / 2 + base : n._dir;
+      let center = depth === 0 ? -Math.PI / 2 + base : n._dir;
+      // Single-child chains (e.g. Instructions steps) would go in a straight line.
+      // Alternate ±68° each level so the chain zigzags visibly instead.
+      if (cnt === 1 && depth > 0) {
+        const side = depth % 2 === 1 ? 1 : -1;
+        center = n._dir + side * (Math.PI * 0.38);
+      }
       const dist = depth === 0 ? RING1 : RSTEP;
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
