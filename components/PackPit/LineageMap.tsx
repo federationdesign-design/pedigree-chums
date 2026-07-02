@@ -927,7 +927,16 @@ export default function LineageMap({
           const RADIUS = IW * 0.1;
           const illoH = IH - FOOTER - BORDER * 2;
           const illoW = IW - BORDER * 2;
-          const caption = "DEAL 3–6 CHUMS EACH";
+          // Use the card's own label -- map breed name to the label shown in the pit
+          const INSTR_LABELS: Record<string, string> = {
+            "Deal the cards": "DEAL THE CARDS",
+            "Head outside": "HEAD OUTSIDE",
+            "Spot real dogs": "SPOT REAL DOGS",
+            "Match to your chum": "MATCH YOUR CHUM",
+            "Find more chums": "FIND MORE CHUMS",
+            "Most chums wins": "MOST CHUMS WINS",
+          };
+          const caption = INSTR_LABELS[breed.name] ?? breed.name.toUpperCase();
           const fs = Math.max(10, Math.round(FOOTER * 0.32));
           return (
             <>
