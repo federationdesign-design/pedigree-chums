@@ -127,7 +127,6 @@ export default function PackPit() {
     setShowHint(false);
     try { localStorage.setItem("pc-onboard-hint", "1"); } catch {}
   };
-  const [howToPlayCardPos, setHowToPlayCardPos] = useState<{ x: number; y: number; w: number; h: number; angle: number; image: string } | null>(null);
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
@@ -948,22 +947,19 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           const HTP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
           const stepIdx = HTP_NAMES.indexOf(hit.plugin.name);
           if (stepIdx !== -1) {
-            // Check all previous steps have been opened
-            const allBodiesNow = dyn();
-            const prevBlocked = HTP_NAMES.slice(0, stepIdx).some(prevName => {
-              const prevCard = allBodiesNow.find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.name === prevName && !b.plugin?.opened);
-              return !!prevCard;
-            });
-            if (prevBlocked) {
-              // Flash the number of the step they need to open first
-              const firstLocked = HTP_NAMES.findIndex(n => allBodiesNow.find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.name === n && !b.plugin?.opened));
-              numAt(hit.position.x, hit.position.y, firstLocked + 1, 22, false);
+            // If already zoomed, dismiss it
+            if (hit.plugin.zoomed) {
+              hit.plugin.zoomed = false;
+              hit.plugin.opened = true;
               return true;
             }
+            // Dismiss any other zoomed step card first
+            dyn().forEach((b: any) => { if (b.plugin?.kind === "stepcard" && b.plugin?.zoomed) b.plugin.zoomed = false; });
+            // Zoom this card in place -- no sequential lock, no separate overlay
+            hit.plugin.zoomed = true;
             hit.plugin.opened = true;
-            const r = render.canvas.getBoundingClientRect();
-            setHowToPlayCardPos({ x: r.left + hit.position.x, y: r.top + hit.position.y, w: hit.plugin.w || 120, h: hit.plugin.h || 120, angle: hit.angle || 0, image: hit.plugin.img?.src || "" });
-            setHowToPlayStep(stepIdx); setHowToPlay(true); return true;
+            numAt(hit.position.x, hit.position.y, 500);
+            return true;
           }
         }
         return false;
@@ -1002,6 +998,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const up = localPoint(e);
         // ignore drags: only a near-stationary click opens the lineage
         if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
+        // Dismiss zoomed step card on tap anywhere outside it
+        const anyZoomed = dyn().find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.zoomed);
+        if (anyZoomed) {
+          const hitZoomed = Query.point(dyn(), up).find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.zoomed);
+          if (!hitZoomed) { anyZoomed.plugin.zoomed = false; return; }
+        }
         if (tapButton(up)) return;
         openLineageAt(up);
       };
@@ -1016,6 +1018,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (!start || e.changedTouches.length !== 1) return;
         const up = touchLocal(e.changedTouches[0]);
         if (Math.hypot(up.x - start.x, up.y - start.y) > 10) return; // a drag, not a tap
+        // Dismiss zoomed step card on tap outside it (touch)
+        const anyZoomedT = dyn().find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.zoomed);
+        if (anyZoomedT) {
+          const hitZoomedT = Query.point(dyn(), up).find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.zoomed);
+          if (!hitZoomedT) { anyZoomedT.plugin.zoomed = false; e.preventDefault(); return; }
+        }
         if (tapButton(up)) { e.preventDefault(); return; }
         if (openLineageAt(up)) e.preventDefault(); // opened: stop the ghost click reaching the overlay
       };
@@ -1227,140 +1235,121 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               ctx.restore(); return;
             }
 
-            // Step card: draw yellow frame + illustration + footer caption
+            // Step card: draw in place, zoom to centre when tapped (like dog cards)
             if (b.plugin.kind === "stepcard") {
               // Advance cycle for step 5
               if (b.plugin.cycleImgs) {
-                const t = performance.now();
-                if (t > b.plugin.cycleAt) {
+                const now5 = performance.now();
+                if (now5 > b.plugin.cycleAt) {
                   b.plugin.cycleIdx = (b.plugin.cycleIdx + 1) % b.plugin.cycleImgs.length;
                   b.plugin.img = b.plugin.cycleImgs[b.plugin.cycleIdx];
-                  b.plugin.cycleAt = t + 3000;
+                  b.plugin.cycleAt = now5 + 3000;
                 }
               }
+
+              if (b.plugin.zoomed) {
+                // ── Zoomed state: draw large and centred on screen ──────────
+                ctx.restore(); // undo the per-body translate/rotate from drawBall caller
+                ctx.save();
+                const CX = render.canvas.width / 2, CY = render.canvas.height / 2;
+                const ZW = Math.min(render.canvas.width * 0.8, 480);
+                const ZH = ZW / (b.plugin.w / b.plugin.h);
+                const ZBORDER = Math.round(ZW * 0.03);
+                const ZFOOTER = Math.round(ZH * 0.14);
+                const ZRADIUS = ZW * 0.06;
+                ctx.translate(CX, CY);
+
+                // Drop shadow
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 40;
+                ctx.shadowOffsetY = 8;
+
+                // Card body
+                rrect(ctx, -ZW / 2, -ZH / 2, ZW, ZH, ZRADIUS);
+                ctx.fillStyle = "#ffed00"; ctx.fill();
+                ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+                // Image fills most of the card
+                const zIlloH = ZH - ZFOOTER - ZBORDER * 2;
+                const zIlloW = ZW - ZBORDER * 2;
+                if (img && img.complete && img.naturalWidth) {
+                  const iar = img.naturalWidth / img.naturalHeight, iar2 = zIlloW / zIlloH;
+                  const sw = iar > iar2 ? zIlloH * iar : zIlloW, sh = iar > iar2 ? zIlloH : zIlloW / iar;
+                  rrect(ctx, -ZW / 2 + ZBORDER, -ZH / 2 + ZBORDER, zIlloW, zIlloH, ZRADIUS * 0.7);
+                  ctx.save(); ctx.clip();
+                  ctx.drawImage(img, -ZW / 2 + ZBORDER - (sw - zIlloW) / 2, -ZH / 2 + ZBORDER - (sh - zIlloH) / 2, sw, sh);
+                  ctx.restore();
+                }
+
+                // Caption
+                ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                const zfs = Math.max(14, Math.round(ZFOOTER * 0.4));
+                ctx.font = `600 ${zfs}px "Luckiest Guy", system-ui, sans-serif`;
+                ctx.fillText(b.plugin.name || "", 0, ZH / 2 - ZFOOTER / 2);
+
+                // Numbered badge
+                const zbR = Math.max(18, ZW * 0.1);
+                ctx.beginPath(); ctx.arc(-ZW / 2 + zbR * 0.7, -ZH / 2 + zbR * 0.7, zbR, 0, Math.PI * 2);
+                ctx.fillStyle = "#1497d6"; ctx.fill();
+                ctx.lineWidth = 3; ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+                ctx.fillStyle = "#ffed00"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.font = `900 ${Math.round(zbR * 0.9)}px "Luckiest Guy", system-ui, sans-serif`;
+                ctx.fillText(String(b.plugin.seq || ""), -ZW / 2 + zbR * 0.7, -ZH / 2 + zbR * 0.7 + Math.round(zbR * 0.06));
+
+                // "Tap to close" hint
+                ctx.fillStyle = "rgba(255,255,255,0.55)";
+                ctx.font = `500 12px Montserrat, system-ui, sans-serif`;
+                ctx.fillText("Tap anywhere to close", 0, ZH / 2 + 22);
+
+                ctx.restore();
+                return;
+              }
+
+              // ── Normal (small) state ───────────────────────────────────────
               const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
-              // Work out if this card is locked (a lower-numbered card not yet opened)
-              // Outer border -- yellow always at rest, grey only on hover if locked
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
-              ctx.fillStyle = "#ffed00";
-              if (hovered) {
-                const HTP_ORDER = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
-                const scIdx = HTP_ORDER.indexOf(b.plugin.name);
-                const scLocked = scIdx > 0 && dyn().some((ob: any) => ob.plugin?.kind === "stepcard" && HTP_ORDER.indexOf(ob.plugin?.name) < scIdx && !ob.plugin?.opened);
-                if (scLocked) {
-                  ctx.fillStyle = "#888888";
-                } else if (!b.plugin.opened) {
-                  // Next card the player should open -- highlight green on hover
-                  ctx.fillStyle = "#3cb24a";
-                }
-              }
+              ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";
               ctx.fill();
-              // Inner illustration -- use natural image aspect ratio if available
-              const illoH = ph - FOOTER - BORDER * 2;
-              const illoW = pw - BORDER * 2;
-              // Slice (cover) -- fills illo area, no letterbox yellow
-              const imgAr = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1;
-              const illoAr = illoW / illoH;
-              const sliceW = imgAr > illoAr ? illoH * imgAr : illoW;
-              const sliceH = imgAr > illoAr ? illoH : illoW / imgAr;
-              const fitX = -pw / 2 + BORDER - (sliceW - illoW) / 2;
-              const fitY = -ph / 2 + BORDER - (sliceH - illoH) / 2;
-              rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
-              ctx.save(); ctx.clip();
-              ctx.drawImage(img, fitX, fitY, sliceW, sliceH);
-              ctx.restore();
-              // Footer caption text
+
+              // Image
+              const illoH = ph - FOOTER - BORDER * 2, illoW = pw - BORDER * 2;
+              if (img && img.complete && img.naturalWidth) {
+                const imgAr = img.naturalWidth / img.naturalHeight, illoAr = illoW / illoH;
+                const sliceW = imgAr > illoAr ? illoH * imgAr : illoW;
+                const sliceH = imgAr > illoAr ? illoH : illoW / imgAr;
+                rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
+                ctx.save(); ctx.clip();
+                ctx.drawImage(img, -pw / 2 + BORDER - (sliceW - illoW) / 2, -ph / 2 + BORDER - (sliceH - illoH) / 2, sliceW, sliceH);
+                ctx.restore();
+              }
+
+              // Caption
               const caption = b.plugin.name || "";
               const maxFontSize = Math.max(10, Math.round(FOOTER * 0.35));
-              ctx.fillStyle = "#0a3a57";
-              ctx.textAlign = "center"; ctx.textBaseline = "middle";
+              ctx.fillStyle = "#0a3a57"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
               ctx.font = `400 ${maxFontSize}px "Luckiest Guy", system-ui, sans-serif`;
               const maxTw = pw * 0.86, tw = ctx.measureText(caption).width;
               let fs = maxFontSize;
               if (tw > maxTw) { fs = Math.max(6, Math.floor(maxFontSize * maxTw / tw)); ctx.font = `400 ${fs}px "Luckiest Guy", system-ui, sans-serif`; }
-              // Wrap to 2 lines if needed
               const words = caption.split(" "); let line1 = "", line2 = "";
               for (const w2 of words) {
                 if (ctx.measureText(line1 + " " + w2).width < maxTw) line1 = (line1 ? line1 + " " : "") + w2;
                 else line2 = (line2 ? line2 + " " : "") + w2;
               }
               const footerY = ph / 2 - FOOTER / 2;
-              if (line2) {
-                ctx.fillText(line1, 0, footerY - fs * 0.6);
-                ctx.fillText(line2, 0, footerY + fs * 0.6);
-              } else {
-                ctx.fillText(line1, 0, footerY);
-              }
-              // Numbered badge -- top-left corner like the physical card
+              if (line2) { ctx.fillText(line1, 0, footerY - fs * 0.6); ctx.fillText(line2, 0, footerY + fs * 0.6); }
+              else ctx.fillText(line1, 0, footerY);
+
+              // Numbered badge (once, not three times)
               if (b.plugin.seq) {
-                const bR = Math.max(14, pw * 0.14);
-                const bx = -pw / 2 + bR * 0.6;
-                const by = -ph / 2 + bR * 0.6;
+                const bR = Math.max(14, pw * 0.14), bx = -pw / 2 + bR * 0.6, by = -ph / 2 + bR * 0.6;
                 ctx.beginPath(); ctx.arc(bx, by, bR, 0, Math.PI * 2);
                 ctx.fillStyle = "#1497d6"; ctx.fill();
-                ctx.lineWidth = Math.max(2, bR * 0.15);
-                ctx.strokeStyle = "#0a3a57"; ctx.stroke();
-                ctx.fillStyle = "#ffed00";
-                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.lineWidth = Math.max(2, bR * 0.15); ctx.strokeStyle = "#0a3a57"; ctx.stroke();
+                ctx.fillStyle = "#ffed00"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 const bfs = Math.max(9, Math.round(bR * 0.85));
                 ctx.font = `900 ${bfs}px "Luckiest Guy", system-ui, sans-serif`;
                 ctx.fillText(String(b.plugin.seq), bx, by + bfs * 0.06);
-              }
-              // Numbered badge -- top-left corner like the physical card
-              if (b.plugin.seq) {
-                const bR = Math.max(14, pw * 0.14);
-                const bx = -pw / 2 + bR * 0.6;
-                const by = -ph / 2 + bR * 0.6;
-                ctx.beginPath(); ctx.arc(bx, by, bR, 0, Math.PI * 2);
-                ctx.fillStyle = "#1497d6"; ctx.fill();
-                ctx.lineWidth = Math.max(2, bR * 0.15);
-                ctx.strokeStyle = "#0a3a57"; ctx.stroke();
-                ctx.fillStyle = "#ffed00";
-                ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                const bfs = Math.max(9, Math.round(bR * 0.85));
-                ctx.font = `900 ${bfs}px "Luckiest Guy", system-ui, sans-serif`;
-                ctx.fillText(String(b.plugin.seq), bx, by + bfs * 0.06);
-              }
-              // Numbered badge -- top-left corner like the physical card
-              if (b.plugin.seq) {
-                const bR = Math.max(14, pw * 0.14);
-                const bx = -pw / 2 + bR * 0.6;
-                const by = -ph / 2 + bR * 0.6;
-                ctx.beginPath(); ctx.arc(bx, by, bR, 0, Math.PI * 2);
-                ctx.fillStyle = "#1497d6"; ctx.fill();
-                ctx.lineWidth = Math.max(2, bR * 0.15);
-                ctx.strokeStyle = "#0a3a57"; ctx.stroke();
-                ctx.fillStyle = "#ffed00";
-                ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                const bfs = Math.max(9, Math.round(bR * 0.85));
-                ctx.font = `900 ${bfs}px "Luckiest Guy", system-ui, sans-serif`;
-                ctx.fillText(String(b.plugin.seq), bx, by + bfs * 0.06);
-              }
-              // Hover state
-              if (hovered) {
-                const HTP_NAMES_H = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
-                const sIdx = HTP_NAMES_H.indexOf(b.plugin.name);
-                if (sIdx !== -1) {
-                  // Check if this card is locked (previous not opened)
-                  const isLocked = sIdx > 0 && !b.plugin.opened;
-                  const iloMidY = -ph / 2 + BORDER + illoH / 2;
-                  if (isLocked) {
-                    // Dark navy overlay + greyscale filter on image
-                    ctx.save();
-                    ctx.globalCompositeOperation = "multiply";
-                    ctx.fillStyle = "rgba(10,30,60,0.7)";
-                    rrect(ctx, -pw / 2 + BORDER, -ph / 2 + BORDER, illoW, illoH, RADIUS * 0.7);
-                    ctx.fill();
-                    ctx.restore();
-                  }
-                  // Number centred in image -- yellow if unlocked, white if locked
-                  const numSize = Math.round(Math.max(illoH, illoW) * 0.5);
-                  ctx.font = `400 ${numSize}px "Luckiest Guy", system-ui, sans-serif`;
-                  ctx.fillStyle = isLocked ? "rgba(255,255,255,0.9)" : "#ffed00";
-                  ctx.textAlign = "center";
-                  ctx.textBaseline = "middle";
-                  ctx.fillText(String(sIdx + 1), 0, iloMidY);
-                }
               }
               ctx.restore(); return;
             }
@@ -1875,7 +1864,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
         const hov = pointer ? (Query.point(bodies, pointer).find((b: any) => !b.plugin?.logo) ?? null) : null;
         if (hov !== hoverBody) { hoverBody = hov; hoverStart = now; }
-        const spotlight = hoverBody && hoverBody.plugin.family;
+        const zoomedCard = bodies.find((b: any) => b.plugin?.kind === "stepcard" && b.plugin?.zoomed);
+        const spotlight = (hoverBody && hoverBody.plugin.family) || !!zoomedCard;
         // ease the dim toward its target rather than snapping, so sweeping across
         // a shaken pack never flashes
         const dimTarget = spotlight ? DIM_MIN : 1;
@@ -2530,16 +2520,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       window.addEventListener("pc:close-howtoplay", onHowToPlayClose);
       // poof the specific HTP step card when the user closes the lightbox after viewing it
       const HTP_STEP_NAMES = ["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"];
-      const onHtpStepViewed = (ev: any) => {
-        const idx = ev?.detail?.stepIdx;
-        if (idx == null) return;
-        const name = HTP_STEP_NAMES[idx];
-        if (!name) return;
-        const all = Composite.allBodies(engine.world);
-        const card = all.find((b: any) => b.plugin?.prop === "logopiece" && b.plugin?.name === name);
-        if (card) { poof(card.position.x, card.position.y, card.plugin.half || 30); Composite.remove(engine.world, card); }
-      };
-      window.addEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
+      // onHtpStepViewed removed -- step cards now zoom in place rather than launching StepMap
       const onOfferSuccess = () => {
         const reserve = Composite.allBodies(engine.world).find((b: any) => b.plugin?.kind === "reserve");
         if (reserve) { const ov = preorderReward(score) * 4; numAt(reserve.position.x, reserve.position.y, ov); poof(reserve.position.x, reserve.position.y, reserve.plugin.half || 20); Composite.remove(engine.world, reserve); }
@@ -2790,7 +2771,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         render.canvas.removeEventListener("mousedown", onDown);
         window.removeEventListener("mouseup", releaseHeldPct);
         window.removeEventListener("pc:howtoplay-drop", onHowToPlayDrop as EventListener);
-        window.removeEventListener("pc:howtoplay-step-viewed", onHtpStepViewed as EventListener);
         window.removeEventListener("pc:britain-dismiss", onBritainDismiss);
         Events.off(engine.world, "afterAdd", onAfterAdd);
         Events.off(engine, "afterUpdate", onAfterUpdateGO);
@@ -2824,7 +2804,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
   return (
     <section
-      className={`${styles.stage}${activeBreed || (howToPlay && howToPlayStep !== null) ? " " + styles.dimmed : ""}`}
+      className={`${styles.stage}${activeBreed || howToPlay ? " " + styles.dimmed : ""}`}
       ref={stageRef}
       aria-label="The Pack Pit: tip out all the chums and play"
     >
@@ -2848,7 +2828,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       </button>
 
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
-      <HowToPlay open={howToPlay} activeStep={howToPlayStep} cardPos={howToPlayCardPos} onClose={() => { setHowToPlay(false); setHowToPlayStep(null); setHowToPlayCardPos(null); }} />
+      <HowToPlay open={howToPlay} onClose={() => { setHowToPlay(false); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
           {Array.from({ length: 30 }).map((_, i) => {
