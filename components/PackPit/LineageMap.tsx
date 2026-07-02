@@ -975,7 +975,7 @@ export default function LineageMap({
         )}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Learn button -- blue -- auto-reveals tree ring by ring (was mislabelled, called doPack) */}
-        {!packed && !collecting && !removing ? (
+        {!packed && !collecting && !removing && !(breed.name === "Instructions" && framesDone) ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
