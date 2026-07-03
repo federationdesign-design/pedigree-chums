@@ -469,6 +469,7 @@ export default function LineageMap({
   // otherwise close the overlay or select a circle.
   const onPanDown = (e: React.PointerEvent) => {
     if (packed) return; // Done state: the grid is fixed, only the main card moves
+    if (canDragRoot) return; // all frames filled: only root card drag moves the tree
     suppressClick.current = false;
     setInfoHover(null); // a tap on empty space dismisses any open info label
     drag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
