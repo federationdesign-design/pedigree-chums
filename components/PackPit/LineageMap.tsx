@@ -253,8 +253,6 @@ export default function LineageMap({
   const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
-  const [flipPhase, setFlipPhase] = useState<null | "closing" | "back" | "opening">(null); // SVG fake-flip idle attractor
-  const flipTimer = useRef<any>(null); // holds the 2min idle + loop timers
   const interacted = useRef(false);
   useEffect(() => {
     setAutoArmed(false); setPenalty(null);
@@ -267,27 +265,7 @@ export default function LineageMap({
     return () => clearTimeout(t);
   }, [breed.name]);
   // 2-minute idle flip attractor - loops until the user interacts
-  const startFlipLoop = () => {
-    if (flipTimer.current) clearTimeout(flipTimer.current);
-    setFlipPhase("closing");
-    flipTimer.current = setTimeout(() => {
-      setFlipPhase("back");
-      flipTimer.current = setTimeout(() => {
-        setFlipPhase("opening");
-        flipTimer.current = setTimeout(() => {
-          setFlipPhase(null);
-          // loop: flip again after 8s
-          flipTimer.current = setTimeout(startFlipLoop, 8000);
-        }, 260);
-      }, 3000);
-    }, 260);
-  };
-  useEffect(() => {
-    setFlipPhase(null);
-    if (flipTimer.current) clearTimeout(flipTimer.current);
-    flipTimer.current = setTimeout(startFlipLoop, 2000); // 2 seconds
-    return () => { if (flipTimer.current) clearTimeout(flipTimer.current); };
-  }, [breed.name]);
+
   const flashNum = (x: number, y: number, val: number, size: number) => {
     const id = (fxId.current += 1);
     setFlashes((f) => [...f, { id, x, y, val, size }]);
@@ -662,7 +640,7 @@ export default function LineageMap({
       });
       setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
       pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
-      interacted.current = true; setIdleHint(false); setFlipPhase(null); if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; }
+      interacted.current = true; setIdleHint(false);
       return;
     }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
@@ -871,16 +849,9 @@ export default function LineageMap({
           </>);
         })() : (<>
           <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={20} /></clipPath>
-          <g style={{ animation: flipPhase === "closing" ? `${styles.lmFlipClose} 0.26s ease-in forwards` : flipPhase === "opening" ? `${styles.lmFlipOpen} 0.26s ease-out forwards` : undefined }}>
-            {flipPhase === "back" || flipPhase === "opening" ? (
-              <><rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} fill="var(--yellow, #ffd23e)" /><image href="/double-tap-icon-blue.svg" x={-ROOT*0.72} y={-ROOT*0.82} width={ROOT*1.44} height={ROOT*1.44} /></>
-            ) : (
-              <><rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />{breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}</>
-            )}
-          </g>
+          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />
+          {breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
         </>)}
-        {/* double-tap hint: pulses on the card when idle and tree not yet opened */}
-
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
