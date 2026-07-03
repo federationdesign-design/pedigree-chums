@@ -24,25 +24,25 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Find your pack",
         note: "Dig out your Pedigree Chums deck.",
-        img: "/shuffle-icon.svg",
+        img: "/find-pack-icon.svg",
         value: 1,
         children: [
           {
             name: "Gather your players",
             note: "No limit on players. You can even go solo.",
-            img: "/deal-icon.svg",
+            img: "/friends-icon.svg",
             value: 2,
             children: [
               {
                 name: "Shuffle well",
                 note: "Give the deck a good shuffle.",
-                img: "/friends-icon.svg",
+                img: "/shuffle-icon.svg",
                 value: 3,
                 children: [
                   {
                     name: "Deal 3 to 6 cards",
                     note: "Hand out 3 to 6 cards each. Show your hand to the other players, then hide it.",
-                    img: "/find-pack-icon.svg",
+                    img: "/deal-icon.svg",
                     value: 4,
                   },
                 ],
