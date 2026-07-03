@@ -608,11 +608,14 @@ export default function LineageMap({
   const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing;
   const autoCollect = () => {
     setOpen(() => { const s = new Set<string>(["0"]); allNodes.forEach((n) => { if (n.hasKids) s.add(n.id); }); return s; });
-    setSeen(() => new Set(allNodes.map((n) => n.id)));
-    setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; }); // everything auto reveals (bar what was opened by hand) hides its leaf name
+    setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; });
     const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
-    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); }); // pop the cards in one by one, a ripple down the tree
-    allNodes.forEach((n) => scoredRef.current.add(n.id)); // counted now, so a later tap scores nothing
+    // Ripple: each node turns blue and its card pops at the same moment
+    allNodes.forEach((n, i) => {
+      window.setTimeout(() => setSeen((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45);
+    });
+    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); });
+    allNodes.forEach((n) => scoredRef.current.add(n.id));
     onScore?.(-2500); // the shortcut costs 2500
     const pk = (fxId.current += 1);
     setPenalty(pk);
