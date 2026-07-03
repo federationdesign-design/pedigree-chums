@@ -1146,6 +1146,7 @@ export default function LineageMap({
             {pickCards.map((c) => { /* stable card order: the zoom is a separate overlay, so no reordering (which used to remount + re-wobble every card) */
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               if (stackedIds.has(c.id)) return null; // absorbed into a frame's stack
+              if (cardFrame.has(c.id) && !collectRef.current) return null; // placed cards rendered as fixed HTML outside SVG
               const clipId = `lm-pick-${c.id}`;
               const packScale = 1; // the zoom is now a draggable overlay, not an in-place scale /* zoom-overlay */
               const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
@@ -1155,10 +1156,11 @@ export default function LineageMap({
                   key={`pick-${c.id}`}
                   className={(placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? styles.rootHit : `${styles.rootHit} ${styles.grab}`} /* zoom-cursor: fixed images get the magnifier cursor, loose cards grab */
                   transform={(() => {
-                    const crx = c.cardX - CW / 2, cry = c.cardY - CW / 2; // top-left corner: the zoom pivot, so it grows down-right /* zoom-topleft */
-                    const zoom = `translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`; // identity when packScale === 1
-                    const underneath = packed && isDupImg(c.img) && !isTopOfStack(c); // a card with others on top of it
-                    const fan = underneath ? (((stackOrder.get(c.id) ?? 0) % 2) ? 1 : -1) * (2 + ((stackOrder.get(c.id) ?? 0) % 2)) : 0; // small alternating splay
+
+                    const crx = c.cardX - CW / 2, cry = c.cardY - CW / 2;
+                    const zoom = `translate(${crx},${cry}) scale(${packScale}) translate(${-crx},${-cry})`;
+                    const underneath = packed && isDupImg(c.img) && !isTopOfStack(c);
+                    const fan = underneath ? (((stackOrder.get(c.id) ?? 0) % 2) ? 1 : -1) * (2 + ((stackOrder.get(c.id) ?? 0) % 2)) : 0;
                     return cxf
                       ? `${cxf.transform} ${zoom}`
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
@@ -1476,6 +1478,62 @@ export default function LineageMap({
           </div>
         );
       })()}
+      {/* Placed cards rendered as position:fixed HTML -- completely immune to SVG pan */}
+      {pickCards.filter((c) => cardFrame.has(c.id) && !collectRef.current && !stackedIds.has(c.id)).map((c) => {
+        const ff2 = cardFrame.get(c.id)!;
+        const left = ff2.sx - CW / 2;
+        const top = ff2.sy - CW / 2;
+        return (
+          <div
+            key={`placed-${c.id}`}
+            style={{
+              position: "fixed", left, top, width: CW, height: CW,
+              borderRadius: 15, overflow: "hidden",
+              transform: `rotate(${cardDeg}deg)`,
+              transformOrigin: "center",
+              pointerEvents: "all",
+              cursor: !PACK_BREEDS.has(c.name) ? "zoom-in" : "default",
+              zIndex: 62,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+            }}
+            onClick={(e) => { e.stopPropagation(); }}
+            onPointerDown={(e) => { e.stopPropagation(); if (isMobile) startGridDrag(e); }}
+            onPointerMove={(e) => { if (isMobile) moveGridDrag(e); }}
+            onPointerUp={(e) => { if (isMobile) endGridDrag(e); }}
+          >
+            <img
+              src={encodeURI(bust(c.img))}
+              alt={c.name}
+              draggable={false}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+            {/* magnify icon bottom-left */}
+            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
+              <button
+                style={{ position: "absolute", left: 4, bottom: 4, width: 28, height: 28, border: "none", borderRadius: 8, background: "rgba(10,58,87,0.75)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                onClick={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+              </button>
+            )}
+            {/* % pill bottom-right */}
+            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+              const pillMix = breedMix.get(c.img)?.norm ?? c.mix;
+              const pillTxt = pillMix < 1 ? "<1%*" : `${Math.round(pillMix)}%${c.share !== pillMix ? "*" : ""}`;
+              return (
+                <div
+                  onClick={(e) => { e.stopPropagation(); setPctHover((h) => h === c.id ? null : c.id); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  style={{ position: "absolute", right: 2, bottom: 4, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui" }}
+                >
+                  {pillTxt}
+                </div>
+              );
+            })()}
+          </div>
+        );
+      })}
       {zoomedId && (() => {
         const c = pickCards.find((x) => x.id === zoomedId);
         if (!c) return null;
