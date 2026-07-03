@@ -764,6 +764,12 @@ export default function LineageMap({
 
   const startRemove = () => {
     if (removing) return;
+    // Instructions cards: just close the overlay, no collect animation
+    if (INSTR_NAMES.has(breed.name)) {
+      onRemove?.(breed.name);
+      window.setTimeout(() => onClose(), 200);
+      return;
+    }
     // snapshot where every visible card is right now, plus a tumble spin for each,
     // so they can all fall into the bottom-right corner like the main square card
     const cards = new Map<string, { x: number; y: number; spin: number }>();
@@ -901,7 +907,7 @@ export default function LineageMap({
               <g className={removing ? styles.chumTopDown : styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
-                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>Collect</text>
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>{INSTR_NAMES.has(breed.name) ? "Complete" : "Collect"}</text>
               </g>
             </g>
           </g>
