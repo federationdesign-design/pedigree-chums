@@ -1338,7 +1338,8 @@ export default function LineageMap({
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
-                    const wasAdjusted = c.share !== c.mix; // adjusted cards get a * in the pill
+                    const pillMix = breedMix.get(c.img)?.norm ?? c.mix; // use fully normalised figure from breedMix
+                    const wasAdjusted = c.share !== pillMix; // adjusted cards get a * in the pill
                     return (
                       <g
                         style={{ cursor: "pointer" }}
@@ -1348,7 +1349,7 @@ export default function LineageMap({
                         <rect x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
-                          {(c.mix < 1 ? "<1%" : `${rolledMix(c.id, c.mix)}%`) + (wasAdjusted ? "*" : "")}
+                          {(pillMix < 1 ? "<1%" : `${rolledMix(c.id, pillMix)}%`) + (wasAdjusted ? "*" : "")}
                         </text>
                       </g>
                     );

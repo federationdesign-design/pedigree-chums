@@ -117,16 +117,7 @@ export default function PackPit() {
   const [gameOver, setGameOver] = useState(false);
   // true only when the game-over trigger fired because all 54 were collected
   // (rather than the pit filling up) -- passed to GameOver for the celebration variant
-  const [showHint, setShowHint] = useState(false);
-  useEffect(() => {
-    try { if (localStorage.getItem("pc-onboard-hint")) return; } catch {}
-    const t = window.setTimeout(() => setShowHint(true), 8000);
-    return () => window.clearTimeout(t);
-  }, []);
-  const dismissHint = () => {
-    setShowHint(false);
-    try { localStorage.setItem("pc-onboard-hint", "1"); } catch {}
-  };
+
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
     const open = () => setHowToPlay(true);
@@ -1011,8 +1002,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         return true;
       };
       const onClick = (e: MouseEvent) => {
-        setShowHint(false);
-        try { localStorage.setItem("pc-onboard-hint", "1"); } catch {}
         const up = localPoint(e);
         // ignore drags: only a near-stationary click opens the lineage
         if (downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) > 6) return;
@@ -3114,57 +3103,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           </div>
         );
       })()}
-      {showHint && (() => {
-        // Find first dog card screen position
-        let cardX = window.innerWidth * 0.2;
-        let cardY = window.innerHeight * 0.6;
-        try {
-          const eng = engineRef.current;
-          const ren = renderRef.current;
-          if (eng && ren) {
-            const rect = ren.canvas.getBoundingClientRect();
-            const dog = ((eng.world as any).bodies as any[]).filter((b:any)=>!b.isStatic).find((b: any) =>
-              b.plugin && !b.plugin.prop && !b.plugin.logo && !b.plugin.kind && b.plugin.half > 20 && !b.plugin.pop
-            );
-            if (dog) {
-              cardX = rect.left + dog.position.x;
-              cardY = rect.top + dog.position.y;
-            }
-          }
-        } catch {}
-        // Hand sits just below-left of card, bubble above hand
-        const handX = Math.max(20, cardX - 20);
-        const handY = Math.max(100, cardY + 20);
-        const bubbleX = Math.max(10, handX - 60);
-        const bubbleY = Math.max(10, handY - 100);
-        return (
-          <div onClick={dismissHint} style={{ position: "fixed", inset: 0, zIndex: 999, pointerEvents: "all" }}>
-            <div style={{
-              position: "fixed", left: bubbleX, top: bubbleY,
-              background: "#0a3a57", color: "#ffffff",
-              borderRadius: 12, padding: "10px 14px", maxWidth: 200,
-              fontFamily: "'Luckiest Guy', system-ui",
-              fontSize: "clamp(13px, 1.8vw, 16px)", lineHeight: 1.4,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.4)", pointerEvents: "none",
-            }}>
-              Tap a dog to explore its family tree!
-              <div style={{
-                position: "absolute", bottom: -10, left: 24, width: 0, height: 0,
-                borderLeft: "10px solid transparent", borderRight: "10px solid transparent",
-                borderTop: "10px solid #0a3a57",
-              }} />
-            </div>
-            <div style={{
-              position: "fixed", left: handX, top: handY,
-              fontSize: "clamp(36px, 6vw, 52px)",
-              transform: "rotate(20deg)",
-              animation: "pcHandHint 1.8s ease-in-out infinite",
-              pointerEvents: "none",
-            }}>👆</div>
-            <style>{`@keyframes pcHandHint { 0%,100%{transform:rotate(20deg) translateY(0)} 50%{transform:rotate(20deg) translateY(-14px)} }`}</style>
-          </div>
-        );
-      })()}
+
       {gameOver && <GameOver
         chums={collected}
         score={score}
