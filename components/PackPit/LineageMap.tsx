@@ -811,7 +811,7 @@ export default function LineageMap({
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => {
-    const rx = rootPos ? rootPos.x : cx, ry = rootPos ? rootPos.y : cy; // peels off and drags, but only after the grid is full
+    const rx = cx, ry = cy; // root card stays in SVG content space; pan moves the whole tree including it
     const baseDeg = (cardLean * 180) / Math.PI;
     const rootXf = collecting && collectRef.current
       ? collectXf(rx, ry, collectRef.current.rootSpin, baseDeg)
@@ -830,16 +830,13 @@ export default function LineageMap({
           e.stopPropagation();
           try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
           // store both root start and pan start so we can update both in sync
-          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: rx, oy: ry, moved: false, px: pan.x, py: pan.y } as any;
+          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: pan.x, oy: pan.y, moved: false };
         }}
         onPointerMove={(e) => {
-          const d = rootDrag.current as any; if (!d || e.pointerId !== d.id) return;
+          const d = rootDrag.current; if (!d || e.pointerId !== d.id) return;
           const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
           if (!d.moved && Math.hypot(dx, dy) > 3) d.moved = true;
-          if (d.moved) {
-            setRootPos({ x: d.ox + dx, y: d.oy + dy });
-            setPan({ x: d.px + dx, y: d.py + dy });
-          }
+          if (d.moved) setPan({ x: d.ox + dx, y: d.oy + dy });
         }}
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
@@ -1036,10 +1033,10 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={n.img && placedImgs.has(n.img as string) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={(n.img && (placedImgs.has(n.img as string) || packed)) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                       fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
-                      style={(n.img && placedImgs.has(n.img as string)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
+                      style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
