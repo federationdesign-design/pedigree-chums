@@ -649,17 +649,20 @@ export default function PackPit() {
         const pairOrder = [...BREEDS.keys()].sort(() => Math.random() - 0.5);
 
 
-        waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 4000));
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 14000));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 5000));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(howPanel, w, "right")); }, 4500));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makePanel(enterPanel, w, "left")); }, 6500));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeArrow(w)); }, 8000));
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 30000));
+        waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                              // 700   tennis balls
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));             // 1050  cookies
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 1750 discount
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); } }, 2750));        // 2750 pair 1
+        waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone, slipper]); }, 6400));                                                       // 6400 bone + slipper
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000));                                      // 9000 hamburger menu
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); } }, 10050));           // 10050 pair 4
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 70000));                                  // 70000 bowl
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
             const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -697,59 +700,8 @@ export default function PackPit() {
       }
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
-      const LOCKED_CAT = 0x0004; // bowl + fused bone, once locked, excluded from drag
-      // --- Fuse magnetism (Phase 2) ---------------------------------------
-      // Once the logo has been knocked loose, dragging it near a bone (or a bone
-      // near it) makes the two drift together. Symmetrical shapes, so position
-      // only. Gentle pull you can still fight; tune with the dials below.
-      const FUSE_MAGNET_RADIUS = 40; // px, centre-to-centre, when the pull starts
-      const FUSE_SNAP_DIST = 12;       // px, centre-to-centre, when they snap and fuse
-      const FUSE_PULL = 0.00005;       // pull strength (force per px of closeness)
-      const isBone = (b: any) => b?.plugin?.prop === "bone";
-      const nearestBone = (to: any) => {
-        let best: any = null, bestD = Infinity;
-        for (const b of Composite.allBodies(engine.world)) {
-          if (!isBone(b)) continue;
-          const dx = b.position.x - to.position.x, dy = b.position.y - to.position.y, d = Math.hypot(dx, dy);
-          if (d < bestD) { bestD = d; best = b; }
-        }
-        return best;
-      };
-      const onFuseMagnet = () => {
-        if (!logoBody || logoBody.isStatic) return; // only once the logo has fallen loose
-        const held = mc.body;
-        if (!held) return;
-        let logo: any = null, bone: any = null;
-        if (held === logoBody) { logo = logoBody; bone = nearestBone(logoBody); }
-        else if (isBone(held)) { logo = logoBody; bone = held; }
-        if (!logo || !bone) return;
-        // pull the OTHER (non-dragged) piece toward the dragged one
-        const other = held === logoBody ? bone : logo;
-        const tx = held.position.x - other.position.x, ty = held.position.y - other.position.y;
-        const dist = Math.hypot(tx, ty);
-        if (dist > FUSE_MAGNET_RADIUS || dist < 1) return;
-        const closeness = (FUSE_MAGNET_RADIUS - dist); // stronger as they near
-        const f = FUSE_PULL * closeness;
-        Body.applyForce(other, other.position, { x: (tx / dist) * f * other.mass, y: (ty / dist) * f * other.mass });
-        // close enough? snap, goo, fuse.
-        if (!fused && dist <= FUSE_SNAP_DIST) {
-          fused = true;
-          const jx = logo.position.x, jy = logo.position.y; // join point = logo centre
-          Body.setPosition(bone, { x: jx, y: jy });          // snap bone onto the logo
-          Body.setVelocity(bone, { x: 0, y: 0 });
-          Body.setAngularVelocity(bone, 0);
-          // gooey join: a clutch of soft blobs that swell then fade over the join
-          const t0 = performance.now();
-          const R = Math.max(logo.plugin?.half || 60, bone.plugin?.half || 60);
-          for (let i = 0; i < 9; i++) {
-            const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
-            gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
-          }
-          numAt(jx, jy, 2000); // the payoff pops out of the goo and scores
-          Composite.remove(engine.world, logoBody); // the logo vanishes under the goo
-          logoBody = null;
-        }
-      };
+      const LOCKED_CAT = 0x0004; // reserved category (unused since fuse mechanic removed)
+      const onFuseMagnet = () => {}; // fuse mechanic abandoned
       // pill magnet: each breed name pill gently attracts its matching dog card
       const PILL_MAGNET_RADIUS = 200;
       const PILL_PULL = 0.00008;
@@ -797,7 +749,6 @@ export default function PackPit() {
           numAt(pill.position.x, pill.position.y, 50); // small bonus for the match
         }
       });
-      Events.on(engine, "beforeUpdate", onFuseMagnet);
       // --------------------------------------------------------------------
       mc.collisionFilter.mask = 0xffffffff & ~0x0002 & ~LOCKED_CAT; // inert circles and locked bowl/bone cannot be grabbed
       let pressedBomb: any = null; // the bomb currently being pressed/held, for the click-vs-hold fuse
@@ -1556,7 +1507,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       // a quick pink starburst, fired only when a circle is pressed while still active
       const bursts: any[] = [];
       const gooBlobs: any[] = []; // soft white blobs for the gooey logo+bone fuse
-      let fused = false;          // the logo+bone fuse fires once
+      let fused = true;           // fuse mechanic abandoned - always treated as already fused
       // arrow-autofuse: when the logo and a LANDED bone come within 500px, a yellow
       // arrow pops out between them and super-magnetism eases the pair together to
       // fuse, then the arrow pops away. Automatic, no dragging. Separate from the
@@ -1647,7 +1598,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           if (gone) { Composite.remove(engine.world, arrowBody); arrowBody = null; }
         }
       };
-      Events.on(engine, "beforeUpdate", onArrowFuse);
+      // Events.on(engine, "beforeUpdate", onArrowFuse); // fuse mechanic abandoned
       const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
       // An explosion is three starbursts at once, red then yellow then white, each
       // turned 11 degrees further than the last, so a detonation reads far harder
