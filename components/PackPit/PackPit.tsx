@@ -629,15 +629,6 @@ export default function PackPit() {
       let waveTimers: any[] = [];
       let buzzTimer: any = null;
       const dropped = new Set<number>(); // every breed index ever spawned, including collected ones --
-      // Pick one name randomly from a pair (alternates each load)
-      const pickName = (a: string, b: string) => Math.random() < 0.5 ? a : b;
-      // Drop a specific named breed card, mark it as dropped
-      const dropCardNamed = (name: string, droppedSet: Set<number>) => {
-        const idx = BREEDS.findIndex((b: any) => b.name === name);
-        if (idx === -1 || droppedSet.has(idx)) return;
-        droppedSet.add(idx);
-        Composite.add(engine.world, makeBall(BREEDS[idx], idx, w));
-      };
                                           // shared between dropAll's pair-drop and the refill check below
       function dropAll() {
         const ex = dyn();
@@ -645,6 +636,15 @@ export default function PackPit() {
         if (dropTimer) clearInterval(dropTimer);
         waveTimers.forEach(clearTimeout); waveTimers = [];
         const w = stage.clientWidth;
+        // Pick one name randomly from a pair (alternates each load)
+        const pickName = (a: string, b: string) => Math.random() < 0.5 ? a : b;
+        // Drop a specific named breed card, mark it as dropped
+        const dropCardNamed = (name: string, droppedSet: Set<number>) => {
+          const idx = BREEDS.findIndex((br: any) => br.name === name);
+          if (idx === -1 || droppedSet.has(idx)) return;
+          droppedSet.add(idx);
+          Composite.add(engine.world, makeBall(BREEDS[idx], idx, w));
+        };
         const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
         // tennis balls only; the pre-order button now drops on its own beat (desktop)
         const dropBalls = () => {
