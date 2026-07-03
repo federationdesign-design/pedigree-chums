@@ -710,9 +710,51 @@ export default function PackPit() {
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
       const LOCKED_CAT = 0x0004; // reserved category (unused since fuse mechanic removed)
-      const onFuseMagnet = () => {}; // fuse mechanic abandoned
-      const nearestBone = (_to: any) => null as any; // fuse mechanic abandoned
-      const FUSE_SNAP_DIST = 0; // fuse mechanic abandoned
+      const FUSE_MAGNET_RADIUS = 40;
+      const FUSE_SNAP_DIST = 12;
+      const FUSE_PULL = 0.00005;
+      const isBone = (b: any) => b?.plugin?.prop === "bone";
+      const nearestBone = (to: any) => {
+        let best: any = null, bestD = Infinity;
+        for (const b of Composite.allBodies(engine.world)) {
+          if (!isBone(b)) continue;
+          const dx = b.position.x - to.position.x, dy = b.position.y - to.position.y, d = Math.hypot(dx, dy);
+          if (d < bestD) { bestD = d; best = b; }
+        }
+        return best;
+      };
+      const onFuseMagnet = () => {
+        if (!logoBody || logoBody.isStatic) return;
+        const held = mc.body;
+        if (!held) return;
+        let logo: any = null, bone: any = null;
+        if (held === logoBody) { logo = logoBody; bone = nearestBone(logoBody); }
+        else if (isBone(held)) { logo = logoBody; bone = held; }
+        if (!logo || !bone) return;
+        const other = held === logoBody ? bone : logo;
+        const tx = held.position.x - other.position.x, ty = held.position.y - other.position.y;
+        const dist = Math.hypot(tx, ty);
+        if (dist > FUSE_MAGNET_RADIUS || dist < 1) return;
+        const closeness = (FUSE_MAGNET_RADIUS - dist);
+        const f = FUSE_PULL * closeness;
+        Body.applyForce(other, other.position, { x: (tx / dist) * f * other.mass, y: (ty / dist) * f * other.mass });
+        if (!fused && dist <= FUSE_SNAP_DIST) {
+          fused = true;
+          const jx = logo.position.x, jy = logo.position.y;
+          Body.setPosition(bone, { x: jx, y: jy });
+          Body.setVelocity(bone, { x: 0, y: 0 });
+          Body.setAngularVelocity(bone, 0);
+          const t0 = performance.now();
+          const R = Math.max(logo.plugin?.half || 60, bone.plugin?.half || 60);
+          for (let i = 0; i < 9; i++) {
+            const a = (i / 9) * Math.PI * 2, r = (i === 0 ? 0 : R * (0.25 + Math.random() * 0.5));
+            gooBlobs.push({ x: jx + Math.cos(a) * r, y: jy + Math.sin(a) * r, s: R * (0.5 + Math.random() * 0.5), born: t0 + i * 12, life: 620 });
+          }
+          numAt(jx, jy, 2000);
+          Composite.remove(engine.world, logoBody);
+          logoBody = null;
+        }
+      };
       // pill magnet: each breed name pill gently attracts its matching dog card
       const PILL_MAGNET_RADIUS = 200;
       const PILL_PULL = 0.00008;
@@ -1518,7 +1560,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       // a quick pink starburst, fired only when a circle is pressed while still active
       const bursts: any[] = [];
       const gooBlobs: any[] = []; // soft white blobs for the gooey logo+bone fuse
-      let fused = true;           // fuse mechanic abandoned - always treated as already fused
+      let fused = false;          // the logo+bone fuse fires once
       // arrow-autofuse: when the logo and a LANDED bone come within 500px, a yellow
       // arrow pops out between them and super-magnetism eases the pair together to
       // fuse, then the arrow pops away. Automatic, no dragging. Separate from the
@@ -1609,7 +1651,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           if (gone) { Composite.remove(engine.world, arrowBody); arrowBody = null; }
         }
       };
-      // Events.on(engine, "beforeUpdate", onArrowFuse); // fuse mechanic abandoned
+      Events.on(engine, "beforeUpdate", onFuseMagnet);
+      // Events.on(engine, "beforeUpdate", onArrowFuse); // auto-fuse arrow disabled
       const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
       // An explosion is three starbursts at once, red then yellow then white, each
       // turned 11 degrees further than the last, so a detonation reads far harder
