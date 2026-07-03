@@ -530,8 +530,6 @@ export default function LineageMap({
   const cardFrame = new Map<string, { sx: number; sy: number }>();
   filled.forEach((cardId, frameId) => { const f = frames.find((x) => x.id === frameId); if (f) cardFrame.set(cardId, { sx: f.sx, sy: f.sy }); });
   const placedSet = new Set(filled.values()); // cards sitting in a frame: fixed, not draggable
-  // images that have been successfully placed in a frame -- used to turn nodes green
-  const placedImgs = new Set(pickCards.filter((c) => placedSet.has(c.id)).map((c) => c.img));
   const stackedIds = new Set<string>();
   stacked.forEach((ids) => ids.forEach((id) => stackedIds.add(id))); // duplicate cards absorbed into a stack, hidden as loose cards
   const isDupImg = (img: string) => (dupTotal.get(img) ?? 0) > 1; // breed appears more than once: its frame is a stack target
@@ -569,6 +567,8 @@ export default function LineageMap({
       return { id, img, name, note, share, mix, status, cardX, cardY };
     })
     .filter((c) => c.img);
+  // images successfully placed in a frame -- turns their node green
+  const placedImgs = new Set(pickCards.filter((c) => placedSet.has(c.id)).map((c) => c.img));
   // Duplicate cards of one breed stack at the same spot; only the top of each
   // stack (the last in order) shows its status dot, % pill and info icon.
   const topByImg = new Map<string, string>();
@@ -1170,7 +1170,7 @@ export default function LineageMap({
 
                   onClick={(e) => {
                     e.stopPropagation();
-                    if ((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name)) setZoomedId((z) => (z === c.id ? null : c.id)); // click still toggles zoom
+                    // zoom only via magnifying glass icon, not direct click
                   }}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
