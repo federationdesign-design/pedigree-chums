@@ -641,7 +641,7 @@ export default function LineageMap({
           }
         });
       });
-      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
+      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; }); // opened node turns blue; newly-revealed children stay yellow until tapped
       pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
       interacted.current = true; setIdleHint(false);
       return;
