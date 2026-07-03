@@ -530,6 +530,8 @@ export default function LineageMap({
   const cardFrame = new Map<string, { sx: number; sy: number }>();
   filled.forEach((cardId, frameId) => { const f = frames.find((x) => x.id === frameId); if (f) cardFrame.set(cardId, { sx: f.sx, sy: f.sy }); });
   const placedSet = new Set(filled.values()); // cards sitting in a frame: fixed, not draggable
+  // images that have been successfully placed in a frame -- used to turn nodes green
+  const placedImgs = new Set(pickCards.filter((c) => placedSet.has(c.id)).map((c) => c.img));
   const stackedIds = new Set<string>();
   stacked.forEach((ids) => ids.forEach((id) => stackedIds.add(id))); // duplicate cards absorbed into a stack, hidden as loose cards
   const isDupImg = (img: string) => (dupTotal.get(img) ?? 0) > 1; // breed appears more than once: its frame is a stack target
@@ -1030,10 +1032,10 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={n.img && placedImgs.has(n.img as string) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                       fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
-                      style={seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
+                      style={(n.img && placedImgs.has(n.img as string)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) ? (() => {
