@@ -638,7 +638,7 @@ export default function LineageMap({
           }
         });
       });
-      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; }); // opened node turns blue; its newly-revealed children stay yellow until tapped
+      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => (n.children as Node[]).forEach((k) => s.add(k._id))); return s; });
       pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
       interacted.current = true; setIdleHint(false);
       return;
@@ -818,7 +818,7 @@ export default function LineageMap({
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => { e.stopPropagation(); revealStep(); }}
+        onDoubleClick={(e) => { e.stopPropagation(); if (allBlue && !packed && !collecting) { burstAt(rx, ry, ROOT * 0.9); doPack(rx, ry, 500); } else { revealStep(); } }}
         onPointerDown={(e) => {
           if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
