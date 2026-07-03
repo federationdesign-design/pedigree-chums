@@ -826,13 +826,13 @@ export default function LineageMap({
           if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
           e.stopPropagation();
           try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
-          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: rx, oy: ry, moved: false };
+          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: pan.x, oy: pan.y, moved: false };
         }}
         onPointerMove={(e) => {
           const d = rootDrag.current; if (!d || e.pointerId !== d.id) return;
           const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
           if (!d.moved && Math.hypot(dx, dy) > 3) d.moved = true;
-          if (d.moved) setRootPos({ x: d.ox + dx, y: d.oy + dy });
+          if (d.moved) setPan({ x: d.ox + dx, y: d.oy + dy }); // move whole tree with card
         }}
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
