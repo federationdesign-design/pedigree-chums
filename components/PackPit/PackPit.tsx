@@ -2092,7 +2092,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       });
 
       // bone+bowl magnetism -- much weaker than bone+logo, only when bowl is upright
-      let bowlFused = false;
+      let bowlFused = true; // bowl+bone fuse abandoned
       const BOWL_MAGNET_RADIUS = 350;
       const BOWL_MAGNET_PULL = 0.000008; // ~6x weaker than bone+logo FUSE_PULL
       const BOWL_SNAP_DIST = 180;
