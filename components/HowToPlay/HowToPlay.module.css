@@ -84,27 +84,22 @@
 
 /* Step image scroll */
 .stepScroll {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 14px;
+  overflow-x: visible;
   overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
   margin: 0 0 clamp(20px, 3vw, 32px);
   padding: 0 clamp(16px, 3vw, 40px) 28px;
   width: 100%;
-  scrollbar-width: none;
 }
 .stepScroll::-webkit-scrollbar { display: none; }
 
 /* Step image with yellow frame */
 .stepCard {
   position: relative;
-  flex: 0 0 auto;
-  width: clamp(122px, 22.5vw, 188px);
+  width: 100%;
   border-radius: 14px;
-  scroll-snap-align: center;
   background: #ffed00;
   border: 6px solid #ffed00;
   box-shadow: 0 4px 20px rgba(10, 58, 87, 0.4);
