@@ -826,16 +826,20 @@ export default function LineageMap({
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => { e.stopPropagation(); if (allBlue && !packed && !collecting) { burstAt(rx, ry, ROOT * 0.9); doPack(rx, ry, 500); } else { revealStep(); } }}
         onPointerDown={(e) => {
-          if (!canDragRoot) return; // pinned to the tree until the grid is settled (all frames filled or packed)
+          if (!canDragRoot) return;
           e.stopPropagation();
           try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
-          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: pan.x, oy: pan.y, moved: false };
+          // store both root start and pan start so we can update both in sync
+          rootDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: rx, oy: ry, moved: false, px: pan.x, py: pan.y } as any;
         }}
         onPointerMove={(e) => {
-          const d = rootDrag.current; if (!d || e.pointerId !== d.id) return;
+          const d = rootDrag.current as any; if (!d || e.pointerId !== d.id) return;
           const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
           if (!d.moved && Math.hypot(dx, dy) > 3) d.moved = true;
-          if (d.moved) setPan({ x: d.ox + dx, y: d.oy + dy }); // move whole tree with card
+          if (d.moved) {
+            setRootPos({ x: d.ox + dx, y: d.oy + dy });
+            setPan({ x: d.px + dx, y: d.py + dy });
+          }
         }}
         onPointerUp={(e) => { const d = rootDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} rootDrag.current = null; } }}
         onPointerCancel={() => { rootDrag.current = null; }}
