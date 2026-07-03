@@ -5,7 +5,7 @@ import PitchPanel from "../../components/PitchPanel/PitchPanel";
 import PhotoSplit from "../../components/PhotoSplit/PhotoSplit";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Footer from "../../components/Footer/Footer";
-import ComicStrip from "../../components/ComicStrip/ComicStrip";
+import StepCards from "../../components/StepCards/StepCards";
 import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import styles from "../page.module.css";
 
@@ -62,7 +62,7 @@ export default function About() {
           </ul>
         </PhotoSplit>
 
-        <ComicStrip />
+        <StepCards />
 
         <section className={styles.feedSection}>
           <PopHeading className={`display ${styles.feedTitle}`}>
