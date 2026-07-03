@@ -472,7 +472,7 @@
     width: 63px;
     height: 63px;
     border-radius: 16px;
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px) + 63px + 10px + 63px + 10px);
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px) + 63px + 10px);
     right: clamp(12px, 3vw, 32px);
   }
   .pausedOverlay {
