@@ -1502,6 +1502,8 @@ export default function LineageMap({
               boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
               userSelect: "none",
               touchAction: "none",
+              outline: "3px solid var(--yellow, #ffd23e)",
+              outlineOffset: "-1px",
             }}
             onClick={(e) => { e.stopPropagation(); }}
             onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); if (isMobile) startGridDrag(e); }}
