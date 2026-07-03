@@ -711,6 +711,8 @@ export default function PackPit() {
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
       const LOCKED_CAT = 0x0004; // reserved category (unused since fuse mechanic removed)
       const onFuseMagnet = () => {}; // fuse mechanic abandoned
+      const nearestBone = (_to: any) => null as any; // fuse mechanic abandoned
+      const FUSE_SNAP_DIST = 0; // fuse mechanic abandoned
       // pill magnet: each breed name pill gently attracts its matching dog card
       const PILL_MAGNET_RADIUS = 200;
       const PILL_PULL = 0.00008;
