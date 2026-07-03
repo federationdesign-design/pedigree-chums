@@ -544,9 +544,9 @@
   100% { opacity: var(--fill-opacity, 0); }
 }
 
-/* Pattern unchanged when overlay is open */
+/* Hide pattern when overlay is open */
 .dimmed .pattern {
-  opacity: var(--fill-opacity, 0);
+  opacity: 0 !important;
 }
 
 /* Shake/jelly button flash -- brief yellow burst on press, not persistent */
