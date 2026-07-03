@@ -874,14 +874,14 @@ export default function LineageMap({
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
-        {collectShowing && !INSTR_NAMES.has(breed.name) ? (
+        {!packed && !collecting && !INSTR_NAMES.has(breed.name) ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
-            onClick={(e) => { e.stopPropagation(); burstAt(rx, ry + ROOT + 88, ROOT * 0.9); doPack(rx, ry + ROOT + 88, 500); }}
+            onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
-            aria-label="Collect the ancestor pack"
+            aria-label="Learn"
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
