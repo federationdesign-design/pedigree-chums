@@ -527,8 +527,12 @@ export default function LineageMap({
   minGridXRef.current = isMobile ? Math.min(0, vp.w - gridRight - 16) : 0;
   const frameTotal = frames.length;
   // where each filled card should sit: its frame's screen centre, kept pan-fixed
-  const cardFrame = new Map<string, { sx: number; sy: number }>();
-  filled.forEach((cardId, frameId) => { const f = frames.find((x) => x.id === frameId); if (f) cardFrame.set(cardId, { sx: f.sx, sy: f.sy }); });
+  // cardFrame: placed card screen positions -- memoised so pan changes don't shift them
+  const cardFrame = useMemo(() => {
+    const m = new Map<string, { sx: number; sy: number }>();
+    filled.forEach((cardId, frameId) => { const f = frames.find((x) => x.id === frameId); if (f) m.set(cardId, { sx: f.sx, sy: f.sy }); });
+    return m;
+  }, [filled, frames]); // eslint-disable-line react-hooks/exhaustive-deps
   const placedSet = new Set(filled.values()); // cards sitting in a frame: fixed, not draggable
   const stackedIds = new Set<string>();
   stacked.forEach((ids) => ids.forEach((id) => stackedIds.add(id))); // duplicate cards absorbed into a stack, hidden as loose cards
@@ -1486,6 +1490,7 @@ export default function LineageMap({
         return (
           <div
             key={`placed-${c.id}`}
+            draggable={false}
             style={{
               position: "fixed", left, top, width: CW, height: CW,
               borderRadius: 15, overflow: "hidden",
@@ -1495,11 +1500,14 @@ export default function LineageMap({
               cursor: !PACK_BREEDS.has(c.name) ? "zoom-in" : "default",
               zIndex: 62,
               boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              userSelect: "none",
+              touchAction: "none",
             }}
             onClick={(e) => { e.stopPropagation(); }}
-            onPointerDown={(e) => { e.stopPropagation(); if (isMobile) startGridDrag(e); }}
-            onPointerMove={(e) => { if (isMobile) moveGridDrag(e); }}
-            onPointerUp={(e) => { if (isMobile) endGridDrag(e); }}
+            onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); if (isMobile) startGridDrag(e); }}
+            onPointerMove={(e) => { e.stopPropagation(); if (isMobile) moveGridDrag(e); }}
+            onPointerUp={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
+            onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
             <img
               src={encodeURI(bust(c.img))}
