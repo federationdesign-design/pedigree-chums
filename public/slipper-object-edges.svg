@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1108.5 407.4">
+  <!-- Generator: Adobe Illustrator 29.7.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 138)  -->
+  <defs>
+    <style>
+      .st0 {
+        stroke: #f7d129;
+      }
+
+      .st0, .st1, .st2, .st3, .st4 {
+        fill: none;
+        stroke-miterlimit: 10;
+      }
+
+      .st1 {
+        stroke: #ef4725;
+      }
+
+      .st2 {
+        stroke: #009fe0;
+      }
+
+      .st3 {
+        stroke: #3bd702;
+      }
+
+      .st4 {
+        stroke: #ed4699;
+      }
+    </style>
+  </defs>
+  <rect class="st1" x="1" y="321" width="1107" height="84"/>
+  <circle class="st0" cx="546" cy="241" r="164"/>
+  <circle class="st3" cx="123.5" cy="283" r="96.5"/>
+  <rect class="st2" x="100.3" y="97.8" width="539.7" height="69.7" transform="translate(-23 125.5) rotate(-18.7)"/>
+  <rect class="st4" x="716.9" y="254.5" width="348.6" height="63.9"/>
+</svg>
