@@ -237,7 +237,7 @@ export default function HotDogs() {
                 <span className={styles.congaStep}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/yellow-arrow.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-16px",right:"-20px",width:"36px",height:"36px",zIndex:2,display:"block"}} />
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-16px",right:"-20px",width:"36px",height:"36px",zIndex:2,display:"block"}} />
                   <strong>Dachs + Hund</strong>
                   <em>German. Dachs means badger. Hund means dog. Together: a dog bred to dig into badger burrows, low to the ground, long in the body, short in the leg. The Germans named it for its job. Sensible people, the Germans.</em>
                 </span>
