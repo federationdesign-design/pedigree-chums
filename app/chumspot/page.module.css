@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(80px, 12vw, 120px) clamp(24px, 6vw, 80px);
+  padding: clamp(80px, 12vw, 120px) clamp(24px, 6vw, 80px) calc(clamp(80px, 12vw, 120px) + 50px);
   background: var(--navy, #0a3a57);
   position: relative;
   overflow: hidden;
@@ -143,7 +143,7 @@
 .ctaSecondary {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(0.6rem, 1.1vw, 0.78rem);
-  padding: clamp(8px, 1vw, 11px) clamp(19px, 2.7vw, 32px);
+  padding: clamp(13px, 1.4vw, 16px) clamp(19px, 2.7vw, 32px) clamp(8px, 1vw, 11px);
   border-radius: 999px;
   text-decoration: none;
   transition: transform 0.15s, filter 0.15s;
@@ -177,6 +177,13 @@
   background: rgba(255,255,255,0.07);
   border-radius: 16px;
   padding: clamp(20px, 3vw, 32px);
+}
+.stepIcon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 12px;
 }
 .stepTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);

@@ -165,18 +165,26 @@ export default function ChumSpotClient() {
             <h2 className={styles.sectionTitle}>How to enter</h2>
             <div className={styles.steps}>
               <div className={styles.step}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/spot-icon.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
                 <h3 className={styles.stepTitle}>1. Spot</h3>
                 <p>Find a dog that matches a breed featured in your Pedigree Chums pack.</p>
               </div>
               <div className={styles.step}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Snap-icon.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
                 <h3 className={styles.stepTitle}>2. Snap</h3>
                 <p>Ask the dog&rsquo;s owner or handler for permission, then take a photo showing the dog with the matching card.</p>
               </div>
               <div className={styles.step}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/post-icon.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
                 <h3 className={styles.stepTitle}>3. Post</h3>
                 <p>Share your photo publicly on Instagram or TikTok.</p>
               </div>
               <div className={styles.step}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/PC-tag.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
                 <h3 className={styles.stepTitle}>4. Tag</h3>
                 <p>Tag @pedigree_chums + include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public.</p>
               </div>
@@ -191,10 +199,17 @@ export default function ChumSpotClient() {
             <div className={styles.prizeCols}>
               <div>
                 <video
+                  ref={(el) => {
+                    if (!el) return;
+                    const obs = new IntersectionObserver(
+                      ([entry]) => { if (entry.intersectionRatio >= 0.5) { el.play().catch(() => {}); } else { el.pause(); } },
+                      { threshold: 0.5 }
+                    );
+                    obs.observe(el);
+                  }}
                   className={styles.prizeVideo}
                   src="/lab-animation.mp4"
                   poster="/lab-animation-1stframe.jpg"
-                  autoPlay
                   muted
                   playsInline
                   onEnded={(e) => { const v = e.currentTarget; v.pause(); }}
