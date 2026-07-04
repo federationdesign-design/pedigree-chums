@@ -371,7 +371,7 @@ const LINEAGE: Record<string, LineageNode> = {
   "Boxer": {
     name: "Boxer",
     note: "Created in Munich in the 1890s by crossing the German Bullenbeisser with English Bulldogs. The Bullenbeisser — meaning bull-biter — had hunted boar and bear for German nobility for centuries. The Bulldog brought a shorter muzzle and calmer temperament. The result was the Boxer: athletic, square-headed and devoted.",
-    image: "/boxer-square.jpg",
+    img: "/boxer-square.jpg",
     children: [
       {
         name: "Bullenbeisser",
