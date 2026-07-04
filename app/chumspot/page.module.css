@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(100px, 14vw, 160px) clamp(24px, 6vw, 80px) clamp(48px, 8vw, 96px);
+  padding: clamp(80px, 12vw, 120px) clamp(24px, 6vw, 80px);
   background: var(--navy, #0a3a57);
   position: relative;
   overflow: hidden;
@@ -41,17 +41,32 @@
   max-width: 860px;
   margin: 0 auto;
 }
+.heroAgeNote {
+  position: absolute;
+  bottom: clamp(16px, 3vw, 32px);
+  left: clamp(16px, 3vw, 40px);
+  z-index: 2;
+  max-width: clamp(240px, 35vw, 420px);
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.68rem, 1vw, 0.82rem);
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.4;
+  text-align: left;
+  border-left: 2px solid var(--yellow, #ffd23e);
+  padding-left: 12px;
+}
 .eyebrow {
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--yellow, #ffd23e);
+  color: #ffffff;
   margin: 0 0 12px;
 }
 .heroTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.5rem, 10vw, 8rem);
+  font-size: clamp(3rem, 8.5vw, 6.8rem);
   line-height: 0.95;
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(16px, 3vw, 32px);
@@ -123,8 +138,8 @@
 .ctaPrimary,
 .ctaSecondary {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
-  padding: clamp(12px, 1.5vw, 16px) clamp(28px, 4vw, 48px);
+  font-size: clamp(0.6rem, 1.1vw, 0.78rem);
+  padding: clamp(8px, 1vw, 11px) clamp(19px, 2.7vw, 32px);
   border-radius: 999px;
   text-decoration: none;
   transition: transform 0.15s, filter 0.15s;

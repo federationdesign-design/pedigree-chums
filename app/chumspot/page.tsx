@@ -123,9 +123,12 @@ export default function ChumSpot() {
             src="/comp-hero-vid.mp4"
             autoPlay
             muted
-            loop
             playsInline
+            onEnded={(e) => { const v = e.currentTarget; v.pause(); }}
           />
+          <div className={styles.heroAgeNote}>
+              Open to UK residents aged 18 or over. Young people aged 14&ndash;17 may participate through a parent or legal guardian, who must submit the entry from their own account.
+            </div>
           <div className={styles.heroInner}>
             <p className={styles.eyebrow}>Monthly Competition</p>
             <h1 className={styles.heroTitle}>Spot your Chum<br />Photo Competition</h1>
@@ -157,10 +160,6 @@ export default function ChumSpot() {
               Every month, we&rsquo;ll choose our favourite entry as <strong>Best in Show</strong>.
               The winner receives an exclusive Limited Edition Chum Figurine, 3D printed to order
               and delivered free anywhere in the United Kingdom.
-            </p>
-            <p className={styles.ageNote}>
-              Open to UK residents aged 18 or over. Young people aged 14–17 may participate through
-              a parent or legal guardian, who must submit the entry from their own account.
             </p>
           </div>
         </section>
@@ -202,8 +201,8 @@ export default function ChumSpot() {
                   poster="/lab-animation-1stframe.jpg"
                   autoPlay
                   muted
-                  loop
                   playsInline
+                  onEnded={(e) => { const v = e.currentTarget; v.pause(); }}
                 />
               </div>
               <div>
