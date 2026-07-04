@@ -1524,7 +1524,7 @@ export default function LineageMap({
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
-            <div style={{ fontFamily: ""Luckiest Guy", system-ui", fontSize: "13px", marginBottom: "4px", color: "var(--yellow, #ffd23e)" }}>{c.name}</div>
+            <div style={{ fontFamily: "'Luckiest Guy', system-ui", fontSize: "13px", marginBottom: "4px", color: "var(--yellow, #ffd23e)" }}>{c.name}</div>
             {text}
           </div>
         );
