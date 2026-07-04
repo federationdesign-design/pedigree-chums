@@ -201,11 +201,11 @@ export default function PackPit() {
         // until average body speed drops below threshold, then wait an extra 1.5s
         const checkQuiet = () => {
           const eng = engineRef.current;
-          if (!eng) { if (runnerRef.current) Runner.stop(runnerRef.current); window.setTimeout(() => setGameOver(true), 1500); return; }
+          if (!eng) { if (runnerRef.current) (runnerRef.current as any).enabled = false; window.setTimeout(() => setGameOver(true), 1500); return; }
           const all = (eng.world.bodies as any[]).filter((b: any) => !b.isStatic);
           const avgSpeed = all.length ? all.reduce((s: number, b: any) => s + Math.hypot(b.velocity.x, b.velocity.y), 0) / all.length : 0;
           if (avgSpeed < 2) {
-            if (runnerRef.current) Runner.stop(runnerRef.current);
+            if (runnerRef.current) (runnerRef.current as any).enabled = false;
             window.setTimeout(() => setGameOver(true), 1500);
           } else {
             window.setTimeout(checkQuiet, 500);
