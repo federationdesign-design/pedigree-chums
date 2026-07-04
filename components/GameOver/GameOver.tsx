@@ -27,7 +27,7 @@ function getDogLeaderboard() {
   const seed = todayStr().split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const rng = (n: number) => { const x = Math.sin(seed + n) * 10000; return x - Math.floor(x); };
   const shuffled = [...DOG_POOL].sort((a, b) => rng(a.name.charCodeAt(0)) - rng(b.name.charCodeAt(0)));
-  return shuffled.slice(0, 7).map((dog, i) => ({
+  return shuffled.slice(0, 4).map((dog, i) => ({
     name: dog.name,
     score: dog.scores[Math.floor(rng(i + 10) * dog.scores.length)],
     isDog: true,
@@ -61,7 +61,7 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
     const k = `${e.name}:${e.score}`;
     if (seen.has(k)) return false;
     seen.add(k); return true;
-  }).slice(0, 10);
+  }).slice(0, 5);
 }
 
 export default function GameOver({ chums, score, collectedBreeds = [], allCollected = false }: Props) {
@@ -149,92 +149,107 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
   const [deckHover, setDeckHover] = useState<number | null>(null);
 
   const generateScoreCard = (): Promise<string> => new Promise((resolve) => {
-    const W = 1080, H = 1080;
+    // OG social share size: 1200x630 (landscape, like original)
+    const W = 1200, H = 630;
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d")!;
 
-    const drawCard = (logoImg: HTMLImageElement | null) => {
-      // Light blue background
+    const drawCard = (logoImg: HTMLImageElement | null, patternImg: HTMLImageElement | null) => {
+      // Light blue background (#2bb4ee)
       ctx.fillStyle = "#2bb4ee";
       ctx.fillRect(0, 0, W, H);
 
-      // Subtle radial highlight
-      const grad = ctx.createRadialGradient(W/2, H*0.35, 0, W/2, H*0.35, W*0.65);
-      grad.addColorStop(0, "rgba(255,255,255,0.18)");
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      // Bone/background pattern tiled at low opacity
+      if (patternImg) {
+        ctx.globalAlpha = 0.08;
+        const pw = 200, ph = pw * (patternImg.naturalHeight / patternImg.naturalWidth || 1);
+        for (let y = 0; y < H + ph; y += ph) {
+          for (let x = 0; x < W + pw; x += pw) {
+            ctx.drawImage(patternImg, x - pw/2, y - ph/2, pw, ph);
+          }
+        }
+        ctx.globalAlpha = 1;
+      }
 
-      // Yellow rounded border - thick
-      const brd = 28, rad = 60;
+      // Yellow thick rounded border
+      const brd = 22, rad = 40;
       ctx.strokeStyle = "#ffd23e";
       ctx.lineWidth = brd;
       ctx.beginPath();
       ctx.roundRect(brd/2, brd/2, W-brd, H-brd, rad);
       ctx.stroke();
 
-      // Logo image centred near top
+      // Logo left side
       if (logoImg) {
-        const lw = 520, lh = lw * (logoImg.naturalHeight / logoImg.naturalWidth);
-        ctx.drawImage(logoImg, (W-lw)/2, 90, lw, lh);
+        const lw = 320, lh = lw * (logoImg.naturalHeight / logoImg.naturalWidth || 0.5);
+        ctx.drawImage(logoImg, 60, (H - lh) / 2, lw, lh);
       } else {
         ctx.fillStyle = "#ffd23e";
-        ctx.font = "bold 72px Arial Black, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("PEDIGREE CHUMS", W/2, 180);
+        ctx.font = "bold 48px Arial Black, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("PEDIGREE", 60, H/2 - 10);
+        ctx.fillText("CHUMS", 60, H/2 + 50);
       }
 
-      // Divider
-      ctx.strokeStyle = "rgba(255,255,255,0.4)";
+      // Vertical divider
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
       ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(120, 340); ctx.lineTo(W-120, 340); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(440, 60); ctx.lineTo(440, H-60); ctx.stroke();
+
+      // Right side content
+      ctx.textAlign = "center";
+      const cx = 440 + (W - 440) / 2; // centre of right panel
 
       // MY SCORE label
       ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 52px Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("MY SCORE", W/2, 430);
+      ctx.font = "bold 32px Arial, sans-serif";
+      ctx.fillText("MY SCORE", cx, 130);
 
-      // Score - big arcade/computer game style (monospace bold)
+      // Score in Press Start 2P (arcade pixel font via CSS var - use system monospace fallback on canvas)
       ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 220px 'Courier New', Courier, monospace";
-      ctx.textAlign = "center";
-      // Drop shadow for depth
-      ctx.shadowColor = "rgba(255,210,62,0.5)";
-      ctx.shadowBlur = 20;
-      ctx.fillText(score.toLocaleString(), W/2, 670);
+      ctx.font = "bold 148px 'Courier New', monospace";
+      ctx.shadowColor = "rgba(255,210,62,0.6)";
+      ctx.shadowBlur = 18;
+      ctx.fillText(score.toLocaleString(), cx, 310);
       ctx.shadowBlur = 0;
 
-      // Chums found
+      // Chums line
       ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 48px Arial, sans-serif";
-      ctx.fillText(`${chums} Chums Found`, W/2, 760);
+      ctx.font = "bold 36px Arial, sans-serif";
+      ctx.fillText(`${chums} Chum${chums === 1 ? "" : "s"} Found`, cx, 390);
 
       // Divider
-      ctx.strokeStyle = "rgba(255,255,255,0.4)";
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(120, 810); ctx.lineTo(W-120, 810); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(460, 420); ctx.lineTo(W-60, 420); ctx.stroke();
 
-      // URL
+      // URL + hashtag
       ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 40px Arial, sans-serif";
-      ctx.fillText("pedigreechums.co.uk", W/2, 900);
+      ctx.font = "bold 28px Arial, sans-serif";
+      ctx.fillText("pedigreechums.co.uk  •  #PedigreeChums", cx, 490);
 
-      // Tagline
       ctx.fillStyle = "#0a3a57";
-      ctx.font = "36px Arial, sans-serif";
-      ctx.fillText("Can you beat my score? 🐾", W/2, 960);
+      ctx.font = "26px Arial, sans-serif";
+      ctx.fillText("Can you beat my score? 🐾", cx, 540);
 
       resolve(canvas.toDataURL("image/png"));
     };
 
-    // Load logo
-    const logo = new Image();
-    logo.crossOrigin = "anonymous";
-    logo.onload = () => drawCard(logo);
-    logo.onerror = () => drawCard(null);
+    let loaded = 0;
+    let logoImg: HTMLImageElement | null = null;
+    let patternImg: HTMLImageElement | null = null;
+    const tryDraw = () => { loaded++; if (loaded === 2) drawCard(logoImg, patternImg); };
+
+    const logo = new Image(); logo.crossOrigin = "anonymous";
+    logo.onload = () => { logoImg = logo; tryDraw(); };
+    logo.onerror = tryDraw;
     logo.src = "/PC-logo.svg";
+
+    const pat = new Image(); pat.crossOrigin = "anonymous";
+    pat.onload = () => { patternImg = pat; tryDraw(); };
+    pat.onerror = tryDraw;
+    pat.src = "/background-pattern.svg";
   });
 
   const handleShare = async () => {
@@ -304,13 +319,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
           <div className={styles.allCollectedPaw} aria-hidden="true">🐾</div>
         )}
         <h1 className={styles.title}>
-          {allCollected
-            ? "YOU GOT 'EM ALL!"
-            : chums === 0
-            ? "You have no chums and your... tell you what, grab some chums next time!"
-            : chums === 1
-            ? "Well done, you found 1 chum!"
-            : `Well done, you found ${chums} chums!`}
+          {allCollected ? "YOU GOT 'EM ALL!" : chums === 0 ? "No chums — try again!" : `Well done — ${chums} chum${chums === 1 ? "" : "s"} found!`}
         </h1>
         {allCollected && (
           <p className={styles.allCollectedSub}>ALL 54 CHUMS COLLECTED</p>

@@ -58,6 +58,8 @@
 }
 
 .title {
+  white-space: nowrap;
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
   font-family: 'Luckiest Guy', system-ui;
   font-size: clamp(28px, 4.5vw, 56px);
   color: #ffed00;
