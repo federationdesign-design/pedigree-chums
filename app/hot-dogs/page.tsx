@@ -235,6 +235,8 @@ export default function HotDogs() {
             <div className={styles.congaFeature}>
               <div className={styles.congaChain}>
                 <span className={styles.congaStep}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/yellow-arrow.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-14px",width:"28px",zIndex:1}} />
                   <strong>Dachs + Hund</strong>
                   <em>German. Dachs means badger. Hund means dog. Together: a dog bred to dig into badger burrows, low to the ground, long in the body, short in the leg. The Germans named it for its job. Sensible people, the Germans.</em>
                 </span>
@@ -318,47 +320,31 @@ export default function HotDogs() {
             </p>
             <p>Hot Dogs mode is different.</p>
 
-            <div className={styles.ruleSteps}>
-              <div className={styles.ruleStep}>
-                <span className={styles.ruleNum}>1</span>
-                <div>
-                  <strong>Draw your hand</strong>
-                  <p>Deal as normal.</p>
-                </div>
-              </div>
-              <div className={styles.ruleStep}>
-                <span className={styles.ruleNum}>2</span>
-                <div>
-                  <strong>Show your hand</strong>
-                  <p>Everyone briefly shows their cards to the table. Three to five seconds. Long enough to see. Short enough to panic.</p>
-                </div>
-              </div>
-              <div className={styles.ruleStep}>
-                <span className={styles.ruleNum}>3</span>
-                <div>
-                  <strong>Hide your hand</strong>
-                  <p>Cards go face down again. From this point you can only look at your own hand.</p>
-                </div>
-              </div>
-              <div className={styles.ruleStep}>
-                <span className={styles.ruleNum}>4</span>
-                <div>
-                  <strong>Remember</strong>
-                  <p>You must recall which dogs were in each other&rsquo;s hands. Your memory is now on its own.</p>
-                </div>
-              </div>
-              <div className={styles.ruleStep}>
-                <span className={styles.ruleNum}>5</span>
-                <div>
-                  <strong>Spot and call</strong>
-                  <p>When a dog appears, the fastest correct call wins. If you call wrong, everyone is allowed to look at you. Like a disappointed spaniel.</p>
-                </div>
-              </div>
-            </div>
-
             <div className={styles.gameTwoCols}>
               <div>
-                <p>Hot Dogs is a memory test disguised as a shouting problem.</p>
+                <div className={styles.ruleSteps}>
+                  <div className={styles.ruleStep}>
+                    <span className={styles.ruleNum}>1</span>
+                    <div><strong>Draw your hand</strong><p>Deal as normal.</p></div>
+                  </div>
+                  <div className={styles.ruleStep}>
+                    <span className={styles.ruleNum}>2</span>
+                    <div><strong>Show your hand</strong><p>Everyone briefly shows their cards to the table. Three to five seconds. Long enough to see. Short enough to panic.</p></div>
+                  </div>
+                  <div className={styles.ruleStep}>
+                    <span className={styles.ruleNum}>3</span>
+                    <div><strong>Hide your hand</strong><p>Cards go face down again. From this point you can only look at your own hand.</p></div>
+                  </div>
+                  <div className={styles.ruleStep}>
+                    <span className={styles.ruleNum}>4</span>
+                    <div><strong>Remember</strong><p>You must recall which dogs were in each other&rsquo;s hands. Your memory is now on its own.</p></div>
+                  </div>
+                  <div className={styles.ruleStep}>
+                    <span className={styles.ruleNum}>5</span>
+                    <div><strong>Spot and call</strong><p>When a dog appears, the fastest correct call wins. If you call wrong, everyone is allowed to look at you. Like a disappointed spaniel.</p></div>
+                  </div>
+                </div>
+                <p style={{marginTop:"16px"}}>Hot Dogs is a memory test disguised as a shouting problem.</p>
                 <p>It is a bit like Snap. It is a bit like Pairs. It is a bit like looking into someone else&rsquo;s kennel for three seconds and then being expected to act normal.</p>
               </div>
               <div>

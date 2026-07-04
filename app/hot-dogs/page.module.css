@@ -132,7 +132,7 @@
 .safetySection,
 .faqSection,
 .endSection {
-  padding: clamp(56px, 8vw, 112px) clamp(24px, 6vw, 80px);
+  padding: clamp(32px, 5vw, 64px) clamp(24px, 6vw, 80px);
 }
 .sectionInner {
   max-width: 720px;
@@ -146,7 +146,7 @@
   text-transform: uppercase;
   color: #ffffff;
   margin: 0 0 10px;
-  text-align: left;
+  text-align: center;
 }
 .sectionTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -378,7 +378,7 @@
 }
 .gameTwoCols {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3fr 2fr;
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
   margin: clamp(24px, 4vw, 40px) 0;
@@ -546,14 +546,14 @@
 }
 
 .cookingSection {
-  padding: clamp(56px, 8vw, 112px) 50px;
+  padding: clamp(32px, 5vw, 64px) 50px;
 }
 .cookingInner {
   width: 100%;
 }
 
 .gameSection {
-  padding: clamp(56px, 8vw, 112px) 50px;
+  padding: clamp(32px, 5vw, 64px) 50px;
 }
 .gameInner {
   width: 100%;
@@ -617,6 +617,7 @@
   padding: 16px 20px;
   flex: 1 1 0;
   min-width: 140px;
+  position: relative;
 }
 .congaStep strong {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
@@ -627,7 +628,7 @@
 }
 .congaStep em {
   font-style: normal;
-  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-size: clamp(0.78rem, 1.3vw, 0.9rem);
   font-weight: 600;
   color: rgba(255,255,255,0.95);
   line-height: 1.5;
