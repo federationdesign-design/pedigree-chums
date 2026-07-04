@@ -245,7 +245,7 @@ export default function PackPit() {
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.25 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 4.95 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
-      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
+      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit2.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.745 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
@@ -344,7 +344,7 @@ export default function PackPit() {
             Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
-              ? [R(555, 400, 1060, 60)] // sole only - full width, lower
+              ? [R(555, 390, 1060, 60)] // sole only - fresh start with slipper-edit2
               : [
                 R(515, 295, 820, 30, po2),   // floor -- full inner width, thin
                 R(515, 265, 120, 80, po2),   // centre bump -- uneven floor stops stacking
