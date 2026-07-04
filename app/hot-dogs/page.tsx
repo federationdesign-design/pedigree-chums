@@ -53,7 +53,8 @@ export default function HotDogs() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/eatinghotdog.png" alt="" className={styles.noteImg} />
               <div className={styles.noteText}>
-                <h2 className={styles.noteTitle}>Disclaimer:<br />A note about hot dogs</h2>
+                <p className={styles.noteTitle}>Disclaimer</p>
+                <h2 className={styles.noteTitleMain}>A note about hot dogs</h2>
                 <p>Sometimes we mean human food: sausages in buns.</p>
                 <p>Sometimes we mean dogs who are too hot and need shade, water and probably some ice.</p>
                 <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums game flavour.</p>
@@ -78,9 +79,9 @@ export default function HotDogs() {
           <div className={styles.safetyInner}>
             <p className={styles.sectionEyebrow}>The serious bit</p>
             <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about hot dogs</h2>
-            <p className={styles.lead}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
+            <p className={styles.lead} style={{textAlign:"center"}}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
 
-            <p>
+            <p style={{textAlign:"center"}}>
               This is where the joke stops being a joke.
             </p>
 
@@ -184,6 +185,8 @@ export default function HotDogs() {
 
             <div className={styles.cookingTwoCols}>
               <div className={styles.cookingCol}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Why are hot dogs called hot dogs.jpg" alt="Why are hot dogs called hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
                 <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
                 <p>
                   Not because dogs are hot. Disappointing, perhaps.
@@ -194,6 +197,8 @@ export default function HotDogs() {
                   Then language stood back and pretended this was normal.
                 </p>
 
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/What is a sausage dog.jpg" alt="What is a sausage dog" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
                 <h3 className={styles.subTitle}>What is a sausage dog?</h3>
                 <p>
                   A sausage dog is a dachshund. A dachshund is not a sausage.
@@ -208,18 +213,20 @@ export default function HotDogs() {
               </div>
 
               <div className={styles.cookingCol}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/cooking-hot-dogs.jpg" alt="Instructions for tinned hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
                 <h3 className={styles.subTitle}>Instructions for tinned hot dogs</h3>
-                <p>Where do you store your dogs? Store in a cool, dry place. Preferably not on the floor where the dog can reach them. The hot dogs, that is. Not the dogs. Although arguably both.</p>
-                <p>
+                <p style={{marginBottom:"20px"}}>Where do you store your dogs? Store in a cool, dry place. Preferably not on the floor where the dog can reach them. The hot dogs, that is. Not the dogs. Although arguably both.</p>
+                <p style={{marginBottom:"20px"}}>
                   Once opened, empty unused hot dogs into a bowl, cover, and refrigerate.
                   Consume within 2 days of opening.
                   Do not refrigerate in the can. The can has done its job. Let it go.
                 </p>
-                <p>
+                <p style={{marginBottom:"20px"}}>
                   Unused hot dogs can be frozen and consumed within 3 months.
                   This is longer than most people keep leftovers and shorter than a dachshund grudge.
                 </p>
-                <p>
+                <p style={{marginBottom:"20px"}}>
                   <strong>For best before end:</strong> See date on can end.
                   The can end is the round bit. Yes, there are two of them. Check both if you are worried.
                   One is a lid. One is a question.
@@ -237,7 +244,7 @@ export default function HotDogs() {
                 <span className={styles.congaStep}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-16px",right:"-20px",width:"36px",height:"36px",zIndex:2,display:"block"}} />
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"54px",height:"54px",zIndex:2,display:"block",transform:"scaleX(-1)"}} />
                   <strong>Dachs + Hund</strong>
                   <em>German. Dachs means badger. Hund means dog. Together: a dog bred to dig into badger burrows, low to the ground, long in the body, short in the leg. The Germans named it for its job. Sensible people, the Germans.</em>
                 </span>

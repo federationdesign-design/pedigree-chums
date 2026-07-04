@@ -243,10 +243,21 @@
 }
 
 .noteTitle {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 8px;
+  text-align: center;
+}
+.noteTitleMain {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(2rem, 5vw, 3.6rem);
   color: #ffffff;
   margin: 0 0 clamp(16px, 2.5vw, 28px);
+  text-align: center;
 }
 .rule { display: none; margin: 0; }
 .legal {
