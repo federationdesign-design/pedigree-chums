@@ -158,12 +158,20 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
                   ref={(el) => {
                     if (!el) return;
                     if (i === 0) {
-                      // video 2 starts 2s after video 1 starts
                       el.addEventListener("play", () => {
                         window.setTimeout(() => {
                           const v2 = el.closest("[data-htp-scroll]")?.querySelector("[data-step=\"1\"]") as HTMLVideoElement | null;
                           if (v2) v2.play().catch(() => {});
                         }, 2000);
+                      }, { once: true });
+                    }
+                    if (i === 2) {
+                      // video 6 starts 4s after video 3 starts
+                      el.addEventListener("play", () => {
+                        window.setTimeout(() => {
+                          const v6 = el.closest("[data-htp-scroll]")?.querySelector("[data-step=\"5\"]") as HTMLVideoElement | null;
+                          if (v6) v6.play().catch(() => {});
+                        }, 4000);
                       }, { once: true });
                     }
                   }}

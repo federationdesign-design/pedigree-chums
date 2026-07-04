@@ -84,7 +84,7 @@ const SPREADN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
-const CARD = 82; // card + frame + image size (reduced 25% so more rows fit)
+const CARD = 74; // card + frame + image size (reduced 10% further)
 const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
 const PACK_IMG = new Map(breeds.map((b) => [b.name, b.image])); // pack breed -> its square cartoon card art
 // every white flash number is this small, fixed size, matching the pit; it never
