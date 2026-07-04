@@ -316,7 +316,7 @@
 /* ── Prize two-col with video ────────────────────────────────────────────── */
 .prizeCols {
   display: grid;
-  grid-template-columns: 1fr clamp(200px, 30%, 340px);
+  grid-template-columns: clamp(160px, 22%, 280px) 1fr;
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
   margin-top: clamp(16px, 2vw, 24px);

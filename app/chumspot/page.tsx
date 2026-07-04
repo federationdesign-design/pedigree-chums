@@ -1,3 +1,4 @@
+"use client";
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import styles from "./page.module.css";
@@ -245,7 +246,7 @@ export default function ChumSpot() {
         {/* ── Full Terms ───────────────────────────────────────── */}
         <section className={styles.termsSection}>
           <div className={styles.inner}>
-            <h2 className={styles.termsSectionTitle}>Spot your Chum: Full Competition Terms</h2>
+            <h2 className={styles.termsSectionTitle}>Spot your Chum: <span style={{color:"#ffffff"}}>Full Competition Terms</span></h2>
             <div className={styles.termsGrid}>
               {TERMS.map((t, i) => (
                 <div key={t.num} className={`${styles.termCard} ${i % 2 === 0 ? styles.termCardYellow : styles.termCardWhite}`}>
@@ -264,7 +265,7 @@ export default function ChumSpot() {
               ))}
             </div>
             <p className={styles.contactNote}>
-              Questions about the Spot your Chum competition can be sent to <strong>[COMPETITION EMAIL ADDRESS]</strong>.
+              Questions about the Spot your Chum competition can be sent to <strong><a href="mailto:hello@Pedigree-Chums.co.uk" style={{color:"#ffffff"}}>hello@Pedigree-Chums.co.uk</a></strong>.
               Please do not send bank details, card details or other unnecessary financial information.
             </p>
           </div>
