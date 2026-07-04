@@ -664,9 +664,9 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 2050 pre-order
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); } }, 2750));        // 2750 pair 1
         waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Saint Bernard", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2
         waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone, slipper]); }, 6400));                                                       // 6400 bone + slipper
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Basset Hound", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Dachshund", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000));                                      // 9000 hamburger menu
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); } }, 10050));           // 10050 pair 4
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5
