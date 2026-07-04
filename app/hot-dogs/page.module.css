@@ -528,8 +528,8 @@
 /* ── Fixed cerberus dog ─────────────────────────────────────────────────── */
 
 
-.safetyInner .lead,
-.safetyInner > p { font-size: 1.2rem; }
+.cookingInner .lead,
+.cookingInner > p:not([class]) { font-size: 1.2rem; }
 
 .alert p { font-weight: 500; line-height: 1.5; font-size: clamp(0.95rem, 1.5vw, 1.1rem); margin: 8px 0; }
 

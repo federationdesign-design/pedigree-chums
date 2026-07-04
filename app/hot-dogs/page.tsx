@@ -76,7 +76,7 @@ export default function HotDogs() {
 
         {/* ── Keeping dogs cool ────────────────────────────────────── */}
         <section id="safety" className={styles.safetySection}>
-          <div className={styles.safetyInner}>
+          <div className={styles.cookingInner}>
             <p className={styles.sectionEyebrow}>The serious bit</p>
             <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about hot dogs</h2>
             <p className={styles.lead} style={{textAlign:"center"}}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
@@ -173,6 +173,8 @@ export default function HotDogs() {
         {/* ── Cooking sausages ─────────────────────────────────────── */}
         <section id="cooking" className={styles.cookingSection}>
           <div className={styles.cookingInner}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/the-edible-kind.jpg" alt="" style={{width:"100%",borderRadius:"16px",display:"block",marginBottom:"clamp(20px, 3vw, 36px)"}} />
             <p className={styles.sectionEyebrow}>The edible kind</p>
             <h2 className={styles.sectionTitle}>How do I cook hot dogs?</h2>
             <p className={styles.lead}>Carefully. And preferably without involving a dachshund.</p>
@@ -322,7 +324,7 @@ export default function HotDogs() {
 
         {/* ── Game rules ───────────────────────────────────────────── */}
         <section id="game" className={styles.gameSection}>
-          <div className={styles.gameInner}>
+          <div className={styles.cookingInner}>
             <p className={styles.sectionEyebrow}>Pedigree Chums game flavour</p>
             <h2 className={styles.sectionTitle}>Hot Dogs mode</h2>
             <div className={styles.gameTwoCols}>
