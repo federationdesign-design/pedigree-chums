@@ -911,7 +911,21 @@ export default function LineageMap({
         transform={rootXf.transform}
         style={{ opacity: rootXf.opacity }}
         onClick={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => { e.stopPropagation(); if (allBlue && !packed && !collecting) { burstAt(rx, ry, ROOT * 0.9); doPack(rx, ry, 500); } else { revealStep(); } }}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          if (allBlue && !packed && !collecting) {
+            burstAt(rx, ry, ROOT * 0.9); doPack(rx, ry, 500);
+          } else {
+            // hop whole tree right+up away from the frames grid while frames still need filling
+            if (!framesDone && !packed) {
+              setPan((prev) => ({
+                x: prev.x + 28 + Math.random() * 12,
+                y: prev.y - 18 - Math.random() * 8,
+              }));
+            }
+            revealStep();
+          }
+        }}
         onPointerDown={(e) => {
           if (!canDragRoot) return;
           e.stopPropagation();
