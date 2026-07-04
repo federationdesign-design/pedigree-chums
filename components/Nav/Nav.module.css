@@ -47,12 +47,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100px;
   height: 100px;
   padding: 0;
-  border: 5px solid var(--navy);
-  border-radius: 18px;
+  outline: 5px solid var(--navy);
+  border: none;
+  border-radius: 30px;
   background: var(--yellow);
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
@@ -60,8 +61,8 @@
 }
 .burger span {
   display: block;
-  width: 44px;
-  height: 5px;
+  width: 50px;
+  height: 10px;
   border-radius: 999px;
   background: var(--navy);
 }
