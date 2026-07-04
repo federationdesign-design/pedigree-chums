@@ -186,7 +186,7 @@ export default function HotDogs() {
             <div className={styles.cookingTwoCols}>
               <div className={styles.cookingCol}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/why-are-hot-dogs-called-hot-dogs.jpg" alt="Why are hot dogs called hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
+                <img src="/Why-are-hot-dogs-called-hot-dogs.jpg" alt="Why are hot dogs called hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
                 <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
                 <p>
                   Not because dogs are hot. Disappointing, perhaps.
