@@ -185,9 +185,11 @@ export default function HotDogs() {
 
             <div className={styles.cookingTwoCols}>
               <div className={styles.cookingCol}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/Why-are-hot-dogs-called-hot-dogs.jpg" alt="Why are hot dogs called hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
-                <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
+                <div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"8px"}}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/Why-are-hot-dogs-called-hot-dogs.jpg" alt="" style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  <h3 className={styles.subTitle} style={{margin:0}}>Why are hot dogs called hot dogs?</h3>
+                </div>
                 <p>
                   Not because dogs are hot. Disappointing, perhaps.
                 </p>
@@ -197,9 +199,11 @@ export default function HotDogs() {
                   Then language stood back and pretended this was normal.
                 </p>
 
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/what-is-a-sausage-dog.jpg" alt="What is a sausage dog" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
-                <h3 className={styles.subTitle}>What is a sausage dog?</h3>
+                <div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"8px"}}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/what-is-a-sausage-dog.jpg" alt="" style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  <h3 className={styles.subTitle} style={{margin:0}}>What is a sausage dog?</h3>
+                </div>
                 <p>
                   A sausage dog is a dachshund. A dachshund is not a sausage.
                   A sausage is not a dachshund. But put them in the same sentence
@@ -213,9 +217,11 @@ export default function HotDogs() {
               </div>
 
               <div className={styles.cookingCol}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/cooking-hot-dogs.jpg" alt="Instructions for tinned hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
-                <h3 className={styles.subTitle}>Instructions for tinned hot dogs</h3>
+                <div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"8px"}}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/cooking-hot-dogs.jpg" alt="" style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  <h3 className={styles.subTitle} style={{margin:0}}>Instructions for tinned hot dogs</h3>
+                </div>
                 <p style={{marginBottom:"20px"}}>Where do you store your dogs? Store in a cool, dry place. Preferably not on the floor where the dog can reach them. The hot dogs, that is. Not the dogs. Although arguably both.</p>
                 <p style={{marginBottom:"20px"}}>
                   Once opened, empty unused hot dogs into a bowl, cover, and refrigerate.
