@@ -1438,26 +1438,7 @@ export default function LineageMap({
                 </g>
               );
             })}
-            {!packed && !collecting && frames.map((f) => {
-              const ids = stacked.get(f.id);
-              if (!ids || !ids.length || !filled.has(f.id)) return null;
-              // each duplicate cascades down and to the right of the last, sitting on top of the fixed primary so the newest is fully visible
-              return ids.map((sid, i) => {
-                const off = (i + 1) * 7;
-                const sx = f.sx - pan.x + off * 0.55, sy = f.sy - pan.y + off * 0.55;
-                const stackTilt = (i % 2 ? 1 : -1) * (5 + (i % 3) * 2); // fan each card so the pile is visible
-                const sClip = `lm-stack-${f.id}-${i}`;
-                return (
-                  <g key={`stk-${sid}`} transform={`rotate(${(cardDeg + stackTilt).toFixed(2)} ${sx} ${sy})`} style={{ pointerEvents: "none", filter: "drop-shadow(0 3px 3px rgba(0,0,0,0.32))" }}>
-                    <clipPath id={sClip}>
-                      <rect x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} rx={15} />
-                    </clipPath>
-                    <image href={encodeURI(bust(f.img))} x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} clipPath={`url(#${sClip})`} preserveAspectRatio="xMidYMid slice" />
-                    <rect x={sx - CW / 2} y={sy - CW / 2} width={CW} height={CW} rx={15} className={`${styles.pickCard} ${styles.pickCardStack}`} />
-                  </g>
-                );
-              });
-            })}
+{/* stacked duplicate cards rendered as fixed HTML below */}
             {rootCard(breed.x, breed.y)}
           </>
         ) : (
@@ -1531,6 +1512,36 @@ export default function LineageMap({
           </div>
         );
       })()}
+      {/* Stacked duplicate cards as fixed HTML -- immune to pan */}
+      {!packed && !collecting && frames.map((f) => {
+        const ids = stacked.get(f.id);
+        if (!ids || !ids.length || !filled.has(f.id)) return null;
+        return ids.map((sid, i) => {
+          const off = (i + 1) * 7;
+          const stackTilt = (i % 2 ? 1 : -1) * (5 + (i % 3) * 2);
+          const left = f.sx - CW / 2 + off * 0.55;
+          const top = f.sy - CW / 2 + off * 0.55;
+          return (
+            <div
+              key={`stk-html-${sid}`}
+              style={{
+                position: "fixed", left, top, width: CW, height: CW,
+                borderRadius: 15, overflow: "hidden",
+                transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
+                transformOrigin: "center",
+                pointerEvents: "none",
+                zIndex: 61,
+                boxShadow: "0 3px 3px rgba(0,0,0,0.32)",
+                userSelect: "none",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={encodeURI(bust(f.img))} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <div style={{ position: "absolute", inset: 0, borderRadius: 15, border: "3px solid rgba(255,255,255,0.3)", pointerEvents: "none" }} />
+            </div>
+          );
+        });
+      })}
       {/* Placed cards rendered as position:fixed HTML -- completely immune to SVG pan */}
       {pickCards.filter((c) => cardFrame.has(c.id) && !collectRef.current && !stackedIds.has(c.id)).map((c) => {
         const ff2 = cardFrame.get(c.id)!;
