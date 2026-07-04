@@ -321,7 +321,7 @@ export default function LineageMap({
     return () => cancelAnimationFrame(raf);
   }, [bursts.length]);
   useEffect(() => {
-    setShowRemove(false);
+    setShowRemove(INSTR_NAMES.has(breed.name)); // immediate for instruction cards
     setRemoving(false);
     const t = setTimeout(() => setShowRemove(true), 30000); // auto-show the green button after 30s
     return () => clearTimeout(t);
@@ -828,10 +828,23 @@ export default function LineageMap({
 
   const startRemove = () => {
     if (removing) return;
-    // Instructions cards: just close the overlay, no collect animation
+    // Instructions cards: auto-place all cards into frames, then close after 1s
     if (INSTR_NAMES.has(breed.name)) {
       onRemove?.(breed.name);
-      window.setTimeout(() => onClose(), 200);
+      // auto-place any unplaced cards
+      const unplacedInstr = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
+      const claimedFilled = new Map(filled);
+      unplacedInstr.forEach((c, i) => {
+        const target = frames.find((f) => f.img === c.img && !claimedFilled.has(f.id));
+        if (!target) return;
+        claimedFilled.set(target.id, c.id);
+        window.setTimeout(() => {
+          setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
+          setFilled((m) => { const x = new Map(m); x.set(target.id, c.id); return x; });
+          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
+        }, i * 120);
+      });
+      window.setTimeout(() => onClose(), Math.max(600, unplacedInstr.length * 120 + 1000));
       return;
     }
     // snapshot where every visible card is right now, plus a tumble spin for each,
@@ -1602,6 +1615,11 @@ export default function LineageMap({
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
+            {INSTR_NAMES.has(breed.name) && (
+              <div style={{ position: "absolute", bottom: -20, left: 0, right: 0, textAlign: "center", fontFamily: "'Luckiest Guy', system-ui, sans-serif", fontSize: 11, color: "#ffffff", pointerEvents: "none", lineHeight: 1.2 }}>
+                {c.name}
+              </div>
+            )}
             {/* magnify icon bottom-left */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
               <button

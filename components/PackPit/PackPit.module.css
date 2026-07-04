@@ -392,7 +392,7 @@
 /* Pause button -- sits above shake */
 .pause {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 84px + 12px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   right: clamp(18px, 4vw, 48px);
   z-index: 65;
   width: 84px;
@@ -420,7 +420,7 @@
 /* Slow motion button -- sits above pause */
 .slowmo {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 84px + 12px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   right: clamp(18px, 4vw, 48px);
   z-index: 65;
   width: 84px;
