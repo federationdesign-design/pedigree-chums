@@ -221,7 +221,9 @@ export default function LineageMap({
   const zoomDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
   const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
-  const magnifyHold = (id: string) => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); }; // patch_hoverfix_v1: info opens with zoom
+  // closeAll: ensure only one overlay is open at a time
+  const closeAll = () => { setInfoHover(null); setPctHover(null); setZoomedId(null); if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } };
+  const magnifyHold = (id: string) => { closeAll(); setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); };
   const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); setInfoHover(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks; patch_hoverfix_v1: info closes with zoom
 
   // Dismiss a fixed/opened card (the X in its corner).
@@ -1399,7 +1401,7 @@ export default function LineageMap({
                       <g
                         style={{ cursor: "pointer" }}
                         onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => { e.stopPropagation(); setPctHover((h) => (h === c.id ? null : c.id)); }}
+                        onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                       >
                         <rect x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
                         <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />
@@ -1419,7 +1421,7 @@ export default function LineageMap({
                         onClick={(e) => {
                           e.stopPropagation();
                           const opening = infoHover !== c.id;
-                          setInfoHover((h) => (h === c.id ? null : c.id)); // tap to toggle, works on touch and mouse
+                          if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } // tap to toggle, works on touch and mouse
                           if (opening && !infoSeen.current.has(c.id)) {
                             infoSeen.current.add(c.id);
                             flashNum(ix, iy, 2, FLASH_SIZE); // +2 the first time this card's info is exposed, white and small like the rest
@@ -1578,7 +1580,7 @@ export default function LineageMap({
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
                 style={{ position: "absolute", right: 4, top: 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif" }}
-                onClick={(e) => { e.stopPropagation(); setInfoHover((h) => h === c.id ? null : c.id); }}
+                onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
             )}
@@ -1588,7 +1590,7 @@ export default function LineageMap({
               const pillTxt = pillMix < 1 ? "<1%*" : `${Math.round(pillMix)}%${c.share !== pillMix ? "*" : ""}`;
               return (
                 <div
-                  onClick={(e) => { e.stopPropagation(); setPctHover((h) => h === c.id ? null : c.id); }}
+                  onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
                   style={{ position: "absolute", right: 2, bottom: 4, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui" }}
                 >
