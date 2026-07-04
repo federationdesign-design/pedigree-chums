@@ -125,7 +125,7 @@ export default function ChumSpot() {
               <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" className={styles.ctaSecondary}>Enter on TikTok</a>
             </div>
             <p className={styles.closingDate}>
-              Current monthly round closes at 23:59 on <strong>[CURRENT CLOSING DATE]</strong>.
+              Current monthly round closes at 23:59 on <strong>{new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString("en-GB", {day:"numeric", month:"long", year:"numeric"})}</strong>.
             </p>
           </div>
         </section>

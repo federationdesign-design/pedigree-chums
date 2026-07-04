@@ -251,12 +251,13 @@
 .termNum {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(2.5rem, 5vw, 3.5rem);
-  color: var(--navy, #0a3a57);
   line-height: 1;
   display: block;
   margin-bottom: 8px;
-  opacity: 0.25;
+  opacity: 1;
 }
+.termCardYellow .termNum { color: var(--navy, #0a3a57); }
+.termCardWhite .termNum { color: var(--yellow, #ffd23e); }
 .termTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(1.1rem, 2vw, 1.5rem);
@@ -266,7 +267,7 @@
 }
 .termBody {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.75rem, 1.1vw, 0.88rem);
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
   font-weight: 500;
   color: var(--navy, #0a3a57);
   line-height: 1.3;
