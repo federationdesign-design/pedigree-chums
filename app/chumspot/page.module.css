@@ -74,9 +74,9 @@
 }
 .sectionTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2.4rem, 5.5vw, 4.5rem);
   color: var(--yellow, #ffd23e);
-  margin: 0 0 clamp(20px, 3vw, 36px);
+  margin: 0 0 clamp(8px, 1.5vw, 14px);
   line-height: 1.05;
   text-align: center;
 }
@@ -145,20 +145,20 @@
 }
 .stepTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
   color: var(--yellow, #ffd23e);
   margin: 0 0 10px;
   line-height: 1.1;
 }
 .step p {
-  font-size: clamp(0.82rem, 1.3vw, 0.95rem);
+  font-size: clamp(0.75rem, 1.1vw, 0.88rem);
   color: #ffffff;
   margin: 0;
   line-height: 1.3;
 }
 
 /* ── Prize ───────────────────────────────────────────────────────────────── */
-.prizeSection { background: rgba(255,210,62,0.08); }
+.prizeSection {}
 .prizeList {
   list-style: none;
   padding: 0;
@@ -212,7 +212,7 @@
 }
 
 /* ── CTA section ─────────────────────────────────────────────────────────── */
-.ctaSection { background: rgba(10,58,87,0.35); }
+.ctaSection {}
 .hashtags {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(1.3rem, 3vw, 2rem);
@@ -286,3 +286,19 @@
   .termsGrid { grid-template-columns: 1fr; }
   .criteria { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── Prize two-col with video ────────────────────────────────────────────── */
+.prizeCols {
+  display: grid;
+  grid-template-columns: 1fr clamp(200px, 30%, 340px);
+  gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+  margin-top: clamp(16px, 2vw, 24px);
+}
+.prizeVideo {
+  width: 100%;
+  border-radius: 16px;
+  display: block;
+  overflow: hidden;
+}
+@media (max-width: 640px) { .prizeCols { grid-template-columns: 1fr; } }

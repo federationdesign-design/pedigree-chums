@@ -11,12 +11,12 @@ const TERMS = [
   {
     num: "1",
     title: "The promoter",
-    body: "The promoter of the ChumSpot Challenge is [FULL LEGAL BUSINESS NAME], trading as Pedigree Chums, [BUSINESS POSTAL ADDRESS]. Competition enquiries should be sent to [COMPETITION EMAIL ADDRESS]. In these terms, \"we\", \"us\", \"our\" and \"the promoter\" refer to the business identified above.",
+    body: "The promoter of the ChumSpot Challenge is Taylor James Stephens Ltd, trading as Pedigree Chums. Competition enquiries should be sent to hello@Pedigree-Chums.co.uk. In these terms, \"we\", \"us\", \"our\" and \"the promoter\" refer to the business identified above.",
   },
   {
     num: "2",
     title: "Competition dates",
-    body: "The ChumSpot Challenge begins on [OVERALL START DATE] and ends at 23:59 UK time on [OVERALL FINAL CLOSING DATE]. The competition is divided into monthly rounds. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. All times are UK local time (GMT or BST as applicable). An entry received after a monthly closing time may be considered during the following monthly round, provided the overall competition is still open. Entries received after the overall final closing date will not be accepted.",
+    body: "The ChumSpot Challenge is an ongoing monthly competition. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. The competition is divided into monthly rounds. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. All times are UK local time (GMT or BST as applicable). An entry received after a monthly closing time may be considered during the following monthly round, provided the overall competition is still open. Entries received after the overall final closing date will not be accepted.",
   },
   {
     num: "3",
@@ -26,7 +26,7 @@ const TERMS = [
   {
     num: "4",
     title: "How to enter",
-    body: "1. Spot a dog matching a breed in the Pedigree Chums pack. 2. Take an original photo or video with the matching card. 3. Post publicly on Instagram or TikTok during the relevant competition period. 4. Tag @pedigree_chums. 5. Include both #ChumSpot and #DogSpotting. 6. Keep the post publicly viewable until the winner is selected. Multiple entries are permitted but each must be a separate post with an original photo or video.",
+    body: "(1) Spot a dog matching a breed in the Pedigree Chums pack. (2) Take an original photo or video with the matching card. (3) Post publicly on Instagram or TikTok during the relevant period. (4) Tag @pedigree_chums. (5) Include both #ChumSpot and #DogSpotting. (6) Keep the post publicly viewable until the winner is selected. Multiple entries are permitted — each must be a separate post featuring an original photo or video.",
   },
   {
     num: "5",
@@ -46,7 +46,7 @@ const TERMS = [
   {
     num: "8",
     title: "Judging process",
-    body: "The ChumSpot Challenge is a judged competition, not a random draw. A panel including at least one independent member will score entries on: Charm and personality (30%), Creativity and originality (30%), Dog-and-card match (20%), Clarity and storytelling (20%). The highest-scoring eligible entry wins. In the event of a tie, the creativity criterion is reassessed. The judges' decision is final.",
+    body: "We choose our favourite each month — and our criteria change to keep things fresh. That said, the safest way to get noticed is simple: a good quality image or video, a clear view of the card, a clear view of the dog, and something fun. Make us smile. The judges' decision is final.",
   },
   {
     num: "9",
@@ -161,7 +161,7 @@ export default function ChumSpot() {
                 ["1. Spot", "Find a dog that matches a breed featured in your Pedigree Chums pack."],
                 ["2. Snap", "Ask the dog\u2019s owner or handler for permission, then take a photo or video showing the dog with the matching card."],
                 ["3. Post", "Share your photo or video publicly on Instagram or TikTok."],
-                ["4. Tag", "Tag our official account @pedigree_chums and include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public until the winner is selected."],
+                ["4. Tag", "Tag @pedigree_chums + include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public."],
               ].map(([title, body]) => (
                 <div key={title} className={styles.step}>
                   <h3 className={styles.stepTitle}>{title}</h3>
@@ -176,14 +176,28 @@ export default function ChumSpot() {
         <section className={styles.prizeSection}>
           <div className={styles.inner}>
             <h2 className={styles.sectionTitle}>The prize</h2>
-            <p>One <strong>Best in Show</strong> winner will be selected during each monthly round. The winner receives:</p>
-            <ul className={styles.prizeList}>
-              <li>One exclusive Limited Edition Chum Figurine</li>
-              <li>3D printed to order</li>
-              <li>Free delivery to one UK address</li>
-              <li>The title of ChumSpot Best in Show</li>
-              <li>The opportunity to be featured on the Pedigree Chums website and social channels</li>
-            </ul>
+            <div className={styles.prizeCols}>
+              <div>
+                <p>One <strong>Best in Show</strong> winner will be selected during each monthly round. The winner receives:</p>
+                <ul className={styles.prizeList}>
+                  <li>One exclusive Limited Edition Chum Figurine</li>
+                  <li>3D printed to order</li>
+                  <li>Free delivery to one UK address</li>
+                  <li>The title of ChumSpot Best in Show</li>
+                  <li>The opportunity to be featured on the Pedigree Chums website and social channels</li>
+                </ul>
+              </div>
+              <div>
+                <video
+                  className={styles.prizeVideo}
+                  src="/prize-figurine.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -191,8 +205,9 @@ export default function ChumSpot() {
         <section className={styles.section}>
           <div className={styles.inner}>
             <h2 className={styles.sectionTitle}>What are we looking for?</h2>
-            <p>You do not need professional equipment. We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
-            <p>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
+            <p style={{textAlign:"center"}}>You do not need professional equipment.</p>
+            <p style={{textAlign:"center"}}>We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
+            <p style={{textAlign:"center"}}>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
           </div>
         </section>
 
