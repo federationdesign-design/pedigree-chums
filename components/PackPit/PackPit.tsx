@@ -245,7 +245,7 @@ export default function PackPit() {
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.25 * (isMobile ? 0.9 : 1), aspect: 1 };
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 4.95 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
-      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit2.svg", shape: "slipper-std", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.721 };
+      const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit2.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.721 };
       const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
       const BALLS = isMobile ? [ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
@@ -334,17 +334,19 @@ export default function PackPit() {
           // drawn image back over it.
           const bw = prop.width, bh = prop.width / prop.aspect;
           const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const VB = prop.shape === "slipper" ? { w: 1110.4, h: 411.3 } : { w: 1031.7, h: 316.8 };
+          const VB = prop.shape === "slipper" ? { w: 1108.5, h: 407.4 } : { w: 1031.7, h: 316.8 };
           const po2 = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
           const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
           // parts at origin so centroid is predictable
           const R = (vx: number, vy: number, w: number, h: number, opts = po) =>
             Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, opts);
+          const RA = (vx: number, vy: number, w: number, h: number, deg: number, opts = po) =>
+            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, { ...opts, angle: deg * Math.PI / 180 });
           const C = (vx: number, vy: number, r: number) =>
             Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
-              ? [R(555, 377, 1060, 60)] // sole only - bottom flush with VB h=407.4
+              ? [R(554, 363, 1107, 84), C(546, 241, 164), C(124, 283, 97), RA(370, 133, 540, 70, -18.7), R(891, 286, 349, 64)] // sole, upper slope, toe, upper ridge, heel
               : [
                 R(515, 295, 820, 30, po2),   // floor -- full inner width, thin
                 R(515, 265, 120, 80, po2),   // centre bump -- uneven floor stops stacking
