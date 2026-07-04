@@ -2084,7 +2084,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const pinC = Constraint.create({ pointA: { x: cx, y: floorY - 5 }, bodyB: bowlB, pointB: { x: 0, y: bowlB.plugin.h * 0.35 }, stiffness: 1, length: 0, render: { visible: false } });
         Composite.add(engine.world, [pinL, pinR, pinC]);
         // Make bowl a sensor -- no contact forces, stops wobble from other objects
-        bowlB.collisionFilter = { ...bowlB.collisionFilter, category: LOCKED_CAT };
+        // bowl stays in default category so mouse constraint can grab it
         Body.set(bowlB, { frictionAir: 0.99, density: 10, gravityScale: 0, inertia: Infinity, inverseInertia: 0 });
         bowlB.plugin.lockedBowl = true; // flag for draw order
         burstAt(cx, cy, bowlB.plugin.half * 0.3);
