@@ -279,8 +279,6 @@ export default function HotDogs() {
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"68px",height:"68px",zIndex:2,display:"block",transform:"rotate(-45deg) scaleX(-1)"}} />
                   <strong>Hot/Dogs</strong>
                   <em>2024, Britain. A card game about spotting dog breeds. Named after sausages named after dogs named after badger holes. The dachshund appears on card 14. It looks like it knows exactly what happened.</em>
                 </span>
@@ -391,7 +389,7 @@ export default function HotDogs() {
 
         {/* ── End ──────────────────────────────────────────────────── */}
         <section className={styles.endSection}>
-          <div className={styles.sectionInner}>
+          <div className={styles.cookingInner}>
             <p className={styles.endLine}>A sausage can be a dog.</p>
             <p className={styles.endLine}>A dog can be a sausage.</p>
             <p className={styles.endLine}>A comma can move the joke.</p>
