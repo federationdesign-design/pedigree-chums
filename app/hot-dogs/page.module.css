@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(80px, 12vw, 140px) 50px clamp(48px, 8vw, 96px);
+  padding: clamp(155px, 18vw, 215px) 50px clamp(48px, 8vw, 96px);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -487,7 +487,7 @@
 }
 .endBig {
   font-family: var(--font-display, 'Luckiest Guy', system-ui) !important;
-  font-size: clamp(2rem, 6vw, 4.5rem) !important;
+  font-size: clamp(4rem, 12vw, 9rem) !important;
   color: var(--yellow, #ffd23e) !important;
   margin-top: clamp(20px, 3vw, 32px) !important;
 }

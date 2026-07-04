@@ -258,21 +258,29 @@ export default function HotDogs() {
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"68px",height:"68px",zIndex:2,display:"block",transform:"rotate(-45deg) scaleX(-1)"}} />
                   <strong>Dachshund</strong>
                   <em>1700s. British troops returning from Europe brought the breed home. The name came with it. &ldquo;Dachshund&rdquo; proved difficult to say after a long day, and British English was already looking for a way out.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"68px",height:"68px",zIndex:2,display:"block",transform:"rotate(-45deg) scaleX(-1)"}} />
                   <strong>Sausage dog</strong>
                   <em>Britain looked at the dachshund and thought: sausage. Long body. Short legs. Slightly startled expression. The name stuck. The dachshund has not fully forgiven us. Their official name is still dachshund. We have not taken the hint.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"68px",height:"68px",zIndex:2,display:"block",transform:"rotate(-45deg) scaleX(-1)"}} />
                   <strong>Hot dog</strong>
                   <em>1890s, New York. Street vendors sold warm sausages in rolls. Cartoonists drew them as dachshunds. The joke became the name. A hot sausage became a hot dog. No actual dogs were harmed. Several were confused.</em>
                 </span>
                 <span className={styles.congaArrow}>&rarr;</span>
                 <span className={styles.congaStep}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"68px",height:"68px",zIndex:2,display:"block",transform:"rotate(-45deg) scaleX(-1)"}} />
                   <strong>Hot/Dogs</strong>
                   <em>2024, Britain. A card game about spotting dog breeds. Named after sausages named after dogs named after badger holes. The dachshund appears on card 14. It looks like it knows exactly what happened.</em>
                 </span>
