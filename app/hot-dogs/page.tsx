@@ -53,7 +53,7 @@ export default function HotDogs() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/eatinghotdog.png" alt="" className={styles.noteImg} />
               <div className={styles.noteText}>
-                <h2 className={styles.noteTitle}>Disclaimer: A note about hot dogs</h2>
+                <h2 className={styles.noteTitle}>Disclaimer:<br />A note about hot dogs</h2>
                 <p>Sometimes we mean human food: sausages in buns.</p>
                 <p>Sometimes we mean dogs who are too hot and need shade, water and probably some ice.</p>
                 <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums game flavour.</p>
@@ -236,7 +236,8 @@ export default function HotDogs() {
               <div className={styles.congaChain}>
                 <span className={styles.congaStep}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/yellow-arrow.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-14px",width:"28px",zIndex:1}} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/yellow-arrow.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-16px",right:"-20px",width:"36px",height:"36px",zIndex:2,display:"block"}} />
                   <strong>Dachs + Hund</strong>
                   <em>German. Dachs means badger. Hund means dog. Together: a dog bred to dig into badger burrows, low to the ground, long in the body, short in the leg. The Germans named it for its job. Sensible people, the Germans.</em>
                 </span>
@@ -311,17 +312,9 @@ export default function HotDogs() {
           <div className={styles.gameInner}>
             <p className={styles.sectionEyebrow}>Pedigree Chums game flavour</p>
             <h2 className={styles.sectionTitle}>Hot Dogs mode</h2>
-            <p className={styles.lead}>
-              In normal play, your hand is your kennel. In Hot Dogs, every kennel opens once.
-            </p>
-            <p>
-              In the original game, your hand is private. Your dogs are your dogs.
-              Your secrets are your secrets.
-            </p>
-            <p>Hot Dogs mode is different.</p>
-
             <div className={styles.gameTwoCols}>
               <div>
+                <h3 className={styles.subTitle} style={{marginTop:0}}>In the original game, your hand is private. Your dogs are your dogs. Your secrets are your secrets. Hot Dogs mode is different.</h3>
                 <div className={styles.ruleSteps}>
                   <div className={styles.ruleStep}>
                     <span className={styles.ruleNum}>1</span>
