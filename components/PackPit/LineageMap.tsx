@@ -1595,7 +1595,7 @@ export default function LineageMap({
             {/* magnify icon bottom-left */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
               <button
-                style={{ position: "absolute", left: 4, bottom: 4, width: 28, height: 28, border: "none", borderRadius: 8, background: "rgba(10,58,87,0.75)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                style={{ position: "absolute", left: 4, bottom: 4, width: 28, height: 28, border: "none", borderRadius: 8, background: "rgba(10,58,87,0.75)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
                 onPointerDown={(e) => e.stopPropagation()}
               >
@@ -1610,22 +1610,22 @@ export default function LineageMap({
               );
             })()}
             {/* info icon top-right */}
-            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
+            {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
-                style={{ position: "absolute", right: 4, top: 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif" }}
+                style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
             )}
             {/* % pill bottom-right */}
-            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+            {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (() => {
               const pillMix = breedMix.get(c.img)?.norm ?? c.mix;
               const pillTxt = pillMix < 1 ? "<1%*" : `${Math.round(pillMix)}%${c.share !== pillMix ? "*" : ""}`;
               return (
                 <div
                   onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  style={{ position: "absolute", right: 2, bottom: 4, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui" }}
+                  style={{ position: "absolute", right: -2, bottom: -14, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 65 }}
                 >
                   {pillTxt}
                 </div>
