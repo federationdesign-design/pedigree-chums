@@ -26,7 +26,7 @@ const TERMS = [
   {
     num: "4",
     title: "How to enter",
-    body: "(1) Spot a dog matching a breed in the Pedigree Chums pack. (2) Take an original photo or video with the matching card. (3) Post publicly on Instagram or TikTok during the relevant period. (4) Tag @pedigree_chums. (5) Include both #ChumSpot and #DogSpotting. (6) Keep the post publicly viewable until the winner is selected. Multiple entries are permitted — each must be a separate post featuring an original photo or video.",
+    body: "1. Spot a dog matching a breed in the Pedigree Chums pack. | 2. Take an original photo or video with the matching card. | 3. Post publicly on Instagram or TikTok during the relevant period. | 4. Tag @pedigree_chums. | 5. Include both #ChumSpot and #DogSpotting. | 6. Keep the post publicly viewable until the winner is selected. Multiple entries are permitted — each must be a separate post featuring an original photo or video.",
   },
   {
     num: "5",
@@ -133,14 +133,14 @@ export default function ChumSpot() {
         {/* ── What it is ───────────────────────────────────────── */}
         <section className={styles.section}>
           <div className={styles.inner}>
-            <p className={styles.lead}>
+            <p className={styles.lead} style={{textAlign:"center"}}>
               Have you spotted a dog that matches one of the breeds in your Pedigree Chums pack?
             </p>
-            <p>
+            <p style={{textAlign:"center"}}>
               Take a photo or video with the matching card, share it on Instagram or TikTok,
               and enter the <strong>ChumSpot Challenge</strong>.
             </p>
-            <p>
+            <p style={{textAlign:"center"}}>
               Every month, we&rsquo;ll choose our favourite entry as <strong>Best in Show</strong>.
               The winner receives an exclusive Limited Edition Chum Figurine, 3D printed to order
               and delivered free anywhere in the United Kingdom.
@@ -157,17 +157,22 @@ export default function ChumSpot() {
           <div className={styles.inner}>
             <h2 className={styles.sectionTitle}>How to enter</h2>
             <div className={styles.steps}>
-              {[
-                ["1. Spot", "Find a dog that matches a breed featured in your Pedigree Chums pack."],
-                ["2. Snap", "Ask the dog\u2019s owner or handler for permission, then take a photo or video showing the dog with the matching card."],
-                ["3. Post", "Share your photo or video publicly on Instagram or TikTok."],
-                ["4. Tag", "Tag @pedigree_chums + include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public."],
-              ].map(([title, body]) => (
-                <div key={title} className={styles.step}>
-                  <h3 className={styles.stepTitle}>{title}</h3>
-                  <p>{body}</p>
-                </div>
-              ))}
+              <div className={styles.step}>
+                <h3 className={styles.stepTitle}>1. Spot</h3>
+                <p>Find a dog that matches a breed featured in your Pedigree Chums pack.</p>
+              </div>
+              <div className={styles.step}>
+                <h3 className={styles.stepTitle}>2. Snap</h3>
+                <p>Ask the dog&rsquo;s owner or handler for permission, then take a photo or video showing the dog with the matching card.</p>
+              </div>
+              <div className={styles.step}>
+                <h3 className={styles.stepTitle}>3. Post</h3>
+                <p>Share your photo or video publicly on Instagram or TikTok.</p>
+              </div>
+              <div className={styles.step}>
+                <h3 className={styles.stepTitle}>4. Tag</h3>
+                <p>Tag @pedigree_chums + include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public.</p>
+              </div>
             </div>
           </div>
         </section>
@@ -190,7 +195,8 @@ export default function ChumSpot() {
               <div>
                 <video
                   className={styles.prizeVideo}
-                  src="/prize-figurine.mp4"
+                  src="/lab-animation.mp4"
+                  poster="/lab-animation-1stframe.jpg"
                   autoPlay
                   muted
                   loop
@@ -201,25 +207,25 @@ export default function ChumSpot() {
           </div>
         </section>
 
-        {/* ── Judging criteria ─────────────────────────────────── */}
+        {/* ── What + Ready: two columns ────────────────────────── */}
         <section className={styles.section}>
           <div className={styles.inner}>
-            <h2 className={styles.sectionTitle}>What are we looking for?</h2>
-            <p style={{textAlign:"center"}}>You do not need professional equipment.</p>
-            <p style={{textAlign:"center"}}>We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
-            <p style={{textAlign:"center"}}>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
-          </div>
-        </section>
-
-        {/* ── CTA ──────────────────────────────────────────────── */}
-        <section className={styles.ctaSection}>
-          <div className={styles.inner} style={{textAlign:"center"}}>
-            <h2 className={styles.sectionTitle}>Ready to join the pack?</h2>
-            <p>Spot your next Chum, share your entry and remember both hashtags:</p>
-            <p className={styles.hashtags}>#ChumSpot &nbsp; #DogSpotting</p>
-            <div className={styles.ctaPills}>
-              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className={styles.ctaPrimary}>Enter on Instagram</a>
-              <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" className={styles.ctaSecondary}>Enter on TikTok</a>
+            <div className={styles.whatReadyCols}>
+              <div>
+                <h2 className={styles.sectionTitle}>What are we looking for?</h2>
+                <p>You do not need professional equipment.</p>
+                <p>We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
+                <p>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
+              </div>
+              <div style={{textAlign:"center"}}>
+                <h2 className={styles.sectionTitle}>Ready to join the pack?</h2>
+                <p>Spot your next Chum, share your entry and remember both hashtags:</p>
+                <p className={styles.hashtags}>#ChumSpot &nbsp; #DogSpotting</p>
+                <div className={styles.ctaPills}>
+                  <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className={styles.ctaPrimary}>Enter on Instagram</a>
+                  <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" className={styles.ctaSecondary}>Enter on TikTok</a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -233,7 +239,15 @@ export default function ChumSpot() {
                 <div key={t.num} className={`${styles.termCard} ${i % 2 === 0 ? styles.termCardYellow : styles.termCardWhite}`}>
                   <span className={styles.termNum}>{t.num}</span>
                   <h3 className={styles.termTitle}>{t.title}</h3>
-                  <p className={styles.termBody}>{t.body}</p>
+                  {t.body.includes(" | ") ? (
+                    <ol className={styles.termList}>
+                      {t.body.split(" | ").map((item, j) => (
+                        <li key={j} className={styles.termBody}>{item}</li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className={styles.termBody}>{t.body}</p>
+                  )}
                 </div>
               ))}
             </div>

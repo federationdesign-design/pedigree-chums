@@ -99,7 +99,9 @@
   border-left: 3px solid var(--yellow, #ffd23e);
   padding-left: 16px;
   margin-top: clamp(20px, 3vw, 32px);
+  max-width: 40%;
 }
+@media (max-width: 768px) { .ageNote { max-width: 100%; } }
 
 /* ── CTA pills ──────────────────────────────────────────────────────────── */
 .ctaPills {
@@ -151,10 +153,10 @@
   line-height: 1.1;
 }
 .step p {
-  font-size: clamp(0.75rem, 1.1vw, 0.88rem);
+  font-size: clamp(0.75rem, 1.1vw, 0.88rem) !important;
   color: #ffffff;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.3 !important;
 }
 
 /* ── Prize ───────────────────────────────────────────────────────────────── */
@@ -302,3 +304,26 @@
   overflow: hidden;
 }
 @media (max-width: 640px) { .prizeCols { grid-template-columns: 1fr; } }
+
+/* ── Two-col: What/Ready side by side ───────────────────────────────────── */
+.whatReadyCols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+}
+.whatReadyCols .sectionTitle { text-align: left; }
+@media (max-width: 720px) { .whatReadyCols { grid-template-columns: 1fr; } }
+
+.termList {
+  padding-left: 18px;
+  margin: 0;
+}
+.termList li {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-weight: 500;
+  color: var(--navy, #0a3a57);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
