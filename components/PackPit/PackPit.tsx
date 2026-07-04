@@ -73,9 +73,9 @@ export default function PackPit() {
   }, []);
   // a milestone must wait for the family tree, the pre-order form (a modal dialog
   // in the DOM) and the cookies banner to clear before it pops over the pit
-  const msBlocked = () => !!activeBreed
-    || cookiesOpenRef.current
+  const anyOverlayOpen = () => !!activeBreed || howToPlay || shelfOpen || cookiesOpenRef.current
     || (typeof document !== "undefined" && !!document.querySelector('[role="dialog"][aria-modal="true"]'));
+  const msBlocked = anyOverlayOpen;
   useEffect(() => {
     const reached = Math.floor(score / MS_STEP) * MS_STEP; // highest 5k mark at or below the score
     if (reached >= MS_STEP && reached > msLast.current) {
@@ -140,6 +140,14 @@ export default function PackPit() {
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
+  // Fire pending game over as soon as all overlays close
+  useEffect(() => {
+    if (!activeBreed && !howToPlay && !shelfOpen && !cookiesOpenRef.current && pendingGameOver.current && !gameOver) {
+      pendingGameOver.current = false;
+      gameOverRef.current = true;
+      window.setTimeout(() => setGameOver(true), 800);
+    }
+  }, [activeBreed, howToPlay, shelfOpen, gameOver]);
 
   // Auto slow motion at zero drain cost when any overlay is open
   const autoSlowmoRef = useRef(false);
@@ -188,6 +196,7 @@ export default function PackPit() {
   // If a body spawns and is still in the top 10% of the pit after 3s, the pit is full.
   // Cannot fire before 30s to avoid triggering during the opening cascade.
   const gameOverRef = useRef(false);
+  const pendingGameOver = useRef(false); // queued game over, fires when all overlays close
   useEffect(() => {
     const startTime = Date.now();
     const onResult = (e: Event) => {
@@ -201,12 +210,12 @@ export default function PackPit() {
         // until average body speed drops below threshold, then wait an extra 1.5s
         const checkQuiet = () => {
           const eng = engineRef.current;
-          if (!eng) { if (runnerRef.current) (runnerRef.current as any).enabled = false; window.setTimeout(() => setGameOver(true), 1500); return; }
+          if (!eng) { if (runnerRef.current) (runnerRef.current as any).enabled = false; pendingGameOver.current = true; return; }
           const all = (eng.world.bodies as any[]).filter((b: any) => !b.isStatic);
           const avgSpeed = all.length ? all.reduce((s: number, b: any) => s + Math.hypot(b.velocity.x, b.velocity.y), 0) / all.length : 0;
           if (avgSpeed < 2) {
             if (runnerRef.current) (runnerRef.current as any).enabled = false;
-            window.setTimeout(() => setGameOver(true), 1500);
+            pendingGameOver.current = true;
           } else {
             window.setTimeout(checkQuiet, 500);
           }
@@ -1957,7 +1966,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               fillFullTimer = setTimeout(() => {
                 if (gameOverRef.current) return;
                 if (runnerRef.current) Runner.stop(runnerRef.current);
-                window.setTimeout(() => setGameOver(true), 1500);
+                pendingGameOver.current = true;
               }, 4000);
             }
           } else {
@@ -2988,7 +2997,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         <span className={styles.shakeText}>Shake</span>
       </button>
 
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (!["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"].includes(name)) { setCollected((c) => { const next = c + 1; if (next >= 54) window.setTimeout(() => setGameOver(true), 800); return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (!["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"].includes(name)) { setCollected((c) => { const next = c + 1; if (next >= 54) { pendingGameOver.current = true; }; return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
       <HowToPlay open={howToPlay} onClose={() => { setHowToPlay(false); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">

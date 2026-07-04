@@ -828,10 +828,12 @@ export default function LineageMap({
 
   const startRemove = () => {
     if (removing) return;
-    // Instructions cards: auto-place all cards into frames, then close after 1s
+    // Instructions cards: reveal all nodes, auto-place cards, poof root card, then close
     if (INSTR_NAMES.has(breed.name)) {
-      onRemove?.(breed.name);
-      // auto-place any unplaced cards
+      // Step 1: reveal all unopened nodes immediately
+      const allNodeIds = shown.map((n) => n._id);
+      setOpen(new Set(allNodeIds.map(String)));
+      // Step 2: auto-place unplaced cards staggered
       const unplacedInstr = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
       const claimedFilled = new Map(filled);
       unplacedInstr.forEach((c, i) => {
@@ -841,10 +843,25 @@ export default function LineageMap({
         window.setTimeout(() => {
           setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
           setFilled((m) => { const x = new Map(m); x.set(target.id, c.id); return x; });
-          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
-        }, i * 120);
+          // poof at frame location
+          const pid = puffSeq.current++;
+          setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
+          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 50, FLASH_SIZE);
+        }, 400 + i * 150);
       });
-      window.setTimeout(() => onClose(), Math.max(600, unplacedInstr.length * 120 + 1000));
+      const delay = Math.max(800, 400 + unplacedInstr.length * 150 + 400);
+      // Step 3: poof the root card with 3 smoke balls, then close
+      window.setTimeout(() => {
+        burstAt(breed.x, breed.y, ROOT * 1.5);
+        for (let i = 0; i < 3; i++) {
+          const pid = puffSeq.current++;
+          const ox = (Math.random() - 0.5) * ROOT * 1.2, oy = (Math.random() - 0.5) * ROOT * 1.2;
+          setPuffs((p) => [...p, { id: pid, sx: breed.x + pan.x + ox, sy: breed.y + pan.y + oy }]);
+          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+        }
+        window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 500);
+      }, delay);
       return;
     }
     // snapshot where every visible card is right now, plus a tumble spin for each,
