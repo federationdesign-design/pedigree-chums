@@ -153,7 +153,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
               {(i < 3 || i === 5) ? (
                 <video
                   data-step={i}
-                  src={`/step${i + 1}-video-animation.mp4`}
+                  src={i === 2 ? "/step3-video-animationv3.mp4" : `/step${i + 1}-video-animation.mp4`}
                   autoPlay={i === 0} muted playsInline preload="auto"
                   ref={(el) => {
                     if (!el) return;
