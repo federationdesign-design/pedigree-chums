@@ -679,12 +679,24 @@ export default function LineageMap({
     // fully open: auto-place all unplaced cards into their frames with bubble animation
     const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
     if (unplaced.length > 0) {
+      // Track claimed frame IDs locally so duplicate-breed cards don't all race to the same empty frame
+      const claimedFilled = new Map(filled); // snapshot: frameId -> cardId
+      const claimedStacked = new Map(stacked); // snapshot: frameId -> cardIds[]
       unplaced.forEach((c, i) => {
-        const emptyTarget = frames.find((f) => f.img === c.img && !filled.has(f.id));
-        const stackTarget = emptyTarget ?? frames.find((f) => f.img === c.img && filled.get(f.id) !== c.id);
+        // Find target using local snapshot so each card claims a unique slot
+        const emptyTarget = frames.find((f) => f.img === c.img && !claimedFilled.has(f.id));
+        const stackTarget = emptyTarget ?? frames.find((f) => f.img === c.img);
         const target = stackTarget;
         const isDup = !emptyTarget && !!stackTarget;
         if (!target) return;
+        // Claim the slot immediately in local snapshot
+        if (isDup) {
+          const arr = claimedStacked.get(target.id) ? [...claimedStacked.get(target.id)!] : [];
+          arr.push(c.id);
+          claimedStacked.set(target.id, arr);
+        } else {
+          claimedFilled.set(target.id, c.id);
+        }
         window.setTimeout(() => {
           setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
           const sx0 = c.cardX, sy0 = c.cardY;
