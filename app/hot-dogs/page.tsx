@@ -186,7 +186,7 @@ export default function HotDogs() {
             <div className={styles.cookingTwoCols}>
               <div className={styles.cookingCol}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/Why are hot dogs called hot dogs.jpg" alt="Why are hot dogs called hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
+                <img src="/why-are-hot-dogs-called-hot-dogs.jpg" alt="Why are hot dogs called hot dogs" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
                 <h3 className={styles.subTitle}>Why are hot dogs called hot dogs?</h3>
                 <p>
                   Not because dogs are hot. Disappointing, perhaps.
@@ -198,7 +198,7 @@ export default function HotDogs() {
                 </p>
 
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/What is a sausage dog.jpg" alt="What is a sausage dog" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
+                <img src="/what-is-a-sausage-dog.jpg" alt="What is a sausage dog" style={{width:"100px",height:"100px",objectFit:"cover",borderRadius:"50%",display:"block",marginBottom:"16px"}} />
                 <h3 className={styles.subTitle}>What is a sausage dog?</h3>
                 <p>
                   A sausage dog is a dachshund. A dachshund is not a sausage.
@@ -244,7 +244,7 @@ export default function HotDogs() {
                 <span className={styles.congaStep}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"54px",height:"54px",zIndex:2,display:"block",transform:"scaleX(-1)"}} />
+                  <img src="/arrow-yellow-mid.svg" alt="" aria-hidden="true" style={{position:"absolute",top:"-18px",right:"-24px",width:"54px",height:"54px",zIndex:2,display:"block",transform:"rotate(-45deg) scaleX(-1)"}} />
                   <strong>Dachs + Hund</strong>
                   <em>German. Dachs means badger. Hund means dog. Together: a dog bred to dig into badger burrows, low to the ground, long in the body, short in the leg. The Germans named it for its job. Sensible people, the Germans.</em>
                 </span>
