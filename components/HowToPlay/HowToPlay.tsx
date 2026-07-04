@@ -136,6 +136,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
         <div
           className={styles.stepScroll}
           ref={scrollRef}
+          data-htp-scroll="1"
           onScroll={(e) => { const el = e.currentTarget; setScrollFraction(el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)); }}
           onPointerDown={(e) => {
             const el = scrollRef.current; if (!el) return;
@@ -153,13 +154,27 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
                 <video
                   data-step={i}
                   src={`/step${i + 1}-video-animation.mp4`}
-                  autoPlay={i !== 1} muted playsInline preload="auto"
+                  autoPlay={i === 0} muted playsInline preload="auto"
+                  ref={(el) => {
+                    if (!el) return;
+                    if (i === 0) {
+                      // video 2 starts 2s after video 1 starts
+                      el.addEventListener("play", () => {
+                        window.setTimeout(() => {
+                          const v2 = el.closest("[data-htp-scroll]")?.querySelector("[data-step=\"1\"]") as HTMLVideoElement | null;
+                          if (v2) v2.play().catch(() => {});
+                        }, 2000);
+                      }, { once: true });
+                    }
+                  }}
                   onEnded={(e) => {
                     const v = e.currentTarget;
                     v.pause(); v.currentTime = Math.max(0, v.duration - 0.05);
                     if (i === 0) {
-                      const v2 = v.closest('[data-htp-step="0"]')?.parentElement?.querySelector('[data-step="1"]') as HTMLVideoElement | null;
-                      if (v2) v2.play().catch(() => {});
+                      // video 3 starts when video 1 finishes
+                      const scroll = v.closest("[data-htp-scroll]");
+                      const v3 = scroll?.querySelector("[data-step=\"2\"]") as HTMLVideoElement | null;
+                      if (v3) v3.play().catch(() => {});
                     }
                   }}
                   className={styles.stepImg}
