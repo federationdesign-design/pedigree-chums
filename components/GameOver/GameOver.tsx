@@ -153,50 +153,88 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#0a3a57"; ctx.fillRect(0, 0, W, H);
-    const grad = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, W*0.8);
-    grad.addColorStop(0, "rgba(20,151,214,0.45)"); grad.addColorStop(1, "rgba(12,91,146,0.1)");
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#ffd23e"; ctx.font = "bold 68px Arial Black, sans-serif"; ctx.textAlign = "center";
-    ctx.fillText("PEDIGREE CHUMS", W/2, 130);
-    ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.fillRect(80, 155, W-160, 3);
-    ctx.fillStyle = "#ffffff"; ctx.font = "bold 44px Arial, sans-serif"; ctx.fillText("MY SCORE", W/2, 240);
-    ctx.fillStyle = "#ffd23e"; ctx.font = "bold 180px Arial Black, sans-serif";
-    ctx.fillText(score.toLocaleString(), W/2, 430);
-    ctx.fillStyle = "#ffffff"; ctx.font = "bold 44px Arial, sans-serif";
-    ctx.fillText(`${chums} Chums Found`, W/2, 510);
-    ctx.strokeStyle = "rgba(255,210,62,0.3)"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(120, 560); ctx.lineTo(W-120, 560); ctx.stroke();
-    const shown = collectedBreeds.slice(-8);
-    if (shown.length === 0) {
-      ctx.fillStyle = "#ffd23e"; ctx.font = "bold 38px Arial, sans-serif";
-      ctx.fillText("Can you beat my score? 🐾", W/2, 700);
-      ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "32px Arial, sans-serif";
-      ctx.fillText("pedigreechums.co.uk", W/2, 760);
-      resolve(canvas.toDataURL("image/png")); return;
-    }
-    const sz = 110, gap = 16, totalW = shown.length * sz + (shown.length-1)*gap;
-    let x = (W - totalW) / 2; let loaded = 0;
-    shown.forEach((breed) => {
-      const bx = x; x += sz + gap;
-      const img = new Image(); img.crossOrigin = "anonymous";
-      const finish = () => { loaded++; if (loaded === shown.length) {
-        ctx.fillStyle = "#ffd23e"; ctx.font = "bold 38px Arial, sans-serif";
-        ctx.fillText("Can you beat my score? 🐾", W/2, 760);
-        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "32px Arial, sans-serif";
-        ctx.fillText("pedigreechums.co.uk", W/2, 820);
-        resolve(canvas.toDataURL("image/png"));
-      }};
-      img.onload = () => {
-        ctx.save(); ctx.beginPath(); ctx.arc(bx+sz/2, 650, sz/2, 0, Math.PI*2); ctx.clip();
-        ctx.drawImage(img, bx, 600, sz, sz); ctx.restore();
-        ctx.strokeStyle = "#ffd23e"; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(bx+sz/2, 650, sz/2, 0, Math.PI*2); ctx.stroke();
-        finish();
-      };
-      img.onerror = finish;
-      img.src = breed.img;
-    });
+
+    const drawCard = (logoImg: HTMLImageElement | null) => {
+      // Light blue background
+      ctx.fillStyle = "#2bb4ee";
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle radial highlight
+      const grad = ctx.createRadialGradient(W/2, H*0.35, 0, W/2, H*0.35, W*0.65);
+      grad.addColorStop(0, "rgba(255,255,255,0.18)");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Yellow rounded border - thick
+      const brd = 28, rad = 60;
+      ctx.strokeStyle = "#ffd23e";
+      ctx.lineWidth = brd;
+      ctx.beginPath();
+      ctx.roundRect(brd/2, brd/2, W-brd, H-brd, rad);
+      ctx.stroke();
+
+      // Logo image centred near top
+      if (logoImg) {
+        const lw = 520, lh = lw * (logoImg.naturalHeight / logoImg.naturalWidth);
+        ctx.drawImage(logoImg, (W-lw)/2, 90, lw, lh);
+      } else {
+        ctx.fillStyle = "#ffd23e";
+        ctx.font = "bold 72px Arial Black, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("PEDIGREE CHUMS", W/2, 180);
+      }
+
+      // Divider
+      ctx.strokeStyle = "rgba(255,255,255,0.4)";
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(120, 340); ctx.lineTo(W-120, 340); ctx.stroke();
+
+      // MY SCORE label
+      ctx.fillStyle = "#0a3a57";
+      ctx.font = "bold 52px Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("MY SCORE", W/2, 430);
+
+      // Score - big arcade/computer game style (monospace bold)
+      ctx.fillStyle = "#0a3a57";
+      ctx.font = "bold 220px 'Courier New', Courier, monospace";
+      ctx.textAlign = "center";
+      // Drop shadow for depth
+      ctx.shadowColor = "rgba(255,210,62,0.5)";
+      ctx.shadowBlur = 20;
+      ctx.fillText(score.toLocaleString(), W/2, 670);
+      ctx.shadowBlur = 0;
+
+      // Chums found
+      ctx.fillStyle = "#0a3a57";
+      ctx.font = "bold 48px Arial, sans-serif";
+      ctx.fillText(`${chums} Chums Found`, W/2, 760);
+
+      // Divider
+      ctx.strokeStyle = "rgba(255,255,255,0.4)";
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(120, 810); ctx.lineTo(W-120, 810); ctx.stroke();
+
+      // URL
+      ctx.fillStyle = "#0a3a57";
+      ctx.font = "bold 40px Arial, sans-serif";
+      ctx.fillText("pedigreechums.co.uk", W/2, 900);
+
+      // Tagline
+      ctx.fillStyle = "#0a3a57";
+      ctx.font = "36px Arial, sans-serif";
+      ctx.fillText("Can you beat my score? 🐾", W/2, 960);
+
+      resolve(canvas.toDataURL("image/png"));
+    };
+
+    // Load logo
+    const logo = new Image();
+    logo.crossOrigin = "anonymous";
+    logo.onload = () => drawCard(logo);
+    logo.onerror = () => drawCard(null);
+    logo.src = "/PC-logo.svg";
   });
 
   const handleShare = async () => {
