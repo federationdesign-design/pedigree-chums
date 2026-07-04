@@ -370,46 +370,56 @@ const LINEAGE: Record<string, LineageNode> = {
 
   "Boxer": {
     name: "Boxer",
-    note: "Created in Munich in the 1890s by crossing the German Bullenbeisser with English Bulldogs. The Bullenbeisser — meaning bull-biter — had hunted boar and bear for German nobility for centuries. The Bulldog brought a shorter muzzle and calmer temperament. The result was the Boxer: athletic, square-headed and devoted.",
+    note: "Developed in Munich in the 1890s. The FCI names the small Brabant Bullenbeisser as the Boxer's immediate ancestor, with later influence from the English Bulldog to further shorten the muzzle. The result: square-headed, athletic and devoted.",
     img: "/boxer-square.jpg",
     children: [
       {
-        name: "Bullenbeisser",
-        note: "The extinct German hunting and bull-baiting dog at the heart of the Boxer. Used by German nobility to hunt boar, bear and deer. Powerful, fearless and fast — bred to hold prey by the muzzle until the hunter arrived.",
+        name: "Brabant Bullenbeisser",
+        note: "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor.",
         img: "/history/breeds/Bullenbeisser.jpg",
-        value: 70,
+        value: 75,
         children: [
           {
-            name: "Ancient Molossers",
-            note: "The great war and hunting dogs of the ancient world. Brought west by trade and conquest, they became the root stock of nearly every large working dog in Europe.",
-            img: "/history/breeds/Ancient-Molossers.jpg",
-            value: 60,
-          },
-          {
-            name: "Old German boarhounds",
-            note: "Heavy German hunting dogs used to hold large game. Contributed size, courage and the tenacious grip that defined the Bullenbeisser.",
+            name: "German Bullenbeisser types",
+            note: "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound.",
             img: "/history/breeds/Old-German-boarhounds.jpg",
-            value: 40,
+            value: 65,
+            children: [
+              {
+                name: "Medieval Alaunts and catch dogs",
+                note: "European catch dogs descended from dogs brought west by the Alans and other steppe peoples in the early medieval period. Bred across the continent for size, grip and courage in the hunt and in war.",
+                img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg",
+                value: 60,
+                children: [
+                  {
+                    name: "Ancient Molossers",
+                    note: "The great war and guard dogs of the ancient world, kept by Assyrians, Greeks and Romans. Root stock of nearly every large holding and fighting dog in Europe and western Asia.",
+                    img: "/history/breeds/Ancient-Molossers.jpg",
+                    value: 100,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
       {
         name: "Old English Bulldog",
-        note: "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the Boxer to shorten the muzzle and broaden the chest.",
+        note: "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the early Boxer to further shorten the muzzle and soften temperament.",
         img: "/history/breeds/Old-English-Bulldog.jpg",
-        value: 30,
+        value: 25,
         children: [
           {
             name: "English Mastiff",
-            note: "The ancient Molosser line of Britain, brought by Phoenician traders. Gave the Bulldog its bone and bulk.",
+            note: "The ancient Molosser line of Britain. Gave the Bulldog its bone, bulk and broad head.",
             img: "/history/breeds/english-mastiff-photo.jpg",
-            value: 55,
+            value: 60,
           },
           {
             name: "Ancient Molossers",
-            note: "The common ancestor of all Mastiff-type dogs. Spread across Europe and Asia with armies and traders.",
+            note: "The common deep ancestor of all Mastiff-type dogs across Europe.",
             img: "/history/breeds/Ancient-Molossers.jpg",
-            value: 45,
+            value: 40,
           },
         ],
       },
