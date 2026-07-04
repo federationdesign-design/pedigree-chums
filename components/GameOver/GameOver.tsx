@@ -27,7 +27,7 @@ function getDogLeaderboard() {
   const seed = todayStr().split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const rng = (n: number) => { const x = Math.sin(seed + n) * 10000; return x - Math.floor(x); };
   const shuffled = [...DOG_POOL].sort((a, b) => rng(a.name.charCodeAt(0)) - rng(b.name.charCodeAt(0)));
-  return shuffled.slice(0, 3).map((dog, i) => ({
+  return shuffled.slice(0, 7).map((dog, i) => ({
     name: dog.name,
     score: dog.scores[Math.floor(rng(i + 10) * dog.scores.length)],
     isDog: true,
@@ -61,7 +61,7 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
     const k = `${e.name}:${e.score}`;
     if (seen.has(k)) return false;
     seen.add(k); return true;
-  }).slice(0, 3);
+  }).slice(0, 10);
 }
 
 export default function GameOver({ chums, score, collectedBreeds = [], allCollected = false }: Props) {
@@ -144,35 +144,81 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
     setEmailSaved(true);
   };
 
-  const [shareState, setShareState] = useState<"idle" | "copied" | "options">("idle");
+  const [shareState, setShareState] = useState<"idle" | "generating" | "ready" | "shared">("idle");
+  const [shareDataUrl, setShareDataUrl] = useState<string | null>(null);
   const [deckHover, setDeckHover] = useState<number | null>(null);
 
-  const handleShare = async () => {
-    const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
-    const url = "https://pedigreechums.co.uk";
-    if (navigator.share) {
-      try { await navigator.share({ title: "Pedigree Chums", text, url }); return; } catch {}
+  const generateScoreCard = (): Promise<string> => new Promise((resolve) => {
+    const W = 1080, H = 1080;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#0a3a57"; ctx.fillRect(0, 0, W, H);
+    const grad = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, W*0.8);
+    grad.addColorStop(0, "rgba(20,151,214,0.45)"); grad.addColorStop(1, "rgba(12,91,146,0.1)");
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#ffd23e"; ctx.font = "bold 68px Arial Black, sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("PEDIGREE CHUMS", W/2, 130);
+    ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.fillRect(80, 155, W-160, 3);
+    ctx.fillStyle = "#ffffff"; ctx.font = "bold 44px Arial, sans-serif"; ctx.fillText("MY SCORE", W/2, 240);
+    ctx.fillStyle = "#ffd23e"; ctx.font = "bold 180px Arial Black, sans-serif";
+    ctx.fillText(score.toLocaleString(), W/2, 430);
+    ctx.fillStyle = "#ffffff"; ctx.font = "bold 44px Arial, sans-serif";
+    ctx.fillText(`${chums} Chums Found`, W/2, 510);
+    ctx.strokeStyle = "rgba(255,210,62,0.3)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(120, 560); ctx.lineTo(W-120, 560); ctx.stroke();
+    const shown = collectedBreeds.slice(-8);
+    if (shown.length === 0) {
+      ctx.fillStyle = "#ffd23e"; ctx.font = "bold 38px Arial, sans-serif";
+      ctx.fillText("Can you beat my score? 🐾", W/2, 700);
+      ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "32px Arial, sans-serif";
+      ctx.fillText("pedigreechums.co.uk", W/2, 760);
+      resolve(canvas.toDataURL("image/png")); return;
     }
-    setShareState("options");
-    window.setTimeout(() => setShareState("idle"), 8000);
+    const sz = 110, gap = 16, totalW = shown.length * sz + (shown.length-1)*gap;
+    let x = (W - totalW) / 2; let loaded = 0;
+    shown.forEach((breed) => {
+      const bx = x; x += sz + gap;
+      const img = new Image(); img.crossOrigin = "anonymous";
+      const finish = () => { loaded++; if (loaded === shown.length) {
+        ctx.fillStyle = "#ffd23e"; ctx.font = "bold 38px Arial, sans-serif";
+        ctx.fillText("Can you beat my score? 🐾", W/2, 760);
+        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "32px Arial, sans-serif";
+        ctx.fillText("pedigreechums.co.uk", W/2, 820);
+        resolve(canvas.toDataURL("image/png"));
+      }};
+      img.onload = () => {
+        ctx.save(); ctx.beginPath(); ctx.arc(bx+sz/2, 650, sz/2, 0, Math.PI*2); ctx.clip();
+        ctx.drawImage(img, bx, 600, sz, sz); ctx.restore();
+        ctx.strokeStyle = "#ffd23e"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(bx+sz/2, 650, sz/2, 0, Math.PI*2); ctx.stroke();
+        finish();
+      };
+      img.onerror = finish;
+      img.src = breed.img;
+    });
+  });
+
+  const handleShare = async () => {
+    setShareState("generating");
+    const dataUrl = await generateScoreCard();
+    setShareDataUrl(dataUrl);
+    setShareState("ready");
   };
 
-  const shareVia = (method: "twitter" | "email" | "copy") => {
-    const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! 🐾 pedigreechums.co.uk`;
-    const url = "https://pedigreechums.co.uk";
-    if (method === "twitter") window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank");
-    if (method === "email") window.open(`mailto:?subject=Pedigree Chums&body=${encodeURIComponent(text)}`, "_blank");
-    if (method === "copy") { navigator.clipboard.writeText(text).catch(() => {}); setShareState("copied"); window.setTimeout(() => setShareState("idle"), 2500); }
+  const doShare = (method: "download" | "instagram" | "copy") => {
+    const text = `I scored ${score.toLocaleString()} pts and found ${chums} chums in Pedigree Chums! Can you beat me? 🐾 #PedigreeChums #DogSpotting pedigreechums.co.uk`;
+    if ((method === "download" || method === "instagram") && shareDataUrl) {
+      const a = document.createElement("a"); a.href = shareDataUrl; a.download = "pedigree-chums-score.png"; a.click();
+      if (method === "instagram") window.setTimeout(() => window.open("https://www.instagram.com", "_blank"), 600);
+    }
+    if (method === "copy") navigator.clipboard.writeText(text).catch(() => {});
+    setShareState("shared"); window.setTimeout(() => setShareState("ready"), 2500);
   };
 
   return (
     <div ref={overlayRef} className={styles.overlay} onClick={resetIdleTimer} onKeyDown={resetIdleTimer}>
-      {/* Replay button */}
-      <button className={styles.closeBtn} onClick={() => window.location.reload()} type="button" aria-label="Play again">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-          <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
-        </svg>
-      </button>
+
 
       {/* Score top-left */}
       <div className={styles.scoreDisplay}>
@@ -297,18 +343,24 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
 
         {/* Actions */}
         <div className={styles.actions}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-            <button className={styles.shareBtn} onClick={handleShare} type="button">
-              Share Score
-            </button>
-            {shareState === "options" && (
-              <div style={{ display: "flex", gap: 8 }}>
-                <button className={styles.shareOption} onClick={() => shareVia("twitter")} type="button">X / Twitter</button>
-                <button className={styles.shareOption} onClick={() => shareVia("email")} type="button">Email</button>
-                <button className={styles.shareOption} onClick={() => shareVia("copy")} type="button">Copy link</button>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            {shareState === "idle" && (
+              <button className={styles.shareBtn} onClick={handleShare} type="button">📸 Create Score Card</button>
+            )}
+            {shareState === "generating" && (
+              <p style={{ color: "#ffd23e", fontFamily: "'Luckiest Guy', system-ui", fontSize: 16, margin: 0 }}>Creating your card...</p>
+            )}
+            {(shareState === "ready" || shareState === "shared") && shareDataUrl && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <img src={shareDataUrl} alt="Score card" style={{ width: 180, height: 180, borderRadius: 14, border: "3px solid #ffd23e", display: "block" }} />
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+                  <button className={styles.shareOption} onClick={() => doShare("download")} type="button">⬇ Save Image</button>
+                  <button className={styles.shareOption} onClick={() => doShare("instagram")} type="button">📷 Instagram</button>
+                  <button className={styles.shareOption} onClick={() => doShare("copy")} type="button">📋 Copy Caption</button>
+                </div>
+                {shareState === "shared" && <p style={{ color: "#22c55e", fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, margin: 0 }}>Ready to post! 🐾</p>}
               </div>
             )}
-            {shareState === "copied" && <p style={{ color: "#22c55e", fontFamily: "'Luckiest Guy', system-ui", fontSize: 14, margin: 0 }}>Copied!</p>}
           </div>
           <button className={styles.continueBtn} onClick={() => window.location.assign("/about")} type="button">
             Continue &rarr;
