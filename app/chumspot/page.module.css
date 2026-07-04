@@ -1,0 +1,287 @@
+/* ── ChumSpot Challenge page ──────────────────────────────────────────── */
+
+.main {
+  min-height: 100vh;
+  font-family: Montserrat, sans-serif;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────────── */
+.hero {
+  min-height: 80svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(100px, 14vw, 160px) clamp(24px, 6vw, 80px) clamp(48px, 8vw, 96px);
+  background: var(--blue-sky, #2bb4ee) url("/hot-dog-hearo-img.jpg") center / cover no-repeat;
+  position: relative;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,58,87,0.4) 0%, rgba(10,58,87,0.65) 100%);
+  pointer-events: none;
+}
+.heroInner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 12px;
+}
+.heroTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  line-height: 0.95;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 clamp(16px, 3vw, 32px);
+}
+.heroSub {
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
+  font-weight: 500;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.6;
+  margin: 0 0 clamp(28px, 4vw, 48px);
+}
+.closingDate {
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  color: rgba(255,255,255,0.75);
+  margin: clamp(16px, 2vw, 24px) 0 0;
+}
+
+/* ── Shared ─────────────────────────────────────────────────────────────── */
+.section,
+.howSection,
+.prizeSection,
+.ctaSection,
+.termsSection {
+  padding: clamp(40px, 6vw, 80px) clamp(24px, 6vw, 80px);
+}
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.sectionTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2rem, 5vw, 4rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 clamp(20px, 3vw, 36px);
+  line-height: 1.05;
+  text-align: center;
+}
+.lead {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0 0 clamp(16px, 2vw, 24px);
+}
+.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags) {
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  color: rgba(255,255,255,0.88);
+  line-height: 1.7;
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+}
+.ageNote {
+  font-size: clamp(0.82rem, 1.2vw, 0.95rem);
+  color: rgba(255,255,255,0.6);
+  border-left: 3px solid rgba(255,210,62,0.4);
+  padding-left: 16px;
+  margin-top: clamp(20px, 3vw, 32px);
+}
+
+/* ── CTA pills ──────────────────────────────────────────────────────────── */
+.ctaPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 0;
+}
+.ctaPrimary,
+.ctaSecondary {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  padding: clamp(12px, 1.5vw, 16px) clamp(28px, 4vw, 48px);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.15s, filter 0.15s;
+  letter-spacing: 0.03em;
+}
+.ctaPrimary {
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+}
+.ctaPrimary:hover { filter: brightness(0.95); transform: translateY(-2px); }
+.ctaSecondary {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255,255,255,0.7);
+}
+.ctaSecondary:hover { border-color: #ffffff; transform: translateY(-2px); }
+
+/* ── How to enter steps ──────────────────────────────────────────────────── */
+.howSection { background: rgba(10,58,87,0.3); }
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(16px, 2.5vw, 28px);
+}
+.step {
+  background: rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: clamp(20px, 3vw, 32px);
+}
+.stepTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 10px;
+  line-height: 1.1;
+}
+.step p {
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  color: rgba(255,255,255,0.88);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Prize ───────────────────────────────────────────────────────────────── */
+.prizeSection { background: rgba(255,210,62,0.08); }
+.prizeList {
+  list-style: none;
+  padding: 0;
+  margin: clamp(16px, 2vw, 24px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.prizeList li {
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  color: #ffffff;
+  padding-left: 28px;
+  position: relative;
+}
+.prizeList li::before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  color: var(--yellow, #ffd23e);
+  font-size: 1rem;
+}
+
+/* ── Judging criteria ────────────────────────────────────────────────────── */
+.criteria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+  margin: clamp(20px, 3vw, 36px) 0;
+}
+.criterion {
+  background: rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: clamp(16px, 2.5vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.criterionPct {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--yellow, #ffd23e);
+  line-height: 1;
+}
+.criterionLabel {
+  font-size: clamp(0.88rem, 1.4vw, 1rem);
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.3;
+}
+
+/* ── CTA section ─────────────────────────────────────────────────────────── */
+.ctaSection { background: rgba(10,58,87,0.35); }
+.hashtags {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  color: var(--yellow, #ffd23e);
+  margin: clamp(12px, 2vw, 20px) 0 clamp(24px, 3vw, 40px);
+  letter-spacing: 0.04em;
+}
+
+/* ── Full Terms ──────────────────────────────────────────────────────────── */
+.termsSection { background: rgba(10,58,87,0.2); }
+.termsSectionTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 clamp(24px, 4vw, 48px);
+  text-align: center;
+  line-height: 1.1;
+}
+.termsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+.termCard {
+  border-radius: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  position: relative;
+}
+.termCardYellow {
+  background: var(--yellow, #ffd23e);
+}
+.termCardWhite {
+  background: #ffffff;
+}
+.termNum {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  color: var(--navy, #0a3a57);
+  line-height: 1;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.25;
+}
+.termTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--navy, #0a3a57);
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+  line-height: 1.15;
+}
+.termBody {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.82rem, 1.2vw, 0.95rem);
+  font-weight: 500;
+  color: var(--navy, #0a3a57);
+  line-height: 1.65;
+  margin: 0;
+}
+.contactNote {
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  line-height: 1.6;
+}
+.contactNote strong { color: #ffffff; }
+
+@media (max-width: 640px) {
+  .steps { grid-template-columns: 1fr; }
+  .termsGrid { grid-template-columns: 1fr; }
+  .criteria { grid-template-columns: repeat(2, 1fr); }
+}
