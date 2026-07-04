@@ -292,7 +292,7 @@ export default function HotDogs() {
                     ["Why were sausages called dogs before hot dogs were called hot dogs?", "Nobody is entirely sure, which is reassuring if you were worried etymology was an exact science. The best theory: in the 1800s, cheap sausages were sometimes suspected of containing dog meat. Rather than addressing the rumour, the name stuck. The sausage became the dog. Then someone warmed it up and we were off."],
                     ["What food smells nicest to dogs?", "Meat, fish, and anything you are currently eating. Dogs are not subtle. Their sense of smell is roughly 10,000 times stronger than ours, which means a tin of hot dogs from the next room smells, to a dog, approximately as loud as a brass band."],
                     ["Can dogs eat the hot dogs I have left?", "A tiny plain bit may not cause immediate disaster. But hot dogs are salty, processed, and made for humans. The dog looking at you wants them very much. The dog looking at you also wanted to eat a sock last Tuesday. Use your judgement."],
-                    ["Can dogs eat the hot, hot dogs?", "No. Hot food is genuinely dangerous for dogs. Their mouths and throats are not built for heat the way ours are. Let the hot dog cool completely first. Or just eat it yourself. There are plenty of actual dog treats available, and none of them are called hot dogs."],
+                    ["Can my dog eat hot, hot dogs?", "No. Hot food is genuinely dangerous for dogs. Their mouths and throats are not built for heat the way ours are. Let the hot dog cool completely first. Or just eat it yourself. There are plenty of actual dog treats available, and none of them are called hot dogs."],
                     ["What are Hot Dogs made from?", "The game? Dogs. Specifically: 54 unique dog breeds illustrated on playing cards. Also some rules, a lot of shouting, and one person who insists they saw the Golden Retriever in someone else's hand and cannot let it go."],
                     ["Should I keep my dogs in the fridge?", "The cards? No. They will go damp. The dogs? Also no. They will go unhappy. Fridge temperature for a dog is approximately the same as a walk in November without a coat. Technically survivable. Not recommended."],
                   ].map(([q, a], i) => (
@@ -341,7 +341,7 @@ export default function HotDogs() {
                 <p>It is a bit like Snap. It is a bit like Pairs. It is a bit like looking into someone else&rsquo;s kennel for three seconds and then being expected to act normal.</p>
               </div>
               <div>
-                <h3 className={styles.subTitle}>Questions this page has unfortunately made necessary</h3>
+                <h3 className={styles.subTitle} style={{marginTop:0}}>Questions this page has unfortunately made necessary</h3>
                 <div className={styles.faqList}>
               {[
                 ["Why are hot dogs called hot dogs?", "Not because dogs are hot. Hot dogs are called hot dogs because sausages were once jokingly called dogs. A hot sausage became a hot dog. Then a dog shaped like a sausage became a sausage dog. Then language stood back and pretended this was normal."],

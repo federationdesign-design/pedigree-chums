@@ -401,9 +401,9 @@
   min-width: 36px;
 }
 .ruleStep strong {
-  font-family: Montserrat, sans-serif;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
-  font-weight: 700;
+  font-weight: 400;
   color: #ffffff;
   display: block;
   margin-bottom: 4px;
@@ -411,7 +411,8 @@
 .ruleStep p {
   font-family: Montserrat, sans-serif;
   font-size: clamp(0.85rem, 1.3vw, 1rem);
-  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
   margin: 0;
   line-height: 1.55;
 }
