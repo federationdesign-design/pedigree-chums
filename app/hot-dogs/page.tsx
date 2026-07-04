@@ -356,16 +356,14 @@ export default function HotDogs() {
               </div>
             </div>
 
-            <p>Hot Dogs is a memory test disguised as a shouting problem.</p>
-            <p>It is a bit like Snap. It is a bit like Pairs. It is a bit like looking into someone else&rsquo;s kennel for three seconds and then being expected to act normal.</p>
-          </div>
-        </section>
-
-        {/* ── FAQ accordion ────────────────────────────────────────── */}
-        <section className={styles.faqSection}>
-          <div className={styles.sectionInner}>
-            <h2 className={styles.sectionTitle}>Questions this page has unfortunately made necessary</h2>
-            <div className={styles.faqList}>
+            <div className={styles.gameTwoCols}>
+              <div>
+                <p>Hot Dogs is a memory test disguised as a shouting problem.</p>
+                <p>It is a bit like Snap. It is a bit like Pairs. It is a bit like looking into someone else&rsquo;s kennel for three seconds and then being expected to act normal.</p>
+              </div>
+              <div>
+                <h3 className={styles.subTitle}>Questions this page has unfortunately made necessary</h3>
+                <div className={styles.faqList}>
               {[
                 ["Why are hot dogs called hot dogs?", "Not because dogs are hot. Hot dogs are called hot dogs because sausages were once jokingly called dogs. A hot sausage became a hot dog. Then a dog shaped like a sausage became a sausage dog. Then language stood back and pretended this was normal."],
                 ["What is a sausage dog?", "A sausage dog is a dachshund. A dachshund is not a sausage. A sausage is not a dachshund. But put them in the same sentence and the English language starts chasing its tail."],
@@ -376,12 +374,15 @@ export default function HotDogs() {
                 ["What is Hot Dogs mode?", "Hot Dogs mode is a Pedigree Chums game flavour where everyone briefly shows their hand after the draw, then hides it again. From then on you can only look at your own cards. You must remember which dogs were in the other players' hands. It is fast, it is memory, and it makes everyone accuse Grandma of hiding a spaniel."],
                 ["Is Hot Dogs mode like Snap?", "Yes. But with homework. In Snap you react to what you can see. In Hot Dogs you react to what you think you remember seeing. That is worse. And therefore better."],
                 ["Is Pedigree Chums dog food?", "No. Pedigree Chums is a dog card game. It contains dog characters, dog jokes, and dog chaos. It does not contain dog food. Do not feed the game to the dog. Play the game. Feed the dog something else."],
+                    ["What is the best kind of hot dog?", "The one in a bun. The one with mustard. The one that is not panting, drooling, wobbling, trapped in a car, standing on hot pavement, or wondering why humans have made summer everybody’s problem. The best hot dogs are not dogs."],
               ].map(([q, a], i) => (
                 <details key={i} className={styles.faqItem}>
                   <summary className={styles.faqQ}>{q}</summary>
                   <p className={styles.faqA}>{a}</p>
                 </details>
               ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
