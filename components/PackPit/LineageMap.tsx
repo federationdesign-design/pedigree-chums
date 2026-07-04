@@ -1530,7 +1530,7 @@ export default function LineageMap({
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
                 pointerEvents: "none",
-                zIndex: 61,
+                zIndex: 63 + i,
                 boxShadow: "0 3px 3px rgba(0,0,0,0.32)",
                 userSelect: "none",
               }}
@@ -1553,7 +1553,7 @@ export default function LineageMap({
             draggable={false}
             style={{
               position: "fixed", left, top, width: CW, height: CW,
-              borderRadius: 15, overflow: "hidden",
+              borderRadius: 15, overflow: "visible",
               transform: `rotate(${cardDeg}deg)`,
               transformOrigin: "center",
               pointerEvents: "all",
@@ -1571,12 +1571,15 @@ export default function LineageMap({
             onPointerUp={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
             onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
-            <img
-              src={encodeURI(bust(c.img))}
-              alt={c.name}
-              draggable={false}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
+            <div style={{ width: "100%", height: "100%", borderRadius: 13, overflow: "hidden" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={encodeURI(bust(c.img))}
+                alt={c.name}
+                draggable={false}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </div>
             {/* magnify icon bottom-left */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
               <button
