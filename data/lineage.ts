@@ -376,7 +376,7 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Brabant Bullenbeisser",
         note: "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor.",
-        img: "/history/breeds/Bullenbeisser.jpg",
+        img: "/brabant-bullenbeisser.jpg",
         value: 75,
         children: [
           {
