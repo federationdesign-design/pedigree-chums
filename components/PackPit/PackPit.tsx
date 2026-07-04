@@ -344,7 +344,7 @@ export default function PackPit() {
             Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
           const parts =
             prop.shape === "slipper"
-              ? [R(440, 368, 840, 90), R(280, 200, 520, 290), C(120, 275, 138), C(400, 160, 165), C(430, 55, 62), R(680, 333, 155, 98)] // sole, upper-left bulk, toe, upper slope, tongue, right bridge
+              ? [R(440, 368, 840, 90), R(280, 200, 520, 290), C(120, 275, 138), C(400, 160, 165)] // sole, upper-left bulk, toe, upper slope
               : [
                 R(515, 295, 820, 30, po2),   // floor -- full inner width, thin
                 R(515, 265, 120, 80, po2),   // centre bump -- uneven floor stops stacking
