@@ -71,7 +71,7 @@ type Node = LineageNode & {
 };
 
 // half-size of the dog card at the centre of the fan
-const ROOT = 58;
+const ROOT = 52;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;

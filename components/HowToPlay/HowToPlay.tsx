@@ -151,9 +151,17 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
               <div className={styles.stepBadge}>{i + 1}</div>
               {(i < 3 || i === 5) ? (
                 <video
+                  data-step={i}
                   src={`/step${i + 1}-video-animation.mp4`}
-                  autoPlay muted playsInline
-                  onEnded={(e) => { const v = e.currentTarget; v.pause(); v.currentTime = Math.max(0, v.duration - 0.05); }}
+                  autoPlay={i !== 1} muted playsInline preload="auto"
+                  onEnded={(e) => {
+                    const v = e.currentTarget;
+                    v.pause(); v.currentTime = Math.max(0, v.duration - 0.05);
+                    if (i === 0) {
+                      const v2 = v.closest('[data-htp-step="0"]')?.parentElement?.querySelector('[data-step="1"]') as HTMLVideoElement | null;
+                      if (v2) v2.play().catch(() => {});
+                    }
+                  }}
                   className={styles.stepImg}
                 />
               ) : (
