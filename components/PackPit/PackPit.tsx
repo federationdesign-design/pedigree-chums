@@ -120,7 +120,15 @@ export default function PackPit() {
 
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
-    const open = () => setHowToPlay(true);
+    const open = () => {
+      setHowToPlay(true);
+      // Preload HowToPlay videos so they start instantly
+      [1,2,3,6].forEach((n) => {
+        const src = n === 3 ? "/step3-video-animationv3.mp4" : n === 6 ? "/step6-video-animation.mp4" : `/step${n}-video-animation.mp4`;
+        const v = document.createElement("video");
+        v.src = src; v.preload = "auto"; v.muted = true;
+      });
+    };
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
   }, []);
