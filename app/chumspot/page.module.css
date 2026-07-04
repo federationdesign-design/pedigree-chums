@@ -88,6 +88,9 @@
 .section {
   padding: clamp(12px, 2vw, 24px) clamp(24px, 6vw, 80px);
 }
+.sectionTopPad {
+  padding-top: 40px;
+}
 .howSection,
 .ctaSection,
 .termsSection {
@@ -140,7 +143,7 @@
 .ctaSecondary {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(0.6rem, 1.1vw, 0.78rem);
-  padding: clamp(8px, 1vw, 11px) clamp(19px, 2.7vw, 32px);
+  padding: clamp(1px, 0.4vw, 2px) clamp(19px, 2.7vw, 32px);
   border-radius: 999px;
   text-decoration: none;
   transition: transform 0.15s, filter 0.15s;
@@ -159,7 +162,11 @@
 .ctaSecondary:hover { border-color: #ffffff; transform: translateY(-2px); }
 
 /* ── How to enter steps ──────────────────────────────────────────────────── */
-.howSection {}
+.howSection {
+  border: 3px dashed var(--yellow, #ffd23e);
+  border-radius: 20px;
+  margin: 0 clamp(24px, 6vw, 80px);
+}
 .steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -375,6 +382,7 @@
   grid-template-columns: 1fr 1fr;
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
+  padding-top: 50px;
 }
 .whatReadyCols .sectionTitle { text-align: left; }
 @media (max-width: 720px) { .whatReadyCols { grid-template-columns: 1fr; } }
