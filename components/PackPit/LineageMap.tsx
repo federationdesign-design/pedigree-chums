@@ -428,7 +428,7 @@ export default function LineageMap({
   const [dragXY, setDragXY] = useState<{ x: number; y: number } | null>(null); // live pointer while dragging a card, for the proximity glow
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
-      const t = setTimeout(() => setShowRemove(true), 1000); // hold the green button back one second after the last circle turns blue
+      const t = setTimeout(() => setShowRemove(true), 0); // show immediately when all nodes are seen
       return () => clearTimeout(t);
     }
   }, [seen, totalNodes]);

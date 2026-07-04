@@ -19,6 +19,7 @@
   flex: 0 0 auto;
   width: clamp(140px, 22vw, 200px);
   background: #ffed00;
+  border: 6px solid #ffed00;
   border-radius: 16px;
   scroll-snap-align: center;
   display: flex;
