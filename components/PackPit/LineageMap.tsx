@@ -71,7 +71,7 @@ type Node = LineageNode & {
 };
 
 // half-size of the dog card at the centre of the fan
-const ROOT = 52;
+const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
@@ -133,6 +133,16 @@ export default function LineageMap({
   currentScore?: number;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
+  // Preload all images for instruction cards so they appear instantly when tapped
+  useEffect(() => {
+    if (!INSTR_NAMES.has(breed.name)) return;
+    const root = getLineage(breed.name);
+    if (!root) return;
+    const imgs: string[] = [];
+    const collect = (n: any) => { if (n.img) imgs.push(n.img); if (n.children) n.children.forEach(collect); };
+    collect(root);
+    imgs.forEach((src) => { const img = new window.Image(); img.src = encodeURI(bust(src)); });
+  }, [breed.name]);
   useEffect(() => {
     const f = () => setVp({ w: window.innerWidth, h: window.innerHeight });
     f();
