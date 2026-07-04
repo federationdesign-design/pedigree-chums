@@ -191,20 +191,7 @@ export default function ChumSpot() {
         <section className={styles.section}>
           <div className={styles.inner}>
             <h2 className={styles.sectionTitle}>What are we looking for?</h2>
-            <p>You do not need professional equipment. We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting. Eligible entries will be judged on:</p>
-            <div className={styles.criteria}>
-              {[
-                ["Charm and personality", "30%"],
-                ["Creativity and originality", "30%"],
-                ["The dog-and-card match", "20%"],
-                ["Clarity and storytelling", "20%"],
-              ].map(([label, pct]) => (
-                <div key={label} className={styles.criterion}>
-                  <span className={styles.criterionPct}>{pct}</span>
-                  <span className={styles.criterionLabel}>{label}</span>
-                </div>
-              ))}
-            </div>
+            <p>You do not need professional equipment. We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
             <p>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
           </div>
         </section>

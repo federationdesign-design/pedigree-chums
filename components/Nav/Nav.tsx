@@ -10,7 +10,7 @@ const links = [
   { label: "Know Your Chums", href: "/know-your-chums" },
   { label: "Britain's Dog History", href: "/britains-dog-history" },
   { label: "Hot/Dogs", href: "/hot-dogs" },
-  { label: "ChumSpot", href: "/chumspot" },
+  { label: "Competitions", href: "/chumspot" },
 ];
 
 export default function Nav({ hideLogo = false, dockBottomLeft = false }: { hideLogo?: boolean; dockBottomLeft?: boolean }) {
