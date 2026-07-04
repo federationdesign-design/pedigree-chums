@@ -111,10 +111,12 @@ export default function HotDogs() {
                 <h3 className={styles.subTitle}>What do I do if my dog is hot?</h3>
                 <p className={styles.lead}>Stop.</p>
                 <p>That is not a punchline. That is the answer.</p>
+                <br />
                 <p>
-                  Stop walking. Stop playing. Stop throwing the ball. Stop the errand.
+                  <strong>Stop walking. Stop playing. Stop throwing the ball.</strong> Stop the errand.
                   Stop assuming they are probably fine.
                 </p>
+                <br />
                 <p>
                   Move them somewhere cooler. Offer water. Get them off hot ground. Keep them calm.
                   If you are worried, call a vet.

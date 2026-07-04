@@ -708,23 +708,26 @@
 }
 .miniQ {
   font-family: Montserrat, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-weight: 700;
   color: var(--navy, #0a3a57);
-  padding: 12px 16px;
+  padding: clamp(14px, 2vw, 20px) clamp(16px, 2.5vw, 24px);
   cursor: pointer;
   list-style: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
-.miniQ::after { content: "+"; opacity: 0.7; color: var(--navy, #0a3a57); }
-details[open] .miniQ::after { content: "−"; }
+.miniQ::-webkit-details-marker { display: none; }
+.miniQ::after { content: "+"; font-family: var(--font-display, 'Luckiest Guy', system-ui); font-size: 1.4rem; color: var(--navy, #0a3a57); flex: 0 0 auto; transition: transform 0.2s; }
+details[open] .miniQ::after { transform: rotate(45deg); }
 .miniA {
-  font-size: 0.9rem;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
   font-weight: 400;
   color: var(--navy, #0a3a57);
-  padding: 0 16px 14px;
+  padding: 0 clamp(16px, 2.5vw, 24px) clamp(14px, 2vw, 20px);
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.7;
 }
