@@ -667,13 +667,13 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Labrador", "Old English Sheepdog"), dropped); } }, 2750));        // 2750 pair 1
         waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 3050 panels + arrow
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pug", "Chihuahua"), dropped); } }, 5050));              // 5050 pair 2
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone, slipper]); }, 6400));                                                       // 6400 bone + slipper
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone, slipper]); }, 10400));                                                      // 10400 bone + slipper
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Dachshund", "Border Collie"), dropped); } }, 8050));            // 8050 pair 3
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000));                                      // 9000 hamburger menu
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Pomeranian", "German Shepherd"), dropped); } }, 10050));           // 10050 pair 4
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Bichon Frise", "Siberian Husky"), dropped); } }, 20000));          // 20000 pair 5
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(pickName("Maltese", "Greyhound"), dropped); } }, 30000));                    // 30000 pair 6
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 70000));                                  // 70000 bowl
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 85000));                                  // 85000 bowl
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
             const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
