@@ -1576,6 +1576,13 @@ export default function LineageMap({
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
               </button>
             )}
+            {/* status dot top-left */}
+            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+              const ts = TAG_STYLE[c.status ?? "extinct"];
+              return (
+                <div title={ts.label} style={{ position: "absolute", left: -4, top: -4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
+              );
+            })()}
             {/* info icon top-right */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
