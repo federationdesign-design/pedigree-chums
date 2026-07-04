@@ -1518,12 +1518,13 @@ export default function LineageMap({
           <div
             onMouseLeave={() => setInfoHover(null)}
             style={{
-              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "auto", /* patch_bits_v1: hoverable so it self-dismisses */
+              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "auto",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
+            <div style={{ fontFamily: ""Luckiest Guy", system-ui", fontSize: "13px", marginBottom: "4px", color: "var(--yellow, #ffd23e)" }}>{c.name}</div>
             {text}
           </div>
         );
@@ -1572,6 +1573,14 @@ export default function LineageMap({
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
               </button>
+            )}
+            {/* info icon top-right */}
+            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
+              <button
+                style={{ position: "absolute", right: 4, top: 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif" }}
+                onClick={(e) => { e.stopPropagation(); setInfoHover((h) => h === c.id ? null : c.id); }}
+                onPointerDown={(e) => e.stopPropagation()}
+              >i</button>
             )}
             {/* % pill bottom-right */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
