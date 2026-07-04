@@ -179,14 +179,8 @@ export default function ChumSpotClient() {
               <div className={styles.step}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/post-icon.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
-                <h3 className={styles.stepTitle}>3. Post</h3>
-                <p>Share your photo publicly on Instagram or TikTok.</p>
-              </div>
-              <div className={styles.step}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/PC-tag.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
-                <h3 className={styles.stepTitle}>4. Tag</h3>
-                <p>Tag @pedigree_chums + include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public.</p>
+                <h3 className={styles.stepTitle}>3. Post &amp; Tag</h3>
+                <p>Share your photo publicly on Instagram or TikTok. Tag @pedigree_chums and include both hashtags: #ChumSpot and #DogSpotting. Your post must stay public until the winner is selected.</p>
               </div>
             </div>
           </div>

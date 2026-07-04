@@ -113,7 +113,7 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.5;
-  margin: 0 0 clamp(16px, 2vw, 24px);
+  margin: 50px 0 clamp(16px, 2vw, 24px);
 }
 .inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
@@ -170,7 +170,7 @@
 }
 .steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: clamp(16px, 2.5vw, 28px);
 }
 .step {
