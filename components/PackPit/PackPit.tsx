@@ -1806,6 +1806,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let patternUntil = 0;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
+      let fillFullTimer: ReturnType<typeof setTimeout> | null = null; // game over when pit stays full
       let lastPulse = 0;
       const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
       const onFloorHit = (ev: any) => {
@@ -1948,6 +1949,19 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           // Yellow warning flashes at 40%, 70%, 90%, 99%
           if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
           if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          if (ratio >= 0.85) {
+            // Pit is critically full — start a 4-second timer; if it stays full, game over
+            if (!fillFullTimer && !gameOverRef.current) {
+              fillFullTimer = setTimeout(() => {
+                if (gameOverRef.current) return;
+                if (runnerRef.current) Runner.stop(runnerRef.current);
+                window.setTimeout(() => setGameOver(true), 1500);
+              }, 4000);
+            }
+          } else {
+            // Pit has breathing room — cancel any pending game over
+            if (fillFullTimer) { clearTimeout(fillFullTimer); fillFullTimer = null; }
+          }
           if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
         }
         // Bone proximity: slow to 50% when two bones are within 100px of each other
