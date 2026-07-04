@@ -319,7 +319,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
           <div className={styles.allCollectedPaw} aria-hidden="true">🐾</div>
         )}
         <h1 className={styles.title}>
-          {allCollected ? "YOU GOT 'EM ALL!" : chums === 0 ? "No chums — try again!" : `Well done — ${chums} chum${chums === 1 ? "" : "s"} found!`}
+          {allCollected ? "YOU GOT 'EM ALL!" : chums === 0 ? "You have no chums and your... tell you what, grab some chums next time!" : `Well done — ${chums} chum${chums === 1 ? "" : "s"} found!`}
         </h1>
         {allCollected && (
           <p className={styles.allCollectedSub}>ALL 54 CHUMS COLLECTED</p>
@@ -399,7 +399,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
             )}
             {(shareState === "ready" || shareState === "shared") && shareDataUrl && (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                <img src={shareDataUrl} alt="Score card" style={{ width: 180, height: 180, borderRadius: 14, border: "3px solid #ffd23e", display: "block" }} />
+                <img src={shareDataUrl} alt="Score card" style={{ width: "100%", maxWidth: 440, height: "auto", aspectRatio: "1200/630", borderRadius: 14, border: "3px solid #ffd23e", display: "block" }} />
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
                   <button className={styles.shareOption} onClick={() => doShare("download")} type="button">⬇ Save Image</button>
                   <button className={styles.shareOption} onClick={() => doShare("instagram")} type="button">📷 Instagram</button>
