@@ -87,7 +87,7 @@
   line-height: 1.5;
   margin: 0 0 clamp(16px, 2vw, 24px);
 }
-.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags) {
+.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   color: #ffffff;
   line-height: 1.7;
