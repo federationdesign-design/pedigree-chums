@@ -226,11 +226,11 @@ const LINEAGE: Record<string, LineageNode> = {
         ]
       },
       {
-        name: "Black and Tan Terrier",
-        note: "Gave the sleek coat, the tan points and the terrier fire. This is the Manchester Terrier line.",
+        name: "Manchester Terrier",
+        note: "Gave the sleek coat, the tan points and the terrier fire. Developed from the Old English Black and Tan Terrier.",
         img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
         children: [
-          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 14 },
+          { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier, foundation of the Manchester Terrier line.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 14 },
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
         ]
       },
