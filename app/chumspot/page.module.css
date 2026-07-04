@@ -85,9 +85,10 @@
 }
 
 /* ── Shared ─────────────────────────────────────────────────────────────── */
-.section,
+.section {
+  padding: clamp(24px, 4vw, 48px) clamp(24px, 6vw, 80px);
+}
 .howSection,
-.prizeSection,
 .ctaSection,
 .termsSection {
   padding: clamp(40px, 6vw, 80px) clamp(24px, 6vw, 80px);
@@ -184,7 +185,12 @@
 }
 
 /* ── Prize ───────────────────────────────────────────────────────────────── */
-.prizeSection {}
+.prizeSection {
+  border: 3px dashed var(--yellow, #ffd23e);
+  border-radius: 20px;
+  margin: 0 clamp(24px, 6vw, 80px);
+  padding: clamp(20px, 3vw, 36px) clamp(20px, 3vw, 36px) !important;
+}
 .prizeList {
   list-style: none;
   padding: 0;
@@ -323,9 +329,10 @@
 }
 .prizeVideo {
   width: 100%;
+  min-height: 200px;
   border-radius: 16px;
   display: block;
-  overflow: hidden;
+  object-fit: cover;
 }
 @media (max-width: 640px) { .prizeCols { grid-template-columns: 1fr; } }
 
