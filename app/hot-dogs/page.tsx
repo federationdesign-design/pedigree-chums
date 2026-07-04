@@ -291,7 +291,7 @@ export default function HotDogs() {
 
             <div className={styles.foodFaqCols}>
               <div className={styles.foodCol}>
-                <h3 className={styles.subTitle}>Do dogs prefer hot food or cold food?</h3>
+                <h3 className={styles.subTitle}>Do dogs prefer hot or cold food?</h3>
                 <p>
                   Some dogs like dinner slightly warmed because it smells more interesting.
                   This is not because they are restaurant critics. It is because their nose is in charge
@@ -317,7 +317,7 @@ export default function HotDogs() {
                     ["What are Hot Dogs made from?", "The game? Dogs. Specifically: 54 unique dog breeds illustrated on playing cards. Also some rules, a lot of shouting, and one person who insists they saw the Golden Retriever in someone else's hand and cannot let it go."],
                     ["Should I keep my dogs in the fridge?", "The cards? No. They will go damp. The dogs? Also no. They will go unhappy. Fridge temperature for a dog is approximately the same as a walk in November without a coat. Technically survivable. Not recommended."],
                   ].map(([q, a], i) => (
-                    <details key={i} className={styles.miniItem}>
+                    <details key={i} className={styles.miniItem} open={i === 0}>
                       <summary className={styles.miniQ}>{q}</summary>
                       <p className={styles.miniA}>{a}</p>
                     </details>

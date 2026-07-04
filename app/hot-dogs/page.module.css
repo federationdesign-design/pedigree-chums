@@ -53,7 +53,7 @@
   font-size: clamp(3rem, 9vw, 7.5rem);
   line-height: 0.9;
   color: var(--yellow, #ffd23e);
-  margin: 0 0 clamp(16px, 3vw, 32px);
+  margin: 100px 0 clamp(16px, 3vw, 32px);
   text-align: center;
   width: 100%;
   max-width: 100%;
@@ -380,6 +380,7 @@
 .safetyNote {
   font-size: clamp(0.78rem, 1.1vw, 0.9rem) !important;
   color: rgba(255,255,255,0.5) !important;
+  font-weight: 500 !important;
 }
 .safetyNote a { color: rgba(255,255,255,0.7); }
 .safetyNote a:hover { color: #ffffff; }
@@ -417,7 +418,7 @@
 }
 .ruleStep strong {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+  font-size: clamp(2.2rem, 3.6vw, 2.6rem);
   font-weight: 400;
   color: #ffffff;
   display: block;
@@ -439,16 +440,16 @@
 .faqList { display: flex; flex-direction: column; gap: 4px; margin-top: clamp(20px, 3vw, 36px); columns: 2; column-gap: clamp(24px,4vw,48px); }
 .faqItem {
   border-radius: 12px;
-  background: rgba(255,255,255,0.06);
+  background: #ffffff;
   overflow: hidden;
   transition: background 0.15s;
 }
-.faqItem[open] { background: rgba(255,255,255,0.1); }
+.faqItem[open] { background: #ffffff; }
 .faqQ {
   font-family: Montserrat, sans-serif;
   font-size: clamp(0.9rem, 1.5vw, 1.05rem);
   font-weight: 700;
-  color: #ffffff;
+  color: var(--navy, #0a3a57);
   padding: clamp(14px, 2vw, 20px) clamp(16px, 2.5vw, 24px);
   cursor: pointer;
   list-style: none;
@@ -462,7 +463,7 @@
   content: "+";
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 1.4rem;
-  color: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
   flex: 0 0 auto;
   transition: transform 0.2s;
 }
@@ -470,7 +471,7 @@
 .faqA {
   font-family: Montserrat, sans-serif;
   font-size: clamp(0.85rem, 1.3vw, 1rem);
-  color: rgba(255,255,255,0.82);
+  color: var(--navy, #0a3a57);
   line-height: 1.7;
   margin: 0;
   padding: 0 clamp(16px, 2.5vw, 24px) clamp(14px, 2vw, 20px);
@@ -562,7 +563,7 @@
 }
 
 .cookingSection {
-  padding: clamp(32px, 5vw, 64px) 50px;
+  padding: clamp(12px, 2vw, 20px) 50px clamp(32px, 5vw, 64px);
 }
 .cookingInner {
   width: 100%;
@@ -648,7 +649,7 @@
 }
 .congaStep em {
   font-style: normal;
-  font-size: clamp(0.78rem, 1.3vw, 0.9rem);
+  font-size: clamp(0.72rem, 1.2vw, 0.83rem);
   font-weight: 600;
   color: rgba(255,255,255,0.95);
   line-height: 1.3;
@@ -698,9 +699,12 @@
 }
 .miniItem {
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--yellow, #ffd23e);
   border: none;
   overflow: hidden;
+}
+.miniItem[open] {
+  background: #ffffff;
 }
 .miniQ {
   font-family: Montserrat, sans-serif;
