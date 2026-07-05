@@ -1943,7 +1943,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
       let dangerTimer: ReturnType<typeof setTimeout> | null = null;
       let countdownEl: HTMLDivElement | null = null;
-      let countdownTick: ReturnType<typeof setInterval> | null = null; // cancelable interval
+      let countdownTick: ReturnType<typeof setInterval> | null = null;
+      let graceUntil = 0; // 2.5s grace after cancellation - prevents flicker
       let throbIntervalOuter: ReturnType<typeof setInterval> | null = null; // hoisted for cleanup
       const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
@@ -2098,7 +2099,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (settledInZone >= DANGER_COUNT) {
               // Start throb at 90% opacity
               // throb removed - steady max opacity when danger
-              if (!dangerTimer && !countdownEl) {
+              if (!dangerTimer && !countdownEl && performance.now() > graceUntil) {
                 // Sequential: 3 (2s) → 2 (2s) → 1 (2s) → GAME OVER → navigate
                 countdownEl = document.createElement("div");
                 countdownEl.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
@@ -2139,6 +2140,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 clearTimeout(dangerTimer); dangerTimer = null;
                 if (countdownTick) { clearInterval(countdownTick); countdownTick = null; }
                 if (countdownEl) { countdownEl.remove(); countdownEl = null; }
+                graceUntil = performance.now() + 2500; // 2.5s grace before countdown can restart
               }
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
