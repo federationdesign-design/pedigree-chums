@@ -1007,8 +1007,8 @@ export default function LineageMap({
           // Each frontier layer = 1 click; toPop phase = 1 click if needed; unplaced phase = 1 click if needed
           const instrIconClicks = INSTR_NAMES.has(breed.name) ? instrFirstUnpicked.length : 0;
           const frontierClicks = frontierNodes.length > 0 ? (INSTR_NAMES.has(breed.name) ? frontierNodes.length : 1) : 0;
-          const toPopClick = toPopNodes.length > 0 && instrFirstUnpicked.length === 0 && frontierNodes.length === 0 ? 1 : 0;
-          const unplacedClick = unplacedCards.length > 0 && toPopNodes.length === 0 && frontierNodes.length === 0 ? 1 : 0;
+          const toPopClick = toPopNodes.length > 0 ? 1 : 0; // always count if images to expose
+          const unplacedClick = unplacedCards.length > 0 ? 1 : 0; // always count if cards to place
           const stepsLeft = instrIconClicks + frontierClicks + toPopClick + unplacedClick;
           return (
           <g
