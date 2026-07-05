@@ -994,13 +994,22 @@ export default function LineageMap({
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
         {!packed && !collecting && !framesDone ? (() => {
-          // Count remaining revealStep clicks needed
-          const firstUnpickedExists = INSTR_NAMES.has(breed.name)
-            ? shown.some((n) => n.img && !picked.has(n._id) && n._parent)
-            : (root && root.img && !picked.has(root._id));
-          const frontierCount = shown.filter((n) => n.children && (n.children as Node[]).length && !open.has(n._id)).length;
-          const unpickedCount = shown.filter((n) => n._parent && n.img && !picked.has(n._id)).length;
-          const stepsLeft = (firstUnpickedExists ? 1 : 0) + (frontierCount > 0 ? 1 : 0) + (unpickedCount > 0 && !firstUnpickedExists && frontierCount === 0 ? 1 : 0);
+          // Count ALL remaining revealStep clicks:
+          // phase 1: each frontier layer to open
+          // phase 2: expose images (toPop)
+          // phase 3: place images into frames (unplaced)
+          const instrFirstUnpicked = INSTR_NAMES.has(breed.name)
+            ? shown.filter((n) => n.img && !picked.has(n._id) && n._parent)
+            : [];
+          const frontierNodes = shown.filter((n) => n.children && (n.children as Node[]).length && !open.has(n._id));
+          const toPopNodes = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
+          const unplacedCards = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
+          // Each frontier layer = 1 click; toPop phase = 1 click if needed; unplaced phase = 1 click if needed
+          const instrIconClicks = INSTR_NAMES.has(breed.name) ? instrFirstUnpicked.length : 0;
+          const frontierClicks = frontierNodes.length > 0 ? (INSTR_NAMES.has(breed.name) ? frontierNodes.length : 1) : 0;
+          const toPopClick = toPopNodes.length > 0 && instrFirstUnpicked.length === 0 && frontierNodes.length === 0 ? 1 : 0;
+          const unplacedClick = unplacedCards.length > 0 && toPopNodes.length === 0 && frontierNodes.length === 0 ? 1 : 0;
+          const stepsLeft = instrIconClicks + frontierClicks + toPopClick + unplacedClick;
           return (
           <g
             className={styles.removeBtn}
