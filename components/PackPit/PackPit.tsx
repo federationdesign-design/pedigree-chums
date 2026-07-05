@@ -129,8 +129,9 @@ export default function PackPit() {
       const v = document.createElement("video");
       v.src = vsrc; v.preload = "auto"; v.muted = true;
     });
-    // Preload all breed card images so game over screen shows them instantly
+    // Preload pit square images AND card artwork so game over screen shows them instantly
     breeds.forEach((b) => { if (b.image) { const img = new Image(); img.src = b.image; } });
+    Object.values(breedCard).forEach((src) => { const img = new Image(); img.src = src; });
     const open = () => { setHowToPlay(true); };
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
