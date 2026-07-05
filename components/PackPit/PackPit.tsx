@@ -611,19 +611,24 @@ export default function PackPit() {
       const enterPanel = { key: "__entersite", label: "Enter site", src: "/entersite.svg", width: BIG * 3.0, aspect: 86.9 / 45.9, kind: "entersite" };
       // PC-logo-6th-hit collider: dumbbell shape traced from 595.3x356.5 viewBox
       // Left circle ~cx105,cy178,r105; right circle ~cx490,cy178,r105; bar ~cx297,cy178,w400,h120 at ~8deg
+      // Pre-build logo dumbbell body (2 circles + bar) at init to avoid freeze on creation
+      // VB: 595.3x356.5. Left circle cx105,cy178,r105; right cx490,cy178,r105; bar cx297,cy178,w400,h120 at 8deg
+      const _lpo = { restitution: 0.45, friction: 0.3, density: 0.0009, render: { visible: false } };
+      const _lW = BIG * 6.8, _lH = _lW / (150 / 64);
+      const _lk = _lW / 595.3, _lcx = 595.3 / 2, _lcy = 356.5 / 2;
+      const _lC = (vx: number, vy: number, r: number) => Bodies.circle((vx - _lcx) * _lk, (vy - _lcy) * _lk, r * _lk, _lpo);
+      const _lR = (vx: number, vy: number, w: number, h: number, a = 0) => Bodies.rectangle((vx - _lcx) * _lk, (vy - _lcy) * _lk, w * _lk, h * _lk, { ..._lpo, angle: a });
+      const _logoColliderBody: any = Body.create({ parts: [
+        _lC(105, 178, 105),
+        _lC(490, 178, 105),
+        _lR(297, 178, 400, 120, 0.14),
+      ], frictionAir: 0.012, render: { visible: false } });
+
       const makeLogoCollider = (x: number, y: number, bw: number, bh: number) => {
-        const VBW = 595.3, VBH = 356.5, k = bw / VBW;
-        const cx0 = VBW / 2, cy0 = VBH / 2;
-        const po = { restitution: 0.45, friction: 0.3, density: 0.0009, render: { visible: false } };
-        const C = (vx: number, vy: number, r: number) => Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
-        const R = (vx: number, vy: number, w: number, h: number, a = 0) => Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, { ...po, angle: a });
-        // Single chamfered rect - compound body caused physics freeze on creation
-        const b2 = Bodies.rectangle(x, y, bw, bh, {
-          chamfer: { radius: Math.min(bw, bh) * 0.18 },
-          restitution: 0.45, friction: 0.3, density: 0.0009,
-          frictionAir: 0.012, render: { visible: false },
-        });
-        return b2;
+        Body.setPosition(_logoColliderBody, { x, y });
+        Body.setVelocity(_logoColliderBody, { x: 0, y: 0 });
+        Body.setAngularVelocity(_logoColliderBody, 0);
+        return _logoColliderBody;
       };
       const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
       function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number, side?: "left" | "right") {
