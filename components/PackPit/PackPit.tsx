@@ -304,7 +304,8 @@ export default function PackPit() {
         _sR(891, 336, 349, 64),
       ], frictionAir: 0.012, render: { visible: false } });
       const slipperImg = getImg(slipper.key, slipper.src);
-      _slipperBody.plugin = { name: slipper.label, half: Math.min(slipperW, slipperH)/2, w: slipperW, h: slipperH, color:"#bfe3f7", img: slipperImg, prop:"slipper", family:null, ping:0, ox:0, oy:0 };
+      // ox/oy compensate for compound body centroid offset (centroid is ~27px left, 58px below VB centre)
+      _slipperBody.plugin = { name: slipper.label, half: Math.min(slipperW, slipperH)/2, w: slipperW, h: slipperH, color:"#bfe3f7", img: slipperImg, prop:"slipper", family:null, ping:0, ox: slipperW * 0.039, oy: -(slipperH * 0.227) };
 
       const engine = Engine.create();
       engineRef.current = engine;
@@ -1940,8 +1941,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let patternUntil = 0;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
-      let dangerTimer: ReturnType<typeof setTimeout> | null = null; // tetris-style: objects in spawn zone
-      let countdownEl: HTMLDivElement | null = null; // single countdown div, never duplicated
+      let dangerTimer: ReturnType<typeof setTimeout> | null = null;
+      let countdownEl: HTMLDivElement | null = null;
+      let countdownTick: ReturnType<typeof setInterval> | null = null; // cancelable interval
       let throbIntervalOuter: ReturnType<typeof setInterval> | null = null; // hoisted for cleanup
       const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
@@ -2128,10 +2130,16 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                     window.location.href = "/about?gameover=1";
                   }
                 }, 1000);
+                countdownTick = tick;
                 dangerTimer = setTimeout(() => {}, 0); // mark as started
               }
             } else {
-              if (dangerTimer && !countdownEl) { clearTimeout(dangerTimer); dangerTimer = null; countdownEl = null; } // only cancel before countdown shows
+              // Cancel if below threshold - even during countdown (one item removed stops it)
+              if (dangerTimer) {
+                clearTimeout(dangerTimer); dangerTimer = null;
+                if (countdownTick) { clearInterval(countdownTick); countdownTick = null; }
+                if (countdownEl) { countdownEl.remove(); countdownEl = null; }
+              }
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
