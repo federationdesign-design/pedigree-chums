@@ -159,7 +159,7 @@ export default function PackPit() {
         try {
           sessionStorage.setItem("pc-gameover-score", String(score));
           sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
-          const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.image || b.img || ""]));
+          const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
           sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
         } catch {}
         window.location.href = "/about?gameover=1";
@@ -2122,7 +2122,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                     try {
                       sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
                       sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
-                      const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.image || b.img || ""]));
+                      const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
                       sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
                     } catch {}
                     window.location.href = "/about?gameover=1";
@@ -2131,7 +2131,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 dangerTimer = setTimeout(() => {}, 0); // mark as started
               }
             } else {
-              if (dangerTimer && !countdownEl) { clearTimeout(dangerTimer); dangerTimer = null; } // only cancel if countdown not yet showing
+              if (dangerTimer && !countdownEl) { clearTimeout(dangerTimer); dangerTimer = null; countdownEl = null; } // only cancel before countdown shows
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
