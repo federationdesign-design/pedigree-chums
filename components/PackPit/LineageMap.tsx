@@ -451,7 +451,8 @@ export default function LineageMap({
       const cnt = kids.length;
       const spread = depth === 0 ? SPREAD1 : SPREADN;
       let center = depth === 0 ? -Math.PI / 2 + base : n._dir;
-      if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
+      if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.42); } // curl clockwise for instructional
+      else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
       const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
