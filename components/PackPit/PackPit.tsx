@@ -152,19 +152,25 @@ export default function PackPit() {
     if (!activeBreed && !howToPlay && !shelfOpen && !cookiesOpenRef.current && pendingGameOver.current && !gameOver) {
       pendingGameOver.current = false;
       gameOverRef.current = true;
+      // Show GAME OVER flash before navigating
+      const stageEl = document.querySelector(".stage") as HTMLElement | null;
+      if (stageEl) {
+        const flash = document.createElement("div");
+        flash.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+        flash.textContent = "GAME OVER";
+        stageEl.appendChild(flash);
+      }
       window.setTimeout(() => {
-        // Disable pit canvas interaction before navigating
         const canvas = document.querySelector(".stage > canvas") as HTMLElement | null;
         if (canvas) canvas.style.pointerEvents = "none";
-        // Store game state for GameOver overlay on about page
         try {
-          sessionStorage.setItem("pc-gameover-score", String(score));
+          sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
           sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
           const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
           sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
         } catch {}
         window.location.href = "/about?gameover=1";
-      }, 800);
+      }, 1800);
     }
   }, [activeBreed, howToPlay, shelfOpen, gameOver]);
 

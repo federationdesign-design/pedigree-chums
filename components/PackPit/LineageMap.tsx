@@ -646,16 +646,20 @@ export default function LineageMap({
   // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
   // than a manual tap (125/250) so hand-exploration stays the rewarding route.
   const revealStep = () => {
-    // For instructional cards: if root icon hasn't been shown yet, show it first
-    if (INSTR_NAMES.has(breed.name) && root && root.img && !picked.has(root._id)) {
-      setPicked((prev) => { const s = new Set(prev); s.add(root._id); return s; });
-      const sh = 100;
-      const rr = radius(sh), dd = rr + 10 + CW / 2;
-      const px1 = root._x + Math.cos(0) * dd, py1 = root._y - dd;
-      setPinned((m) => { const x = new Map(m); x.set(root._id, { img: root.img as string, name: root.name, note: root.note, share: sh, mix: sh, status: nodeStatus(root.name, root.note) }); return x; });
-      setDragPos((m) => { const x = new Map(m); x.set(root._id, { x: px1, y: py1 }); return x; });
-      interacted.current = true; setIdleHint(false);
-      return;
+    // For instructional cards: show first child icon on first double-click
+    if (INSTR_NAMES.has(breed.name)) {
+      const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent);
+      if (firstUnpicked.length > 0) {
+        const n = firstUnpicked[0];
+        const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
+        const rr = radius(sh), dd = rr + 10 + CW / 2;
+        const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
+        setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+        setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
+        setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
+        interacted.current = true; setIdleHint(false);
+        return;
+      }
     }
     const frontier = shown.filter((n) => n.children && n.children.length && !open.has(n._id));
     if (frontier.length) {
@@ -1437,7 +1441,7 @@ export default function LineageMap({
                   <g className={styles.pickWobble}>
                   {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
                   {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
-                  {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:13,fontWeight:400,pointerEvents:"none" as const}; const by=c.cardY+CW/2+28; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by}>{l1}</tspan><tspan x={c.cardX} dy={16}>{l2}</tspan></text>):(<text x={c.cardX} y={by} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
+                  {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:13,fontWeight:400,pointerEvents:"none" as const}; const by=c.cardY+CW/2+38; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by}>{l1}</tspan><tspan x={c.cardX} dy={16}>{l2}</tspan></text>):(<text x={c.cardX} y={by} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
                   {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
@@ -1663,13 +1667,13 @@ export default function LineageMap({
             onPointerUp={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
             onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
-            <div style={{ width: "100%", height: "100%", borderRadius: 13, overflow: "hidden" }}>
+            <div style={{ width: "100%", height: "100%", borderRadius: 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={encodeURI(bust(c.img))}
                 alt={c.name}
                 draggable={false}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                style={{ width: INSTR_NAMES.has(breed.name) ? "65%" : "100%", height: INSTR_NAMES.has(breed.name) ? "65%" : "100%", objectFit: INSTR_NAMES.has(breed.name) ? "contain" : "cover", display: "block" }}
               />
             </div>
             {INSTR_NAMES.has(breed.name) && (
