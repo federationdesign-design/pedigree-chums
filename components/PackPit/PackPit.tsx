@@ -273,7 +273,7 @@ export default function PackPit() {
       engine.gravity.y = 1;
       const render = Render.create({
         element: stage, engine,
-        options: { width: stage.clientWidth, height: stage.clientHeight * 2, background: "transparent", wireframes: false, pixelRatio: 1 },
+        options: { width: stage.clientWidth, height: stage.clientHeight, background: "transparent", wireframes: false, pixelRatio: 1 },
       });
       renderRef.current = render;
       Render.run(render);
@@ -290,7 +290,7 @@ export default function PackPit() {
         const sideTop = ceilY - t, sideBot = h * 2;
         const sideH = sideBot - sideTop, sideC = (sideTop + sideBot) / 2;
         walls = [
-          Bodies.rectangle(w / 2, h * 2 + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // floor
+          Bodies.rectangle(w / 2, h + t / 2 - 2, w + t * 2, t, { isStatic: true, restitution: 0.4, render: { visible: false } }), // floor
           Bodies.rectangle(-t / 2 + 2, sideC, t, sideH, { isStatic: true, restitution: 0.5, render: { visible: false } }),
           Bodies.rectangle(w + t / 2 - 2, sideC, t, sideH, { isStatic: true, restitution: 0.5, render: { visible: false } }),
           Bodies.rectangle(w / 2, ceilY - t / 2, w + t * 2, t, { isStatic: true, restitution: 0.2, render: { visible: false } }), // ceiling -- low restitution kills upward energy
