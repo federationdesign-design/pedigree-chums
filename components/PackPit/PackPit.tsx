@@ -783,15 +783,7 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardRejects[4], dropped); }, 285000)); // 4:45.0 pool3-C
 
 
-        pairOrder.forEach((idx: number, i: number) => {
-          const delay = 2000 + Math.floor(i / 2) * 10000 + (i % 2) * 800;
-          waveTimers.push(setTimeout(() => {
-            if (!disposed && !dropped.has(idx)) {
-              dropped.add(idx);
-              Composite.add(engine.world, makeBall(BREEDS[idx], idx, w));
-            }
-          }, delay));
-        });
+        // pairOrder loop removed - replaced by tiered easy/medium/hard drop system above
 
         waveTimers.push(setTimeout(() => {
           if (!disposed) {
