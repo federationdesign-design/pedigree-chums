@@ -273,12 +273,20 @@ export default function PackPit() {
       const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 4.95 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit2.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.721 };
-      // Pre-build slipper compound body NOW (before physics runs) to avoid freeze on drop
+
+      const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
+      const BALLS = isMobile ? [ball] : [ball, ball, ball];
+      const HEAVY = [bone, slipper];
+
+      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
+
+      // Pre-build slipper compound body AFTER Body is available - avoids freeze on drop
       const slipperW = BIG * (isMobile ? 6.65 : 8.31), slipperH = slipperW / 2.721;
       const _sk = slipperW / 1108.5, _scx = 1108.5 / 2, _scy = 407.4 / 2;
-      const _sR = (vx: number, vy: number, w: number, h: number) => Bodies.rectangle((vx-_scx)*_sk, (vy-_scy)*_sk, w*_sk, h*_sk, { restitution:0.3, friction:0.3, density:0.0008, render:{ visible:false } });
-      const _sRA = (vx: number, vy: number, w: number, h: number, deg: number) => Bodies.rectangle((vx-_scx)*_sk, (vy-_scy)*_sk, w*_sk, h*_sk, { restitution:0.3, friction:0.3, density:0.0008, angle: deg*Math.PI/180, render:{ visible:false } });
-      const _sC = (vx: number, vy: number, r: number) => Bodies.circle((vx-_scx)*_sk, (vy-_scy)*_sk, r*_sk, { restitution:0.3, friction:0.3, density:0.0008, render:{ visible:false } });
+      const _spo = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
+      const _sR = (vx: number, vy: number, w: number, h: number) => Bodies.rectangle((vx-_scx)*_sk, (vy-_scy)*_sk, w*_sk, h*_sk, _spo);
+      const _sRA = (vx: number, vy: number, w: number, h: number, deg: number) => Bodies.rectangle((vx-_scx)*_sk, (vy-_scy)*_sk, w*_sk, h*_sk, { ..._spo, angle: deg*Math.PI/180 });
+      const _sC = (vx: number, vy: number, r: number) => Bodies.circle((vx-_scx)*_sk, (vy-_scy)*_sk, r*_sk, _spo);
       const _slipperBody: any = Body.create({ parts: [
         _sR(554, 363, 1107, 84),
         _sC(546, 241, 154),
@@ -288,11 +296,6 @@ export default function PackPit() {
       ], frictionAir: 0.012, render: { visible: false } });
       const slipperImg = getImg(slipper.key, slipper.src);
       _slipperBody.plugin = { name: slipper.label, half: Math.min(slipperW, slipperH)/2, w: slipperW, h: slipperH, color:"#bfe3f7", img: slipperImg, prop:"slipper", family:null, ping:0, ox:0, oy:0 };
-      const logo = { key: "__logo", label: "Pedigree Chums", src: "/PC-logo.svg", shape: "logo", width: BIG * 6.8, aspect: 150 / 64 };
-      const BALLS = isMobile ? [ball] : [ball, ball, ball];
-      const HEAVY = [bone, slipper];
-
-      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       const engine = Engine.create();
       engineRef.current = engine;
@@ -744,8 +747,8 @@ export default function PackPit() {
         // ── POOL 1 (easy rejects, 3 drops of 2) ─────────────────────────────
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 35000));  // 0:35.0 pool1-A
         waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 40000));                                                                     // 0:40.0  bone
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[2], dropped); dropCardNamed(easyRejects[3], dropped); } }, 47000));  // 0:47.0 pool1-B
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[4], dropped); dropCardNamed(easyRejects[5], dropped); } }, 55000));  // 0:55.0 pool1-C
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[2], dropped); dropCardNamed(easyRejects[3], dropped); } }, 41000));  // 0:41.0 pool1-B
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[4], dropped); dropCardNamed(easyRejects[5], dropped); } }, 47000));  // 0:47.0 pool1-C
 
         // ── MEDIUM PAIRS (pairs 7-12) ────────────────────────────────────────
         const medPairs: [string,string][] = [
@@ -766,19 +769,19 @@ export default function PackPit() {
           [medRejects[i], medRejects[j]] = [medRejects[j], medRejects[i]];
         }
 
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[0].find(n=>!medRejects.includes(n))??medPairs[0][0], dropped); }, 70000));   // 1:10.0  pair 7
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[1].find(n=>!medRejects.includes(n))??medPairs[1][0], dropped); }, 80000));   // 1:20.0  pair 8
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[2].find(n=>!medRejects.includes(n))??medPairs[2][0], dropped); }, 90000));   // 1:30.0  pair 9
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[3].find(n=>!medRejects.includes(n))??medPairs[3][0], dropped); }, 105000));  // 1:45.0  pair 10
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[4].find(n=>!medRejects.includes(n))??medPairs[4][0], dropped); }, 115000)); // 1:55.0  pair 11
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[0].find(n=>!medRejects.includes(n))??medPairs[0][0], dropped); }, 60000));   // 1:00.0  pair 7
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[1].find(n=>!medRejects.includes(n))??medPairs[1][0], dropped); }, 65000));   // 1:05.0  pair 8
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[2].find(n=>!medRejects.includes(n))??medPairs[2][0], dropped); }, 71000));   // 1:11.0  pair 9
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[3].find(n=>!medRejects.includes(n))??medPairs[3][0], dropped); }, 75000));   // 1:15.0  pair 10
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[4].find(n=>!medRejects.includes(n))??medPairs[4][0], dropped); }, 81000));   // 1:21.0  pair 11
         // bowl removed - diagnostic test
         // waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 120000));
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[5].find(n=>!medRejects.includes(n))??medPairs[5][0], dropped); }, 125000)); // 2:05.0  pair 12
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[5].find(n=>!medRejects.includes(n))??medPairs[5][0], dropped); }, 86000));   // 1:26.0  pair 12
 
         // ── POOL 2 (medium rejects, 3 drops of 2) ───────────────────────────
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[0], dropped); dropCardNamed(medRejects[1], dropped); } }, 135000)); // 2:15.0 pool2-A
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[2], dropped); dropCardNamed(medRejects[3], dropped); } }, 150000)); // 2:30.0 pool2-B
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[4], dropped); dropCardNamed(medRejects[5], dropped); } }, 165000)); // 2:45.0 pool2-C
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[0], dropped); dropCardNamed(medRejects[1], dropped); } }, 92000));   // 1:32.0 pool2-A
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[2], dropped); dropCardNamed(medRejects[3], dropped); } }, 98000));   // 1:38.0 pool2-B
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[4], dropped); dropCardNamed(medRejects[5], dropped); } }, 104000));  // 1:44.0 pool2-C
 
         // ── HARD PAIRS (pairs 13-17) ─────────────────────────────────────────
         const hardPairs: [string,string][] = [
@@ -798,16 +801,16 @@ export default function PackPit() {
           [hardRejects[i], hardRejects[j]] = [hardRejects[j], hardRejects[i]];
         }
 
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[0].find(n=>!hardRejects.includes(n))??hardPairs[0][0], dropped); }, 180000));  // 3:00.0  pair 13
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[1].find(n=>!hardRejects.includes(n))??hardPairs[1][0], dropped); }, 195000));  // 3:15.0  pair 14
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[2].find(n=>!hardRejects.includes(n))??hardPairs[2][0], dropped); }, 210000));  // 3:30.0  pair 15
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[3].find(n=>!hardRejects.includes(n))??hardPairs[3][0], dropped); }, 225000));  // 3:45.0  pair 16
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[4].find(n=>!hardRejects.includes(n))??hardPairs[4][0], dropped); }, 240000));  // 4:00.0  pair 17
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[0].find(n=>!hardRejects.includes(n))??hardPairs[0][0], dropped); }, 110000));  // 1:50.0  pair 13
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[1].find(n=>!hardRejects.includes(n))??hardPairs[1][0], dropped); }, 116000));  // 1:56.0  pair 14
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[2].find(n=>!hardRejects.includes(n))??hardPairs[2][0], dropped); }, 122000));  // 2:02.0  pair 15
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[3].find(n=>!hardRejects.includes(n))??hardPairs[3][0], dropped); }, 128000));  // 2:08.0  pair 16
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[4].find(n=>!hardRejects.includes(n))??hardPairs[4][0], dropped); }, 134000));  // 2:14.0  pair 17
 
         // ── POOL 3 (hard rejects, drops of 2/2/1) ───────────────────────────
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[0], dropped); dropCardNamed(hardRejects[1], dropped); } }, 255000)); // 4:15.0 pool3-A
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[2], dropped); dropCardNamed(hardRejects[3], dropped); } }, 270000)); // 4:30.0 pool3-B
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardRejects[4], dropped); }, 285000)); // 4:45.0 pool3-C
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[0], dropped); dropCardNamed(hardRejects[1], dropped); } }, 140000));  // 2:20.0 pool3-A
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[2], dropped); dropCardNamed(hardRejects[3], dropped); } }, 146000));  // 2:26.0 pool3-B
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardRejects[4], dropped); }, 152000));  // 2:32.0 pool3-C
 
 
         // pairOrder loop removed - replaced by tiered easy/medium/hard drop system above
@@ -2053,11 +2056,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         let throbHigh = true;
         const setThrob = (iv: ReturnType<typeof setInterval> | null) => { throbInterval = iv; throbIntervalOuter = iv; };
         const scheduleIdleCheck = () => {
-          const ric = (window as any).requestIdleCallback ?? ((cb: any) => setTimeout(cb, 2000));
-          ric((deadline: any) => {
+          setTimeout(() => {
             if (disposed || gameOverRef.current) return;
-            const remaining = deadline?.timeRemaining ? deadline.timeRemaining() : 10;
-            if (remaining < 4) { scheduleIdleCheck(); return; }
             // Count all settled objects in the spawn zone
             let settledInZone = 0;
             for (const b of Composite.allBodies(engine.world)) {
@@ -2116,7 +2116,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
-          });
+          }, 0);
         };
         setTimeout(scheduleIdleCheck, 5000); // start checking after 5s
         // Bone proximity: slow to 50% when two bones are within 100px of each other
