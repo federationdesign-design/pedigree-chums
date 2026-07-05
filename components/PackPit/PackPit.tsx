@@ -2037,21 +2037,19 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (disposed || gameOverRef.current) return;
             const remaining = deadline?.timeRemaining ? deadline.timeRemaining() : 10;
             if (remaining < 4) { scheduleIdleCheck(); return; }
-            // Count ALL settled dog cards in the world (not just spawn zone)
-            let totalSettled = 0;
+            // Count settled dog cards in the spawn zone only
             let settledInZone = 0;
             for (const b of Composite.allBodies(engine.world)) {
               if (b.isStatic || !(b as any).plugin) continue;
               const plug = (b as any).plugin;
               if (plug.prop || plug.kind || !plug.family) continue;
               if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
-              totalSettled++;
               const top = b.position.y - (plug.half ?? 40);
               if (top < SPAWN_ZONE) settledInZone++;
             }
-            // Pattern opacity curve: 0-4 cards = 0%, 5=10%, 6=25%, 7=50%, 8=75%, 9+=100%
+            // Pattern opacity curve: 0-4 cards in zone = 0%, 5=10%, 6=25%, 7=50%, 8=75%, 9+=100%
             const opacityMap: number[] = [0, 0, 0, 0, 0, 0.10, 0.25, 0.50, 0.75, 1.0];
-            const targetOpacity = opacityMap[Math.min(totalSettled, opacityMap.length - 1)];
+            const targetOpacity = opacityMap[Math.min(settledInZone, opacityMap.length - 1)];
             if (!throbInterval) {
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
