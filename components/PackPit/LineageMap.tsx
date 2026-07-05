@@ -660,8 +660,22 @@ export default function LineageMap({
           }
         });
       });
-      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; }); // opened node turns blue; newly-revealed children stay yellow until tapped
-      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE)); // -100 per newly revealed node (patch_revealscore_v1)
+      setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; });
+      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE));
+      // Instructional cards: show pick-card icon for each newly revealed child immediately
+      if (INSTR_NAMES.has(breed.name)) {
+        const newKids = toOpen.flatMap((n) => (n.children as Node[]) || []).filter((k) => k.img && !picked.has(k._id));
+        newKids.forEach((n, i) => {
+          window.setTimeout(() => {
+            setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+            const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
+            const rr = radius(sh), dd = rr + 10 + CW / 2;
+            const px1 = n._x + Math.cos(n._dir) * dd, py1 = n._y + Math.sin(n._dir) * dd;
+            setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: sh, status: nodeStatus(n.name, n.note) }); return x; });
+            setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
+          }, i * 80);
+        });
+      }
       interacted.current = true; setIdleHint(false);
       return;
     }
