@@ -2022,25 +2022,25 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
-        // Tetris game over: runs in idle time, never blocks physics
-        const SPAWN_ZONE = 140;
+        // Game over: 10+ settled dog cards in spawn zone = pit is genuinely full
+        const SPAWN_ZONE = 140; // px from top
+        const DANGER_COUNT = 10; // settled cards needed to trigger
         const scheduleIdleCheck = () => {
           const ric = (window as any).requestIdleCallback ?? ((cb: any) => setTimeout(cb, 2000));
           ric((deadline: any) => {
             if (disposed || gameOverRef.current) return;
             const remaining = deadline?.timeRemaining ? deadline.timeRemaining() : 10;
             if (remaining < 4) { scheduleIdleCheck(); return; }
-            const pitH = stage.clientHeight;
-            let highestCardY = pitH;
+            let settledInZone = 0;
             for (const b of Composite.allBodies(engine.world)) {
               if (b.isStatic || !(b as any).plugin) continue;
               const plug = (b as any).plugin;
-              if (plug.prop || plug.kind || !plug.family) continue;
-              if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
+              if (plug.prop || plug.kind || !plug.family) continue; // dog cards only
+              if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue; // must be settled
               const top = b.position.y - (plug.half ?? 40);
-              if (top < highestCardY) highestCardY = top;
+              if (top < SPAWN_ZONE) settledInZone++;
             }
-            if (highestCardY < SPAWN_ZONE) {
+            if (settledInZone >= DANGER_COUNT) {
               if (!dangerTimer) {
                 dangerTimer = setTimeout(() => {
                   if (gameOverRef.current || disposed) return;
