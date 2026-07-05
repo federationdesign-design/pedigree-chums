@@ -3,7 +3,7 @@
    (z-index 120) and clears the nav (top) and cookie banner (bottom). */
 .card {
   position: fixed;
-  top: 50%;
+  bottom: clamp(80px, 12vw, 120px);
   right: 0;
   z-index: 100;
   width: min(258px, 80vw);
@@ -16,7 +16,7 @@
     inset 0 0 0 3px rgba(255, 255, 255, 0.12);
 
   /* hidden by default: parked off the right edge, no pointer events */
-  transform: translate(115%, -50%);
+  transform: translate(115%, 0);
   opacity: 0;
   pointer-events: none;
   transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1),
@@ -24,7 +24,7 @@
 }
 
 .show {
-  transform: translate(0, -50%);
+  transform: translate(0, 0);
   opacity: 1;
   pointer-events: auto;
 }

@@ -191,7 +191,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={src} alt={`How to play, step ${i + 1}`} className={styles.stepImg} />
               )}
-              <div className={styles.stepCaption}>{"DEAL 3–6 CHUMS EACH,HEAD OUTSIDE,SPOT REAL DOGS,MATCH TO YOUR CHUM,FIND MORE CHUMS,MOST CHUMS WINS".split(",")[i]}</div>
+              <div className={styles.stepCaption}>{"DEAL THE CARDS,HEAD OUTSIDE,SPOT REAL DOGS,MATCH TO YOUR CHUM,FIND MORE CHUMS,MOST CHUMS WINS".split(",")[i]}</div>
             </div>
           ))}
         </div>

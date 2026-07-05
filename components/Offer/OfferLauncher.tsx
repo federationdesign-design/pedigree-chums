@@ -16,6 +16,7 @@ import { startCheckout } from "./startCheckout";
 export default function OfferLauncher() {
   const [open, setOpen] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const isPit = typeof window !== "undefined" && window.location.pathname === "/";
   const [dismissed, setDismissed] = useState(false);
   const [buying, setBuying] = useState(false);
 
@@ -53,7 +54,8 @@ export default function OfferLauncher() {
     };
   }, []);
 
-  const show = revealed && !dismissed && !open;
+  const isPitPage = typeof window !== "undefined" && window.location.pathname === "/";
+  const show = revealed && !dismissed && !open && !isPitPage;
   const focusable = show ? 0 : -1;
 
   return (
