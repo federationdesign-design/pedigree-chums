@@ -66,12 +66,6 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
 
 export default function GameOver({ chums, score, collectedBreeds = [], allCollected = false, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const idleTimerRef = useRef<number | null>(null);
-  const resetIdleTimer = () => {
-    if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
-    idleTimerRef.current = window.setTimeout(() => window.location.assign("/about"), 10000);
-  };
-  useEffect(() => { resetIdleTimer(); return () => { if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current); }; }, []);
 
   // Arcade name entry: array of char indices, one active column
   const [chars, setChars] = useState<number[]>(Array(MAX_NAME).fill(0));
@@ -270,7 +264,10 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
   };
 
   return (
-    <div ref={overlayRef} className={styles.overlay} onClick={resetIdleTimer} onKeyDown={resetIdleTimer}>
+    <div ref={overlayRef} className={styles.overlay}>
+      {onClose && (
+        <button onClick={onClose} aria-label="Close and continue" style={{ position: "fixed", top: 20, right: 20, zIndex: 300, width: 52, height: 52, borderRadius: "50%", background: "var(--yellow,#ffd23e)", border: "none", fontSize: "1.5rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--navy,#0a3a57)", fontWeight: 900, boxShadow: "0 4px 12px rgba(0,0,0,0.3)" }}>&#x2715;</button>
+      )}
 
 
       {/* Score top-left */}
@@ -319,7 +316,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
           <div className={styles.allCollectedPaw} aria-hidden="true">🐾</div>
         )}
         <h1 className={styles.title}>
-          {allCollected ? "YOU GOT 'EM ALL!" : chums === 0 ? "You have no chums and your... tell you what, grab some chums next time!" : `Well done — ${chums} chum${chums === 1 ? "" : "s"} found!`}
+          {allCollected ? "YOU GOT 'EM ALL!" : chums === 0 ? "You were meant to collect Chums!" : `Well done — ${chums} chum${chums === 1 ? "" : "s"} found!`}
         </h1>
         {allCollected && (
           <p className={styles.allCollectedSub}>ALL 54 CHUMS COLLECTED</p>

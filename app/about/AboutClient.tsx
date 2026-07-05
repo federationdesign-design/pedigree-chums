@@ -29,6 +29,11 @@ export default function AboutClient() {
     document.body.style.top = `-${scrollPos.current}px`;
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
+    // Pause Vimeo video while overlay is showing
+    try {
+      const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
+      if (iframe) iframe.contentWindow?.postMessage('{"method":"pause"}', "*");
+    } catch {}
     setShowGameOver(true);
   }, [params]);
 
@@ -42,6 +47,11 @@ export default function AboutClient() {
     window.scrollTo(0, scrollPos.current);
     // Clean URL
     router.replace("/about", { scroll: false });
+    // Resume Vimeo video
+    try {
+      const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
+      if (iframe) iframe.contentWindow?.postMessage('{"method":"play"}', "*");
+    } catch {}
   };
 
   if (!showGameOver) return null;
