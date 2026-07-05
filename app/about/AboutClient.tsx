@@ -11,6 +11,25 @@ export default function AboutClient() {
   const [breeds, setBreeds] = useState<{ name: string; img: string }[]>([]);
   const scrollPos = useRef(0);
 
+  // Normal page load (no gameover) - trigger video play once ready
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("gameover") === "1") return; // gameover path handles its own play
+    const onReady = (e: MessageEvent) => {
+      try {
+        const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+        if (data.event === "ready") {
+          const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
+          if (iframe) iframe.contentWindow?.postMessage('{"method":"play"}', "*");
+          window.removeEventListener("message", onReady);
+        }
+      } catch {}
+    };
+    window.addEventListener("message", onReady);
+    return () => window.removeEventListener("message", onReady);
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
