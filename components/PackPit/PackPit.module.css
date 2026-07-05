@@ -1,9 +1,9 @@
 .stage {
   position: relative;
   width: 100%;
-  height: 100vh;
-  height: 100svh;
-  min-height: 780px;
+  height: 200vh;
+  height: 200svh;
+  min-height: 1560px;
   overflow: hidden;
   background: linear-gradient(165deg, var(--blue-sky), var(--blue) 48%, var(--blue-deep));
 }
