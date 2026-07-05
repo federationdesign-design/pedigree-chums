@@ -337,33 +337,14 @@ export default function PackPit() {
           return b;
         }
         if (prop.shape === "slipper" || prop.shape === "bowl") {
-          // Same idea as the bone: trace the silhouette with a few primitives so
-          // objects meet the actual shape, not the empty corners of a box. The
-          // collider centre lands off the art box, so plugin.ox/oy nudges the
-          // drawn image back over it.
+          // Simple chamfered rects - compound bodies caused physics freeze on creation
           const bw = prop.width, bh = prop.width / prop.aspect;
-          const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const VB = prop.shape === "slipper" ? { w: 1108.5, h: 407.4 } : { w: 1031.7, h: 316.8 };
-          const po2 = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
-          const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
-          // parts at origin so centroid is predictable
-          const R = (vx: number, vy: number, w: number, h: number, opts = po) =>
-            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, opts);
-          const RA = (vx: number, vy: number, w: number, h: number, deg: number, opts = po) =>
-            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, { ...opts, angle: deg * Math.PI / 180 });
-          const C = (vx: number, vy: number, r: number) =>
-            Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
-          const parts =
-            prop.shape === "slipper"
-              ? [R(554, 363, 1107, 84), C(446, 241, 154), C(124, 333, 97), RA(370, 143, 380, 70, -18.7), R(891, 336, 349, 64)] // sole, upper slope, toe, upper ridge, heel
-              : [
-                R(515, 295, 820, 30, po2),   // floor -- full inner width, thin
-                R(515, 265, 120, 80, po2),   // centre bump -- uneven floor stops stacking
-                Bodies.rectangle((90 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: 0.349 }),  // left wall angled
-                Bodies.rectangle((940 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: -0.349 }) // right wall angled
-              ];
-          const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-          Body.setPosition(b, { x, y });
+          const density = prop.shape === "bowl" ? 0.006 : 0.0008;
+          const b: any = Bodies.rectangle(x, y, bw, bh, {
+            chamfer: { radius: Math.min(bw, bh) * 0.12 },
+            frictionAir: 0.012, restitution: 0.3, friction: 0.4, density,
+            render: { visible: false },
+          });
           if (prop.angle) Body.setAngle(b, prop.angle);
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
