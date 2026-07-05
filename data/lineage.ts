@@ -22,13 +22,13 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Find your pack, gather players, shuffle and deal 3 to 6 cards each.",
     children: [
       {
-        name: "Find your pack",
+        name: "Find pack",
         note: "Dig out your Pedigree Chums deck.",
         img: "/find-pack-icon.svg",
         value: 1,
         children: [
           {
-            name: "Gather your players",
+            name: "Gather players",
             note: "No limit on players. You can even go solo.",
             img: "/friends-icon.svg",
             value: 2,
@@ -64,7 +64,7 @@ const LINEAGE: Record<string, LineageNode> = {
         value: 1,
         children: [
           {
-            name: "Keep your cards close",
+            name: "Cards near",
             note: "Keep somewhere easy to pull out.",
             img: "/cards-close-icon.svg",
             value: 2,
@@ -92,7 +92,7 @@ const LINEAGE: Record<string, LineageNode> = {
         value: 1,
         children: [
           {
-            name: "Check the card",
+            name: "Check card",
             note: "Does it match?",
             img: "/check.svg",
             value: 2,
@@ -106,13 +106,13 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Call it out, claim your matched card and help your team.",
     children: [
       {
-        name: "Call it out loud",
+        name: "Call out",
         note: "Say the breed name. Other players can challenge if they disagree.",
         img: "/shout-icon.svg",
         value: 1,
         children: [
           {
-            name: "Claim your chum",
+            name: "Claim chum",
             note: "Separate the found chum card.",
             img: "/trun-card-icon.svg",
             value: 2,
@@ -152,13 +152,13 @@ const LINEAGE: Record<string, LineageNode> = {
         value: 1,
         children: [
           {
-            name: "Count up chums",
+            name: "Count up",
             note: "Tot up who has the most chums.",
             img: "/count-icon.svg",
             value: 2,
             children: [
               {
-                name: "The most wins",
+                name: "Most wins",
                 note: "The player with the most matched chums wins.",
                 img: "/winner-icon.svg",
                 value: 3,
