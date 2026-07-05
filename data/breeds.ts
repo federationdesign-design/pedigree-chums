@@ -1,6 +1,5 @@
 // Single source of truth for the 54 dogs in the pack.
 // Physical characteristics + personality, from the card data.
-// `draft: true` entries (Irish Setter, Bernedoodle) are placeholder
 // copy pending final card content – review before relying on them.
 
 export type SizeBand = "small" | "medium" | "large" | "giant";
@@ -979,25 +978,7 @@ const allBreeds: Breed[] = [
     sizeBand: "large",
     skull: "long",
     draft: true,
-    image: "/history/breeds/irish-setter-photo.jpg",
-  },
-  {
-    name: "Bernedoodle",
-    slug: "bernedoodle",
-    lookFor: "Wavy Tri-Colour Coat",
-    size: "Medium / Large",
-    coatColour: "Black, white & rust tri-colour, or solid",
-    coatLength: "Wavy to curly, low-shedding",
-    height: "74cm",
-    length: "–",
-    weight: "(11-41 kg)",
-    fact: "cross bred from Bernese Mountain Dog & Poodle",
-    character: "Comes in Tiny, Mini & Standard sizes. Gentle, loyal and playful. Often low-shedding. Friendly family dogs that bond closely with their owners.",
-    type: "designer-crossbreed",
-    sizeBand: "large",
-    skull: "medium",
-    draft: true,
-    image: "/lab-square.jpg",
+    image: "/irish-square.png",
   },
 ];
 
@@ -1008,7 +989,7 @@ export const breeds: Breed[] = allBreeds.filter((b) => !b.draft);
 
 // Physical trading-card art per breed, keyed by slug. Used by the collection
 // shelf to show the real card a child plays with, rather than the pit's square
-// cartoon. Breeds with no card yet (irish-setter, bernedoodle) are omitted on
+// cartoon.
 // purpose, so the shelf falls back to the cartoon for them.
 export const breedCard: Record<string, string> = {
   "cocker-spaniel": "/card.jpg",
