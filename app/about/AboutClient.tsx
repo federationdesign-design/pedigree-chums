@@ -17,6 +17,17 @@ export default function AboutClient() {
 
   useEffect(() => {
     if (params.get("gameover") !== "1") return;
+    // Pause video immediately before anything else renders
+    const tryPause = () => {
+      const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
+      if (iframe) {
+        iframe.contentWindow?.postMessage('{"method":"pause"}', "*");
+      } else {
+        // Iframe not yet in DOM, try again shortly
+        setTimeout(tryPause, 50);
+      }
+    };
+    tryPause();
     // Read game state from sessionStorage
     try {
       setScore(Number(sessionStorage.getItem("pc-gameover-score") || "0"));

@@ -126,6 +126,8 @@ export default function PackPit() {
       const v = document.createElement("video");
       v.src = vsrc; v.preload = "auto"; v.muted = true;
     });
+    // Preload all breed card images so game over screen shows them instantly
+    breeds.forEach((b) => { if (b.image) { const img = new Image(); img.src = b.image; } });
     const open = () => { setHowToPlay(true); };
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
@@ -151,7 +153,8 @@ export default function PackPit() {
         try {
           sessionStorage.setItem("pc-gameover-score", String(score));
           sessionStorage.setItem("pc-gameover-chums", String(collected));
-          sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: "" }))));
+          const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.img]));
+                    sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
         } catch {}
         window.location.href = "/about?gameover=1";
       }, 800);
@@ -2108,7 +2111,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                     try {
                       sessionStorage.setItem("pc-gameover-score", String(score));
                       sessionStorage.setItem("pc-gameover-chums", String(collected));
-                      sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: "" }))));
+                      const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.img]));
+                    sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
                     } catch {}
                     window.location.href = "/about?gameover=1";
                   }
@@ -2116,8 +2120,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 dangerTimer = setTimeout(() => {}, 0); // mark as started
               }
             } else {
-              if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
-              if (countdownEl) { countdownEl.remove(); countdownEl = null; }
+              if (dangerTimer && !countdownEl) { clearTimeout(dangerTimer); dangerTimer = null; } // only cancel if countdown not yet showing
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);

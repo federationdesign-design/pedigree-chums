@@ -67,7 +67,7 @@ export default function Hero() {
         <iframe
           ref={iframeRef}
           className={styles.video}
-          src={`https://player.vimeo.com/video/1199216471?autoplay=${typeof window !== "undefined" && new URLSearchParams(window.location.search).get("gameover") === "1" ? "0" : "1"}&loop=0&muted=1&controls=0&title=0&byline=0&portrait=0&autopause=0`}
+          src="https://player.vimeo.com/video/1199216471?autoplay=1&loop=0&muted=1&controls=0&title=0&byline=0&portrait=0&autopause=0"
           title="Pedigree Chums"
           allow="autoplay; fullscreen; picture-in-picture"
           frameBorder="0"
