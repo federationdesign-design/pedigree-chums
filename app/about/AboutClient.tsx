@@ -12,6 +12,9 @@ export default function AboutClient() {
   const [breeds, setBreeds] = useState<{ name: string; img: string }[]>([]);
   const scrollPos = useRef(0);
 
+  // Lock scroll immediately if gameover param present (before video loads)
+  const isGameOver = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("gameover") === "1";
+
   useEffect(() => {
     if (params.get("gameover") !== "1") return;
     // Read game state from sessionStorage
@@ -23,17 +26,18 @@ export default function AboutClient() {
       sessionStorage.removeItem("pc-gameover-chums");
       sessionStorage.removeItem("pc-gameover-breeds");
     } catch {}
-    // Lock scroll
+    // Lock scroll immediately
     scrollPos.current = window.scrollY;
     document.body.style.overflow = "hidden";
     document.body.style.top = `-${scrollPos.current}px`;
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
-    // Pause Vimeo video while overlay is showing
+    // Pause video immediately
     try {
       const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
-      if (iframe) iframe.contentWindow?.postMessage('{"method":"pause"}', "*");
+      if (iframe) { iframe.contentWindow?.postMessage('{"method":"pause"}', "*"); }
     } catch {}
+
     setShowGameOver(true);
   }, [params]);
 

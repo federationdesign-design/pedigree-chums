@@ -774,8 +774,7 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[2].find(n=>!medRejects.includes(n))??medPairs[2][0], dropped); }, 71000));   // 1:11.0  pair 9
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[3].find(n=>!medRejects.includes(n))??medPairs[3][0], dropped); }, 75000));   // 1:15.0  pair 10
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[4].find(n=>!medRejects.includes(n))??medPairs[4][0], dropped); }, 81000));   // 1:21.0  pair 11
-        // bowl removed - diagnostic test
-        // waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 120000));
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 120000));  // 2:00.0  bowl
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[5].find(n=>!medRejects.includes(n))??medPairs[5][0], dropped); }, 86000));   // 1:26.0  pair 12
 
         // ── POOL 2 (medium rejects, 3 drops of 2) ───────────────────────────
@@ -2081,12 +2080,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             }
             if (settledInZone >= DANGER_COUNT) {
               // Start throb at 90% opacity
-              if (!throbInterval) {
-                setThrob(setInterval(() => {
-                  throbHigh = !throbHigh;
-                  stage.style.setProperty("--fill-opacity", throbHigh ? "0.9" : "0.3");
-                }, 1000));
-              }
+              // throb removed - steady max opacity when danger
               if (!dangerTimer) {
                 // Sequential: 3 (2s) → 2 (2s) → 1 (2s) → GAME OVER (2s) → navigate
                 if (runnerRef.current) (runnerRef.current as any).enabled = false;
@@ -2118,7 +2112,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
-              if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
@@ -3133,14 +3126,16 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       <div className={styles.controls}>
         <div className={styles.scoreTotal + (scorePulse ? " " + styles.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>{score.toLocaleString("en-GB")}</div>
       </div>
-      <button
-        type="button"
-        className={`${styles.slowmo}${slowmo ? " " + styles.slowmoActive : ""}`}
-        onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
-        aria-label={slowmo ? "Normal speed" : "Slow motion"}
-      >
-        <img src="/svg-snail-icon.svg" width="52" height="52" alt="" aria-hidden="true" style={{ display: "block" }} />
-      </button>
+      {!activeBreed && !howToPlay && !gameOver && (
+        <button
+          type="button"
+          className={`${styles.slowmo}${slowmo ? " " + styles.slowmoActive : ""}`}
+          onClick={() => { slowmoRef.current(); setSlowmo((s) => !s); }}
+          aria-label={slowmo ? "Normal speed" : "Slow motion"}
+        >
+          <img src="/svg-snail-icon.svg" width="52" height="52" alt="" aria-hidden="true" style={{ display: "block" }} />
+        </button>
+      )}
 
       <button ref={shakeBtnRef} type="button" className={styles.shake} onClick={(e) => { motionRef.current(); shakeRef.current(); flashShakeRef.current(); const el = e.currentTarget; el.classList.add(styles.shakeFlash); setTimeout(() => el.classList.remove(styles.shakeFlash), 300); }} aria-label="Shake the pit">
         <span className={styles.shakeIcon} aria-hidden="true" />

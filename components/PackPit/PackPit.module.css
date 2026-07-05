@@ -417,10 +417,10 @@
   color: var(--yellow);
   box-shadow: 0 5px 0 rgba(3, 87, 245, 0.4);
 }
-/* Slow motion button -- sits above pause */
+/* Slow motion button -- above shake */
 .slowmo {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 84px + 12px + 84px + 12px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 84px + 12px);
   right: clamp(18px, 4vw, 48px);
   z-index: 65;
   width: 84px;
