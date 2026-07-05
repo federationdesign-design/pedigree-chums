@@ -266,7 +266,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
   return (
     <div ref={overlayRef} className={styles.overlay}>
       {onClose && (
-        <button onClick={onClose} aria-label="Close and continue" style={{ position: "fixed", top: 20, right: 20, zIndex: 300, width: 100, height: 100, borderRadius: 30, background: "var(--yellow,#ffd23e)", border: "none", outline: "5px solid var(--navy,#0a3a57)", cursor: "pointer", display: "inline-flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 4px 0 rgba(10,58,87,0.3)" }}>
+        <button onClick={onClose} aria-label="Close and continue" style={{ position: "fixed", top: 20, right: 30, zIndex: 300, width: 100, height: 100, borderRadius: 30, background: "var(--yellow,#ffd23e)", border: "none", outline: "5px solid var(--navy,#0a3a57)", cursor: "pointer", display: "inline-flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 4px 0 rgba(10,58,87,0.3)" }}>
           <span style={{ display: "block", width: 50, height: 10, borderRadius: 999, background: "var(--navy,#0a3a57)", transform: "rotate(45deg) translate(7px, 7px)" }} />
           <span style={{ display: "block", width: 50, height: 10, borderRadius: 999, background: "var(--navy,#0a3a57)", transform: "rotate(-45deg) translate(7px, -7px)" }} />
         </button>
@@ -297,12 +297,15 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
                     zIndex: isHov ? total + 1 : i,
                     transform: isHov ? "translateY(-20px) scale(1.15)" : "translateY(0) scale(1)",
                     transition: "transform 0.2s cubic-bezier(0.22,1,0.36,1)",
+                    opacity: 0,
+                    animation: "deckCardPop 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards",
+                    animationDelay: `${i * 150}ms`,
                   }}
                   onMouseEnter={() => setDeckHover(i)}
                   onMouseLeave={() => setDeckHover(null)}
                 >
                   {c.img
-                    ? <img src={c.img} alt={c.name} />
+                    ? <img src={c.img} alt={c.name} onLoad={(e) => { (e.target as HTMLImageElement).closest('.chumDeckCardHidden')?.classList.remove('chumDeckCardHidden'); }} />
                     : <div style={{ width: "100%", height: "100%", background: "#0a3a57", borderRadius: "inherit" }} />
                   }
                   {isHov && (
@@ -405,7 +408,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
                   <button className={styles.shareOption} onClick={() => doShare("instagram")} type="button">📷 Instagram</button>
                   <button className={styles.shareOption} onClick={() => doShare("copy")} type="button">📋 Copy Caption</button>
                 </div>
-                {shareState === "shared" && <p style={{ color: "#22c55e", fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, margin: 0 }}>Ready to post! 🐾</p>}
+                {shareState === "shared" && <p style={{ color: "var(--yellow,#ffd23e)", fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, margin: 0 }}>Ready to post! 🐾</p>}
               </div>
             )}
           </div>

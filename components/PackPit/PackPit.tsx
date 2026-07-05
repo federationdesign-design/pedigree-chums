@@ -344,7 +344,7 @@ export default function PackPit() {
         const s = ((RADIUS[breed.size] || 32) + (Math.random() * 4 - 2)) * SCALE;
         const cr = Math.max(7, s * 0.22);
         const color = PALETTE[i % PALETTE.length];
-        const b = Bodies.rectangle(40 + Math.random() * (w - 80), -120 - Math.random() * 600, 2 * s, 2 * s, {
+        const b = Bodies.rectangle(40 + Math.random() * (w - 80), -20 - Math.random() * 500, 2 * s, 2 * s, {
           chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
         });
         b.plugin = { name: breed.name, half: s, corner: cr, color, family: FAMILY[breed.name] || null, img: getImg(breed.name, breed.img), ping: 0, seq: i + 1 };
@@ -436,7 +436,7 @@ export default function PackPit() {
         const bw = logo.width, bh = logo.width / ar;
         // collider shrunk to artwork bounds: dumbbell sits in ~85% width, ~70% height of bounding box
         const b: any = Bodies.rectangle(w / 2, h * 0.2 + 100, bw * 0.85, bh * 0.7, { isStatic: true, isSensor: false, collisionFilter: { category: LOGO_LOGO_CAT, group: FUSE_GROUP }, render: { visible: false } });
-        b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0 };
+        b.plugin = { name: logo.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#ffffff", img, prop: "logo", logo: true, family: null, ping: 0, popAlpha: 0, popStart: performance.now(), logoFading: true };
         if (!(img.complete && img.naturalWidth)) {
           img.addEventListener("load", () => {
             const a = img.naturalWidth / img.naturalHeight, newH = logo.width / a;
@@ -1377,10 +1377,16 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           }
           if (hovered && b.plugin.prop !== "logopiece") { ctx.shadowColor = "rgba(10,58,87,0.4)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
           if (img && img.complete && (img.naturalWidth || b.plugin.prop === "logopiece")) {
-            const iw = img.naturalWidth || pw, ih = img.naturalHeight || ph; // viewBox-only SVGs report 0; fall back to the body box
+            // Logo fades in over 600ms
+            if (b.plugin.logoFading) {
+              const elapsed = performance.now() - (b.plugin.popStart || 0);
+              b.plugin.popAlpha = Math.min(1, elapsed / 600);
+              if (b.plugin.popAlpha >= 1) b.plugin.logoFading = false;
+              ctx.globalAlpha *= b.plugin.popAlpha;
+            }
+            const iw = img.naturalWidth || pw, ih = img.naturalHeight || ph;
             const ir = iw / ih, br = pw / ph;
             const dw = ir > br ? pw : ph * ir, dh = ir > br ? pw / ir : ph;
-            // ox/oy shifts draw origin so a custom pivot point sits at body centre
             const dox = b.plugin.ox || 0, doy = b.plugin.oy || 0;
 
             // Blue circle from HTP overlay -- draw as filled circle with image
