@@ -559,12 +559,3 @@
   100% { filter: brightness(1); }
 }
 
-
-/* Tetris danger: CSS animates pattern flash, no JS interval */
-.dangerFlash .pattern {
-  animation: dangerPatternFlash 0.8s ease-in-out infinite;
-}
-@keyframes dangerPatternFlash {
-  0%, 100% { opacity: 0.15; }
-  50%      { opacity: 0.6; }
-}

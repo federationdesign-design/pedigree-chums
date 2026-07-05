@@ -702,7 +702,7 @@ export default function PackPit() {
           [easyRejects[i], easyRejects[j]] = [easyRejects[j], easyRejects[i]];
         }
 
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyPairs[0][Math.random()<0.5?0:1]==="Chihuahua"||true?easyPairs[0].find(n=>!easyRejects.includes(n))??easyPairs[0][0]:easyPairs[0][1], dropped); } }, 8000));   // 0:08.0  pair 1
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[0].find(n=>!easyRejects.includes(n))??easyPairs[0][0], dropped); }, 8000));   // 0:08.0  pair 1
         waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 9000)); // 0:09.0  panels+arrow
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[1].find(n=>!easyRejects.includes(n))??easyPairs[1][0], dropped); }, 11000));    // 0:11.0  pair 2
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[2].find(n=>!easyRejects.includes(n))??easyPairs[2][0], dropped); }, 14000));    // 0:14.0  pair 3
@@ -779,7 +779,7 @@ export default function PackPit() {
         }
 
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[0].find(n=>!hardRejects.includes(n))??hardPairs[0][0], dropped); }, 180000));  // 3:00.0  pair 13
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[1].find(n=>!hardRejects.includes(n))??hardPairs[1][0], dropped); }, 315000));  // 3:00.0  pair 14
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[1].find(n=>!hardRejects.includes(n))??hardPairs[1][0], dropped); }, 195000));  // 3:15.0  pair 14
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[2].find(n=>!hardRejects.includes(n))??hardPairs[2][0], dropped); }, 210000));  // 3:30.0  pair 15
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[3].find(n=>!hardRejects.includes(n))??hardPairs[3][0], dropped); }, 225000));  // 3:45.0  pair 16
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[4].find(n=>!hardRejects.includes(n))??hardPairs[4][0], dropped); }, 240000));  // 4:00.0  pair 17
@@ -2025,60 +2025,33 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
-        // Fill + danger check: every 3s (reduced from 2s to ease physics load)
-        if (now - lastFillCheck > 3000) {
+        // Fill + danger check: every 5s
+        if (now - lastFillCheck > 5000) {
           lastFillCheck = now;
           const pitH = render.canvas.height;
-          const pitW = render.canvas.width;
-          const pitArea = pitH * pitW;
-          // Single body traversal for both fill area and highest settled object
-          let coveredArea = 0;
-          let highestY = pitH;
-          const allB = Composite.allBodies(engine.world);
-          for (const b of allB) {
-            if (b.isStatic) continue;
-            if (!(b as any).plugin) continue;
-            const bw = b.bounds.max.x - b.bounds.min.x;
-            const bh = b.bounds.max.y - b.bounds.min.y;
-            coveredArea += bw * bh;
-            // Danger check: only cards/props, not balls
-            if ((b as any).plugin.prop !== "ball" && Math.hypot(b.velocity.x, b.velocity.y) < 2) {
-              const top = b.position.y - ((b as any).plugin?.half ?? 40);
-              if (top < highestY) highestY = top;
-            }
+          // Single body traversal: find highest settled NON-PROP card (dog cards only)
+          let highestCardY = pitH;
+          for (const b of Composite.allBodies(engine.world)) {
+            if (b.isStatic || !(b as any).plugin) continue;
+            const plug = (b as any).plugin;
+            // Only dog cards trigger game over, not props/bone/slipper/bowl/buttons
+            if (plug.prop || plug.kind || !plug.family) continue;
+            if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
+            const top = b.position.y - (plug.half ?? 40);
+            if (top < highestCardY) highestCardY = top;
           }
-          const ratio = coveredArea / pitArea;
-          (stage as any).__fillLevel = ratio;
-
-          // Pattern opacity: only show when objects are in top 40% of pit
-          // Use pitH (already read, no reflow) instead of clientHeight
-          const topThreshold = pitH * 0.4;
-          const approachOpacity = highestY < topThreshold
-            ? Math.max(0, Math.min(0.3, (topThreshold - highestY) / topThreshold * 0.3))
-            : 0;
-          stage.style.setProperty("--fill-opacity", approachOpacity.toFixed(3));
-
-          const inDanger = highestY < SPAWN_ZONE && !gameOverRef.current;
+          const inDanger = highestCardY < SPAWN_ZONE && !gameOverRef.current;
           if (inDanger) {
-            stage.classList.add(styles.dangerFlash);
             if (!dangerTimer) {
               dangerTimer = setTimeout(() => {
                 if (gameOverRef.current) return;
                 if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                stage.classList.remove(styles.dangerFlash);
-                stage.style.setProperty("--fill-opacity", "0");
                 pendingGameOver.current = true;
               }, DANGER_SECONDS);
             }
           } else {
-            stage.classList.remove(styles.dangerFlash);
             if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
           }
-
-          // Yellow warning flashes at fill thresholds
-          if (ratio >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (ratio >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (ratio >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
         }
         // Bone proximity: slow to 50% when two bones are within 100px of each other
         // Restores to normal when they move apart (or if user has set slow motion)
