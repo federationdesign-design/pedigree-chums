@@ -297,8 +297,10 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
                     zIndex: isHov ? total + 1 : i,
                     transform: isHov ? "translateY(-20px) scale(1.15)" : "translateY(0) scale(1)",
                     transition: "transform 0.2s cubic-bezier(0.22,1,0.36,1)",
-                    opacity: 0,
-                    animation: "deckCardPop 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards",
+                    animationName: "deckCardPop",
+                    animationDuration: "0.35s",
+                    animationTimingFunction: "cubic-bezier(0.34,1.56,0.64,1)",
+                    animationFillMode: "both",
                     animationDelay: `${i * 150}ms`,
                   }}
                   onMouseEnter={() => setDeckHover(i)}
