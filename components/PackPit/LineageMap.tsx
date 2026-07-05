@@ -1018,13 +1018,13 @@ export default function LineageMap({
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
               </g>
             </g>
-            {stepsLeft > 1 && (
+            {stepsLeft > 0 && (
               <text
                 x={108}
                 y={5}
                 textAnchor="start"
                 dominantBaseline="central"
-                style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 13, fill: "#ffd23e", pointerEvents: "none" }}
+                style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 14, fill: "#ffffff", pointerEvents: "none" }}
               >{`x${stepsLeft} more`}</text>
             )}
           </g>
