@@ -1007,7 +1007,8 @@ export default function LineageMap({
       <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
-        {!packed && !collecting && !INSTR_NAMES.has(breed.name) ? (
+        {/* Blue Learn button - on ALL cards including instructional */}
+        {!packed && !collecting && !framesDone ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
@@ -1026,14 +1027,14 @@ export default function LineageMap({
             </g>
           </g>
         ) : null}
-        {/* the green pack chum button sits below Collect; it pushes the cards into the box */}
-        {canRemove || removing ? (
+        {/* Green button - Complete/skip for instructional, Pack chum for dog cards */}
+        {(canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${collectShowing ? 138 : 62})`}
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + (collectShowing ? 164 : 88), 500, FLASH_SIZE); startRemove(); }}
+            transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (collectShowing ? 138 : 62)})`}
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 500, FLASH_SIZE); startRemove(); }}
             role="button"
-            aria-label="Choose as pack chum"
+            aria-label={INSTR_NAMES.has(breed.name) ? "Complete" : "Choose as pack chum"}
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />

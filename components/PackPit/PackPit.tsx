@@ -158,9 +158,9 @@ export default function PackPit() {
         // Store game state for GameOver overlay on about page
         try {
           sessionStorage.setItem("pc-gameover-score", String(score));
-          sessionStorage.setItem("pc-gameover-chums", String(collected));
-          const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.img]));
-                    sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
+          sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
+          const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.image || b.img || ""]));
+          sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
         } catch {}
         window.location.href = "/about?gameover=1";
       }, 800);
@@ -2120,10 +2120,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                     countdown.remove(); countdownEl = null;
                     gameOverRef.current = true;
                     try {
-                      sessionStorage.setItem("pc-gameover-score", String(score));
-                      sessionStorage.setItem("pc-gameover-chums", String(collected));
-                      const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.img]));
-                    sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
+                      sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
+                      sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
+                      const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, b.image || b.img || ""]));
+                      sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
                     } catch {}
                     window.location.href = "/about?gameover=1";
                   }
@@ -2782,14 +2782,16 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           const alreadyExists = Composite.allBodies(engine.world).find((b: any) => b.plugin?.name === meta.name && b.plugin?.isInstructions);
           if (alreadyExists) return;
           const instrImg = getImg("__instr_" + idx, meta.img);
-          const s = 85 * SCALE;
-          const cr = Math.max(7, s * 0.22);
+          // Match LineageMap portrait dimensions: IW=170, IH=round(170*1.36)=231
+          const instrW = Math.round(128 * 1.33) * SCALE; // 170 on desktop
+          const instrH = Math.round(instrW * 1.36); // 231 on desktop
+          const cr = Math.max(7, instrW * 0.1);
           const icx = pc.x + pc.w / 2 - sr.left;
           const icy = pc.y + pc.h / 2 - sr.top;
-          const instrB: any = Bodies.rectangle(icx, icy, 2 * s, 2 * s, {
+          const instrB: any = Bodies.rectangle(icx, icy, instrW, instrH, {
             chamfer: { radius: cr }, restitution: 0.32, friction: 0.28, frictionAir: 0.012, density: 0.001, render: { visible: false },
           });
-          instrB.plugin = { name: meta.name, label: meta.label, half: s, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: idx + 1, isInstructions: true };
+          instrB.plugin = { name: meta.name, label: meta.label, half: Math.min(instrW, instrH) / 2, w: instrW, h: instrH, corner: cr, color: "#ffed00", family: null, img: instrImg, ping: 0, seq: idx + 1, isInstructions: true };
           Body.setVelocity(instrB, { x: (Math.random() - 0.5) * 2, y: 3 });
           Composite.add(engine.world, instrB);
         });
