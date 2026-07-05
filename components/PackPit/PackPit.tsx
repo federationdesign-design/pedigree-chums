@@ -677,9 +677,9 @@ export default function PackPit() {
 
 
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                    // 0:00.7  tennis balls
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 1050));    // 0:01.0  cookies
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 1750)); // 0:01.75 discount
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 2050));     // 0:02.0  pre-order
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 2000));    // 0:02.0  cookies
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 4000)); // 0:04.0  discount
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 6000));     // 0:06.0  pre-order
 
         // ── EASY PAIRS (pairs 1-6) ───────────────────────────────────────────
         // Pair logic: pick one randomly, loser joins reject pool for pool drops
@@ -702,12 +702,12 @@ export default function PackPit() {
           [easyRejects[i], easyRejects[j]] = [easyRejects[j], easyRejects[i]];
         }
 
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyPairs[0][Math.random()<0.5?0:1]==="Chihuahua"||true?easyPairs[0].find(n=>!easyRejects.includes(n))??easyPairs[0][0]:easyPairs[0][1], dropped); } }, 2750));   // 0:02.75 pair 1
-        waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 3050)); // 0:03.0  panels+arrow
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[1].find(n=>!easyRejects.includes(n))??easyPairs[1][0], dropped); }, 5000));    // 0:05.0  pair 2
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[2].find(n=>!easyRejects.includes(n))??easyPairs[2][0], dropped); }, 8000));    // 0:08.0  pair 3
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 9000));                                                  // 0:09.0  hamburger menu
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[3].find(n=>!easyRejects.includes(n))??easyPairs[3][0], dropped); }, 11000));   // 0:11.0  pair 4
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyPairs[0][Math.random()<0.5?0:1]==="Chihuahua"||true?easyPairs[0].find(n=>!easyRejects.includes(n))??easyPairs[0][0]:easyPairs[0][1], dropped); } }, 8000));   // 0:08.0  pair 1
+        waveTimers.push(setTimeout(() => { if (!disposed) { Composite.add(engine.world, makePanel(howPanel, w, "right")); Composite.add(engine.world, makePanel(enterPanel, w, "left")); Composite.add(engine.world, makeArrow(w)); } }, 9000)); // 0:09.0  panels+arrow
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[1].find(n=>!easyRejects.includes(n))??easyPairs[1][0], dropped); }, 11000));    // 0:11.0  pair 2
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[2].find(n=>!easyRejects.includes(n))??easyPairs[2][0], dropped); }, 14000));    // 0:14.0  pair 3
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeMenuObj(w)); }, 16000));                                                 // 0:16.0  hamburger menu
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[3].find(n=>!easyRejects.includes(n))??easyPairs[3][0], dropped); }, 18000));   // 0:18.0  pair 4
         waveTimers.push(setTimeout(() => { // 0:12.0 union jack
           if (!disposed) {
             const ujImg = getImg("__uk_icon", "/uk-icon.jpg");
@@ -717,16 +717,16 @@ export default function PackPit() {
             Body.setVelocity(ujB, { x: (Math.random() - 0.5) * 3, y: 3 });
             Composite.add(engine.world, ujB);
           }
-        }, 12000));
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[4].find(n=>!easyRejects.includes(n))??easyPairs[4][0], dropped); }, 14000));   // 0:14.0  pair 5
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[5].find(n=>!easyRejects.includes(n))??easyPairs[5][0], dropped); }, 17000));   // 0:17.0  pair 6
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 20000));                                                                         // 0:20.0  slipper
+        }, 20000));
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[4].find(n=>!easyRejects.includes(n))??easyPairs[4][0], dropped); }, 23000));   // 0:23.0  pair 5
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[5].find(n=>!easyRejects.includes(n))??easyPairs[5][0], dropped); }, 27000));   // 0:27.0  pair 6
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 31000));                                                                         // 0:31.0  slipper
 
         // ── POOL 1 (easy rejects, 3 drops of 2) ─────────────────────────────
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 25000));  // 0:25.0
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 28000));                                                                     // 0:28.0  bone
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[2], dropped); dropCardNamed(easyRejects[3], dropped); } }, 35000));  // 0:35.0
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[4], dropped); dropCardNamed(easyRejects[5], dropped); } }, 45000));  // 0:45.0
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 35000));  // 0:35.0 pool1-A
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 40000));                                                                     // 0:40.0  bone
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[2], dropped); dropCardNamed(easyRejects[3], dropped); } }, 47000));  // 0:47.0 pool1-B
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[4], dropped); dropCardNamed(easyRejects[5], dropped); } }, 55000));  // 0:55.0 pool1-C
 
         // ── MEDIUM PAIRS (pairs 7-12) ────────────────────────────────────────
         const medPairs: [string,string][] = [
@@ -747,18 +747,18 @@ export default function PackPit() {
           [medRejects[i], medRejects[j]] = [medRejects[j], medRejects[i]];
         }
 
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[0].find(n=>!medRejects.includes(n))??medPairs[0][0], dropped); }, 55000));   // 0:55.0  pair 7
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[1].find(n=>!medRejects.includes(n))??medPairs[1][0], dropped); }, 65000));   // 1:05.0  pair 8
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[2].find(n=>!medRejects.includes(n))??medPairs[2][0], dropped); }, 75000));   // 1:15.0  pair 9
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[3].find(n=>!medRejects.includes(n))??medPairs[3][0], dropped); }, 90000));   // 1:30.0  pair 10
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[4].find(n=>!medRejects.includes(n))??medPairs[4][0], dropped); }, 100000));  // 1:40.0  pair 11
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 105000));                                         // 1:45.0  bowl
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[5].find(n=>!medRejects.includes(n))??medPairs[5][0], dropped); }, 110000));  // 1:50.0  pair 12
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[0].find(n=>!medRejects.includes(n))??medPairs[0][0], dropped); }, 70000));   // 1:10.0  pair 7
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[1].find(n=>!medRejects.includes(n))??medPairs[1][0], dropped); }, 80000));   // 1:20.0  pair 8
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[2].find(n=>!medRejects.includes(n))??medPairs[2][0], dropped); }, 90000));   // 1:30.0  pair 9
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[3].find(n=>!medRejects.includes(n))??medPairs[3][0], dropped); }, 105000));  // 1:45.0  pair 10
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[4].find(n=>!medRejects.includes(n))??medPairs[4][0], dropped); }, 115000)); // 1:55.0  pair 11
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 120000));                                        // 2:00.0  bowl
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[5].find(n=>!medRejects.includes(n))??medPairs[5][0], dropped); }, 125000)); // 2:05.0  pair 12
 
         // ── POOL 2 (medium rejects, 3 drops of 2) ───────────────────────────
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[0], dropped); dropCardNamed(medRejects[1], dropped); } }, 120000)); // 2:00.0
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[2], dropped); dropCardNamed(medRejects[3], dropped); } }, 135000)); // 2:15.0
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[4], dropped); dropCardNamed(medRejects[5], dropped); } }, 150000)); // 2:30.0
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[0], dropped); dropCardNamed(medRejects[1], dropped); } }, 135000)); // 2:15.0 pool2-A
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[2], dropped); dropCardNamed(medRejects[3], dropped); } }, 150000)); // 2:30.0 pool2-B
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(medRejects[4], dropped); dropCardNamed(medRejects[5], dropped); } }, 165000)); // 2:45.0 pool2-C
 
         // ── HARD PAIRS (pairs 13-17) ─────────────────────────────────────────
         const hardPairs: [string,string][] = [
@@ -778,16 +778,16 @@ export default function PackPit() {
           [hardRejects[i], hardRejects[j]] = [hardRejects[j], hardRejects[i]];
         }
 
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[0].find(n=>!hardRejects.includes(n))??hardPairs[0][0], dropped); }, 165000));  // 2:45.0  pair 13
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[1].find(n=>!hardRejects.includes(n))??hardPairs[1][0], dropped); }, 300000));  // 3:00.0  pair 14
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[2].find(n=>!hardRejects.includes(n))??hardPairs[2][0], dropped); }, 195000));  // 3:15.0  pair 15
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[3].find(n=>!hardRejects.includes(n))??hardPairs[3][0], dropped); }, 210000));  // 3:30.0  pair 16
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[4].find(n=>!hardRejects.includes(n))??hardPairs[4][0], dropped); }, 225000));  // 3:45.0  pair 17
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[0].find(n=>!hardRejects.includes(n))??hardPairs[0][0], dropped); }, 180000));  // 3:00.0  pair 13
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[1].find(n=>!hardRejects.includes(n))??hardPairs[1][0], dropped); }, 315000));  // 3:00.0  pair 14
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[2].find(n=>!hardRejects.includes(n))??hardPairs[2][0], dropped); }, 210000));  // 3:30.0  pair 15
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[3].find(n=>!hardRejects.includes(n))??hardPairs[3][0], dropped); }, 225000));  // 3:45.0  pair 16
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardPairs[4].find(n=>!hardRejects.includes(n))??hardPairs[4][0], dropped); }, 240000));  // 4:00.0  pair 17
 
         // ── POOL 3 (hard rejects, drops of 2/2/1) ───────────────────────────
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[0], dropped); dropCardNamed(hardRejects[1], dropped); } }, 240000)); // 4:00.0
-        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[2], dropped); dropCardNamed(hardRejects[3], dropped); } }, 255000)); // 4:15.0
-        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardRejects[4], dropped); }, 270000)); // 4:30.0
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[0], dropped); dropCardNamed(hardRejects[1], dropped); } }, 255000)); // 4:15.0 pool3-A
+        waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(hardRejects[2], dropped); dropCardNamed(hardRejects[3], dropped); } }, 270000)); // 4:30.0 pool3-B
+        waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(hardRejects[4], dropped); }, 285000)); // 4:45.0 pool3-C
 
 
         pairOrder.forEach((idx: number, i: number) => {
