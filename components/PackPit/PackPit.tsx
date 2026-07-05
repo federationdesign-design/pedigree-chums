@@ -1271,8 +1271,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               const bw = ar >= 1 ? box : box * ar, bh = ar >= 1 ? box / ar : box;
               ctx.drawImage(bi, -bw / 2, -bh / 2, bw, bh);
             } else {
-              ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fillStyle = "#0a3a57"; ctx.fill();
-              ctx.lineWidth = 3; ctx.strokeStyle = "#ffd23e"; ctx.stroke();
+              ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fillStyle = "#111111"; ctx.fill();
+              ctx.lineWidth = 3; ctx.strokeStyle = "#000000"; ctx.stroke();
+              // Draw a fuse so it reads as bomb even without SVG
+              ctx.beginPath(); ctx.moveTo(0, -rr); ctx.lineTo(rr * 0.3, -rr * 1.4); ctx.strokeStyle = "#888888"; ctx.lineWidth = 2; ctx.stroke();
             }
             ctx.restore(); return;
           }
