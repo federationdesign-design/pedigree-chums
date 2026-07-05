@@ -38,12 +38,15 @@ export default function PackPit() {
   const flashShakeRef = useRef<() => void>(() => {});
   const [activeBreed, setActiveBreed] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [collected, setCollected] = useState(0); // chums chosen; each my-chum removal bumps this
-  const [collectedChums, setCollectedChums] = useState<string[]>([]); // breed name of each chum collected, for the shelf
+  const collectedRef = useRef(0); // ref mirror for use in physics closures
+  const [collectedChums, setCollectedChums] = useState<string[]>([]);
+  const collectedChumsRef = useRef<string[]>([]); // ref mirror for use in physics closures // breed name of each chum collected, for the shelf
   const [shelfOpen, setShelfOpen] = useState(false); // the collection shelf overlay, opened from the tally
   const [dockOpen, setDockOpen] = useState(false); // My Chums dock, fanned up from tally chip
   const [dockHover, setDockHover] = useState<number | null>(null); // which card is magnified
   const [dockFlipped, setDockFlipped] = useState<Set<number>>(new Set()); // which cards are flipped
-  const [score, setScore] = useState(0); // running total of every flashed number, shown above the shake button
+  const [score, setScore] = useState(0);
+  const scoreRef = useRef(0); // ref mirror for use in physics closures // running total of every flashed number, shown above the shake button
   const [scorePulse, setScorePulse] = useState(false);
   const [britainMsg, setBritainMsg] = useState<number | null>(null);
   const britainTimer = useRef<any>(null);
@@ -140,6 +143,9 @@ export default function PackPit() {
   const removeBreedRef = useRef<(name: string) => void>(() => {});
   const scatterRef = useRef<(data: { circles: { x: number; y: number; r: number; share: number; name: string }[]; rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[]; pills: { x: number; y: number; w: number; name: string }[] }) => void>(() => {});
   useEffect(() => { lineageOpenRef.current = !!activeBreed; }, [activeBreed]);
+  useEffect(() => { collectedRef.current = collected; }, [collected]);
+  useEffect(() => { collectedChumsRef.current = collectedChums; }, [collectedChums]);
+  useEffect(() => { scoreRef.current = score; }, [score]);
   // Fire pending game over as soon as all overlays close
   useEffect(() => {
     if (!activeBreed && !howToPlay && !shelfOpen && !cookiesOpenRef.current && pendingGameOver.current && !gameOver) {

@@ -1,24 +1,33 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import GameOver from "../../components/GameOver/GameOver";
 
 export default function AboutClient() {
-  const params = useSearchParams();
   const router = useRouter();
-  const [showGameOver, setShowGameOver] = useState(false);
-  const [score, setScore] = useState(0);
-  const [chums, setChums] = useState(0);
-  const [breeds, setBreeds] = useState<{ name: string; img: string }[]>([]);
+  const isGameOver = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("gameover") === "1";
+  const [showGameOver, setShowGameOver] = useState(isGameOver);
+  const [score, setScore] = useState(() => isGameOver ? Number(sessionStorage.getItem("pc-gameover-score") || "0") : 0);
+  const [chums, setChums] = useState(() => isGameOver ? Number(sessionStorage.getItem("pc-gameover-chums") || "0") : 0);
+  const [breeds, setBreeds] = useState<{ name: string; img: string }[]>(() => {
+    if (!isGameOver) return [];
+    try { return JSON.parse(sessionStorage.getItem("pc-gameover-breeds") || "[]"); } catch { return []; }
+  });
   const scrollPos = useRef(0);
 
-  // Lock scroll immediately if gameover param present (before video loads)
-  const isGameOver = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("gameover") === "1";
-
   useEffect(() => {
-    if (params.get("gameover") !== "1") return;
-    // Pause video immediately before anything else renders
-    // Listen for Vimeo player ready event, then pause immediately
+    if (!isGameOver) return;
+    // Clear sessionStorage now that we've read it
+    sessionStorage.removeItem("pc-gameover-score");
+    sessionStorage.removeItem("pc-gameover-chums");
+    sessionStorage.removeItem("pc-gameover-breeds");
+    // Lock scroll
+    scrollPos.current = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.top = `-${scrollPos.current}px`;
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+    // Pause Vimeo - listen for ready event
     const onVimeoMsg = (e: MessageEvent) => {
       try {
         const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
@@ -30,48 +39,22 @@ export default function AboutClient() {
       } catch {}
     };
     window.addEventListener("message", onVimeoMsg);
-    // Also try immediately in case already loaded
+    // Also pause immediately if already loaded
     const iframe0 = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
     if (iframe0) iframe0.contentWindow?.postMessage('{"method":"pause"}', "*");
-    // Read game state from sessionStorage
-    try {
-      setScore(Number(sessionStorage.getItem("pc-gameover-score") || "0"));
-      setChums(Number(sessionStorage.getItem("pc-gameover-chums") || "0"));
-      setBreeds(JSON.parse(sessionStorage.getItem("pc-gameover-breeds") || "[]"));
-      sessionStorage.removeItem("pc-gameover-score");
-      sessionStorage.removeItem("pc-gameover-chums");
-      sessionStorage.removeItem("pc-gameover-breeds");
-    } catch {}
-    // Lock scroll immediately
-    scrollPos.current = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.top = `-${scrollPos.current}px`;
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
-    // Pause video immediately
-    try {
-      const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
-      if (iframe) { iframe.contentWindow?.postMessage('{"method":"pause"}', "*"); }
-    } catch {}
-
-    setShowGameOver(true);
-  }, [params]);
+    return () => window.removeEventListener("message", onVimeoMsg);
+  }, [isGameOver]);
 
   const handleClose = () => {
     setShowGameOver(false);
-    // Unlock scroll
     document.body.style.overflow = "";
     document.body.style.top = "";
     document.body.style.position = "";
     document.body.style.width = "";
     window.scrollTo(0, scrollPos.current);
-    // Clean URL
     router.replace("/about", { scroll: false });
-    // Resume Vimeo video
-    try {
-      const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
-      if (iframe) iframe.contentWindow?.postMessage('{"method":"play"}', "*");
-    } catch {}
+    const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
+    if (iframe) iframe.contentWindow?.postMessage('{"method":"play"}', "*");
   };
 
   if (!showGameOver) return null;
