@@ -1927,6 +1927,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
       let dangerTimer: ReturnType<typeof setTimeout> | null = null; // tetris-style: objects in spawn zone
+      let countdownEl: HTMLDivElement | null = null; // single countdown div, never duplicated
       let throbIntervalOuter: ReturnType<typeof setInterval> | null = null; // hoisted for cleanup
       const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
@@ -2081,12 +2082,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (settledInZone >= DANGER_COUNT) {
               // Start throb at 90% opacity
               // throb removed - steady max opacity when danger
-              if (!dangerTimer) {
-                // Sequential: 3 (2s) → 2 (2s) → 1 (2s) → GAME OVER (2s) → navigate
-                // Runner stops only when GAME OVER shows, not at start of countdown
-                const countdown = document.createElement("div");
-                countdown.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
-                stage.appendChild(countdown);
+              if (!dangerTimer && !countdownEl) {
+                // Sequential: 3 (2s) → 2 (2s) → 1 (2s) → GAME OVER → navigate
+                countdownEl = document.createElement("div");
+                countdownEl.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+                stage.appendChild(countdownEl);
+                const countdown = countdownEl;
                 const steps = ["3","2","1","GAME OVER"];
                 let step = 0;
                 countdown.textContent = steps[step];
@@ -2102,7 +2103,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                     clearInterval(tick);
                     if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
                     stage.style.setProperty("--fill-opacity", "0");
-                    countdown.remove();
+                    countdown.remove(); countdownEl = null;
                     gameOverRef.current = true;
                     try {
                       sessionStorage.setItem("pc-gameover-score", String(score));
@@ -2116,6 +2117,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
+              if (countdownEl) { countdownEl.remove(); countdownEl = null; }
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
