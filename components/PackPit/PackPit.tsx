@@ -1355,7 +1355,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           if (b.plugin.isInstructions) {
             const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
             rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
-            ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";
+            ctx.fillStyle = (hovered && !b.plugin.isInstructions) ? "#3cb24a" : "#ffed00";
             ctx.fill();
             const illoH = ph - FOOTER - BORDER * 2, illoW = pw - BORDER * 2;
             if (img && img.complete && img.naturalWidth) {
@@ -1536,7 +1536,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               // ── Normal (small) state ───────────────────────────────────────
               const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = pw * 0.1;
               rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
-              ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";
+              ctx.fillStyle = (hovered && !b.plugin.isInstructions) ? "#3cb24a" : "#ffed00";
               ctx.fill();
 
               // Image
@@ -1619,7 +1619,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           const ph = Math.round(pw * 1.36); // portrait -- same ratio as overlay
           const BORDER = Math.round(pw * 0.03), FOOTER = Math.round(ph * 0.18), RADIUS = cr;
           rrect(ctx, -pw / 2, -ph / 2, pw, ph, RADIUS);
-          ctx.fillStyle = hovered ? "#3cb24a" : "#ffed00";
+          ctx.fillStyle = "#ffed00"; // no green hover on instructional cards
           ctx.fill();
           const illoH = ph - FOOTER - BORDER * 2, illoW = pw - BORDER * 2;
           if (img && img.complete && img.naturalWidth) {
@@ -2222,9 +2222,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (hoverBody) {
           const hp = hoverBody.position;
           ctx.save(); ctx.font = "800 14px Montserrat,sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          const w = ctx.measureText(hoverBody.plugin.name).width + 20; const ly = hp.y + hoverBody.plugin.half + 18;
+          const label = hoverBody.plugin.label || hoverBody.plugin.name;
+          const w = ctx.measureText(label).width + 20; const ly = hp.y + hoverBody.plugin.half + 18;
           ctx.fillStyle = "rgba(10,58,87,0.92)"; pill(ctx, hp.x - w / 2, ly - 13, w, 26); ctx.fill();
-          ctx.fillStyle = "#fff"; ctx.fillText(hoverBody.plugin.name, hp.x, ly); ctx.restore();
+          ctx.fillStyle = "#fff"; ctx.fillText(label, hp.x, ly); ctx.restore();
         }
         drawParticles(ctx, now);
         drawFuseSparks(ctx, now);
