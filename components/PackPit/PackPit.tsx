@@ -2082,39 +2082,33 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 }, 1000));
               }
               if (!dangerTimer) {
-                // Show 3,2,1 countdown then GAME OVER
+                // Sequential: 3 (2s) → 2 (2s) → 1 (2s) → GAME OVER (2s) → navigate
+                if (runnerRef.current) (runnerRef.current as any).enabled = false;
                 const countdown = document.createElement("div");
-                countdown.className = styles.gameOverFlash;
-                // Inline fallback so countdown shows even if CSS module hash mismatches
                 countdown.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
                 stage.appendChild(countdown);
-                let count = 3;
-                countdown.textContent = String(count);
+                const steps = ["3","2","1","GAME OVER"];
+                let step = 0;
+                countdown.textContent = steps[step];
                 const tick = setInterval(() => {
-                  count--;
-                  if (count > 0) {
-                    countdown.textContent = String(count);
+                  step++;
+                  if (step < steps.length) {
+                    countdown.textContent = steps[step];
                   } else {
                     clearInterval(tick);
-                    countdown.textContent = "GAME OVER";
-                    window.setTimeout(() => {
-                      if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
-                      stage.style.setProperty("--fill-opacity", "0");
-                      countdown.remove();
-                    }, 1500);
+                    if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
+                    stage.style.setProperty("--fill-opacity", "0");
+                    countdown.remove();
+                    gameOverRef.current = true;
+                    try {
+                      sessionStorage.setItem("pc-gameover-score", String(score));
+                      sessionStorage.setItem("pc-gameover-chums", String(collected));
+                      sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: "" }))));
+                    } catch {}
+                    window.location.href = "/about?gameover=1";
                   }
                 }, 2000);
-                dangerTimer = setTimeout(() => {
-                  if (gameOverRef.current || disposed) return;
-                  if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                  // Navigate directly - don't rely on React effect to pick up ref change
-                  try {
-                    sessionStorage.setItem("pc-gameover-score", String(score));
-                    sessionStorage.setItem("pc-gameover-chums", String(collected));
-                    sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: "" }))));
-                  } catch {}
-                  window.setTimeout(() => { window.location.href = "/about?gameover=1"; }, 200);
-                }, 7500);
+                dangerTimer = setTimeout(() => {}, 0); // mark as started
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
