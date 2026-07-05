@@ -1034,7 +1034,7 @@ export default function LineageMap({
         {(canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (collectShowing ? 138 : 62)})`}
+            transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (!packed && !collecting && !framesDone ? 138 : 62)})`}
             onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 500, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label={INSTR_NAMES.has(breed.name) ? "Complete" : "Choose as pack chum"}
