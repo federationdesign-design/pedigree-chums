@@ -2058,12 +2058,18 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const scheduleIdleCheck = () => {
           setTimeout(() => {
             if (disposed || gameOverRef.current) return;
-            // Count all settled objects in the spawn zone
+            // Count settled objects genuinely in the spawn zone
+            // Exclude: moving fast, moving upward, or outside pit walls
+            const pitW = stage.clientWidth;
             let settledInZone = 0;
             for (const b of Composite.allBodies(engine.world)) {
               if (b.isStatic || !(b as any).plugin) continue;
-              if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
+              const spd = Math.hypot(b.velocity.x, b.velocity.y);
+              if (spd > 2) continue; // must be settled
+              if (b.velocity.y < -0.5) continue; // moving upward - flying out
               const plug = (b as any).plugin;
+              const bx = b.position.x;
+              if (bx < 0 || bx > pitW) continue; // outside pit walls
               const top = b.position.y - (plug.half ?? 40);
               if (top < SPAWN_ZONE) settledInZone++;
             }
