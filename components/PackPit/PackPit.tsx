@@ -823,7 +823,7 @@ export default function PackPit() {
       const isBone = (b: any) => b?.plugin?.prop === "bone";
       const nearestBone = (to: any) => {
         let best: any = null, bestD = Infinity;
-        for (const b of Composite.allBodies(engine.world)) {
+        for (const b of getBodies()) {
           if (!isBone(b)) continue;
           const dx = b.position.x - to.position.x, dy = b.position.y - to.position.y, d = Math.hypot(dx, dy);
           if (d < bestD) { bestD = d; best = b; }
@@ -865,8 +865,17 @@ export default function PackPit() {
       // pill magnet: each breed name pill gently attracts its matching dog card
       const PILL_MAGNET_RADIUS = 200;
       const PILL_PULL = 0.00008;
+      // Shared body cache -- refreshed once per tick, used by all beforeUpdate handlers
+      let _cachedBodies: any[] = [];
+      let _cacheTime = -1;
+      const getBodies = () => {
+        const t = engine.timing.timestamp;
+        if (t !== _cacheTime) { _cachedBodies = Composite.allBodies(engine.world); _cacheTime = t; }
+        return _cachedBodies;
+      };
+
       Events.on(engine, "beforeUpdate", () => {
-        const all = Composite.allBodies(engine.world);
+        const all = getBodies();
         const pills = all.filter((b: any) => b.plugin?.kind === "pill" && !b.plugin.gone);
         for (const pill of pills) {
           if (pill.plugin.stuck) continue; // already latched to its card, skip magnet
@@ -933,7 +942,7 @@ export default function PackPit() {
       Events.on(engine, "afterUpdate", () => {
         if (!lastDraggedBall) return;
         const b = lastDraggedBall;
-        if (!Composite.allBodies(engine.world).includes(b)) { lastDraggedBall = null; return; }
+        if (!getBodies().includes(b)) { lastDraggedBall = null; return; }
         // if still moving upward and exits top of canvas, remove permanently
         if (b.position.y < -b.plugin.half) {
           userThrownBalls.add(b.id);
@@ -2176,7 +2185,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let bowlLocked = false;
       Events.on(engine, "afterUpdate", () => {
         if (bowlLocked) return;
-        const bowlB = Composite.allBodies(engine.world).find((b: any) => b.plugin?.isBowl && !b.isStatic);
+        const bowlB = getBodies().find((b: any) => b.plugin?.isBowl && !b.isStatic);
         if (!bowlB) return;
         const pitW = render.canvas.width;
         const floorY = walls[0] ? walls[0].bounds.min.y : render.canvas.height;
@@ -2211,7 +2220,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       const BOWL_SNAP_DIST = 180;
       Events.on(engine, "beforeUpdate", () => {
         if (bowlFused) return;
-        const all = Composite.allBodies(engine.world);
+        const all = getBodies();
         const bowlBody = all.find((b: any) => b.plugin?.isBowl && !b.isStatic);
         const boneBody = all.find((b: any) => b.plugin?.prop === "bone" && !b.isStatic);
         if (!bowlBody || !boneBody) return;
@@ -2289,7 +2298,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       // we only correct position if it has drifted by more than a few px,
       // and even then via velocity nudging rather than Body.setPosition.
       Events.on(engine, "afterUpdate", () => {
-        const all2 = Composite.allBodies(engine.world);
+        const all2 = getBodies();
         const lb = all2.find((b: any) => b.plugin?.lockedBowl);
         if (lb) {
           Body.setVelocity(lb, { x: 0, y: 0 });
@@ -2594,7 +2603,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       };
       Events.on(engine, "beforeUpdate", () => {
         const now = performance.now();
-        const all = Composite.allBodies(engine.world);
+        const all = getBodies();
         for (const b of all) {
           if (!b.plugin?.repelOn) continue;
           if (now - b.plugin.repelStart > 5000) { releasePct(b); continue; } // auto-release after 5s
@@ -2617,7 +2626,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       const GREEN_SETTLE_MS = 2000;
       const GREEN_HOP_EVERY = 3000;
       Events.on(engine, "beforeUpdate", () => {
-        const all = Composite.allBodies(engine.world);
+        const all = getBodies();
         const gArrow = all.find((b: any) => b.plugin?.kind === "arrow-green");
         const howTo = all.find((b: any) => b.plugin?.kind === "howtoplay");
         const enterS = all.find((b: any) => b.plugin?.kind === "entersite");
@@ -2651,7 +2660,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       const imgDragMe = getImg("__bone_dragme", "/big-bone-dragme.svg");
       const imgOhYea = getImg("__bone_ohyea", "/big-bone-ohyea.svg");
       Events.on(engine, "beforeUpdate", () => {
-        const allB = Composite.allBodies(engine.world);
+        const allB = getBodies();
         const bones = allB.filter((b: any) => b.plugin?.prop === "bone");
         if (!logoBody || fused) {
           // revert all bones to plain SVG when logo is gone or fused
