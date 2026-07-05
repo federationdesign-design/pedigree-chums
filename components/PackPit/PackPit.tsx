@@ -2091,7 +2091,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 countdownEl.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
                 stage.appendChild(countdownEl);
                 const countdown = countdownEl;
-                const steps = ["3","2","1","GAME OVER"];
+                const steps = ["10","9","8","7","6","5","4","3","2","1","GAME OVER"];
                 let step = 0;
                 countdown.textContent = steps[step];
                 const tick = setInterval(() => {
@@ -2116,7 +2116,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                     } catch {}
                     window.location.href = "/about?gameover=1";
                   }
-                }, 2000);
+                }, 1000);
                 dangerTimer = setTimeout(() => {}, 0); // mark as started
               }
             } else {
