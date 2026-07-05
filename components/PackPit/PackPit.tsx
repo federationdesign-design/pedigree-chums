@@ -2051,23 +2051,22 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
           if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
           // ── Tetris-style game over: check if settled objects reach the spawn zone ──
-          const allBodies = Composite.allBodies(engine.world).filter((b: any) =>
-            !b.isStatic && b.plugin && b.plugin.prop !== "ball" && Math.hypot(b.velocity.x, b.velocity.y) < 1.5
-          );
-          const highestY = allBodies.length
-            ? Math.min(...allBodies.map((b: any) => b.position.y - (b.plugin?.half ?? 40)))
-            : stage.clientHeight;
-          // dangerLevel: 0=safe, 1=spawn zone blocked
-          const dangerLevel = Math.max(0, Math.min(1, (SPAWN_ZONE - highestY) / SPAWN_ZONE + 1));
+          const allBodies = Composite.allBodies(engine.world);
+          let highestY = stage.clientHeight;
+          for (const b of allBodies) {
+            if (b.isStatic || !(b as any).plugin || (b as any).plugin.prop === "ball") continue;
+            if (Math.hypot(b.velocity.x, b.velocity.y) > 2) continue; // only settled
+            const top = b.position.y - ((b as any).plugin?.half ?? 40);
+            if (top < highestY) highestY = top;
+          }
           const inDanger = highestY < SPAWN_ZONE;
-
-          // Drive pattern opacity: 0 when safe, up to 0.45 as danger rises
-          const patternOpacity = Math.max(fill * 0.3, inDanger ? 0.35 + dangerLevel * 0.1 : Math.max(0, (SPAWN_ZONE - highestY) / (SPAWN_ZONE * 2) * 0.35));
+          // Drive pattern opacity: rises as objects approach top
+          const approachRatio = Math.max(0, Math.min(1, 1 - highestY / stage.clientHeight));
+          const patternOpacity = inDanger ? 0.35 : approachRatio * 0.3;
           stage.style.setProperty("--fill-opacity", patternOpacity.toFixed(3));
 
           if (inDanger && !gameOverRef.current) {
             if (!dangerTimer) {
-              // Start 4s countdown
               dangerTimer = setTimeout(() => {
                 if (gameOverRef.current) return;
                 if (runnerRef.current) (runnerRef.current as any).enabled = false;
@@ -2075,14 +2074,13 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 stage.style.setProperty("--fill-opacity", "0");
                 pendingGameOver.current = true;
               }, DANGER_SECONDS);
-              // Start flash: alternate pattern between 0.4 and 0.8
+              // Flash at 500ms — slow enough not to fight the physics loop
               flashInterval = setInterval(() => {
                 flashOn = !flashOn;
-                stage.style.setProperty("--fill-opacity", flashOn ? "0.75" : "0.35");
-              }, 250);
+                stage.style.setProperty("--fill-opacity", flashOn ? "0.6" : "0.2");
+              }, 500);
             }
           } else {
-            // Objects cleared from spawn zone — cancel danger
             if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
             if (flashInterval) { clearInterval(flashInterval); flashInterval = null; flashOn = false; }
           }
