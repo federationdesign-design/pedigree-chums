@@ -2025,36 +2025,64 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         // Game over: 10+ settled dog cards in spawn zone = pit is genuinely full
         const SPAWN_ZONE = 140; // px from top
         const DANGER_COUNT = 10; // settled cards needed to trigger
+        let throbInterval: ReturnType<typeof setInterval> | null = null;
+        let throbHigh = true;
         const scheduleIdleCheck = () => {
           const ric = (window as any).requestIdleCallback ?? ((cb: any) => setTimeout(cb, 2000));
           ric((deadline: any) => {
             if (disposed || gameOverRef.current) return;
             const remaining = deadline?.timeRemaining ? deadline.timeRemaining() : 10;
             if (remaining < 4) { scheduleIdleCheck(); return; }
+            // Count ALL settled dog cards in the world (not just spawn zone)
+            let totalSettled = 0;
             let settledInZone = 0;
             for (const b of Composite.allBodies(engine.world)) {
               if (b.isStatic || !(b as any).plugin) continue;
               const plug = (b as any).plugin;
-              if (plug.prop || plug.kind || !plug.family) continue; // dog cards only
-              if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue; // must be settled
+              if (plug.prop || plug.kind || !plug.family) continue;
+              if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
+              totalSettled++;
               const top = b.position.y - (plug.half ?? 40);
               if (top < SPAWN_ZONE) settledInZone++;
             }
+            // Pattern opacity: 10% per settled card up to 90%
+            const targetOpacity = Math.min(0.9, totalSettled * 0.1);
+            if (!throbInterval) {
+              stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
+            }
             if (settledInZone >= DANGER_COUNT) {
+              // Start throb at 90% opacity
+              if (!throbInterval) {
+                throbInterval = setInterval(() => {
+                  throbHigh = !throbHigh;
+                  stage.style.setProperty("--fill-opacity", throbHigh ? "0.9" : "0.3");
+                }, 1000);
+              }
               if (!dangerTimer) {
                 dangerTimer = setTimeout(() => {
                   if (gameOverRef.current || disposed) return;
                   if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                  pendingGameOver.current = true;
+                  // Show GAME OVER flash text
+                  const flash = document.createElement("div");
+                  flash.className = styles.gameOverFlash;
+                  flash.textContent = "GAME OVER";
+                  stage.appendChild(flash);
+                  window.setTimeout(() => {
+                    if (throbInterval) { clearInterval(throbInterval); throbInterval = null; }
+                    stage.style.setProperty("--fill-opacity", "0");
+                    pendingGameOver.current = true;
+                  }, 1500);
                 }, 4000);
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
+              if (throbInterval) { clearInterval(throbInterval); throbInterval = null; }
+              stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
           });
         };
-        setTimeout(scheduleIdleCheck, 10000); // start checking after 10s
+        setTimeout(scheduleIdleCheck, 5000); // start checking after 5s
         // Bone proximity: slow to 50% when two bones are within 100px of each other
         // Restores to normal when they move apart (or if user has set slow motion)
         if (!slowmoActiveRef.current) {
@@ -3040,6 +3068,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Render.stop(render);
         Runner.stop(runner);
         if (dangerTimer) clearTimeout(dangerTimer);
+        if (throbInterval) clearInterval(throbInterval);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
         if (render.canvas && render.canvas.parentNode) render.canvas.parentNode.removeChild(render.canvas);
