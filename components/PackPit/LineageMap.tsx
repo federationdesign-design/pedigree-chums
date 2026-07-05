@@ -175,6 +175,15 @@ export default function LineageMap({
   // pan offset so the whole diagram can be dragged to reveal off-screen parts
   const [pan, setPan] = useState({ x: 0, y: 0 });
   useEffect(() => setPan({ x: 0, y: 0 }), [breed.name]);
+  useEffect(() => {
+    // If root card is too close to the bottom, pan up so buttons are visible
+    const buttonBottomY = breed.y + 180; // approx Y of green button
+    const viewH = typeof window !== "undefined" ? window.innerHeight : 800;
+    if (buttonBottomY > viewH - 60) {
+      const nudge = buttonBottomY - (viewH - 80);
+      setPan((p) => ({ x: p.x, y: p.y - nudge }));
+    }
+  }, [breed.name, breed.y]);
   const drag = useRef<{ id: number; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
   // Mobile only: the pack grid lays each section out as one long horizontal strip

@@ -139,6 +139,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
   };
 
   const [shareState, setShareState] = useState<"idle" | "generating" | "ready" | "shared">("idle");
+  const [showScoreCard, setShowScoreCard] = useState(false);
   const [shareDataUrl, setShareDataUrl] = useState<string | null>(null);
   const [deckHover, setDeckHover] = useState<number | null>(null);
 
@@ -251,6 +252,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
     const dataUrl = await generateScoreCard();
     setShareDataUrl(dataUrl);
     setShareState("ready");
+    setShowScoreCard(true);
   };
 
   const doShare = (method: "download" | "instagram" | "copy") => {
@@ -330,7 +332,13 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
           <p className={styles.allCollectedSub}>ALL 54 CHUMS COLLECTED</p>
         )}
 
-        {/* Leaderboard */}
+        {/* Leaderboard or Scorecard */}
+        {showScoreCard && shareDataUrl ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "0 0 16px" }}>
+            <button onClick={() => setShowScoreCard(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontFamily: "'Luckiest Guy', system-ui", fontSize: 13, cursor: "pointer", marginBottom: 4 }}>← Today's High Scores</button>
+            <img src={shareDataUrl} alt="Score card" style={{ width: "100%", maxWidth: 440, height: "auto", aspectRatio: "1200/630", borderRadius: 14, border: "3px solid #ffd23e", display: "block" }} />
+          </div>
+        ) : (
         <div className={styles.leaderboard}>
           <p className={styles.leaderTitle}>Today&rsquo;s High Scores</p>
           {leaders.map((entry, i) => (
@@ -342,6 +350,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
             </div>
           ))}
         </div>
+        )}
 
         {/* Arcade name entry -- only if score beats 3rd place */}
         {qualifies && !submitted ? (
@@ -396,7 +405,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
         {/* Actions */}
         <div className={styles.actions}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            {shareState === "idle" && (
+            {shareState === "idle" && !showScoreCard && (
               <button className={styles.shareBtn} onClick={handleShare} type="button">📸 Create Score Card</button>
             )}
             {shareState === "generating" && (
@@ -404,7 +413,6 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
             )}
             {(shareState === "ready" || shareState === "shared") && shareDataUrl && (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                <img src={shareDataUrl} alt="Score card" style={{ width: "100%", maxWidth: 440, height: "auto", aspectRatio: "1200/630", borderRadius: 14, border: "3px solid #ffd23e", display: "block" }} />
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
                   <button className={styles.shareOption} onClick={() => doShare("download")} type="button">⬇ Save Image</button>
                   <button className={styles.shareOption} onClick={() => doShare("instagram")} type="button">📷 Instagram</button>
