@@ -222,7 +222,7 @@ export default function LineageMap({
       const rootId = "0";
       setTimeout(() => {
         setPicked((prev) => { const s = new Set(prev); s.add(rootId); return s; });
-        setPinned((m) => { const x = new Map(m); x.set(rootId, { img: breed.image as string, name: breed.name, note: "", share: 100, mix: 100, status: "alive" }); return x; });
+        setPinned((m) => { const x = new Map(m); x.set(rootId, { img: breed.image as string, name: breed.name, note: "", share: 100, mix: 100, status: null }); return x; });
         setDragPos((m) => { const x = new Map(m); x.set(rootId, { x: 80, y: -80 }); return x; });
       }, 200);
     }
