@@ -2035,13 +2035,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (disposed || gameOverRef.current) return;
             const remaining = deadline?.timeRemaining ? deadline.timeRemaining() : 10;
             if (remaining < 4) { scheduleIdleCheck(); return; }
-            // Count settled dog cards in the spawn zone only
+            // Count all settled objects in the spawn zone
             let settledInZone = 0;
             for (const b of Composite.allBodies(engine.world)) {
               if (b.isStatic || !(b as any).plugin) continue;
-              const plug = (b as any).plugin;
-              if (plug.prop || plug.kind || !plug.family) continue;
               if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
+              const plug = (b as any).plugin;
               const top = b.position.y - (plug.half ?? 40);
               if (top < SPAWN_ZONE) settledInZone++;
             }
