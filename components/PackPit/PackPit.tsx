@@ -848,7 +848,7 @@ export default function PackPit() {
               }
             });
           }
-        }, 300000));
+        }, 180000));  // 3:00.0  remaining flood
       }
       const mouse = Mouse.create(render.canvas);
       const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
