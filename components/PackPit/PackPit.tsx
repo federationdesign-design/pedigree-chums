@@ -1904,8 +1904,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
       let dangerTimer: ReturnType<typeof setTimeout> | null = null; // tetris-style: objects in spawn zone
-      let flashInterval: ReturnType<typeof setInterval> | null = null; // pattern flash during danger
-      let flashOn = false;
       const SPAWN_ZONE = 140; // px from top - if settled objects reach here, danger starts
       const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
@@ -2066,23 +2064,19 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           stage.style.setProperty("--fill-opacity", patternOpacity.toFixed(3));
 
           if (inDanger && !gameOverRef.current) {
+            stage.classList.add(styles.dangerFlash);
             if (!dangerTimer) {
               dangerTimer = setTimeout(() => {
                 if (gameOverRef.current) return;
                 if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                if (flashInterval) { clearInterval(flashInterval); flashInterval = null; }
+                stage.classList.remove(styles.dangerFlash);
                 stage.style.setProperty("--fill-opacity", "0");
                 pendingGameOver.current = true;
               }, DANGER_SECONDS);
-              // Flash at 500ms — slow enough not to fight the physics loop
-              flashInterval = setInterval(() => {
-                flashOn = !flashOn;
-                stage.style.setProperty("--fill-opacity", flashOn ? "0.6" : "0.2");
-              }, 500);
             }
           } else {
+            stage.classList.remove(styles.dangerFlash);
             if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
-            if (flashInterval) { clearInterval(flashInterval); flashInterval = null; flashOn = false; }
           }
 
           // Keep old fill warnings for audio/visual pops at thresholds
@@ -3073,7 +3067,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Render.stop(render);
         Runner.stop(runner);
         if (dangerTimer) clearTimeout(dangerTimer);
-        if (flashInterval) clearInterval(flashInterval);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
         if (render.canvas && render.canvas.parentNode) render.canvas.parentNode.removeChild(render.canvas);
