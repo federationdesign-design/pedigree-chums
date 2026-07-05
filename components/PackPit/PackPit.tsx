@@ -1903,7 +1903,11 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let patternUntil = 0;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
-      let fillFullTimer: ReturnType<typeof setTimeout> | null = null; // game over when pit stays full
+      let dangerTimer: ReturnType<typeof setTimeout> | null = null; // tetris-style: objects in spawn zone
+      let flashInterval: ReturnType<typeof setInterval> | null = null; // pattern flash during danger
+      let flashOn = false;
+      const SPAWN_ZONE = 140; // px from top - if settled objects reach here, danger starts
+      const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
       const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
       const onFloorHit = (ev: any) => {
@@ -2040,25 +2044,50 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           // Pattern shows only when pit is 90%+ full, instant on/off, no fade
           const ratio = coveredArea / pitArea;
           const fill = ratio >= 0.9 ? 1 : 0;
-          stage.style.setProperty("--fill-opacity", fill.toFixed(3));
+          // --fill-opacity now driven by Tetris danger level above
           // Store fill for pulse interval
           (stage as any).__fillLevel = ratio;
           // Yellow warning flashes at 40%, 70%, 90%, 99%
           if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
           if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (ratio >= 0.85) {
-            // Pit is critically full — start a 4-second timer; if it stays full, game over
-            if (!fillFullTimer && !gameOverRef.current) {
-              fillFullTimer = setTimeout(() => {
+          // ── Tetris-style game over: check if settled objects reach the spawn zone ──
+          const allBodies = Composite.allBodies(engine.world).filter((b: any) =>
+            !b.isStatic && b.plugin && b.plugin.prop !== "ball" && Math.hypot(b.velocity.x, b.velocity.y) < 1.5
+          );
+          const highestY = allBodies.length
+            ? Math.min(...allBodies.map((b: any) => b.position.y - (b.plugin?.half ?? 40)))
+            : h;
+          // dangerLevel: 0=safe, 1=spawn zone blocked
+          const dangerLevel = Math.max(0, Math.min(1, (SPAWN_ZONE - highestY) / SPAWN_ZONE + 1));
+          const inDanger = highestY < SPAWN_ZONE;
+
+          // Drive pattern opacity: 0 when safe, up to 0.45 as danger rises
+          const patternOpacity = Math.max(fill * 0.3, inDanger ? 0.35 + dangerLevel * 0.1 : Math.max(0, (SPAWN_ZONE - highestY) / (SPAWN_ZONE * 2) * 0.35));
+          stage.style.setProperty("--fill-opacity", patternOpacity.toFixed(3));
+
+          if (inDanger && !gameOverRef.current) {
+            if (!dangerTimer) {
+              // Start 4s countdown
+              dangerTimer = setTimeout(() => {
                 if (gameOverRef.current) return;
-                if (runnerRef.current) Runner.stop(runnerRef.current);
+                if (runnerRef.current) (runnerRef.current as any).enabled = false;
+                if (flashInterval) { clearInterval(flashInterval); flashInterval = null; }
+                stage.style.setProperty("--fill-opacity", "0");
                 pendingGameOver.current = true;
-              }, 4000);
+              }, DANGER_SECONDS);
+              // Start flash: alternate pattern between 0.4 and 0.8
+              flashInterval = setInterval(() => {
+                flashOn = !flashOn;
+                stage.style.setProperty("--fill-opacity", flashOn ? "0.75" : "0.35");
+              }, 250);
             }
           } else {
-            // Pit has breathing room — cancel any pending game over
-            if (fillFullTimer) { clearTimeout(fillFullTimer); fillFullTimer = null; }
+            // Objects cleared from spawn zone — cancel danger
+            if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
+            if (flashInterval) { clearInterval(flashInterval); flashInterval = null; flashOn = false; }
           }
+
+          // Keep old fill warnings for audio/visual pops at thresholds
           if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
         }
         // Bone proximity: slow to 50% when two bones are within 100px of each other
@@ -3045,6 +3074,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Events.off(engine, "collisionStart", onKnockScore);
         Render.stop(render);
         Runner.stop(runner);
+        if (dangerTimer) clearTimeout(dangerTimer);
+        if (flashInterval) clearInterval(flashInterval);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
         if (render.canvas && render.canvas.parentNode) render.canvas.parentNode.removeChild(render.canvas);
