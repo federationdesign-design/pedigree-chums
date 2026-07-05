@@ -698,7 +698,7 @@ export default function PackPit() {
 
         // ── POOL 1 (easy rejects, 3 drops of 2) ─────────────────────────────
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 35000));  // 0:35.0 pool1-A
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 40000));                                                                     // 0:40.0  bone
+        // bone removed - was causing freeze on spawn
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[2], dropped); dropCardNamed(easyRejects[3], dropped); } }, 47000));  // 0:47.0 pool1-B
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[4], dropped); dropCardNamed(easyRejects[5], dropped); } }, 55000));  // 0:55.0 pool1-C
 
