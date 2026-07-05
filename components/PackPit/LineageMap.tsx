@@ -993,7 +993,15 @@ export default function LineageMap({
         {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
-        {!packed && !collecting && !framesDone ? (
+        {!packed && !collecting && !framesDone ? (() => {
+          // Count remaining revealStep clicks needed
+          const firstUnpickedExists = INSTR_NAMES.has(breed.name)
+            ? shown.some((n) => n.img && !picked.has(n._id) && n._parent)
+            : (root && root.img && !picked.has(root._id));
+          const frontierCount = shown.filter((n) => n.children && (n.children as Node[]).length && !open.has(n._id)).length;
+          const unpickedCount = shown.filter((n) => n._parent && n.img && !picked.has(n._id)).length;
+          const stepsLeft = (firstUnpickedExists ? 1 : 0) + (frontierCount > 0 ? 1 : 0) + (unpickedCount > 0 && !firstUnpickedExists && frontierCount === 0 ? 1 : 0);
+          return (
           <g
             className={styles.removeBtn}
             transform={`translate(0,62)`}
@@ -1010,8 +1018,18 @@ export default function LineageMap({
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
               </g>
             </g>
+            {stepsLeft > 1 && (
+              <text
+                x={108}
+                y={5}
+                textAnchor="start"
+                dominantBaseline="central"
+                style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 13, fill: "#ffd23e", pointerEvents: "none" }}
+              >{`x${stepsLeft} more`}</text>
+            )}
           </g>
-        ) : null}
+          );
+        })() : null}
         {/* Green button - Complete/skip for instructional, Pack chum for dog cards */}
         {(canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
