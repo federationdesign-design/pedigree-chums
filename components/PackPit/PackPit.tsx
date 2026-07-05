@@ -694,7 +694,7 @@ export default function PackPit() {
         }, 20000));
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[4].find(n=>!easyRejects.includes(n))??easyPairs[4][0], dropped); }, 23000));   // 0:23.0  pair 5
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[5].find(n=>!easyRejects.includes(n))??easyPairs[5][0], dropped); }, 27000));   // 0:27.0  pair 6
-        // slipper removed - diagnostic test
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 31000));                                                                         // 0:31.0  slipper
 
         // ── POOL 1 (easy rejects, 3 drops of 2) ─────────────────────────────
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 35000));  // 0:35.0 pool1-A
@@ -2000,7 +2000,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
-        // Tetris danger check removed - was causing freeze
+        // Tetris game over check: removed (was blocking physics thread)
+        // TODO: reimplement via requestIdleCallback
         // Bone proximity: slow to 50% when two bones are within 100px of each other
         // Restores to normal when they move apart (or if user has set slow motion)
         if (!slowmoActiveRef.current) {
