@@ -2101,14 +2101,20 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                       if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
                       stage.style.setProperty("--fill-opacity", "0");
                       countdown.remove();
-                    }, 1200);
+                    }, 1500);
                   }
-                }, 1000);
+                }, 2000);
                 dangerTimer = setTimeout(() => {
                   if (gameOverRef.current || disposed) return;
                   if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                  pendingGameOver.current = true;
-                }, 4200);
+                  // Navigate directly - don't rely on React effect to pick up ref change
+                  try {
+                    sessionStorage.setItem("pc-gameover-score", String(score));
+                    sessionStorage.setItem("pc-gameover-chums", String(collected));
+                    sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: "" }))));
+                  } catch {}
+                  window.setTimeout(() => { window.location.href = "/about?gameover=1"; }, 200);
+                }, 7500);
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
