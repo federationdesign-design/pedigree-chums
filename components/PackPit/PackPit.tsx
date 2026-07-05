@@ -314,6 +314,21 @@ export default function PackPit() {
       // ox/oy compensate for compound body centroid offset (centroid is ~27px left, 58px below VB centre)
       _slipperBody.plugin = { name: slipper.label, half: Math.min(slipperW, slipperH)/2, w: slipperW, h: slipperH, color:"#bfe3f7", img: slipperImg, prop:"slipper", family:null, ping:0, ox: slipperW * 0.039, oy: -(slipperH * 0.227) };
 
+      // Pre-build bowl compound body at init (avoids freeze on creation)
+      // VB: 1031.7 x 316.8 - floor + bump + two angled walls
+      const bowlW = bowl.width, bowlH = bowlW / bowl.aspect;
+      const _bk = bowlW / 1031.7, _bcx = 1031.7 / 2, _bcy = 316.8 / 2;
+      const _bpo = { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } };
+      const _bR = (vx: number, vy: number, w: number, h: number) => Bodies.rectangle((vx-_bcx)*_bk, (vy-_bcy)*_bk, w*_bk, h*_bk, _bpo);
+      const _bowlBody: any = Body.create({ parts: [
+        _bR(515, 295, 820, 30),   // floor
+        _bR(515, 265, 120, 80),   // centre bump
+        Bodies.rectangle((90-_bcx)*_bk, (150-_bcy)*_bk, 18*_bk, 230*_bk, { ..._bpo, angle: 0.349 }),  // left wall
+        Bodies.rectangle((940-_bcx)*_bk, (150-_bcy)*_bk, 18*_bk, 230*_bk, { ..._bpo, angle: -0.349 }), // right wall
+      ], frictionAir: 0.012, render: { visible: false } });
+      const bowlImg = getImg(bowl.key, bowl.src);
+      _bowlBody.plugin = { name: bowl.label, half: Math.min(bowlW, bowlH)/2, w: bowlW, h: bowlH, color:"#bfe3f7", img: bowlImg, prop:"bowl", family:null, ping:0, ox:0, oy:0, isBowl:true, bowlScored: new Set() };
+
       const engine = Engine.create();
       engineRef.current = engine;
       engine.gravity.y = 1;
@@ -402,12 +417,12 @@ export default function PackPit() {
             Body.setVelocity(b, { x: 0, y: 0 });
             Body.setAngularVelocity(b, 0);
           } else {
-            // Bowl: single chamfered rect
-            b = Bodies.rectangle(x, y, bw, bh, {
-              chamfer: { radius: Math.min(bw, bh) * 0.2 },
-              frictionAir: 0.012, restitution: 0.3, friction: 0.4, density: 0.006,
-              render: { visible: false },
-            });
+            // Bowl: use pre-built compound body
+            b = _bowlBody;
+            Body.setPosition(b, { x, y });
+            Body.setVelocity(b, { x: 0, y: 0 });
+            Body.setAngularVelocity(b, 0);
+            b.plugin.bowlScored = new Set(); // reset scored set each drop
           }
           if (prop.angle) Body.setAngle(b, prop.angle);
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
