@@ -2193,7 +2193,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       };
       removeBreedRef.current = (name: string) => {
         const INSTR = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
-        if (INSTR.has(name)) return; // instructional cards poof in LineageMap, no pit fly animation
+        if (INSTR.has(name)) {
+          // Remove card from pit without fly animation
+          const all = dyn().filter((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
+          all.forEach((b: any) => { poof(b.position.x, b.position.y, b.plugin.half || 30); Composite.remove(engine.world, b); });
+          return;
+        }
         const all = dyn().filter((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
         const target = all.find((b: any) => !b.plugin.pop);
         if (target) {
