@@ -359,17 +359,19 @@ export default function PackPit() {
             Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, { ...opts, angle: deg * Math.PI / 180 });
           const C = (vx: number, vy: number, r: number) =>
             Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
-          const parts =
-            prop.shape === "slipper"
-              ? [R(554, 363, 1107, 84), C(546, 241, 154), C(124, 333, 97), RA(370, 143, 380, 70, -18.7), R(891, 336, 349, 64)]
-              : [
-                R(515, 295, 820, 30, po2),
-                R(515, 265, 120, 80, po2),
-                Bodies.rectangle((90 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: 0.349 }),
-                Bodies.rectangle((940 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: -0.349 })
-              ];
-          const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-          Body.setPosition(b, { x, y });
+          let b: any;
+          if (prop.shape === "slipper") {
+            const parts = [R(554, 363, 1107, 84), C(546, 241, 154), C(124, 333, 97), RA(370, 143, 380, 70, -18.7), R(891, 336, 349, 64)];
+            b = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+            Body.setPosition(b, { x, y });
+          } else {
+            // Bowl: single chamfered rect — compound body caused physics freeze
+            b = Bodies.rectangle(x, y, bw, bh, {
+              chamfer: { radius: Math.min(bw, bh) * 0.2 },
+              frictionAir: 0.012, restitution: 0.3, friction: 0.4, density: 0.006,
+              render: { visible: false },
+            });
+          }
           if (prop.angle) Body.setAngle(b, prop.angle);
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
@@ -592,12 +594,13 @@ export default function PackPit() {
         const po = { restitution: 0.45, friction: 0.3, density: 0.0009, render: { visible: false } };
         const C = (vx: number, vy: number, r: number) => Bodies.circle(x + (vx - cx0) * k, y + (vy - cy0) * k, r * k, po);
         const R = (vx: number, vy: number, w: number, h: number, a = 0) => Bodies.rectangle(x + (vx - cx0) * k, y + (vy - cy0) * k, w * k, h * k, { ...po, angle: a });
-        const parts = [
-          C(105, 178, 105),   // left circle
-          C(490, 178, 105),   // right circle
-          R(297, 178, 380, 110, 0.14), // connecting bar, slight angle
-        ];
-        return Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+        // Single chamfered rect - compound body caused physics freeze on creation
+        const b2 = Bodies.rectangle(x, y, bw, bh, {
+          chamfer: { radius: Math.min(bw, bh) * 0.18 },
+          restitution: 0.45, friction: 0.3, density: 0.0009,
+          frictionAir: 0.012, render: { visible: false },
+        });
+        return b2;
       };
       const howPanel = { key: "__howtoplay", label: "How to play", src: "/howtoplay.svg", width: BIG * 3.0, aspect: 134.8 / 74.5, kind: "howtoplay" };
       function makePanel(cfg: { key: string; label: string; src: string; width: number; aspect: number; kind: string }, w: number, side?: "left" | "right") {
@@ -2026,7 +2029,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
         // Game over: 10+ settled dog cards in spawn zone = pit is genuinely full
-        const SPAWN_ZONE = Math.round(stage.clientHeight * 0.02); // 2% from top
+        const SPAWN_ZONE = 120; // 120px from top - reachable when pit is genuinely full
         const DANGER_COUNT = 10; // settled cards needed to trigger
         let throbInterval: ReturnType<typeof setInterval> | null = null;
         let throbHigh = true;
