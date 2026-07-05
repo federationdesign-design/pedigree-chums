@@ -646,6 +646,17 @@ export default function LineageMap({
   // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
   // than a manual tap (125/250) so hand-exploration stays the rewarding route.
   const revealStep = () => {
+    // For instructional cards: if root icon hasn't been shown yet, show it first
+    if (INSTR_NAMES.has(breed.name) && root && root.img && !picked.has(root._id)) {
+      setPicked((prev) => { const s = new Set(prev); s.add(root._id); return s; });
+      const sh = 100;
+      const rr = radius(sh), dd = rr + 10 + CW / 2;
+      const px1 = root._x + Math.cos(0) * dd, py1 = root._y - dd;
+      setPinned((m) => { const x = new Map(m); x.set(root._id, { img: root.img as string, name: root.name, note: root.note, share: sh, mix: sh, status: nodeStatus(root.name, root.note) }); return x; });
+      setDragPos((m) => { const x = new Map(m); x.set(root._id, { x: px1, y: py1 }); return x; });
+      interacted.current = true; setIdleHint(false);
+      return;
+    }
     const frontier = shown.filter((n) => n.children && n.children.length && !open.has(n._id));
     if (frontier.length) {
       const toOpen = INSTR_NAMES.has(breed.name) ? [frontier[0]] : frontier;
