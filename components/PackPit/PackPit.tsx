@@ -754,7 +754,8 @@ export default function PackPit() {
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[2].find(n=>!medRejects.includes(n))??medPairs[2][0], dropped); }, 90000));   // 1:30.0  pair 9
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[3].find(n=>!medRejects.includes(n))??medPairs[3][0], dropped); }, 105000));  // 1:45.0  pair 10
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[4].find(n=>!medRejects.includes(n))??medPairs[4][0], dropped); }, 115000)); // 1:55.0  pair 11
-        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 120000));                                        // 2:00.0  bowl
+        // bowl removed - diagnostic test
+        // waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeProp(bowl, w)); }, 120000));
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(medPairs[5].find(n=>!medRejects.includes(n))??medPairs[5][0], dropped); }, 125000)); // 2:05.0  pair 12
 
         // ── POOL 2 (medium rejects, 3 drops of 2) ───────────────────────────
