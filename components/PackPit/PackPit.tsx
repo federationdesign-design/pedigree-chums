@@ -651,12 +651,12 @@ export default function PackPit() {
       const _lpo = { restitution: 0.45, friction: 0.3, density: 0.0009, render: { visible: false } };
       const _lW = BIG * 6.8, _lH = _lW / (150 / 64);
       const _lk = _lW / 595.3, _lcx = 595.3 / 2, _lcy = 356.5 / 2;
+      const _lC = (vx: number, vy: number, r: number) => Bodies.circle((vx - _lcx) * _lk, (vy - _lcy) * _lk, r * _lk, _lpo);
       const _lR = (vx: number, vy: number, w: number, h: number, a = 0) => Bodies.rectangle((vx - _lcx) * _lk, (vy - _lcy) * _lk, w * _lk, h * _lk, { ..._lpo, angle: a });
-      // Collider matches 6th-hit tagline artwork: two tall end lobes + thin centre band
       const _logoColliderBody: any = Body.create({ parts: [
-        _lR(80,  178, 150, 200),  // left lobe
-        _lR(515, 178, 150, 200),  // right lobe
-        _lR(297, 178, 380,  80),  // centre band
+        _lC(105, 178, 105),
+        _lC(490, 178, 105),
+        _lR(297, 178, 400, 120, 0.14),
       ], frictionAir: 0.012, render: { visible: false } });
 
       const makeLogoCollider = (x: number, y: number, bw: number, bh: number) => {
@@ -1036,11 +1036,14 @@ export default function PackPit() {
         if (acceptBody) { Composite.remove(engine.world, acceptBody); acceptBody = null; }
         if (rejectBody) {
           if (keepReject) {
-            // leave reject in pit but make it inert with 20 hit life like yellow circles
+            // leave reject in pit as a small inert object, gone on first hit
             rejectBody.plugin.inert = true;
             rejectBody.plugin.hits = 0;
-            rejectBody.plugin.maxHits = 20;
+            rejectBody.plugin.maxHits = 1;
             rejectBody.plugin.kind = "cookiereject-inert";
+            // shrink it down to a small puck
+            Body.scale(rejectBody, 0.35, 0.35);
+            rejectBody.plugin.w *= 0.35; rejectBody.plugin.h *= 0.35; rejectBody.plugin.half *= 0.35;
             rejectBody = null; // stop tracking -- it will poof naturally on hits
           } else {
             Composite.remove(engine.world, rejectBody); rejectBody = null;
