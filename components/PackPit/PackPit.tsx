@@ -1905,7 +1905,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
       let dangerTimer: ReturnType<typeof setTimeout> | null = null; // tetris-style: objects in spawn zone
       let throbIntervalOuter: ReturnType<typeof setInterval> | null = null; // hoisted for cleanup
-      const SPAWN_ZONE = 140; // px from top - if settled objects reach here, danger starts
       const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
       const PATTERN_FLASH = 220; // ms a single impact keeps the pattern lit
@@ -2027,7 +2026,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
         // Game over: 10+ settled dog cards in spawn zone = pit is genuinely full
-        const SPAWN_ZONE = 140; // px from top
+        const SPAWN_ZONE = Math.round(stage.clientHeight * 0.02); // 2% from top
         const DANGER_COUNT = 10; // settled cards needed to trigger
         let throbInterval: ReturnType<typeof setInterval> | null = null;
         let throbHigh = true;
