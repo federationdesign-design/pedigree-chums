@@ -385,14 +385,19 @@ export default function PackPit() {
           return b;
         }
         if (prop.shape === "bone") {
-          // A bone is two lobed ends joined by a thin shaft, so a plain box collider
-          // Simplified bone: single chamfered rect - compound body was causing physics freeze
+          // Bone compound body: two end lobes + connecting shaft
+          // VB: 205x100, aspect 2.05
           const bw = prop.width, bh = prop.width / prop.aspect;
-          const b: any = Bodies.rectangle(x, y, bw, bh, {
-            chamfer: { radius: bh * 0.22 },
-            frictionAir: 0.012, restitution: 0.3, friction: 0.3, density: 0.0008,
-            render: { visible: false }
-          });
+          const _bk = bw / 205, _bcx = 102.5, _bcy = 50;
+          const _bpo = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
+          const _bC = (vx: number, vy: number, r: number) => Bodies.circle((vx-_bcx)*_bk, (vy-_bcy)*_bk, r*_bk, _bpo);
+          const _bR = (vx: number, vy: number, w: number, h: number) => Bodies.rectangle((vx-_bcx)*_bk, (vy-_bcy)*_bk, w*_bk, h*_bk, _bpo);
+          const b: any = Body.create({ parts: [
+            _bC(25, 50, 38),    // left lobe
+            _bC(180, 50, 38),   // right lobe
+            _bR(102, 50, 130, 28), // shaft
+          ], frictionAir: 0.012, render: { visible: false } });
+          Body.setPosition(b, { x, y });
           b.collisionFilter = { ...(b.collisionFilter || {}), group: FUSE_GROUP };
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#f6ecd6", img, prop: "bone", family: null, ping: 0 };
           return b;
