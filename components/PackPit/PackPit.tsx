@@ -337,14 +337,28 @@ export default function PackPit() {
           return b;
         }
         if (prop.shape === "slipper" || prop.shape === "bowl") {
-          // Simple chamfered rects - compound bodies caused physics freeze on creation
           const bw = prop.width, bh = prop.width / prop.aspect;
-          const density = prop.shape === "bowl" ? 0.006 : 0.0008;
-          const b: any = Bodies.rectangle(x, y, bw, bh, {
-            chamfer: { radius: Math.min(bw, bh) * 0.12 },
-            frictionAir: 0.012, restitution: 0.3, friction: 0.4, density,
-            render: { visible: false },
-          });
+          const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
+          const VB = prop.shape === "slipper" ? { w: 1108.5, h: 407.4 } : { w: 1031.7, h: 316.8 };
+          const po2 = prop.shape === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006, render: { visible: false } } : po;
+          const k = bw / VB.w, cx0 = VB.w / 2, cy0 = VB.h / 2;
+          const R = (vx: number, vy: number, w: number, h: number, opts = po) =>
+            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, opts);
+          const RA = (vx: number, vy: number, w: number, h: number, deg: number, opts = po) =>
+            Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, { ...opts, angle: deg * Math.PI / 180 });
+          const C = (vx: number, vy: number, r: number) =>
+            Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
+          const parts =
+            prop.shape === "slipper"
+              ? [R(554, 363, 1107, 84), C(546, 241, 154), C(124, 333, 97), RA(370, 143, 380, 70, -18.7), R(891, 336, 349, 64)]
+              : [
+                R(515, 295, 820, 30, po2),
+                R(515, 265, 120, 80, po2),
+                Bodies.rectangle((90 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: 0.349 }),
+                Bodies.rectangle((940 - cx0) * k, (150 - cy0) * k, 18 * k, 230 * k, { ...po, angle: -0.349 })
+              ];
+          const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
+          Body.setPosition(b, { x, y });
           if (prop.angle) Body.setAngle(b, prop.angle);
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
@@ -2000,8 +2014,39 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
-        // Tetris game over check: removed (was blocking physics thread)
-        // TODO: reimplement via requestIdleCallback
+        // Tetris game over: runs in idle time, never blocks physics
+        const SPAWN_ZONE = 140;
+        const scheduleIdleCheck = () => {
+          const ric = (window as any).requestIdleCallback ?? ((cb: any) => setTimeout(cb, 2000));
+          ric((deadline: any) => {
+            if (disposed || gameOverRef.current) return;
+            const remaining = deadline?.timeRemaining ? deadline.timeRemaining() : 10;
+            if (remaining < 4) { scheduleIdleCheck(); return; }
+            const pitH = stage.clientHeight;
+            let highestCardY = pitH;
+            for (const b of Composite.allBodies(engine.world)) {
+              if (b.isStatic || !(b as any).plugin) continue;
+              const plug = (b as any).plugin;
+              if (plug.prop || plug.kind || !plug.family) continue;
+              if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
+              const top = b.position.y - (plug.half ?? 40);
+              if (top < highestCardY) highestCardY = top;
+            }
+            if (highestCardY < SPAWN_ZONE) {
+              if (!dangerTimer) {
+                dangerTimer = setTimeout(() => {
+                  if (gameOverRef.current || disposed) return;
+                  if (runnerRef.current) (runnerRef.current as any).enabled = false;
+                  pendingGameOver.current = true;
+                }, 4000);
+              }
+            } else {
+              if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
+            }
+            setTimeout(scheduleIdleCheck, 3000);
+          });
+        };
+        setTimeout(scheduleIdleCheck, 10000); // start checking after 10s
         // Bone proximity: slow to 50% when two bones are within 100px of each other
         // Restores to normal when they move apart (or if user has set slow motion)
         if (!slowmoActiveRef.current) {
