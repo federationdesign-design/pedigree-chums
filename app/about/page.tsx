@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Nav from "../../components/Nav/Nav";
+import AboutClient from "./AboutClient";
 import Hero from "../../components/Hero/Hero";
 import PitchPanel from "../../components/PitchPanel/PitchPanel";
 import PhotoSplit from "../../components/PhotoSplit/PhotoSplit";
@@ -18,6 +20,7 @@ export const metadata: Metadata = {
 export default function About() {
   return (
     <>
+      <Suspense><AboutClient /></Suspense>
       <Nav />
       <main>
         <Hero />

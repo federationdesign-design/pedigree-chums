@@ -143,7 +143,15 @@ export default function PackPit() {
     if (!activeBreed && !howToPlay && !shelfOpen && !cookiesOpenRef.current && pendingGameOver.current && !gameOver) {
       pendingGameOver.current = false;
       gameOverRef.current = true;
-      window.setTimeout(() => setGameOver(true), 800);
+      window.setTimeout(() => {
+        // Store game state for GameOver overlay on about page
+        try {
+          sessionStorage.setItem("pc-gameover-score", String(score));
+          sessionStorage.setItem("pc-gameover-chums", String(collected));
+          sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChums.map((n: string) => ({ name: n, img: "" }))));
+        } catch {}
+        window.location.href = "/about?gameover=1";
+      }, 800);
     }
   }, [activeBreed, howToPlay, shelfOpen, gameOver]);
 
@@ -3217,7 +3225,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         );
       })()}
 
-      {gameOver && <GameOver
+      {false && <GameOver  // moved to about page
         chums={collected}
         score={score}
         allCollected={collected >= 54}

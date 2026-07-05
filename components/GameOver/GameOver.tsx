@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./GameOver.module.css";
 
-type Props = { chums: number; score: number; collectedBreeds?: { name: string; img: string }[]; allCollected?: boolean };
+type Props = { chums: number; score: number; collectedBreeds?: { name: string; img: string }[]; allCollected?: boolean; onClose?: () => void; };
 
 const MAX_NAME = 6;
 const STORAGE_KEY = "pc_scores";
@@ -64,7 +64,7 @@ function buildLeaderboard(playerScore: number, playerName: string | null) {
   }).slice(0, 5);
 }
 
-export default function GameOver({ chums, score, collectedBreeds = [], allCollected = false }: Props) {
+export default function GameOver({ chums, score, collectedBreeds = [], allCollected = false, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const idleTimerRef = useRef<number | null>(null);
   const resetIdleTimer = () => {
