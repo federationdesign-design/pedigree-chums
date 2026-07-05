@@ -2151,7 +2151,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 countdownEl.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
                 stage.appendChild(countdownEl);
                 const countdown = countdownEl;
-                const steps = ["10","9","8","7","6","5","4","3","2","1","GAME OVER"];
+                const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
                 let step = 0;
                 countdown.textContent = steps[step];
                 const tick = setInterval(() => {
@@ -2159,22 +2159,29 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                   if (step < steps.length) {
                     countdown.textContent = steps[step];
                     if (step === steps.length - 1) {
-                      // Freeze pit when GAME OVER appears
-                      if (runnerRef.current) (runnerRef.current as any).enabled = false;
+                      // "0" — hold 1.5s, then show GAME OVER, freeze, navigate
+                      clearInterval(tick);
+                      countdownTick = null;
+                      window.setTimeout(() => {
+                        countdown.textContent = "GAME OVER";
+                        if (runnerRef.current) (runnerRef.current as any).enabled = false;
+                        window.setTimeout(() => {
+                          if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
+                          stage.style.setProperty("--fill-opacity", "0");
+                          countdown.remove(); countdownEl = null;
+                          gameOverRef.current = true;
+                          try {
+                            sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
+                            sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
+                            const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
+                            sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
+                          } catch {}
+                          window.location.href = "/about?gameover=1";
+                        }, 800);
+                      }, 1500);
                     }
                   } else {
                     clearInterval(tick);
-                    if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
-                    stage.style.setProperty("--fill-opacity", "0");
-                    countdown.remove(); countdownEl = null;
-                    gameOverRef.current = true;
-                    try {
-                      sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
-                      sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
-                      const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
-                      sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
-                    } catch {}
-                    window.location.href = "/about?gameover=1";
                   }
                 }, 1000);
                 countdownTick = tick;
