@@ -144,6 +144,9 @@ export default function PackPit() {
       pendingGameOver.current = false;
       gameOverRef.current = true;
       window.setTimeout(() => {
+        // Disable pit canvas interaction before navigating
+        const canvas = document.querySelector(".stage > canvas") as HTMLElement | null;
+        if (canvas) canvas.style.pointerEvents = "none";
         // Store game state for GameOver overlay on about page
         try {
           sessionStorage.setItem("pc-gameover-score", String(score));
@@ -720,7 +723,7 @@ export default function PackPit() {
 
         // ── POOL 1 (easy rejects, 3 drops of 2) ─────────────────────────────
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 35000));  // 0:35.0 pool1-A
-        // bone removed - was causing freeze on spawn
+        waveTimers.push(setTimeout(() => { if (!disposed) addProps([bone]); }, 40000));                                                                     // 0:40.0  bone
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[2], dropped); dropCardNamed(easyRejects[3], dropped); } }, 47000));  // 0:47.0 pool1-B
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[4], dropped); dropCardNamed(easyRejects[5], dropped); } }, 55000));  // 0:55.0 pool1-C
 
@@ -1901,6 +1904,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       let lastFillCheck = 0;
       let fillWarned90 = false, fillWarned95 = false, fillWarned99 = false;
       let dangerTimer: ReturnType<typeof setTimeout> | null = null; // tetris-style: objects in spawn zone
+      let throbIntervalOuter: ReturnType<typeof setInterval> | null = null; // hoisted for cleanup
       const SPAWN_ZONE = 140; // px from top - if settled objects reach here, danger starts
       const DANGER_SECONDS = 4000; // 4s to clear before game over
       let lastPulse = 0;
@@ -2027,6 +2031,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const DANGER_COUNT = 10; // settled cards needed to trigger
         let throbInterval: ReturnType<typeof setInterval> | null = null;
         let throbHigh = true;
+        const setThrob = (iv: ReturnType<typeof setInterval> | null) => { throbInterval = iv; throbIntervalOuter = iv; };
         const scheduleIdleCheck = () => {
           const ric = (window as any).requestIdleCallback ?? ((cb: any) => setTimeout(cb, 2000));
           ric((deadline: any) => {
@@ -2053,10 +2058,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (settledInZone >= DANGER_COUNT) {
               // Start throb at 90% opacity
               if (!throbInterval) {
-                throbInterval = setInterval(() => {
+                setThrob(setInterval(() => {
                   throbHigh = !throbHigh;
                   stage.style.setProperty("--fill-opacity", throbHigh ? "0.9" : "0.3");
-                }, 1000);
+                }, 1000));
               }
               if (!dangerTimer) {
                 dangerTimer = setTimeout(() => {
@@ -2068,7 +2073,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                   flash.textContent = "GAME OVER";
                   stage.appendChild(flash);
                   window.setTimeout(() => {
-                    if (throbInterval) { clearInterval(throbInterval); throbInterval = null; }
+                    if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
                     stage.style.setProperty("--fill-opacity", "0");
                     pendingGameOver.current = true;
                   }, 1500);
@@ -2076,7 +2081,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
-              if (throbInterval) { clearInterval(throbInterval); throbInterval = null; }
+              if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
             setTimeout(scheduleIdleCheck, 3000);
@@ -3068,7 +3073,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Render.stop(render);
         Runner.stop(runner);
         if (dangerTimer) clearTimeout(dangerTimer);
-        if (throbInterval) clearInterval(throbInterval);
+        if (throbIntervalOuter) clearInterval(throbIntervalOuter);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
         if (render.canvas && render.canvas.parentNode) render.canvas.parentNode.removeChild(render.canvas);
