@@ -2000,34 +2000,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
-        // Fill + danger check: every 5s
-        if (now - lastFillCheck > 5000) {
-          lastFillCheck = now;
-          const pitH = render.canvas.height;
-          // Single body traversal: find highest settled NON-PROP card (dog cards only)
-          let highestCardY = pitH;
-          for (const b of Composite.allBodies(engine.world)) {
-            if (b.isStatic || !(b as any).plugin) continue;
-            const plug = (b as any).plugin;
-            // Only dog cards trigger game over, not props/bone/slipper/bowl/buttons
-            if (plug.prop || plug.kind || !plug.family) continue;
-            if (Math.hypot(b.velocity.x, b.velocity.y) > 3) continue;
-            const top = b.position.y - (plug.half ?? 40);
-            if (top < highestCardY) highestCardY = top;
-          }
-          const inDanger = highestCardY < SPAWN_ZONE && !gameOverRef.current;
-          if (inDanger) {
-            if (!dangerTimer) {
-              dangerTimer = setTimeout(() => {
-                if (gameOverRef.current) return;
-                if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                pendingGameOver.current = true;
-              }, DANGER_SECONDS);
-            }
-          } else {
-            if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
-          }
-        }
+        // Tetris danger check removed - was causing freeze
         // Bone proximity: slow to 50% when two bones are within 100px of each other
         // Restores to normal when they move apart (or if user has set slow motion)
         if (!slowmoActiveRef.current) {
