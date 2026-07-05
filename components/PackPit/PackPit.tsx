@@ -2025,45 +2025,41 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const wantPattern = onFloor || now < patternUntil;
         if (wantPattern !== patternOn) { patternOn = wantPattern; stage.classList.toggle(styles.showPattern, wantPattern); }
 
-        // Fill indicator: measure every 2s, drive --fill-opacity on stage, flash yellow at thresholds
-        if (now - lastFillCheck > 2000) {
+        // Fill + danger check: every 3s (reduced from 2s to ease physics load)
+        if (now - lastFillCheck > 3000) {
           lastFillCheck = now;
           const pitH = render.canvas.height;
           const pitW = render.canvas.width;
           const pitArea = pitH * pitW;
+          // Single body traversal for both fill area and highest settled object
           let coveredArea = 0;
-          for (const b of Composite.allBodies(engine.world)) {
+          let highestY = pitH;
+          const allB = Composite.allBodies(engine.world);
+          for (const b of allB) {
             if (b.isStatic) continue;
-            if (!b.plugin) continue;
+            if (!(b as any).plugin) continue;
             const bw = b.bounds.max.x - b.bounds.min.x;
             const bh = b.bounds.max.y - b.bounds.min.y;
             coveredArea += bw * bh;
+            // Danger check: only cards/props, not balls
+            if ((b as any).plugin.prop !== "ball" && Math.hypot(b.velocity.x, b.velocity.y) < 2) {
+              const top = b.position.y - ((b as any).plugin?.half ?? 40);
+              if (top < highestY) highestY = top;
+            }
           }
-          // Pattern shows only when pit is 90%+ full, instant on/off, no fade
           const ratio = coveredArea / pitArea;
-          const fill = ratio >= 0.9 ? 1 : 0;
-          // --fill-opacity now driven by Tetris danger level above
-          // Store fill for pulse interval
           (stage as any).__fillLevel = ratio;
-          // Yellow warning flashes at 40%, 70%, 90%, 99%
-          if (fill >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          if (fill >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
-          // ── Tetris-style game over: check if settled objects reach the spawn zone ──
-          const allBodies = Composite.allBodies(engine.world);
-          let highestY = stage.clientHeight;
-          for (const b of allBodies) {
-            if (b.isStatic || !(b as any).plugin || (b as any).plugin.prop === "ball") continue;
-            if (Math.hypot(b.velocity.x, b.velocity.y) > 2) continue; // only settled
-            const top = b.position.y - ((b as any).plugin?.half ?? 40);
-            if (top < highestY) highestY = top;
-          }
-          const inDanger = highestY < SPAWN_ZONE;
-          // Drive pattern opacity: rises as objects approach top
-          const approachRatio = Math.max(0, Math.min(1, 1 - highestY / stage.clientHeight));
-          const patternOpacity = inDanger ? 0.35 : approachRatio * 0.3;
-          stage.style.setProperty("--fill-opacity", patternOpacity.toFixed(3));
 
-          if (inDanger && !gameOverRef.current) {
+          // Pattern opacity: only show when objects are in top 40% of pit
+          // Use pitH (already read, no reflow) instead of clientHeight
+          const topThreshold = pitH * 0.4;
+          const approachOpacity = highestY < topThreshold
+            ? Math.max(0, Math.min(0.3, (topThreshold - highestY) / topThreshold * 0.3))
+            : 0;
+          stage.style.setProperty("--fill-opacity", approachOpacity.toFixed(3));
+
+          const inDanger = highestY < SPAWN_ZONE && !gameOverRef.current;
+          if (inDanger) {
             stage.classList.add(styles.dangerFlash);
             if (!dangerTimer) {
               dangerTimer = setTimeout(() => {
@@ -2079,8 +2075,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
             if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }
           }
 
-          // Keep old fill warnings for audio/visual pops at thresholds
-          if (fill >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          // Yellow warning flashes at fill thresholds
+          if (ratio >= 0.4 && !fillWarned90) { fillWarned90 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          if (ratio >= 0.7 && !fillWarned95) { fillWarned95 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
+          if (ratio >= 0.99 && !fillWarned99) { fillWarned99 = true; stage.classList.add(styles.fillWarn); setTimeout(() => stage.classList.remove(styles.fillWarn), 800); }
         }
         // Bone proximity: slow to 50% when two bones are within 100px of each other
         // Restores to normal when they move apart (or if user has set slow motion)
