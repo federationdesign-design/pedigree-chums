@@ -312,7 +312,8 @@ export default function PackPit() {
       ], frictionAir: 0.012, render: { visible: false } });
       const slipperImg = getImg(slipper.key, slipper.src);
       // ox/oy compensate for compound body centroid offset (centroid is ~27px left, 58px below VB centre)
-      _slipperBody.plugin = { name: slipper.label, half: Math.min(slipperW, slipperH)/2, w: slipperW, h: slipperH, color:"#bfe3f7", img: slipperImg, prop:"slipper", family:null, ping:0, ox: slipperW * 0.039, oy: -(slipperH * 0.227) };
+      // ox/oy: centroid is ~27px left and ~1.5px above image centre - nearly zero correction needed
+      _slipperBody.plugin = { name: slipper.label, half: Math.min(slipperW, slipperH)/2, w: slipperW, h: slipperH, color:"#bfe3f7", img: slipperImg, prop:"slipper", family:null, ping:0, ox: slipperW * 0.039, oy: -(slipperH * 0.006) };
 
       // Pre-build bowl compound body at init (avoids freeze on creation)
       // VB: 1031.7 x 316.8 - floor + bump + two angled walls
