@@ -2025,7 +2025,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
 
         // Game over: 10+ settled dog cards in spawn zone = pit is genuinely full
         const SPAWN_ZONE = 120; // 120px from top - reachable when pit is genuinely full
-        const DANGER_COUNT = 10; // settled cards needed to trigger
+        const DANGER_COUNT = 7; // settled cards needed to trigger
         let throbInterval: ReturnType<typeof setInterval> | null = null;
         let throbHigh = true;
         const setThrob = (iv: ReturnType<typeof setInterval> | null) => { throbInterval = iv; throbIntervalOuter = iv; };
@@ -2046,7 +2046,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               if (top < SPAWN_ZONE) settledInZone++;
             }
             // Pattern opacity curve: 0-4 cards in zone = 0%, 5=10%, 6=25%, 7=50%, 8=75%, 9+=100%
-            const opacityMap: number[] = [0, 0, 0, 0, 0, 0.10, 0.25, 0.50, 0.75, 1.0];
+            const opacityMap: number[] = [0, 0.14, 0.28, 0.42, 0.56, 0.70, 0.84, 1.0];
             const targetOpacity = opacityMap[Math.min(settledInZone, opacityMap.length - 1)];
             if (!throbInterval) {
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
@@ -2063,6 +2063,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 // Show 3,2,1 countdown then GAME OVER
                 const countdown = document.createElement("div");
                 countdown.className = styles.gameOverFlash;
+                // Inline fallback so countdown shows even if CSS module hash mismatches
+                countdown.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
                 stage.appendChild(countdown);
                 let count = 3;
                 countdown.textContent = String(count);
@@ -2683,9 +2685,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (spd > 1.5) { greenSettledSince = null; return; }
         if (!greenSettledSince) greenSettledSince = now2;
         if (now2 - greenSettledSince < GREEN_SETTLE_MS) return;
-        if (now2 - greenLastHop < GREEN_HOP_EVERY) return;
-        greenLastHop = now2; gArrow.plugin.hoppingUntil = now2 + 600;
-        Body.applyForce(gArrow, gArrow.position, { x: 0, y: -gArrow.mass * 0.06 });
+        // arrow hop removed - no autonomous movement
       });
       // bone drag-me hint: swap SVG when bone is within 300px of logo
       const DRAGME_RANGE = 300;
@@ -3010,7 +3010,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const now = performance.now();
 
         if (acceptBody && acceptBody.position) {
-          Body.applyForce(acceptBody, acceptBody.position, { x: (Math.random() - 0.5) * 0.00006, y: (Math.random() - 0.5) * 0.00005 }); // patch_quickfixes_v1: 0.1 power tremble
+          // cookie force removed - no autonomous movement
           if (now - (acceptBody.plugin.lastOne || 0) > 320) {
             acceptBody.plugin.lastOne = now;
             numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), -1, 13, true, "#ff2d4f"); // streaming red -1s that nibble the score
