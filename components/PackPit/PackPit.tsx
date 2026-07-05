@@ -2066,20 +2066,31 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                 }, 1000));
               }
               if (!dangerTimer) {
+                // Show 3,2,1 countdown then GAME OVER
+                const countdown = document.createElement("div");
+                countdown.className = styles.gameOverFlash;
+                stage.appendChild(countdown);
+                let count = 3;
+                countdown.textContent = String(count);
+                const tick = setInterval(() => {
+                  count--;
+                  if (count > 0) {
+                    countdown.textContent = String(count);
+                  } else {
+                    clearInterval(tick);
+                    countdown.textContent = "GAME OVER";
+                    window.setTimeout(() => {
+                      if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
+                      stage.style.setProperty("--fill-opacity", "0");
+                      countdown.remove();
+                    }, 1200);
+                  }
+                }, 1000);
                 dangerTimer = setTimeout(() => {
                   if (gameOverRef.current || disposed) return;
                   if (runnerRef.current) (runnerRef.current as any).enabled = false;
-                  // Show GAME OVER flash text
-                  const flash = document.createElement("div");
-                  flash.className = styles.gameOverFlash;
-                  flash.textContent = "GAME OVER";
-                  stage.appendChild(flash);
-                  window.setTimeout(() => {
-                    if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
-                    stage.style.setProperty("--fill-opacity", "0");
-                    pendingGameOver.current = true;
-                  }, 1500);
-                }, 4000);
+                  pendingGameOver.current = true;
+                }, 4200);
               }
             } else {
               if (dangerTimer) { clearTimeout(dangerTimer); dangerTimer = null; }

@@ -10,7 +10,7 @@
 .stage > canvas {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 2;
   display: block;
   transition: opacity 0.25s ease, filter 0.25s ease;
 }
@@ -564,21 +564,15 @@
 .gameOverFlash {
   position: absolute;
   inset: 0;
-  z-index: 500;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(4rem, 14vw, 9rem);
+  font-size: clamp(5rem, 18vw, 12rem);
   color: #ffffff;
   letter-spacing: 0.04em;
   pointer-events: none;
-  animation: gameOverAppear 1.5s ease-out forwards;
-  text-shadow: 0 4px 40px rgba(0,0,0,0.5);
-}
-@keyframes gameOverAppear {
-  0%   { opacity: 0; transform: scale(0.6); }
-  30%  { opacity: 1; transform: scale(1.05); }
-  70%  { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.1); }
+  text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+  transition: font-size 0.2s ease;
 }
