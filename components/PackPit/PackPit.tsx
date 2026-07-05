@@ -3092,54 +3092,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       // The cookie behaves like a kettle. It sits quiet, then a tremor rises to a
       // steady simmer by ~15s and just holds there (no runaway bouncing off the
       // sides), until one intense burst at ~30s flings its neighbours and it settles
-      // still again. Alongside it, the Accept button trembles faintly, leaks a
-      // steady stream of 1s, and spits another cookie policy out if ignored for 30s.
-      const CALM = 10000, RISE = 5000, SIMMER = 15000;
-      let cycleStart = performance.now();
-      buzzTimer = setInterval(() => {
-        if (disposed) return;
-        const now = performance.now();
-
-        if (acceptBody && acceptBody.position) {
-          // cookie force removed - no autonomous movement
-          if (now - (acceptBody.plugin.lastOne || 0) > 320) {
-            acceptBody.plugin.lastOne = now;
-            numAt(acceptBody.position.x + (Math.random() - 0.5) * 22, acceptBody.position.y - (acceptBody.plugin.half || 30), -1, 13, true, "#ff2d4f"); // streaming red -1s that nibble the score
-          }
-          if (now - (acceptBody.plugin.bornAt || now) > 90000) {
-            acceptBody.plugin.bornAt = now; // and it nags again after another 90s
-            const nc = makeCookies(stage.clientWidth);
-            Body.setPosition(nc, { x: acceptBody.position.x, y: acceptBody.position.y });
-            Body.setVelocity(nc, { x: (Math.random() - 0.5) * 7, y: -10 }); // skips up out of the button
-            Body.setAngularVelocity(nc, (Math.random() - 0.5) * 0.5);
-            poof(acceptBody.position.x, acceptBody.position.y, acceptBody.plugin.half || 30);
-            Composite.add(engine.world, nc);
-          }
-        }
-
-        if (!cookiesBody || !cookiesBody.position || cookiesBody.plugin.inert) return; // a tapped cookie has gone inert
-        const elapsed = now - cycleStart;
-        if (elapsed < CALM) return; // quiet start
-        const t = elapsed - CALM;
-        const level = Math.min(1, t / RISE); // rises to the simmer, then holds at 1
-        // wobble removed (patch_bits_v1): shake/rattle disabled
-        // Body.applyForce(cookiesBody, cookiesBody.position, { x: (Math.random() - 0.5) * (0.00025 + level * 0.0006), y: (Math.random() - 0.5) * (0.00025 + level * 0.0005) });
-        // Body.setAngularVelocity(cookiesBody, cookiesBody.angularVelocity + (Math.random() - 0.5) * (0.01 + level * 0.05));
-        if (t >= RISE + SIMMER) { // the one intense burst, then it settles over the calm
-          Body.setVelocity(cookiesBody, { x: (Math.random() - 0.5) * 0.5, y: -0.4 }); // minimal end buzz
-          Body.setAngularVelocity(cookiesBody, (Math.random() - 0.5) * 0.1); // minimal spin
-          const others = dyn().filter((b: any) => b !== cookiesBody);
-          for (const col of Query.collides(cookiesBody, others)) {
-            const other = col.bodyA === cookiesBody ? col.bodyB : col.bodyA;
-            if (!other || other.isStatic) continue;
-            let dx = other.position.x - cookiesBody.position.x, dy = other.position.y - cookiesBody.position.y;
-            const len = Math.hypot(dx, dy) || 1;
-            Body.setVelocity(other, { x: other.velocity.x + (dx / len) * 0.2, y: other.velocity.y + (dy / len) * 0.2 - 0.1 }); // minimal neighbour shove
-            Body.setAngularVelocity(other, other.angularVelocity + (Math.random() - 0.5) * 0.4);
-          }
-          cycleStart = now; // back to quiet
-        }
-      }, 50);
+      // buzzTimer removed - cookies no longer buzz, repel or nag
 
       dispose = () => {
         if (dropTimer) clearInterval(dropTimer);
