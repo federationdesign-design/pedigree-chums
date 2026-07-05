@@ -359,19 +359,13 @@ export default function PackPit() {
             Bodies.rectangle((vx - cx0) * k, (vy - cy0) * k, w * k, h * k, { ...opts, angle: deg * Math.PI / 180 });
           const C = (vx: number, vy: number, r: number) =>
             Bodies.circle((vx - cx0) * k, (vy - cy0) * k, r * k, po);
-          let b: any;
-          if (prop.shape === "slipper") {
-            const parts = [R(554, 363, 1107, 84), C(546, 241, 154), C(124, 333, 97), RA(370, 143, 380, 70, -18.7), R(891, 336, 349, 64)];
-            b = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-            Body.setPosition(b, { x, y });
-          } else {
-            // Bowl: single chamfered rect — compound body caused physics freeze
-            b = Bodies.rectangle(x, y, bw, bh, {
-              chamfer: { radius: Math.min(bw, bh) * 0.2 },
-              frictionAir: 0.012, restitution: 0.3, friction: 0.4, density: 0.006,
-              render: { visible: false },
-            });
-          }
+          // Both slipper and bowl use simple chamfered rects - compound bodies cause physics freeze
+          const b: any = Bodies.rectangle(x, y, bw, bh, {
+            chamfer: { radius: Math.min(bw, bh) * 0.15 },
+            frictionAir: 0.012, restitution: 0.3, friction: 0.4,
+            density: prop.shape === "bowl" ? 0.006 : 0.0008,
+            render: { visible: false },
+          });
           if (prop.angle) Body.setAngle(b, prop.angle);
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#bfe3f7", img, prop: prop.shape, family: null, ping: 0, ox: 0, oy: 0, isBowl: prop.shape === "bowl", bowlScored: new Set() };
           return b;
