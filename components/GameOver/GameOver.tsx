@@ -266,7 +266,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
   return (
     <div ref={overlayRef} className={styles.overlay}>
       {onClose && (
-        <button onClick={onClose} aria-label="Close and continue" style={{ position: "fixed", top: 20, right: 30, zIndex: 300, width: 100, height: 100, borderRadius: 30, background: "var(--yellow,#ffd23e)", border: "none", outline: "5px solid var(--navy,#0a3a57)", cursor: "pointer", display: "inline-flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 4px 0 rgba(10,58,87,0.3)" }}>
+        <button onClick={onClose} aria-label="Close and continue" style={{ position: "fixed", top: 20, right: 40, zIndex: 300, width: 100, height: 100, borderRadius: 30, background: "var(--yellow,#ffd23e)", border: "none", outline: "5px solid var(--navy,#0a3a57)", cursor: "pointer", display: "inline-flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 4px 0 rgba(10,58,87,0.3)" }}>
           <span style={{ display: "block", width: 50, height: 10, borderRadius: 999, background: "var(--navy,#0a3a57)", transform: "rotate(45deg) translate(7px, 7px)" }} />
           <span style={{ display: "block", width: 50, height: 10, borderRadius: 999, background: "var(--navy,#0a3a57)", transform: "rotate(-45deg) translate(7px, -7px)" }} />
         </button>

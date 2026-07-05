@@ -215,18 +215,7 @@ export default function LineageMap({
   // a dragged card becomes "pinned": snapshot its art so it survives its branch
   // closing, and keep showing it at its dropped spot until breed change / close
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
-  useEffect(() => {
-    setPinned(new Map());
-    // Show root icon immediately for instructional cards
-    if (INSTR_NAMES.has(breed.name) && breed.image) {
-      const rootId = "0";
-      setTimeout(() => {
-        setPicked((prev) => { const s = new Set(prev); s.add(rootId); return s; });
-        setPinned((m) => { const x = new Map(m); x.set(rootId, { img: breed.image as string, name: breed.name, note: "", share: 100, mix: 100, status: null }); return x; });
-        setDragPos((m) => { const x = new Map(m); x.set(rootId, { x: 80, y: -80 }); return x; });
-      }, 200);
-    }
-  }, [breed.name]);
+  useEffect(() => { setPinned(new Map()); }, [breed.name]);
   // which collected card is showing its info label right now (toggled by tapping its i)
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open

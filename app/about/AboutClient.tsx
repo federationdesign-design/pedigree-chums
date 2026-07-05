@@ -5,29 +5,33 @@ import GameOver from "../../components/GameOver/GameOver";
 
 export default function AboutClient() {
   const router = useRouter();
-  const isGameOver = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("gameover") === "1";
-  const [showGameOver, setShowGameOver] = useState(isGameOver);
-  const [score, setScore] = useState(() => isGameOver ? Number(sessionStorage.getItem("pc-gameover-score") || "0") : 0);
-  const [chums, setChums] = useState(() => isGameOver ? Number(sessionStorage.getItem("pc-gameover-chums") || "0") : 0);
-  const [breeds, setBreeds] = useState<{ name: string; img: string }[]>(() => {
-    if (!isGameOver) return [];
-    try { return JSON.parse(sessionStorage.getItem("pc-gameover-breeds") || "[]"); } catch { return []; }
-  });
+  const [showGameOver, setShowGameOver] = useState(false);
+  const [score, setScore] = useState(0);
+  const [chums, setChums] = useState(0);
+  const [breeds, setBreeds] = useState<{ name: string; img: string }[]>([]);
   const scrollPos = useRef(0);
 
   useEffect(() => {
-    if (!isGameOver) return;
-    // Clear sessionStorage now that we've read it
-    sessionStorage.removeItem("pc-gameover-score");
-    sessionStorage.removeItem("pc-gameover-chums");
-    sessionStorage.removeItem("pc-gameover-breeds");
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("gameover") !== "1") return;
+    // Read state from sessionStorage
+    try {
+      setScore(Number(sessionStorage.getItem("pc-gameover-score") || "0"));
+      setChums(Number(sessionStorage.getItem("pc-gameover-chums") || "0"));
+      const raw = sessionStorage.getItem("pc-gameover-breeds") || "[]";
+      setBreeds(JSON.parse(raw));
+      sessionStorage.removeItem("pc-gameover-score");
+      sessionStorage.removeItem("pc-gameover-chums");
+      sessionStorage.removeItem("pc-gameover-breeds");
+    } catch {}
     // Lock scroll
     scrollPos.current = window.scrollY;
     document.body.style.overflow = "hidden";
     document.body.style.top = `-${scrollPos.current}px`;
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
-    // Pause Vimeo - listen for ready event
+    // Pause Vimeo
     const onVimeoMsg = (e: MessageEvent) => {
       try {
         const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
@@ -39,11 +43,11 @@ export default function AboutClient() {
       } catch {}
     };
     window.addEventListener("message", onVimeoMsg);
-    // Also pause immediately if already loaded
     const iframe0 = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
     if (iframe0) iframe0.contentWindow?.postMessage('{"method":"pause"}', "*");
+    setShowGameOver(true);
     return () => window.removeEventListener("message", onVimeoMsg);
-  }, [isGameOver]);
+  }, []);
 
   const handleClose = () => {
     setShowGameOver(false);
