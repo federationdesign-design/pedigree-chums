@@ -325,21 +325,14 @@ export default function PackPit() {
         }
         if (prop.shape === "bone") {
           // A bone is two lobed ends joined by a thin shaft, so a plain box collider
-          // leaves big empty corners. Build the collider from a central bar plus four
-          // end lobes (proportions read off the 400.2 x 195 viewBox) so objects meet
-          // the bone where the vector actually is.
-          const bw = prop.width, bh = prop.width / prop.aspect, k = bw / 400.2;
-          const R = 56 * k, dx = 143.5 * k, dy = 40.7 * k, barW = 287 * k, barH = 92 * k;
-          const po = { restitution: 0.3, friction: 0.3, density: 0.0008, render: { visible: false } };
-          const parts = [
-            Bodies.rectangle(x, y, barW, barH, po),
-            Bodies.circle(x - dx, y - dy, R, po),
-            Bodies.circle(x - dx, y + dy, R, po),
-            Bodies.circle(x + dx, y - dy, R, po),
-            Bodies.circle(x + dx, y + dy, R, po),
-          ];
-          const b: any = Body.create({ parts, frictionAir: 0.012, render: { visible: false } });
-          b.collisionFilter = { ...(b.collisionFilter || {}), group: FUSE_GROUP }; // bones pass through the logo (and each other) so they can fuse
+          // Simplified bone: single chamfered rect - compound body was causing physics freeze
+          const bw = prop.width, bh = prop.width / prop.aspect;
+          const b: any = Bodies.rectangle(x, y, bw, bh, {
+            chamfer: { radius: bh * 0.22 },
+            frictionAir: 0.012, restitution: 0.3, friction: 0.3, density: 0.0008,
+            render: { visible: false }
+          });
+          b.collisionFilter = { ...(b.collisionFilter || {}), group: FUSE_GROUP };
           b.plugin = { name: prop.label, half: Math.min(bw, bh) / 2, w: bw, h: bh, color: "#f6ecd6", img, prop: "bone", family: null, ping: 0 };
           return b;
         }
