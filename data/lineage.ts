@@ -40,7 +40,7 @@ const LINEAGE: Record<string, LineageNode> = {
                 value: 3,
                 children: [
                   {
-                    name: "Deal 3 to 6 cards",
+                    name: "Deal cards",
                     note: "Hand out 3 to 6 cards each. Show your hand to the other players, then hide it.",
                     img: "/deal-icon.svg",
                     value: 4,
