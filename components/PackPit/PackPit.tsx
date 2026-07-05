@@ -694,7 +694,7 @@ export default function PackPit() {
         }, 20000));
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[4].find(n=>!easyRejects.includes(n))??easyPairs[4][0], dropped); }, 23000));   // 0:23.0  pair 5
         waveTimers.push(setTimeout(() => { if (!disposed) dropCardNamed(easyPairs[5].find(n=>!easyRejects.includes(n))??easyPairs[5][0], dropped); }, 27000));   // 0:27.0  pair 6
-        waveTimers.push(setTimeout(() => { if (!disposed) addProps([slipper]); }, 31000));                                                                         // 0:31.0  slipper
+        // slipper removed - diagnostic test
 
         // ── POOL 1 (easy rejects, 3 drops of 2) ─────────────────────────────
         waveTimers.push(setTimeout(() => { if (!disposed) { dropCardNamed(easyRejects[0], dropped); dropCardNamed(easyRejects[1], dropped); } }, 35000));  // 0:35.0 pool1-A
