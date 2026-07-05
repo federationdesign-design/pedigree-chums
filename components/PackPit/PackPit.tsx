@@ -2056,7 +2056,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           );
           const highestY = allBodies.length
             ? Math.min(...allBodies.map((b: any) => b.position.y - (b.plugin?.half ?? 40)))
-            : h;
+            : stage.clientHeight;
           // dangerLevel: 0=safe, 1=spawn zone blocked
           const dangerLevel = Math.max(0, Math.min(1, (SPAWN_ZONE - highestY) / SPAWN_ZONE + 1));
           const inDanger = highestY < SPAWN_ZONE;
