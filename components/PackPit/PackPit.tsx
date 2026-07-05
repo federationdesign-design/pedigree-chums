@@ -16,7 +16,7 @@ import styles from "./PackPit.module.css";
 const MS_STEP = 5000;
 const MS_LABELS = ["Yapp Yapp Yapp", "Bark Bark Bark", "Woof Woof Woof", "Yapp Bark Woof", "Hoooowwwwllllllll", "Are you done?", "maybe enter the site now?"];
 
-const RADIUS: Record<string, number> = { small: 58.99, medium: 70.13, large: 82.5, giant: 84.0 }; // +25% across all sizes
+const RADIUS: Record<string, number> = { small: 57.5, medium: 62.5, large: 72.5, giant: 82.5 };
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
 
 // a child's share is the sum of its leaf values (leaves total 100 across the tree)
