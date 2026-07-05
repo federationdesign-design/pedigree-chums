@@ -2049,8 +2049,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               const top = b.position.y - (plug.half ?? 40);
               if (top < SPAWN_ZONE) settledInZone++;
             }
-            // Pattern opacity: 10% per settled card up to 90%
-            const targetOpacity = Math.min(0.9, totalSettled * 0.1);
+            // Pattern opacity curve: 0-4 cards = 0%, 5=10%, 6=25%, 7=50%, 8=75%, 9+=100%
+            const opacityMap: number[] = [0, 0, 0, 0, 0, 0.10, 0.25, 0.50, 0.75, 1.0];
+            const targetOpacity = opacityMap[Math.min(totalSettled, opacityMap.length - 1)];
             if (!throbInterval) {
               stage.style.setProperty("--fill-opacity", targetOpacity.toFixed(2));
             }
