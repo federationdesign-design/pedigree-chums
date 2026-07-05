@@ -2083,7 +2083,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
               // throb removed - steady max opacity when danger
               if (!dangerTimer) {
                 // Sequential: 3 (2s) → 2 (2s) → 1 (2s) → GAME OVER (2s) → navigate
-                if (runnerRef.current) (runnerRef.current as any).enabled = false;
+                // Runner stops only when GAME OVER shows, not at start of countdown
                 const countdown = document.createElement("div");
                 countdown.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
                 stage.appendChild(countdown);
@@ -2094,6 +2094,10 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                   step++;
                   if (step < steps.length) {
                     countdown.textContent = steps[step];
+                    if (step === steps.length - 1) {
+                      // Freeze pit when GAME OVER appears
+                      if (runnerRef.current) (runnerRef.current as any).enabled = false;
+                    }
                   } else {
                     clearInterval(tick);
                     if (throbInterval) { clearInterval(throbInterval); setThrob(null); }
@@ -2188,6 +2192,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         drawNumbers(ctx, now);
       };
       removeBreedRef.current = (name: string) => {
+        const INSTR = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
+        if (INSTR.has(name)) return; // instructional cards poof in LineageMap, no pit fly animation
         const all = dyn().filter((b: any) => b.plugin?.name === name && !b.plugin.prop && !b.plugin.logo && b.plugin.kind !== "pct");
         const target = all.find((b: any) => !b.plugin.pop);
         if (target) {
