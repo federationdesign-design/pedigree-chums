@@ -252,8 +252,23 @@ export default function BreedTreeMap({
   }, []);
 
   // Fixed coordinate space - no scaling, tree spreads as large as it needs to
-  const VIEW_W = 1400;
-  const VIEW_H = 1000;
+  // Calculate natural bounds from all node positions after layout
+  const bounds = useMemo(() => {
+    const allN: Node[] = [];
+    const collect = (n: Node) => { allN.push(n); (n.children as Node[] | undefined)?.forEach(collect); };
+    collect(root);
+    const PAD = 120;
+    const xs = allN.map((n) => n._x);
+    const ys = allN.map((n) => n._y);
+    return {
+      minX: Math.min(...xs) - PAD,
+      maxX: Math.max(...xs) + PAD,
+      minY: Math.min(...ys) - PAD,
+      maxY: Math.max(...ys) + PAD,
+    };
+  }, [root]);
+  const VIEW_W = Math.max(1400, bounds.maxX - bounds.minX);
+  const VIEW_H = Math.max(1000, bounds.maxY - bounds.minY);
 
   return (
     <div
@@ -266,9 +281,9 @@ export default function BreedTreeMap({
     >
       <svg
         className={styles.svg}
-        width={1400}
-        height={1000}
-        viewBox={`${pan.x} ${pan.y} 1400 1000`}
+        width={VIEW_W}
+        height={VIEW_H}
+        viewBox={`${bounds.minX + pan.x} ${bounds.minY + pan.y} ${VIEW_W} ${VIEW_H}`}
         style={{ display: "block" }}
       >
         <defs>

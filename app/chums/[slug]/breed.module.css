@@ -41,9 +41,9 @@
 }
 
 .treeWrap {
-  height: 700px;
   flex-shrink: 0;
-  min-width: 600px;
+  min-width: 1400px;
+  min-height: 1000px;
 }
 
 /* ── Title block ─────────────────────────────────────────── */
