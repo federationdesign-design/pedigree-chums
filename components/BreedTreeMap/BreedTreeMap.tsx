@@ -374,6 +374,22 @@ export default function BreedTreeMap({
                   +{descendantCount} inside
                 </text>
               )}
+
+              {/* Eye icon on leaf nodes */}
+              {!hasKids && (
+                <g
+                  transform={`translate(${r - 8}, ${-r + 8})`}
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => { e.stopPropagation(); }}
+                >
+                  <circle r={10} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
+                  <text
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    style={{ fontSize: "11px", fill: "var(--navy, #0a3a57)", fontWeight: 800, pointerEvents: "none" }}
+                  >ⓘ</text>
+                </g>
+              )}
             </g>
           );
         })}
