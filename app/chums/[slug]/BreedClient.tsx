@@ -25,7 +25,7 @@ type Props = {
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
   tree:       { x: 0.04, y: 0.30 },  // left - below title
-  infoBox:    { x: 0.70, y: 0.55 },  // bottom right - info
+  infoBox:    { x: 0.04, y: 0.12 },  // top left, just below menu
   familyTree: { x: 0.26, y: 0.10 },  // centre - main element
 };
 
@@ -156,7 +156,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         className={`${styles.card} ${styles.infoCard}`}
         style={{ ...positions.infoBox, zIndex: zOrders.infoBox }}
         onBringToFront={bringToFront}
-        draggingStyle={{ background: "rgba(255,255,255,0.95)", color: "var(--navy)" }}
+        draggingStyle={{ background: "#ffffff", color: "var(--navy, #0a3a57)" }}
       >
         <div className={styles.infoSection}>
           <p className={styles.infoHeading}>Temperament</p>

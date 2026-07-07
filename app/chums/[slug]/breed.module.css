@@ -18,7 +18,7 @@
 
 .h1 {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.8rem, 8vw, 7rem);
+  font-size: clamp(2.1rem, 6vw, 5.25rem);
   color: var(--yellow, #ffd23e);
   line-height: 1;
   margin: 0;
@@ -261,4 +261,23 @@
   .photoImg {
     aspect-ratio: 4/3;
   }
+}
+
+/* When info card is dragged (white bg), force all text navy */
+.infoCard:active,
+.infoCard.cardDragging {
+  color: var(--navy, #0a3a57);
+}
+.infoCard:active .infoHeading,
+.infoCard.cardDragging .infoHeading {
+  color: var(--navy, #0a3a57);
+}
+.infoCard:active .prosConsList li,
+.infoCard.cardDragging .prosConsList li {
+  color: var(--navy, #0a3a57);
+}
+.infoCard:active .tag,
+.infoCard.cardDragging .tag {
+  color: var(--navy, #0a3a57);
+  border-color: var(--navy, #0a3a57);
 }
