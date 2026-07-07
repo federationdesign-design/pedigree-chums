@@ -138,17 +138,27 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {/* Family tree card */}
       {lineage && (
         <div
-          className={styles.treeWrap}
-          style={{ ...positions.tree, zIndex: zOrders.tree, width: 520, height: 520, position: "absolute", overflow: "visible" }}
+          style={{
+            position: "absolute",
+            left: positions.tree.left,
+            top: positions.tree.top,
+            zIndex: zOrders.tree,
+            width: 560,
+            height: 560,
+            cursor: "grab",
+            userSelect: "none",
+            touchAction: "none",
+          }}
           onPointerDown={(e) => {
             const el = e.currentTarget;
             bringToFront("tree");
             const rect = el.getBoundingClientRect();
             const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
             el.setPointerCapture(e.pointerId);
-            let dragging = true;
-            const onMove = (ev: PointerEvent) => { if (!dragging) return; el.style.left = `${ev.clientX - ox}px`; el.style.top = `${ev.clientY - oy}px`; };
-            const onUp = () => { dragging = false; window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
+            let active = true;
+            const onMove = (ev: PointerEvent) => { if (!active) return; el.style.left = `${ev.clientX - ox}px`; el.style.top = `${ev.clientY - oy}px`; };
+            const onUp = () => { active = false; el.style.cursor = "grab"; window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
+            el.style.cursor = "grabbing";
             window.addEventListener("pointermove", onMove);
             window.addEventListener("pointerup", onUp);
           }}
