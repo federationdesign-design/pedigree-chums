@@ -4,11 +4,7 @@ import { breeds } from "../../../data/breeds";
 
 type Props = { params: { slug: string } };
 
-export const dynamicParams = false;
-
-export async function generateStaticParams() {
-  return breeds.map((b) => ({ slug: b.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const breed = breeds.find((b) => b.slug === params.slug);
