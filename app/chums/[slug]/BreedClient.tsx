@@ -35,12 +35,14 @@ function DragCard({
   className,
   children,
   onBringToFront,
+  draggingStyle,
 }: {
   id: string;
   style: React.CSSProperties;
   className: string;
   children: React.ReactNode;
   onBringToFront: (id: string) => void;
+  draggingStyle?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
@@ -48,7 +50,6 @@ function DragCard({
   const [isDragging, setIsDragging] = useState(false);
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
-    // Don't drag if clicking interactive elements inside
     const target = e.target as HTMLElement;
     if (target.closest("button, a, input, circle, svg")) return;
     e.preventDefault();
@@ -79,7 +80,7 @@ function DragCard({
     <div
       ref={ref}
       className={`${className} ${isDragging ? styles.cardDragging : ""}`}
-      style={style}
+      style={{ ...style, ...(isDragging && draggingStyle ? draggingStyle : {}) }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -95,7 +96,7 @@ function DragCard({
 }
 
 export default function BreedClient({ name, image, info, lineage }: Props) {
-  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, familyTree: 13 });
+  const [zOrders, setZOrders] = useState({ familyTree: 5, tree: 11, infoBox: 12 });
   const zCounter = useRef(20);
 
   const bringToFront = useCallback((id: string) => {
@@ -148,6 +149,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         className={`${styles.card} ${styles.infoCard}`}
         style={{ ...positions.infoBox, zIndex: zOrders.infoBox }}
         onBringToFront={bringToFront}
+        draggingStyle={{ background: "rgba(255,255,255,0.95)", color: "var(--navy)" }}
       >
         <div className={styles.infoSection}>
           <p className={styles.infoHeading}>Temperament</p>
@@ -203,7 +205,10 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             const oy = e.clientY - rect.top;
             el.setPointerCapture(e.pointerId);
             el.style.cursor = "grabbing";
-            el.style.outline = "3px solid rgba(255,210,62,0.8)";
+            el.style.outline = "3px solid #ffffff";
+            el.classList.add("btm-dragging");
+            // Switch tree strokes to white via CSS var
+            el.style.setProperty("--btm-stroke", "#ffffff");
             const onMove = (ev: PointerEvent) => {
               el.style.left = `${ev.clientX - ox}px`;
               el.style.top = `${ev.clientY - oy}px`;
@@ -211,6 +216,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             const onUp = () => {
               el.style.cursor = "grab";
               el.style.outline = "none";
+              el.classList.remove("btm-dragging");
+              el.style.removeProperty("--btm-stroke");
               el.removeEventListener("pointermove", onMove);
               el.removeEventListener("pointerup", onUp);
             };
