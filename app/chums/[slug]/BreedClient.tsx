@@ -134,8 +134,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.tree.left,
             top: positions.tree.top,
             zIndex: zOrders.tree,
-            width: 680,
-            height: 680,
+            width: 1360,
+            height: 1360,
             overflow: "visible",
           }}
         >
@@ -212,10 +212,9 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             const oy = e.clientY - rect.top;
             el.setPointerCapture(e.pointerId);
             el.style.cursor = "grabbing";
-            el.style.outline = "3px solid #ffffff";
-            el.classList.add("btm-dragging");
-            // Switch tree strokes to white via CSS var
-            el.style.setProperty("--btm-stroke", "#ffffff");
+            el.style.outline = "none"; // no outline on the wrapper
+            // Switch edge connector lines to white via CSS var
+            el.style.setProperty("--btm-edge-color", "#ffffff");
             const onMove = (ev: PointerEvent) => {
               el.style.left = `${ev.clientX - ox}px`;
               el.style.top = `${ev.clientY - oy}px`;
@@ -223,8 +222,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             const onUp = () => {
               el.style.cursor = "grab";
               el.style.outline = "none";
-              el.classList.remove("btm-dragging");
-              el.style.removeProperty("--btm-stroke");
+              el.style.removeProperty("--btm-edge-color");
               el.removeEventListener("pointermove", onMove);
               el.removeEventListener("pointerup", onUp);
             };

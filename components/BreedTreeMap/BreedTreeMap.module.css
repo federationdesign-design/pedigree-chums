@@ -25,7 +25,7 @@
 /* Edges - matching pit exactly */
 .edge {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.55);
+  stroke: var(--btm-edge-color, rgba(255, 255, 255, 0.55));
   stroke-width: 3;
   stroke-linecap: round;
   transition: stroke 0.25s ease, stroke-width 0.25s ease;
@@ -141,6 +141,5 @@
 }
 
 .tooltipNote {
-  opacity: 0.8;
   font-size: 12px;
 }
