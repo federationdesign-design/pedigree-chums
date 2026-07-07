@@ -166,8 +166,8 @@ export default function BreedTreeMap({
   const shown = useMemo(() => getShown(root, open), [root, open]);
 
   // Pan state
-  const [pan, setPan] = useState({ x: -700, y: -500 }); // centre root at 0,0
-  const panRef = useRef({ x: -700, y: -500 });
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const panRef = useRef({ x: 0, y: 0 });
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // Tooltip (hover)
@@ -274,7 +274,6 @@ export default function BreedTreeMap({
     <div
       ref={wrapRef}
       className={styles.wrap}
-      style={{ width: VIEW_W, height: VIEW_H }}
       onPointerDown={onWrapPointerDown}
       onPointerMove={onWrapPointerMove}
       onPointerUp={onWrapPointerUp}
@@ -284,7 +283,7 @@ export default function BreedTreeMap({
         className={styles.svg}
         width={VIEW_W}
         height={VIEW_H}
-        viewBox={`${bounds.minX + pan.x} ${bounds.minY + pan.y} ${VIEW_W} ${VIEW_H}`}
+        viewBox={`${bounds.minX - pan.x} ${bounds.minY - pan.y} ${VIEW_W} ${VIEW_H}`}
         style={{ display: "block" }}
       >
         <defs>
