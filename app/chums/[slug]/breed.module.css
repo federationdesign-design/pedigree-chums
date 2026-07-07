@@ -118,6 +118,7 @@
 .infoCard {
   width: clamp(260px, 34vw, 420px);
   padding: 0 0 20px;
+  background: var(--navy, #0a3a57) !important;
 }
 
 .infoSection {
@@ -126,7 +127,7 @@
 
 .infoHeading {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
+  font-size: 26px;
   letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;
@@ -280,4 +281,50 @@
 .infoCard.cardDragging .tag {
   color: var(--navy, #0a3a57);
   border-color: var(--navy, #0a3a57);
+}
+
+/* ── Ancestry card ───────────────────────────────────────── */
+.ancestryCard {
+  width: clamp(260px, 30vw, 380px);
+  padding: 0 0 16px;
+  background: var(--navy, #0a3a57) !important;
+}
+
+.ancestryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.ancestryName {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ancestryPct {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 16px;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
+}
+
+.ancestryBar {
+  height: 4px;
+  background: var(--yellow, #ffd23e);
+  border-radius: 2px;
+  margin: 0 20px 0;
+  transition: width 0.4s ease;
+}
+
+.ancestryDisclaimer {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+  padding: 10px 20px 0;
+  line-height: 1.5;
+  font-style: italic;
 }

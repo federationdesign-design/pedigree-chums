@@ -24,8 +24,9 @@ type Props = {
 
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
-  tree:       { x: 0.04, y: 0.30 },  // left - below title
+  tree:       { x: 0.04, y: 0.38 },  // left - below title with gap
   infoBox:    { x: 0.65, y: 0.12 },  // right side, below menu
+  ancestry:   { x: 0.65, y: 0.55 },  // right side, lower
   familyTree: { x: 0.26, y: 0.10 },  // centre - main element
 };
 
@@ -96,7 +97,21 @@ function DragCard({
 }
 
 export default function BreedClient({ name, image, info, lineage }: Props) {
-  const [zOrders, setZOrders] = useState({ familyTree: 5, tree: 11, infoBox: 12 });
+  const [zOrders, setZOrders] = useState({ familyTree: 5, tree: 11, infoBox: 12, ancestry: 13 });
+
+  // Compute top-level ancestry from lineage
+  const ancestryBreakdown = useMemo(() => {
+    if (!lineage) return [];
+    const total = (lineage.children as any[])?.reduce((s: number, c: any) => s + (c.value ?? 0), 0) || 1;
+    return ((lineage.children as any[]) || [])
+      .map((c: any) => ({
+        name: c.name,
+        pct: Math.round(((c.value ?? 0) / total) * 100),
+        note: c.note,
+      }))
+      .filter((c: any) => c.pct > 0)
+      .sort((a: any, b: any) => b.pct - a.pct);
+  }, [lineage]);
   const zCounter = useRef(20);
 
   const bringToFront = useCallback((id: string) => {
@@ -113,11 +128,12 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     setPositions({
       tree:       { left: `${DEFAULTS.tree.x * vw}px`,       top: `${DEFAULTS.tree.y * vh}px` },
       infoBox:    { left: `${DEFAULTS.infoBox.x * vw}px`,    top: `${DEFAULTS.infoBox.y * vh}px` },
+      ancestry:   { left: `${DEFAULTS.ancestry.x * vw}px`,   top: `${DEFAULTS.ancestry.y * vh}px` },
       familyTree: { left: `${DEFAULTS.familyTree.x * vw}px`, top: `${DEFAULTS.familyTree.y * vh}px` },
     });
   }, []);
 
-  if (!positions.tree) return null; // wait for positions before rendering
+  if (!positions.tree || !positions.ancestry) return null; // wait for positions before rendering
 
   return (
     <div className={styles.canvas}>
@@ -135,8 +151,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.tree.left,
             top: positions.tree.top,
             zIndex: zOrders.tree,
-            width: 1360,
-            height: 1360,
+            width: 911,
+            height: 911,
             overflow: "visible",
           }}
         >
@@ -236,6 +252,30 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         >
           <BreedTreeMap lineage={lineage} rootImage={image} />
         </div>
+      )}
+
+      {/* Ancestry breakdown card */}
+      {lineage && positions.ancestry && ancestryBreakdown.length > 0 && (
+        <DragCard
+          id="ancestry"
+          className={`${styles.card} ${styles.ancestryCard}`}
+          style={{ ...positions.ancestry, zIndex: zOrders.ancestry }}
+          onBringToFront={bringToFront}
+        >
+          <p className={styles.infoHeading} style={{ padding: "16px 20px 0" }}>Ancestry</p>
+          {ancestryBreakdown.map((a) => (
+            <div key={a.name}>
+              <div className={styles.ancestryRow}>
+                <span className={styles.ancestryName}>{a.name}</span>
+                <span className={styles.ancestryPct}>{a.pct}%</span>
+              </div>
+              <div className={styles.ancestryBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
+            </div>
+          ))}
+          <p className={styles.ancestryDisclaimer}>
+            Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
+          </p>
+        </DragCard>
       )}
 
       {/* Back button */}
