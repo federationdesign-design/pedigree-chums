@@ -5,9 +5,9 @@ import type { LineageNode } from "../../data/lineage";
 import styles from "./BreedTreeMap.module.css";
 
 // ── Constants (matching LineageMap pit values) ────────────────────────────────
-const ROOT   = 39;
-const RING1  = ROOT + 64;
-const RSTEP  = 99;
+const ROOT   = 77;
+const RING1  = ROOT + 128;
+const RSTEP  = 197;
 const SPREAD1 = Math.PI * 1.1;
 const SPREADN = Math.PI * 1.6;
 
