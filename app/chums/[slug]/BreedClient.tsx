@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
@@ -23,12 +23,6 @@ type Props = {
 };
 
 // Default positions for each card (as % of viewport)
-const DEFAULTS = {
-  tree:       { x: 0.04, y: 0.38 },  // left - below title with gap
-  infoBox:    { x: 0.04, y: 0.26 },  // left, below H2
-  ancestry:   { x: 0.36, y: 0.26 },  // right of infoBox, below H2
-  familyTree: { x: 0.26, y: 0.10 },  // centre - main element
-};
 
 function DragCard({
   id,
@@ -97,7 +91,7 @@ function DragCard({
 }
 
 export default function BreedClient({ name, image, info, lineage }: Props) {
-  const [zOrders, setZOrders] = useState({ familyTree: 5, tree: 11, infoBox: 12, ancestry: 13 });
+  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13 });
 
   // Compute top-level ancestry from lineage
   const ancestryBreakdown = useMemo(() => {
@@ -115,168 +109,105 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const zCounter = useRef(20);
 
   const bringToFront = useCallback((id: string) => {
-    if (id === "familyTree") return; // family tree stays at z-index 5
     zCounter.current += 1;
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
   }, []);
 
   // Calculate initial pixel positions after mount
-  const [positions, setPositions] = useState<Record<string, { left: string; top: string }>>({});
-  useEffect(() => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    setPositions({
-      tree:       { left: `${DEFAULTS.tree.x * vw}px`,       top: `${DEFAULTS.tree.y * vh}px` },
-      infoBox:    { left: `${DEFAULTS.infoBox.x * vw}px`,    top: `${DEFAULTS.infoBox.y * vh}px` },
-      ancestry:   { left: `${DEFAULTS.ancestry.x * vw}px`,   top: `${DEFAULTS.ancestry.y * vh}px` },
-      familyTree: { left: `${DEFAULTS.familyTree.x * vw}px`, top: `${DEFAULTS.familyTree.y * vh}px` },
-    });
-  }, []);
 
-  if (!positions.tree || !positions.ancestry) return null; // wait for positions before rendering
 
   return (
     <div className={styles.canvas}>
-      {/* Title — static, not draggable */}
-      <div className={styles.titleBlock}>
+      {/* Header */}
+      <div className={styles.header}>
         <h1 className={styles.h1}>{name}</h1>
         <p className={styles.subtitle}>{info.subtitle}</p>
       </div>
 
-      {/* Family tree card */}
-      {lineage && positions.tree && (
-        <div
-          style={{
-            position: "absolute",
-            left: positions.tree.left,
-            top: positions.tree.top,
-            zIndex: zOrders.tree,
-            width: 911,
-            height: 911,
-            overflow: "visible",
-          }}
-        >
-          <div style={{ width: "100%", height: "100%", position: "relative" }} ref={(el) => {
-            if (!el) return;
-            // Force BreedTree stage to be interactive by removing z-index:-1
-            const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
-            if (stage) stage.style.zIndex = "1";
-          }}>
-            <BreedTree root={lineage} rootImage={image} centred />
-          </div>
-        </div>
-      )}
-
-      {/* Info card */}
-      <DragCard
-        id="infoBox"
-        className={`${styles.card} ${styles.infoCard}`}
-        style={{ ...positions.infoBox, zIndex: zOrders.infoBox }}
-        onBringToFront={bringToFront}
-        draggingStyle={{ background: "#ffffff", color: "var(--navy, #0a3a57)", border: "2px solid var(--navy, #0a3a57)" }}
-      >
-        <div className={styles.infoSection}>
-          <p className={styles.infoHeading}>Temperament</p>
-          <div className={styles.temperamentTags}>
-            {info.temperament.map((t) => (
-              <span key={t} className={styles.tag}>{t}</span>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.divider} />
-
-        <div className={styles.infoSection}>
-          <div className={styles.prosConsGrid}>
-            <div className={styles.prosCol}>
-              <p className={`${styles.prosConsHead} ${styles.pros}`}>Pros</p>
-              <ul className={styles.prosConsList}>
-                {info.pros.map((p) => <li key={p}>{p}</li>)}
-              </ul>
-            </div>
-            <div className={styles.consCol}>
-              <p className={`${styles.prosConsHead} ${styles.cons}`}>Cons</p>
-              <ul className={styles.prosConsList}>
-                {info.cons.map((c) => <li key={c}>{c}</li>)}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </DragCard>
-
-      {/* Family tree - loose on canvas, no container, draggable */}
-      {lineage && positions.familyTree && (
-        <div
-          style={{
-            position: "absolute",
-            left: positions.familyTree.left,
-            top: positions.familyTree.top,
-            zIndex: zOrders.familyTree,
-            width: "120vw",
-            height: "160vh",
-            overflow: "visible",
-            cursor: "grab",
-            touchAction: "none",
-            userSelect: "none" as const,
-          }}
-          onPointerDown={(e) => {
-            if ((e.target as Element).closest("[data-node]")) return;
-            e.preventDefault();
-            const el = e.currentTarget;
-            bringToFront("familyTree");
-            const rect = el.getBoundingClientRect();
-            const ox = e.clientX - rect.left;
-            const oy = e.clientY - rect.top;
-            el.setPointerCapture(e.pointerId);
-            el.style.cursor = "grabbing";
-            el.style.outline = "none"; // no outline on the wrapper
-            // Switch edge connector lines to white via CSS var
-            el.style.setProperty("--btm-edge-color", "#ffffff");
-            const onMove = (ev: PointerEvent) => {
-              el.style.left = `${ev.clientX - ox}px`;
-              el.style.top = `${ev.clientY - oy}px`;
-            };
-            const release = () => {
-              el.style.cursor = "grab";
-              el.style.outline = "none";
-              el.style.removeProperty("--btm-edge-color");
-              el.removeEventListener("pointermove", onMove);
-              el.removeEventListener("pointerup", release);
-              el.removeEventListener("pointercancel", release);
-              el.releasePointerCapture(e.pointerId);
-            };
-            el.addEventListener("pointermove", onMove);
-            el.addEventListener("pointerup", release);
-            el.addEventListener("pointercancel", release);
-          }}
-        >
-          <BreedTreeMap lineage={lineage} rootImage={image} />
-        </div>
-      )}
-
-      {/* Ancestry breakdown card */}
-      {lineage && positions.ancestry && ancestryBreakdown.length > 0 && (
+      {/* Two cards side by side */}
+      <div className={styles.cardsRow}>
+        {/* Temperament card */}
         <DragCard
-          id="ancestry"
-          className={`${styles.card} ${styles.ancestryCard}`}
-          style={{ ...positions.ancestry, zIndex: zOrders.ancestry }}
+          id="infoBox"
+          className={`${styles.card} ${styles.infoCard}`}
+          style={{ position: "relative", zIndex: 12 }}
           onBringToFront={bringToFront}
+          draggingStyle={{ background: "#ffffff", color: "var(--navy, #0a3a57)", border: "2px solid var(--navy, #0a3a57)" }}
         >
-          <p className={styles.infoHeading} style={{ padding: "16px 20px 0" }}>Ancestry</p>
-          {ancestryBreakdown.map((a) => (
-            <div key={a.name}>
-              <div className={styles.ancestryRow}>
-                <span className={styles.ancestryName}>{a.name}</span>
-                <span className={styles.ancestryPct}>{a.pct}%</span>
-              </div>
-              <div className={styles.ancestryBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
+          <p className={styles.infoHeading}>Temperament</p>
+          <div className={styles.infoSection}>
+            <div className={styles.temperamentTags}>
+              {info.temperament.map((t) => (
+                <span key={t} className={styles.tag}>{t}</span>
+              ))}
             </div>
-          ))}
-          <p className={styles.ancestryDisclaimer}>
-            Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
-          </p>
+          </div>
+          <div className={styles.divider} />
+          <div className={styles.infoSection}>
+            <div className={styles.prosConsGrid}>
+              <div className={styles.prosCol}>
+                <p className={`${styles.prosConsHead} ${styles.pros}`}>Pros</p>
+                <ul className={styles.prosConsList}>
+                  {info.pros.map((p) => <li key={p}>{p}</li>)}
+                </ul>
+              </div>
+              <div className={styles.consCol}>
+                <p className={`${styles.prosConsHead} ${styles.cons}`}>Cons</p>
+                <ul className={styles.prosConsList}>
+                  {info.cons.map((c) => <li key={c}>{c}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
         </DragCard>
-      )}
+
+        {/* Ancestry card */}
+        {lineage && ancestryBreakdown.length > 0 && (
+          <DragCard
+            id="ancestry"
+            className={`${styles.card} ${styles.ancestryCard}`}
+            style={{ position: "relative", zIndex: 13 }}
+            onBringToFront={bringToFront}
+          >
+            <p className={styles.infoHeading} style={{ padding: "16px 20px 0" }}>Ancestry</p>
+            {ancestryBreakdown.map((a) => (
+              <div key={a.name}>
+                <div className={styles.ancestryRow}>
+                  <span className={styles.ancestryName}>{a.name}</span>
+                  <span className={styles.ancestryPct}>{a.pct}%</span>
+                </div>
+                <div className={styles.ancestryBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
+              </div>
+            ))}
+            <p className={styles.ancestryDisclaimer}>
+              Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
+            </p>
+          </DragCard>
+        )}
+      </div>
+
+      {/* Diagrams row */}
+      <div className={styles.diagramsRow}>
+        {/* Circular diagram - fixed */}
+        {lineage && (
+          <div className={styles.circularWrap} style={{ width: 911, height: 911 }}>
+            <div style={{ width: "100%", height: "100%", position: "relative" }} ref={(el) => {
+              if (!el) return;
+              const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
+              if (stage) stage.style.zIndex = "1";
+            }}>
+              <BreedTree root={lineage} rootImage={image} centred />
+            </div>
+          </div>
+        )}
+
+        {/* Family tree - fixed, scrollable if wide */}
+        {lineage && (
+          <div className={styles.treeWrap}>
+            <BreedTreeMap lineage={lineage} rootImage={image} />
+          </div>
+        )}
+      </div>
 
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>

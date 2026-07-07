@@ -1,9 +1,48 @@
 .canvas {
   min-height: 100svh;
   background: transparent;
-  position: relative;
-  overflow: visible;
   font-family: var(--font-body, 'Montserrat', system-ui);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.header {
+  padding: clamp(80px, 10vw, 100px) clamp(20px, 4vw, 48px) 24px;
+  flex-shrink: 0;
+}
+
+/* ── Two cards row ───────────────────────────────────────── */
+.cardsRow {
+  display: flex;
+  gap: 10px;
+  padding: 0 clamp(20px, 4vw, 48px) 32px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ── Diagrams row: circular left, tree right ─────────────── */
+.diagramsRow {
+  display: flex;
+  gap: 32px;
+  padding: 0 clamp(20px, 4vw, 48px) 48px;
+  align-items: flex-start;
+  overflow-x: auto;
+  flex: 1;
+}
+
+/* Scrollbar styling */
+.diagramsRow::-webkit-scrollbar { height: 6px; }
+.diagramsRow::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+.diagramsRow::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+.circularWrap {
+  flex-shrink: 0;
+}
+
+.treeWrap {
+  flex-shrink: 0;
+  min-width: 600px;
 }
 
 /* ── Title block ─────────────────────────────────────────── */
