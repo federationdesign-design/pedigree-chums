@@ -139,7 +139,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {lineage && (
         <div
           className={styles.treeWrap}
-          style={{ ...positions.tree, zIndex: zOrders.tree, width: 560, height: 560, overflow: "visible" }}
+          style={{ ...positions.tree, zIndex: zOrders.tree, width: 520, height: 520, position: "absolute", overflow: "visible" }}
           onPointerDown={(e) => {
             const el = e.currentTarget;
             bringToFront("tree");

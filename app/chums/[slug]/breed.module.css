@@ -1,8 +1,8 @@
 .canvas {
   min-height: 100svh;
-  background: var(--navy, #0a3a57);
+  background: var(--blue-sky, #2bb4ee);
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   font-family: var(--font-body, 'Montserrat', system-ui);
 }
 
@@ -39,7 +39,7 @@
 .card {
   position: absolute;
   border-radius: 24px;
-  background: var(--blue-deep, #0c5b92);
+  background: rgba(255,255,255,0.15);
   border: 2.5px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35);
   cursor: grab;
