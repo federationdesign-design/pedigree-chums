@@ -190,7 +190,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       <div className={styles.diagramsRow}>
         {/* Circular diagram - fixed */}
         {lineage && (
-          <div className={styles.circularWrap} style={{ width: 911, height: 911 }}>
+          <div className={styles.circularWrap} style={{ width: 560, height: 560 }}>
             <div style={{ width: "100%", height: "100%", position: "relative" }} ref={(el) => {
               if (!el) return;
               const stage = el.querySelector("[class*=stage]") as HTMLElement | null;

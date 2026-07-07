@@ -24,7 +24,7 @@
 /* ── Diagrams row: circular left, tree right ─────────────── */
 .diagramsRow {
   display: flex;
-  gap: 32px;
+  gap: 0;
   padding: 0 clamp(20px, 4vw, 48px) 48px;
   align-items: flex-start;
   overflow-x: auto;
