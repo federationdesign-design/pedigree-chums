@@ -1,5 +1,6 @@
 .canvas {
   min-height: 100svh;
+  min-width: 4000px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   display: flex;
@@ -27,13 +28,9 @@
   gap: 0;
   padding: 0 clamp(20px, 4vw, 48px) 48px;
   align-items: flex-start;
-  overflow-x: auto;
 }
 
 /* Scrollbar styling */
-.diagramsRow::-webkit-scrollbar { height: 6px; }
-.diagramsRow::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
-.diagramsRow::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
 
 

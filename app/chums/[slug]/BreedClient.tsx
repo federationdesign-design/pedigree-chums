@@ -91,6 +91,17 @@ function DragCard({
 }
 
 export default function BreedClient({ name, image, info, lineage }: Props) {
+  // Enable horizontal scroll for this wide canvas page
+  useEffect(() => {
+    const prev = document.documentElement.style.overflowX;
+    document.documentElement.style.overflowX = "auto";
+    document.body.style.overflowX = "auto";
+    return () => {
+      document.documentElement.style.overflowX = prev;
+      document.body.style.overflowX = "";
+    };
+  }, []);
+
   const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13 });
 
   // Compute top-level ancestry from lineage
