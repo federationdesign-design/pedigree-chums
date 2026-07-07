@@ -135,19 +135,18 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         <img src={image} alt={name} className={styles.photoImg} draggable={false} />
       </DragCard>
 
-      {/* Family tree - loose, no card wrapper */}
-      {lineage && positions.tree && (
+      {/* Family tree card */}
+      {lineage && (
         <div
-          ref={(el) => { if (el) el.style.left = positions.tree.left; }}
           className={styles.treeWrap}
-          style={{ ...positions.tree, zIndex: zOrders.tree, width: "clamp(320px,46vw,580px)", height: "clamp(320px,46vw,580px)" }}
+          style={{ ...positions.tree, zIndex: zOrders.tree, width: 560, height: 560, overflow: "visible" }}
           onPointerDown={(e) => {
             const el = e.currentTarget;
             bringToFront("tree");
-            let dragging = true;
             const rect = el.getBoundingClientRect();
             const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
             el.setPointerCapture(e.pointerId);
+            let dragging = true;
             const onMove = (ev: PointerEvent) => { if (!dragging) return; el.style.left = `${ev.clientX - ox}px`; el.style.top = `${ev.clientY - oy}px`; };
             const onUp = () => { dragging = false; window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
             window.addEventListener("pointermove", onMove);
