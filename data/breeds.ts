@@ -943,8 +943,7 @@ const allBreeds: Breed[] = [
     type: "classic",
     sizeBand: "large",
     skull: "long",
-    draft: true,
-    image: "/history/breeds/irish-setter-photo.jpg",
+    image: "/irish-square.png",
   },
 ];
 
