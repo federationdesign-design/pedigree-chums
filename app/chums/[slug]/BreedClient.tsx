@@ -100,6 +100,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const zCounter = useRef(20);
 
   const bringToFront = useCallback((id: string) => {
+    if (id === "familyTree") return; // family tree stays at z-index 5
     zCounter.current += 1;
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
   }, []);
@@ -219,15 +220,18 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
               el.style.left = `${ev.clientX - ox}px`;
               el.style.top = `${ev.clientY - oy}px`;
             };
-            const onUp = () => {
+            const release = () => {
               el.style.cursor = "grab";
               el.style.outline = "none";
               el.style.removeProperty("--btm-edge-color");
               el.removeEventListener("pointermove", onMove);
-              el.removeEventListener("pointerup", onUp);
+              el.removeEventListener("pointerup", release);
+              el.removeEventListener("pointercancel", release);
+              el.releasePointerCapture(e.pointerId);
             };
             el.addEventListener("pointermove", onMove);
-            el.addEventListener("pointerup", onUp);
+            el.addEventListener("pointerup", release);
+            el.addEventListener("pointercancel", release);
           }}
         >
           <BreedTreeMap lineage={lineage} rootImage={image} />
