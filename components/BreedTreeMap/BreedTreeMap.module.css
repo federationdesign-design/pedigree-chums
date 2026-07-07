@@ -1,0 +1,121 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.wrap:active {
+  cursor: grabbing;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Node circles */
+.disc {
+  fill: var(--blue-deep, #0c5b92);
+  stroke: var(--yellow, #ffd23e);
+  stroke-width: 2.5px;
+  cursor: pointer;
+  transition: fill 0.18s ease;
+}
+
+.disc:hover {
+  fill: var(--blue-sky, #2bb4ee);
+}
+
+.discOpen {
+  fill: var(--blue, #1497d6);
+}
+
+.discRoot {
+  fill: var(--navy, #0a3a57);
+  stroke: var(--yellow, #ffd23e);
+  stroke-width: 3px;
+  cursor: default;
+}
+
+/* Rod lines */
+.rod {
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 1.5px;
+  pointer-events: none;
+}
+
+/* Percentage text */
+.pct {
+  fill: #ffffff;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-weight: 800;
+  pointer-events: none;
+}
+
+/* Name pill */
+.nmPill {
+  fill: rgba(10, 58, 87, 0.85);
+  pointer-events: none;
+}
+
+.nm {
+  fill: #ffffff;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+/* Expand hint */
+.more {
+  fill: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 10px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: rgba(10, 58, 87, 0.95);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 240px;
+  pointer-events: none;
+  z-index: 10;
+  border: 1.5px solid rgba(255, 210, 62, 0.4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.tooltipName {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 15px;
+  color: var(--yellow, #ffd23e);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tooltipShare {
+  font-weight: 800;
+  font-size: 15px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tooltipNote {
+  opacity: 0.8;
+  font-size: 12px;
+}

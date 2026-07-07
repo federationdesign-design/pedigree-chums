@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
+import BreedTreeMap from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 
 type BreedInfo = {
@@ -23,9 +24,10 @@ type Props = {
 
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
-  photo:   { x: 0.05, y: 0.30 },
-  tree:    { x: 0.32, y: 0.16 },
-  infoBox: { x: 0.05, y: 0.62 },
+  photo:    { x: 0.04, y: 0.28 },
+  tree:     { x: 0.30, y: 0.10 },
+  infoBox:  { x: 0.04, y: 0.62 },
+  familyTree: { x: 0.62, y: 0.12 },
 };
 
 function DragCard({
@@ -94,7 +96,7 @@ function DragCard({
 }
 
 export default function BreedClient({ name, image, info, lineage }: Props) {
-  const [zOrders, setZOrders] = useState({ photo: 10, tree: 11, infoBox: 12 });
+  const [zOrders, setZOrders] = useState({ photo: 10, tree: 11, infoBox: 12, familyTree: 13 });
   const zCounter = useRef(20);
 
   const bringToFront = useCallback((id: string) => {
@@ -108,9 +110,10 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     setPositions({
-      photo:   { left: `${DEFAULTS.photo.x * vw}px`,   top: `${DEFAULTS.photo.y * vh}px` },
-      tree:    { left: `${DEFAULTS.tree.x * vw}px`,    top: `${DEFAULTS.tree.y * vh}px` },
-      infoBox: { left: `${DEFAULTS.infoBox.x * vw}px`, top: `${DEFAULTS.infoBox.y * vh}px` },
+      photo:      { left: `${DEFAULTS.photo.x * vw}px`,      top: `${DEFAULTS.photo.y * vh}px` },
+      tree:       { left: `${DEFAULTS.tree.x * vw}px`,       top: `${DEFAULTS.tree.y * vh}px` },
+      infoBox:    { left: `${DEFAULTS.infoBox.x * vw}px`,    top: `${DEFAULTS.infoBox.y * vh}px` },
+      familyTree: { left: `${DEFAULTS.familyTree.x * vw}px`, top: `${DEFAULTS.familyTree.y * vh}px` },
     });
   }, []);
 
@@ -143,8 +146,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.tree.left,
             top: positions.tree.top,
             zIndex: zOrders.tree,
-            width: 680,
-            height: 680,
+            width: 900,
+            height: 700,
             overflow: "visible",
             cursor: "grab",
             userSelect: "none" as const,
@@ -164,7 +167,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             window.addEventListener("pointerup", onUp);
           }}
         >
-          <BreedTree root={lineage} rootImage={image} centred />
+          <BreedTree root={lineage} rootImage={image} />
         </div>
       )}
 
@@ -203,6 +206,21 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           </div>
         </div>
       </DragCard>
+
+      {/* Family tree - draggable, fully interactive */}
+      {lineage && positions.familyTree && (
+        <DragCard
+          id="familyTree"
+          className={`${styles.card}`}
+          style={{ ...positions.familyTree, zIndex: zOrders.familyTree, width: 560, height: 560 }}
+          onBringToFront={bringToFront}
+        >
+          <p className={styles.treeLabel}>Family tree</p>
+          <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
+            <BreedTreeMap lineage={lineage} rootImage={image} />
+          </div>
+        </DragCard>
+      )}
 
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>
