@@ -7,9 +7,9 @@ import styles from "./BreedTreeMap.module.css";
 // ── Constants (matching LineageMap pit values) ────────────────────────────────
 const ROOT   = 58;
 const RING1  = ROOT + 96;
-const RSTEP  = 128;
+const RSTEP  = 148;
 const SPREAD1 = Math.PI * 1.1;
-const SPREADN = Math.PI * 1.4;
+const SPREADN = Math.PI * 1.6;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Node = LineageNode & {
@@ -73,6 +73,41 @@ function layoutTree(root: Node) {
     });
   }
   place(root, 0);
+
+  // Collision resolution - push overlapping nodes apart
+  // Run multiple passes until stable
+  const NODE_R = 28; // fixed radius
+  const MIN_DIST = NODE_R * 2 + 12; // minimum distance between node centres
+  const allNodes: Node[] = [];
+  const collectAll = (n: Node) => {
+    allNodes.push(n);
+    (n.children as Node[] | undefined)?.forEach(collectAll);
+  };
+  collectAll(root);
+
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = false;
+    for (let i = 0; i < allNodes.length; i++) {
+      for (let j = i + 1; j < allNodes.length; j++) {
+        const a = allNodes[i];
+        const b = allNodes[j];
+        if (a._parent === b || b._parent === a) continue; // never push parent/child apart
+        const dx = b._x - a._x;
+        const dy = b._y - a._y;
+        const dist = Math.hypot(dx, dy) || 0.001;
+        if (dist < MIN_DIST) {
+          const push = (MIN_DIST - dist) / 2;
+          const nx = dx / dist * push;
+          const ny = dy / dist * push;
+          // Only push the node that is NOT the root
+          if (a !== root) { a._x -= nx; a._y -= ny; }
+          if (b !== root) { b._x += nx; b._y += ny; }
+          moved = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
 }
 
 // Build a flat list of all visible nodes given the open set
