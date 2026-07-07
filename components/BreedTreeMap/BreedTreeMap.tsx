@@ -182,18 +182,9 @@ export default function BreedTreeMap({
     });
   }, []);
 
-  // Compute SVG viewBox to fit all shown nodes
-  const vb = useMemo(() => {
-    if (shown.length === 0) return { x: -400, y: -400, w: 800, h: 800 };
-    const xs = shown.map((n) => n._x);
-    const ys = shown.map((n) => n._y);
-    const pad = 100;
-    const minX = Math.min(...xs) - pad;
-    const maxX = Math.max(...xs) + pad;
-    const minY = Math.min(...ys) - pad;
-    const maxY = Math.max(...ys) + pad;
-    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
-  }, [shown]);
+  // Fixed coordinate space - no scaling, tree spreads as large as it needs to
+  const VIEW_W = 1400;
+  const VIEW_H = 1000;
 
   return (
     <div
@@ -206,8 +197,8 @@ export default function BreedTreeMap({
     >
       <svg
         className={styles.svg}
-        viewBox={`${vb.x - pan.x} ${vb.y - pan.y} ${vb.w} ${vb.h}`}
-        preserveAspectRatio="xMidYMid meet"
+        viewBox={`${-VIEW_W / 2 - pan.x} ${-VIEW_H / 2 - pan.y} ${VIEW_W} ${VIEW_H}`}
+        preserveAspectRatio="none"
       >
         <defs>
           {rootImage && (
