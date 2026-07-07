@@ -1,6 +1,7 @@
 .canvas {
   min-height: 100svh;
-  background: var(--blue-sky, #2bb4ee);
+  background: var(--blue-sky, #2bb4ee) url("/paw-pattern2.svg") repeat;
+  background-size: 320px;
   position: relative;
   overflow: hidden;
   font-family: var(--font-body, 'Montserrat', system-ui);
@@ -39,7 +40,7 @@
 .card {
   position: absolute;
   border-radius: 24px;
-  background: rgba(0,0,0,0.15);
+  background: var(--blue-deep, #0c5b92);
   border: 2.5px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35);
   cursor: grab;
@@ -87,7 +88,7 @@
 
 /* ── Photo card ──────────────────────────────────────────── */
 .photoCard {
-  width: clamp(200px, 28vw, 340px);
+  width: clamp(170px, 24vw, 289px);
 }
 
 .photoImg {
@@ -117,8 +118,11 @@
 
 /* ── Info card ───────────────────────────────────────────── */
 .infoCard {
-  width: clamp(260px, 34vw, 420px);
+  width: clamp(380px, 46vw, 620px);
   padding: 0 0 20px;
+  background: transparent !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: none !important;
 }
 
 .infoSection {
@@ -185,7 +189,8 @@
 .prosConsList li {
   font-size: 12px;
   line-height: 1.4;
-  color: rgba(255,255,255,0.8);
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
   padding-left: 16px;
   position: relative;
 }
@@ -262,5 +267,3 @@
     aspect-ratio: 4/3;
   }
 }
-
-.treeWrap { position: relative; }

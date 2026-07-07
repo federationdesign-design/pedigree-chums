@@ -197,8 +197,8 @@ export default function BreedTreeMap({
     >
       <svg
         className={styles.svg}
-        viewBox={`${-VIEW_W / 2 - pan.x} ${-VIEW_H / 2 - pan.y} ${VIEW_W} ${VIEW_H}`}
-        preserveAspectRatio="none"
+        viewBox={`${-700 - pan.x} ${-500 - pan.y} 1400 1000`}
+        preserveAspectRatio="xMidYMid meet"
       >
         <defs>
           {rootImage && (
