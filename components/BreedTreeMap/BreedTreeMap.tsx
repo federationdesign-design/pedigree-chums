@@ -154,8 +154,8 @@ export default function BreedTreeMap({
     const dy = e.clientY - panDrag.current.sy;
     if (!panDrag.current.moved && Math.hypot(dx, dy) < 4) return;
     panDrag.current.moved = true;
-    const nx = panDrag.current.px + dx;
-    const ny = panDrag.current.py + dy;
+    const nx = panDrag.current.px - dx;
+    const ny = panDrag.current.py - dy;
     panRef.current = { x: nx, y: ny };
     setPan({ x: nx, y: ny });
   }, []);
@@ -197,8 +197,8 @@ export default function BreedTreeMap({
     >
       <svg
         className={styles.svg}
-        viewBox={`${-700 - pan.x} ${-500 - pan.y} 1400 1000`}
-        preserveAspectRatio="xMidYMid meet"
+        viewBox={`${-700 + pan.x} ${-500 + pan.y} 1400 1000`}
+        preserveAspectRatio="xMidYMid slice"
       >
         <defs>
           {rootImage && (
@@ -229,15 +229,31 @@ export default function BreedTreeMap({
 
         {/* Root node */}
         <g transform={`translate(${root._x},${root._y})`}>
-          <circle
-            r={ROOT}
-            fill={rootImage ? "url(#btm-root)" : "var(--navy, #0a3a57)"}
+          <defs>
+            <clipPath id="btm-root-clip">
+              <rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={16} />
+            </clipPath>
+          </defs>
+          <rect
+            x={-ROOT-4} y={-ROOT-4}
+            width={ROOT*2+8} height={ROOT*2+8}
+            rx={20}
+            fill="var(--blue, #1497d6)"
             stroke="var(--yellow, #ffd23e)"
-            strokeWidth={3}
+            strokeWidth={4}
           />
+          {rootImage && (
+            <image
+              href={rootImage}
+              x={-ROOT} y={-ROOT}
+              width={ROOT*2} height={ROOT*2}
+              clipPath="url(#btm-root-clip)"
+              preserveAspectRatio="xMidYMid slice"
+            />
+          )}
           {(() => {
             const w = root.name.length * 6.8 + 20;
-            const py = -(ROOT + 13);
+            const py = ROOT + 16;
             return (
               <g>
                 <rect className={styles.nmPill} x={-w/2} y={py-10} width={w} height={20} rx={10} />

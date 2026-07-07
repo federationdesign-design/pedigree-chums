@@ -1,7 +1,18 @@
+.canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .canvas {
   min-height: 100svh;
-  background: var(--blue-sky, #2bb4ee) url("/paw-pattern2.svg") repeat;
-  background-size: 320px;
+  background: var(--blue-sky, #2bb4ee);
   position: relative;
   overflow: hidden;
   font-family: var(--font-body, 'Montserrat', system-ui);
@@ -30,7 +41,7 @@
 .subtitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1rem, 2.5vw, 1.8rem);
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
   margin: 8px 0 0;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -246,7 +257,19 @@
     pointer-events: auto;
   }
 
-  .canvas {
+  .canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.canvas {
     overflow: auto;
   }
 
