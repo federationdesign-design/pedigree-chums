@@ -1,7 +1,7 @@
 /* ── Page canvas ─────────────────────────────────────────── */
 .canvas {
   min-height: 100svh;
-  background: var(--blue-sky) url("/paw-pattern2.svg") repeat;
+  background: url("/paw-pattern2.svg") repeat;
   background-size: 144px auto;
   position: relative;
   overflow: visible; /* allow elements to overflow and page to scroll */

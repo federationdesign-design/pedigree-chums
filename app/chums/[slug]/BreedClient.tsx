@@ -25,7 +25,7 @@ type Props = {
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
   photo:      { x: 0.70, y: 0.08 },  // top right - dog photo
-  tree:       { x: 0.04, y: 0.08 },  // top left - circular diagram
+  tree:       { x: 0.04, y: 0.30 },  // left - below title
   infoBox:    { x: 0.70, y: 0.55 },  // bottom right - info
   familyTree: { x: 0.26, y: 0.10 },  // centre - main element
 };
@@ -199,8 +199,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.familyTree.left,
             top: positions.familyTree.top,
             zIndex: zOrders.familyTree,
-            width: "60vw",
-            height: "80vh",
+            width: "120vw",
+            height: "160vh",
             overflow: "visible",
             cursor: "grab",
             touchAction: "none",
