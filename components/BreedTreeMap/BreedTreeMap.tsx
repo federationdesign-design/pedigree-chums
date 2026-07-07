@@ -7,9 +7,9 @@ import styles from "./BreedTreeMap.module.css";
 // ── Constants (matching LineageMap pit values) ────────────────────────────────
 const ROOT   = 58;
 const RING1  = ROOT + 96;
-const RSTEP  = 128;
+const RSTEP  = 148;
 const SPREAD1 = Math.PI * 1.1;
-const SPREADN = Math.PI * 1.4;
+const SPREADN = Math.PI * 1.6;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Node = LineageNode & {
@@ -42,8 +42,8 @@ function countDescendants(n: LineageNode): number {
   return kids.length + kids.reduce((s, k) => s + countDescendants(k), 0);
 }
 
-function radius(share: number) {
-  return Math.max(21, 5 * Math.sqrt(share));
+function radius(_share: number) {
+  return 28; // fixed size - matches pit visual where nodes appear consistent
 }
 
 // Assign positions recursively from a root node
@@ -73,6 +73,41 @@ function layoutTree(root: Node) {
     });
   }
   place(root, 0);
+
+  // Collision resolution - push overlapping nodes apart
+  // Run multiple passes until stable
+  const NODE_R = 28; // fixed radius
+  const MIN_DIST = NODE_R * 2 + 12; // minimum distance between node centres
+  const allNodes: Node[] = [];
+  const collectAll = (n: Node) => {
+    allNodes.push(n);
+    (n.children as Node[] | undefined)?.forEach(collectAll);
+  };
+  collectAll(root);
+
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = false;
+    for (let i = 0; i < allNodes.length; i++) {
+      for (let j = i + 1; j < allNodes.length; j++) {
+        const a = allNodes[i];
+        const b = allNodes[j];
+        if (a._parent === b || b._parent === a) continue; // never push parent/child apart
+        const dx = b._x - a._x;
+        const dy = b._y - a._y;
+        const dist = Math.hypot(dx, dy) || 0.001;
+        if (dist < MIN_DIST) {
+          const push = (MIN_DIST - dist) / 2;
+          const nx = dx / dist * push;
+          const ny = dy / dist * push;
+          // Only push the node that is NOT the root
+          if (a !== root) { a._x -= nx; a._y -= ny; }
+          if (b !== root) { b._x += nx; b._y += ny; }
+          moved = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
 }
 
 // Build a flat list of all visible nodes given the open set
@@ -135,8 +170,42 @@ export default function BreedTreeMap({
   const panRef = useRef({ x: -700, y: -500 });
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Tooltip
+  // Tooltip (hover)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+
+  // Image popup (eye icon click)
+  type ImgPopup = { name: string; img: string; note?: string; x: number; y: number };
+  const [imgPopup, setImgPopup] = useState<ImgPopup | null>(null);
+
+  // Pct card (click) - detailed ancestry breakdown
+  type PctCard = { name: string; share: number; norm: number; depth: number; note?: string; x: number; y: number };
+  const [pctCard, setPctCard] = useState<PctCard | null>(null);
+
+  // Calculate normalised share relative to root
+  const normShare = (n: Node): number => {
+    if (!n._parent) return 100;
+    return Math.round((n._leaves / root._leaves) * 100);
+  };
+
+  const genLabel = (d: number) => {
+    if (d <= 0) return "the breed itself";
+    if (d === 1) return "parent";
+    if (d === 2) return "grandparent";
+    return `${"great-".repeat(d - 2)}grandparent`;
+  };
+
+  const TITLES = [
+    "Our best guess, not hard science.",
+    "An educated guess, not gospel.",
+    "Informed estimate, not exact science.",
+    "Our reckoning, not the final word.",
+    "A considered guess, not cold fact.",
+    "Best judgement, not laboratory proof.",
+    "Our read on it, not a certainty.",
+    "A fair estimate, not a fixed figure.",
+    "Studied guesswork, not hard data.",
+    "Our interpretation, not established fact.",
+  ];
 
   // Pan drag
   const panDrag = useRef<{ sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
@@ -183,13 +252,29 @@ export default function BreedTreeMap({
   }, []);
 
   // Fixed coordinate space - no scaling, tree spreads as large as it needs to
-  const VIEW_W = 1400;
-  const VIEW_H = 1000;
+  // Calculate natural bounds from all node positions after layout
+  const bounds = useMemo(() => {
+    const allN: Node[] = [];
+    const collect = (n: Node) => { allN.push(n); (n.children as Node[] | undefined)?.forEach(collect); };
+    collect(root);
+    const PAD = 120;
+    const xs = allN.map((n) => n._x);
+    const ys = allN.map((n) => n._y);
+    return {
+      minX: Math.min(...xs) - PAD,
+      maxX: Math.max(...xs) + PAD,
+      minY: Math.min(...ys) - PAD,
+      maxY: Math.max(...ys) + PAD,
+    };
+  }, [root]);
+  const VIEW_W = Math.max(1400, bounds.maxX - bounds.minX);
+  const VIEW_H = Math.max(1000, bounds.maxY - bounds.minY);
 
   return (
     <div
       ref={wrapRef}
       className={styles.wrap}
+      style={{ width: VIEW_W, height: VIEW_H }}
       onPointerDown={onWrapPointerDown}
       onPointerMove={onWrapPointerMove}
       onPointerUp={onWrapPointerUp}
@@ -197,9 +282,9 @@ export default function BreedTreeMap({
     >
       <svg
         className={styles.svg}
-        width={1400}
-        height={1000}
-        viewBox={`${pan.x} ${pan.y} 1400 1000`}
+        width={VIEW_W}
+        height={VIEW_H}
+        viewBox={`${bounds.minX + pan.x} ${bounds.minY + pan.y} ${VIEW_W} ${VIEW_H}`}
         style={{ display: "block" }}
       >
         <defs>
@@ -280,7 +365,22 @@ export default function BreedTreeMap({
               data-node="1"
               transform={`translate(${n._x},${n._y})`}
               style={{ cursor: hasKids ? "pointer" : "default" }}
-              onClick={(e) => { e.stopPropagation(); toggleNode(n); }}
+              onClick={(e) => {
+              e.stopPropagation();
+              const rect = wrapRef.current?.getBoundingClientRect();
+              if (!rect) { toggleNode(n); return; }
+              // Single click on leaf = show pct card; on branch = toggle open/close
+              setPctCard({
+                name: n.name,
+                share,
+                norm: normShare(n),
+                depth: n._parent ? 1 : 0,
+                note: n.note,
+                x: e.clientX - rect.left + 12,
+                y: e.clientY - rect.top - 20,
+              });
+              toggleNode(n);
+            }}
               onMouseEnter={(e) => {
                 const rect = wrapRef.current?.getBoundingClientRect();
                 if (!rect) return;
@@ -329,13 +429,52 @@ export default function BreedTreeMap({
                   +{descendantCount} inside
                 </text>
               )}
+
+              {/* Eye icon on leaf nodes with images */}
+              {!hasKids && n.img && (
+                <g
+                  transform={`translate(${r - 8}, ${-r + 8})`}
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const rect = wrapRef.current?.getBoundingClientRect();
+                    if (!rect) return;
+                    setImgPopup({
+                      name: n.name,
+                      img: n.img as string,
+                      note: n.note,
+                      x: n._x + pan.x + 700 - 140 + 40,
+                      y: n._y + pan.y + 500 - 20,
+                    });
+                  }}
+                >
+                  <circle r={11} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
+                  <text textAnchor="middle" dominantBaseline="central" style={{ fontSize: "13px", fill: "var(--navy, #0a3a57)", fontWeight: 800, pointerEvents: "none", fontFamily: "system-ui" }}>👁</text>
+                </g>
+              )}
+
+              {/* Eye icon on leaf nodes */}
+              {!hasKids && (
+                <g
+                  transform={`translate(${r - 8}, ${-r + 8})`}
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => { e.stopPropagation(); }}
+                >
+                  <circle r={10} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
+                  <text
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    style={{ fontSize: "11px", fill: "var(--navy, #0a3a57)", fontWeight: 800, pointerEvents: "none" }}
+                  >ⓘ</text>
+                </g>
+              )}
             </g>
           );
         })}
       </svg>
 
-      {/* Tooltip */}
-      {tooltip && (
+      {/* Tooltip (hover) */}
+      {tooltip && !pctCard && (
         <div
           className={styles.tooltip}
           style={{ left: tooltip.x, top: tooltip.y }}
@@ -343,6 +482,34 @@ export default function BreedTreeMap({
           <span className={styles.tooltipName}>{tooltip.name}</span>
           <span className={styles.tooltipShare}>{tooltip.share}% of ancestry</span>
           {tooltip.note && <span className={styles.tooltipNote}>{tooltip.note}</span>}
+        </div>
+      )}
+
+      {/* Image popup (eye icon) */}
+      {imgPopup && (
+        <div className={styles.imgPopup} style={{ left: imgPopup.x, top: imgPopup.y }}>
+          <button className={styles.pctClose} onClick={() => setImgPopup(null)}>×</button>
+          <div className={styles.pctName}>{imgPopup.name}</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imgPopup.img} alt={imgPopup.name} className={styles.imgPopupImg} />
+          {imgPopup.note && <p className={styles.pctNote}>{imgPopup.note}</p>}
+        </div>
+      )}
+
+      {/* Pct card (click) */}
+      {pctCard && (
+        <div
+          className={styles.pctCard}
+          style={{ left: Math.min(pctCard.x, 700), top: pctCard.y }}
+        >
+          <button className={styles.pctClose} onClick={() => setPctCard(null)}>×</button>
+          <div className={styles.pctName}>{pctCard.name}</div>
+          <div className={styles.pctBig}>{pctCard.norm < 1 ? "<1%" : `${pctCard.norm}%`} of your chum</div>
+          <div className={styles.pctRow}>As {genLabel(pctCard.depth)}: {pctCard.share < 1 ? "<1%" : `${pctCard.share}%`}</div>
+          <div className={styles.pctRow}>Share of your chum: {pctCard.norm < 1 ? "<1%" : `${pctCard.norm}%`}</div>
+          <div className={styles.pctTitle}>{TITLES[Math.abs(pctCard.name.split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % TITLES.length]}</div>
+          {pctCard.note && <div className={styles.pctNote}>{pctCard.note}</div>}
+          <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}
     </div>
