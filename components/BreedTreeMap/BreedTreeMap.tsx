@@ -559,7 +559,6 @@ export default function BreedTreeMap({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.img} alt={d.name} className={styles.imgCardImg} draggable={false} />
-          <div className={styles.imgCardName}>{d.name}</div>
           <button className={styles.imgCardClose} onClick={() => setDragImgs((prev) => prev.filter((p) => p.id !== d.id))}>×</button>
         </div>
       ))}
@@ -576,7 +575,6 @@ export default function BreedTreeMap({
           <div className={styles.pctRow}>As {genLabel(pctCard.depth)}: {pctCard.share < 1 ? "<1%" : `${pctCard.share}%`}</div>
           <div className={styles.pctRow}>Share of your chum: {pctCard.norm < 1 ? "<1%" : `${pctCard.norm}%`}</div>
           <div className={styles.pctTitle}>{TITLES[Math.abs(pctCard.name.split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % TITLES.length]}</div>
-          {pctCard.note && <div className={styles.pctNote}>{pctCard.note}</div>}
           <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}

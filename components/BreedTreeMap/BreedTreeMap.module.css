@@ -233,7 +233,7 @@
 
 /* ── Draggable image cards ───────────────────────────────── */
 .imgCard {
-  width: 120px;
+  width: 240px;
   background: var(--navy, #0a3a57);
   border-radius: 14px;
   border: 2.5px solid var(--yellow, #ffd23e);
@@ -305,8 +305,8 @@
 }
 
 .frame {
-  width: 80px;
-  height: 80px;
+  width: 160px;
+  height: 160px;
   border-radius: 12px;
   border: 2.5px dashed rgba(255,255,255,0.3);
   display: flex;
