@@ -173,6 +173,10 @@ export default function BreedTreeMap({
   // Tooltip (hover)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
+  // Image popup (eye icon click)
+  type ImgPopup = { name: string; img: string; note?: string; x: number; y: number };
+  const [imgPopup, setImgPopup] = useState<ImgPopup | null>(null);
+
   // Pct card (click) - detailed ancestry breakdown
   type PctCard = { name: string; share: number; norm: number; depth: number; note?: string; x: number; y: number };
   const [pctCard, setPctCard] = useState<PctCard | null>(null);
@@ -410,6 +414,29 @@ export default function BreedTreeMap({
                 </text>
               )}
 
+              {/* Eye icon on leaf nodes with images */}
+              {!hasKids && n.img && (
+                <g
+                  transform={`translate(${r - 8}, ${-r + 8})`}
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const rect = wrapRef.current?.getBoundingClientRect();
+                    if (!rect) return;
+                    setImgPopup({
+                      name: n.name,
+                      img: n.img as string,
+                      note: n.note,
+                      x: n._x + pan.x + 700 - 140 + 40,
+                      y: n._y + pan.y + 500 - 20,
+                    });
+                  }}
+                >
+                  <circle r={11} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
+                  <text textAnchor="middle" dominantBaseline="central" style={{ fontSize: "13px", fill: "var(--navy, #0a3a57)", fontWeight: 800, pointerEvents: "none", fontFamily: "system-ui" }}>👁</text>
+                </g>
+              )}
+
               {/* Eye icon on leaf nodes */}
               {!hasKids && (
                 <g
@@ -442,12 +469,22 @@ export default function BreedTreeMap({
         </div>
       )}
 
+      {/* Image popup (eye icon) */}
+      {imgPopup && (
+        <div className={styles.imgPopup} style={{ left: imgPopup.x, top: imgPopup.y }}>
+          <button className={styles.pctClose} onClick={() => setImgPopup(null)}>×</button>
+          <div className={styles.pctName}>{imgPopup.name}</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imgPopup.img} alt={imgPopup.name} className={styles.imgPopupImg} />
+          {imgPopup.note && <p className={styles.pctNote}>{imgPopup.note}</p>}
+        </div>
+      )}
+
       {/* Pct card (click) */}
       {pctCard && (
         <div
           className={styles.pctCard}
           style={{ left: Math.min(pctCard.x, 700), top: pctCard.y }}
-          onClick={(e) => e.stopPropagation()}
         >
           <button className={styles.pctClose} onClick={() => setPctCard(null)}>×</button>
           <div className={styles.pctName}>{pctCard.name}</div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
@@ -25,8 +25,8 @@ type Props = {
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
   tree:       { x: 0.04, y: 0.38 },  // left - below title with gap
-  infoBox:    { x: 0.65, y: 0.12 },  // right side, below menu
-  ancestry:   { x: 0.65, y: 0.55 },  // right side, lower
+  infoBox:    { x: 0.04, y: 0.26 },  // left, below H2
+  ancestry:   { x: 0.36, y: 0.26 },  // right of infoBox, below H2
   familyTree: { x: 0.26, y: 0.10 },  // centre - main element
 };
 
