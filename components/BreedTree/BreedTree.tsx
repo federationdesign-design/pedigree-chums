@@ -136,12 +136,14 @@ export default function BreedTree({
   onActiveChange,
   onClose,
   centred = false,
+  size = 760,
 }: {
   root: LineageNode;
   rootImage?: string;
   onActiveChange?: (active: boolean) => void;
   onClose?: () => void;
   centred?: boolean;
+  size?: number;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -380,7 +382,7 @@ export default function BreedTree({
   const buriedSet = hovered ? new Set(hovered.descendants()) : null;
 
   return (
-    <div className={styles.tree} ref={wrapRef}>
+    <div className={styles.tree} ref={wrapRef} style={{ width: size, height: size }}>
       <div className={styles.stage} ref={stageRef}>
         <svg
           viewBox={viewBox}

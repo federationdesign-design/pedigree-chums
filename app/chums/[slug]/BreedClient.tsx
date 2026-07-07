@@ -188,24 +188,20 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Diagrams row */}
       <div className={styles.diagramsRow}>
-        {/* Circular diagram - fixed */}
+        {/* Circular diagram - free, no container */}
         {lineage && (
-          <div className={styles.circularWrap} style={{ width: 560, height: 560 }}>
-            <div style={{ width: "100%", height: "100%", position: "relative" }} ref={(el) => {
-              if (!el) return;
-              const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
-              if (stage) stage.style.zIndex = "1";
-            }}>
-              <BreedTree root={lineage} rootImage={image} centred />
-            </div>
+          <div ref={(el) => {
+            if (!el) return;
+            const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
+            if (stage) stage.style.zIndex = "1";
+          }}>
+            <BreedTree root={lineage} rootImage={image} centred size={760} />
           </div>
         )}
 
-        {/* Family tree - fixed, scrollable if wide */}
+        {/* Family tree - free, natural size */}
         {lineage && (
-          <div className={styles.treeWrap}>
-            <BreedTreeMap lineage={lineage} rootImage={image} />
-          </div>
+          <BreedTreeMap lineage={lineage} rootImage={image} />
         )}
       </div>
 

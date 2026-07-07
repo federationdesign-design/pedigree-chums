@@ -28,7 +28,6 @@
   padding: 0 clamp(20px, 4vw, 48px) 48px;
   align-items: flex-start;
   overflow-x: auto;
-  flex: 1;
 }
 
 /* Scrollbar styling */
@@ -36,15 +35,9 @@
 .diagramsRow::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
 .diagramsRow::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
-.circularWrap {
-  flex-shrink: 0;
-}
 
-.treeWrap {
-  flex-shrink: 0;
-  min-width: 1400px;
-  min-height: 1000px;
-}
+
+
 
 /* ── Title block ─────────────────────────────────────────── */
 .titleBlock {
