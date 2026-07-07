@@ -115,7 +115,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     });
   }, []);
 
-  if (!positions.photo) return null; // wait for positions before rendering
+  if (!positions.tree) return null; // wait for positions before rendering
 
   return (
     <div className={styles.canvas}>
