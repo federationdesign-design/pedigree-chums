@@ -29,6 +29,16 @@ export default function HomeClient() {
 
   return (
     <>
+      {/* Hero image */}
+      <section className={styles.hero}>
+        <div className={styles.heroImg} aria-hidden="true" />
+        <div className={styles.heroTint} aria-hidden="true" />
+        <div className={styles.heroContent}>
+          <h1 className={styles.heroTitle}>Pedigree <span>Chums</span></h1>
+          <p className={styles.heroSub}>The on-the-go dog spotting game. 54 breeds to discover.</p>
+        </div>
+      </section>
+
       {/* Search hero */}
       <section className={styles.searchHero}>
         <p className={styles.searchEyebrow}>54 breeds to discover</p>
