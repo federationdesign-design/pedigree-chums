@@ -366,18 +366,6 @@ export default function BreedTreeMap({
               style={{ cursor: hasKids ? "pointer" : "default" }}
               onClick={(e) => {
               e.stopPropagation();
-              const rect = wrapRef.current?.getBoundingClientRect();
-              if (!rect) { toggleNode(n); return; }
-              // Single click on leaf = show pct card; on branch = toggle open/close
-              setPctCard({
-                name: n.name,
-                share,
-                norm: normShare(n),
-                depth: n._parent ? 1 : 0,
-                note: n.note,
-                x: e.clientX - rect.left + 12,
-                y: e.clientY - rect.top - 20,
-              });
               toggleNode(n);
             }}
               onMouseEnter={(e) => {
@@ -408,16 +396,40 @@ export default function BreedTreeMap({
                 {`${share}%`}
               </text>
 
-              {/* Name pill */}
+              {/* Name pill - wraps at 16 chars */}
               {(() => {
-                const w = n.name.length * 6.8 + 20;
-                const py = -r - 13;
+                const MAX = 16;
+                const words = n.name.split(" ");
+                const lines: string[] = [];
+                let current = "";
+                for (const word of words) {
+                  if ((current + " " + word).trim().length <= MAX) {
+                    current = (current + " " + word).trim();
+                  } else {
+                    if (current) lines.push(current);
+                    current = word;
+                  }
+                }
+                if (current) lines.push(current);
+                const lineH = 14;
+                const pillH = lines.length * lineH + 8;
+                const pillW = Math.max(...lines.map((l) => l.length)) * 6.2 + 20;
+                const py = -r - 8 - pillH;
                 return (
                   <g>
-                    <rect className={styles.nmPill} x={-w / 2} y={py - 10} width={w} height={20} rx={10} />
-                    <text className={styles.nm} textAnchor="middle" dominantBaseline="central" y={py}>
-                      {n.name}
-                    </text>
+                    <rect className={styles.nmPill} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={8} />
+                    {lines.map((line, i) => (
+                      <text
+                        key={i}
+                        className={styles.nm}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        y={py + 8 + i * lineH + lineH / 2}
+                        style={{ fontSize: "12px" }}
+                      >
+                        {line}
+                      </text>
+                    ))}
                   </g>
                 );
               })()}
@@ -452,21 +464,7 @@ export default function BreedTreeMap({
                 </g>
               )}
 
-              {/* Eye icon on leaf nodes */}
-              {!hasKids && (
-                <g
-                  transform={`translate(${r - 8}, ${-r + 8})`}
-                  style={{ cursor: "pointer" }}
-                  onClick={(e) => { e.stopPropagation(); }}
-                >
-                  <circle r={10} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
-                  <text
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    style={{ fontSize: "11px", fill: "var(--navy, #0a3a57)", fontWeight: 800, pointerEvents: "none" }}
-                  >ⓘ</text>
-                </g>
-              )}
+
             </g>
           );
         })}
