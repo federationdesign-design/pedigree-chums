@@ -29,7 +29,7 @@
 .subtitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1rem, 2.5vw, 1.8rem);
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
   margin: 8px 0 0;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -185,7 +185,7 @@
 .prosConsList li {
   font-size: 12px;
   line-height: 1.4;
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
   padding-left: 16px;
   position: relative;
 }
@@ -261,4 +261,18 @@
   .photoImg {
     aspect-ratio: 4/3;
   }
+}
+
+/* ── Loose family tree ───────────────────────────────────── */
+.treeWrap {
+  position: absolute;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+}
+
+.treeWrap:active {
+  cursor: grabbing;
+  z-index: 200 !important;
 }
