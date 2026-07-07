@@ -125,17 +125,6 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         <p className={styles.subtitle}>{info.subtitle}</p>
       </div>
 
-      {/* Photo card */}
-      <DragCard
-        id="photo"
-        className={`${styles.card} ${styles.photoCard}`}
-        style={{ ...positions.photo, zIndex: zOrders.photo }}
-        onBringToFront={bringToFront}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt={name} className={styles.photoImg} draggable={false} />
-      </DragCard>
-
       {/* Family tree card */}
       {lineage && positions.tree && (
         <div
