@@ -1,8 +1,7 @@
 /* ── Page canvas ─────────────────────────────────────────── */
 .canvas {
   min-height: 100svh;
-  background: url("/paw-pattern2.svg") repeat;
-  background-size: 144px auto;
+  background: transparent;
   position: relative;
   overflow: visible; /* allow elements to overflow and page to scroll */
   font-family: var(--font-body, 'Montserrat', system-ui);
