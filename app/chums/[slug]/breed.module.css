@@ -1,21 +1,19 @@
-/* ── Page canvas ─────────────────────────────────────────── */
 .canvas {
   min-height: 100svh;
   background: transparent;
   position: relative;
-  overflow: visible; /* allow elements to overflow and page to scroll */
+  overflow: visible;
   font-family: var(--font-body, 'Montserrat', system-ui);
 }
 
 /* ── Title block ─────────────────────────────────────────── */
 .titleBlock {
   position: absolute;
-  top: clamp(80px, 10vw, 100px);
+  top: clamp(80px, 12vw, 120px);
   left: clamp(20px, 5vw, 60px);
   z-index: 10;
   pointer-events: none;
   user-select: none;
-  max-width: 50vw;
 }
 
 .h1 {
@@ -31,7 +29,7 @@
 .subtitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1rem, 2.5vw, 1.8rem);
-  color: #ffffff;
+  color: rgba(255,255,255,0.8);
   margin: 8px 0 0;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -41,7 +39,7 @@
 .card {
   position: absolute;
   border-radius: 24px;
-  background: var(--blue-deep, #0c5b92);
+  background: linear-gradient(180deg, rgba(10,58,87,0.4) 0%, rgba(10,58,87,0.65) 100%);
   border: 2.5px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35);
   cursor: grab;
@@ -62,7 +60,7 @@
   z-index: 200 !important;
 }
 
-/* drag handle */
+/* drag handle strip */
 .dragHandle {
   width: 100%;
   display: flex;
@@ -74,11 +72,23 @@
 
 .dragHandle:active { cursor: grabbing; }
 
-.dragPips { display: flex; gap: 5px; }
-.dragPips span { width: 28px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); display: block; }
+.dragPips {
+  display: flex;
+  gap: 5px;
+}
+
+.dragPips span {
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.2);
+  display: block;
+}
 
 /* ── Photo card ──────────────────────────────────────────── */
-.photoCard { width: clamp(170px, 24vw, 289px); }
+.photoCard {
+  width: clamp(200px, 28vw, 340px);
+}
 
 .photoImg {
   width: 100%;
@@ -89,8 +99,12 @@
   pointer-events: none;
 }
 
-/* ── Tree card (circular diagram) ────────────────────────── */
-.treeCard { width: clamp(300px, 46vw, 580px); }
+/* ── Tree card ───────────────────────────────────────────── */
+.treeCard {
+  width: clamp(300px, 46vw, 580px);
+  padding-bottom: 16px;
+}
+
 .treeLabel {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 13px;
@@ -103,14 +117,13 @@
 
 /* ── Info card ───────────────────────────────────────────── */
 .infoCard {
-  width: clamp(380px, 46vw, 620px);
+  width: clamp(260px, 34vw, 420px);
   padding: 0 0 20px;
-  background: transparent !important;
-  border: 1px solid #ffffff !important;
-  box-shadow: none !important;
 }
 
-.infoSection { padding: 0 20px; }
+.infoSection {
+  padding: 0 20px;
+}
 
 .infoHeading {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -122,7 +135,12 @@
   opacity: 0.8;
 }
 
-.temperamentTags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.temperamentTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
 
 .tag {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -135,7 +153,14 @@
   padding: 4px 12px;
 }
 
-.prosConsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.prosConsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.prosCol { }
+.consCol { }
 
 .prosConsHead {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -144,6 +169,7 @@
   margin: 0 0 6px;
   text-transform: uppercase;
 }
+
 .prosConsHead.pros { color: #4ade80; }
 .prosConsHead.cons { color: #f87171; }
 
@@ -159,8 +185,7 @@
 .prosConsList li {
   font-size: 12px;
   line-height: 1.4;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255,255,255,0.8);
   padding-left: 16px;
   position: relative;
 }
@@ -178,7 +203,11 @@
 .prosCol .prosConsList li::before { background: #4ade80; }
 .consCol .prosConsList li::before { background: #f87171; }
 
-.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 20px; }
+.divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 12px 20px;
+}
 
 /* ── Back button ─────────────────────────────────────────── */
 .backBtn {
@@ -196,17 +225,40 @@
   padding: 10px 22px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
-  text-decoration: none;
-  display: inline-block;
   backdrop-filter: blur(8px);
 }
 
-.backBtn:hover { background: rgba(255,255,255,0.18); color: #fff; }
+.backBtn:hover {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
 
-/* ── Mobile ──────────────────────────────────────────────── */
+/* ── Mobile stack ────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .titleBlock { position: static; padding: 100px 20px 24px; pointer-events: auto; max-width: 100%; }
-  .card { position: relative !important; left: auto !important; top: auto !important; width: calc(100% - 40px) !important; margin: 0 20px 16px; cursor: default; }
-  .photoCard { width: calc(100% - 40px) !important; }
-  .photoImg { aspect-ratio: 4/3; }
+  .titleBlock {
+    position: static;
+    padding: 100px 20px 24px;
+    pointer-events: auto;
+  }
+
+  .canvas {
+    overflow: auto;
+  }
+
+  .card {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: calc(100% - 40px) !important;
+    margin: 0 20px 16px;
+    cursor: default;
+  }
+
+  .photoCard {
+    width: calc(100% - 40px) !important;
+  }
+
+  .photoImg {
+    aspect-ratio: 4/3;
+  }
 }

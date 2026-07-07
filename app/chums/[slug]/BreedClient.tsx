@@ -24,7 +24,6 @@ type Props = {
 
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
-  photo:      { x: 0.70, y: 0.08 },  // top right - dog photo
   tree:       { x: 0.04, y: 0.30 },  // left - below title
   infoBox:    { x: 0.70, y: 0.55 },  // bottom right - info
   familyTree: { x: 0.26, y: 0.10 },  // centre - main element
@@ -96,7 +95,7 @@ function DragCard({
 }
 
 export default function BreedClient({ name, image, info, lineage }: Props) {
-  const [zOrders, setZOrders] = useState({ photo: 10, tree: 11, infoBox: 12, familyTree: 13 });
+  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, familyTree: 13 });
   const zCounter = useRef(20);
 
   const bringToFront = useCallback((id: string) => {
@@ -110,7 +109,6 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     setPositions({
-      photo:      { left: `${DEFAULTS.photo.x * vw}px`,      top: `${DEFAULTS.photo.y * vh}px` },
       tree:       { left: `${DEFAULTS.tree.x * vw}px`,       top: `${DEFAULTS.tree.y * vh}px` },
       infoBox:    { left: `${DEFAULTS.infoBox.x * vw}px`,    top: `${DEFAULTS.infoBox.y * vh}px` },
       familyTree: { left: `${DEFAULTS.familyTree.x * vw}px`, top: `${DEFAULTS.familyTree.y * vh}px` },
@@ -208,17 +206,27 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           }}
           onPointerDown={(e) => {
             if ((e.target as Element).closest("[data-node]")) return;
+            e.preventDefault();
             const el = e.currentTarget;
             bringToFront("familyTree");
             const rect = el.getBoundingClientRect();
-            const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+            const ox = e.clientX - rect.left;
+            const oy = e.clientY - rect.top;
             el.setPointerCapture(e.pointerId);
-            let active = true;
-            const onMove = (ev: PointerEvent) => { if (!active) return; el.style.left = `${ev.clientX - ox}px`; el.style.top = `${ev.clientY - oy}px`; };
-            const onUp = () => { active = false; el.style.cursor = "grab"; window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
             el.style.cursor = "grabbing";
-            window.addEventListener("pointermove", onMove);
-            window.addEventListener("pointerup", onUp);
+            el.style.outline = "3px solid rgba(255,210,62,0.8)";
+            const onMove = (ev: PointerEvent) => {
+              el.style.left = `${ev.clientX - ox}px`;
+              el.style.top = `${ev.clientY - oy}px`;
+            };
+            const onUp = () => {
+              el.style.cursor = "grab";
+              el.style.outline = "none";
+              el.removeEventListener("pointermove", onMove);
+              el.removeEventListener("pointerup", onUp);
+            };
+            el.addEventListener("pointermove", onMove);
+            el.addEventListener("pointerup", onUp);
           }}
         >
           <BreedTreeMap lineage={lineage} rootImage={image} />
