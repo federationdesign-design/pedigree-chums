@@ -1,18 +1,6 @@
-.canvas::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("/paw-pattern2.svg");
-  background-repeat: repeat;
-  background-size: 144px auto;
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 0;
-}
-
 .canvas {
   min-height: 100svh;
-  background: var(--blue-sky, #2bb4ee);
+  background: var(--navy, var(--navy));
   position: relative;
   overflow: hidden;
   font-family: var(--font-body, 'Montserrat', system-ui);
@@ -31,7 +19,7 @@
 .h1 {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(2.8rem, 8vw, 7rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow, var(--yellow));
   line-height: 1;
   margin: 0;
   letter-spacing: 0.02em;
@@ -51,7 +39,7 @@
 .card {
   position: absolute;
   border-radius: 24px;
-  background: var(--blue-deep, #0c5b92);
+  background: var(--blue-deep, var(--blue-deep));
   border: 2.5px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35);
   cursor: grab;
@@ -99,7 +87,7 @@
 
 /* ── Photo card ──────────────────────────────────────────── */
 .photoCard {
-  width: clamp(170px, 24vw, 289px);
+  width: clamp(200px, 28vw, 340px);
 }
 
 .photoImg {
@@ -121,7 +109,7 @@
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 13px;
   letter-spacing: 0.12em;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow, var(--yellow));
   text-transform: uppercase;
   padding: 0 20px 8px;
   opacity: 0.8;
@@ -129,11 +117,8 @@
 
 /* ── Info card ───────────────────────────────────────────── */
 .infoCard {
-  width: clamp(380px, 46vw, 620px);
+  width: clamp(260px, 34vw, 420px);
   padding: 0 0 20px;
-  background: transparent !important;
-  border: 1px solid #ffffff !important;
-  box-shadow: none !important;
 }
 
 .infoSection {
@@ -144,7 +129,7 @@
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 13px;
   letter-spacing: 0.12em;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow, var(--yellow));
   text-transform: uppercase;
   margin: 16px 0 10px;
   opacity: 0.8;
@@ -200,8 +185,7 @@
 .prosConsList li {
   font-size: 12px;
   line-height: 1.4;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
+  color: #ffffff;
   padding-left: 16px;
   position: relative;
 }
@@ -257,19 +241,7 @@
     pointer-events: auto;
   }
 
-  .canvas::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("/paw-pattern2.svg");
-  background-repeat: repeat;
-  background-size: 144px auto;
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.canvas {
+  .canvas {
     overflow: auto;
   }
 

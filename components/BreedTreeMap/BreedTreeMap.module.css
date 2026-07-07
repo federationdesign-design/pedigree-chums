@@ -32,7 +32,7 @@
 }
 
 .edgeLit {
-  stroke: var(--yellow, #ffd23e);
+  stroke: var(--yellow, var(--yellow));
   stroke-width: 5;
 }
 
@@ -44,8 +44,8 @@
 
 /* Disc - yellow fill, navy stroke, matching pit exactly */
 .disc {
-  fill: var(--yellow, #ffd23e);
-  stroke: var(--navy, #0a3a57);
+  fill: var(--yellow, var(--yellow));
+  stroke: var(--navy, var(--navy));
   stroke-width: 3;
   transition: r 0.18s ease;
 }
@@ -62,23 +62,23 @@
 
 /* Open nodes turn blue */
 .discOpen {
-  fill: var(--blue, #1497d6);
-  stroke: var(--navy, #0a3a57);
+  fill: var(--blue, var(--blue));
+  stroke: var(--navy, var(--navy));
   stroke-width: 3;
   stroke-dasharray: none;
 }
 
 /* Root node */
 .discRoot {
-  fill: var(--navy, #0a3a57);
-  stroke: var(--yellow, #ffd23e);
+  fill: var(--navy, var(--navy));
+  stroke: var(--yellow, var(--yellow));
   stroke-width: 3;
   cursor: default;
 }
 
 /* Percentage text - navy, matching pit */
 .pct {
-  fill: var(--navy, #0a3a57);
+  fill: var(--navy, var(--navy));
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-weight: 800;
   pointer-events: none;
@@ -86,7 +86,7 @@
 
 /* Name pill - navy background with shadow */
 .nmPill {
-  fill: var(--navy, #0a3a57);
+  fill: var(--navy, var(--navy));
   filter: drop-shadow(0 2px 0 rgba(10, 58, 87, 0.35));
   pointer-events: none;
 }
@@ -101,7 +101,7 @@
 
 /* Expand hint */
 .more {
-  fill: var(--navy, #0a3a57);
+  fill: var(--navy, var(--navy));
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-weight: 800;
   font-size: 11px;
@@ -128,7 +128,7 @@
 .tooltipName {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 15px;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow, var(--yellow));
   display: block;
   margin-bottom: 4px;
 }
