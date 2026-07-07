@@ -143,8 +143,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.tree.left,
             top: positions.tree.top,
             zIndex: zOrders.tree,
-            width: 900,
-            height: 700,
+            width: 680,
+            height: 680,
             overflow: "visible",
             cursor: "grab",
             userSelect: "none" as const,
@@ -164,7 +164,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             window.addEventListener("pointerup", onUp);
           }}
         >
-          <BreedTree root={lineage} rootImage={image} />
+          <BreedTree root={lineage} rootImage={image} centred />
         </div>
       )}
 

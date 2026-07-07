@@ -135,11 +135,13 @@ export default function BreedTree({
   rootImage,
   onActiveChange,
   onClose,
+  centred = false,
 }: {
   root: LineageNode;
   rootImage?: string;
   onActiveChange?: (active: boolean) => void;
   onClose?: () => void;
+  centred?: boolean;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -225,7 +227,7 @@ export default function BreedTree({
             // clamped to stay inside the canvas.
             const vbWl = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHl = aspect >= 1 ? SIZE : SIZE / aspect;
-            const xMinl = aspect >= 1 ? -vbWl * SHIFT : -vbWl / 2;
+            const xMinl = aspect >= 1 ? -vbWl * shift : -vbWl / 2;
             const margin = 120;
             const lx = Math.max(xMinl + margin, Math.min(xMinl + vbWl - margin, tx));
             let ly = ty < 0 ? ty - childR - 70 : ty + childR + 70;
@@ -361,7 +363,8 @@ export default function BreedTree({
   // right of the pop-up, clear of the text column, rather than dead centre.
   const vbW = aspect >= 1 ? SIZE * aspect : SIZE;
   const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
-  const xMin = aspect >= 1 ? -vbW * SHIFT : -vbW / 2;
+  const shift = centred ? 0.5 : SHIFT; // 0.5 = dead centre, 0.66 = offset right for text column
+  const xMin = aspect >= 1 ? -vbW * shift : -vbW / 2;
   const viewBox = `${xMin} ${-vbH / 2} ${vbW} ${vbH}`;
 
   const trail = focus.ancestors().reverse();
