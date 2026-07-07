@@ -470,23 +470,6 @@ const allBreeds: Breed[] = [
     image: "/Cavachon-square.jpg",
   },
   {
-    name: "Puggle",
-    slug: "puggle",
-    lookFor: "Wrinked Face",
-    size: "Small / Stocky",
-    coatColour: "Black, Fawn, Red, Tan, Lemon",
-    coatLength: "Short dense undercoat, smooth outer",
-    height: "38cm",
-    length: "35cm",
-    weight: "(6.3-8k)",
-    fact: "cross Bred from Pug and a Beagle",
-    character: "Short & dense with Barrel-shaped torso. Wrinkled face & floppy ears. Playful & energetic personality. Gets along well with children",
-    type: "designer-crossbreed",
-    sizeBand: "small",
-    skull: "flat",
-    image: "/puggle-square.jpg",
-  },
-  {
     name: "Cavapoo",
     slug: "cavapoo",
     lookFor: "Teddy Bear",
@@ -929,23 +912,6 @@ const allBreeds: Breed[] = [
     image: "/jack-russel-square.jpg",
   },
   {
-    name: "English Setter",
-    slug: "english-setter",
-    lookFor: "An elegant, feathered bird dog with a silky white coat speckled with orange, lemon, liver or black — known as belton markings",
-    size: "61–69 cm",
-    coatColour: "White with orange, lemon, liver or black flecking (belton pattern)",
-    coatLength: "Long, silky and flat with feathering on the legs, chest and tail",
-    height: "61–69 cm",
-    length: "65–75 cm",
-    weight: "20–30 kg",
-    fact: "One of the oldest gundogs, the English Setter was developed from old setting spaniels that crouched low — or 'set' — to mark game for the net",
-    character: "Gentle, affectionate and energetic — a graceful dog that thrives outdoors but is equally content curled up with family",
-    type: "classic",
-    sizeBand: "large",
-    skull: "long",
-    image: "/setter-square.jpg",
-  },
-  {
     name: "Boxer",
     slug: "boxer",
     lookFor: "A medium-large dog with a broad, square head, short pushed-in muzzle, fawn or brindle coat and a white chest flash",
@@ -978,7 +944,7 @@ const allBreeds: Breed[] = [
     sizeBand: "large",
     skull: "long",
     draft: true,
-    image: "/irish-square.png",
+    image: "/history/breeds/irish-setter-photo.jpg",
   },
 ];
 
@@ -989,7 +955,7 @@ export const breeds: Breed[] = allBreeds.filter((b) => !b.draft);
 
 // Physical trading-card art per breed, keyed by slug. Used by the collection
 // shelf to show the real card a child plays with, rather than the pit's square
-// cartoon.
+// cartoon. Breeds with no card yet (irish-setter, bernedoodle) are omitted on
 // purpose, so the shelf falls back to the cartoon for them.
 export const breedCard: Record<string, string> = {
   "cocker-spaniel": "/card.jpg",
