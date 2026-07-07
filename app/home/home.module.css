@@ -59,7 +59,7 @@
 
 /* ── Search hero ─────────────────────────────────────────── */
 .searchHero {
-  padding: clamp(100px, 14vw, 160px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
+  padding: clamp(24px, 4vw, 48px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
   text-align: center;
   position: relative;
 }

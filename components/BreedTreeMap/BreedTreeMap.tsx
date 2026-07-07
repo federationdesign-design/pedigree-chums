@@ -274,6 +274,7 @@ export default function BreedTreeMap({
     <div
       ref={wrapRef}
       className={styles.wrap}
+      style={{ width: VIEW_W, height: VIEW_H }}
       onPointerDown={onWrapPointerDown}
       onPointerMove={onWrapPointerMove}
       onPointerUp={onWrapPointerUp}
