@@ -1,3 +1,5 @@
+/* Exact match to pit LineageMap styles */
+
 .wrap {
   position: relative;
   width: 100%;
@@ -20,66 +22,89 @@
   overflow: visible;
 }
 
-/* Node circles */
-.disc {
-  fill: var(--blue-deep, #0c5b92);
+/* Edges - matching pit exactly */
+.edge {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.edgeLit {
   stroke: var(--yellow, #ffd23e);
-  stroke-width: 2.5px;
+  stroke-width: 5;
+}
+
+/* Node group */
+.node {
   cursor: pointer;
-  transition: fill 0.18s ease;
+  pointer-events: auto;
 }
 
-.disc:hover {
-  fill: var(--blue-sky, #2bb4ee);
+/* Disc - yellow fill, navy stroke, matching pit exactly */
+.disc {
+  fill: var(--yellow, #ffd23e);
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 3;
+  transition: r 0.18s ease;
 }
 
+/* Dashed when has children (closed) */
+.discHas {
+  stroke-dasharray: 5 5;
+}
+
+/* Thicker on hover */
+.node:hover .disc {
+  stroke-width: 5;
+}
+
+/* Open nodes turn blue */
 .discOpen {
   fill: var(--blue, #1497d6);
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 3;
+  stroke-dasharray: none;
 }
 
+/* Root node */
 .discRoot {
   fill: var(--navy, #0a3a57);
   stroke: var(--yellow, #ffd23e);
-  stroke-width: 3px;
+  stroke-width: 3;
   cursor: default;
 }
 
-/* Rod lines */
-.rod {
-  stroke: rgba(255, 255, 255, 0.25);
-  stroke-width: 1.5px;
-  pointer-events: none;
-}
-
-/* Percentage text */
+/* Percentage text - navy, matching pit */
 .pct {
-  fill: #ffffff;
+  fill: var(--navy, #0a3a57);
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-weight: 800;
   pointer-events: none;
 }
 
-/* Name pill */
+/* Name pill - navy background with shadow */
 .nmPill {
-  fill: rgba(10, 58, 87, 0.85);
+  fill: var(--navy, #0a3a57);
+  filter: drop-shadow(0 2px 0 rgba(10, 58, 87, 0.35));
   pointer-events: none;
 }
 
 .nm {
   fill: #ffffff;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  font-size: 13px;
   pointer-events: none;
 }
 
 /* Expand hint */
 .more {
-  fill: rgba(255, 255, 255, 0.5);
+  fill: var(--navy, #0a3a57);
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 10px;
-  font-weight: 600;
+  font-weight: 800;
+  font-size: 11px;
   pointer-events: none;
 }
 

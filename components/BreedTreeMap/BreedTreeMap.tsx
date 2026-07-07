@@ -218,7 +218,7 @@ export default function BreedTreeMap({
           {shown.filter((n) => n._parent).map((n) => (
             <line
               key={`rod-${n._id}`}
-              className={styles.rod}
+              className={`${styles.edge} ${open.has(n._id) ? styles.edgeLit : ""}`}
               x1={(n._parent as Node)._x}
               y1={(n._parent as Node)._y}
               x2={n._x}
@@ -230,19 +230,21 @@ export default function BreedTreeMap({
         {/* Root node */}
         <g transform={`translate(${root._x},${root._y})`}>
           <circle
-            className={styles.discRoot}
             r={ROOT}
             fill={rootImage ? "url(#btm-root)" : "var(--navy, #0a3a57)"}
+            stroke="var(--yellow, #ffd23e)"
+            strokeWidth={3}
           />
-          <text
-            className={styles.nm}
-            textAnchor="middle"
-            dominantBaseline="central"
-            y={ROOT + 18}
-            style={{ fontSize: 13 }}
-          >
-            {root.name}
-          </text>
+          {(() => {
+            const w = root.name.length * 6.8 + 20;
+            const py = -(ROOT + 13);
+            return (
+              <g>
+                <rect className={styles.nmPill} x={-w/2} y={py-10} width={w} height={20} rx={10} />
+                <text className={styles.nm} textAnchor="middle" dominantBaseline="central" y={py}>{root.name}</text>
+              </g>
+            );
+          })()}
         </g>
 
         {/* Child nodes */}
@@ -275,7 +277,7 @@ export default function BreedTreeMap({
               onMouseLeave={() => setTooltip(null)}
             >
               <circle
-                className={`${styles.disc} ${isOpen && hasKids ? styles.discOpen : ""}`}
+                className={`${styles.disc} ${hasKids && !isOpen ? styles.discHas : ""} ${isOpen ? styles.discOpen : ""}`.trim()}
                 r={r}
                 fill={n.img ? `url(#btm-${n._id})` : undefined}
               />
@@ -284,6 +286,7 @@ export default function BreedTreeMap({
                 textAnchor="middle"
                 dominantBaseline="central"
                 fontSize={Math.max(11, r * 0.5)}
+                style={isOpen ? { fill: "#ffffff" } : undefined}
               >
                 {`${share}%`}
               </text>
