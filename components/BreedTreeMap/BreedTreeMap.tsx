@@ -42,8 +42,8 @@ function countDescendants(n: LineageNode): number {
   return kids.length + kids.reduce((s, k) => s + countDescendants(k), 0);
 }
 
-function radius(share: number) {
-  return Math.max(21, 5 * Math.sqrt(share));
+function radius(_share: number) {
+  return 28; // fixed size - matches pit visual where nodes appear consistent
 }
 
 // Assign positions recursively from a root node
