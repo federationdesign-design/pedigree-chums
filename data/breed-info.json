@@ -1,0 +1,1202 @@
+{
+  "Irish Wolfhound": {
+    "subtitle": "Gentle giant of the ancient world",
+    "temperament": [
+      "Gentle",
+      "Loyal",
+      "Patient",
+      "Dignified",
+      "Calm"
+    ],
+    "pros": [
+      "Exceptionally gentle with children",
+      "Low aggression",
+      "Great with other dogs",
+      "Loyal companion"
+    ],
+    "cons": [
+      "Short lifespan (6-8 years)",
+      "Very large - needs space",
+      "Expensive to feed",
+      "Prone to heart issues"
+    ]
+  },
+  "Bloodhound": {
+    "subtitle": "The nose that never forgets",
+    "temperament": [
+      "Stubborn",
+      "Affectionate",
+      "Gentle",
+      "Inquisitive",
+      "Even-tempered"
+    ],
+    "pros": [
+      "Excellent tracker",
+      "Good with children",
+      "Gentle nature",
+      "Loyal"
+    ],
+    "cons": [
+      "Extremely stubborn",
+      "Loud howling",
+      "Strong odour",
+      "Drools heavily",
+      "Needs lots of exercise"
+    ]
+  },
+  "Mastiff": {
+    "subtitle": "The original gentle protector",
+    "temperament": [
+      "Gentle",
+      "Courageous",
+      "Calm",
+      "Dignified",
+      "Protective"
+    ],
+    "pros": [
+      "Natural guardian",
+      "Calm indoors",
+      "Loyal to family",
+      "Good with children"
+    ],
+    "cons": [
+      "Enormous - needs space",
+      "Heavy drooling",
+      "Short lifespan",
+      "High food costs",
+      "Can be stubborn"
+    ]
+  },
+  "Great Dane": {
+    "subtitle": "The friendly skyscraper",
+    "temperament": [
+      "Friendly",
+      "Patient",
+      "Dependable",
+      "Gentle",
+      "Confident"
+    ],
+    "pros": [
+      "Friendly with strangers",
+      "Good with children",
+      "Calm indoors",
+      "Eager to please"
+    ],
+    "cons": [
+      "Very short lifespan (7-10 years)",
+      "Expensive to keep",
+      "Prone to bloat",
+      "Needs large home"
+    ]
+  },
+  "Bull Terrier": {
+    "subtitle": "Mischievous clown with a heart of gold",
+    "temperament": [
+      "Playful",
+      "Stubborn",
+      "Sweet-tempered",
+      "Active",
+      "Protective"
+    ],
+    "pros": [
+      "Loyal and loving",
+      "Entertaining personality",
+      "Good with older children",
+      "Low grooming"
+    ],
+    "cons": [
+      "Stubborn to train",
+      "Can be dog-aggressive",
+      "High energy",
+      "Prone to obsessive behaviour"
+    ]
+  },
+  "Doberman Pinscher": {
+    "subtitle": "Intelligent elegance on four legs",
+    "temperament": [
+      "Alert",
+      "Loyal",
+      "Fearless",
+      "Obedient",
+      "Energetic"
+    ],
+    "pros": [
+      "Highly trainable",
+      "Excellent guard dog",
+      "Loyal to family",
+      "Athletic"
+    ],
+    "cons": [
+      "Needs experienced owner",
+      "High exercise demand",
+      "Can be aloof with strangers",
+      "Prone to DCM"
+    ]
+  },
+  "Saint Bernard": {
+    "subtitle": "The mountain's most famous rescuer",
+    "temperament": [
+      "Gentle",
+      "Friendly",
+      "Calm",
+      "Patient",
+      "Watchful"
+    ],
+    "pros": [
+      "Excellent with children",
+      "Gentle nature",
+      "Loyal",
+      "Good natured"
+    ],
+    "cons": [
+      "Heavy drooling",
+      "Sheds enormously",
+      "Short lifespan",
+      "Very large food bills",
+      "Prone to overheating"
+    ]
+  },
+  "Afghan Hound": {
+    "subtitle": "Ancient royalty draped in silk",
+    "temperament": [
+      "Aloof",
+      "Clownish",
+      "Dignified",
+      "Independent",
+      "Happy"
+    ],
+    "pros": [
+      "Stunning appearance",
+      "Loyal to owner",
+      "Gentle",
+      "Good with gentle children"
+    ],
+    "cons": [
+      "Very independent",
+      "Difficult to train",
+      "Extremely high grooming needs",
+      "Strong prey drive"
+    ]
+  },
+  "Weimaraner": {
+    "subtitle": "The silver ghost of the hunting field",
+    "temperament": [
+      "Friendly",
+      "Fearless",
+      "Alert",
+      "Obedient",
+      "Energetic"
+    ],
+    "pros": [
+      "Highly trainable",
+      "Loyal",
+      "Good with active families",
+      "Athletic"
+    ],
+    "cons": [
+      "Extremely high energy",
+      "Separation anxiety",
+      "Needs experienced owner",
+      "Strong prey drive"
+    ]
+  },
+  "Dalmatian": {
+    "subtitle": "Spotless in character, spotted in style",
+    "temperament": [
+      "Playful",
+      "Energetic",
+      "Sensitive",
+      "Intelligent",
+      "Active"
+    ],
+    "pros": [
+      "Distinctive looks",
+      "Loyal",
+      "Good with older children",
+      "Loves activity"
+    ],
+    "cons": [
+      "Very high exercise needs",
+      "Prone to deafness",
+      "Can be stubborn",
+      "Sheds constantly"
+    ]
+  },
+  "Rottweiler": {
+    "subtitle": "Steady, loyal, and utterly fearless",
+    "temperament": [
+      "Loyal",
+      "Loving",
+      "Confident",
+      "Calm",
+      "Courageous"
+    ],
+    "pros": [
+      "Extremely loyal",
+      "Natural guardian",
+      "Trainable",
+      "Good with family"
+    ],
+    "cons": [
+      "Needs experienced owner",
+      "Strong prey drive",
+      "Requires firm training",
+      "Can be territorial"
+    ]
+  },
+  "Old English Sheepdog": {
+    "subtitle": "The lovable mop that herds hearts",
+    "temperament": [
+      "Adaptable",
+      "Gentle",
+      "Intelligent",
+      "Bubbly",
+      "Playful"
+    ],
+    "pros": [
+      "Great with children",
+      "Gentle nature",
+      "Adaptable",
+      "Entertaining"
+    ],
+    "cons": [
+      "Extremely high grooming needs",
+      "Sheds heavily",
+      "High exercise needs",
+      "Can be boisterous"
+    ]
+  },
+  "Basset Hound": {
+    "subtitle": "Low to the ground, high on charm",
+    "temperament": [
+      "Tenacious",
+      "Friendly",
+      "Playful",
+      "Outgoing",
+      "Gentle"
+    ],
+    "pros": [
+      "Excellent with children",
+      "Friendly",
+      "Low energy indoors",
+      "Good with other dogs"
+    ],
+    "cons": [
+      "Stubborn to train",
+      "Heavy drooling",
+      "Loud baying",
+      "Prone to obesity",
+      "Strong scent drive"
+    ]
+  },
+  "Cavalier King Charles Spaniel": {
+    "subtitle": "Born for the lap, made for the heart",
+    "temperament": [
+      "Affectionate",
+      "Gentle",
+      "Graceful",
+      "Playful",
+      "Adaptable"
+    ],
+    "pros": [
+      "Excellent family dog",
+      "Adaptable to any home",
+      "Great with children",
+      "Easy to train"
+    ],
+    "cons": [
+      "Prone to heart disease",
+      "Separation anxiety",
+      "Needs company",
+      "Health screening essential"
+    ]
+  },
+  "Bulldog": {
+    "subtitle": "Britain's most beloved couch philosopher",
+    "temperament": [
+      "Docile",
+      "Willful",
+      "Friendly",
+      "Gregarious",
+      "Loyal"
+    ],
+    "pros": [
+      "Low exercise needs",
+      "Great with children",
+      "Loyal",
+      "Calm indoors"
+    ],
+    "cons": [
+      "Breathing problems",
+      "Expensive vet bills",
+      "Overheats easily",
+      "Snoring and flatulence",
+      "Stubborn"
+    ]
+  },
+  "Italian Greyhound": {
+    "subtitle": "Greyhound soul in miniature form",
+    "temperament": [
+      "Sensitive",
+      "Affectionate",
+      "Agile",
+      "Athletic",
+      "Playful"
+    ],
+    "pros": [
+      "Low shedding",
+      "Elegant and graceful",
+      "Loyal to owner",
+      "Small and manageable"
+    ],
+    "cons": [
+      "Extremely sensitive",
+      "Prone to broken legs",
+      "Difficult to housetrain",
+      "Shiver in cold"
+    ]
+  },
+  "Papillon": {
+    "subtitle": "Butterfly ears, boundless spirit",
+    "temperament": [
+      "Friendly",
+      "Alert",
+      "Happy",
+      "Hardy",
+      "Intelligent"
+    ],
+    "pros": [
+      "Highly trainable",
+      "Adaptable",
+      "Long-lived",
+      "Great agility dog"
+    ],
+    "cons": [
+      "Can be yappy",
+      "Fragile build",
+      "High energy for small dog",
+      "Can be possessive"
+    ]
+  },
+  "Corgi": {
+    "subtitle": "Royal approval, working dog soul",
+    "temperament": [
+      "Bold",
+      "Tenacious",
+      "Outgoing",
+      "Playful",
+      "Protective"
+    ],
+    "pros": [
+      "Highly intelligent",
+      "Great with active families",
+      "Trainable",
+      "Loyal"
+    ],
+    "cons": [
+      "Heavy shedding",
+      "Herding nipping tendency",
+      "Can be bossy",
+      "Back problems"
+    ]
+  },
+  "Bichon Frise": {
+    "subtitle": "The little white cloud of happiness",
+    "temperament": [
+      "Playful",
+      "Gentle",
+      "Sensitive",
+      "Cheerful",
+      "Affectionate"
+    ],
+    "pros": [
+      "Low shedding",
+      "Great for allergy sufferers",
+      "Friendly with everyone",
+      "Adaptable"
+    ],
+    "cons": [
+      "High grooming costs",
+      "Can be difficult to housetrain",
+      "Separation anxiety",
+      "Prone to skin issues"
+    ]
+  },
+  "Maltese": {
+    "subtitle": "Ancient companion, timeless elegance",
+    "temperament": [
+      "Gentle",
+      "Playful",
+      "Fearless",
+      "Affectionate",
+      "Docile"
+    ],
+    "pros": [
+      "Low shedding",
+      "Long-lived",
+      "Loving companion",
+      "Adaptable to apartment"
+    ],
+    "cons": [
+      "High grooming needs",
+      "Can be snappy if spoiled",
+      "Fragile build",
+      "Prone to dental issues"
+    ]
+  },
+  "Boston Terrier": {
+    "subtitle": "The American gentleman in a tuxedo",
+    "temperament": [
+      "Friendly",
+      "Bright",
+      "Amusing",
+      "Enthusiastic",
+      "Gentle"
+    ],
+    "pros": [
+      "Low shedding",
+      "Adaptable",
+      "Friendly with everyone",
+      "Good size for city living"
+    ],
+    "cons": [
+      "Breathing issues",
+      "Gassy",
+      "Can be stubborn",
+      "Sensitive to heat and cold"
+    ]
+  },
+  "Beagle": {
+    "subtitle": "Nose first, heart second, ears last",
+    "temperament": [
+      "Merry",
+      "Friendly",
+      "Curious",
+      "Determined",
+      "Gentle"
+    ],
+    "pros": [
+      "Great with children",
+      "Friendly",
+      "Compact size",
+      "Hardy"
+    ],
+    "cons": [
+      "Extremely stubborn",
+      "Loud howling",
+      "Strong scent drive",
+      "Can be escape artists",
+      "Prone to obesity"
+    ]
+  },
+  "Siberian Husky": {
+    "subtitle": "Born to run, impossible to contain",
+    "temperament": [
+      "Outgoing",
+      "Mischievous",
+      "Loyal",
+      "Gentle",
+      "Alert"
+    ],
+    "pros": [
+      "Friendly with everyone",
+      "Stunning looks",
+      "Good with other dogs",
+      "Energetic companion"
+    ],
+    "cons": [
+      "Escapes constantly",
+      "Extremely high exercise needs",
+      "Heavy shedding",
+      "Howls loudly",
+      "Not a guard dog"
+    ]
+  },
+  "Shih Tzu": {
+    "subtitle": "Little lion, maximum affection",
+    "temperament": [
+      "Affectionate",
+      "Playful",
+      "Outgoing",
+      "Alert",
+      "Gentle"
+    ],
+    "pros": [
+      "Adaptable",
+      "Good for apartments",
+      "Friendly",
+      "Low exercise needs"
+    ],
+    "cons": [
+      "High grooming needs",
+      "Can be stubborn",
+      "Breathing issues",
+      "Eye problems"
+    ]
+  },
+  "Jackapoo": {
+    "subtitle": "Jack Russell fire meets Poodle brains",
+    "temperament": [
+      "Energetic",
+      "Playful",
+      "Intelligent",
+      "Loyal",
+      "Cheeky"
+    ],
+    "pros": [
+      "Low shedding",
+      "Highly trainable",
+      "Energetic companion",
+      "Good size"
+    ],
+    "cons": [
+      "Very high energy",
+      "Can be stubborn",
+      "Needs lots of stimulation",
+      "Variable coat type"
+    ]
+  },
+  "Cavachon": {
+    "subtitle": "All the sweetness, none of the fuss",
+    "temperament": [
+      "Gentle",
+      "Playful",
+      "Affectionate",
+      "Sociable",
+      "Calm"
+    ],
+    "pros": [
+      "Low shedding",
+      "Great with children",
+      "Adaptable",
+      "Gentle nature"
+    ],
+    "cons": [
+      "Can be prone to inherited health issues",
+      "Needs regular grooming",
+      "Separation anxiety",
+      "Variable traits"
+    ]
+  },
+  "Cavapoo": {
+    "subtitle": "Perfectly sized, perfectly tempered",
+    "temperament": [
+      "Sociable",
+      "Playful",
+      "Curious",
+      "Loyal",
+      "Gentle"
+    ],
+    "pros": [
+      "Low shedding",
+      "Great with children",
+      "Adaptable",
+      "Easy to train"
+    ],
+    "cons": [
+      "Health screening needed",
+      "Separation anxiety",
+      "High grooming cost",
+      "Variable coat"
+    ]
+  },
+  "Miniature Schnauzer": {
+    "subtitle": "Big personality in a compact package",
+    "temperament": [
+      "Fearless",
+      "Friendly",
+      "Obedient",
+      "Intelligent",
+      "Alert"
+    ],
+    "pros": [
+      "Low shedding",
+      "Adaptable",
+      "Trainable",
+      "Long-lived",
+      "Great watchdog"
+    ],
+    "cons": [
+      "Can be stubborn",
+      "Prone to barking",
+      "High prey drive",
+      "Needs regular grooming"
+    ]
+  },
+  "Greyhound": {
+    "subtitle": "The world's fastest couch potato",
+    "temperament": [
+      "Gentle",
+      "Affectionate",
+      "Even-tempered",
+      "Intelligent",
+      "Athletic"
+    ],
+    "pros": [
+      "Low energy indoors",
+      "Low shedding",
+      "Gentle nature",
+      "Great for adoption"
+    ],
+    "cons": [
+      "Strong prey drive",
+      "Needs secure garden",
+      "Sensitive to cold",
+      "Can't be let off lead"
+    ]
+  },
+  "Lurcher": {
+    "subtitle": "Sighthound soul with a gentle spirit",
+    "temperament": [
+      "Gentle",
+      "Affectionate",
+      "Calm",
+      "Sensitive",
+      "Loyal"
+    ],
+    "pros": [
+      "Low energy indoors",
+      "Gentle with children",
+      "Low grooming",
+      "Loyal"
+    ],
+    "cons": [
+      "Strong prey drive",
+      "Needs secure fencing",
+      "Sensitive",
+      "Not suited to cats"
+    ]
+  },
+  "Whippet": {
+    "subtitle": "Sprint, snuggle, repeat",
+    "temperament": [
+      "Gentle",
+      "Friendly",
+      "Lively",
+      "Quiet",
+      "Affectionate"
+    ],
+    "pros": [
+      "Low maintenance coat",
+      "Quiet indoors",
+      "Gentle with children",
+      "Adaptable"
+    ],
+    "cons": [
+      "Strong prey drive",
+      "Needs secure garden",
+      "Sensitive to cold",
+      "Separation anxiety"
+    ]
+  },
+  "Maltipoo": {
+    "subtitle": "Fluffy, clever, and endlessly loving",
+    "temperament": [
+      "Gentle",
+      "Playful",
+      "Affectionate",
+      "Intelligent",
+      "Adaptable"
+    ],
+    "pros": [
+      "Low shedding",
+      "Great for allergy sufferers",
+      "Adaptable",
+      "Friendly"
+    ],
+    "cons": [
+      "Variable traits",
+      "High grooming needs",
+      "Separation anxiety",
+      "Can be yappy"
+    ]
+  },
+  "Goldendoodle": {
+    "subtitle": "Golden heart wrapped in curls",
+    "temperament": [
+      "Friendly",
+      "Energetic",
+      "Loyal",
+      "Intelligent",
+      "Playful"
+    ],
+    "pros": [
+      "Low to no shedding",
+      "Highly trainable",
+      "Great with children",
+      "Sociable"
+    ],
+    "cons": [
+      "High grooming costs",
+      "Variable coat type",
+      "High energy",
+      "Health screening needed"
+    ]
+  },
+  "Cockapoo": {
+    "subtitle": "Britain's favourite hybrid with good reason",
+    "temperament": [
+      "Outgoing",
+      "Happy",
+      "Affectionate",
+      "Intelligent",
+      "Playful"
+    ],
+    "pros": [
+      "Low shedding",
+      "Easy to train",
+      "Great with everyone",
+      "Adaptable"
+    ],
+    "cons": [
+      "High grooming costs",
+      "Separation anxiety",
+      "Variable traits",
+      "Health screening essential"
+    ]
+  },
+  "West Highland Terrier": {
+    "subtitle": "Small, white, and absolutely certain",
+    "temperament": [
+      "Hardy",
+      "Confident",
+      "Alert",
+      "Friendly",
+      "Independent"
+    ],
+    "pros": [
+      "Sturdy and robust",
+      "Low shedding",
+      "Adaptable",
+      "Long-lived"
+    ],
+    "cons": [
+      "Stubborn",
+      "High prey drive",
+      "Can be dog-aggressive",
+      "Prone to skin conditions"
+    ]
+  },
+  "Pomeranian": {
+    "subtitle": "Tiny dog, enormous opinion",
+    "temperament": [
+      "Lively",
+      "Bold",
+      "Inquisitive",
+      "Friendly",
+      "Alert"
+    ],
+    "pros": [
+      "Adaptable to apartment",
+      "Intelligent",
+      "Loyal",
+      "Good watchdog"
+    ],
+    "cons": [
+      "Excessive barking",
+      "Heavy shedding",
+      "Fragile build",
+      "Can be difficult to housetrain"
+    ]
+  },
+  "French Bulldog": {
+    "subtitle": "Urban legend, actual best friend",
+    "temperament": [
+      "Playful",
+      "Affectionate",
+      "Easygoing",
+      "Sociable",
+      "Lively"
+    ],
+    "pros": [
+      "Low exercise needs",
+      "Adaptable",
+      "Great with children",
+      "Quiet"
+    ],
+    "cons": [
+      "Breathing problems",
+      "High vet costs",
+      "Cannot swim",
+      "Overheats easily",
+      "Expensive to buy"
+    ]
+  },
+  "Staffordshire Bull Terrier": {
+    "subtitle": "The nanny dog that loves unconditionally",
+    "temperament": [
+      "Loyal",
+      "Affectionate",
+      "Bold",
+      "Fearless",
+      "Reliable"
+    ],
+    "pros": [
+      "Excellent with children",
+      "Loyal",
+      "Adaptable",
+      "Low grooming"
+    ],
+    "cons": [
+      "Can be dog-aggressive",
+      "Strong and powerful",
+      "Stigma from breed legislation",
+      "High energy"
+    ]
+  },
+  "Chihuahua": {
+    "subtitle": "Ancient soul in the world's smallest body",
+    "temperament": [
+      "Alert",
+      "Devoted",
+      "Lively",
+      "Courageous",
+      "Sassy"
+    ],
+    "pros": [
+      "Long-lived",
+      "Low exercise needs",
+      "Adaptable",
+      "Fiercely loyal to one person"
+    ],
+    "cons": [
+      "Can be snappy",
+      "Fragile build",
+      "Difficult with children",
+      "Excessive barking",
+      "Prone to dental issues"
+    ]
+  },
+  "German Shepherd": {
+    "subtitle": "Brains, bravery, and boundless loyalty",
+    "temperament": [
+      "Loyal",
+      "Obedient",
+      "Curious",
+      "Alert",
+      "Confident"
+    ],
+    "pros": [
+      "Highly trainable",
+      "Versatile working dog",
+      "Loyal",
+      "Natural protector"
+    ],
+    "cons": [
+      "Heavy shedding",
+      "Needs lots of exercise",
+      "Can develop anxiety",
+      "Prone to hip dysplasia"
+    ]
+  },
+  "Pug": {
+    "subtitle": "Maximum personality, minimum snout",
+    "temperament": [
+      "Charming",
+      "Mischievous",
+      "Loving",
+      "Even-tempered",
+      "Playful"
+    ],
+    "pros": [
+      "Low exercise needs",
+      "Great with children",
+      "Adaptable",
+      "Sociable"
+    ],
+    "cons": [
+      "Serious breathing problems",
+      "Heavy shedding",
+      "Eye problems",
+      "Overheats easily",
+      "Snoring"
+    ]
+  },
+  "Labradoodle": {
+    "subtitle": "The original designer dog done right",
+    "temperament": [
+      "Sociable",
+      "Joyful",
+      "Energetic",
+      "Clever",
+      "Friendly"
+    ],
+    "pros": [
+      "Low shedding",
+      "Highly trainable",
+      "Great with children",
+      "Friendly"
+    ],
+    "cons": [
+      "Variable coat type",
+      "High energy",
+      "Health screening needed",
+      "High grooming costs"
+    ]
+  },
+  "Yorkshire Terrier": {
+    "subtitle": "Seven pounds of pure determination",
+    "temperament": [
+      "Bold",
+      "Confident",
+      "Intelligent",
+      "Independent",
+      "Tomboyish"
+    ],
+    "pros": [
+      "Low shedding",
+      "Adaptable",
+      "Loyal",
+      "Good watchdog"
+    ],
+    "cons": [
+      "Fragile build",
+      "Prone to barking",
+      "High grooming needs",
+      "Can be stubborn"
+    ]
+  },
+  "Poodle": {
+    "subtitle": "The most intelligent dog hiding in plain sight",
+    "temperament": [
+      "Intelligent",
+      "Active",
+      "Alert",
+      "Instinctual",
+      "Loyal"
+    ],
+    "pros": [
+      "Highly trainable",
+      "Low shedding",
+      "Long-lived",
+      "Adaptable to all sizes"
+    ],
+    "cons": [
+      "High grooming costs",
+      "Can develop anxiety",
+      "Needs lots of stimulation",
+      "Prone to ear infections"
+    ]
+  },
+  "Dachshund": {
+    "subtitle": "Long on charm, short on compromise",
+    "temperament": [
+      "Stubborn",
+      "Playful",
+      "Devoted",
+      "Lively",
+      "Clever"
+    ],
+    "pros": [
+      "Adaptable",
+      "Loyal",
+      "Entertaining personality",
+      "Good watchdog"
+    ],
+    "cons": [
+      "Prone to back problems",
+      "Stubborn to train",
+      "Loud bark",
+      "Can be aggressive to strangers"
+    ]
+  },
+  "Springer Spaniel": {
+    "subtitle": "Energy, enthusiasm, and endless loyalty",
+    "temperament": [
+      "Friendly",
+      "Playful",
+      "Obedient",
+      "Active",
+      "Attentive"
+    ],
+    "pros": [
+      "Highly trainable",
+      "Great with children",
+      "Versatile",
+      "Enthusiastic"
+    ],
+    "cons": [
+      "Very high energy",
+      "Needs lots of exercise",
+      "Prone to ear infections",
+      "Can be boisterous"
+    ]
+  },
+  "Border Terrier": {
+    "subtitle": "Tough little worker with a big heart",
+    "temperament": [
+      "Affectionate",
+      "Alert",
+      "Obedient",
+      "Intelligent",
+      "Hardy"
+    ],
+    "pros": [
+      "Hardy and robust",
+      "Good with children",
+      "Low grooming",
+      "Trainable"
+    ],
+    "cons": [
+      "High prey drive",
+      "Escape artist",
+      "Needs lots of exercise",
+      "Can be stubborn"
+    ]
+  },
+  "Border Collie": {
+    "subtitle": "The canine world's greatest overachiever",
+    "temperament": [
+      "Energetic",
+      "Responsive",
+      "Alert",
+      "Intelligent",
+      "Loyal"
+    ],
+    "pros": [
+      "Most intelligent breed",
+      "Highly trainable",
+      "Loyal",
+      "Excels at any sport"
+    ],
+    "cons": [
+      "Needs constant mental stimulation",
+      "Not suited to city life",
+      "Can be obsessive",
+      "Very high exercise needs"
+    ]
+  },
+  "Cocker Spaniel": {
+    "subtitle": "Soft eyes, strong nose, pure joy",
+    "temperament": [
+      "Merry",
+      "Playful",
+      "Affectionate",
+      "Quiet",
+      "Faithful"
+    ],
+    "pros": [
+      "Great with children",
+      "Adaptable",
+      "Trainable",
+      "Loving companion"
+    ],
+    "cons": [
+      "Prone to ear infections",
+      "Can suffer rage syndrome",
+      "High grooming needs",
+      "Needs regular exercise"
+    ]
+  },
+  "Golden Retriever": {
+    "subtitle": "The gold standard of family dogs",
+    "temperament": [
+      "Reliable",
+      "Trustworthy",
+      "Friendly",
+      "Kind",
+      "Confident"
+    ],
+    "pros": [
+      "Perfect family dog",
+      "Highly trainable",
+      "Gentle with children",
+      "Sociable"
+    ],
+    "cons": [
+      "Heavy shedding",
+      "Prone to cancer",
+      "High exercise needs",
+      "Can be too boisterous when young"
+    ]
+  },
+  "Labrador": {
+    "subtitle": "Britain's best friend, officially",
+    "temperament": [
+      "Kind",
+      "Outgoing",
+      "Active",
+      "Gentle",
+      "Intelligent"
+    ],
+    "pros": [
+      "Perfect family dog",
+      "Highly trainable",
+      "Gentle",
+      "Versatile working dog"
+    ],
+    "cons": [
+      "Heavy shedding",
+      "Prone to obesity",
+      "Boisterous when young",
+      "Prone to hip dysplasia"
+    ]
+  },
+  "Jack Russell Terrier": {
+    "subtitle": "Maximum mischief in minimum space",
+    "temperament": [
+      "Vocal",
+      "Fearless",
+      "Athletic",
+      "Stubborn",
+      "Energetic"
+    ],
+    "pros": [
+      "Hardy and long-lived",
+      "Entertaining personality",
+      "Low grooming",
+      "Energetic companion"
+    ],
+    "cons": [
+      "Extremely stubborn",
+      "High prey drive",
+      "Can be aggressive to other dogs",
+      "Excessive barking"
+    ]
+  },
+  "Boxer": {
+    "subtitle": "Playful, loyal, and forever young at heart",
+    "temperament": [
+      "Playful",
+      "Energetic",
+      "Loyal",
+      "Cheerful",
+      "Devoted"
+    ],
+    "pros": [
+      "Great with children",
+      "Loyal",
+      "Playful",
+      "Natural guard dog"
+    ],
+    "cons": [
+      "Breathing problems",
+      "Short lifespan",
+      "Prone to cancer",
+      "High energy",
+      "Drools"
+    ]
+  },
+  "Irish Setter": {
+    "subtitle": "Red-coated wanderer with a joyful soul",
+    "temperament": [
+      "Lively",
+      "Energetic",
+      "Affectionate",
+      "Playful",
+      "Independent"
+    ],
+    "pros": [
+      "Stunning appearance",
+      "Friendly with everyone",
+      "Good with children",
+      "Athletic"
+    ],
+    "cons": [
+      "Very high exercise needs",
+      "Slow to mature",
+      "Can be stubborn",
+      "Prone to bloat"
+    ]
+  }
+}
