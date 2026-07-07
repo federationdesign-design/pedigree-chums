@@ -5,9 +5,9 @@ import type { LineageNode } from "../../data/lineage";
 import styles from "./BreedTreeMap.module.css";
 
 // ── Constants (matching LineageMap pit values) ────────────────────────────────
-const ROOT   = 58;
-const RING1  = ROOT + 96;
-const RSTEP  = 148;
+const ROOT   = 39;
+const RING1  = ROOT + 64;
+const RSTEP  = 99;
 const SPREAD1 = Math.PI * 1.1;
 const SPREADN = Math.PI * 1.6;
 
@@ -77,7 +77,7 @@ function layoutTree(root: Node) {
   // Collision resolution - push overlapping nodes apart
   // Run multiple passes until stable
   const NODE_R = 28; // fixed radius
-  const MIN_DIST = NODE_R * 2 + 12; // minimum distance between node centres
+  const MIN_DIST = NODE_R * 2 + 8; // minimum distance between node centres
   const allNodes: Node[] = [];
   const collectAll = (n: Node) => {
     allNodes.push(n);
