@@ -24,10 +24,10 @@ type Props = {
 
 // Default positions for each card (as % of viewport)
 const DEFAULTS = {
-  photo:      { x: 0.72, y: 0.10 },  // top right
-  tree:       { x: 0.68, y: 0.06 },  // top right
-  infoBox:    { x: 0.04, y: 0.38 },  // left side, below title
-  familyTree: { x: 0.20, y: 0.08 },  // centre - main element
+  photo:      { x: 0.70, y: 0.08 },  // top right - dog photo
+  tree:       { x: 0.04, y: 0.08 },  // top left - circular diagram
+  infoBox:    { x: 0.70, y: 0.55 },  // bottom right - info
+  familyTree: { x: 0.26, y: 0.10 },  // centre - main element
 };
 
 function DragCard({
@@ -146,8 +146,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.tree.left,
             top: positions.tree.top,
             zIndex: zOrders.tree,
-            width: 884,
-            height: 884,
+            width: 680,
+            height: 680,
             overflow: "visible",
           }}
         >
@@ -199,9 +199,9 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.familyTree.left,
             top: positions.familyTree.top,
             zIndex: zOrders.familyTree,
-            width: "56vw",
-            height: "88vh",
-            overflow: "hidden",
+            width: "60vw",
+            height: "80vh",
+            overflow: "visible",
             cursor: "grab",
             touchAction: "none",
             userSelect: "none" as const,

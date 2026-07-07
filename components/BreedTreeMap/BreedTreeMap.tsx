@@ -131,8 +131,8 @@ export default function BreedTreeMap({
   const shown = useMemo(() => getShown(root, open), [root, open]);
 
   // Pan state
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const panRef = useRef({ x: 0, y: 0 });
+  const [pan, setPan] = useState({ x: -700, y: -500 }); // centre root at 0,0
+  const panRef = useRef({ x: -700, y: -500 });
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // Tooltip
@@ -197,8 +197,10 @@ export default function BreedTreeMap({
     >
       <svg
         className={styles.svg}
-        viewBox={`${-700 + pan.x} ${-500 + pan.y} 1400 1000`}
-        preserveAspectRatio="xMidYMid slice"
+        width={1400}
+        height={1000}
+        viewBox={`${pan.x} ${pan.y} 1400 1000`}
+        style={{ display: "block" }}
       >
         <defs>
           {rootImage && (
