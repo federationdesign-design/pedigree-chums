@@ -45,7 +45,6 @@
 }
 .scorePts {
   font-size: clamp(16px, 2vw, 28px);
-  opacity: 0.8;
 }
 
 .inner {

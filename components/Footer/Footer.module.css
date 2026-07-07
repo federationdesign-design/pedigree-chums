@@ -20,7 +20,6 @@
   max-width: 760px;
   font-size: 0.8rem;
   font-weight: 500;
-  opacity: 0.8;
 }
 .links {
   margin-top: clamp(20px, 3vw, 32px);
@@ -35,7 +34,6 @@
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
-  opacity: 0.9;
 }
 .link:hover {
   opacity: 1;

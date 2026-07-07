@@ -54,7 +54,6 @@
   font-size: clamp(0.95rem, 2.2vw, 1.05rem);
   line-height: 1.5;
   margin: 0 0 14px;
-  opacity: 0.9;
 }
 
 .btn {
