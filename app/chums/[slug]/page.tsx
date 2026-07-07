@@ -42,8 +42,11 @@ export default function BreedPage({ params }: Props) {
     cons: [],
   };
 
-  const lineageName = resolveLineageName(breed.name);
-  const lineage = getLineage(lineageName) ?? null;
+  let lineage = null;
+  try {
+    const lineageName = resolveLineageName(breed.name);
+    lineage = getLineage(lineageName) ?? null;
+  } catch {}
 
   return (
     <>
