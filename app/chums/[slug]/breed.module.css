@@ -41,6 +41,7 @@
 }
 
 .treeWrap {
+  height: 700px;
   flex-shrink: 0;
   min-width: 600px;
 }
