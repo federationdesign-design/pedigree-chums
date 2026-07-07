@@ -135,8 +135,38 @@ export default function BreedTreeMap({
   const panRef = useRef({ x: -700, y: -500 });
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Tooltip
+  // Tooltip (hover)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+
+  // Pct card (click) - detailed ancestry breakdown
+  type PctCard = { name: string; share: number; norm: number; depth: number; note?: string; x: number; y: number };
+  const [pctCard, setPctCard] = useState<PctCard | null>(null);
+
+  // Calculate normalised share relative to root
+  const normShare = (n: Node): number => {
+    if (!n._parent) return 100;
+    return Math.round((n._leaves / root._leaves) * 100);
+  };
+
+  const genLabel = (d: number) => {
+    if (d <= 0) return "the breed itself";
+    if (d === 1) return "parent";
+    if (d === 2) return "grandparent";
+    return `${"great-".repeat(d - 2)}grandparent`;
+  };
+
+  const TITLES = [
+    "Our best guess, not hard science.",
+    "An educated guess, not gospel.",
+    "Informed estimate, not exact science.",
+    "Our reckoning, not the final word.",
+    "A considered guess, not cold fact.",
+    "Best judgement, not laboratory proof.",
+    "Our read on it, not a certainty.",
+    "A fair estimate, not a fixed figure.",
+    "Studied guesswork, not hard data.",
+    "Our interpretation, not established fact.",
+  ];
 
   // Pan drag
   const panDrag = useRef<{ sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
@@ -280,7 +310,22 @@ export default function BreedTreeMap({
               data-node="1"
               transform={`translate(${n._x},${n._y})`}
               style={{ cursor: hasKids ? "pointer" : "default" }}
-              onClick={(e) => { e.stopPropagation(); toggleNode(n); }}
+              onClick={(e) => {
+              e.stopPropagation();
+              const rect = wrapRef.current?.getBoundingClientRect();
+              if (!rect) { toggleNode(n); return; }
+              // Single click on leaf = show pct card; on branch = toggle open/close
+              setPctCard({
+                name: n.name,
+                share,
+                norm: normShare(n),
+                depth: n._parent ? 1 : 0,
+                note: n.note,
+                x: e.clientX - rect.left + 12,
+                y: e.clientY - rect.top - 20,
+              });
+              toggleNode(n);
+            }}
               onMouseEnter={(e) => {
                 const rect = wrapRef.current?.getBoundingClientRect();
                 if (!rect) return;
@@ -334,8 +379,8 @@ export default function BreedTreeMap({
         })}
       </svg>
 
-      {/* Tooltip */}
-      {tooltip && (
+      {/* Tooltip (hover) */}
+      {tooltip && !pctCard && (
         <div
           className={styles.tooltip}
           style={{ left: tooltip.x, top: tooltip.y }}
@@ -343,6 +388,24 @@ export default function BreedTreeMap({
           <span className={styles.tooltipName}>{tooltip.name}</span>
           <span className={styles.tooltipShare}>{tooltip.share}% of ancestry</span>
           {tooltip.note && <span className={styles.tooltipNote}>{tooltip.note}</span>}
+        </div>
+      )}
+
+      {/* Pct card (click) */}
+      {pctCard && (
+        <div
+          className={styles.pctCard}
+          style={{ left: Math.min(pctCard.x, 700), top: pctCard.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button className={styles.pctClose} onClick={() => setPctCard(null)}>×</button>
+          <div className={styles.pctName}>{pctCard.name}</div>
+          <div className={styles.pctBig}>{pctCard.norm < 1 ? "<1%" : `${pctCard.norm}%`} of your chum</div>
+          <div className={styles.pctRow}>As {genLabel(pctCard.depth)}: {pctCard.share < 1 ? "<1%" : `${pctCard.share}%`}</div>
+          <div className={styles.pctRow}>Share of your chum: {pctCard.norm < 1 ? "<1%" : `${pctCard.norm}%`}</div>
+          <div className={styles.pctTitle}>{TITLES[Math.abs(pctCard.name.split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % TITLES.length]}</div>
+          {pctCard.note && <div className={styles.pctNote}>{pctCard.note}</div>}
+          <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}
     </div>
