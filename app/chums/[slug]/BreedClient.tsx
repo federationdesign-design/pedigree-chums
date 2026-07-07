@@ -146,28 +146,12 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             left: positions.tree.left,
             top: positions.tree.top,
             zIndex: zOrders.tree,
-            width: 900,
-            height: 700,
+            width: 680,
+            height: 680,
             overflow: "visible",
-            cursor: "grab",
-            userSelect: "none" as const,
-            touchAction: "none",
-          }}
-          onPointerDown={(e) => {
-            const el = e.currentTarget;
-            bringToFront("tree");
-            const rect = el.getBoundingClientRect();
-            const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
-            el.setPointerCapture(e.pointerId);
-            let active = true;
-            const onMove = (ev: PointerEvent) => { if (!active) return; el.style.left = `${ev.clientX - ox}px`; el.style.top = `${ev.clientY - oy}px`; };
-            const onUp = () => { active = false; el.style.cursor = "grab"; window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
-            el.style.cursor = "grabbing";
-            window.addEventListener("pointermove", onMove);
-            window.addEventListener("pointerup", onUp);
           }}
         >
-          <BreedTree root={lineage} rootImage={image} />
+          <BreedTree root={lineage} rootImage={image} centred />
         </div>
       )}
 
@@ -207,19 +191,38 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         </div>
       </DragCard>
 
-      {/* Family tree - draggable, fully interactive */}
+      {/* Family tree - loose on canvas, no container, draggable */}
       {lineage && positions.familyTree && (
-        <DragCard
-          id="familyTree"
-          className={`${styles.card}`}
-          style={{ ...positions.familyTree, zIndex: zOrders.familyTree, width: 560, height: 560 }}
-          onBringToFront={bringToFront}
+        <div
+          style={{
+            position: "absolute",
+            left: positions.familyTree.left,
+            top: positions.familyTree.top,
+            zIndex: zOrders.familyTree,
+            width: 700,
+            height: 700,
+            overflow: "visible",
+            cursor: "grab",
+            touchAction: "none",
+            userSelect: "none" as const,
+          }}
+          onPointerDown={(e) => {
+            if ((e.target as Element).closest("[data-node]")) return;
+            const el = e.currentTarget;
+            bringToFront("familyTree");
+            const rect = el.getBoundingClientRect();
+            const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+            el.setPointerCapture(e.pointerId);
+            let active = true;
+            const onMove = (ev: PointerEvent) => { if (!active) return; el.style.left = `${ev.clientX - ox}px`; el.style.top = `${ev.clientY - oy}px`; };
+            const onUp = () => { active = false; el.style.cursor = "grab"; window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
+            el.style.cursor = "grabbing";
+            window.addEventListener("pointermove", onMove);
+            window.addEventListener("pointerup", onUp);
+          }}
         >
-          <p className={styles.treeLabel}>Family tree</p>
-          <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
-            <BreedTreeMap lineage={lineage} rootImage={image} />
-          </div>
-        </DragCard>
+          <BreedTreeMap lineage={lineage} rootImage={image} />
+        </div>
       )}
 
       {/* Back button */}
