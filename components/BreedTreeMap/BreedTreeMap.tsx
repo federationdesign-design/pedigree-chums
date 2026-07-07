@@ -173,9 +173,28 @@ export default function BreedTreeMap({
   // Tooltip (hover)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
-  // Image popup (eye icon click)
-  type ImgPopup = { name: string; img: string; note?: string; x: number; y: number };
-  const [imgPopup, setImgPopup] = useState<ImgPopup | null>(null);
+  // Draggable image cards (eye icon click)
+  type DragImg = { id: string; name: string; img: string; x: number; y: number; placed: boolean };
+  const [dragImgs, setDragImgs] = useState<DragImg[]>([]);
+  const [draggingImg, setDraggingImg] = useState<string | null>(null); // id being dragged
+
+  // Frames - one per node with image, stacked
+  type Frame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
+  const [frames, setFrames] = useState<Frame[]>([]);
+  const [frameFlash, setFrameFlash] = useState<string | null>(null);
+
+  // Build frames from all nodes with images on mount
+  useEffect(() => {
+    const found: Frame[] = [];
+    const walk = (n: Node) => {
+      if (n.img && n._parent) {
+        found.push({ id: n._id, name: n.name, img: n.img as string, filled: false, shake: false });
+      }
+      (n.children as Node[] | undefined)?.forEach(walk);
+    };
+    walk(root);
+    setFrames(found);
+  }, [root]);
 
   // Pct card (click) - detailed ancestry breakdown
   type PctCard = { name: string; share: number; norm: number; depth: number; note?: string; x: number; y: number };
@@ -274,6 +293,7 @@ export default function BreedTreeMap({
     <div
       ref={wrapRef}
       className={styles.wrap}
+      style={{ position: "relative" }}
       onPointerDown={onWrapPointerDown}
       onPointerMove={onWrapPointerMove}
       onPointerUp={onWrapPointerUp}
@@ -443,8 +463,8 @@ export default function BreedTreeMap({
                 </text>
               )}
 
-              {/* Eye icon on leaf nodes with images */}
-              {!hasKids && n.img && (
+              {/* Eye icon on all nodes with images */}
+              {n.img && !dragImgs.find((d) => d.id === n._id) && (
                 <g
                   transform={`translate(${r - 8}, ${-r + 8})`}
                   style={{ cursor: "pointer" }}
@@ -452,13 +472,17 @@ export default function BreedTreeMap({
                     e.stopPropagation();
                     const rect = wrapRef.current?.getBoundingClientRect();
                     if (!rect) return;
-                    setImgPopup({
-                      name: n.name,
-                      img: n.img as string,
-                      note: n.note,
-                      x: n._x + pan.x + 700 - 140 + 40,
-                      y: n._y + pan.y + 500 - 20,
-                    });
+                    setDragImgs((prev) => [
+                      ...prev,
+                      {
+                        id: n._id,
+                        name: n.name,
+                        img: n.img as string,
+                        x: rect.left + 100 + prev.length * 10,
+                        y: rect.top + 100 + prev.length * 10,
+                        placed: false,
+                      }
+                    ]);
                   }}
                 >
                   <circle r={11} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
@@ -484,16 +508,61 @@ export default function BreedTreeMap({
         </div>
       )}
 
-      {/* Image popup (eye icon) */}
-      {imgPopup && (
-        <div className={styles.imgPopup} style={{ left: imgPopup.x, top: imgPopup.y }}>
-          <button className={styles.pctClose} onClick={() => setImgPopup(null)}>×</button>
-          <div className={styles.pctName}>{imgPopup.name}</div>
+      {/* Draggable image cards */}
+      {dragImgs.filter((d) => !d.placed).map((d) => (
+        <div
+          key={d.id}
+          className={`${styles.imgCard} ${draggingImg === d.id ? styles.imgCardDragging : ""}`}
+          style={{ position: "fixed", left: d.x, top: d.y, zIndex: 200 }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            setDraggingImg(d.id);
+            const startX = e.clientX - d.x;
+            const startY = e.clientY - d.y;
+            const el = e.currentTarget;
+            el.setPointerCapture(e.pointerId);
+            const onMove = (ev: PointerEvent) => {
+              const nx = ev.clientX - startX;
+              const ny = ev.clientY - startY;
+              setDragImgs((prev) => prev.map((p) => p.id === d.id ? { ...p, x: nx, y: ny } : p));
+            };
+            const onUp = (ev: PointerEvent) => {
+              setDraggingImg(null);
+              el.removeEventListener("pointermove", onMove);
+              el.removeEventListener("pointerup", onUp);
+              // Check if dropped on matching frame
+              const frameEls = document.querySelectorAll<HTMLElement>("[data-frame]");
+              let matched = false;
+              frameEls.forEach((f) => {
+                const rect = f.getBoundingClientRect();
+                if (ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
+                  const frameId = f.dataset.frame!;
+                  const frame = frames.find((fr) => fr.id === frameId);
+                  if (frame && frame.img === d.img && !frame.filled) {
+                    // Correct match
+                    setFrames((prev) => prev.map((fr) => fr.id === frameId ? { ...fr, filled: true } : fr));
+                    setDragImgs((prev) => prev.map((p) => p.id === d.id ? { ...p, placed: true } : p));
+                    setFrameFlash(frameId);
+                    setTimeout(() => setFrameFlash(null), 600);
+                    matched = true;
+                  } else if (frame && !frame.filled) {
+                    // Wrong match - shake
+                    setFrames((prev) => prev.map((fr) => fr.id === frameId ? { ...fr, shake: true } : fr));
+                    setTimeout(() => setFrames((prev) => prev.map((fr) => fr.id === frameId ? { ...fr, shake: false } : fr)), 400);
+                  }
+                }
+              });
+            };
+            el.addEventListener("pointermove", onMove);
+            el.addEventListener("pointerup", onUp);
+          }}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgPopup.img} alt={imgPopup.name} className={styles.imgPopupImg} />
-          {imgPopup.note && <p className={styles.pctNote}>{imgPopup.note}</p>}
+          <img src={d.img} alt={d.name} className={styles.imgCardImg} draggable={false} />
+          <div className={styles.imgCardName}>{d.name}</div>
+          <button className={styles.imgCardClose} onClick={() => setDragImgs((prev) => prev.filter((p) => p.id !== d.id))}>×</button>
         </div>
-      )}
+      ))}
 
       {/* Pct card (click) */}
       {pctCard && (
@@ -511,6 +580,29 @@ export default function BreedTreeMap({
           <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}
+      {/* Frames panel - fixed position relative to wrap */}
+      <div className={styles.framesCard} style={{ position: "absolute", top: 16, right: 16 }}>
+        <p style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow, #ffd23e)", margin: "0 0 10px", textTransform: "uppercase" }}>Place your chums</p>
+        <div className={styles.framesGrid}>
+          {frames.map((f) => (
+            <div
+              key={f.id}
+              data-frame={f.id}
+              className={`${styles.frame} ${f.filled ? styles.frameFilled : ""} ${f.shake ? styles.frameShake : ""} ${frameFlash === f.id ? styles.frameFlash : ""}`}
+            >
+              {f.filled ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={f.img} alt={f.name} className={styles.frameImg} />
+                  <span className={styles.frameLabel}>{f.name}</span>
+                </>
+              ) : (
+                <span className={styles.frameEmpty}>+</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
