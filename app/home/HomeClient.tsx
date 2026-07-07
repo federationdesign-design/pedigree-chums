@@ -87,31 +87,6 @@ export default function HomeClient() {
 
       <div className={styles.divider} />
 
-      {/* Stats strip */}
-      <div className={styles.strip}>
-        <div className={styles.stripStat}>
-          <span className={styles.stripNum}>54</span>
-          <span className={styles.stripLabel}>Breed cards</span>
-        </div>
-        <div className={styles.stripDivider} />
-        <div className={styles.stripStat}>
-          <span className={styles.stripNum}>2+</span>
-          <span className={styles.stripLabel}>Players</span>
-        </div>
-        <div className={styles.stripDivider} />
-        <div className={styles.stripStat}>
-          <span className={styles.stripNum}>∞</span>
-          <span className={styles.stripLabel}>Dog walks</span>
-        </div>
-        <div className={styles.stripDivider} />
-        <div className={styles.stripStat}>
-          <span className={styles.stripNum}>1</span>
-          <span className={styles.stripLabel}>Deck to rule them all</span>
-        </div>
-      </div>
-
-      <div className={styles.divider} />
-
       {/* Product section */}
       <section className={styles.product}>
         <div className={styles.productImage}>
