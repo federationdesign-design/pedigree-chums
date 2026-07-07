@@ -55,7 +55,7 @@ export default function HomeClient() {
               {filtered.length > 0 ? filtered.map((b) => (
                 <Link
                   key={b.slug}
-                  href={`/breeds/${b.slug}`}
+                  href={`/chums/${b.slug}`}
                   className={styles.dropdownItem}
                   onClick={() => { setOpen(false); setQuery(""); }}
                 >
