@@ -9,6 +9,8 @@ import breedInfo from "../../../data/breed-info.json";
 
 type Props = { params: { slug: string } };
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return breeds.map((b) => ({ slug: b.slug }));
 }
@@ -27,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function BreedPage({ params }: Props) {
   const breed = breeds.find((b) => b.slug === params.slug);
-  if (!breed) notFound();
+  if (!breed) return notFound();
 
   const info = (breedInfo as Record<string, {
     subtitle: string;
