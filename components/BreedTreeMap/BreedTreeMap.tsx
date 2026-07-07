@@ -411,20 +411,22 @@ export default function BreedTreeMap({
                   }
                 }
                 if (current) lines.push(current);
-                const lineH = 14;
-                const pillH = lines.length * lineH + 8;
-                const pillW = Math.max(...lines.map((l) => l.length)) * 6.2 + 20;
-                const py = -r - 8 - pillH;
+                const lineH = 15;
+                const padX = 14;
+                const padY = 8;
+                const pillH = lines.length * lineH + padY * 2;
+                const pillW = Math.max(...lines.map((l) => l.length)) * 6.4 + padX * 2;
+                const py = -r - 6 - pillH;
                 return (
                   <g>
-                    <rect className={styles.nmPill} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={8} />
+                    <rect className={styles.nmPill} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={33} />
                     {lines.map((line, i) => (
                       <text
                         key={i}
                         className={styles.nm}
                         textAnchor="middle"
                         dominantBaseline="central"
-                        y={py + 8 + i * lineH + lineH / 2}
+                        y={py + padY + i * lineH + lineH / 2}
                         style={{ fontSize: "12px" }}
                       >
                         {line}

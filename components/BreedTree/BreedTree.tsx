@@ -137,6 +137,7 @@ export default function BreedTree({
   onClose,
   centred = false,
   size = 760,
+  hideLabels = false,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -144,6 +145,7 @@ export default function BreedTree({
   onClose?: () => void;
   centred?: boolean;
   size?: number;
+  hideLabels?: boolean;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -458,7 +460,7 @@ export default function BreedTree({
             })}
           </g>
 
-          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }}>
+          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: hideLabels ? 0 : entered ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: hideLabels ? "none" : "auto" }}>
             {nodes.map((d, i) => {
               const isChild = d.parent === focus;
               // When zoomed right into a single circle that has nothing inside

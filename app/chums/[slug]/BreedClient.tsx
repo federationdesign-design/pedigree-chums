@@ -206,7 +206,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
             if (stage) stage.style.zIndex = "1";
           }}>
-            <BreedTree root={lineage} rootImage={image} centred size={760} />
+            <BreedTree root={lineage} rootImage={image} centred size={760} hideLabels />
           </div>
         )}
 
