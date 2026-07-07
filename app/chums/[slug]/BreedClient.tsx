@@ -139,7 +139,14 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             overflow: "visible",
           }}
         >
-          <BreedTree root={lineage} rootImage={image} centred />
+          <div style={{ width: "100%", height: "100%", position: "relative" }} ref={(el) => {
+            if (!el) return;
+            // Force BreedTree stage to be interactive by removing z-index:-1
+            const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
+            if (stage) stage.style.zIndex = "1";
+          }}>
+            <BreedTree root={lineage} rootImage={image} centred />
+          </div>
         </div>
       )}
 
