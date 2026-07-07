@@ -5,12 +5,13 @@ import Link from "next/link";
 import styles from "./Nav.module.css";
 
 const links = [
-  { label: "Home", href: "/" },
+  { label: "Home", href: "/home" },
   { label: "About", href: "/about" },
   { label: "Know Your Chums", href: "/know-your-chums" },
   { label: "Britain's Dog History", href: "/britains-dog-history" },
   { label: "Hot/Dogs", href: "/hot-dogs" },
   { label: "Competitions", href: "/chumspot" },
+  { label: "Chum Drop", href: "/" },
 ];
 
 export default function Nav({ hideLogo = false, dockBottomLeft = false }: { hideLogo?: boolean; dockBottomLeft?: boolean }) {
