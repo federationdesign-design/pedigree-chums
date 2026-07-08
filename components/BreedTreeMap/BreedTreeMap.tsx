@@ -249,11 +249,16 @@ export default function BreedTreeMap({
     if (!onFramesReady || framesReadyFired.current) return;
     framesReadyFired.current = true;
     const found: FrameNode[] = [];
+    const seenImg = new Set<string>();
     const walk = (n: Node) => {
       if (n.img && n._parent) {
-        const pct = Math.round((n._leaves / root._leaves) * 100);
-        const status = nodeStatus(n.name, n.note ?? "");
-        found.push({ id: n._id, name: n.name, img: n.img as string, pct, note: n.note, status });
+        const img = n.img as string;
+        if (!seenImg.has(img)) {
+          seenImg.add(img);
+          const pct = Math.round((n._leaves / root._leaves) * 100);
+          const status = nodeStatus(n.name, n.note ?? "");
+          found.push({ id: n._id, name: n.name, img, pct, note: n.note, status });
+        }
       }
       (n.children as Node[] | undefined)?.forEach(walk);
     };
