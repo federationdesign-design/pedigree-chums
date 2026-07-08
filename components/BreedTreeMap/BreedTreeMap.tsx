@@ -284,8 +284,7 @@ export default function BreedTreeMap({
                 style={{ cursor: hasKids ? "pointer" : "default" }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!hasKids) return;
-                  toggleNode(n);
+                  // Nodes are always open - not closable
                 }}>
 
                 <circle

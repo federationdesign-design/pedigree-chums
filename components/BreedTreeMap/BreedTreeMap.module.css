@@ -43,8 +43,8 @@
 
 /* Disc - yellow fill, navy stroke, matching pit exactly */
 .disc {
-  fill: var(--yellow, var(--yellow));
-  stroke: var(--navy, var(--navy));
+  fill: #ffd23e;
+  stroke: #0a3a57;
   stroke-width: 3;
   transition: r 0.18s ease;
 }
@@ -61,16 +61,16 @@
 
 /* Open nodes turn blue */
 .discOpen {
-  fill: var(--blue, var(--blue));
-  stroke: var(--navy, var(--navy));
+  fill: #0a3a57;
+  stroke: #0a3a57;
   stroke-width: 3;
   stroke-dasharray: none;
 }
 
 /* Root node */
 .discRoot {
-  fill: var(--navy, var(--navy));
-  stroke: var(--yellow, var(--yellow));
+  fill: #0a3a57;
+  stroke: #ffd23e;
   stroke-width: 3;
   cursor: default;
 }
