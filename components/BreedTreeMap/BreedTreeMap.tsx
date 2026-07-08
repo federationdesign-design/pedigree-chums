@@ -148,6 +148,7 @@ export default function BreedTreeMap({
 
   type DragImg = { id: string; name: string; img: string; x: number; y: number; placed: boolean };
   const [dragImgs, setDragImgs] = useState<DragImg[]>([]);
+  const [openedIds, setOpenedIds] = useState<Set<string>>(new Set());
   const [draggingImg, setDraggingImg] = useState<string | null>(null);
   const [dragName, setDragName] = useState<string | null>(null);
 
@@ -263,7 +264,7 @@ export default function BreedTreeMap({
 
           <g transform={`translate(${root._x},${root._y})`}>
             <rect x={-ROOT - 4} y={-ROOT - 4} width={ROOT * 2 + 8} height={ROOT * 2 + 8}
-              rx={20} fill="var(--blue, #1497d6)" stroke="var(--yellow, #ffd23e)" strokeWidth={4} />
+              rx={20} fill="var(--blue-deep, #0b78bd)" stroke="var(--yellow, #ffd23e)" strokeWidth={4} />
             {rootImage && (
               <image href={rootImage} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2}
                 clipPath="url(#btm-root-clip)" preserveAspectRatio="xMidYMid slice" />
@@ -293,15 +294,18 @@ export default function BreedTreeMap({
                 style={{ cursor: "pointer" }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  const rect = wrapRef.current?.getBoundingClientRect();
-                  if (rect) setPctCard({ name: n.name, share, norm: normShare(n), depth: n._parent ? 1 : 0, x: e.clientX - rect.left + 12, y: e.clientY - rect.top - 20 });
+                  if (!hasKids) return; // leaf nodes: no toggle
                   toggleNode(n);
                 }}>
                 <circle
                   className={`${styles.disc} ${hasKids && !isOpen ? styles.discHas : ""} ${isOpen ? styles.discOpen : ""}`.trim()}
                   r={r}
-                  fill={isFilled ? "#22c55e" : n.img ? `url(#btm-${n._id})` : undefined}
-                  style={isFilled ? { stroke: "#16a34a" } : undefined} />
+                  fill={
+                    isFilled ? "#22c55e" :
+                    openedIds.has(n._id) ? "var(--blue-deep, #0b78bd)" :
+                    n.img ? `url(#btm-${n._id})` : undefined
+                  }
+                  style={isFilled ? { stroke: "#16a34a" } : openedIds.has(n._id) ? { stroke: "var(--blue-sky, #5cc4ee)" } : undefined} />
                 <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                   fontSize={Math.max(11, r * 0.5)} style={isOpen ? { fill: "#ffffff" } : undefined}>
                   {`${share}%`}
@@ -339,16 +343,12 @@ export default function BreedTreeMap({
                       e.stopPropagation();
                       const wrap = wrapRef.current;
                       if (!wrap) return;
-                      // Get node SVG position relative to wrap
-                      const svgEl = wrap.querySelector("svg");
-                      if (!svgEl) return;
-                      const svgRect = svgEl.getBoundingClientRect();
-                      const vbParts = svgEl.getAttribute("viewBox")?.split(" ").map(Number) ?? [0,0,1400,1000];
-                      const scaleX = svgRect.width / (vbParts[2] ?? 1400);
-                      const scaleY = svgRect.height / (vbParts[3] ?? 1000);
-                      const screenX = (n._x - (vbParts[0] ?? 0)) * scaleX + svgRect.left - wrap.getBoundingClientRect().left;
-                      const screenY = (n._y - (vbParts[1] ?? 0)) * scaleY + svgRect.top - wrap.getBoundingClientRect().top;
-                      setDragImgs((prev) => [...prev, { id: n._id, name: n.name, img: n.img as string, x: screenX + 40, y: screenY - 80, placed: false }]);
+                      // Position card near click point, relative to wrap
+                      const wrapRect = wrap.getBoundingClientRect();
+                      const x = e.clientX - wrapRect.left + 20;
+                      const y = e.clientY - wrapRect.top - 80;
+                      setOpenedIds((prev) => new Set([...prev, n._id]));
+                      setDragImgs((prev) => [...prev, { id: n._id, name: n.name, img: n.img as string, x, y, placed: false }]);
                     }}>
                     <circle r={11} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
                     <text textAnchor="middle" dominantBaseline="central"
