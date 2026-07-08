@@ -117,6 +117,7 @@ export default function BreedTreeMap({
   filledIds = [],
   onFramesReady,
   onImageDropped,
+  onDragName,
 }: {
   lineage: LineageNode;
   rootImage?: string;
