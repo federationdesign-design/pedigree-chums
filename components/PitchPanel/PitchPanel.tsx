@@ -1,7 +1,6 @@
 import CardRail from "../CardRail/CardRail";
 import LabPop from "./LabPop";
 import OfferCta from "../Offer/OfferCta";
-import ParallaxShape from "../Parallax/ParallaxShape";
 import Triangles, { type Tri } from "../Parallax/Triangles";
 import styles from "./PitchPanel.module.css";
 
@@ -14,7 +13,6 @@ const pitchTriangles: Tri[] = [
 export default function PitchPanel() {
   return (
     <div className={styles.outer}>
-      <ParallaxShape className={styles.yellowCircle} speed={0.25} />
       <section className={styles.panel}>
         <div className={styles.glowLayer} aria-hidden="true">
           <span className={`${styles.glowCircle} ${styles.glowTop}`} />

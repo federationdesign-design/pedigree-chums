@@ -407,3 +407,38 @@
     display: none;
   }
 }
+
+/* ── Video + cards section ───────────────────────────────── */
+.videoSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 6vw, 80px);
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 96px) clamp(20px, 6vw, 80px);
+}
+
+.videoCol {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+}
+
+.videoFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 20px;
+}
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
