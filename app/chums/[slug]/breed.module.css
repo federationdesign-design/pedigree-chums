@@ -1,7 +1,7 @@
 /* ── Page canvas ─────────────────────────────────────────── */
 .canvas {
   min-height: 100svh;
-  min-width: 4000px;
+  min-width: 3000px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   display: flex;
@@ -206,7 +206,7 @@
   display: flex;
   flex-direction: row;
   gap: 48px;
-  padding: 0 clamp(20px, 4vw, 48px) 48px;
+  padding: 0 clamp(20px, 4vw, 48px) 0;
   align-items: flex-start;
   overflow-x: auto;
 }
@@ -225,7 +225,7 @@
 
 .framesSectionTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
+  font-size: 26px;
   letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;

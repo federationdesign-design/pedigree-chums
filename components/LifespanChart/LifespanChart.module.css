@@ -4,7 +4,7 @@
 
 .title {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
+  font-size: 26px;
   letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;

@@ -231,6 +231,10 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           </DragCard>
         )}
 
+        {/* Lifespan chart - in cards row */}
+        {lifespanCurves[name] && (
+          <LifespanChart breedName={name} />
+        )}
       </div>
 
       {/* Diagrams row */}
@@ -251,10 +255,6 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} />
         )}
 
-        {/* Lifespan chart - free diagram */}
-        {lifespanCurves[name] && (
-          <LifespanChart breedName={name} />
-        )}
       </div>
 
       {/* Ancestor Pack - page level with correct left edge padding */}

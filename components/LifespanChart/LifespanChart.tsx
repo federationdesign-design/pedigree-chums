@@ -4,8 +4,8 @@ import { useState, useMemo } from "react";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES, type CurvePoint } from "../../data/lifespanCurves";
 import styles from "./LifespanChart.module.css";
 
-const W = 560;
-const H = 320;
+const W = 700;
+const H = 400;
 const PAD = { top: 24, right: 24, bottom: 48, left: 44 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
