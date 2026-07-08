@@ -9,7 +9,7 @@
 
 /* ── Page header ─────────────────────────────────────────── */
 .header {
-  padding: clamp(80px, 10vw, 100px) clamp(20px, 4vw, 48px) 24px;
+  padding: clamp(85px, 10vw, 105px) clamp(20px, 4vw, 48px) 24px;
   flex-shrink: 0;
 }
 

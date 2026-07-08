@@ -225,7 +225,7 @@
 
 /* ── Draggable image cards ───────────────────────────────── */
 .imgCard {
-  width: 154px;
+  width: 77px;
   background: var(--navy, #0a3a57);
   border-radius: 20px;
   border: 2.5px solid var(--yellow, #ffd23e);
