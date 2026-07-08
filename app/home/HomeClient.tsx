@@ -89,7 +89,6 @@ export default function HomeClient() {
       {/* Product section */}
       <section className={styles.product}>
         <div className={styles.productImage}>
-          <p className={styles.productPlaceholder}>Product image coming soon</p>
           <span className={styles.productCorner}>Pre-order</span>
         </div>
         <div className={styles.productContent}>

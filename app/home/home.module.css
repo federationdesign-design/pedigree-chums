@@ -59,7 +59,7 @@
 
 /* ── Search hero ─────────────────────────────────────────── */
 .searchHero {
-  padding: clamp(24px, 4vw, 48px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
+  padding: clamp(24px, 4vw, 48px) clamp(20px, 6vw, 80px) 16px;
   text-align: center;
   position: relative;
 }
@@ -194,7 +194,7 @@
   grid-template-columns: 1fr 1fr;
   gap: clamp(32px, 6vw, 80px);
   align-items: center;
-  padding: clamp(60px, 10vw, 120px) clamp(20px, 6vw, 80px);
+  padding: 16px clamp(20px, 6vw, 80px) clamp(60px, 10vw, 120px);
   max-width: 1280px;
   margin: 0 auto;
 }
