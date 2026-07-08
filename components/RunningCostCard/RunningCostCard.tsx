@@ -32,11 +32,10 @@ export default function RunningCostCard({ config }: Props) {
   const [sliderValue, setSliderValue] = useState(50);
   const sliderId = useId();
 
-  const { food, routineCare, dentalAllowance, neuteringAllowance } = config.annualCosts;
   const { low, typical, high } = config.medicalScenarios;
 
   const medical = medicalAllowance(sliderValue, low, typical, high);
-  const fixedAnnual = food + routineCare + dentalAllowance + neuteringAllowance;
+  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance;
   const annual = fixedAnnual + medical;
   const lifetime = annual * config.lifespanYears;
   const medicalPct = Math.round((medical / annual) * 100);
@@ -44,7 +43,7 @@ export default function RunningCostCard({ config }: Props) {
   return (
     <div className={styles.card}>
       <h3 className={styles.heading}>Cost to care</h3>
-      <p className={styles.sub}>Adjust the slider to explore different health-needs scenarios.</p>
+      <p className={styles.sub}>Just like owning a car or any other liability, upkeep and maintenance is required — and dog ownership is no different. Particular breeds need more attention from the vet, others have higher grooming costs, while others will eat you out of house and home. We have built this tool to help you understand what to expect from owning this breed.</p>
 
       <div className={styles.sliderWrap}>
         <div className={styles.sliderLabels}>
@@ -68,37 +67,12 @@ export default function RunningCostCard({ config }: Props) {
 
       <div className={styles.outputs}>
         <div className={styles.outputBlock}>
+          <div className={styles.outputLabel}>Annual cost*</div>
           <div className={styles.outputValue}>{fmt(annual)}</div>
-          <div className={styles.outputLabel}>Estimated annual care cost</div>
         </div>
-        <div className={styles.divider} />
         <div className={styles.outputBlock}>
+          <div className={styles.outputLabel}>Lifetime cost*</div>
           <div className={styles.outputValue}>{fmt(lifetime)}</div>
-          <div className={styles.outputLabel}>Estimated lifetime care cost</div>
-        </div>
-      </div>
-
-      <div className={styles.breakdown}>
-        <div className={styles.breakdownTitle}>Your estimate includes</div>
-        <div className={styles.breakdownRow}>
-          <span>Food</span>
-          <span>{fmt(food)}</span>
-        </div>
-        <div className={styles.breakdownRow}>
-          <span>Routine and preventive care</span>
-          <span>{fmt(routineCare)}</span>
-        </div>
-        <div className={styles.breakdownRow}>
-          <span>Dental allowance</span>
-          <span>{fmt(dentalAllowance)}</span>
-        </div>
-        <div className={styles.breakdownRow}>
-          <span>Neutering allowance</span>
-          <span>{fmt(neuteringAllowance)}</span>
-        </div>
-        <div className={styles.breakdownRowVariable}>
-          <span>Medical-risk allowance</span>
-          <span>{fmt(medical)} <span className={styles.pct}>({medicalPct}%)</span></span>
         </div>
       </div>
 
@@ -106,11 +80,7 @@ export default function RunningCostCard({ config }: Props) {
         <div className={styles.barFill} style={{ width: `${medicalPct}%` }} />
       </div>
 
-      <p className={styles.disclaimer}>
-        Illustrative UK estimates ({config.priceYear}). Not a veterinary prognosis or guarantee. Actual costs vary with the individual dog, sex, weight, health, location and price changes. The high-needs scenario is not a maximum possible veterinary bill.
-      </p>
-
-      <div className={styles.modelTag}>{config.modelVersion}</div>
+      <p className={styles.asterisk}>* Projected figures based on breed-typical UK costs ({config.priceYear}). Individual dogs will vary.</p>
     </div>
   );
 }

@@ -10,6 +10,7 @@
   flex-direction: column;
   gap: 14px;
 }
+
 .heading {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 26px;
@@ -18,19 +19,22 @@
   text-transform: uppercase;
   margin: 0;
 }
+
 .sub {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #ffffff;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.6;
 }
+
 .sliderWrap {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
 .sliderLabels {
   display: flex;
   justify-content: space-between;
@@ -39,6 +43,7 @@
   font-weight: 600;
   color: rgba(255,255,255,0.55);
 }
+
 .slider {
   -webkit-appearance: none;
   appearance: none;
@@ -49,6 +54,7 @@
   outline: none;
   cursor: pointer;
 }
+
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -60,6 +66,7 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.35);
 }
+
 .slider::-moz-range-thumb {
   width: 22px;
   height: 22px;
@@ -69,14 +76,17 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.35);
 }
+
 .slider:focus-visible::-webkit-slider-thumb {
   outline: 3px solid var(--yellow, #ffd23e);
   outline-offset: 2px;
 }
+
 .slider:focus-visible::-moz-range-thumb {
   outline: 3px solid var(--yellow, #ffd23e);
   outline-offset: 2px;
 }
+
 .scenarioLabel {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.72rem;
@@ -85,21 +95,34 @@
   text-align: center;
   min-height: 1.1em;
 }
+
 .outputs {
   display: flex;
   gap: 10px;
 }
+
 .outputBlock {
   flex: 1;
   background: rgba(255,255,255,0.08);
   border: 1.5px solid rgba(255,255,255,0.14);
   border-radius: 14px;
-  padding: 14px 10px 12px;
+  padding: 14px 10px 14px;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
+
+.outputLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+}
+
 .outputValue {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 2rem;
@@ -107,77 +130,26 @@
   letter-spacing: 0.02em;
   line-height: 1;
 }
-.outputLabel {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
-}
-.breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.breakdownTitle {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.55);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 2px;
-}
-.breakdownRow,
-.breakdownRowVariable {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.73rem;
-  color: #ffffff;
-}
-.breakdownRow {
-  font-weight: 500;
-}
-.breakdownRowVariable {
-  font-weight: 700;
-  color: var(--yellow, #ffd23e);
-  border-top: 1px solid rgba(255,255,255,0.12);
-  padding-top: 5px;
-  margin-top: 2px;
-}
-.pct {
-  font-weight: 500;
-  font-size: 0.65rem;
-}
+
 .barWrap {
   height: 4px;
   background: rgba(255,255,255,0.12);
   border-radius: 2px;
   overflow: hidden;
 }
+
 .barFill {
   height: 100%;
   background: var(--yellow, #ffd23e);
   border-radius: 2px;
   transition: width 0.15s ease;
 }
-.disclaimer {
+
+.asterisk {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.6rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.4);
   line-height: 1.45;
   margin: 0;
-}
-.modelTag {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.52rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.25);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-align: right;
 }
