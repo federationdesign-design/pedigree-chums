@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
-import BreedTreeMap from "../../../components/BreedTreeMap/BreedTreeMap";
+import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -102,6 +102,39 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
   const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15 });
   const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+  type PageFrame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
+  const [frames, setFrames] = useState<PageFrame[]>([]);
+  const [frameFlash, setFrameFlash] = useState<string | null>(null);
+  const [filledIds, setFilledIds] = useState<string[]>([]);
+  const [dragName, setDragName] = useState<string | null>(null);
+
+  const handleFramesReady = useCallback((nodes: FrameNode[]) => {
+    setFrames(nodes.map((n) => ({ ...n, filled: false, shake: false })));
+  }, []);
+
+  const handleImageDropped = useCallback((nodeId: string, nodeName: string, clientX: number, clientY: number) => {
+    setDragName(null);
+    document.querySelectorAll<HTMLElement>("[data-frame]").forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+        const frameId = el.dataset.frame!;
+        setFrames((prev) => {
+          const frame = prev.find((f) => f.id === frameId);
+          const node = prev.find((f) => f.id === nodeId);
+          if (frame && node && frame.img === node.img && !frame.filled) {
+            setFilledIds((ids) => [...ids, nodeId]);
+            setFrameFlash(frameId);
+            setTimeout(() => setFrameFlash(null), 600);
+            return prev.map((f) => f.id === frameId ? { ...f, filled: true } : f);
+          } else if (frame && !frame.filled) {
+            setTimeout(() => setFrames((p) => p.map((f) => f.id === frameId ? { ...f, shake: false } : f)), 400);
+            return prev.map((f) => f.id === frameId ? { ...f, shake: true } : f);
+          }
+          return prev;
+        });
+      }
+    });
+  }, []);
   const closeCard = useCallback((id: string) => setClosedCards((prev) => new Set([...prev, id])), []);
 
   // Canvas scroll control
@@ -137,6 +170,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const CHART_TOP = CARD_TOP;
   const EXPLAIN_TOP = CARD_TOP + 280; // below chart
   const DIAGRAM_TOP = CARD_TOP + 520; // below cards
+  const FRAMES_TOP = DIAGRAM_TOP + 1050; // below diagrams
   const CIRCLE_LEFT = LEFT_EDGE;
   const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48; // right of lifespan chart
 
@@ -243,12 +277,43 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {/* Family tree - fixed position to right of circular */}
       {lineage && (
         <div style={{ position: "absolute", left: TREE_LEFT, top: DIAGRAM_TOP }}>
-          <BreedTreeMap lineage={lineage} rootImage={image} />
+          <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={setDragName} />
+        </div>
+      )}
+
+      {/* Ancestor pack frames - far left */}
+      {frames.length > 0 && (
+        <div style={{ position: "absolute", left: LEFT_EDGE, top: FRAMES_TOP }}>
+          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 26, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 16px", textTransform: "uppercase" }}>Ancestor Pack</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, maxWidth: 2800 }}>
+            {frames.map((f) => (
+              <div key={f.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  data-frame={f.id}
+                  style={{
+                    width: 160, height: 160, borderRadius: 12,
+                    border: f.filled ? "2.5px solid #22c55e" : "2.5px dashed rgba(255,255,255,0.3)",
+                    background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
+                    position: "relative", overflow: "hidden", transition: "border-color 0.2s",
+                    animation: f.shake ? "frameShake 0.4s ease" : frameFlash === f.id ? "frameFlash 0.6s ease" : "none"
+                  }}
+                >
+                  {f.filled
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
+                    : dragName
+                      ? <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center", padding: 8 }}>{f.name}</span>
+                      : <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>}
+                </div>
+                <span style={{ display: "block", marginTop: 6, fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 600, color: "var(--yellow,#ffd23e)", textAlign: "center" }}>{f.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Spacer to give canvas height */}
-      <div style={{ height: DIAGRAM_TOP + 1200 }} />
+      <div style={{ height: FRAMES_TOP + 400 }} />
 
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>

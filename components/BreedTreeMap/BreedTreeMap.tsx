@@ -164,7 +164,8 @@ export default function BreedTreeMap({
     };
     walk(root);
     setFrames(found);
-  }, [root]);
+    onFramesReady?.(found.map(({ id, name, img }) => ({ id, name, img })));
+  }, [root, onFramesReady]);
 
   useEffect(() => {
     if (!onFramesReady) return;
@@ -379,6 +380,7 @@ export default function BreedTreeMap({
               e.preventDefault(); e.stopPropagation();
               setDraggingImg(d.id);
               setDragName(d.name);
+              onDragName?.(d.name);
               const startX = e.clientX - d.x; const startY = e.clientY - d.y;
               const el = e.currentTarget;
               el.setPointerCapture(e.pointerId);
@@ -386,6 +388,7 @@ export default function BreedTreeMap({
               const onUp = (ev: PointerEvent) => {
                 setDraggingImg(null);
                 setDragName(null);
+                onDragName?.(null);
                 el.removeEventListener("pointermove", onMove);
                 el.removeEventListener("pointerup", onUp);
                 document.querySelectorAll<HTMLElement>("[data-frame]").forEach((f) => {
