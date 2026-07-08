@@ -1393,8 +1393,7 @@ function expandNode(
     const kids = sub.children.map((c) =>
       expandNode({ ...c, value: ((c.value ?? 0) * share) / total }, depth + 1, next),
     );
-    const { value: _omit, ...rest } = node;
-    return { ...rest, children: kids };
+    return { ...node, children: kids };
   }
 
   if (node.children && node.children.length) {
