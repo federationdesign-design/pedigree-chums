@@ -5,7 +5,7 @@
 export type CurvePoint = { age: number; score: number; stage: "Puppy" | "Adolescent" | "Adult" | "Senior" | "Aged" };
 
 export const lifespanCurves: Record<string, CurvePoint[]> = {
-  "Labrador Retriever": [
+  "Labrador": [
     {age:0.0,score:0.0,stage:"Puppy"},{age:0.1,score:24.422,stage:"Puppy"},{age:0.2,score:42.879,stage:"Puppy"},{age:0.3,score:56.829,stage:"Puppy"},{age:0.4,score:67.372,stage:"Puppy"},{age:0.5,score:75.34,stage:"Puppy"},{age:0.6,score:81.363,stage:"Puppy"},{age:0.7,score:85.914,stage:"Puppy"},{age:0.8,score:89.354,stage:"Puppy"},{age:0.9,score:91.954,stage:"Puppy"},
     {age:1.0,score:93.919,stage:"Adolescent"},{age:1.1,score:95.404,stage:"Adolescent"},{age:1.2,score:96.526,stage:"Adolescent"},{age:1.3,score:97.375,stage:"Adolescent"},{age:1.4,score:98.016,stage:"Adolescent"},{age:1.5,score:98.5,stage:"Adolescent"},{age:1.6,score:97.88,stage:"Adolescent"},{age:1.7,score:97.76,stage:"Adolescent"},{age:1.8,score:97.64,stage:"Adolescent"},{age:1.9,score:97.52,stage:"Adolescent"},
     {age:2.0,score:97.4,stage:"Adult"},{age:2.5,score:96.8,stage:"Adult"},{age:3.0,score:96.2,stage:"Adult"},{age:3.5,score:95.6,stage:"Adult"},{age:4.0,score:95.0,stage:"Adult"},{age:4.5,score:94.4,stage:"Adult"},{age:5.0,score:93.8,stage:"Adult"},{age:5.5,score:93.2,stage:"Adult"},{age:6.0,score:92.6,stage:"Adult"},{age:6.5,score:92.0,stage:"Adult"},{age:7.0,score:91.4,stage:"Adult"},{age:7.5,score:89.55,stage:"Adult"},{age:7.9,score:86.99,stage:"Adult"},
