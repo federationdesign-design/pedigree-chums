@@ -46,8 +46,8 @@ function nodeStatus(name: string, note: string): BreedTag | null {
 }
 
 const ROOT    = 77;
-const RING1   = ROOT + 128;
-const RSTEP   = 197;
+const RING1   = ROOT + 64;
+const RSTEP   = 98;
 const SPREAD1 = Math.PI * 1.1;
 const SPREADN = Math.PI * 1.6;
 
@@ -102,6 +102,7 @@ function layoutTree(root: Node) {
   const all: Node[] = [];
   const collect = (n: Node) => { all.push(n); (n.children as Node[] | undefined)?.forEach(collect); };
   collect(root);
+  // Phase 1: hard collision resolution (8 passes)
   for (let pass = 0; pass < 8; pass++) {
     let moved = false;
     for (let i = 0; i < all.length; i++) {
@@ -120,6 +121,55 @@ function layoutTree(root: Node) {
       }
     }
     if (!moved) break;
+  }
+
+  // Phase 2: force-directed settling (20 iterations)
+  const REPEL = 2800;  // repulsion strength
+  const ATTRACT = 0.12; // spring attraction to ideal position
+  for (let iter = 0; iter < 20; iter++) {
+    const fx: Record<string, number> = {};
+    const fy: Record<string, number> = {};
+    all.forEach((n) => { fx[n._id] = 0; fy[n._id] = 0; });
+
+    // Repulsion between all non-root pairs
+    for (let i = 0; i < all.length; i++) {
+      for (let j = i + 1; j < all.length; j++) {
+        const a = all[i]; const b = all[j];
+        if (a === root || b === root) continue;
+        const dx = b._x - a._x; const dy = b._y - a._y;
+        const dist2 = dx * dx + dy * dy || 1;
+        const dist = Math.sqrt(dist2);
+        const force = REPEL / dist2;
+        fx[a._id] -= force * dx / dist;
+        fy[a._id] -= force * dy / dist;
+        fx[b._id] += force * dx / dist;
+        fy[b._id] += force * dy / dist;
+      }
+    }
+
+    // Apply forces, damped
+    const damping = 1 - iter / 25;
+    all.forEach((n) => {
+      if (n === root) return;
+      n._x += fx[n._id] * damping * 0.5;
+      n._y += fy[n._id] * damping * 0.5;
+    });
+
+    // Re-enforce minimum distances after force step
+    for (let i = 0; i < all.length; i++) {
+      for (let j = i + 1; j < all.length; j++) {
+        const a = all[i]; const b = all[j];
+        if (a._parent === b || b._parent === a) continue;
+        const dx = b._x - a._x; const dy = b._y - a._y;
+        const dist = Math.hypot(dx, dy) || 0.001;
+        if (dist < MIN_DIST) {
+          const push = (MIN_DIST - dist) / 2;
+          const nx = dx / dist * push; const ny = dy / dist * push;
+          if (a !== root) { a._x -= nx; a._y -= ny; }
+          if (b !== root) { b._x += nx; b._y += ny; }
+        }
+      }
+    }
   }
 }
 
@@ -326,10 +376,24 @@ export default function BreedTreeMap({
 
             return (
               <g key={n._id} data-node="1" transform={`translate(${n._x},${n._y})`}
-                style={{ cursor: hasKids ? "pointer" : "default" }}
+                style={{ cursor: "pointer" }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Nodes are always open - not closable
+                  // Branch nodes: toggle open/closed
+                  if (hasKids) { toggleNode(n); return; }
+                  // Leaf/image nodes: click opens image card
+                  if (n.img && !dragImgs.find((d) => d.id === n._id)) {
+                    const wrap = wrapRef.current;
+                    if (!wrap) return;
+                    const wrapRect = wrap.getBoundingClientRect();
+                    setOpenedIds((prev) => new Set([...prev, n._id]));
+                    setDragImgs((prev) => [...prev, {
+                      id: n._id, name: n.name, img: n.img as string,
+                      x: e.clientX - wrapRect.left + 20,
+                      y: e.clientY - wrapRect.top - 80,
+                      placed: false,
+                    }]);
+                  }
                 }}>
 
                 <circle
