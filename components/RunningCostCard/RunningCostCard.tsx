@@ -21,11 +21,11 @@ function fmt(n: number): string {
 }
 
 function scenarioLabel(value: number): string {
-  if (value <= 0) return "Low Maintenance";
+  if (value <= 0) return "Lower medical needs";
   if (value <= 25) return "Below typical";
   if (value <= 50) return value === 50 ? "Typical expected scenario" : "Below typical";
   if (value <= 75) return value === 75 ? "Higher medical needs" : "Higher medical needs";
-  return "Sick as a dog";
+  return "Complex medical needs";
 }
 
 export default function RunningCostCard({ config }: Props) {
@@ -41,7 +41,7 @@ export default function RunningCostCard({ config }: Props) {
   const medicalPct = Math.round((medical / annual) * 100);
 
   return (
-    <>
+    <div className={styles.card}>
       <h3 className={styles.heading}>Cost to care</h3>
       <p className={styles.sub}>Just like owning a car or any other liability, upkeep and maintenance is required — and dog ownership is no different. Particular breeds need more attention from the vet, others have higher grooming costs, while others will eat you out of house and home. We have built this tool to help you understand what to expect from owning this breed.</p>
 
@@ -81,6 +81,6 @@ export default function RunningCostCard({ config }: Props) {
       </div>
 
       <p className={styles.asterisk}>* Projected figures based on breed-typical UK costs ({config.priceYear}). Individual dogs will vary.</p>
-    </>
+    </div>
   );
 }
