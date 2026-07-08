@@ -484,7 +484,7 @@ export default function BreedTreeMap({
             </g>
           );
         })}
-      </svg>}
+      </svg>
 
       {/* Draggable image cards */}
       {dragImgs.filter((d) => !d.placed).map((d) => (
