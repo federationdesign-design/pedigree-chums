@@ -123,6 +123,7 @@ export default function BreedTreeMap({
   filledIds?: string[];
   onFramesReady?: (frames: FrameNode[]) => void;
   onImageDropped?: (nodeId: string, nodeName: string, clientX: number, clientY: number) => void;
+  onDragName?: (name: string | null) => void;
 }) {
   const root = useMemo<Node>(() => {
     const clone = JSON.parse(JSON.stringify(lineage)) as Node;
