@@ -170,8 +170,7 @@ export default function BreedTreeMap({
   const panRef = useRef({ x: 0, y: 0 });
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Tooltip (hover)
-  const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+
 
   // Draggable image cards (eye icon click)
   type DragImg = { id: string; name: string; img: string; x: number; y: number; placed: boolean };
@@ -388,18 +387,7 @@ export default function BreedTreeMap({
               e.stopPropagation();
               toggleNode(n);
             }}
-              onMouseEnter={(e) => {
-                const rect = wrapRef.current?.getBoundingClientRect();
-                if (!rect) return;
-                setTooltip({
-                  x: e.clientX - rect.left + 14,
-                  y: e.clientY - rect.top - 10,
-                  name: n.name,
-                  share,
-                  note: n.note,
-                });
-              }}
-              onMouseLeave={() => setTooltip(null)}
+  
             >
               <circle
                 className={`${styles.disc} ${hasKids && !isOpen ? styles.discHas : ""} ${isOpen ? styles.discOpen : ""}`.trim()}
@@ -496,19 +484,7 @@ export default function BreedTreeMap({
             </g>
           );
         })}
-      </svg>
-
-      {/* Tooltip (hover) */}
-      {tooltip && !pctCard && (
-        <div
-          className={styles.tooltip}
-          style={{ left: tooltip.x, top: tooltip.y }}
-        >
-          <span className={styles.tooltipName}>{tooltip.name}</span>
-          <span className={styles.tooltipShare}>{tooltip.share}% of ancestry</span>
-          {tooltip.note && <span className={styles.tooltipNote}>{tooltip.note}</span>}
-        </div>
-      )}
+      </svg>}
 
       {/* Draggable image cards */}
       {dragImgs.filter((d) => !d.placed).map((d) => (
