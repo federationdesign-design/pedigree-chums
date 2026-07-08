@@ -290,12 +290,12 @@ export default function BreedTreeMap({
                 <circle
                   className={`${styles.disc} ${hasKids && !isOpen ? styles.discHas : ""} ${isOpen ? styles.discOpen : ""}`.trim()}
                   r={r}
-                  fill={isFilled ? "#22c55e" : isOpened ? "#22c55e" : n.img ? "#ffd23e" : undefined}
-                  style={
-                    isFilled ? { stroke: "#22c55e", strokeWidth: 3 } :
-                    isOpened ? { stroke: "#22c55e", strokeWidth: 3 } :
-                    undefined
-                  } />
+                  fill="none"
+                  style={{
+                    fill: isFilled ? "#22c55e" : isOpened ? "#22c55e" : n.img ? "#ffd23e" : undefined,
+                    stroke: isFilled ? "#22c55e" : isOpened ? "#22c55e" : undefined,
+                    strokeWidth: (isFilled || isOpened) ? 3 : undefined,
+                  }} />
 
                 <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                   fontSize={Math.max(11, r * 0.5)} style={isOpen ? { fill: "#ffffff" } : undefined}>
