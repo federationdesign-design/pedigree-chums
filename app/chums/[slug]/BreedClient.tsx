@@ -24,88 +24,87 @@ type Props = {
   lineage: LineageNode | null;
 };
 
-// Default positions for each card (as % of viewport)
-
+// ── Draggable card ────────────────────────────────────────────────────────────
 function DragCard({
-  id,
-  style,
-  className,
-  children,
-  onBringToFront,
-  draggingStyle,
-  onClose,
+  id, initialX, initialY, zIndex, children, onBringToFront, onClose, className, style,
 }: {
   id: string;
-  style: React.CSSProperties;
-  className: string;
+  initialX: number;
+  initialY: number;
+  zIndex: number;
   children: React.ReactNode;
   onBringToFront: (id: string) => void;
-  draggingStyle?: React.CSSProperties;
   onClose?: () => void;
+  className?: string;
+  style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
-  const origin = useRef({ px: 0, py: 0, ex: 0, ey: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+  const pos = useRef({ x: initialX, y: initialY });
+  const drag = useRef<{ sx: number; sy: number; px: number; py: number } | null>(null);
+
+  // Apply initial position
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.left = `${initialX}px`;
+      ref.current.style.top = `${initialY}px`;
+    }
+  }, [initialX, initialY]);
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     const target = e.target as HTMLElement;
-    if (target.closest("button, a, input, circle, svg, details, summary")) return;
+    if (target.closest("button, a, input, details, summary")) return;
     e.preventDefault();
     onBringToFront(id);
-    dragging.current = true;
-    setIsDragging(true);
     const el = ref.current!;
-    const canvas = el.closest("[data-canvas]") as HTMLElement | null;
-    const canvasRect = canvas?.getBoundingClientRect() ?? { left: 0, top: 0 };
-    const rect = el.getBoundingClientRect();
-    // Switch to absolute positioning relative to canvas
-    el.style.position = "absolute";
-    el.style.left = `${rect.left - canvasRect.left + (canvas?.scrollLeft ?? 0)}px`;
-    el.style.top = `${rect.top - canvasRect.top + (canvas?.scrollTop ?? 0)}px`;
-    el.style.margin = "0";
-    origin.current = { px: rect.left - canvasRect.left + (canvas?.scrollLeft ?? 0), py: rect.top - canvasRect.top + (canvas?.scrollTop ?? 0), ex: e.clientX, ey: e.clientY };
+    drag.current = { sx: e.clientX, sy: e.clientY, px: pos.current.x, py: pos.current.y };
     el.setPointerCapture(e.pointerId);
   }, [id, onBringToFront]);
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragging.current) return;
+    if (!drag.current) return;
+    const dx = e.clientX - drag.current.sx;
+    const dy = e.clientY - drag.current.sy;
+    pos.current = { x: drag.current.px + dx, y: drag.current.py + dy };
     const el = ref.current!;
-    const canvas = el.closest("[data-canvas]") as HTMLElement | null;
-    const canvasRect = canvas?.getBoundingClientRect() ?? { left: 0, top: 0 };
-    const dx = e.clientX - origin.current.ex;
-    const dy = e.clientY - origin.current.ey;
-    el.style.left = `${origin.current.px + dx}px`;
-    el.style.top  = `${origin.current.py + dy}px`;
+    el.style.left = `${pos.current.x}px`;
+    el.style.top = `${pos.current.y}px`;
   }, []);
 
-  const onPointerUp = useCallback(() => {
-    dragging.current = false;
-    setIsDragging(false);
-  }, []);
+  const onPointerUp = useCallback(() => { drag.current = null; }, []);
 
   return (
     <div
       ref={ref}
-      className={`${className} ${isDragging ? styles.cardDragging : ""}`}
-      style={{ ...style, ...(isDragging && draggingStyle ? draggingStyle : {}) }}
+      className={`${styles.card} ${className ?? ""}`}
+      style={{ position: "absolute", zIndex, ...style }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
       {onClose && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
-            style={{ position: "absolute", top: 10, right: 12, background: "none", border: "none", color: "var(--yellow, #ffd23e)", fontSize: 28, cursor: "pointer", lineHeight: 1, padding: 0, zIndex: 1, fontWeight: 700 }}
-          >×</button>
-        )}
+        <button
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          style={{ position: "absolute", top: 8, right: 12, background: "none", border: "none", color: "var(--yellow, #ffd23e)", fontSize: 28, cursor: "pointer", lineHeight: 1, padding: 0, zIndex: 1, fontWeight: 700 }}
+        >×</button>
+      )}
       {children}
     </div>
   );
 }
 
+// ── Main component ────────────────────────────────────────────────────────────
 export default function BreedClient({ name, image, info, lineage }: Props) {
-  // Enable horizontal scroll for this wide canvas page
+  const zCounter = useRef(20);
+  const bringToFront = useCallback((id: string) => {
+    zCounter.current += 1;
+    setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
+  }, []);
+
+  const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15 });
+  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+  const closeCard = useCallback((id: string) => setClosedCards((prev) => new Set([...prev, id])), []);
+
+  // Canvas scroll control
   useEffect(() => {
     const prev = document.documentElement.style.overflowX;
     document.documentElement.style.overflowX = "auto";
@@ -116,60 +115,50 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     };
   }, []);
 
-  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13, lifespanExplain: 15 });
-
-  // Compute top-level ancestry from lineage
   const ancestryBreakdown = useMemo(() => {
     if (!lineage) return [];
     const total = (lineage.children as any[])?.reduce((s: number, c: any) => s + (c.value ?? 0), 0) || 1;
     return ((lineage.children as any[]) || [])
-      .map((c: any) => ({
-        name: c.name,
-        pct: Math.round(((c.value ?? 0) / total) * 100),
-        note: c.note,
-      }))
-      .filter((c: any) => c.pct > 0)
-      .sort((a: any, b: any) => b.pct - a.pct);
+      .map((c: any) => ({ name: c.name, pct: Math.round((c.value ?? 0) / total * 100) }))
+      .filter((a: any) => a.pct > 0)
+      .sort((a: any, b: any) => b.pct - a.pct)
+      .slice(0, 8);
   }, [lineage]);
-  const zCounter = useRef(20);
-  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
-  const closeCard = useCallback((id: string) => setClosedCards((prev) => new Set([...prev, id])), []);
 
+  const hasLifespan = !!lifespanCurves[name];
 
-  const bringToFront = useCallback((id: string) => {
-    zCounter.current += 1;
-    setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
-  }, []);
-
-  // Calculate initial pixel positions after mount
-
+  // Fixed layout positions
+  const HEADER_H = 180;    // approx height of H1+H2
+  const CARD_TOP = HEADER_H + 20;
+  const LEFT_EDGE = 48;
+  const CARD_GAP = 10;
+  const INFO_W = 420;
+  const ANCESTRY_W = 340;
+  const CHART_TOP = CARD_TOP;
+  const EXPLAIN_TOP = CARD_TOP + 280; // below chart
+  const DIAGRAM_TOP = CARD_TOP + 520; // below cards
+  const CIRCLE_LEFT = LEFT_EDGE;
+  const TREE_LEFT = CIRCLE_LEFT + 820; // right of circular diagram
 
   return (
     <div className={styles.canvas} data-canvas="true">
-      {/* Header */}
+      {/* Header - in flow */}
       <div className={styles.header}>
         <h1 className={styles.h1}>{name}</h1>
         <p className={styles.subtitle}>{info.subtitle}</p>
       </div>
 
-      {/* Two cards side by side */}
-      <div className={styles.cardsRow}>
-        {/* Temperament + ancestry in a column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <DragCard
-          id="infoBox"
-          className={`${styles.card} ${styles.infoCard}`}
-          style={{ position: "relative", zIndex: 12 }}
-          onBringToFront={bringToFront}
-          onClose={() => closeCard("infoBox")}
-          draggingStyle={{ background: "#ffffff", color: "var(--navy, #0a3a57)", border: "2px solid var(--navy, #0a3a57)" }}
-        >
+      {/* All cards and diagrams absolutely positioned */}
+
+      {/* Temperament card */}
+      {!closedCards.has("infoBox") && (
+        <DragCard id="infoBox" initialX={LEFT_EDGE} initialY={CARD_TOP} zIndex={zOrders.infoBox}
+          onBringToFront={bringToFront} onClose={() => closeCard("infoBox")}
+          style={{ width: INFO_W, padding: "0 0 20px" }}>
           <p className={styles.infoHeading}>Temperament</p>
           <div className={styles.infoSection}>
             <div className={styles.temperamentTags}>
-              {info.temperament.map((t) => (
-                <span key={t} className={styles.tag}>{t}</span>
-              ))}
+              {info.temperament.map((t) => <span key={t} className={styles.tag}>{t}</span>)}
             </div>
           </div>
           <div className={styles.divider} />
@@ -177,100 +166,93 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             <div className={styles.prosConsGrid}>
               <div className={styles.prosCol}>
                 <p className={`${styles.prosConsHead} ${styles.pros}`}>Pros</p>
-                <ul className={styles.prosConsList}>
-                  {info.pros.map((p) => <li key={p}>{p}</li>)}
-                </ul>
+                <ul className={styles.prosConsList}>{info.pros.map((p) => <li key={p}>{p}</li>)}</ul>
               </div>
               <div className={styles.consCol}>
                 <p className={`${styles.prosConsHead} ${styles.cons}`}>Cons</p>
-                <ul className={styles.prosConsList}>
-                  {info.cons.map((c) => <li key={c}>{c}</li>)}
-                </ul>
+                <ul className={styles.prosConsList}>{info.cons.map((c) => <li key={c}>{c}</li>)}</ul>
               </div>
             </div>
           </div>
         </DragCard>
+      )}
 
-        {/* Ancestry card */}
-        {lineage && ancestryBreakdown.length > 0 && (
-          <DragCard
-            id="ancestry"
-            className={`${styles.card} ${styles.ancestryCard}`}
-            style={{ position: "relative", zIndex: 13 }}
-            onBringToFront={bringToFront}
-            onClose={() => closeCard("ancestry")}
-          >
-            <p className={styles.infoHeading} style={{ padding: "16px 20px 0" }}>Ancestry</p>
-            {ancestryBreakdown.map((a) => (
-              <div key={a.name}>
-                <div className={styles.ancestryRow}>
-                  <span className={styles.ancestryName}>{a.name}</span>
-                  <span className={styles.ancestryPct}>{a.pct}%</span>
-                </div>
-                <div className={styles.ancestryBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
+      {/* Ancestry card - below temperament */}
+      {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
+        <DragCard id="ancestry" initialX={LEFT_EDGE} initialY={CARD_TOP + 340} zIndex={zOrders.ancestry}
+          onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
+          style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
+          <p className={styles.infoHeading} style={{ padding: "16px 16px 0" }}>Ancestry</p>
+          {ancestryBreakdown.map((a) => (
+            <div key={a.name}>
+              <div className={styles.ancestryRow}>
+                <span className={styles.ancestryName}>{a.name}</span>
+                <span className={styles.ancestryPct}>{a.pct}%</span>
               </div>
-            ))}
-            <p className={styles.ancestryDisclaimer}>
-              Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
-            </p>
-          </DragCard>
-        )}
+              <div className={styles.ancestryBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
+            </div>
+          ))}
+          <p className={styles.ancestryDisclaimer}>
+            Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
+          </p>
+        </DragCard>
+      )}
+
+      {/* Lifespan chart - to the right of temperament */}
+      {hasLifespan && (
+        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP, top: CHART_TOP, marginTop: -25 }}>
+          <LifespanChart breedName={name} />
         </div>
+      )}
 
-        {/* Lifespan chart - in cards row */}
-        {lifespanCurves[name] && (
-          <div style={{ marginTop: -25 }}><LifespanChart breedName={name} /></div>
-        )}
+      {/* Lifespan explanation card */}
+      {!closedCards.has("lifespanExplain") && hasLifespan && (
+        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP} initialY={EXPLAIN_TOP}
+          zIndex={zOrders.lifespanExplain} onBringToFront={bringToFront} onClose={() => closeCard("lifespanExplain")}
+          style={{ width: INFO_W, padding: "16px 20px 20px" }}>
+          <p className={styles.infoHeading} style={{ paddingLeft: 0, marginTop: 0 }}>The Lifespan Diagram</p>
+          <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>
+            A visual guide to how this breed moves through life. The horizontal axis shows age from birth to old age; the vertical axis represents overall function, health and quality of life. The curve rises quickly through puppyhood, holds high during the prime adult years, then gradually declines into the senior stage. The exact shape varies by breed. This is a conceptual illustration, not a clinical or veterinary prediction for any individual dog.
+          </p>
+          <details style={{ cursor: "pointer" }}>
+            <summary style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "var(--yellow,#ffd23e)", letterSpacing: "0.05em" }}>Method &amp; sources</summary>
+            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, fontWeight: 600, color: "#ffffff", lineHeight: 1.6, margin: "8px 0", fontStyle: "italic" }}>{METHOD}</p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {SOURCES.map((s) => (
+                <li key={s.url} style={{ marginBottom: 4 }}>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "var(--yellow,#ffd23e)", textDecoration: "underline", wordBreak: "break-all" }}>{s.label}</a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </DragCard>
+      )}
 
-        {/* Lifespan explanation card */}
-        {lifespanCurves[name] && (
-          <DragCard
-            id="lifespanExplain"
-            className={`${styles.card}`}
-            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0 }}
-            onBringToFront={bringToFront}
-            onClose={() => closeCard("ancestry")}
-          >
-            <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>The Lifespan Diagram</p>
-            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>"A visual guide to how this breed moves through life. The horizontal axis shows age from birth to old age; the vertical axis represents overall function, health and quality of life. The curve rises quickly through puppyhood, holds high during the prime adult years, then gradually declines into the senior stage. The exact shape varies by breed — this diagram makes those differences easy to understand at a glance. This is a conceptual illustration, not a clinical or veterinary prediction for any individual dog."</p>
-            <details style={{ cursor: "pointer" }}>
-              <summary style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "var(--yellow,#ffd23e)", letterSpacing: "0.05em" }}>Method &amp; sources</summary>
-              <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, fontWeight: 600, color: "#ffffff", lineHeight: 1.6, margin: "8px 0", fontStyle: "italic" }}>{METHOD}</p>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {SOURCES.map((s) => (
-                  <li key={s.url} style={{ marginBottom: 4 }}>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "var(--yellow,#ffd23e)", textDecoration: "underline", wordBreak: "break-all" }}>{s.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </DragCard>
-        )}
-      </div>
-
-      {/* Diagrams row */}
-      <div className={styles.diagramsRow}>
-        {/* Circular diagram - free, no container */}
-        {lineage && (
-          <div ref={(el) => {
+      {/* Circular diagram - fixed position */}
+      {lineage && (
+        <div style={{ position: "absolute", left: CIRCLE_LEFT, top: DIAGRAM_TOP }}
+          ref={(el) => {
             if (!el) return;
             const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
             if (stage) stage.style.zIndex = "1";
           }}>
-            <BreedTree root={lineage} rootImage={image} centred size={760} hideLabels />
-          </div>
-        )}
+          <BreedTree root={lineage} rootImage={image} centred size={760} hideLabels />
+        </div>
+      )}
 
-        {/* Family tree - free, natural size */}
-        {lineage && (
+      {/* Family tree - fixed position to right of circular */}
+      {lineage && (
+        <div style={{ position: "absolute", left: TREE_LEFT, top: DIAGRAM_TOP }}>
           <BreedTreeMap lineage={lineage} rootImage={image} />
-        )}
+        </div>
+      )}
 
-      </div>
+      {/* Spacer to give canvas height */}
+      <div style={{ height: DIAGRAM_TOP + 1200 }} />
 
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>
-        ← All chums
+        Back
       </Link>
     </div>
   );
