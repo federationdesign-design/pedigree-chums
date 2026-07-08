@@ -109,7 +109,21 @@ const TITLES = [
   "Our interpretation, not established fact.",
 ];
 
-export default function BreedTreeMap({ lineage, rootImage }: { lineage: LineageNode; rootImage?: string }) {
+export type FrameNode = { id: string; name: string; img: string };
+
+export default function BreedTreeMap({
+  lineage,
+  rootImage,
+  filledIds = [],
+  onFramesReady,
+  onImageDropped,
+}: {
+  lineage: LineageNode;
+  rootImage?: string;
+  filledIds?: string[];
+  onFramesReady?: (frames: FrameNode[]) => void;
+  onImageDropped?: (nodeId: string, clientX: number, clientY: number) => void;
+}) {
   const root = useMemo<Node>(() => {
     const clone = JSON.parse(JSON.stringify(lineage)) as Node;
     function assign(n: Node, id: string, parent: Node | null) {
@@ -136,19 +150,16 @@ export default function BreedTreeMap({ lineage, rootImage }: { lineage: LineageN
   const [dragImgs, setDragImgs] = useState<DragImg[]>([]);
   const [draggingImg, setDraggingImg] = useState<string | null>(null);
 
-  type Frame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
-  const [frames, setFrames] = useState<Frame[]>([]);
-  const [frameFlash, setFrameFlash] = useState<string | null>(null);
-
   useEffect(() => {
-    const found: Frame[] = [];
+    if (!onFramesReady) return;
+    const found: FrameNode[] = [];
     const walk = (n: Node) => {
-      if (n.img && n._parent) found.push({ id: n._id, name: n.name, img: n.img as string, filled: false, shake: false });
+      if (n.img && n._parent) found.push({ id: n._id, name: n.name, img: n.img as string });
       (n.children as Node[] | undefined)?.forEach(walk);
     };
     walk(root);
-    setFrames(found);
-  }, [root]);
+    onFramesReady(found);
+  }, [root, onFramesReady]);
 
   const normShare = (n: Node) => !n._parent ? 100 : Math.round((n._leaves / root._leaves) * 100);
   const genLabel = (d: number) => d <= 0 ? "the breed itself" : d === 1 ? "parent" : d === 2 ? "grandparent" : `${"great-".repeat(d - 2)}grandparent`;
@@ -259,7 +270,7 @@ export default function BreedTreeMap({ lineage, rootImage }: { lineage: LineageN
             const hasKids = !!(n.children as Node[] | undefined)?.length;
             const isOpen = open.has(n._id);
             const descendantCount = countDescendants(n);
-            const isFilled = frames.some((f) => f.id === n._id && f.filled);
+            const isFilled = filledIds.includes(n._id);
             return (
               <g key={n._id} data-node="1" transform={`translate(${n._x},${n._y})`}
                 style={{ cursor: "pointer" }}
@@ -348,21 +359,7 @@ export default function BreedTreeMap({ lineage, rootImage }: { lineage: LineageN
                 setDraggingImg(null);
                 el.removeEventListener("pointermove", onMove);
                 el.removeEventListener("pointerup", onUp);
-                document.querySelectorAll<HTMLElement>("[data-frame]").forEach((f) => {
-                  const rect = f.getBoundingClientRect();
-                  if (ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
-                    const frame = frames.find((fr) => fr.id === f.dataset.frame);
-                    if (frame && frame.img === d.img && !frame.filled) {
-                      setFrames((prev) => prev.map((fr) => fr.id === frame.id ? { ...fr, filled: true } : fr));
-                      setDragImgs((prev) => prev.map((p) => p.id === d.id ? { ...p, placed: true } : p));
-                      setFrameFlash(frame.id);
-                      setTimeout(() => setFrameFlash(null), 600);
-                    } else if (frame && !frame.filled) {
-                      setFrames((prev) => prev.map((fr) => fr.id === frame.id ? { ...fr, shake: true } : fr));
-                      setTimeout(() => setFrames((prev) => prev.map((fr) => fr.id === frame.id ? { ...fr, shake: false } : fr)), 400);
-                    }
-                  }
-                });
+                onImageDropped?.(d.id, ev.clientX, ev.clientY);
               };
               el.addEventListener("pointermove", onMove);
               el.addEventListener("pointerup", onUp);
@@ -374,25 +371,7 @@ export default function BreedTreeMap({ lineage, rootImage }: { lineage: LineageN
         ))}
       </div>
 
-      {frames.length > 0 && (
-        <div className={styles.framesCard}>
-          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 12px", textTransform: "uppercase" }}>Ancestor Pack</p>
-          <div className={styles.framesGrid}>
-            {frames.map((f) => (
-              <div key={f.id} className={styles.frameItem}>
-                <div data-frame={f.id}
-                  className={`${styles.frame} ${f.filled ? styles.frameFilled : ""} ${f.shake ? styles.frameShake : ""} ${frameFlash === f.id ? styles.frameFlash : ""}`.trim()}>
-                  {f.filled
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={f.img} alt={f.name} className={styles.frameImg} />
-                    : <span className={styles.frameEmpty}>+</span>}
-                </div>
-                <span className={styles.frameLabel}>{f.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

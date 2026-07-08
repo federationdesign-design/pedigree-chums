@@ -1,40 +1,10 @@
 .canvas {
   min-height: 100svh;
-  min-width: 4000px;
-  background: transparent;
+  background: var(--navy, #0a3a57);
+  position: relative;
+  overflow: hidden;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  display: flex;
-  flex-direction: column;
 }
-
-/* ── Page header ─────────────────────────────────────────── */
-.header {
-  padding: clamp(80px, 10vw, 100px) clamp(20px, 4vw, 48px) 24px;
-  flex-shrink: 0;
-}
-
-/* ── Two cards row ───────────────────────────────────────── */
-.cardsRow {
-  display: flex;
-  gap: 10px;
-  padding: 0 clamp(20px, 4vw, 48px) 32px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-/* ── Diagrams row: circular left, tree right ─────────────── */
-.diagramsRow {
-  display: flex;
-  gap: 0;
-  padding: 0 clamp(20px, 4vw, 48px) 48px;
-  align-items: flex-start;
-}
-
-/* Scrollbar styling */
-
-
-
-
 
 /* ── Title block ─────────────────────────────────────────── */
 .titleBlock {
@@ -48,7 +18,7 @@
 
 .h1 {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.1rem, 6vw, 5.25rem);
+  font-size: clamp(2.8rem, 8vw, 7rem);
   color: var(--yellow, #ffd23e);
   line-height: 1;
   margin: 0;
@@ -59,7 +29,7 @@
 .subtitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1rem, 2.5vw, 1.8rem);
-  color: #ffffff;
+  color: rgba(255,255,255,0.8);
   margin: 8px 0 0;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -69,7 +39,7 @@
 .card {
   position: absolute;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(10,58,87,0.4) 0%, rgba(10,58,87,0.65) 100%);
+  background: var(--blue-deep, #0c5b92);
   border: 2.5px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35);
   cursor: grab;
@@ -142,13 +112,13 @@
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;
   padding: 0 20px 8px;
+  opacity: 0.8;
 }
 
 /* ── Info card ───────────────────────────────────────────── */
 .infoCard {
   width: clamp(260px, 34vw, 420px);
   padding: 0 0 20px;
-  background: var(--navy, #0a3a57) !important;
 }
 
 .infoSection {
@@ -157,11 +127,12 @@
 
 .infoHeading {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 26px;
+  font-size: 13px;
   letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;
   margin: 16px 0 10px;
+  opacity: 0.8;
 }
 
 .temperamentTags {
@@ -212,11 +183,9 @@
 }
 
 .prosConsList li {
-  font-family: var(--font-body, 'Montserrat', system-ui);
   font-size: 12px;
-  font-weight: 800;
   line-height: 1.4;
-  color: #ffffff;
+  color: rgba(255,255,255,0.8);
   padding-left: 16px;
   position: relative;
 }
@@ -250,7 +219,7 @@
   font-size: 14px;
   letter-spacing: 0.08em;
   background: rgba(255,255,255,0.1);
-  color: #ffffff;
+  color: rgba(255,255,255,0.7);
   border: 2px solid rgba(255,255,255,0.15);
   border-radius: 50px;
   padding: 10px 22px;
@@ -294,67 +263,74 @@
   }
 }
 
-/* When info card is dragged (white bg), force all text navy */
-.infoCard:active,
-.infoCard.cardDragging {
-  color: var(--navy, #0a3a57);
-}
-.infoCard:active .infoHeading,
-.infoCard.cardDragging .infoHeading {
-  color: var(--navy, #0a3a57);
-}
-.infoCard:active .prosConsList li,
-.infoCard.cardDragging .prosConsList li {
-  color: var(--navy, #0a3a57);
-}
-.infoCard:active .tag,
-.infoCard.cardDragging .tag {
-  color: var(--navy, #0a3a57);
-  border-color: var(--navy, #0a3a57);
+/* ── Ancestor pack frames ────────────────────────────────── */
+.framesSection {
+  padding: 32px clamp(20px, 4vw, 48px) 48px;
 }
 
-/* ── Ancestry card ───────────────────────────────────────── */
-.ancestryCard {
-  width: clamp(260px, 30vw, 380px);
-  padding: 0 0 16px;
-  background: var(--navy, #0a3a57) !important;
-}
-
-.ancestryRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.ancestryName {
-  font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 13px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.ancestryPct {
+.framesSectionTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 16px;
+  font-size: 13px;
+  letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
-  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 16px;
 }
 
-.ancestryBar {
-  height: 4px;
-  background: var(--yellow, #ffd23e);
-  border-radius: 2px;
-  margin: 0 20px 0;
-  transition: width 0.4s ease;
+.framesGrid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.ancestryDisclaimer {
+.frameItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.frame {
+  width: 160px;
+  height: 160px;
+  border-radius: 12px;
+  border: 2.5px dashed rgba(255,255,255,0.3);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.frameFilled { border-color: #22c55e; border-style: solid; }
+.frameFlash { animation: frameFlash 0.6s ease; }
+@keyframes frameFlash {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.frameShake { animation: frameShake 0.4s ease; }
+@keyframes frameShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.frameImg { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+.frameLabel {
+  display: block;
+  margin-top: 6px;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 10px;
-  color: rgba(255,255,255,0.6);
-  padding: 10px 20px 0;
-  line-height: 1.5;
-  font-style: italic;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yellow, #ffd23e);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
 }
+
+.frameEmpty { font-size: 20px; color: rgba(255,255,255,0.2); }
