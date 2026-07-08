@@ -6,7 +6,7 @@ import styles from "./LifespanChart.module.css";
 
 const W = 840;
 const H = 480;
-const PAD = { top: 32, right: 32, bottom: 60, left: 52 };
+const PAD = { top: 32, right: 32, bottom: 80, left: 52 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
@@ -69,7 +69,7 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.title}>Lifespan curve</p>
+      <p className={styles.title} style={{ paddingLeft: PAD.left }}>Lifespan curve</p>
 
       <svg
         width={W}
@@ -100,14 +100,16 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
           />
         ))}
 
-        {/* Stage labels */}
+        {/* Stage labels - below x-axis numbers to avoid overlap */}
         {ranges.map((r, i) => {
           const midX = (toSvgX(r.startAge, maxAge) + toSvgX(r.endAge, maxAge)) / 2;
+          const bandW = toSvgX(r.endAge, maxAge) - toSvgX(r.startAge, maxAge);
+          if (bandW < 20) return null; // skip if too narrow
           return (
             <text
               key={`label-${i}`}
               x={midX}
-              y={PAD.top - 6}
+              y={PAD.top + PLOT_H + 42}
               textAnchor="middle"
               className={styles.stageLabel}
             >

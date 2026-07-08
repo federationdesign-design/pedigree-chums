@@ -31,6 +31,7 @@
 .gridLine {
   stroke: #ffffff;
   stroke-width: 1;
+  stroke-dasharray: 4 4;
 }
 
 .axis {
