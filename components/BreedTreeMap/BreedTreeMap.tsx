@@ -559,7 +559,7 @@ export default function BreedTreeMap({
         </div>
       )}
 
-      {/* Ancestor pack frames - horizontal row below diagram */
+      {/* Ancestor pack frames - horizontal row below diagram */}
       {frames.length > 0 && (
       <div className={styles.framesCard}>
         <p style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow, #ffd23e)", margin: "0 0 10px", textTransform: "uppercase" }}>Ancestor Pack</p>
