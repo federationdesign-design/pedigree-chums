@@ -1,5 +1,6 @@
 "use client";
 import { use } from "react";
+import Footer from "../../../components/Footer/Footer";
 import Nav from "../../../components/Nav/Nav";
 import BreedClient from "./BreedClient";
 import { breeds } from "../../../data/breeds";
@@ -33,6 +34,7 @@ export default function BreedPage({ params }: Props) {
         info={info}
         lineage={lineage}
       />
+      <Footer />
     </>
   );
 }
