@@ -291,9 +291,9 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Lifespan explanation card */}
       {!closedCards.has("lifespanExplain") && hasLifespan && (
-        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP} initialY={EXPLAIN_TOP}
-          zIndex={zOrders.lifespanExplain} onBringToFront={bringToFront} onClose={() => closeCard("lifespanExplain")}
-          style={{ width: INFO_W, padding: "16px 20px 20px" }}>
+        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 200} initialY={CHART_TOP + 85}
+          zIndex={zOrders.runningCost} onBringToFront={bringToFront} onClose={() => setClosedCards((prev) => new Set(prev).add("runningCost"))}
+          style={{ width: 380, padding: "0 20px 20px" }}>
           <p className={styles.infoHeading} style={{ paddingLeft: 0, marginTop: 0 }}>The Lifespan Diagram</p>
           <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>
             A visual guide to how this breed moves through life. The horizontal axis shows age from birth to old age; the vertical axis represents overall function, health and quality of life. The curve rises quickly through puppyhood, holds high during the prime adult years, then gradually declines into the senior stage. The exact shape varies by breed. This is a conceptual illustration, not a clinical or veterinary prediction for any individual dog.
