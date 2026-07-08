@@ -557,7 +557,7 @@ export default function BreedTreeMap({
           <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}
-      </div>
+
 
       {/* Ancestor pack frames - horizontal row below diagram */}
       {frames.length > 0 && (
