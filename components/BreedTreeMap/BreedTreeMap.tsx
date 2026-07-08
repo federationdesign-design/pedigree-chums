@@ -557,29 +557,31 @@ export default function BreedTreeMap({
           <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}
-      {/* Frames panel - fixed position relative to wrap */}
-      <div className={styles.framesCard} style={{ position: "absolute", top: 16, right: 16 }}>
+      </div>
+
+      {/* Ancestor pack frames - horizontal row below diagram */}
+      {frames.length > 0 && (
+      <div className={styles.framesCard}>
         <p style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow, #ffd23e)", margin: "0 0 10px", textTransform: "uppercase" }}>Ancestor Pack</p>
         <div className={styles.framesGrid}>
           {frames.map((f) => (
-            <div
-              key={f.id}
-              data-frame={f.id}
-              className={`${styles.frame} ${f.filled ? styles.frameFilled : ""} ${f.shake ? styles.frameShake : ""} ${frameFlash === f.id ? styles.frameFlash : ""}`}
-            >
-              {f.filled ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+            <div key={f.id} className={styles.frameItem}>
+              <div
+                data-frame={f.id}
+                className={`${styles.frame} ${f.filled ? styles.frameFilled : ""} ${f.shake ? styles.frameShake : ""} ${frameFlash === f.id ? styles.frameFlash : ""}`}
+              >
+                {f.filled ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={f.img} alt={f.name} className={styles.frameImg} />
-                  <span className={styles.frameLabel}>{f.name}</span>
-                </>
-              ) : (
-                <span className={styles.frameEmpty}>+</span>
-              )}
+                ) : (
+                  <span className={styles.frameEmpty}>+</span>
+                )}
+              </div>
+              <span className={styles.frameLabel}>{f.name}</span>
             </div>
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }

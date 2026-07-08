@@ -298,8 +298,10 @@
 
 .framesGrid {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  max-width: calc(12 * 172px); /* 160px frame + 12px gap */
 }
 
 .frame {
@@ -348,20 +350,26 @@
 }
 
 .frameLabel {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(10,58,87,0.85);
+  display: block;
+  margin-top: 6px;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 9px;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yellow, #ffd23e);
   text-align: center;
-  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
 }
 
 .frameEmpty {
   font-size: 20px;
   color: rgba(255,255,255,0.2);
+}
+
+.frameItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
