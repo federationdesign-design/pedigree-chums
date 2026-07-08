@@ -55,6 +55,11 @@ function DragCard({
     setIsDragging(true);
     const el = ref.current!;
     const rect = el.getBoundingClientRect();
+    // Switch to absolute positioning anchored at current visual position
+    el.style.position = "fixed";
+    el.style.left = `${rect.left}px`;
+    el.style.top = `${rect.top}px`;
+    el.style.margin = "0";
     origin.current = { px: rect.left, py: rect.top, ex: e.clientX, ey: e.clientY };
     el.setPointerCapture(e.pointerId);
   }, [id, onBringToFront]);
@@ -236,12 +241,14 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           <LifespanChart breedName={name} />
         )}
 
-        {/* Lifespan explanation card - 10px below temperament card */}
+        {/* Force wrap to new row */}
+        <div style={{ flexBasis: "100%", height: 10 }} />
+        {/* Lifespan explanation card */}
         {lifespanCurves[name] && (
           <DragCard
             id="lifespanExplain"
             className={`${styles.card}`}
-            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0, alignSelf: "flex-start" }}
+            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0 }}
             onBringToFront={bringToFront}
           >
             <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>The Lifespan Diagram</p>

@@ -69,8 +69,6 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.title} style={{ paddingLeft: PAD.left }}>Lifespan curve</p>
-
       <svg
         width={W}
         height={H}
