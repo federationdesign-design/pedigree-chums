@@ -283,7 +283,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Running cost card */}
       {runningCosts[slug] && !closedCards.has("runningCost") && (
-        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24} initialY={CHART_TOP - 15}
+        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200}
           zIndex={zOrders.runningCost} onBringToFront={bringToFront} onClose={() => setClosedCards((prev) => new Set(prev).add("runningCost"))}>
           <RunningCostCard config={runningCosts[slug]} />
         </DragCard>
@@ -291,7 +291,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Lifespan explanation card */}
       {!closedCards.has("lifespanExplain") && hasLifespan && (
-        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP} initialY={EXPLAIN_TOP}
+        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 25} initialY={EXPLAIN_TOP}
           zIndex={zOrders.lifespanExplain} onBringToFront={bringToFront} onClose={() => closeCard("lifespanExplain")}
           style={{ width: INFO_W, padding: "16px 20px 20px" }}>
           <p className={styles.infoHeading} style={{ paddingLeft: 0, marginTop: 0 }}>The Lifespan Diagram</p>
