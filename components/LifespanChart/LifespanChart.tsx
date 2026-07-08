@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { lifespanCurves, EXPLANATION, METHOD, SOURCES, type CurvePoint } from "../../data/lifespanCurves";
+import { lifespanCurves, EXPLANATION, METHOD, type CurvePoint } from "../../data/lifespanCurves";
 import styles from "./LifespanChart.module.css";
 
 const W = 1008;
@@ -45,6 +45,17 @@ function stageRanges(pts: CurvePoint[]): { stage: string; startAge: number; endA
 }
 
 export default function LifespanChart({ breedName }: { breedName: string }) {
+  // Dynamic sources based on which breed we are viewing
+  const sources = [
+    // McMillan 2024 is the primary source for all breeds
+    { label: "McMillan 2024: Longevity of companion dog breeds — 584,734 UK dogs across 155 breeds", url: "https://www.nature.com/articles/s41598-023-50458-w" },
+    // McGreevy 2018 specifically for Labrador
+    ...(breedName === "Labrador" ? [{ label: "McGreevy 2018: Labrador Retrievers under primary veterinary care in the UK — median 12.0 years", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6196571/" }] : []),
+    // Always include methodology sources
+    { label: "AAHA 2019: Senior life stage defined as final 25% of estimated lifespan", url: "https://www.aaha.org/wp-content/uploads/globalassets/02-guidelines/canine-life-stage-2019/2019-aaha-canine-life-stage-guidelines-final.pdf" },
+    { label: "Harvey 2021: Canine age groupings and social/behavioural maturity", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8110720/" },
+  ];
+
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [hoverAge, setHoverAge] = useState<number | null>(null);
 
