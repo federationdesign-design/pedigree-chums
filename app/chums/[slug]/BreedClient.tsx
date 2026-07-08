@@ -186,7 +186,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const CHART_TOP = CARD_TOP;
   const EXPLAIN_TOP = CARD_TOP + 280; // below chart
   const DIAGRAM_TOP = CARD_TOP + 520; // below cards
-  const TREE_TOP = DIAGRAM_TOP + 300; // tree 300px lower than circle
+  const TREE_TOP = DIAGRAM_TOP + 400; // tree 400px lower than circle
   const FRAMES_TOP = DIAGRAM_TOP + 800; // below diagrams
   const CIRCLE_LEFT = LEFT_EDGE;
   const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48 - 400; // right of lifespan chart
@@ -251,7 +251,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Lifespan chart - to the right of temperament */}
       {hasLifespan && (
-        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP + 10, top: CHART_TOP, marginTop: -25 }}>
+        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP + 10, top: CHART_TOP, marginTop: -25, zIndex: 5 }}>
           <LifespanChart breedName={name} />
         </div>
       )}
@@ -293,7 +293,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Family tree - fixed position to right of circular */}
       {lineage && (
-        <div style={{ position: "absolute", left: TREE_LEFT, top: TREE_TOP }}>
+        <div style={{ position: "absolute", left: TREE_LEFT, top: TREE_TOP, zIndex: 10 }}>
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={handleDragName} />
         </div>
       )}
