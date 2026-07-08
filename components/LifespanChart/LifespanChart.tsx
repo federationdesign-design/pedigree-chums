@@ -4,15 +4,15 @@ import { useState, useMemo } from "react";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES, type CurvePoint } from "../../data/lifespanCurves";
 import styles from "./LifespanChart.module.css";
 
-const W = 840;
-const H = 480;
+const W = 1008;
+const H = 576;
 const PAD = { top: 44, right: 32, bottom: 60, left: 52 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
 const STAGES = ["Puppy", "Adolescent", "Adult", "Senior", "Aged"] as const;
-const STAGE_FILL = "rgba(255,255,255,0.08)";
-const STAGE_ALT  = "rgba(255,255,255,0.04)";
+const "rgba(255,255,255,0.08)" = "rgba(255,255,255,0.05)";
+const "rgba(255,255,255,0.04)"  = "rgba(255,255,255,0.10)";
 
 function toSvgX(age: number, maxAge: number) {
   return PAD.left + (age / maxAge) * PLOT_W;
@@ -147,7 +147,7 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
         ))}
 
         {/* X axis title */}
-        <text x={PAD.left + PLOT_W / 2} y={H - 4} textAnchor="middle" className={styles.axisTitle}>Age (years)</text>
+        <text x={PAD.left + PLOT_W / 2} y={H - 4} textAnchor="middle" className={styles.axisTitle} style={{ fontSize: 15 }}>Age (years)</text>
 
         {/* Curve */}
         <path d={path} className={styles.curve} />
@@ -187,6 +187,14 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
         {/* Axes */}
         <line x1={PAD.left} x2={PAD.left} y1={PAD.top} y2={PAD.top + PLOT_H} className={styles.axis} />
         <line x1={PAD.left} x2={PAD.left + PLOT_W} y1={PAD.top + PLOT_H} y2={PAD.top + PLOT_H} className={styles.axis} />
+        {/* Vertical axis label */}
+        <text
+          x={14}
+          y={PAD.top + PLOT_H / 2}
+          textAnchor="middle"
+          className={styles.axisTitle}
+          transform={`rotate(-90, 14, ${PAD.top + PLOT_H / 2})`}
+        >Function &amp; Health</text>
       </svg>
 
     </div>

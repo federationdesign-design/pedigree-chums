@@ -236,13 +236,12 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           <LifespanChart breedName={name} />
         )}
 
-        {/* Row break - explanation card on its own row below */}
-        <div style={{ flexBasis: "100%", height: 0 }} />
+        {/* Lifespan explanation card - 10px below temperament card */}
         {lifespanCurves[name] && (
           <DragCard
             id="lifespanExplain"
             className={`${styles.card}`}
-            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0 }}
+            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0, alignSelf: "flex-start" }}
             onBringToFront={bringToFront}
           >
             <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>The Lifespan Diagram</p>
