@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
-import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/BreedTreeMap";
+import BreedTreeMap from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -125,39 +125,6 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       .sort((a: any, b: any) => b.pct - a.pct);
   }, [lineage]);
   const zCounter = useRef(20);
-
-  // Frames owned by page for correct padding/layout
-  type PageFrame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
-  const [frames, setFrames] = useState<PageFrame[]>([]);
-  const [frameFlash, setFrameFlash] = useState<string | null>(null);
-  const [filledIds, setFilledIds] = useState<string[]>([]);
-
-  const handleFramesReady = useCallback((nodes: FrameNode[]) => {
-    setFrames(nodes.map((n) => ({ ...n, filled: false, shake: false })));
-  }, []);
-
-  const handleImageDropped = useCallback((nodeId: string, clientX: number, clientY: number) => {
-    document.querySelectorAll<HTMLElement>("[data-frame]").forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
-        const frameId = el.dataset.frame!;
-        setFrames((prev) => {
-          const frame = prev.find((f) => f.id === frameId);
-          const node = prev.find((f) => f.id === nodeId);
-          if (frame && node && frame.img === node.img && !frame.filled) {
-            setFilledIds((ids) => [...ids, nodeId]);
-            setFrameFlash(frameId);
-            setTimeout(() => setFrameFlash(null), 600);
-            return prev.map((f) => f.id === frameId ? { ...f, filled: true } : f);
-          } else if (frame && !frame.filled) {
-            setTimeout(() => setFrames((p) => p.map((f) => f.id === frameId ? { ...f, shake: false } : f)), 400);
-            return prev.map((f) => f.id === frameId ? { ...f, shake: true } : f);
-          }
-          return prev;
-        });
-      }
-    });
-  }, []);
 
   const bringToFront = useCallback((id: string) => {
     zCounter.current += 1;
@@ -283,33 +250,10 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
         {/* Family tree - free, natural size */}
         {lineage && (
-          <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} />
+          <BreedTreeMap lineage={lineage} rootImage={image} />
         )}
 
       </div>
-
-      {/* Ancestor Pack - page level with correct left edge padding */}
-      {frames.length > 0 && (
-        <div className={styles.framesSection}>
-          <p className={styles.framesSectionTitle}>Ancestor Pack</p>
-          <div className={styles.framesGrid}>
-            {frames.map((f) => (
-              <div key={f.id} className={styles.frameItem}>
-                <div
-                  data-frame={f.id}
-                  className={`${styles.frame} ${f.filled ? styles.frameFilled : ""} ${f.shake ? styles.frameShake : ""} ${frameFlash === f.id ? styles.frameFlash : ""}`.trim()}
-                >
-                  {f.filled
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={f.img} alt={f.name} className={styles.frameImg} />
-                    : <span className={styles.frameEmpty}>+</span>}
-                </div>
-                <span className={styles.frameLabel}>{f.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>

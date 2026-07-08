@@ -150,6 +150,21 @@ export default function BreedTreeMap({
   const [dragImgs, setDragImgs] = useState<DragImg[]>([]);
   const [draggingImg, setDraggingImg] = useState<string | null>(null);
 
+  // Frames state lives inside tree so drag coords match
+  type Frame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
+  const [frames, setFrames] = useState<Frame[]>([]);
+  const [frameFlash, setFrameFlash] = useState<string | null>(null);
+
+  useEffect(() => {
+    const found: Frame[] = [];
+    const walk = (n: Node) => {
+      if (n.img && n._parent) found.push({ id: n._id, name: n.name, img: n.img as string, filled: false, shake: false });
+      (n.children as Node[] | undefined)?.forEach(walk);
+    };
+    walk(root);
+    setFrames(found);
+  }, [root]);
+
   useEffect(() => {
     if (!onFramesReady) return;
     const found: FrameNode[] = [];
@@ -359,7 +374,21 @@ export default function BreedTreeMap({
                 setDraggingImg(null);
                 el.removeEventListener("pointermove", onMove);
                 el.removeEventListener("pointerup", onUp);
-                onImageDropped?.(d.id, ev.clientX, ev.clientY);
+                document.querySelectorAll<HTMLElement>("[data-frame]").forEach((f) => {
+                  const rect = f.getBoundingClientRect();
+                  if (ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
+                    const frame = frames.find((fr) => fr.id === f.dataset.frame);
+                    if (frame && frame.img === d.img && !frame.filled) {
+                      setFrames((prev) => prev.map((fr) => fr.id === frame.id ? { ...fr, filled: true } : fr));
+                      setDragImgs((prev) => prev.map((p) => p.id === d.id ? { ...p, placed: true } : p));
+                      setFrameFlash(frame.id);
+                      setTimeout(() => setFrameFlash(null), 600);
+                    } else if (frame && !frame.filled) {
+                      setFrames((prev) => prev.map((fr) => fr.id === frame.id ? { ...fr, shake: true } : fr));
+                      setTimeout(() => setFrames((prev) => prev.map((fr) => fr.id === frame.id ? { ...fr, shake: false } : fr)), 400);
+                    }
+                  }
+                });
               };
               el.addEventListener("pointermove", onMove);
               el.addEventListener("pointerup", onUp);
@@ -372,6 +401,25 @@ export default function BreedTreeMap({
       </div>
 
 
+      {frames.length > 0 && (
+        <div className={styles.framesCard}>
+          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 12px", textTransform: "uppercase" }}>Ancestor Pack</p>
+          <div className={styles.framesGrid}>
+            {frames.map((f) => (
+              <div key={f.id} className={styles.frameItem}>
+                <div data-frame={f.id}
+                  className={`${styles.frame} ${f.filled ? styles.frameFilled : ""} ${f.shake ? styles.frameShake : ""} ${frameFlash === f.id ? styles.frameFlash : ""}`.trim()}>
+                  {f.filled
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={f.img} alt={f.name} className={styles.frameImg} />
+                    : <span className={styles.frameEmpty}>+</span>}
+                </div>
+                <span className={styles.frameLabel}>{f.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
