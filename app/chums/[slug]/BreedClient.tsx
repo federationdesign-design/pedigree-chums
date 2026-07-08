@@ -317,7 +317,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           className=""
           style={{ background: "transparent", border: "none", boxShadow: "none", cursor: "default" }}>
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={handleDragName} />
-        </div>
+        </DragCard>
       )}
 
       {/* Ancestor pack frames - far left */}
