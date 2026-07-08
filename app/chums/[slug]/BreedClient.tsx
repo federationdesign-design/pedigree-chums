@@ -103,8 +103,7 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
   }, []);
 
-  const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10 });
-  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
@@ -282,11 +281,12 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
         </div>
       )}
 
-      {/* Running cost card - fixed, to the right of lifespan chart */}
-      {runningCosts[slug] && (
-        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24, top: CHART_TOP, marginTop: -25, zIndex: 5 }}>
+      {/* Running cost card */}
+      {runningCosts[slug] && !closedCards.has("runningCost") && (
+        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24} initialY={CHART_TOP - 15}
+          zIndex={zOrders.runningCost} onBringToFront={bringToFront} onClose={() => setClosedCards((prev) => new Set(prev).add("runningCost"))}>
           <RunningCostCard config={runningCosts[slug]} />
-        </div>
+        </DragCard>
       )}
 
       {/* Lifespan explanation card */}
