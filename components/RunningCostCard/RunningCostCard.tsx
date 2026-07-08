@@ -47,8 +47,8 @@ export default function RunningCostCard({ config }: Props) {
 
       <div className={styles.sliderWrap}>
         <div className={styles.sliderLabels}>
-          <span>Lower medical needs</span>
-          <span>Higher medical needs</span>
+          <span>Low Maintenance</span>
+          <span>Sick as a dog</span>
         </div>
         <input
           id={sliderId}
