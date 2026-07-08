@@ -104,7 +104,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     };
   }, []);
 
-  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13, lifespan: 14 });
+  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13 });
 
   // Compute top-level ancestry from lineage
   const ancestryBreakdown = useMemo(() => {
@@ -213,14 +213,14 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           </div>
         )}
 
+        {/* Lifespan chart - above family tree */}
+        {lifespanCurves[name] && (
+          <LifespanChart breedName={name} />
+        )}
+
         {/* Family tree - free, natural size */}
         {lineage && (
           <BreedTreeMap lineage={lineage} rootImage={image} />
-        )}
-
-        {/* Lifespan chart - free diagram */}
-        {lifespanCurves[name] && (
-          <LifespanChart breedName={name} />
         )}
       </div>
 
