@@ -1,6 +1,5 @@
 "use client";
 import { use } from "react";
-import Footer from "../../../components/Footer/Footer";
 import Nav from "../../../components/Nav/Nav";
 import BreedClient from "./BreedClient";
 import { breeds } from "../../../data/breeds";
@@ -34,7 +33,6 @@ export default function BreedPage({ params }: Props) {
         info={info}
         lineage={lineage}
       />
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, display: "none" }} id="breed-footer"></div><div style={{ width: "100vw", marginLeft: "calc(-1 * ((100vw - 100%) / 2))", boxSizing: "border-box" }}><Footer /></div>
     </>
   );
 }
