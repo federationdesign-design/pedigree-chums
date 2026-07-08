@@ -173,7 +173,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
   // Fixed layout positions
   const HEADER_H = 180;    // approx height of H1+H2
-  const CARD_TOP = HEADER_H + 20;
+  const CARD_TOP = HEADER_H + 80;
   const LEFT_EDGE = 48;
   const CARD_GAP = 10;
   const INFO_W = 420;
@@ -246,7 +246,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Lifespan chart - to the right of temperament */}
       {hasLifespan && (
-        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP, top: CHART_TOP, marginTop: -25 }}>
+        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP + 10, top: CHART_TOP, marginTop: -25 }}>
           <LifespanChart breedName={name} />
         </div>
       )}
@@ -304,7 +304,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                   data-frame={f.id}
                   style={{
                     width: 160, height: 160, borderRadius: 12,
-                    border: f.filled ? "2.5px solid #22c55e" : draggingImg === f.img ? "2.5px solid var(--yellow, #ffd23e)" : "2.5px dashed rgba(255,255,255,0.3)",
+                    border: f.filled ? "4px solid #22c55e" : draggingImg === f.img ? "4px solid #ffd23e" : "4px dashed rgba(255,255,255,0.3)",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative", overflow: "hidden", transition: "border-color 0.2s",
                     animation: f.shake ? "frameShake 0.4s ease" : frameFlash === f.id ? "frameFlash 0.6s ease" : "none"
@@ -316,7 +316,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                     : (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: 8 }}>
                         <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>
-                        <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
+                        <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 13, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
                       </div>
                     )}
                 </div>

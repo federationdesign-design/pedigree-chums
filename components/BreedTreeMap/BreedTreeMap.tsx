@@ -251,7 +251,7 @@ export default function BreedTreeMap({
           {/* Root node */}
           <g transform={`translate(${root._x},${root._y})`}>
             <rect x={-ROOT - 4} y={-ROOT - 4} width={ROOT * 2 + 8} height={ROOT * 2 + 8}
-              rx={20} fill="var(--blue-deep, #0b78bd)" stroke="var(--yellow, #ffd23e)" strokeWidth={4} />
+              rx={20} fill="#0a3a57" stroke="#ffd23e" strokeWidth={4} />
             {rootImage && (
               <image href={rootImage} x={-ROOT} y={-ROOT} width={ROOT * 2} height={ROOT * 2}
                 clipPath="url(#btm-root-clip)" preserveAspectRatio="xMidYMid slice" />
@@ -291,8 +291,12 @@ export default function BreedTreeMap({
                 <circle
                   className={`${styles.disc} ${hasKids && !isOpen ? styles.discHas : ""} ${isOpen ? styles.discOpen : ""}`.trim()}
                   r={r}
-                  fill={isFilled ? "#22c55e" : isOpened ? "var(--navy, #0a3a57)" : n.img ? `url(#btm-${n._id})` : undefined}
-                  style={isFilled ? { stroke: "#16a34a", strokeWidth: 3 } : isOpened ? { stroke: "var(--blue-deep, #0b78bd)", strokeWidth: 3 } : undefined} />
+                  fill={isFilled ? "#22c55e" : isOpened ? "#22c55e" : n.img ? "#ffd23e" : undefined}
+                  style={
+                    isFilled ? { stroke: "#22c55e", strokeWidth: 3 } :
+                    isOpened ? { stroke: "#22c55e", strokeWidth: 3 } :
+                    undefined
+                  } />
 
                 <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                   fontSize={Math.max(11, r * 0.5)} style={isOpen ? { fill: "#ffffff" } : undefined}>
@@ -366,7 +370,7 @@ export default function BreedTreeMap({
         )}
 
         {/* Draggable image cards */}
-        {dragImgs.filter((d) => !d.placed).map((d) => (
+        {dragImgs.filter((d) => !d.placed && !filledIds.includes(d.id)).map((d) => (
           <div key={d.id}
             className={`${styles.imgCard} ${draggingImg === d.id ? styles.imgCardDragging : ""}`}
             style={{ position: "absolute", left: d.x, top: d.y, zIndex: 200 }}
