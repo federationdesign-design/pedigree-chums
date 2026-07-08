@@ -53,7 +53,7 @@ function DragCard({
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest("button, a, input, details, summary")) return;
-    if ((target as unknown as Element).closest?.("g[data-node]")) return;
+    if ((target as SVGElement).closest?.("g[data-node]")) return;
     e.preventDefault();
     onBringToFront(id);
     const el = ref.current!;
@@ -335,7 +335,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                 <div
                   data-frame={f.id}
                   style={{
-                    width: 77, height: 77, borderRadius: 10,
+                    width: 160, height: 160, borderRadius: 12,
                     border: f.filled ? "4px solid #22c55e" : draggingImg === f.img ? "4px solid #ffd23e" : "4px dashed rgba(255,255,255,0.3)",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative", overflow: "visible", transition: "border-color 0.2s",
@@ -389,38 +389,11 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
               </div>
             ))}
           </div>
-        </div>
+        </DragCard>
       )}
 
       {/* Spacer to give canvas height */}
-      <div style={{ height: FRAMES_TOP + 400 }} />
-
-      {/* Fixed ancestor pack at bottom - only visible when dragging an image */}
-      {dragName && frames.length > 0 && (
-        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(10,58,87,0.95)", backdropFilter: "blur(8px)", borderTop: "2px solid rgba(255,210,62,0.3)", padding: "12px 24px 16px", zIndex: 1000, display: "flex", gap: 12, overflowX: "auto" }}>
-          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 16, color: "var(--yellow,#ffd23e)", margin: "0 16px 0 0", whiteSpace: "nowrap", alignSelf: "center" }}>Ancestor Pack</p>
-          {frames.map((f) => (
-            <div key={f.id} style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <div
-                data-frame={f.id}
-                style={{
-                  width: 80, height: 80, borderRadius: 12, flexShrink: 0,
-                  border: f.filled ? "3px solid #22c55e" : draggingImg === f.img ? "3px solid #ffd23e" : "3px dashed rgba(255,255,255,0.3)",
-                  background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
-                  overflow: "visible", position: "relative", transition: "border-color 0.2s",
-                }}
-              >
-                {f.filled
-                  // eslint-disable-next-line @next/next/no-img-element
-                  ? <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
-                  : <span style={{ fontSize: 14, color: "rgba(255,255,255,0.2)" }}>+</span>}
-              </div>
-              <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 9, fontWeight: 700, color: "#ffffff", marginTop: 4, textAlign: "center", maxWidth: 80 }}>{f.name}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
+      <div style={{ height: FRAMES_TOP + 80 }} />
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>
         Back

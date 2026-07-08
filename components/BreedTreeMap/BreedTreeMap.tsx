@@ -45,11 +45,11 @@ function nodeStatus(name: string, note: string): BreedTag | null {
   return null;
 }
 
-const ROOT    = 77;
-const RING1   = ROOT + 96;
-const RSTEP   = 130;
-const SPREAD1 = Math.PI * 1.1;
-const SPREADN = Math.PI * 1.6;
+const ROOT    = 58;
+const RING1   = ROOT + 96; // matches pit
+const RSTEP   = 128; // matches pit
+const SPREAD1 = Math.PI * 1.5; // matches pit
+const SPREADN = Math.PI * 0.9; // matches pit - tighter deep arcs = less crisscross
 
 type Node = LineageNode & {
   _id: string;
@@ -74,7 +74,7 @@ function countDescendants(n: LineageNode): number {
   return kids.length + kids.reduce((s, k) => s + countDescendants(k), 0);
 }
 
-function radius(_share: number) { return 28; }
+function radius(share: number) { return Math.max(21, 5 * Math.sqrt(share)); }
 
 function layoutTree(root: Node) {
   root._x = 0; root._y = 0; root._dir = -Math.PI / 2;
@@ -121,55 +121,6 @@ function layoutTree(root: Node) {
       }
     }
     if (!moved) break;
-  }
-
-  // Phase 2: force-directed settling (20 iterations)
-  const REPEL = 2800;  // repulsion strength
-  const ATTRACT = 0.12; // spring attraction to ideal position
-  for (let iter = 0; iter < 20; iter++) {
-    const fx: Record<string, number> = {};
-    const fy: Record<string, number> = {};
-    all.forEach((n) => { fx[n._id] = 0; fy[n._id] = 0; });
-
-    // Repulsion between all non-root pairs
-    for (let i = 0; i < all.length; i++) {
-      for (let j = i + 1; j < all.length; j++) {
-        const a = all[i]; const b = all[j];
-        if (a === root || b === root) continue;
-        const dx = b._x - a._x; const dy = b._y - a._y;
-        const dist2 = dx * dx + dy * dy || 1;
-        const dist = Math.sqrt(dist2);
-        const force = REPEL / dist2;
-        fx[a._id] -= force * dx / dist;
-        fy[a._id] -= force * dy / dist;
-        fx[b._id] += force * dx / dist;
-        fy[b._id] += force * dy / dist;
-      }
-    }
-
-    // Apply forces, damped
-    const damping = 1 - iter / 25;
-    all.forEach((n) => {
-      if (n === root) return;
-      n._x += fx[n._id] * damping * 0.5;
-      n._y += fy[n._id] * damping * 0.5;
-    });
-
-    // Re-enforce minimum distances after force step
-    for (let i = 0; i < all.length; i++) {
-      for (let j = i + 1; j < all.length; j++) {
-        const a = all[i]; const b = all[j];
-        if (a._parent === b || b._parent === a) continue;
-        const dx = b._x - a._x; const dy = b._y - a._y;
-        const dist = Math.hypot(dx, dy) || 0.001;
-        if (dist < MIN_DIST) {
-          const push = (MIN_DIST - dist) / 2;
-          const nx = dx / dist * push; const ny = dy / dist * push;
-          if (a !== root) { a._x -= nx; a._y -= ny; }
-          if (b !== root) { b._x += nx; b._y += ny; }
-        }
-      }
-    }
   }
 }
 
