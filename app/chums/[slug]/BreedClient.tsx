@@ -107,10 +107,21 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
   const [filledIds, setFilledIds] = useState<string[]>([]);
   const [dragName, setDragName] = useState<string | null>(null);
+  const [draggingImg, setDraggingImg] = useState<string | null>(null);
 
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames(nodes.map((n) => ({ ...n, filled: false, shake: false })));
   }, []);
+
+  const handleDragName = useCallback((name: string | null) => {
+    setDragName(name);
+    if (name) {
+      const frame = frames.find((f) => f.name === name);
+      setDraggingImg(frame?.img ?? null);
+    } else {
+      setDraggingImg(null);
+    }
+  }, [frames]);
 
   const handleImageDropped = useCallback((nodeId: string, nodeName: string, clientX: number, clientY: number) => {
     setDragName(null);
@@ -278,7 +289,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {/* Family tree - fixed position to right of circular */}
       {lineage && (
         <div style={{ position: "absolute", left: TREE_LEFT, top: TREE_TOP }}>
-          <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={setDragName} />
+          <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={handleDragName} />
         </div>
       )}
 
@@ -293,7 +304,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                   data-frame={f.id}
                   style={{
                     width: 160, height: 160, borderRadius: 12,
-                    border: f.filled ? "2.5px solid #22c55e" : "2.5px dashed rgba(255,255,255,0.3)",
+                    border: f.filled ? "2.5px solid #22c55e" : draggingImg === f.img ? "2.5px solid var(--yellow, #ffd23e)" : "2.5px dashed rgba(255,255,255,0.3)",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative", overflow: "hidden", transition: "border-color 0.2s",
                     animation: f.shake ? "frameShake 0.4s ease" : frameFlash === f.id ? "frameFlash 0.6s ease" : "none"
