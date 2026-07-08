@@ -14,7 +14,7 @@ const links = [
   { label: "Chum Drop", href: "/" },
 ];
 
-export default function Nav({ hideLogo = false, dockBottomLeft = false }: { hideLogo?: boolean; dockBottomLeft?: boolean }) {
+export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 

@@ -116,3 +116,8 @@
   color: var(--yellow);
   transform: scale(1.04);
 }
+
+.logoVisible {
+  opacity: 1 !important;
+  transform: none !important;
+}

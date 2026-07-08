@@ -25,7 +25,7 @@ export default function BreedPage({ params }: Props) {
   try { lineage = getLineage(resolveLineageName(breed.name)) ?? null; } catch {}
   return (
     <>
-      <Nav />
+      <Nav showLogo />
       <BreedClient
         name={breed.name}
         slug={breed.slug}

@@ -290,9 +290,7 @@
 
 /* ── Frames ──────────────────────────────────────────────── */
 .framesCard {
-  background: var(--navy, #0a3a57);
-  border-radius: 20px;
-  border: 2px solid rgba(255,255,255,0.12);
+  background: transparent;
   padding: 16px;
   min-width: 200px;
   max-width: 320px;

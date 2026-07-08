@@ -494,6 +494,7 @@ export default function BreedTreeMap({
           style={{ position: "absolute", left: d.x, top: d.y, zIndex: 200 }}
           onPointerDown={(e) => {
             e.preventDefault();
+            e.stopPropagation(); // prevent tree pan
             setDraggingImg(d.id);
             const startX = e.clientX - d.x;
             const startY = e.clientY - d.y;
@@ -558,7 +559,7 @@ export default function BreedTreeMap({
       )}
       {/* Frames panel - fixed position relative to wrap */}
       <div className={styles.framesCard} style={{ position: "absolute", top: 16, right: 16 }}>
-        <p style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow, #ffd23e)", margin: "0 0 10px", textTransform: "uppercase" }}>Place your chums</p>
+        <p style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: 13, letterSpacing: "0.1em", color: "var(--yellow, #ffd23e)", margin: "0 0 10px", textTransform: "uppercase" }}>Ancestor Pack</p>
         <div className={styles.framesGrid}>
           {frames.map((f) => (
             <div
