@@ -242,11 +242,11 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           <DragCard
             id="lifespanExplain"
             className={`${styles.card}`}
-            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", maxWidth: 420, flexShrink: 0 }}
+            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0 }}
             onBringToFront={bringToFront}
           >
-            <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>About this chart</p>
-            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>{EXPLANATION}</p>
+            <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>The Lifespan Diagram</p>
+            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>"A visual guide to how this breed moves through life. The horizontal axis shows age from birth to old age; the vertical axis represents overall function, health and quality of life. The curve rises quickly through puppyhood, holds high during the prime adult years, then gradually declines into the senior stage. The exact shape varies by breed — this diagram makes those differences easy to understand at a glance. This is a conceptual illustration, not a clinical or veterinary prediction for any individual dog."</p>
             <details style={{ cursor: "pointer" }}>
               <summary style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "var(--yellow,#ffd23e)", letterSpacing: "0.05em" }}>Method &amp; sources</summary>
               <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, fontWeight: 600, color: "#ffffff", lineHeight: 1.6, margin: "8px 0", fontStyle: "italic" }}>{METHOD}</p>

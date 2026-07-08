@@ -6,13 +6,13 @@ import styles from "./LifespanChart.module.css";
 
 const W = 840;
 const H = 480;
-const PAD = { top: 32, right: 32, bottom: 80, left: 52 };
+const PAD = { top: 44, right: 32, bottom: 60, left: 52 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
 const STAGES = ["Puppy", "Adolescent", "Adult", "Senior", "Aged"] as const;
-const STAGE_FILL = "rgba(255,255,255,0.05)";
-const STAGE_ALT  = "rgba(255,255,255,0.10)";
+const "rgba(255,255,255,0.08)" = "rgba(255,255,255,0.05)";
+const "rgba(255,255,255,0.04)"  = "rgba(255,255,255,0.10)";
 
 function toSvgX(age: number, maxAge: number) {
   return PAD.left + (age / maxAge) * PLOT_W;
@@ -92,25 +92,27 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
             width={toSvgX(r.endAge, maxAge) - toSvgX(r.startAge, maxAge)}
             height={PLOT_H}
             fill={
-              r.stage === "Adolescent" ? "rgba(255,210,62,0.15)" :
-              r.stage === "Adult" ? "rgba(34,197,94,0.12)" :
-              r.stage === "Senior" ? "rgba(248,113,113,0.12)" :
-              i % 2 === 0 ? STAGE_FILL : STAGE_ALT
+              r.stage === "Adolescent" ? "rgba(255,210,62,0.35)" :
+              r.stage === "Adult" ? "rgba(34,197,94,0.25)" :
+              r.stage === "Senior" ? "rgba(248,113,113,0.25)" :
+              i % 2 === 0 ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"
             }
           />
         ))}
 
-        {/* Stage labels - below x-axis numbers to avoid overlap */}
+        {/* Stage labels - rotated when band is narrow */}
         {ranges.map((r, i) => {
           const midX = (toSvgX(r.startAge, maxAge) + toSvgX(r.endAge, maxAge)) / 2;
           const bandW = toSvgX(r.endAge, maxAge) - toSvgX(r.startAge, maxAge);
-          if (bandW < 20) return null; // skip if too narrow
+          if (bandW < 8) return null;
+          const narrow = bandW < 50;
           return (
             <text
               key={`label-${i}`}
               x={midX}
-              y={PAD.top + PLOT_H + 42}
-              textAnchor="middle"
+              y={PAD.top - 6}
+              textAnchor={narrow ? "start" : "middle"}
+              transform={narrow ? `rotate(-45, ${midX}, ${PAD.top - 6})` : undefined}
               className={styles.stageLabel}
             >
               {r.stage}
