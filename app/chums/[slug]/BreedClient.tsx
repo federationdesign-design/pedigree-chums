@@ -48,7 +48,7 @@ function DragCard({
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     const target = e.target as HTMLElement;
-    if (target.closest("button, a, input, circle, svg")) return;
+    if (target.closest("button, a, input, circle, svg, details, summary")) return;
     e.preventDefault();
     onBringToFront(id);
     dragging.current = true;
@@ -241,7 +241,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           <DragCard
             id="lifespanExplain"
             className={`${styles.card}`}
-            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", maxWidth: 380 }}
+            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", maxWidth: 380, marginLeft: 16, flexShrink: 0 }}
             onBringToFront={bringToFront}
           >
             <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>About this chart</p>

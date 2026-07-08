@@ -4,9 +4,9 @@ import { useState, useMemo } from "react";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES, type CurvePoint } from "../../data/lifespanCurves";
 import styles from "./LifespanChart.module.css";
 
-const W = 700;
-const H = 400;
-const PAD = { top: 24, right: 24, bottom: 48, left: 44 };
+const W = 840;
+const H = 480;
+const PAD = { top: 32, right: 32, bottom: 60, left: 52 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
@@ -91,7 +91,12 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
             y={PAD.top}
             width={toSvgX(r.endAge, maxAge) - toSvgX(r.startAge, maxAge)}
             height={PLOT_H}
-            fill={r.stage === "Adult" ? "rgba(255,210,62,0.12)" : i % 2 === 0 ? STAGE_FILL : STAGE_ALT}
+            fill={
+              r.stage === "Adolescent" ? "rgba(255,210,62,0.15)" :
+              r.stage === "Adult" ? "rgba(34,197,94,0.12)" :
+              r.stage === "Senior" ? "rgba(248,113,113,0.12)" :
+              i % 2 === 0 ? STAGE_FILL : STAGE_ALT
+            }
           />
         ))}
 
