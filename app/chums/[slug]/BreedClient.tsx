@@ -197,17 +197,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             </p>
           </DragCard>
         )}
-        {/* Lifespan chart card */}
-        {lifespanCurves[name] && (
-          <DragCard
-            id="lifespan"
-            className={`${styles.card}`}
-            style={{ position: "relative", zIndex: 14, padding: "16px 20px 20px" }}
-            onBringToFront={bringToFront}
-          >
-            <LifespanChart breedName={name} />
-          </DragCard>
-        )}
+
       </div>
 
       {/* Diagrams row */}
@@ -226,6 +216,11 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         {/* Family tree - free, natural size */}
         {lineage && (
           <BreedTreeMap lineage={lineage} rootImage={image} />
+        )}
+
+        {/* Lifespan chart - free diagram */}
+        {lifespanCurves[name] && (
+          <LifespanChart breedName={name} />
         )}
       </div>
 
