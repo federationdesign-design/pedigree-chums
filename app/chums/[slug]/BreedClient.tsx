@@ -96,7 +96,7 @@ function DragCard({
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export default function BreedClient({ name, image, info, lineage }: Props) {
+export default function BreedClient({ name, slug, image, info, lineage }: Props) {
   const zCounter = useRef(20);
   const bringToFront = useCallback((id: string) => {
     zCounter.current += 1;
