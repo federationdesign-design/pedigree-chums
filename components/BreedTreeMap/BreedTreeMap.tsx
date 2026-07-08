@@ -117,14 +117,12 @@ export default function BreedTreeMap({
   filledIds = [],
   onFramesReady,
   onImageDropped,
-  onDragName,
 }: {
   lineage: LineageNode;
   rootImage?: string;
   filledIds?: string[];
   onFramesReady?: (frames: FrameNode[]) => void;
-  onImageDropped?: (nodeId: string, nodeName: string, clientX: number, clientY: number) => void;
-  onDragName?: (name: string | null) => void;
+  onImageDropped?: (nodeId: string, clientX: number, clientY: number) => void;
 }) {
   const root = useMemo<Node>(() => {
     const clone = JSON.parse(JSON.stringify(lineage)) as Node;
@@ -304,10 +302,10 @@ export default function BreedTreeMap({
                   r={r}
                   fill={
                     isFilled ? "#22c55e" :
-                    openedIds.has(n._id) ? "var(--blue-deep, #0b78bd)" :
+                    openedIds.has(n._id) ? "var(--navy, #0a3a57)" :
                     n.img ? `url(#btm-${n._id})` : undefined
                   }
-                  style={isFilled ? { stroke: "#16a34a" } : openedIds.has(n._id) ? { stroke: "var(--blue-sky, #5cc4ee)" } : undefined} />
+                  style={isFilled ? { stroke: "#16a34a", strokeWidth: 3 } : openedIds.has(n._id) ? { stroke: "var(--blue-deep, #0b78bd)", strokeWidth: 3 } : undefined} />
                 <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                   fontSize={Math.max(11, r * 0.5)} style={isOpen ? { fill: "#ffffff" } : undefined}>
                   {`${share}%`}
@@ -431,8 +429,8 @@ export default function BreedTreeMap({
                   {f.filled
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={f.img} alt={f.name} className={styles.frameImg} />
-                    : draggingImg && frames.find((df) => df.img === f.img) && dragName
-                      ? <span className={styles.frameNameHint}>{dragName}</span>
+                    : draggingImg && frames.find((df) => df.id === draggingImg && df.img === f.img)
+                      ? <span className={styles.frameNameHint}>{f.name}</span>
                       : <span className={styles.frameEmpty}>+</span>}
                 </div>
                 <span className={styles.frameLabel}>{f.name}</span>

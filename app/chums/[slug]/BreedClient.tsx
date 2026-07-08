@@ -170,9 +170,10 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const CHART_TOP = CARD_TOP;
   const EXPLAIN_TOP = CARD_TOP + 280; // below chart
   const DIAGRAM_TOP = CARD_TOP + 520; // below cards
+  const TREE_TOP = DIAGRAM_TOP + 200; // tree 200px lower than circle
   const FRAMES_TOP = DIAGRAM_TOP + 1050; // below diagrams
   const CIRCLE_LEFT = LEFT_EDGE;
-  const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48; // right of lifespan chart
+  const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48 - 400; // right of lifespan chart
 
   return (
     <div className={styles.canvas} data-canvas="true">
@@ -276,7 +277,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Family tree - fixed position to right of circular */}
       {lineage && (
-        <div style={{ position: "absolute", left: TREE_LEFT, top: DIAGRAM_TOP }}>
+        <div style={{ position: "absolute", left: TREE_LEFT, top: TREE_TOP }}>
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={setDragName} />
         </div>
       )}
@@ -284,7 +285,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {/* Ancestor pack frames - far left */}
       {frames.length > 0 && (
         <div style={{ position: "absolute", left: LEFT_EDGE, top: FRAMES_TOP }}>
-          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 26, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 16px", textTransform: "uppercase" }}>Ancestor Pack</p>
+          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 78, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 24px", textTransform: "uppercase", lineHeight: 1 }}>Ancestor Pack</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, maxWidth: 2800 }}>
             {frames.map((f) => (
               <div key={f.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -301,11 +302,9 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                   {f.filled
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
-                    : dragName
-                      ? <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center", padding: 8 }}>{f.name}</span>
-                      : <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>}
+                    : <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>}
                 </div>
-                <span style={{ display: "block", marginTop: 6, fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 600, color: "var(--yellow,#ffd23e)", textAlign: "center" }}>{f.name}</span>
+                <span style={{ display: "block", marginTop: 8, fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 33, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center" }}>{f.name}</span>
               </div>
             ))}
           </div>
