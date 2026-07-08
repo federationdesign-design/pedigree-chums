@@ -166,12 +166,31 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
   const ancestryBreakdown = useMemo(() => {
     if (!lineage) return [];
-    const total = (lineage.children as any[])?.reduce((s: number, c: any) => s + (c.value ?? 0), 0) || 1;
-    return ((lineage.children as any[]) || [])
-      .map((c: any) => ({ name: c.name, pct: Math.round((c.value ?? 0) / total * 100) }))
-      .filter((a: any) => a.pct > 0)
-      .sort((a: any, b: any) => b.pct - a.pct)
-      .slice(0, 8);
+    // Collect all leaf nodes with normalised share (same as pit breedMix)
+    const sumLeaves = (n: any): number => {
+      const kids = n.children as any[] | undefined;
+      if (!kids || kids.length === 0) return n.value ?? 1;
+      return kids.reduce((s: number, k: any) => s + sumLeaves(k), 0);
+    };
+    const rootLeaves = sumLeaves(lineage);
+    const results: { name: string; pct: number }[] = [];
+    const walk = (n: any) => {
+      const kids = n.children as any[] | undefined;
+      if (!kids || kids.length === 0) {
+        const pct = Math.round((sumLeaves(n) / rootLeaves) * 100);
+        if (pct > 0) results.push({ name: n.name, pct });
+      } else {
+        kids.forEach(walk);
+      }
+    };
+    (lineage.children as any[] | undefined)?.forEach(walk);
+    // Sort descending, merge duplicates, normalise to exactly 100
+    const merged = new Map<string, number>();
+    results.forEach(({ name, pct }) => merged.set(name, (merged.get(name) ?? 0) + pct));
+    const sorted = [...merged.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, pct]) => ({ name, pct }));
+    return sorted;
   }, [lineage]);
 
   const hasLifespan = !!lifespanCurves[name];
