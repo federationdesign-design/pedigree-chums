@@ -138,7 +138,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const EXPLAIN_TOP = CARD_TOP + 280; // below chart
   const DIAGRAM_TOP = CARD_TOP + 520; // below cards
   const CIRCLE_LEFT = LEFT_EDGE;
-  const TREE_LEFT = CIRCLE_LEFT + 820; // right of circular diagram
+  const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48; // right of lifespan chart
 
   return (
     <div className={styles.canvas} data-canvas="true">
