@@ -272,10 +272,10 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Ancestry card - below temperament */}
       {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
-        <DragCard id="ancestry" initialX={LEFT_EDGE} initialY={CARD_TOP + infoBoxHeight + 16 + 50} zIndex={zOrders.ancestry}
+        <DragCard id="ancestry" initialX={TREE_LEFT} initialY={CARD_TOP + infoBoxHeight + 16 + 50} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
-          <p className={styles.infoHeading} style={{ padding: "16px 16px 0" }}>Ancestry</p>
+          <p className={styles.infoHeading}>Ancestry</p>
           {ancestryBreakdown.map((a) => (
             <div key={a.name}>
               <div className={styles.ancestryRow}>
@@ -331,7 +331,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Circular diagram - fixed position */}
       {lineage && (
-        <div style={{ position: "absolute", left: CIRCLE_LEFT, top: DIAGRAM_TOP }}
+        <div style={{ position: "absolute", left: CIRCLE_LEFT, top: DIAGRAM_TOP - 100 }}
           ref={(el) => {
             if (!el) return;
             const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
