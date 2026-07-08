@@ -100,7 +100,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
   }, []);
 
-  const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15 });
+  const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10 });
   const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
@@ -310,9 +310,12 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         </div>
       )}
 
-      {/* Family tree - fixed position to right of circular */}
+      {/* Family tree - draggable, starts at right of circular */}
       {lineage && (
-        <div style={{ position: "absolute", left: TREE_LEFT, top: TREE_TOP, zIndex: 10 }}>
+        <DragCard id="familyTree" initialX={TREE_LEFT} initialY={TREE_TOP} zIndex={10}
+          onBringToFront={bringToFront}
+          className=""
+          style={{ background: "transparent", border: "none", boxShadow: "none", cursor: "default" }}>
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={handleDragName} />
         </div>
       )}
@@ -384,7 +387,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
               </div>
             ))}
           </div>
-        </div>
+        </DragCard>
       )}
 
       {/* Spacer to give canvas height */}
