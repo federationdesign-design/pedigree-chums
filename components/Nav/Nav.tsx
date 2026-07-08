@@ -37,7 +37,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   }, []);
 
   return (
-    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""}`}>
+    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
       {hideLogo ? (
         <span aria-hidden />
       ) : (

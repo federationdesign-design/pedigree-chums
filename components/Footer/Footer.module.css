@@ -38,3 +38,36 @@
 .link:hover {
   opacity: 1;
 }
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: clamp(28px, 4vw, 48px);
+  padding-bottom: clamp(20px, 3vw, 32px);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+}
+.navItem {
+  display: flex;
+  align-items: center;
+}
+.pipe {
+  color: rgba(255,255,255,0.3);
+  margin: 0 16px;
+  font-size: 1rem;
+  font-weight: 300;
+}
+.navLink {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(11px, 1.2vw, 14px);
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffd23e);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+.navLink:hover {
+  opacity: 0.75;
+}

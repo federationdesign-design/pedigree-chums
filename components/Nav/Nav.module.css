@@ -121,3 +121,10 @@
   opacity: 1 !important;
   transform: none !important;
 }
+
+/* Always show logo when showLogo is used (breed pages) */
+.bar.showLogo .logo {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
