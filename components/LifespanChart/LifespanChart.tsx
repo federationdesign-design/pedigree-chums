@@ -169,7 +169,7 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
             <circle
               cx={toSvgX(hoverPt.age, maxAge)}
               cy={toSvgY(hoverPt.score)}
-              r={5}
+              r={10}
               className={styles.hoverDot}
             />
             <text

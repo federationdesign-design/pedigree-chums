@@ -208,8 +208,6 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           <LifespanChart breedName={name} />
         )}
 
-        {/* Force wrap to new row */}
-        <div style={{ flexBasis: "100%", height: 10 }} />
         {/* Lifespan explanation card */}
         {lifespanCurves[name] && (
           <DragCard
