@@ -389,7 +389,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
               </div>
             ))}
           </div>
-        </DragCard>
+        </div>
       )}
 
       {/* Spacer to give canvas height */}
