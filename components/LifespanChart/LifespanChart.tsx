@@ -91,7 +91,7 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
             y={PAD.top}
             width={toSvgX(r.endAge, maxAge) - toSvgX(r.startAge, maxAge)}
             height={PLOT_H}
-            fill={i % 2 === 0 ? STAGE_FILL : STAGE_ALT}
+            fill={r.stage === "Adult" ? "rgba(255,210,62,0.12)" : i % 2 === 0 ? STAGE_FILL : STAGE_ALT}
           />
         ))}
 
@@ -180,28 +180,6 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
         <line x1={PAD.left} x2={PAD.left + PLOT_W} y1={PAD.top + PLOT_H} y2={PAD.top + PLOT_H} className={styles.axis} />
       </svg>
 
-      {/* Explanation */}
-      <p className={styles.explanation}>{EXPLANATION}</p>
-
-      {/* Method + sources collapsible */}
-      <button className={styles.toggle} onClick={() => setSourcesOpen((o) => !o)}>
-        {sourcesOpen ? "▲" : "▼"} Method &amp; sources
-      </button>
-
-      {sourcesOpen && (
-        <div className={styles.sources}>
-          <p className={styles.method}>{METHOD}</p>
-          <ul className={styles.sourceList}>
-            {SOURCES.map((s) => (
-              <li key={s.url}>
-                <a href={s.url} target="_blank" rel="noopener noreferrer" className={styles.sourceLink}>
-                  {s.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

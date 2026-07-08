@@ -7,7 +7,7 @@ import BreedTree from "../../../components/BreedTree/BreedTree";
 import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
-import { lifespanCurves } from "../../../data/lifespanCurves";
+import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
 
 type BreedInfo = {
   subtitle: string;
@@ -104,7 +104,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     };
   }, []);
 
-  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13 });
+  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13, lifespanExplain: 15 });
 
   // Compute top-level ancestry from lineage
   const ancestryBreakdown = useMemo(() => {
@@ -234,6 +234,30 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
         {/* Lifespan chart - in cards row */}
         {lifespanCurves[name] && (
           <LifespanChart breedName={name} />
+        )}
+
+        {/* Lifespan explanation card */}
+        {lifespanCurves[name] && (
+          <DragCard
+            id="lifespanExplain"
+            className={`${styles.card}`}
+            style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", maxWidth: 380 }}
+            onBringToFront={bringToFront}
+          >
+            <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>About this chart</p>
+            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>{EXPLANATION}</p>
+            <details style={{ cursor: "pointer" }}>
+              <summary style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "var(--yellow,#ffd23e)", letterSpacing: "0.05em" }}>Method &amp; sources</summary>
+              <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, fontWeight: 600, color: "#ffffff", lineHeight: 1.6, margin: "8px 0", fontStyle: "italic" }}>{METHOD}</p>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {SOURCES.map((s) => (
+                  <li key={s.url} style={{ marginBottom: 4 }}>
+                    <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "var(--yellow,#ffd23e)", textDecoration: "underline", wordBreak: "break-all" }}>{s.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </DragCard>
         )}
       </div>
 
