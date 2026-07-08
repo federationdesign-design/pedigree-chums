@@ -34,7 +34,7 @@ export default function BreedPage({ params }: Props) {
         info={info}
         lineage={lineage}
       />
-      <div style={{ minWidth: "100vw", width: "100vw" }}><Footer /></div>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, display: "none" }} id="breed-footer"></div><div style={{ width: "100vw", marginLeft: "calc(-1 * ((100vw - 100%) / 2))", boxSizing: "border-box" }}><Footer /></div>
     </>
   );
 }
