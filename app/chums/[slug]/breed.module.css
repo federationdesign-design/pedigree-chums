@@ -1,24 +1,22 @@
+/* ── Page canvas ─────────────────────────────────────────── */
 .canvas {
   min-height: 100svh;
-  background: var(--navy, #0a3a57);
-  position: relative;
-  overflow: hidden;
+  min-width: 4000px;
+  background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
+  display: flex;
+  flex-direction: column;
 }
 
-/* ── Title block ─────────────────────────────────────────── */
-.titleBlock {
-  position: absolute;
-  top: clamp(80px, 12vw, 120px);
-  left: clamp(20px, 5vw, 60px);
-  z-index: 10;
-  pointer-events: none;
-  user-select: none;
+/* ── Page header ─────────────────────────────────────────── */
+.header {
+  padding: clamp(80px, 10vw, 100px) clamp(20px, 4vw, 48px) 24px;
+  flex-shrink: 0;
 }
 
 .h1 {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.8rem, 8vw, 7rem);
+  font-size: clamp(2.1rem, 6vw, 5.25rem);
   color: var(--yellow, #ffd23e);
   line-height: 1;
   margin: 0;
@@ -29,17 +27,27 @@
 .subtitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1rem, 2.5vw, 1.8rem);
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
   margin: 8px 0 0;
   letter-spacing: 0.04em;
   line-height: 1.2;
 }
 
+/* ── Cards row ───────────────────────────────────────────── */
+.cardsRow {
+  display: flex;
+  gap: 10px;
+  padding: 0 clamp(20px, 4vw, 48px) 32px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
 /* ── Draggable card base ─────────────────────────────────── */
 .card {
-  position: absolute;
+  position: relative;
   border-radius: 24px;
-  background: var(--blue-deep, #0c5b92);
+  background: var(--navy, #0a3a57);
   border: 2.5px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35);
   cursor: grab;
@@ -52,15 +60,12 @@
 .card:active {
   cursor: grabbing;
   box-shadow: 0 16px 60px rgba(0,0,0,0.5);
-  z-index: 200 !important;
 }
 
 .cardDragging {
   box-shadow: 0 20px 70px rgba(0,0,0,0.55);
-  z-index: 200 !important;
 }
 
-/* drag handle strip */
 .dragHandle {
   width: 100%;
   display: flex;
@@ -71,76 +76,28 @@
 }
 
 .dragHandle:active { cursor: grabbing; }
-
-.dragPips {
-  display: flex;
-  gap: 5px;
-}
-
-.dragPips span {
-  width: 28px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255,255,255,0.2);
-  display: block;
-}
-
-/* ── Photo card ──────────────────────────────────────────── */
-.photoCard {
-  width: clamp(200px, 28vw, 340px);
-}
-
-.photoImg {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 18px;
-  display: block;
-  pointer-events: none;
-}
-
-/* ── Tree card ───────────────────────────────────────────── */
-.treeCard {
-  width: clamp(300px, 46vw, 580px);
-  padding-bottom: 16px;
-}
-
-.treeLabel {
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  color: var(--yellow, #ffd23e);
-  text-transform: uppercase;
-  padding: 0 20px 8px;
-  opacity: 0.8;
-}
+.dragPips { display: flex; gap: 5px; }
+.dragPips span { width: 28px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); display: block; }
 
 /* ── Info card ───────────────────────────────────────────── */
 .infoCard {
-  width: clamp(260px, 34vw, 420px);
+  width: clamp(380px, 46vw, 620px);
   padding: 0 0 20px;
 }
 
-.infoSection {
-  padding: 0 20px;
-}
+.infoSection { padding: 0 20px; }
 
 .infoHeading {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
+  font-size: 26px;
   letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;
   margin: 16px 0 10px;
-  opacity: 0.8;
+  padding-left: 16px;
 }
 
-.temperamentTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 4px;
-}
+.temperamentTags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
 
 .tag {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -148,19 +105,12 @@
   letter-spacing: 0.08em;
   background: rgba(255,255,255,0.1);
   border: 1.5px solid rgba(255,255,255,0.18);
-  color: #fff;
+  color: #ffffff;
   border-radius: 20px;
   padding: 4px 12px;
 }
 
-.prosConsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.prosCol { }
-.consCol { }
+.prosConsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
 .prosConsHead {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -169,23 +119,17 @@
   margin: 0 0 6px;
   text-transform: uppercase;
 }
-
 .prosConsHead.pros { color: #4ade80; }
 .prosConsHead.cons { color: #f87171; }
 
-.prosConsList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+.prosConsList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
 
 .prosConsList li {
+  font-family: var(--font-body, 'Montserrat', system-ui);
   font-size: 12px;
+  font-weight: 800;
   line-height: 1.4;
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
   padding-left: 16px;
   position: relative;
 }
@@ -202,65 +146,76 @@
 
 .prosCol .prosConsList li::before { background: #4ade80; }
 .consCol .prosConsList li::before { background: #f87171; }
+.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 20px; }
 
-.divider {
-  height: 1px;
-  background: rgba(255,255,255,0.08);
-  margin: 12px 20px;
+/* When dragged - white background */
+.infoCard:active .infoHeading,
+.infoCard.cardDragging .infoHeading { color: var(--navy, #0a3a57); }
+.infoCard:active .prosConsList li,
+.infoCard.cardDragging .prosConsList li { color: var(--navy, #0a3a57); }
+.infoCard:active .tag,
+.infoCard.cardDragging .tag { color: var(--navy, #0a3a57); border-color: var(--navy, #0a3a57); }
+
+/* ── Ancestry card ───────────────────────────────────────── */
+.ancestryCard {
+  width: clamp(260px, 30vw, 380px);
+  padding: 0 0 16px;
 }
 
-/* ── Back button ─────────────────────────────────────────── */
-.backBtn {
-  position: fixed;
-  bottom: clamp(20px, 4vw, 36px);
-  left: clamp(20px, 4vw, 36px);
-  z-index: 50;
+.ancestryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.ancestryName {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ancestryPct {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.7);
-  border: 2px solid rgba(255,255,255,0.15);
-  border-radius: 50px;
-  padding: 10px 22px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  backdrop-filter: blur(8px);
+  font-size: 16px;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
 }
 
-.backBtn:hover {
-  background: rgba(255,255,255,0.18);
-  color: #fff;
+.ancestryBar {
+  height: 4px;
+  background: var(--yellow, #ffd23e);
+  border-radius: 2px;
+  margin: 0 20px;
+  transition: width 0.4s ease;
 }
 
-/* ── Mobile stack ────────────────────────────────────────── */
-@media (max-width: 640px) {
-  .titleBlock {
-    position: static;
-    padding: 100px 20px 24px;
-    pointer-events: auto;
-  }
+.ancestryDisclaimer {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 10px;
+  color: #ffffff;
+  padding: 10px 20px 0;
+  line-height: 1.5;
+  font-style: italic;
+}
 
-  .canvas {
-    overflow: auto;
-  }
+/* ── Diagrams row ────────────────────────────────────────── */
+.diagramsRow {
+  display: flex;
+  flex-direction: row;
+  gap: 48px;
+  padding: 0 clamp(20px, 4vw, 48px) 48px;
+  align-items: flex-start;
+  overflow-x: auto;
+}
 
-  .card {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: calc(100% - 40px) !important;
-    margin: 0 20px 16px;
-    cursor: default;
-  }
-
-  .photoCard {
-    width: calc(100% - 40px) !important;
-  }
-
-  .photoImg {
-    aspect-ratio: 4/3;
-  }
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: flex-start;
 }
 
 /* ── Ancestor pack frames ────────────────────────────────── */
@@ -334,3 +289,32 @@
 }
 
 .frameEmpty { font-size: 20px; color: rgba(255,255,255,0.2); }
+
+/* ── Back button ─────────────────────────────────────────── */
+.backBtn {
+  position: fixed;
+  bottom: clamp(20px, 4vw, 36px);
+  left: clamp(20px, 4vw, 36px);
+  z-index: 50;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.1);
+  color: #ffffff;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 50px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  display: inline-block;
+  backdrop-filter: blur(8px);
+}
+
+.backBtn:hover { background: rgba(255,255,255,0.18); }
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .canvas { min-width: 100vw; overflow-x: auto; }
+  .card { cursor: default; }
+}
