@@ -496,7 +496,7 @@ export default function BreedTree({
       </div>
 
       <div className={styles.aside} style={{ position: "relative" }}>
-        <button onClick={() => setFocus(root)} style={{ position: "absolute", top: -8, right: -8, width: 24, height: 24, borderRadius: "50%", background: "var(--navy, #0a3a57)", border: "2px solid var(--yellow, #ffd23e)", color: "var(--yellow, #ffd23e)", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, padding: 0, zIndex: 10 }}>×</button>
+        <button onClick={() => zoom(nodes[0])} style={{ position: "absolute", top: -8, right: -8, width: 24, height: 24, borderRadius: "50%", background: "var(--navy, #0a3a57)", border: "2px solid var(--yellow, #ffd23e)", color: "var(--yellow, #ffd23e)", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, padding: 0, zIndex: 10 }}>×</button>
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
             <span key={i}>
