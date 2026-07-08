@@ -331,7 +331,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                 <div
                   data-frame={f.id}
                   style={{
-                    width: 160, height: 160, borderRadius: 12,
+                    width: 77, height: 77, borderRadius: 10,
                     border: f.filled ? "4px solid #22c55e" : draggingImg === f.img ? "4px solid #ffd23e" : "4px dashed rgba(255,255,255,0.3)",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative", overflow: "visible", transition: "border-color 0.2s",
