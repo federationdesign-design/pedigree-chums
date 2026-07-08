@@ -46,8 +46,8 @@ function nodeStatus(name: string, note: string): BreedTag | null {
 }
 
 const ROOT    = 77;
-const RING1   = ROOT + 64;
-const RSTEP   = 98;
+const RING1   = ROOT + 96;
+const RSTEP   = 130;
 const SPREAD1 = Math.PI * 1.1;
 const SPREADN = Math.PI * 1.6;
 
@@ -377,6 +377,7 @@ export default function BreedTreeMap({
             return (
               <g key={n._id} data-node="1" transform={`translate(${n._x},${n._y})`}
                 style={{ cursor: "pointer" }}
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
                   // Branch nodes: toggle open/closed
@@ -428,9 +429,9 @@ export default function BreedTreeMap({
                   const py = -r - 6 - pillH;
                   return (
                     <g>
-                      <rect className={styles.nmPill} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={pillH / 2} />
+                      <rect className={`${styles.nmPill} ${styles.nmPillHover}`} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={pillH / 2} />
                       {lines.map((line, i) => (
-                        <text key={i} className={styles.nm} textAnchor="middle" dominantBaseline="central"
+                        <text key={i} className={`${styles.nm} ${styles.nmHover}`} textAnchor="middle" dominantBaseline="central"
                           y={py + padY + i * lineH + lineH / 2} style={{ fontSize: "12px" }}>{line}</text>
                       ))}
                     </g>

@@ -53,6 +53,7 @@ function DragCard({
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest("button, a, input, details, summary")) return;
+    if ((target as any).closest?.("g[data-node]")) return;
     e.preventDefault();
     onBringToFront(id);
     const el = ref.current!;

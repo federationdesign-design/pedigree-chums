@@ -346,3 +346,17 @@
   font-size: 20px;
   color: rgba(255,255,255,0.2);
 }
+
+/* Name pills hidden by default, show on node hover */
+.nmPillHover {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.nmHover {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.node:hover .nmPillHover,
+.node:hover .nmHover {
+  opacity: 1;
+}
