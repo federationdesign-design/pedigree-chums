@@ -6,6 +6,8 @@ import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
 import BreedTreeMap from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
+import LifespanChart from "../../../components/LifespanChart/LifespanChart";
+import { lifespanCurves } from "../../../data/lifespanCurves";
 
 type BreedInfo = {
   subtitle: string;
@@ -102,7 +104,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
     };
   }, []);
 
-  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13 });
+  const [zOrders, setZOrders] = useState({ tree: 11, infoBox: 12, ancestry: 13, lifespan: 14 });
 
   // Compute top-level ancestry from lineage
   const ancestryBreakdown = useMemo(() => {
@@ -193,6 +195,17 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             <p className={styles.ancestryDisclaimer}>
               Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
             </p>
+          </DragCard>
+        )}
+        {/* Lifespan chart card */}
+        {lifespanCurves[name] && (
+          <DragCard
+            id="lifespan"
+            className={`${styles.card}`}
+            style={{ position: "relative", zIndex: 14, padding: "16px 20px 20px" }}
+            onBringToFront={bringToFront}
+          >
+            <LifespanChart breedName={name} />
           </DragCard>
         )}
       </div>
