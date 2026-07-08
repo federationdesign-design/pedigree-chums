@@ -11,8 +11,8 @@ const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
 const STAGES = ["Puppy", "Adolescent", "Adult", "Senior", "Aged"] as const;
-const "rgba(255,255,255,0.08)" = "rgba(255,255,255,0.05)";
-const "rgba(255,255,255,0.04)"  = "rgba(255,255,255,0.10)";
+const STAGE_FILL = "rgba(255,255,255,0.08)";
+const STAGE_ALT  = "rgba(255,255,255,0.04)";
 
 function toSvgX(age: number, maxAge: number) {
   return PAD.left + (age / maxAge) * PLOT_W;
