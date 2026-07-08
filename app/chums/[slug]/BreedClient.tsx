@@ -33,6 +33,7 @@ function DragCard({
   children,
   onBringToFront,
   draggingStyle,
+  onClose,
 }: {
   id: string;
   style: React.CSSProperties;
@@ -40,6 +41,7 @@ function DragCard({
   children: React.ReactNode;
   onBringToFront: (id: string) => void;
   draggingStyle?: React.CSSProperties;
+  onClose?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
@@ -54,19 +56,23 @@ function DragCard({
     dragging.current = true;
     setIsDragging(true);
     const el = ref.current!;
+    const canvas = el.closest("[data-canvas]") as HTMLElement | null;
+    const canvasRect = canvas?.getBoundingClientRect() ?? { left: 0, top: 0 };
     const rect = el.getBoundingClientRect();
-    // Switch to absolute positioning anchored at current visual position
-    el.style.position = "fixed";
-    el.style.left = `${rect.left}px`;
-    el.style.top = `${rect.top}px`;
+    // Switch to absolute positioning relative to canvas
+    el.style.position = "absolute";
+    el.style.left = `${rect.left - canvasRect.left + (canvas?.scrollLeft ?? 0)}px`;
+    el.style.top = `${rect.top - canvasRect.top + (canvas?.scrollTop ?? 0)}px`;
     el.style.margin = "0";
-    origin.current = { px: rect.left, py: rect.top, ex: e.clientX, ey: e.clientY };
+    origin.current = { px: rect.left - canvasRect.left + (canvas?.scrollLeft ?? 0), py: rect.top - canvasRect.top + (canvas?.scrollTop ?? 0), ex: e.clientX, ey: e.clientY };
     el.setPointerCapture(e.pointerId);
   }, [id, onBringToFront]);
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (!dragging.current) return;
     const el = ref.current!;
+    const canvas = el.closest("[data-canvas]") as HTMLElement | null;
+    const canvasRect = canvas?.getBoundingClientRect() ?? { left: 0, top: 0 };
     const dx = e.clientX - origin.current.ex;
     const dy = e.clientY - origin.current.ey;
     el.style.left = `${origin.current.px + dx}px`;
@@ -87,10 +93,16 @@ function DragCard({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
-      <div className={styles.dragHandle}>
+      <div className={styles.dragHandle} style={{ justifyContent: "space-between", paddingRight: 10 }}>
         <div className={styles.dragPips}>
           <span /><span /><span />
         </div>
+        {onClose && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: "0 4px" }}
+          >×</button>
+        )}
       </div>
       {children}
     </div>
@@ -125,6 +137,9 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       .sort((a: any, b: any) => b.pct - a.pct);
   }, [lineage]);
   const zCounter = useRef(20);
+  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+  const closeCard = useCallback((id: string) => setClosedCards((prev) => new Set([...prev, id])), []);
+
 
   const bringToFront = useCallback((id: string) => {
     zCounter.current += 1;
@@ -135,7 +150,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
 
   return (
-    <div className={styles.canvas}>
+    <div className={styles.canvas} data-canvas="true">
       {/* Header */}
       <div className={styles.header}>
         <h1 className={styles.h1}>{name}</h1>
@@ -186,6 +201,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             className={`${styles.card} ${styles.ancestryCard}`}
             style={{ position: "relative", zIndex: 13 }}
             onBringToFront={bringToFront}
+            onClose={() => closeCard("infoBox")}
           >
             <p className={styles.infoHeading} style={{ padding: "16px 20px 0" }}>Ancestry</p>
             {ancestryBreakdown.map((a) => (
@@ -205,7 +221,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
         {/* Lifespan chart - in cards row */}
         {lifespanCurves[name] && (
-          <LifespanChart breedName={name} />
+          <div style={{ marginTop: -25 }}><LifespanChart breedName={name} /></div>
         )}
 
         {/* Lifespan explanation card */}
@@ -215,6 +231,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             className={`${styles.card}`}
             style={{ position: "relative", zIndex: 15, padding: "16px 20px 20px", width: "clamp(380px, 46vw, 620px)", flexShrink: 0 }}
             onBringToFront={bringToFront}
+            onClose={() => closeCard("ancestry")}
           >
             <p className={styles.infoHeading} style={{ paddingLeft: 0 }}>The Lifespan Diagram</p>
             <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 12, fontWeight: 600, lineHeight: 1.6, color: "#ffffff", margin: "0 0 12px" }}>"A visual guide to how this breed moves through life. The horizontal axis shows age from birth to old age; the vertical axis represents overall function, health and quality of life. The curve rises quickly through puppyhood, holds high during the prime adult years, then gradually declines into the senior stage. The exact shape varies by breed — this diagram makes those differences easy to understand at a glance. This is a conceptual illustration, not a clinical or veterinary prediction for any individual dog."</p>
