@@ -170,8 +170,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const CHART_TOP = CARD_TOP;
   const EXPLAIN_TOP = CARD_TOP + 280; // below chart
   const DIAGRAM_TOP = CARD_TOP + 520; // below cards
-  const TREE_TOP = DIAGRAM_TOP + 200; // tree 200px lower than circle
-  const FRAMES_TOP = DIAGRAM_TOP + 1050; // below diagrams
+  const TREE_TOP = DIAGRAM_TOP + 300; // tree 300px lower than circle
+  const FRAMES_TOP = DIAGRAM_TOP + 800; // below diagrams
   const CIRCLE_LEFT = LEFT_EDGE;
   const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48 - 400; // right of lifespan chart
 
@@ -302,9 +302,13 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                   {f.filled
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
-                    : <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>}
+                    : (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: 8 }}>
+                        <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>
+                        <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
+                      </div>
+                    )}
                 </div>
-                <span style={{ display: "block", marginTop: 8, fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 33, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center" }}>{f.name}</span>
               </div>
             ))}
           </div>
