@@ -63,14 +63,14 @@
 }
 
 .hoverLine {
-  stroke: var(--yellow, #ffd23e);
+  stroke: var(--navy, #0a3a57);
   stroke-width: 1;
   stroke-dasharray: 3 3;
   pointer-events: none;
 }
 
 .hoverDot {
-  fill: var(--yellow, #ffd23e);
+  fill: var(--navy, #0a3a57);
   stroke: #ffffff;
   stroke-width: 2;
   pointer-events: none;

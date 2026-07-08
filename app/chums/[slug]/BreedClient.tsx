@@ -102,7 +102,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
   const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15 });
   const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
-  type PageFrame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
+  type PageFrame = { id: string; name: string; img: string; pct?: number; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
   const [filledIds, setFilledIds] = useState<string[]>([]);
@@ -110,7 +110,12 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const [draggingImg, setDraggingImg] = useState<string | null>(null);
 
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
-    setFrames(nodes.map((n) => ({ ...n, filled: false, shake: false })));
+    setFrames(nodes.map((n) => ({
+      ...n,
+      pct: n.pct,
+      filled: false,
+      shake: false,
+    })));
   }, []);
 
   const handleDragName = useCallback((name: string | null) => {
@@ -311,12 +316,24 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                   }}
                 >
                   {f.filled
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
+                    ? (
+                      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
+                        {/* Green tick - top left */}
+                        <div style={{ position: "absolute", top: 6, left: 6, width: 22, height: 22, borderRadius: "50%", background: "#22c55e", border: "2px solid #ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ color: "#ffffff", fontSize: 12, fontWeight: 900, lineHeight: 1 }}>✓</span>
+                        </div>
+                        {/* % pill - bottom right */}
+                        <div style={{ position: "absolute", bottom: 6, right: 6, background: "rgba(10,58,87,0.9)", borderRadius: 20, padding: "2px 8px", border: "1.5px solid rgba(255,255,255,0.3)" }}>
+                          <span style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 11, color: "#ffd23e", letterSpacing: "0.05em" }}>{f.pct ? `${f.pct}%` : ""}</span>
+                        </div>
+                      </div>
+                    )
                     : (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: 8 }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: "0 8px 8px" }}>
                         <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>
-                        <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 13, fontWeight: 700, color: "var(--yellow,#ffd23e)", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
+                        <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 16, fontWeight: 700, color: "#ffffff", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
                       </div>
                     )}
                 </div>

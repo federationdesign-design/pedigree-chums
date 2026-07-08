@@ -19,7 +19,7 @@ type Node = LineageNode & {
   _dir: number;
 };
 
-export type FrameNode = { id: string; name: string; img: string };
+export type FrameNode = { id: string; name: string; img: string; pct?: number };
 
 function sumLeaves(n: LineageNode): number {
   const kids = n.children as LineageNode[] | undefined;
@@ -157,7 +157,10 @@ export default function BreedTreeMap({
     if (!onFramesReady) return;
     const found: FrameNode[] = [];
     const walk = (n: Node) => {
-      if (n.img && n._parent) found.push({ id: n._id, name: n.name, img: n.img as string });
+      if (n.img && n._parent) {
+        const pct = Math.round((n._leaves / root._leaves) * 100);
+        found.push({ id: n._id, name: n.name, img: n.img as string, pct });
+      }
       (n.children as Node[] | undefined)?.forEach(walk);
     };
     walk(root);
