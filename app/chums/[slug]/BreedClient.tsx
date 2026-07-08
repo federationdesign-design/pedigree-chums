@@ -213,15 +213,14 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           </div>
         )}
 
-        {/* Lifespan chart - above family tree */}
-        {lifespanCurves[name] && (
-          <LifespanChart breedName={name} />
-        )}
-
-        {/* Family tree - free, natural size */}
-        {lineage && (
-          <BreedTreeMap lineage={lineage} rootImage={image} />
-        )}
+        <div className={styles.rightColumn}>
+          {lifespanCurves[name] && (
+            <LifespanChart breedName={name} />
+          )}
+          {lineage && (
+            <BreedTreeMap lineage={lineage} rootImage={image} />
+          )}
+        </div>
       </div>
 
       {/* Back button */}
