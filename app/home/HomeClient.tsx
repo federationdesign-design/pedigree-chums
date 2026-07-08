@@ -43,7 +43,7 @@ export default function HomeClient() {
       <section className={styles.searchHero}>
         <p className={styles.searchEyebrow}>54 breeds to discover</p>
         <h1 className={styles.searchTitle}>
-          Find your <span>Chum</span>
+          Explore Britain's most <span>popular breeds</span>
         </h1>
         <p className={styles.searchSub}>
           Type a breed to explore its family tree, history, and personality
@@ -85,7 +85,6 @@ export default function HomeClient() {
         </div>
       </section>
 
-      <div className={styles.divider} />
 
       {/* Product section */}
       <section className={styles.product}>

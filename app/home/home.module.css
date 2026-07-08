@@ -106,7 +106,7 @@
   font-size: clamp(16px, 2.2vw, 22px);
   letter-spacing: 0.04em;
   background: rgba(255,255,255,0.08);
-  border: 2.5px solid rgba(255,255,255,0.18);
+  border: 2.5px solid #ffffff;
   border-radius: 50px;
   color: #fff;
   outline: none;
@@ -187,12 +187,6 @@
 }
 
 /* ── Divider ─────────────────────────────────────────────── */
-.divider {
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--blue-sky, #2bb4ee), transparent);
-  margin: 0 clamp(20px, 6vw, 80px);
-  opacity: 0.4;
-}
 
 /* ── Product section ─────────────────────────────────────── */
 .product {
