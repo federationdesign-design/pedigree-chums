@@ -243,9 +243,11 @@ export default function BreedTreeMap({
   // Opened node IDs (turn blue when eye clicked)
   const [openedIds, setOpenedIds] = useState<Set<string>>(new Set());
 
-  // Notify parent of frame nodes
+  // Notify parent of frame nodes — fire only once per root
+  const framesReadyFired = useRef(false);
   useEffect(() => {
-    if (!onFramesReady) return;
+    if (!onFramesReady || framesReadyFired.current) return;
+    framesReadyFired.current = true;
     const found: FrameNode[] = [];
     const walk = (n: Node) => {
       if (n.img && n._parent) {

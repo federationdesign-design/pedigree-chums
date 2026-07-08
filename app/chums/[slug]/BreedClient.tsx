@@ -53,7 +53,7 @@ function DragCard({
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest("button, a, input, details, summary")) return;
-    if ((target as any).closest?.("g[data-node]")) return;
+    if ((target as SVGElement).closest?.("g[data-node]")) return;
     e.preventDefault();
     onBringToFront(id);
     const el = ref.current!;
@@ -112,11 +112,15 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const [frameInfoHover, setFrameInfoHover] = useState<string | null>(null);
 
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
-    setFrames(nodes.map((n) => ({
-      ...n,
-      filled: false,
-      shake: false,
-    })));
+    setFrames((prev) => {
+      if (prev.length > 0) return prev; // already populated, ignore duplicate calls
+      const seen = new Set<string>();
+      return nodes.filter((n) => {
+        if (seen.has(n.id)) return false;
+        seen.add(n.id);
+        return true;
+      }).map((n) => ({ ...n, filled: false, shake: false }));
+    });
   }, []);
 
   const handleDragName = useCallback((name: string | null) => {
@@ -325,13 +329,13 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {frames.length > 0 && (
         <div style={{ position: "absolute", left: LEFT_EDGE, top: FRAMES_TOP }}>
           <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 78, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 24px", textTransform: "uppercase", lineHeight: 1 }}>Ancestor Pack</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, maxWidth: 2800 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, maxWidth: 1200 }}>
             {frames.map((f) => (
               <div key={f.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div
                   data-frame={f.id}
                   style={{
-                    width: 77, height: 77, borderRadius: 10,
+                    width: 160, height: 160, borderRadius: 12,
                     border: f.filled ? "4px solid #22c55e" : draggingImg === f.img ? "4px solid #ffd23e" : "4px dashed rgba(255,255,255,0.3)",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative", overflow: "visible", transition: "border-color 0.2s",
@@ -379,16 +383,13 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                       </div>
                     )
                     : (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", gap: 4, padding: "8px 8px 4px" }}>
-                        <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>
-                        <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 16, fontWeight: 700, color: "#ffffff", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
-                      </div>
+                      <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "#ffffff", textAlign: "center", lineHeight: 1.3, padding: "4px 6px", display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>{f.name}</span>
                     )}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </DragCard>
       )}
 
       {/* Spacer to give canvas height */}
