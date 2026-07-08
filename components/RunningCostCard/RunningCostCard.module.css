@@ -1,0 +1,181 @@
+.card {
+  width: 380px;
+  background: var(--cream, #fff8e6);
+  border-radius: 16px;
+  padding: 24px 24px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.heading {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.5rem;
+  color: var(--navy, #0a3a57);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.sub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.78rem;
+  color: var(--navy, #0a3a57);
+  margin: 0;
+  line-height: 1.4;
+}
+.sliderWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--blue-deep, #0b78bd);
+}
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--blue-sky, #5cc4ee), var(--blue-deep, #0b78bd));
+  outline: none;
+  cursor: pointer;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 3px solid var(--navy, #0a3a57);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 3px solid var(--navy, #0a3a57);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.slider:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--yellow, #ffd23e);
+  outline-offset: 2px;
+}
+.slider:focus-visible::-moz-range-thumb {
+  outline: 3px solid var(--yellow, #ffd23e);
+  outline-offset: 2px;
+}
+.scenarioLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--blue-deep, #0b78bd);
+  text-align: center;
+  min-height: 1.1em;
+}
+.outputs {
+  display: flex;
+  align-items: center;
+  background: var(--navy, #0a3a57);
+  border-radius: 12px;
+  padding: 16px 12px;
+}
+.outputBlock {
+  flex: 1;
+  text-align: center;
+}
+.outputValue {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.6rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+.outputLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--cream, #fff8e6);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.divider {
+  width: 1px;
+  height: 48px;
+  background: var(--blue-deep, #0b78bd);
+  flex-shrink: 0;
+  margin: 0 8px;
+}
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.breakdownTitle {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+.breakdownRow,
+.breakdownRowVariable {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  color: var(--navy, #0a3a57);
+}
+.breakdownRow {
+  font-weight: 500;
+}
+.breakdownRowVariable {
+  font-weight: 700;
+  color: var(--blue-deep, #0b78bd);
+  border-top: 1px solid var(--blue-sky, #5cc4ee);
+  padding-top: 5px;
+  margin-top: 2px;
+}
+.pct {
+  font-weight: 500;
+  font-size: 0.68rem;
+}
+.barWrap {
+  height: 4px;
+  background: var(--blue-sky, #5cc4ee);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.barFill {
+  height: 100%;
+  background: var(--blue-deep, #0b78bd);
+  border-radius: 2px;
+  transition: width 0.15s ease;
+}
+.disclaimer {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  color: var(--navy, #0a3a57);
+  line-height: 1.45;
+  margin: 0;
+}
+.modelTag {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--blue-sky, #5cc4ee);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: right;
+}

@@ -8,6 +8,8 @@ import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/B
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
+import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard";
+import runningCosts from "../../../data/runningCosts";
 
 type BreedInfo = {
   subtitle: string;
@@ -277,6 +279,13 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
       {hasLifespan && (
         <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP + 10, top: CHART_TOP, marginTop: -25, zIndex: 5 }}>
           <LifespanChart breedName={name} />
+        </div>
+      )}
+
+      {/* Running cost card - fixed, to the right of lifespan chart */}
+      {runningCosts[slug] && (
+        <div style={{ position: "absolute", left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24, top: CHART_TOP, marginTop: -25, zIndex: 5 }}>
+          <RunningCostCard config={runningCosts[slug]} />
         </div>
       )}
 
