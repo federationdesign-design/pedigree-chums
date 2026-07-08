@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import HomeClient from "./HomeClient";
-import PopHeading from "../../components/PopHeading/PopHeading";
 import StepCards from "../../components/StepCards/StepCards";
+import VideoSection from "./VideoSection";
 import Footer from "../../components/Footer/Footer";
 import styles from "./home.module.css";
 
@@ -18,31 +18,23 @@ export default function HomePage() {
       <Nav />
       <HomeClient />
 
-      {/* Video + 54 cards section */}
+      {/* Video + 54 cards section - text left, video right */}
       <section className={styles.videoSection}>
-        <div className={styles.videoCol}>
-          <iframe
-            src="https://player.vimeo.com/video/1199216471?autoplay=0&loop=1&muted=1&controls=1&title=0&byline=0&portrait=0"
-            title="Pedigree Chums"
-            allow="autoplay; fullscreen; picture-in-picture"
-            frameBorder="0"
-            className={styles.videoFrame}
-          />
-        </div>
         <div className={styles.textCol}>
-          <PopHeading className="display">
-            54 Unique <span className="display-yellow">Dog Cards</span>
-          </PopHeading>
-          <p className="lead">Each card includes:</p>
-          <ul className="points">
-            <li className="point">Breed traits and temperament</li>
-            <li className="point">Coat colours and markings</li>
-            <li className="point">Size and build</li>
-            <li className="point">Tell-tale identifiers</li>
-            <li className="point">Cute yet accurate illustrations</li>
-            <li className="point">Quick-reference stats</li>
+          <h2 className={styles.cardsHeading}>
+            54 Unique <span className={styles.cardsHeadingYellow}>Dog Cards</span>
+          </h2>
+          <p className={styles.cardsLead}>Each card includes:</p>
+          <ul className={styles.cardsList}>
+            <li className={styles.cardsPoint}>Breed traits and temperament</li>
+            <li className={styles.cardsPoint}>Coat colours and markings</li>
+            <li className={styles.cardsPoint}>Size and build</li>
+            <li className={styles.cardsPoint}>Tell-tale identifiers</li>
+            <li className={styles.cardsPoint}>Cute yet accurate illustrations</li>
+            <li className={styles.cardsPoint}>Quick-reference stats</li>
           </ul>
         </div>
+        <VideoSection />
       </section>
 
       <StepCards />

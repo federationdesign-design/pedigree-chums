@@ -408,15 +408,74 @@
   }
 }
 
+
 /* ── Video + cards section ───────────────────────────────── */
 .videoSection {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(32px, 6vw, 80px);
+  gap: clamp(32px, 6vw, 64px);
   align-items: center;
   max-width: 1280px;
   margin: 0 auto;
-  padding: clamp(48px, 8vw, 96px) clamp(20px, 6vw, 80px);
+  padding: clamp(24px, 4vw, 48px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 80px);
+}
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cardsHeading {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(32px, 5vw, 64px);
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  line-height: 1.05;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+}
+
+.cardsHeadingYellow {
+  color: var(--yellow, #ffd23e);
+}
+
+.cardsLead {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-size: clamp(16px, 1.8vw, 20px);
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 16px;
+}
+
+.cardsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardsPoint {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-size: clamp(14px, 1.4vw, 17px);
+  font-weight: 600;
+  color: #ffffff;
+  padding-left: 24px;
+  position: relative;
+}
+
+.cardsPoint::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
 }
 
 .videoCol {
@@ -434,11 +493,4 @@
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 20px;
-}
-
-.textCol {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
 }
