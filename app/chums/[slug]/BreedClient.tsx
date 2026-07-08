@@ -102,17 +102,17 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
   const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15 });
   const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
-  type PageFrame = { id: string; name: string; img: string; pct?: number; filled: boolean; shake: boolean };
+  type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
   const [filledIds, setFilledIds] = useState<string[]>([]);
   const [dragName, setDragName] = useState<string | null>(null);
   const [draggingImg, setDraggingImg] = useState<string | null>(null);
+  const [frameInfoHover, setFrameInfoHover] = useState<string | null>(null);
 
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames(nodes.map((n) => ({
       ...n,
-      pct: n.pct,
       filled: false,
       shake: false,
     })));
@@ -320,13 +320,38 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                       <div style={{ position: "relative", width: "100%", height: "100%" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
-                        {/* Green tick - top left */}
-                        <div style={{ position: "absolute", top: 6, left: 6, width: 22, height: 22, borderRadius: "50%", background: "#22c55e", border: "2px solid #ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ color: "#ffffff", fontSize: 12, fontWeight: 900, lineHeight: 1 }}>✓</span>
-                        </div>
-                        {/* % pill - bottom right */}
-                        <div style={{ position: "absolute", bottom: 6, right: 6, background: "rgba(10,58,87,0.9)", borderRadius: 20, padding: "2px 8px", border: "1.5px solid rgba(255,255,255,0.3)" }}>
-                          <span style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 11, color: "#ffd23e", letterSpacing: "0.05em" }}>{f.pct ? `${f.pct}%` : ""}</span>
+
+                        {/* Status dot - top left (matches pit colour system) */}
+                        <div title={f.status ?? "unknown"} style={{
+                          position: "absolute", left: -4, top: -4, width: 14, height: 14,
+                          borderRadius: "50%", border: "2px solid #ffffff", pointerEvents: "none",
+                          background: f.status === "extinct" ? "#d64545" : f.status === "trending" ? "#2e9e5b" : f.status === "endangered" ? "#ff7a3c" : f.status === "in-decline" ? "#ffb02e" : "#4ade80"
+                        }} />
+
+                        {/* Info i - top right */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setFrameInfoHover(frameInfoHover === f.id ? null : f.id); }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0b78bd)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                        >i</button>
+                        {frameInfoHover === f.id && (
+                          <div style={{ position: "absolute", right: 0, top: 20, background: "rgba(10,58,87,0.96)", border: "1.5px solid rgba(255,210,62,0.4)", borderRadius: 12, padding: "10px 14px", zIndex: 200, minWidth: 200, maxWidth: 260, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
+                            onPointerDown={(e) => e.stopPropagation()}
+                          >
+                            <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, color: "#ffd23e", margin: "0 0 4px", letterSpacing: "0.05em" }}>{f.name}</p>
+                            {f.note && <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, color: "#ffffff", margin: 0, lineHeight: 1.5 }}>{f.note}</p>}
+                            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", fontStyle: "italic" }}>Status: {f.status ?? "unknown"}</p>
+                            <button onClick={(e) => { e.stopPropagation(); setFrameInfoHover(null); }} style={{ position: "absolute", top: 6, right: 8, background: "none", border: "none", color: "#ffd23e", fontSize: 16, cursor: "pointer" }}>×</button>
+                          </div>
+                        )}
+
+                        {/* % pill - bottom right, clickable */}
+                        <div
+                          onClick={(e) => { e.stopPropagation(); }}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          style={{ position: "absolute", right: -2, bottom: -14, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "default", fontFamily: "Montserrat, system-ui", zIndex: 65, whiteSpace: "nowrap" }}
+                        >
+                          {f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}
                         </div>
                       </div>
                     )

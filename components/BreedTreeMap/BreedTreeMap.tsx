@@ -2,7 +2,48 @@
 
 import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import type { LineageNode } from "../../data/lineage";
+import { breeds } from "../../data/breeds";
+import { ukBreeds } from "../../data/uk-breeds";
 import styles from "./BreedTreeMap.module.css";
+
+type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
+
+const TAG_STYLE: Record<BreedTag, { bg: string }> = {
+  extinct:      { bg: "#d64545" },
+  trending:     { bg: "#2e9e5b" },
+  popular:      { bg: "#4ade80" },
+  endangered:   { bg: "#ff7a3c" },
+  "in-decline": { bg: "#ffb02e" },
+};
+
+const PROGENITOR_STATUS: Record<string, BreedTag> = {
+  "Talbot hound": "extinct", "Talbot hounds": "extinct", "St Hubert Hound": "extinct",
+  "Old scenting hounds": "extinct", "Old English Black and Tan Terrier": "extinct",
+  "White English Terrier": "extinct", "Old English White Terrier": "extinct",
+  "English White Terrier": "extinct",
+};
+
+const LIVING_STATUS: Record<string, BreedTag> = {
+  "Labrador": "popular", "Poodle": "popular",
+};
+
+const LIVING_NAMES = new Set<string>(
+  [...ukBreeds.map((b) => b.name), ...breeds.map((b) => b.name)].map((s) => s.toLowerCase().trim())
+);
+
+function nodeStatus(name: string, note: string): BreedTag | null {
+  const n = (note || "").toLowerCase();
+  if (n.includes("extinct")) return "extinct";
+  if (n.includes("in decline") || n.includes("declining")) return "in-decline";
+  if (n.includes("endangered") || n.includes("vulnerable")) return "endangered";
+  if (PROGENITOR_STATUS[name]) return PROGENITOR_STATUS[name];
+  if (LIVING_STATUS[name]) return LIVING_STATUS[name];
+  const key = name.toLowerCase().trim();
+  const uk = ukBreeds.find((b) => b.name.toLowerCase().trim() === key);
+  if (uk) return (uk.tag as BreedTag) ?? "popular";
+  if (LIVING_NAMES.has(key)) return "popular";
+  return null;
+}
 
 const ROOT    = 77;
 const RING1   = ROOT + 128;
@@ -19,7 +60,7 @@ type Node = LineageNode & {
   _dir: number;
 };
 
-export type FrameNode = { id: string; name: string; img: string; pct?: number };
+export type FrameNode = { id: string; name: string; img: string; pct?: number; note?: string; status?: BreedTag | null };
 
 function sumLeaves(n: LineageNode): number {
   const kids = n.children as LineageNode[] | undefined;
@@ -159,7 +200,8 @@ export default function BreedTreeMap({
     const walk = (n: Node) => {
       if (n.img && n._parent) {
         const pct = Math.round((n._leaves / root._leaves) * 100);
-        found.push({ id: n._id, name: n.name, img: n.img as string, pct });
+        const status = nodeStatus(n.name, n.note ?? "");
+        found.push({ id: n._id, name: n.name, img: n.img as string, pct, note: n.note, status });
       }
       (n.children as Node[] | undefined)?.forEach(walk);
     };
