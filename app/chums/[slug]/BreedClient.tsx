@@ -159,7 +159,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Two cards side by side */}
       <div className={styles.cardsRow}>
-        {/* Temperament card */}
+        {/* Temperament + ancestry in a column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <DragCard
           id="infoBox"
           className={`${styles.card} ${styles.infoCard}`}
@@ -218,6 +219,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             </p>
           </DragCard>
         )}
+        </div>
 
         {/* Lifespan chart - in cards row */}
         {lifespanCurves[name] && (

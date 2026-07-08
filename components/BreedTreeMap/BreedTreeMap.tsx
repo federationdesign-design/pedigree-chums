@@ -149,6 +149,7 @@ export default function BreedTreeMap({
   type DragImg = { id: string; name: string; img: string; x: number; y: number; placed: boolean };
   const [dragImgs, setDragImgs] = useState<DragImg[]>([]);
   const [draggingImg, setDraggingImg] = useState<string | null>(null);
+  const [dragName, setDragName] = useState<string | null>(null);
 
   // Frames state lives inside tree so drag coords match
   type Frame = { id: string; name: string; img: string; filled: boolean; shake: boolean };
@@ -335,7 +336,18 @@ export default function BreedTreeMap({
                   <g transform={`translate(${r - 8}, ${-r + 8})`} style={{ cursor: "pointer" }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setDragImgs((prev) => [...prev, { id: n._id, name: n.name, img: n.img as string, x: 20 + prev.length * 20, y: 20 + prev.length * 20, placed: false }]);
+                      const wrap = wrapRef.current;
+                      if (!wrap) return;
+                      // Get node SVG position relative to wrap
+                      const svgEl = wrap.querySelector("svg");
+                      if (!svgEl) return;
+                      const svgRect = svgEl.getBoundingClientRect();
+                      const vbParts = svgEl.getAttribute("viewBox")?.split(" ").map(Number) ?? [0,0,1400,1000];
+                      const scaleX = svgRect.width / (vbParts[2] ?? 1400);
+                      const scaleY = svgRect.height / (vbParts[3] ?? 1000);
+                      const screenX = (n._x - (vbParts[0] ?? 0)) * scaleX + svgRect.left - wrap.getBoundingClientRect().left;
+                      const screenY = (n._y - (vbParts[1] ?? 0)) * scaleY + svgRect.top - wrap.getBoundingClientRect().top;
+                      setDragImgs((prev) => [...prev, { id: n._id, name: n.name, img: n.img as string, x: screenX + 40, y: screenY - 80, placed: false }]);
                     }}>
                     <circle r={11} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={1.5} />
                     <text textAnchor="middle" dominantBaseline="central"
@@ -366,12 +378,14 @@ export default function BreedTreeMap({
             onPointerDown={(e) => {
               e.preventDefault(); e.stopPropagation();
               setDraggingImg(d.id);
+              setDragName(d.name);
               const startX = e.clientX - d.x; const startY = e.clientY - d.y;
               const el = e.currentTarget;
               el.setPointerCapture(e.pointerId);
               const onMove = (ev: PointerEvent) => setDragImgs((prev) => prev.map((p) => p.id === d.id ? { ...p, x: ev.clientX - startX, y: ev.clientY - startY } : p));
               const onUp = (ev: PointerEvent) => {
                 setDraggingImg(null);
+                setDragName(null);
                 el.removeEventListener("pointermove", onMove);
                 el.removeEventListener("pointerup", onUp);
                 document.querySelectorAll<HTMLElement>("[data-frame]").forEach((f) => {
@@ -412,7 +426,9 @@ export default function BreedTreeMap({
                   {f.filled
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={f.img} alt={f.name} className={styles.frameImg} />
-                    : <span className={styles.frameEmpty}>+</span>}
+                    : draggingImg && frames.find((df) => df.img === f.img) && dragName
+                      ? <span className={styles.frameNameHint}>{dragName}</span>
+                      : <span className={styles.frameEmpty}>+</span>}
                 </div>
                 <span className={styles.frameLabel}>{f.name}</span>
               </div>
