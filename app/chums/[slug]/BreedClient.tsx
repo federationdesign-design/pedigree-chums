@@ -362,7 +362,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                           style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0b78bd)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
                         >i</button>
                         {frameInfoHover === f.id && (
-                          <div style={{ position: "absolute", right: 0, top: 20, background: "rgba(10,58,87,0.96)", border: "1.5px solid rgba(255,210,62,0.4)", borderRadius: 12, padding: "10px 14px", zIndex: 200, minWidth: 200, maxWidth: 260, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
+                          <div style={{ position: "absolute", left: 0, top: 20, background: "rgba(10,58,87,0.96)", border: "1.5px solid rgba(255,210,62,0.4)", borderRadius: 12, padding: "10px 14px", zIndex: 200, minWidth: 200, maxWidth: 260, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
                             onPointerDown={(e) => e.stopPropagation()}
                           >
                             <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, color: "#ffd23e", margin: "0 0 4px", letterSpacing: "0.05em" }}>{f.name}</p>
