@@ -309,6 +309,7 @@
   height: 160px;
   border-radius: 12px;
   border: 2.5px dashed rgba(255,255,255,0.3);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;

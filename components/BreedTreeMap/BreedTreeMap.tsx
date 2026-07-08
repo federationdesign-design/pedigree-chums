@@ -439,7 +439,7 @@ export default function BreedTreeMap({
                 const py = -r - 6 - pillH;
                 return (
                   <g>
-                    <rect className={styles.nmPill} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={33} />
+                    <rect className={styles.nmPill} x={-pillW / 2} y={py} width={pillW} height={pillH} rx={pillH / 2} />
                     {lines.map((line, i) => (
                       <text
                         key={i}
@@ -472,14 +472,16 @@ export default function BreedTreeMap({
                     e.stopPropagation();
                     const rect = wrapRef.current?.getBoundingClientRect();
                     if (!rect) return;
+                    // Position relative to wrap element
+                    const wrapRect = wrapRef.current!.getBoundingClientRect();
                     setDragImgs((prev) => [
                       ...prev,
                       {
                         id: n._id,
                         name: n.name,
                         img: n.img as string,
-                        x: rect.left + 100 + prev.length * 10,
-                        y: rect.top + 100 + prev.length * 10,
+                        x: 20 + prev.length * 20,
+                        y: 20 + prev.length * 20,
                         placed: false,
                       }
                     ]);
@@ -513,7 +515,7 @@ export default function BreedTreeMap({
         <div
           key={d.id}
           className={`${styles.imgCard} ${draggingImg === d.id ? styles.imgCardDragging : ""}`}
-          style={{ position: "fixed", left: d.x, top: d.y, zIndex: 200 }}
+          style={{ position: "absolute", left: d.x, top: d.y, zIndex: 200 }}
           onPointerDown={(e) => {
             e.preventDefault();
             setDraggingImg(d.id);
