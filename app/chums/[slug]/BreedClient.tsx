@@ -249,7 +249,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Ancestry card - below temperament */}
       {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
-        <DragCard id="ancestry" initialX={LEFT_EDGE} initialY={CARD_TOP + 340} zIndex={zOrders.ancestry}
+        <DragCard id="ancestry" initialX={LEFT_EDGE} initialY={CARD_TOP + 276} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
           <p className={styles.infoHeading} style={{ padding: "16px 16px 0" }}>Ancestry</p>
@@ -333,7 +333,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                     width: 160, height: 160, borderRadius: 12,
                     border: f.filled ? "4px solid #22c55e" : draggingImg === f.img ? "4px solid #ffd23e" : "4px dashed rgba(255,255,255,0.3)",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
-                    position: "relative", overflow: "hidden", transition: "border-color 0.2s",
+                    position: "relative", overflow: "visible", transition: "border-color 0.2s",
                     animation: f.shake ? "frameShake 0.4s ease" : frameFlash === f.id ? "frameFlash 0.6s ease" : "none"
                   }}
                 >
@@ -341,7 +341,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                     ? (
                       <div style={{ position: "relative", width: "100%", height: "100%" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
+                        <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 16, display: "block" }} />
 
                         {/* Status dot - top left (matches pit colour system) */}
                         <div title={f.status ?? "unknown"} style={{
@@ -378,7 +378,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
                       </div>
                     )
                     : (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: "0 8px 8px" }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", gap: 4, padding: "8px 8px 4px" }}>
                         <span style={{ fontSize: 20, color: "rgba(255,255,255,0.2)" }}>+</span>
                         <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 16, fontWeight: 700, color: "#ffffff", textAlign: "center", lineHeight: 1.3 }}>{f.name}</span>
                       </div>
@@ -392,6 +392,32 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
 
       {/* Spacer to give canvas height */}
       <div style={{ height: FRAMES_TOP + 400 }} />
+
+      {/* Fixed ancestor pack at bottom - only visible when dragging an image */}
+      {dragName && frames.length > 0 && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(10,58,87,0.95)", backdropFilter: "blur(8px)", borderTop: "2px solid rgba(255,210,62,0.3)", padding: "12px 24px 16px", zIndex: 1000, display: "flex", gap: 12, overflowX: "auto" }}>
+          <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 16, color: "var(--yellow,#ffd23e)", margin: "0 16px 0 0", whiteSpace: "nowrap", alignSelf: "center" }}>Ancestor Pack</p>
+          {frames.map((f) => (
+            <div key={f.id} style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div
+                data-frame={f.id}
+                style={{
+                  width: 80, height: 80, borderRadius: 12, flexShrink: 0,
+                  border: f.filled ? "3px solid #22c55e" : draggingImg === f.img ? "3px solid #ffd23e" : "3px dashed rgba(255,255,255,0.3)",
+                  background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "visible", position: "relative", transition: "border-color 0.2s",
+                }}
+              >
+                {f.filled
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
+                  : <span style={{ fontSize: 14, color: "rgba(255,255,255,0.2)" }}>+</span>}
+              </div>
+              <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 9, fontWeight: 700, color: "#ffffff", marginTop: 4, textAlign: "center", maxWidth: 80 }}>{f.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>
