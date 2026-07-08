@@ -222,7 +222,7 @@ export default function BreedTreeMap({
   const VIEW_H = Math.max(1000, bounds.maxY - bounds.minY);
 
   return (
-    <div>
+    <div style={{ display: "block" }}>
       <div
         ref={wrapRef}
         className={styles.wrap}

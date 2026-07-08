@@ -93,17 +93,12 @@ function DragCard({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
-      <div className={styles.dragHandle} style={{ justifyContent: "space-between", paddingRight: 10 }}>
-        <div className={styles.dragPips}>
-          <span /><span /><span />
-        </div>
-        {onClose && (
+      {onClose && (
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
-            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: "0 4px" }}
+            style={{ position: "absolute", top: 10, right: 12, background: "none", border: "none", color: "var(--yellow, #ffd23e)", fontSize: 28, cursor: "pointer", lineHeight: 1, padding: 0, zIndex: 1, fontWeight: 700 }}
           >×</button>
         )}
-      </div>
       {children}
     </div>
   );
@@ -166,6 +161,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
           className={`${styles.card} ${styles.infoCard}`}
           style={{ position: "relative", zIndex: 12 }}
           onBringToFront={bringToFront}
+          onClose={() => closeCard("infoBox")}
           draggingStyle={{ background: "#ffffff", color: "var(--navy, #0a3a57)", border: "2px solid var(--navy, #0a3a57)" }}
         >
           <p className={styles.infoHeading}>Temperament</p>
@@ -202,7 +198,7 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
             className={`${styles.card} ${styles.ancestryCard}`}
             style={{ position: "relative", zIndex: 13 }}
             onBringToFront={bringToFront}
-            onClose={() => closeCard("infoBox")}
+            onClose={() => closeCard("ancestry")}
           >
             <p className={styles.infoHeading} style={{ padding: "16px 20px 0" }}>Ancestry</p>
             {ancestryBreakdown.map((a) => (
