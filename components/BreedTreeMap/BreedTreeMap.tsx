@@ -360,7 +360,7 @@ export default function BreedTreeMap({
                   r={r}
                   fill="none"
                   style={{
-                    fill: isFilled ? "#22c55e" : isOpened ? "#22c55e" : n.img ? "#ffd23e" : undefined,
+                    fill: isFilled ? "#22c55e" : isOpened ? "#22c55e" : (n.img && !hasKids) ? "var(--navy, #0a3a57)" : n.img ? "#ffd23e" : undefined,
                     stroke: isFilled ? "#22c55e" : isOpened ? "#22c55e" : undefined,
                     strokeWidth: (isFilled || isOpened) ? 3 : undefined,
                   }} />

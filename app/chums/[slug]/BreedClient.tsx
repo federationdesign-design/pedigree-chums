@@ -208,8 +208,8 @@ export default function BreedClient({ name, image, info, lineage }: Props) {
   const INFO_W = 420;
   const ANCESTRY_W = 340;
   const CHART_TOP = CARD_TOP;
-  const EXPLAIN_TOP = CARD_TOP + 280; // below chart
-  const DIAGRAM_TOP = CARD_TOP + 520; // below cards
+  const EXPLAIN_TOP = CARD_TOP + 255; // below chart
+  const DIAGRAM_TOP = CARD_TOP + 620; // below cards
   const TREE_TOP = DIAGRAM_TOP + 400; // tree 400px lower than circle
   const FRAMES_TOP = DIAGRAM_TOP + 800; // below diagrams
   const CIRCLE_LEFT = LEFT_EDGE;
