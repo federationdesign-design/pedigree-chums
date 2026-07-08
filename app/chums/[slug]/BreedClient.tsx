@@ -103,6 +103,9 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
   }, []);
 
+  const infoBoxRef = useRef<HTMLDivElement>(null);
+  const [infoBoxHeight, setInfoBoxHeight] = useState(276);
+
 const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
@@ -170,6 +173,18 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
     };
   }, []);
 
+  // Measure temperament card height so ancestry card sits 16px below it
+  useEffect(() => {
+    if (!infoBoxRef.current) return;
+    const measure = () => {
+      if (infoBoxRef.current) setInfoBoxHeight(infoBoxRef.current.offsetHeight);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(infoBoxRef.current);
+    return () => ro.disconnect();
+  }, []);
+
   const ancestryBreakdown = useMemo(() => {
     if (!lineage) return [];
     // Collect all leaf nodes with normalised share (same as pit breedMix)
@@ -231,6 +246,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
         <DragCard id="infoBox" initialX={LEFT_EDGE} initialY={CARD_TOP} zIndex={zOrders.infoBox}
           onBringToFront={bringToFront} onClose={() => closeCard("infoBox")}
           style={{ width: INFO_W, padding: "0 0 20px" }}>
+          <div ref={infoBoxRef}>
           <p className={styles.infoHeading}>Temperament</p>
           <div className={styles.infoSection}>
             <div className={styles.temperamentTags}>
@@ -250,12 +266,13 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
               </div>
             </div>
           </div>
+          </div>
         </DragCard>
       )}
 
       {/* Ancestry card - below temperament */}
       {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
-        <DragCard id="ancestry" initialX={LEFT_EDGE} initialY={CARD_TOP + 276} zIndex={zOrders.ancestry}
+        <DragCard id="ancestry" initialX={LEFT_EDGE} initialY={CARD_TOP + infoBoxHeight + 16} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
           <p className={styles.infoHeading} style={{ padding: "16px 16px 0" }}>Ancestry</p>
