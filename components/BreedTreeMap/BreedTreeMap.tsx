@@ -392,7 +392,8 @@ export default function BreedTreeMap({
               <circle
                 className={`${styles.disc} ${hasKids && !isOpen ? styles.discHas : ""} ${isOpen ? styles.discOpen : ""}`.trim()}
                 r={r}
-                fill={n.img ? `url(#btm-${n._id})` : undefined}
+                fill={frames.find((f) => f.id === n._id && f.filled) ? "#22c55e" : n.img ? `url(#btm-${n._id})` : undefined}
+                style={frames.find((f) => f.id === n._id && f.filled) ? { stroke: "#16a34a" } : undefined}
               />
               <text
                 className={styles.pct}
@@ -557,7 +558,7 @@ export default function BreedTreeMap({
           <div className={styles.pctDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
         </div>
       )}
-
+      </div>
 
       {/* Ancestor pack frames - horizontal row below diagram */}
       {frames.length > 0 && (
