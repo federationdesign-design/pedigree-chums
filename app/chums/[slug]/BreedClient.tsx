@@ -113,7 +113,7 @@ function DragCard({
 export default function BreedClient({ name, slug, image, info, lineage }: Props) {
   const zCounter = useRef(120);
   const bringToFront = useCallback((id: string) => {
-    zCounter.current += 1;
+    zCounter.current = Math.min(zCounter.current + 1, 290);
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
   }, []);
 

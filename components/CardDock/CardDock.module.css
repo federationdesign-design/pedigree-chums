@@ -1,19 +1,19 @@
 .dock {
   position: fixed;
-  right: 16px;
-  top: 80px;
+  right: clamp(18px, 4vw, 48px);
+  top: 152px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  z-index: 200;
+  z-index: 250;
 }
 
 .icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  border-radius: 24px;
   background: var(--navy, #0a3a57);
-  border: 2px solid var(--yellow, #ffd23e);
+  border: 3px solid var(--yellow, #ffd23e);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -23,11 +23,12 @@
   padding: 0;
   position: relative;
   transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 0 rgba(10,58,87,0.3);
 }
 
 .icon:hover {
   background: var(--yellow, #ffd23e);
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .icon:hover .abbr {
@@ -36,13 +37,13 @@
 
 .icon:hover .label {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(-50%) translateX(0);
   pointer-events: auto;
 }
 
 .abbr {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   letter-spacing: 0.05em;
   color: var(--yellow, #ffd23e);
   line-height: 1;
@@ -52,7 +53,7 @@
 /* Tooltip label that appears on hover */
 .label {
   position: absolute;
-  right: 56px;
+  right: 112px;
   top: 50%;
   transform: translateY(-50%) translateX(8px);
   background: var(--navy, #0a3a57);
