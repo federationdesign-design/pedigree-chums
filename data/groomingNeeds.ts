@@ -66,3 +66,6 @@ const groomingNeeds: Record<string, GroomingNeeds> = {
   "irish-setter":                   { breedId: "irish-setter",                   timePerWeek: 40,  monthlyProfessionalCost: 45,  professionalFrequency: "Every 8-10 weeks", homeGroomingTools: ["Pin brush", "Slicker brush", "Wide-tooth comb"], sheddingLevel: 3, coatType: "Long silky coat with feathering", notes: "The Irish Setter's flowing coat needs regular brushing to prevent tangles in the feathering. Professional trimming every 8-10 weeks keeps the coat looking its best.", modelVersion: "prototype-1.0" },
   "bull-terrier":                   { breedId: "bull-terrier",                   timePerWeek: 10,  monthlyProfessionalCost: 0,   professionalFrequency: null,              homeGroomingTools: ["Rubber grooming mitt"], sheddingLevel: 2, coatType: "Short flat coat",            notes: "Bull Terriers are extremely easy to groom. A weekly rub with a rubber mitt keeps the coat in great condition.", modelVersion: "prototype-1.0" },
   
+};
+
+export default groomingNeeds;

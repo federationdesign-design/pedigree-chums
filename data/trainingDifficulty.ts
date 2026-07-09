@@ -64,3 +64,6 @@ const trainingDifficulty: Record<string, TrainingDifficulty> = {
   "maltipoo": { breedId: "maltipoo", score: 2, label: "Willing and responsive", traits: ["Generally eager to please and picks up basic commands readily", "Responds well to gentle positive reinforcement", "Short attentive sessions work best"], goodFor: "Trick training and basic obedience", watchOut: "Can be prone to separation anxiety -- build independence training in from day one", modelVersion: "prototype-1.0" },
   "jackapoo": { breedId: "jackapoo", score: 2, label: "Quick but wilful", traits: ["Intelligent mix that learns fast -- both good and bad habits", "Benefits from Poodle focus but retains Jack Russell independence", "Responds well to high-value rewards and varied short sessions"], goodFor: "Agility, trick training and obedience", watchOut: "Prey drive from the terrier side needs careful management off lead", modelVersion: "prototype-1.0" },
   
+};
+
+export default trainingDifficulty;
