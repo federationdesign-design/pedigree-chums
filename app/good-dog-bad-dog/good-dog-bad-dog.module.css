@@ -1,14 +1,13 @@
 /* ── Page shell ─────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
-  background: linear-gradient(160deg, #5cc4ee 0%, #0b78bd 50%, #0a3a57 100%);
   padding-top: 140px;
   padding-bottom: 80px;
 }
 
 /* ── Hero ──────────────────────────────────────────────────── */
 .hero {
-  max-width: 760px;
+  max-width: 900px;
   margin: 0 auto 80px;
   padding: 0 24px;
 }
@@ -44,12 +43,12 @@
   color: #ffffff;
   line-height: 1.7;
   margin: 0 0 16px;
-  max-width: 640px;
+  max-width: 780px;
 }
 
 /* ── Essay ──────────────────────────────────────────────────── */
 .essay {
-  max-width: 760px;
+  max-width: 900px;
   margin: 0 auto 80px;
   padding: 0 24px;
 }
@@ -106,6 +105,7 @@
   color: #ffffff;
   line-height: 1.8;
   margin: 0 0 18px;
+  max-width: 720px;
 }
 
 .subhead {
@@ -127,6 +127,7 @@
   gap: 8px;
   border-left: 3px solid var(--yellow, #ffd23e);
   padding-left: 20px;
+  max-width: 520px;
 }
 
 .evidenceList li {
@@ -143,6 +144,7 @@
   border-radius: 0 12px 12px 0;
   padding: 20px 24px;
   margin: 32px 0;
+  max-width: 720px;
 }
 
 .breedPanelLabel {
@@ -162,6 +164,7 @@
   color: #ffffff;
   line-height: 1.7;
   margin: 0 0 10px;
+  max-width: unset;
 }
 
 .breedPanel p:last-child {
@@ -179,6 +182,7 @@
   font-weight: 500;
   color: #ffffff;
   line-height: 1.7;
+  max-width: 720px;
 }
 
 .verdict strong {
@@ -187,7 +191,7 @@
 
 /* ── Coming soon ────────────────────────────────────────────── */
 .coming {
-  max-width: 760px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 0 24px;
 }
