@@ -1,0 +1,268 @@
+/* ── Page shell ─────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #5cc4ee 0%, #0b78bd 50%, #0a3a57 100%);
+  padding-top: 140px;
+  padding-bottom: 80px;
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.hero {
+  max-width: 760px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  margin: 0 0 16px;
+}
+
+.title {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(3rem, 8vw, 6rem);
+  color: #ffffff;
+  margin: 0 0 24px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.titleAccent {
+  color: var(--yellow, #ffd23e);
+}
+
+.intro {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.7;
+  margin: 0 0 16px;
+  max-width: 640px;
+}
+
+/* ── Essay ──────────────────────────────────────────────────── */
+.essay {
+  max-width: 760px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+}
+
+.essayMeta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+
+.tagBreed {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: transparent;
+  color: #ffffff;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+
+.essayTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 40px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-bottom: 2px solid rgba(255,255,255,0.15);
+  padding-bottom: 24px;
+}
+
+/* ── Essay body ─────────────────────────────────────────────── */
+.essayBody p {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.8;
+  margin: 0 0 18px;
+}
+
+.subhead {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.2rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 48px 0 16px;
+  line-height: 1.2;
+}
+
+.evidenceList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 3px solid var(--yellow, #ffd23e);
+  padding-left: 20px;
+}
+
+.evidenceList li {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.5;
+}
+
+.breedPanel {
+  background: var(--navy, #0a3a57);
+  border-left: 4px solid var(--yellow, #ffd23e);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  margin: 32px 0;
+}
+
+.breedPanelLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 10px;
+}
+
+.breedPanel p {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.7;
+  margin: 0 0 10px;
+}
+
+.breedPanel p:last-child {
+  margin-bottom: 0;
+}
+
+.verdict {
+  background: rgba(255,210,62,0.12);
+  border: 1.5px solid var(--yellow, #ffd23e);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 48px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.7;
+}
+
+.verdict strong {
+  color: var(--yellow, #ffd23e);
+}
+
+/* ── Coming soon ────────────────────────────────────────────── */
+.coming {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.comingTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.8rem;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 24px;
+  border-bottom: 2px solid rgba(255,255,255,0.15);
+  padding-bottom: 16px;
+}
+
+.comingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .comingGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.comingCard {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comingTag {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.1);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 3px 12px;
+  align-self: flex-start;
+}
+
+.comingName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.1rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.comingBreed {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.comingDesc {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.6;
+  margin: 4px 0 0;
+}
