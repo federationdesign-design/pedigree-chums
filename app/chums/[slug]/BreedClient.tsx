@@ -22,6 +22,8 @@ import HealthSection from "../../../components/HealthSection/HealthSection";
 import healthConditions from "../../../data/healthConditions";
 import FamousDogsSection from "../../../components/FamousDogsSection/FamousDogsSection";
 import famousDogs from "../../../data/famousDogs";
+import CardDock from "../../../components/CardDock/CardDock";
+import type { DockItem } from "../../../components/CardDock/CardDock";
 
 type BreedInfo = {
   subtitle: string;
@@ -173,6 +175,22 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
     });
   }, []);
   const closeCard = useCallback((id: string) => setClosedCards((prev) => new Set([...prev, id])), []);
+
+  const reopenCard = useCallback((id: string) => {
+    setClosedCards((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    bringToFront(id);
+  }, [bringToFront]);
+
+  const ALL_DOCK_ITEMS: DockItem[] = [
+    { id: "infoBox",       label: "Temperament",    abbr: "TM" },
+    { id: "ancestry",      label: "Ancestry",       abbr: "AN" },
+    { id: "lifespanExplain", label: "Lifespan",     abbr: "LS" },
+    { id: "runningCost",   label: "Cost to care",   abbr: "CC" },
+    { id: "suitability",   label: "Suitability",    abbr: "SU" },
+    { id: "exercise",      label: "Exercise",       abbr: "EX" },
+    { id: "grooming",      label: "Grooming",       abbr: "GR" },
+    { id: "training",      label: "Training",       abbr: "TR" },
+  ];
 
   // Canvas scroll control
   useEffect(() => {
@@ -483,6 +501,12 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
           <FamousDogsSection dogs={famousDogs[slug]} />
         </div>
       )}
+
+      {/* Card dock -- reopens minimised cards */}
+      <CardDock
+        items={ALL_DOCK_ITEMS.filter((item) => closedCards.has(item.id))}
+        onReopen={reopenCard}
+      />
 
       {/* Spacer to give canvas height */}
       <div style={{ height: FRAMES_TOP + 25 }} />

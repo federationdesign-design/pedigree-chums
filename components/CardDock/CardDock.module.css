@@ -1,0 +1,72 @@
+.dock {
+  position: fixed;
+  right: 16px;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--navy, #0a3a57);
+  border: 2px solid var(--yellow, #ffd23e);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  position: relative;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.icon:hover {
+  background: var(--yellow, #ffd23e);
+  transform: scale(1.1);
+}
+
+.icon:hover .abbr {
+  color: var(--navy, #0a3a57);
+}
+
+.icon:hover .label {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.abbr {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: var(--yellow, #ffd23e);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Tooltip label that appears on hover */
+.label {
+  position: absolute;
+  right: 56px;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid var(--yellow, #ffd23e);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
