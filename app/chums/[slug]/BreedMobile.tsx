@@ -6,6 +6,7 @@ import type { LineageNode } from "../../../data/lineage";
 import Footer from "../../../components/Footer/Footer";
 import { lifespanCurves } from "../../../data/lifespanCurves";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
+import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard";
 import runningCosts from "../../../data/runningCosts";
 import suitabilityScores from "../../../data/suitabilityScores";
 import exerciseNeeds from "../../../data/exerciseNeeds";
@@ -59,6 +60,7 @@ function getAncestry(lineage: LineageNode): { name: string; pct: number }[] {
 
 // ── Colour helpers ──────────────────────────────────────────
 const SEVERITY_COLOURS = ["#22c55e", "#84cc16", "#ffd23e", "#fb923c", "#ef4444"];
+const SCORE_COLOURS = ["#22c55e", "#4ade80", "#ffd23e", "#fb923c", "#ef4444"];
 const SEVERITY_LABELS  = ["Minor", "Mild", "Moderate", "Serious", "Severe"];
 const LIKELIHOOD_TEXT: Record<string, string> = {
   "rare": "#5cc4ee", "occasional": "#ffd23e", "common": "#fb923c", "very-common": "#ef4444",
@@ -139,6 +141,7 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
   // Training gauge
   const score = training?.score ?? 3;
   const fillDeg = ((6 - score) / 5) * 180;
+  const gaugeColour = SCORE_COLOURS[score - 1] ?? "#ffd23e";
 
   return (
     <div className={styles.page}>
@@ -213,29 +216,7 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
       {/* ── Cost to care ── */}
       {cost && (
         <Section title="Cost to care">
-          {(() => {
-            const annual = cost.annualCosts.food + cost.annualCosts.routineCare + cost.annualCosts.dentalAllowance + cost.annualCosts.neuteringAllowance + cost.medicalScenarios.typical;
-            const lifetime = Math.round(annual * cost.lifespanYears);
-            return (
-              <>
-                <div className={styles.costGrid}>
-                  <div className={styles.costCard}>
-                    <span className={styles.costAmount}>~£{annual.toLocaleString()}</span>
-                    <span className={styles.costLabel}>Per year (typical)</span>
-                  </div>
-                  <div className={styles.costCard}>
-                    <span className={styles.costAmount}>~£{lifetime.toLocaleString()}</span>
-                    <span className={styles.costLabel}>Over a lifetime</span>
-                  </div>
-                </div>
-                <div className={styles.costBreakdown}>
-                  <div className={styles.costRow}><span>Food</span><span>~£{cost.annualCosts.food}/yr</span></div>
-                  <div className={styles.costRow}><span>Routine care</span><span>~£{cost.annualCosts.routineCare}/yr</span></div>
-                  <div className={styles.costRow}><span>Vet (typical)</span><span>~£{cost.medicalScenarios.typical}/yr</span></div>
-                </div>
-              </>
-            );
-          })()}
+          <RunningCostCard config={cost} />
         </Section>
       )}
 
@@ -332,11 +313,11 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
                 return (
                   <path
                     d={`M 20 100 A 80 80 0 ${lg} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`}
-                    fill="none" stroke="#ffd23e" strokeWidth="14" strokeLinecap="round"
+                    fill="none" stroke={gaugeColour} strokeWidth="14" strokeLinecap="round"
                   />
                 );
               })()}
-              <text x="100" y="92" textAnchor="middle" fill="#ffd23e" fontSize="28" fontFamily="Luckiest Guy, cursive">{score}</text>
+              <text x="100" y="92" textAnchor="middle" fill={gaugeColour} fontSize="28" fontFamily="Luckiest Guy, cursive">{score}</text>
               <text x="24" y="112" textAnchor="middle" fill="#ffffff" fontSize="9" fontFamily="Montserrat, sans-serif">Easy</text>
               <text x="176" y="112" textAnchor="middle" fill="#ffffff" fontSize="9" fontFamily="Montserrat, sans-serif">Hard</text>
             </svg>

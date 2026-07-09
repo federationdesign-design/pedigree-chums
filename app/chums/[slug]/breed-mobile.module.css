@@ -1,7 +1,6 @@
 /* ── Page shell ─────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
-  background: linear-gradient(160deg, #5cc4ee 0%, #0b78bd 50%, #0a3a57 100%);
   padding-bottom: 48px;
 }
 
@@ -94,7 +93,10 @@
 /* ── Sections ───────────────────────────────────────────────── */
 .section {
   margin: 0 16px 4px;
-  padding: 24px 0 0;
+  padding: 20px;
+  background: var(--navy, #0a3a57);
+  border-radius: 16px;
+  margin-top: 12px;
 }
 
 .sectionTitle {
@@ -227,6 +229,13 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 8px;
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.lifespanScroll > * {
+  min-width: 600px;
 }
 
 /* ── Cost ───────────────────────────────────────────────────── */
