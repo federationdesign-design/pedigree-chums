@@ -94,7 +94,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.6rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: var(--blue-sky, #5cc4ee);
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
@@ -111,7 +111,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.58rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.35);
+  color: var(--blue-sky, #5cc4ee);
   line-height: 1.45;
   margin: 0;
 }
