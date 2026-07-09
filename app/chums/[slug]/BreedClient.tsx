@@ -10,6 +10,8 @@ import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
 import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard";
 import runningCosts from "../../../data/runningCosts";
+import SuitabilityRadar from "../../../components/SuitabilityRadar/SuitabilityRadar";
+import suitabilityScores from "../../../data/suitabilityScores";
 
 type BreedInfo = {
   subtitle: string;
@@ -106,7 +108,7 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [infoBoxHeight, setInfoBoxHeight] = useState(276);
 
-const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11, suitability: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
@@ -342,6 +344,16 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
       )}
 
       {/* Family tree - draggable, starts at right of circular */}
+
+      {/* Suitability radar */}
+      {suitabilityScores[slug] && !closedCards.has("suitability") && (
+        <DragCard id="suitability" initialX={LEFT_EDGE + 780} initialY={DIAGRAM_TOP - 100}
+          zIndex={zOrders.suitability} onBringToFront={bringToFront}
+          onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
+          style={{ width: 360 }}>
+          <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} />
+        </DragCard>
+      )}
       {lineage && (
         <DragCard id="familyTree" initialX={TREE_LEFT} initialY={TREE_TOP} zIndex={10}
           onBringToFront={bringToFront}

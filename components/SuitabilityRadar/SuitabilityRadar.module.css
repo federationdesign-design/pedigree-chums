@@ -1,0 +1,85 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+.heading {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  margin: 0;
+  align-self: flex-start;
+}
+
+.svg {
+  overflow: visible;
+}
+
+.label {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  fill: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Score dots row */
+.scoreRow {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+}
+
+.scoreItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.scoreLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ffffff;
+  min-width: 120px;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dotFilled,
+.dotEmpty {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dotFilled {
+  background: var(--yellow, #ffd23e);
+}
+
+.dotEmpty {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.disclaimer {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.45;
+  margin: 0;
+  text-align: center;
+}
