@@ -107,7 +107,7 @@ function DragCard({
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function BreedClient({ name, slug, image, info, lineage }: Props) {
-  const zCounter = useRef(20);
+  const zCounter = useRef(120);
   const bringToFront = useCallback((id: string) => {
     zCounter.current += 1;
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
@@ -116,7 +116,7 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [infoBoxHeight, setInfoBoxHeight] = useState(276);
 
-const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11, suitability: 11, exercise: 11, grooming: 11, training: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanChart: 114, lifespanExplain: 115, familyTree: 110, runningCost: 111, suitability: 111, exercise: 111, grooming: 111, training: 111 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
@@ -355,7 +355,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Suitability radar */}
       {suitabilityScores[slug] && !closedCards.has("suitability") && (
-        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 - 50} initialY={CHART_TOP - 25 + 576 + 24 + 600 + 10}
+        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16}
           zIndex={zOrders.suitability} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
@@ -393,7 +393,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
         </DragCard>
       )}
       {lineage && (
-        <DragCard id="familyTree" initialX={TREE_LEFT} initialY={TREE_TOP} zIndex={10}
+        <DragCard id="familyTree" initialX={TREE_LEFT} initialY={TREE_TOP} zIndex={110}
           onBringToFront={bringToFront}
           className=""
           style={{ background: "transparent", border: "none", boxShadow: "none", cursor: "default" }}>
