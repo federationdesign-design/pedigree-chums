@@ -9,22 +9,21 @@ interface Props {
 }
 
 const AXES = [
-  { key: "children",   label: "Children" },
-  { key: "otherDogs",  label: "Other dogs" },
-  { key: "cats",       label: "Cats" },
-  { key: "smallHome",  label: "Small home" },
-  { key: "firstTimer", label: "First-time owner" },
-  { key: "timeAlone",  label: "Time alone" },
+  { key: "children",   label: "Children",       line2: null },
+  { key: "otherDogs",  label: "Other dogs",     line2: null },
+  { key: "cats",       label: "Cats",           line2: null },
+  { key: "smallHome",  label: "Small home",     line2: null },
+  { key: "firstTimer", label: "1st-time",       line2: "owner" },
+  { key: "timeAlone",  label: "Time alone",     line2: null },
 ] as const;
 
 const N = AXES.length;
 const MAX = 5;
 const CX = 160;
 const CY = 160;
-const R = 110; // outer ring radius
+const R = 100;
 
 function angleOf(i: number): number {
-  // Start at top (-90 deg), go clockwise
   return (Math.PI * 2 * i) / N - Math.PI / 2;
 }
 
@@ -44,8 +43,6 @@ function polygonPoints(values: number[]): string {
 
 export default function SuitabilityRadar({ score, breedName }: Props) {
   const values = AXES.map((a) => score[a.key] as number);
-
-  // Grid rings at 1,2,3,4,5
   const rings = [1, 2, 3, 4, 5];
 
   return (
@@ -118,10 +115,10 @@ export default function SuitabilityRadar({ score, breedName }: Props) {
           );
         })}
 
-        {/* Axis labels */}
+        {/* Axis labels -- two-line where needed */}
         {AXES.map((axis, i) => {
           const angle = angleOf(i);
-          const labelR = R + 22;
+          const labelR = R + 26;
           const [x, y] = point(angle, labelR);
           const anchor =
             Math.abs(Math.cos(angle)) < 0.15
@@ -129,6 +126,21 @@ export default function SuitabilityRadar({ score, breedName }: Props) {
               : Math.cos(angle) > 0
               ? "start"
               : "end";
+          if (axis.line2) {
+            return (
+              <text
+                key={axis.key}
+                x={x}
+                y={y}
+                textAnchor={anchor}
+                dominantBaseline="central"
+                className={styles.label}
+              >
+                <tspan x={x} dy="-0.6em">{axis.label}</tspan>
+                <tspan x={x} dy="1.2em">{axis.line2}</tspan>
+              </text>
+            );
+          }
           return (
             <text
               key={axis.key}
@@ -148,7 +160,9 @@ export default function SuitabilityRadar({ score, breedName }: Props) {
       <div className={styles.scoreRow}>
         {AXES.map((axis) => (
           <div key={axis.key} className={styles.scoreItem}>
-            <span className={styles.scoreLabel}>{axis.label}</span>
+            <span className={styles.scoreLabel}>
+              {axis.line2 ? `${axis.label} ${axis.line2}` : axis.label}
+            </span>
             <div className={styles.dots}>
               {[1, 2, 3, 4, 5].map((d) => (
                 <span
