@@ -243,7 +243,7 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
         <Section title="Suitability">
           <div className={styles.suitList}>
             {suitAxes.map(({ key, label }) => {
-              const val = (suitability as Record<string, number>)[key] ?? 0;
+              const val = suitability[key as keyof typeof suitability] as number ?? 0;
               return (
                 <div key={key} className={styles.suitRow}>
                   <span className={styles.suitLabel}>{label}</span>
