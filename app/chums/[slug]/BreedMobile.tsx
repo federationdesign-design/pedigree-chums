@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import type { LineageNode } from "../../../data/lineage";
+import Footer from "../../../components/Footer/Footer";
 import { lifespanCurves } from "../../../data/lifespanCurves";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import runningCosts from "../../../data/runningCosts";
@@ -395,5 +396,6 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
       )}
 
     </div>
+    <Footer />
   );
 }

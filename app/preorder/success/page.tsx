@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Footer from "../../../components/Footer/Footer";
 import type { Metadata } from "next";
 import styles from "../preorder.module.css";
 
@@ -40,5 +41,6 @@ export default function PreorderSuccess() {
         </Link>
       </section>
     </main>
+      <Footer />
   );
 }

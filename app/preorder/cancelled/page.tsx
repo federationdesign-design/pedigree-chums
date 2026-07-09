@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import styles from "../preorder.module.css";
+import Footer from "../../../components/Footer/Footer";
 
 export const metadata: Metadata = {
   title: "Pre-order cancelled | Pedigree Chums",
@@ -25,5 +26,6 @@ export default function PreorderCancelled() {
         </Link>
       </section>
     </main>
+    <Footer />
   );
 }
