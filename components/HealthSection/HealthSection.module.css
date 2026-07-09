@@ -59,10 +59,11 @@
 }
 
 .row {
-  background: var(--blue-deep, #0b78bd);
+  background: var(--navy, #0a3a57);
   border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   overflow: hidden;
+  
 }
 
 .row:hover {
@@ -175,7 +176,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.62rem;
   font-weight: 500;
-  color: var(--blue-sky, #5cc4ee);
+  color: #ffffff;
   line-height: 1.5;
   margin: 0;
 }

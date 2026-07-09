@@ -39,7 +39,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.65rem;
   font-weight: 600;
-  color: var(--blue-sky, #5cc4ee);
+  color: #ffffff;
 }
 
 .slider {
@@ -147,7 +147,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.6rem;
   font-weight: 500;
-  color: var(--blue-sky, #5cc4ee);
+  color: #ffffff;
   line-height: 1.45;
   margin: 0;
 }
