@@ -1,0 +1,166 @@
+.heading {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  margin: 0 0 0 20px;
+}
+
+/* Stats row */
+.statsRow {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 0 20px;
+  gap: 0;
+}
+
+.statBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.statValue {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.4rem;
+  color: var(--yellow, #ffd23e);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.statUnit {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-left: 3px;
+}
+
+.statLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.statDivider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,0.12);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+/* Cope dots */
+.copeDots {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+
+.dotFilled,
+.dotEmpty {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.dotFilled {
+  background: var(--yellow, #ffd23e);
+}
+
+.dotEmpty {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Day column chart */
+.chartWrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 20px;
+  height: 140px;
+}
+
+.dayCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  gap: 4px;
+  height: 100%;
+}
+
+.dayMins {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+.barTrack {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.bar {
+  width: 100%;
+  background: var(--blue-sky, #5cc4ee);
+  border-radius: 4px 4px 2px 2px;
+  transition: height 0.3s ease;
+  min-height: 4px;
+}
+
+.barWeekend {
+  background: var(--yellow, #ffd23e);
+}
+
+.dayLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dayLabelWeekend {
+  color: var(--yellow, #ffd23e);
+}
+
+/* Notes */
+.notes {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0 20px;
+}
+
+.disclaimer {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.45;
+  margin: 0 20px 4px;
+}

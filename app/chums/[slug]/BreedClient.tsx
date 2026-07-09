@@ -12,6 +12,8 @@ import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard
 import runningCosts from "../../../data/runningCosts";
 import SuitabilityRadar from "../../../components/SuitabilityRadar/SuitabilityRadar";
 import suitabilityScores from "../../../data/suitabilityScores";
+import ExerciseCard from "../../../components/ExerciseCard/ExerciseCard";
+import exerciseNeeds from "../../../data/exerciseNeeds";
 
 type BreedInfo = {
   subtitle: string;
@@ -108,7 +110,7 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [infoBoxHeight, setInfoBoxHeight] = useState(276);
 
-const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11, suitability: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11, suitability: 11, exercise: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
@@ -352,6 +354,16 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
           <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} />
+        </DragCard>
+      )}
+
+      {/* Exercise needs card */}
+      {exerciseNeeds[slug] && !closedCards.has("exercise") && (
+        <DragCard id="exercise" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 + 380 + 24 + 360 + 24} initialY={DIAGRAM_TOP - 100}
+          zIndex={zOrders.exercise} onBringToFront={bringToFront}
+          onClose={() => setClosedCards((prev) => new Set(prev).add("exercise"))}
+          style={{ width: 380, padding: "16px 0 16px" }}>
+          <ExerciseCard data={exerciseNeeds[slug]} />
         </DragCard>
       )}
       {lineage && (
