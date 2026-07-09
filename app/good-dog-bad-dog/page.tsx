@@ -503,23 +503,218 @@ export default function GoodDogBadDogPage() {
           </div>
         </article>
 
-        {/* ── Coming soon ── */}
-        <section className={styles.coming}>
-          <h2 className={styles.comingTitle}>Coming next</h2>
-          <div className={styles.comingGrid}>
-            <div className={styles.comingCard}>
-              <span className={styles.comingTag}>Good dog</span>
-              <h3 className={styles.comingName}>Lassie</h3>
-              <p className={styles.comingBreed}>Rough Collie</p>
-              <p className={styles.comingDesc}>
-                Lassie's intelligence and sensitivity are genuinely Collie-like.
-                But what happens when a real trait gets elevated into something
-                close to a superpower -- and what does that do to our expectations
-                of the real breed?
+        {/* ── Essay divider ── */}
+        <div className={styles.essayDivider} />
+
+        {/* ── Essay: Lassie ── */}
+        <article className={styles.essay}>
+
+          <div className={styles.essayMeta}>
+            <span className={styles.tag}>Good dog</span>
+            <span className={styles.tagBreed}>Rough Collie</span>
+          </div>
+
+          <h2 className={styles.essayTitle}>
+            Lassie: The Burden of Being the Perfect Dog
+          </h2>
+
+          <div className={styles.essayBody}>
+
+            <h3 className={styles.subhead}>The dog who is always right</h3>
+
+            <p>Lassie never makes a mistake.</p>
+            <p>
+              She knows when someone is in danger. She finds help when adults cannot.
+              She travels hundreds of miles through unfamiliar country, crosses rivers,
+              survives injury and keeps moving. She cannot speak, but the people around
+              her eventually understand exactly what she needs them to know.
+            </p>
+            <p>
+              She is intelligent, loyal, brave and -- most importantly -- she always does
+              the right thing. That last quality is where the story gets interesting.
+              Because intelligence does not guarantee good decisions. Loyalty does not
+              guarantee obedience. Bravery is not the same as wisdom. Lassie possesses
+              all of these qualities simultaneously, at an exceptional level, directed
+              always towards the correct outcome.
+            </p>
+            <p>She is not a dog. She is a heroic design.</p>
+            <p>And that is where the real breed pays the price.</p>
+
+            <h3 className={styles.subhead}>Where Lassie came from</h3>
+
+            <p>
+              Eric Knight introduced Lassie in a magazine story in 1938, then expanded
+              the character into the novel <em>Lassie Come-Home</em> in 1940. The story
+              is set in Yorkshire, where a boy named Joe Carraclough has grown up with a
+              Rough Collie he loves. When Joe's family falls on hard times, they are forced
+              to sell Lassie to the Duke of Rudling, who takes her to Scotland.
+            </p>
+            <p>
+              Lassie keeps escaping. Eventually she is transported hundreds of miles
+              north. From there, she begins the journey home -- crossing unfamiliar
+              country, facing hunger, injury and the full difficulty of moving through a
+              landscape built for humans, not dogs.
+            </p>
+            <p>
+              The plot is straightforward enough for a child. A dog is separated from the
+              person she loves and refuses to accept it. What gives the novel its staying
+              power is that Lassie's journey is both extraordinary and emotionally
+              inevitable. She cannot do anything else.
+            </p>
+            <p>
+              The 1943 film brought the character to a global audience. Further films and
+              a long-running television series followed. Over time, "Lassie" stopped
+              meaning one fictional dog and started meaning a type -- the Collie who
+              understands, rescues and returns.
+            </p>
+
+            <h3 className={styles.subhead}>What is genuinely Collie-like</h3>
+
+            <p>The Lassie image did not appear from nowhere.</p>
+            <p>
+              Rough Collies were developed as working dogs expected to cooperate with
+              people, respond to movement and manage livestock at a distance from their
+              handler. Dogs can become highly attuned to routine. They can read body
+              language and tone of voice with extraordinary sensitivity. A pastoral breed
+              that has spent generations working alongside people may appear, from the
+              outside, to understand almost everything.
+            </p>
+            <p>
+              The Kennel Club describes the Rough Collie as friendly, active and suited
+              to companionship -- nothing in the real breed profile contradicts the Lassie
+              image outright. That is precisely what makes the exaggeration so effective.
+              Lassie looks like a real Collie with the volume turned up. She is believable
+              because she starts from something true.
+            </p>
+
+            <h3 className={styles.subhead}>Intelligence is not the same as wisdom</h3>
+
+            <p>Here is where the story quietly departs from reality.</p>
+            <p>
+              Dogs are genuinely intelligent. They learn words, routines, associations and
+              gestures. When a dog looks at you, moves towards the door and then looks
+              back, the interpretation -- "come with me, something is wrong" -- may be
+              broadly right. But the dog has not constructed a sentence or weighed the
+              options and decided on a course of action. Its behaviour is real. The human
+              interpretation of that behaviour contains more certainty than the evidence
+              supports.
+            </p>
+            <p>
+              Lassie stories depend on this gap. The dog communicates so successfully
+              that people understand exactly what she wants. She leads them to the right
+              place, alerts them to the right person, rejects the wrong plan. The audience
+              is invited to believe she understands not just a cue but the whole problem.
+            </p>
+            <p>
+              This is dramatically satisfying. But it quietly suggests that a truly
+              intelligent dog should just <em>know</em> -- that understanding ought to
+              emerge naturally from the bond, without training, without instruction,
+              without much human effort at all. That expectation does not survive contact
+              with actual dogs.
+            </p>
+
+            <h3 className={styles.subhead}>The intelligence without the inconvenience</h3>
+
+            <p>Real intelligence in a dog is not always convenient.</p>
+            <p>
+              A clever dog can learn unwanted routines as quickly as wanted ones. It can
+              anticipate commands and decide not to cooperate. It can become difficult when
+              insufficiently occupied, reactive to things it notices that its owner misses,
+              anxious in environments that feel unpredictable. The same sensitivity that
+              makes a Collie responsive to a child in distress can make the same dog
+              overwhelmed by a chaotic household.
+            </p>
+            <p>Lassie rarely encounters any of this.</p>
+            <p>
+              Her intelligence is consistently directed towards moral outcomes. She solves
+              the right problems. She uses initiative without becoming unmanageable. She
+              is independent without ever being irresponsible. She contains the desirable
+              side of every Collie trait, with the difficult side quietly removed.
+            </p>
+            <p>That is not a breed profile. It is a wish list.</p>
+
+            <h3 className={styles.subhead}>The social world Lassie lives in</h3>
+
+            <p>
+              Joe's family does not sell Lassie because they do not love her. They sell
+              her because poverty forces them to make a choice they do not want to make.
+              The dog therefore becomes a measure of what hardship takes away. For the
+              Duke, Lassie is a valuable pedigree animal. For Joe, she is a relationship.
+            </p>
+            <p>
+              Lassie answers through action. She keeps choosing Joe.
+            </p>
+            <p>
+              Adults in Lassie's world are constrained by class, money and circumstance.
+              The dog is not. She cannot solve the economic problem, but she can refuse to
+              be separated from the person she loves. Her loyalty becomes a kind of repair
+              for what the adult world has broken. That is a lot to ask of any animal.
+              But it is why the character has lasted.
+            </p>
+
+            <h3 className={styles.subhead}>Positive stereotypes are still stereotypes</h3>
+
+            <p>
+              Negative breed stereotypes are easy to recognise. A black dog is presented
+              as dangerous. A Bull Terrier is assumed to be violent. The association is
+              obvious enough to challenge.
+            </p>
+            <p>
+              Positive stereotypes appear kinder. They are harder to question because they
+              seem complimentary. But the Lassie image creates its own problems. Someone
+              drawn to the breed because it seems wise and effortlessly good with children
+              may be less prepared for what a real Collie actually needs -- the exercise,
+              mental stimulation, careful socialisation and consistent training that any
+              intelligent working breed requires.
+            </p>
+            <p>
+              When the real dog turns out to be reactive, anxious, or difficult to recall,
+              the animal tends to get the blame. It has failed to live up to the image.
+              The fact that the image was always impossible does not help the dog.
+            </p>
+
+            <div className={styles.breedPanel}>
+              <p className={styles.breedPanelLabel}>The real Rough Collie</p>
+              <p>
+                The Kennel Club describes the Rough Collie as friendly and active, bred
+                for close cooperation with people. They are highly trainable and responsive
+                -- but that same sensitivity means they need consistent mental stimulation,
+                structured exercise and careful socialisation. A bored or under-stimulated
+                Collie can become anxious, reactive or difficult. None of that appears in
+                Lassie's world.
               </p>
             </div>
+
+            <h3 className={styles.subhead}>What Lassie tells us</h3>
+
+            <p>
+              The Hound of the Baskervilles reflects the fear that dogs can become
+              monsters. Gelert reflects the fear that we might condemn an innocent animal.
+              Lassie reflects something different -- the desire that dogs might be better
+              than we are.
+            </p>
+            <p>
+              The character works because genuine Collie qualities are real. The story
+              takes those qualities and elevates them until the dog seems incapable of
+              error. She is not simply well trained. She is wise. She is not simply
+              attached. She is faithful in the heroic sense. She does not merely respond
+              to people. She understands what they cannot say.
+            </p>
+            <p>
+              That is the gap between the story and the breed. And it is why the good dog
+              can be as misleading as the bad one.
+            </p>
+            <p>She is a believable Collie made unbelievable through perfection.</p>
+
+            <p className={styles.verdict}>
+              <strong>The verdict:</strong> Positive stereotype. Lassie is rooted in
+              genuine Collie qualities -- then elevated into an ideal no individual dog
+              can meet. The danger is not that she made the breed look bad. It is that
+              she made it look impossibly good.
+            </p>
+
           </div>
-        </section>
+        </article>
 
       </main>
       <Footer />
