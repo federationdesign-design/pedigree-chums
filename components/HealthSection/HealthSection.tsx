@@ -61,7 +61,6 @@ export default function HealthSection({ profile }: Props) {
         <span className={styles.colCondition}>Condition</span>
         <span className={styles.colSeverity}>Severity</span>
         <span className={styles.colLikelihood}>Likelihood</span>
-        <span className={styles.colOnset}>Onset</span>
         <span className={styles.colToggle} />
       </div>
 
@@ -78,7 +77,6 @@ export default function HealthSection({ profile }: Props) {
                 aria-expanded={isOpen}
               >
                 <span className={styles.colCondition}>
-                  <span className={styles.severityDot} style={{ background: colour }} />
                   {c.name}
                 </span>
                 <span className={styles.colSeverity}>
@@ -95,9 +93,6 @@ export default function HealthSection({ profile }: Props) {
                       return <span key={d} className={styles.dot} style={{ background: filled ? LIKELIHOOD_TEXT[c.likelihood] : "rgba(255,255,255,0.15)" }} />;
                     })}
                   </span>
-                </span>
-                <span className={styles.colOnset}>
-                  <span className={styles.onsetLabel}>{ONSET_LABELS[c.onsetStage]}</span>
                 </span>
                 <span className={styles.colToggle}>
                   <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}>›</span>

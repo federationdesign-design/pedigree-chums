@@ -29,7 +29,7 @@
 /* Table header */
 .tableHead {
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) 80px 80px 90px 28px;
+  grid-template-columns: minmax(200px, 1fr) 80px 80px 28px;
   gap: 0;
   padding: 0 16px 8px;
   border-bottom: 1px solid rgba(255,255,255,0.12);
@@ -48,7 +48,7 @@
 .colCondition  { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 200px; }
 .colSeverity   { width: 80px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .colLikelihood { width: 80px; display: flex; align-items: center; flex-shrink: 0; }
-.colOnset      { width: 90px; display: flex; align-items: center; flex-shrink: 0; }
+
 .colToggle     { width: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 /* Rows */
@@ -59,26 +59,26 @@
 }
 
 .row {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   overflow: hidden;
-  transition: background 0.15s ease;
+  
 }
 
 .row:hover {
-  background: rgba(255,255,255,0.07);
+  
 }
 
 .rowOpen {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.16);
+  
+  border-color: var(--yellow, #ffd23e);
 }
 
 .rowHeader {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) 80px 80px 90px 28px;
+  grid-template-columns: minmax(200px, 1fr) 80px 80px 28px;
   align-items: center;
   padding: 14px 16px;
   background: none;
