@@ -371,7 +371,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Grooming card */}
       {groomingNeeds[slug] && !closedCards.has("grooming") && (
-        <DragCard id="grooming" initialX={LEFT_EDGE + 380 + 24} initialY={FRAMES_TOP - 380}
+        <DragCard id="grooming" initialX={LEFT_EDGE + 380 + 24 + 300} initialY={FRAMES_TOP - 380 + 300}
           zIndex={zOrders.grooming} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("grooming"))}
           style={{ width: 360, padding: "16px 0 16px" }}>

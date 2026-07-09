@@ -1,3 +1,10 @@
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 4px;
+}
+
 .heading {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 24px;

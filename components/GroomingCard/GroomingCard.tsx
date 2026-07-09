@@ -31,7 +31,7 @@ export default function GroomingCard({ data }: Props) {
     : `${timePerWeek}m`;
 
   return (
-    <>
+    <div className={styles.inner}>
       <p className={styles.heading}>Grooming</p>
 
       {/* Coat type pill */}
@@ -92,6 +92,6 @@ export default function GroomingCard({ data }: Props) {
       <p className={styles.disclaimer}>
         Typical breed guidelines. Costs vary by location and coat condition.
       </p>
-    </>
+    </div>
   );
 }
