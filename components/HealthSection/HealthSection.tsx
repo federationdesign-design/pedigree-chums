@@ -82,9 +82,6 @@ export default function HealthSection({ profile }: Props) {
                   {c.name}
                 </span>
                 <span className={styles.colSeverity}>
-                  <span className={styles.severityLabel} style={{ color: colour }}>
-                    {SEVERITY_LABELS[c.severity - 1]}
-                  </span>
                   <span className={styles.severityDots}>
                     {[1,2,3,4,5].map((d) => (
                       <span key={d} className={styles.dot} style={{ background: d <= c.severity ? colour : "rgba(255,255,255,0.15)" }} />
