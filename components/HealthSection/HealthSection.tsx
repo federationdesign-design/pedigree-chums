@@ -89,8 +89,11 @@ export default function HealthSection({ profile }: Props) {
                   </span>
                 </span>
                 <span className={styles.colLikelihood}>
-                  <span className={styles.likelihoodPill} style={{ background: LIKELIHOOD_COLOURS[c.likelihood], color: LIKELIHOOD_TEXT[c.likelihood] }}>
-                    {LIKELIHOOD_LABELS[c.likelihood]}
+                  <span className={styles.severityDots}>
+                    {[1,2,3,4].map((d) => {
+                      const filled = d <= { "rare": 1, "occasional": 2, "common": 3, "very-common": 4 }[c.likelihood];
+                      return <span key={d} className={styles.dot} style={{ background: filled ? LIKELIHOOD_TEXT[c.likelihood] : "rgba(255,255,255,0.15)" }} />;
+                    })}
                   </span>
                 </span>
                 <span className={styles.colOnset}>
