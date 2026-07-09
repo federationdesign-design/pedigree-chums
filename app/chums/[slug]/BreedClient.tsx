@@ -282,7 +282,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Ancestry card - below temperament */}
       {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
-        <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP + infoBoxHeight + 16 + 50 - 75} zIndex={zOrders.ancestry}
+        <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
           <p className={styles.infoHeading}>Ancestry</p>
