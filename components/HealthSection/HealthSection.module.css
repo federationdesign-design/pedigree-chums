@@ -144,15 +144,15 @@
 
 /* Chevron */
 .chevron {
-  font-size: 1.2rem;
-  color: var(--blue-sky, #5cc4ee);
+  font-size: 1rem;
+  color: #ffffff;
   display: inline-block;
   transition: transform 0.2s ease;
   line-height: 1;
 }
 
 .chevronOpen {
-  transform: rotate(90deg);
+  transform: rotate(180deg);
 }
 
 /* Expanded body */

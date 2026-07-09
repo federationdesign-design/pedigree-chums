@@ -95,7 +95,7 @@ export default function HealthSection({ profile }: Props) {
                   </span>
                 </span>
                 <span className={styles.colToggle}>
-                  <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}>›</span>
+                  <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}>↓</span>
                 </span>
               </button>
               {isOpen && (
