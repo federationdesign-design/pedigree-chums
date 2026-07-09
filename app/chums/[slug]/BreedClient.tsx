@@ -355,7 +355,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Suitability radar */}
       {suitabilityScores[slug] && !closedCards.has("suitability") && (
-        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 - 50} initialY={CHART_TOP - 15 + 200 + 50 + 460 + 16 - 250}
+        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 - 50} initialY={FRAMES_TOP - 380 + 300}
           zIndex={zOrders.suitability} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
@@ -470,7 +470,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Health conditions -- fixed section below lifespan chart */}
       {healthConditions[slug] && (
-        <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 1008 }}>
+        <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 560 }}>
           <HealthSection profile={healthConditions[slug]} />
         </div>
       )}
