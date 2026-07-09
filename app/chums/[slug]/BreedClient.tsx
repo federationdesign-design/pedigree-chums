@@ -387,7 +387,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Training difficulty card */}
       {trainingDifficulty[slug] && !closedCards.has("training") && (
-        <DragCard id="training" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 - 50 + 665 + 16}
+        <DragCard id="training" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 - 50 + 665 + 16 - 30}
           zIndex={zOrders.training} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("training"))}
           style={{ width: 360, padding: 0 }}>
@@ -479,7 +479,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Famous dogs -- fixed section below health conditions */}
       {famousDogs[slug] && (
-        <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24 + 700, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 900 }}>
+        <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24 + 750, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 900 }}>
           <FamousDogsSection dogs={famousDogs[slug]} />
         </div>
       )}

@@ -13,8 +13,7 @@ export default function HomeClient() {
   const filtered = query.trim().length === 0
     ? []
     : breeds.filter((b) =>
-        b.name.toLowerCase().startsWith(query.trim().toLowerCase()) ||
-        b.name.toLowerCase().includes(query.trim().toLowerCase())
+        b.name.toLowerCase().startsWith(query.trim().toLowerCase())
       ).slice(0, 8);
 
   useEffect(() => {

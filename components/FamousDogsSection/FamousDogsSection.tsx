@@ -7,7 +7,21 @@ interface Props {
   dogs: FamousDog[];
 }
 
-const TYPE_COLOURS: Record<string, string> = {
+const TYPE_ICONS: Record<string, string> = {
+  "Real":               "🐕",
+  "Animated":           "🎬",
+  "Live-action film":   "🎥",
+  "Live-action TV":     "📺",
+  "Literature":         "📖",
+  "Literature / film":  "📖",
+  "Literature / animation": "📖",
+  "Advertising":        "📢",
+  "Comics":             "💬",
+  "Comics / film":      "💬",
+  "Real / animation":   "🐕",
+  "Legend":             "⚡",
+  "Mascot":             "⭐",
+};
   "Real":               "#22c55e",
   "Animated":           "#5cc4ee",
   "Live-action film":   "#ffd23e",
@@ -30,10 +44,11 @@ function typeColour(type: string): string {
 export default function FamousDogsSection({ dogs }: Props) {
   return (
     <div className={styles.section}>
-      <h2 className={styles.heading}>Famous examples</h2>
+      <h2 className={styles.heading}>Famous Chums</h2>
       <div className={styles.strip}>
         {dogs.map((dog) => {
           const colour = typeColour(dog.type);
+          const icon = TYPE_ICONS[dog.type] ?? "🐕";
           return (
             <a
               key={dog.name}
@@ -42,6 +57,7 @@ export default function FamousDogsSection({ dogs }: Props) {
               rel="noopener noreferrer"
               className={styles.card}
             >
+              <span className={styles.icon}>{icon}</span>
               <span className={styles.typePill} style={{ color: colour, borderColor: colour }}>
                 {dog.type}
               </span>
