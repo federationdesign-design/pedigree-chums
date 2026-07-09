@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 
 export default function PreorderCancelled() {
   return (
+    <>
     <main className={styles.page}>
       <section className={styles.card}>
         <p className={styles.kicker}>Checkout cancelled</p>
@@ -27,5 +28,6 @@ export default function PreorderCancelled() {
       </section>
     </main>
     <Footer />
+    </>
   );
 }

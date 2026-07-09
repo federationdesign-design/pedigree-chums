@@ -144,6 +144,7 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
   const gaugeColour = SCORE_COLOURS[score - 1] ?? "#ffd23e";
 
   return (
+    <>
     <div className={styles.page}>
 
       {/* ── Hero ── */}
@@ -378,5 +379,6 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
 
     </div>
     <Footer />
+    </>
   );
 }
