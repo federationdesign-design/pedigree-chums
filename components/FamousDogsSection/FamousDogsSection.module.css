@@ -38,13 +38,6 @@
   border-color: var(--yellow, #ffd23e);
 }
 
-.icon {
-  font-size: 2rem;
-  line-height: 1;
-  display: block;
-  margin-bottom: 4px;
-}
-
 .typePill {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.6rem;

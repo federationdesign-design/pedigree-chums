@@ -7,36 +7,6 @@ interface Props {
   dogs: FamousDog[];
 }
 
-const TYPE_ICONS: Record<string, string> = {
-  "Real":               "🐕",
-  "Animated":           "🎬",
-  "Live-action film":   "🎥",
-  "Live-action TV":     "📺",
-  "Literature":         "📖",
-  "Literature / film":  "📖",
-  "Literature / animation": "📖",
-  "Advertising":        "📢",
-  "Comics":             "💬",
-  "Comics / film":      "💬",
-  "Real / animation":   "🐕",
-  "Legend":             "⚡",
-  "Mascot":             "⭐",
-};
-  "Real":               "#22c55e",
-  "Animated":           "#5cc4ee",
-  "Live-action film":   "#ffd23e",
-  "Live-action TV":     "#ffd23e",
-  "Literature":         "#fb923c",
-  "Literature / film":  "#fb923c",
-  "Literature / animation": "#fb923c",
-  "Advertising":        "#a855f7",
-  "Comics":             "#5cc4ee",
-  "Comics / film":      "#5cc4ee",
-  "Real / animation":   "#22c55e",
-  "Legend":             "#fb923c",
-  "Mascot":             "#a855f7",
-};
-
 function typeColour(type: string): string {
   return TYPE_COLOURS[type] ?? "#ffffff";
 }
@@ -57,7 +27,6 @@ export default function FamousDogsSection({ dogs }: Props) {
               rel="noopener noreferrer"
               className={styles.card}
             >
-              <span className={styles.icon}>{icon}</span>
               <span className={styles.typePill} style={{ color: colour, borderColor: colour }}>
                 {dog.type}
               </span>
