@@ -10,11 +10,11 @@ interface Props {
 
 const AXES = [
   { key: "children",   label: "Children",       line2: null },
-  { key: "otherDogs",  label: "Other dogs",     line2: null },
+  { key: "otherDogs",  label: "Other",          line2: "dogs" },
   { key: "cats",       label: "Cats",           line2: null },
   { key: "smallHome",  label: "Small home",     line2: null },
   { key: "firstTimer", label: "1st-time",       line2: "owner" },
-  { key: "timeAlone",  label: "Time alone",     line2: null },
+  { key: "timeAlone",  label: "Time",           line2: "alone" },
 ] as const;
 
 const N = AXES.length;
