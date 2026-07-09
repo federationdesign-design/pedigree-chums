@@ -349,7 +349,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Suitability radar */}
       {suitabilityScores[slug] && !closedCards.has("suitability") && (
-        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 + 380 + 24} initialY={DIAGRAM_TOP - 100}
+        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 + 460 + 16}
           zIndex={zOrders.suitability} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
