@@ -18,6 +18,8 @@ import GroomingCard from "../../../components/GroomingCard/GroomingCard";
 import groomingNeeds from "../../../data/groomingNeeds";
 import TrainingCard from "../../../components/TrainingCard/TrainingCard";
 import trainingDifficulty from "../../../data/trainingDifficulty";
+import HealthSection from "../../../components/HealthSection/HealthSection";
+import healthConditions from "../../../data/healthConditions";
 
 type BreedInfo = {
   subtitle: string;
@@ -466,8 +468,15 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
         </div>
       )}
 
+      {/* Health conditions -- fixed section below ancestor pack */}
+      {healthConditions[slug] && (
+        <div style={{ position: "absolute", top: FRAMES_TOP + 520, left: 0, width: "100%" }}>
+          <HealthSection profile={healthConditions[slug]} />
+        </div>
+      )}
+
       {/* Spacer to give canvas height */}
-      <div style={{ height: FRAMES_TOP + 80 }} />
+      <div style={{ height: FRAMES_TOP + 80 + (healthConditions[slug] ? 900 : 0) }} />
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>
         Back
