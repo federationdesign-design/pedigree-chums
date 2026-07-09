@@ -282,7 +282,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Ancestry card - below temperament */}
       {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
-        <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP} zIndex={zOrders.ancestry}
+        <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP - 75} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
           <p className={styles.infoHeading}>Ancestry</p>
@@ -365,7 +365,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Exercise needs card */}
       {exerciseNeeds[slug] && !closedCards.has("exercise") && (
-        <DragCard id="exercise" initialX={LEFT_EDGE} initialY={CHART_TOP - 25 + 576 + 24 + 600 + 10}
+        <DragCard id="exercise" initialX={LEFT_EDGE} initialY={CHART_TOP - 25 + 576 + 24 + 600 + 10 - 75}
           zIndex={zOrders.exercise} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("exercise"))}
           style={{ width: 380, padding: "16px 0 16px" }}>
@@ -385,7 +385,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Training difficulty card */}
       {trainingDifficulty[slug] && !closedCards.has("training") && (
-        <DragCard id="training" initialX={LEFT_EDGE + 380 + 24 + 300 + 360 + 24} initialY={CHART_TOP - 25 + 576 + 24 + 600 + 10}
+        <DragCard id="training" initialX={LEFT_EDGE + 380 + 24 + 300 + 360 + 24} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 + 520 + 16}
           zIndex={zOrders.training} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("training"))}
           style={{ width: 360, padding: 0 }}>
