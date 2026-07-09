@@ -359,7 +359,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Exercise needs card */}
       {exerciseNeeds[slug] && !closedCards.has("exercise") && (
-        <DragCard id="exercise" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 + 380 + 24 + 360 + 24} initialY={DIAGRAM_TOP - 100}
+        <DragCard id="exercise" initialX={LEFT_EDGE} initialY={FRAMES_TOP - 380}
           zIndex={zOrders.exercise} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("exercise"))}
           style={{ width: 380, padding: "16px 0 16px" }}>
