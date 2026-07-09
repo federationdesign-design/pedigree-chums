@@ -1,7 +1,6 @@
 .section {
-  position: absolute;
-  left: 48px;
-  width: 900px;
+  position: relative;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -30,7 +29,7 @@
 /* Table header */
 .tableHead {
   display: grid;
-  grid-template-columns: 1fr 180px 140px 100px 32px;
+  grid-template-columns: 1fr 200px 160px 110px 32px;
   gap: 0;
   padding: 0 16px 8px;
   border-bottom: 1px solid rgba(255,255,255,0.12);

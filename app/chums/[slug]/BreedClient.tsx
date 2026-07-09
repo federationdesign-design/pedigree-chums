@@ -468,9 +468,9 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
         </div>
       )}
 
-      {/* Health conditions -- fixed section below ancestor pack */}
+      {/* Health conditions -- fixed section below lifespan chart */}
       {healthConditions[slug] && (
-        <div style={{ position: "absolute", top: FRAMES_TOP + 520, left: 0, width: "100%" }}>
+        <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24, left: LEFT_EDGE + INFO_W + CARD_GAP + 10, width: 1008 }}>
           <HealthSection profile={healthConditions[slug]} />
         </div>
       )}
