@@ -37,9 +37,9 @@
 
 .tableHead span {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--blue-sky, #5cc4ee);
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
