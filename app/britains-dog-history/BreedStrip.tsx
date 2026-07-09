@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ukBreeds, type UKBreed } from "../../data/uk-breeds";
 import { breeds as packBreeds } from "../../data/breeds";
@@ -31,6 +32,7 @@ const ERA_LABELS: Record<string, string> = {
 };
 
 export default function BreedStrip({ era }: { era: string }) {
+  const router = useRouter();
   const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -255,7 +257,9 @@ export default function BreedStrip({ era }: { era: string }) {
             const packName = resolveLineageName(b.name);
             const lineage = getLineage(packName);
             const pack = packBreeds.find((x) => x.name === packName);
-            const open = lineage
+            const open = pack?.slug
+              ? () => router.push(`/chums/${pack.slug}`)
+              : lineage
               ? () =>
                   setActive({
                     name: b.name,

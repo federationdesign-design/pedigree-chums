@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { breeds, type Breed } from "../../data/breeds";
-import BreedDialog from "./BreedDialog";
 import styles from "./know.module.css";
 
 const ROWS: { title: string; accent: string; names: string[] }[] = [
@@ -20,9 +20,9 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
 
 const byName = (name: string): Breed | undefined => breeds.find((b) => b.name === name);
 
-function ChumCard({ breed, onOpen }: { breed: Breed; onOpen: (b: Breed) => void }) {
+function ChumCard({ breed }: { breed: Breed }) {
   return (
-    <button className={styles.chumCard} onClick={() => onOpen(breed)} aria-label={`View ${breed.name}`}>
+    <Link href={`/chums/${breed.slug}`} className={styles.chumCard} aria-label={`Explore ${breed.name}`}>
       <div className={styles.flipInner}>
         <div className={styles.flipFront}>
           <Image src={breed.image} alt={breed.name} width={300} height={300} className={styles.chumImg} unoptimized />
@@ -31,13 +31,12 @@ function ChumCard({ breed, onOpen }: { breed: Breed; onOpen: (b: Breed) => void 
           <span className={styles.flipName}>{breed.name}</span>
         </div>
       </div>
-    </button>
+    </Link>
   );
 }
 
 export default function ChumExplorer() {
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Breed | null>(null);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -66,7 +65,7 @@ export default function ChumExplorer() {
             </p>
             <div className={styles.resultGrid}>
               {results.map((b) => (
-                <ChumCard key={b.slug} breed={b} onOpen={setSelected} />
+                <ChumCard key={b.slug} breed={b} />
               ))}
             </div>
           </>
@@ -85,7 +84,7 @@ export default function ChumExplorer() {
               </h3>
               <div className={styles.rowGrid}>
                 {dogs.map((b) => (
-                  <ChumCard key={`${row.title}-${b.slug}`} breed={b} onOpen={setSelected} />
+                  <ChumCard key={`${row.title}-${b.slug}`} breed={b} />
                 ))}
               </div>
             </div>
@@ -93,7 +92,6 @@ export default function ChumExplorer() {
         })
       )}
 
-      {selected && <BreedDialog breed={selected} onClose={() => setSelected(null)} />}
     </section>
   );
 }
