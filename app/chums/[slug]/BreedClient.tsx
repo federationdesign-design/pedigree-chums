@@ -14,6 +14,8 @@ import SuitabilityRadar from "../../../components/SuitabilityRadar/SuitabilityRa
 import suitabilityScores from "../../../data/suitabilityScores";
 import ExerciseCard from "../../../components/ExerciseCard/ExerciseCard";
 import exerciseNeeds from "../../../data/exerciseNeeds";
+import GroomingCard from "../../../components/GroomingCard/GroomingCard";
+import groomingNeeds from "../../../data/groomingNeeds";
 
 type BreedInfo = {
   subtitle: string;
@@ -110,7 +112,7 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [infoBoxHeight, setInfoBoxHeight] = useState(276);
 
-const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11, suitability: 11, exercise: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChart: 14, lifespanExplain: 15, familyTree: 10, runningCost: 11, suitability: 11, exercise: 11, grooming: 11 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameFlash, setFrameFlash] = useState<string | null>(null);
@@ -364,6 +366,16 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
           onClose={() => setClosedCards((prev) => new Set(prev).add("exercise"))}
           style={{ width: 380, padding: "16px 0 16px" }}>
           <ExerciseCard data={exerciseNeeds[slug]} />
+        </DragCard>
+      )}
+
+      {/* Grooming card */}
+      {groomingNeeds[slug] && !closedCards.has("grooming") && (
+        <DragCard id="grooming" initialX={LEFT_EDGE + 380 + 24} initialY={FRAMES_TOP - 380}
+          zIndex={zOrders.grooming} onBringToFront={bringToFront}
+          onClose={() => setClosedCards((prev) => new Set(prev).add("grooming"))}
+          style={{ width: 360, padding: "16px 0 16px" }}>
+          <GroomingCard data={groomingNeeds[slug]} />
         </DragCard>
       )}
       {lineage && (
