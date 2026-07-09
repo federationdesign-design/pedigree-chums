@@ -3,28 +3,29 @@ import Link from "next/link";
 import styles from "./Footer.module.css";
 
 const NAV_LINKS = [
-  { href: "/home", label: "Explore Breeds" },
-  { href: "/about", label: "About" },
-  { href: "/hot-dogs", label: "Hot Dogs" },
-  { href: "/know-your-chums", label: "Know Your Chums" },
-  { href: "/preorder", label: "Pre-order" },
+  { href: "/home",                label: "Home" },
+  { href: "/about",               label: "About" },
+  { href: "/know-your-chums",     label: "Know Your Chums" },
+  { href: "/britains-dog-history", label: "Britain's Dog History" },
+  { href: "/hot-dogs",            label: "Hot/Dogs" },
+  { href: "/chumspot",            label: "Competitions" },
+  { href: "/",                    label: "Chum Drop" },
 ];
 
 export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean }) {
   return (
     <footer className={styles.footer}>
-      <nav className={styles.nav}>
-        {NAV_LINKS.map((link, i) => (
-          <span key={link.href} className={styles.navItem}>
-            {i > 0 && <span className={styles.pipe}>|</span>}
-            <Link href={link.href} className={styles.navLink}>{link.label}</Link>
-          </span>
-        ))}
-      </nav>
-
       <div className={styles.logoCol}>
         <Image src="/dogbingo.svg" alt="Pedigree Chums" width={340} height={148} />
       </div>
+
+      <nav className={styles.nav}>
+        {NAV_LINKS.map((link) => (
+          <Link key={link.href} href={link.href} className={styles.navLink}>
+            {link.label}
+          </Link>
+        ))}
+      </nav>
 
       {tradeLinks && (
         <nav className={styles.links}>
