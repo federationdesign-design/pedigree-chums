@@ -13,7 +13,7 @@ const SCORE_BG      = ["rgba(34,197,94,0.15)", "rgba(74,222,128,0.15)", "rgba(25
 // Arc gauge: draws a semicircle gauge from left to right
 // Full arc = 180deg. Score 1-5 fills a proportional segment.
 const GAUGE_R = 80;
-const GAUGE_CX = 110;
+const GAUGE_CX = 130;
 const GAUGE_CY = 100;
 
 function describeArc(cx: number, cy: number, r: number, startDeg: number, endDeg: number): string {
@@ -42,7 +42,7 @@ export default function TrainingCard({ data }: Props) {
 
       {/* Arc gauge */}
       <div className={styles.gaugeWrap}>
-        <svg viewBox="0 0 220 110" width={220} height={110} aria-label={`Training difficulty gauge: ${score} out of 5`}>
+        <svg viewBox="0 0 260 110" width={260} height={110} aria-label={`Training difficulty gauge: ${score} out of 5`}>
           {/* Track arc */}
           <path
             d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 180, 360)}
