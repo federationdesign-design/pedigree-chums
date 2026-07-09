@@ -96,7 +96,6 @@ const famousDogs: Record<string, FamousDog[]> = {
   "golden-retriever": [
     { name: "Goldie", type: "Real", knownFor: "Blue Peter dog", sourceUrl: "https://en.wikipedia.org/wiki/Blue_Peter_pets" },
     { name: "Bonnie", type: "Real", knownFor: "Blue Peter dog -- Goldie's daughter", sourceUrl: "https://en.wikipedia.org/wiki/Blue_Peter_pets" },
-    { name: "Buddy", type: "Live-action film", knownFor: "Air Bud", sourceUrl: "https://en.wikipedia.org/wiki/Air_Bud" },
     { name: "Shadow", type: "Live-action film", knownFor: "Homeward Bound: The Incredible Journey", sourceUrl: "https://en.wikipedia.org/wiki/Homeward_Bound:_The_Incredible_Journey" },
     { name: "Dug", type: "Animated", knownFor: "Up", sourceUrl: "https://en.wikipedia.org/wiki/Dug_(Up)" },
   ],
