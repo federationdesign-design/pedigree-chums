@@ -310,7 +310,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Running cost card */}
       {runningCosts[slug] && !closedCards.has("runningCost") && (
-        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250}
+        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 - 50}
           zIndex={zOrders.runningCost} onBringToFront={bringToFront} onClose={() => setClosedCards((prev) => new Set(prev).add("runningCost"))}>
           <RunningCostCard config={runningCosts[slug]} />
         </DragCard>
@@ -318,7 +318,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Lifespan explanation card */}
       {!closedCards.has("lifespanExplain") && hasLifespan && (
-        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 25 - 40 - 100} initialY={EXPLAIN_TOP + 50}
+        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 25 - 40 - 100 - 30} initialY={EXPLAIN_TOP + 50}
           zIndex={zOrders.lifespanExplain} onBringToFront={bringToFront} onClose={() => closeCard("lifespanExplain")}
           style={{ width: INFO_W, padding: "16px 20px 20px" }}>
           <p className={styles.infoHeading} style={{ paddingLeft: 0, marginTop: 0 }}>The Lifespan Diagram</p>
@@ -355,7 +355,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Suitability radar */}
       {suitabilityScores[slug] && !closedCards.has("suitability") && (
-        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16}
+        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 - 50}
           zIndex={zOrders.suitability} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
