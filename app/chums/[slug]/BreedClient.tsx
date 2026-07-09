@@ -20,6 +20,8 @@ import TrainingCard from "../../../components/TrainingCard/TrainingCard";
 import trainingDifficulty from "../../../data/trainingDifficulty";
 import HealthSection from "../../../components/HealthSection/HealthSection";
 import healthConditions from "../../../data/healthConditions";
+import FamousDogsSection from "../../../components/FamousDogsSection/FamousDogsSection";
+import famousDogs from "../../../data/famousDogs";
 
 type BreedInfo = {
   subtitle: string;
@@ -472,6 +474,13 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
       {healthConditions[slug] && (
         <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 560 }}>
           <HealthSection profile={healthConditions[slug]} />
+        </div>
+      )}
+
+      {/* Famous dogs -- fixed section below health conditions */}
+      {famousDogs[slug] && (
+        <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24 + 700, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 900 }}>
+          <FamousDogsSection dogs={famousDogs[slug]} />
         </div>
       )}
 

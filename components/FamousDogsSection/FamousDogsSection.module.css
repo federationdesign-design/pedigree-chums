@@ -1,0 +1,68 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.heading {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 3rem;
+  letter-spacing: 0.1em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}
+
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 14px 16px;
+  width: 200px;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  border-color: var(--yellow, #ffd23e);
+}
+
+.typePill {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 2px 8px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.name {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: var(--yellow, #ffd23e);
+  line-height: 1.1;
+}
+
+.knownFor {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.4;
+}
