@@ -32,7 +32,7 @@ export default function TrainingCard({ data }: Props) {
   const bgColour = SCORE_BG[score - 1];
 
   // Gauge: start at 180deg (left), end proportional to score
-  const fillDeg = (score / 5) * 180;
+  const fillDeg = ((6 - score) / 5) * 180;
   const startDeg = 180;
   const endDeg = 180 + fillDeg;
 
