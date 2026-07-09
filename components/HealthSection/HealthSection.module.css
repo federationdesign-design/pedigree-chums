@@ -59,11 +59,10 @@
 }
 
 .row {
-  background: var(--navy, #0a3a57);
+  background: var(--blue-deep, #0b78bd);
   border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   overflow: hidden;
-  
 }
 
 .row:hover {
