@@ -1,0 +1,576 @@
+/* ── Page shell ─────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #5cc4ee 0%, #0b78bd 50%, #0a3a57 100%);
+  padding-bottom: 48px;
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+}
+
+.heroImage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(10,58,87,0.3) 0%, rgba(10,58,87,0.85) 100%);
+}
+
+.heroText {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 20px 20px;
+  z-index: 1;
+}
+
+.heroName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 2.8rem;
+  color: var(--yellow, #ffd23e);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.heroSub {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  color: #ffffff;
+  margin: 6px 0 0;
+  letter-spacing: 0.04em;
+}
+
+/* ── Quick stats bar ────────────────────────────────────────── */
+.statsBar {
+  display: flex;
+  gap: 0;
+  background: var(--navy, #0a3a57);
+  border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  gap: 4px;
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.statLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.statValue {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--yellow, #ffd23e);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ── Sections ───────────────────────────────────────────────── */
+.section {
+  margin: 0 16px 4px;
+  padding: 24px 0 0;
+}
+
+.sectionTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.8rem;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+  padding-bottom: 10px;
+}
+
+.bodyText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+/* ── Temperament ────────────────────────────────────────────── */
+.traitPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.traitPill {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  border-radius: 999px;
+  padding: 5px 14px;
+  letter-spacing: 0.04em;
+}
+
+.prosCons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.prosCol, .consCol {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.prosConsTitle {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #ffffff;
+  margin: 0 0 8px;
+}
+
+.prosItem {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #22c55e;
+  margin: 0 0 4px;
+  line-height: 1.4;
+}
+
+.consItem {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #fb923c;
+  margin: 0 0 4px;
+  line-height: 1.4;
+}
+
+/* ── Ancestry ───────────────────────────────────────────────── */
+.ancestryList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ancestryRow {
+  display: grid;
+  grid-template-columns: 140px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.ancestryName {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.ancestryBarWrap {
+  height: 8px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ancestryBar {
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.ancestryPct {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--yellow, #ffd23e);
+  text-align: right;
+}
+
+/* ── Lifespan ───────────────────────────────────────────────── */
+.lifespanScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+/* ── Cost ───────────────────────────────────────────────────── */
+.costGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.costCard {
+  background: var(--navy, #0a3a57);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+.costAmount {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.95rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.costLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.costBreakdown {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.costRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ── Suitability ────────────────────────────────────────────── */
+.suitList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suitRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--blue-deep, #0b78bd);
+  border-radius: 10px;
+}
+
+.suitLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.suitDots {
+  display: flex;
+  gap: 5px;
+}
+
+.suitDot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ── Exercise ───────────────────────────────────────────────── */
+.exerciseChart {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  height: 140px;
+  margin: 16px 0;
+}
+
+.exerciseCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+
+.exerciseBarWrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+}
+
+.exerciseBar {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s ease;
+  min-height: 4px;
+}
+
+.exerciseDay {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.exerciseMins {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ── Grooming ───────────────────────────────────────────────── */
+.groomingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.groomingStat {
+  background: var(--navy, #0a3a57);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+.groomingValue {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.1rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.03em;
+}
+
+.groomingLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.groomingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--blue-deep, #0b78bd);
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+/* ── Training gauge ─────────────────────────────────────────── */
+.trainingGauge {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.trainingLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
+}
+
+.trainingTraits {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* ── Health ─────────────────────────────────────────────────── */
+.healthList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.healthRow {
+  background: var(--blue-deep, #0b78bd);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.healthRowOpen {
+  border-color: var(--yellow, #ffd23e);
+}
+
+.healthBtn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 8px;
+}
+
+.healthName {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  flex: 1;
+  text-align: left;
+}
+
+.healthMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.healthSeverity {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.healthLikelihood {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.healthChevron {
+  font-size: 1rem;
+  color: #ffffff;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.healthChevronOpen {
+  transform: rotate(180deg);
+}
+
+.healthDesc {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 12px;
+}
+
+.disclaimer {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Famous Chums ───────────────────────────────────────────── */
+.famousGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.famousCard {
+  background: var(--blue-deep, #0b78bd);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.famousCard:hover {
+  border-color: var(--yellow, #ffd23e);
+}
+
+.famousType {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 2px 7px;
+  align-self: flex-start;
+}
+
+.famousName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+.famousKnown {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.4;
+}
