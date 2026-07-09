@@ -85,6 +85,25 @@
   padding: 4px 14px;
 }
 
+.tagBad {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #ef4444;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+
+.essayDivider {
+  max-width: 900px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+  border-top: 2px solid rgba(255,255,255,0.15);
+}
+
 .essayTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(1.8rem, 4vw, 3rem);

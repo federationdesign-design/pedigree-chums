@@ -263,20 +263,250 @@ export default function GoodDogBadDogPage() {
           </div>
         </article>
 
+        {/* ── Essay divider ── */}
+        <div className={styles.essayDivider} />
+
+        {/* ── Essay: Hound of the Baskervilles ── */}
+        <article className={styles.essay}>
+
+          <div className={styles.essayMeta}>
+            <span className={styles.tagBad}>Bad dog</span>
+            <span className={styles.tagBreed}>Bloodhound / Mastiff</span>
+          </div>
+
+          <h2 className={styles.essayTitle}>
+            The Hound of the Baskervilles: How a Dog Was Made into a Monster
+          </h2>
+
+          <div className={styles.essayBody}>
+
+            <h3 className={styles.subhead}>A body on the moor, and something in the dark</h3>
+
+            <p>
+              A wealthy man is found dead on the edge of Dartmoor. No obvious wounds.
+              But nearby, someone has found the footprints of an enormous hound.
+            </p>
+            <p>
+              Sir Charles Baskerville already believed his family was haunted. An old
+              legend told of a monstrous black dog that had pursued generations of
+              Baskervilles across the moor as punishment for the cruelty of an ancestor.
+              Now Sir Charles is dead, and the impossible appears to have left tracks in
+              the mud.
+            </p>
+            <p>
+              Arthur Conan Doyle's <em>The Hound of the Baskervilles</em> works because
+              it allows two explanations to exist at the same time. One is rational: a
+              person has committed a crime. The other belongs to folklore: an ancient
+              beast has returned to claim another victim.
+            </p>
+            <p>A dog sits at the centre of both.</p>
+            <p>
+              The hound is eventually revealed to be a real animal -- a huge cross between
+              a Bloodhound and a Mastiff, kept and controlled by a human murderer. Conan
+              Doyle describes it as "as large as a small lioness." The dog is genuinely
+              terrifying. But is it evil? That question makes this one of the most
+              interesting cases in the Good Dog, Bad Dog series. The novel appears to give
+              us the ultimate bad dog. Look closer, and almost everything monstrous about
+              it has been manufactured by a person.
+            </p>
+
+            <h3 className={styles.subhead}>The hound exists in language before it exists in flesh</h3>
+
+            <p>
+              One of the cleverest things about the novel is that the dog becomes
+              frightening long before anyone properly sees it.
+            </p>
+            <p>
+              The reader first encounters it through a family manuscript, local rumours,
+              a dead man's footprints, distant sounds on the moor and Watson's increasingly
+              uneasy imagination. By the time the animal actually appears, it is carrying
+              the weight of an entire legend. It is not simply a large dog. It has already
+              been presented as a family curse, an instrument of divine punishment, a
+              creature from hell.
+            </p>
+            <p>
+              People rarely encounter dogs without context arriving first. Breed reputation,
+              previous stories, headlines and visual stereotypes often land before the
+              individual animal does. The Baskerville hound is feared before anyone has
+              seen it. When it finally appears, every witness is already primed to see a
+              monster.
+            </p>
+            <p>
+              Stapleton -- the novel's villain, secretly another Baskerville heir --
+              understands this perfectly. He does not simply release a dog onto the moor.
+              He releases a story first.
+            </p>
+
+            <h3 className={styles.subhead}>Why a Bloodhound and a Mastiff?</h3>
+
+            <p>Conan Doyle's choice of breeds is deliberate.</p>
+            <p>
+              The Bloodhound contributes the idea of relentless pursuit. Its threat is
+              not speed but inevitability -- the sense that it can find you, wherever you
+              go, however long it takes. The Mastiff contributes sheer physical mass. The
+              word alone suggests an animal capable of overpowering a person.
+            </p>
+            <p>
+              Put the two together and the story has a dog that can both hunt and destroy.
+              This is effective storytelling. It is not, however, a fair breed portrait.
+            </p>
+
+            <div className={styles.breedPanel}>
+              <p className={styles.breedPanelLabel}>The real breeds</p>
+              <p>
+                The Kennel Club describes the Bloodhound as affectionate, sensitive and
+                not quarrelsome with people or other dogs. The Mastiff standard describes
+                a calm dog, affectionate towards its owners. Neither description supports
+                the idea of breeds naturally driven to hunt human beings across moorland.
+              </p>
+              <p>
+                That does not make either breed suitable for every household. A very large
+                dog that is poorly managed or deliberately provoked is genuinely dangerous.
+                But physical capability is not the same as murderous intent. Conan Doyle
+                selects the traits that serve his story and sets aside the ones that do not.
+              </p>
+            </div>
+
+            <h3 className={styles.subhead}>The phosphorus</h3>
+
+            <p>
+              Here is the detail that gives the whole novel away, if you read it carefully enough.
+            </p>
+            <p>
+              Stapleton does not rely on the dog's natural appearance. He paints the
+              animal's head and body with phosphorus, so that it glows in the darkness
+              of the moor. Think about what that tells you.
+            </p>
+            <p>
+              A normal dog, however large, is apparently not frightening enough to sustain
+              the Baskerville legend. Stapleton has to alter it. He has to make it look
+              unnatural. He needs witnesses to see not an animal but something that appears
+              to burn. He transforms the dog into theatre.
+            </p>
+            <p>
+              The luminous coating conceals the dog's ordinary identity, connects the
+              attack to the ancient curse, causes panic before physical contact occurs and
+              makes witnesses doubt their own reason. The hound's supernatural quality is
+              not inherent. It is applied.
+            </p>
+            <p>
+              This is not so different from the way dogs are filmed. Low camera angles
+              enlarge the body. Close-ups isolate teeth. Growling is added or intensified.
+              Darkness prevents the audience from reading the animal's full posture or
+              expression. The viewer is shown how to feel about the dog before they have
+              had time to look at it. Stapleton is doing inside the story exactly what a
+              director does outside it.
+            </p>
+
+            <h3 className={styles.subhead}>The dog does not write the plot</h3>
+
+            <p>
+              The central moral fact of the novel is this: the hound does not design the murder.
+            </p>
+            <p>
+              Stapleton does. He identifies his target, obtains the dog, hides it on the
+              moor, exploits the family legend and controls precisely when the animal is
+              released. The dog supplies the teeth. The human supplies the motive, the
+              plan and the staging.
+            </p>
+            <p>
+              The hound has physical agency -- it runs, it attacks. Stapleton has moral
+              agency -- he understands the consequences and intends them. Yet the dog is
+              what ends up on the book cover.
+            </p>
+            <p>
+              This reflects something wider in how stories use animals. A villain's dog
+              becomes an extension of the villain -- its teeth represent his cruelty, its
+              size represents his power, its obedience reveals his control. The animal
+              does the visible thing. The human who directed it remains one step removed.
+              The Baskerville hound absorbs the visual blame for a crime it did not conceive.
+            </p>
+
+            <h3 className={styles.subhead}>The nameless dog</h3>
+
+            <p>
+              Unlike Gelert, the Baskerville hound has no name. It is called the hound,
+              the fiend, the creature, the beast, the family curse. Never anything else.
+            </p>
+            <p>
+              A name would imply an individual animal with a history and a relationship
+              to people. "The hound" turns it into a category. It represents not one dog
+              but all the dogs in the legend, all the accumulated fear of the Baskerville
+              family across generations.
+            </p>
+            <p>
+              That namelessness also means the reader is never invited to ask the obvious
+              questions. Where did this animal come from? What was it like before Stapleton
+              acquired it? How was it trained? The novel does not want you to think about
+              these things. The plot needs a threat, not a biography.
+            </p>
+            <p>
+              Strip away the legend, the phosphorus, the isolation and the deliberate
+              staging, and you have an animal whose aggression has been cultivated and
+              directed by a person, then released into a situation designed to make
+              violence inevitable. The less individuality a dog possesses in fiction,
+              the more easily it becomes a monster.
+            </p>
+
+            <h3 className={styles.subhead}>The legend as alibi</h3>
+
+            <p>
+              The legend provides Stapleton with more than a method of killing. It
+              provides him with an explanation. If Sir Henry dies from fright or an animal
+              attack, the supernatural story actively discourages people from looking for
+              a human criminal. Fear becomes concealment. The curse explains what happened
+              without requiring anyone to look for who caused it.
+            </p>
+            <p>
+              Stapleton understands something that remains entirely recognisable: people
+              see what they have been prepared to see. If the Baskervilles expect a curse,
+              a glowing dog in the fog will confirm it. The legend turns an attack into
+              evidence of something already believed.
+            </p>
+            <p>The dog's reputation arrives first. The dog follows.</p>
+
+            <h3 className={styles.subhead}>What the story is really asking</h3>
+
+            <p>
+              <em>The Hound of the Baskervilles</em> appears to ask whether a supernatural
+              dog exists. Its deeper question is why people are so ready to believe in one.
+            </p>
+            <p>
+              The answer the novel gives, without quite saying so directly, is that fear
+              does not need much help. Give people a legend, a death they cannot fully
+              explain, some footprints and a glimpse of something enormous and luminous
+              in the fog -- and they will do the rest themselves.
+            </p>
+            <p>
+              Stapleton does not create the fear. He finds it already there, in the family
+              history, in local belief, in the dark reputation of the moor itself. He
+              simply gives it a body. That body happens to be a dog.
+            </p>
+            <p>
+              The hound is dangerous. It is not the architect of its own monstrosity. A
+              dog can be capable of causing serious harm without possessing anything
+              resembling human malice. A person can take that capability, sharpen it,
+              stage it and then allow the animal to carry the blame.
+            </p>
+            <p>That is what Stapleton does.</p>
+            <p>
+              There is no ancient curse. There is only a person who recognised the
+              usefulness of an animal, a legend and other people's readiness to believe.
+            </p>
+
+            <p className={styles.verdict}>
+              <strong>The verdict:</strong> Manufactured monster. The hound's danger was
+              real. Its monstrosity was built by a human being who knew exactly what he
+              was doing -- and who let the dog carry the blame.
+            </p>
+
+          </div>
+        </article>
+
         {/* ── Coming soon ── */}
         <section className={styles.coming}>
           <h2 className={styles.comingTitle}>Coming next</h2>
           <div className={styles.comingGrid}>
-            <div className={styles.comingCard}>
-              <span className={styles.comingTag}>Bad dog</span>
-              <h3 className={styles.comingName}>The Hound of the Baskervilles</h3>
-              <p className={styles.comingBreed}>Bloodhound / Mastiff</p>
-              <p className={styles.comingDesc}>
-                How Arthur Conan Doyle turned a real dog into the image of a
-                supernatural killer -- and what the story actually says about who
-                is responsible for the violence.
-              </p>
-            </div>
             <div className={styles.comingCard}>
               <span className={styles.comingTag}>Good dog</span>
               <h3 className={styles.comingName}>Lassie</h3>
@@ -284,7 +514,8 @@ export default function GoodDogBadDogPage() {
               <p className={styles.comingDesc}>
                 Lassie's intelligence and sensitivity are genuinely Collie-like.
                 But what happens when a real trait gets elevated into something
-                close to a superpower?
+                close to a superpower -- and what does that do to our expectations
+                of the real breed?
               </p>
             </div>
           </div>
