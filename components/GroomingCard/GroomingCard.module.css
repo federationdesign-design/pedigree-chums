@@ -48,6 +48,12 @@
   text-align: center;
 }
 
+.clockIcon {
+  color: var(--yellow, #ffd23e);
+  font-size: 1.2rem;
+  margin-right: 4px;
+}
+
 .statValue {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.6rem;

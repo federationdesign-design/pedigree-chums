@@ -26,9 +26,9 @@ export default function GroomingCard({ data }: Props) {
     notes,
   } = data;
 
-  const hoursPerWeek = timePerWeek >= 60
+  const timeDisplay = timePerWeek >= 60
     ? `${Math.floor(timePerWeek / 60)}h ${timePerWeek % 60 > 0 ? `${timePerWeek % 60}m` : ""}`.trim()
-    : `${timePerWeek}m`;
+    : `${timePerWeek}`;
 
   return (
     <div className={styles.inner}>
@@ -40,7 +40,11 @@ export default function GroomingCard({ data }: Props) {
       {/* Stats grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statBlock}>
-          <span className={styles.statValue}>{hoursPerWeek}</span>
+          <span className={styles.statValue}>
+            <span className={styles.clockIcon}>⏱</span>
+            {timeDisplay}
+            {timePerWeek < 60 && <span className={styles.statUnit}>min</span>}
+          </span>
           <span className={styles.statLabel}>Home grooming per week</span>
         </div>
         <div className={styles.statBlock}>

@@ -375,7 +375,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Grooming card */}
       {groomingNeeds[slug] && !closedCards.has("grooming") && (
-        <DragCard id="grooming" initialX={LEFT_EDGE + 380 + 24 + 300} initialY={CHART_TOP - 25 + 576 + 24 + 600 + 10}
+        <DragCard id="grooming" initialX={LEFT_EDGE + 380 + 24 + 300} initialY={CHART_TOP - 25 + 576 + 24 + 600 + 10 + 20}
           zIndex={zOrders.grooming} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("grooming"))}
           style={{ width: 360, padding: "16px 0 16px" }}>
@@ -385,7 +385,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Training difficulty card */}
       {trainingDifficulty[slug] && !closedCards.has("training") && (
-        <DragCard id="training" initialX={LEFT_EDGE + 380 + 24 + 300 + 360 + 24} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 + 520 + 16}
+        <DragCard id="training" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 + 400 + 16}
           zIndex={zOrders.training} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("training"))}
           style={{ width: 360, padding: 0 }}>
