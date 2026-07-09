@@ -1,7 +1,7 @@
 /* ── Page canvas ─────────────────────────────────────────── */
 .canvas {
   min-height: 100svh;
-  min-width: 2000px;
+  min-width: 1800px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   position: relative;
