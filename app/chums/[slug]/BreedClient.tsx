@@ -282,7 +282,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Ancestry card - below temperament */}
       {!closedCards.has("ancestry") && lineage && ancestryBreakdown.length > 0 && (
-        <DragCard id="ancestry" initialX={TREE_LEFT - 100} initialY={CARD_TOP + infoBoxHeight + 16 + 50} zIndex={zOrders.ancestry}
+        <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP + infoBoxHeight + 16 + 50 - 75} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
           <p className={styles.infoHeading}>Ancestry</p>
@@ -310,7 +310,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Running cost card */}
       {runningCosts[slug] && !closedCards.has("runningCost") && (
-        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50}
+        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250}
           zIndex={zOrders.runningCost} onBringToFront={bringToFront} onClose={() => setClosedCards((prev) => new Set(prev).add("runningCost"))}>
           <RunningCostCard config={runningCosts[slug]} />
         </DragCard>
@@ -318,7 +318,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Lifespan explanation card */}
       {!closedCards.has("lifespanExplain") && hasLifespan && (
-        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 25 - 40} initialY={EXPLAIN_TOP + 50}
+        <DragCard id="lifespanExplain" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 25 - 40 - 100} initialY={EXPLAIN_TOP + 50}
           zIndex={zOrders.lifespanExplain} onBringToFront={bringToFront} onClose={() => closeCard("lifespanExplain")}
           style={{ width: INFO_W, padding: "16px 20px 20px" }}>
           <p className={styles.infoHeading} style={{ paddingLeft: 0, marginTop: 0 }}>The Lifespan Diagram</p>
@@ -355,7 +355,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
 
       {/* Suitability radar */}
       {suitabilityScores[slug] && !closedCards.has("suitability") && (
-        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 + 460 + 16}
+        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 - 50} initialY={CHART_TOP - 15 + 200 + 50 + 460 + 16 - 250}
           zIndex={zOrders.suitability} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
@@ -476,7 +476,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 12, ancestry: 13, lifespanChar
       )}
 
       {/* Spacer to give canvas height */}
-      <div style={{ height: FRAMES_TOP + 80 + (healthConditions[slug] ? 900 : 0) }} />
+      <div style={{ height: FRAMES_TOP + 25 }} />
       {/* Back button */}
       <Link href="/home" className={styles.backBtn}>
         Back
