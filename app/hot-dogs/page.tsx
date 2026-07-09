@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
+import Footer from "../../components/Footer/Footer";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -401,6 +402,7 @@ export default function HotDogs() {
         </section>
 
       </main>
+      <Footer />
     </>
   );
 }
