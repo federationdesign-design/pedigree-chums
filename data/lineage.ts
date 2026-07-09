@@ -1307,7 +1307,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Standard Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 60 },
       { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
-      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, biddable head.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 15 }
+      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, obedient temperament.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 15 }
     ]
   },
   "Pomeranian": {
