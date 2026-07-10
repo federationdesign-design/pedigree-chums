@@ -42,12 +42,19 @@
 }
 
 .abbr {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   color: var(--yellow, #ffd23e);
   line-height: 1;
-  text-transform: uppercase;
+}
+
+.abbr svg {
+  width: 100%;
+  height: 100%;
+  stroke: var(--yellow, #ffd23e);
 }
 
 /* Tooltip label that appears on hover */

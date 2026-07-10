@@ -138,6 +138,7 @@ export default function BreedTree({
   centred = false,
   size = 760,
   hideLabels = false,
+  disableZoom = false,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -146,6 +147,7 @@ export default function BreedTree({
   centred?: boolean;
   size?: number;
   hideLabels?: boolean;
+  disableZoom?: boolean;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -388,7 +390,7 @@ export default function BreedTree({
       <div className={styles.stage} ref={stageRef}>
         <svg
           viewBox={viewBox}
-          onClick={onBackground}
+          onClick={disableZoom ? undefined : onBackground}
           style={{ opacity: ready ? 1 : 0 }}
         >
           <defs>
@@ -454,7 +456,7 @@ export default function BreedTree({
                   }}
                   onMouseEnter={hidden ? undefined : () => setHovered(d)}
                   onMouseLeave={hidden ? undefined : () => setHovered((h) => (h === d ? null : h))}
-                  onClick={(e) => onCircle(e, d)}
+                  onClick={disableZoom ? undefined : (e) => onCircle(e, d)}
                 />
               );
             })}
