@@ -4,7 +4,6 @@ import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
-import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -120,58 +119,20 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [infoBoxHeight, setInfoBoxHeight] = useState(276);
 
-const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanChart: 114, lifespanExplain: 115, familyTree: 110, runningCost: 111, suitability: 111, exercise: 111, grooming: 111, training: 111 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
+const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanChart: 114, lifespanExplain: 115, runningCost: 111, suitability: 111, exercise: 111, grooming: 111, training: 111 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
   type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
-  const [frameFlash, setFrameFlash] = useState<string | null>(null);
-  const [filledIds, setFilledIds] = useState<string[]>([]);
-  const [dragName, setDragName] = useState<string | null>(null);
-  const [draggingImg, setDraggingImg] = useState<string | null>(null);
   const [frameInfoHover, setFrameInfoHover] = useState<string | null>(null);
 
-  const handleFramesReady = useCallback((nodes: FrameNode[]) => {
+  const handleFramesReady = useCallback((nodes: { id: string; name: string; img: string; pct?: number; note?: string; status?: string }[]) => {
     setFrames((prev) => {
-      if (prev.length > 0) return prev; // already populated, ignore duplicate calls
+      if (prev.length > 0) return prev;
       const seen = new Set<string>();
       return nodes.filter((n) => {
         if (seen.has(n.id)) return false;
         seen.add(n.id);
         return true;
-      }).map((n) => ({ ...n, filled: false, shake: false }));
-    });
-  }, []);
-
-  const handleDragName = useCallback((name: string | null) => {
-    setDragName(name);
-    if (name) {
-      const frame = frames.find((f) => f.name === name);
-      setDraggingImg(frame?.img ?? null);
-    } else {
-      setDraggingImg(null);
-    }
-  }, [frames]);
-
-  const handleImageDropped = useCallback((nodeId: string, nodeName: string, clientX: number, clientY: number) => {
-    setDragName(null);
-    document.querySelectorAll<HTMLElement>("[data-frame]").forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
-        const frameId = el.dataset.frame!;
-        setFrames((prev) => {
-          const frame = prev.find((f) => f.id === frameId);
-          const node = prev.find((f) => f.id === nodeId);
-          if (frame && node && frame.img === node.img && !frame.filled) {
-            setFilledIds((ids) => [...ids, nodeId]);
-            setFrameFlash(frameId);
-            setTimeout(() => setFrameFlash(null), 600);
-            return prev.map((f) => f.id === frameId ? { ...f, filled: true } : f);
-          } else if (frame && !frame.filled) {
-            setTimeout(() => setFrames((p) => p.map((f) => f.id === frameId ? { ...f, shake: false } : f)), 400);
-            return prev.map((f) => f.id === frameId ? { ...f, shake: true } : f);
-          }
-          return prev;
-        });
-      }
+      }).map((n) => ({ ...n, filled: true, shake: false }));
     });
   }, []);
   const closeCard = useCallback((id: string) => setClosedCards((prev) => new Set([...prev, id])), []);
@@ -256,7 +217,6 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
   const CHART_TOP = CARD_TOP;
   const EXPLAIN_TOP = CARD_TOP + 255; // below chart
   const DIAGRAM_TOP = CARD_TOP + 620; // below cards
-  const TREE_TOP = DIAGRAM_TOP + 400; // tree 400px lower than circle
   const FRAMES_TOP = DIAGRAM_TOP + 800; // below diagrams
   const CIRCLE_LEFT = LEFT_EDGE;
   const TREE_LEFT = LEFT_EDGE + INFO_W + CARD_GAP + 1008 + 48 - 400; // right of lifespan chart
@@ -412,16 +372,14 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
           <TrainingCard data={trainingDifficulty[slug]} />
         </DragCard>
       )}
+      {/* Hidden BreedTreeMap -- feeds ancestor pack frames only, not rendered visibly */}
       {lineage && (
-        <DragCard id="familyTree" initialX={TREE_LEFT} initialY={TREE_TOP} zIndex={110}
-          onBringToFront={bringToFront}
-          className=""
-          style={{ background: "transparent", border: "none", boxShadow: "none", cursor: "default" }}>
-          <BreedTreeMap lineage={lineage} rootImage={image} filledIds={filledIds} onFramesReady={handleFramesReady} onImageDropped={handleImageDropped} onDragName={handleDragName} />
-        </DragCard>
+        <div style={{ position: "absolute", left: -9999, top: -9999, visibility: "hidden", pointerEvents: "none" }}>
+          <BreedTreeMap lineage={lineage} rootImage={image} filledIds={[]} onFramesReady={handleFramesReady} onImageDropped={() => {}} onDragName={() => {}} />
+        </div>
       )}
 
-      {/* Ancestor pack frames - far left */}
+      {/* Ancestor pack frames */}
       {frames.length > 0 && (
         <div style={{ position: "absolute", left: LEFT_EDGE, top: FRAMES_TOP }}>
           <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 78, letterSpacing: "0.1em", color: "var(--yellow,#ffd23e)", margin: "0 0 24px", textTransform: "uppercase", lineHeight: 1 }}>Ancestor Pack</p>
@@ -429,65 +387,49 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
             {frames.map((f) => (
               <div key={f.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div
-                  data-frame={f.id}
                   style={{
                     width: 77, height: 77, borderRadius: 10,
-                    border: f.filled ? "4px solid #22c55e" : draggingImg === f.img ? "4px solid #ffd23e" : "4px dashed rgba(255,255,255,0.3)",
+                    border: "4px solid #22c55e",
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
-                    position: "relative", overflow: "visible", transition: "border-color 0.2s",
-                    animation: f.shake ? "frameShake 0.4s ease" : frameFlash === f.id ? "frameFlash 0.6s ease" : "none"
+                    position: "relative", overflow: "visible",
                   }}
                 >
-                  {f.filled
-                    ? (
-                      <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 16, display: "block" }} />
+                  <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 6, display: "block" }} />
 
-                        {/* Status dot - top left (matches pit colour system) */}
-                        <div title={f.status ?? "unknown"} style={{
-                          position: "absolute", left: -4, top: -4, width: 14, height: 14,
-                          borderRadius: "50%", border: "2px solid #ffffff", pointerEvents: "none",
-                          background: f.status === "extinct" ? "#d64545" : f.status === "trending" ? "#2e9e5b" : f.status === "endangered" ? "#ff7a3c" : f.status === "in-decline" ? "#ffb02e" : "#4ade80"
-                        }} />
+                    {/* Status dot */}
+                    <div title={f.status ?? "unknown"} style={{
+                      position: "absolute", left: -4, top: -4, width: 14, height: 14,
+                      borderRadius: "50%", border: "2px solid #ffffff", pointerEvents: "none",
+                      background: f.status === "extinct" ? "#d64545" : f.status === "trending" ? "#2e9e5b" : f.status === "endangered" ? "#ff7a3c" : f.status === "in-decline" ? "#ffb02e" : "#4ade80"
+                    }} />
 
-                        {/* Info i - top right */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setFrameInfoHover(frameInfoHover === f.id ? null : f.id); }}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0b78bd)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
-                        >i</button>
-                        {frameInfoHover === f.id && (
-                          <div style={{ position: "absolute", left: 0, top: 20, background: "rgba(10,58,87,0.96)", border: "1.5px solid rgba(255,210,62,0.4)", borderRadius: 12, padding: "10px 14px", zIndex: 200, minWidth: 200, maxWidth: 260, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
-                            onPointerDown={(e) => e.stopPropagation()}
-                          >
-                            <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, color: "#ffd23e", margin: "0 0 4px", letterSpacing: "0.05em" }}>{f.name}</p>
-                            {f.note && <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, color: "#ffffff", margin: 0, lineHeight: 1.5 }}>{f.note}</p>}
-                            <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", fontStyle: "italic" }}>Status: {f.status ?? "unknown"}</p>
-                            <button onClick={(e) => { e.stopPropagation(); setFrameInfoHover(null); }} style={{ position: "absolute", top: 6, right: 8, background: "none", border: "none", color: "#ffd23e", fontSize: 16, cursor: "pointer" }}>×</button>
-                          </div>
-                        )}
-
-                        {/* % pill - bottom right, clickable */}
-                        <div
-                          onClick={(e) => { e.stopPropagation(); }}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          style={{ position: "absolute", right: -2, bottom: -14, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "default", fontFamily: "Montserrat, system-ui", zIndex: 65, whiteSpace: "nowrap" }}
-                        >
-                          {f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}
-                        </div>
+                    {/* Info button */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setFrameInfoHover(frameInfoHover === f.id ? null : f.id); }}
+                      style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0b78bd)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                    >i</button>
+                    {frameInfoHover === f.id && (
+                      <div style={{ position: "absolute", left: 0, top: 20, background: "rgba(10,58,87,0.96)", border: "1.5px solid rgba(255,210,62,0.4)", borderRadius: 12, padding: "10px 14px", zIndex: 200, minWidth: 200, maxWidth: 260, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
+                        <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, color: "#ffd23e", margin: "0 0 4px", letterSpacing: "0.05em" }}>{f.name}</p>
+                        {f.note && <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, color: "#ffffff", margin: 0, lineHeight: 1.5 }}>{f.note}</p>}
+                        <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", fontStyle: "italic" }}>Status: {f.status ?? "unknown"}</p>
+                        <button onClick={(e) => { e.stopPropagation(); setFrameInfoHover(null); }} style={{ position: "absolute", top: 6, right: 8, background: "none", border: "none", color: "#ffd23e", fontSize: 16, cursor: "pointer" }}>×</button>
                       </div>
-                    )
-                    : (
-                      <span style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, fontWeight: 700, color: "#ffffff", textAlign: "center", lineHeight: 1.3, padding: "4px 6px", display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>{f.name}</span>
                     )}
+
+                    {/* % pill */}
+                    <div style={{ position: "absolute", right: -2, bottom: -14, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, fontFamily: "Montserrat, system-ui", zIndex: 65, whiteSpace: "nowrap" }}>
+                      {f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       )}
-
       {/* Health conditions -- fixed section below lifespan chart */}
       {healthConditions[slug] && (
         <div style={{ position: "absolute", top: CHART_TOP - 25 + 576 + 24, left: LEFT_EDGE + INFO_W + CARD_GAP + 10 + 300, width: 560 }}>
