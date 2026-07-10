@@ -5,6 +5,7 @@ import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode 
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
+import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
 
 const SIZE = 760;
@@ -520,7 +521,7 @@ export default function BreedTree({
             </span>
           )}
           <p className={styles.cNote}>
-            {shown.data.note}
+            {breedInfo[shown.data.name] || shown.data.note}
             {shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
         </div>
