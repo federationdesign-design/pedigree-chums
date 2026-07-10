@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
+import BreedTreeMap from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
