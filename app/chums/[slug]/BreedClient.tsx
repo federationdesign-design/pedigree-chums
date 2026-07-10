@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import styles from "./breed.module.css";
 import BreedTree from "../../../components/BreedTree/BreedTree";
-import BreedTreeMap from "../../../components/BreedTreeMap/BreedTreeMap";
+import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -121,11 +121,11 @@ export default function BreedClient({ name, slug, image, info, lineage }: Props)
   const [infoBoxHeight, setInfoBoxHeight] = useState(276);
 
 const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanChart: 114, lifespanExplain: 115, runningCost: 111, suitability: 111, exercise: 111, grooming: 111, training: 111 });  const [closedCards, setClosedCards] = useState<Set<string>>(new Set());
-  type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: string | null; filled: boolean; shake: boolean };
+  type PageFrame = { id: string; name: string; img: string; pct?: number; note?: string; status?: "extinct" | "trending" | "popular" | "endangered" | "in-decline" | null; filled: boolean; shake: boolean };
   const [frames, setFrames] = useState<PageFrame[]>([]);
   const [frameInfoHover, setFrameInfoHover] = useState<string | null>(null);
 
-  const handleFramesReady = useCallback((nodes: { id: string; name: string; img: string; pct?: number; note?: string; status?: string }[]) => {
+  const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames((prev) => {
       if (prev.length > 0) return prev;
       const seen = new Set<string>();
