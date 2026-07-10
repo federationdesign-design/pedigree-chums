@@ -19,6 +19,7 @@ export default function PreorderSuccess() {
   const dispatchNote = process.env.PREORDER_DISPATCH_NOTE || DEFAULT_DISPATCH_NOTE;
 
   return (
+    <>
     <main className={styles.page}>
       <section className={styles.card}>
         <p className={styles.kicker}>Pre-order confirmed</p>
@@ -41,6 +42,7 @@ export default function PreorderSuccess() {
         </Link>
       </section>
     </main>
-      <Footer />
+    <Footer />
+    </>
   );
 }
