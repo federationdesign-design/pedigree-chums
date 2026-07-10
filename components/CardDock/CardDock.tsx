@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import styles from "./CardDock.module.css";
 
 export interface DockItem {
@@ -13,7 +15,7 @@ interface Props {
   onReopen: (id: string) => void;
 }
 
-const ICONS: Record<string, JSX.Element> = {
+const ICONS: Record<string, ReactElement> = {
 
   /* Temperament -- brain */
   infoBox: (
