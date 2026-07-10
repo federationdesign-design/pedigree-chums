@@ -4,6 +4,7 @@ import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import type { LineageNode } from "../../data/lineage";
 import { breeds } from "../../data/breeds";
 import { ukBreeds } from "../../data/uk-breeds";
+import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTreeMap.module.css";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
@@ -208,7 +209,7 @@ export default function BreedTreeMap({
           seenImg.add(img);
           const pct = Math.round((n._leaves / root._leaves) * 100);
           const status = nodeStatus(n.name, n.note ?? "");
-          found.push({ id: n._id, name: n.name, img, pct, note: n.note, status });
+          found.push({ id: n._id, name: n.name, img, pct, note: breedInfo[n.name] || n.note, status });
         }
       }
       (n.children as Node[] | undefined)?.forEach(walk);
