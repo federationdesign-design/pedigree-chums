@@ -45,8 +45,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 56px;
+  height: 56px;
   color: var(--yellow, #ffd23e);
   line-height: 1;
 }

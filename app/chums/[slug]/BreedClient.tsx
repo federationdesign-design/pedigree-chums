@@ -101,7 +101,7 @@ function DragCard({
       {onClose && (
         <button
           onClick={(e) => { e.stopPropagation(); onClose(); }}
-          style={{ position: "absolute", top: 8, right: 12, background: "none", border: "none", color: "var(--yellow, #ffd23e)", fontSize: 28, cursor: "pointer", lineHeight: 1, padding: 0, zIndex: 1, fontWeight: 700 }}
+          style={{ position: "absolute", top: 8, right: 12, background: "none", border: "none", color: "var(--yellow, #ffd23e)", fontSize: 40, cursor: "pointer", lineHeight: 1, padding: 0, zIndex: 1, fontWeight: 700 }}
         >×</button>
       )}
       {children}
