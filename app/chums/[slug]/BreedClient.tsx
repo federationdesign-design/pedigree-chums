@@ -399,13 +399,6 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={f.img} alt={f.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 6, display: "block" }} />
 
-                    {/* Status dot */}
-                    <div title={f.status ?? "unknown"} style={{
-                      position: "absolute", left: -4, top: -4, width: 14, height: 14,
-                      borderRadius: "50%", border: "2px solid #ffffff", pointerEvents: "none",
-                      background: f.status === "extinct" ? "#d64545" : f.status === "trending" ? "#2e9e5b" : f.status === "endangered" ? "#ff7a3c" : f.status === "in-decline" ? "#ffb02e" : "#4ade80"
-                    }} />
-
                     {/* Info button */}
                     <button
                       onClick={(e) => { e.stopPropagation(); setFrameInfoHover(frameInfoHover === f.id ? null : f.id); }}
@@ -415,7 +408,6 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
                       <div style={{ position: "absolute", left: 0, top: 20, background: "rgba(10,58,87,0.96)", border: "1.5px solid rgba(255,210,62,0.4)", borderRadius: 12, padding: "10px 14px", zIndex: 200, minWidth: 200, maxWidth: 260, boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
                         <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: 13, color: "#ffd23e", margin: "0 0 4px", letterSpacing: "0.05em" }}>{f.name}</p>
                         {f.note && <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 11, color: "#ffffff", margin: 0, lineHeight: 1.5 }}>{f.note}</p>}
-                        <p style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", fontStyle: "italic" }}>Status: {f.status ?? "unknown"}</p>
                         <button onClick={(e) => { e.stopPropagation(); setFrameInfoHover(null); }} style={{ position: "absolute", top: 6, right: 8, background: "none", border: "none", color: "#ffd23e", fontSize: 16, cursor: "pointer" }}>×</button>
                       </div>
                     )}
