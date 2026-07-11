@@ -18,23 +18,22 @@ export default function StepCards() {
     const videos = videoRefs.current.filter(Boolean) as HTMLVideoElement[];
     if (!videos.length) return;
 
-    const midpoint = window.innerHeight / 2;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const v = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
 
-    const check = () => {
-      videos.forEach((v) => {
-        const rect = v.getBoundingClientRect();
-        const cardMid = rect.top + rect.height / 2;
-        if (cardMid < midpoint && cardMid > 0) {
-          if (v.paused) v.play().catch(() => {});
-        } else {
-          if (!v.paused) { v.pause(); }
-        }
-      });
-    };
-
-    window.addEventListener("scroll", check, { passive: true });
-    check(); // run once on mount
-    return () => window.removeEventListener("scroll", check);
+    videos.forEach((v) => observer.observe(v));
+    return () => observer.disconnect();
   }, []);
 
   return (
