@@ -31,7 +31,7 @@ export default function GelertPage() {
 
         {/* Hero image */}
         <div className={styles.essayHero}>
-          <img src="/Irish Wolfhound-square.jpg" alt="Irish Wolfhound" className={styles.essayHeroImg} />
+          <img src="/gelert-painting.jpg" alt="Gelert" className={styles.essayHeroImg} />
         </div>
 
         <div className={styles.essayLayout}>
