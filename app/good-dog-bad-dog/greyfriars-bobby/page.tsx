@@ -28,10 +28,10 @@ export default function GreyfriarsBobbyPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <img src="/greyfryers-bobby.jpg" alt="Greyfriars Bobby" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagReal}`}>Real dog</span>
               <span className={styles.tagBreed}>Skye Terrier</span>

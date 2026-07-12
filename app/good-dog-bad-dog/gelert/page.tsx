@@ -28,10 +28,10 @@ export default function GelertPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <img src="/gelert-painting.jpg" alt="Gelert" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagMisjudged}`}>Misjudged dog</span>
               <span className={styles.tagBreed}>Irish Wolfhound</span>
