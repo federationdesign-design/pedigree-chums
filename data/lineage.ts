@@ -515,7 +515,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The smallest of the old land spaniels, bred to flush, or 'cock', woodcock from cover. For years Cockers and Springers were born in the very same litters, sorted only by working size.",
     children: [
       { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel.jpg", value: 25 },
+      { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel-photo.jpg", value: 25 },
       { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 20 }
     ]
   },

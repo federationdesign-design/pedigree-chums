@@ -390,7 +390,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
                 <div
                   style={{
                     width: 77, height: 77, borderRadius: 10,
-                    border: "4px solid #22c55e",
+                    border: `4px solid ${f.status === "extinct" ? "#ef4444" : f.status === "endangered" || f.status === "in-decline" ? "#f97316" : "#22c55e"}`,
                     background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative", overflow: "visible",
                   }}
