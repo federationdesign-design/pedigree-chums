@@ -7,13 +7,13 @@ import styles from "./Nav.module.css";
 const links = [
   { label: "Home", href: "/home" },
   { label: "About", href: "/about" },
-  { label: "Know Your Chums", href: "/know-your-chums" },
-  { label: "Chum Calculator", href: "/chum-calculator" },
-  { label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog" },
   { label: "Britain's Dog History", href: "/britains-dog-history" },
+  { label: "Know Your Chums", href: "/know-your-chums" },
   { label: "Hot/Dogs", href: "/hot-dogs" },
   { label: "Competitions", href: "/chumspot" },
+  { label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog" },
   { label: "Chum Drop", href: "/" },
+  { label: "Chum Calculator", href: "/chum-calculator" },
 ];
 
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean }) {
