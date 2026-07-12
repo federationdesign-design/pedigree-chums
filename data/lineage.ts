@@ -175,28 +175,28 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       {
         name: "St John's Water Dog",
-        note: "The earlier dog it all grew from: the fishermen's water dog of Newfoundland, brought to Britain and bred up from there.",
+        note: "The earlier dog it all grew from: the fishermen's water dog of Newfoundland, brought to Britain and bred up from there. Now extinct.",
         img: "/history/breeds/St-Johns-Water-Dog.jpg",
         children: [
           { name: "Fishermen's water dogs", note: "The working water dogs the European fishing crews brought across the Atlantic.", img: "/history/breeds/Fishermens-water-dogs.jpg", value: 34 },
-          { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
+          { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed. Now extinct.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
         ]
       },
       {
         name: "British Pointers",
-        note: "Crossed in by British breeders for nose and a steady, focused drive in the field.",
+        note: "Crossed in by British breeders for nose and a steady, focused drive in the field. Now in-decline.",
         img: "/history/breeds/british-pointers.jpg",
         value: 17
       },
       {
         name: "British Setters",
-        note: "Added biddability and a love of working close with people on the shoot.",
+        note: "Added biddability and a love of working close with people on the shoot. Now in-decline.",
         img: "/history/breeds/british-setters.jpg",
         value: 15
       },
       {
         name: "Water spaniels",
-        note: "A touch of spaniel for a soft mouth and real keenness in water and cover.",
+        note: "A touch of spaniel for a soft mouth and real keenness in water and cover. Now extinct.",
         img: "/history/breeds/Water-spaniels.jpg",
         value: 13
       }
@@ -212,8 +212,8 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The base type, and where the name comes from: a sharp German farm and ratting dog.",
         img: "/history/breeds/working-German-Pinscher.jpg",
         children: [
-          { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 22 },
-          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region.", img: "/history/breeds/Schnauzer-type-farm-dogs.jpg", value: 16 }
+          { name: "Old German ratting terriers", note: "Quick vermin dogs of the German farms. Now extinct.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 22 },
+          { name: "Schnauzer-type farm dogs", note: "Wiry, all-round working dogs of the same region. Now extinct.", img: "/history/breeds/Schnauzer-type-farm-dogs.jpg", value: 16 }
         ]
       },
       {
@@ -221,8 +221,8 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "Brought bone, substance and a steady guarding drive.",
         img: "/Rottweiler-square.jpg",
         children: [
-          { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north.", img: "/history/breeds/Roman-drover-dog.jpg", value: 17 },
-          { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil.",  img: "/history/breeds/Local-German-cattle-dogs.jpg", value: 10 }
+          { name: "Roman drover dogs", note: "Molosser cattle dogs left behind as the Roman legions moved north. Now extinct.", img: "/history/breeds/Roman-drover-dog.jpg", value: 17 },
+          { name: "Local German cattle dogs", note: "The butchers' dogs of the town of Rottweil. Now extinct.",  img: "/history/breeds/Local-German-cattle-dogs.jpg", value: 10 }
         ]
       },
       {
@@ -364,7 +364,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bedlington Terrier", note: "Shares the same old Border terrier stock and a common working ancestor.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 34 },
       { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 33 },
-      { name: "Old fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 33 }
+      { name: "Old fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 33 }
     ]
   },
 
@@ -375,31 +375,31 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       {
         name: "Brabant Bullenbeisser",
-        note: "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor.",
+        note: "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor. Now extinct.",
         img: "/brabant-bullenbeisser.jpg",
         value: 75,
         children: [
           {
             name: "German Bullenbeisser types",
-            note: "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound.",
+            note: "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound. Now extinct.",
             img: "/history/breeds/Old-German-boarhounds.jpg",
             value: 65,
             children: [
               {
                 name: "Medieval Alaunts and catch dogs",
-                note: "European catch dogs descended from dogs brought west by the Alans and other steppe peoples in the early medieval period. Bred across the continent for size, grip and courage in the hunt and in war.",
+                note: "European catch dogs descended from dogs brought west by the Alans and other steppe peoples in the early medieval period. Bred across the continent for size, grip and courage in the hunt and in war. Now extinct.",
                 img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg",
                 value: 60,
                 children: [
                   {
                     name: "Ancient Molossers",
-                    note: "The great war and guard dogs of the ancient world, kept by Assyrians, Greeks and Romans. Root stock of nearly every large holding and fighting dog in Europe and western Asia.",
+                    note: "The great war and guard dogs of the ancient world, kept by Assyrians, Greeks and Romans. Root stock of nearly every large holding and fighting dog in Europe and western Asia. Now extinct.",
                     img: "/history/breeds/Ancient-Molossers.jpg",
                     value: 70,
                   },
                   {
                     name: "Early Germanic hunting dogs",
-                    note: "Local Germanic stock crossed into the Alaunt lines as they spread through the Holy Roman Empire, adding regional hardiness to the heavy catch-dog base.",
+                    note: "Local Germanic stock crossed into the Alaunt lines as they spread through the Holy Roman Empire, adding regional hardiness to the heavy catch-dog base. Now extinct.",
                     img: "/history/breeds/Old-German-boarhounds.jpg",
                     value: 30,
                   },
@@ -407,7 +407,7 @@ const LINEAGE: Record<string, LineageNode> = {
               },
               {
                 name: "Old German farm guards",
-                note: "Heavy-boned German estate and farm dogs that contributed size and territorial drive to the Bullenbeisser lines.",
+                note: "Heavy-boned German estate and farm dogs that contributed size and territorial drive to the Bullenbeisser lines. Now extinct.",
                 img: "/history/breeds/Old-German-farm-guards.jpg",
                 value: 35,
               },
@@ -417,7 +417,7 @@ const LINEAGE: Record<string, LineageNode> = {
       },
       {
         name: "Old English Bulldog",
-        note: "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the early Boxer to further shorten the muzzle and soften temperament.",
+        note: "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the early Boxer to further shorten the muzzle and soften temperament. Now extinct.",
         img: "/history/breeds/Old-English-Bulldog.jpg",
         value: 25,
         children: [
@@ -429,7 +429,7 @@ const LINEAGE: Record<string, LineageNode> = {
           },
           {
             name: "Ancient Molossers",
-            note: "The common deep ancestor of all Mastiff-type dogs across Europe.",
+            note: "The common deep ancestor of all Mastiff-type dogs across Europe. Now extinct.",
             img: "/history/breeds/Ancient-Molossers.jpg",
             value: 40,
           },
@@ -442,7 +442,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bulldog",
     note: "Once a fierce bull-baiting dog, then bred into the gentle, wrinkly companion we know after blood sports were banned in 1835.",
     children: [
-      { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 60 },
+      { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 60 },
       { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
       { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 15 }
     ]
@@ -464,7 +464,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.", img: "/history/breeds/Northern-Spitz-landraces.jpg",  value: 40 },
       { name: "Cardigan Welsh Corgi", note: "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.", img: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", value: 35 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 }
     ]
   },
 
@@ -483,9 +483,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Border Collie",
     note: "Widely called the cleverest dog of all, bred purely for the work of gathering and moving sheep on the hills.",
     children: [
-      { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 50 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 },
-      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 25 }
+      { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 50 },
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 },
+      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country. Now extinct.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 25 }
     ]
   },
 
@@ -506,7 +506,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Fox Terrier", note: "The old white-bodied fox-working terriers that are the breed's direct foundation.", img: "/history/breeds/fox_terrier-img.jpg", value: 55 },
       { name: "Old English White Terrier", note: "A now-extinct terrier behind the mostly white coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 30 },
-      { name: "Working hunt terriers", note: "Hardy local terriers kept for going to ground after fox.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 15 }
+      { name: "Working hunt terriers", note: "Hardy local terriers kept for going to ground after fox. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 15 }
     ]
   },
 
@@ -514,7 +514,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cocker Spaniel",
     note: "The smallest of the old land spaniels, bred to flush, or 'cock', woodcock from cover. For years Cockers and Springers were born in the very same litters, sorted only by working size.",
     children: [
-      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
       { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel-photo.jpg", value: 25 },
       { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 20 }
     ]
@@ -525,7 +525,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
     children: [
       { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/Norfolk-Spaniel.jpg", value: 45 },
-      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover.", img: "/history/breeds/original-water-spaniel.jpg", value: 30 },
+      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 30 },
       { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
     ]
   },
@@ -534,8 +534,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Skye Terrier",
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
     children: [
-      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
+      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
+      { name: "Skye terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
     ]
   },
 
@@ -543,8 +543,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Scottish Terrier",
     note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
     children: [
-      { name: "Old Highland terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye terrier stock", note: "The long-coated island terriers from the same rootstock.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
+      { name: "Old Highland terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
+      { name: "Skye terrier stock", note: "The long-coated island terriers from the same rootstock. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
     ]
   },
 
@@ -552,8 +552,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Dandie Dinmont Terrier",
     note: "A long-bodied terrier of the Anglo-Scottish border with a soft topknot, named after a character in a Walter Scott novel.",
     children: [
-      { name: "Old Border terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone.", img: "/history/breeds/Old-Border-terriers.jpg", value: 65 },
-      { name: "Skye terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
+      { name: "Old Border terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone. Now extinct.", img: "/history/breeds/Old-Border-terriers.jpg", value: 65 },
+      { name: "Skye terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
       { name: "Otterhound", note: "A little hound blood is thought to have added size and the soft coat.", img: "/history/breeds/otterhound-photo.jpg", value: 15 }
     ]
   },
@@ -562,8 +562,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Black and Tan Terrier",
     note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
-      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 60 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 60 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
 
@@ -580,7 +580,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bedlington Terrier",
     note: "A lithe, lamb-like terrier from the Northumberland mining country, once called the Rothbury or Rodbury Terrier and prized by poachers.",
     children: [
-      { name: "Old Border terriers", note: "The local working terriers of the Rothbury and border country.", img: "/history/breeds/Old-Border-terriers.jpg", value: 50 },
+      { name: "Old Border terriers", note: "The local working terriers of the Rothbury and border country. Now extinct.", img: "/history/breeds/Old-Border-terriers.jpg", value: 50 },
       { name: "Whippet", note: "Brought in for speed and the arched, racy back.", img: "/history/breeds/whippet-photo.jpg", value: 30 },
       { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 20 }
     ]
@@ -591,7 +591,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A wiry black-and-tan terrier from Wales, bred to face fox, otter and badger underground.",
     children: [
       { name: "Old English Black and Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 75 },
-      { name: "Old fell terriers", note: "Hardy broken-coated working terriers of the hills.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 25 }
+      { name: "Old fell terriers", note: "Hardy broken-coated working terriers of the hills. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 25 }
     ]
   },
 
@@ -600,7 +600,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Ireland's blue-coated all-rounder from County Kerry, a farm dog, herder, hunter and fighter rolled into one.",
     children: [
       { name: "Soft-Coated Wheaten Terrier", note: "The older native Irish terrier widely held to be its parent.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
-      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 }
+      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 }
     ]
   },
 
@@ -628,7 +628,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 35 },
       { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
-      { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
+      { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
     ]
   },
 
@@ -636,8 +636,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cairn Terrier",
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
-      { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
-      { name: "Highland mainland terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie.", img: "/history/breeds/Highland-mainland-terriers.jpg", value: 45 }
+      { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
+      { name: "Highland mainland terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Highland-mainland-terriers.jpg", value: 45 }
     ]
   },
 
@@ -645,10 +645,10 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lakeland Terrier",
     note: "A fell terrier from the Lake District, bred to follow fox over the crags and go to ground without flinching.",
     children: [
-      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 30 },
-      { name: "Old wirehaired fell terriers", note: "The wiry-coated strain of fell terrier behind its broken jacket.", img: "/history/breeds/Old-wirehaired-fell-terrier.jpg", value: 20 },
+      { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 30 },
+      { name: "Old wirehaired fell terriers", note: "The wiry-coated strain of fell terrier behind its broken jacket. Now extinct.", img: "/history/breeds/Old-wirehaired-fell-terrier.jpg", value: 20 },
       { name: "Bedlington Terrier", note: "A near neighbour that lent coat and line.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 25 },
-      { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
+      { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
     ]
   },
 
@@ -676,8 +676,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Paisley Terrier",
     note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
     children: [
-      { name: "Skye terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 65 },
-      { name: "Old Highland terriers", note: "The working Scottish terriers behind the silky Clydeside strains.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 35 }
+      { name: "Skye terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 65 },
+      { name: "Old Highland terriers", note: "The working Scottish terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 35 }
     ]
   },
 
@@ -685,7 +685,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Terrier",
     note: "The 'daredevil' of Ireland, a fiery red terrier and one of the four native Irish terrier breeds.",
     children: [
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
       { name: "Old English Black and Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 40 }
     ]
   },
@@ -694,7 +694,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Soft-Coated Wheaten Terrier",
     note: "The oldest of Ireland's four native terriers, a soft-coated all-purpose farm dog, and the likely parent of the Kerry Blue and Irish Terrier.",
     children: [
-      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers.", img: "/history/breeds/irish-terrier-photo.jpg", value: 100 }
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 100 }
     ]
   },
 
@@ -702,8 +702,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Glen of Imaal Terrier",
     note: "A low, powerful terrier from a remote Wicklow valley, one of the four native Irish terriers and quiet for its kind.",
     children: [
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
-      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 40 }
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
+      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 40 }
     ]
   },
 
@@ -713,7 +713,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Irish Terrier", note: "Small red Irish terriers in the early Trumpington stock.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 },
       { name: "Yorkshire Terrier", note: "A bigger silky terrier said to be in the early mix.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 30 },
-      { name: "Local red ratting terriers", note: "The small working terriers of Norfolk farms and gypsy ratters.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
+      { name: "Local red ratting terriers", note: "The small working terriers of Norfolk farms and gypsy ratters. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
     ]
   },
 
@@ -721,7 +721,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Patterdale Terrier",
     note: "A tough, no-nonsense black fell terrier from the Lake District, bred purely to work fox and not for the show ring.",
     children: [
-      { name: "Old fell terriers", note: "The black-and-tan working terriers of the northern fells.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 60 },
+      { name: "Old fell terriers", note: "The black-and-tan working terriers of the northern fells. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 60 },
       { name: "Border Terrier", note: "A close fell neighbour from the same hill stock.", img: "/history/breeds/border-terrier-photo.jpg", value: 25 },
       { name: "Bedlington Terrier", note: "A dash of Bedlington in some northern lines.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 15 }
     ]
@@ -750,8 +750,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Tweed Water Spaniel",
     note: "An extinct liver-brown water dog from the Scottish Borders and the Tweed valley, famous as a key ancestor of the Golden and Curly-Coated Retrievers.",
     children: [
-      { name: "Water spaniels", note: "The local rough-coated water dogs of the Border rivers.", img: "/history/breeds/original-water-spaniel.jpg", value: 55 },
-      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 45 }
+      { name: "Water spaniels", note: "The local rough-coated water dogs of the Border rivers. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 55 },
+      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood that added retrieving power. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 45 }
     ]
   },
 
@@ -760,7 +760,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Not a breed but a type: a sighthound crossed with a working dog, long the poacher's and traveller's companion, fast and quiet.",
     children: [
       { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
-      { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 30 },
+      { name: "Collie or working dog", note: "Herding or pastoral blood for brains and biddability. Now extinct.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 30 },
       { name: "Old English Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 20 }
     ]
   },
@@ -771,7 +771,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Greyhound", note: "The foundation of nearly every running dog.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
       { name: "Whippet", note: "Added for nimble, sprinting pace.", img: "/history/breeds/whippet-photo.jpg", value: 25 },
-      { name: "Deerhound", note: "Bigger sighthound blood for stamina over rough ground.", img: "/history/breeds/Medieval-Scottish-Deerhound.jpg", value: 25 }
+      { name: "Deerhound", note: "Bigger sighthound blood for stamina over rough ground. Now endangered.", img: "/history/breeds/Medieval-Scottish-Deerhound.jpg", value: 25 }
     ]
   },
 
@@ -779,8 +779,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Welsh Springer Spaniel",
     note: "An old red-and-white Welsh gundog, known for generations as the Welsh Cocker before becoming the Welsh Springer in 1902.",
     children: [
-      { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales.", img: "/history/breeds/Old-Welsh-land-spaniels.jpg", value: 60 },
-      { name: "Land spaniels", note: "The larger flushing spaniels of the same family.", img: "/history/breeds/original-land-spaniel.jpg", value: 40 }
+      { name: "Old Welsh land spaniels", note: "The native red-and-white working spaniels of Wales. Now extinct.", img: "/history/breeds/Old-Welsh-land-spaniels.jpg", value: 60 },
+      { name: "Land spaniels", note: "The larger flushing spaniels of the same family. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 40 }
     ]
   },
 
@@ -788,7 +788,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Field Spaniel",
     note: "A long, low black spaniel bred up in Victorian show rings from the larger cocking spaniels, once nearly ruined by exaggeration.",
     children: [
-      { name: "Land spaniels", note: "The old land-spaniel stock at its foundation.", img: "/history/breeds/original-land-spaniel.jpg", value: 45 },
+      { name: "Land spaniels", note: "The old land-spaniel stock at its foundation. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 45 },
       { name: "Sussex Spaniel", note: "Lent weight, bone and a longer body.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 35 },
       { name: "Clumber Spaniel", note: "Heavier spaniel blood for substance.", img: "/history/breeds/clumber-spaniel-photo.jpg", value: 20 }
     ]
@@ -798,8 +798,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Sussex Spaniel",
     note: "An old, short-legged, golden-liver spaniel from the county of Sussex, bred to work slowly and give tongue in dense cover.",
     children: [
-      { name: "Land spaniels", note: "The native working spaniels of southern England.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
-      { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build.", img: "/history/breeds/heavier-working-spaniel.jpg", value: 40 }
+      { name: "Land spaniels", note: "The native working spaniels of southern England. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
+      { name: "Heavier working spaniels", note: "Lower, stouter spaniels that fixed its build. Now extinct.", img: "/history/breeds/heavier-working-spaniel.jpg", value: 40 }
     ]
   },
 
@@ -807,8 +807,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Norfolk Spaniel",
     note: "An extinct liver-and-white springer-type spaniel, the Victorian forerunner of the English Springer, rolled into that breed in 1903.",
     children: [
-      { name: "Land spaniels", note: "The old springing land-spaniel stock at its core.", img: "/history/breeds/original-land-spaniel.jpg", value: 65 },
-      { name: "Water spaniels", note: "Water-spaniel blood for the liver colour and a keenness in wet cover.", img: "/history/breeds/original-water-spaniel.jpg", value: 35 }
+      { name: "Land spaniels", note: "The old springing land-spaniel stock at its core. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 65 },
+      { name: "Water spaniels", note: "Water-spaniel blood for the liver colour and a keenness in wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 35 }
     ]
   },
 
@@ -825,8 +825,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Water Spaniel",
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
     children: [
-      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
-      { name: "Poodle and Barbet water dogs", note: "Continental curly water dogs that shaped the coat.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
+      { name: "Poodle and Barbet water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -835,7 +835,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The gamekeeper's night dog, built in Victorian England to track and pin poachers without mauling them. Mostly Mastiff, with Bulldog for grip.",
     children: [
       { name: "English Mastiff", note: "The larger share, for size, scent and a steady nerve.", img: "/history/breeds/english-mastiff-photo.jpg", value: 60 },
-      { name: "Old English Bulldog", note: "Bulldog drive and a tenacious grip.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 40 }
+      { name: "Old English Bulldog", note: "Bulldog drive and a tenacious grip. Now extinct.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 40 }
     ]
   },
 
@@ -844,7 +844,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "One of the oldest retrievers, a tall water dog covered in tight curls, the gamekeeper's and poacher's choice for wildfowl.",
     children: [
       { name: "English Water Spaniel", note: "The extinct native water spaniel at its core.", img: "/history/breeds/original-water-spaniel.jpg", value: 35 },
-      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood for retrieving.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 30 },
+      { name: "St John's Water Dog", note: "Newfoundland fishing-dog blood for retrieving. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 30 },
       { name: "Irish Water Spaniel", note: "Its closest relative, sharing the curly water-dog coat.", img: "/history/breeds/irish-water-spaniel.jpg", value: 20 },
       { name: "Poodle", note: "A later touch, often credited for the tight curls.", img: "/poodle-square.jpg", value: 15 }
     ]
@@ -854,9 +854,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Flat-Coated Retriever",
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
-      { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
-      { name: "Setter", note: "Setter blood for feathering and a good nose.", img: "/history/breeds/british-setters.jpg", value: 30 },
-      { name: "Water spaniel and Collie", note: "A little water-spaniel and collie for coat and brains.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
+      { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
+      { name: "Setter", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
+      { name: "Water spaniel and Collie", note: "A little water-spaniel and collie for coat and brains. Now extinct.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
     ]
   },
 
@@ -864,8 +864,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rough Collie",
     note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
-      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family.",  img: "/history/breeds/bearded-collie-photo.jpg", value: 35 }
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
+      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family. Now extinct.",  img: "/history/breeds/bearded-collie-photo.jpg", value: 35 }
     ]
   },
 
@@ -873,9 +873,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Gordon Setter",
     note: "Scotland's black-and-tan setter, built up at the Duke of Gordon's kennels into a heavier, steady bird dog.",
     children: [
-      { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/british-setters.jpg", value: 65 },
+      { name: "Old black-and-tan setters", note: "The setting dogs at its foundation. Now extinct.", img: "/history/breeds/british-setters.jpg", value: 65 },
       { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
-      { name: "Collie", note: "A little collie for steadiness, by tradition.",  img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
+      { name: "Collie", note: "A little collie for steadiness, by tradition. Now extinct.",  img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
   },
 
@@ -893,7 +893,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1920s revival of the older, longer-nosed toy spaniel of the Stuart court, bred back from the flat-faced King Charles Spaniel.",
     children: [
       { name: "King Charles Spaniel", note: "The modern flat-faced toy spaniel it was bred back from.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 70 },
-      { name: "Old sporting toy spaniels", note: "The longer-muzzled toy spaniels of older paintings.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
+      { name: "Old sporting toy spaniels", note: "The longer-muzzled toy spaniels of older paintings. Now extinct.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
     ]
   },
 
@@ -910,8 +910,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cumberland Sheepdog",
     note: "An extinct northern working collie of Cumberland and the border hills, a close relative of the Border Collie that was largely absorbed into it.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 60 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 40 }
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 60 },
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 40 }
     ]
   },
 
@@ -919,8 +919,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Toy Bulldog",
     note: "An extinct miniature Bulldog of Victorian England, a small companion bull-type that helped give rise to the French Bulldog.",
     children: [
-      { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
-      { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size.", img: "/history/breeds/pug-type-toy-dog.jpg", value: 35 }
+      { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size. Now extinct.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
+      { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size. Now extinct.", img: "/history/breeds/pug-type-toy-dog.jpg", value: 35 }
     ]
   },
 
@@ -929,7 +929,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A pack of big black-and-tan foxhounds bred in Dumfriesshire after the First World War, kept working until the pack was disbanded in 2001.",
     children: [
       { name: "English Foxhound", note: "The foxhound base for the pack.", img: "/history/breeds/english-foxhound.jpg", value: 50 },
-      { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 50 }
+      { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan. Now in-decline.", img: "/history/breeds/modern-bloodhound.jpg", value: 50 }
     ]
   },
 
@@ -938,7 +938,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A towering ancient hound bred to hunt wolves and guard halls, and one of the tallest dogs in the world.",
     children: [
       { name: "Celtic Hound", note: "The ancient sighthound stock the Celts brought across Europe.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Ancient Molossers", note: "Big mastiff-type blood for the bulk to bring down a wolf.", img: "/history/breeds/Ancient-Molossers.jpg", value: 40 }
+      { name: "Ancient Molossers", note: "Big mastiff-type blood for the bulk to bring down a wolf. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 40 }
     ]
   },
 
@@ -946,8 +946,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
     children: [
-      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
-      { name: "Old British bandogs", note: "The heavy chained guard dogs of early Britain.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
+      { name: "Old British bandogs", note: "The heavy chained guard dogs of early Britain. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
 
@@ -956,7 +956,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The fastest of all dogs, a sighthound that has hunted in Britain since antiquity.",
     children: [
       { name: "Celtic Hound", note: "The old running hounds the Celts brought west.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 40 }
+      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 40 }
     ]
   },
 
@@ -974,7 +974,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
       { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
 
@@ -992,7 +992,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A tall, rough-coated sighthound bred to course red deer across the Highlands, close kin to the Irish Wolfhound.",
     children: [
       { name: "Celtic Hound", note: "The ancient sighthound stock of the north.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 40 }
+      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground. Now extinct.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 40 }
     ]
   },
 
@@ -1000,8 +1000,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Celtic Hound",
     note: "An ancient running hound of the Celts, the deep root behind the Greyhound, Wolfhound and Deerhound.",
     children: [
-      { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of Egypt and the Near East.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 }
+      { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of Egypt and the Near East. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 }
     ]
   },
 
@@ -1037,7 +1037,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
     children: [
       { name: "Mastiff and Alaunt war dogs", note: "The big Molossers and the extinct Alaunt that gave it bulk and a broad jaw.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 60 },
-      { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
 
@@ -1057,7 +1057,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 },
       { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
-      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 25 }
+      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work. Now extinct.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 25 }
     ]
   },
 
@@ -1065,8 +1065,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Turnspit Dog",
     note: "An extinct, short-legged kitchen dog bred to trot inside a wheel and turn the roasting spit over the fire.",
     children: [
-      { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it.", img: "/history/breeds/Old-short-legged-working-dogs.jpg", value: 60 },
-      { name: "Farm and kitchen curs", note: "The everyday kitchen curs and household mongrels it was bred down from.", img: "/history/breeds/Farm-and-kitchen-curs.jpg", value: 40 }
+      { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it. Now extinct.", img: "/history/breeds/Old-short-legged-working-dogs.jpg", value: 60 },
+      { name: "Farm and kitchen curs", note: "The everyday kitchen curs and household mongrels it was bred down from. Now extinct.", img: "/history/breeds/Farm-and-kitchen-curs.jpg", value: 40 }
     ]
   },
 
@@ -1095,7 +1095,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
     children: [
       { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
 
@@ -1104,7 +1104,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A big, shaggy, bobtailed drover's dog of the west country, bred to drive sheep and cattle to market.",
     children: [
       { name: "Bearded Collie", note: "The shaggy Scottish herder in its make-up.", img: "/history/breeds/bearded-collie-photo.jpg", value: 55 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
 
@@ -1112,8 +1112,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "King Charles Spaniel",
     note: "The flat-faced toy spaniel of the Stuart court, a lapdog favourite long before its longer-nosed Cavalier cousin.",
     children: [
-      { name: "Old toy spaniels", note: "The small sporting and lap spaniels of Tudor and Stuart England.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 60 },
-      { name: "Asian flat-faced toys", note: "Pug and oriental toy blood that shortened the muzzle.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 40 }
+      { name: "Old toy spaniels", note: "The small sporting and lap spaniels of Tudor and Stuart England. Now extinct.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 60 },
+      { name: "Asian flat-faced toys", note: "Pug and oriental toy blood that shortened the muzzle. Now extinct.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 40 }
     ]
   },
 
@@ -1124,7 +1124,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 25 },
-      { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/british-setters.jpg", value: 20 }
+      { name: "Setter", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
 
@@ -1132,9 +1132,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Setter",
     note: "An elegant, feathered bird dog that 'sets', crouching low when it scents game, built up from the old setting spaniels.",
     children: [
-      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/old-setting-spaniels.jpg", value: 50 },
+      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net. Now extinct.", img: "/history/breeds/old-setting-spaniels.jpg", value: 50 },
       { name: "Pointer", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/british-pointers.jpg", value: 30 },
-      { name: "Water spaniels", note: "A little water-spaniel for coat and biddability.", img: "/history/breeds/original-water-spaniel.jpg", value: 20 }
+      { name: "Water spaniels", note: "A little water-spaniel for coat and biddability. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 20 }
     ]
   },
 
@@ -1142,8 +1142,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Clumber Spaniel",
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
     children: [
-      { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
+      { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
+      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
     ]
   },
 
@@ -1151,8 +1151,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cur",
     note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 55 },
-      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
+      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 55 },
+      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
     ]
   },
 
@@ -1167,10 +1167,10 @@ const LINEAGE: Record<string, LineageNode> = {
 
   "Old Welsh Grey Sheepdog": {
     name: "Old Welsh Grey Sheepdog",
-    note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost.",
+    note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost. Now extinct.",
     children: [
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 60 },
-      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 40 }
+      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 60 },
+      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 40 }
     ]
   },
 
@@ -1178,8 +1178,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Maltese",
     note: "An ancient white lapdog of the Mediterranean, a favourite of Roman ladies and prized for over two thousand years.",
     children: [
-      { name: "Ancient Spitz-type dogs", note: "The small spitz-type dogs many historians see as its oldest ancestors, bred down in size over centuries.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg",  value: 55 },
-      { name: "Mediterranean bichon lapdogs", note: "The old white bichon-family lapdogs spread around the Mediterranean by ancient traders.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 45 }
+      { name: "Ancient Spitz-type dogs", note: "The small spitz-type dogs many historians see as its oldest ancestors, bred down in size over centuries. Now extinct.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg",  value: 55 },
+      { name: "Mediterranean bichon lapdogs", note: "The old white bichon-family lapdogs spread around the Mediterranean by ancient traders. Now extinct.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 45 }
     ]
   },
 
@@ -1188,7 +1188,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
     children: [
       { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
-      { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 50 }
+      { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family. Now extinct.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 50 }
     ]
   },
 
@@ -1196,8 +1196,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Poodle",
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
     children: [
-      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
-      { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 45 }
+      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
+      { name: "Barbet and water spaniels", note: "The curly-coated Barbet, the old water dog at the root of the whole poodle and bichon family. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1205,17 +1205,17 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pug",
     note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
     children: [
-      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
-      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
+      { name: "Eastern lion and lap dogs", note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
     ]
   },
   "Great Dane": {
     name: "Great Dane",
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
     children: [
-      { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 50 },
+      { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front. Now extinct.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 50 },
       { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 30 },
-      { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }
+      { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed. Now extinct.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }
     ]
   },
   "Saint Bernard": {
@@ -1223,16 +1223,16 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The Alpine rescue dog of the Great St Bernard hospice, grown from Roman farm mastiffs and later thickened with Newfoundland blood.",
     children: [
       { name: "Alpine mastiff farm dogs", note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.", img: "/history/breeds/Alpine-mastiff-farm-dogs.jpg", value: 55 },
-      { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 25 },
-      { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to.", img: "/history/breeds/Ancient-Molossers.jpg", value: 20 }
+      { name: "Newfoundland landrace dogs", note: "Crossed in during the 1800s after hard winters thinned the hospice line, adding size and coat. Now extinct.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 25 },
+      { name: "Ancient Molossers", note: "The old war dog root every European mastiff traces back to. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 20 }
     ]
   },
   "Afghan Hound": {
     name: "Afghan Hound",
     note: "An ancient sighthound from the mountains of Afghanistan, coated long against the cold, one of the oldest coursing lines there is.",
     children: [
-      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old Silk Road, its deepest root.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 65 },
-      { name: "Mountain coursing hounds", note: "The high altitude hunting dogs that gave it the heavy coat and big feet for rough ground.", img: "/history/breeds/Mountain-coursing-hounds.jpg", value: 35 }
+      { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old Silk Road, its deepest root. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 65 },
+      { name: "Mountain coursing hounds", note: "The high altitude hunting dogs that gave it the heavy coat and big feet for rough ground. Now extinct.", img: "/history/breeds/Mountain-coursing-hounds.jpg", value: 35 }
     ]
   },
   "Weimaraner": {
@@ -1241,7 +1241,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 },
       { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/british-pointers.jpg", value: 40 },
-      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 20 }
+      { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type. Now extinct.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 20 }
     ]
   },
   "Dalmatian": {
@@ -1250,15 +1250,15 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Ancient spotted hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
       { name: "Pointer", note: "Pointing and hound blood that shaped its build and steady working head.", img: "/history/breeds/british-pointers.jpg", value: 30 },
-      { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for.", img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg", value: 15 }
+      { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for. Now extinct.", img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg", value: 15 }
     ]
   },
   "Rottweiler": {
     name: "Rottweiler",
     note: "The butcher's dog of Rottweil, descended from the drover mastiffs the Roman legions marched over the Alps.",
     children: [
-      { name: "Ancient Molossers", note: "The Roman drover and war mastiffs left in the region, the breed's deepest root.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
-      { name: "Local German cattle dogs", note: "The herding farm dogs of the Wurttemberg valleys it was crossed with to make a steady drover.", img: "/history/breeds/Local-German-cattle-dogs.jpg", value: 40 }
+      { name: "Ancient Molossers", note: "The Roman drover and war mastiffs left in the region, the breed's deepest root. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
+      { name: "Local German cattle dogs", note: "The herding farm dogs of the Wurttemberg valleys it was crossed with to make a steady drover. Now extinct.", img: "/history/breeds/Local-German-cattle-dogs.jpg", value: 40 }
     ]
   },
   "Basset Hound": {
@@ -1266,15 +1266,15 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A low set French scenthound bred short in the leg on purpose, so hunters could keep up with it on foot.",
     children: [
       { name: "Bloodhound", note: "The St Hubert scent trailing line behind its nose, long ears and deep voice.", img: "/history/breeds/modern-bloodhound.jpg", value: 55 },
-      { name: "Basset Artesien Normand", note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset.", img: "/history/breeds/Basset-Artesien-Normand.jpg", value: 45 }
+      { name: "Basset Artesien Normand", note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset. Now endangered.", img: "/history/breeds/Basset-Artesien-Normand.jpg", value: 45 }
     ]
   },
   "Italian Greyhound": {
     name: "Italian Greyhound",
     note: "A sighthound shrunk to a lapdog in ancient Italy, all the speed in miniature, kept for warmth and company.",
     children: [
-      { name: "Ancient eastern sighthounds", note: "The desert coursing hounds of Egypt and the Near East, the Saluki-like deep root found mummified in the pharaohs' tombs.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
-      { name: "Mediterranean miniature sighthounds", note: "The small coursing dogs bred down as companions across Greece, Rome and Renaissance Italy.", img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg", value: 45 }
+      { name: "Ancient eastern sighthounds", note: "The desert coursing hounds of Egypt and the Near East, the Saluki-like deep root found mummified in the pharaohs' tombs. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
+      { name: "Mediterranean miniature sighthounds", note: "The small coursing dogs bred down as companions across Greece, Rome and Renaissance Italy. Now extinct.", img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg", value: 45 }
     ]
   },
   "Papillon": {
@@ -1282,7 +1282,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The butterfly dog, a tiny continental spaniel with winged ears, a fixture of European courts for 700 years.",
     children: [
       { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance.", img: "/history/breeds/Continental-toy-spaniels.jpg", value: 70 },
-      { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 30 }
+      { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds. Now extinct.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 30 }
     ]
   },
   "Siberian Husky": {
@@ -1290,7 +1290,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The sled dog of the Chukchi people of north east Siberia, bred to pull light loads vast distances in brutal cold.",
     children: [
       { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them.", img: "/history/breeds/Chukchi-sled-dogs.jpg", value: 75 },
-      { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 25 }
+      { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 25 }
     ]
   },
   "Shih Tzu": {
@@ -1298,7 +1298,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The lion dog of the Chinese imperial court, made by crossing Tibetan holy dogs with the palace's own toys.",
     children: [
       { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 55 },
-      { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 45 }
+      { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 45 }
     ]
   },
   "Miniature Schnauzer": {
@@ -1306,7 +1306,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A small German farm ratter, the standard schnauzer shrunk with toy blood into a sharp little vermin dog.",
     children: [
       { name: "Standard Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 60 },
-      { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
+      { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down. Now endangered.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
       { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, obedient temperament.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 15 }
     ]
   },
@@ -1315,7 +1315,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A spitz shrunk to a toy in the Pomerania region, descended from big Arctic sled and herding dogs.",
     children: [
       { name: "Arctic sled spitz", note: "The large Nordic sled, hunting and herding spitz of Iceland and Lapland, the breed's deep northern root.", img: "/history/breeds/Ancient-Arctic-spitz.jpg", value: 55 },
-      { name: "German farm spitz", note: "The Wolfspitz and mid-size German Spitz guard strains of the Pomerania region it was bred straight down from.", img: "/history/breeds/Continental-European-farm-watch-spitz.jpg", value: 45 }
+      { name: "German farm spitz", note: "The Wolfspitz and mid-size German Spitz guard strains of the Pomerania region it was bred straight down from. Now extinct.", img: "/history/breeds/Continental-European-farm-watch-spitz.jpg", value: 45 }
     ]
   },
   "French Bulldog": {
@@ -1323,7 +1323,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Born when English lacemakers took their little toy bulldogs to France, where Paris fell for the bat eared result.",
     children: [
       { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
-      { name: "Parisian ratters and terriers", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears.", img: "/history/breeds/Parisian-ratters-and-terriers.jpg", value: 35 }
+      { name: "Parisian ratters and terriers", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears. Now extinct.", img: "/history/breeds/Parisian-ratters-and-terriers.jpg", value: 35 }
     ]
   },
   "Chihuahua": {
@@ -1331,7 +1331,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The smallest dog of all, traced to the Techichi companion dogs kept by the peoples of ancient Mexico.",
     children: [
       { name: "Ancient Techichi dogs", note: "The small sacred companion dogs of the Toltec and Aztec, the breed's direct root.", img: "/history/breeds/Ancient-Techichi-dogs.jpg", value: 80 },
-      { name: "Small imported dogs", note: "Tiny dogs brought by later traders, thought to add coat and the bold, terrier like spark.", img: "/history/breeds/small-imported-dogs.jpg", value: 20 }
+      { name: "Small imported dogs", note: "Tiny dogs brought by later traders, thought to add coat and the bold, terrier like spark. Now extinct.", img: "/history/breeds/small-imported-dogs.jpg", value: 20 }
     ]
   },
   "German Shepherd": {
@@ -1339,16 +1339,16 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Standardised from Germany's regional sheep herding dogs into one clever, hard working breed in the 1890s.",
     children: [
       { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", img: "/history/breeds/Thuringian-herding-dogs.jpg", value: 45 },
-      { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head.", img: "/history/breeds/Wurttemberg-sheepdogs.jpg", value: 40 },
-      { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 15 }
+      { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head. Now extinct.", img: "/history/breeds/Wurttemberg-sheepdogs.jpg", value: 40 },
+      { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 15 }
     ]
   },
   "Dachshund": {
     name: "Dachshund",
     note: "The German badger dog, a scenthound bred low and long to follow its quarry straight down into the earth.",
     children: [
-      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 60 },
-      { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
+      { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground. Now extinct.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 60 },
+      { name: "Old earth terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox. Now extinct.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
       { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 15 }
     ]
   },
