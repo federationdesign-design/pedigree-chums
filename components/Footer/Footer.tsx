@@ -6,6 +6,8 @@ const NAV_LINKS = [
   { href: "/home",                label: "Home" },
   { href: "/about",               label: "About" },
   { href: "/know-your-chums",     label: "Know Your Chums" },
+  { href: "/chum-calculator",     label: "Chum Calculator" },
+  { href: "/good-dog-bad-dog",    label: "Good Dog, Bad Dog" },
   { href: "/britains-dog-history", label: "Britain's Dog History" },
   { href: "/hot-dogs",            label: "Hot/Dogs" },
   { href: "/chumspot",            label: "Competitions" },

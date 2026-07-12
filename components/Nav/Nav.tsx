@@ -8,6 +8,8 @@ const links = [
   { label: "Home", href: "/home" },
   { label: "About", href: "/about" },
   { label: "Know Your Chums", href: "/know-your-chums" },
+  { label: "Chum Calculator", href: "/chum-calculator" },
+  { label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog" },
   { label: "Britain's Dog History", href: "/britains-dog-history" },
   { label: "Hot/Dogs", href: "/hot-dogs" },
   { label: "Competitions", href: "/chumspot" },
