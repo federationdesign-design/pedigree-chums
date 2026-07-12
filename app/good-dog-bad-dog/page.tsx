@@ -58,8 +58,7 @@ export default function GoodDogBadDogPage() {
             become shorthand for the role the story needs them to play.
           </p>
           <p className={styles.intro}>
-            This series looks at some of the most famous dogs in stories and legends --
-            and asks what they actually tell us about the real breeds behind the image.
+            This series looks at some of the most famous dog stories and legends and asks what effect this has had on our conceptions of the actual breeds and the effect of that portrayal.
           </p>
         </header>
 

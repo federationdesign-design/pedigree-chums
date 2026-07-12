@@ -275,7 +275,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.7rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: #aac4d4;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -320,11 +320,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.5);
+  color: #aac4d4;
 }
 .cardTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -379,3 +379,60 @@
   transition: color 0.15s ease;
 }
 .backLink:hover { color: #ffffff; }
+
+/* ── Essay two-column layout ────────────────────────────────── */
+.essayLayout {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
+  align-items: start;
+}
+
+.essayHero {
+  max-width: 1300px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+
+.essayHeroImg {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 20px;
+  display: block;
+}
+
+.essayHeroImgFallback {
+  width: 100%;
+  height: 340px;
+  border-radius: 20px;
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 120px;
+}
+
+.sidebarCard {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .essayLayout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+  }
+}
