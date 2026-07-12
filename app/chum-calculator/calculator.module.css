@@ -275,3 +275,61 @@
   padding: 2px 8px;
   backdrop-filter: blur(4px);
 }
+
+/* ── Tiebreaker question style ──────────────────────────────── */
+.qBlockTiebreaker {
+  border-color: rgba(255,210,62,0.3);
+  background: rgba(255,210,62,0.05);
+}
+
+.qBlockTiebreaker .qNum {
+  color: var(--yellow, #ffd23e);
+  font-size: 1.4rem;
+}
+
+/* ── Adaptive banners ───────────────────────────────────────── */
+.adaptiveBanner {
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.adaptiveBanner p {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.adaptiveBanner strong {
+  color: var(--yellow, #ffd23e);
+}
+
+.adaptiveBannerWarn {
+  border-color: rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.08);
+}
+
+.relaxBtn {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.relaxBtn:hover { background: #ffe566; }

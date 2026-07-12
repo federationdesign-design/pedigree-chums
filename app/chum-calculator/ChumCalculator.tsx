@@ -11,12 +11,14 @@ import groomingNeeds from "../../data/groomingNeeds";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
 
-// ── Questions ─────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; options: Option[] };
 
-const QUESTIONS: Question[] = [
+// ── Core 10 questions ─────────────────────────────────────────────────────────
+
+const CORE_QUESTIONS: Question[] = [
   {
     id: "size",
     question: "How big do you want your dog?",
@@ -116,7 +118,50 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// ── Scoring ───────────────────────────────────────────────────────────────────
+// ── Tiebreaker questions (shown when >12 breeds remain) ───────────────────────
+
+const TIEBREAKERS: Question[] = [
+  {
+    id: "tb_type",
+    question: "Are you open to designer crossbreeds?",
+    sub: "Cockapoos, Labradoodles, Cavapoos and similar",
+    options: [
+      { label: "Pedigree breeds only", value: "classic" },
+      { label: "Crossbreeds only", value: "designer" },
+      { label: "Either -- doesn't matter to me", value: "any" },
+    ],
+  },
+  {
+    id: "tb_coat",
+    question: "What kind of coat do you prefer?",
+    options: [
+      { label: "Short and smooth -- minimal coat care", value: "short" },
+      { label: "Medium length", value: "medium" },
+      { label: "Long and flowing -- I love a fluffy dog", value: "long" },
+      { label: "No preference", value: "any" },
+    ],
+  },
+  {
+    id: "tb_professional_groom",
+    question: "Are you happy paying for professional grooming?",
+    options: [
+      { label: "No -- I want to handle all grooming at home", value: "no" },
+      { label: "Occasionally is fine", value: "occasional" },
+      { label: "Yes -- regular salon visits are fine", value: "yes" },
+    ],
+  },
+  {
+    id: "tb_snoring",
+    question: "How do you feel about a dog that snores?",
+    sub: "Flat-faced breeds (pugs, bulldogs, French bulldogs) tend to snore and breathe loudly",
+    options: [
+      { label: "I'd find that annoying -- prefer a longer muzzle", value: "no" },
+      { label: "I don't mind at all", value: "yes" },
+    ],
+  },
+];
+
+// ── Scoring engine ────────────────────────────────────────────────────────────
 
 function scoreBreed(slug: string, answers: Record<string, string>): number {
   let score = 100;
@@ -127,19 +172,23 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   const train = trainingDifficulty[slug];
   const breed = breeds.find((b) => b.slug === slug);
 
-  if (!suit && !ex) return 30; // no data -- keep in list but low score
+  if (!suit && !ex) return 30;
 
+  // Size
   if (answers.size && answers.size !== "any" && breed?.sizeBand) {
     if (breed.sizeBand !== answers.size) score -= 40;
   }
+  // Home
   if (suit && answers.home) {
     if (answers.home === "flat") score += (suit.smallHome - 3) * 12;
     else if (answers.home === "small_garden") score += (suit.smallHome - 3) * 6;
   }
+  // Children
   if (suit && answers.children) {
     if (answers.children === "young") score += (suit.children - 3) * 15;
     else if (answers.children === "older") score += (suit.children - 3) * 8;
   }
+  // Other pets
   if (suit && answers.other_pets) {
     if (answers.other_pets === "dogs") score += (suit.otherDogs - 3) * 10;
     if (answers.other_pets === "cats") score += (suit.cats - 3) * 10;
@@ -148,32 +197,33 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
       score += (suit.cats - 3) * 8;
     }
   }
+  // Alone
   if (suit && answers.alone) {
     const aloneMap: Record<string, number> = { rarely: 5, sometimes: 3, often: 2, lots: 1 };
     const needed = aloneMap[answers.alone] ?? 3;
     const diff = suit.timeAlone - needed;
     score += diff < -1 ? diff * 18 : diff * 6;
   }
+  // Exercise
   if (ex && answers.exercise) {
     const mins = ex.minutesPerDay;
-    if (answers.exercise === "high") {
-      score += mins >= 90 ? 15 : mins >= 60 ? 5 : -10;
-    } else if (answers.exercise === "medium") {
-      score += mins > 100 ? -15 : mins >= 50 && mins <= 90 ? 10 : 2;
-    } else if (answers.exercise === "low") {
-      score += mins > 80 ? -25 : mins <= 40 ? 15 : -5;
-    }
+    if (answers.exercise === "high") score += mins >= 90 ? 15 : mins >= 60 ? 5 : -10;
+    else if (answers.exercise === "medium") score += mins > 100 ? -15 : mins >= 50 && mins <= 90 ? 10 : 2;
+    else if (answers.exercise === "low") score += mins > 80 ? -25 : mins <= 40 ? 15 : -5;
   }
+  // Experience
   if (train && answers.experience) {
     if (answers.experience === "first") score += (3 - train.score) * 12;
     else if (answers.experience === "some") score += (3 - train.score) * 6;
   }
   if (suit && answers.experience === "first") score += (suit.firstTimer - 3) * 10;
+  // Grooming
   if (groom && answers.grooming) {
     const groomMap: Record<string, number> = { low: 30, medium: 60, high: 120 };
     const maxMins = groomMap[answers.grooming] ?? 60;
     score += groom.timePerWeek > maxMins ? -(groom.timePerWeek - maxMins) * 0.4 : 5;
   }
+  // Budget
   if (cost && answers.budget) {
     const annual = cost.annualCosts.food + cost.annualCosts.routineCare +
       cost.annualCosts.dentalAllowance + cost.annualCosts.neuteringAllowance +
@@ -182,52 +232,140 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     const max = budgetMap[answers.budget] ?? 2000;
     score += annual > max ? -(annual - max) * 0.02 : 8;
   }
+  // Shedding
   if (groom && answers.shedding) {
     if (answers.shedding === "low" && groom.sheddingLevel >= 4) score -= 20;
     if (answers.shedding === "low" && groom.sheddingLevel <= 2) score += 10;
     if (answers.shedding === "medium" && groom.sheddingLevel >= 5) score -= 10;
   }
 
+  // ── Tiebreakers ──
+  if (answers.tb_type && answers.tb_type !== "any" && breed) {
+    if (answers.tb_type === "classic" && breed.type !== "classic") score -= 35;
+    if (answers.tb_type === "designer" && breed.type !== "designer-crossbreed") score -= 35;
+  }
+  if (answers.tb_coat && answers.tb_coat !== "any" && breed) {
+    const coat = breed.coatLength.toLowerCase();
+    if (answers.tb_coat === "short" && !coat.includes("short")) score -= 20;
+    if (answers.tb_coat === "long" && !coat.includes("long")) score -= 20;
+    if (answers.tb_coat === "medium" && (coat.includes("short") || coat.includes("long"))) score -= 10;
+  }
+  if (answers.tb_professional_groom && groom) {
+    if (answers.tb_professional_groom === "no" && groom.monthlyProfessionalCost > 0) score -= 25;
+    if (answers.tb_professional_groom === "occasional" && groom.monthlyProfessionalCost > 60) score -= 15;
+  }
+  if (answers.tb_snoring && breed) {
+    const isFlat = breed.skull === "flat";
+    if (answers.tb_snoring === "no" && isFlat) score -= 40;
+    if (answers.tb_snoring === "yes" && isFlat) score += 5;
+  }
+
   return Math.max(0, Math.round(score));
+}
+
+// ── Identify which tiebreaker questions to show based on remaining breeds ─────
+
+function selectTiebreakers(slugs: string[], existingAnswers: Record<string, string>): Question[] {
+  const remaining: Question[] = [];
+  for (const tb of TIEBREAKERS) {
+    if (existingAnswers[tb.id] !== undefined) continue; // already answered
+    // Only suggest relevant tiebreakers
+    if (tb.id === "tb_type") {
+      const hasDesigner = slugs.some((s) => breeds.find((b) => b.slug === s)?.type === "designer-crossbreed");
+      const hasClassic = slugs.some((s) => breeds.find((b) => b.slug === s)?.type === "classic");
+      if (hasDesigner && hasClassic) remaining.push(tb);
+    } else if (tb.id === "tb_coat") {
+      remaining.push(tb);
+    } else if (tb.id === "tb_professional_groom") {
+      const hasProfessional = slugs.some((s) => (groomingNeeds[s]?.monthlyProfessionalCost ?? 0) > 0);
+      if (hasProfessional) remaining.push(tb);
+    } else if (tb.id === "tb_snoring") {
+      const hasFlat = slugs.some((s) => breeds.find((b) => b.slug === s)?.skull === "flat");
+      if (hasFlat) remaining.push(tb);
+    }
+    if (remaining.length >= 3) break;
+  }
+  return remaining;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
+const THRESHOLD = 65;
+const TOO_MANY = 12;
+const TOO_FEW = 2;
 
 export default function ChumCalculator() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [activeQ, setActiveQ] = useState<string | null>(QUESTIONS[0].id);
+  const [activeQ, setActiveQ] = useState<string | null>(CORE_QUESTIONS[0].id);
 
-  const answeredCount = Object.keys(answers).length;
-  const progress = Math.round((answeredCount / QUESTIONS.length) * 100);
+  const coreAnsweredCount = CORE_QUESTIONS.filter((q) => answers[q.id] !== undefined).length;
+  const allAnswered = coreAnsweredCount === CORE_QUESTIONS.length;
+  const progress = Math.round((coreAnsweredCount / CORE_QUESTIONS.length) * 100);
 
-  // Score and sort all breeds based on answers so far
   const scoredBreeds = useMemo(() => {
-    if (answeredCount === 0) return ALL_BREEDS.map((b) => ({ ...b, score: 100 }));
+    if (coreAnsweredCount === 0) return ALL_BREEDS.map((b) => ({ ...b, score: 100 }));
     return ALL_BREEDS
       .map((b) => ({ ...b, score: scoreBreed(b.slug, answers) }))
       .sort((a, b) => b.score - a.score);
-  }, [answers, answeredCount]);
+  }, [answers, coreAnsweredCount]);
 
-  // Threshold: hide breeds below 40 once at least 3 questions answered
-  const visibleBreeds = answeredCount >= 3
-    ? scoredBreeds.filter((b) => b.score >= 40)
-    : scoredBreeds;
+  // Apply threshold only once core questions are mostly answered
+  const thresholdActive = coreAnsweredCount >= 5;
+  const aboveThreshold = scoredBreeds.filter((b) => b.score >= THRESHOLD);
+  const visibleBreeds = thresholdActive ? aboveThreshold : scoredBreeds;
+
+  // Adaptive state
+  const tooMany = allAnswered && visibleBreeds.length > TOO_MANY;
+  const tooFew = allAnswered && visibleBreeds.length <= TOO_FEW;
+  const tiebreakersAvailable = tooMany
+    ? selectTiebreakers(visibleBreeds.map((b) => b.slug), answers)
+    : [];
+
+  // Which tiebreakers are answered
+  const tbAnswered = TIEBREAKERS.filter((tb) => answers[tb.id] !== undefined);
 
   function handleAnswer(qId: string, value: string) {
     const next = { ...answers, [qId]: value };
     setAnswers(next);
-    // Advance to next unanswered question
-    const qIdx = QUESTIONS.findIndex((q) => q.id === qId);
-    const nextQ = QUESTIONS[qIdx + 1];
-    setActiveQ(nextQ ? nextQ.id : null);
+    // Advance to next unanswered core question, or first tiebreaker
+    const coreIdx = CORE_QUESTIONS.findIndex((q) => q.id === qId);
+    if (coreIdx !== -1) {
+      const nextCore = CORE_QUESTIONS[coreIdx + 1];
+      setActiveQ(nextCore ? nextCore.id : null);
+    } else {
+      // Was a tiebreaker -- advance to next tiebreaker if any
+      const tbIdx = TIEBREAKERS.findIndex((q) => q.id === qId);
+      const nextTb = TIEBREAKERS[tbIdx + 1];
+      setActiveQ(nextTb ? nextTb.id : null);
+    }
+  }
+
+  function relaxAnswers() {
+    // Soften the most restrictive answer
+    const relaxOrder = ["shedding", "grooming", "budget", "exercise", "alone"];
+    const relaxMap: Record<string, Record<string, string>> = {
+      shedding: { low: "medium", medium: "high" },
+      grooming: { low: "medium", medium: "high" },
+      budget: { low: "medium", medium: "high" },
+      exercise: { high: "medium", low: "medium" },
+      alone: { lots: "often", often: "sometimes" },
+    };
+    for (const key of relaxOrder) {
+      const current = answers[key];
+      if (current && relaxMap[key]?.[current]) {
+        setAnswers({ ...answers, [key]: relaxMap[key][current] });
+        return;
+      }
+    }
   }
 
   function reset() {
     setAnswers({});
-    setActiveQ(QUESTIONS[0].id);
+    setActiveQ(CORE_QUESTIONS[0].id);
   }
+
+  const ALL_QUESTIONS = [...CORE_QUESTIONS, ...(tooMany ? tiebreakersAvailable : [])];
 
   return (
     <main className={styles.page}>
@@ -239,27 +377,24 @@ export default function ChumCalculator() {
           Chum <span className={styles.titleAccent}>Calculator</span>
         </h1>
         <p className={styles.headerSub}>
-          Answer the questions below and watch the pack filter down to your ideal chums in real time.
+          Answer the questions below and watch the pack filter to your ideal chums in real time.
         </p>
       </div>
 
       {/* ── Questions ── */}
       <div className={styles.questionsWrap}>
-        {QUESTIONS.map((q, idx) => {
+        {ALL_QUESTIONS.map((q, idx) => {
           const answered = answers[q.id];
           const isActive = activeQ === q.id;
-          const isPast = !!answered;
+          const isTiebreaker = TIEBREAKERS.some((tb) => tb.id === q.id);
 
           return (
             <div
               key={q.id}
-              className={`${styles.qBlock} ${isActive ? styles.qBlockActive : ""} ${isPast && !isActive ? styles.qBlockDone : ""}`}
+              className={`${styles.qBlock} ${isActive ? styles.qBlockActive : ""} ${answered && !isActive ? styles.qBlockDone : ""} ${isTiebreaker ? styles.qBlockTiebreaker : ""}`}
             >
-              <button
-                className={styles.qHeader}
-                onClick={() => setActiveQ(isActive ? null : q.id)}
-              >
-                <span className={styles.qNum}>{idx + 1}</span>
+              <button className={styles.qHeader} onClick={() => setActiveQ(isActive ? null : q.id)}>
+                <span className={styles.qNum}>{isTiebreaker ? "+" : idx + 1}</span>
                 <span className={styles.qTitle}>{q.question}</span>
                 {answered && (
                   <span className={styles.qAnswer}>
@@ -267,7 +402,6 @@ export default function ChumCalculator() {
                   </span>
                 )}
               </button>
-
               {isActive && (
                 <div className={styles.qOptions}>
                   {q.sub && <p className={styles.qSub}>{q.sub}</p>}
@@ -286,22 +420,44 @@ export default function ChumCalculator() {
           );
         })}
 
-        {answeredCount > 0 && (
-          <button className={styles.resetBtn} onClick={reset}>
-            Reset all answers
-          </button>
+        {/* Too many -- prompt tiebreakers */}
+        {tooMany && tiebreakersAvailable.length === 0 && tbAnswered.length > 0 && (
+          <div className={styles.adaptiveBanner}>
+            <p>Still {visibleBreeds.length} matches -- try adjusting your answers above to narrow further.</p>
+          </div>
+        )}
+        {tooMany && tiebreakersAvailable.length > 0 && (
+          <div className={styles.adaptiveBanner}>
+            <p>You still have <strong>{visibleBreeds.length} matches</strong>. Answer a few more questions to narrow it down.</p>
+          </div>
+        )}
+
+        {/* Too few -- offer to relax */}
+        {tooFew && (
+          <div className={`${styles.adaptiveBanner} ${styles.adaptiveBannerWarn}`}>
+            <p>Only <strong>{visibleBreeds.length} breed{visibleBreeds.length !== 1 ? "s" : ""}</strong> match your criteria. That might be too narrow.</p>
+            <button className={styles.relaxBtn} onClick={relaxAnswers}>
+              Relax my criteria →
+            </button>
+          </div>
+        )}
+
+        {coreAnsweredCount > 0 && (
+          <button className={styles.resetBtn} onClick={reset}>Reset all answers</button>
         )}
       </div>
 
-      {/* ── Progress + breed count ── */}
+      {/* ── Progress + count ── */}
       <div className={styles.progressRow}>
         <div className={styles.progressTrack}>
           <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
         <p className={styles.breedCount}>
-          {visibleBreeds.length === ALL_BREEDS.length
+          {!thresholdActive
             ? `All ${ALL_BREEDS.length} breeds`
-            : `${visibleBreeds.length} of ${ALL_BREEDS.length} breeds match`}
+            : visibleBreeds.length === 0
+            ? "No matches yet"
+            : `${visibleBreeds.length} breed${visibleBreeds.length !== 1 ? "s" : ""} match`}
         </p>
       </div>
 
@@ -309,7 +465,7 @@ export default function ChumCalculator() {
       <div className={styles.breedGrid}>
         {scoredBreeds.map((b) => {
           const cardImg = breedCard[b.slug];
-          const hidden = answeredCount >= 3 && b.score < 40;
+          const hidden = thresholdActive && b.score < THRESHOLD;
           return (
             <Link
               key={b.slug}
@@ -317,14 +473,14 @@ export default function ChumCalculator() {
               className={`${styles.breedCard} ${hidden ? styles.breedCardHidden : ""}`}
               tabIndex={hidden ? -1 : 0}
             >
-              {cardImg
-                ? <img src={bust(cardImg)} alt={b.name} className={styles.cardImg} loading="lazy" />
-                : <img src={bust(b.image)} alt={b.name} className={styles.cardImgFallback} loading="lazy" />
-              }
-              {answeredCount > 0 && !hidden && (
-                <div className={styles.cardScore}>
-                  {b.score}%
-                </div>
+              <img
+                src={bust(cardImg || b.image)}
+                alt={b.name}
+                className={styles.cardImg}
+                loading="lazy"
+              />
+              {coreAnsweredCount > 0 && !hidden && (
+                <div className={styles.cardScore}>{b.score}%</div>
               )}
             </Link>
           );
