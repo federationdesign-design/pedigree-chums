@@ -95,7 +95,6 @@ const PROGENITOR_STATUS: Record<string, BreedTag> = {
   "Skye terrier stock":              "endangered",
   "Collie or working dog":           "extinct",
   "Working hunt terriers":           "extinct",
-  "Heavier working spaniels":        "extinct",
   // ── Endangered living breeds appearing as ancestors ───────────────────────
   "Otterhound":                      "endangered",
   "Scottish Deerhound":              "endangered",
