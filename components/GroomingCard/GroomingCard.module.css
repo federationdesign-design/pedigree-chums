@@ -10,6 +10,7 @@
   font-size: 24px;
   letter-spacing: 0.12em;
   color: var(--yellow, #ffd23e);
+  padding-top: 14px;
   text-transform: uppercase;
   margin: 0 0 0 20px;
 }

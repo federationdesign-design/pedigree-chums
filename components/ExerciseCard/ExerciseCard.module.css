@@ -5,6 +5,7 @@
   color: var(--yellow, #ffd23e);
   text-transform: uppercase;
   margin: 0 0 0 20px;
+  padding-top: 14px;
 }
 
 /* Stats row */
