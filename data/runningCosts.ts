@@ -123,7 +123,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "doberman-pinscher": {
     breedId: "doberman-pinscher", breedName: "Doberman Pinscher",
-    currency: "GBP", priceYear: 2026, lifespanYears: 11,
+    currency: "GBP", priceYear: 2026, lifespanYears: 9,
     annualCosts: { food: 620, routineCare: 340, dentalAllowance: 90, neuteringAllowance: 35, insurance: 850, boarding: 430 },
     medicalScenarios: { low: 110, typical: 450, high: 1500 },
     modelVersion: "1.1",
@@ -171,7 +171,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "labradoodle": {
     breedId: "labradoodle", breedName: "Labradoodle",
-    currency: "GBP", priceYear: 2026, lifespanYears: 12,
+    currency: "GBP", priceYear: 2026, lifespanYears: 14,
     annualCosts: { food: 540, routineCare: 320, dentalAllowance: 85, neuteringAllowance: 33, insurance: 680, boarding: 400 },
     medicalScenarios: { low: 100, typical: 400, high: 1300 },
     modelVersion: "1.1",
@@ -179,7 +179,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "goldendoodle": {
     breedId: "goldendoodle", breedName: "Goldendoodle",
-    currency: "GBP", priceYear: 2026, lifespanYears: 12,
+    currency: "GBP", priceYear: 2026, lifespanYears: 14,
     annualCosts: { food: 540, routineCare: 320, dentalAllowance: 85, neuteringAllowance: 33, insurance: 680, boarding: 400 },
     medicalScenarios: { low: 100, typical: 400, high: 1300 },
     modelVersion: "1.1",
@@ -211,7 +211,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "lurcher": {
     breedId: "lurcher", breedName: "Lurcher",
-    currency: "GBP", priceYear: 2026, lifespanYears: 13,
+    currency: "GBP", priceYear: 2026, lifespanYears: 14,
     annualCosts: { food: 500, routineCare: 300, dentalAllowance: 80, neuteringAllowance: 30, insurance: 560, boarding: 380 },
     medicalScenarios: { low: 80, typical: 350, high: 1150 },
     modelVersion: "1.1",
@@ -227,7 +227,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "staffordshire-bull-terrier": {
     breedId: "staffordshire-bull-terrier", breedName: "Staffordshire Bull Terrier",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 13,
     annualCosts: { food: 480, routineCare: 290, dentalAllowance: 80, neuteringAllowance: 30, insurance: 820, boarding: 370 },
     medicalScenarios: { low: 100, typical: 420, high: 1400 },
     modelVersion: "1.1",
@@ -253,7 +253,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "cocker-spaniel": {
     breedId: "cocker-spaniel", breedName: "Cocker Spaniel",
-    currency: "GBP", priceYear: 2026, lifespanYears: 13,
+    currency: "GBP", priceYear: 2026, lifespanYears: 12,
     annualCosts: { food: 360, routineCare: 270, dentalAllowance: 70, neuteringAllowance: 27, insurance: 600, boarding: 340 },
     medicalScenarios: { low: 90, typical: 360, high: 1200 },
     modelVersion: "1.1",
@@ -261,7 +261,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "whippet": {
     breedId: "whippet", breedName: "Whippet",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 13,
     annualCosts: { food: 340, routineCare: 260, dentalAllowance: 65, neuteringAllowance: 25, insurance: 500, boarding: 330 },
     medicalScenarios: { low: 70, typical: 310, high: 1000 },
     modelVersion: "1.1",
@@ -293,7 +293,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "cockapoo": {
     breedId: "cockapoo", breedName: "Cockapoo",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 15,
     annualCosts: { food: 300, routineCare: 260, dentalAllowance: 65, neuteringAllowance: 25, insurance: 520, boarding: 320 },
     medicalScenarios: { low: 70, typical: 310, high: 1000 },
     modelVersion: "1.1",
@@ -359,7 +359,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "pug": {
     breedId: "pug", breedName: "Pug",
-    currency: "GBP", priceYear: 2026, lifespanYears: 12,
+    currency: "GBP", priceYear: 2026, lifespanYears: 11,
     annualCosts: { food: 200, routineCare: 250, dentalAllowance: 70, neuteringAllowance: 25, insurance: 1200, boarding: 290 },
     medicalScenarios: { low: 160, typical: 600, high: 2200 },
     modelVersion: "1.1",
@@ -409,7 +409,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "bichon-frise": {
     breedId: "bichon-frise", breedName: "Bichon Frise",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 16,
     annualCosts: { food: 180, routineCare: 230, dentalAllowance: 60, neuteringAllowance: 21, insurance: 440, boarding: 270 },
     medicalScenarios: { low: 60, typical: 270, high: 900 },
     modelVersion: "1.1",
@@ -417,7 +417,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "shih-tzu": {
     breedId: "shih-tzu", breedName: "Shih Tzu",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 13,
     annualCosts: { food: 160, routineCare: 220, dentalAllowance: 60, neuteringAllowance: 19, insurance: 500, boarding: 260 },
     medicalScenarios: { low: 70, typical: 290, high: 980 },
     modelVersion: "1.1",
@@ -433,7 +433,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "maltipoo": {
     breedId: "maltipoo", breedName: "Maltipoo",
-    currency: "GBP", priceYear: 2026, lifespanYears: 13,
+    currency: "GBP", priceYear: 2026, lifespanYears: 15,
     annualCosts: { food: 160, routineCare: 220, dentalAllowance: 55, neuteringAllowance: 19, insurance: 420, boarding: 250 },
     medicalScenarios: { low: 55, typical: 260, high: 880 },
     modelVersion: "1.1",
@@ -441,7 +441,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "chihuahua": {
     breedId: "chihuahua", breedName: "Chihuahua",
-    currency: "GBP", priceYear: 2026, lifespanYears: 15,
+    currency: "GBP", priceYear: 2026, lifespanYears: 16,
     annualCosts: { food: 120, routineCare: 200, dentalAllowance: 55, neuteringAllowance: 17, insurance: 380, boarding: 230 },
     medicalScenarios: { low: 50, typical: 240, high: 820 },
     modelVersion: "1.1",
@@ -449,7 +449,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "yorkshire-terrier": {
     breedId: "yorkshire-terrier", breedName: "Yorkshire Terrier",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 15,
     annualCosts: { food: 120, routineCare: 200, dentalAllowance: 55, neuteringAllowance: 17, insurance: 420, boarding: 230 },
     medicalScenarios: { low: 55, typical: 250, high: 850 },
     modelVersion: "1.1",
@@ -465,7 +465,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "papillon": {
     breedId: "papillon", breedName: "Papillon",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 15,
     annualCosts: { food: 120, routineCare: 200, dentalAllowance: 55, neuteringAllowance: 17, insurance: 380, boarding: 230 },
     medicalScenarios: { low: 50, typical: 240, high: 820 },
     modelVersion: "1.1",
@@ -473,7 +473,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
 
   "pomeranian": {
     breedId: "pomeranian", breedName: "Pomeranian",
-    currency: "GBP", priceYear: 2026, lifespanYears: 14,
+    currency: "GBP", priceYear: 2026, lifespanYears: 15,
     annualCosts: { food: 120, routineCare: 200, dentalAllowance: 55, neuteringAllowance: 17, insurance: 420, boarding: 230 },
     medicalScenarios: { low: 55, typical: 250, high: 850 },
     modelVersion: "1.1",
