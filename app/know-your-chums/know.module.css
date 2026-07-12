@@ -545,11 +545,14 @@
   padding-top: calc(clamp(20px, 3.5vw, 44px) + 50px);
 }
 .familyLead {
-  position: relative;
-  z-index: 1;
-  max-width: 50%;
+  position: absolute;
+  top: clamp(20px, 3.5vw, 44px);
+  right: 80px;
+  z-index: 10;
+  max-width: 280px;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
+  text-align: right;
 }
 .familyTitle {
   font-size: clamp(3.6rem, 8vw, 5.6rem);
@@ -560,7 +563,6 @@
   white-space: nowrap;
 }
 .familyText {
-  max-width: 24rem;
   transition: opacity 0.35s ease;
 }
 .familyTextDim {
