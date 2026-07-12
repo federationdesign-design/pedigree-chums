@@ -144,107 +144,50 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
   const [deckHover, setDeckHover] = useState<number | null>(null);
 
   const generateScoreCard = (): Promise<string> => new Promise((resolve) => {
-    // OG social share size: 1200x630 (landscape, like original)
+    // OG social share size: 1200x630 (landscape)
     const W = 1200, H = 630;
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d")!;
 
-    const drawCard = (logoImg: HTMLImageElement | null, patternImg: HTMLImageElement | null) => {
-      // Light blue background (#2bb4ee)
-      ctx.fillStyle = "#2bb4ee";
-      ctx.fillRect(0, 0, W, H);
-
-      // Bone/background pattern tiled at low opacity
-      if (patternImg) {
-        ctx.globalAlpha = 0.08;
-        const pw = 200, ph = pw * (patternImg.naturalHeight / patternImg.naturalWidth || 1);
-        for (let y = 0; y < H + ph; y += ph) {
-          for (let x = 0; x < W + pw; x += pw) {
-            ctx.drawImage(patternImg, x - pw/2, y - ph/2, pw, ph);
-          }
-        }
-        ctx.globalAlpha = 1;
-      }
-
-      // Yellow thick rounded border
-      const brd = 22, rad = 40;
-      ctx.strokeStyle = "#ffd23e";
-      ctx.lineWidth = brd;
-      ctx.beginPath();
-      ctx.roundRect(brd/2, brd/2, W-brd, H-brd, rad);
-      ctx.stroke();
-
-      // Logo left side
-      if (logoImg) {
-        const lw = 320, lh = lw * (logoImg.naturalHeight / logoImg.naturalWidth || 0.5);
-        ctx.drawImage(logoImg, 60, (H - lh) / 2, lw, lh);
+    const drawCard = (bgImg: HTMLImageElement | null) => {
+      // Draw the highscore background image to fill the canvas
+      if (bgImg) {
+        ctx.drawImage(bgImg, 0, 0, W, H);
       } else {
-        ctx.fillStyle = "#ffd23e";
-        ctx.font = "bold 48px Arial Black, sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText("PEDIGREE", 60, H/2 - 10);
-        ctx.fillText("CHUMS", 60, H/2 + 50);
+        // Fallback plain background
+        ctx.fillStyle = "#2bb4ee";
+        ctx.fillRect(0, 0, W, H);
       }
 
-      // Vertical divider
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(440, 60); ctx.lineTo(440, H-60); ctx.stroke();
-
-      // Right side content
+      // ── Score number -- large, centred in the top cream area ──────────────
+      // The cream panel runs roughly y:90 to y:470, centred at x:600
       ctx.textAlign = "center";
-      const cx = 440 + (W - 440) / 2; // centre of right panel
-
-      // MY SCORE label
-      ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 32px Arial, sans-serif";
-      ctx.fillText("MY SCORE", cx, 130);
-
-      // Score in Press Start 2P (arcade pixel font via CSS var - use system monospace fallback on canvas)
-      ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 148px 'Courier New', monospace";
-      ctx.shadowColor = "rgba(255,210,62,0.6)";
-      ctx.shadowBlur = 18;
-      ctx.fillText(score.toLocaleString(), cx, 310);
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#0a5c7a";
+      ctx.shadowColor = "rgba(0,0,0,0.15)";
+      ctx.shadowBlur = 12;
+      ctx.font = "bold 180px 'Courier New', monospace";
+      ctx.fillText(score.toLocaleString(), W / 2, 280);
       ctx.shadowBlur = 0;
 
-      // Chums line
-      ctx.fillStyle = "#0a3a57";
+      // ── Chums found -- inside the blue pill at the bottom ─────────────────
+      // The pill sits roughly y:530 to y:590, left-aligned after the paw circle
+      // Centre of pill text area: approximately x:670, y:560
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "bold 36px Arial, sans-serif";
-      ctx.fillText(`${chums} Chum${chums === 1 ? "" : "s"} Found`, cx, 390);
-
-      // Divider
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(460, 420); ctx.lineTo(W-60, 420); ctx.stroke();
-
-      // URL + hashtag
-      ctx.fillStyle = "#0a3a57";
-      ctx.font = "bold 28px Arial, sans-serif";
-      ctx.fillText("pedigreechums.co.uk  •  #PedigreeChums", cx, 490);
-
-      ctx.fillStyle = "#0a3a57";
-      ctx.font = "26px Arial, sans-serif";
-      ctx.fillText("Can you beat my score? 🐾", cx, 540);
+      ctx.fillText(`${chums} Chum${chums === 1 ? "" : "s"} Found`, 670, 558);
 
       resolve(canvas.toDataURL("image/png"));
     };
 
-    let loaded = 0;
-    let logoImg: HTMLImageElement | null = null;
-    let patternImg: HTMLImageElement | null = null;
-    const tryDraw = () => { loaded++; if (loaded === 2) drawCard(logoImg, patternImg); };
-
-    const logo = new Image(); logo.crossOrigin = "anonymous";
-    logo.onload = () => { logoImg = logo; tryDraw(); };
-    logo.onerror = tryDraw;
-    logo.src = "/PC-logo.svg";
-
-    const pat = new Image(); pat.crossOrigin = "anonymous";
-    pat.onload = () => { patternImg = pat; tryDraw(); };
-    pat.onerror = tryDraw;
-    pat.src = "/background-pattern.svg";
+    const bg = new Image();
+    bg.crossOrigin = "anonymous";
+    bg.onload = () => drawCard(bg);
+    bg.onerror = () => drawCard(null);
+    bg.src = "/highscore-table.jpg";
   });
 
   const handleShare = async () => {
