@@ -12,6 +12,13 @@ export const metadata: Metadata = {
 
 const ESSAYS = [
   {
+    slug: "bulls-eye",
+    tag: "Bad dog", tagStyle: "tagBad",
+    breed: "Bull Terrier",
+    title: "Bull's-eye: The Dog as the Owner's Shadow",
+    summary: "Bull's-eye belongs to Bill Sikes, one of Dickens's most violent characters. He is not simply a bad dog -- he is a dog made to carry a bad man's reputation. An essay on Oliver Twist, the status dog and what happens when an animal becomes the emblem of human threat.",
+  },
+  {
     slug: "gelert",
     tag: "Misjudged dog", tagStyle: "tagMisjudged",
     breed: "Irish Wolfhound",
