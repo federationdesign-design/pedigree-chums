@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { breeds, breedCard } from "../../data/breeds";
+import { bust } from "../../data/imgVersion";
 import suitabilityScores from "../../data/suitabilityScores";
 import exerciseNeeds from "../../data/exerciseNeeds";
 import runningCosts from "../../data/runningCosts";
@@ -317,8 +318,8 @@ export default function ChumCalculator() {
               tabIndex={hidden ? -1 : 0}
             >
               {cardImg
-                ? <img src={cardImg} alt={b.name} className={styles.cardImg} />
-                : <img src={b.image} alt={b.name} className={styles.cardImgFallback} />
+                ? <img src={bust(cardImg)} alt={b.name} className={styles.cardImg} loading="lazy" />
+                : <img src={bust(b.image)} alt={b.name} className={styles.cardImgFallback} loading="lazy" />
               }
               {answeredCount > 0 && !hidden && (
                 <div className={styles.cardScore}>
