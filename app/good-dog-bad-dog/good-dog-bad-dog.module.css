@@ -371,6 +371,7 @@
   text-decoration: none;
   padding: 12px 24px;
   display: inline-block;
+  white-space: nowrap;
   position: relative;
   z-index: 2;
   margin-top: clamp(90px, 12vw, 140px);
