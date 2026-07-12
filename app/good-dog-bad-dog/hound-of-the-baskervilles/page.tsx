@@ -29,7 +29,7 @@ export default function HoundPage() {
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
           <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
-          <img src="/bloodhound-square.jpg" alt="Bloodhound" className={styles.essayHeroImg} />
+          <img src="/hound-of-the-baskervilles.jpg" alt="The Hound of the Baskervilles" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <div className={styles.essayHeroMeta}>
