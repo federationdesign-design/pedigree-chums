@@ -27,10 +27,10 @@ export default function LassiePage() {
     <>
       <Nav showLogo />
       <main className={styles.essayPage}>
-        <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
-
         <div className={styles.essayHero}>
+          <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <img src="/collie-square.jpg" alt="Rough Collie" className={styles.essayHeroImg} />
+          <div className={styles.essayHeroTint} />
         </div>
 
         <div className={styles.essayLayout}>
