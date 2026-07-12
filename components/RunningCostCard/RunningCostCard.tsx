@@ -35,7 +35,7 @@ export default function RunningCostCard({ config }: Props) {
   const { low, typical, high } = config.medicalScenarios;
 
   const medical = medicalAllowance(sliderValue, low, typical, high);
-  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance;
+  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance + (config.annualCosts.insurance ?? 0) + (config.annualCosts.boarding ?? 0);
   const annual = fixedAnnual + medical;
   const lifetime = annual * config.lifespanYears;
   const medicalPct = Math.round((medical / annual) * 100);

@@ -95,11 +95,11 @@ const QUESTIONS: Question[] = [
   {
     id: "budget",
     question: "What's your rough annual budget?",
-    sub: "Including food, vet bills and routine care",
+    sub: "All-in: food, insurance, vet bills, grooming and boarding",
     options: [
-      { label: "Under £1,000", value: "low" },
-      { label: "£1,000 -- £2,000", value: "medium" },
-      { label: "£2,000 -- £3,500", value: "high" },
+      { label: "Up to £1,500", value: "low" },
+      { label: "£1,500 -- £2,500", value: "medium" },
+      { label: "£2,500 -- £3,500", value: "high" },
       { label: "Over £3,500 -- cost is not a concern", value: "any" },
     ],
   },
@@ -200,10 +200,11 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   if (cost && answers.budget) {
     const annual = cost.annualCosts.food + cost.annualCosts.routineCare +
       cost.annualCosts.dentalAllowance + cost.annualCosts.neuteringAllowance +
+      cost.annualCosts.insurance + cost.annualCosts.boarding +
       cost.medicalScenarios.typical;
-    const budgetMap: Record<string, number> = { low: 1000, medium: 2000, high: 3500, any: 99999 };
-    const max = budgetMap[answers.budget] ?? 2000;
-    score += annual > max ? -(annual - max) * 0.02 : 8;
+    const budgetMap: Record<string, number> = { low: 1500, medium: 2500, high: 3500, any: 99999 };
+    const max = budgetMap[answers.budget] ?? 2500;
+    score += annual > max ? -(annual - max) * 0.04 : 10;
   }
   if (groom && answers.shedding) {
     if (answers.shedding === "low" && groom.sheddingLevel >= 4) score -= 20;
