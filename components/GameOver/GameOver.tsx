@@ -145,7 +145,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
 
   const generateScoreCard = (): Promise<string> => new Promise((resolve) => {
     // OG social share size: 1200x630 (landscape)
-    const W = 1200, H = 630;
+    const W = 1100, H = 918;
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d")!;
@@ -168,7 +168,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
       ctx.shadowColor = "rgba(0,0,0,0.15)";
       ctx.shadowBlur = 12;
       ctx.font = "bold 180px 'Courier New', monospace";
-      ctx.fillText(score.toLocaleString(), W / 2, 280);
+      ctx.fillText(score.toLocaleString(), W / 2, H * 0.42);
       ctx.shadowBlur = 0;
 
       // ── Chums found -- inside the blue pill at the bottom ─────────────────
@@ -178,7 +178,7 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 36px Arial, sans-serif";
-      ctx.fillText(`${chums} Chum${chums === 1 ? "" : "s"} Found`, 670, 558);
+      ctx.fillText(`${chums} Chum${chums === 1 ? "" : "s"} Found`, W * 0.62, H * 0.895);
 
       resolve(canvas.toDataURL("image/png"));
     };
@@ -225,8 +225,8 @@ export default function GameOver({ chums, score, collectedBreeds = [], allCollec
       </div>
 
       <div className={styles.inner}>
-        {/* Collected chums deck */}
-        {collectedBreeds.length > 0 && (
+        {/* Collected chums deck -- only show if 5 or fewer to avoid overflow and loading issues */}
+        {collectedBreeds.length > 0 && collectedBreeds.length <= 5 && (
           <div className={styles.chumDeck}>
             {collectedBreeds.slice().reverse().map((c, i) => {
               const isHov = deckHover === i;

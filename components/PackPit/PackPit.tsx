@@ -1054,6 +1054,7 @@ export default function PackPit() {
         if (menuBody && menuBody.isStatic && Query.point([menuBody], pt).length) { window.dispatchEvent(new Event("pc:open-menu")); return true; } // tap the fixed menu before it dislodges
         const hit = Query.point(dyn(), pt)[0];
         if (!hit) return false;
+        if (hit.plugin?.kind === "cookiereject-inert") return true; // swallow tap -- cannot be collected
         if (hit.plugin?.kind === "menu") { window.dispatchEvent(new Event("pc:open-menu")); return true; }
         if (hit.plugin?.kind === "reserve") { if (!hit.plugin.scored) { hit.plugin.scored = true; const rv = preorderReward(score); numAt(hit.position.x, hit.position.y, rv); } window.dispatchEvent(new Event("pc:open-offer")); return true; }
         if (hit.plugin?.kind === "cookies") {
@@ -1173,7 +1174,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         const hit = Query.point(dyn(), up)[0];
         if (!hit || hit.plugin.prop || hit.plugin.kind === "pct" || hit.plugin.kind === "reserve" || hit.plugin.kind === "preorder" || hit.plugin.kind === "menu" || hit.plugin.kind === "cookieaccept" || hit.plugin.kind === "cookiereject" || hit.plugin.kind === "rod" || hit.plugin.kind === "pill") return false; // dogs only, not the toys, fallen circles or the buttons
         if (hit.plugin.pop) return false; // already flying away -- don't re-open
-        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && hit.plugin.kind !== "cookiereject" && hit.plugin.kind !== "rod" && hit.plugin.kind !== "pill" && !hit.plugin.collected) {
+        if (!hit.plugin.prop && hit.plugin.kind !== "pct" && hit.plugin.kind !== "reserve" && hit.plugin.kind !== "preorder" && hit.plugin.kind !== "menu" && hit.plugin.kind !== "cookieaccept" && hit.plugin.kind !== "cookiereject" && hit.plugin.kind !== "cookiereject-inert" && hit.plugin.kind !== "rod" && hit.plugin.kind !== "pill" && !hit.plugin.collected) {
           hit.plugin.collected = true;                                              // only the first collect of a card scores
           numAt(hit.position.x, hit.position.y, 100);                               // first collect scores 100
           burstAt(hit.position.x, hit.position.y, Math.max(40, hit.plugin.half));   // pink starburst on first collect
