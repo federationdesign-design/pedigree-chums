@@ -35,10 +35,13 @@ export default function RunningCostCard({ config }: Props) {
   const { low, typical, high } = config.medicalScenarios;
 
   const medical = medicalAllowance(sliderValue, low, typical, high);
-  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance + (config.annualCosts.insurance ?? 0) + (config.annualCosts.boarding ?? 0);
+  const insuranceFull = config.annualCosts.insurance ?? 0;
+  const insuranceApplied = Math.round(insuranceFull * Math.pow(sliderValue / 100, 0.7));
+  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance + insuranceApplied + (config.annualCosts.boarding ?? 0);
   const annual = fixedAnnual + medical;
   const lifetime = annual * config.lifespanYears;
   const medicalPct = Math.round((medical / annual) * 100);
+  const noInsurance = insuranceFull === 0;
 
   return (
     <div className={styles.card}>
@@ -63,6 +66,10 @@ export default function RunningCostCard({ config }: Props) {
           aria-valuetext={scenarioLabel(sliderValue)}
         />
         <div className={styles.scenarioLabel}>{scenarioLabel(sliderValue)}</div>
+        {noInsurance
+          ? <p className={styles.noInsuranceNote}>Insurance not included -- many owners of this breed opt out</p>
+          : sliderValue <= 10 && <p className={styles.noInsuranceNote}>At low maintenance, insurance costs drop out</p>
+        }
       </div>
 
       <div className={styles.outputs}>

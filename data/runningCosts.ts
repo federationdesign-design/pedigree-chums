@@ -204,7 +204,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
   "greyhound": {
     breedId: "greyhound", breedName: "Greyhound",
     currency: "GBP", priceYear: 2026, lifespanYears: 12,
-    annualCosts: { food: 520, routineCare: 300, dentalAllowance: 80, neuteringAllowance: 30, insurance: 300, boarding: 380 },
+    annualCosts: { food: 520, routineCare: 300, dentalAllowance: 80, neuteringAllowance: 30, insurance: 0, boarding: 380 },
     medicalScenarios: { low: 80, typical: 360, high: 1200 },
     modelVersion: "1.1",
   },
@@ -212,7 +212,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
   "lurcher": {
     breedId: "lurcher", breedName: "Lurcher",
     currency: "GBP", priceYear: 2026, lifespanYears: 13,
-    annualCosts: { food: 500, routineCare: 300, dentalAllowance: 80, neuteringAllowance: 30, insurance: 300, boarding: 380 },
+    annualCosts: { food: 500, routineCare: 300, dentalAllowance: 80, neuteringAllowance: 30, insurance: 0, boarding: 380 },
     medicalScenarios: { low: 80, typical: 350, high: 1150 },
     modelVersion: "1.1",
   },
@@ -262,7 +262,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
   "whippet": {
     breedId: "whippet", breedName: "Whippet",
     currency: "GBP", priceYear: 2026, lifespanYears: 13,
-    annualCosts: { food: 340, routineCare: 260, dentalAllowance: 65, neuteringAllowance: 25, insurance: 300, boarding: 330 },
+    annualCosts: { food: 340, routineCare: 260, dentalAllowance: 65, neuteringAllowance: 25, insurance: 0, boarding: 330 },
     medicalScenarios: { low: 70, typical: 310, high: 1000 },
     modelVersion: "1.1",
   },
@@ -318,7 +318,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
   "border-terrier": {
     breedId: "border-terrier", breedName: "Border Terrier",
     currency: "GBP", priceYear: 2026, lifespanYears: 14,
-    annualCosts: { food: 220, routineCare: 240, dentalAllowance: 60, neuteringAllowance: 23, insurance: 240, boarding: 290 },
+    annualCosts: { food: 220, routineCare: 240, dentalAllowance: 60, neuteringAllowance: 23, insurance: 0, boarding: 290 },
     medicalScenarios: { low: 60, typical: 270, high: 900 },
     modelVersion: "1.1",
   },
@@ -334,7 +334,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
   "jack-russell-terrier": {
     breedId: "jack-russell-terrier", breedName: "Jack Russell Terrier",
     currency: "GBP", priceYear: 2026, lifespanYears: 13,
-    annualCosts: { food: 200, routineCare: 230, dentalAllowance: 55, neuteringAllowance: 21, insurance: 200, boarding: 270 },
+    annualCosts: { food: 200, routineCare: 230, dentalAllowance: 55, neuteringAllowance: 21, insurance: 0, boarding: 270 },
     medicalScenarios: { low: 55, typical: 250, high: 850 },
     modelVersion: "1.1",
   },
@@ -482,7 +482,7 @@ const runningCosts: Record<string, RunningCostConfig> = {
   "italian-greyhound": {
     breedId: "italian-greyhound", breedName: "Italian Greyhound",
     currency: "GBP", priceYear: 2026, lifespanYears: 14,
-    annualCosts: { food: 140, routineCare: 210, dentalAllowance: 55, neuteringAllowance: 19, insurance: 230, boarding: 240 },
+    annualCosts: { food: 140, routineCare: 210, dentalAllowance: 55, neuteringAllowance: 19, insurance: 115, boarding: 240 },
     medicalScenarios: { low: 60, typical: 260, high: 880 },
     modelVersion: "1.1",
   },

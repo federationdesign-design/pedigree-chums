@@ -151,3 +151,13 @@
   line-height: 1.45;
   margin: 0;
 }
+
+.noInsuranceNote {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+  margin: 6px 20px 0;
+  text-align: center;
+}
