@@ -11,8 +11,6 @@ import groomingNeeds from "../../data/groomingNeeds";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
 
-// ── Questions ─────────────────────────────────────────────────────────────────
-
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; options: Option[] };
 
@@ -154,8 +152,9 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   const groom = groomingNeeds[slug];
   const train = trainingDifficulty[slug];
   const breed = breeds.find((b) => b.slug === slug);
+  const flags = personalityFlags[slug];
 
-  if (!suit && !ex) return 30; // no data -- keep in list but low score
+  if (!suit && !ex) return 30;
 
   if (answers.size && answers.size !== "any" && breed?.sizeBand) {
     if (breed.sizeBand !== answers.size) score -= 40;
@@ -184,13 +183,9 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   }
   if (ex && answers.exercise) {
     const mins = ex.minutesPerDay;
-    if (answers.exercise === "high") {
-      score += mins >= 90 ? 15 : mins >= 60 ? 5 : -10;
-    } else if (answers.exercise === "medium") {
-      score += mins > 100 ? -15 : mins >= 50 && mins <= 90 ? 10 : 2;
-    } else if (answers.exercise === "low") {
-      score += mins > 80 ? -25 : mins <= 40 ? 15 : -5;
-    }
+    if (answers.exercise === "high") score += mins >= 90 ? 15 : mins >= 60 ? 5 : -10;
+    else if (answers.exercise === "medium") score += mins > 100 ? -15 : mins >= 50 && mins <= 90 ? 10 : 2;
+    else if (answers.exercise === "low") score += mins > 80 ? -25 : mins <= 40 ? 15 : -5;
   }
   if (train && answers.experience) {
     if (answers.experience === "first") score += (3 - train.score) * 12;
@@ -215,20 +210,15 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.shedding === "low" && groom.sheddingLevel <= 2) score += 10;
     if (answers.shedding === "medium" && groom.sheddingLevel >= 5) score -= 10;
   }
-
-  // Velcro
-  const flags = personalityFlags[slug];
   if (flags && answers.velcro) {
     if (answers.velcro === "no" && flags.velcro) score -= 35;
     if (answers.velcro === "yes" && flags.velcro) score += 10;
     if (answers.velcro === "yes" && !flags.velcro) score -= 10;
   }
-  // Vocal
   if (flags && answers.vocal) {
     if (answers.vocal === "yes" && flags.vocal) score -= 40;
     if (answers.vocal === "no" && !flags.vocal) score += 8;
   }
-  // Destructive
   if (flags && answers.destructive) {
     if (answers.destructive === "yes" && flags.destructive) score -= 40;
     if (answers.destructive === "no" && !flags.destructive) score += 8;
@@ -237,18 +227,27 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   return Math.max(0, Math.round(score));
 }
 
+function fitLabel(score: number): string {
+  if (score >= 120) return "Perfect fit";
+  if (score >= 100) return "Great fit";
+  return "Good fit";
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
+const THRESHOLD = 80;
 
 export default function ChumCalculator() {
+  const [step, setStep] = useState(0); // 0 = not started, 1..N = question index (1-based)
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [activeQ, setActiveQ] = useState<string | null>(QUESTIONS[0].id);
 
   const answeredCount = Object.keys(answers).length;
-  const progress = Math.round((answeredCount / QUESTIONS.length) * 100);
+  const total = QUESTIONS.length;
+  const currentQ = step >= 1 && step <= total ? QUESTIONS[step - 1] : null;
+  const started = step > 0;
+  const finished = step > total;
 
-  // Score and sort all breeds based on answers so far
   const scoredBreeds = useMemo(() => {
     if (answeredCount === 0) return ALL_BREEDS.map((b) => ({ ...b, score: 100 }));
     return ALL_BREEDS
@@ -256,23 +255,30 @@ export default function ChumCalculator() {
       .sort((a, b) => b.score - a.score);
   }, [answers, answeredCount]);
 
-  // Threshold: hide breeds below 40 once at least 3 questions answered
-  const visibleBreeds = answeredCount >= 3
-    ? scoredBreeds.filter((b) => b.score >= 80)
-    : scoredBreeds;
+  const thresholdActive = answeredCount >= 3;
+  const visibleCount = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD).length : ALL_BREEDS.length;
 
   function handleAnswer(qId: string, value: string) {
-    const next = { ...answers, [qId]: value };
-    setAnswers(next);
-    // Advance to next unanswered question
-    const qIdx = QUESTIONS.findIndex((q) => q.id === qId);
-    const nextQ = QUESTIONS[qIdx + 1];
-    setActiveQ(nextQ ? nextQ.id : null);
+    setAnswers((prev) => ({ ...prev, [qId]: value }));
+    setStep((s) => s + 1);
+  }
+
+  function goBack() {
+    if (step > 1) {
+      // Remove the previous answer so it doesn't score
+      const prevQ = QUESTIONS[step - 2];
+      setAnswers((prev) => {
+        const next = { ...prev };
+        delete next[prevQ.id];
+        return next;
+      });
+      setStep((s) => s - 1);
+    }
   }
 
   function reset() {
     setAnswers({});
-    setActiveQ(QUESTIONS[0].id);
+    setStep(0);
   }
 
   return (
@@ -285,77 +291,95 @@ export default function ChumCalculator() {
           Chum <span className={styles.titleAccent}>Calculator</span>
         </h1>
         <p className={styles.headerSub}>
-          Answer the questions below and watch the pack filter down to your ideal chums in real time.
+          Answer {total} questions and watch the pack filter to your ideal chums in real time.
         </p>
       </div>
 
-      {/* ── Questions ── */}
-      <div className={styles.questionsWrap}>
-        {QUESTIONS.map((q, idx) => {
-          const answered = answers[q.id];
-          const isActive = activeQ === q.id;
-          const isPast = !!answered;
+      {/* ── Question stepper ── */}
+      <div className={styles.stepperWrap}>
 
-          return (
-            <div
-              key={q.id}
-              className={`${styles.qBlock} ${isActive ? styles.qBlockActive : ""} ${isPast && !isActive ? styles.qBlockDone : ""}`}
-            >
-              <button
-                className={styles.qHeader}
-                onClick={() => setActiveQ(isActive ? null : q.id)}
-              >
-                <span className={styles.qNum}>{idx + 1}</span>
-                <span className={styles.qTitle}>{q.question}</span>
-                {answered && (
-                  <span className={styles.qAnswer}>
-                    {q.options.find((o) => o.value === answered)?.label}
-                  </span>
-                )}
-              </button>
+        {/* Not started */}
+        {!started && (
+          <div className={styles.stepCard}>
+            <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
+            <button className={styles.startBtn} onClick={() => setStep(1)}>
+              Let's go →
+            </button>
+          </div>
+        )}
 
-              {isActive && (
-                <div className={styles.qOptions}>
-                  {q.sub && <p className={styles.qSub}>{q.sub}</p>}
-                  {q.options.map((opt) => (
-                    <button
-                      key={opt.value}
-                      className={`${styles.option} ${answered === opt.value ? styles.optionSelected : ""}`}
-                      onClick={() => handleAnswer(q.id, opt.value)}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+        {/* Active question */}
+        {currentQ && (
+          <div className={styles.stepCard}>
+            <div className={styles.stepProgress}>
+              <div className={styles.stepDots}>
+                {QUESTIONS.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`${styles.stepDot} ${i < step - 1 ? styles.stepDotDone : ""} ${i === step - 1 ? styles.stepDotActive : ""}`}
+                  />
+                ))}
+              </div>
+              <span className={styles.stepCount}>{step} / {total}</span>
             </div>
-          );
-        })}
 
-        {answeredCount > 0 && (
-          <button className={styles.resetBtn} onClick={reset}>
-            Reset all answers
-          </button>
+            <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
+            {currentQ.sub && <p className={styles.stepSub}>{currentQ.sub}</p>}
+
+            <div className={styles.stepOptions}>
+              {currentQ.options.map((opt) => (
+                <button
+                  key={opt.value}
+                  className={styles.option}
+                  onClick={() => handleAnswer(currentQ.id, opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {step > 1 && (
+              <button className={styles.backBtn} onClick={goBack}>← Back</button>
+            )}
+          </div>
+        )}
+
+        {/* Finished */}
+        {finished && (
+          <div className={styles.stepCard}>
+            <p className={styles.stepDoneIcon}>🐾</p>
+            <h2 className={styles.stepDoneTitle}>Here are your chums</h2>
+            <p className={styles.stepDoneSub}>
+              {visibleCount > 0
+                ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match your lifestyle`
+                : "No strong matches -- try relaxing your answers"}
+            </p>
+            <button className={styles.resetBtn} onClick={reset}>Start again</button>
+          </div>
         )}
       </div>
 
-      {/* ── Progress + breed count ── */}
-      <div className={styles.progressRow}>
-        <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+      {/* ── Progress bar + count ── */}
+      {started && (
+        <div className={styles.progressRow}>
+          <div className={styles.progressTrack}>
+            <div className={styles.progressFill} style={{ width: `${Math.round((answeredCount / total) * 100)}%` }} />
+          </div>
+          <p className={styles.breedCount}>
+            {!thresholdActive
+              ? `All ${ALL_BREEDS.length} breeds`
+              : visibleCount === 0
+              ? "No matches yet"
+              : `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match`}
+          </p>
         </div>
-        <p className={styles.breedCount}>
-          {visibleBreeds.length === ALL_BREEDS.length
-            ? `All ${ALL_BREEDS.length} breeds`
-            : `${visibleBreeds.length} of ${ALL_BREEDS.length} breeds match`}
-        </p>
-      </div>
+      )}
 
       {/* ── Breed grid ── */}
       <div className={styles.breedGrid}>
         {scoredBreeds.map((b) => {
           const cardImg = breedCard[b.slug];
-          const hidden = answeredCount >= 3 && b.score < 80;
+          const hidden = thresholdActive && b.score < THRESHOLD;
           return (
             <Link
               key={b.slug}
@@ -363,14 +387,14 @@ export default function ChumCalculator() {
               className={`${styles.breedCard} ${hidden ? styles.breedCardHidden : ""}`}
               tabIndex={hidden ? -1 : 0}
             >
-              {cardImg
-                ? <img src={bust(cardImg)} alt={b.name} className={styles.cardImg} loading="lazy" />
-                : <img src={bust(b.image)} alt={b.name} className={styles.cardImgFallback} loading="lazy" />
-              }
+              <img
+                src={bust(cardImg || b.image)}
+                alt={b.name}
+                className={styles.cardImg}
+                loading="lazy"
+              />
               {answeredCount > 0 && !hidden && (
-                <div className={styles.cardScore}>
-                  {b.score >= 120 ? 'Perfect fit' : b.score >= 100 ? 'Great fit' : 'Good fit'}
-                </div>
+                <div className={styles.cardScore}>{fitLabel(b.score)}</div>
               )}
             </Link>
           );

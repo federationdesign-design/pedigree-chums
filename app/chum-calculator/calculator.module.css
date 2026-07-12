@@ -1,18 +1,15 @@
 /* ── Page ───────────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
-  padding-top: 120px;
-  padding-bottom: 80px;
+  padding: 120px 24px 80px;
   max-width: 1300px;
   margin: 0 auto;
-  padding-left: 24px;
-  padding-right: 24px;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
 .header {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 48px;
 }
 
 .eyebrow {
@@ -41,126 +38,116 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.95rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.7);
   margin: 0;
 }
 
-/* ── Questions ──────────────────────────────────────────────── */
-.questionsWrap {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 40px;
-  max-width: 760px;
-  margin-left: auto;
-  margin-right: auto;
+/* ── Stepper wrapper ─────────────────────────────────────────── */
+.stepperWrap {
+  max-width: 620px;
+  margin: 0 auto 40px;
 }
 
-.qBlock {
+/* ── Step card ───────────────────────────────────────────────── */
+.stepCard {
   background: var(--navy, #0a3a57);
-  border: 1.5px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  overflow: hidden;
-  transition: border-color 0.2s ease;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 36px 32px 28px;
 }
 
-.qBlockActive {
-  border-color: var(--yellow, #ffd23e);
-}
-
-.qBlockDone {
-  border-color: rgba(255,255,255,0.06);
-  opacity: 0.85;
-}
-
-.qHeader {
-  width: 100%;
+/* ── Dot progress ────────────────────────────────────────────── */
+.stepProgress {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
 }
 
-.qNum {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.1rem;
-  color: var(--yellow, #ffd23e);
-  letter-spacing: 0.04em;
+.stepDots {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.2s ease, transform 0.2s ease;
   flex-shrink: 0;
-  width: 24px;
 }
 
-.qTitle {
+.stepDotDone {
+  background: var(--yellow, #ffd23e);
+}
+
+.stepDotActive {
+  background: #ffffff;
+  transform: scale(1.3);
+}
+
+.stepCount {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: #ffffff;
-  flex: 1;
-  text-align: left;
-}
-
-.qAnswer {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--yellow, #ffd23e);
-  background: rgba(255,210,62,0.12);
-  border-radius: 999px;
-  padding: 3px 12px;
-  flex-shrink: 0;
-  max-width: 240px;
+  color: rgba(255,255,255,0.5);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
-.qOptions {
-  padding: 0 20px 20px;
+/* ── Question text ───────────────────────────────────────────── */
+.stepQuestion {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+.stepSub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+  margin: 0 0 24px;
+}
+
+/* ── Options ─────────────────────────────────────────────────── */
+.stepOptions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.qSub {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.5);
-  font-style: italic;
-  margin: 0 0 12px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .option {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #ffffff;
   background: rgba(255,255,255,0.06);
   border: 1.5px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  padding: 12px 18px;
+  border-radius: 12px;
+  padding: 14px 20px;
   text-align: left;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
 
 .option:hover {
-  background: rgba(255,210,62,0.12);
+  background: rgba(255,210,62,0.14);
   border-color: var(--yellow, #ffd23e);
   transform: translateX(4px);
 }
 
-.optionSelected {
-  background: rgba(255,210,62,0.2);
-  border-color: var(--yellow, #ffd23e);
-  color: var(--yellow, #ffd23e);
-}
-
-.resetBtn {
+/* ── Back btn ────────────────────────────────────────────────── */
+.backBtn {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.7rem;
   font-weight: 700;
@@ -170,26 +157,95 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px 0;
-  align-self: center;
+  padding: 0;
   transition: color 0.15s;
 }
-.resetBtn:hover { color: rgba(255,255,255,0.8); }
+.backBtn:hover { color: rgba(255,255,255,0.8); }
 
-/* ── Progress row ───────────────────────────────────────────── */
+/* ── Not started ─────────────────────────────────────────────── */
+.stepIntro {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.startBtn {
+  display: block;
+  width: 100%;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.startBtn:hover { background: #ffe566; transform: scale(1.02); }
+
+/* ── Finished ────────────────────────────────────────────────── */
+.stepDoneIcon {
+  font-size: 2.5rem;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.stepDoneTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.8rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.stepDoneSub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.resetBtn {
+  display: block;
+  width: 100%;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.resetBtn:hover { color: #ffffff; border-color: rgba(255,255,255,0.5); }
+
+/* ── Progress row ────────────────────────────────────────────── */
 .progressRow {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 32px;
-  max-width: 760px;
+  gap: 16px;
+  margin-bottom: 28px;
+  max-width: 620px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .progressTrack {
   flex: 1;
-  height: 5px;
+  height: 4px;
   background: rgba(255,255,255,0.15);
   border-radius: 999px;
   overflow: hidden;
@@ -204,9 +260,9 @@
 
 .breedCount {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.55);
   white-space: nowrap;
   margin: 0;
 }
@@ -219,10 +275,7 @@
 }
 
 @media (max-width: 600px) {
-  .breedGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
+  .breedGrid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
 }
 
 .breedCard {
@@ -230,9 +283,9 @@
   border-radius: 12px;
   overflow: hidden;
   display: block;
-  transition: transform 0.2s ease, opacity 0.3s ease, box-shadow 0.2s ease;
   aspect-ratio: 5 / 7;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, opacity 0.35s ease, filter 0.35s ease, box-shadow 0.2s ease;
 }
 
 .breedCard:hover {
@@ -242,20 +295,13 @@
 }
 
 .breedCardHidden {
-  opacity: 0.12;
+  opacity: 0.1;
   filter: grayscale(1);
   pointer-events: none;
   transform: scale(0.96);
 }
 
 .cardImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.cardImgFallback {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -270,69 +316,11 @@
   background: rgba(10,58,87,0.92);
   color: var(--yellow, #ffd23e);
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   border-radius: 999px;
   padding: 3px 10px;
   white-space: nowrap;
   backdrop-filter: blur(4px);
 }
-
-/* ── Tiebreaker question style ──────────────────────────────── */
-.qBlockTiebreaker {
-  border-color: rgba(255,210,62,0.3);
-  background: rgba(255,210,62,0.05);
-}
-
-.qBlockTiebreaker .qNum {
-  color: var(--yellow, #ffd23e);
-  font-size: 1.4rem;
-}
-
-/* ── Adaptive banners ───────────────────────────────────────── */
-.adaptiveBanner {
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.adaptiveBanner p {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0;
-}
-
-.adaptiveBanner strong {
-  color: var(--yellow, #ffd23e);
-}
-
-.adaptiveBannerWarn {
-  border-color: rgba(239,68,68,0.4);
-  background: rgba(239,68,68,0.08);
-}
-
-.relaxBtn {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: var(--yellow, #ffd23e);
-  color: var(--navy, #0a3a57);
-  border: none;
-  border-radius: 999px;
-  padding: 10px 20px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s ease;
-}
-
-.relaxBtn:hover { background: #ffe566; }
