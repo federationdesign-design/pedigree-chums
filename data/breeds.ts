@@ -1013,3 +1013,71 @@ export const breedCard: Record<string, string> = {
   "english-setter": "/setter-square.jpg",
   "boxer": "/boxer-square.jpg",
 };
+
+// ── Personality flags for Chum Calculator filtering ──────────────────────────
+// velcro:      strongly shadows their owner, rarely settles alone by choice
+// vocal:       barks, howls or whines frequently -- likely to disturb neighbours
+// destructive: known to chew, dig or destroy when bored or anxious
+export interface PersonalityFlags {
+  velcro: boolean;
+  vocal: boolean;
+  destructive: boolean;
+}
+
+export const personalityFlags: Record<string, PersonalityFlags> = {
+  "irish-wolfhound":              { velcro: false, vocal: false, destructive: false },
+  "bloodhound":                   { velcro: false, vocal: true,  destructive: false },
+  "mastiff":                      { velcro: true,  vocal: false, destructive: false },
+  "great-dane":                   { velcro: true,  vocal: false, destructive: false },
+  "bull-terrier":                 { velcro: false, vocal: false, destructive: true  },
+  "doberman-pinscher":            { velcro: true,  vocal: false, destructive: true  },
+  "saint-bernard":                { velcro: false, vocal: false, destructive: false },
+  "afghan-hound":                 { velcro: false, vocal: false, destructive: false },
+  "weimaraner":                   { velcro: true,  vocal: true,  destructive: true  },
+  "dalmatian":                    { velcro: false, vocal: false, destructive: true  },
+  "rottweiler":                   { velcro: true,  vocal: false, destructive: false },
+  "old-english-sheepdog":         { velcro: false, vocal: false, destructive: false },
+  "basset-hound":                 { velcro: false, vocal: true,  destructive: false },
+  "cavalier-king-charles-spaniel":{ velcro: true,  vocal: false, destructive: false },
+  "bulldog":                      { velcro: false, vocal: false, destructive: false },
+  "italian-greyhound":            { velcro: true,  vocal: false, destructive: false },
+  "papillon":                     { velcro: false, vocal: true,  destructive: false },
+  "corgi":                        { velcro: false, vocal: true,  destructive: false },
+  "bichon-frise":                 { velcro: true,  vocal: false, destructive: false },
+  "maltese":                      { velcro: true,  vocal: true,  destructive: false },
+  "boston-terrier":               { velcro: false, vocal: false, destructive: false },
+  "beagle":                       { velcro: false, vocal: true,  destructive: true  },
+  "siberian-husky":               { velcro: false, vocal: true,  destructive: true  },
+  "shih-tzu":                     { velcro: true,  vocal: false, destructive: false },
+  "jackapoo":                     { velcro: false, vocal: true,  destructive: false },
+  "cavachon":                     { velcro: true,  vocal: false, destructive: false },
+  "cavapoo":                      { velcro: true,  vocal: false, destructive: false },
+  "miniature-schnauzer":          { velcro: false, vocal: true,  destructive: false },
+  "greyhound":                    { velcro: false, vocal: false, destructive: false },
+  "lurcher":                      { velcro: false, vocal: false, destructive: false },
+  "whippet":                      { velcro: true,  vocal: false, destructive: false },
+  "maltipoo":                     { velcro: true,  vocal: true,  destructive: false },
+  "goldendoodle":                 { velcro: true,  vocal: false, destructive: true  },
+  "cockapoo":                     { velcro: true,  vocal: true,  destructive: false },
+  "west-highland-terrier":        { velcro: false, vocal: true,  destructive: true  },
+  "pomeranian":                   { velcro: false, vocal: true,  destructive: false },
+  "french-bulldog":               { velcro: true,  vocal: false, destructive: false },
+  "staffordshire-bull-terrier":   { velcro: true,  vocal: false, destructive: true  },
+  "chihuahua":                    { velcro: true,  vocal: true,  destructive: false },
+  "german-shepherd":              { velcro: true,  vocal: true,  destructive: true  },
+  "pug":                          { velcro: true,  vocal: false, destructive: false },
+  "labradoodle":                  { velcro: false, vocal: false, destructive: true  },
+  "yorkshire-terrier":            { velcro: false, vocal: true,  destructive: false },
+  "poodle":                       { velcro: false, vocal: false, destructive: false },
+  "dachshund":                    { velcro: false, vocal: true,  destructive: true  },
+  "springer-spaniel":             { velcro: true,  vocal: false, destructive: true  },
+  "border-terrier":               { velcro: false, vocal: false, destructive: true  },
+  "border-collie":                { velcro: false, vocal: false, destructive: true  },
+  "cocker-spaniel":               { velcro: true,  vocal: false, destructive: false },
+  "golden-retriever":             { velcro: false, vocal: false, destructive: true  },
+  "labrador":                     { velcro: false, vocal: false, destructive: true  },
+  "jack-russell-terrier":         { velcro: false, vocal: true,  destructive: true  },
+  "boxer":                        { velcro: true,  vocal: false, destructive: true  },
+  "irish-setter":                 { velcro: false, vocal: false, destructive: true  },
+  "rough-collie":                 { velcro: false, vocal: true,  destructive: false },
+};
