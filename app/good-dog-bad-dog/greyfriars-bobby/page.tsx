@@ -31,15 +31,17 @@ export default function GreyfriarsBobbyPage() {
           <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <div className={styles.essayHeroImgFallback} />
           <div className={styles.essayHeroTint} />
+          <div className={styles.essayHeroContent}>
+            <div className={styles.essayHeroMeta}>
+              <span className={`${styles.tag} ${styles.tagReal}`}>Real dog</span>
+              <span className={styles.tagBreed}>Skye Terrier</span>
+            </div>
+            <h1 className={styles.essayHeroTitle}>Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog</h1>
+          </div>
         </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
-            <div className={styles.essayMeta}>
-              <span className={`${styles.tag} ${styles.tagReal}`}>Real dog</span>
-              <span className={styles.tagBreed}>Skye Terrier</span>
-            </div>
-            <h1 className={styles.essayTitle}>Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog</h1>
             <div className={styles.essayBody}>
               <h2 className={styles.subhead}>The story that grew larger than the life</h2>
               <p>Here is what we know with reasonable confidence about Greyfriars Bobby.</p>

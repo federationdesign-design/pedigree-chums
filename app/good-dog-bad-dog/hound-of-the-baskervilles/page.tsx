@@ -31,15 +31,17 @@ export default function HoundPage() {
           <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <img src="/bloodhound-square.jpg" alt="Bloodhound" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
+          <div className={styles.essayHeroContent}>
+            <div className={styles.essayHeroMeta}>
+              <span className={`${styles.tag} ${styles.tagBad}`}>Bad dog</span>
+              <span className={styles.tagBreed}>Bloodhound / Mastiff</span>
+            </div>
+            <h1 className={styles.essayHeroTitle}>The Hound of the Baskervilles: How a Dog Was Made into a Monster</h1>
+          </div>
         </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
-            <div className={styles.essayMeta}>
-              <span className={`${styles.tag} ${styles.tagBad}`}>Bad dog</span>
-              <span className={styles.tagBreed}>Bloodhound / Mastiff</span>
-            </div>
-            <h1 className={styles.essayTitle}>The Hound of the Baskervilles: How a Dog Was Made into a Monster</h1>
             <div className={styles.essayBody}>
               <h2 className={styles.subhead}>A body on the moor, and something in the dark</h2>
               <p>A wealthy man is found dead on the edge of Dartmoor. No obvious wounds. But nearby, someone has found the footprints of an enormous hound.</p>

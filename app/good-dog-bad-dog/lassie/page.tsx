@@ -31,15 +31,17 @@ export default function LassiePage() {
           <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <img src="/collie-square.jpg" alt="Rough Collie" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
+          <div className={styles.essayHeroContent}>
+            <div className={styles.essayHeroMeta}>
+              <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
+              <span className={styles.tagBreed}>Rough Collie</span>
+            </div>
+            <h1 className={styles.essayHeroTitle}>Lassie: The Burden of Being the Perfect Dog</h1>
+          </div>
         </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
-            <div className={styles.essayMeta}>
-              <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
-              <span className={styles.tagBreed}>Rough Collie</span>
-            </div>
-            <h1 className={styles.essayTitle}>Lassie: The Burden of Being the Perfect Dog</h1>
             <div className={styles.essayBody}>
               <h2 className={styles.subhead}>The dog who is always right</h2>
               <p>Lassie never makes a mistake.</p>

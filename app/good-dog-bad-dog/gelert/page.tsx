@@ -31,16 +31,18 @@ export default function GelertPage() {
           <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           <img src="/gelert-painting.jpg" alt="Gelert" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
+          <div className={styles.essayHeroContent}>
+            <div className={styles.essayHeroMeta}>
+              <span className={`${styles.tag} ${styles.tagMisjudged}`}>Misjudged dog</span>
+              <span className={styles.tagBreed}>Irish Wolfhound</span>
+            </div>
+            <h1 className={styles.essayHeroTitle}>Gelert: The Dog Who Couldn't Explain Himself</h1>
+          </div>
         </div>
 
         <div className={styles.essayLayout}>
           {/* Main essay column */}
           <article className={styles.essay}>
-            <div className={styles.essayMeta}>
-              <span className={`${styles.tag} ${styles.tagMisjudged}`}>Misjudged dog</span>
-              <span className={styles.tagBreed}>Irish Wolfhound</span>
-            </div>
-            <h1 className={styles.essayTitle}>Gelert: The Dog Who Couldn't Explain Himself</h1>
             <div className={styles.essayBody}>
               <h2 className={styles.subhead}>A prince, a wolf and a terrible mistake</h2>
               <p>Llywelyn the Great returns from the hunt to find his favourite hound bounding towards him, muzzle covered in blood.</p>

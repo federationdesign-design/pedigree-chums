@@ -112,8 +112,6 @@
   line-height: 1.1;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border-bottom: 2px solid rgba(255,255,255,0.15);
-  padding-bottom: 24px;
 }
 
 /* ── Essay body ─────────────────────────────────────────────── */
@@ -129,10 +127,13 @@
 
 .subhead {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.325rem;
+  font-size: 2.0rem;
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  margin: 48px 0 16px;
+  line-height: 1.2;
+}
   margin: 48px 0 16px;
   line-height: 1.2;
 }
@@ -379,6 +380,34 @@
   transition: color 0.15s ease;
 }
 .backLink:hover { color: #ffffff; }
+
+/* ── Hero content (h1 + pills inside hero) ──────────────────── */
+.essayHeroContent {
+  position: relative;
+  z-index: 2;
+  padding: 24px 24px 40px;
+  width: 100%;
+  align-self: flex-end;
+}
+
+.essayHeroMeta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.essayHeroTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
 
 /* ── Essay two-column layout ────────────────────────────────── */
 .essayLayout {
