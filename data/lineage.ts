@@ -185,13 +185,13 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "British Pointers",
         note: "Crossed in by British breeders for nose and a steady, focused drive in the field.",
-        img: "/history/breeds/pointer-photo.jpg",
+        img: "/history/breeds/british-pointers.jpg",
         value: 17
       },
       {
         name: "British Setters",
         note: "Added biddability and a love of working close with people on the shoot.",
-        img: "/history/breeds/english_setter-photo.jpg",
+        img: "/history/breeds/british-setters.jpg",
         value: 15
       },
       {
@@ -493,10 +493,10 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Setter",
     note: "The flashy red gundog of Ireland, bred to range wide and find game birds across open country.",
     children: [
-      { name: "English Setter", note: "The base setter type behind the breed's style and stance.", img: "/history/breeds/english_setter-photo.jpg", value: 35 },
+      { name: "English Setter", note: "The base setter type behind the breed's style and stance.", img: "/history/breeds/british-setters.jpg", value: 35 },
       { name: "Irish Water Spaniel", note: "Native Irish spaniel blood for coat and a love of water.", img: "/history/breeds/irish-water-spaniel.jpg", value: 25 },
       { name: "Gordon Setter", note: "Another setter in the mix, adding substance and steadiness.", img: "/history/breeds/gordon-setter-photo.jpg", value: 20 },
-      { name: "Pointer", note: "A touch of pointer for nose and a wide-ranging hunt.", img: "/history/breeds/pointer-photo.jpg", value: 20 }
+      { name: "Pointer", note: "A touch of pointer for nose and a wide-ranging hunt.", img: "/history/breeds/british-pointers.jpg", value: 20 }
     ]
   },
 
@@ -855,7 +855,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
       { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
-      { name: "Setter", note: "Setter blood for feathering and a good nose.", img: "/history/breeds/english_setter-photo.jpg", value: 30 },
+      { name: "Setter", note: "Setter blood for feathering and a good nose.", img: "/history/breeds/british-setters.jpg", value: 30 },
       { name: "Water spaniel and Collie", note: "A little water-spaniel and collie for coat and brains.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
     ]
   },
@@ -873,7 +873,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Gordon Setter",
     note: "Scotland's black-and-tan setter, built up at the Duke of Gordon's kennels into a heavier, steady bird dog.",
     children: [
-      { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/english_setter-photo.jpg", value: 65 },
+      { name: "Old black-and-tan setters", note: "The setting dogs at its foundation.", img: "/history/breeds/british-setters.jpg", value: 65 },
       { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
       { name: "Collie", note: "A little collie for steadiness, by tradition.",  img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
@@ -1124,7 +1124,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 25 },
-      { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/english_setter-photo.jpg", value: 20 }
+      { name: "Setter", note: "Setting-dog blood for style and steadiness.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
 
@@ -1132,8 +1132,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Setter",
     note: "An elegant, feathered bird dog that 'sets', crouching low when it scents game, built up from the old setting spaniels.",
     children: [
-      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/field-spaniel.jpg", value: 50 },
-      { name: "Pointer", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
+      { name: "Old setting spaniels", note: "The crouching land spaniels that marked game for the net.", img: "/history/breeds/old-setting-spaniels.jpg", value: 50 },
+      { name: "Pointer", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/british-pointers.jpg", value: 30 },
       { name: "Water spaniels", note: "A little water-spaniel for coat and biddability.", img: "/history/breeds/original-water-spaniel.jpg", value: 20 }
     ]
   },
@@ -1240,7 +1240,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The grey ghost, a noble gun dog from the Weimar court of Germany, built on old scent trailing and pointing stock.",
     children: [
       { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 },
-      { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/pointer-photo.jpg", value: 40 },
+      { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/british-pointers.jpg", value: 40 },
       { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 20 }
     ]
   },
@@ -1249,7 +1249,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The spotted coach dog, named for Dalmatia on the Adriatic coast, bred to trot for miles beside a carriage.",
     children: [
       { name: "Ancient spotted hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
-      { name: "Pointer", note: "Pointing and hound blood that shaped its build and steady working head.", img: "/history/breeds/pointer-photo.jpg", value: 30 },
+      { name: "Pointer", note: "Pointing and hound blood that shaped its build and steady working head.", img: "/history/breeds/british-pointers.jpg", value: 30 },
       { name: "Carriage guard dogs", note: "The road dogs kept to run with the horses and mind the coach, the job it was made for.", img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg", value: 15 }
     ]
   },
