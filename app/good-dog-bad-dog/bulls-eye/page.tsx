@@ -28,7 +28,7 @@ export default function BullsEyePage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <div className={styles.essayHeroImgFallback} />
+          <img src="/bulls-eye-img.jpg" alt="Bull's-eye" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
