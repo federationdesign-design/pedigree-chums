@@ -1,0 +1,320 @@
+/* ── Page shell ─────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  padding-top: 120px;
+  padding-bottom: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Intro ──────────────────────────────────────────────────── */
+.intro {
+  max-width: 640px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.eyebrow {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 16px;
+}
+
+.title {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 24px;
+}
+
+.titleAccent {
+  color: var(--yellow, #ffd23e);
+}
+
+.introText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.7;
+  margin: 0 0 40px;
+}
+
+.startBtn {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  border: none;
+  border-radius: 999px;
+  padding: 18px 48px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.startBtn:hover {
+  background: #ffe566;
+  transform: scale(1.04);
+}
+
+/* ── Question ───────────────────────────────────────────────── */
+.questionWrap {
+  width: 100%;
+  max-width: 680px;
+  padding: 0 24px;
+}
+
+.progressWrap {
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.progressLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+  margin: 0;
+}
+
+.questionCard {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 36px 32px 28px;
+}
+
+.questionNum {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 12px;
+}
+
+.question {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+.questionSub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 28px;
+  font-style: italic;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.option {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 14px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.option:hover {
+  background: rgba(255,210,62,0.15);
+  border-color: var(--yellow, #ffd23e);
+  transform: translateX(4px);
+}
+
+.backBtn {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.backBtn:hover {
+  color: #ffffff;
+}
+
+/* ── Results ────────────────────────────────────────────────── */
+.resultsWrap {
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.resultsTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+.resultsSub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  margin: 0 0 48px;
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 700px) {
+  .resultsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 440px) {
+  .resultsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resultCard {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 20px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+  position: relative;
+}
+
+.resultCard:hover {
+  border-color: var(--yellow, #ffd23e);
+  transform: translateY(-4px);
+}
+
+.resultRank {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: 32px;
+  height: 32px;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.85rem;
+}
+
+.resultImgWrap {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255,255,255,0.15);
+}
+
+.resultImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.resultName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.resultScore {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--yellow, #ffd23e);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.restartBtn {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.restartBtn:hover {
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.5);
+}
