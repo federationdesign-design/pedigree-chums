@@ -289,3 +289,93 @@
   line-height: 1.6;
   margin: 4px 0 0;
 }
+
+/* ── Index grid ─────────────────────────────────────────────── */
+.grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+}
+.card {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s ease;
+}
+.card:hover { border-color: rgba(255,255,255,0.25); }
+.cardMeta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.cardBreed {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+}
+.cardTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.2;
+}
+.cardSummary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.7;
+  margin: 0;
+  flex: 1;
+}
+.readMore {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 10px 22px;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.readMore:hover { background: #ffe566; transform: scale(1.03); }
+.tagMisjudged { background: var(--yellow, #ffd23e); color: var(--navy, #0a3a57); }
+.tagGood { background: #22c55e; color: #ffffff; }
+.tagReal { background: #3b82f6; color: #ffffff; }
+.essayPage {
+  min-height: 100vh;
+  padding-top: 140px;
+  padding-bottom: 80px;
+}
+.backLink {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  max-width: 900px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+  display: block;
+  transition: color 0.15s ease;
+}
+.backLink:hover { color: #ffffff; }
