@@ -35,6 +35,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   if (!mounted) return null;
 
   return createPortal(
+    // ── Backdrop ──────────────────────────────────────────────────────────────
     <div
       onClick={onClose}
       role="dialog"
@@ -46,31 +47,38 @@ export default function LineageModal({ name, image, character, lineage, onClose 
         background: "rgba(0,0,0,0.55)", padding: "16px",
       }}
     >
-      {/* Modal card -- the one and only container */}
+      {/* ── Modal card -- single container, BreedTree fills it ────────────── */}
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
           position: "relative",
-          width: "min(1344px, 96vw)",
-          height: "min(90vh, 880px)",
+          width: "min(1200px, 96vw)",
+          height: "min(88vh, 820px)",
           background: "linear-gradient(to top right, #00e2ff, #008eff)",
           borderRadius: 28,
           boxShadow: "0 24px 80px rgba(0,0,0,0.4)",
           overflow: "hidden",
+          isolation: "isolate",
         }}
       >
-        {/* BreedTree fills the full modal -- no inner wrapper */}
-        <BreedTree root={lineage} rootImage={image} onActiveChange={setTreeActive} onClose={onClose} />
+        {/* ── BreedTree fills the entire card ───────────────────────────── */}
+        <div style={{ position: "absolute", inset: 0 }}>
+          <BreedTree
+            root={lineage}
+            rootImage={image}
+            onActiveChange={setTreeActive}
+            onClose={onClose}
+          />
+        </div>
 
-        {/* Title + description -- absolute top right, above the tree */}
+        {/* ── Breed name -- top left, over the tree ─────────────────────── */}
         <div
           style={{
             position: "absolute",
             top: 28,
-            right: 80,
+            left: 32,
             zIndex: 10,
-            textAlign: "right",
-            maxWidth: 280,
+            maxWidth: "38%",
             opacity: treeActive ? 0.08 : 1,
             transition: "opacity 0.35s ease",
             pointerEvents: treeActive ? "none" : "auto",
@@ -78,26 +86,45 @@ export default function LineageModal({ name, image, character, lineage, onClose 
         >
           <h3 style={{
             fontFamily: "var(--font-display,'Luckiest Guy',system-ui)",
-            fontSize: "clamp(2.4rem, 6vw, 4rem)",
+            fontSize: "clamp(2rem, 5vw, 3.8rem)",
             color: "#ffffff",
             textTransform: "uppercase",
             letterSpacing: "0.04em",
-            margin: "0 0 8px",
+            margin: 0,
             lineHeight: 1.1,
+            textShadow: "0 2px 12px rgba(0,0,0,0.25)",
           }}>{name}</h3>
-          {character && (
-            <p style={{
-              fontFamily: "var(--font-body,'Montserrat',system-ui)",
-              fontSize: "0.9rem",
-              fontWeight: 500,
-              color: "rgba(255,255,255,0.9)",
-              margin: 0,
-              lineHeight: 1.5,
-            }}>{character}</p>
-          )}
         </div>
 
-        {/* Close button */}
+        {/* ── Character description -- top right blue box ────────────────── */}
+        {character && (
+          <div
+            style={{
+              position: "absolute",
+              top: 28,
+              right: 80,
+              zIndex: 10,
+              maxWidth: 260,
+              background: "rgba(10,58,87,0.88)",
+              borderRadius: 16,
+              padding: "14px 18px",
+              opacity: treeActive ? 0.08 : 1,
+              transition: "opacity 0.35s ease",
+              pointerEvents: treeActive ? "none" : "auto",
+            }}
+          >
+            <p style={{
+              fontFamily: "var(--font-body,'Montserrat',system-ui)",
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              color: "#ffffff",
+              margin: 0,
+              lineHeight: 1.6,
+            }}>{character}</p>
+          </div>
+        )}
+
+        {/* ── Close button ──────────────────────────────────────────────── */}
         <button
           type="button"
           onClick={onClose}

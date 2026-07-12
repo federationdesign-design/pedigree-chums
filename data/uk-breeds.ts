@@ -56,7 +56,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/history/breeds/cocker_spaniel-photo.jpg", tag: "popular" },
   { name: "Field Spaniel", strip: "spaniels", era: "1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
   { name: "Sussex Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/Sussex-Spaniel.jpg", tag: "endangered" },
-  { name: "Irish Water Spaniel", strip: "mid1800", era: "1830s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/Old-Irish-water-dog.jpg", tag: "endangered" },
+  { name: "Irish Water Spaniel", strip: "mid1800", era: "1830s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel-photo.jpg", tag: "endangered" },
   { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
