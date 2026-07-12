@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { breeds, type Breed } from "../../data/breeds";
-import BreedDialog from "./BreedDialog";
 import styles from "./know.module.css";
 
 // Stat-table names that differ from the pack's breed names.
@@ -60,12 +60,10 @@ const MAX_PCT = 7.0; // longest common-breed bar = French Bulldog 7.0%
 function BarTable({
   caption,
   bars,
-  onOpen,
   max = MAX_PCT,
 }: {
   caption: string;
   bars: Bar[];
-  onOpen: (b: Breed) => void;
   max?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -104,25 +102,13 @@ function BarTable({
       {bars.map((b, i) => {
         const target = (b.w != null ? b.w : (b.pct / max) * 78) * barScale;
         const breed = resolveBreed(b.name);
-        const open = breed ? () => onOpen(breed) : undefined;
         return (
-          <div
+          <Link
+            href={breed ? `/chums/${breed.slug}` : "#"}
             className={`${styles.barRow} ${breed ? styles.barClickable : ""}`.trim()}
             key={`${b.name}-${i}`}
-            onClick={open}
-            role={breed ? "button" : undefined}
-            tabIndex={breed ? 0 : undefined}
             aria-label={breed ? `View ${breed.name}` : undefined}
-            onKeyDown={
-              breed
-                ? (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      open!();
-                    }
-                  }
-                : undefined
-            }
+            style={{ textDecoration: "none" }}
           >
             <div className={styles.barThumb}>
               {b.img ? (
@@ -142,7 +128,7 @@ function BarTable({
               </div>
               <span className={styles.barPct}>{b.label ?? `${b.pct.toFixed(1)}%`}</span>
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>
@@ -150,14 +136,13 @@ function BarTable({
 }
 
 export default function BreedStats() {
-  const [selected, setSelected] = useState<Breed | null>(null);
   return (
     <section className={styles.statsSection}>
       <h2 className={`display ${styles.statsHeading}`}>
         The trends <span className="display-yellow">&amp; stats</span>
       </h2>
 
-      <BarTable caption="The most common dog breeds across all ages" bars={ALL_AGES} onOpen={setSelected} />
+      <BarTable caption="The most common dog breeds across all ages" bars={ALL_AGES} />
 
       <p className={styles.statsIntro}>
         The most common dogs across all ages were the crossbreed, Labrador and
@@ -167,7 +152,7 @@ export default function BreedStats() {
         favourites.
       </p>
 
-      <BarTable caption="The most common puppy breeds" bars={PUPPIES} onOpen={setSelected} />
+      <BarTable caption="The most common puppy breeds" bars={PUPPIES} />
 
       <p className={styles.statsIntro}>
         Now the other end of the lead. These five are in the pack too, yet you
@@ -178,14 +163,14 @@ export default function BreedStats() {
         a quiet act of rescue.
       </p>
 
-      <BarTable caption="And the rarest breeds in the pack" bars={RARE} onOpen={setSelected} />
+      <BarTable caption="And the rarest breeds in the pack" bars={RARE} />
 
       <p className={styles.source}>
         Rarity estimated from Kennel Club puppy registrations (2024). Most-common
         figures: RVC VetCompass, O&apos;Neill et al. (2023).
       </p>
 
-      {selected && <BreedDialog breed={selected} onClose={() => setSelected(null)} />}
+
     </section>
   );
 }
