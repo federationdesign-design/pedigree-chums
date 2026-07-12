@@ -12,18 +12,14 @@ const famousDogs: Record<string, FamousDog[]> = {
   "basset-hound": [
     { name: "Droopy", type: "Animated", knownFor: "Droopy cartoons", sourceUrl: "https://en.wikipedia.org/wiki/Droopy" },
     { name: "Toby", type: "Animated", knownFor: "The Great Mouse Detective", sourceUrl: "https://en.wikipedia.org/wiki/The_Great_Mouse_Detective" },
-    { name: "Flash", type: "Live-action TV", knownFor: "The Dukes of Hazzard", sourceUrl: "https://en.wikipedia.org/wiki/Flash_(dog)" },
     { name: "Lafayette", type: "Animated", knownFor: "The Aristocats", sourceUrl: "https://en.wikipedia.org/wiki/The_Aristocats" },
   ],
   "beagle": [
     { name: "Snoopy", type: "Animated", knownFor: "Peanuts", sourceUrl: "https://www.thekennelclub.org.uk/blog/6-top-dogs-in-comic-books/" },
-    { name: "Shiloh", type: "Live-action film", knownFor: "Shiloh", sourceUrl: "https://en.wikipedia.org/wiki/Shiloh_(Naylor_novel)" },
-    { name: "Underdog", type: "Animated", knownFor: "Underdog", sourceUrl: "https://en.wikipedia.org/wiki/Underdog_(TV_series)" },
   ],
   "bloodhound": [
     { name: "Trusty", type: "Animated", knownFor: "Lady and the Tramp", sourceUrl: "https://en.wikipedia.org/wiki/Lady_and_the_Tramp" },
     { name: "Copper", type: "Animated", knownFor: "The Fox and the Hound", sourceUrl: "https://en.wikipedia.org/wiki/The_Fox_and_the_Hound" },
-    { name: "Wylie Burp", type: "Animated", knownFor: "An American Tail: Fievel Goes West", sourceUrl: "https://en.wikipedia.org/wiki/An_American_Tail:_Fievel_Goes_West" },
   ],
   "border-collie": [
     { name: "Shep", type: "Real", knownFor: "Blue Peter dog", sourceUrl: "https://en.wikipedia.org/wiki/Blue_Peter_pets" },
@@ -32,7 +28,6 @@ const famousDogs: Record<string, FamousDog[]> = {
     { name: "Dog", type: "Comics", knownFor: "Footrot Flats", sourceUrl: "https://en.wikipedia.org/wiki/Footrot_Flats" },
   ],
   "border-terrier": [
-    { name: "Baxter", type: "Live-action film", knownFor: "Anchorman films", sourceUrl: "https://en.wikipedia.org/wiki/Anchorman:_The_Legend_of_Ron_Burgundy" },
   ],
   "boston-terrier": [
     { name: "Sergeant Stubby", type: "Real", knownFor: "First World War decorated war dog", sourceUrl: "https://en.wikipedia.org/wiki/Sergeant_Stubby" },
@@ -53,15 +48,12 @@ const famousDogs: Record<string, FamousDog[]> = {
     { name: "Dash", type: "Real", knownFor: "Queen Victoria's companion", sourceUrl: "https://en.wikipedia.org/wiki/Dash_(spaniel)" },
   ],
   "chihuahua": [
-    { name: "Bruiser Woods", type: "Live-action film", knownFor: "Legally Blonde films", sourceUrl: "https://en.wikipedia.org/wiki/Legally_Blonde" },
     { name: "Tito", type: "Animated", knownFor: "Oliver & Company", sourceUrl: "https://en.wikipedia.org/wiki/Oliver_%26_Company" },
-    { name: "Chloe", type: "Live-action film", knownFor: "Beverly Hills Chihuahua", sourceUrl: "https://en.wikipedia.org/wiki/Beverly_Hills_Chihuahua" },
     { name: "Ren Höek", type: "Animated", knownFor: "The Ren & Stimpy Show", sourceUrl: "https://en.wikipedia.org/wiki/Ren_H%C3%B6ek" },
   ],
   "cocker-spaniel": [
     { name: "Lady", type: "Animated", knownFor: "Lady and the Tramp", sourceUrl: "https://en.wikipedia.org/wiki/Lady_and_the_Tramp" },
     { name: "Flush", type: "Literature", knownFor: "Flush: A Biography by Virginia Woolf", sourceUrl: "https://en.wikipedia.org/wiki/Flush:_A_Biography" },
-    { name: "Checkers", type: "Real", knownFor: "Richard Nixon's Checkers speech dog", sourceUrl: "https://en.wikipedia.org/wiki/Checkers_speech" },
   ],
   "corgi": [
     { name: "Susan", type: "Real", knownFor: "Foundation dog of Queen Elizabeth II's Corgi line", sourceUrl: "https://www.thekennelclub.org.uk/media-centre/2018/april/corgis-and-the-queen-celebrating-the-breed-that-the-queen-made-popular/" },
@@ -82,8 +74,6 @@ const famousDogs: Record<string, FamousDog[]> = {
   ],
   "doberman-pinscher": [
     { name: "Alpha", type: "Animated", knownFor: "Up", sourceUrl: "https://en.wikipedia.org/wiki/Up_(2009_film)" },
-    { name: "Roscoe and DeSoto", type: "Animated", knownFor: "Oliver & Company", sourceUrl: "https://en.wikipedia.org/wiki/Oliver_%26_Company" },
-    { name: "Zeus and Apollo", type: "Live-action TV", knownFor: "Magnum, P.I.", sourceUrl: "https://en.wikipedia.org/wiki/Magnum,_P.I." },
   ],
   "french-bulldog": [
     { name: "Stella", type: "Live-action TV", knownFor: "Modern Family", sourceUrl: "https://en.wikipedia.org/wiki/Stella_(Modern_Family)" },
@@ -122,7 +112,6 @@ const famousDogs: Record<string, FamousDog[]> = {
     { name: "Uggie", type: "Real", knownFor: "The Artist", sourceUrl: "https://en.wikipedia.org/wiki/Uggie" },
     { name: "Milo", type: "Live-action film", knownFor: "The Mask", sourceUrl: "https://en.wikipedia.org/wiki/The_Mask_(1994_film)" },
     { name: "Max", type: "Animated", knownFor: "The Secret Life of Pets", sourceUrl: "https://en.wikipedia.org/wiki/The_Secret_Life_of_Pets" },
-    { name: "Wishbone", type: "Live-action TV", knownFor: "Wishbone", sourceUrl: "https://en.wikipedia.org/wiki/Wishbone_(TV_series)" },
   ],
   "labrador": [
     { name: "Marley", type: "Literature / film", knownFor: "Marley & Me", sourceUrl: "https://en.wikipedia.org/wiki/Marley_%26_Me" },
@@ -132,7 +121,6 @@ const famousDogs: Record<string, FamousDog[]> = {
   ],
   "mastiff": [
     { name: "Fang", type: "Literature", knownFor: "Harry Potter novels", sourceUrl: "https://en.wikipedia.org/wiki/Magical_creatures_in_Harry_Potter" },
-    { name: "Hercules", type: "Live-action film", knownFor: "The Sandlot", sourceUrl: "https://en.wikipedia.org/wiki/The_Sandlot" },
     { name: "Zorba", type: "Real", knownFor: "Former record-holder for heaviest and longest dog", sourceUrl: "https://en.wikipedia.org/wiki/Zorba_(dog)" },
   ],
   "miniature-schnauzer": [
@@ -145,24 +133,20 @@ const famousDogs: Record<string, FamousDog[]> = {
     { name: "Ambrosius", type: "Live-action film", knownFor: "Labyrinth", sourceUrl: "https://en.wikipedia.org/wiki/Labyrinth_(1986_film)" },
   ],
   "pomeranian": [
-    { name: "Gidget", type: "Animated", knownFor: "The Secret Life of Pets", sourceUrl: "https://en.wikipedia.org/wiki/The_Secret_Life_of_Pets" },
     { name: "Boo", type: "Real", knownFor: "Widely followed social-media dog", sourceUrl: "https://en.wikipedia.org/wiki/Boo_(dog)" },
     { name: "Marco", type: "Real", knownFor: "Queen Victoria's Pomeranian", sourceUrl: "https://en.wikipedia.org/wiki/Pomeranian_dog" },
   ],
   "poodle": [
     { name: "Roly", type: "Live-action TV", knownFor: "EastEnders", sourceUrl: "https://en.wikipedia.org/wiki/Roly_(dog)" },
     { name: "Georgette", type: "Animated", knownFor: "Oliver & Company", sourceUrl: "https://en.wikipedia.org/wiki/Oliver_%26_Company" },
-    { name: "Daphne", type: "Live-action film", knownFor: "Look Who's Talking Now", sourceUrl: "https://en.wikipedia.org/wiki/Look_Who%27s_Talking_Now" },
   ],
   "pug": [
     { name: "Frank", type: "Live-action film", knownFor: "Men in Black films", sourceUrl: "https://en.wikipedia.org/wiki/Frank_the_Pug" },
     { name: "Percy", type: "Animated", knownFor: "Pocahontas", sourceUrl: "https://en.wikipedia.org/wiki/Pocahontas_(1995_film)" },
-    { name: "Mel", type: "Animated", knownFor: "The Secret Life of Pets", sourceUrl: "https://en.wikipedia.org/wiki/The_Secret_Life_of_Pets" },
     { name: "Willy", type: "Live-action TV", knownFor: "EastEnders", sourceUrl: "https://en.wikipedia.org/wiki/List_of_EastEnders_characters" },
   ],
   "rottweiler": [
     { name: "Carl", type: "Literature", knownFor: "Good Dog, Carl", sourceUrl: "https://en.wikipedia.org/wiki/Good_Dog,_Carl" },
-    { name: "Muzzle", type: "Animated", knownFor: "Road Rovers", sourceUrl: "https://en.wikipedia.org/wiki/Road_Rovers" },
   ],
   "saint-bernard": [
     { name: "Beethoven", type: "Live-action film", knownFor: "Beethoven franchise", sourceUrl: "https://en.wikipedia.org/wiki/Beethoven_(film)" },
@@ -170,12 +154,10 @@ const famousDogs: Record<string, FamousDog[]> = {
     { name: "Nana", type: "Literature / animation", knownFor: "Peter Pan adaptations", sourceUrl: "https://en.wikipedia.org/wiki/Nana_(Peter_Pan)" },
   ],
   "shih-tzu": [
-    { name: "Bonny", type: "Live-action film", knownFor: "Seven Psychopaths", sourceUrl: "https://en.wikipedia.org/wiki/Seven_Psychopaths" },
   ],
   "siberian-husky": [
     { name: "Togo", type: "Real", knownFor: "1925 serum run to Nome", sourceUrl: "https://en.wikipedia.org/wiki/Togo_(dog)" },
     { name: "Balto", type: "Real / animation", knownFor: "1925 serum run to Nome", sourceUrl: "https://en.wikipedia.org/wiki/Balto" },
-    { name: "Demon", type: "Live-action film", knownFor: "Snow Dogs", sourceUrl: "https://en.wikipedia.org/wiki/Snow_Dogs" },
   ],
   "springer-spaniel": [
     { name: "Buster", type: "Real", knownFor: "PDSA Dickin Medal recipient and arms-detection dog", sourceUrl: "https://en.wikipedia.org/wiki/Buster_(dog)" },
@@ -197,7 +179,6 @@ const famousDogs: Record<string, FamousDog[]> = {
   "yorkshire-terrier": [
     { name: "Smoky", type: "Real", knownFor: "Second World War therapy and war dog", sourceUrl: "https://en.wikipedia.org/wiki/Smoky_(dog)" },
     { name: "Mr Famous", type: "Real", knownFor: "Audrey Hepburn's Yorkshire Terrier", sourceUrl: "https://en.wikipedia.org/wiki/Audrey_Hepburn" },
-    { name: "Dante", type: "Live-action film", knownFor: "Show Dogs", sourceUrl: "https://en.wikipedia.org/wiki/Show_Dogs" },
   ],
 };
 
