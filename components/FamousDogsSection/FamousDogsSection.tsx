@@ -49,6 +49,7 @@ function typeOrder(type: string): number {
 
 export default function FamousDogsSection({ dogs }: Props) {
   const sorted = [...dogs].sort((a, b) => typeOrder(a.type) - typeOrder(b.type));
+  if (sorted.length === 0) return null;
   return (
     <div className={styles.section}>
       <h2 className={styles.heading}>Famous Chums</h2>

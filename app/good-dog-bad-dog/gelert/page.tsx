@@ -33,7 +33,7 @@ export default function GelertPage() {
           <div className={styles.essayHeroContent}>
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
             <div className={styles.essayHeroMeta}>
-              <span className={`${styles.tag} ${styles.tagMisjudged}`}>Misjudged dog</span>
+              <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Irish Wolfhound</span>
             </div>
             <h1 className={styles.essayHeroTitle}>Gelert: The Dog Who Couldn't Explain Himself</h1>

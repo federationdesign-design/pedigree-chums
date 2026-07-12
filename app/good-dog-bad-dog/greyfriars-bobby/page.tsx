@@ -33,7 +33,7 @@ export default function GreyfriarsBobbyPage() {
           <div className={styles.essayHeroContent}>
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
             <div className={styles.essayHeroMeta}>
-              <span className={`${styles.tag} ${styles.tagReal}`}>Real dog</span>
+              <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Skye Terrier</span>
             </div>
             <h1 className={styles.essayHeroTitle}>Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog</h1>
