@@ -369,12 +369,9 @@
   letter-spacing: 0.08em;
   color: rgba(255,255,255,0.85);
   text-decoration: none;
-  padding: 12px 24px;
   display: inline-block;
   white-space: nowrap;
-  position: relative;
-  z-index: 2;
-  margin-top: clamp(90px, 12vw, 140px);
+  margin-bottom: 20px;
   transition: color 0.15s ease;
 }
 .backLink:hover { color: #ffffff; }
@@ -386,6 +383,7 @@
   padding: 24px 24px 40px;
   width: 100%;
   align-self: flex-end;
+  margin-top: auto;
 }
 
 .essayHeroMeta {
