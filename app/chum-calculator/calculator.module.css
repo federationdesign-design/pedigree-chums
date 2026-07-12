@@ -265,14 +265,17 @@
 .cardScore {
   position: absolute;
   bottom: 6px;
-  right: 6px;
-  background: rgba(10,58,87,0.85);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10,58,87,0.92);
   color: var(--yellow, #ffd23e);
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   border-radius: 999px;
-  padding: 2px 8px;
+  padding: 3px 10px;
+  white-space: nowrap;
   backdrop-filter: blur(4px);
 }
 

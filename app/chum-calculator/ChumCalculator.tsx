@@ -258,7 +258,7 @@ export default function ChumCalculator() {
 
   // Threshold: hide breeds below 40 once at least 3 questions answered
   const visibleBreeds = answeredCount >= 3
-    ? scoredBreeds.filter((b) => b.score >= 40)
+    ? scoredBreeds.filter((b) => b.score >= 80)
     : scoredBreeds;
 
   function handleAnswer(qId: string, value: string) {
@@ -355,7 +355,7 @@ export default function ChumCalculator() {
       <div className={styles.breedGrid}>
         {scoredBreeds.map((b) => {
           const cardImg = breedCard[b.slug];
-          const hidden = answeredCount >= 3 && b.score < 40;
+          const hidden = answeredCount >= 3 && b.score < 80;
           return (
             <Link
               key={b.slug}
@@ -369,7 +369,7 @@ export default function ChumCalculator() {
               }
               {answeredCount > 0 && !hidden && (
                 <div className={styles.cardScore}>
-                  {b.score}%
+                  {b.score >= 120 ? 'Perfect fit' : b.score >= 100 ? 'Great fit' : 'Good fit'}
                 </div>
               )}
             </Link>
