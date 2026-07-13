@@ -160,53 +160,53 @@ export default function SmarterThanTheTestPage() {
                 margin: "0 0 16px",
                 padding: "0 20px",
               }}>Notable animals</h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {NOTABLE.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "block",
-                      padding: "12px 20px",
-                      textDecoration: "none",
-                      borderTop: "1px solid rgba(255,255,255,0.07)",
-                      transition: "background 0.15s ease",
-                    }}
-
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <span style={{
-                        fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                        fontSize: "0.58rem",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        color: CATEGORY_COLOUR[item.category] ?? "#ffffff",
-                        border: `1px solid ${CATEGORY_COLOUR[item.category] ?? "#ffffff"}`,
-                        borderRadius: 999,
-                        padding: "1px 8px",
-                        flexShrink: 0,
-                      }}>{item.category}</span>
-                      <span style={{
-                        fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                        fontSize: "0.82rem",
-                        fontWeight: 700,
-                        color: "#ffffff",
-                      }}>{item.name} ↗</span>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {(["Dog", "Cetacean", "Ancestor", "Other"]).map((cat) => {
+                  const items = NOTABLE.filter((n) => n.category === cat);
+                  if (!items.length) return null;
+                  const colour = CATEGORY_COLOUR[cat] ?? "#ffffff";
+                  return (
+                    <div key={cat} style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 4, marginBottom: 4 }}>
+                      <div style={{ padding: "8px 20px 4px" }}>
+                        <span style={{
+                          fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                          fontSize: "0.6rem", fontWeight: 700,
+                          textTransform: "uppercase", letterSpacing: "0.1em",
+                          color: colour, border: `1px solid ${colour}`,
+                          borderRadius: 999, padding: "2px 10px",
+                        }}>{cat}</span>
+                      </div>
+                      {items.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: "block",
+                            padding: "10px 20px",
+                            textDecoration: "none",
+                            borderTop: "1px solid rgba(255,255,255,0.05)",
+                          }}
+                        >
+                          <div style={{
+                            fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                            fontSize: "0.82rem", fontWeight: 700,
+                            color: "#ffffff", marginBottom: 3,
+                          }}>{item.name} ↗</div>
+                          <p style={{
+                            fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                            fontSize: "0.7rem", fontWeight: 500,
+                            color: "rgba(255,255,255,0.6)",
+                            margin: 0, lineHeight: 1.5,
+                          }}>{item.note}</p>
+                        </a>
+                      ))}
                     </div>
-                    <p style={{
-                      fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                      fontSize: "0.72rem",
-                      fontWeight: 500,
-                      color: "rgba(255,255,255,0.65)",
-                      margin: 0,
-                      lineHeight: 1.5,
-                    }}>{item.note}</p>
-                  </a>
-                ))}
+                  );
+                })}
               </div>
+            </div>
             </div>
           </aside>
         </div>
