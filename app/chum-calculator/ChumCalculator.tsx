@@ -409,7 +409,7 @@ export default function ChumCalculator() {
   // After core questions, show tiebreakers only if >5 breeds remain
   const needsTiebreakers = coreAnswered >= CORE_COUNT && coreVisible > 5;
   const total = needsTiebreakers ? QUESTIONS.length : CORE_COUNT;
-  const currentQ = step >= 1 && step <= QUESTIONS.length ? QUESTIONS[step - 1] : null;
+  const currentQ = step >= 1 && step <= total ? QUESTIONS[step - 1] : null;
   const started = step > 0;
   const finished = step > total;
 
