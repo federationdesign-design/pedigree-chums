@@ -140,6 +140,34 @@ const QUESTIONS: Question[] = [
       { label: "No -- I'm not precious about my home", value: "no" },
     ],
   },
+  {
+    id: "tb_roughplay",
+    question: "Do you like rough and tumble play with your dog?",
+    sub: "Some breeds have very fine bones and can be seriously injured by boisterous play",
+    options: [
+      { label: "Yes -- I want a sturdy dog that can handle it", value: "yes" },
+      { label: "No -- I prefer gentle, calm interaction", value: "no" },
+      { label: "Either is fine", value: "any" },
+    ],
+  },
+  {
+    id: "tb_location",
+    question: "Where do you live?",
+    sub: "Some breeds need open countryside -- others are happiest on city streets",
+    options: [
+      { label: "City or large town -- mostly pavements and parks", value: "city" },
+      { label: "Suburban -- some green space nearby", value: "suburban" },
+      { label: "Rural -- countryside, fields and open space", value: "rural" },
+    ],
+  },
+  {
+    id: "tb_openspace",
+    question: "Do you have easy access to open space for off-lead running?",
+    options: [
+      { label: "Yes -- fields, woodland or a large park nearby", value: "yes" },
+      { label: "No -- mostly streets and small urban parks", value: "no" },
+    ],
+  },
 ];
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
@@ -266,8 +294,13 @@ export default function ChumCalculator() {
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
 
   const answeredCount = Object.keys(answers).length;
-  const total = QUESTIONS.length;
-  const currentQ = step >= 1 && step <= total ? QUESTIONS[step - 1] : null;
+  const CORE_COUNT = 13;
+  const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_")).length;
+  const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed, answers) })).sort((a, b) => b.score - a.score);
+  const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
+  // Skip tiebreakers if 5 or fewer breeds remain after core questions
+  const total = (step > CORE_COUNT || coreAnswered < CORE_COUNT) && coreVisible > 5 ? QUESTIONS.length : CORE_COUNT;
+  const currentQ = step >= 1 && step <= QUESTIONS.length ? QUESTIONS[step - 1] : null;
   const started = step > 0;
   const finished = step > total;
 
