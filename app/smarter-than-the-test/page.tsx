@@ -9,6 +9,76 @@ export const metadata: Metadata = {
   description: "We measure animal intelligence by how closely it resembles our own. Dogs and dolphins suggest we have been asking the wrong question.",
 };
 
+const NOTABLE = [
+  {
+    name: "Chaser",
+    category: "Dog",
+    note: "Border Collie who learned 1,022 object names -- the largest tested vocabulary of any non-human animal.",
+    url: "https://en.wikipedia.org/wiki/Chaser_(dog)",
+  },
+  {
+    name: "Rico",
+    category: "Dog",
+    note: "Border Collie who could identify objects by name and use fast mapping to learn new words from a single exposure.",
+    url: "https://en.wikipedia.org/wiki/Rico_(dog)",
+  },
+  {
+    name: "Betsy",
+    category: "Dog",
+    note: "Border Collie with a vocabulary of over 340 words who could match a photograph of an object to the real thing.",
+    url: "https://en.wikipedia.org/wiki/Betsy_(dog)",
+  },
+  {
+    name: "Endal",
+    category: "Dog",
+    note: "Labrador Retriever service dog who could respond to hundreds of signed commands and was filmed using a cash machine.",
+    url: "https://en.wikipedia.org/wiki/Endal",
+  },
+  {
+    name: "Bottlenose Dolphin",
+    category: "Cetacean",
+    note: "Forms multi-level social alliances, uses signature whistles as individual names, and passes learned behaviours between generations.",
+    url: "https://en.wikipedia.org/wiki/Bottlenose_dolphin",
+  },
+  {
+    name: "Orca",
+    category: "Cetacean",
+    note: "Hunts cooperatively in family pods, has distinct dialects by population, and shows evidence of cultural transmission across generations.",
+    url: "https://en.wikipedia.org/wiki/Orca",
+  },
+  {
+    name: "Sperm Whale",
+    category: "Cetacean",
+    note: "Has the largest brain of any animal on Earth. Lives in matriarchal social groups with complex vocalisation patterns.",
+    url: "https://en.wikipedia.org/wiki/Sperm_whale",
+  },
+  {
+    name: "Pakicetus",
+    category: "Ancestor",
+    note: "The earliest known cetacean ancestor -- a dog-sized land mammal that lived 50 million years ago before the whale lineage returned to the sea.",
+    url: "https://en.wikipedia.org/wiki/Pakicetus",
+  },
+  {
+    name: "African Elephant",
+    category: "Other",
+    note: "Recognises itself in mirrors, mourns its dead, uses tools, and maintains complex long-term social bonds across decades.",
+    url: "https://en.wikipedia.org/wiki/African_elephant",
+  },
+  {
+    name: "New Caledonian Crow",
+    category: "Other",
+    note: "Manufactures hooked tools from leaves, solves multi-step problems, and can plan for future needs -- a capacity once thought uniquely human.",
+    url: "https://en.wikipedia.org/wiki/New_Caledonian_crow",
+  },
+];
+
+const CATEGORY_COLOUR: Record<string, string> = {
+  "Dog":      "#22c55e",
+  "Cetacean": "#5cc4ee",
+  "Ancestor": "#fb923c",
+  "Other":    "#a855f7",
+};
+
 export default function SmarterThanTheTestPage() {
   return (
     <>
@@ -47,12 +117,11 @@ export default function SmarterThanTheTestPage() {
               <h2 className={styles.subhead}>Dogs do not just obey -- they interpret</h2>
               <p>The smartest dogs are often described as obedient, but obedience is only one piece of the picture. A Border Collie working sheep may operate at a distance from the handler, reading the flock, the terrain, the pressure of its own position and the intention behind a whistle or gesture. A guide dog may disobey a command if obeying it would lead its person into danger. These are not simple reflexes. They require attention, memory, inhibition, learning and judgement.</p>
               <p>The Border Collie Chaser learned and retained the names of 1,022 objects over three years of training, and researchers found she could distinguish object names from commands. That matters because it challenges a simple idea of dogs as creatures who merely associate one sound with one reward. Chaser showed that a dog could build a large vocabulary of object labels and use them flexibly. Most dogs will never become Chaser. But Chaser shows what the canine mind is capable of under patient, structured teaching.</p>
-              <p>Other work has explored dogs' ability to imitate human actions. The Do as I Do method, developed by Claudia Fugazza and colleagues, trains dogs to observe a human action and reproduce it on cue -- and has been used to study imitation of novel actions, sequences and deferred imitation in dogs. That is not just trick training. It suggests that some dogs can map a human action onto their own body and reproduce it in a new context. The dog watches. The dog interprets. The dog acts.</p>
+              <p>Other work has explored dogs' ability to imitate human actions. The Do as I Do method, developed by Claudia Fugazza and colleagues, trains dogs to observe a human action and reproduce it on cue. That is not just trick training. It suggests that some dogs can map a human action onto their own body and reproduce it in a new context. The dog watches. The dog interprets. The dog acts.</p>
 
               <h2 className={styles.subhead}>Smell as thought</h2>
               <p>A large part of canine intelligence is built on a sense we barely possess. Humans are visual creatures. We organise the world through sight and language. Dogs experience a world thick with scent: identity, time, sex, stress, illness, direction, absence, presence. A path is not just a path. It is a recent history of who has passed, when, in what condition, and in what direction.</p>
               <p>This is why dogs can track people, detect explosives, locate drugs, find human remains, alert to low blood sugar or seizures, and in some experimental contexts detect disease-related odours -- though researchers are careful to stress that detection work requires rigorous validation before it reaches clinical use.</p>
-              <p>But the broader lesson is clear: dogs can perceive biologically meaningful information that humans cannot perceive directly, and then communicate that information through trained behaviour. That is not merely a good nose. It is a different sensory intelligence.</p>
               <p>Imagine designing an intelligence test where the central task was to identify disease, emotional state, age, sex and direction of travel from odour alone. We would fail. But our failure would not prove that humans lack intelligence. It would prove that the test was built around another animal's world. This is what we often do to animals. We ask them to be clever in our language.</p>
 
               <h2 className={styles.subhead}>The problem with one ladder</h2>
@@ -78,7 +147,69 @@ export default function SmarterThanTheTestPage() {
 
             </div>
           </article>
-          <aside className={styles.sidebar} />
+
+          {/* ── Sidebar -- Notable animals ──────────────────────────────── */}
+          <aside className={styles.sidebar}>
+            <div className={styles.sidebarCard} style={{ padding: "20px 0 8px" }}>
+              <h2 style={{
+                fontFamily: "var(--font-display,'Luckiest Guy',cursive)",
+                fontSize: "1.1rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--yellow,#ffd23e)",
+                margin: "0 0 16px",
+                padding: "0 20px",
+              }}>Notable animals</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {NOTABLE.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "block",
+                      padding: "12px 20px",
+                      textDecoration: "none",
+                      borderTop: "1px solid rgba(255,255,255,0.07)",
+                      transition: "background 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{
+                        fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                        fontSize: "0.58rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        color: CATEGORY_COLOUR[item.category] ?? "#ffffff",
+                        border: `1px solid ${CATEGORY_COLOUR[item.category] ?? "#ffffff"}`,
+                        borderRadius: 999,
+                        padding: "1px 8px",
+                        flexShrink: 0,
+                      }}>{item.category}</span>
+                      <span style={{
+                        fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                        fontSize: "0.82rem",
+                        fontWeight: 700,
+                        color: "#ffffff",
+                      }}>{item.name} ↗</span>
+                    </div>
+                    <p style={{
+                      fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                      fontSize: "0.72rem",
+                      fontWeight: 500,
+                      color: "rgba(255,255,255,0.65)",
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}>{item.note}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
       <Footer />
