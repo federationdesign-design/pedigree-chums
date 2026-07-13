@@ -174,8 +174,7 @@ export default function SmarterThanTheTestPage() {
                       borderTop: "1px solid rgba(255,255,255,0.07)",
                       transition: "background 0.15s ease",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                       <span style={{
