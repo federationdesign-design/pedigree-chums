@@ -973,7 +973,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cardigan Welsh Corgi",
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
-      { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
+      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },

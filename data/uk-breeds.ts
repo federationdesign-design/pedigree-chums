@@ -22,7 +22,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "English Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, prized as far back as Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
   { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/original-greyhound.jpg", tag: "in-decline" },
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
-  { name: "Cardigan Welsh Corgi", strip: "ancient-medieval", era: "Medieval", anchor: 1250, note: "Ancient Welsh cattle dog, the older of the two corgi breeds.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
+
   { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/Medieval-Bloodhound.jpg", tag: "endangered" },
   { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
@@ -94,6 +94,8 @@ export const ukBreeds: UKBreed[] = [
   { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
   { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/history/breeds/Border_Collie_photo.jpg" , tag: "popular" },
   { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/history/breeds/golden-retriever-photo.jpg", tag: "popular" },
+  { name: "Celtic Heeler", strip: "ancient-medieval", era: "Ancient", anchor: 900, note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes, forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.", image: "/history/breeds/Welsh-herding-dogs-cluster.jpg", tag: "extinct" },
+  { name: "Cardigan Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1919, note: "The older of the two corgis, first shown in 1919 and recognised by the Kennel Club in 1928. The long tail distinguishes it from the Pembroke.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
   { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg", tag: "trending" },
   { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
 
