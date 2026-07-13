@@ -234,10 +234,10 @@ function fitLabel(score: number): string {
   return "Good fit";
 }
 
-function fitColour(score: number): string {
-  if (score >= 120) return "#16a34a"; // green
-  if (score >= 100) return "#ea580c"; // orange
-  return "#ca8a04";                   // yellow/amber
+function fitColour(score: number): { bg: string; text: string } {
+  if (score >= 120) return { bg: "#4ade80", text: "#0a3a57" }; // green -- Popular
+  if (score >= 100) return { bg: "#ff7a3c", text: "#ffffff" }; // orange -- Endangered
+  return { bg: "#ffb02e", text: "#0a3a57" };                   // amber -- In decline
 }
 
 function fitReason(breed: { name: string; score: number }, answers: Record<string, string>): string {
@@ -419,7 +419,7 @@ export default function ChumCalculator() {
               {answeredCount > 0 && !hidden && (
                 <div
                   className={styles.cardScore}
-                  style={{ background: fitColour(b.score) }}
+                  style={{ background: fitColour(b.score).bg, color: fitColour(b.score).text }}
                   onMouseEnter={() => setHoveredBreed(b.slug)}
                   onMouseLeave={() => setHoveredBreed(null)}
                 >
