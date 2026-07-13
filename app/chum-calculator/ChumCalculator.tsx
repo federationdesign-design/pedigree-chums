@@ -364,16 +364,18 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   return Math.max(0, Math.round(score));
 }
 
-function fitLabel(score: number): string {
+function fitLabel(score: number, isBest = false): string {
+  if (isBest) return "Best fit";
   if (score >= 120) return "Perfect fit";
   if (score >= 100) return "Great fit";
   return "Good fit";
 }
 
-function fitColour(score: number): { bg: string; text: string } {
-  if (score >= 120) return { bg: "#4ade80", text: "#0a3a57" }; // green -- Popular
-  if (score >= 100) return { bg: "#ff7a3c", text: "#ffffff" }; // orange -- Endangered
-  return { bg: "#ffb02e", text: "#0a3a57" };                   // amber -- In decline
+function fitColour(score: number, isBest = false): { bg: string; text: string } {
+  if (isBest) return { bg: "#9333ea", text: "#ffffff" };        // purple -- best fit
+  if (score >= 120) return { bg: "#4ade80", text: "#0a3a57" }; // green -- perfect
+  if (score >= 100) return { bg: "#ff7a3c", text: "#ffffff" }; // orange -- great
+  return { bg: "#ffb02e", text: "#0a3a57" };                   // amber -- good
 }
 
 function fitReason(breed: { name: string; score: number }, answers: Record<string, string>): string {
@@ -421,7 +423,20 @@ export default function ChumCalculator() {
   }, [answers, answeredCount]);
 
   const thresholdActive = answeredCount >= 5;
-  const visibleCount = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD).length : ALL_BREEDS.length;
+  const visibleBreeds = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD) : scoredBreeds;
+  const visibleCount = thresholdActive ? visibleBreeds.length : ALL_BREEDS.length;
+
+  // Best fit -- rank 1 only, and only when 20+ points clear of rank 2
+  const top2 = visibleBreeds.slice(0, 2);
+  const bestSlug = (
+    finished &&
+    top2.length >= 1 &&
+    (top2.length === 1 || top2[0].score - top2[1].score >= 20)
+  ) ? top2[0].slug : null;
+
+  // Hide tail when 5+ perfect fits exist
+  const perfectCount = visibleBreeds.filter(b => b.score >= 120).length;
+  const hideTail = finished && perfectCount >= 5;
 
   function handleAnswer(qId: string, value: string) {
     setAnswers((prev) => ({ ...prev, [qId]: value }));
@@ -545,6 +560,8 @@ export default function ChumCalculator() {
         {scoredBreeds.map((b) => {
           const cardImg = breedCard[b.slug];
           const hidden = thresholdActive && b.score < THRESHOLD;
+          const isBest = b.slug === bestSlug;
+          if (hideTail && b.score < 120 && !isBest) return null;
           return (
             <Link
               key={b.slug}
@@ -561,7 +578,7 @@ export default function ChumCalculator() {
               {answeredCount >= 5 && !hidden && (
                 <div
                   className={styles.cardScore}
-                  style={{ background: fitColour(b.score).bg, color: fitColour(b.score).text }}
+                  style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
                   onMouseEnter={() => setHoveredBreed(b.slug)}
                   onMouseLeave={() => setHoveredBreed(null)}
                 >
@@ -570,7 +587,7 @@ export default function ChumCalculator() {
                       <p className={styles.fitTooltipText}>{fitReason(b, answers)}</p>
                     </div>
                   )}
-                  {fitLabel(b.score)}
+                  {fitLabel(b.score, isBest)}
                 </div>
               )}
             </Link>
