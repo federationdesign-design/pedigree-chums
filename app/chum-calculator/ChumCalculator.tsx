@@ -237,6 +237,26 @@ const QUESTIONS: Question[] = [
       { label: "No -- mostly streets and small urban parks", value: "no" },
     ],
   },
+  {
+    id: "tb_salon",
+    question: "Would you be happy booking your dog into a grooming salon every 6-8 weeks?",
+    sub: "For some breeds it is not optional -- it is part of the deal, at around £40-55 a month",
+    options: [
+      { label: "Yes -- I do not mind regular appointments and the cost", value: "yes" },
+      { label: "I would prefer a breed I can maintain at home with a brush", value: "home" },
+      { label: "I want something really low maintenance -- a quick wipe down is enough", value: "minimal" },
+    ],
+  },
+  {
+    id: "tb_smallchar",
+    question: "Small dogs have very different personalities. Some are bold, spirited and a bit confrontational -- tiny dogs with big opinions. Others are gentle, cuddly and content to follow your lead.",
+    sub: "Which appeals more to you?",
+    options: [
+      { label: "Bold and spirited -- a dog with strong opinions and a big personality for its size", value: "bold" },
+      { label: "Gentle and cuddly -- affectionate, easy-going, follows my lead", value: "gentle" },
+      { label: "Somewhere in between", value: "any" },
+    ],
+  },
 ];
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
@@ -484,6 +504,15 @@ export default function ChumCalculator() {
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
   const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
   // After core questions, show tiebreakers only if >5 breeds remain
+  // Check if the visible breeds are dominated by small breeds -- trigger small-breed tiebreakers
+  const smallSlugs = new Set(["chihuahua","yorkshire-terrier","miniature-schnauzer",
+    "west-highland-terrier","jack-russell-terrier","pomeranian","papillon","boston-terrier",
+    "jackapoo","border-terrier","cavapoo","cavalier-king-charles-spaniel","bichon-frise",
+    "maltese","maltipoo","cavachon","shih-tzu","cockapoo","italian-greyhound","poodle",
+    "labradoodle","goldendoodle","french-bulldog","pug","bulldog","shih-tzu"]);
+  const smallCount = coreAnswered >= 3
+    ? coreScored.filter(b => b.score >= THRESHOLD && smallSlugs.has(b.slug)).length
+    : 0;
   const needsTiebreakers = coreAnswered >= CORE_COUNT && coreVisible > 5;
   const total = needsTiebreakers ? QUESTIONS.length : CORE_COUNT;
   const currentQ = step >= 1 && step <= total ? QUESTIONS[step - 1] : null;
