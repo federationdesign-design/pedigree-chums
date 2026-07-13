@@ -973,7 +973,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cardigan Welsh Corgi",
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
-      { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
+      { name: "Teckel (Dachshund) family", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },
@@ -1094,7 +1094,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bearded Collie",
     note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
     children: [
-      { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
+      { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland. Now extinct.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
@@ -1187,7 +1187,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bichon Frise",
     note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
     children: [
-      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
+      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
       { name: "Mediterranean bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family. Now extinct.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 50 }
     ]
   },
@@ -1281,7 +1281,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Papillon",
     note: "The butterfly dog, a tiny continental spaniel with winged ears, a fixture of European courts for 700 years.",
     children: [
-      { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance.", img: "/history/breeds/Continental-toy-spaniels.jpg", value: 70 },
+      { name: "Continental toy spaniels", note: "The dwarf spaniels of France, Spain and Italy painted on noble laps through the Renaissance. Now extinct.", img: "/history/breeds/Continental-toy-spaniels.jpg", value: 70 },
       { name: "Old European lapdogs", note: "The wider family of small companion dogs that fed into Europe's toy breeds. Now extinct.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 30 }
     ]
   },
@@ -1289,7 +1289,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Siberian Husky",
     note: "The sled dog of the Chukchi people of north east Siberia, bred to pull light loads vast distances in brutal cold.",
     children: [
-      { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them.", img: "/history/breeds/Chukchi-sled-dogs.jpg", value: 75 },
+      { name: "Chukchi sled dogs", note: "The endurance team dogs of the Siberian Arctic, the breed almost unchanged from them. Now extinct.", img: "/history/breeds/Chukchi-sled-dogs.jpg", value: 75 },
       { name: "Ancient Arctic spitz", note: "The wider northern spitz family behind the pricked ears, curled tail and dense double coat. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 25 }
     ]
   },
@@ -1297,7 +1297,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Shih Tzu",
     note: "The lion dog of the Chinese imperial court, made by crossing Tibetan holy dogs with the palace's own toys.",
     children: [
-      { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 55 },
+      { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 55 },
       { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 45 }
     ]
   },
@@ -1338,7 +1338,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "German Shepherd",
     note: "Standardised from Germany's regional sheep herding dogs into one clever, hard working breed in the 1890s.",
     children: [
-      { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look.", img: "/history/breeds/Thuringian-herding-dogs.jpg", value: 45 },
+      { name: "Thuringian herding dogs", note: "The pricked ear, curl tailed herders of central Germany behind the alert look. Now extinct.", img: "/history/breeds/Thuringian-herding-dogs.jpg", value: 45 },
       { name: "Wurttemberg sheepdogs", note: "The larger, steadier southern herding dogs that gave size and a calm working head. Now extinct.", img: "/history/breeds/Wurttemberg-sheepdogs.jpg", value: 40 },
       { name: "Old German farm guards", note: "Local farm and guard stock folded in as the breed was fixed to a single type. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 15 }
     ]
