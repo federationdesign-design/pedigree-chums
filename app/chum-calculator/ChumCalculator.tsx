@@ -141,6 +141,25 @@ const QUESTIONS: Question[] = [
     ],
   },
   {
+    id: "mobility",
+    question: "Do you have any physical limitations that affect how far or fast you can walk?",
+    sub: "There is no wrong answer -- this helps us match you to a breed that genuinely suits your daily life",
+    options: [
+      { label: "Fully mobile -- exercise is about preference not ability", value: "full" },
+      { label: "Some limitations -- I can manage regular walks but nothing strenuous", value: "limited" },
+      { label: "Significantly limited -- short slow walks only, around 10-15 minutes", value: "minimal" },
+    ],
+  },
+  {
+    id: "allergies",
+    question: "Does anyone in the household have dog allergies or asthma that could be triggered by pet hair or dander?",
+    options: [
+      { label: "No -- we are all fine", value: "none" },
+      { label: "Mild -- we would prefer a lower-shedding breed", value: "mild" },
+      { label: "Yes, significant -- we need a breed known to be low-allergen", value: "significant" },
+    ],
+  },
+  {
     id: "tb_substance",
     question: "When you picture your ideal dog, what do you see?",
     sub: "Be honest -- this shapes everything that follows",
