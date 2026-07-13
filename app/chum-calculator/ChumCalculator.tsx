@@ -322,6 +322,45 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.destructive === "no" && !flags.destructive) score += 8;
   }
 
+  // ── Mobility scoring ────────────────────────────────────────────────────
+  const minimalWalkOk = new Set(["maltese","chihuahua","bulldog","french-bulldog","pug",
+    "bichon-frise","shih-tzu","yorkshire-terrier","pomeranian","maltipoo",
+    "cavachon","cavalier-king-charles-spaniel","boston-terrier","papillon"]);
+  const highExercise = new Set(["labrador","golden-retriever","rottweiler","boxer",
+    "labradoodle","goldendoodle","german-shepherd","dalmatian","irish-setter",
+    "springer-spaniel","doberman-pinscher","old-english-sheepdog",
+    "weimaraner","border-collie","siberian-husky"]);
+  const largeHard = new Set(["irish-wolfhound","mastiff","great-dane","saint-bernard",
+    "bloodhound","weimaraner","rottweiler","boxer","doberman-pinscher",
+    "old-english-sheepdog","german-shepherd"]);
+  if (answers.mobility === "minimal") {
+    if (minimalWalkOk.has(slug)) score += 15;
+    else if (highExercise.has(slug)) score -= 50;
+    else score -= 25;
+    if (largeHard.has(slug)) score -= 30;
+  } else if (answers.mobility === "limited") {
+    if (highExercise.has(slug)) score -= 25;
+    if (largeHard.has(slug)) score -= 15;
+  }
+
+  // ── Allergy scoring ─────────────────────────────────────────────────────
+  const lowAllergen = new Set(["poodle","cockapoo","labradoodle","goldendoodle","cavapoo",
+    "maltipoo","jackapoo","bichon-frise","maltese","yorkshire-terrier",
+    "shih-tzu","west-highland-terrier","miniature-schnauzer",
+    "border-terrier","boston-terrier"]);
+  const highAllergen = new Set(["german-shepherd","siberian-husky","golden-retriever",
+    "labrador","old-english-sheepdog","rottweiler","boxer","dalmatian",
+    "great-dane","saint-bernard","bloodhound","rough-collie",
+    "springer-spaniel","basset-hound","corgi"]);
+  if (answers.allergies === "significant") {
+    if (lowAllergen.has(slug)) score += 20;
+    else if (highAllergen.has(slug)) score -= 50;
+    else score -= 20;
+  } else if (answers.allergies === "mild") {
+    if (highAllergen.has(slug)) score -= 25;
+    if (lowAllergen.has(slug)) score += 8;
+  }
+
   return Math.max(0, Math.round(score));
 }
 
