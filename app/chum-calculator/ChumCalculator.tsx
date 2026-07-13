@@ -499,16 +499,6 @@ export default function ChumCalculator() {
 
   const thresholdActive = answeredCount >= 5;
   const visibleBreeds = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD) : scoredBreeds;
-  // shownCount reflects what's actually displayed after tier hiding
-  const shownBreeds = finished
-    ? visibleBreeds.filter(b => {
-        if (b.slug === bestSlug) return true;
-        if (hideGreat && b.score >= 100 && b.score < 120) return false;
-        if (hideTail && b.score < 100) return false;
-        return true;
-      }).slice(0, 16) // max 1 best + 5 perfect + 5 great + 5 good
-    : visibleBreeds;
-  const visibleCount = thresholdActive ? shownBreeds.length : ALL_BREEDS.length;
 
   // Best fit -- rank 1 only, and only when 20+ points clear of rank 2
   const top2 = visibleBreeds.slice(0, 2);
@@ -527,6 +517,17 @@ export default function ChumCalculator() {
   // Always cap each tier at 5
   const hideTail = finished && (perfectCount > 0 || greatCount > 0);
   const hideGreat = finished && perfectCount > 0;
+
+  // shownBreeds -- what's actually displayed after all tier hiding rules
+  const shownBreeds = finished
+    ? visibleBreeds.filter(b => {
+        if (b.slug === bestSlug) return true;
+        if (hideGreat && b.score >= 100 && b.score < 120) return false;
+        if (hideTail && b.score < 100) return false;
+        return true;
+      }).slice(0, 16)
+    : visibleBreeds;
+  const visibleCount = thresholdActive ? shownBreeds.length : ALL_BREEDS.length;
   // Track how many of each tier we have shown so far (used in render)
   let shownPerfect = 0;
   let shownGreat = 0;
