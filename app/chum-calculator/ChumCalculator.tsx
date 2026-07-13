@@ -296,7 +296,7 @@ export default function ChumCalculator() {
   const answeredCount = Object.keys(answers).length;
   const CORE_COUNT = 13;
   const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_")).length;
-  const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed, answers) })).sort((a, b) => b.score - a.score);
+  const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
   const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
   // Skip tiebreakers if 5 or fewer breeds remain after core questions
   const total = (step > CORE_COUNT || coreAnswered < CORE_COUNT) && coreVisible > 5 ? QUESTIONS.length : CORE_COUNT;
