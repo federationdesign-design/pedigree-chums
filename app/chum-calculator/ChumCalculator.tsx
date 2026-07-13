@@ -141,6 +141,56 @@ const QUESTIONS: Question[] = [
     ],
   },
   {
+    id: "tb_substance",
+    question: "When you picture your ideal dog, what do you see?",
+    sub: "Be honest -- this shapes everything that follows",
+    options: [
+      { label: "A proper dog -- substantial, grounded, takes up space", value: "substantial" },
+      { label: "Small and light -- easy to carry, happy on a lap", value: "lap" },
+      { label: "Either is fine", value: "any" },
+    ],
+  },
+  {
+    id: "tb_park",
+    question: "At the park, dogs play rough -- jumping, barging, tumbling. Some breeds can get seriously hurt in that environment.",
+    sub: "Would you rather have a dog that can pile in and take care of itself?",
+    options: [
+      { label: "Yes -- I want a sturdy dog that can handle boisterous play", value: "sturdy" },
+      { label: "No -- I'd prefer a more delicate dog and manage the environment", value: "delicate" },
+      { label: "Either is fine", value: "any" },
+    ],
+  },
+  {
+    id: "tb_dogperson",
+    question: "Be honest -- are you drawn to dogs as animals, or mainly as company?",
+    sub: "Some people love a dog with its own agenda. Others just want something warm and devoted.",
+    options: [
+      { label: "As an animal -- independent spirit, its own instincts and agenda", value: "animal" },
+      { label: "As a companion -- devoted, close, emotionally attuned", value: "companion" },
+      { label: "Somewhere in the middle", value: "any" },
+    ],
+  },
+  {
+    id: "tb_instincts",
+    question: "A Beagle that catches an interesting scent will follow it with total commitment -- your recall becomes irrelevant. A Border Collie without a job will invent one, usually involving your furniture.",
+    sub: "Working breeds live out their instincts every day. Would that feel charming, or drive you mad?",
+    options: [
+      { label: "Charming -- I'd love a dog with real instincts and drive", value: "working" },
+      { label: "Honestly that would frustrate me -- I want a calmer, more biddable dog", value: "biddable" },
+      { label: "Somewhere in between", value: "any" },
+    ],
+  },
+  {
+    id: "tb_looks",
+    question: "Some dogs stop traffic -- long coats, striking looks, unusual shapes. Others are just dogs.",
+    sub: "Does the aesthetic matter to you?",
+    options: [
+      { label: "Yes -- I'd love something visually striking that turns heads", value: "striking" },
+      { label: "No -- temperament and practicality matter far more than looks", value: "practical" },
+      { label: "No strong feelings either way", value: "any" },
+    ],
+  },
+  {
     id: "tb_roughplay",
     question: "Do you like rough and tumble play with your dog?",
     sub: "Some breeds have very fine bones and can be seriously injured by boisterous play",
@@ -311,7 +361,7 @@ export default function ChumCalculator() {
       .sort((a, b) => b.score - a.score);
   }, [answers, answeredCount]);
 
-  const thresholdActive = answeredCount >= 3;
+  const thresholdActive = answeredCount >= 5;
   const visibleCount = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD).length : ALL_BREEDS.length;
 
   function handleAnswer(qId: string, value: string) {
@@ -449,7 +499,7 @@ export default function ChumCalculator() {
                 className={styles.cardImg}
                 loading="lazy"
               />
-              {answeredCount > 0 && !hidden && (
+              {answeredCount >= 5 && !hidden && (
                 <div
                   className={styles.cardScore}
                   style={{ background: fitColour(b.score).bg, color: fitColour(b.score).text }}

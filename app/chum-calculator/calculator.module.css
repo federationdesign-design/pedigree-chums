@@ -44,7 +44,7 @@
 
 /* ── Stepper wrapper ─────────────────────────────────────────── */
 .stepperWrap {
-  max-width: 620px;
+  max-width: 960px;
   margin: 0 auto 40px;
 }
 
@@ -238,7 +238,7 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 28px;
-  max-width: 620px;
+  max-width: 960px;
   margin-left: auto;
   margin-right: auto;
 }
