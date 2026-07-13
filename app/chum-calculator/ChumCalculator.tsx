@@ -234,6 +234,27 @@ function fitLabel(score: number): string {
   return "Good fit";
 }
 
+function fitColour(score: number): string {
+  if (score >= 120) return "#16a34a"; // green
+  if (score >= 100) return "#ea580c"; // orange
+  return "#ca8a04";                   // yellow/amber
+}
+
+function fitReason(breed: { name: string; score: number }, answers: Record<string, string>): string {
+  const parts: string[] = [];
+  if (answers.size && answers.size !== "any") parts.push(`matches your size preference`);
+  if (answers.children === "young" || answers.children === "older") parts.push(`good with children`);
+  if (answers.exercise === "high") parts.push(`suits an active lifestyle`);
+  if (answers.exercise === "low") parts.push(`happy with a relaxed routine`);
+  if (answers.alone === "lots") parts.push(`copes well alone`);
+  if (answers.alone === "rarely") parts.push(`thrives with company`);
+  if (answers.shedding === "low") parts.push(`low shedding`);
+  if (answers.velcro === "yes") parts.push(`loves being close to you`);
+  if (answers.velcro === "no") parts.push(`independent natured`);
+  if (parts.length === 0) return `${breed.name} scores well across your answers.`;
+  return `${breed.name} is a strong match: ${parts.slice(0, 3).join(", ")}.`;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
@@ -242,6 +263,7 @@ const THRESHOLD = 80;
 export default function ChumCalculator() {
   const [step, setStep] = useState(0); // 0 = not started, 1..N = question index (1-based)
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
 
   const answeredCount = Object.keys(answers).length;
   const total = QUESTIONS.length;
@@ -395,7 +417,19 @@ export default function ChumCalculator() {
                 loading="lazy"
               />
               {answeredCount > 0 && !hidden && (
-                <div className={styles.cardScore}>{fitLabel(b.score)}</div>
+                <div
+                  className={styles.cardScore}
+                  style={{ background: fitColour(b.score) }}
+                  onMouseEnter={() => setHoveredBreed(b.slug)}
+                  onMouseLeave={() => setHoveredBreed(null)}
+                >
+                  {hoveredBreed === b.slug && (
+                    <div className={styles.fitTooltip}>
+                      <p className={styles.fitTooltipText}>{fitReason(b, answers)}</p>
+                    </div>
+                  )}
+                  {fitLabel(b.score)}
+                </div>
               )}
             </Link>
           );
