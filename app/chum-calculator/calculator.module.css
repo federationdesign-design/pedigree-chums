@@ -313,33 +313,30 @@
   bottom: 0;
   left: 0;
   right: 0;
-  transform: rotate(-2deg) translateY(2px);
+  transform: rotate(-3deg) translateY(2px);
   color: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 0.7rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border-radius: 0 0 10px 10px;
-  padding: 6px 10px;
+  padding: 11px 10px;
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .fitTooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) rotate(2deg);
+  position: fixed;
   background: rgba(10,58,87,0.97);
   border: 1.5px solid rgba(255,255,255,0.15);
   border-radius: 12px;
   padding: 10px 14px;
   width: 200px;
-  z-index: 100;
+  z-index: 1000;
   pointer-events: none;
-  margin-bottom: 6px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transform: none;
 }
 
 .fitTooltipText {

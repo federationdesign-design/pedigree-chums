@@ -402,6 +402,7 @@ export default function ChumCalculator() {
   const [step, setStep] = useState(0); // 0 = not started, 1..N = question index (1-based)
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
   const answeredCount = Object.keys(answers).length;
   const CORE_COUNT = 13;
@@ -436,7 +437,9 @@ export default function ChumCalculator() {
 
   // Hide tail when 5+ perfect fits exist
   const perfectCount = visibleBreeds.filter(b => b.score >= 120).length;
-  const hideTail = finished && perfectCount >= 5;
+  const greatCount = visibleBreeds.filter(b => b.score >= 100 && b.score < 120).length;
+  // Hide good fits if 5+ great fits exist; hide everything below perfect if 5+ perfect fits
+  const hideTail = finished && (perfectCount >= 5 || (greatCount >= 5 && perfectCount === 0));
 
   function handleAnswer(qId: string, value: string) {
     setAnswers((prev) => ({ ...prev, [qId]: value }));
@@ -579,14 +582,10 @@ export default function ChumCalculator() {
                 <div
                   className={styles.cardScore}
                   style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
-                  onMouseEnter={() => setHoveredBreed(b.slug)}
+                  onMouseEnter={(e) => { setHoveredBreed(b.slug); setTooltipPos({ x: e.clientX, y: e.clientY }); }}
+                  onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
                   onMouseLeave={() => setHoveredBreed(null)}
                 >
-                  {hoveredBreed === b.slug && (
-                    <div className={styles.fitTooltip}>
-                      <p className={styles.fitTooltipText}>{fitReason(b, answers)}</p>
-                    </div>
-                  )}
                   {fitLabel(b.score, isBest)}
                 </div>
               )}
@@ -595,6 +594,18 @@ export default function ChumCalculator() {
         })}
       </div>
 
+      {/* Global tooltip rendered at mouse position */}
+      {hoveredBreed && (() => {
+        const hb = scoredBreeds.find(b => b.slug === hoveredBreed);
+        return hb ? (
+          <div
+            className={styles.fitTooltip}
+            style={{ left: tooltipPos.x - 100, top: tooltipPos.y - 80 }}
+          >
+            <p className={styles.fitTooltipText}>{fitReason(hb, answers)}</p>
+          </div>
+        ) : null;
+      })()}
     </main>
   );
 }
