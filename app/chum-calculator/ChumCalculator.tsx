@@ -438,8 +438,11 @@ export default function ChumCalculator() {
   // Hide tail when 5+ perfect fits exist
   const perfectCount = visibleBreeds.filter(b => b.score >= 120).length;
   const greatCount = visibleBreeds.filter(b => b.score >= 100 && b.score < 120).length;
-  // Hide good fits if 5+ great fits exist; hide everything below perfect if 5+ perfect fits
+  // Cap shown breeds: max 5 perfect, max 5 great, hide good if enough above
   const hideTail = finished && (perfectCount >= 5 || (greatCount >= 5 && perfectCount === 0));
+  // Track how many of each tier we have shown so far (used in render)
+  let shownPerfect = 0;
+  let shownGreat = 0;
 
   function handleAnswer(qId: string, value: string) {
     setAnswers((prev) => ({ ...prev, [qId]: value }));
@@ -565,12 +568,25 @@ export default function ChumCalculator() {
           const hidden = thresholdActive && b.score < THRESHOLD;
           const isBest = b.slug === bestSlug;
           if (hideTail && b.score < 120 && !isBest) return null;
+          // Cap perfect fits at 5
+          if (finished && b.score >= 120 && !isBest) {
+            shownPerfect++;
+            if (shownPerfect > 5) return null;
+          }
+          // Cap great fits at 5
+          if (finished && b.score >= 100 && b.score < 120 && !isBest) {
+            shownGreat++;
+            if (shownGreat > 5) return null;
+          }
           return (
             <Link
               key={b.slug}
               href={`/chums/${b.slug}`}
               className={`${styles.breedCard} ${hidden ? styles.breedCardHidden : ""}`}
               tabIndex={hidden ? -1 : 0}
+              onMouseEnter={(e) => { setHoveredBreed(b.slug); setTooltipPos({ x: e.clientX, y: e.clientY }); }}
+              onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
+              onMouseLeave={() => setHoveredBreed(null)}
             >
               <img
                 src={bust(cardImg || b.image)}
@@ -582,9 +598,7 @@ export default function ChumCalculator() {
                 <div
                   className={styles.cardScore}
                   style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
-                  onMouseEnter={(e) => { setHoveredBreed(b.slug); setTooltipPos({ x: e.clientX, y: e.clientY }); }}
-                  onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
-                  onMouseLeave={() => setHoveredBreed(null)}
+
                 >
                   {fitLabel(b.score, isBest)}
                 </div>
