@@ -378,19 +378,93 @@ function fitColour(score: number, isBest = false): { bg: string; text: string } 
   return { bg: "#ffb02e", text: "#0a3a57" };                   // amber -- good
 }
 
-function fitReason(breed: { name: string; score: number }, answers: Record<string, string>): string {
+function fitReason(breed: { name: string; score: number; slug: string }, answers: Record<string, string>): string {
   const parts: string[] = [];
-  if (answers.size && answers.size !== "any") parts.push(`matches your size preference`);
-  if (answers.children === "young" || answers.children === "older") parts.push(`good with children`);
-  if (answers.exercise === "high") parts.push(`suits an active lifestyle`);
-  if (answers.exercise === "low") parts.push(`happy with a relaxed routine`);
-  if (answers.alone === "lots") parts.push(`copes well alone`);
-  if (answers.alone === "rarely") parts.push(`thrives with company`);
-  if (answers.shedding === "low") parts.push(`low shedding`);
-  if (answers.velcro === "yes") parts.push(`loves being close to you`);
-  if (answers.velcro === "no") parts.push(`independent natured`);
-  if (parts.length === 0) return `${breed.name} scores well across your answers.`;
-  return `${breed.name} is a strong match: ${parts.slice(0, 3).join(", ")}.`;
+  const flags = personalityFlags[breed.slug] ?? {};
+  const robust: Record<string, boolean> = {
+    "labrador": true, "golden-retriever": true, "german-shepherd": true, "springer-spaniel": true,
+    "staffordshire-bull-terrier": true, "boxer": true, "border-collie": true, "beagle": true,
+    "border-terrier": true, "jack-russell-terrier": true, "bull-terrier": true, "rottweiler": true,
+    "lurcher": true, "corgi": true, "labradoodle": true, "goldendoodle": true,
+    "chihuahua": false, "papillon": false, "maltese": false, "italian-greyhound": false,
+    "yorkshire-terrier": false, "pomeranian": false, "shih-tzu": false, "cavapoo": false,
+    "cavachon": false, "bichon-frise": false, "maltipoo": false, "dachshund": false,
+    "pug": false, "french-bulldog": false, "cavalier-king-charles-spaniel": false,
+  };
+  const isRobust = robust[breed.slug] ?? true;
+
+  // Size match
+  const sizeBandMap: Record<string, string[]> = {
+    small: ["small","toy"], medium: ["medium"], large: ["large","giant"],
+  };
+  const breedSizes: Record<string, string> = {
+    "irish-wolfhound": "giant", "mastiff": "giant", "great-dane": "giant", "saint-bernard": "giant",
+    "bloodhound": "large", "labrador": "large", "golden-retriever": "large", "german-shepherd": "large",
+    "rottweiler": "large", "doberman-pinscher": "large", "weimaraner": "large", "dalmatian": "large",
+    "old-english-sheepdog": "large", "siberian-husky": "large", "labradoodle": "large",
+    "goldendoodle": "large", "boxer": "large", "irish-setter": "large", "springer-spaniel": "medium",
+    "border-collie": "medium", "beagle": "medium", "cocker-spaniel": "medium", "whippet": "medium",
+    "basset-hound": "medium", "staffordshire-bull-terrier": "medium", "bull-terrier": "medium",
+    "lurcher": "medium", "poodle": "medium", "cockapoo": "small", "jackapoo": "small",
+    "bulldog": "medium", "dachshund": "small", "corgi": "small", "border-terrier": "small",
+    "miniature-schnauzer": "small", "west-highland-terrier": "small", "jack-russell-terrier": "small",
+    "cavalier-king-charles-spaniel": "small", "cavachon": "small", "cavapoo": "small",
+    "bichon-frise": "small", "shih-tzu": "small", "boston-terrier": "small", "pug": "small",
+    "french-bulldog": "small", "pomeranian": "toy", "maltipoo": "toy", "chihuahua": "toy",
+    "yorkshire-terrier": "toy", "maltese": "toy", "papillon": "toy", "italian-greyhound": "small",
+    "rough-collie": "large", "greyhound": "large", "afghan-hound": "large",
+  };
+  const breedSize = breedSizes[breed.slug] ?? "medium";
+  const wantedSizes = sizeBandMap[answers.size] ?? [];
+  if (answers.size && answers.size !== "any" && wantedSizes.includes(breedSize)) {
+    parts.push(`the right size for you`);
+  }
+
+  // Exercise match
+  const exerciseMins: Record<string, number> = {
+    "border-collie": 120, "siberian-husky": 120, "weimaraner": 100, "dalmatian": 90,
+    "german-shepherd": 90, "irish-setter": 90, "springer-spaniel": 90, "doberman-pinscher": 90,
+    "old-english-sheepdog": 90, "labrador": 80, "golden-retriever": 80, "rottweiler": 80,
+    "boxer": 80, "labradoodle": 80, "goldendoodle": 80, "staffordshire-bull-terrier": 70,
+    "lurcher": 50, "bloodhound": 60, "great-dane": 60, "irish-wolfhound": 60,
+    "afghan-hound": 60, "beagle": 60, "bull-terrier": 60, "jack-russell-terrier": 60,
+    "cockapoo": 60, "jackapoo": 60, "poodle": 60, "cocker-spaniel": 60, "corgi": 60,
+    "border-terrier": 60, "mastiff": 45, "saint-bernard": 45, "basset-hound": 45,
+    "cavalier-king-charles-spaniel": 45, "miniature-schnauzer": 45, "west-highland-terrier": 45,
+    "cavapoo": 45, "greyhound": 40, "whippet": 40, "italian-greyhound": 40,
+    "papillon": 40, "boston-terrier": 40, "dachshund": 40, "cavachon": 40,
+    "bulldog": 30, "french-bulldog": 30, "pug": 30, "bichon-frise": 30,
+    "shih-tzu": 30, "yorkshire-terrier": 30, "pomeranian": 30, "maltipoo": 30,
+    "maltese": 25, "chihuahua": 25, "rough-collie": 80,
+  };
+  const mins = exerciseMins[breed.slug] ?? 60;
+  if (answers.exercise === "high" && mins >= 80) parts.push(`matches your active lifestyle`);
+  if (answers.exercise === "low" && mins <= 45) parts.push(`happy with shorter walks`);
+  if (answers.exercise === "medium" && mins >= 45 && mins <= 80) parts.push(`suits your exercise level`);
+
+  // Children
+  if ((answers.children === "young" || answers.children === "older") && isRobust) {
+    parts.push(`sturdy and good with children`);
+  }
+
+  // Velcro
+  if (answers.velcro === "yes" && flags.velcro) parts.push(`loves being close to you`);
+  if (answers.velcro === "no" && !flags.velcro) parts.push(`gives you space`);
+
+  // Shedding
+  if (answers.shedding === "low") {
+    const lowShed = new Set(["poodle","cockapoo","labradoodle","goldendoodle","cavapoo","maltipoo",
+      "jackapoo","bichon-frise","maltese","yorkshire-terrier","shih-tzu",
+      "west-highland-terrier","miniature-schnauzer","border-terrier","boston-terrier"]);
+    if (lowShed.has(breed.slug)) parts.push(`low shedding coat`);
+  }
+
+  // Alone time
+  if (answers.alone === "lots" && !flags.velcro) parts.push(`handles time alone well`);
+  if (answers.alone === "rarely" && flags.velcro) parts.push(`loves constant company`);
+
+  if (parts.length === 0) return `${breed.name} scores well across your lifestyle answers.`;
+  return `${breed.name}: ${parts.slice(0, 3).join(", ")}.`;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -439,7 +513,11 @@ export default function ChumCalculator() {
   const perfectCount = visibleBreeds.filter(b => b.score >= 120).length;
   const greatCount = visibleBreeds.filter(b => b.score >= 100 && b.score < 120).length;
   // Cap shown breeds: max 5 perfect, max 5 great, hide good if enough above
-  const hideTail = finished && (perfectCount >= 5 || (greatCount >= 5 && perfectCount === 0));
+  // Hide good fits if any great or perfect fits exist
+  // Hide great fits if any perfect fits exist
+  // Always cap each tier at 5
+  const hideTail = finished && (perfectCount > 0 || greatCount > 0);
+  const hideGreat = finished && perfectCount > 0;
   // Track how many of each tier we have shown so far (used in render)
   let shownPerfect = 0;
   let shownGreat = 0;
@@ -567,7 +645,10 @@ export default function ChumCalculator() {
           const cardImg = breedCard[b.slug];
           const hidden = thresholdActive && b.score < THRESHOLD;
           const isBest = b.slug === bestSlug;
-          if (hideTail && b.score < 120 && !isBest) return null;
+          // Hide good fits when great/perfect fits exist
+          if (hideTail && b.score < 100 && !isBest) return null;
+          // Hide great fits when perfect fits exist
+          if (hideGreat && b.score >= 100 && b.score < 120 && !isBest) return null;
           // Cap perfect fits at 5
           if (finished && b.score >= 120 && !isBest) {
             shownPerfect++;
