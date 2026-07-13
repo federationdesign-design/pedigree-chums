@@ -207,7 +207,6 @@ export default function SmarterThanTheTestPage() {
                 })}
               </div>
             </div>
-            </div>
           </aside>
         </div>
       </main>
