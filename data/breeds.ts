@@ -1081,3 +1081,124 @@ export const personalityFlags: Record<string, PersonalityFlags> = {
   "irish-setter":                 { velcro: false, vocal: false, destructive: true  },
   "rough-collie":                 { velcro: false, vocal: true,  destructive: false },
 };
+
+// ── Physical robustness -- for rough and tumble question ─────────────────────
+// robust: true = sturdy, handles boisterous play well
+// robust: false = delicate frame, fine bones, vulnerable to rough handling
+export const robustFlags: Record<string, boolean> = {
+  "irish-wolfhound": true,
+  "mastiff": true,
+  "great-dane": true,
+  "saint-bernard": true,
+  "bloodhound": true,
+  "labrador": true,
+  "golden-retriever": true,
+  "german-shepherd": true,
+  "rottweiler": true,
+  "doberman-pinscher": true,
+  "weimaraner": true,
+  "dalmatian": true,
+  "old-english-sheepdog": true,
+  "afghan-hound": false,      // elegant, can be startled, not suited to rough play
+  "siberian-husky": true,
+  "labradoodle": true,
+  "goldendoodle": true,
+  "boxer": true,
+  "irish-setter": true,
+  "greyhound": false,          // thin skin, fine bones, vulnerable to injury
+  "lurcher": true,
+  "springer-spaniel": true,
+  "staffordshire-bull-terrier": true,
+  "beagle": true,
+  "border-collie": true,
+  "cocker-spaniel": true,
+  "whippet": false,            // fine-boned sighthound, can be injured easily
+  "basset-hound": true,
+  "bull-terrier": true,
+  "miniature-schnauzer": true,
+  "cockapoo": true,
+  "jackapoo": true,
+  "bulldog": true,
+  "dachshund": false,          // long spine, very vulnerable to back injury
+  "corgi": true,
+  "border-terrier": true,
+  "west-highland-terrier": true,
+  "jack-russell-terrier": true,
+  "cavalier-king-charles-spaniel": false, // small, fragile frame
+  "cavachon": false,
+  "cavapoo": false,
+  "bichon-frise": false,       // small, delicate
+  "shih-tzu": false,
+  "boston-terrier": true,
+  "pug": false,                // brachycephalic, physically fragile
+  "french-bulldog": false,     // brachycephalic, not suited to boisterous play
+  "poodle": true,
+  "maltipoo": false,
+  "chihuahua": false,          // tiny bones, easily injured
+  "yorkshire-terrier": false,  // small and fine-boned
+  "maltese": false,
+  "papillon": false,           // very delicate frame
+  "pomeranian": false,
+  "italian-greyhound": false,  // extremely fine bones, can snap from a jump
+  "rough-collie": true,
+};
+
+// ── City friendliness -- for location question ────────────────────────────────
+// cityScore: 1-5 -- 5 = thrives in city, 1 = needs countryside/open space
+export const cityScore: Record<string, number> = {
+  "irish-wolfhound": 1,        // giant, needs huge space
+  "mastiff": 2,
+  "great-dane": 2,
+  "saint-bernard": 1,
+  "bloodhound": 2,
+  "labrador": 3,
+  "golden-retriever": 3,
+  "german-shepherd": 3,
+  "rottweiler": 3,
+  "doberman-pinscher": 3,
+  "weimaraner": 1,             // high drive, needs space and off-lead running
+  "dalmatian": 2,              // high energy, needs a lot of exercise
+  "old-english-sheepdog": 3,
+  "afghan-hound": 2,
+  "siberian-husky": 1,         // needs vast space, not suited to small parks
+  "labradoodle": 3,
+  "goldendoodle": 3,
+  "boxer": 3,
+  "irish-setter": 2,           // high energy working dog
+  "greyhound": 2,              // needs space for occasional sprints (zoomies)
+  "lurcher": 2,
+  "springer-spaniel": 2,       // working dog, needs countryside stimulation
+  "staffordshire-bull-terrier": 4,
+  "beagle": 3,
+  "border-collie": 1,          // working dog, suffers without space and a job
+  "cocker-spaniel": 4,
+  "whippet": 3,
+  "basset-hound": 4,
+  "bull-terrier": 4,
+  "miniature-schnauzer": 4,
+  "cockapoo": 5,
+  "jackapoo": 4,
+  "bulldog": 5,
+  "dachshund": 4,
+  "corgi": 4,
+  "border-terrier": 4,
+  "west-highland-terrier": 4,
+  "jack-russell-terrier": 3,
+  "cavalier-king-charles-spaniel": 5,
+  "cavachon": 5,
+  "cavapoo": 5,
+  "bichon-frise": 5,
+  "shih-tzu": 5,
+  "boston-terrier": 5,
+  "pug": 5,
+  "french-bulldog": 5,
+  "poodle": 4,
+  "maltipoo": 5,
+  "chihuahua": 5,
+  "yorkshire-terrier": 5,
+  "maltese": 5,
+  "papillon": 5,
+  "pomeranian": 5,
+  "italian-greyhound": 4,
+  "rough-collie": 2,
+};

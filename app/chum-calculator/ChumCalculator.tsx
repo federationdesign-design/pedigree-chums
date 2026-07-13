@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { breeds, breedCard, personalityFlags } from "../../data/breeds";
+import { breeds, breedCard, personalityFlags, robustFlags, cityScore } from "../../data/breeds";
 import { bust } from "../../data/imgVersion";
 import suitabilityScores from "../../data/suitabilityScores";
 import exerciseNeeds from "../../data/exerciseNeeds";
