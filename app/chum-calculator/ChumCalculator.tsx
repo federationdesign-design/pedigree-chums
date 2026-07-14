@@ -12,31 +12,56 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
 
 type Option = { label: string; value: string };
-type Question = { id: string; question: string; sub?: string; options: Option[] };
+type Question = { id: string; question: string; sub?: string; info?: string; options: Option[] };
 
 const QUESTIONS: Question[] = [
   {
-    id: "size",
-    question: "How big do you want your dog?",
+    id: "intent",
+    question: "Let's find you a chum!",
+    sub: "First -- what brings you here today?",
     options: [
-      { label: "Small -- lap dog, easy to carry", value: "small" },
-      { label: "Medium -- the classic family dog", value: "medium" },
-      { label: "Large -- a proper big dog", value: "large" },
-      { label: "No preference", value: "any" },
+      { label: "I'm actively looking for my perfect dog", value: "looking" },
+      { label: "I'd love a dog one day -- just exploring for now", value: "exploring" },
+      { label: "I've never really thought about getting a dog -- just curious", value: "curious" },
+      { label: "I already have a dog -- let's see if the calculator agrees", value: "have_dog" },
+    ],
+  },
+  {
+    id: "size",
+    question: "What size dogs do you like most?",
+    info: "Size affects everything -- how much they eat, how much space they need, how much they cost to insure, and how much of the sofa they claim.",
+    options: [
+      { label: "Small -- light, easy to manage, good for smaller spaces", value: "small" },
+      { label: "Medium -- the classic family dog, not too big, not too small", value: "medium" },
+      { label: "Large -- a proper big dog that you can really feel beside you", value: "large" },
     ],
   },
   {
     id: "home",
-    question: "What kind of home do you have?",
+    question: "What kind of home do you live in?",
+    info: "Upper floor flats without lifts limit large breeds significantly. A ground floor flat with outdoor access is quite different to a third floor flat with stairs.",
     options: [
-      { label: "Flat or apartment -- no garden", value: "flat" },
-      { label: "House with a small garden", value: "small_garden" },
-      { label: "House with a large garden", value: "large_garden" },
+      { label: "Flat or apartment -- upper floor", value: "flat_upper" },
+      { label: "Flat or apartment -- ground floor", value: "flat_ground" },
+      { label: "Terraced or semi-detached house", value: "terraced" },
+      { label: "Detached house", value: "detached" },
+    ],
+  },
+  {
+    id: "garden",
+    question: "Do you have access to outdoor space?",
+    info: "A dog living opposite a big park with no garden can be better off than one with a tiny paved yard. What matters is the quality and regularity of outdoor access.",
+    options: [
+      { label: "Yes -- a private garden", value: "private" },
+      { label: "Yes -- shared or communal garden", value: "shared" },
+      { label: "No garden, but green space nearby -- park, common or fields", value: "nearby" },
+      { label: "No -- mostly urban streets and no regular green space", value: "none" },
     ],
   },
   {
     id: "children",
-    question: "Do you have young children?",
+    question: "Do you have young children at home?",
+    info: "Very young children and fragile toy breeds are a risky combination. Some breeds are wonderfully patient with children; others find unpredictable small humans stressful.",
     options: [
       { label: "Yes -- toddlers or under 5", value: "young" },
       { label: "Yes -- school age (5-12)", value: "older" },
@@ -45,38 +70,43 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "other_pets",
-    question: "Do you have other pets?",
+    question: "Do you have other animals in the home?",
+    info: "High prey drive breeds can be dangerous around small animals. Some dogs are fine with cats they grew up with but will chase a stranger's cat relentlessly.",
     options: [
       { label: "Other dogs", value: "dogs" },
       { label: "Cats", value: "cats" },
+      { label: "Small animals -- rabbits, guinea pigs, hamsters or similar", value: "small_animals" },
       { label: "Both dogs and cats", value: "both" },
       { label: "No other pets", value: "none" },
     ],
   },
   {
     id: "alone",
-    question: "How many hours a day is the house empty?",
-    sub: "Include commuting and working hours",
+    question: "How long are you out of the house normally?",
+    info: "Dogs are social animals. Some breeds develop severe separation anxiety if left alone regularly -- barking, destruction, or self-harm. Others are surprisingly independent.",
     options: [
-      { label: "Under 2 hours -- nearly always someone home", value: "rarely" },
-      { label: "2-4 hours -- mornings or afternoons", value: "sometimes" },
-      { label: "4-6 hours -- a standard working day", value: "often" },
-      { label: "Over 6 hours most days", value: "lots" },
+      { label: "Hardly ever -- someone is almost always home", value: "rarely" },
+      { label: "A few hours max -- back before it becomes an issue", value: "sometimes" },
+      { label: "Sometimes over half the day", value: "often" },
+      { label: "Regularly half a day or more", value: "lots" },
+      { label: "Most of the day -- long working hours are the norm", value: "always" },
     ],
   },
   {
     id: "exercise",
     question: "How active is your household?",
     sub: "Be honest -- a dog's needs will outlast your good intentions",
+    info: "A Border Collie given one short walk a day will redecorate your home. A Bulldog taken on a five-mile run will struggle to breathe. The match matters.",
     options: [
-      { label: "Very active -- daily runs, long hikes", value: "high" },
-      { label: "Moderately active -- good walks every day", value: "medium" },
+      { label: "Very -- daily runs, long walks in the countryside", value: "high" },
+      { label: "Moderate -- good walks every day", value: "medium" },
       { label: "Fairly relaxed -- shorter walks, mostly home", value: "low" },
     ],
   },
   {
     id: "experience",
     question: "Have you owned a dog before?",
+    info: "Some breeds are wilful, stubborn or highly strung in ways that catch first-time owners off guard. Others seem almost to train themselves.",
     options: [
       { label: "First time dog owner", value: "first" },
       { label: "Some experience -- had dogs growing up", value: "some" },
@@ -86,49 +116,56 @@ const QUESTIONS: Question[] = [
   {
     id: "grooming",
     question: "How much grooming are you happy with?",
+    info: "Some breeds need professional grooming every six weeks or they become matted and uncomfortable. Others need nothing more than a wipe with a damp cloth.",
     options: [
       { label: "Minimal -- a quick brush now and then", value: "low" },
       { label: "Some -- weekly brushing is fine", value: "medium" },
-      { label: "Happy to groom regularly", value: "high" },
+      { label: "Lots -- happy to groom regularly", value: "high" },
     ],
   },
   {
     id: "budget",
     question: "What's your rough annual budget?",
     sub: "All-in: food, insurance, vet bills, grooming and boarding",
+    info: "Giant breeds eat more, insure for more and cost more to board. Brachycephalic breeds (flat-faced dogs) have higher vet bills on average due to breathing issues.",
     options: [
-      { label: "Up to £1,500", value: "low" },
-      { label: "£1,500 -- £2,500", value: "medium" },
-      { label: "£2,500 -- £3,500", value: "high" },
-      { label: "Over £3,500 -- cost is not a concern", value: "any" },
+      { label: "Under £1,200 per year (around £100/month)", value: "low" },
+      { label: "£1,200 -- £1,800 per year (£100-£150/month)", value: "medium" },
+      { label: "£1,800 -- £2,500 per year (£150-£210/month)", value: "high" },
+      { label: "Over £2,500 per year -- cost is not a concern", value: "any" },
     ],
   },
   {
     id: "shedding",
     question: "How do you feel about dog hair?",
+    info: "Shedding means hair -- on your sofa, your clothes, your food. Heavy shedders like German Shepherds and Golden Retrievers lose fur year-round. Low-shedding breeds like Poodles and Bichons barely drop a hair.",
     options: [
-      { label: "I need a low-shedding breed", value: "low" },
+      { label: "I need a low-shedding breed -- hair is a dealbreaker", value: "low" },
       { label: "I can live with some hair", value: "medium" },
-      { label: "Completely unbothered", value: "high" },
+      { label: "I like the smell and taste of dog hair -- bring it on", value: "high" },
     ],
   },
   {
     id: "velcro",
-    question: "Do you need personal space, or are you happy with a dog glued to you?",
-    sub: "Some breeds follow their owner everywhere and struggle to settle alone",
+    question: "How closely attached do you want your dog to be?",
+    sub: "Some breeds follow their owner from room to room and genuinely cannot cope alone",
+    info: "Velcro dogs are devoted and deeply bonded -- but they can also be exhausting. Independent dogs are easier to leave but may seem aloof.",
     options: [
+      { label: "Like brand-new Velcro -- stuck to me at all times", value: "yes" },
+      { label: "Like ten-year-old Velcro -- close but not obsessive", value: "medium" },
       { label: "I need my space -- an independent dog suits me better", value: "no" },
-      { label: "I'd love a dog that wants to be close all the time", value: "yes" },
-      { label: "Either is fine", value: "any" },
     ],
   },
   {
     id: "vocal",
-    question: "Do you or your neighbours mind a noisy dog?",
-    sub: "Some breeds bark, howl or whine frequently -- huskies, beagles and some terriers are particularly vocal",
+    question: "How much noise can you and your neighbours handle?",
+    info: "Some breeds are almost silent. Others communicate constantly -- barks, howls, yodels, groans and dramatic sighs. Huskies and Beagles are famously vocal.",
     options: [
-      { label: "Yes -- I need a quieter breed", value: "yes" },
-      { label: "No -- noise doesn't bother us", value: "no" },
+      { label: "Yes -- I need a quieter breed, as little noise as possible", value: "silent" },
+      { label: "Minimal is fine -- the odd bark or groan is okay", value: "low" },
+      { label: "I don't mind barking -- but regular howling is a step too far", value: "medium" },
+      { label: "I can handle everything apart from howling at night", value: "high" },
+      { label: "Completely unbothered -- noise is not an issue", value: "no" },
     ],
   },
   {
@@ -153,6 +190,7 @@ const QUESTIONS: Question[] = [
   {
     id: "allergies",
     question: "Does anyone in the household have dog allergies or asthma that could be triggered by pet hair or dander?",
+    info: "No dog is fully hypoallergenic, but low-shedding breeds like Poodles and Bichons produce far less of the proteins that trigger reactions.",
     options: [
       { label: "No -- we are all fine", value: "none" },
       { label: "Mild -- we would prefer a lower-shedding breed", value: "mild" },
@@ -161,22 +199,19 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "tb_substance",
-    question: "When you picture your ideal dog, what do you see?",
-    sub: "Be honest -- this shapes everything that follows",
+    question: "When you imagine you and your dog, what do you see?",
     options: [
       { label: "A proper dog -- substantial, grounded, takes up space", value: "substantial" },
-      { label: "Small and light -- easy to carry, happy on a lap", value: "lap" },
-      { label: "Either is fine", value: "any" },
+      { label: "Something small and light -- easy to carry, happy on a lap", value: "lap" },
     ],
   },
   {
     id: "tb_park",
-    question: "At the park, dogs play rough -- jumping, barging, tumbling. Some breeds can get seriously hurt in that environment.",
-    sub: "Would you rather have a dog that can pile in and take care of itself?",
+    question: "At the park, dogs play rough -- jumping, barging, tumbling",
+    sub: "Would you rather have a dog that can pile in and take care of itself, or one you need to keep an eye on?",
     options: [
-      { label: "Yes -- I want a sturdy dog that can handle boisterous play", value: "sturdy" },
-      { label: "No -- I'd prefer a more delicate dog and manage the environment", value: "delicate" },
-      { label: "Either is fine", value: "any" },
+      { label: "Pile in -- I want a sturdy dog that can handle boisterous play", value: "sturdy" },
+      { label: "Keep an eye on -- I'd manage the environment around a more delicate dog", value: "delicate" },
     ],
   },
   {
@@ -195,13 +230,13 @@ const QUESTIONS: Question[] = [
     sub: "Working breeds live out their instincts every day. Would that feel charming, or drive you mad?",
     options: [
       { label: "Charming -- I'd love a dog with real instincts and drive", value: "working" },
-      { label: "Honestly that would frustrate me -- I want a calmer, more biddable dog", value: "biddable" },
+      { label: "That would frustrate me -- I want a calm, obedient dog that listens", value: "biddable" },
       { label: "Somewhere in between", value: "any" },
     ],
   },
   {
     id: "tb_looks",
-    question: "Some dogs stop traffic -- long coats, striking looks, unusual shapes. Others are just dogs.",
+    question: "Some dogs stop the show -- double takes and rubber-necking from the general public. Others are just dogs.",
     sub: "Does the aesthetic matter to you?",
     options: [
       { label: "Yes -- I'd love something visually striking that turns heads", value: "striking" },
@@ -216,7 +251,6 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "Yes -- I want a sturdy dog that can handle it", value: "yes" },
       { label: "No -- I prefer gentle, calm interaction", value: "no" },
-      { label: "Either is fine", value: "any" },
     ],
   },
   {
@@ -249,12 +283,11 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "tb_smallchar",
-    question: "Small dogs have very different personalities. Some are bold, spirited and a bit confrontational -- tiny dogs with big opinions. Others are gentle, cuddly and content to follow your lead.",
+    question: "Dogs have very different personalities. Some are bold, spirited and a bit confrontational. Others are gentle, cuddly and content to follow your lead.",
     sub: "Which appeals more to you?",
     options: [
-      { label: "Bold and spirited -- a dog with strong opinions and a big personality for its size", value: "bold" },
+      { label: "Bold and spirited -- a dog with strong opinions and a big personality", value: "bold" },
       { label: "Gentle and cuddly -- affectionate, easy-going, follows my lead", value: "gentle" },
-      { label: "Somewhere in between", value: "any" },
     ],
   },
 ];
@@ -497,9 +530,10 @@ export default function ChumCalculator() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [infoOpen, setInfoOpen] = useState(false);
 
   const answeredCount = Object.keys(answers).length;
-  const CORE_COUNT = 13;
+  const CORE_COUNT = 17;
   const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_")).length;
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
   const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
@@ -562,6 +596,7 @@ export default function ChumCalculator() {
   let shownGreat = 0;
 
   function handleAnswer(qId: string, value: string) {
+    setInfoOpen(false);
     setAnswers((prev) => ({ ...prev, [qId]: value }));
     setStep((s) => s + 1);
   }
@@ -626,7 +661,19 @@ export default function ChumCalculator() {
               <span className={styles.stepCount}>{step} / {total}</span>
             </div>
 
-            <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
+            <div className={styles.questionHeader}>
+              <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
+              {currentQ.info && (
+                <div className={styles.infoIcon} onClick={() => setInfoOpen(o => !o)}>
+                  i
+                  {infoOpen && (
+                    <div className={styles.infoPopup}>
+                      <p className={styles.infoPopupText}>{currentQ.info}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             {currentQ.sub && <p className={styles.stepSub}>{currentQ.sub}</p>}
 
             <div className={styles.stepOptions}>
