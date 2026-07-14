@@ -23,8 +23,8 @@
 
 .aside {
   position: absolute;
-  right: clamp(56px, 5vw, 72px);
-  top: clamp(-94px, -8%, -70px);
+  left: 420px;
+  top: -120px;
   width: 34%;
   max-width: 460px;
   z-index: 3;
