@@ -651,13 +651,13 @@ export default function ChumCalculator() {
           <div className={styles.stepCard} style={{ textAlign: "center", padding: "32px 24px" }}>
             <p style={{ fontSize: "2rem", margin: "0 0 12px" }}>🐾</p>
             <h2 className={styles.stepQuestion} style={{ marginBottom: 8 }}>
-              You&apos;re a tricky one, aren&apos;t you?
+              We still have a few too many chums matching you
             </h2>
             <p className={styles.stepSub} style={{ marginBottom: 24 }}>
               We still have a few too many chums matching you -- let us ask a couple more questions to narrow it down.
             </p>
-            <button className={styles.startBtn} onClick={() => setStep(s => s)}>
-              Go on then →
+            <button className={styles.startBtn} onClick={() => setStep(s => s + 1)}>
+              Continue
             </button>
           </div>
         )}
