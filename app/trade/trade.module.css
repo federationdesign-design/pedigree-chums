@@ -421,7 +421,7 @@
 
 /* Display-units / POS block beneath the tiles */
 .posBlock {
-  margin-top: clamp(-100px, -8vw, -60px);
+  margin-top: clamp(32px, 4vw, 64px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(24px, 5vw, 64px);
