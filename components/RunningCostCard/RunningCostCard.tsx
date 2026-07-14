@@ -36,7 +36,8 @@ export default function RunningCostCard({ config }: Props) {
 
   const medical = medicalAllowance(sliderValue, low, typical, high);
   const insuranceFull = config.annualCosts.insurance ?? 0;
-  const insuranceApplied = Math.round(insuranceFull * Math.pow(sliderValue / 100, 0.7));
+  // Hard cutoff -- below 20 on the slider (low maintenance) insurance drops to zero
+  const insuranceApplied = sliderValue < 20 ? 0 : Math.round(insuranceFull * Math.pow(sliderValue / 100, 0.7));
   const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance + insuranceApplied + (config.annualCosts.boarding ?? 0);
   const annual = fixedAnnual + medical;
   const lifetime = annual * config.lifespanYears;
@@ -68,7 +69,7 @@ export default function RunningCostCard({ config }: Props) {
         <div className={styles.scenarioLabel}>{scenarioLabel(sliderValue)}</div>
         {noInsurance
           ? <p className={styles.noInsuranceNote}>Insurance not included -- many owners of this breed opt out</p>
-          : sliderValue <= 10 && <p className={styles.noInsuranceNote}>At low maintenance, insurance costs drop out</p>
+          : sliderValue < 20 && <p className={styles.noInsuranceNote}>At low maintenance, insurance costs drop out</p>
         }
       </div>
 
