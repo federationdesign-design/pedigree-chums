@@ -390,28 +390,12 @@ const LINEAGE: Record<string, LineageNode> = {
                 note: "European catch dogs descended from dogs brought west by the Alans and other steppe peoples in the early medieval period. Bred across the continent for size, grip and courage in the hunt and in war. Now extinct.",
                 img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg",
                 value: 55,
-                children: [
-                  {
-                    name: "Ancient Molossers",
-                    note: "The great war and guard dogs of the ancient world, kept by Assyrians, Greeks and Romans. Root stock of nearly every large holding and fighting dog in Europe and western Asia. Now extinct.",
-                    img: "/history/breeds/Ancient-Molossers.jpg",
-                    value: 70,
-                  },
-                ],
               },
               {
                 name: "Early Germanic boar hunting dogs",
                 note: "Large, rough hunting dogs native to northern Europe, documented in Roman accounts of Germanic tribes. Bred to seize and hold boar and bear rather than chase -- the instinct that defined the Bullenbeisser type. When crossed with the incoming Alaunt lines they produced the distinctly German bull-baiting dog. Now extinct.",
                 img: "/history/breeds/Old-German-boarhounds.jpg",
                 value: 45,
-                children: [
-                  {
-                    name: "Ancient Germanic hunting dogs",
-                    note: "The broad landrace of hunting dogs kept by Germanic peoples across northern Europe before Roman contact. Diverse in type but selected for courage and grip in the hunt. Now extinct.",
-                    img: "/history/breeds/Ancient-spotted-hounds.jpg",
-                    value: 60,
-                  },
-                ],
               },
             ],
           },
