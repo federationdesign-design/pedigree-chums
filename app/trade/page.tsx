@@ -200,7 +200,7 @@ export default function TradePage() {
                 </ul>
               </div>
               <div className={styles.posDiagram}>
-                <Image src="/stand-diagram.png" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto", filter: "invert(1)", mixBlendMode: "screen" }} />
+                <Image src="/CDU-POS.jpg" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto" }} />
               </div>
             </div>
           </div>
