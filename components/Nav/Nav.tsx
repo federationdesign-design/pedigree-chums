@@ -22,9 +22,8 @@ const tradeNavLinks = [
   { label: "Toy Safety Technical File", href: "/toy-safety" },
 ];
 
-const links = tradeLinks ? tradeNavLinks : customerLinks;
-
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
+  const links = tradeLinks ? tradeNavLinks : customerLinks;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
