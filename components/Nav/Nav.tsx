@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./Nav.module.css";
 
-const links = [
+const customerLinks = [
   { label: "Home", href: "/home" },
   { label: "About", href: "/about" },
   { label: "Britain's Dog History", href: "/britains-dog-history" },
@@ -16,7 +16,15 @@ const links = [
   { label: "Chum Calculator", href: "/chum-calculator" },
 ];
 
-export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean }) {
+const tradeNavLinks = [
+  { label: "Trade Enquiry", href: "/trade" },
+  { label: "Evidence Register", href: "/evidence-register" },
+  { label: "Toy Safety Technical File", href: "/toy-safety" },
+];
+
+const links = tradeLinks ? tradeNavLinks : customerLinks;
+
+export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 

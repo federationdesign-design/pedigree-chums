@@ -45,7 +45,7 @@ export default function TradePage() {
     <>
       {/* Shared site header — identical to the homepage (scroll-reveal logo,
           transparent bar, no button). */}
-      <Nav />
+      <Nav tradeLinks />
 
       <main>
         {/* HERO — full-bleed video, same treatment as B2C */}

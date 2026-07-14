@@ -30,7 +30,7 @@ const rows: [string, string][] = [
 export default function EvidenceRegisterPage() {
   return (
     <>
-      <Nav />
+      <Nav tradeLinks />
       <main className={styles.wrap}>
         <div className={styles.doc}>
           <h1>Evidence Register</h1>

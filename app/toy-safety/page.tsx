@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function ToySafetyPage() {
   return (
     <>
-      <Nav />
+      <Nav tradeLinks />
       <main className={styles.wrap}>
         <div className={styles.doc}>
           <h1>Toy Safety Technical File</h1>
