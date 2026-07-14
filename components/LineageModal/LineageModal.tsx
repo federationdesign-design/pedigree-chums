@@ -57,8 +57,9 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           background: "linear-gradient(to top right, #00e2ff, #008eff)",
           borderRadius: 28,
           boxShadow: "0 24px 80px rgba(0,0,0,0.4)",
-          overflow: "hidden",
+          overflow: "visible",
           isolation: "isolate",
+          clipPath: "inset(0 round 28px)",
         }}
       >
         {/* ── BreedTree fills the entire card ───────────────────────────── */}
@@ -102,9 +103,9 @@ export default function LineageModal({ name, image, character, lineage, onClose 
             style={{
               position: "absolute",
               top: 28,
-              right: 80,
+              right: 72,
               zIndex: 10,
-              maxWidth: 260,
+              width: "clamp(180px, 22%, 260px)",
               background: "rgba(10,58,87,0.88)",
               borderRadius: 16,
               padding: "14px 18px",
