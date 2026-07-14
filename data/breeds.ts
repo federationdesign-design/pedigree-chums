@@ -954,10 +954,10 @@ export const breeds: Breed[] = allBreeds.filter((b) => !b.draft);
 
 // Physical trading-card art per breed, keyed by slug. Used by the collection
 // shelf to show the real card a child plays with, rather than the pit's square
-// cartoon. Breeds with no card yet (irish-setter, bernedoodle) are omitted on
+// cartoon. Breeds with no card yet (bernedoodle) are omitted on
 // purpose, so the shelf falls back to the cartoon for them.
 export const breedCard: Record<string, string> = {
-  "cocker-spaniel": "/card.jpg",
+  "cocker-spaniel": "/card1.jpg",
   "cavalier-king-charles-spaniel": "/card2.jpg",
   "springer-spaniel": "/card3.jpg",
   "golden-retriever": "/card4.jpg",
@@ -974,7 +974,7 @@ export const breedCard: Record<string, string> = {
   "yorkshire-terrier": "/card15.jpg",
   "bulldog": "/card16.jpg",
   "great-dane": "/card18.jpg",
-  "dalmatian": "/card19.jpg",
+  "dalmatian": "/card17.jpg",
   "staffordshire-bull-terrier": "/card20.jpg",
   "border-collie": "/card21-1199411114.jpg",
   "old-english-sheepdog": "/card22.jpg",
@@ -995,6 +995,7 @@ export const breedCard: Record<string, string> = {
   "bull-terrier": "/card38.jpg",
   "doberman-pinscher": "/card39.jpg",
   "irish-wolfhound": "/card40.jpg",
+  "irish-setter": "/card19.jpg",
   "shih-tzu": "/card41.jpg",
   "mastiff": "/card42.jpg",
   "poodle": "/card43.jpg",
@@ -1006,9 +1007,9 @@ export const breedCard: Record<string, string> = {
   "puggle": "/card49.jpg",
   "maltipoo": "/card50.jpg",
   "jackapoo": "/card51.jpg",
-  "lurcher": "/card52.jpg",
-  "whippet": "/card53.jpg",
-  "bloodhound": "/card54.jpg",
+  "lurcher": "/card51.jpg",
+  "whippet": "/card52.jpg",
+  "bloodhound": "/card53.jpg",
   "jack-russell-terrier": "/card54.jpg",
   "english-setter": "/setter-square.jpg",
   "boxer": "/card47.jpg",
