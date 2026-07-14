@@ -322,7 +322,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Circular diagram - fixed position */}
       {lineage && (
-        <div style={{ position: "absolute", left: CIRCLE_LEFT, top: DIAGRAM_TOP - 100 }}
+        <div style={{ position: "absolute", left: CIRCLE_LEFT + 20, top: DIAGRAM_TOP - 150 }}
           ref={(el) => {
             if (!el) return;
             const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
