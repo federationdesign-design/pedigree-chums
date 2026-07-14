@@ -380,6 +380,34 @@ const LINEAGE: Record<string, LineageNode> = {
         value: 75,
         children: [
           {
+            name: "Great Bullenbeisser (Danziger Bullenbeisser)",
+            note: "The larger, heavier northern German bull-baiting dog from which the smaller Brabant variant descended. Standing around 60-65cm and 40-50kg, it was used to seize and hold boar, bear and bull by the muzzle. The Brabant line emerged as a smaller, more agile regional type. Now extinct.",
+            img: "/great-bullenbeisser.jpg",
+            value: 60,
+            children: [
+              {
+                name: "Medieval Alaunts and catch dogs",
+                note: "European catch dogs descended from dogs brought west by the Alans and other steppe peoples in the early medieval period. Bred across the continent for size, grip and courage in the hunt and in war. Now extinct.",
+                img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg",
+                value: 60,
+                children: [
+                  {
+                    name: "Ancient Molossers",
+                    note: "The great war and guard dogs of the ancient world, kept by Assyrians, Greeks and Romans. Root stock of nearly every large holding and fighting dog in Europe and western Asia. Now extinct.",
+                    img: "/history/breeds/Ancient-Molossers.jpg",
+                    value: 70,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Old English Bulldog",
+            note: "The stocky bull-baiting dog of England, crossed into the Brabant line via documented cross-channel exchange of bull-baiting dogs in the 16th and 17th centuries. Contributed the shortened muzzle and broader head. Now extinct.",
+            img: "/history/breeds/Old-English-Bulldog.jpg",
+            value: 40,
+          },
+          {
             name: "German Bullenbeisser types",
             note: "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound. Now extinct.",
             img: "/history/breeds/Old-German-boarhounds.jpg",
