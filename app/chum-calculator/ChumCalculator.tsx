@@ -414,6 +414,123 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (lowAllergen.has(slug)) score += 8;
   }
 
+  // ── Tiebreaker scoring ──────────────────────────────────────────────────
+  const fragile = new Set(["whippet","greyhound","lurcher","italian-greyhound",
+    "afghan-hound","chihuahua","papillon","maltese","yorkshire-terrier","pomeranian",
+    "shih-tzu","cavapoo","cavachon","bichon-frise","maltipoo","dachshund",
+    "pug","french-bulldog","cavalier-king-charles-spaniel"]);
+  const sturdy = new Set(["labrador","golden-retriever","german-shepherd","springer-spaniel",
+    "staffordshire-bull-terrier","boxer","border-collie","beagle","border-terrier",
+    "jack-russell-terrier","bull-terrier","rottweiler","corgi","labradoodle",
+    "goldendoodle","cockapoo","jackapoo","mastiff","great-dane","saint-bernard",
+    "bloodhound","irish-wolfhound","weimaraner","dalmatian","siberian-husky",
+    "doberman-pinscher","old-english-sheepdog","basset-hound","irish-setter",
+    "cocker-spaniel","miniature-schnauzer","west-highland-terrier","boston-terrier",
+    "bulldog","rough-collie"]);
+
+  // tb_park -- rough park play
+  if (answers.tb_park) {
+    if (answers.tb_park === "sturdy" && fragile.has(slug)) score -= 35;
+    if (answers.tb_park === "sturdy" && sturdy.has(slug)) score += 10;
+    if (answers.tb_park === "delicate" && fragile.has(slug)) score += 10;
+    if (answers.tb_park === "delicate" && sturdy.has(slug)) score -= 10;
+  }
+  // tb_roughplay -- rough and tumble play
+  if (answers.tb_roughplay) {
+    if (answers.tb_roughplay === "yes" && fragile.has(slug)) score -= 35;
+    if (answers.tb_roughplay === "yes" && sturdy.has(slug)) score += 8;
+    if (answers.tb_roughplay === "no" && fragile.has(slug)) score += 8;
+    if (answers.tb_roughplay === "no" && sturdy.has(slug)) score -= 8;
+  }
+  // tb_substance -- proper dog vs lap dog
+  if (answers.tb_substance && breed?.sizeBand) {
+    const isToy = ["toy","small"].includes(breed.sizeBand);
+    if (answers.tb_substance === "substantial" && isToy) score -= 30;
+    if (answers.tb_substance === "lap" && !isToy) score -= 15;
+    if (answers.tb_substance === "lap" && isToy) score += 10;
+  }
+  // tb_dogperson -- animal vs companion
+  const workingBreeds = new Set(["border-collie","springer-spaniel","cocker-spaniel",
+    "labrador","golden-retriever","german-shepherd","siberian-husky","weimaraner",
+    "irish-setter","dalmatian","beagle","basset-hound","bloodhound","greyhound",
+    "lurcher","whippet","afghan-hound","rough-collie","old-english-sheepdog",
+    "jack-russell-terrier","border-terrier","staffordshire-bull-terrier","bull-terrier",
+    "rottweiler","doberman-pinscher","boxer","mastiff","great-dane","saint-bernard",
+    "irish-wolfhound","corgi"]);
+  const companionBreeds = new Set(["cavalier-king-charles-spaniel","bichon-frise",
+    "shih-tzu","maltese","maltipoo","cavapoo","cavachon","pomeranian","chihuahua",
+    "yorkshire-terrier","papillon","italian-greyhound","boston-terrier","pug",
+    "french-bulldog","cockapoo","jackapoo","miniature-schnauzer","poodle",
+    "goldendoodle","labradoodle"]);
+  if (answers.tb_dogperson && answers.tb_dogperson !== "any") {
+    if (answers.tb_dogperson === "animal" && companionBreeds.has(slug)) score -= 20;
+    if (answers.tb_dogperson === "companion" && workingBreeds.has(slug)) score -= 15;
+    if (answers.tb_dogperson === "animal" && workingBreeds.has(slug)) score += 10;
+    if (answers.tb_dogperson === "companion" && companionBreeds.has(slug)) score += 10;
+  }
+  // tb_instincts -- working instincts vs obedient
+  const highInstinct = new Set(["border-collie","beagle","basset-hound","bloodhound",
+    "siberian-husky","weimaraner","irish-setter","dalmatian","greyhound","lurcher",
+    "afghan-hound","jack-russell-terrier","springer-spaniel","rough-collie",
+    "german-shepherd","whippet"]);
+  if (answers.tb_instincts && answers.tb_instincts !== "any") {
+    if (answers.tb_instincts === "working" && highInstinct.has(slug)) score += 15;
+    if (answers.tb_instincts === "biddable" && highInstinct.has(slug)) score -= 25;
+    if (answers.tb_instincts === "working" && companionBreeds.has(slug)) score -= 15;
+  }
+  // tb_looks -- striking vs practical
+  const strikingBreeds = new Set(["afghan-hound","dalmatian","irish-setter","rough-collie",
+    "old-english-sheepdog","siberian-husky","weimaraner","papillon","pomeranian",
+    "shih-tzu","maltese","bichon-frise","great-dane","irish-wolfhound","golden-retriever"]);
+  if (answers.tb_looks && answers.tb_looks !== "any") {
+    if (answers.tb_looks === "striking" && strikingBreeds.has(slug)) score += 12;
+    if (answers.tb_looks === "practical" && strikingBreeds.has(slug)) score -= 8;
+  }
+  // tb_location / tb_openspace -- city vs rural
+  const cityFriendly = new Set(["french-bulldog","pug","shih-tzu","cavalier-king-charles-spaniel",
+    "bichon-frise","poodle","boston-terrier","maltese","chihuahua","yorkshire-terrier",
+    "cockapoo","cavapoo","maltipoo","cavachon","pomeranian","italian-greyhound",
+    "staffordshire-bull-terrier","bulldog"]);
+  const spaceNeeding = new Set(["border-collie","greyhound","lurcher","siberian-husky",
+    "weimaraner","irish-setter","springer-spaniel","dalmatian","afghan-hound",
+    "german-shepherd","golden-retriever","labrador","rough-collie","whippet"]);
+  if (answers.tb_location) {
+    if (answers.tb_location === "city" && spaceNeeding.has(slug)) score -= 25;
+    if (answers.tb_location === "city" && cityFriendly.has(slug)) score += 12;
+    if (answers.tb_location === "rural" && cityFriendly.has(slug)) score -= 8;
+    if (answers.tb_location === "rural" && spaceNeeding.has(slug)) score += 10;
+  }
+  if (answers.tb_openspace) {
+    if (answers.tb_openspace === "no" && spaceNeeding.has(slug)) score -= 30;
+    if (answers.tb_openspace === "yes" && spaceNeeding.has(slug)) score += 10;
+  }
+  // tb_salon -- grooming salon
+  const salonBreeds = new Set(["bichon-frise","shih-tzu","cavapoo","maltese","maltipoo",
+    "yorkshire-terrier","cavalier-king-charles-spaniel","cavachon","pomeranian",
+    "labradoodle","goldendoodle","cockapoo","jackapoo","poodle","miniature-schnauzer"]);
+  const wipeBreeds = new Set(["chihuahua","italian-greyhound","boston-terrier",
+    "french-bulldog","pug","bulldog","whippet","greyhound","lurcher",
+    "staffordshire-bull-terrier","doberman-pinscher","weimaraner","dalmatian"]);
+  if (answers.tb_salon) {
+    if (answers.tb_salon === "yes" && salonBreeds.has(slug)) score += 15;
+    if (answers.tb_salon === "yes" && wipeBreeds.has(slug)) score -= 10;
+    if (answers.tb_salon === "home" && salonBreeds.has(slug)) score -= 20;
+    if (answers.tb_salon === "minimal" && wipeBreeds.has(slug)) score += 20;
+    if (answers.tb_salon === "minimal" && salonBreeds.has(slug)) score -= 35;
+  }
+  // tb_smallchar -- bold vs gentle
+  const boldBreeds = new Set(["chihuahua","yorkshire-terrier","miniature-schnauzer",
+    "west-highland-terrier","jack-russell-terrier","pomeranian","papillon",
+    "boston-terrier","jackapoo","border-terrier"]);
+  const gentleBreeds = new Set(["cavapoo","cavalier-king-charles-spaniel","bichon-frise",
+    "maltese","maltipoo","cavachon","shih-tzu","cockapoo"]);
+  if (answers.tb_smallchar) {
+    if (answers.tb_smallchar === "bold" && boldBreeds.has(slug)) score += 18;
+    if (answers.tb_smallchar === "bold" && gentleBreeds.has(slug)) score -= 25;
+    if (answers.tb_smallchar === "gentle" && gentleBreeds.has(slug)) score += 18;
+    if (answers.tb_smallchar === "gentle" && boldBreeds.has(slug)) score -= 25;
+  }
+
   return Math.max(0, Math.round(score));
 }
 
