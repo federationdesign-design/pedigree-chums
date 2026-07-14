@@ -17,7 +17,7 @@ const customerLinks = [
 ];
 
 const tradeNavLinks = [
-  { label: "Trade Enquiry", href: "/trade" },
+  { label: "Trade Enquiry", href: "/trade#enquire" },
   { label: "Evidence Register", href: "/evidence-register" },
   { label: "Toy Safety Technical File", href: "/toy-safety" },
 ];
@@ -83,16 +83,22 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 {l.label}
               </Link>
             ))}
-            <button
-              type="button"
-              className={styles.menuLink}
-              onClick={() => {
-                setOpen(false);
-                window.dispatchEvent(new CustomEvent("pc:open-offer"));
-              }}
-            >
-              Get discount code
-            </button>
+            {tradeLinks ? (
+              <Link href="/preorder" className={styles.menuLink} onClick={() => setOpen(false)}>
+                Get pre-order discount code
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className={styles.menuLink}
+                onClick={() => {
+                  setOpen(false);
+                  window.dispatchEvent(new CustomEvent("pc:open-offer"));
+                }}
+              >
+                Get discount code
+              </button>
+            )}
           </nav>
         </div>
       )}
