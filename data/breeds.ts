@@ -1009,9 +1009,9 @@ export const breedCard: Record<string, string> = {
   "lurcher": "/card52.jpg",
   "whippet": "/card53.jpg",
   "bloodhound": "/card54.jpg",
-  "jack-russell-terrier": "/jack-russel-square.jpg",
+  "jack-russell-terrier": "/card54.jpg",
   "english-setter": "/setter-square.jpg",
-  "boxer": "/boxer-square.jpg",
+  "boxer": "/card47.jpg",
 };
 
 // ── Personality flags for Chum Calculator filtering ──────────────────────────
