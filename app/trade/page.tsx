@@ -169,7 +169,7 @@ export default function TradePage() {
                   <Image src="/trade-img2.png" alt="Healthy retail margin" fill sizes="(max-width: 980px) 45vw, 240px" style={{ objectFit: "contain" }} />
                 </div>
                 <h3 className={styles.tileTitle}>~60% retail margin</h3>
-                <p className={styles.tileBody}>£4.00 wholesale against a £9.99 suggested RRP leaves a healthy margin on every single pack — strong returns from a very small slice of shelf or counter space.</p>
+                <p className={styles.tileBody}>£4.05 wholesale against a £9.99 suggested RRP leaves a healthy margin on every single pack — strong returns from a very small slice of shelf or counter space.</p>
               </div>
               <div className={styles.tile}>
                 <div className={styles.tileImg}>
@@ -333,7 +333,7 @@ export default function TradePage() {
               <p>
                 Go on to place a 1,000+ order within 60 days and we credit
                 <strong> £250 against it</strong> — bringing your starter units
-                down to the full £4.00 wholesale price. Sample packs are available
+                down to the full £4.05 wholesale price. Sample packs are available
                 now to see and play before you decide.
               </p>
             </div>
