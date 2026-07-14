@@ -382,7 +382,7 @@ const LINEAGE: Record<string, LineageNode> = {
           {
             name: "Great Bullenbeisser (Danziger Bullenbeisser)",
             note: "The larger, heavier northern German bull-baiting dog from which the smaller Brabant variant descended. Standing around 60-65cm and 40-50kg, it was used to seize and hold boar, bear and bull by the muzzle. The Brabant line emerged as a smaller, more agile regional type. Now extinct.",
-            img: "/great-bullenbeisser.jpg",
+            img: "/history/breeds/great-bullenbeisser.jpg",
             value: 60,
             children: [
               {
