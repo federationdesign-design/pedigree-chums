@@ -4,9 +4,9 @@ import Footer from "../../components/Footer/Footer";
 import styles from "../toy-safety/toy-safety.module.css";
 
 export const metadata: Metadata = {
-  title: "Evidence Register | Pedigree Chums",
+  title: "Evidence Register | Pedigree Chums™",
   description:
-    "Status of the supporting compliance evidence for the Pedigree Chums dog bingo card game Technical File.",
+    "Status of the supporting compliance evidence for the Pedigree Chums™ dog bingo card game Technical File.",
 };
 
 const rows: [string, string][] = [
@@ -34,7 +34,7 @@ export default function EvidenceRegisterPage() {
       <main className={styles.wrap}>
         <div className={styles.doc}>
           <h1>Evidence Register</h1>
-          <p className={styles.sub}>Pedigree Chums, dog bingo game. Status of supporting compliance evidence.</p>
+          <p className={styles.sub}>Pedigree Chums™, dog bingo game. Status of supporting compliance evidence.</p>
 
           <div className={styles.tableWrap}>
             <table>

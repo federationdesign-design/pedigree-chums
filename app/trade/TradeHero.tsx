@@ -19,7 +19,7 @@ export default function TradeHero() {
         <iframe
           className={styles.heroVideo}
           src="https://player.vimeo.com/video/1199216471?background=1&autoplay=1&loop=1&muted=1&controls=0&title=0&byline=0&portrait=0&autopause=0"
-          title="Pedigree Chums being played"
+          title="Pedigree Chums™ being played"
           allow="autoplay; fullscreen; picture-in-picture"
           frameBorder="0"
         />

@@ -30,7 +30,7 @@ export default function VideoSection() {
       <iframe
         ref={iframeRef}
         src="https://player.vimeo.com/video/1199216471?autoplay=0&loop=1&muted=1&controls=0&title=0&byline=0&portrait=0&background=1"
-        title="Pedigree Chums"
+        title="Pedigree Chums™"
         allow="autoplay; fullscreen; picture-in-picture"
         frameBorder="0"
         className={styles.videoFrame}

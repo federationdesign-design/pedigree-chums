@@ -23,7 +23,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       {
         name: "Find pack",
-        note: "Dig out your Pedigree Chums deck.",
+        note: "Dig out your Pedigree Chums™ deck.",
         img: "/find-pack-icon.svg",
         value: 1,
         children: [

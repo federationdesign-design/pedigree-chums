@@ -135,7 +135,7 @@ export default function TradeEnquiryForm() {
             }}
           />
           <span>
-            I agree to Pedigree Chums storing these details so they can respond to
+            I agree to Pedigree Chums™ storing these details so they can respond to
             my trade enquiry. I can ask to be removed at any time. See the{" "}
             <Link
               href="/privacy"

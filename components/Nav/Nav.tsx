@@ -43,8 +43,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       {hideLogo ? (
         <span aria-hidden />
       ) : (
-        <Link href="/" className={styles.logo} aria-label="Pedigree Chums home">
-          <Image src="/dogbingo.svg" alt="Pedigree Chums" width={150} height={64} priority />
+        <Link href="/" className={styles.logo} aria-label="Pedigree Chums™ home">
+          <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={150} height={64} priority />
         </Link>
       )}
       {!dockBottomLeft && (

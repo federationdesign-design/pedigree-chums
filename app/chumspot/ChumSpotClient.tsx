@@ -52,7 +52,7 @@ const TERMS = [
   {
     num: "10",
     title: "Winner announcement",
-    body: "The winner may be announced on the Pedigree Chums website and social channels. We may publish the winner's surname, county, social-media username and winning entry. Winners may ask us to limit what we publish. We will not publicly identify a young person aged 14–17 without express agreement from their parent or guardian.",
+    body: "The winner may be announced on the Pedigree Chums™ website and social channels. We may publish the winner's surname, county, social-media username and winning entry. Winners may ask us to limit what we publish. We will not publicly identify a young person aged 14–17 without express agreement from their parent or guardian.",
   },
   {
     num: "11",
@@ -67,12 +67,12 @@ const TERMS = [
   {
     num: "13",
     title: "Permission to use entries",
-    body: "Entrants retain ownership of their content. By entering, you grant Pedigree Chums a non-exclusive, royalty-free licence to reproduce, display, edit and share your entry to administer and promote the competition, celebrate winners and promote future rounds. This licence applies worldwide for 24 months from submission. We will credit your account when reasonably practical when reposting.",
+    body: "Entrants retain ownership of their content. By entering, you grant Pedigree Chums™ a non-exclusive, royalty-free licence to reproduce, display, edit and share your entry to administer and promote the competition, celebrate winners and promote future rounds. This licence applies worldwide for 24 months from submission. We will credit your account when reasonably practical when reposting.",
   },
   {
     num: "14",
     title: "Personal information and privacy",
-    body: "We use personal information to verify eligibility, contact winners, administer the competition and arrange prize delivery. We collect only what is reasonably required. Delivery addresses are normally requested only from winners. We will not add you to a marketing list without your agreement. Further information is in the Pedigree Chums Privacy Policy at [PRIVACY POLICY LINK].",
+    body: "We use personal information to verify eligibility, contact winners, administer the competition and arrange prize delivery. We collect only what is reasonably required. Delivery addresses are normally requested only from winners. We will not add you to a marketing list without your agreement. Further information is in the Pedigree Chums™ Privacy Policy at [PRIVACY POLICY LINK].",
   },
   {
     num: "15",
@@ -102,7 +102,7 @@ const TERMS = [
   {
     num: "20",
     title: "Figurine selection",
-    body: "The winner cannot choose which Chum figurine they receive. The figurine design is selected by Pedigree Chums at the time of fulfilment. Only certain Chum characters have currently been modelled for 3D printing. If the specific character cannot be produced for any reason, a reasonable alternative figurine of equal or greater value will be provided.",
+    body: "The winner cannot choose which Chum figurine they receive. The figurine design is selected by Pedigree Chums™ at the time of fulfilment. Only certain Chum characters have currently been modelled for 3D printing. If the specific character cannot be produced for any reason, a reasonable alternative figurine of equal or greater value will be provided.",
   },
 ];
 
@@ -146,7 +146,7 @@ export default function ChumSpotClient() {
         <section className={styles.section}>
           <div className={styles.inner}>
             <p className={styles.lead} style={{textAlign:"center"}}>
-              Have you spotted a dog that matches one of the breeds in your Pedigree Chums pack?
+              Have you spotted a dog that matches one of the breeds in your Pedigree Chums™ pack?
             </p>
             <p style={{textAlign:"center"}}>
               Take a photo with the matching card, share it on Instagram or TikTok,
@@ -169,7 +169,7 @@ export default function ChumSpotClient() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/spot-icon.svg" alt="" className={styles.stepIcon} aria-hidden="true" />
                 <h3 className={styles.stepTitle}>1. Spot</h3>
-                <p>Find a dog that matches a breed featured in your Pedigree Chums pack.</p>
+                <p>Find a dog that matches a breed featured in your Pedigree Chums™ pack.</p>
               </div>
               <div className={styles.step}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -216,9 +216,9 @@ export default function ChumSpotClient() {
                   <li>One exclusive 3D printed Chum Figurine*</li>
                   <li>Free delivery to one UK address</li>
                   <li>The title of Spot your Chum winner</li>
-                  <li>The opportunity to be featured on the Pedigree Chums website and social channels</li>
+                  <li>The opportunity to be featured on the Pedigree Chums™ website and social channels</li>
                 </ul>
-                <p style={{fontSize:"0.78rem",marginTop:"16px",opacity:1}}>* The figurine design is selected by Pedigree Chums. Only certain Chum characters have currently been modelled for 3D printing. The winner cannot choose which figurine they receive.</p>
+                <p style={{fontSize:"0.78rem",marginTop:"16px",opacity:1}}>* The figurine design is selected by Pedigree Chums™. Only certain Chum characters have currently been modelled for 3D printing. The winner cannot choose which figurine they receive.</p>
               </div>
             </div>
           </div>

@@ -4,7 +4,7 @@ import styles from "../preorder.module.css";
 import Footer from "../../../components/Footer/Footer";
 
 export const metadata: Metadata = {
-  title: "Pre-order cancelled | Pedigree Chums",
+  title: "Pre-order cancelled | Pedigree Chums™",
   robots: { index: false, follow: false },
 };
 

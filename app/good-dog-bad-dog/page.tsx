@@ -5,7 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./good-dog-bad-dog.module.css";
 
 export const metadata: Metadata = {
-  title: "Good Dog, Bad Dog | Pedigree Chums",
+  title: "Good Dog, Bad Dog | Pedigree Chums™",
   description: "A series of essays exploring how dogs are portrayed in stories, legends and popular culture -- and what those portrayals really say about the breeds behind the image.",
   robots: "noindex",
 };

@@ -5,7 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog/good-dog-bad-dog.module.css";
 
 export const metadata: Metadata = {
-  title: "Your Dog Is Smarter Than the Test | Pedigree Chums",
+  title: "Your Dog Is Smarter Than the Test | Pedigree Chums™",
   description: "We measure animal intelligence by how closely it resembles our own. Dogs and dolphins suggest we have been asking the wrong question.",
 };
 

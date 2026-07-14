@@ -7,7 +7,7 @@ const STEPS: StepData[] = [
     caption: "Deal 3-6 chums each",
     heading: "Step 1",
     rows: [
-      { icon: "/shuffle-icon.svg", title: "Find your pack", body: "Dig out your Pedigree Chums deck." },
+      { icon: "/shuffle-icon.svg", title: "Find your pack", body: "Dig out your Pedigree Chums™ deck." },
       { icon: "/deal-icon.svg", title: "Gather your players", body: "No limit on players. You can even go solo." },
       { icon: "/friends-icon.svg", title: "Shuffle well", body: "Give the deck a good shuffle." },
       { icon: "/find-pack-icon.svg", title: "Deal the cards", body: "Hand out 3 to 6 cards each. Show your hand to the other players, then hide it." },

@@ -129,7 +129,7 @@ export default function OfferModal({
                     }}
                   />
                   <span>
-                    I agree to Pedigree Chums storing my email so they can send my
+                    I agree to Pedigree Chums™ storing my email so they can send my
                     discount code and launch updates. I can unsubscribe at any time.
                     See the{" "}
                     <Link

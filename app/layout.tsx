@@ -38,7 +38,7 @@ const score = Press_Start_2P({
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://pedigree-chums.vercel.app";
 
-const TITLE = "Pedigree Chums | The Dog Bingo Game";
+const TITLE = "Pedigree Chums™ | The Dog Bingo Game";
 const DESCRIPTION =
   "The ultimate on-the-go dog spotting game. 54 uniquely-illustrated breed cards. Fun, educational and addictive, perfect for families, tourists and dog lovers.";
 
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     url: SITE_URL,
-    siteName: "Pedigree Chums",
+    siteName: "Pedigree Chums™",
     locale: "en_GB",
     type: "website",
     images: [
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Pedigree Chums - The Dog Bingo Game",
+        alt: "Pedigree Chums™ - The Dog Bingo Game",
       },
     ],
   },

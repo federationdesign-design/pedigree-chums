@@ -53,7 +53,7 @@ export async function sendOrderConfirmation(order: OrderConfirmation): Promise<v
         <h1 style="color: #ffd23e; font-size: 22px; margin: 0;">Your pre-order is confirmed</h1>
       </div>
       <div style="background: #fbf7ec; border-radius: 0 0 16px 16px; padding: 24px 28px;">
-        <p style="margin: 0 0 14px;">Thank you for pre-ordering <strong>Pedigree Chums: The Dog Bingo Game</strong>. Your payment has gone through and your pack is reserved.</p>
+        <p style="margin: 0 0 14px;">Thank you for pre-ordering <strong>Pedigree Chums™: The Dog Bingo Game</strong>. Your payment has gone through and your pack is reserved.</p>
         <table style="width: 100%; border-collapse: collapse; margin: 18px 0;">
           <tr>
             <td style="padding: 6px 0; color: #0a3a57;">Order reference</td>
@@ -74,7 +74,7 @@ export async function sendOrderConfirmation(order: OrderConfirmation): Promise<v
         </table>
         <p style="margin: 0 0 14px;">${order.dispatchNote}</p>
         <p style="margin: 0 0 14px; font-size: 14px; color: #0a3a57;">As a pre-order placed online, you have the right to cancel within 14 days of receiving your pack. To cancel before dispatch, just reply to this email.</p>
-        <p style="margin: 18px 0 0;">See you soon,<br/>The Pedigree Chums team</p>
+        <p style="margin: 18px 0 0;">See you soon,<br/>The Pedigree Chums™ team</p>
       </div>
     </div>
   `;
@@ -88,7 +88,7 @@ export async function sendOrderConfirmation(order: OrderConfirmation): Promise<v
     body: JSON.stringify({
       from,
       to: order.to,
-      subject: `Pre-order confirmed (${ref}) - Pedigree Chums`,
+      subject: `Pre-order confirmed (${ref}) - Pedigree Chums™`,
       html,
     }),
   });

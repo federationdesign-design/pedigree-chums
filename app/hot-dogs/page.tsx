@@ -4,7 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Hot/Dogs - Pedigree Chums",
+  title: "Hot/Dogs - Pedigree Chums™",
   description: "A hot dog is a sausage. A sausage dog is a dog. A dog can be hot. A hot dog in a car is not funny at all.",
 };
 
@@ -58,12 +58,12 @@ export default function HotDogs() {
                 <h2 className={styles.noteTitleMain}>A note about hot dogs</h2>
                 <p>Sometimes we mean human food: sausages in buns.</p>
                 <p>Sometimes we mean dogs who are too hot and need shade, water and probably some ice.</p>
-                <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums game flavour.</p>
+                <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums™ game flavour.</p>
                 <p>We do not mean heating up your dog&rsquo;s food.</p>
                 <hr className={styles.rule} />
                 <p className={styles.legal}>
-                  Pedigree Chums is an dog spotting card game. It is not food or pet food, not dog food, not a dog treat,
-                  There are not nuts in Pedigree Chums.
+                  Pedigree Chums™ is an dog spotting card game. It is not food or pet food, not dog food, not a dog treat,
+                  There are not nuts in Pedigree Chums™.
                 </p>
                 <p className={styles.legal}>
                   The cards may contain dogs. Your dog may show interest in the dogs like it does with your hotdogs.
@@ -334,7 +334,7 @@ export default function HotDogs() {
         {/* ── Game rules ───────────────────────────────────────────── */}
         <section id="game" className={styles.gameSection}>
           <div className={styles.cookingInner}>
-            <p className={styles.sectionEyebrow}>Pedigree Chums game flavour</p>
+            <p className={styles.sectionEyebrow}>Pedigree Chums™ game flavour</p>
             <h2 className={styles.sectionTitle}>Hot Dogs mode</h2>
             <div className={styles.gameTwoCols}>
               <div>
@@ -374,9 +374,9 @@ export default function HotDogs() {
                 ["Can dogs eat hot dogs?", "Emotionally, your dog says yes. Should they? Hot dogs are made for humans. They can be salty, processed, and fatty. A tiny plain bit may not end the world for many dogs, but it should not become a habit. Your dog also wants to eat socks. We cannot let desire run the department."],
                 ["Is it too hot to walk my dog?", "Ask the pavement. If it feels too hot for your hand, it is too hot for paws. A dog never died from missing a walk. Dogs do die from being too hot."],
                 ["Are dogs safe in hot cars?", "No. Not for five minutes. Not with the window cracked. Not because you parked in the shade. Not because you are just popping in. A car is not a kennel. It is an oven with cup holders."],
-                ["What is Hot Dogs mode?", "Hot Dogs mode is a Pedigree Chums game flavour where everyone briefly shows their hand after the draw, then hides it again. From then on you can only look at your own cards. You must remember which dogs were in the other players' hands. It is fast, it is memory, and it makes everyone accuse Grandma of hiding a spaniel."],
+                ["What is Hot Dogs mode?", "Hot Dogs mode is a Pedigree Chums™ game flavour where everyone briefly shows their hand after the draw, then hides it again. From then on you can only look at your own cards. You must remember which dogs were in the other players' hands. It is fast, it is memory, and it makes everyone accuse Grandma of hiding a spaniel."],
                 ["Is Hot Dogs mode like Snap?", "Yes. But with homework. In Snap you react to what you can see. In Hot Dogs you react to what you think you remember seeing. That is worse. And therefore better."],
-                ["Is Pedigree Chums dog food?", "No. Pedigree Chums is a dog card game. It contains dog characters, dog jokes, and dog chaos. It does not contain dog food. Do not feed the game to the dog. Play the game. Feed the dog something else."],
+                ["Is Pedigree Chums™ dog food?", "No. Pedigree Chums™ is a dog card game. It contains dog characters, dog jokes, and dog chaos. It does not contain dog food. Do not feed the game to the dog. Play the game. Feed the dog something else."],
                     ["What is the best kind of hot dog?", "The one in a bun. The one with mustard. The one that is not panting, drooling, wobbling, trapped in a car, standing on hot pavement, or wondering why humans have made summer everybody’s problem. The best hot dogs are not dogs."],
               ].map(([q, a], i) => (
                 <details key={i} className={styles.faqItem}>

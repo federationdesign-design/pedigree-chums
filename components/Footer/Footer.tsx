@@ -18,7 +18,7 @@ export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean })
   return (
     <footer className={styles.footer}>
       <div className={styles.logoCol}>
-        <Image src="/dogbingo.svg" alt="Pedigree Chums" width={340} height={148} />
+        <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={340} height={148} />
       </div>
 
       <nav className={styles.nav}>
@@ -37,8 +37,8 @@ export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean })
       )}
 
       <p className={styles.legal}>
-        Pedigree Chums | The Dog Bingo Game. Registered in England and Wales.
-        Copyright 2026: Taylor James Stephens Ltd Trading as Pedigree Chums |
+        Pedigree Chums™ | The Dog Bingo Game. Registered in England and Wales.
+        Copyright 2026: Taylor James Stephens Ltd Trading as Pedigree Chums™ |
         United Kingdom
       </p>
     </footer>

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import styles from "../preorder.module.css";
 
 export const metadata: Metadata = {
-  title: "Pre-order confirmed | Pedigree Chums",
+  title: "Pre-order confirmed | Pedigree Chums™",
   robots: { index: false, follow: false },
 };
 
@@ -27,7 +27,7 @@ export default function PreorderSuccess() {
           You are one of the <span className={styles.accent}>chums</span>!
         </h1>
         <p className={styles.lead}>
-          Thank you for pre-ordering Pedigree Chums: The Dog Bingo Game. Your
+          Thank you for pre-ordering Pedigree Chums™: The Dog Bingo Game. Your
           payment has gone through and your pack is reserved.
         </p>
         <p className={styles.body}>
