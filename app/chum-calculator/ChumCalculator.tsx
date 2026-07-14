@@ -153,6 +153,7 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "Like brand-new Velcro -- stuck to me at all times", value: "yes" },
       { label: "Like ten-year-old Velcro -- close but not obsessive", value: "medium" },
+      { label: "Mine and mine alone -- devoted to me, not bothered about everyone else", value: "mine" },
       { label: "I need my space -- an independent dog suits me better", value: "no" },
     ],
   },
@@ -361,10 +362,18 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.shedding === "low" && groom.sheddingLevel <= 2) score += 10;
     if (answers.shedding === "medium" && groom.sheddingLevel >= 5) score -= 10;
   }
+  const onePersonBreeds = new Set(["dachshund", "corgi", "weimaraner", "rough-collie", "afghan-hound", "greyhound", "lurcher", "doberman-pinscher", "german-shepherd", "siberian-husky", "whippet"]);
+  const everyonesFriend = new Set(["labrador", "golden-retriever", "labradoodle", "goldendoodle", "beagle", "cocker-spaniel", "springer-spaniel", "cavalier-king-charles-spaniel", "cockapoo", "cavapoo", "bichon-frise", "boxer", "staffordshire-bull-terrier"]);
   if (flags && answers.velcro) {
     if (answers.velcro === "no" && flags.velcro) score -= 35;
     if (answers.velcro === "yes" && flags.velcro) score += 10;
     if (answers.velcro === "yes" && !flags.velcro) score -= 10;
+    if (answers.velcro === "medium" && flags.velcro) score -= 10;
+    if (answers.velcro === "medium" && !flags.velcro) score -= 5;
+    // One-person dog scoring
+    if (answers.velcro === "mine" && onePersonBreeds.has(slug)) score += 20;
+    if (answers.velcro === "mine" && everyonesFriend.has(slug)) score -= 20;
+    if (answers.velcro === "yes" && onePersonBreeds.has(slug)) score += 5; // close enough
   }
   if (flags && answers.vocal) {
     if (answers.vocal === "yes" && flags.vocal) score -= 40;
@@ -415,18 +424,39 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
   }
 
   // ── Tiebreaker scoring ──────────────────────────────────────────────────
-  const fragile = new Set(["whippet","greyhound","lurcher","italian-greyhound",
-    "afghan-hound","chihuahua","papillon","maltese","yorkshire-terrier","pomeranian",
-    "shih-tzu","cavapoo","cavachon","bichon-frise","maltipoo","dachshund",
-    "pug","french-bulldog","cavalier-king-charles-spaniel"]);
-  const sturdy = new Set(["labrador","golden-retriever","german-shepherd","springer-spaniel",
+  // Fragile -- fine bones, thin skin, vulnerable to rough play/collisions
+  const fragile = new Set([
+    "whippet",           // sighthound -- thin skin, fine bones
+    "greyhound",         // thin skin tears easily
+    "lurcher",           // sighthound cross -- fragile despite speed
+    "italian-greyhound", // extremely fine bones, legs snap easily
+    "afghan-hound",      // elegant sighthound, fragile in collisions
+    "chihuahua",         // tiny bones, fontanelle on skull
+    "papillon",          // very fine-boned
+    "maltese",           // fragile toy breed
+    "yorkshire-terrier", // fine-boned despite terrier spirit
+    "pomeranian",        // tiny frame
+    "shih-tzu",          // small, pushed-in face vulnerable to impact
+    "cavapoo",           // small fine-boned companion cross
+    "cavachon",          // small companion cross
+    "bichon-frise",      // small, fine-boned
+    "maltipoo",          // small toy cross
+    "dachshund",         // long spine extremely vulnerable to back injury
+    "pug",               // brachycephalic airways + protruding eyes
+    "french-bulldog",    // brachycephalic, spine issues
+    "cavalier-king-charles-spaniel", // small and gentle
+  ]);
+  // Sturdy -- solid build, tolerates rough and tumble well
+  const sturdy = new Set([
+    "labrador","golden-retriever","german-shepherd","springer-spaniel",
     "staffordshire-bull-terrier","boxer","border-collie","beagle","border-terrier",
     "jack-russell-terrier","bull-terrier","rottweiler","corgi","labradoodle",
     "goldendoodle","cockapoo","jackapoo","mastiff","great-dane","saint-bernard",
     "bloodhound","irish-wolfhound","weimaraner","dalmatian","siberian-husky",
     "doberman-pinscher","old-english-sheepdog","basset-hound","irish-setter",
     "cocker-spaniel","miniature-schnauzer","west-highland-terrier","boston-terrier",
-    "bulldog","rough-collie"]);
+    "bulldog","rough-collie","poodle",
+  ]);
 
   // tb_park -- rough park play
   if (answers.tb_park) {
