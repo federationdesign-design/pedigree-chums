@@ -116,8 +116,8 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           >
             <p style={{
               fontFamily: "var(--font-body,'Montserrat',system-ui)",
-              fontSize: "0.85rem",
-              fontWeight: 500,
+              fontSize: "0.75rem",
+              fontWeight: 600,
               color: "#ffffff",
               margin: 0,
               lineHeight: 1.6,
