@@ -132,12 +132,12 @@ export default function TradePage() {
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/stacked-comicstrip.png"
+            src="/how-to-play-comic-strip.png"
             alt="How to play, step by step"
             className={styles.comicDesktop}
           />
           <div className={styles.comicSteps}>
-            {["/step1.png", "/step2.png", "/step3.png", "/step4.png", "/step5.png"].map(
+            {["/step1-redue.jpg", "/step2-redue.jpg", "/step3-redue.jpg", "/step4-redue.jpg", "/step5-redue.jpg", "/step6-redue.jpg"].map(
               (src, i) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img key={src} src={src} alt={`How to play, step ${i + 1}`} className={styles.comicStep} />
