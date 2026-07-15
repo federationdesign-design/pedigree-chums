@@ -447,7 +447,7 @@ function getGroup(breed: string): string {
 
 function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.length]; }
 
-function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number) {
+function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "") {
   const group = getGroup(breed);
   const nameBank = (NAMES[group] || NAMES.default)[gender];
   const titleBank = gender === "boy" ? (BOY_TITLES[group] || BOY_TITLES.default) : (GIRL_TITLES[group] || GIRL_TITLES.default);
