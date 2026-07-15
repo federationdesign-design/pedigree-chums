@@ -291,7 +291,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Running cost card */}
       {runningCosts[slug] && !closedCards.has("runningCost") && (
-        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 - 50}
+        <DragCard id="runningCost" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100 - 50} initialY={CHART_TOP - 15 + 200 + 50 - 250 - 50}
           zIndex={zOrders.runningCost} onBringToFront={bringToFront} onClose={() => setClosedCards((prev) => new Set(prev).add("runningCost"))}>
           <RunningCostCard config={runningCosts[slug]} />
         </DragCard>
@@ -336,7 +336,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
 
       {/* Suitability radar */}
       {suitabilityScores[slug] && !closedCards.has("suitability") && (
-        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 - 50}
+        <DragCard id="suitability" initialX={LEFT_EDGE + INFO_W + CARD_GAP + 10 + 1008 + 24 - 100} initialY={CHART_TOP - 15 + 200 + 50 - 250 + 460 + 16 - 50 + 40}
           zIndex={zOrders.suitability} onBringToFront={bringToFront}
           onClose={() => setClosedCards((prev) => new Set(prev).add("suitability"))}
           style={{ width: 360 }}>
