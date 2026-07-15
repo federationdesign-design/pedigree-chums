@@ -147,26 +147,49 @@ const NAMES: Record<string, { boy: string[]; girl: string[] }> = {
 };
 
 // ── TITLES ─────────────────────────────────────────────────────────────────────
-const TITLES: Record<string, string[]> = {
-  terrier:    ["Mr","Miss"],
-  spaniel:    ["Field Marshal","General","Admiral","Brigadier","Colonel"],
-  retriever:  ["Colonel","Major","Captain","Commander"],
-  german:     ["Colonel","Major","Captain"],
-  collie:     ["Lieutenant","Second Lieutenant","Professor"],
-  boxer:      ["Sergeant","Corporal","Lance Corporal"],
-  sniffer:    ["Inspector","Chief Inspector","Superintendent","Commissioner","Judge"],
-  sighthound: ["Duke","Duchess","Earl","Countess","Lord","Lady","Sir","Dame","Viscount","Viscountess"],
-  giant:      ["The Great","The Magnificent","The Formidable","The Legendary","The Unstoppable"],
-  poodle:     ["Professor","Doctor"],
-  lapdog:     ["Reverend","Dean","Bishop","Archdeacon"],
-  character:  ["The Notorious","The Incomparable","The Inimitable","The Illustrious"],
-  gentry:     ["Viscount","Viscountess","Baron","Baroness","The Right Honourable"],
-  highenergy: ["Lieutenant","Sergeant","Captain"],
-  lowactivity:["Private","Lance Corporal","The Magnificent"],
-  scottish:   ["Lord","Lady","Duke","Duchess","Sir","Dame"],
-  historical: ["The Notorious","The Legendary","The Incomparable"],
-  doodle:     ["Professor","Major","Inspector","The Magnificent"],
-  default:    ["Major","Inspector","Baron","Lord"],
+// Boy and girl titles split -- females never get military ranks
+const TITLES_BOY: Record<string, string[]> = {
+  terrier:     ["Mr"],
+  spaniel:     ["Field Marshal","General","Admiral","Brigadier","Colonel"],
+  retriever:   ["Colonel","Major","Captain","Commander"],
+  german:      ["Colonel","Major","Captain"],
+  collie:      ["Lieutenant","Second Lieutenant","Professor"],
+  boxer:       ["Sergeant","Corporal","Lance Corporal"],
+  sniffer:     ["Inspector","Chief Inspector","Superintendent","Commissioner","Judge"],
+  sighthound:  ["Duke","Earl","Lord","Sir","Viscount","Baron"],
+  giant:       ["The Great","The Magnificent","The Formidable","The Legendary","The Unstoppable","Duke","Earl","Baron"],
+  poodle:      ["Professor","Doctor"],
+  lapdog:      ["Reverend","Dean","Bishop","Archdeacon"],
+  character:   ["The Notorious","The Incomparable","The Inimitable","The Illustrious","Baron","Inspector","Judge"],
+  gentry:      ["Viscount","Baron","The Right Honourable","Lord","Sir"],
+  highenergy:  ["Lieutenant","Sergeant","Captain"],
+  lowactivity: ["Private","Lance Corporal","The Magnificent"],
+  scottish:    ["Lord","Duke","Sir","Earl"],
+  historical:  ["The Notorious","The Legendary","The Incomparable"],
+  doodle:      ["Professor","Major","Inspector","The Magnificent"],
+  default:     ["Major","Inspector","Baron","Lord"],
+};
+
+const TITLES_GIRL: Record<string, string[]> = {
+  terrier:     ["Miss"],
+  spaniel:     ["Dame","Lady","Countess","Duchess","Viscountess"],
+  retriever:   ["Dame","Lady","Countess","Viscountess"],
+  german:      ["Countess","Dame","Baroness"],
+  collie:      ["Professor","Doctor","Lady"],
+  boxer:       ["Dame","Lady","Countess"],
+  sniffer:     ["Inspector","Chief Inspector","Commissioner","Judge","Superintendent"],
+  sighthound:  ["Duchess","Countess","Lady","Dame","Viscountess","Baroness"],
+  giant:       ["The Great","The Magnificent","The Formidable","The Legendary","The Unstoppable","Duchess","Countess","Lady"],
+  poodle:      ["Professor","Doctor"],
+  lapdog:      ["Reverend","Dean","Bishop","Archdeacon"],
+  character:   ["The Notorious","The Incomparable","The Inimitable","The Illustrious","Baroness","Judge"],
+  gentry:      ["Viscountess","Baroness","The Right Honourable","Lady","Dame"],
+  highenergy:  ["Lady","Countess","Dame","Captain"],
+  lowactivity: ["Lady","Baroness","The Magnificent"],
+  scottish:    ["Lady","Duchess","Dame","Countess"],
+  historical:  ["The Notorious","The Legendary","The Incomparable"],
+  doodle:      ["Professor","Lady","Inspector","The Magnificent"],
+  default:     ["Lady","Baroness","Countess","Dame"],
 };
 
 // ── DOG WORDS ──────────────────────────────────────────────────────────────────
@@ -287,7 +310,9 @@ function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.le
 function makeName(breed: string, surname: string, gender: "boy"|"girl", seed: number) {
   const group = getGroup(breed);
   const nameBank = NAMES[group] || NAMES.default;
-  const titleBank = TITLES[group] || TITLES.default;
+  const titleBank = gender === "boy"
+    ? (TITLES_BOY[group] || TITLES_BOY.default)
+    : (TITLES_GIRL[group] || TITLES_GIRL.default);
   const wordBank = DOG_WORDS[group] || DOG_WORDS.default;
   const reasoningBank = REASONING[group] || REASONING.default;
 
