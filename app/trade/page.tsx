@@ -251,7 +251,7 @@ export default function TradePage() {
             <PopHeading className={`display ${styles.bigTitle} ${styles.titleCenter}`}>Trade pricing &amp; terms</PopHeading>
             <div className={styles.priceHeadline}>
               <div className={styles.priceFig}>
-                <span className={styles.priceVal}>£4.00</span>
+                <span className={styles.priceVal}>£4.05</span>
                 <span className={styles.priceLabel}>wholesale / unit</span>
               </div>
               <div className={styles.priceFig}>
