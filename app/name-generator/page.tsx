@@ -542,6 +542,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 
 type Stage = "inputs"|"question"|"reveal";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
+type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
 
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
@@ -568,7 +569,24 @@ export default function NameGeneratorPage() {
     const effectiveTown = townMatch ? town.trim() : "";
     const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour));
     candidates.sort((a,b) => b.score - a.score);
-    setResults(candidates.filter(Boolean).slice(0,10) as Result[]);
+    const THRESHOLD2 = 16;
+    const topScore2 = candidates[0]?.score ?? 0;
+    let finalCandidates2 = candidates;
+    if (topScore2 < THRESHOLD2) {
+      const group2b = getGroup(breed);
+      const prefixPass = Array.from({length:20},(_,i) => {
+        const r = generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour);
+        if (!r) return null;
+        const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group2b));
+        if (!matching.length) return null;
+        const pe = matching[(seed + i) % matching.length];
+        const prefixedTitle = pe.prefix + " " + r.full.split(" ")[0];
+        const rest = r.full.split(" ").slice(1).join(" ");
+        return { ...r, full: prefixedTitle + " " + rest, score: r.score + pe.bonusContrast };
+      }).filter(Boolean) as Result[];
+      finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
+    }
+    setResults(finalCandidates2.filter(Boolean).slice(0,10) as Result[]);
     setStage("reveal");
   }
 
