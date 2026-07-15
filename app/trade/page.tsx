@@ -226,7 +226,7 @@ export default function TradePage() {
                 </tr>
                 <tr>
                   <th scope="row">Pack size &amp; weight</th>
-                  <td>6.4 cm tall &times; 8.9 cm wide, 0.9 mm thick</td>
+                  <td>9.3 cm tall &times; 6.7 cm wide &times; 2.1 cm deep</td>
                 </tr>
                 <tr>
                   <th scope="row">Barcode</th>
@@ -234,7 +234,7 @@ export default function TradePage() {
                 </tr>
                 <tr>
                   <th scope="row">Case quantity</th>
-                  <td>256 per box</td>
+                  <td>80 per box</td>
                 </tr>
               </tbody>
             </table>
