@@ -130,19 +130,21 @@ export default function TradePage() {
           <div className={styles.center}>
             <PopHeading className="display">How it plays</PopHeading>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/how-to-play-comic-strip.png"
-            alt="How to play, step by step"
-            className={styles.comicDesktop}
-          />
           <div className={styles.comicSteps}>
-            {["/step1-redue.jpg", "/step2-redue.jpg", "/step3-redue.jpg", "/step4-redue.jpg", "/step5-redue.jpg", "/step6-redue.jpg"].map(
-              (src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={src} src={src} alt={`How to play, step ${i + 1}`} className={styles.comicStep} />
-              )
-            )}
+            {/* Step 1 -- video */}
+            <video src="/step1-video-animation.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 1" />
+            {/* Step 2 -- video */}
+            <video src="/step2-video-animation.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 2" />
+            {/* Step 3 -- video */}
+            <video src="/step3-video-animationv3.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 3" />
+            {/* Step 4 -- image */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/step4-redue.jpg" alt="How to play, step 4" className={styles.comicStep} />
+            {/* Step 5 -- image */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/step5-redue.jpg" alt="How to play, step 5" className={styles.comicStep} />
+            {/* Step 6 -- video */}
+            <video src="/step6-video-animation.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 6" />
           </div>
         </section>
 
