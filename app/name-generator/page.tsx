@@ -510,7 +510,7 @@ export default function NameGeneratorPage() {
   const [gender, setGender] = useState<"boy"|"girl">("boy");
   const [stage, setStage] = useState<Stage>("inputs");
   const [question, setQuestion] = useState("");
-  const [result, setResult] = useState<Result|null>(null);
+  const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
 
   function handleGenerate() {
@@ -538,17 +538,17 @@ export default function NameGeneratorPage() {
     setStage("question");
   }
 
-  const cardImg = breed ? CARD_IMAGE[breed] : null;
+  const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
 
   return (
     <>
       <Nav />
       <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
-        <div style={{ maxWidth:600, margin:"0 auto" }}>
-          <h1 className="display" style={{ textAlign:"center", marginBottom:8 }}>
+        <div style={{ maxWidth:960, margin:"0 auto" }}>
+          <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"var(--navy)", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator
           </h1>
-          <p style={{ textAlign:"center", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"1rem", fontWeight:600, marginBottom:40 }}>
+          <p style={{ textAlign:"center", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
             Give your dog the title they truly deserve
           </p>
 
@@ -611,35 +611,37 @@ export default function NameGeneratorPage() {
           )}
 
           {/* ── STAGE 3: REVEAL ── */}
-          {stage === "reveal" && result && (
+          {stage === "reveal" && results.length > 0 && (
             <>
               {cardImg && (
-                <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
+                <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cardImg} alt={breed} style={{ width:180, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
+                  <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
                 </div>
               )}
-              <div style={{ background:"#fff", borderRadius:20, padding:"clamp(24px,4vw,40px)", borderTop:"6px solid var(--yellow)", boxShadow:"0 4px 24px rgba(10,58,87,0.12)", textAlign:"center" }}>
-                <div className="display" style={{ fontSize:"clamp(1.4rem,4vw,2.2rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.2 }}>
-                  {result.full}
-                </div>
-                {result.nickname && (
-                  <div style={{ fontSize:"1rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:20, fontFamily:"var(--font-body)", fontWeight:600 }}>
-                    Known to friends as: {result.nickname}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16, marginBottom:20 }}>
+                {results.map((r, i) => (
+                  <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
+                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                    <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
+                    {r.nickname && (
+                      <div style={{ fontSize:"0.8rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:10, fontFamily:"var(--font-body)", fontWeight:600 }}>
+                        Known to friends as: {r.nickname}
+                      </div>
+                    )}
+                    <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
+                    <div style={{ fontSize:"0.65rem", color:"#ccc", marginTop:8, fontFamily:"var(--font-body)" }}>score: {r.score}</div>
                   </div>
-                )}
-                <div style={{ fontSize:"0.9rem", color:"#555", lineHeight:1.7, borderTop:"1px solid #eee", paddingTop:20, fontFamily:"var(--font-body)" }}>
-                  {result.reasoning}
-                </div>
+                ))}
               </div>
 
-              <div style={{ display:"flex", gap:12, marginTop:16 }}>
+              <div style={{ display:"flex", gap:12 }}>
                 <button onClick={handleRollAgain} className="display"
-                  style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"1.1rem", cursor:"pointer", letterSpacing:"0.04em" }}>
+                  style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResult(null); }} className="display"
-                  style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"1.1rem", cursor:"pointer", letterSpacing:"0.04em" }}>
+                <button onClick={() => { setStage("inputs"); setResults([]); }} className="display"
+                  style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
               </div>
