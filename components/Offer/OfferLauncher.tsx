@@ -54,7 +54,8 @@ export default function OfferLauncher() {
     };
   }, []);
 
-  const isPitPage = typeof window !== "undefined" && window.location.pathname === "/";
+  const tradePages = ["/", "/trade", "/independents", "/evidence-register", "/toy-safety"];
+  const isPitPage = typeof window !== "undefined" && tradePages.includes(window.location.pathname);
   const show = revealed && !dismissed && !open && !isPitPage;
   const focusable = show ? 0 : -1;
 
