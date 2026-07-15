@@ -525,9 +525,9 @@ export default function NameGeneratorPage() {
   function handleAnswer() {
     const townMatch = FUNNY_PLACES.has(town.trim());
     const effectiveTown = townMatch ? town.trim() : "";
-    const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown));
+    const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour));
     candidates.sort((a,b) => b.score - a.score);
-    setResult(candidates[0]);
+    setResults(candidates.filter(Boolean).slice(0,10) as Result[]);
     setStage("reveal");
   }
 
