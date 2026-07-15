@@ -159,6 +159,30 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"TM",meaning:"Top Man",gender:"boy"},{code:"TR",meaning:"The Realest",gender:"boy"},
   {code:"VIP",meaning:"Very Important Person",gender:"any"},
   {code:"YG",meaning:"Young General",gender:"boy"},{code:"YK",meaning:"Young King",gender:"boy"},
+  // ── POLICE RANKS ─────────────────────────────────────────────────────────────
+  {code:"PC",meaning:"Police Constable",gender:"boy",breeds:["boxer","retriever","default"]},
+  {code:"DC",meaning:"Detective Constable",gender:"boy",breeds:["sniffer","default"]},
+  {code:"DS",meaning:"Detective Sergeant",gender:"boy",breeds:["sniffer","default"]},
+  {code:"DCI",meaning:"Detective Chief Inspector",gender:"boy",breeds:["sniffer","poodle"]},
+  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","lapdog","terrier"]},
+  {code:"Insp",meaning:"Inspector",gender:"boy",breeds:["sniffer","retriever"]},
+  // ── ARMY RANKS ────────────────────────────────────────────────────────────────
+  {code:"Pte",meaning:"Private",gender:"boy",breeds:["boxer","terrier","character"]},
+  {code:"Cpl",meaning:"Corporal",gender:"boy",breeds:["boxer","retriever","german"]},
+  {code:"Spr",meaning:"Sapper",gender:"boy",breeds:["terrier"]},
+  {code:"Gnr",meaning:"Gunner",gender:"boy",breeds:["terrier","character","sniffer"]},
+  {code:"Rfn",meaning:"Rifleman",gender:"boy",breeds:["sighthound","terrier"]},
+  {code:"Gdsm",meaning:"Guardsman",gender:"boy",breeds:["gentry","spaniel","german"]},
+  {code:"Tpr",meaning:"Trooper",gender:"boy",breeds:["sighthound","retriever"]},
+  {code:"Brig",meaning:"Brigadier",gender:"boy",breeds:["spaniel","german","giant"]},
+  // ── NAVY RANKS ────────────────────────────────────────────────────────────────
+  {code:"Mid",meaning:"Midshipman",gender:"boy"},
+  {code:"PO",meaning:"Petty Officer",gender:"boy",breeds:["spaniel","retriever"]},
+  // ── RAF RANKS ─────────────────────────────────────────────────────────────────
+  {code:"Sqn Ldr",meaning:"Squadron Leader",gender:"boy",breeds:["spaniel","retriever","collie"]},
+  {code:"Wg Cdr",meaning:"Wing Commander",gender:"boy",breeds:["spaniel","german","giant"]},
+  {code:"Flt Lt",meaning:"Flight Lieutenant",gender:"boy",breeds:["collie","poodle","retriever"]},
+  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]},
 ];
 
 const DTRAIN_LETTERS  = ["A","B","C","D","E","G","J","K","L","M","R","S","T"];
