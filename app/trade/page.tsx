@@ -80,8 +80,9 @@ export default function TradePage() {
                 <ul className={styles.bullets} aria-label="At a glance">
                   <li className={styles.bullet}>Made in the UK</li>
                   <li className={styles.bullet}>FSC recycled card</li>
-                  <li className={styles.bullet}>Low MOQ + 250-unit starter order</li>
-                  <li className={styles.bullet}>Free POS on 1,000+</li>
+                  <li className={styles.bullet}>Minimum order 1,000 units</li>
+                  <li className={styles.bullet}>Free CDU with first order</li>
+                  <li className={styles.bullet}>Free standing POS unit on 1,000+</li>
                 </ul>
               </div>
               <div className={styles.pitchMedia}>
@@ -190,17 +191,17 @@ export default function TradePage() {
             <div className={styles.posBlock}>
               <div className={styles.posCopy}>
                 <h3 className={`display ${styles.titleCenter}`}>
-                  Display units <span className="display-yellow">available</span>
+                  Display units <span className="display-yellow">included</span>
                 </h3>
                 <ul className={styles.bullets}>
-                  <li className={styles.bullet}>A free standing POS display unit included with every order of 1,000 units or more.</li>
-                  <li className={styles.bullet}>Holds the packs upright and fully branded, turning a small footprint into an eye-catching feature by the till.</li>
-                  <li className={styles.bullet}>Further point-of-sale material — shelf-talkers, posters and more — available on larger orders.</li>
+                  <li className={styles.bullet}>A fully branded counter display unit (CDU) included free with every first order.</li>
+                  <li className={styles.bullet}>A free standing POS unit included with every order of 1,000 units or more.</li>
+                  <li className={styles.bullet}>Both hold the packs upright and fully branded, turning a small footprint into an eye-catching feature by the till.</li>
                   <li className={styles.bullet}>Custom or co-branded display options can be discussed for bigger commitments.</li>
                 </ul>
               </div>
               <div className={styles.posDiagram}>
-                <Image src="/CDU-POS.jpg" alt="Free standing point-of-sale display unit" width={520} height={420} style={{ width: "100%", height: "auto" }} />
+                <Image src="/CDU-POS.jpg" alt="Counter display unit and free standing POS unit" width={520} height={420} style={{ width: "100%", height: "auto" }} />
               </div>
             </div>
           </div>
@@ -275,12 +276,12 @@ export default function TradePage() {
                     <td>2,000 / 5,000 / 10,000 — full price list on request</td>
                   </tr>
                   <tr>
-                    <th scope="row">POS display</th>
-                    <td>Free standing unit included on orders of 1,000+</td>
+                    <th scope="row">CDU</th>
+                    <td>Free counter display unit included with first order</td>
                   </tr>
                   <tr>
-                    <th scope="row">Trial</th>
-                    <td>250-unit starter at £5.00/unit; £250 credited if you order 1,000+ within 60 days</td>
+                    <th scope="row">POS display</th>
+                    <td>Free standing POS unit included on orders of 1,000+</td>
                   </tr>
                   <tr>
                     <th scope="row">Terms</th>
@@ -322,19 +323,18 @@ export default function TradePage() {
               </ul>
             </div>
 
-            {/* Trial — yellow */}
+            {/* Independent stockists card — yellow */}
             <div className={`${styles.gridCard} ${styles.cardYellow}`}>
-              <h3 className="display">Not ready for 1,000? Try 250.</h3>
+              <h3 className="display">Independent retailer?</h3>
               <p>
-                A 250-unit starter order lets you test it on your shelf before
-                committing to a full run — bought upfront at £5.00 per unit
-                (250 units = £1,250).
+                We have a separate programme for independent shops with lower
+                minimum orders starting from just 80 units, a free CDU with
+                every order, and a flat wholesale rate of £4.45 per unit.
               </p>
               <p>
-                Go on to place a 1,000+ order within 60 days and we credit
-                <strong> £250 against it</strong> — bringing your starter units
-                down to the full £4.05 wholesale price. Sample packs are available
-                now to see and play before you decide.
+                <a href="/independents" style={{ fontWeight: 700, textDecoration: "underline" }}>
+                  See the independent stockist programme &rarr;
+                </a>
               </p>
             </div>
 
