@@ -18,8 +18,45 @@ Title assignment rules (follow strictly):
 - All crossbreeds and doodles: pick most fitting from above based on dominant breed character
 - All other breeds: pick the most fitting title based on breed character`;
 
+const DAILY_LIMIT = 10;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + dayMs });
+    return { allowed: true, remaining: DAILY_LIMIT - 1 };
+  }
+
+  if (entry.count >= DAILY_LIMIT) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  entry.count += 1;
+  return { allowed: true, remaining: DAILY_LIMIT - entry.count };
+}
+
+function getIP(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return "unknown";
+}
+
 export async function POST(req: Request) {
   try {
+    const ip = getIP(req);
+    const { allowed, remaining } = checkRateLimit(ip);
+
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "You have reached the daily limit of 10 name generations. Please try again tomorrow." },
+        { status: 429 }
+      );
+    }
+
     const { breed, surname, gender } = await req.json();
 
     if (!breed || !surname || !gender) {
@@ -58,7 +95,7 @@ Return ONLY valid JSON, no markdown, no backticks, no preamble:
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-haiku-4-5",
         max_tokens: 1200,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -75,7 +112,7 @@ Return ONLY valid JSON, no markdown, no backticks, no preamble:
     if (!match) return NextResponse.json({ error: "Invalid response from AI" }, { status: 500 });
 
     const parsed = JSON.parse(match[0]);
-    return NextResponse.json(parsed);
+    return NextResponse.json({ ...parsed, remaining });
 
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
