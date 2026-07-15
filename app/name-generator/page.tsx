@@ -206,7 +206,6 @@ const QUESTIONS = [
   "Have you ever bought your dog a birthday cake?",
   "Do you let the dog sleep on the bed?",
   "Have you ever cancelled plans because of your dog?",
-  "Do you think your dog has a favourite colour?",
   "Have you ever dressed your dog up?",
   "Do you think your dog understands everything you say?",
   "Have you ever apologised to your dog?",
@@ -292,20 +291,37 @@ const OTHER_BREEDS = ["Airedale Terrier","Akita","Alaskan Malamute","Bedlington 
 
 // ── TITLE BANKS ────────────────────────────────────────────────────────────────
 const BOY_TITLES: Record<string, TitleEntry[]> = {
+  // Terriers -- Mr is the joke, no grand title needed
   terrier:    [{title:"Mr",reg:"mundane",syllables:1}],
-  spaniel:    [{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3},{title:"Admiral",reg:"grand",syllables:3},{title:"Brigadier",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2}],
-  retriever:  [{title:"Colonel",reg:"grand",syllables:2},{title:"Major",reg:"grand",syllables:2},{title:"Captain",reg:"grand",syllables:2},{title:"Commander",reg:"grand",syllables:3}],
-  german:     [{title:"Colonel",reg:"grand",syllables:2},{title:"Major",reg:"grand",syllables:2},{title:"Captain",reg:"grand",syllables:2}],
-  collie:     [{title:"Lieutenant",reg:"grand",syllables:3},{title:"Second Lieutenant",reg:"grand",syllables:4},{title:"Professor",reg:"grand",syllables:3}],
-  boxer:      [{title:"Sergeant",reg:"grand",syllables:2},{title:"Corporal",reg:"grand",syllables:3},{title:"Lance Corporal",reg:"grand",syllables:3}],
-  sniffer:    [{title:"Inspector",reg:"grand",syllables:3},{title:"Chief Inspector",reg:"grand",syllables:4},{title:"Superintendent",reg:"grand",syllables:5},{title:"Commissioner",reg:"grand",syllables:4},{title:"Judge",reg:"grand",syllables:1}],
+  // Spaniels -- working military and police dogs
+  spaniel:    [{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3},{title:"Admiral",reg:"grand",syllables:3},{title:"Brigadier",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Chief Inspector",reg:"grand",syllables:4}],
+  // Retrievers / Labs -- guide dogs, detection dogs, civic service
+  retriever:  [{title:"Commissioner",reg:"grand",syllables:4},{title:"Chief Inspector",reg:"grand",syllables:4},{title:"Inspector",reg:"grand",syllables:3},{title:"Judge",reg:"grand",syllables:1},{title:"Colonel",reg:"grand",syllables:2},{title:"Major",reg:"grand",syllables:2}],
+  // German Shepherd / Doberman / Rottweiler / Weimaraner -- military working dogs
+  german:     [{title:"Colonel",reg:"grand",syllables:2},{title:"Major",reg:"grand",syllables:2},{title:"Captain",reg:"grand",syllables:2},{title:"Sergeant Major",reg:"grand",syllables:4},{title:"General",reg:"grand",syllables:3}],
+  // Collies -- intelligence not brawn
+  collie:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Chief Analyst",reg:"grand",syllables:4},{title:"Commissioner",reg:"grand",syllables:4}],
+  // Boxer / Staffie / Bull Terrier -- street respect, civic pomp
+  boxer:      [{title:"Sergeant",reg:"grand",syllables:2},{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Corporal",reg:"grand",syllables:3}],
+  // Sniffer dogs -- detectives
+  sniffer:    [{title:"Inspector",reg:"grand",syllables:3},{title:"Chief Inspector",reg:"grand",syllables:4},{title:"Commissioner",reg:"grand",syllables:4},{title:"Judge",reg:"grand",syllables:1},{title:"DCI",reg:"grand",syllables:3},{title:"DS",reg:"grand",syllables:2}],
+  // Sighthounds -- pure aristocracy
   sighthound: [{title:"Duke",reg:"grand",syllables:1},{title:"Earl",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2}],
-  giant:      [{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Unstoppable",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duke",reg:"grand",syllables:1}],
-  poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2}],
-  lapdog:     [{title:"Reverend",reg:"grand",syllables:3},{title:"Dean",reg:"grand",syllables:1},{title:"Bishop",reg:"grand",syllables:2},{title:"Archdeacon",reg:"grand",syllables:3}],
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baron",reg:"grand",syllables:2},{title:"Judge",reg:"grand",syllables:1}],
-  gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1}],
-  default:    [{title:"Major",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Baron",reg:"grand",syllables:2},{title:"Lord",reg:"grand",syllables:1}],
+  // Giants -- scale demands grandeur
+  giant:      [{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1}],
+  // Poodle -- academic only
+  poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Chief Analyst",reg:"grand",syllables:4}],
+  // Lapdog -- ecclesiastical pomp
+  lapdog:     [{title:"Reverend",reg:"grand",syllables:3},{title:"Bishop",reg:"grand",syllables:2},{title:"Archdeacon",reg:"grand",syllables:3},{title:"Sir",reg:"grand",syllables:1}],
+  // Bulldog specifically -- Churchill energy
+  bulldog:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Field Marshal",reg:"grand",syllables:3}],
+  // Character breeds -- self-appointed grandeur
+  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baron",reg:"grand",syllables:2}],
+  // Gentry -- Dalmatian, OES etc
+  gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1}],
+  // Dachshund -- absurdly self-important
+  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3}],
+  default:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Inspector",reg:"grand",syllables:3},{title:"Baron",reg:"grand",syllables:2}],
 };
 
 const GIRL_TITLES: Record<string, TitleEntry[]> = {
@@ -314,13 +330,15 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   retriever:  [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3}],
   german:     [{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2}],
   collie:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1}],
-  boxer:      [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3}],
+  boxer:      [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   sniffer:    [{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Countess",reg:"grand",syllables:2},{title:"Doctor",reg:"grand",syllables:2}],
   sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3}],
   giant:      [{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1}],
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2}],
-  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Wee",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Noisy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
+  bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2}],
+  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Countess",reg:"grand",syllables:2}],
   gentry:     [{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Most Honourable",reg:"grand",syllables:4},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Marchioness",reg:"grand",syllables:3}],
   default:    [{title:"Lady",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3}],
 };
@@ -453,7 +471,8 @@ function getGroup(breed: string): string {
   if (b.includes("spaniel")) return "spaniel";
   if (b.includes("retriever") || b === "labrador" || b === "labradoodle" || b === "goldendoodle") return "retriever";
   if (b === "border collie" || b === "rough collie") return "collie";
-  if (["staffordshire bull terrier","boxer","bull terrier","bulldog","french bulldog"].includes(b)) return "boxer";
+  if (["bulldog"].includes(b)) return "bulldog";
+  if (["staffordshire bull terrier","boxer","bull terrier","french bulldog"].includes(b)) return "boxer";
   if (["basset hound","bloodhound","beagle"].includes(b)) return "sniffer";
   if (["greyhound","afghan hound","borzoi","saluki","irish wolfhound","lurcher","whippet","italian greyhound"].includes(b)) return "sighthound";
   if (["great dane","mastiff","saint bernard","newfoundland","leonberger"].includes(b)) return "giant";
