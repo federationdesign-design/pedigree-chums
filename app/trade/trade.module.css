@@ -455,12 +455,17 @@
   margin-top: clamp(16px, 3vw, 36px);
 }
 .comicSteps {
-  display: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 24px);
+  justify-content: center;
+  margin-top: clamp(16px, 3vw, 36px);
 }
 .comicStep {
   display: block;
-  width: 100%;
+  width: clamp(140px, 15vw, 200px);
   height: auto;
+  border-radius: 12px;
 }
 
 /* Data tables (spec + pricing): outline-only, no cell fills, centred text. */
