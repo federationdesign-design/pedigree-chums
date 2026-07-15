@@ -131,7 +131,7 @@ export default function NameGeneratorPage() {
 
           {error && (
             <div style={{ background: "#fee", border: "2px solid #c44", borderRadius: 14, padding: 16, color: "#900", fontFamily: "var(--font-body)", fontSize: "0.9rem", marginBottom: 16 }}>
-              Something went wrong. Please try again.
+              {error}
             </div>
           )}
 
