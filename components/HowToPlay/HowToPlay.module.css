@@ -3,7 +3,7 @@
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.22), rgba(12, 91, 146, 0.46));
+  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.10), rgba(12, 91, 146, 0.28));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,7 +44,7 @@
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
-  z-index: 10;
+  z-index: 200;
 }
 .close:hover { filter: brightness(0.95); }
 
