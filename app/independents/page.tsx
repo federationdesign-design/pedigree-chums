@@ -9,6 +9,7 @@ import TradeHero from "../trade/TradeHero";
 import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import TradeEnquiryForm from "../trade/TradeEnquiryForm";
 import styles from "../trade/trade.module.css";
+import TradeHowToPlay from "../trade/TradeHowToPlay";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.pedigreechums.co.uk"),

@@ -9,6 +9,7 @@ import TradeHero from "./TradeHero";
 import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import TradeEnquiryForm from "./TradeEnquiryForm";
 import styles from "./trade.module.css";
+import TradeHowToPlay from "./TradeHowToPlay";
 
 // Keep the trade page out of search and fully separate from the consumer site.
 export const metadata: Metadata = {
@@ -125,27 +126,12 @@ export default function TradePage() {
           <CardRail />
         </section>
 
-        {/* HOW IT PLAYS — the instructional comic strip, directly below the rail */}
+        {/* HOW IT PLAYS */}
         <section className={styles.comicSection}>
           <div className={styles.center}>
             <PopHeading className="display">How it plays</PopHeading>
           </div>
-          <div className={styles.comicSteps}>
-            {/* Step 1 -- video */}
-            <video src="/step1-video-animation.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 1" />
-            {/* Step 2 -- video */}
-            <video src="/step2-video-animation.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 2" />
-            {/* Step 3 -- video */}
-            <video src="/step3-video-animationv3.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 3" />
-            {/* Step 4 -- image */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/step4-redue.jpg" alt="How to play, step 4" className={styles.comicStep} />
-            {/* Step 5 -- image */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/step5-redue.jpg" alt="How to play, step 5" className={styles.comicStep} />
-            {/* Step 6 -- video */}
-            <video src="/step6-video-animation.mp4" autoPlay muted playsInline className={styles.comicStep} aria-label="How to play, step 6" />
-          </div>
+          <TradeHowToPlay />
         </section>
 
         {/* WHY IT SELLS — image tiles + POS block inside a pitch panel (deck style) */}

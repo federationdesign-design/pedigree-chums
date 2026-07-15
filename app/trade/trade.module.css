@@ -849,3 +849,9 @@
     padding: 0 clamp(16px, 5vw, 32px);
   }
 }
+
+.htpRow {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(24px, 4vw, 48px);
+}
