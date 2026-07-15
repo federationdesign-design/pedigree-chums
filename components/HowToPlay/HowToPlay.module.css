@@ -2,7 +2,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 400;
   background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.10), rgba(12, 91, 146, 0.28));
   display: flex;
   align-items: center;
