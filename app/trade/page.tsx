@@ -285,7 +285,7 @@ export default function TradePage() {
                   </tr>
                   <tr>
                     <th scope="row">Terms</th>
-                    <td>Pro-forma for first orders · UK dispatch · no VAT currently applicable</td>
+                    <td>Pro-forma for first orders · UK dispatch · all prices ex VAT · VAT invoices issued on all orders</td>
                   </tr>
                 </tbody>
               </table>
