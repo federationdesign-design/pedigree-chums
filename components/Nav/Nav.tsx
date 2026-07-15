@@ -18,6 +18,7 @@ const customerLinks = [
 
 const tradeNavLinks = [
   { label: "Trade Enquiry", href: "/trade#enquire" },
+  { label: "Independent Stockists", href: "/independents#enquire" },
   { label: "Evidence Register", href: "/evidence-register" },
   { label: "Toy Safety Technical File", href: "/toy-safety" },
 ];
