@@ -29,12 +29,22 @@ const OTHER_BREEDS = [
   "Tibetan Mastiff","Welsh Springer Spaniel","Welsh Terrier",
 ];
 
-const DOG_WORDS = [
-  "Bark","Woof","Paw","Snout","Tail","Fetch","Growl","Ruff","Howl",
-  "Biscuit","Bone","Lead","Chase","Sniff","Puddle","Waggle","Scoff",
-  "Trot","Drool","Snuffle","Gnaw","Lick","Nuzzle","Beg","Romp","Bound",
-  "Caper","Gambol","Frolic","Scamper",
-];
+const DOG_WORDS_BY_GROUP: Record<string, string[]> = {
+  terrier:   ["Bolt","Dig","Scrap","Scruff","Rumpus","Rattle","Scuttle","Scrabble","Pounce","Bristle"],
+  spaniel:   ["Flush","Fetch","Bound","Waggle","Splash","Scamper","Frolic","Gambol","Romp","Prance"],
+  retriever: ["Fetch","Bound","Wag","Leap","Paddle","Gambol","Romp","Gallop","Lollop","Caper"],
+  collie:    ["Herd","Steer","Dart","Circle","Round","Weave","Dash","Sprint","Nip","Gather"],
+  tough:     ["Charge","Bark","Rumble","Barge","Barrel","Lumber","Blunder","Crash","Thump","Bellow"],
+  sniffer:   ["Sniff","Snuffle","Nose","Trail","Track","Plod","Mosey","Amble","Trundle","Dawdle"],
+  sighthound:["Sprint","Dart","Bolt","Flash","Streak","Glide","Sweep","Flow","Bound","Skim"],
+  giant:     ["Lumber","Plod","Amble","Stomp","Thud","Rumble","Clump","Trundle","Trudge","Sway"],
+  poodle:    ["Prance","Trot","Strut","Waltz","Sashay","Glide","Mince","Bounce","Flourish","Pirouette"],
+  lapdog:    ["Prance","Bounce","Trot","Waltz","Flounce","Sashay","Fluff","Frolic","Gambol","Shimmy"],
+  character: ["Snort","Waddle","Snuffle","Tumble","Bumble","Toddle","Trundle","Wobble","Shuffle","Bustle"],
+  gentry:    ["Trot","Canter","Prance","Stride","Saunter","Amble","March","Parade","Promenade","Gallop"],
+  doodle:    ["Bounce","Bound","Leap","Caper","Romp","Frolic","Gambol","Cavort","Prance","Scamper"],
+  default:   ["Trot","Bound","Wag","Prance","Romp","Caper","Gambol","Frolic","Scamper","Saunter"],
+};
 
 type BreedData = {
   titles: string[];
@@ -644,8 +654,11 @@ function makeName(breed: string, surname: string, gender: "boy" | "girl", seed: 
 
   const firstName = pick(names, seed + 1);
 
-  const dogWord = pick(DOG_WORDS, seed + 2);
-  const fullSurname = `${dogWord}-${surname}`;
+  const group = getBreedGroup(breed);
+  const wordBank = DOG_WORDS_BY_GROUP[group] || DOG_WORDS_BY_GROUP["default"];
+  const dogWord = pick(wordBank, seed + 2);
+  const alreadyHyphenated = surname.includes("-");
+  const fullSurname = alreadyHyphenated ? surname : `${dogWord}-${surname}`;
   const full = `${title} ${firstName} ${fullSurname}`;
 
   const reasoning = pick(data.reasoning, seed + 3);
