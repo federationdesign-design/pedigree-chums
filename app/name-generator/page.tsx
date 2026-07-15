@@ -498,7 +498,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname);
   return { full, nickname, reasoning, score };
-
+}
 
 type Stage = "inputs"|"question"|"reveal";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
