@@ -129,7 +129,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"CK",meaning:"Chaos King",gender:"boy",breeds:["terrier","character"]},
   {code:"CL",meaning:"Certified Lover",gender:"boy"},{code:"CLB",meaning:"Certified Lover Boy",gender:"boy"},
   {code:"DB",meaning:"Da Boss",gender:"boy"},{code:"DC",meaning:"Dream Chaser",gender:"any"},
-  {code:"DM",meaning:"Don\'t Miss",gender:"any"},{code:"DR",meaning:"Da Realest",gender:"boy"},
+  {code:"DM",meaning:"Don't Miss",gender:"any"},{code:"DR",meaning:"Da Realest",gender:"boy"},
   {code:"FB",meaning:"Fearless Boss",gender:"boy"},{code:"FL",meaning:"First Lady",gender:"girl"},
   {code:"GC",meaning:"Game Changer",gender:"any"},
   {code:"GM",meaning:"Grand Master",gender:"boy",breeds:["poodle","collie","german"]},
