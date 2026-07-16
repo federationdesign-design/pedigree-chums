@@ -781,8 +781,34 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const wordBank = DOG_WORDS[group] || DOG_WORDS.default;
   const reasoningBank = REASONING[group] || REASONING.default;
   const title = pick(titleBank, seed);
-  const firstName = pick(nameBank, seed + 3);
-  const dogWordEntry = pick(wordBank, seed + 7);
+
+  // ── SURNAME-AWARE NAME + WORD SELECTION ──────────────────────────────────
+  // Prefer names and dog words that alliterate with the surname initial.
+  // This makes Donald → Duke/Dash/Dobby etc much more likely.
+  const surnameInitial = surname.replace(/-.*/, "")[0]?.toUpperCase() ?? "";
+  const soundFamily: Record<string,string> = {B:"BP",P:"BP",D:"DT",T:"DT",G:"GK",K:"GK",F:"FV",V:"FV",S:"SZ",Z:"SZ",M:"MN",N:"MN"};
+  const surnameFamily = soundFamily[surnameInitial] ?? surnameInitial;
+
+  // Filter nameBank for names starting with surname initial or sound family
+  const matchingNames = nameBank.filter((n: NameEntry) =>
+    n.name[0].toUpperCase() === surnameInitial ||
+    (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
+  );
+  // Use matching names ~60% of passes (seeds divisible by 5 use random pick for variety)
+  const useMatchingName = matchingNames.length >= 2 && (seed % 5 !== 0);
+  const firstName = useMatchingName
+    ? matchingNames[(seed + 3) % matchingNames.length]
+    : pick(nameBank, seed + 3);
+
+  // Filter wordBank for dog words starting with surname initial or sound family
+  const matchingWords = wordBank.filter((w: WordEntry) =>
+    w.firstLetter.toUpperCase() === surnameInitial ||
+    (soundFamily[w.firstLetter.toUpperCase()] === surnameFamily && surnameFamily.length > 1)
+  );
+  const useMatchingWord = matchingWords.length >= 2 && (seed % 7 !== 0);
+  const dogWordEntry = useMatchingWord
+    ? matchingWords[(seed + 7) % matchingWords.length]
+    : pick(wordBank, seed + 7);
   const alreadyHyphenated = surname.includes("-");
   // Only hyphenate if dog word adds contrast against the first name
   const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
