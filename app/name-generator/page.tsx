@@ -679,17 +679,23 @@ export default function NameGeneratorPage() {
   const [town, setTown] = useState("");
   const [gender, setGender] = useState<"boy"|"girl">("boy");
   const [stage, setStage] = useState<Stage>("inputs");
-  const [question, setQuestion] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
+  const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
+  const [q1Answer, setQ1Answer] = useState("");
+  const [activeQ, setActiveQ] = useState<1|2>(1);
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(pickQuestion(s));
+    const qi = pickTwoQuestions(s);
+    setQIndices(qi);
+    setQ1Answer("");
+    setActiveQ(1);
+    setResults([]);
     setStage("question");
   }
 
@@ -721,7 +727,11 @@ export default function NameGeneratorPage() {
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(pickQuestion(s));
+    const qi = pickTwoQuestions(s);
+    setQIndices(qi);
+    setQ1Answer("");
+    setActiveQ(1);
+    setResults([]);
     setStage("question");
   }
 
@@ -833,7 +843,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQ1Answer(""); setActiveQ(1); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
