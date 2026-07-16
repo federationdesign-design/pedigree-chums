@@ -702,6 +702,18 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const baseTitle = pick(titleBank, seed).title;
     full = `${descriptor} ${baseTitle} ${firstName.name} ${effectiveSurname}`;
     nickname = getNickname(firstName.name);
+  } else if (styleRoll === 4) {
+    // No title -- the name is the whole joke
+    full = `${firstName.name} ${effectiveSurname}`;
+    nickname = getNickname(firstName.name);
+  } else if (styleRoll === 5) {
+    // Single descriptor word only -- no rank/title, just an adjective
+    const bareDescriptors = ["Magnificent","Notorious","Legendary","Unstoppable","Incomparable",
+      "Formidable","Glorious","Relentless","Tremendous","Outrageous","Marvellous","Indefatigable",
+      "Preposterous","Spectacular","Phenomenal","Extraordinary","Stupendous","Unbelievable"];
+    const descriptor = pick(bareDescriptors, seed + 41);
+    full = `${descriptor} ${firstName.name} ${effectiveSurname}`;
+    nickname = getNickname(firstName.name);
   } else {
     full = `${title.title} ${firstName.name} ${effectiveSurname}`;
     if (title.title === "Itsy") nickname = "Bitsy";
