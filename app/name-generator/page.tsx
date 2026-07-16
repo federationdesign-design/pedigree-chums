@@ -1,7 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
-import { breedCard } from "../../data/breeds";
-import { bust } from "../../data/imgVersion";
+import { useState } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 
@@ -115,7 +113,48 @@ const FUNNY_PLACES = new Set([
   "Maidwell","Cold Ashby","Hollowell","Creaton","Spratton","Scaldwell",
   "Walgrave","Hannington","Lamport","Raunds","Ringstead","Stanwick","Hargrave",
   "Pertenhall","Kimbolton","Tilbrook","Catworth","Molesworth","Brington",
-  "Bythorn","Keyston","Clopton","Thurning"]);
+  "Bythorn","Keyston","Clopton","Thurning",
+  "Birmingham",
+  "Wolverhampton",
+  "Dudley",
+  "Walsall",
+  "Coventry",
+  "Stoke",
+  "Derby",
+  "Leicester",
+  "Nottingham",
+  "Loughborough",
+  "Lincoln",
+  "Leeds",
+  "Sheffield",
+  "Bradford",
+  "Hull",
+  "York",
+  "Huddersfield",
+  "Manchester",
+  "Salford",
+  "Bolton",
+  "Wigan",
+  "Liverpool",
+  "Blackpool",
+  "Newcastle",
+  "Sunderland",
+  "Middlesbrough",
+  "Gateshead",
+  "Durham",
+  "Bristol",
+  "Exeter",
+  "Plymouth",
+  "Truro",
+  "Penzance",
+  "Falmouth",
+  "Bath",
+  "Glasgow",
+  "Edinburgh",
+  "Aberdeen",
+  "Dundee",
+  "Inverness",
+  "Stirling"]);
 
 // ── ABBREVIATION WHITELIST ─────────────────────────────────────────────────────
 interface AbbrevEntry { code: string; meaning: string; gender: "boy"|"girl"|"any"; breeds?: string[]; }
@@ -894,7 +933,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     full = `${sbAdj1}${sbMid} ${sbAdj2}${sbBody} ${effectiveSurname}`;
     nickname = sbMid;
   } else {
-    full = `${title.title} ${firstName.name} ${effectiveSurname}`;
+    // Regional term override -- if town matches a region, use local endearment as first name
+    const regionalTerm = getRegionalTerm(town, seed, gender);
+    const displayFirst = regionalTerm && (seed % 4 === 0)  // ~25% of standard passes
+      ? regionalTerm
+      : firstName.name;
+    full = `${title.title} ${displayFirst} ${effectiveSurname}`;
+    if (regionalTerm && seed % 4 === 0) nickname = displayFirst;
     if (title.title === "Itsy") nickname = "Bitsy";
     if (title.title === "Hong Kong") nickname = "HK";
     const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
@@ -1119,6 +1164,94 @@ const MCFACE_SUFFIX: Record<string, string[]> = {
 const MCFACE_PREFIX_BOY: string[]  = ["Mc","Mc","Mc","Mac","Mac","O'","O'","Fitz","Fitz","De","Von","Van","Le","Ap","Dal","Di"];
 const MCFACE_PREFIX_GIRL: string[] = ["Mc","Mc","Mc","Mac","Mac","O'","O'","Fitz","De","Von","Van","Le","Ferch","Dal","Di","Ni"];
 
+
+// ── REGIONAL TERMS OF ENDEARMENT ──────────────────────────────────────────────
+// Keyed by lowercase town/city name → region key
+const REGIONAL_TOWNS: Record<string, string> = {
+  // Birmingham & Black Country
+  "birmingham":"brum","wolverhampton":"brum","dudley":"brum","walsall":"brum",
+  "west bromwich":"brum","sandwell":"brum","solihull":"brum","coventry":"brum",
+  "stoke-on-trent":"brum","stoke on trent":"brum","stoke":"brum",
+  "lichfield":"brum","tamworth":"brum","cannock":"brum","stafford":"brum",
+  // East Midlands
+  "derby":"eastmids","leicester":"eastmids","nottingham":"eastmids",
+  "loughborough":"eastmids","mansfield":"eastmids","lincoln":"eastmids",
+  "northampton":"eastmids","chesterfield":"eastmids","burton":"eastmids",
+  // Yorkshire
+  "leeds":"yorks","sheffield":"yorks","bradford":"yorks","hull":"yorks",
+  "york":"yorks","harrogate":"yorks","wakefield":"yorks","huddersfield":"yorks",
+  "rotherham":"yorks","barnsley":"yorks","doncaster":"yorks","halifax":"yorks",
+  // Lancashire & North West
+  "manchester":"nw","salford":"nw","bolton":"nw","wigan":"nw","burnley":"nw",
+  "blackburn":"nw","blackpool":"nw","preston":"nw","liverpool":"nw",
+  "chester":"nw","warrington":"nw","rochdale":"nw","oldham":"nw","bury":"nw",
+  "stockport":"nw","lancaster":"nw","accrington":"nw",
+  // North East
+  "newcastle":"northeast","sunderland":"northeast","middlesbrough":"northeast",
+  "gateshead":"northeast","durham":"northeast","hartlepool":"northeast",
+  "darlington":"northeast","stockton":"northeast","redcar":"northeast",
+  // West Country & Cornwall
+  "bristol":"westcountry","exeter":"westcountry","plymouth":"westcountry",
+  "truro":"westcountry","penzance":"westcountry","falmouth":"westcountry",
+  "torquay":"westcountry","bath":"westcountry","taunton":"westcountry",
+  "bodmin":"westcountry","newquay":"westcountry","st ives":"westcountry",
+  "barnstaple":"westcountry","yeovil":"westcountry","glastonbury":"westcountry",
+  // London & South East
+  "london":"london","croydon":"london","romford":"london","barking":"london",
+  "peckham":"london","brixton":"london","hackney":"london","islington":"london",
+  "camden":"london","brighton":"london","southend":"london","basildon":"london",
+  "chatham":"london","maidstone":"london","guildford":"london","oxford":"london",
+  "cambridge":"london","ipswich":"london","norwich":"london","colchester":"london",
+  "chelmsford":"london","canterbury":"london","eastbourne":"london",
+  // Scotland
+  "glasgow":"scotland","edinburgh":"scotland","aberdeen":"scotland",
+  "dundee":"scotland","inverness":"scotland","stirling":"scotland",
+  "perth":"scotland","falkirk":"scotland","kilmarnock":"scotland",
+  "paisley":"scotland","motherwell":"scotland","hamilton":"scotland",
+};
+
+// Regional term pools -- these become first names or nicknames
+const REGIONAL_TERMS: Record<string, string[]> = {
+  brum: ["Bab","Babby","Babs","OurKid","ArKid","MeBab","Duck","Cock","Cocker","OldCock","Chick","Chucky","Mucker"],
+  eastmids: ["Duck","Ducky","Duckie","MeDuck","MyDuck","Love","Luv","Bab","Youth","MeYouth"],
+  yorks: ["Love","Luv","Cock","Cocker","OldCock","Lad","Lass","Duck","Pet","Flower","Pal","Kidda"],
+  nw: ["Chuck","Chucky","Chuckie","Love","Luv","OurKid","Kidda","Cock","Cocker","Mate","Pal","Mucker","Lad","Lass","Flower","Petal"],
+  northeast: ["Pet","Petal","Hinny","Flower","Marra","Love","Luv","BonnyLad","BonnyLass","Lad","Lass","Bairn","Littleun","Youngblood"],
+  westcountry: ["Lover","MyLover","MeLover","MyLovely","MeLovely","MyHandsome","MeHandsome","MyBeauty","Love","Luv","Darling","Maid","MyMaid"],
+  london: ["Treacle","Sweetheart","Darling","Dear","Love","Luv","Lovely","Babe","Babes","Doll","Dollface","Poppet","Petal","Flower","Guv","Sonny"],
+  scotland: ["Hen","WeeHen","Pal","WeePal","Doll","Dollie","Dearie","Love","WeeMan","WeeLass","Lassie","Laddie","Bairn","WeeYin","Bonny"],
+};
+
+// Display form of compound terms (stored without spaces, displayed with)
+const REGIONAL_DISPLAY: Record<string, string> = {
+  OurKid:"Our Kid",ArKid:"Ar Kid",MeBab:"Me Bab",OldCock:"Old Cock",
+  MeDuck:"Me Duck",MyDuck:"My Duck",MeYouth:"Me Youth",
+  BonnyLad:"Bonny Lad",BonnyLass:"Bonny Lass",Littleun:"Little'un",
+  Youngblood:"Young'un",MyLover:"My Lover",MeLover:"Me Lover",
+  MyLovely:"My Lovely",MeLovely:"Me Lovely",MyHandsome:"My Handsome",
+  MeHandsome:"Me Handsome",MyBeauty:"My Beauty",MyMaid:"My Maid",
+  WeeHen:"Wee Hen",WeePal:"Wee Pal",WeeMan:"Wee Man",WeeLass:"Wee Lass",
+  WeeYin:"Wee Yin",Dollie:"Dollie",Dearie:"Dearie",Dollface:"Dollface",
+};
+
+function getRegionalTerm(town: string, seed: number, gender: "boy"|"girl"): string | null {
+  const key = town.toLowerCase().trim();
+  const region = REGIONAL_TOWNS[key];
+  if (!region) return null;
+  const pool = REGIONAL_TERMS[region] || [];
+  if (pool.length === 0) return null;
+  // Filter by gender -- some terms are gender-specific
+  const femPool = ["Lass","WeeYin","WeeLass","Lassie","Maid","MyMaid","Hen","WeeHen","BonnyLass","Dollie","Doll","Dollface"];
+  const mascPool = ["Lad","Laddie","WeeMan","BonnyLad","Guv","Sonny","OldCock"];
+  const filtered = pool.filter(t => {
+    if (gender === "girl" && mascPool.includes(t)) return false;
+    if (gender === "boy" && femPool.includes(t)) return false;
+    return true;
+  });
+  const chosen = filtered[(seed + 13) % filtered.length];
+  return REGIONAL_DISPLAY[chosen] || chosen;
+}
+
 // ── GENERATION HELPERS ────────────────────────────────────────────────────────
 function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
@@ -1238,14 +1371,6 @@ const TITLE_PREFIXES: PrefixEntry[] = [
 
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
-  const [fromCalculator, setFromCalculator] = useState(false);
-
-  // Read ?breed= param from URL on mount
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const b = params.get("breed") || "";
-    if (b) { setBreed(b); setFromCalculator(true); }
-  }, []);
   const [surname, setSurname] = useState("");
   const [town, setTown] = useState("");
   const [gender, setGender] = useState<"boy"|"girl">("boy");
@@ -1378,25 +1503,6 @@ export default function NameGeneratorPage() {
           </p>
 
           {/* ── STAGE 1: INPUTS ── */}
-          {fromCalculator && breed && (() => {
-            const slug = breed.toLowerCase().replace(/ /g, "-");
-            const img = breedCard[slug];
-            return img ? (
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, marginBottom:24 }}>
-                <img
-                  src={bust(img)}
-                  alt={breed}
-                  style={{ width: "clamp(120px,30vw,200px)", borderRadius:16, boxShadow:"0 4px 24px rgba(10,58,87,0.18)" }}
-                />
-                <p style={{ fontFamily:"var(--font-display)", color:"var(--navy)", fontSize:"clamp(1rem,3vw,1.4rem)", margin:0 }}>
-                  {breed}
-                </p>
-                <p style={{ fontFamily:"var(--font-body)", color:"var(--blue-deep)", fontSize:"0.85rem", margin:0 }}>
-                  Found your best chum! Now let&#39;s name them.
-                </p>
-              </div>
-            ) : null;
-          })()}
           {stage === "inputs" && (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
@@ -1488,92 +1594,6 @@ export default function NameGeneratorPage() {
               </div>
 
               <div style={{ display:"flex", gap:12 }}>
-                {results.length > 0 && (() => {
-                  const best = results[0];
-                  const slug = breed.toLowerCase().replace(/ /g, "-");
-                  const img = breedCard[slug];
-                  return (
-                    <button
-                      className="display"
-                      style={{ background:"var(--yellow)", color:"var(--navy)", marginBottom:8 }}
-                      onClick={() => {
-                        const canvas = document.createElement("canvas");
-                        canvas.width = 800; canvas.height = 500;
-                        const ctx = canvas.getContext("2d")!;
-                        // Background
-                        ctx.fillStyle = "#0a3a57";
-                        ctx.fillRect(0, 0, 800, 500);
-                        // Breed card image
-                        if (img) {
-                          const bImg = new Image();
-                          bImg.crossOrigin = "anonymous";
-                          bImg.onload = () => {
-                            ctx.drawImage(bImg, 30, 30, 220, 300);
-                            // Name text
-                            ctx.fillStyle = "#ffd23e";
-                            ctx.font = "bold 36px 'Luckiest Guy', cursive";
-                            ctx.textBaseline = "top";
-                            const name = best.full;
-                            const maxW = 500;
-                            let fontSize = 36;
-                            ctx.font = `bold ${fontSize}px 'Luckiest Guy', cursive`;
-                            while (ctx.measureText(name).width > maxW && fontSize > 18) {
-                              fontSize -= 2;
-                              ctx.font = `bold ${fontSize}px 'Luckiest Guy', cursive`;
-                            }
-                            ctx.fillText(name, 280, 80);
-                            // Known as
-                            if (best.nickname) {
-                              ctx.fillStyle = "#5cc4ee";
-                              ctx.font = "bold 22px Montserrat, sans-serif";
-                              ctx.fillText(`Known as: ${best.nickname}`, 280, 140);
-                            }
-                            // Reasoning
-                            ctx.fillStyle = "#ffffff";
-                            ctx.font = "16px Montserrat, sans-serif";
-                            const words = best.reasoning.split(" ");
-                            let line = ""; let y = 200;
-                            for (const w of words) {
-                              const test = line + w + " ";
-                              if (ctx.measureText(test).width > 490 && line) {
-                                ctx.fillText(line, 280, y); line = w + " "; y += 24;
-                              } else { line = test; }
-                            }
-                            ctx.fillText(line, 280, y);
-                            // Score badge
-                            const sc = best.score;
-                            ctx.fillStyle = sc >= 22 ? "#9333ea" : "#22c55e";
-                            ctx.beginPath();
-                            ctx.arc(700, 430, 50, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = "#fff";
-                            ctx.font = "bold 20px Montserrat, sans-serif";
-                            ctx.textAlign = "center";
-                            ctx.textBaseline = "middle";
-                            ctx.fillText(String(sc), 700, 430);
-                            // Logo text
-                            ctx.fillStyle = "#ffd23e";
-                            ctx.font = "bold 18px 'Luckiest Guy', cursive";
-                            ctx.textAlign = "left";
-                            ctx.textBaseline = "bottom";
-                            ctx.fillText("Pedigree Chums", 30, 480);
-                            ctx.fillStyle = "#5cc4ee";
-                            ctx.font = "14px Montserrat, sans-serif";
-                            ctx.fillText("pedigreechums.co.uk", 30, 498);
-                            // Download
-                            const link = document.createElement("a");
-                            link.download = `${slug}-name-card.jpg`;
-                            link.href = canvas.toDataURL("image/jpeg", 0.9);
-                            link.click();
-                          };
-                          bImg.src = bust(img);
-                        }
-                      }}
-                    >
-                      Share your chum ★
-                    </button>
-                  );
-                })()}
                 <button onClick={handleRollAgain} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
