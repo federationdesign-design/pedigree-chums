@@ -231,6 +231,15 @@ const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
 
 // ── RANDOM QUESTIONS ───────────────────────────────────────────────────────────
 const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }[] }[] = [
+  {
+    text: "Where are you from?",
+    options: [
+      {label:"Down South", bonus:["Treacle","Sweetheart","Darling","Dear","Doll","Dollface","Poppet","Petal","Flower","Lovely","Babe","Babes","Guv","Sonny","Lover","Maid","MyLover","MyHandsome","MyBeauty"]},
+      {label:"The Midlands", bonus:["Bab","Babby","Babs","OurKid","ArKid","Duck","Ducky","Duckie","Cock","Cocker","Chick","Chucky","Mucker","Youth","MeDuck","MyDuck"]},
+      {label:"Up North", bonus:["Chuck","Chucky","Pet","Petal","Hinny","Marra","BonnyLad","BonnyLass","Lad","Lass","Kidda","Cock","Cocker","Flower","Love","Luv","Bairn"]},
+      {label:"Scotland / Elsewhere", bonus:["Hen","WeeHen","WeePal","Doll","Dollie","Dearie","Lassie","Laddie","Bairn","WeeYin","WeeMan","WeeLass","Bonny","Pal"]}
+    ]
+  },
   { text:"Do you like space?", options:[
     {label:"Yes",bonus:["Luna","Nova","Orion","Astro","Astrid","Comet","Nebula","Aurora","Cassiopeia","Cosmo","Cosimo","Galileo","Kepler","Eclipse","Stellar","Vega","Lyra","Polaris","Orbit","Cosmos","Titan","Atlas","Jupiter","Saturn","Darkstar","Moonbeam","Stardust","Celestia","Lunaris","Astra","Solaris","Quasar","Pulsar"]},
     {label:"No", bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Sausage","Dumpling","Wobble"]},
@@ -1252,6 +1261,75 @@ function getRegionalTerm(town: string, seed: number, gender: "boy"|"girl"): stri
   return REGIONAL_DISPLAY[chosen] || chosen;
 }
 
+
+// ── COMEDY TIEBREAK SCORE ─────────────────────────────────────────────────────
+// When multiple candidates score 21+, this picks the genuinely funniest one.
+// Operates on different axes from the alliteration-based rawScore.
+
+function comedyScore(result: Result, group: string): number {
+  let c = 0;
+  const full = result.full;
+  const nick = result.nickname || "";
+  const parts = full.split(" ");
+  const firstName = parts.length >= 2 ? parts[parts.length - 2] : "";
+  const titlePart = parts.slice(0, -2).join(" ");
+
+  // ── Register collision: gap between title grandeur and name chaos ──────────
+  // Grand title + chaos/baby/food name = maximum comedy
+  const grandTitles = ["Emperor","Empress","Baron","Baroness","Archdruid","Commissioner","Field Marshal","Admiral","Archdeacon","Magnificent","Legendary","Incomparable","Notorious","Countess","Viscountess","Marchioness","Archdruid","Bard","Shogun","Grand Master","Cosmic Queen","Star Queen","Warrior Queen"];
+  const isGrandTitle = grandTitles.some(t => titlePart.includes(t));
+  const chaosFirstNames = ["Biscuit","Pudding","Treacle","Duck","Cocker","Bab","Our Kid","Chick","Chuck","Hinny","Wobble","Bumble","Doodle","Squiggle","Muffin","Radish","Cabbage","Turnip","Pickle","Biscuity","Snorty","Droopy","Wiggly"];
+  const isChaosName = chaosFirstNames.some(n => firstName.toLowerCase().includes(n.toLowerCase()));
+  if (isGrandTitle && isChaosName) c += 5;
+  else if (isGrandTitle) c += 2;
+  else if (isChaosName) c += 3;
+
+  // ── Phonaesthetic pleasure: mouth-feel of the first name ──────────────────
+  const fn = firstName.toLowerCase();
+  // Double letters / repeated consonants
+  if (/(.)/.test(fn)) c += 2;
+  // Inherently funny endings
+  if (/([bglmpw]le|um[bp]|og[gs]?|ub[bs]?|unk|wig|wob|bum|puf|snor)/.test(fn)) c += 2;
+  // Funny consonant clusters (W, F, G, B sounds)
+  if ((fn.match(/[wfgbp]/g) || []).length >= 2) c += 1;
+  // Welsh/Germanic/unusual spelling = cultural placement
+  if (/dd|ff|ll|ck$|tz|ph|wh/.test(fn)) c += 2;
+
+  // ── Cultural specificity: does the name place the dog in a real world ─────
+  const culturalGroups = ["welsh","german","asian","boston","dalmatian","sheepdog","greatdane","afghan","sighthound"];
+  if (culturalGroups.includes(group)) c += 2;
+  // McFace / SpongeBob styles have built-in comedy
+  if (/Mc[A-Z]/.test(full) || /[A-Z][a-z]+[A-Z][a-z]+\s[A-Z][a-z]+[A-Z][a-z]+/.test(full)) c += 3;
+
+  // ── Nickname punchline: is the nickname funnier than the name? ────────────
+  if (nick && nick !== firstName) {
+    // Nickname is meaningfully different
+    if (nick.length <= 5 && firstName.length > 6) c += 2; // compression = punchline
+    if (/z$|x$|y$/.test(nick.toLowerCase())) c += 1;      // Wizz, Lulz, Narcy etc
+  }
+  if (!nick) c -= 1;
+
+  // ── Rhythm: STRONG-weak pattern across the full name ─────────────────────
+  const syllCount = full.replace(/[^aeiou]/gi,"").length;
+  if (syllCount >= 6 && syllCount <= 10) c += 2;
+
+  // ── Surprise density: unexpected elements per word ───────────────────────
+  const wordCount = parts.length;
+  const surprises = (isGrandTitle ? 1 : 0) + (isChaosName ? 1 : 0) + (nick && nick !== firstName ? 1 : 0);
+  if (surprises >= 2 && wordCount <= 3) c += 2; // multiple surprises, compact name
+
+  return c;
+}
+
+// ── FINAL RANKING: blend rawScore + comedyScore ───────────────────────────────
+function rankResults(results: Result[], group: string): Result[] {
+  if (results.length <= 1) return results;
+  return results
+    .map(r => ({ r, final: r.score * 0.6 + comedyScore(r, group) * 0.4 }))
+    .sort((a, b) => b.final - a.final)
+    .map(x => x.r);
+}
+
 // ── GENERATION HELPERS ────────────────────────────────────────────────────────
 function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
@@ -1415,8 +1493,8 @@ export default function NameGeneratorPage() {
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
       const sc21 = allD.filter(r => r.score >= 21);
-      const best21 = sc21.sort((a,b) => b.score - a.score);
-      setResults(best21.length > 0 ? [best21[0]] : [allD.sort((a,b) => b.score - a.score)[0]].filter(Boolean) as Result[]);
+      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
+      setResults(ranked.length > 0 ? [ranked[0]] : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,1));
       setStage("reveal");
     }
   }
@@ -1450,8 +1528,8 @@ export default function NameGeneratorPage() {
     const merged = [...topFromEach, ...allCandidates];
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
     const scored21 = allDeduped.filter(r => r.score >= 21);
-    const topScored = scored21.sort((a,b) => b.score - a.score);
-    setResults(topScored.length > 0 ? [topScored[0]] : [allDeduped.sort((a,b) => b.score - a.score)[0]].filter(Boolean) as Result[]);
+    const ranked2 = rankResults(scored21, breed ? getGroup(breed) : "default");
+    setResults(ranked2.length > 0 ? [ranked2[0]] : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,1));
     setStage("reveal");
   }
 
@@ -1486,8 +1564,8 @@ export default function NameGeneratorPage() {
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
       const sc21 = allD.filter(r => r.score >= 21);
-      const best21 = sc21.sort((a,b) => b.score - a.score);
-      setResults(best21.length > 0 ? [best21[0]] : [allD.sort((a,b) => b.score - a.score)[0]].filter(Boolean) as Result[]);
+      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
+      setResults(ranked.length > 0 ? [ranked[0]] : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,1));
       setStage("reveal");
     }
   }
