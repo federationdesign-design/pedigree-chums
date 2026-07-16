@@ -821,7 +821,9 @@ function runPass(
     else if (allBonus.has(fn)) qBonus += 2;
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
-    if (dogWord && !allit(fn, dogWord)) {
+    const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
+    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry"];
+    if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
       if (pool && pool.length > 0) {
