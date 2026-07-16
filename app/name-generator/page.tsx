@@ -269,6 +269,11 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   if (tf === fl) score += 2;
   if (fl === wl && tf === fl) score += 2;
   score += colourScore(first.name, colour as DogColour);
+  // Penalise very short abbreviation-only first names (LM, HB, BP etc) -- need a real name
+  if (/^[A-Z]{1,3}$/.test(first.name)) score -= 3;
+  // Bonus for genuinely funny/breed-appropriate first names (short, punchy, food or chaos)
+  if (first.reg === "food" && first.syllables <= 2) score += 2;
+  if (first.reg === "chaos" && first.syllables <= 2) score += 1;
   return score;
 }
 
@@ -536,6 +541,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 function dedupeResults(candidates: Result[], limit = 10): Result[] {
   const usedFirstNames  = new Set<string>();
   const usedTitles      = new Set<string>();
+  const usedPrefixBase  = new Set<string>(); // dedupe on base title ignoring prefix
   const usedDogWords    = new Set<string>();
   const out: Result[] = [];
   for (const r of candidates) {
@@ -548,9 +554,14 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
     if (usedFirstNames.has(firstName)) continue;
     if (usedTitles.has(title)) continue;
+    // Also dedupe on base title (strip prefix like Grand/Supreme/Divine)
+    const prefixList = ["Grand ","Supreme ","Divine ","Imperial ","Arch ","High ","Ultra ","Très ","Super ","Hyper ","Uber ","Mega "];
+    const baseTitle = prefixList.reduce((t, p) => t.startsWith(p) ? t.slice(p.length) : t, title);
+    if (usedPrefixBase.has(baseTitle)) continue;
     if (dogWord && usedDogWords.has(dogWord)) continue;
     usedFirstNames.add(firstName);
     usedTitles.add(title);
+    usedPrefixBase.add(baseTitle);
     if (dogWord) usedDogWords.add(dogWord);
     out.push(r);
     if (out.length >= limit) break;
@@ -597,7 +608,7 @@ export default function NameGeneratorPage() {
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(QUESTIONS[s % QUESTIONS.length]);
+    setQuestion(QUESTIONS[(s ^ (Date.now() & 0xffff)) % QUESTIONS.length]);
     setStage("question");
   }
 
@@ -622,7 +633,12 @@ export default function NameGeneratorPage() {
         } else {
           pe = TITLE_PREFIXES_GIRL[(seed + i) % TITLE_PREFIXES_GIRL.length];
         }
-        const prefixedTitle = pe.prefix + " " + r.full.split(" ")[0];
+        // Don't stack prefix on D-Train or abbreviation-only styles
+        const firstWord = r.full.split(" ")[0];
+        const isDTrain = /^[A-Z]-/.test(firstWord);
+        const isAbbrev = /^[A-Z]{1,4}$/.test(firstWord);
+        if (isDTrain || isAbbrev) return null;
+        const prefixedTitle = pe.prefix + " " + firstWord;
         const rest = r.full.split(" ").slice(1).join(" ");
         return { ...r, full: prefixedTitle + " " + rest, score: r.score + pe.bonusContrast };
       }).filter(Boolean) as Result[];
@@ -635,7 +651,7 @@ export default function NameGeneratorPage() {
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(QUESTIONS[s % QUESTIONS.length]);
+    setQuestion(QUESTIONS[(s ^ (Date.now() & 0xffff)) % QUESTIONS.length]);
     setStage("question");
   }
 
