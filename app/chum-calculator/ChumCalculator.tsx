@@ -933,13 +933,13 @@ export default function ChumCalculator() {
                   </div>
                 )}
               </Link>
-              {finished && !hidden && (
+              {finished && !hidden && (isBest || b.score >= 120) && (
                 <Link
                   href={`/name-generator?breed=${encodeURIComponent(b.name)}`}
                   className={styles.nameThisChum}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  Name this chum
+                  ★ Name this chum
                 </Link>
               )}
             </div>

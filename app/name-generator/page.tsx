@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 
@@ -1457,6 +1457,17 @@ const TITLE_PREFIXES: PrefixEntry[] = [
 
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
+  const [fromCalculator, setFromCalculator] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const b = params.get("breed") || "";
+    if (b) {
+      setBreed(b);
+      setFromCalculator(true);
+    }
+  }, []);
+
   const [surname, setSurname] = useState("");
   const [town, setTown] = useState("");
   const [gender, setGender] = useState<"boy"|"girl">("boy");
@@ -1593,19 +1604,46 @@ export default function NameGeneratorPage() {
           </p>
 
           {/* ── STAGE 1: INPUTS ── */}
+          {fromCalculator && breed && stage === "inputs" && (() => {
+            const img = CARD_IMAGE[breed] ?? null;
+            return (
+              <div style={{
+                display:"flex", alignItems:"center", gap:16, marginBottom:24,
+                background:"var(--navy)", borderRadius:16, padding:"14px 18px",
+                animation:"fadeInDown 0.4s ease"
+              }}>
+                {img && (
+                  <img src={img} alt={breed} style={{
+                    width:64, height:"auto", borderRadius:10, flexShrink:0,
+                    transform:"rotate(-2deg)", boxShadow:"0 4px 16px rgba(0,0,0,0.25)"
+                  }} />
+                )}
+                <div>
+                  <div style={{ fontFamily:"var(--font-display)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2.5vw,1.1rem)", lineHeight:1.2 }}>
+                    Found your best chum!
+                  </div>
+                  <div style={{ fontFamily:"var(--font-body)", color:"var(--blue-sky)", fontSize:"0.85rem", marginTop:4 }}>
+                    Now let&apos;s give {breed} a name.
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           {stage === "inputs" && (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
-              <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-              <select value={breed} onChange={(e: { target: HTMLSelectElement }) => setBreed(e.target.value)}
-                style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
-                <option value="">-- Select a breed --</option>
-                <optgroup label="Pedigree Chums Pack Breeds">
-                  {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
-                </optgroup>
-                <optgroup label="Other Breeds">
-                  {OTHER_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
-                </optgroup>
-              </select>
+              {!fromCalculator && (<>
+                <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
+                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => setBreed(e.target.value)}
+                  style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
+                  <option value="">-- Select a breed --</option>
+                  <optgroup label="Pedigree Chums Pack Breeds">
+                    {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
+                  </optgroup>
+                  <optgroup label="Other Breeds">
+                    {OTHER_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
+                  </optgroup>
+                </select>
+              </>)}
 
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your surname</label>
               <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
@@ -1657,28 +1695,24 @@ export default function NameGeneratorPage() {
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
+              {cardImg && (
+                <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
+                </div>
+              )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
                 {results.map((r: Result, i: number) => (
-                  <div key={i} style={{ position:"relative", background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", paddingRight: cardImg ? "clamp(100px,22vw,160px)" : "clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)", overflow:"visible" }}>
-                    {/* Breed card -- rotated, anchored to right side of box */}
-                    {cardImg && (
-                      <div style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={cardImg} alt={breed} style={{ width:"clamp(80px,18vw,130px)", height:"auto", borderRadius:12, display:"block" }} />
-                      </div>
-                    )}
-                    {/* Top pick pill */}
-                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                    {/* Name */}
-                    <div className="display" style={{ fontSize:"clamp(1.1rem,2.7vw,1.55rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.2, textAlign:"left" }}>{r.full}</div>
-                    {/* Nickname */}
+                  <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
+                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                    <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
                     {r.nickname && (
-                      <div style={{ fontSize:"0.9rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
+                      <div style={{ fontSize:"0.8rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:10, fontFamily:"var(--font-body)", fontWeight:600 }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
-                    {/* Reasoning */}
-                    <div style={{ fontSize:"0.9rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
+                    <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
+
                   </div>
                 ))}
               </div>
