@@ -522,13 +522,6 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
       else score -= 4;  // penalise -- Baron Tubby Wobble-Harris is wrong register
     }
 
-    // Cartoon-character names -- only work with Dawg as dog word, or chaos/baby title
-    const cartoonOnlyWithDawg = new Set(["Tubby","Pudgy","Porky","Wimpy","Doofus","Nincompoop","Scraggy"]);
-    if (cartoonOnlyWithDawg.has(first.name)) {
-      if (dogWord.word === "Dawg") score += 5;
-      else if (["chaos","baby"].includes(title.reg)) score += 1;
-      else score -= 4;
-    }
   return score;
 }
 
