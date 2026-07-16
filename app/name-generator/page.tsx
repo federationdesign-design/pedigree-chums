@@ -1758,15 +1758,15 @@ export default function NameGeneratorPage() {
                     {/* Top pick pill -- navy text on yellow, full pill radius */}
                     {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
                     {/* Name -- 2pt bigger, left aligned */}
-                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.15rem,4.5vw,1.6rem)", color:"#fff", marginBottom:6, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"left", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.3rem,5vw,1.9rem)", color:"#fff", marginBottom:8, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
                     {/* Nickname -- 2pt bigger, left aligned */}
                     {r.nickname && (
-                      <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"rgba(255,255,255,0.9)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
+                      <div style={{ fontSize:"clamp(1rem,3vw,1.1rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
                     {/* Reasoning -- 2pt bigger, left aligned */}
-                    <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"rgba(255,255,255,0.85)", lineHeight:1.6, borderTop:"1px solid rgba(255,255,255,0.25)", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
+                    <div style={{ fontSize:"clamp(1rem,3vw,1.15rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
