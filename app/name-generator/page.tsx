@@ -721,7 +721,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
         nickname = naturalNick;
       } else {
         // Try acronym from full name -- only use if pronounceable (has vowel, sounds like a word)
-        const acronym = full.split(" ").map(w => w[0]).join("").toUpperCase().replace(/[^A-Z]/g,"");
+        const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
         const hasVowel = /[AEIOU]/.test(acronym);
         const notTooLong = acronym.length >= 2 && acronym.length <= 5;
         const notAllConsonants = hasVowel;
@@ -754,7 +754,11 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
     if (!r) continue;
     const parts   = r.full.split(" ");
     const title   = parts[0];
-    const firstName = parts[1] ?? "";
+    // For abbrev style "B.O (Boss Original) Surname", treat whole meaning as firstName for dedup
+    const isAbbrevFull = /^[A-Z]\.[A-Z]/.test(title);
+    const firstName = isAbbrevFull
+      ? parts.slice(1, parts.length - 1).join(" ")  // "(Boss Original)"
+      : parts[1] ?? "";
     // Extract dog word from hyphenated surname (e.g. "Sniff-Taylor" -> "Sniff")
     const surnamepart = parts[parts.length - 1] ?? "";
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
@@ -862,6 +866,8 @@ function runPass(
       if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
       const isDTrain    = /^[A-Z]-/.test(firstWord);
       const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
+      const isDotted    = /^[A-Z]\.[A-Z]/.test(firstWord);  // e.g. "B.O", "C.L.B"
+      if (isDotted) return null;  // never prefix dotted abbrev names
       const prefixedTitle = pe.prefix + " " + firstWord;
       let rest = parts.slice(1).join(" ");
       if (isDTrain || isAbbrev) {
