@@ -113,8 +113,7 @@ const FUNNY_PLACES = new Set([
   "Maidwell","Cold Ashby","Hollowell","Creaton","Spratton","Scaldwell",
   "Walgrave","Hannington","Lamport","Raunds","Ringstead","Stanwick","Hargrave",
   "Pertenhall","Kimbolton","Tilbrook","Catworth","Molesworth","Brington",
-  "Bythorn","Keyston","Clopton","Thurning",
-]);
+  "Bythorn","Keyston","Clopton","Thurning"]);
 
 // ── ABBREVIATION WHITELIST ─────────────────────────────────────────────────────
 interface AbbrevEntry { code: string; meaning: string; gender: "boy"|"girl"|"any"; breeds?: string[]; }
@@ -182,163 +181,51 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"Sqn Ldr",meaning:"Squadron Leader",gender:"boy",breeds:["spaniel","retriever","collie"]},
   {code:"Wg Cdr",meaning:"Wing Commander",gender:"boy",breeds:["spaniel","german","giant"]},
   {code:"Flt Lt",meaning:"Flight Lieutenant",gender:"boy",breeds:["collie","poodle","retriever"]},
-  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]},
-];
+  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]}];
 
 const DTRAIN_LETTERS  = ["A","B","C","D","E","G","J","K","L","M","R","S","T"];
 const DTRAIN_SUFFIXES = ["Train","Prince","Money","King","Boss","Smooth","Real","Fresh","Young","Hype"];
 const MARIEJ_FIRSTS  = ["Mary","Lisa","Rosa","Lola","Nina","Tina","Gina","Dina","Mona","Fiona","Cara","Sara","Nora","Cora","Vera","Zara","Kara","Lara","Myra","Lyra"];
 const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
 
-// ── QUESTION BANK ─────────────────────────────────────────────────────────────
-interface QOption { label: string; bonus: string[]; }
-interface QItem   { text: string; options: QOption[]; }
+// ── RANDOM QUESTIONS ───────────────────────────────────────────────────────────
+const QUESTIONS = [
+  "Do you like space?",
+  "Are you a morning person?",
+  "Have you ever talked to a plant?",
+  "Have you ever worn a onesie in public?",
+  "Do you believe in ghosts?",
+  "Do you take sugar in your tea?",
+  "Do you like myths and legends?",
+  "Sugar or salt?",
+  "Autumn or summer?",
+  "How many sides does a circle have?",
+  "Tea or coffee?",
+  "Would you rather be invisible or fly?",
+  "Night owl or early bird?",
+  "Are you cool?",
+  "Are you a nerd?",
+  "Do you make your bed in the morning?",
+  "Do you read the terms and conditions?",
+  "New book -- do you break the spine?",
+  "Do you reply to texts immediately?",
+  "Do you eat the crusts?",
+  "Ketchup -- fridge or cupboard?",
+  "Escalator -- walk or stand?",
+  "At a party -- kitchen or dance floor?",
+  "Do you rehearse conversations in your head?",
+  "Do you believe in luck?",
+  "Windows or Mac?",
+  "Are you a good dancer?",
+  "When did you last call your mother?",
+  "Favourite pizza?",
+  "Do you enjoy smells?"];
 
-const QUESTION_BANK: QItem[] = [
-  { text:"Do you like space?", options:[
-    {label:"Yes",bonus:["Luna","Nova","Orion","Astrid","Comet","Nebula","Aurora","Cassiopeia","Cosmo","Galileo","Kepler","Eclipse","Stellar","Vega","Lyra","Polaris"]},
-    {label:"No", bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Sausage","Dumpling","Wobble","Cobbler"]},
-  ]},
-  { text:"Do you enjoy smells?", options:[
-    {label:"Yes",bonus:["Jasmine","Heather","Sage","Basil","Clover","Juniper","Cedar","Sorrel","Yarrow","Flora","Lavender","Mint","Rosemary","Thyme","Blossom"]},
-    {label:"No", bonus:["Flint","Stone","Slate","Steel","Grit","Gravel","Iron","Chrome","Cinder","Concrete"]},
-  ]},
-  { text:"Are you a morning person?", options:[
-    {label:"Yes",bonus:["Dawn","Sparky","Sunny","Breezy","Zippy","Perky","Dewy","Lark","Robin","Crisp","Chipper","Bright","Fresh","Radiant"]},
-    {label:"No", bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Slumber","Haze","Mellow"]},
-  ]},
-  { text:"Have you ever talked to a plant?", options:[
-    {label:"Yes",bonus:["Fern","Ivy","Willow","Daisy","Skye","Moss","Briar","Bloom","Rowan","Clover","Hazel","Elder","Birch","Cedar","Ash","Bramble"]},
-    {label:"No", bonus:["Brick","Steel","Chrome","Concrete","Tarmac","Gravel","Slate","Cinder","Iron"]},
-  ]},
-  { text:"Have you ever worn a onesie in public?", options:[
-    {label:"Yes",bonus:["Snugglebum","Fluffy","Booboo","Fifi","Mimi","Puddingkins","Lulu","Noo-Noo","Cuddlekins","Fluffybum","Jellybean","Candyfloss","Tiddlywink"]},
-    {label:"No", bonus:["Dapper","Debonair","Suave","Sharp","Immaculate","Sterling","Pristine","Sleek","Trim","Tailored"]},
-  ]},
-  { text:"Do you believe in ghosts?", options:[
-    {label:"Yes",bonus:["Ghost","Shadow","Phantom","Midnight","Eclipse","Misty","Spectre","Vesper","Wraith","Shade","Spirit","Wisp","Echo","Mist","Void"]},
-    {label:"No", bonus:["Solid","Grounded","Flint","Stone","Anchor","Boulder","Bedrock","Steadfast","Grit","Granite"]},
-  ]},
-  { text:"Do you take sugar in your tea?", options:[
-    {label:"Yes",bonus:["Honey","Toffee","Fudge","Caramel","Treacle","Sherbet","Bonbon","Butterscotch","Jellybean","Gumdrop","Sweetpea","Syrup","Custard","Pudding","Lollipop"]},
-    {label:"No", bonus:["Bitter","Tonic","Brisk","Sharp","Crisp","Earl","Assam","Pekoe","Darjeeling"]},
-  ]},
-  { text:"Do you like myths and legends?", options:[
-    {label:"Yes",bonus:["Orpheus","Perseus","Achilles","Heracles","Theseus","Ajax","Odysseus","Circe","Phoenix","Griffin","Merlin","Lancelot","Morgan","Oberon","Avalon","Medusa","Pegasus","Icarus","Apollo","Artemis"]},
-    {label:"No", bonus:["Norman","Derek","Keith","Brian","Barry","Colin","Basil","Kevin","Biscuit","Custard"]},
-  ]},
-  { text:"Sugar or salt?", options:[
-    {label:"Sugar",bonus:["Honey","Fudge","Caramel","Toffee","Treacle","Butterscotch","Sherbet","Bonbon","Mellow","Syrup","Candy","Nectar","Praline"]},
-    {label:"Salt", bonus:["Brine","Flint","Gravel","Sharp","Crisp","Gruff","Stone","Slate","Tonic","Crag","Grit","Granite","Rust"]},
-  ]},
-  { text:"Autumn or summer?", options:[
-    {label:"Autumn",bonus:["Amber","Russet","Conker","Chestnut","Bramble","Hazel","Harvest","Ember","Copper","Acorn","Tawny","Sienna","Cinnamon","Mist","Dusk"]},
-    {label:"Summer",bonus:["Sunny","Blaze","Sandy","Breeze","Dazzle","Shimmer","Freckle","Goldie","Honey","Wildflower","Surf","Coral","Azure","Radiant","Glow","Lemon"]},
-  ]},
-  { text:"How many sides does a circle have?", options:[
-    {label:"None",bonus:["Ace","Boss","Stone","Flint","Blade","Steel","Iron","Frost","Sharp","Crisp","Direct","Decisive","Clean","Bolt"]},
-    {label:"One", bonus:["Infinite","Spiral","Orbit","Cycle","Curve","Eternal","Continuum","Loop","Cosmos","Omega","Zen","Endless","Void","Paradox"]},
-  ]},
-  { text:"Tea or coffee?", options:[
-    {label:"Tea",   bonus:["Earl","Darjeeling","Assam","Oolong","Chamomile","Pekoe","Brew","Steep","Mellow","Proper","Crumpet","Scone","Biscuit","Lapsang"]},
-    {label:"Coffee",bonus:["Espresso","Cortado","Arabica","Mocha","Crema","Grind","Press","Dark","Roast","Intense","Robust","Bold","Bitter","Jet"]},
-  ]},
-  { text:"Would you rather be invisible or fly?", options:[
-    {label:"Invisible",bonus:["Ghost","Shadow","Phantom","Spectre","Wraith","Shade","Mist","Wisp","Echo","Blur","Fade","Smoke"]},
-    {label:"Fly",      bonus:["Falcon","Hawk","Eagle","Icarus","Pegasus","Cloud","Nimbus","Soar","Glide","Swift","Dart","Streak","Apex"]},
-  ]},
-  { text:"Night owl or early bird?", options:[
-    {label:"Night owl",  bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Sable","Noir","Obsidian","Onyx"]},
-    {label:"Early bird", bonus:["Dawn","Lark","Robin","Crisp","Dewy","Sparky","Sunny","Chirpy","Bright","Breezy","Perky","Glow","Fresh","Zippy"]},
-  ]},
-  { text:"Are you cool?", options:[
-    {label:"Yes",bonus:["Ace","Slick","Smooth","Ice","Frost","Suave","Sharp","Dapper","Blade","Shadow","Chrome","Silk","Velvet","Steel","Noir"]},
-    {label:"No", bonus:["Goofy","Doofus","Dingbat","Goofball","Wonky","Doolally","Bumbly","Topsy","Wibble","Clumsy","Wobble","Bumble","Scatty"]},
-  ]},
-  { text:"Are you a nerd?", options:[
-    {label:"Yes",bonus:["Kepler","Copernicus","Turing","Pascal","Euler","Archimedes","Pythagoras","Worf","Spock","Data","Hubble","Fibonacci","Bohr","Lovelace"]},
-    {label:"No", bonus:["Maverick","Rebel","Wildcard","Outlaw","Renegade","Rogue","Hotshot","Bandit","Flash","Blaze","Bolt","Rocket","Dash"]},
-  ]},
-  { text:"Do you make your bed in the morning?", options:[
-    {label:"Yes",bonus:["Pristine","Crisp","Sterling","Proper","Immaculate","Dapper","Sharp","Composed","Prim","Trim","Precise","Neat","Buff"]},
-    {label:"No", bonus:["Rumple","Tumble","Shambles","Chaos","Muddle","Scruffy","Slouch","Sprawl","Tangle","Topple","Wobble","Raggle","Jumble"]},
-  ]},
-  { text:"Do you read the terms and conditions?", options:[
-    {label:"Yes",bonus:["Prudence","Constance","Diligent","Earnest","Steadfast","Thorough","Scholar","Counsel","Careful","Measured","Exact","Vigilant"]},
-    {label:"No", bonus:["Maverick","Reckless","Wildcard","Rogue","Rebel","Outlaw","Carefree","Breezy","Blithe","Nonchalance","Audacious","Brazen"]},
-  ]},
-  { text:"New book -- break the spine?", options:[
-    {label:"Yes",bonus:["Battered","Beloved","Weathered","Story","Chapter","Thumbed","Worn","Creased","Dogear","Tattered","Frayed","Loved"]},
-    {label:"No", bonus:["Pristine","Ivory","Pearl","Gilt","Vellum","Parchment","Folio","Lacquer","Crisp","Mint","Immaculate"]},
-  ]},
-  { text:"Reply to texts immediately?", options:[
-    {label:"Yes",bonus:["Swift","Prompt","Flash","Zip","Dart","Ready","Alert","Keen","Sprightly","Rapid","Instant","Snappy","Brisk"]},
-    {label:"No", bonus:["Languid","Aloof","Nonchalance","Glaciale","Reservée","Unhurried","Mellow","Drift","Mosey","Saunter","Laze","Meander"]},
-  ]},
-  { text:"Do you eat the crusts?", options:[
-    {label:"Yes",bonus:["Sturdy","Grit","Solid","Wholesome","Hearty","Stalwart","Steadfast","Biscuit","Dependable","Robust","Trusty","Stout","Hardy"]},
-    {label:"No", bonus:["Delicate","Dainty","Precious","Refined","Particular","Fussy","Finicky","Petite","Prim","Gentle","Soft","Tender"]},
-  ]},
-  { text:"Ketchup -- fridge or cupboard?", options:[
-    {label:"Fridge",   bonus:["Chilled","Crisp","Precise","Measured","Exact","Rigorous","Rational","Careful","Scientific","Correct","Orderly"]},
-    {label:"Cupboard", bonus:["Instinct","Bold","Brazen","Fearless","Reckless","Maverick","Audacious","Daring","Bravado","Gutsy","Rogue","Defiant"]},
-  ]},
-  { text:"Escalator -- walk or stand?", options:[
-    {label:"Walk",  bonus:["Rocket","Dash","Sprint","Bolt","Charge","Hustle","Drive","Momentum","Relentless","Surge","Blaze","Flash","Rapid"]},
-    {label:"Stand", bonus:["Repose","Mellow","Saunter","Drift","Amble","Mosey","Languid","Unhurried","Serene","Composed","Placid","Still","Calm"]},
-  ]},
-  { text:"Party -- kitchen or dance floor?", options:[
-    {label:"Kitchen",     bonus:["Sage","Thoughtful","Ember","Hearth","Warmth","Steady","Quiet","Considered","Mellow","Grounded","Earnest"]},
-    {label:"Dance floor", bonus:["Showtime","Dazzle","Shimmy","Foxtrot","Sashay","Tango","Boogie","Ziggy","Sparkle","Strut","Glitter","Flash"]},
-  ]},
-  { text:"Rehearse conversations in your head?", options:[
-    {label:"Yes",bonus:["Considered","Measured","Ponder","Ruminate","Reflect","Muse","Contemplate","Deliberate","Thoughtful","Nuanced","Meticulous"]},
-    {label:"No", bonus:["Blurt","Spark","Candid","Frank","Brash","Forthright","Bold","Direct","Unfiltered","Raw","Spontaneous","Impulsive"]},
-  ]},
-  { text:"Do you believe in luck?", options:[
-    {label:"Yes",bonus:["Lucky","Fortune","Charm","Clover","Wishbone","Serendipity","Kismet","Fate","Fortuna","Star","Chance","Destiny","Omen"]},
-    {label:"No", bonus:["Grit","Hustle","Grind","Steel","Forge","Drive","Muscle","Tenacity","Earn","Build","Craft","Toil","Persist","Relentless"]},
-  ]},
-  { text:"Windows or Mac?", options:[
-    {label:"Windows",bonus:["Pixel","Glitch","Buffer","Crash","Reboot","Patch","Clippy","Loading","Freeze","Spinner","Update","Error"]},
-    {label:"Mac",    bonus:["Retina","Safari","Sleek","Minimal","Studio","Render","Siri","Fusion","Carbon","Silicon","Spotlight","Aluminium"]},
-  ]},
-  { text:"Are you a good dancer?", options:[
-    {label:"Yes",bonus:["Foxtrot","Tango","Waltz","Sashay","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Salsa","Rumba","Swing","Jive"]},
-    {label:"No", bonus:["Lumber","Shuffle","Plod","Stumble","Wobble","Trundle","Sway","Stomp","Clump","Blunder","Flail","Lurch","Stagger"]},
-  ]},
-  { text:"When did you last call your mother?", options:[
-    {label:"Recently",     bonus:["Loyal","Faithful","Devoted","True","Steadfast","Beloved","Darling","Treasure","Precious","Cherished","Noble","Gallant"]},
-    {label:"Not recently", bonus:["Rogue","Rebel","Outlaw","Maverick","Renegade","Wildcard","Trouble","Chaos","Rascal","Scamp","Scoundrel","Vagabond"]},
-  ]},
-  { text:"What music moves you?", options:[
-    {label:"Classic / Jazz",    bonus:["Sinatra","Ella","Billie","Miles","Duke","Dizzy","Satchmo","Monk","Coltrane","Armstrong","Holiday"]},
-    {label:"Rock / Indie",      bonus:["Bowie","Jagger","Lennon","Hendrix","Cobain","Strummer","Iggy","Lemmy","Morrissey","Ziggy","Riff","Thunder"]},
-    {label:"Pop",               bonus:["Presley","Freddie","Elton","George","Prince","Kylie","Adele","Showtime","Glitter","Dazzle","Sparkle"]},
-    {label:"Hip Hop / R&B",     bonus:["Ghost","Shadow","Ice","Smooth","Phantom","Ace","Blaze","Hustle","Flex","Drip","Hype","Vibe","Wave"]},
-    {label:"Country",           bonus:["Dolly","Hank","Waylon","Willie","Cash","Loretta","Patsy","Emmylou","Harvest","Dusty","Rusty","Prairie"]},
-    {label:"Electronic / Dance",bonus:["Moby","Orbital","Prodigy","Massive","Tricky","Bass","Pulse","Beat","Rhythm","Tempo","Sync","Surge"]},
-    {label:"Metal",             bonus:["Ozzy","Lemmy","Dio","Riff","Thunder","Havoc","Chaos","Rampage","Iron","Steel","Blade","Hammer","Fury"]},
-    {label:"Classical",         bonus:["Mozart","Bach","Handel","Vivaldi","Chopin","Liszt","Mahler","Brahms","Elgar","Purcell","Cadence","Forte"]},
-  ]},
-  { text:"Favourite pizza?", options:[
-    {label:"Margherita", bonus:["Pearl","Ivory","Simple","Pure","Classic","Refined","Elegant","Clean","Minimal","Pristine","Delicate","Noble"]},
-    {label:"Pepperoni",  bonus:["Biscuit","Buddy","Champ","Sunny","Lucky","Faithful","Happy","Reliable","Steady","True","Trusty","Solid","Warm"]},
-    {label:"Meat feast", bonus:["Boss","Havoc","Chaos","Thunder","Blaze","Savage","Titan","Goliath","Maximus","Beast","Rampage","Fury","Brute"]},
-    {label:"Vegetarian", bonus:["Flora","Basil","Sage","Clover","Bloom","Meadow","Willow","Fern","Ivy","Petal","Briar","Moss","Leaf","Blossom"]},
-    {label:"Hawaiian",   bonus:["Maverick","Wildcard","Renegade","Rebel","Outlaw","Bonkers","Doolally","Chaos","Rogue","Breezy","Carefree","Bold"]},
-  ]},
-];
-
-// Pick two non-overlapping questions with genuine rotation
-function pickTwoQuestions(seed: number): [number, number] {
-  const t = Date.now() & 0x7fffffff;
-  const q1 = Math.abs((seed ^ t) % QUESTION_BANK.length);
-  let q2 = Math.abs(((seed * 7 + 3) ^ (t >> 5)) % QUESTION_BANK.length);
-  if (q2 === q1) q2 = (q2 + 1) % QUESTION_BANK.length;
-  return [q1, q2];
+// Pick a question using both seed and timestamp for genuine variety
+function pickQuestion(seed: number): string {
+  const idx = (seed ^ (Date.now() & 0x7fffffff)) % QUESTIONS.length;
+  return QUESTIONS[Math.abs(idx)];
 }
-
 
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
@@ -443,7 +330,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Bulldog specifically -- Churchill energy
   bulldog:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Field Marshal",reg:"grand",syllables:3}],
   // Character breeds -- self-appointed grandeur
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baron",reg:"grand",syllables:2}],
+  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
   // Gentry -- Dalmatian, OES etc
   gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1}],
   // Dachshund -- absurdly self-important
@@ -464,8 +351,8 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2}],
   lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
   bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2}],
-  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Countess",reg:"grand",syllables:2}],
+  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2}],
+  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Countess",reg:"grand",syllables:2}],
   gentry:     [{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Most Honourable",reg:"grand",syllables:4},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Marchioness",reg:"grand",syllables:3}],
   default:    [{title:"Lady",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3}],
 };
@@ -705,7 +592,68 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
   return out;
 }
 
-type Stage = "inputs"|"question"|"reveal";  // "question" handles both q1 and q2 via activeQ
+
+// ── GENERATION HELPERS ────────────────────────────────────────────────────────
+function runPass(
+  breed: string, surname: string, gender: "boy"|"girl",
+  baseSeed: number, town: string, colour: DogColour,
+  bonusPool1: string[], bonusPool2: string[]
+): Result[] {
+  const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
+  const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
+
+  const raw = Array.from({length:20}, (_, i) => {
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+    if (!r) return null;
+    const fn = r.full.split(" ")[1] ?? "";
+    let qBonus = 0;
+    if (doubleBonus.has(fn)) qBonus += 4;
+    else if (allBonus.has(fn)) qBonus += 2;
+    return { ...r, score: r.score + qBonus };
+  }).filter(Boolean) as Result[];
+
+  raw.sort((a,b) => b.score - a.score);
+
+  // Prefix tiebreaker if top score below threshold
+  const THRESHOLD = 19;
+  if ((raw[0]?.score ?? 0) < THRESHOLD) {
+    const group = getGroup(breed);
+    const prefixed = Array.from({length:20}, (_, i) => {
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+      if (!r) return null;
+      let pe: { prefix: string; bonusContrast: number };
+      if (gender === "boy") {
+        const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group));
+        if (!matching.length) return null;
+        pe = matching[(baseSeed + i) % matching.length];
+      } else {
+        pe = TITLE_PREFIXES_GIRL[(baseSeed + i) % TITLE_PREFIXES_GIRL.length];
+      }
+      const parts    = r.full.split(" ");
+      const firstWord = parts[0];
+      const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable"];
+      const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+      if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
+      const isDTrain    = /^[A-Z]-/.test(firstWord);
+      const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
+      const prefixedTitle = pe.prefix + " " + firstWord;
+      let rest = parts.slice(1).join(" ");
+      if (isDTrain || isAbbrev) {
+        const last = parts[parts.length - 1];
+        if (last?.includes("-")) {
+          const clean = last.split("-").slice(1).join("-");
+          rest = [...parts.slice(1, -1), clean].filter(Boolean).join(" ");
+        }
+      }
+      const bonus = r.score >= 14 ? 1 : pe.bonusContrast;
+      return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + bonus };
+    }).filter(Boolean) as Result[];
+    return [...raw, ...prefixed].sort((a,b) => b.score - a.score);
+  }
+  return raw;
+}
+
+type Stage = "inputs"|"question"|"reveal";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
 
@@ -716,16 +664,14 @@ const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   { prefix: "Imperial", bonusContrast: 2 },
   { prefix: "Arch",     bonusContrast: 2 },
   { prefix: "High",     bonusContrast: 2 },
-  { prefix: "Très",     bonusContrast: 3 },
-];
+  { prefix: "Très",     bonusContrast: 3 }];
 
 const TITLE_PREFIXES: PrefixEntry[] = [
   { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
   { prefix: "Uber",   breeds: ["german","boxer","giant"], bonusContrast: 2 },
   { prefix: "Hyper",  breeds: ["collie","terrier","highenergy"], bonusContrast: 3 },
   { prefix: "Mega",   breeds: ["giant","character","dachshund"], bonusContrast: 2 },
-  { prefix: "Ultra",  breeds: ["german","sighthound"], bonusContrast: 2 },
-];
+  { prefix: "Ultra",  breeds: ["german","sighthound"], bonusContrast: 2 }];
 
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
@@ -733,9 +679,7 @@ export default function NameGeneratorPage() {
   const [town, setTown] = useState("");
   const [gender, setGender] = useState<"boy"|"girl">("boy");
   const [stage, setStage] = useState<Stage>("inputs");
-  const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
-  const [q1Answer, setQ1Answer] = useState("");
-  const [activeQ, setActiveQ] = useState<1|2>(1);
+  const [question, setQuestion] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
@@ -745,79 +689,39 @@ export default function NameGeneratorPage() {
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
-    setResults([]);
+    setQuestion(pickQuestion(s));
     setStage("question");
   }
 
-  function handleAnswer() {
+  function handleAnswer(q1ans = "", q2ans = "") {
     const townMatch = FUNNY_PLACES.has(town.trim());
     const effectiveTown = townMatch ? town.trim() : "";
-    const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour));
-    candidates.sort((a,b) => b.score - a.score);
-    const THRESHOLD2 = 19;
-    const topScore2 = candidates[0]?.score ?? 0;
-    let finalCandidates2 = candidates;
-    if (topScore2 < THRESHOLD2) {
-      const group2b = getGroup(breed);
-      const prefixPass = Array.from({length:20},(_,i) => {
-        const r = generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour);
-        if (!r) return null;
-        let pe: { prefix: string; bonusContrast: number };
-        if (gender === "boy") {
-          const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group2b));
-          if (!matching.length) return null;
-          pe = matching[(seed + i) % matching.length];
-        } else {
-          pe = TITLE_PREFIXES_GIRL[(seed + i) % TITLE_PREFIXES_GIRL.length];
-        }
-        const parts = r.full.split(" ");
-        const firstWord = parts[0];
-        const isDTrain = /^[A-Z]-/.test(firstWord);
-        const isAbbrevOnly = /^[A-Z]{1,4}$/.test(firstWord);
-        // Don't prefix already-grand titles -- stacking two grand things kills the comedy
-        const alreadyGrand = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Inimitable","Illustrious"];
-        if (alreadyGrand.includes(firstWord)) return null;
-        const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
-        if (informalTitles.includes(firstWord)) return null;
-        // Don't prefix if the second word looks like a name not a title (Myra, Imperial Myra L)
-        // i.e. the existing title is already a prefix+title combo
-        const secondWord = parts[1] ?? "";
-        const looksLikeName = /^[A-Z][a-z]/.test(secondWord) && !["Sir","Lord","Lady","Dame","Duke","Earl","Baron","Count"].includes(secondWord);
-        if (looksLikeName && (isDTrain || isAbbrevOnly)) return null;
-        const prefixedTitle = pe.prefix + " " + firstWord;
-        let rest = parts.slice(1).join(" ");
-        // D-Train and abbrev styles: strip dog word from surname for cleaner result
-        // "Super B-Hype Galumph-Harris" -> "Super B-Hype Harris"
-        if (isDTrain || isAbbrevOnly) {
-          const lastPart = parts[parts.length - 1];
-          if (lastPart && lastPart.includes("-")) {
-            const cleanSurname = lastPart.split("-").slice(1).join("-");
-            const middleParts = parts.slice(1, -1);
-            rest = [...middleParts, cleanSurname].filter(Boolean).join(" ");
-          }
-        }
-        // Cap prefix bonus if base result already scores well
-        const effectiveBonus = r.score >= 14 ? 1 : pe.bonusContrast;
-        return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + effectiveBonus };
-      }).filter(Boolean) as Result[];
-      finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
-    }
-    setResults(dedupeResults(finalCandidates2.filter(Boolean) as Result[]));
+
+    // Question bonus pools (empty if no QUESTION_BANK yet)
+    const bonus1: string[] = [];
+    const bonus2: string[] = [];
+
+    // Three independent passes with offset seeds for maximum variety
+    const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
+    const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
+    const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
+
+    // Take top scorer from each pass, then merge all three full lists
+    // This guarantees the cream from each independent roll is represented
+    const topFromEach = [pass1[0], pass2[0], pass3[0]].filter(Boolean) as Result[];
+    const allCandidates = [...pass1, ...pass2, ...pass3];
+    allCandidates.sort((a,b) => b.score - a.score);
+
+    // Ensure top picks from each pass appear in results
+    const merged = [...topFromEach, ...allCandidates];
+    setResults(dedupeResults(merged.filter(Boolean) as Result[]));
     setStage("reveal");
   }
 
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    const qi2 = pickTwoQuestions(s);
-    setQIndices(qi2);
-    setQ1Answer("");
-    setActiveQ(1);
-    setResults([]);
+    setQuestion(pickQuestion(s));
     setStage("question");
   }
 
@@ -873,31 +777,27 @@ export default function NameGeneratorPage() {
             </div>
           )}
 
-          {/* ── STAGE 2: QUESTIONS ── */}
-          {stage === "question" && (() => {
-            const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
-            const qItem = QUESTION_BANK[qi];
-            return (
-              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)" }}>
-                <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
-                  Question {activeQ} of 2
-                </p>
-                <p className="display" style={{ fontSize:"clamp(1.2rem,3.5vw,1.8rem)", color:"#fff", marginBottom:32, lineHeight:1.3, textAlign:"center" }}>
-                  {qItem.text}
-                </p>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
-                  {qItem.options.map(opt => (
-                    <button key={opt.label} onClick={() => handleAnswer(opt.label)}
-                      style={{ padding:"12px 22px", borderRadius:12, border:"2px solid rgba(255,255,255,0.25)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
+          {/* ── STAGE 2: RANDOM QUESTION ── */}
+          {stage === "question" && (
+            <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", textAlign:"center" }}>
+              <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24 }}>One quick question</p>
+              <p className="display" style={{ fontSize:"clamp(1.4rem,4vw,2rem)", color:"#fff", marginBottom:40, lineHeight:1.3 }}>
+                {question}
+              </p>
+              <div style={{ display:"flex", gap:12 }}>
+                <button onClick={handleAnswer}
+                  style={{ flex:1, padding:"16px", borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"1.1rem", fontWeight:700, cursor:"pointer" }}>
+                  Yes
+                </button>
+                <button onClick={handleAnswer}
+                  style={{ flex:1, padding:"16px", borderRadius:14, border:"2px solid rgba(255,255,255,0.3)", background:"transparent", color:"#fff", fontFamily:"var(--font-body)", fontSize:"1.1rem", fontWeight:700, cursor:"pointer" }}>
+                  No
+                </button>
               </div>
-            );
-          })()}
+            </div>
+          )}
 
-                    {/* ── STAGE 3: REVEAL ── */}
+          {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
               {cardImg && (
@@ -929,7 +829,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQ1Answer(""); setActiveQ(1); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
