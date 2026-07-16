@@ -515,6 +515,14 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     if (dogContrast >= 3) score -= 2;
   }
 
+
+    // Cartoon-character names -- only work with Dawg as dog word, or chaos/baby title
+    const cartoonOnlyWithDawg = new Set(["Tubby","Pudgy","Porky","Wimpy","Doofus","Nincompoop","Scraggy"]);
+    if (cartoonOnlyWithDawg.has(first.name)) {
+      if (dogWord.word === "Dawg") score += 5;  // perfect match -- Porky Dawg-Jones
+      else if (["chaos","baby"].includes(title.reg)) score += 1;  // tolerable with silly title
+      else score -= 4;  // penalise -- Baron Tubby Wobble-Harris is wrong register
+    }
   return score;
 }
 
@@ -755,7 +763,7 @@ const DOG_WORDS: Record<string, WordEntry[]> = {
   boston:     [{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Hustle",reg:"chaos",firstLetter:"h"},{word:"Brawl",reg:"chaos",firstLetter:"b"},{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Dodge",reg:"chaos",firstLetter:"d"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Jabber",reg:"chaos",firstLetter:"j"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"March",reg:"grand",firstLetter:"m"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
   welsh:      [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Round",reg:"grand",firstLetter:"r"},{word:"Trot",reg:"mundane",firstLetter:"t"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Gather",reg:"grand",firstLetter:"g"}],
   asian:      [{word:"Strike",reg:"grand",firstLetter:"s"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Dodge",reg:"chaos",firstLetter:"d"},{word:"Prowl",reg:"grand",firstLetter:"p"},{word:"Stalk",reg:"grand",firstLetter:"s"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Shuffle",reg:"chaos",firstLetter:"s"}],
-  character:  [{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Totter",reg:"chaos",firstLetter:"t"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Wheeze",reg:"chaos",firstLetter:"w"},{word:"Puff",reg:"chaos",firstLetter:"p"}],
+  character:  [{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Totter",reg:"chaos",firstLetter:"t"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Wheeze",reg:"chaos",firstLetter:"w"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Dawg",reg:"chaos",firstLetter:"d"}],
   terrier:    [{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Dig",reg:"chaos",firstLetter:"d"},{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Rumpus",reg:"chaos",firstLetter:"r"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Snap",reg:"chaos",firstLetter:"s"},{word:"Yap",reg:"chaos",firstLetter:"y"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Burrow",reg:"chaos",firstLetter:"b"}],
   german:     [{word:"March",reg:"grand",firstLetter:"m"},{word:"Drill",reg:"grand",firstLetter:"d"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Flank",reg:"grand",firstLetter:"f"},{word:"Advance",reg:"grand",firstLetter:"a"},{word:"Intercept",reg:"grand",firstLetter:"i"},{word:"Secure",reg:"grand",firstLetter:"s"},{word:"Enforce",reg:"grand",firstLetter:"e"},{word:"Breach",reg:"grand",firstLetter:"b"}],
   dachshund:  [{word:"Scuttle",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Burrow",reg:"chaos",firstLetter:"b"},{word:"Squeeze",reg:"chaos",firstLetter:"s"},{word:"Tunnel",reg:"chaos",firstLetter:"t"},{word:"Wriggle",reg:"chaos",firstLetter:"w"},{word:"Slither",reg:"chaos",firstLetter:"s"},{word:"Stretch",reg:"absurd",firstLetter:"s"},{word:"Extend",reg:"absurd",firstLetter:"e"},{word:"Elongate",reg:"absurd",firstLetter:"e"}],
