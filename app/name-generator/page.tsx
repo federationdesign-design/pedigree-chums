@@ -296,6 +296,12 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   if (tf === fl) score += 2;
   if (fl === wl && tf === fl) score += 2;
   score += colourScore(first.name, colour as DogColour);
+  // Penalise grand title on baby/food name when dog word already provides contrast
+  // e.g. "Doctor Gigi Glide-Harris" -- the title adds nothing, Gigi does the work
+  if (title.reg === "grand" && (first.reg === "baby" || first.reg === "food") && first.syllables <= 2) {
+    const dogContrast = contrastScore(first.reg, dogWord.reg);
+    if (dogContrast >= 3) score -= 2; // name+dogword already funny, title is redundant
+  }
   return score;
 }
 
@@ -631,7 +637,7 @@ function runPass(
       }
       const parts    = r.full.split(" ");
       const firstWord = parts[0];
-      const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable"];
+      const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Professor","Doctor","Chief Analyst"];
       const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
       if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
       const isDTrain    = /^[A-Z]-/.test(firstWord);
