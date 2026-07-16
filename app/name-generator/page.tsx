@@ -530,6 +530,34 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   return { full, nickname, reasoning, score };
 }
 
+
+// ── DEDUPLICATION ─────────────────────────────────────────────────────────────
+// Pick top results ensuring no repeated first names, titles, or dog words
+function dedupeResults(candidates: Result[], limit = 10): Result[] {
+  const usedFirstNames  = new Set<string>();
+  const usedTitles      = new Set<string>();
+  const usedDogWords    = new Set<string>();
+  const out: Result[] = [];
+  for (const r of candidates) {
+    if (!r) continue;
+    const parts   = r.full.split(" ");
+    const title   = parts[0];
+    const firstName = parts[1] ?? "";
+    // Extract dog word from hyphenated surname (e.g. "Sniff-Taylor" -> "Sniff")
+    const surnamepart = parts[parts.length - 1] ?? "";
+    const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
+    if (usedFirstNames.has(firstName)) continue;
+    if (usedTitles.has(title)) continue;
+    if (dogWord && usedDogWords.has(dogWord)) continue;
+    usedFirstNames.add(firstName);
+    usedTitles.add(title);
+    if (dogWord) usedDogWords.add(dogWord);
+    out.push(r);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 type Stage = "inputs"|"question"|"reveal";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
@@ -600,7 +628,7 @@ export default function NameGeneratorPage() {
       }).filter(Boolean) as Result[];
       finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
     }
-    setResults(finalCandidates2.filter(Boolean).slice(0,10) as Result[]);
+    setResults(dedupeResults(finalCandidates2.filter(Boolean) as Result[]));
     setStage("reveal");
   }
 
