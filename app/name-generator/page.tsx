@@ -1561,8 +1561,8 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc19 = allD.filter(r => r.score >= 19);
-      const ranked = rankResults(sc19, breed ? getGroup(breed) : "default");
+      const sc17 = allD.filter(r => r.score >= 17);
+      const ranked = rankResults(sc17, breed ? getGroup(breed) : "default");
       setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
       setStage("reveal");
     }
@@ -1596,8 +1596,8 @@ export default function NameGeneratorPage() {
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored19 = allDeduped.filter(r => r.score >= 19);
-    const ranked2 = rankResults(scored19, breed ? getGroup(breed) : "default");
+    const scored17 = allDeduped.filter(r => r.score >= 17);
+    const ranked2 = rankResults(scored17, breed ? getGroup(breed) : "default");
     setResults(ranked2.length > 0 ? ranked2.slice(0,5) : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,5));
     setStage("reveal");
   }
@@ -1632,8 +1632,8 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc19 = allD.filter(r => r.score >= 19);
-      const ranked = rankResults(sc19, breed ? getGroup(breed) : "default");
+      const sc17 = allD.filter(r => r.score >= 17);
+      const ranked = rankResults(sc17, breed ? getGroup(breed) : "default");
       setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
       setStage("reveal");
     }
@@ -1761,7 +1761,7 @@ export default function NameGeneratorPage() {
                       <div style={{
                         position:"absolute",
                         right:-12,
-                        top:-10,
+                        top:-110,
                         zIndex:2,
                         transform:"rotate(2deg)",
                         transformOrigin:"bottom right",
