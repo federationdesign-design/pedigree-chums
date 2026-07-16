@@ -193,12 +193,42 @@ const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
 // ── RANDOM QUESTIONS ───────────────────────────────────────────────────────────
 const QUESTIONS = [
   "Do you like space?",
-  "Have you ever eaten a whole pizza alone?",
-  "Do you consider yourself a morning person?",
+  "Are you a morning person?",
   "Have you ever talked to a plant?",
-  "Do you prefer baths or showers?",
   "Have you ever worn a onesie in public?",
+  "Do you believe in ghosts?",
+  "Do you take sugar in your tea?",
+  "Do you like myths and legends?",
+  "Sugar or salt?",
+  "Autumn or summer?",
+  "How many sides does a circle have?",
+  "Tea or coffee?",
+  "Would you rather be invisible or fly?",
+  "Night owl or early bird?",
+  "Are you cool?",
+  "Are you a nerd?",
+  "Do you make your bed in the morning?",
+  "Do you read the terms and conditions?",
+  "New book -- do you break the spine?",
+  "Do you reply to texts immediately?",
+  "Do you eat the crusts?",
+  "Ketchup -- fridge or cupboard?",
+  "Escalator -- walk or stand?",
+  "At a party -- kitchen or dance floor?",
+  "Do you rehearse conversations in your head?",
+  "Do you believe in luck?",
+  "Windows or Mac?",
+  "Are you a good dancer?",
+  "When did you last call your mother?",
+  "Favourite pizza?",
+  "Do you enjoy smells?",
 ];
+
+// Pick a question using both seed and timestamp for genuine variety
+function pickQuestion(seed: number): string {
+  const idx = (seed ^ (Date.now() & 0x7fffffff)) % QUESTIONS.length;
+  return QUESTIONS[Math.abs(idx)];
+}
 
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
@@ -603,7 +633,7 @@ export default function NameGeneratorPage() {
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(QUESTIONS[s % QUESTIONS.length]);
+    setQuestion(pickQuestion(s));
     setStage("question");
   }
 
@@ -667,7 +697,7 @@ export default function NameGeneratorPage() {
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(QUESTIONS[s % QUESTIONS.length]);
+    setQuestion(pickQuestion(s));
     setStage("question");
   }
 
