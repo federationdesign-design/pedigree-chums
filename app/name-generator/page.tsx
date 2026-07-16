@@ -1766,26 +1766,43 @@ export default function NameGeneratorPage() {
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
-              {cardImg && (
-                <div style={{ display:"flex", justifyContent:"flex-start", paddingLeft:8, marginBottom:-40, position:"relative", zIndex:3 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cardImg} alt={breed} style={{ width:"clamp(100px,26vw,170px)", height:"auto", borderRadius:14, display:"block", transform:"rotate(-2deg)", transformOrigin:"bottom left", filter:"drop-shadow(0 12px 28px rgba(10,58,87,0.45))" }} />
-                </div>
-              )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
                 {results.map((r: Result, i: number) => (
-                  <div key={i} style={{ position:"relative", background:"linear-gradient(135deg, #7dd8f8 0%, #3ab5f0 50%, #1a8fd1 100%)", borderRadius:28, padding:"clamp(20px,3.5vw,32px)", paddingTop: cardImg && i===0 ? "clamp(40px,6vw,56px)" : "clamp(20px,3.5vw,32px)", boxShadow:"0 18px 40px rgba(10,58,87,0.28)", overflow:"visible" }}>
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:10 }}>
+                  <div key={i} style={{
+                    position:"relative",
+                    background:"linear-gradient(to top right, #00e2ff, #008eff)",
+                    borderRadius:40,
+                    padding:"clamp(20px,3.5vw,32px)",
+                    paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(20px,3.5vw,32px)",
+                    boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
+                    overflow:"visible"
+                  }}>
+                    {/* Breed card -- rotated 2deg, anchored to top-right corner of box */}
+                    {cardImg && (
+                      <div style={{
+                        position:"absolute",
+                        right:-12,
+                        top:-110,
+                        zIndex:2,
+                        transform:"rotate(2deg)",
+                        transformOrigin:"bottom right",
+                        filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))"
+                      }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
+                      </div>
+                    )}
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
                       {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.8)" : "rgba(10,58,87,0.35)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
                     </div>
-                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5.5vw,2.2rem)", color:"#fff", marginBottom:8, lineHeight:1.05, letterSpacing:"0.02em", textAlign:"center", textShadow:"0 2px 10px rgba(10,58,87,0.35)" }}>{r.full}</div>
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.3rem,5vw,1.9rem)", color:"#fff", marginBottom:8, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
                     {r.nickname && (
-                      <div style={{ fontSize:"clamp(1rem,3vw,1.2rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
+                      <div style={{ fontSize:"clamp(1rem,3vw,1.1rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
-                    <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.65, borderTop:"1px solid rgba(10,58,87,0.18)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                    <div style={{ fontSize:"clamp(1rem,3vw,1.15rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
