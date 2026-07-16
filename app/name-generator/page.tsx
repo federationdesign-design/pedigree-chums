@@ -1713,12 +1713,11 @@ export default function NameGeneratorPage() {
                 {results.map((r: Result, i: number) => (
                   <div key={i} style={{
                     position:"relative",
-                    background:"#fff",
-                    borderRadius:18,
-                    padding:"clamp(16px,2.5vw,24px)",
-                    paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(16px,2.5vw,24px)",
-                    borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`,
-                    boxShadow:"0 2px 16px rgba(10,58,87,0.08)",
+                    background:"linear-gradient(to top right, #00e2ff, #008eff)",
+                    borderRadius:40,
+                    padding:"clamp(20px,3.5vw,32px)",
+                    paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(20px,3.5vw,32px)",
+                    boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
                     overflow:"visible"
                   }}>
                     {/* Breed card -- rotated 2deg, anchored to top-right corner of box */}
@@ -1739,15 +1738,15 @@ export default function NameGeneratorPage() {
                     {/* Top pick pill -- navy text on yellow, full pill radius */}
                     {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
                     {/* Name -- 2pt bigger, left aligned */}
-                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.15rem,4.5vw,1.6rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"left" }}>{r.full}</div>
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.15rem,4.5vw,1.6rem)", color:"#fff", marginBottom:6, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"left", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
                     {/* Nickname -- 2pt bigger, left aligned */}
                     {r.nickname && (
-                      <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
+                      <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"rgba(255,255,255,0.9)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
                     {/* Reasoning -- 2pt bigger, left aligned */}
-                    <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
+                    <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"rgba(255,255,255,0.85)", lineHeight:1.6, borderTop:"1px solid rgba(255,255,255,0.25)", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
