@@ -198,19 +198,6 @@ const QUESTIONS = [
   "Have you ever talked to a plant?",
   "Do you prefer baths or showers?",
   "Have you ever worn a onesie in public?",
-  "Do you think dogs can tell the time?",
-  "Have you ever waved back at someone who wasn't waving at you?",
-  "Do you ever sing to your dog?",
-  "Have you ever let a dog lick your face?",
-  "Do you talk about your dog like they're a person?",
-  "Have you ever bought your dog a birthday cake?",
-  "Do you let the dog sleep on the bed?",
-  "Have you ever cancelled plans because of your dog?",
-  "Have you ever dressed your dog up?",
-  "Do you think your dog understands everything you say?",
-  "Have you ever apologised to your dog?",
-  "Do you follow more dog accounts than human ones?",
-  "Have you ever taken your dog's side in an argument?",
 ];
 
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
@@ -685,7 +672,7 @@ export default function NameGeneratorPage() {
                   <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
                 </div>
               )}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16, marginBottom:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
                 {results.map((r, i) => (
                   <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
                     {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
