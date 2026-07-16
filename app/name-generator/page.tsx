@@ -1205,8 +1205,25 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     }
   }
   const reasoning = pick(reasoningBank, seed + 11);
-  const baseScore = scoreName(title, firstName, dogWordEntry, surname, colour);
-  const score = styleRoll === 0 ? baseScore + 4 : baseScore;
+  // styleRoll 4 = no title -- score WITHOUT title so it competes fairly
+  // and add bonus when the name itself carries triple alliteration
+  const noTitleEntry: TitleEntry = { title: "", reg: "mundane" as Register, syllables: 0 };
+  const scoringTitle = styleRoll === 4 ? noTitleEntry : title;
+  const baseScore = scoreName(scoringTitle, firstName, dogWordEntry, surname, colour);
+
+  // Bare name triple-alliteration bonus -- Prudence Prowl-Phillips doesn't need a title
+  let bareBonus = 0;
+  if (styleRoll === 4) {
+    const fl = firstName.name[0].toLowerCase();
+    const wl = dogWordEntry.word[0].toLowerCase();
+    const sl = surname[0].toLowerCase();
+    if (fl === wl && wl === sl) bareBonus = 8;       // triple P/W/S alliteration
+    else if (fl === wl && fl === sl) bareBonus = 8;
+    else if (fl === wl || (fl === sl && fl === wl)) bareBonus = 5;
+    else if (fl === sl || wl === sl) bareBonus = 3;  // two-way with surname
+  }
+
+  const score = styleRoll === 0 ? baseScore + 4 : styleRoll === 4 ? baseScore + bareBonus : baseScore;
 
   // ── RESCUE PASS: if score < 15 and name has a title, try bare name ─────────
   // Strip the title and rescore -- sometimes the name is funnier without it
