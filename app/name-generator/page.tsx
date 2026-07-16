@@ -266,7 +266,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"Spr",meaning:"Sapper",gender:"boy",breeds:["terrier"]},
   {code:"Gnr",meaning:"Gunner",gender:"boy",breeds:["terrier","character","sniffer"]},
   {code:"Rfn",meaning:"Rifleman",gender:"boy",breeds:["sighthound","terrier"]},
-  {code:"Gdsm",meaning:"Guardsman",gender:"boy",breeds:["gentry","spaniel","german"]},
+  {code:"Gdsm",meaning:"Guardsman",gender:"boy",breeds:["spaniel","german"]},
   {code:"Tpr",meaning:"Trooper",gender:"boy",breeds:["sighthound","retriever"]},
   {code:"Brig",meaning:"Brigadier",gender:"boy",breeds:["spaniel","german","giant"]},
   // ── NAVY RANKS ───────────────────────────────────────────────────────────
@@ -928,7 +928,7 @@ function getGroup(breed: string): string {
   if (b === "cavalier king charles spaniel") return "lapdog";
   if (b === "welsh springer spaniel") return "welsh";
   if (b.includes("spaniel")) return "spaniel";
-  if (b.includes("retriever") || b === "labrador" || b === "labradoodle" || b === "goldendoodle") return "retriever";
+  if (b.includes("retriever") || b === "labrador") return "retriever";
   if (b === "border collie" || b === "rough collie") return "collie";
   if (b === "bulldog") return "bulldog";
   if (b === "dalmatian") return "dalmatian";
@@ -944,6 +944,9 @@ function getGroup(breed: string): string {
   if (b === "dachshund") return "dachshund";
   if (["german shepherd","doberman pinscher","rottweiler","weimaraner"].includes(b)) return "german";
   if (b === "boston terrier") return "boston";
+  if (["irish setter","gordon setter","english setter"].includes(b)) return "retriever";
+  if (["cockapoo","jackapoo","labradoodle","goldendoodle"].includes(b)) return "retriever";
+  if (b.includes("terrier") || ["miniature schnauzer","west highland terrier"].includes(b)) return "terrier";
   if (["pug","chow chow","shar pei","shiba inu","akita","lhasa apso","tibetan mastiff","pekingese","japanese chin"].includes(b)) return "asian";
   if (b === "corgi") return "welsh";
   if (["siberian husky","chihuahua"].includes(b)) return "character";
@@ -1004,7 +1007,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   );
 
   const noTitleBreeds = ["labrador","labradoodle","goldendoodle"];
-  const noAbbrevBreeds = ["collie","retriever","sighthound","german","spaniel","giant","afghan","poodle","sniffer","greatdane","welsh","dalmatian","sheepdog"];
+  const noAbbrevBreeds = ["collie","retriever","sighthound","german","spaniel","giant","afghan","poodle","sniffer","greatdane","welsh","dalmatian","sheepdog","default"];
   const rawStyleRoll = seed % 13;
   const styleRoll = noTitleBreeds.includes(breed.toLowerCase()) ? 4 : (noAbbrevBreeds.includes(group2) && rawStyleRoll === 0) ? 4 : rawStyleRoll;
   let full = "";
@@ -1563,7 +1566,7 @@ function runPass(
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
-    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry","collie","retriever","spaniel","welsh"];
+    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","collie","retriever","spaniel","welsh"];
     if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
@@ -1622,7 +1625,7 @@ const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   ];
 
 const TITLE_PREFIXES: PrefixEntry[] = [
-  { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
+  { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","bulldog"], bonusContrast: 2 },
   { prefix: "Uber",   breeds: ["german","boxer","giant"], bonusContrast: 2 },
   { prefix: "Hyper",  breeds: ["collie","terrier","highenergy"], bonusContrast: 3 },
   { prefix: "Mega",   breeds: ["giant","character","dachshund"], bonusContrast: 2 },
