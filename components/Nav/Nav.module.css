@@ -101,23 +101,48 @@
 }
 .menu {
   pointer-events: auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   text-align: center;
+  gap: 0;
+  width: 100%;
+  max-width: 900px;
+  padding: 0 clamp(16px, 5vw, 48px);
 }
 .menuLink {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 8vw, 3.4rem);
+  font-size: clamp(1.5rem, 5.5vw, 2.6rem);
+  line-height: 1.15;
   color: var(--white);
   background: none;
   border: 0;
-  padding: 0;
+  padding: 0.1em 0.5em;
   cursor: pointer;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 .menuLink:hover {
   color: var(--yellow);
   transform: scale(1.04);
+}
+/* 2-column layout on wider screens where height is the constraint */
+@media (min-width: 640px) and (min-height: 500px) {
+  .menu {
+    grid-template-columns: 1fr 1fr;
+    text-align: left;
+    column-gap: clamp(24px, 5vw, 64px);
+  }
+}
+/* Tall enough screens -- go back to single column, larger text */
+@media (min-height: 800px) {
+  .menu {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .menuLink {
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    line-height: 1.2;
+    padding: 0.05em 0;
+  }
 }
 
 .logoVisible {

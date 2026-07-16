@@ -14,6 +14,7 @@ const customerLinks = [
   { label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog" },
   { label: "Chum Drop", href: "/" },
   { label: "Chum Calculator", href: "/chum-calculator" },
+  { label: "Name Generator", href: "/name-generator" },
 ];
 
 const tradeNavLinks = [
