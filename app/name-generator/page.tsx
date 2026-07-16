@@ -951,7 +951,10 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
       full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
     }
-    nickname = mc1[0];
+    // McFace nickname: first 3-4 chars of stem + za/zy
+    const mcStemRaw = mc1[0].toLowerCase(); // e.g. "lollopy"
+    const mcNickStem = mcStemRaw.length > 5 ? mcStemRaw.slice(0,4) : mcStemRaw.slice(0,3);
+    nickname = mcNickStem.charAt(0).toUpperCase() + mcNickStem.slice(1) + "za";
   } else if (styleRoll === 7) {
     // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
     const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
@@ -962,7 +965,17 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       : SPONGEBOB_MID_BOY[(seed + 53) % SPONGEBOB_MID_BOY.length];
     const sbBody = SPONGEBOB_BODY[(seed + 59) % SPONGEBOB_BODY.length];
     full = `${sbAdj1}${sbMid} ${sbAdj2}${sbBody} ${effectiveSurname}`;
-    nickname = sbMid;
+    // Bob → Bobby, classic British nickname doubling
+    const sbNickMap: Record<string,string> = {
+      Bob:"Bobby",Tom:"Tommy",Tim:"Timmy",Sam:"Sammy",Jim:"Jimmy",
+      Ned:"Neddy",Ted:"Teddy",Sid:"Sidney",Baz:"Bazza",Reg:"Reggie",
+      Len:"Lenny",Ken:"Kenny",Mick:"Micky",Nick:"Nicky",Pip:"Pippa",
+      Alf:"Alfie",Ron:"Ronnie",Don:"Donnie",Gav:"Gavvy",Dez:"Dezzy",
+    };
+    // Fuse shortname + first 4 chars of body part adjective for more fun
+    const sbBodyStem = sbAdj2.slice(0, 4);
+    const sbBasicNick = sbNickMap[sbMid] || sbMid;
+    nickname = sbMid.length <= 3 ? sbBasicNick + sbBodyStem : sbBasicNick;
   } else {
     // Regional term override -- if town matches a region, use local endearment as first name
     const regionalTerm = getRegionalTerm(town, seed, gender);
@@ -973,6 +986,11 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     if (regionalTerm && seed % 4 === 0) nickname = displayFirst;
     if (title.title === "Itsy") nickname = "Bitsy";
     if (title.title === "Hong Kong") nickname = "HK";
+    // Multi-word title → abbreviate title to initials, keep first name
+    if (title.title.includes(" ") && !nickname) {
+      const titleInitials = title.title.split(" ").map((w: string) => w[0]).join("");
+      nickname = `${titleInitials} ${firstName.name}`;
+    }
     const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
     const nInit = firstName.name[0]?.toUpperCase() || "";
     const initials2 = tInit + nInit;
@@ -993,11 +1011,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
         if (fn.length <= 4) {
           nickname = fn;
         } else {
-          // Try acronym -- only use if pronounceable AND different from the name
+          // Try acronym -- only if pronounceable, different from name, not a known abbreviation
           const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
           const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
           const acronymIsName = fn.toUpperCase().startsWith(acronym);
-          if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25 && !acronymIsName) {
+          // Block acronyms that match well-known UK/common abbreviations
+          const blockedAcronyms = new Set(["JSA","ESA","PIP","DLA","NHS","BBC","ITV","VAT","DWP","MOT","MP","PM","GP","PC","DC","FC","AFC","CID","RAC","AA","RAC","HMRC","DVLA","DSS","CSA","ASBO","GCSE","BTEC"]);
+          if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25 && !acronymIsName && !blockedAcronyms.has(acronym)) {
             nickname = acronym;
           } else {
             // Shorten first name -- first 3-4 chars + s
