@@ -693,12 +693,17 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     nickname = getNickname(firstName.name);
   } else {
     full = `${title.title} ${firstName.name} ${effectiveSurname}`;
+    if (title.title === "Itsy") nickname = "Bitsy";
     const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
     const nInit = firstName.name[0]?.toUpperCase() || "";
     const initials2 = tInit + nInit;
     const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
     if (matched) {
-      nickname = matched.code;
+      // Some abbreviations have gender-specific nicknames
+      // Itsy title gets Bitsy as nickname
+      if (matched.code === "DC" && gender === "girl") nickname = "Dixy";
+      else if (matched.code === "DC" && gender === "boy") nickname = "Dicky";
+      else nickname = matched.code;
     } else {
       const naturalNick = getNickname(firstName.name);
       if (naturalNick) {
