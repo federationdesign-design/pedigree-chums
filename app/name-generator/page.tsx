@@ -977,30 +977,34 @@ export default function NameGeneratorPage() {
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
+              {/* Card floats left, rotated 2deg, drop shadow, sits beside text */}
               {cardImg && (
-                <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
+                <div style={{ display:"flex", justifyContent:"flex-start", paddingLeft:8, marginBottom:-40, position:"relative", zIndex:3 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
+                  <img src={cardImg} alt={breed} style={{ width:"clamp(100px,26vw,170px)", height:"auto", borderRadius:14, display:"block", transform:"rotate(-2deg)", transformOrigin:"bottom left", filter:"drop-shadow(0 12px 28px rgba(10,58,87,0.45))" }} />
                 </div>
               )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
-                {results.map((r: {full:string;nickname:string;reasoning:string;score:number}, i: number) => (
-                  <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
-                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                    <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
+                {results.map((r: Result, i: number) => (
+                  <div key={i} style={{ position:"relative", background:"linear-gradient(135deg, #7dd8f8 0%, #3ab5f0 50%, #1a8fd1 100%)", borderRadius:28, padding:"clamp(20px,3.5vw,32px)", paddingTop: cardImg && i===0 ? "clamp(40px,6vw,56px)" : "clamp(20px,3.5vw,32px)", boxShadow:"0 18px 40px rgba(10,58,87,0.28)", overflow:"visible" }}>
+                    {/* Top pick pill + score badge */}
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:10 }}>
+                      {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.8)" : "rgba(10,58,87,0.35)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+                    </div>
+                    {/* Name */}
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5.5vw,2.2rem)", color:"#fff", marginBottom:8, lineHeight:1.05, letterSpacing:"0.02em", textAlign:"center", textShadow:"0 2px 10px rgba(10,58,87,0.35)" }}>{r.full}</div>
+                    {/* Nickname */}
                     {r.nickname && (
-                      <div style={{ fontSize:"0.8rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:10, fontFamily:"var(--font-body)", fontWeight:600 }}>
+                      <div style={{ fontSize:"clamp(1rem,3vw,1.2rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
-                    <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : r.score >= 14 ? "#f59e0b" : r.score >= 8 ? "#ef4444" : "#111111" }}>
-                      score: {r.score}
-                    </div>
+                    {/* Reasoning */}
+                    <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.65, borderTop:"1px solid rgba(10,58,87,0.18)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
-
               <div style={{ display:"flex", gap:12 }}>
                 <button onClick={handleRollAgain} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
