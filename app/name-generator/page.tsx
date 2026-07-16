@@ -1404,7 +1404,10 @@ function runPass(
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
     const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry"];
-    if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
+    // Detect McFace (e.g. "Lollopy O'Droppnose") or SpongeBob (e.g. "LollopyBob") by pattern
+    const isMcFaceStyle = /^[A-Z][a-z]+\s[A-Z][a-z]+(face|snout|butt|bum|ears|nose|tail|chops|bonce|jowls|paws|tum|flaps)/.test(r.full);
+    const isSpongeBobStyle = /^[A-Z][a-z]+[A-Z][a-z]+\s[A-Z][a-z]+[A-Z][a-z]+/.test(r.full);
+    if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "") && !isMcFaceStyle && !isSpongeBobStyle) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
       if (pool && pool.length > 0) {
@@ -1546,9 +1549,9 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 21);
-      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? [ranked[0]] : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,1));
+      const sc19 = allD.filter(r => r.score >= 19);
+      const ranked = rankResults(sc19, breed ? getGroup(breed) : "default");
+      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
       setStage("reveal");
     }
   }
@@ -1581,9 +1584,9 @@ export default function NameGeneratorPage() {
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored21 = allDeduped.filter(r => r.score >= 21);
-    const ranked2 = rankResults(scored21, breed ? getGroup(breed) : "default");
-    setResults(ranked2.length > 0 ? [ranked2[0]] : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,1));
+    const scored19 = allDeduped.filter(r => r.score >= 19);
+    const ranked2 = rankResults(scored19, breed ? getGroup(breed) : "default");
+    setResults(ranked2.length > 0 ? ranked2.slice(0,5) : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,5));
     setStage("reveal");
   }
 
@@ -1617,9 +1620,9 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 21);
-      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? [ranked[0]] : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,1));
+      const sc19 = allD.filter(r => r.score >= 19);
+      const ranked = rankResults(sc19, breed ? getGroup(breed) : "default");
+      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
       setStage("reveal");
     }
   }
@@ -1756,11 +1759,8 @@ export default function NameGeneratorPage() {
                         <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                       </div>
                     )}
-                    {/* Top pick pill + score badge */}
-                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-                      {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.25)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
-                    </div>
+                    {/* Top pick pill -- navy text on yellow, full pill radius */}
+                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
                     {/* Name -- 2pt bigger, left aligned */}
                     <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.3rem,5vw,1.9rem)", color:"#fff", marginBottom:8, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
                     {/* Nickname -- 2pt bigger, left aligned */}
