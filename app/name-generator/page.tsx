@@ -512,6 +512,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const fName = pick(MARIEJ_FIRSTS, seed + 7);
     const mInit = pick(MARIEJ_INITIALS, seed + 23);
     full = `${fName} ${mInit} ${effectiveSurname}`;
+  } else if (styleRoll === 3 && gender === "boy" && ["dachshund","character","terrier","collie"].includes(group2)) {
+    // Reversed descriptor: "Extended General Burrow-Patterson" -- adjective before title
+    const descriptors = ["Extended","Horizontal","Stretched","Relentless","Obsessive","Notorious","Incomparable","Frenetic","Unstoppable","Legendary","Indefatigable","Tenacious"];
+    const descriptor = pick(descriptors, seed + 29);
+    const baseTitle = pick(titleBank, seed).title;
+    full = `${descriptor} ${baseTitle} ${firstName.name} ${effectiveSurname}`;
+    nickname = getNickname(firstName.name);
   } else {
     full = `${title.title} ${firstName.name} ${effectiveSurname}`;
     const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
@@ -569,7 +576,6 @@ const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   { prefix: "Imperial", bonusContrast: 2 },
   { prefix: "Arch",     bonusContrast: 2 },
   { prefix: "High",     bonusContrast: 2 },
-  { prefix: "Ultra",    bonusContrast: 2 },
   { prefix: "Très",     bonusContrast: 3 },
 ];
 
@@ -626,6 +632,14 @@ export default function NameGeneratorPage() {
         const firstWord = parts[0];
         const isDTrain = /^[A-Z]-/.test(firstWord);
         const isAbbrevOnly = /^[A-Z]{1,4}$/.test(firstWord);
+        // Don't prefix already-grand titles -- stacking two grand things kills the comedy
+        const alreadyGrand = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Inimitable","Illustrious"];
+        if (alreadyGrand.includes(firstWord)) return null;
+        // Don't prefix if the second word looks like a name not a title (Myra, Imperial Myra L)
+        // i.e. the existing title is already a prefix+title combo
+        const secondWord = parts[1] ?? "";
+        const looksLikeName = /^[A-Z][a-z]/.test(secondWord) && !["Sir","Lord","Lady","Dame","Duke","Earl","Baron","Count"].includes(secondWord);
+        if (looksLikeName && (isDTrain || isAbbrevOnly)) return null;
         const prefixedTitle = pe.prefix + " " + firstWord;
         let rest = parts.slice(1).join(" ");
         // D-Train and abbrev styles: strip dog word from surname for cleaner result
@@ -638,7 +652,9 @@ export default function NameGeneratorPage() {
             rest = [...middleParts, cleanSurname].filter(Boolean).join(" ");
           }
         }
-        return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + pe.bonusContrast };
+        // Cap prefix bonus if base result already scores well
+        const effectiveBonus = r.score >= 14 ? 1 : pe.bonusContrast;
+        return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + effectiveBonus };
       }).filter(Boolean) as Result[];
       finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
     }
