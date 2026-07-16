@@ -979,7 +979,9 @@ export default function NameGeneratorPage() {
 
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
-    setResults(dedupeResults(merged.filter(Boolean) as Result[]));
+    const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]);
+    const scored17 = allDeduped.filter(r => r.score >= 17);
+    setResults(scored17.length > 0 ? scored17 : allDeduped.slice(0, 3));
     setStage("reveal");
   }
 
@@ -1090,9 +1092,11 @@ export default function NameGeneratorPage() {
                       </div>
                     )}
                     <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : r.score >= 14 ? "#f59e0b" : r.score >= 8 ? "#ef4444" : "#111111" }}>
-                      score: {r.score}
-                    </div>
+                    {r.score >= 17 && (
+                      <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : "#f59e0b" }}>
+                        score: {r.score}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
