@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px clamp(18px, 4vw, 48px);
+  pointer-events: none;  /* let clicks pass through the empty bar centre */
 }
 /* Home page: drop the menu out of the top header strip (which can sit under the
    browser chrome) down to the bottom-left, above the chums tally, where it is
@@ -43,6 +44,7 @@
 /* Hamburger, always visible, on both mobile and desktop. The yellow pill is
    legible over the hero and over the page content, so no header fill is needed. */
 .burger {
+  pointer-events: auto;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -98,6 +100,7 @@
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
 }
 .menu {
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
   text-align: center;

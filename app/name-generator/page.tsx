@@ -737,6 +737,19 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     }
   }
 
+  // Fallback nickname -- always have one
+  if (!nickname) {
+    const firstNameStr = firstName.name;
+    // Try contracting to first syllable + y/ie
+    const vowelMatch = firstNameStr.match(/^([^aeiou]*[aeiou]+[^aeiou]*)/i);
+    if (vowelMatch && vowelMatch[1].length < firstNameStr.length) {
+      const stem = vowelMatch[1];
+      nickname = stem.length <= 3 ? stem + "y" : stem.slice(0, 4);
+      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+    } else {
+      nickname = firstNameStr.slice(0, 3);
+    }
+  }
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname, colour);
   return { full, nickname, reasoning, score };
@@ -950,12 +963,28 @@ export default function NameGeneratorPage() {
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
+    // Questions only appear occasionally -- 1 in 3 rolls
     const qi = pickTwoQuestions(s);
     setQIndices(qi);
     setQ1Answer("");
     setActiveQ(1);
     setResults([]);
-    setStage("question");
+    if (Math.random() < 0.33) {
+      setStage("question");
+    } else {
+      // Skip questions, generate directly with empty bonus pools
+      const townMatch2 = FUNNY_PLACES.has(town.trim());
+      const et = townMatch2 ? town.trim() : "";
+      const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
+      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
+      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
+      const top3 = [p1[0], p2[0], p3[0]].filter(Boolean) as Result[];
+      const all3 = [...p1, ...p2, ...p3].sort((a,b) => b.score - a.score);
+      const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
+      const sc17 = allD.filter(r => r.score >= 17);
+      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
+      setStage("reveal");
+    }
   }
 
   function handleAnswer(answer: string) {
@@ -970,16 +999,18 @@ export default function NameGeneratorPage() {
     const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
     const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
     const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
+    const pass4 = runPass(breed, surname.trim(), gender, seed + 3000,    effectiveTown, colour, bonus1, bonus2);
+    const pass5 = runPass(breed, surname.trim(), gender, seed + 4000,    effectiveTown, colour, bonus1, bonus2);
 
     // Take top scorer from each pass, then merge all three full lists
     // This guarantees the cream from each independent roll is represented
-    const topFromEach = [pass1[0], pass2[0], pass3[0]].filter(Boolean) as Result[];
-    const allCandidates = [...pass1, ...pass2, ...pass3];
+    const topFromEach = [pass1[0], pass2[0], pass3[0], pass4[0], pass5[0]].filter(Boolean) as Result[];
+    const allCandidates = [...pass1, ...pass2, ...pass3, ...pass4, ...pass5];
     allCandidates.sort((a,b) => b.score - a.score);
 
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
-    const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]);
+    const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
     const scored17 = allDeduped.filter(r => r.score >= 17);
     setResults(scored17.length > 0 ? scored17 : allDeduped.slice(0, 3));
     setStage("reveal");
@@ -988,12 +1019,28 @@ export default function NameGeneratorPage() {
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
+    // Questions only appear occasionally -- 1 in 3 rolls
     const qi = pickTwoQuestions(s);
     setQIndices(qi);
     setQ1Answer("");
     setActiveQ(1);
     setResults([]);
-    setStage("question");
+    if (Math.random() < 0.33) {
+      setStage("question");
+    } else {
+      // Skip questions, generate directly with empty bonus pools
+      const townMatch2 = FUNNY_PLACES.has(town.trim());
+      const et = townMatch2 ? town.trim() : "";
+      const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
+      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
+      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
+      const top3 = [p1[0], p2[0], p3[0]].filter(Boolean) as Result[];
+      const all3 = [...p1, ...p2, ...p3].sort((a,b) => b.score - a.score);
+      const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
+      const sc17 = allD.filter(r => r.score >= 17);
+      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
+      setStage("reveal");
+    }
   }
 
   const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
