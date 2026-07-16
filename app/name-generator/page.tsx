@@ -530,6 +530,18 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 type Stage = "inputs"|"question"|"reveal";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
+
+const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
+  { prefix: "Grand",    bonusContrast: 2 },
+  { prefix: "Supreme",  bonusContrast: 2 },
+  { prefix: "Divine",   bonusContrast: 3 },
+  { prefix: "Imperial", bonusContrast: 2 },
+  { prefix: "Arch",     bonusContrast: 2 },
+  { prefix: "High",     bonusContrast: 2 },
+  { prefix: "Ultra",    bonusContrast: 2 },
+  { prefix: "Très",     bonusContrast: 3 },
+];
+
 const TITLE_PREFIXES: PrefixEntry[] = [
   { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
   { prefix: "Uber",   breeds: ["german","boxer","giant"], bonusContrast: 2 },
@@ -566,14 +578,19 @@ export default function NameGeneratorPage() {
     const THRESHOLD2 = 16;
     const topScore2 = candidates[0]?.score ?? 0;
     let finalCandidates2 = candidates;
-    if (topScore2 < THRESHOLD2 && gender === "boy") {
+    if (topScore2 < THRESHOLD2) {
       const group2b = getGroup(breed);
       const prefixPass = Array.from({length:20},(_,i) => {
         const r = generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour);
         if (!r) return null;
-        const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group2b));
-        if (!matching.length) return null;
-        const pe = matching[(seed + i) % matching.length];
+        let pe: { prefix: string; bonusContrast: number };
+        if (gender === "boy") {
+          const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group2b));
+          if (!matching.length) return null;
+          pe = matching[(seed + i) % matching.length];
+        } else {
+          pe = TITLE_PREFIXES_GIRL[(seed + i) % TITLE_PREFIXES_GIRL.length];
+        }
         const prefixedTitle = pe.prefix + " " + r.full.split(" ")[0];
         const rest = r.full.split(" ").slice(1).join(" ");
         return { ...r, full: prefixedTitle + " " + rest, score: r.score + pe.bonusContrast };
