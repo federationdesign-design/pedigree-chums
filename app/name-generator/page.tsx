@@ -693,7 +693,7 @@ export default function NameGeneratorPage() {
     setStage("question");
   }
 
-  function handleAnswer(q1ans = "", q2ans = "") {
+  function handleAnswer(answer: string) {
     const townMatch = FUNNY_PLACES.has(town.trim());
     const effectiveTown = townMatch ? town.trim() : "";
 
@@ -777,25 +777,29 @@ export default function NameGeneratorPage() {
             </div>
           )}
 
-          {/* ── STAGE 2: RANDOM QUESTION ── */}
-          {stage === "question" && (
-            <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", textAlign:"center" }}>
-              <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24 }}>One quick question</p>
-              <p className="display" style={{ fontSize:"clamp(1.4rem,4vw,2rem)", color:"#fff", marginBottom:40, lineHeight:1.3 }}>
-                {question}
-              </p>
-              <div style={{ display:"flex", gap:12 }}>
-                <button onClick={handleAnswer}
-                  style={{ flex:1, padding:"16px", borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"1.1rem", fontWeight:700, cursor:"pointer" }}>
-                  Yes
-                </button>
-                <button onClick={handleAnswer}
-                  style={{ flex:1, padding:"16px", borderRadius:14, border:"2px solid rgba(255,255,255,0.3)", background:"transparent", color:"#fff", fontFamily:"var(--font-body)", fontSize:"1.1rem", fontWeight:700, cursor:"pointer" }}>
-                  No
-                </button>
+          {/* ── STAGE 2: QUESTIONS ── */}
+          {stage === "question" && (() => {
+            const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
+            const qItem = QUESTION_BANK[qi];
+            return (
+              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)" }}>
+                <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
+                  Question {activeQ} of 2
+                </p>
+                <p className="display" style={{ fontSize:"clamp(1.2rem,3.5vw,1.8rem)", color:"#fff", marginBottom:32, lineHeight:1.3, textAlign:"center" }}>
+                  {qItem.text}
+                </p>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
+                  {qItem.options.map(opt => (
+                    <button key={opt.label} onClick={() => handleAnswer(opt.label)}
+                      style={{ padding:"12px 22px", borderRadius:12, border:"2px solid rgba(255,255,255,0.25)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
