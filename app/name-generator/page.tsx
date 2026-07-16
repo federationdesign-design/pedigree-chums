@@ -1756,8 +1756,11 @@ export default function NameGeneratorPage() {
                         <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                       </div>
                     )}
-                    {/* Top pick pill -- navy text on yellow, full pill radius */}
-                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                    {/* Top pick pill + score badge */}
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                      {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.25)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+                    </div>
                     {/* Name -- 2pt bigger, left aligned */}
                     <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.3rem,5vw,1.9rem)", color:"#fff", marginBottom:8, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
                     {/* Nickname -- 2pt bigger, left aligned */}
