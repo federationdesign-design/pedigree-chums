@@ -143,7 +143,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"LH",meaning:"Ladies Hero",gender:"boy"},{code:"LK",meaning:"Lady Killer",gender:"boy"},
   {code:"LL",meaning:"Ladies Lover",gender:"boy"},{code:"LM",meaning:"Living Legend",gender:"any"},
   {code:"LP",meaning:"Ladies Pick",gender:"boy"},{code:"MB",meaning:"Master Boss",gender:"boy"},
-  {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"any"},
+  {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"boy"},
   {code:"MVP",meaning:"Most Valued Player",gender:"any"},{code:"NA",meaning:"No Apologies",gender:"any"},
   {code:"NB",meaning:"Natural Boss",gender:"boy"},{code:"NF",meaning:"No Fear",gender:"any"},
   {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier"]},
@@ -322,7 +322,7 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3}],
   giant:      [{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1}],
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2}],
-  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
   bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2}],
   dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Countess",reg:"grand",syllables:2}],
@@ -635,6 +635,8 @@ export default function NameGeneratorPage() {
         // Don't prefix already-grand titles -- stacking two grand things kills the comedy
         const alreadyGrand = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Inimitable","Illustrious"];
         if (alreadyGrand.includes(firstWord)) return null;
+        const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+        if (informalTitles.includes(firstWord)) return null;
         // Don't prefix if the second word looks like a name not a title (Myra, Imperial Myra L)
         // i.e. the existing title is already a prefix+title combo
         const secondWord = parts[1] ?? "";
