@@ -626,6 +626,8 @@ const NICKNAMES: Record<string,string> = {
   microscopic:"Micro",diminutive:"Dimmy",gossamera:"Gossie",daintybell:"Bell",
   galumph:"Lumphy",kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",noodles:"Noods",
   chipmunk:"Chip",
+  tutu:"Tutu",dizzy:"Dizzy",wizzle:"Wizz",wibble:"Wibs",womble:"Womby",
+  bumblebean:"Lulz",tumblewick:"TumTum",gobblesnout:"Gobsnot",
   spogmai:"Spogi",laleh:"Lali",mahsa:"Mahi",noura:"Nouri",lujain:"Lulu",maysa:"Mays",zahra:"Zazi",farah:"Fari",sultan:"Sully",nawab:"Nabs",zalmay:"Zal",
 };
 
@@ -694,7 +696,16 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const fName = pick(MARIEJ_FIRSTS, seed + 7);
     const mInit = pick(MARIEJ_INITIALS, seed + 23);
     full = `${fName} ${mInit} ${effectiveSurname}`;
-    nickname = getNickname(fName);
+    // Mary J nickname -- double the first name syllable
+    const mjNick = getNickname(fName);
+    if (mjNick) {
+      nickname = mjNick;
+    } else {
+      // Double the short name: Dina->Dindin, Nina->Nini, Lisa->Lislis
+      const half = fName.slice(0, Math.max(3, Math.ceil(fName.length / 2)));
+      nickname = half + half.toLowerCase();
+      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1);
+    }
   } else if (styleRoll === 3 && gender === "boy" && ["dachshund","character","terrier","collie"].includes(group2)) {
     // Reversed descriptor: "Extended General Burrow-Patterson" -- adjective before title
     const descriptors = ["Extended","Horizontal","Stretched","Relentless","Obsessive","Notorious","Incomparable","Frenetic","Unstoppable","Legendary","Indefatigable","Tenacious"];
@@ -732,17 +743,23 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       if (naturalNick) {
         nickname = naturalNick;
       } else {
-        // Try acronym -- use if pronounceable, otherwise shorten the first name
-        const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
-        const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
-        if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25) {
-          nickname = acronym;
+        const fn = firstName.name;
+        // If the first name is short enough, use it directly as the nickname
+        if (fn.length <= 4) {
+          nickname = fn;
         } else {
-          // Shorten first name -- first 3-4 chars + s for a nickname feel
-          const fn = firstName.name;
-          const stem = fn.length > 6 ? fn.slice(0, 4) : fn.slice(0, 3);
-          nickname = (stem + "s").replace(/ss$/,"s").replace(/([aeiou])s$/i, "$1s");
-          nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+          // Try acronym -- only use if pronounceable AND different from the name
+          const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
+          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
+          const acronymIsName = fn.toUpperCase().startsWith(acronym);
+          if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25 && !acronymIsName) {
+            nickname = acronym;
+          } else {
+            // Shorten first name -- first 3-4 chars + s
+            const stem = fn.length > 6 ? fn.slice(0, 4) : fn.slice(0, 3);
+            nickname = (stem + "s").replace(/ss$/,"s").replace(/([aeiou])s$/i,"$1s");
+            nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+          }
         }
       }
     }
