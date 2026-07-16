@@ -1674,11 +1674,7 @@ export default function NameGeneratorPage() {
                       </div>
                     )}
                     <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    {r.score >= 21 && (
-                      <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 21 ? "#22c55e" : "#f59e0b" }}>
-                        score: {r.score}
-                      </div>
-                    )}
+
                   </div>
                 ))}
               </div>
