@@ -763,6 +763,27 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   }
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname, colour);
+
+  // ── RESCUE PASS: if score < 15 and name has a title, try bare name ─────────
+  // Strip the title and rescore -- sometimes the name is funnier without it
+  const RESCUE_THRESHOLD = 15;
+  if (score < RESCUE_THRESHOLD && styleRoll >= 4) {
+    // Already a no-title style -- return as-is
+    return { full, nickname, reasoning, score };
+  }
+  if (score < RESCUE_THRESHOLD && full.startsWith(title.title + " ")) {
+    // Build bare version: just firstName + surname
+    const bareFull = `${firstName.name} ${effectiveSurname}`;
+    // Score the bare name using a dummy "no title" entry
+    const noTitle: TitleEntry = { title: "", reg: "mundane" as Register, syllables: 0 };
+    const bareScore = scoreName(noTitle, firstName, dogWordEntry, surname, colour);
+    if (bareScore > score) {
+      // Bare name scores better -- use it
+      const bareNick = getNickname(firstName.name) || nickname;
+      return { full: bareFull, nickname: bareNick, reasoning, score: bareScore };
+    }
+  }
+
   return { full, nickname, reasoning, score };
 }
 
