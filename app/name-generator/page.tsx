@@ -237,7 +237,8 @@ const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }
       {label:"Down South", bonus:["Treacle","Sweetheart","Darling","Dear","Doll","Dollface","Poppet","Petal","Flower","Lovely","Babe","Babes","Guv","Sonny","Lover","Maid","MyLover","MyHandsome","MyBeauty"]},
       {label:"The Midlands", bonus:["Bab","Babby","Babs","OurKid","ArKid","Duck","Ducky","Duckie","Cock","Cocker","Chick","Chucky","Mucker","Youth","MeDuck","MyDuck"]},
       {label:"Up North", bonus:["Chuck","Chucky","Pet","Petal","Hinny","Marra","BonnyLad","BonnyLass","Lad","Lass","Kidda","Cock","Cocker","Flower","Love","Luv","Bairn"]},
-      {label:"Scotland / Elsewhere", bonus:["Hen","WeeHen","WeePal","Doll","Dollie","Dearie","Lassie","Laddie","Bairn","WeeYin","WeeMan","WeeLass","Bonny","Pal"]}
+      {label:"Scotland", bonus:["Hen","WeeHen","WeePal","Doll","Dollie","Dearie","Lassie","Laddie","Bairn","WeeYin","WeeMan","WeeLass","Bonny","Pal"]},
+      {label:"Somewhere else", bonus:["Love","Luv","Darling","Dear","Pet","Petal","Sweetheart","Honey","Sugar","Babe","Flower","Pal","Mate","Duck","Lovely"]}
     ]
   },
   { text:"Do you like space?", options:[
