@@ -396,7 +396,7 @@ const DOG_WORDS: Record<string, WordEntry[]> = {
   retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Galumph",reg:"chaos",firstLetter:"g"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Devour",reg:"food",firstLetter:"d"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
   collie:     [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Gather",reg:"grand",firstLetter:"g"},{word:"Stalk",reg:"chaos",firstLetter:"s"},{word:"Border",reg:"grand",firstLetter:"b"}],
   boxer:      [{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Stumble",reg:"chaos",firstLetter:"s"},{word:"Gallumph",reg:"chaos",firstLetter:"g"},{word:"Bumble",reg:"baby",firstLetter:"b"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
-  sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Sleuth",reg:"grand",firstLetter:"s"},{word:"Hunt",reg:"grand",firstLetter:"h"},{word:"Nose",reg:"mundane",firstLetter:"n"},{word:"Scout",reg:"grand",firstLetter:"s"},{word:"Hound",reg:"grand",firstLetter:"h"},{word:"Quest",reg:"grand",firstLetter:"q"},{word:"Find",reg:"grand",firstLetter:"f"},{word:"Detect",reg:"grand",firstLetter:"d"},{word:"Snuffle",reg:"mundane",firstLetter:"s"}],
+  sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Sleuth",reg:"grand",firstLetter:"s"},{word:"Hunt",reg:"grand",firstLetter:"h"},{word:"Nose",reg:"mundane",firstLetter:"n"},{word:"Scout",reg:"grand",firstLetter:"s"},{word:"Hound",reg:"grand",firstLetter:"h"},{word:"Quest",reg:"grand",firstLetter:"q"},{word:"Find",reg:"grand",firstLetter:"f"},{word:"Detect",reg:"grand",firstLetter:"d"},{word:"Snuffle",reg:"mundane",firstLetter:"s"},{word:"Track",reg:"grand",firstLetter:"t"},{word:"Trace",reg:"grand",firstLetter:"t"},{word:"Track",reg:"grand",firstLetter:"t"},{word:"Trace",reg:"grand",firstLetter:"t"}],
   sighthound: [{word:"Sprint",reg:"grand",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Sweep",reg:"grand",firstLetter:"s"}],
   giant:      [{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Thud",reg:"chaos",firstLetter:"t"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Sway",reg:"grand",firstLetter:"s"},{word:"Loom",reg:"chaos",firstLetter:"l"},{word:"Thunder",reg:"chaos",firstLetter:"t"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Quake",reg:"chaos",firstLetter:"q"}],
   poodle:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Mince",reg:"grand",firstLetter:"m"},{word:"Flourish",reg:"grand",firstLetter:"f"},{word:"Pirouette",reg:"grand",firstLetter:"p"},{word:"Pose",reg:"grand",firstLetter:"p"},{word:"Primp",reg:"grand",firstLetter:"p"}],
@@ -534,6 +534,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 
 // ── DEDUPLICATION ─────────────────────────────────────────────────────────────
 // Pick top results ensuring no repeated first names, titles, or dog words
+const ONCE_ONLY_WORDS = new Set(["Track","Trace","Sleuth","Detect","Quest","Hunt","Scout","Find","Hound","Nose","Sniff","Snuffle"]);
+
 function dedupeResults(candidates: Result[], limit = 10): Result[] {
   const usedFirstNames  = new Set<string>();
   const usedTitles      = new Set<string>();
@@ -544,7 +546,7 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
     const parts   = r.full.split(" ");
     const title   = parts[0];
     const firstName = parts[1] ?? "";
-    // Extract dog word from hyphenated surname (e.g. "Sniff-Taylor" -> "Sniff")
+    // Extract dog word from hyphenated surname
     const surnamepart = parts[parts.length - 1] ?? "";
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
     if (usedFirstNames.has(firstName)) continue;
@@ -625,7 +627,7 @@ export default function NameGeneratorPage() {
         }
         const prefixedTitle = pe.prefix + " " + r.full.split(" ")[0];
         const rest = r.full.split(" ").slice(1).join(" ");
-        return { ...r, full: prefixedTitle + " " + rest, score: r.score + pe.bonusContrast };
+        return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + pe.bonusContrast };
       }).filter(Boolean) as Result[];
       finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
     }
