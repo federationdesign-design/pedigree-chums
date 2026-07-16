@@ -183,7 +183,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"Flt Lt",meaning:"Flight Lieutenant",gender:"boy",breeds:["collie","poodle","retriever"]},
   {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]}];
 
-const DTRAIN_LETTERS  = ["A","B","C","D","E","G","J","K","L","M","R","S","T"];
+const DTRAIN_LETTERS  = ["D"];  // D for Dog -- always
 const DTRAIN_SUFFIXES = ["Train","Prince","Money","King","Boss","Smooth","Real","Fresh","Young","Hype"];
 const MARIEJ_FIRSTS  = ["Mary","Lisa","Rosa","Lola","Nina","Tina","Gina","Dina","Mona","Fiona","Cara","Sara","Nora","Cora","Vera","Zara","Kara","Lara","Myra","Lyra"];
 const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
