@@ -376,12 +376,9 @@ const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }
   ]},
 ];
 
-function pickTwoQuestions(seed: number): [number, number] {
+function pickOneQuestion(seed: number): number {
   const t = Date.now() & 0x7fffffff;
-  const q1 = Math.abs((seed ^ t) % QUESTION_BANK.length);
-  let q2 = Math.abs(((seed * 7 + 3) ^ (t >> 5)) % QUESTION_BANK.length);
-  if (q2 === q1) q2 = (q2 + 1) % QUESTION_BANK.length;
-  return [q1, q2];
+  return Math.abs((seed ^ t) % QUESTION_BANK.length);
 }
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
@@ -974,8 +971,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const descriptor = pick(bareDescriptors, seed + 41);
     full = `${descriptor} ${firstName.name} ${effectiveSurname}`;
     nickname = getNickname(firstName.name);
-  } else if (styleRoll === 6) {
-    // McBoatface: [Adj]y [CelticPrefix][Adj][BreedSuffix] Surname
+  } else if (styleRoll === 6 && !["collie","retriever","sighthound","german","spaniel","welsh","giant","afghan","poodle","sniffer"].includes(group2)) {
+    // McBoatface: [Adj]y [CelticPrefix][Adj][BreedSuffix] Surname -- only chaotic breeds
     // Skip or neutralise if surname already has a Celtic/noble prefix
     const surnameHasPrefix = /^(mc|mac|o'|de|van|von|le|di|dal|fitz|ap|ferch|ni)/i.test(surname.trim());
     const mcPool6 = MCFACE_POOL[group2] || MCFACE_POOL.default;
@@ -999,8 +996,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const mcStemRaw = mc1[0].toLowerCase(); // e.g. "lollopy"
     const mcNickStem = mcStemRaw.length > 5 ? mcStemRaw.slice(0,4) : mcStemRaw.slice(0,3);
     nickname = mcNickStem.charAt(0).toUpperCase() + mcNickStem.slice(1) + "za";
-  } else if (styleRoll === 7) {
-    // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
+  } else if (styleRoll === 7 && ["boxer","terrier","character","lapdog","boston","asian","dachshund","bulldog","default"].includes(group2)) {
+    // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname -- only chaotic breeds
     const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
     const sbAdj1 = sbAdjPool[(seed + 43) % sbAdjPool.length];
     const sbAdj2 = sbAdjPool[(seed + 47) % sbAdjPool.length];
@@ -1476,7 +1473,7 @@ function runPass(
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
-    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry"];
+    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry","collie","retriever","spaniel","welsh"];
     if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
@@ -1561,25 +1558,18 @@ export default function NameGeneratorPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
-  const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
-  const [q1Answer, setQ1Answer] = useState("");
-  const [activeQ, setActiveQ] = useState<1|2>(1);
+  const [qIndex, setQIndex] = useState<number>(0);
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only when a quick pre-pass shows potential for purple (20+)
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
     setResults([]);
-    // Quick pre-pass to check score potential
-    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
-    const preScore = prePass[0]?.score ?? 0;
-    if (preScore >= 20) {
+    const qi = pickOneQuestion(s);
+    setQIndex(qi);
+    const showQuestion = Math.random() < 0.33;
+    if (showQuestion) {
       setStage("question");
     } else {
       // Skip questions, generate directly with empty bonus pools
@@ -1608,8 +1598,8 @@ export default function NameGeneratorPage() {
     const townMatch = FUNNY_PLACES.has(town.trim());
     const effectiveTown = townMatch ? town.trim() : "";
 
-    // Question bonus pools (empty if no QUESTION_BANK yet)
-    const bonus1: string[] = [];
+    const qItem = QUESTION_BANK[qIndex];
+    const bonus1: string[] = qItem?.options?.flatMap((o: {label:string;bonus:string[]}) => o.bonus) ?? [];
     const bonus2: string[] = [];
 
     // Three independent passes with offset seeds for maximum variety
@@ -1641,16 +1631,11 @@ export default function NameGeneratorPage() {
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only when a quick pre-pass shows potential for purple (20+)
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
     setResults([]);
-    // Quick pre-pass to check score potential
-    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
-    const preScore = prePass[0]?.score ?? 0;
-    if (preScore >= 20) {
+    const qi = pickOneQuestion(s);
+    setQIndex(qi);
+    const showQuestion = Math.random() < 0.33;
+    if (showQuestion) {
       setStage("question");
     } else {
       // Skip questions, generate directly with empty bonus pools
@@ -1756,18 +1741,14 @@ export default function NameGeneratorPage() {
 
           {/* ── STAGE 2: QUESTIONS ── */}
           {stage === "question" && (() => {
-            const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
-            const qItem = QUESTION_BANK[qi];
+            const qItem = QUESTION_BANK[qIndex];
             return (
               <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", paddingTop:"clamp(80px,12vw,120px)" }}>
-                <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
-                  Question {activeQ} of 2
-                </p>
                 <p className="display" style={{ fontSize:"clamp(1.2rem,3.5vw,1.8rem)", color:"#fff", marginBottom:32, lineHeight:1.3, textAlign:"center" }}>
                   {qItem.text}
                 </p>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
-                  {qItem.options.map(opt => (
+                  {qItem.options.map((opt: {label:string;bonus:string[]}) => (
                     <button key={opt.label} onClick={() => handleAnswer(opt.label)}
                       style={{ padding:"12px 22px", borderRadius:12, border:"2px solid rgba(255,255,255,0.25)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}>
                       {opt.label}
@@ -1826,7 +1807,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQ1Answer(""); setActiveQ(1); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQIndex(0); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
