@@ -974,8 +974,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const descriptor = pick(bareDescriptors, seed + 41);
     full = `${descriptor} ${firstName.name} ${effectiveSurname}`;
     nickname = getNickname(firstName.name);
-  } else if (styleRoll === 6 && !["collie","retriever","sighthound","german","spaniel","welsh","giant","afghan","poodle","sniffer"].includes(group2)) {
-    // McBoatface: [Adj]y [CelticPrefix][Adj][BreedSuffix] Surname -- only for chaotic breeds
+  } else if (styleRoll === 6) {
+    // McBoatface: [Adj]y [CelticPrefix][Adj][BreedSuffix] Surname
     // Skip or neutralise if surname already has a Celtic/noble prefix
     const surnameHasPrefix = /^(mc|mac|o'|de|van|von|le|di|dal|fitz|ap|ferch|ni)/i.test(surname.trim());
     const mcPool6 = MCFACE_POOL[group2] || MCFACE_POOL.default;
@@ -999,8 +999,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const mcStemRaw = mc1[0].toLowerCase(); // e.g. "lollopy"
     const mcNickStem = mcStemRaw.length > 5 ? mcStemRaw.slice(0,4) : mcStemRaw.slice(0,3);
     nickname = mcNickStem.charAt(0).toUpperCase() + mcNickStem.slice(1) + "za";
-  } else if (styleRoll === 7 && ["boxer","terrier","character","lapdog","boston","asian","dachshund","bulldog","default"].includes(group2)) {
-    // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname -- only for chaotic breeds
+  } else if (styleRoll === 7) {
+    // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
     const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
     const sbAdj1 = sbAdjPool[(seed + 43) % sbAdjPool.length];
     const sbAdj2 = sbAdjPool[(seed + 47) % sbAdjPool.length];
@@ -1476,7 +1476,7 @@ function runPass(
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
-    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry","collie","retriever","spaniel","welsh"];
+    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry"];
     if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
@@ -1492,7 +1492,22 @@ function runPass(
         const wScore = r.score + 5 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
         // Only use whimsy if it scores better
         if (wScore > r.score + qBonus) {
-          return { ...r, full: wFull, nickname: r.nickname, score: wScore };
+          // Derive nickname from the whimsy word -- cut before first 'le' or doubled consonant
+          // e.g. Grumblepaws→Grumbs, Noodlepuff→Noods, Crinkleboots→Crinks
+          const wLow = whimsyName.toLowerCase();
+          const cons = new Set("bcdfghjklmnpqrstvwxyz".split(""));
+          let wCut = wLow.length;
+          for (let wi = 2; wi < wLow.length - 1; wi++) {
+            if (wLow[wi] === "l" && wLow[wi+1] === "e" && cons.has(wLow[wi-1])) { wCut = wi; break; }
+          }
+          for (let wi = 2; wi < wLow.length - 1; wi++) {
+            if (wLow[wi] === wLow[wi-1] && cons.has(wLow[wi]) && wi < wCut) { wCut = wi; break; }
+          }
+          wCut = Math.max(wCut, 3);
+          let wStem = wLow.slice(0, wCut).replace(/[aeiou]+$/, "");
+          if (wStem.length < 3) wStem = wLow.slice(0, 4).replace(/[aeiou]+$/, "");
+          const wNick = wStem.charAt(0).toUpperCase() + wStem.slice(1) + "s";
+          return { ...r, full: wFull, nickname: wNick, score: wScore };
         }
       }
     }
