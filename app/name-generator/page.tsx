@@ -510,6 +510,11 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     if (dogContrast >= 3) score -= 2;
   }
 
+  // ── PENALISE stacked compound titles (e.g. "Chief Inspector" + grand name) ─
+  // Multi-word titles are already grand -- pairing with another grand name = pompous not funny
+  if (title.title.includes(" ") && first.reg === "grand") score -= 3;
+  if (title.title.includes(" ") && first.reg === "pedigree") score -= 1;
+
 
     // Cartoon-character names -- only work with Dawg as dog word, or chaos/baby title
     const cartoonOnlyWithDawg = new Set(["Tubby","Pudgy","Porky","Wimpy","Doofus","Nincompoop","Scraggy"]);
