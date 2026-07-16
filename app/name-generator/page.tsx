@@ -1657,24 +1657,28 @@ export default function NameGeneratorPage() {
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
-              {cardImg && (
-                <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
-                </div>
-              )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
                 {results.map((r: Result, i: number) => (
-                  <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
-                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                    <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
+                  <div key={i} style={{ position:"relative", background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", paddingRight: cardImg ? "clamp(100px,22vw,160px)" : "clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)", overflow:"visible" }}>
+                    {/* Breed card -- rotated, anchored to right side of box */}
+                    {cardImg && (
+                      <div style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={cardImg} alt={breed} style={{ width:"clamp(80px,18vw,130px)", height:"auto", borderRadius:12, display:"block" }} />
+                      </div>
+                    )}
+                    {/* Top pick pill */}
+                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                    {/* Name */}
+                    <div className="display" style={{ fontSize:"clamp(1.1rem,2.7vw,1.55rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.2, textAlign:"left" }}>{r.full}</div>
+                    {/* Nickname */}
                     {r.nickname && (
-                      <div style={{ fontSize:"0.8rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:10, fontFamily:"var(--font-body)", fontWeight:600 }}>
+                      <div style={{ fontSize:"0.9rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
-                    <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-
+                    {/* Reasoning */}
+                    <div style={{ fontSize:"0.9rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
