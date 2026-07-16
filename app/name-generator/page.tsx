@@ -595,6 +595,67 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
   return out;
 }
 
+
+// ── GENERATION HELPERS ────────────────────────────────────────────────────────
+function runPass(
+  breed: string, surname: string, gender: "boy"|"girl",
+  baseSeed: number, town: string, colour: DogColour,
+  bonusPool1: string[], bonusPool2: string[]
+): Result[] {
+  const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
+  const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
+
+  const raw = Array.from({length:20}, (_, i) => {
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+    if (!r) return null;
+    const fn = r.full.split(" ")[1] ?? "";
+    let qBonus = 0;
+    if (doubleBonus.has(fn)) qBonus += 4;
+    else if (allBonus.has(fn)) qBonus += 2;
+    return { ...r, score: r.score + qBonus };
+  }).filter(Boolean) as Result[];
+
+  raw.sort((a,b) => b.score - a.score);
+
+  // Prefix tiebreaker if top score below threshold
+  const THRESHOLD = 19;
+  if ((raw[0]?.score ?? 0) < THRESHOLD) {
+    const group = getGroup(breed);
+    const prefixed = Array.from({length:20}, (_, i) => {
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+      if (!r) return null;
+      let pe: { prefix: string; bonusContrast: number };
+      if (gender === "boy") {
+        const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group));
+        if (!matching.length) return null;
+        pe = matching[(baseSeed + i) % matching.length];
+      } else {
+        pe = TITLE_PREFIXES_GIRL[(baseSeed + i) % TITLE_PREFIXES_GIRL.length];
+      }
+      const parts    = r.full.split(" ");
+      const firstWord = parts[0];
+      const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Inimitable","Illustrious"];
+      const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+      if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
+      const isDTrain    = /^[A-Z]-/.test(firstWord);
+      const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
+      const prefixedTitle = pe.prefix + " " + firstWord;
+      let rest = parts.slice(1).join(" ");
+      if (isDTrain || isAbbrev) {
+        const last = parts[parts.length - 1];
+        if (last?.includes("-")) {
+          const clean = last.split("-").slice(1).join("-");
+          rest = [...parts.slice(1, -1), clean].filter(Boolean).join(" ");
+        }
+      }
+      const bonus = r.score >= 14 ? 1 : pe.bonusContrast;
+      return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + bonus };
+    }).filter(Boolean) as Result[];
+    return [...raw, ...prefixed].sort((a,b) => b.score - a.score);
+  }
+  return raw;
+}
+
 type Stage = "inputs"|"question"|"reveal";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
@@ -637,60 +698,28 @@ export default function NameGeneratorPage() {
     setStage("question");
   }
 
-  function handleAnswer() {
+  function handleAnswer(q1ans = "", q2ans = "") {
     const townMatch = FUNNY_PLACES.has(town.trim());
     const effectiveTown = townMatch ? town.trim() : "";
-    const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour));
-    candidates.sort((a,b) => b.score - a.score);
-    const THRESHOLD2 = 19;
-    const topScore2 = candidates[0]?.score ?? 0;
-    let finalCandidates2 = candidates;
-    if (topScore2 < THRESHOLD2) {
-      const group2b = getGroup(breed);
-      const prefixPass = Array.from({length:20},(_,i) => {
-        const r = generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour);
-        if (!r) return null;
-        let pe: { prefix: string; bonusContrast: number };
-        if (gender === "boy") {
-          const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group2b));
-          if (!matching.length) return null;
-          pe = matching[(seed + i) % matching.length];
-        } else {
-          pe = TITLE_PREFIXES_GIRL[(seed + i) % TITLE_PREFIXES_GIRL.length];
-        }
-        const parts = r.full.split(" ");
-        const firstWord = parts[0];
-        const isDTrain = /^[A-Z]-/.test(firstWord);
-        const isAbbrevOnly = /^[A-Z]{1,4}$/.test(firstWord);
-        // Don't prefix already-grand titles -- stacking two grand things kills the comedy
-        const alreadyGrand = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Inimitable","Illustrious"];
-        if (alreadyGrand.includes(firstWord)) return null;
-        const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
-        if (informalTitles.includes(firstWord)) return null;
-        // Don't prefix if the second word looks like a name not a title (Myra, Imperial Myra L)
-        // i.e. the existing title is already a prefix+title combo
-        const secondWord = parts[1] ?? "";
-        const looksLikeName = /^[A-Z][a-z]/.test(secondWord) && !["Sir","Lord","Lady","Dame","Duke","Earl","Baron","Count"].includes(secondWord);
-        if (looksLikeName && (isDTrain || isAbbrevOnly)) return null;
-        const prefixedTitle = pe.prefix + " " + firstWord;
-        let rest = parts.slice(1).join(" ");
-        // D-Train and abbrev styles: strip dog word from surname for cleaner result
-        // "Super B-Hype Galumph-Harris" -> "Super B-Hype Harris"
-        if (isDTrain || isAbbrevOnly) {
-          const lastPart = parts[parts.length - 1];
-          if (lastPart && lastPart.includes("-")) {
-            const cleanSurname = lastPart.split("-").slice(1).join("-");
-            const middleParts = parts.slice(1, -1);
-            rest = [...middleParts, cleanSurname].filter(Boolean).join(" ");
-          }
-        }
-        // Cap prefix bonus if base result already scores well
-        const effectiveBonus = r.score >= 14 ? 1 : pe.bonusContrast;
-        return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + effectiveBonus };
-      }).filter(Boolean) as Result[];
-      finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
-    }
-    setResults(dedupeResults(finalCandidates2.filter(Boolean) as Result[]));
+
+    // Question bonus pools (empty if no QUESTION_BANK yet)
+    const bonus1: string[] = [];
+    const bonus2: string[] = [];
+
+    // Three independent passes with offset seeds for maximum variety
+    const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
+    const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
+    const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
+
+    // Take top scorer from each pass, then merge all three full lists
+    // This guarantees the cream from each independent roll is represented
+    const topFromEach = [pass1[0], pass2[0], pass3[0]].filter(Boolean) as Result[];
+    const allCandidates = [...pass1, ...pass2, ...pass3];
+    allCandidates.sort((a,b) => b.score - a.score);
+
+    // Ensure top picks from each pass appear in results
+    const merged = [...topFromEach, ...allCandidates];
+    setResults(dedupeResults(merged.filter(Boolean) as Result[]));
     setStage("reveal");
   }
 
