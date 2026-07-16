@@ -163,7 +163,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"DC",meaning:"Detective Constable",gender:"boy",breeds:["sniffer","default"]},
   {code:"DS",meaning:"Detective Sergeant",gender:"boy",breeds:["sniffer","default"]},
   {code:"DCI",meaning:"Detective Chief Inspector",gender:"boy",breeds:["sniffer","poodle"]},
-  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","lapdog","terrier"]},
+  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","terrier","boxer"]},
   {code:"Insp",meaning:"Inspector",gender:"boy",breeds:["sniffer","retriever"]},
   // ── ARMY RANKS ────────────────────────────────────────────────────────────────
   {code:"Pte",meaning:"Private",gender:"boy",breeds:["boxer","terrier","character"]},
@@ -529,8 +529,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 
   if (styleRoll === 0 && validAbbrevs.length > 0) {
     const abbrev = pick(validAbbrevs, seed + 5);
-    full = `${abbrev.code} ${effectiveSurname}`;
-    nickname = abbrev.meaning;
+    full = `${abbrev.meaning} ${effectiveSurname}`;
+    nickname = abbrev.code;
   } else if (styleRoll === 1 && gender === "boy") {
     const letter = pick(DTRAIN_LETTERS, seed + 13);
     const suffix = pick(DTRAIN_SUFFIXES, seed + 19);
@@ -553,7 +553,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const initials2 = tInit + nInit;
     const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
     if (matched) {
-      nickname = `${matched.code} — ${matched.meaning}`;
+      nickname = matched.code;
     } else {
       nickname = getNickname(firstName.name);
     }
