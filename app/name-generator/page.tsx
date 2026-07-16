@@ -1716,7 +1716,7 @@ export default function NameGeneratorPage() {
                     background:"#fff",
                     borderRadius:18,
                     padding:"clamp(16px,2.5vw,24px)",
-                    paddingRight: cardImg ? "clamp(100px,22vw,160px)" : "clamp(16px,2.5vw,24px)",
+                    paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(16px,2.5vw,24px)",
                     borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`,
                     boxShadow:"0 2px 16px rgba(10,58,87,0.08)",
                     overflow:"visible"
@@ -1733,21 +1733,21 @@ export default function NameGeneratorPage() {
                         filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))"
                       }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={cardImg} alt={breed} style={{ width:"clamp(80px,18vw,130px)", height:"auto", borderRadius:12, display:"block" }} />
+                        <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                       </div>
                     )}
                     {/* Top pick pill -- navy text on yellow, full pill radius */}
                     {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
                     {/* Name -- 2pt bigger, left aligned */}
-                    <div className="display" style={{ fontSize:"clamp(1.1rem,2.7vw,1.55rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.2, textAlign:"left" }}>{r.full}</div>
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.15rem,4.5vw,1.6rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"left" }}>{r.full}</div>
                     {/* Nickname -- 2pt bigger, left aligned */}
                     {r.nickname && (
-                      <div style={{ fontSize:"0.9rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
+                      <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
                     {/* Reasoning -- 2pt bigger, left aligned */}
-                    <div style={{ fontSize:"0.9rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
+                    <div style={{ fontSize:"clamp(0.9rem,2.5vw,1rem)", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
