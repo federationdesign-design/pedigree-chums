@@ -446,9 +446,20 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   const sl = surname.replace(/-.*/, "")[0]?.toLowerCase() ?? ""; // base surname initial
   const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
 
+  // ── Surname participation in alliteration ──────────────────────────────────
+  // Does the surname initial join the alliteration chain?
+  const surnameInChain = sl !== "" && (sl === fl || sl === wl || (sf[sl] && sf[sl] === sf[fl]));
+  const surnameClashes  = sl !== "" && sl !== fl && sl !== wl && !(sf[sl] && sf[sl] === sf[fl]);
+
   // First name <-> dog word alliteration (core comedy unit)
-  if (fl === wl) score += 5;
-  else if (sf[fl] && sf[fl] === sf[wl]) score += 2;
+  // Amplified when surname joins, penalised when surname clashes
+  if (fl === wl) {
+    if (surnameInChain)  score += 7;  // name+word+surname all rhyme -- maximum
+    else if (surnameClashes) score += 3;  // name+word rhyme but surname breaks it
+    else score += 5;  // name+word rhyme, neutral surname
+  } else if (sf[fl] && sf[fl] === sf[wl]) {
+    score += surnameInChain ? 3 : 2;  // sound-family match
+  }
 
   // Title initial <-> first name
   const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
@@ -457,11 +468,14 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   // Triple alliteration: title + name + dog word
   if (fl === wl && tf === fl) score += 4;
 
-  // Surname alliteration bonus: dog word and surname start the same
+  // Surname alliteration bonus: dog word matches surname
   if (wl === sl && sl !== "") score += 2;
 
+  // Surname matches first name too
+  if (fl === sl && sl !== "") score += 1;
+
   // Full four-way: title + name + dogword + surname
-  if (tf === fl && fl === wl && wl === sl) score += 2;
+  if (tf === fl && fl === wl && wl === sl) score += 3;  // bumped from 2 to 3
 
   // ── RHYTHM ────────────────────────────────────────────────────────────────
   const total = title.syllables + first.syllables + 1 + countSyllables(surname);
