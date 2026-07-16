@@ -444,12 +444,38 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   const fl = first.name[0].toLowerCase();
   const wl = dogWord.word[0].toLowerCase();
   const sl = surname.replace(/-.*/, "")[0]?.toLowerCase() ?? ""; // base surname initial
-  const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
+  const sf: Record<string,string> = {
+    // Labials -- lip sounds
+    b:"labial",p:"labial",m:"labial",w:"labial",
+    // Dentals -- tongue tip
+    d:"dental",t:"dental",n:"dental",
+    // Velars -- back of mouth
+    g:"velar",k:"velar",q:"velar",c:"velar",
+    // Fricatives
+    f:"fric",v:"fric",
+    // Sibilants
+    s:"sib",z:"sib",x:"sib",
+    // Liquids -- flow sounds
+    l:"liquid",r:"liquid",
+    // Aspirates/glides
+    h:"glide",
+  };
+  // Tier 2 sound connections -- weaker near-alliteration (+1 not +2)
+  const sf2: Record<string,string> = {
+    // Nasals bridge labial and dental
+    m:"nasal",n:"nasal",
+    // Sibilant stops -- s+t, s+p, s+k clusters
+    s:"sstop",t:"sstop",p:"sstop",k:"sstop",
+    // Growl cluster -- gr/br/dr
+    g:"growl",b:"growl",d:"growl",r:"growl",
+    // Glide cluster -- w/h/y
+    w:"glide2",h:"glide2",
+  };
 
   // ── Surname participation in alliteration ──────────────────────────────────
   // Does the surname initial join the alliteration chain?
-  const surnameInChain = sl !== "" && (sl === fl || sl === wl || (sf[sl] && sf[sl] === sf[fl]));
-  const surnameClashes  = sl !== "" && sl !== fl && sl !== wl && !(sf[sl] && sf[sl] === sf[fl]);
+  const surnameInChain = sl !== "" && (sl === fl || sl === wl || (sf[sl] && sf[sl] === sf[fl]) || (sf2[sl] && sf2[sl] === sf2[fl]));
+  const surnameClashes  = sl !== "" && sl !== fl && sl !== wl && !(sf[sl] && sf[sl] === sf[fl]) && !(sf2[sl] && sf2[sl] === sf2[fl]);
 
   // First name <-> dog word alliteration (core comedy unit)
   // Amplified when surname joins, penalised when surname clashes
@@ -458,7 +484,9 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     else if (surnameClashes) score += 3;  // name+word rhyme but surname breaks it
     else score += 5;  // name+word rhyme, neutral surname
   } else if (sf[fl] && sf[fl] === sf[wl]) {
-    score += surnameInChain ? 3 : 2;  // sound-family match
+    score += surnameInChain ? 3 : 2;  // strong sound-family match (labial/velar/etc)
+  } else if (sf2[fl] && sf2[fl] === sf2[wl]) {
+    score += 1;  // weaker tier-2 sound connection (growl/glide/nasal clusters)
   }
 
   // Title initial <-> first name
@@ -851,7 +879,15 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   // Prefer names and dog words that alliterate with the surname initial.
   // This makes Donald → Duke/Dash/Dobby etc much more likely.
   const surnameInitial = surname.replace(/-.*/, "")[0]?.toUpperCase() ?? "";
-  const soundFamily: Record<string,string> = {B:"BP",P:"BP",D:"DT",T:"DT",G:"GK",K:"GK",F:"FV",V:"FV",S:"SZ",Z:"SZ",M:"MN",N:"MN"};
+  const soundFamily: Record<string,string> = {
+    B:"labial",P:"labial",M:"labial",W:"labial",
+    D:"dental",T:"dental",N:"dental",
+    G:"velar",K:"velar",Q:"velar",C:"velar",
+    F:"fric",V:"fric",
+    S:"sib",Z:"sib",X:"sib",
+    L:"liquid",R:"liquid",
+    H:"glide",
+  };
   const surnameFamily = soundFamily[surnameInitial] ?? surnameInitial;
 
   // Filter nameBank for names starting with surname initial or sound family
@@ -1361,7 +1397,33 @@ function runPass(
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
 
-  const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
+  const sf: Record<string,string> = {
+    // Labials -- lip sounds
+    b:"labial",p:"labial",m:"labial",w:"labial",
+    // Dentals -- tongue tip
+    d:"dental",t:"dental",n:"dental",
+    // Velars -- back of mouth
+    g:"velar",k:"velar",q:"velar",c:"velar",
+    // Fricatives
+    f:"fric",v:"fric",
+    // Sibilants
+    s:"sib",z:"sib",x:"sib",
+    // Liquids -- flow sounds
+    l:"liquid",r:"liquid",
+    // Aspirates/glides
+    h:"glide",
+  };
+  // Tier 2 sound connections -- weaker near-alliteration (+1 not +2)
+  const sf2: Record<string,string> = {
+    // Nasals bridge labial and dental
+    m:"nasal",n:"nasal",
+    // Sibilant stops -- s+t, s+p, s+k clusters
+    s:"sstop",t:"sstop",p:"sstop",k:"sstop",
+    // Growl cluster -- gr/br/dr
+    g:"growl",b:"growl",d:"growl",r:"growl",
+    // Glide cluster -- w/h/y
+    w:"glide2",h:"glide2",
+  };
   function allit(a: string, b: string): boolean {
     const f = a[0]?.toLowerCase() ?? "", w = b[0]?.toLowerCase() ?? "";
     return f === w || (!!sf[f] && sf[f] === sf[w]);
