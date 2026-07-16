@@ -485,7 +485,7 @@ function countSyllables(word: string): number {
   return word.toLowerCase().replace(/[^aeiouy]+/g,"x").replace(/x+/g,"x").length || 1;
 }
 
-function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surname: string, colour: DogColour = ""): number {
+function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surname: string, colour: DogColour = "", group = ""): number {
   let score = 0;
 
   // ── CONTRAST (unchanged) ──────────────────────────────────────────────────
@@ -575,6 +575,22 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     const wordStem  = dogWord.word.toLowerCase().slice(0,4);
     if (titleStem.length >= 3 && titleStem === wordStem) score -= 4;
 
+
+  // ── QUALITY FILTER -- breed character check ───────────────────────────────
+  const dignifiedGroups = new Set(["collie","retriever","sighthound","german","spaniel",
+    "giant","afghan","poodle","sniffer","greatdane","welsh","dalmatian","sheepdog","lurcher"]);
+  const whimsyPattern = /paws|bean|boots|puff|whisk|wick|wink|snout|chops|bonce|flap|wiggle|wobble|bumble|scramble|grumble|noodle|puddle|doodle|fizzle|jiggle|toodle|mumble|rumble/i;
+  const isDignified = dignifiedGroups.has(group);
+  // Penalise whimsy compound names on dignified breeds
+  if (isDignified && whimsyPattern.test(first.name)) score -= 8;
+  // Penalise chaos-register first names on dignified breeds
+  if (isDignified && first.reg === "chaos" && first.syllables > 2) score -= 5;
+  // Penalise long two-word pedigree names that clutter (e.g. "Bold Ambition Bolt-Barker")
+  if (first.name.includes(" ") && first.name.length > 10 && isDignified) score -= 3;
+  // Bonus for short real-looking names on any breed
+  if (/^[A-Z][a-z]{1,7}$/.test(first.name)) score += 2;
+  // Penalise very long compound whimsy names anywhere
+  if (whimsyPattern.test(first.name) && first.name.length > 12) score -= 3;
     // Cartoon-character names -- only work with Dawg as dog word, or chaos/baby title
     const cartoonOnlyWithDawg = new Set(["Tubby","Pudgy","Porky","Wimpy","Doofus","Nincompoop","Scraggy"]);
     if (cartoonOnlyWithDawg.has(first.name)) {
@@ -834,9 +850,9 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
 // ── DOG WORDS ──────────────────────────────────────────────────────────────────
 const DOG_WORDS: Record<string, WordEntry[]> = {
   spaniel:    [{word:"Flush",reg:"nature",firstLetter:"f"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Waggle",reg:"chaos",firstLetter:"w"},{word:"Splash",reg:"chaos",firstLetter:"s"},{word:"Frolic",reg:"chaos",firstLetter:"f"},{word:"Gambol",reg:"chaos",firstLetter:"g"},{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Romp",reg:"chaos",firstLetter:"r"}],
-  retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Galumph",reg:"chaos",firstLetter:"g"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Devour",reg:"food",firstLetter:"d"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
-  collie:     [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Gather",reg:"grand",firstLetter:"g"},{word:"Stalk",reg:"chaos",firstLetter:"s"},{word:"Border",reg:"grand",firstLetter:"b"}],
-  boxer:      [{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Stumble",reg:"chaos",firstLetter:"s"},{word:"Gallumph",reg:"chaos",firstLetter:"g"},{word:"Bumble",reg:"baby",firstLetter:"b"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
+  retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Gobble",reg:"food",firstLetter:"g"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Devour",reg:"food",firstLetter:"d"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
+  collie:     [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Gather",reg:"grand",firstLetter:"g"},{word:"Round",reg:"grand",firstLetter:"r"},{word:"Border",reg:"grand",firstLetter:"b"}],
+  boxer:      [{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Stumble",reg:"chaos",firstLetter:"s"},{word:"Bumble",reg:"baby",firstLetter:"b"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
   sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Sleuth",reg:"grand",firstLetter:"s"},{word:"Hunt",reg:"grand",firstLetter:"h"},{word:"Nose",reg:"mundane",firstLetter:"n"},{word:"Track",reg:"grand",firstLetter:"t"},{word:"Scout",reg:"grand",firstLetter:"s"},{word:"Trace",reg:"grand",firstLetter:"t"},{word:"Hound",reg:"grand",firstLetter:"h"},{word:"Quest",reg:"grand",firstLetter:"q"},{word:"Find",reg:"grand",firstLetter:"f"}],
   afghan:     [{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Sweep",reg:"grand",firstLetter:"s"},{word:"Flow",reg:"grand",firstLetter:"f"},{word:"Drift",reg:"grand",firstLetter:"d"},{word:"Surge",reg:"grand",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Soar",reg:"grand",firstLetter:"s"}],
   sighthound: [{word:"Sprint",reg:"grand",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Sweep",reg:"grand",firstLetter:"s"}],
@@ -850,9 +866,9 @@ const DOG_WORDS: Record<string, WordEntry[]> = {
   character:  [{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Totter",reg:"chaos",firstLetter:"t"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Wheeze",reg:"chaos",firstLetter:"w"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Dawg",reg:"chaos",firstLetter:"d"}],
   terrier:    [{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Dig",reg:"chaos",firstLetter:"d"},{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Rumpus",reg:"chaos",firstLetter:"r"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Snap",reg:"chaos",firstLetter:"s"},{word:"Yap",reg:"chaos",firstLetter:"y"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Burrow",reg:"chaos",firstLetter:"b"}],
   german:     [{word:"March",reg:"grand",firstLetter:"m"},{word:"Drill",reg:"grand",firstLetter:"d"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Flank",reg:"grand",firstLetter:"f"},{word:"Advance",reg:"grand",firstLetter:"a"},{word:"Intercept",reg:"grand",firstLetter:"i"},{word:"Secure",reg:"grand",firstLetter:"s"},{word:"Enforce",reg:"grand",firstLetter:"e"},{word:"Breach",reg:"grand",firstLetter:"b"}],
+  bulldog:    [{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Grunt",reg:"chaos",firstLetter:"g"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Barge",reg:"chaos",firstLetter:"b"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Trundle",reg:"chaos",firstLetter:"t"}],
   dachshund:  [{word:"Scuttle",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Burrow",reg:"chaos",firstLetter:"b"},{word:"Squeeze",reg:"chaos",firstLetter:"s"},{word:"Tunnel",reg:"chaos",firstLetter:"t"},{word:"Wriggle",reg:"chaos",firstLetter:"w"},{word:"Slither",reg:"chaos",firstLetter:"s"},{word:"Stretch",reg:"absurd",firstLetter:"s"},{word:"Extend",reg:"absurd",firstLetter:"e"},{word:"Elongate",reg:"absurd",firstLetter:"e"}],
   lurcher:    [{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Lurk",reg:"mundane",firstLetter:"l"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Nip",reg:"chaos",firstLetter:"n"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Ghost",reg:"mundane",firstLetter:"g"},{word:"Slip",reg:"mundane",firstLetter:"s"}],
-  bulldog:    [{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Trundle",reg:"chaos",firstLetter:"t"},{word:"Grunt",reg:"chaos",firstLetter:"g"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Barge",reg:"chaos",firstLetter:"b"}],
   dalmatian:  [{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Dazzle",reg:"grand",firstLetter:"d"},{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Spot",reg:"mundane",firstLetter:"s"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Frolic",reg:"chaos",firstLetter:"f"}],
   sheepdog:   [{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Shaggle",reg:"chaos",firstLetter:"s"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Wander",reg:"mundane",firstLetter:"w"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Mosey",reg:"mundane",firstLetter:"m"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Lollop",reg:"chaos",firstLetter:"l"}],
   default:    [{word:"Trot",reg:"mundane",firstLetter:"t"},{word:"Lope",reg:"mundane",firstLetter:"l"},{word:"Prowl",reg:"grand",firstLetter:"p"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Roam",reg:"mundane",firstLetter:"r"},{word:"Slink",reg:"aloof",firstLetter:"s"},{word:"Stalk",reg:"grand",firstLetter:"s"},{word:"Saunter",reg:"mundane",firstLetter:"s"},{word:"Canter",reg:"grand",firstLetter:"c"},{word:"Wander",reg:"mundane",firstLetter:"w"}],
@@ -1209,7 +1225,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   // and add bonus when the name itself carries triple alliteration
   const noTitleEntry: TitleEntry = { title: "", reg: "mundane" as Register, syllables: 0 };
   const scoringTitle = styleRoll === 4 ? noTitleEntry : title;
-  const baseScore = scoreName(scoringTitle, firstName, dogWordEntry, surname, colour);
+  const baseScore = scoreName(scoringTitle, firstName, dogWordEntry, surname, colour, group);
 
   // Bare name triple-alliteration bonus -- Prudence Prowl-Phillips doesn't need a title
   let bareBonus = 0;
@@ -1237,7 +1253,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const bareFull = `${firstName.name} ${effectiveSurname}`;
     // Score the bare name using a dummy "no title" entry
     const noTitle: TitleEntry = { title: "", reg: "mundane" as Register, syllables: 0 };
-    const bareScore = scoreName(noTitle, firstName, dogWordEntry, surname, colour);
+    const bareScore = scoreName(noTitle, firstName, dogWordEntry, surname, colour, group);
     if (bareScore > score) {
       // Bare name scores better -- use it
       const bareNick = getNickname(firstName.name) || nickname;
