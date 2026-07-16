@@ -281,9 +281,10 @@
 .breedCard {
   position: relative;
   border-radius: 12px;
-  overflow: hidden;
-  display: block;
-  aspect-ratio: 5 / 7;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: unset;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   transition: transform 0.2s ease, opacity 0.35s ease, filter 0.35s ease, box-shadow 0.2s ease;
 }
@@ -415,4 +416,13 @@
   color: #fff;
   transform: scaleY(1.04);
   transform-origin: bottom;
+}
+
+.breedCardInner {
+  border-radius: 12px;
+  overflow: hidden;
+  display: block;
+  aspect-ratio: 5 / 7;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  flex: 1;
 }

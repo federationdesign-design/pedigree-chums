@@ -917,7 +917,7 @@ export default function ChumCalculator() {
               onMouseLeave={() => setHoveredBreed(null)}
               style={{ position: "relative" }}
             >
-              <Link href={`/chums/${b.slug}`} tabIndex={hidden ? -1 : 0} style={{ display: "block" }}>
+              <Link href={`/chums/${b.slug}`} tabIndex={hidden ? -1 : 0} className={styles.breedCardInner}>
                 <img
                   src={bust(cardImg || b.image)}
                   alt={b.name}
