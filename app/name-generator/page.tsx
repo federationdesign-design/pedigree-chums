@@ -577,7 +577,7 @@ const DOG_WORDS: Record<string, WordEntry[]> = {
   sighthound: [{word:"Sprint",reg:"grand",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Sweep",reg:"grand",firstLetter:"s"}],
   giant:      [{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Thud",reg:"chaos",firstLetter:"t"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Sway",reg:"grand",firstLetter:"s"},{word:"Loom",reg:"chaos",firstLetter:"l"},{word:"Thunder",reg:"chaos",firstLetter:"t"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Quake",reg:"chaos",firstLetter:"q"}],
   poodle:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Mince",reg:"grand",firstLetter:"m"},{word:"Flourish",reg:"grand",firstLetter:"f"},{word:"Pirouette",reg:"grand",firstLetter:"p"},{word:"Pose",reg:"grand",firstLetter:"p"},{word:"Primp",reg:"grand",firstLetter:"p"}],
-  lapdog:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Bounce",reg:"baby",firstLetter:"b"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Flounce",reg:"grand",firstLetter:"f"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Fluff",reg:"baby",firstLetter:"f"},{word:"Shimmy",reg:"grand",firstLetter:"s"},{word:"Pamper",reg:"baby",firstLetter:"p"},{word:"Flutter",reg:"baby",firstLetter:"f"},{word:"Glitter",reg:"grand",firstLetter:"g"}],
+  lapdog:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Bounce",reg:"baby",firstLetter:"b"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Flounce",reg:"grand",firstLetter:"f"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Fluff",reg:"baby",firstLetter:"f"},{word:"Shimmy",reg:"grand",firstLetter:"s"},{word:"Pamper",reg:"baby",firstLetter:"p"},{word:"Flutter",reg:"baby",firstLetter:"f"},{word:"Sparkle",reg:"grand",firstLetter:"s"}],
   character:  [{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Totter",reg:"chaos",firstLetter:"t"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Wheeze",reg:"chaos",firstLetter:"w"},{word:"Puff",reg:"chaos",firstLetter:"p"}],
   terrier:    [{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Dig",reg:"chaos",firstLetter:"d"},{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Rumpus",reg:"chaos",firstLetter:"r"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Snap",reg:"chaos",firstLetter:"s"},{word:"Yap",reg:"chaos",firstLetter:"y"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Burrow",reg:"chaos",firstLetter:"b"}],
   german:     [{word:"March",reg:"grand",firstLetter:"m"},{word:"Drill",reg:"grand",firstLetter:"d"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Flank",reg:"grand",firstLetter:"f"},{word:"Advance",reg:"grand",firstLetter:"a"},{word:"Intercept",reg:"grand",firstLetter:"i"},{word:"Secure",reg:"grand",firstLetter:"s"},{word:"Enforce",reg:"grand",firstLetter:"e"},{word:"Breach",reg:"grand",firstLetter:"b"}],
@@ -792,6 +792,29 @@ const WHIMSY: Record<string, string[]> = {
   W: ["Waffleton", "Wafflewhisk", "Waggledorf", "Wagglenose", "Wagglesnack", "Wagglesnort", "Wagglesworth", "Wagglybean", "Wagglyboots", "Wagglychops", "Wagglypaws", "Wagglypuff", "Wagglywhisk", "Wagglywink", "Wibbleton", "Wibblewobble", "Wobblebean", "Wobbleboots", "Wobblebug", "Wobblechops", "Wobblekins", "Wobblepaws", "Wobblepot", "Wobblepuff", "Wobblewhisk", "Wobblewick", "Wobblewink", "Womble", "Womblepaws", "Wompadoodle", "Wompington", "Wompus", "Wompusbean", "Wompusboots", "Wompuschops", "Wompuspuff", "Wompuswhisk", "Wompuswink"],
 };
 
+
+const WHIMSY_RULES: { pattern: RegExp; groups: string[] }[] = [
+  // Doodle words -- doodle/poo breeds only
+  { pattern: /doodle/i, groups: ["retriever","lapdog","spaniel","default"] },
+  // Snout words -- flat-faced breeds
+  { pattern: /snout/i,  groups: ["boxer","character","bulldog","lapdog"] },
+  // Bug words -- small energetic breeds
+  { pattern: /bug$/i,   groups: ["terrier","character","lapdog","collie"] },
+  // Bum/bottom words -- lapdog/character only
+  { pattern: /(bum$|bottom$)/i, groups: ["lapdog","character","boxer"] },
+  // Berry/plop -- character/lapdog only
+  { pattern: /(berry$|plop$)/i, groups: ["character","lapdog","terrier"] },
+  // Kins -- lapdog only, too cutesy
+  { pattern: /kins$/i, groups: ["lapdog","character"] },
+];
+
+function whimsyAllowed(word: string, group: string): boolean {
+  for (const rule of WHIMSY_RULES) {
+    if (rule.pattern.test(word) && !rule.groups.includes(group)) return false;
+  }
+  return true;
+}
+
 // ── GENERATION HELPERS ────────────────────────────────────────────────────────
 function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
@@ -828,6 +851,8 @@ function runPass(
       const pool = WHIMSY[letter];
       if (pool && pool.length > 0) {
         const whimsyName = pool[(baseSeed + i * 7) % pool.length];
+        // Check breed restrictions on this whimsy word
+        if (!whimsyAllowed(whimsyName, getGroup(breed))) { return { ...r, score: r.score + qBonus }; }
         // Build a whimsy version and score it
         const wParts = [...parts];
         wParts[1] = whimsyName;
