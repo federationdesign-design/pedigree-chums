@@ -444,38 +444,12 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   const fl = first.name[0].toLowerCase();
   const wl = dogWord.word[0].toLowerCase();
   const sl = surname.replace(/-.*/, "")[0]?.toLowerCase() ?? ""; // base surname initial
-  const sf: Record<string,string> = {
-    // Labials -- lip sounds
-    b:"labial",p:"labial",m:"labial",w:"labial",
-    // Dentals -- tongue tip
-    d:"dental",t:"dental",n:"dental",
-    // Velars -- back of mouth
-    g:"velar",k:"velar",q:"velar",c:"velar",
-    // Fricatives
-    f:"fric",v:"fric",
-    // Sibilants
-    s:"sib",z:"sib",x:"sib",
-    // Liquids -- flow sounds
-    l:"liquid",r:"liquid",
-    // Aspirates/glides
-    h:"glide",
-  };
-  // Tier 2 sound connections -- weaker near-alliteration (+1 not +2)
-  const sf2: Record<string,string> = {
-    // Nasals bridge labial and dental
-    m:"nasal",n:"nasal",
-    // Sibilant stops -- s+t, s+p, s+k clusters
-    s:"sstop",t:"sstop",p:"sstop",k:"sstop",
-    // Growl cluster -- gr/br/dr
-    g:"growl",b:"growl",d:"growl",r:"growl",
-    // Glide cluster -- w/h/y
-    w:"glide2",h:"glide2",
-  };
+  const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
 
   // ── Surname participation in alliteration ──────────────────────────────────
   // Does the surname initial join the alliteration chain?
-  const surnameInChain = sl !== "" && (sl === fl || sl === wl || (sf[sl] && sf[sl] === sf[fl]) || (sf2[sl] && sf2[sl] === sf2[fl]));
-  const surnameClashes  = sl !== "" && sl !== fl && sl !== wl && !(sf[sl] && sf[sl] === sf[fl]) && !(sf2[sl] && sf2[sl] === sf2[fl]);
+  const surnameInChain = sl !== "" && (sl === fl || sl === wl || (sf[sl] && sf[sl] === sf[fl]));
+  const surnameClashes  = sl !== "" && sl !== fl && sl !== wl && !(sf[sl] && sf[sl] === sf[fl]);
 
   // First name <-> dog word alliteration (core comedy unit)
   // Amplified when surname joins, penalised when surname clashes
@@ -484,9 +458,7 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     else if (surnameClashes) score += 3;  // name+word rhyme but surname breaks it
     else score += 5;  // name+word rhyme, neutral surname
   } else if (sf[fl] && sf[fl] === sf[wl]) {
-    score += surnameInChain ? 3 : 2;  // strong sound-family match (labial/velar/etc)
-  } else if (sf2[fl] && sf2[fl] === sf2[wl]) {
-    score += 1;  // weaker tier-2 sound connection (growl/glide/nasal clusters)
+    score += surnameInChain ? 3 : 2;  // sound-family match
   }
 
   // Title initial <-> first name
@@ -879,15 +851,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   // Prefer names and dog words that alliterate with the surname initial.
   // This makes Donald → Duke/Dash/Dobby etc much more likely.
   const surnameInitial = surname.replace(/-.*/, "")[0]?.toUpperCase() ?? "";
-  const soundFamily: Record<string,string> = {
-    B:"labial",P:"labial",M:"labial",W:"labial",
-    D:"dental",T:"dental",N:"dental",
-    G:"velar",K:"velar",Q:"velar",C:"velar",
-    F:"fric",V:"fric",
-    S:"sib",Z:"sib",X:"sib",
-    L:"liquid",R:"liquid",
-    H:"glide",
-  };
+  const soundFamily: Record<string,string> = {B:"BP",P:"BP",D:"DT",T:"DT",G:"GK",K:"GK",F:"FV",V:"FV",S:"SZ",Z:"SZ",M:"MN",N:"MN"};
   const surnameFamily = soundFamily[surnameInitial] ?? surnameInitial;
 
   // Filter nameBank for names starting with surname initial or sound family
@@ -1397,33 +1361,7 @@ function runPass(
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
 
-  const sf: Record<string,string> = {
-    // Labials -- lip sounds
-    b:"labial",p:"labial",m:"labial",w:"labial",
-    // Dentals -- tongue tip
-    d:"dental",t:"dental",n:"dental",
-    // Velars -- back of mouth
-    g:"velar",k:"velar",q:"velar",c:"velar",
-    // Fricatives
-    f:"fric",v:"fric",
-    // Sibilants
-    s:"sib",z:"sib",x:"sib",
-    // Liquids -- flow sounds
-    l:"liquid",r:"liquid",
-    // Aspirates/glides
-    h:"glide",
-  };
-  // Tier 2 sound connections -- weaker near-alliteration (+1 not +2)
-  const sf2: Record<string,string> = {
-    // Nasals bridge labial and dental
-    m:"nasal",n:"nasal",
-    // Sibilant stops -- s+t, s+p, s+k clusters
-    s:"sstop",t:"sstop",p:"sstop",k:"sstop",
-    // Growl cluster -- gr/br/dr
-    g:"growl",b:"growl",d:"growl",r:"growl",
-    // Glide cluster -- w/h/y
-    w:"glide2",h:"glide2",
-  };
+  const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
   function allit(a: string, b: string): boolean {
     const f = a[0]?.toLowerCase() ?? "", w = b[0]?.toLowerCase() ?? "";
     return f === w || (!!sf[f] && sf[f] === sf[w]);
@@ -1771,24 +1709,45 @@ export default function NameGeneratorPage() {
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
-              {cardImg && (
-                <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
-                </div>
-              )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
                 {results.map((r: Result, i: number) => (
-                  <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
-                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                    <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
+                  <div key={i} style={{
+                    position:"relative",
+                    background:"#fff",
+                    borderRadius:18,
+                    padding:"clamp(16px,2.5vw,24px)",
+                    paddingRight: cardImg ? "clamp(100px,22vw,160px)" : "clamp(16px,2.5vw,24px)",
+                    borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`,
+                    boxShadow:"0 2px 16px rgba(10,58,87,0.08)",
+                    overflow:"visible"
+                  }}>
+                    {/* Breed card -- rotated 2deg, anchored to top-right corner of box */}
+                    {cardImg && (
+                      <div style={{
+                        position:"absolute",
+                        right:-12,
+                        top:-10,
+                        zIndex:2,
+                        transform:"rotate(2deg)",
+                        transformOrigin:"bottom right",
+                        filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))"
+                      }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={cardImg} alt={breed} style={{ width:"clamp(80px,18vw,130px)", height:"auto", borderRadius:12, display:"block" }} />
+                      </div>
+                    )}
+                    {/* Top pick pill -- navy text on yellow, full pill radius */}
+                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", display:"inline-block", padding:"4px 14px", borderRadius:999, marginBottom:10, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                    {/* Name -- 2pt bigger, left aligned */}
+                    <div className="display" style={{ fontSize:"clamp(1.1rem,2.7vw,1.55rem)", color:"var(--navy)", marginBottom:6, lineHeight:1.2, textAlign:"left" }}>{r.full}</div>
+                    {/* Nickname -- 2pt bigger, left aligned */}
                     {r.nickname && (
-                      <div style={{ fontSize:"0.8rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:10, fontFamily:"var(--font-body)", fontWeight:600 }}>
+                      <div style={{ fontSize:"0.9rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:12, fontFamily:"var(--font-body)", fontWeight:600, textAlign:"left" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
-                    <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-
+                    {/* Reasoning -- 2pt bigger, left aligned */}
+                    <div style={{ fontSize:"0.9rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)", textAlign:"left" }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
