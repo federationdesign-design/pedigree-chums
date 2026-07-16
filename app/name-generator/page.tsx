@@ -1004,7 +1004,9 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   );
 
   const noTitleBreeds = ["labrador","labradoodle","goldendoodle"];
-  const styleRoll = noTitleBreeds.includes(breed.toLowerCase()) ? 4 : seed % 13;
+  const noAbbrevBreeds = ["collie","retriever","sighthound","german","spaniel","giant","afghan","poodle","sniffer","greatdane","welsh","dalmatian","sheepdog"];
+  const rawStyleRoll = seed % 13;
+  const styleRoll = noTitleBreeds.includes(breed.toLowerCase()) ? 4 : (noAbbrevBreeds.includes(group2) && rawStyleRoll === 0) ? 4 : rawStyleRoll;
   let full = "";
   let nickname = "";
 
