@@ -396,7 +396,7 @@ const DOG_WORDS: Record<string, WordEntry[]> = {
   retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Galumph",reg:"chaos",firstLetter:"g"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Devour",reg:"food",firstLetter:"d"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
   collie:     [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Gather",reg:"grand",firstLetter:"g"},{word:"Stalk",reg:"chaos",firstLetter:"s"},{word:"Border",reg:"grand",firstLetter:"b"}],
   boxer:      [{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Stumble",reg:"chaos",firstLetter:"s"},{word:"Gallumph",reg:"chaos",firstLetter:"g"},{word:"Bumble",reg:"baby",firstLetter:"b"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
-  sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Snuffle",reg:"mundane",firstLetter:"s"},{word:"Trail",reg:"mundane",firstLetter:"t"},{word:"Track",reg:"mundane",firstLetter:"t"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Mosey",reg:"mundane",firstLetter:"m"},{word:"Amble",reg:"mundane",firstLetter:"a"},{word:"Dawdle",reg:"mundane",firstLetter:"d"},{word:"Shuffle",reg:"mundane",firstLetter:"s"},{word:"Trudge",reg:"mundane",firstLetter:"t"}],
+  sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Sleuth",reg:"grand",firstLetter:"s"},{word:"Hunt",reg:"grand",firstLetter:"h"},{word:"Nose",reg:"mundane",firstLetter:"n"},{word:"Track",reg:"grand",firstLetter:"t"},{word:"Scout",reg:"grand",firstLetter:"s"},{word:"Trace",reg:"grand",firstLetter:"t"},{word:"Hound",reg:"grand",firstLetter:"h"},{word:"Quest",reg:"grand",firstLetter:"q"},{word:"Find",reg:"grand",firstLetter:"f"}],
   sighthound: [{word:"Sprint",reg:"grand",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Sweep",reg:"grand",firstLetter:"s"}],
   giant:      [{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Thud",reg:"chaos",firstLetter:"t"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Sway",reg:"grand",firstLetter:"s"},{word:"Loom",reg:"chaos",firstLetter:"l"},{word:"Thunder",reg:"chaos",firstLetter:"t"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Quake",reg:"chaos",firstLetter:"q"}],
   poodle:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Mince",reg:"grand",firstLetter:"m"},{word:"Flourish",reg:"grand",firstLetter:"f"},{word:"Pirouette",reg:"grand",firstLetter:"p"},{word:"Pose",reg:"grand",firstLetter:"p"},{word:"Primp",reg:"grand",firstLetter:"p"}],
@@ -484,7 +484,10 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const firstName = pick(nameBank, seed + 3);
   const dogWordEntry = pick(wordBank, seed + 7);
   const alreadyHyphenated = surname.includes("-");
-  const baseSurname = alreadyHyphenated ? surname : `${dogWordEntry.word}-${surname}`;
+  // Only hyphenate if dog word adds contrast against the first name
+  const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
+  const useHyphen = !alreadyHyphenated && wordContrast >= 2;
+  const baseSurname = useHyphen ? `${dogWordEntry.word}-${surname}` : surname;
   const effectiveSurname = town || baseSurname;
   const group2 = getGroup(breed);
 
@@ -575,7 +578,7 @@ export default function NameGeneratorPage() {
     const effectiveTown = townMatch ? town.trim() : "";
     const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour));
     candidates.sort((a,b) => b.score - a.score);
-    const THRESHOLD2 = 16;
+    const THRESHOLD2 = 19;
     const topScore2 = candidates[0]?.score ?? 0;
     let finalCandidates2 = candidates;
     if (topScore2 < THRESHOLD2) {
