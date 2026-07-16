@@ -720,18 +720,17 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       if (naturalNick) {
         nickname = naturalNick;
       } else {
-        // Try acronym from full name -- only use if pronounceable (has vowel, sounds like a word)
+        // Try acronym -- use if pronounceable, otherwise shorten the first name
         const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
-        const hasVowel = /[AEIOU]/.test(acronym);
-        const notTooLong = acronym.length >= 2 && acronym.length <= 5;
-        const notAllConsonants = hasVowel;
-        if (hasVowel && notTooLong && notAllConsonants) {
-          // Make it pronounceable by inserting implied vowel sounds
-          // e.g. "BPJS" -> skip, "CATS" -> CATS, "FRD" -> skip
-          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / acronym.length;
-          if (vowelRatio >= 0.25) {
-            nickname = acronym;
-          }
+        const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
+        if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25) {
+          nickname = acronym;
+        } else {
+          // Shorten first name -- first 3-4 chars + s for a nickname feel
+          const fn = firstName.name;
+          const stem = fn.length > 6 ? fn.slice(0, 4) : fn.slice(0, 3);
+          nickname = (stem + "s").replace(/ss$/,"s").replace(/([aeiou])s$/i, "$1s");
+          nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
         }
       }
     }
@@ -957,19 +956,22 @@ export default function NameGeneratorPage() {
   const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
   const [q1Answer, setQ1Answer] = useState("");
   const [activeQ, setActiveQ] = useState<1|2>(1);
+  const [rollCount, setRollCount] = useState(0);
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only appear occasionally -- 1 in 3 rolls
+    // Questions every 3rd roll exactly
+    const newRollCount = rollCount + 1;
+    setRollCount(newRollCount);
     const qi = pickTwoQuestions(s);
     setQIndices(qi);
     setQ1Answer("");
     setActiveQ(1);
     setResults([]);
-    if (Math.random() < 0.33) {
+    if (newRollCount % 3 === 0) {
       setStage("question");
     } else {
       // Skip questions, generate directly with empty bonus pools
@@ -978,8 +980,14 @@ export default function NameGeneratorPage() {
       const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
       const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
       const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
-      const top3 = [p1[0], p2[0], p3[0]].filter(Boolean) as Result[];
-      const all3 = [...p1, ...p2, ...p3].sort((a,b) => b.score - a.score);
+      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], []);
+      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], []);
+      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], []);
+      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], []);
+      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], []);
+      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], []);
+      const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
+      const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
       const sc17 = allD.filter(r => r.score >= 17);
       setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
@@ -1001,11 +1009,15 @@ export default function NameGeneratorPage() {
     const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
     const pass4 = runPass(breed, surname.trim(), gender, seed + 3000,    effectiveTown, colour, bonus1, bonus2);
     const pass5 = runPass(breed, surname.trim(), gender, seed + 4000,    effectiveTown, colour, bonus1, bonus2);
+    const pass6 = runPass(breed, surname.trim(), gender, seed + 5000,    effectiveTown, colour, bonus1, bonus2);
+    const pass7 = runPass(breed, surname.trim(), gender, seed + 6000,    effectiveTown, colour, bonus1, bonus2);
+    const pass8 = runPass(breed, surname.trim(), gender, seed + 7000,    effectiveTown, colour, bonus1, bonus2);
+    const pass9 = runPass(breed, surname.trim(), gender, seed + 8000,    effectiveTown, colour, bonus1, bonus2);
 
     // Take top scorer from each pass, then merge all three full lists
     // This guarantees the cream from each independent roll is represented
-    const topFromEach = [pass1[0], pass2[0], pass3[0], pass4[0], pass5[0]].filter(Boolean) as Result[];
-    const allCandidates = [...pass1, ...pass2, ...pass3, ...pass4, ...pass5];
+    const topFromEach = [pass1[0], pass2[0], pass3[0], pass4[0], pass5[0], pass6[0], pass7[0], pass8[0], pass9[0]].filter(Boolean) as Result[];
+    const allCandidates = [...pass1, ...pass2, ...pass3, ...pass4, ...pass5, ...pass6, ...pass7, ...pass8, ...pass9];
     allCandidates.sort((a,b) => b.score - a.score);
 
     // Ensure top picks from each pass appear in results
@@ -1019,13 +1031,15 @@ export default function NameGeneratorPage() {
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only appear occasionally -- 1 in 3 rolls
+    // Questions every 3rd roll exactly
+    const newRollCount = rollCount + 1;
+    setRollCount(newRollCount);
     const qi = pickTwoQuestions(s);
     setQIndices(qi);
     setQ1Answer("");
     setActiveQ(1);
     setResults([]);
-    if (Math.random() < 0.33) {
+    if (newRollCount % 3 === 0) {
       setStage("question");
     } else {
       // Skip questions, generate directly with empty bonus pools
@@ -1034,8 +1048,14 @@ export default function NameGeneratorPage() {
       const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
       const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
       const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
-      const top3 = [p1[0], p2[0], p3[0]].filter(Boolean) as Result[];
-      const all3 = [...p1, ...p2, ...p3].sort((a,b) => b.score - a.score);
+      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], []);
+      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], []);
+      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], []);
+      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], []);
+      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], []);
+      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], []);
+      const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
+      const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
       const sc17 = allD.filter(r => r.score >= 17);
       setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
@@ -1100,7 +1120,7 @@ export default function NameGeneratorPage() {
             const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
             const qItem = QUESTION_BANK[qi];
             return (
-              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)" }}>
+              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", paddingTop:"clamp(80px,12vw,120px)" }}>
                 <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
                   Question {activeQ} of 2
                 </p>
