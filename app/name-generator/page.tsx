@@ -922,14 +922,21 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     nickname = getNickname(firstName.name);
   } else if (styleRoll === 6) {
     // McBoatface: [Adj]y [CelticPrefix][Adj][BreedSuffix] Surname
+    // Skip or neutralise if surname already has a Celtic/noble prefix
+    const surnameHasPrefix = /^(mc|mac|o'|de|van|von|le|di|dal|fitz|ap|ferch|ni)/i.test(surname.trim());
     const mcPool6 = MCFACE_POOL[group2] || MCFACE_POOL.default;
     const mc1 = mcPool6[(seed + 31) % mcPool6.length];
     const mc2 = mcPool6[(seed + 37) % mcPool6.length];
     const mcSuffixPool = MCFACE_SUFFIX[group2] || MCFACE_SUFFIX.default;
     const mcSuffix = mcSuffixPool[(seed + 41) % mcSuffixPool.length];
-    const mcPrefixPool = gender === "girl" ? MCFACE_PREFIX_GIRL : MCFACE_PREFIX_BOY;
-    const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
-    full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
+    if (surnameHasPrefix) {
+      // Surname already has a prefix -- use bare compound name, no extra prefix
+      full = `${mc1[0]} ${mc2[1]}${mcSuffix} ${effectiveSurname}`;
+    } else {
+      const mcPrefixPool = gender === "girl" ? MCFACE_PREFIX_GIRL : MCFACE_PREFIX_BOY;
+      const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
+      full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
+    }
     nickname = mc1[0];
   } else if (styleRoll === 7) {
     // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
