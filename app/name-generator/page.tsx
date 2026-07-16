@@ -816,7 +816,7 @@ const NICKNAMES: Record<string,string> = {
   hypervigilant:"Hyper",indefatigable:"Indy",infinitesimal:"Tiny",imperceptible:"Imp",
   microscopic:"Micro",diminutive:"Dimmy",gossamera:"Gossie",daintybell:"Bell",
   galumph:"Lumphy",kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",noodles:"Noods",
-  chipmunk:"Chip",
+  chipmunk:"Chip",glen:"Glen",roy:"Roy",cap:"Cap",ben:"Ben",tam:"Tam",rob:"Rob",meg:"Meg",nell:"Nell",jess:"Jess",tess:"Tess",bess:"Bess",fly:"Fly",dot:"Dot",moss:"Moss",
   // German/Nordic names
   trudel:"Tru",traudel:"Traud",traudl:"Traud",
   thekla:"Divi",thyra:"Chook",theresia:"Terri",trixi:"Trixi",therese:"Terri",
@@ -937,7 +937,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const abbrev = pick(validAbbrevs, seed + 5);
     const dottedCode = abbrev.code.split("").join(".");
     full = `${dottedCode} (${abbrev.meaning}) ${effectiveSurname}`;
-    nickname = abbrev.code;
+    // Derive nickname from meaning -- first word of meaning, shortened if long
+    const meaningWords = abbrev.meaning.split(" ");
+    const firstMWord = meaningWords[0];
+    const lastMWord = meaningWords[meaningWords.length - 1];
+    // Pick the most interesting word (last if it's longer/more distinctive)
+    const nickWord = lastMWord.length > firstMWord.length ? lastMWord : firstMWord;
+    nickname = nickWord.length <= 5 ? nickWord : nickWord.slice(0, 5);
   } else if (styleRoll === 1 && gender === "boy") {
     const letter = pick(DTRAIN_LETTERS, seed + 13);
     const suffix = pick(DTRAIN_SUFFIXES, seed + 19);
@@ -1053,14 +1059,16 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const nInit = firstName.name[0]?.toUpperCase() || "";
     const initials2 = tInit + nInit;
     const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
-    if (matched) {
-      // Some abbreviations have gender-specific nicknames
-      // Itsy title gets Bitsy as nickname
+    const naturalNick = getNickname(firstName.name);
+    if (naturalNick) {
+      // Always prefer the natural nickname from the table first
+      nickname = naturalNick;
+    } else if (matched) {
+      // Abbreviation match -- use special cases
       if (matched.code === "DC" && gender === "girl") nickname = "Dixy";
       else if (matched.code === "DC" && gender === "boy") nickname = "Dicky";
       else nickname = matched.code;
     } else {
-      const naturalNick = getNickname(firstName.name);
       if (naturalNick) {
         nickname = naturalNick;
       } else {
