@@ -731,7 +731,9 @@ export default function NameGeneratorPage() {
                       </div>
                     )}
                     <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    <div style={{ fontSize:"0.65rem", color:"#ccc", marginTop:8, fontFamily:"var(--font-body)" }}>score: {r.score}</div>
+                    <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : r.score >= 14 ? "#f59e0b" : r.score >= 8 ? "#ef4444" : "#111111" }}>
+                      score: {r.score}
+                    </div>
                   </div>
                 ))}
               </div>
