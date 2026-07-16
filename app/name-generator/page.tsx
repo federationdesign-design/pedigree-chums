@@ -113,8 +113,7 @@ const FUNNY_PLACES = new Set([
   "Maidwell","Cold Ashby","Hollowell","Creaton","Spratton","Scaldwell",
   "Walgrave","Hannington","Lamport","Raunds","Ringstead","Stanwick","Hargrave",
   "Pertenhall","Kimbolton","Tilbrook","Catworth","Molesworth","Brington",
-  "Bythorn","Keyston","Clopton","Thurning",
-]);
+  "Bythorn","Keyston","Clopton","Thurning"]);
 
 // ── ABBREVIATION WHITELIST ─────────────────────────────────────────────────────
 interface AbbrevEntry { code: string; meaning: string; gender: "boy"|"girl"|"any"; breeds?: string[]; }
@@ -143,7 +142,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"LH",meaning:"Ladies Hero",gender:"boy"},{code:"LK",meaning:"Lady Killer",gender:"boy"},
   {code:"LL",meaning:"Ladies Lover",gender:"boy"},{code:"LM",meaning:"Living Legend",gender:"any"},
   {code:"LP",meaning:"Ladies Pick",gender:"boy"},{code:"MB",meaning:"Master Boss",gender:"boy"},
-  {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"any"},
+  {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"boy"},
   {code:"MVP",meaning:"Most Valued Player",gender:"any"},{code:"NA",meaning:"No Apologies",gender:"any"},
   {code:"NB",meaning:"Natural Boss",gender:"boy"},{code:"NF",meaning:"No Fear",gender:"any"},
   {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier"]},
@@ -164,7 +163,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"DC",meaning:"Detective Constable",gender:"boy",breeds:["sniffer","default"]},
   {code:"DS",meaning:"Detective Sergeant",gender:"boy",breeds:["sniffer","default"]},
   {code:"DCI",meaning:"Detective Chief Inspector",gender:"boy",breeds:["sniffer","poodle"]},
-  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","lapdog","terrier"]},
+  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","terrier","boxer"]},
   {code:"Insp",meaning:"Inspector",gender:"boy",breeds:["sniffer","retriever"]},
   // ── ARMY RANKS ────────────────────────────────────────────────────────────────
   {code:"Pte",meaning:"Private",gender:"boy",breeds:["boxer","terrier","character"]},
@@ -182,8 +181,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"Sqn Ldr",meaning:"Squadron Leader",gender:"boy",breeds:["spaniel","retriever","collie"]},
   {code:"Wg Cdr",meaning:"Wing Commander",gender:"boy",breeds:["spaniel","german","giant"]},
   {code:"Flt Lt",meaning:"Flight Lieutenant",gender:"boy",breeds:["collie","poodle","retriever"]},
-  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]},
-];
+  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]}];
 
 const DTRAIN_LETTERS  = ["A","B","C","D","E","G","J","K","L","M","R","S","T"];
 const DTRAIN_SUFFIXES = ["Train","Prince","Money","King","Boss","Smooth","Real","Fresh","Young","Hype"];
@@ -191,15 +189,149 @@ const MARIEJ_FIRSTS  = ["Mary","Lisa","Rosa","Lola","Nina","Tina","Gina","Dina",
 const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
 
 // ── RANDOM QUESTIONS ───────────────────────────────────────────────────────────
-const QUESTIONS = [
-  "Do you like space?",
-  "Have you ever eaten a whole pizza alone?",
-  "Do you consider yourself a morning person?",
-  "Have you ever talked to a plant?",
-  "Do you prefer baths or showers?",
-  "Have you ever worn a onesie in public?",
+const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }[] }[] = [
+  { text:"Do you like space?", options:[
+    {label:"Yes",bonus:["Luna","Nova","Orion","Astrid","Comet","Nebula","Aurora","Cassiopeia","Cosmo","Galileo","Kepler","Eclipse","Stellar","Vega","Lyra","Polaris"]},
+    {label:"No", bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Sausage","Dumpling","Wobble"]},
+  ]},
+  { text:"Do you enjoy smells?", options:[
+    {label:"Yes",bonus:["Jasmine","Heather","Sage","Basil","Clover","Juniper","Cedar","Sorrel","Flora","Lavender","Mint","Rosemary","Thyme","Blossom"]},
+    {label:"No", bonus:["Flint","Stone","Slate","Steel","Grit","Iron","Chrome","Cinder","Concrete"]},
+  ]},
+  { text:"Are you a morning person?", options:[
+    {label:"Yes",bonus:["Dawn","Sparky","Sunny","Breezy","Zippy","Perky","Dewy","Lark","Robin","Crisp","Chipper","Bright","Fresh"]},
+    {label:"No", bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Slumber","Mellow"]},
+  ]},
+  { text:"Have you ever talked to a plant?", options:[
+    {label:"Yes",bonus:["Fern","Ivy","Willow","Daisy","Skye","Moss","Briar","Bloom","Rowan","Clover","Hazel","Birch","Cedar","Ash","Bramble"]},
+    {label:"No", bonus:["Brick","Steel","Chrome","Concrete","Gravel","Slate","Cinder","Iron"]},
+  ]},
+  { text:"Have you ever worn a onesie in public?", options:[
+    {label:"Yes",bonus:["Snugglebum","Fluffy","Booboo","Fifi","Mimi","Puddingkins","Lulu","Noo-Noo","Cuddlekins","Fluffybum","Jellybean","Candyfloss","Tiddlywink"]},
+    {label:"No", bonus:["Dapper","Debonair","Suave","Sharp","Immaculate","Sterling","Pristine","Sleek","Trim","Tailored"]},
+  ]},
+  { text:"Do you believe in ghosts?", options:[
+    {label:"Yes",bonus:["Ghost","Shadow","Phantom","Midnight","Eclipse","Misty","Spectre","Vesper","Wraith","Shade","Spirit","Wisp","Echo","Mist","Void"]},
+    {label:"No", bonus:["Solid","Grounded","Flint","Stone","Anchor","Boulder","Bedrock","Steadfast","Grit","Granite"]},
+  ]},
+  { text:"Do you take sugar in your tea?", options:[
+    {label:"Yes",bonus:["Honey","Toffee","Fudge","Caramel","Treacle","Sherbet","Bonbon","Butterscotch","Jellybean","Gumdrop","Sweetpea","Syrup","Custard","Pudding","Lollipop"]},
+    {label:"No", bonus:["Bitter","Tonic","Brisk","Sharp","Crisp","Earl","Assam","Pekoe","Darjeeling"]},
+  ]},
+  { text:"Do you like myths and legends?", options:[
+    {label:"Yes",bonus:["Orpheus","Perseus","Achilles","Heracles","Theseus","Ajax","Odysseus","Circe","Phoenix","Griffin","Merlin","Lancelot","Morgan","Oberon","Avalon","Medusa","Pegasus","Icarus","Apollo","Artemis"]},
+    {label:"No", bonus:["Norman","Derek","Keith","Brian","Barry","Colin","Basil","Kevin","Biscuit","Custard"]},
+  ]},
+  { text:"Sugar or salt?", options:[
+    {label:"Sugar",bonus:["Honey","Fudge","Caramel","Toffee","Treacle","Butterscotch","Sherbet","Bonbon","Mellow","Syrup","Candy","Nectar","Praline"]},
+    {label:"Salt", bonus:["Brine","Flint","Gravel","Sharp","Crisp","Gruff","Stone","Slate","Tonic","Crag","Grit","Granite","Rust"]},
+  ]},
+  { text:"Autumn or summer?", options:[
+    {label:"Autumn",bonus:["Amber","Russet","Conker","Chestnut","Bramble","Hazel","Harvest","Ember","Copper","Acorn","Tawny","Sienna","Cinnamon","Mist","Dusk"]},
+    {label:"Summer",bonus:["Sunny","Blaze","Sandy","Breeze","Dazzle","Shimmer","Freckle","Goldie","Honey","Wildflower","Surf","Coral","Azure","Radiant","Glow","Lemon"]},
+  ]},
+  { text:"How many sides does a circle have?", options:[
+    {label:"None",bonus:["Ace","Boss","Stone","Flint","Blade","Steel","Iron","Frost","Sharp","Crisp","Direct","Decisive","Clean","Bolt"]},
+    {label:"One", bonus:["Infinite","Spiral","Orbit","Cycle","Curve","Eternal","Continuum","Loop","Cosmos","Omega","Zen","Endless","Void","Paradox"]},
+  ]},
+  { text:"Tea or coffee?", options:[
+    {label:"Tea",   bonus:["Earl","Darjeeling","Assam","Oolong","Chamomile","Pekoe","Brew","Steep","Mellow","Proper","Crumpet","Scone","Biscuit"]},
+    {label:"Coffee",bonus:["Espresso","Cortado","Arabica","Mocha","Crema","Grind","Press","Dark","Roast","Intense","Robust","Bold","Bitter","Jet"]},
+  ]},
+  { text:"Would you rather be invisible or fly?", options:[
+    {label:"Invisible",bonus:["Ghost","Shadow","Phantom","Spectre","Wraith","Shade","Mist","Wisp","Echo","Blur","Fade","Smoke"]},
+    {label:"Fly",      bonus:["Falcon","Hawk","Eagle","Icarus","Pegasus","Cloud","Nimbus","Soar","Glide","Swift","Dart","Streak","Apex"]},
+  ]},
+  { text:"Night owl or early bird?", options:[
+    {label:"Night owl",  bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Sable","Noir","Obsidian","Onyx"]},
+    {label:"Early bird", bonus:["Dawn","Lark","Robin","Crisp","Dewy","Sparky","Sunny","Chirpy","Bright","Breezy","Perky","Glow","Fresh","Zippy"]},
+  ]},
+  { text:"Are you cool?", options:[
+    {label:"Yes",bonus:["Ace","Slick","Smooth","Ice","Frost","Suave","Sharp","Dapper","Blade","Shadow","Chrome","Silk","Velvet","Steel","Noir"]},
+    {label:"No", bonus:["Goofy","Doofus","Dingbat","Goofball","Wonky","Doolally","Bumbly","Topsy","Wibble","Clumsy","Wobble","Bumble","Scatty"]},
+  ]},
+  { text:"Are you a nerd?", options:[
+    {label:"Yes",bonus:["Kepler","Copernicus","Turing","Pascal","Euler","Archimedes","Pythagoras","Worf","Spock","Data","Hubble","Fibonacci","Bohr","Lovelace"]},
+    {label:"No", bonus:["Maverick","Rebel","Wildcard","Outlaw","Renegade","Rogue","Hotshot","Bandit","Flash","Blaze","Bolt","Rocket","Dash"]},
+  ]},
+  { text:"Do you make your bed in the morning?", options:[
+    {label:"Yes",bonus:["Pristine","Crisp","Sterling","Proper","Immaculate","Dapper","Sharp","Composed","Prim","Trim","Precise","Neat","Buff"]},
+    {label:"No", bonus:["Rumple","Tumble","Shambles","Chaos","Muddle","Scruffy","Slouch","Sprawl","Tangle","Topple","Wobble","Raggle","Jumble"]},
+  ]},
+  { text:"Do you read the terms and conditions?", options:[
+    {label:"Yes",bonus:["Prudence","Constance","Diligent","Earnest","Steadfast","Thorough","Scholar","Counsel","Careful","Measured","Exact","Vigilant"]},
+    {label:"No", bonus:["Maverick","Reckless","Wildcard","Rogue","Rebel","Outlaw","Carefree","Breezy","Blithe","Nonchalance","Audacious","Brazen"]},
+  ]},
+  { text:"New book -- break the spine?", options:[
+    {label:"Yes",bonus:["Battered","Beloved","Weathered","Story","Chapter","Thumbed","Worn","Creased","Dogear","Tattered","Frayed","Loved"]},
+    {label:"No", bonus:["Pristine","Ivory","Pearl","Gilt","Vellum","Parchment","Folio","Lacquer","Crisp","Mint","Immaculate"]},
+  ]},
+  { text:"Reply to texts immediately?", options:[
+    {label:"Yes",bonus:["Swift","Prompt","Flash","Zip","Dart","Ready","Alert","Keen","Sprightly","Rapid","Instant","Snappy","Brisk"]},
+    {label:"No", bonus:["Languid","Aloof","Nonchalance","Glaciale","Unhurried","Mellow","Drift","Mosey","Saunter","Laze","Meander"]},
+  ]},
+  { text:"Do you eat the crusts?", options:[
+    {label:"Yes",bonus:["Sturdy","Grit","Solid","Wholesome","Hearty","Stalwart","Steadfast","Biscuit","Dependable","Robust","Trusty","Stout"]},
+    {label:"No", bonus:["Delicate","Dainty","Precious","Refined","Particular","Fussy","Finicky","Petite","Prim","Gentle","Soft","Tender"]},
+  ]},
+  { text:"Ketchup -- fridge or cupboard?", options:[
+    {label:"Fridge",   bonus:["Chilled","Crisp","Precise","Measured","Exact","Rigorous","Rational","Careful","Scientific","Correct","Orderly"]},
+    {label:"Cupboard", bonus:["Instinct","Bold","Brazen","Fearless","Reckless","Maverick","Audacious","Daring","Bravado","Gutsy","Rogue","Defiant"]},
+  ]},
+  { text:"Escalator -- walk or stand?", options:[
+    {label:"Walk",  bonus:["Rocket","Dash","Sprint","Bolt","Charge","Hustle","Drive","Momentum","Relentless","Surge","Blaze","Flash","Rapid"]},
+    {label:"Stand", bonus:["Repose","Mellow","Saunter","Drift","Amble","Mosey","Languid","Unhurried","Serene","Composed","Placid","Still","Calm"]},
+  ]},
+  { text:"Party -- kitchen or dance floor?", options:[
+    {label:"Kitchen",     bonus:["Sage","Thoughtful","Ember","Hearth","Warmth","Steady","Quiet","Considered","Mellow","Grounded","Earnest"]},
+    {label:"Dance floor", bonus:["Showtime","Dazzle","Shimmy","Foxtrot","Sashay","Tango","Boogie","Ziggy","Sparkle","Strut","Glitter","Flash"]},
+  ]},
+  { text:"Rehearse conversations in your head?", options:[
+    {label:"Yes",bonus:["Considered","Measured","Ponder","Ruminate","Reflect","Muse","Contemplate","Deliberate","Thoughtful","Nuanced","Meticulous"]},
+    {label:"No", bonus:["Blurt","Spark","Candid","Frank","Brash","Forthright","Bold","Direct","Unfiltered","Raw","Spontaneous","Impulsive"]},
+  ]},
+  { text:"Do you believe in luck?", options:[
+    {label:"Yes",bonus:["Lucky","Fortune","Charm","Clover","Wishbone","Serendipity","Kismet","Fate","Fortuna","Star","Chance","Destiny","Omen"]},
+    {label:"No", bonus:["Grit","Hustle","Grind","Steel","Forge","Drive","Muscle","Tenacity","Earn","Build","Craft","Toil","Persist","Relentless"]},
+  ]},
+  { text:"Windows or Mac?", options:[
+    {label:"Windows",bonus:["Pixel","Glitch","Buffer","Crash","Reboot","Patch","Clippy","Loading","Freeze","Spinner","Update","Error"]},
+    {label:"Mac",    bonus:["Retina","Safari","Sleek","Minimal","Studio","Render","Siri","Fusion","Carbon","Silicon","Spotlight","Aluminium"]},
+  ]},
+  { text:"Are you a good dancer?", options:[
+    {label:"Yes",bonus:["Foxtrot","Tango","Waltz","Sashay","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Salsa","Rumba","Swing","Jive"]},
+    {label:"No", bonus:["Lumber","Shuffle","Plod","Stumble","Wobble","Trundle","Sway","Stomp","Clump","Blunder","Flail","Lurch","Stagger"]},
+  ]},
+  { text:"When did you last call your mother?", options:[
+    {label:"Recently",     bonus:["Loyal","Faithful","Devoted","True","Steadfast","Beloved","Darling","Treasure","Precious","Cherished","Noble","Gallant"]},
+    {label:"Not recently", bonus:["Rogue","Rebel","Outlaw","Maverick","Renegade","Wildcard","Trouble","Chaos","Rascal","Scamp","Scoundrel","Vagabond"]},
+  ]},
+  { text:"What music moves you?", options:[
+    {label:"Classic / Jazz",    bonus:["Sinatra","Ella","Billie","Miles","Duke","Dizzy","Satchmo","Monk","Coltrane","Armstrong","Holiday"]},
+    {label:"Rock / Indie",      bonus:["Bowie","Jagger","Lennon","Hendrix","Cobain","Strummer","Iggy","Lemmy","Morrissey","Ziggy","Riff","Thunder"]},
+    {label:"Pop",               bonus:["Presley","Freddie","Elton","George","Prince","Kylie","Adele","Showtime","Glitter","Dazzle","Sparkle"]},
+    {label:"Hip Hop / R&B",     bonus:["Ghost","Shadow","Ice","Smooth","Phantom","Ace","Blaze","Hustle","Flex","Drip","Hype","Vibe","Wave"]},
+    {label:"Country",           bonus:["Dolly","Hank","Waylon","Willie","Cash","Loretta","Patsy","Emmylou","Harvest","Dusty","Rusty","Prairie"]},
+    {label:"Electronic / Dance",bonus:["Moby","Orbital","Prodigy","Massive","Tricky","Bass","Pulse","Beat","Rhythm","Tempo","Sync","Surge"]},
+    {label:"Metal",             bonus:["Ozzy","Lemmy","Dio","Riff","Thunder","Havoc","Chaos","Rampage","Iron","Steel","Blade","Hammer","Fury"]},
+    {label:"Classical",         bonus:["Mozart","Bach","Handel","Vivaldi","Chopin","Liszt","Mahler","Brahms","Elgar","Purcell","Cadence","Forte"]},
+  ]},
+  { text:"Favourite pizza?", options:[
+    {label:"Margherita", bonus:["Pearl","Ivory","Simple","Pure","Classic","Refined","Elegant","Clean","Minimal","Pristine","Delicate","Noble"]},
+    {label:"Pepperoni",  bonus:["Biscuit","Buddy","Champ","Sunny","Lucky","Faithful","Happy","Reliable","Steady","True","Trusty","Solid","Warm"]},
+    {label:"Meat feast", bonus:["Boss","Havoc","Chaos","Thunder","Blaze","Savage","Titan","Goliath","Maximus","Beast","Rampage","Fury","Brute"]},
+    {label:"Vegetarian", bonus:["Flora","Basil","Sage","Clover","Bloom","Meadow","Willow","Fern","Ivy","Petal","Briar","Moss","Leaf","Blossom"]},
+    {label:"Hawaiian",   bonus:["Maverick","Wildcard","Renegade","Rebel","Outlaw","Bonkers","Doolally","Chaos","Rogue","Breezy","Carefree","Bold"]},
+  ]},
 ];
 
+function pickTwoQuestions(seed: number): [number, number] {
+  const t = Date.now() & 0x7fffffff;
+  const q1 = Math.abs((seed ^ t) % QUESTION_BANK.length);
+  let q2 = Math.abs(((seed * 7 + 3) ^ (t >> 5)) % QUESTION_BANK.length);
+  if (q2 === q1) q2 = (q2 + 1) % QUESTION_BANK.length;
+  return [q1, q2];
+}
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
 
@@ -252,28 +384,57 @@ function countSyllables(word: string): number {
 
 function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surname: string, colour: DogColour = ""): number {
   let score = 0;
+
+  // ── CONTRAST (unchanged) ──────────────────────────────────────────────────
   score += contrastScore(title.reg, first.reg);
   score += contrastScore(first.reg, dogWord.reg);
+
+  // ── ALLITERATION (heavily weighted -- the engine of comedy) ──────────────
   const fl = first.name[0].toLowerCase();
   const wl = dogWord.word[0].toLowerCase();
+  const sl = surname.replace(/-.*/, "")[0]?.toLowerCase() ?? ""; // base surname initial
   const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
-  if (fl === wl) score += 3;
-  else if (sf[fl] && sf[fl] === sf[wl]) score += 1;
+
+  // First name <-> dog word alliteration (core comedy unit)
+  if (fl === wl) score += 5;
+  else if (sf[fl] && sf[fl] === sf[wl]) score += 2;
+
+  // Title initial <-> first name
+  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
+  if (tf === fl) score += 3;
+
+  // Triple alliteration: title + name + dog word
+  if (fl === wl && tf === fl) score += 4;
+
+  // Surname alliteration bonus: dog word and surname start the same
+  if (wl === sl && sl !== "") score += 2;
+
+  // Full four-way: title + name + dogword + surname
+  if (tf === fl && fl === wl && wl === sl) score += 2;
+
+  // ── RHYTHM ────────────────────────────────────────────────────────────────
   const total = title.syllables + first.syllables + 1 + countSyllables(surname);
   if (total >= 5 && total <= 9) score += 4;
   else if (total >= 3 && total <= 12) score += 2;
+
+  // ── SHORT PUNCHY NAMES score higher ───────────────────────────────────────
   if (first.syllables <= 2) score += 3;
   else if (first.syllables <= 3) score += 2;
   else if (first.syllables <= 4) score += 1;
-  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase();
-  if (tf === fl) score += 2;
-  if (fl === wl && tf === fl) score += 2;
+
+  // ── COLOUR BONUS ──────────────────────────────────────────────────────────
   score += colourScore(first.name, colour as DogColour);
-  // Penalise very short abbreviation-only first names (LM, HB, BP etc) -- need a real name
-  if (/^[A-Z]{1,3}$/.test(first.name)) score -= 3;
-  // Bonus for genuinely funny/breed-appropriate first names (short, punchy, food or chaos)
+
+  // ── FOOD/CHAOS FIRST NAME BONUS ───────────────────────────────────────────
   if (first.reg === "food" && first.syllables <= 2) score += 2;
   if (first.reg === "chaos" && first.syllables <= 2) score += 1;
+
+  // ── PENALISE grand title on baby/food when dog word already contrasts ─────
+  if (title.reg === "grand" && (first.reg === "baby" || first.reg === "food") && first.syllables <= 2) {
+    const dogContrast = contrastScore(first.reg, dogWord.reg);
+    if (dogContrast >= 3) score -= 2;
+  }
+
   return score;
 }
 
@@ -308,7 +469,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Bulldog specifically -- Churchill energy
   bulldog:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Field Marshal",reg:"grand",syllables:3}],
   // Character breeds -- self-appointed grandeur
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baron",reg:"grand",syllables:2}],
+  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
   // Gentry -- Dalmatian, OES etc
   gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1}],
   // Dachshund -- absurdly self-important
@@ -327,10 +488,10 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3}],
   giant:      [{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1}],
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2}],
-  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2}],
   bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Inimitable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2}],
-  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Illustrious",reg:"grand",syllables:4},{title:"Countess",reg:"grand",syllables:2}],
+  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2}],
+  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Countess",reg:"grand",syllables:2}],
   gentry:     [{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Most Honourable",reg:"grand",syllables:4},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Marchioness",reg:"grand",syllables:3}],
   default:    [{title:"Lady",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3}],
 };
@@ -346,11 +507,11 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
     girl: [{name:"Dizzy",reg:"chaos",syllables:2},{name:"Topsy",reg:"chaos",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Wibble",reg:"chaos",syllables:2},{name:"Doolally",reg:"chaos",syllables:3},{name:"Ramshackle",reg:"chaos",syllables:3},{name:"Twinkles",reg:"baby",syllables:2},{name:"Cornflake",reg:"food",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Babbycakes",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2}],
   },
   sighthound: {
-    boy: [{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Indifference",reg:"aloof",syllables:4},{name:"Lassitude",reg:"aloof",syllables:3},{name:"Apathy",reg:"aloof",syllables:3},{name:"Sangfroid",reg:"aloof",syllables:2},{name:"Miles",reg:"mundane",syllables:1},{name:"Julian",reg:"grand",syllables:3},{name:"Lawrence",reg:"grand",syllables:2},{name:"Richard",reg:"grand",syllables:2},{name:"Quentin",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Vincent",reg:"grand",syllables:2},{name:"Leopold",reg:"grand",syllables:3},{name:"Edgar",reg:"grand",syllables:2}],
-    girl: [{name:"Ennui",reg:"aloof",syllables:2},{name:"Langueur",reg:"aloof",syllables:2},{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Aloofia",reg:"aloof",syllables:4},{name:"Glaciale",reg:"aloof",syllables:3},{name:"Reservée",reg:"aloof",syllables:3},{name:"Austère",reg:"aloof",syllables:2},{name:"Samantha",reg:"mundane",syllables:3},{name:"Bethany",reg:"mundane",syllables:3},{name:"Amanda",reg:"mundane",syllables:3},{name:"Megan",reg:"mundane",syllables:2},{name:"Hannah",reg:"mundane",syllables:2},{name:"Melissa",reg:"mundane",syllables:3},{name:"Nicole",reg:"mundane",syllables:2},{name:"Rachel",reg:"mundane",syllables:2},{name:"Betty",reg:"mundane",syllables:2},{name:"Amy",reg:"mundane",syllables:2},{name:"Emily",reg:"mundane",syllables:3},{name:"Jennifer",reg:"mundane",syllables:3},{name:"Sarah",reg:"mundane",syllables:2},{name:"Lucy",reg:"mundane",syllables:2},{name:"Bailey",reg:"mundane",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Jasmine",reg:"nature",syllables:2}],
+    boy: [{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Indifference",reg:"aloof",syllables:4},{name:"Lassitude",reg:"aloof",syllables:3},{name:"Apathy",reg:"aloof",syllables:3},{name:"Sangfroid",reg:"aloof",syllables:2},{name:"Miles",reg:"mundane",syllables:1},{name:"Julian",reg:"grand",syllables:3},{name:"Lawrence",reg:"grand",syllables:2},{name:"Richard",reg:"grand",syllables:2},{name:"Quentin",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Vincent",reg:"grand",syllables:2},{name:"Leopold",reg:"grand",syllables:3},{name:"Edgar",reg:"grand",syllables:2},{name:"Dash",reg:"mundane",syllables:2},{name:"Drifter",reg:"mundane",syllables:2},{name:"Dancer",reg:"mundane",syllables:2},{name:"Dart",reg:"mundane",syllables:2},{name:"Duke",reg:"mundane",syllables:2},{name:"Flash",reg:"mundane",syllables:2},{name:"Fleet",reg:"mundane",syllables:2},{name:"Flint",reg:"mundane",syllables:2},{name:"Falcon",reg:"mundane",syllables:2},{name:"Fury",reg:"mundane",syllables:2}],
+    girl: [{name:"Ennui",reg:"aloof",syllables:2},{name:"Langueur",reg:"aloof",syllables:2},{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Aloofia",reg:"aloof",syllables:4},{name:"Glaciale",reg:"aloof",syllables:3},{name:"Reservée",reg:"aloof",syllables:3},{name:"Austère",reg:"aloof",syllables:2},{name:"Samantha",reg:"mundane",syllables:3},{name:"Bethany",reg:"mundane",syllables:3},{name:"Amanda",reg:"mundane",syllables:3},{name:"Megan",reg:"mundane",syllables:2},{name:"Hannah",reg:"mundane",syllables:2},{name:"Melissa",reg:"mundane",syllables:3},{name:"Nicole",reg:"mundane",syllables:2},{name:"Rachel",reg:"mundane",syllables:2},{name:"Betty",reg:"mundane",syllables:2},{name:"Amy",reg:"mundane",syllables:2},{name:"Emily",reg:"mundane",syllables:3},{name:"Jennifer",reg:"mundane",syllables:3},{name:"Sarah",reg:"mundane",syllables:2},{name:"Lucy",reg:"mundane",syllables:2},{name:"Bailey",reg:"mundane",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Jasmine",reg:"nature",syllables:2},{name:"Duchess",reg:"aloof",syllables:2},{name:"Drifter",reg:"aloof",syllables:2},{name:"Dazzle",reg:"aloof",syllables:2},{name:"Dancer",reg:"aloof",syllables:2},{name:"Fleur",reg:"aloof",syllables:2},{name:"Flair",reg:"aloof",syllables:2},{name:"Frost",reg:"aloof",syllables:2},{name:"Fauna",reg:"aloof",syllables:2},{name:"Flutter",reg:"aloof",syllables:2}],
   },
   sniffer: {
-    boy: [{name:"Plodsworth",reg:"absurd",syllables:2},{name:"Glumley",reg:"absurd",syllables:2},{name:"Mourny",reg:"absurd",syllables:2},{name:"Woebegone",reg:"absurd",syllables:3},{name:"Lachrymose",reg:"absurd",syllables:3},{name:"Melancholy",reg:"absurd",syllables:4},{name:"Lugubrious",reg:"absurd",syllables:4},{name:"Gloopington",reg:"absurd",syllables:3},{name:"John",reg:"mundane",syllables:1},{name:"Brian",reg:"mundane",syllables:2},{name:"Raymond",reg:"mundane",syllables:2},{name:"George",reg:"mundane",syllables:1},{name:"Arthur",reg:"mundane",syllables:2},{name:"David",reg:"mundane",syllables:2},{name:"Keith",reg:"mundane",syllables:1},{name:"Derek",reg:"mundane",syllables:2},{name:"Kevin",reg:"mundane",syllables:2},{name:"Trevor",reg:"mundane",syllables:2},{name:"Barry",reg:"mundane",syllables:2},{name:"Norman",reg:"mundane",syllables:2},{name:"Basil",reg:"mundane",syllables:2}],
+    boy: [{name:"Plodsworth",reg:"absurd",syllables:2},{name:"Glumley",reg:"absurd",syllables:2},{name:"Mourny",reg:"absurd",syllables:2},{name:"Woebegone",reg:"absurd",syllables:3},{name:"Lachrymose",reg:"absurd",syllables:3},{name:"Melancholy",reg:"absurd",syllables:4},{name:"Lugubrious",reg:"absurd",syllables:4},{name:"Gloopington",reg:"absurd",syllables:3},{name:"John",reg:"mundane",syllables:1},{name:"Brian",reg:"mundane",syllables:2},{name:"Raymond",reg:"mundane",syllables:2},{name:"George",reg:"mundane",syllables:1},{name:"Arthur",reg:"mundane",syllables:2},{name:"David",reg:"mundane",syllables:2},{name:"Keith",reg:"mundane",syllables:1},{name:"Derek",reg:"mundane",syllables:2},{name:"Kevin",reg:"mundane",syllables:2},{name:"Trevor",reg:"mundane",syllables:2},{name:"Barry",reg:"mundane",syllables:2},{name:"Norman",reg:"mundane",syllables:2},{name:"Basil",reg:"mundane",syllables:2},{name:"Hunter",reg:"mundane",syllables:2},{name:"Hector",reg:"mundane",syllables:2},{name:"Hugo",reg:"mundane",syllables:2},{name:"Harold",reg:"mundane",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Hound",reg:"mundane",syllables:2},{name:"Quest",reg:"mundane",syllables:2},{name:"Quincy",reg:"mundane",syllables:2},{name:"Quentin",reg:"mundane",syllables:2},{name:"Shadow",reg:"mundane",syllables:2},{name:"Sherlock",reg:"mundane",syllables:2},{name:"Sleuth",reg:"mundane",syllables:2},{name:"Scout",reg:"mundane",syllables:2},{name:"Snooper",reg:"mundane",syllables:2},{name:"Snout",reg:"mundane",syllables:2},{name:"Snuffle",reg:"mundane",syllables:2},{name:"Sage",reg:"mundane",syllables:2},{name:"Samson",reg:"mundane",syllables:2}],
     girl: [{name:"Gloomsbury",reg:"absurd",syllables:3},{name:"Woesworth",reg:"absurd",syllables:2},{name:"Doleful",reg:"absurd",syllables:2},{name:"Lamentia",reg:"absurd",syllables:3},{name:"Wistfulina",reg:"absurd",syllables:3},{name:"Lacrimosa",reg:"absurd",syllables:4},{name:"Tristesse",reg:"absurd",syllables:2},{name:"Despondina",reg:"absurd",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3}],
   },
   giant: {
@@ -366,19 +527,19 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
     girl: [{name:"Treacle",reg:"food",syllables:2},{name:"Trifle",reg:"food",syllables:2},{name:"Muffin",reg:"food",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Eclair",reg:"food",syllables:2},{name:"Crumpet",reg:"food",syllables:2},{name:"Waffle",reg:"food",syllables:2},{name:"Biscuit",reg:"food",syllables:2},{name:"Brownie",reg:"food",syllables:2},{name:"Pavlova",reg:"food",syllables:3},{name:"Charlotte",reg:"mundane",syllables:2},{name:"Margaret",reg:"mundane",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Edith",reg:"mundane",syllables:2},{name:"Florence",reg:"mundane",syllables:2},{name:"Beatrice",reg:"grand",syllables:3},{name:"Constance",reg:"mundane",syllables:2},{name:"Millicent",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2},{name:"Truffle",reg:"food",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Popcorn",reg:"food",syllables:2},{name:"Beanbag",reg:"food",syllables:2},{name:"Nibbins",reg:"food",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Cracker",reg:"food",syllables:2},{name:"Kipper",reg:"food",syllables:2},{name:"Sardine",reg:"food",syllables:2},{name:"Prawn",reg:"food",syllables:2},{name:"Pickles",reg:"food",syllables:2},{name:"Pippin",reg:"food",syllables:2},{name:"Pip",reg:"food",syllables:2},{name:"Pipsqueak",reg:"food",syllables:2},{name:"Sprout",reg:"food",syllables:2},{name:"Goose",reg:"food",syllables:2},{name:"Smudge",reg:"food",syllables:2},{name:"Splodge",reg:"food",syllables:2}],
   },
   collie: {
-    boy: [{name:"Frenetic",reg:"chaos",syllables:3},{name:"Relentless",reg:"absurd",syllables:3},{name:"Obsessive",reg:"absurd",syllables:3},{name:"Ceaseless",reg:"absurd",syllables:2},{name:"Tenacious",reg:"absurd",syllables:4},{name:"Tireless",reg:"absurd",syllables:2},{name:"Resolute",reg:"grand",syllables:3},{name:"Duncan",reg:"mundane",syllables:2},{name:"Angus",reg:"mundane",syllables:2},{name:"Hamish",reg:"mundane",syllables:2},{name:"Rory",reg:"mundane",syllables:2},{name:"Fergus",reg:"mundane",syllables:2},{name:"Malcolm",reg:"mundane",syllables:2},{name:"Sprocket",reg:"chaos",syllables:2},{name:"Spanner",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Zoomer",reg:"chaos",syllables:2},{name:"Whizz",reg:"chaos",syllables:2},{name:"Rocket",reg:"chaos",syllables:2},{name:"Dasher",reg:"chaos",syllables:2},{name:"Scout",reg:"chaos",syllables:2},{name:"Tracker",reg:"chaos",syllables:2},{name:"Chaser",reg:"chaos",syllables:2},{name:"Boffin",reg:"chaos",syllables:2},{name:"Skitter",reg:"chaos",syllables:2},{name:"Badger",reg:"mundane",syllables:2}],
+    boy: [{name:"Frenetic",reg:"chaos",syllables:3},{name:"Relentless",reg:"absurd",syllables:3},{name:"Obsessive",reg:"absurd",syllables:3},{name:"Ceaseless",reg:"absurd",syllables:2},{name:"Tenacious",reg:"absurd",syllables:4},{name:"Tireless",reg:"absurd",syllables:2},{name:"Resolute",reg:"grand",syllables:3},{name:"Duncan",reg:"mundane",syllables:2},{name:"Angus",reg:"mundane",syllables:2},{name:"Hamish",reg:"mundane",syllables:2},{name:"Rory",reg:"mundane",syllables:2},{name:"Fergus",reg:"mundane",syllables:2},{name:"Malcolm",reg:"mundane",syllables:2},{name:"Sprocket",reg:"chaos",syllables:2},{name:"Spanner",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Zoomer",reg:"chaos",syllables:2},{name:"Whizz",reg:"chaos",syllables:2},{name:"Rocket",reg:"chaos",syllables:2},{name:"Dasher",reg:"chaos",syllables:2},{name:"Scout",reg:"chaos",syllables:2},{name:"Tracker",reg:"chaos",syllables:2},{name:"Chaser",reg:"chaos",syllables:2},{name:"Boffin",reg:"chaos",syllables:2},{name:"Skitter",reg:"chaos",syllables:2},{name:"Badger",reg:"mundane",syllables:2},{name:"Gadget",reg:"absurd",syllables:2},{name:"Genius",reg:"absurd",syllables:2},{name:"Glider",reg:"absurd",syllables:2},{name:"Gatherer",reg:"absurd",syllables:2},{name:"Govern",reg:"absurd",syllables:2},{name:"Grid",reg:"absurd",syllables:2}],
     girl: [{name:"Frenzied",reg:"chaos",syllables:2},{name:"Incessant",reg:"absurd",syllables:3},{name:"Ceaseless",reg:"absurd",syllables:2},{name:"Tireless",reg:"absurd",syllables:2},{name:"Restless",reg:"absurd",syllables:2},{name:"Anxious",reg:"absurd",syllables:2},{name:"Manic",reg:"chaos",syllables:2},{name:"Frantic",reg:"chaos",syllables:2},{name:"Fiona",reg:"mundane",syllables:3},{name:"Morag",reg:"mundane",syllables:2},{name:"Isla",reg:"mundane",syllables:2},{name:"Kirsty",reg:"mundane",syllables:2},{name:"Flora",reg:"nature",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3}],
   },
   poodle: {
-    boy: [{name:"Existentiale",reg:"absurd",syllables:5},{name:"Paradoxe",reg:"absurd",syllables:3},{name:"Dialectique",reg:"absurd",syllables:4},{name:"Ontologie",reg:"absurd",syllables:4},{name:"Hermeneutique",reg:"absurd",syllables:5},{name:"Syllogisme",reg:"absurd",syllables:4},{name:"Pierre",reg:"grand",syllables:1},{name:"Jacques",reg:"grand",syllables:1},{name:"François",reg:"grand",syllables:2},{name:"Henri",reg:"grand",syllables:2},{name:"Marcel",reg:"grand",syllables:2},{name:"Gaston",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Einstein",reg:"grand",syllables:2},{name:"Socrates",reg:"grand",syllables:3},{name:"Darwin",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Freud",reg:"grand",syllables:1}],
-    girl: [{name:"Dialectique",reg:"absurd",syllables:4},{name:"Epistemique",reg:"absurd",syllables:5},{name:"Ontologie",reg:"absurd",syllables:4},{name:"Semantique",reg:"absurd",syllables:3},{name:"Metaphysique",reg:"absurd",syllables:4},{name:"Colette",reg:"grand",syllables:2},{name:"Marguerite",reg:"grand",syllables:3},{name:"Simone",reg:"grand",syllables:2},{name:"Yvette",reg:"grand",syllables:2},{name:"Brigitte",reg:"grand",syllables:2},{name:"Claudette",reg:"grand",syllables:2},{name:"Giselle",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2}],
+    boy: [{name:"Existentiale",reg:"absurd",syllables:5},{name:"Paradoxe",reg:"absurd",syllables:3},{name:"Dialectique",reg:"absurd",syllables:4},{name:"Ontologie",reg:"absurd",syllables:4},{name:"Hermeneutique",reg:"absurd",syllables:5},{name:"Syllogisme",reg:"absurd",syllables:4},{name:"Pierre",reg:"grand",syllables:1},{name:"Jacques",reg:"grand",syllables:1},{name:"François",reg:"grand",syllables:2},{name:"Henri",reg:"grand",syllables:2},{name:"Marcel",reg:"grand",syllables:2},{name:"Gaston",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Einstein",reg:"grand",syllables:2},{name:"Socrates",reg:"grand",syllables:3},{name:"Darwin",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Freud",reg:"grand",syllables:1},{name:"Waltz",reg:"grand",syllables:2},{name:"Wittgenstein",reg:"grand",syllables:2},{name:"Wafture",reg:"grand",syllables:2},{name:"Plato",reg:"grand",syllables:2},{name:"Pythagoras",reg:"grand",syllables:2},{name:"Poirot",reg:"grand",syllables:2},{name:"Proust",reg:"grand",syllables:2},{name:"Pascal",reg:"grand",syllables:2}],
+    girl: [{name:"Dialectique",reg:"absurd",syllables:4},{name:"Epistemique",reg:"absurd",syllables:5},{name:"Ontologie",reg:"absurd",syllables:4},{name:"Semantique",reg:"absurd",syllables:3},{name:"Metaphysique",reg:"absurd",syllables:4},{name:"Colette",reg:"grand",syllables:2},{name:"Marguerite",reg:"grand",syllables:3},{name:"Simone",reg:"grand",syllables:2},{name:"Yvette",reg:"grand",syllables:2},{name:"Brigitte",reg:"grand",syllables:2},{name:"Claudette",reg:"grand",syllables:2},{name:"Giselle",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Waltz",reg:"grand",syllables:2},{name:"Wisteria",reg:"grand",syllables:2},{name:"Whimsy",reg:"grand",syllables:2},{name:"Wistful",reg:"grand",syllables:2},{name:"Wanderlust",reg:"grand",syllables:2}],
   },
   dachshund: {
     boy: [{name:"Elongated",reg:"absurd",syllables:4},{name:"Horizontal",reg:"absurd",syllables:4},{name:"Extended",reg:"absurd",syllables:3},{name:"Protracted",reg:"absurd",syllables:3},{name:"Oblong",reg:"absurd",syllables:2},{name:"Longitudinal",reg:"absurd",syllables:5},{name:"Accordion",reg:"absurd",syllables:4},{name:"Telescopic",reg:"absurd",syllables:4},{name:"Klaus",reg:"grand",syllables:1},{name:"Dieter",reg:"mundane",syllables:2},{name:"Franz",reg:"mundane",syllables:1},{name:"Hans",reg:"mundane",syllables:1},{name:"Otto",reg:"mundane",syllables:2},{name:"Wolfgang",reg:"grand",syllables:2},{name:"Napoleon",reg:"grand",syllables:4},{name:"Rasputin",reg:"grand",syllables:3}],
     girl: [{name:"Slinky",reg:"absurd",syllables:2},{name:"Sinuous",reg:"absurd",syllables:3},{name:"Serpentine",reg:"absurd",syllables:3},{name:"Streamlined",reg:"absurd",syllables:3},{name:"Filiform",reg:"absurd",syllables:3},{name:"Linear",reg:"absurd",syllables:3},{name:"Helga",reg:"mundane",syllables:2},{name:"Greta",reg:"mundane",syllables:2},{name:"Hilde",reg:"mundane",syllables:2},{name:"Ursula",reg:"mundane",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3}],
   },
   german: {
-    boy: [{name:"Heinrich",reg:"grand",syllables:2},{name:"Wolfgang",reg:"grand",syllables:2},{name:"Dieter",reg:"mundane",syllables:2},{name:"Klaus",reg:"mundane",syllables:1},{name:"Reinhard",reg:"grand",syllables:2},{name:"Manfred",reg:"mundane",syllables:2},{name:"Siegfried",reg:"grand",syllables:2},{name:"Konrad",reg:"grand",syllables:2},{name:"Ludwig",reg:"grand",syllables:2},{name:"Friedrich",reg:"grand",syllables:2},{name:"Maximilian",reg:"grand",syllables:5},{name:"Amadeus",reg:"grand",syllables:4},{name:"Beethoven",reg:"grand",syllables:3},{name:"Mozart",reg:"grand",syllables:2}],
+    boy: [{name:"Heinrich",reg:"grand",syllables:2},{name:"Wolfgang",reg:"grand",syllables:2},{name:"Dieter",reg:"mundane",syllables:2},{name:"Klaus",reg:"mundane",syllables:1},{name:"Reinhard",reg:"grand",syllables:2},{name:"Manfred",reg:"mundane",syllables:2},{name:"Siegfried",reg:"grand",syllables:2},{name:"Konrad",reg:"grand",syllables:2},{name:"Ludwig",reg:"grand",syllables:2},{name:"Friedrich",reg:"grand",syllables:2},{name:"Maximilian",reg:"grand",syllables:5},{name:"Amadeus",reg:"grand",syllables:4},{name:"Beethoven",reg:"grand",syllables:3},{name:"Mozart",reg:"grand",syllables:2},{name:"Panzer",reg:"grand",syllables:2},{name:"Patton",reg:"grand",syllables:2},{name:"Pershing",reg:"grand",syllables:2},{name:"Prussian",reg:"grand",syllables:2},{name:"Praetorian",reg:"grand",syllables:2},{name:"Paladin",reg:"grand",syllables:2}],
     girl: [{name:"Hildegard",reg:"grand",syllables:3},{name:"Brunhilde",reg:"grand",syllables:3},{name:"Lieselotte",reg:"grand",syllables:4},{name:"Gertrude",reg:"mundane",syllables:2},{name:"Ingeborg",reg:"grand",syllables:3},{name:"Elfriede",reg:"grand",syllables:3},{name:"Mathilde",reg:"grand",syllables:2},{name:"Hedwig",reg:"mundane",syllables:2},{name:"Mechthild",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2}],
   },
   spaniel: {
@@ -391,7 +552,7 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
   },
   default: {
     boy: [{name:"Archibald",reg:"grand",syllables:3},{name:"Barnaby",reg:"grand",syllables:3},{name:"Cornelius",reg:"grand",syllables:4},{name:"Douglas",reg:"mundane",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Herbert",reg:"mundane",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Lionel",reg:"grand",syllables:3},{name:"Montgomery",reg:"grand",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Percival",reg:"grand",syllables:3},{name:"Reginald",reg:"grand",syllables:3},{name:"Stanley",reg:"mundane",syllables:2},{name:"Theodore",reg:"grand",syllables:3},{name:"Vincent",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3}],
-    girl: [{name:"Arabella",reg:"grand",syllables:4},{name:"Beatrice",reg:"grand",syllables:3},{name:"Clementine",reg:"grand",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Eleanor",reg:"grand",syllables:3},{name:"Georgiana",reg:"grand",syllables:4},{name:"Isadora",reg:"grand",syllables:4},{name:"Lavinia",reg:"grand",syllables:4},{name:"Millicent",reg:"grand",syllables:3},{name:"Nora",reg:"mundane",syllables:2},{name:"Prudence",reg:"mundane",syllables:2},{name:"Rosalind",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Tabitha",reg:"grand",syllables:3},{name:"Vivienne",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3}],
+    girl: [{name:"Arabella",reg:"grand",syllables:4},{name:"Beatrice",reg:"grand",syllables:3},{name:"Clementine",reg:"grand",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Eleanor",reg:"grand",syllables:3},{name:"Georgiana",reg:"grand",syllables:4},{name:"Isadora",reg:"grand",syllables:4},{name:"Lavinia",reg:"grand",syllables:4},{name:"Millicent",reg:"grand",syllables:3},{name:"Nora",reg:"mundane",syllables:2},{name:"Prudence",reg:"mundane",syllables:2},{name:"Rosalind",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Tabitha",reg:"grand",syllables:3},{name:"Vivienne",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wriggle",reg:"chaos",syllables:2},{name:"Waddle",reg:"chaos",syllables:2},{name:"Wander",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2}],
   },
 };
 
@@ -501,22 +662,33 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     (!a.breeds || a.breeds.includes(group2))
   );
 
-  const styleRoll = seed % 13;
+  const noTitleBreeds = ["labrador","labradoodle","goldendoodle"];
+  const styleRoll = noTitleBreeds.includes(breed.toLowerCase()) ? 4 : seed % 13;
   let full = "";
   let nickname = "";
 
   if (styleRoll === 0 && validAbbrevs.length > 0) {
     const abbrev = pick(validAbbrevs, seed + 5);
-    full = `${abbrev.code} ${effectiveSurname}`;
-    nickname = abbrev.meaning;
+    const dottedCode = abbrev.code.split("").join(".");
+    full = `${dottedCode} (${abbrev.meaning}) ${effectiveSurname}`;
+    nickname = abbrev.code;
   } else if (styleRoll === 1 && gender === "boy") {
     const letter = pick(DTRAIN_LETTERS, seed + 13);
     const suffix = pick(DTRAIN_SUFFIXES, seed + 19);
     full = `${letter}-${suffix} ${effectiveSurname}`;
+    nickname = getNickname(firstName.name);
   } else if (styleRoll === 2 && gender === "girl") {
     const fName = pick(MARIEJ_FIRSTS, seed + 7);
     const mInit = pick(MARIEJ_INITIALS, seed + 23);
     full = `${fName} ${mInit} ${effectiveSurname}`;
+    nickname = getNickname(fName);
+  } else if (styleRoll === 3 && gender === "boy" && ["dachshund","character","terrier","collie"].includes(group2)) {
+    // Reversed descriptor: "Extended General Burrow-Patterson" -- adjective before title
+    const descriptors = ["Extended","Horizontal","Stretched","Relentless","Obsessive","Notorious","Incomparable","Frenetic","Unstoppable","Legendary","Indefatigable","Tenacious"];
+    const descriptor = pick(descriptors, seed + 29);
+    const baseTitle = pick(titleBank, seed).title;
+    full = `${descriptor} ${baseTitle} ${firstName.name} ${effectiveSurname}`;
+    nickname = getNickname(firstName.name);
   } else {
     full = `${title.title} ${firstName.name} ${effectiveSurname}`;
     const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
@@ -524,14 +696,32 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const initials2 = tInit + nInit;
     const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
     if (matched) {
-      nickname = `${matched.code} — ${matched.meaning}`;
+      nickname = matched.code;
     } else {
-      nickname = getNickname(firstName.name);
+      const naturalNick = getNickname(firstName.name);
+      if (naturalNick) {
+        nickname = naturalNick;
+      } else {
+        // Try acronym from full name -- only use if pronounceable (has vowel, sounds like a word)
+        const acronym = full.split(" ").map(w => w[0]).join("").toUpperCase().replace(/[^A-Z]/g,"");
+        const hasVowel = /[AEIOU]/.test(acronym);
+        const notTooLong = acronym.length >= 2 && acronym.length <= 5;
+        const notAllConsonants = hasVowel;
+        if (hasVowel && notTooLong && notAllConsonants) {
+          // Make it pronounceable by inserting implied vowel sounds
+          // e.g. "BPJS" -> skip, "CATS" -> CATS, "FRD" -> skip
+          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / acronym.length;
+          if (vowelRatio >= 0.25) {
+            nickname = acronym;
+          }
+        }
+      }
     }
   }
 
   const reasoning = pick(reasoningBank, seed + 11);
-  const score = scoreName(title, firstName, dogWordEntry, surname, colour);
+  const baseScore = scoreName(title, firstName, dogWordEntry, surname, colour);
+  const score = styleRoll === 0 ? baseScore + 4 : baseScore;
   return { full, nickname, reasoning, score };
 }
 
@@ -541,7 +731,6 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 function dedupeResults(candidates: Result[], limit = 10): Result[] {
   const usedFirstNames  = new Set<string>();
   const usedTitles      = new Set<string>();
-  const usedPrefixBase  = new Set<string>(); // dedupe on base title ignoring prefix
   const usedDogWords    = new Set<string>();
   const out: Result[] = [];
   for (const r of candidates) {
@@ -554,19 +743,82 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
     if (usedFirstNames.has(firstName)) continue;
     if (usedTitles.has(title)) continue;
-    // Also dedupe on base title (strip prefix like Grand/Supreme/Divine)
-    const prefixList = ["Grand ","Supreme ","Divine ","Imperial ","Arch ","High ","Ultra ","Très ","Super ","Hyper ","Uber ","Mega "];
-    const baseTitle = prefixList.reduce((t, p) => t.startsWith(p) ? t.slice(p.length) : t, title);
-    if (usedPrefixBase.has(baseTitle)) continue;
     if (dogWord && usedDogWords.has(dogWord)) continue;
     usedFirstNames.add(firstName);
     usedTitles.add(title);
-    usedPrefixBase.add(baseTitle);
     if (dogWord) usedDogWords.add(dogWord);
     out.push(r);
     if (out.length >= limit) break;
   }
   return out;
+}
+
+
+// ── GENERATION HELPERS ────────────────────────────────────────────────────────
+function runPass(
+  breed: string, surname: string, gender: "boy"|"girl",
+  baseSeed: number, town: string, colour: DogColour,
+  bonusPool1: string[], bonusPool2: string[]
+): Result[] {
+  const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
+  const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
+
+  const raw = Array.from({length:20}, (_, i) => {
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+    if (!r) return null;
+    const fn = r.full.split(" ")[1] ?? "";
+    let qBonus = 0;
+    if (doubleBonus.has(fn)) qBonus += 4;
+    else if (allBonus.has(fn)) qBonus += 2;
+    return { ...r, score: r.score + qBonus };
+  }).filter(Boolean) as Result[];
+
+  raw.sort((a,b) => b.score - a.score);
+
+  // Prefix tiebreaker if top score below threshold
+  const THRESHOLD = 19;
+  if ((raw[0]?.score ?? 0) < THRESHOLD) {
+    const group = getGroup(breed);
+    const prefixed = Array.from({length:20}, (_, i) => {
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+      if (!r) return null;
+      let pe: { prefix: string; bonusContrast: number };
+      if (gender === "boy") {
+        const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group));
+        if (!matching.length) return null;
+        pe = matching[(baseSeed + i) % matching.length];
+      } else {
+        pe = TITLE_PREFIXES_GIRL[(baseSeed + i) % TITLE_PREFIXES_GIRL.length];
+      }
+      const parts    = r.full.split(" ");
+      const firstWord = parts[0];
+      const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Professor","Doctor","Chief Analyst"];
+      const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+      if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
+      const isDTrain    = /^[A-Z]-/.test(firstWord);
+      const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
+      const prefixedTitle = pe.prefix + " " + firstWord;
+      let rest = parts.slice(1).join(" ");
+      if (isDTrain || isAbbrev) {
+        const last = parts[parts.length - 1];
+        if (last?.includes("-")) {
+          const clean = last.split("-").slice(1).join("-");
+          rest = [...parts.slice(1, -1), clean].filter(Boolean).join(" ");
+        }
+      }
+      const underlyingTitle = parts[0] ?? "";
+      const titleIsAlreadyGrand = ["Viscountess","Baroness","Marchioness","Countess","Duchess","Dame","Empress","Maharani","Tsarina","Valkyrie","Princess","Queen"].includes(underlyingTitle);
+      const alreadyMultiWord = underlyingTitle.includes(" ");
+      let bonus: number;
+      if (alreadyMultiWord) bonus = -2;
+      else if (titleIsAlreadyGrand) bonus = 0;
+      else if (r.score >= 14) bonus = 1;
+      else bonus = pe.bonusContrast;
+      return { ...r, full: (prefixedTitle + " " + rest).trim(), score: r.score + bonus };
+    }).filter(Boolean) as Result[];
+    return [...raw, ...prefixed].sort((a,b) => b.score - a.score);
+  }
+  return raw;
 }
 
 type Stage = "inputs"|"question"|"reveal";
@@ -580,17 +832,14 @@ const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   { prefix: "Imperial", bonusContrast: 2 },
   { prefix: "Arch",     bonusContrast: 2 },
   { prefix: "High",     bonusContrast: 2 },
-  { prefix: "Ultra",    bonusContrast: 2 },
-  { prefix: "Très",     bonusContrast: 3 },
-];
+  ];
 
 const TITLE_PREFIXES: PrefixEntry[] = [
   { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
   { prefix: "Uber",   breeds: ["german","boxer","giant"], bonusContrast: 2 },
   { prefix: "Hyper",  breeds: ["collie","terrier","highenergy"], bonusContrast: 3 },
   { prefix: "Mega",   breeds: ["giant","character","dachshund"], bonusContrast: 2 },
-  { prefix: "Ultra",  breeds: ["german","sighthound"], bonusContrast: 2 },
-];
+  { prefix: "Ultra",  breeds: ["german","sighthound"], bonusContrast: 2 }];
 
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
@@ -598,60 +847,59 @@ export default function NameGeneratorPage() {
   const [town, setTown] = useState("");
   const [gender, setGender] = useState<"boy"|"girl">("boy");
   const [stage, setStage] = useState<Stage>("inputs");
-  const [question, setQuestion] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
+  const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
+  const [q1Answer, setQ1Answer] = useState("");
+  const [activeQ, setActiveQ] = useState<1|2>(1);
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(QUESTIONS[(s ^ (Date.now() & 0xffff)) % QUESTIONS.length]);
+    const qi = pickTwoQuestions(s);
+    setQIndices(qi);
+    setQ1Answer("");
+    setActiveQ(1);
+    setResults([]);
     setStage("question");
   }
 
-  function handleAnswer() {
+  function handleAnswer(answer: string) {
     const townMatch = FUNNY_PLACES.has(town.trim());
     const effectiveTown = townMatch ? town.trim() : "";
-    const candidates = Array.from({length:20},(_,i) => generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour));
-    candidates.sort((a,b) => b.score - a.score);
-    const THRESHOLD2 = 19;
-    const topScore2 = candidates[0]?.score ?? 0;
-    let finalCandidates2 = candidates;
-    if (topScore2 < THRESHOLD2) {
-      const group2b = getGroup(breed);
-      const prefixPass = Array.from({length:20},(_,i) => {
-        const r = generateScored(breed, surname.trim(), gender, seed + i * 17, effectiveTown, colour);
-        if (!r) return null;
-        let pe: { prefix: string; bonusContrast: number };
-        if (gender === "boy") {
-          const matching = TITLE_PREFIXES.filter((p: PrefixEntry) => p.breeds.includes(group2b));
-          if (!matching.length) return null;
-          pe = matching[(seed + i) % matching.length];
-        } else {
-          pe = TITLE_PREFIXES_GIRL[(seed + i) % TITLE_PREFIXES_GIRL.length];
-        }
-        // Don't stack prefix on D-Train or abbreviation-only styles
-        const firstWord = r.full.split(" ")[0];
-        const isDTrain = /^[A-Z]-/.test(firstWord);
-        const isAbbrev = /^[A-Z]{1,4}$/.test(firstWord);
-        if (isDTrain || isAbbrev) return null;
-        const prefixedTitle = pe.prefix + " " + firstWord;
-        const rest = r.full.split(" ").slice(1).join(" ");
-        return { ...r, full: prefixedTitle + " " + rest, score: r.score + pe.bonusContrast };
-      }).filter(Boolean) as Result[];
-      finalCandidates2 = [...candidates, ...prefixPass].sort((a,b) => b.score - a.score);
-    }
-    setResults(dedupeResults(finalCandidates2.filter(Boolean) as Result[]));
+
+    // Question bonus pools (empty if no QUESTION_BANK yet)
+    const bonus1: string[] = [];
+    const bonus2: string[] = [];
+
+    // Three independent passes with offset seeds for maximum variety
+    const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
+    const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
+    const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
+
+    // Take top scorer from each pass, then merge all three full lists
+    // This guarantees the cream from each independent roll is represented
+    const topFromEach = [pass1[0], pass2[0], pass3[0]].filter(Boolean) as Result[];
+    const allCandidates = [...pass1, ...pass2, ...pass3];
+    allCandidates.sort((a,b) => b.score - a.score);
+
+    // Ensure top picks from each pass appear in results
+    const merged = [...topFromEach, ...allCandidates];
+    setResults(dedupeResults(merged.filter(Boolean) as Result[]));
     setStage("reveal");
   }
 
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    setQuestion(QUESTIONS[(s ^ (Date.now() & 0xffff)) % QUESTIONS.length]);
+    const qi = pickTwoQuestions(s);
+    setQIndices(qi);
+    setQ1Answer("");
+    setActiveQ(1);
+    setResults([]);
     setStage("question");
   }
 
@@ -673,7 +921,7 @@ export default function NameGeneratorPage() {
           {stage === "inputs" && (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-              <select value={breed} onChange={e => setBreed(e.target.value)}
+              <select value={breed} onChange={(e: {target: HTMLSelectElement}) => setBreed(e.target.value)}
                 style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                 <option value="">-- Select a breed --</option>
                 <optgroup label="Pedigree Chums Pack Breeds">
@@ -685,9 +933,9 @@ export default function NameGeneratorPage() {
               </select>
 
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your surname</label>
-              <input type="text" value={surname} onChange={e => setSurname(e.target.value)}
+              <input type="text" value={surname} onChange={(e: {target: HTMLInputElement}) => setSurname(e.target.value)}
                 placeholder="e.g. Jones, Clarke, Thompson-Alexander..."
-                maxLength={60} onKeyDown={e => e.key === "Enter" && handleGenerate()}
+                maxLength={60} onKeyDown={(e: {key: string}) => e.key === "Enter" && handleGenerate()}
                 style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
 
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
@@ -707,59 +955,67 @@ export default function NameGeneratorPage() {
             </div>
           )}
 
-          {/* ── STAGE 2: RANDOM QUESTION ── */}
-          {stage === "question" && (
-            <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", textAlign:"center" }}>
-              <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24 }}>One quick question</p>
-              <p className="display" style={{ fontSize:"clamp(1.4rem,4vw,2rem)", color:"#fff", marginBottom:40, lineHeight:1.3 }}>
-                {question}
-              </p>
-              <div style={{ display:"flex", gap:12 }}>
-                <button onClick={handleAnswer}
-                  style={{ flex:1, padding:"16px", borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"1.1rem", fontWeight:700, cursor:"pointer" }}>
-                  Yes
-                </button>
-                <button onClick={handleAnswer}
-                  style={{ flex:1, padding:"16px", borderRadius:14, border:"2px solid rgba(255,255,255,0.3)", background:"transparent", color:"#fff", fontFamily:"var(--font-body)", fontSize:"1.1rem", fontWeight:700, cursor:"pointer" }}>
-                  No
-                </button>
+          {/* ── STAGE 2: QUESTIONS ── */}
+          {stage === "question" && (() => {
+            const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
+            const qItem = QUESTION_BANK[qi];
+            return (
+              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)" }}>
+                <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
+                  Question {activeQ} of 2
+                </p>
+                <p className="display" style={{ fontSize:"clamp(1.2rem,3.5vw,1.8rem)", color:"#fff", marginBottom:32, lineHeight:1.3, textAlign:"center" }}>
+                  {qItem.text}
+                </p>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
+                  {qItem.options.map(opt => (
+                    <button key={opt.label} onClick={() => handleAnswer(opt.label)}
+                      style={{ padding:"12px 22px", borderRadius:12, border:"2px solid rgba(255,255,255,0.25)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
+              {/* Card floats left, rotated 2deg, drop shadow, sits beside text */}
               {cardImg && (
-                <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
+                <div style={{ display:"flex", justifyContent:"flex-start", paddingLeft:8, marginBottom:-40, position:"relative", zIndex:3 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cardImg} alt={breed} style={{ width:160, height:"auto", borderRadius:16, boxShadow:"0 8px 32px rgba(10,58,87,0.25)" }} />
+                  <img src={cardImg} alt={breed} style={{ width:"clamp(100px,26vw,170px)", height:"auto", borderRadius:14, display:"block", transform:"rotate(-2deg)", transformOrigin:"bottom left", filter:"drop-shadow(0 12px 28px rgba(10,58,87,0.45))" }} />
                 </div>
               )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
-                {results.map((r, i) => (
-                  <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
-                    {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                    <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
+                {results.map((r: Result, i: number) => (
+                  <div key={i} style={{ position:"relative", background:"linear-gradient(135deg, #7dd8f8 0%, #3ab5f0 50%, #1a8fd1 100%)", borderRadius:28, padding:"clamp(20px,3.5vw,32px)", paddingTop: cardImg && i===0 ? "clamp(40px,6vw,56px)" : "clamp(20px,3.5vw,32px)", boxShadow:"0 18px 40px rgba(10,58,87,0.28)", overflow:"visible" }}>
+                    {/* Top pick pill + score badge */}
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:10 }}>
+                      {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
+                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.8)" : "rgba(10,58,87,0.35)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+                    </div>
+                    {/* Name */}
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5.5vw,2.2rem)", color:"#fff", marginBottom:8, lineHeight:1.05, letterSpacing:"0.02em", textAlign:"center", textShadow:"0 2px 10px rgba(10,58,87,0.35)" }}>{r.full}</div>
+                    {/* Nickname */}
                     {r.nickname && (
-                      <div style={{ fontSize:"0.8rem", color:"var(--blue-deep)", fontStyle:"italic", marginBottom:10, fontFamily:"var(--font-body)", fontWeight:600 }}>
+                      <div style={{ fontSize:"clamp(1rem,3vw,1.2rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
                         Known to friends as: {r.nickname}
                       </div>
                     )}
-                    <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : r.score >= 14 ? "#f59e0b" : r.score >= 8 ? "#ef4444" : "#111111" }}>
-                      score: {r.score}
-                    </div>
+                    {/* Reasoning */}
+                    <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.65, borderTop:"1px solid rgba(10,58,87,0.18)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
                   </div>
                 ))}
               </div>
-
               <div style={{ display:"flex", gap:12 }}>
                 <button onClick={handleRollAgain} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQ1Answer(""); setActiveQ(1); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
