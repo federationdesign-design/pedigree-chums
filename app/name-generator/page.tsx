@@ -1185,7 +1185,7 @@ const MCFACE_POOL: Record<string, [string, string][]> = {
 };
 
 const SPONGEBOB_ADJ1: Record<string, string[]> = {
-  sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Saggy","Lollopy","Nosey","Wrinkly"],
+  sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Lollopy","Nosey","Wrinkly","Jowly"],
   retriever:  ["Slobby","Chompy","Waggy","Fluffy","Moppy","Scruffy","Soggy","Hungry"],
   terrier:    ["Scratchy","Nippy","Yappy","Scruffy","Wiry","Zippy","Grubby","Bolty"],
   boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Galumphy","Boingy","Crashy"],
