@@ -828,6 +828,28 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const descriptor = pick(bareDescriptors, seed + 41);
     full = `${descriptor} ${firstName.name} ${effectiveSurname}`;
     nickname = getNickname(firstName.name);
+  } else if (styleRoll === 6) {
+    // McBoatface: [Adj]y [CelticPrefix][Adj][BreedSuffix] Surname
+    const mcPool6 = MCFACE_POOL[group2] || MCFACE_POOL.default;
+    const mc1 = mcPool6[(seed + 31) % mcPool6.length];
+    const mc2 = mcPool6[(seed + 37) % mcPool6.length];
+    const mcSuffixPool = MCFACE_SUFFIX[group2] || MCFACE_SUFFIX.default;
+    const mcSuffix = mcSuffixPool[(seed + 41) % mcSuffixPool.length];
+    const mcPrefixPool = gender === "girl" ? MCFACE_PREFIX_GIRL : MCFACE_PREFIX_BOY;
+    const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
+    full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
+    nickname = mc1[0];
+  } else if (styleRoll === 7) {
+    // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
+    const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
+    const sbAdj1 = sbAdjPool[(seed + 43) % sbAdjPool.length];
+    const sbAdj2 = sbAdjPool[(seed + 47) % sbAdjPool.length];
+    const sbMid = gender === "girl"
+      ? SPONGEBOB_MID_GIRL[(seed + 53) % SPONGEBOB_MID_GIRL.length]
+      : SPONGEBOB_MID_BOY[(seed + 53) % SPONGEBOB_MID_BOY.length];
+    const sbBody = SPONGEBOB_BODY[(seed + 59) % SPONGEBOB_BODY.length];
+    full = `${sbAdj1}${sbMid} ${sbAdj2}${sbBody} ${effectiveSurname}`;
+    nickname = sbMid;
   } else {
     full = `${title.title} ${firstName.name} ${effectiveSurname}`;
     if (title.title === "Itsy") nickname = "Bitsy";
@@ -980,6 +1002,79 @@ function whimsyAllowed(word: string, group: string): boolean {
   }
   return true;
 }
+
+const MCFACE_POOL: Record<string, [string, string][]> = {
+  sniffer:    [["Sniffy","Sniff"],["Droopy","Droop"],["Slobbery","Slobber"],["Lollopy","Lollop"],["Nosey","Nose"],["Tracky","Track"],["Houndy","Hound"],["Questy","Quest"]],
+  retriever:  [["Chompy","Chomp"],["Slobbery","Slobber"],["Waggy","Wag"],["Fetchy","Fetch"],["Munchy","Munch"],["Gobby","Gob"],["Licky","Lick"],["Biscuity","Biscuit"]],
+  terrier:    [["Diggy","Dig"],["Scratchy","Scratch"],["Nippy","Nip"],["Yappy","Yap"],["Scrappy","Scrap"],["Bolty","Bolt"],["Ratty","Rat"],["Snappy","Snap"],["Zippy","Zip"]],
+  boxer:      [["Snorty","Snort"],["Wobbly","Wobble"],["Boingy","Boing"],["Bumpy","Bump"],["Clumsy","Clums"],["Galumphy","Galumph"],["Blundery","Blunder"],["Crashy","Crash"]],
+  character:  [["Snorty","Snort"],["Wheezy","Wheeze"],["Puffy","Puff"],["Grumbly","Grumble"],["Waddly","Waddle"],["Squashy","Squash"],["Squishy","Squish"],["Wriggly","Wriggle"]],
+  lapdog:     [["Fluffy","Fluff"],["Bouncy","Bounce"],["Prancy","Prance"],["Squashy","Squash"],["Flouncy","Flounce"],["Shimmery","Shimmer"],["Pampery","Pamper"],["Glittery","Glitter"]],
+  collie:     [["Herdy","Herd"],["Zippy","Zip"],["Circly","Circle"],["Darty","Dart"],["Sprinty","Sprint"],["Frenzy","Frenz"],["Intense","Intens"],["Obsessy","Obsess"]],
+  poodle:     [["Prancy","Prance"],["Strutty","Strutt"],["Swishy","Swish"],["Mincy","Mince"],["Posy","Pose"],["Primy","Prim"],["Flouncy","Flounce"],["Curly","Curl"]],
+  sighthound: [["Speedy","Speed"],["Slinky","Slink"],["Swoopy","Swoop"],["Darty","Dart"],["Flashy","Flash"],["Gleamy","Gleam"],["Streaky","Streak"],["Racy","Race"]],
+  dachshund:  [["Stretchy","Stretch"],["Wiggly","Wiggle"],["Wormy","Worm"],["Scuttly","Scuttle"],["Squeezy","Squeeze"],["Wriggly","Wriggle"],["Stubby","Stubb"],["Squirmy","Squirm"]],
+  giant:      [["Massive","Massive"],["Stompy","Stomp"],["Loomy","Loom"],["Thumpy","Thump"],["Rumbly","Rumble"],["Lumpy","Lump"],["Shakey","Shake"],["Swavy","Sway"]],
+  greatdane:  [["Cosmic","Cosmic"],["Starry","Star"],["Massive","Massive"],["Orbital","Orbit"],["Stompy","Stomp"],["Galactic","Galactic"],["Loomy","Loom"],["Thumpy","Thump"]],
+  spaniel:    [["Splashy","Splash"],["Waggy","Wag"],["Fetchy","Fetch"],["Frolicky","Frolic"],["Scampy","Scamp"],["Bouncy","Bounce"],["Gamby","Gamb"],["Rompy","Romp"]],
+  german:     [["Patrolly","Patrol"],["Marcy","Marc"],["Drilley","Drill"],["Guardy","Guard"],["Securey","Secure"],["Breachy","Breach"],["Flanky","Flank"],["Strict","Strict"]],
+  asian:      [["Snorty","Snort"],["Waddly","Waddle"],["Grumbly","Grumble"],["Wheezy","Wheeze"],["Squishy","Squish"],["Puffy","Puff"],["Stumply","Stumpl"],["Rolly","Roll"]],
+  boston:     [["Strutty","Strutt"],["Hustly","Hustle"],["Scrappy","Scrap"],["Dodgy","Dodge"],["Rattly","Rattle"],["Jazzy","Jazz"],["Marcy","Marc"],["Blusty","Blust"]],
+  afghan:     [["Flowy","Flow"],["Swooshy","Swoosh"],["Glidy","Glide"],["Aloofy","Aloof"],["Drifty","Drift"],["Surgy","Surge"],["Sweepy","Sweep"],["Soary","Soar"]],
+  bulldog:    [["Grumbly","Grumble"],["Snorty","Snort"],["Wobbly","Wobble"],["Jowly","Jowl"],["Stuffy","Stuff"],["Rolly","Roll"],["Blustey","Blust"],["Squashy","Squash"]],
+  default:    [["Trotty","Trot"],["Wandy","Wand"],["Prowly","Prowl"],["Lopy","Lop"],["Slinky","Slink"],["Stalky","Stalk"],["Sauntry","Sauntr"],["Canty","Cant"]],
+};
+
+const SPONGEBOB_ADJ1: Record<string, string[]> = {
+  sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Saggy","Lollopy","Nosey","Wrinkly"],
+  retriever:  ["Slobby","Chompy","Waggy","Fluffy","Moppy","Scruffy","Soggy","Hungry"],
+  terrier:    ["Scratchy","Nippy","Yappy","Scruffy","Wiry","Zippy","Grubby","Bolty"],
+  boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Galumphy","Boingy","Crashy"],
+  character:  ["Snorty","Squashy","Puffy","Grumbly","Waddly","Squinty","Wrinkly","Squishy"],
+  lapdog:     ["Fluffy","Prancy","Bouncy","Squashy","Flouncy","Glittery","Twinkly","Sparkly"],
+  collie:     ["Zippy","Herdy","Frenzy","Darty","Sprinty","Circly","Intense","Obsessy"],
+  poodle:     ["Prancy","Strutty","Swishy","Mincy","Curly","Fluffy","Posy","Primy"],
+  sighthound: ["Speedy","Slinky","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy"],
+  dachshund:  ["Stretchy","Wiggly","Wormy","Scuttly","Squeezy","Stubby","Waggy","Longey"],
+  giant:      ["Massive","Stompy","Loomy","Lumpy","Rumbly","Thumpy","Shakey","Swavy"],
+  greatdane:  ["Cosmic","Starry","Massive","Orbital","Stompy","Galactic","Loomy","Thumpy"],
+  spaniel:    ["Splashy","Waggy","Floppy","Bouncy","Scampy","Frolicky","Gamby","Rompy"],
+  german:     ["Patrolly","Strict","Marcey","Guardy","Drilley","Securey","Flanky","Breachy"],
+  asian:      ["Snorty","Grumbly","Waddly","Squishy","Puffy","Wrinkly","Rolly","Stumply"],
+  boston:     ["Strutty","Hustly","Scrappy","Dodgy","Rattly","Jazzy","Marcey","Blusty"],
+  afghan:     ["Flowy","Swooshy","Glidy","Aloofy","Drifty","Surgy","Swoopy","Sweepy"],
+  bulldog:    ["Grumbly","Snorty","Wobbly","Jowly","Stuffy","Rolly","Squashy","Blusty"],
+  default:    ["Trotty","Wandy","Prowly","Lopy","Slinky","Stalky","Canty","Sauntry"],
+};
+
+const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
+const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Nan","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
+const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Flaps","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Whiskers","Flops"];
+
+const MCFACE_SUFFIX: Record<string, string[]> = {
+  sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", "flaps"],
+  retriever: ["chops", "tum", "bonce", "chomps", "jowls", "paws", "bum", "tail"],
+  terrier: ["butt", "chops", "bonce", "snoot", "paws", "tail", "whiskers", "ears"],
+  boxer: ["snout", "jowls", "chops", "bonce", "butt", "tum", "flaps", "face"],
+  character: ["snout", "jowls", "butt", "bonce", "chops", "face", "tum", "flaps"],
+  lapdog: ["bum", "bonce", "face", "paws", "ears", "tail", "chops", "snoot"],
+  collie: ["paws", "tail", "bonce", "butt", "chops", "ears", "face", "snoot"],
+  poodle: ["bonce", "face", "snoot", "paws", "chops", "tail", "bum", "ears"],
+  sighthound: ["butt", "tail", "paws", "bonce", "face", "snoot", "chops", "ears"],
+  dachshund: ["bum", "butt", "tail", "bonce", "tum", "chops", "face", "snoot"],
+  giant: ["bonce", "butt", "tum", "jowls", "chops", "paws", "face", "snout"],
+  greatdane: ["bonce", "butt", "paws", "tail", "face", "chops", "snoot", "tum"],
+  spaniel: ["ears", "flaps", "paws", "tail", "bonce", "chops", "face", "snoot"],
+  german: ["bonce", "paws", "tail", "face", "chops", "butt", "snoot", "ears"],
+  asian: ["snout", "jowls", "tum", "bonce", "chops", "butt", "face", "flaps"],
+  boston: ["bonce", "butt", "chops", "face", "snoot", "ears", "paws", "tail"],
+  afghan: ["tail", "bonce", "face", "paws", "snoot", "butt", "ears", "chops"],
+  bulldog: ["jowls", "snout", "chops", "tum", "bonce", "butt", "face", "flaps"],
+  default: ["bonce", "butt", "face", "chops", "paws", "tail", "snoot", "bum"],
+};
+
+const MCFACE_PREFIX_BOY: string[]  = ["Mc","Mc","Mc","Mac","Mac","O'","O'","Fitz","Fitz","De","Von","Van","Le","Ap","Dal","Di"];
+const MCFACE_PREFIX_GIRL: string[] = ["Mc","Mc","Mc","Mac","Mac","O'","O'","Fitz","De","Von","Van","Le","Ferch","Dal","Di","Ni"];
 
 // ── GENERATION HELPERS ────────────────────────────────────────────────────────
 function runPass(
