@@ -1279,8 +1279,8 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc17 = allD.filter(r => r.score >= 17);
-      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
+      const sc21 = allD.filter(r => r.score >= 21);
+      setResults(sc21.length > 0 ? sc21 : allD.slice(0, 3));
       setStage("reveal");
     }
   }
@@ -1313,8 +1313,8 @@ export default function NameGeneratorPage() {
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored17 = allDeduped.filter(r => r.score >= 17);
-    setResults(scored17.length > 0 ? scored17 : allDeduped.slice(0, 3));
+    const scored21 = allDeduped.filter(r => r.score >= 21);
+    setResults(scored21.length > 0 ? scored21 : allDeduped.slice(0, 3));
     setStage("reveal");
   }
 
@@ -1347,8 +1347,8 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc17 = allD.filter(r => r.score >= 17);
-      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
+      const sc21 = allD.filter(r => r.score >= 21);
+      setResults(sc21.length > 0 ? sc21 : allD.slice(0, 3));
       setStage("reveal");
     }
   }
@@ -1449,7 +1449,7 @@ export default function NameGeneratorPage() {
                       </div>
                     )}
                     <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    {r.score >= 17 && (
+                    {r.score >= 21 && (
                       <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : "#f59e0b" }}>
                         score: {r.score}
                       </div>
