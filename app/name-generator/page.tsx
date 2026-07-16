@@ -665,7 +665,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     (!a.breeds || a.breeds.includes(group2))
   );
 
-  const styleRoll = seed % 13;
+  const noTitleBreeds = ["labrador","labradoodle","goldendoodle"];
+  const styleRoll = noTitleBreeds.includes(breed.toLowerCase()) ? 4 : seed % 13;
   let full = "";
   let nickname = "";
 
@@ -826,7 +827,7 @@ const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   { prefix: "Imperial", bonusContrast: 2 },
   { prefix: "Arch",     bonusContrast: 2 },
   { prefix: "High",     bonusContrast: 2 },
-  { prefix: "Très",     bonusContrast: 3 }];
+  ];
 
 const TITLE_PREFIXES: PrefixEntry[] = [
   { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
@@ -915,7 +916,7 @@ export default function NameGeneratorPage() {
           {stage === "inputs" && (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-              <select value={breed} onChange={e => setBreed(e.target.value)}
+              <select value={breed} onChange={(e: {target: HTMLSelectElement}) => setBreed(e.target.value)}
                 style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                 <option value="">-- Select a breed --</option>
                 <optgroup label="Pedigree Chums Pack Breeds">
@@ -927,9 +928,9 @@ export default function NameGeneratorPage() {
               </select>
 
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your surname</label>
-              <input type="text" value={surname} onChange={e => setSurname(e.target.value)}
+              <input type="text" value={surname} onChange={(e: {target: HTMLInputElement}) => setSurname(e.target.value)}
                 placeholder="e.g. Jones, Clarke, Thompson-Alexander..."
-                maxLength={60} onKeyDown={e => e.key === "Enter" && handleGenerate()}
+                maxLength={60} onKeyDown={(e: {key: string}) => e.key === "Enter" && handleGenerate()}
                 style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
 
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
@@ -983,7 +984,7 @@ export default function NameGeneratorPage() {
                 </div>
               )}
               <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
-                {results.map((r, i) => (
+                {results.map((r: {full:string;nickname:string;reasoning:string;score:number}, i: number) => (
                   <div key={i} style={{ background:"#fff", borderRadius:18, padding:"clamp(16px,2.5vw,24px)", borderTop:`5px solid ${i === 0 ? "var(--yellow)" : "var(--blue-sky)"}`, boxShadow:"0 2px 16px rgba(10,58,87,0.08)" }}>
                     {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--yellow)", background:"var(--navy)", display:"inline-block", padding:"2px 8px", borderRadius:6, marginBottom:8, fontFamily:"var(--font-body)" }}>Top pick</div>}
                     <div className="display" style={{ fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"var(--navy)", marginBottom:4, lineHeight:1.2 }}>{r.full}</div>
