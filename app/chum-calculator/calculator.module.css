@@ -394,3 +394,22 @@
   line-height: 1.6;
   margin: 0;
 }
+
+.nameThisChum {
+  display: block;
+  width: 100%;
+  padding: 8px 0;
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  border-radius: 0 0 12px 12px;
+  transition: background 0.15s;
+}
+.nameThisChum:hover {
+  background: var(--blue-sky);
+  color: #fff;
+}

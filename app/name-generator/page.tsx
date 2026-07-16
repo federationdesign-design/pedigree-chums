@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { breedCard } from "../../data/breeds";
+import { bust } from "../../data/imgVersion";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 
@@ -1236,6 +1238,14 @@ const TITLE_PREFIXES: PrefixEntry[] = [
 
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
+  const [fromCalculator, setFromCalculator] = useState(false);
+
+  // Read ?breed= param from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const b = params.get("breed") || "";
+    if (b) { setBreed(b); setFromCalculator(true); }
+  }, []);
   const [surname, setSurname] = useState("");
   const [town, setTown] = useState("");
   const [gender, setGender] = useState<"boy"|"girl">("boy");
@@ -1279,8 +1289,8 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 21);
-      setResults(sc21.length > 0 ? sc21 : allD.slice(0, 3));
+      const sc17 = allD.filter(r => r.score >= 17);
+      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
       setStage("reveal");
     }
   }
@@ -1313,8 +1323,8 @@ export default function NameGeneratorPage() {
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored21 = allDeduped.filter(r => r.score >= 21);
-    setResults(scored21.length > 0 ? scored21 : allDeduped.slice(0, 3));
+    const scored17 = allDeduped.filter(r => r.score >= 17);
+    setResults(scored17.length > 0 ? scored17 : allDeduped.slice(0, 3));
     setStage("reveal");
   }
 
@@ -1347,8 +1357,8 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 21);
-      setResults(sc21.length > 0 ? sc21 : allD.slice(0, 3));
+      const sc17 = allD.filter(r => r.score >= 17);
+      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
       setStage("reveal");
     }
   }
@@ -1368,6 +1378,25 @@ export default function NameGeneratorPage() {
           </p>
 
           {/* ── STAGE 1: INPUTS ── */}
+          {fromCalculator && breed && (() => {
+            const slug = breed.toLowerCase().replace(/ /g, "-");
+            const img = breedCard[slug];
+            return img ? (
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, marginBottom:24 }}>
+                <img
+                  src={bust(img)}
+                  alt={breed}
+                  style={{ width: "clamp(120px,30vw,200px)", borderRadius:16, boxShadow:"0 4px 24px rgba(10,58,87,0.18)" }}
+                />
+                <p style={{ fontFamily:"var(--font-display)", color:"var(--navy)", fontSize:"clamp(1rem,3vw,1.4rem)", margin:0 }}>
+                  {breed}
+                </p>
+                <p style={{ fontFamily:"var(--font-body)", color:"var(--blue-deep)", fontSize:"0.85rem", margin:0 }}>
+                  Found your best chum! Now let&#39;s name them.
+                </p>
+              </div>
+            ) : null;
+          })()}
           {stage === "inputs" && (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
@@ -1449,7 +1478,7 @@ export default function NameGeneratorPage() {
                       </div>
                     )}
                     <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    {r.score >= 21 && (
+                    {r.score >= 17 && (
                       <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : "#f59e0b" }}>
                         score: {r.score}
                       </div>
@@ -1459,6 +1488,92 @@ export default function NameGeneratorPage() {
               </div>
 
               <div style={{ display:"flex", gap:12 }}>
+                {results.length > 0 && (() => {
+                  const best = results[0];
+                  const slug = breed.toLowerCase().replace(/ /g, "-");
+                  const img = breedCard[slug];
+                  return (
+                    <button
+                      className="display"
+                      style={{ background:"var(--yellow)", color:"var(--navy)", marginBottom:8 }}
+                      onClick={() => {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = 800; canvas.height = 500;
+                        const ctx = canvas.getContext("2d")!;
+                        // Background
+                        ctx.fillStyle = "#0a3a57";
+                        ctx.fillRect(0, 0, 800, 500);
+                        // Breed card image
+                        if (img) {
+                          const bImg = new Image();
+                          bImg.crossOrigin = "anonymous";
+                          bImg.onload = () => {
+                            ctx.drawImage(bImg, 30, 30, 220, 300);
+                            // Name text
+                            ctx.fillStyle = "#ffd23e";
+                            ctx.font = "bold 36px 'Luckiest Guy', cursive";
+                            ctx.textBaseline = "top";
+                            const name = best.full;
+                            const maxW = 500;
+                            let fontSize = 36;
+                            ctx.font = `bold ${fontSize}px 'Luckiest Guy', cursive`;
+                            while (ctx.measureText(name).width > maxW && fontSize > 18) {
+                              fontSize -= 2;
+                              ctx.font = `bold ${fontSize}px 'Luckiest Guy', cursive`;
+                            }
+                            ctx.fillText(name, 280, 80);
+                            // Known as
+                            if (best.nickname) {
+                              ctx.fillStyle = "#5cc4ee";
+                              ctx.font = "bold 22px Montserrat, sans-serif";
+                              ctx.fillText(`Known as: ${best.nickname}`, 280, 140);
+                            }
+                            // Reasoning
+                            ctx.fillStyle = "#ffffff";
+                            ctx.font = "16px Montserrat, sans-serif";
+                            const words = best.reasoning.split(" ");
+                            let line = ""; let y = 200;
+                            for (const w of words) {
+                              const test = line + w + " ";
+                              if (ctx.measureText(test).width > 490 && line) {
+                                ctx.fillText(line, 280, y); line = w + " "; y += 24;
+                              } else { line = test; }
+                            }
+                            ctx.fillText(line, 280, y);
+                            // Score badge
+                            const sc = best.score;
+                            ctx.fillStyle = sc >= 22 ? "#9333ea" : "#22c55e";
+                            ctx.beginPath();
+                            ctx.arc(700, 430, 50, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.fillStyle = "#fff";
+                            ctx.font = "bold 20px Montserrat, sans-serif";
+                            ctx.textAlign = "center";
+                            ctx.textBaseline = "middle";
+                            ctx.fillText(String(sc), 700, 430);
+                            // Logo text
+                            ctx.fillStyle = "#ffd23e";
+                            ctx.font = "bold 18px 'Luckiest Guy', cursive";
+                            ctx.textAlign = "left";
+                            ctx.textBaseline = "bottom";
+                            ctx.fillText("Pedigree Chums", 30, 480);
+                            ctx.fillStyle = "#5cc4ee";
+                            ctx.font = "14px Montserrat, sans-serif";
+                            ctx.fillText("pedigreechums.co.uk", 30, 498);
+                            // Download
+                            const link = document.createElement("a");
+                            link.download = `${slug}-name-card.jpg`;
+                            link.href = canvas.toDataURL("image/jpeg", 0.9);
+                            link.click();
+                          };
+                          bImg.src = bust(img);
+                        }
+                      }}
+                    >
+                      Share your chum ★
+                    </button>
+                  );
+                })()}
                 <button onClick={handleRollAgain} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again

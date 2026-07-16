@@ -909,31 +909,40 @@ export default function ChumCalculator() {
             if (shownGreat > 5) return null;
           }
           return (
-            <Link
+            <div
               key={b.slug}
-              href={`/chums/${b.slug}`}
               className={`${styles.breedCard} ${hidden ? styles.breedCardHidden : ""}`}
-              tabIndex={hidden ? -1 : 0}
               onMouseEnter={(e) => { setHoveredBreed(b.slug); setTooltipPos({ x: e.clientX, y: e.clientY }); }}
               onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
               onMouseLeave={() => setHoveredBreed(null)}
+              style={{ position: "relative" }}
             >
-              <img
-                src={bust(cardImg || b.image)}
-                alt={b.name}
-                className={styles.cardImg}
-                loading="lazy"
-              />
-              {answeredCount >= 5 && !hidden && (
-                <div
-                  className={styles.cardScore}
-                  style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
-
+              <Link href={`/chums/${b.slug}`} tabIndex={hidden ? -1 : 0} style={{ display: "block" }}>
+                <img
+                  src={bust(cardImg || b.image)}
+                  alt={b.name}
+                  className={styles.cardImg}
+                  loading="lazy"
+                />
+                {answeredCount >= 5 && !hidden && (
+                  <div
+                    className={styles.cardScore}
+                    style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
+                  >
+                    {fitLabel(b.score, isBest)}
+                  </div>
+                )}
+              </Link>
+              {finished && !hidden && (
+                <Link
+                  href={`/name-generator?breed=${encodeURIComponent(b.name)}`}
+                  className={styles.nameThisChum}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {fitLabel(b.score, isBest)}
-                </div>
+                  Name this chum
+                </Link>
               )}
-            </Link>
+            </div>
           );
         })}
       </div>
