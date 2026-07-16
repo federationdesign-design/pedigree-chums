@@ -1381,22 +1381,22 @@ export default function NameGeneratorPage() {
   const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
   const [q1Answer, setQ1Answer] = useState("");
   const [activeQ, setActiveQ] = useState<1|2>(1);
-  const [rollCount, setRollCount] = useState(0);
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions every 3rd roll exactly
-    const newRollCount = rollCount + 1;
-    setRollCount(newRollCount);
+    // Questions only when a quick pre-pass shows potential for purple (20+)
     const qi = pickTwoQuestions(s);
     setQIndices(qi);
     setQ1Answer("");
     setActiveQ(1);
     setResults([]);
-    if (newRollCount % 3 === 0) {
+    // Quick pre-pass to check score potential
+    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
+    const preScore = prePass[0]?.score ?? 0;
+    if (preScore >= 20) {
       setStage("question");
     } else {
       // Skip questions, generate directly with empty bonus pools
@@ -1414,8 +1414,9 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc17 = allD.filter(r => r.score >= 17);
-      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
+      const sc21 = allD.filter(r => r.score >= 21);
+      const best21 = sc21.sort((a,b) => b.score - a.score);
+      setResults(best21.length > 0 ? [best21[0]] : [allD.sort((a,b) => b.score - a.score)[0]].filter(Boolean) as Result[]);
       setStage("reveal");
     }
   }
@@ -1448,23 +1449,25 @@ export default function NameGeneratorPage() {
     // Ensure top picks from each pass appear in results
     const merged = [...topFromEach, ...allCandidates];
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored17 = allDeduped.filter(r => r.score >= 17);
-    setResults(scored17.length > 0 ? scored17 : allDeduped.slice(0, 3));
+    const scored21 = allDeduped.filter(r => r.score >= 21);
+    const topScored = scored21.sort((a,b) => b.score - a.score);
+    setResults(topScored.length > 0 ? [topScored[0]] : [allDeduped.sort((a,b) => b.score - a.score)[0]].filter(Boolean) as Result[]);
     setStage("reveal");
   }
 
   function handleRollAgain() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions every 3rd roll exactly
-    const newRollCount = rollCount + 1;
-    setRollCount(newRollCount);
+    // Questions only when a quick pre-pass shows potential for purple (20+)
     const qi = pickTwoQuestions(s);
     setQIndices(qi);
     setQ1Answer("");
     setActiveQ(1);
     setResults([]);
-    if (newRollCount % 3 === 0) {
+    // Quick pre-pass to check score potential
+    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
+    const preScore = prePass[0]?.score ?? 0;
+    if (preScore >= 20) {
       setStage("question");
     } else {
       // Skip questions, generate directly with empty bonus pools
@@ -1482,8 +1485,9 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc17 = allD.filter(r => r.score >= 17);
-      setResults(sc17.length > 0 ? sc17 : allD.slice(0, 3));
+      const sc21 = allD.filter(r => r.score >= 21);
+      const best21 = sc21.sort((a,b) => b.score - a.score);
+      setResults(best21.length > 0 ? [best21[0]] : [allD.sort((a,b) => b.score - a.score)[0]].filter(Boolean) as Result[]);
       setStage("reveal");
     }
   }
@@ -1584,8 +1588,8 @@ export default function NameGeneratorPage() {
                       </div>
                     )}
                     <div style={{ fontSize:"0.8rem", color:"#555", lineHeight:1.6, borderTop:"1px solid #eee", paddingTop:10, fontFamily:"var(--font-body)" }}>{r.reasoning}</div>
-                    {r.score >= 17 && (
-                      <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 18 ? "#22c55e" : "#f59e0b" }}>
+                    {r.score >= 21 && (
+                      <div style={{ fontSize:"0.75rem", fontWeight:700, marginTop:8, fontFamily:"var(--font-body)", color: r.score >= 22 ? "#9333ea" : r.score >= 21 ? "#22c55e" : "#f59e0b" }}>
                         score: {r.score}
                       </div>
                     )}
