@@ -760,6 +760,23 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
 }
 
 
+const WHIMSY: Record<string, string[]> = {
+  B: ["Boffle", "Boffleboots", "Bofflewick", "Boogles", "Boondoggle", "Bumbershoot", "Bumblebean", "Bumbleboots", "Bumblebop", "Bumblebottom", "Bumblechops", "Bumblekins", "Bumblepaws", "Bumblepuff", "Bumblesnack", "Bumblesnout", "Bumblewhisk", "Bumblewick", "Bumblewink", "Bunglebean", "Bungleboots", "Bunglechops", "Bunglepaws", "Bunglepuff", "Bunglewink"],
+  C: ["Crankle", "Cranklebean", "Cranklesnout", "Cranklewhisk", "Crankypants", "Crinklebean", "Crinkleboots", "Crinklechops", "Crinklepaws", "Crinklepot", "Crinklepuff", "Crinklewhisk", "Crinklewink", "Crumbkins", "Crumblepaws", "Crumblewick", "Crumbly", "Crumblypaws", "Crumbsnout", "Crumpadoodle", "Crumpaloo", "Crumpetboots", "Crumpetchops", "Crumpetface", "Crumpetpuff", "Crumpetwhisk", "Crumpetwink", "Crumpkin", "Crumpypaws", "Crumpypuff", "Crumpysnout"],
+  D: ["Dinglebean", "Dingleberry", "Dingleboots", "Dinglechops", "Dinglepaws", "Dinglepuff", "Dinglewhisk", "Dinglewick", "Dinglewink", "Doodlebean", "Doodleberry", "Doodleboots", "Doodlebug", "Doodlechops", "Doodlepaws", "Doodleplop", "Doodlepuff", "Doodlewhisk", "Doodlewick", "Doodlewink"],
+  F: ["Fidgetbean", "Fidgetwick", "Fizzlebean", "Fizzlebiscuit", "Fizzleboots", "Fizzlebop", "Fizzlebump", "Fizzlechops", "Fizzlenose", "Fizzlepaws", "Fizzlepuff", "Fizzlewhisk", "Fizzlewink", "Fizzwick", "Flapdoodle", "Flapjack", "Flibbert", "Flopsydoo", "Fluffernugget", "Fumblebean", "Fumbleboots", "Fumblebum", "Fumblechops", "Fumblepaws", "Fumblepuff", "Fumblewhisk", "Fumblewick", "Fumblewink", "Fuzzlebean", "Fuzzleboots", "Fuzzlebug", "Fuzzlechops", "Fuzzlenoodle", "Fuzzlepaws", "Fuzzlepuff", "Fuzzleton", "Fuzzlewhisk", "Fuzzlewink", "Fuzzleworth"],
+  G: ["Gobblebean", "Gobbleboots", "Gobblechops", "Gobblepaws", "Gobblepuff", "Gobblesnout", "Gobblewhisk", "Gobblewick", "Gobblewink", "Gobstopper", "Grizzlebean", "Grumblebean", "Grumbleboots", "Grumblechops", "Grumblepaws", "Grumblepuff", "Grumblewhisk", "Grumblewick", "Grumblewink", "Grumpkin", "Grumpysnout"],
+  J: ["Jibberjab", "Jigglebean", "Jitterbean", "Jitterboots", "Jitterbug", "Jitterchops", "Jitterpaws", "Jitterpuff", "Jitterwhisk", "Jitterwick", "Jitterwink", "Jollybean", "Jollysnout", "Jollywick", "Jumblepaws", "Jumblewick"],
+  M: ["Muddlebean", "Muddleboots", "Muddlebug", "Muddlechops", "Muddlefoot", "Muddlepaws", "Muddlepuff", "Muddlewhisk", "Muddlewink", "Mumblebum", "Mumblewick", "Munchaloo", "Munchbucket", "Munchkinstein", "Munchybean", "Munchysnout", "Munchywick"],
+  N: ["Nibber", "Nibberbean", "Nibberboots", "Nibberchops", "Nibberpaws", "Nibberpuff", "Nibbersnout", "Nibberton", "Nibberwhisk", "Nibberwink", "Nibblesworth", "Niblet", "Nibletboots", "Nibsnack", "Noodlebean", "Noodleboots", "Noodlebug", "Noodlechops", "Noodleface", "Noodlepaws", "Noodlepuff", "Noodlewhisk", "Noodlewick", "Noodlewink"],
+  P: ["Picklewick", "Pipsnort", "Pipsqueaker", "Pipsqueakle", "Plonker", "Pompadoodle", "Pompawhisk", "Pompomble", "Poppycock", "Puddlebean", "Puddleboots", "Puddlebum", "Puddlechops", "Puddlefoot", "Puddlekins", "Puddlepaws", "Puddlepop", "Puddlepuff", "Puddlewhisk", "Puddlewick", "Puddlewink", "Pumpernickel"],
+  Q: ["Quibble", "Quibblebean", "Quibbleboots", "Quibblechops", "Quibblepaws", "Quibblepuff", "Quibbleton", "Quibblewhisk", "Quibblewink", "Quirkle", "Quirklebean", "Quirkleboots", "Quirklewink", "Quirkypants", "Quirkysnout"],
+  R: ["Razzlebean", "Razzleboots", "Razzlechops", "Razzledazzle", "Razzlepaws", "Razzlepuff", "Razzlesnout", "Razzlewhisk", "Razzlewick", "Razzlewink", "Rumblebean", "Rumbleboots", "Rumblechops", "Rumblekins", "Rumblepaws", "Rumblepuff", "Rumblewhisk", "Rumblewink"],
+  S: ["Scramblebean", "Scramblefoot", "Scritchyboo", "Scrufflebump", "Scrumble", "Scrumbleboots", "Scrumblepaws", "Scrumblewick", "Scrungle", "Skedoodle", "Snaffle", "Snazzle", "Snazzlebean", "Snazzleboots", "Snazzlechops", "Snazzlepaws", "Snazzlepuff", "Snazzlewhisk", "Snazzlewink", "Snickerbean", "Snickerboots", "Snickerchops", "Snickerpaws", "Snickerpuff", "Snickerwhisk", "Snickerwick", "Snickerwink", "Snorklebean", "Snortbucket", "Snortle", "Snortleberry", "Snortleboots", "Snortlepuff", "Snortlewick", "Snufflebean", "Snuffleboots", "Snufflechops", "Snufflepaws", "Snufflepot", "Snufflepuff", "Snufflewhisk", "Snufflewink", "Snuzzle", "Sprocketbean", "Sproing", "Squabblepaws", "Squibble", "Squibblebean", "Squibbleboots", "Squibblechops", "Squibblepaws", "Squibblepuff", "Squibblewhisk", "Squibblewink", "Squigglebean", "Squigglesnack", "Squiggleton", "Squigglewick"],
+  T: ["Taterbean", "Taterboots", "Taterbug", "Taterchops", "Taterpaws", "Taterpuff", "Taterwhisk", "Taterwink", "Ticklewick", "Tizzy", "Tizzytoes", "Toodlebean", "Toodleboots", "Toodlebug", "Toodlechops", "Toodlepaws", "Toodlepop", "Toodlepuff", "Toodlewhisk", "Toodlewink", "Tootlesnout", "Tootlewick", "Tumblebean", "Tumbleboots", "Tumblechops", "Tumblepaws", "Tumblepuff", "Tumblewhisk", "Tumblewick", "Tumblewink"],
+  W: ["Waffleton", "Wafflewhisk", "Waggledorf", "Wagglenose", "Wagglesnack", "Wagglesnort", "Wagglesworth", "Wagglybean", "Wagglyboots", "Wagglychops", "Wagglypaws", "Wagglypuff", "Wagglywhisk", "Wagglywink", "Wibbleton", "Wibblewobble", "Wobblebean", "Wobbleboots", "Wobblebug", "Wobblechops", "Wobblekins", "Wobblepaws", "Wobblepot", "Wobblepuff", "Wobblewhisk", "Wobblewick", "Wobblewink", "Womble", "Womblepaws", "Wompadoodle", "Wompington", "Wompus", "Wompusbean", "Wompusboots", "Wompuschops", "Wompuspuff", "Wompuswhisk", "Wompuswink"],
+};
+
 // ── GENERATION HELPERS ────────────────────────────────────────────────────────
 function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
@@ -769,13 +786,44 @@ function runPass(
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
 
+  const sf: Record<string,string> = {b:"bp",p:"bp",d:"dt",t:"dt",g:"gk",k:"gk",f:"fv",v:"fv",s:"sz",z:"sz",m:"mn",n:"mn"};
+  function allit(a: string, b: string): boolean {
+    const f = a[0]?.toLowerCase() ?? "", w = b[0]?.toLowerCase() ?? "";
+    return f === w || (!!sf[f] && sf[f] === sf[w]);
+  }
+
   const raw = Array.from({length:20}, (_, i) => {
     const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
     if (!r) return null;
-    const fn = r.full.split(" ")[1] ?? "";
+    const parts = r.full.split(" ");
+    const fn = parts[1] ?? "";
+    // Extract the dog word from the hyphenated surname
+    const lastPart = parts[parts.length - 1] ?? "";
+    const dogWord = lastPart.includes("-") ? lastPart.split("-")[0] : "";
+
     let qBonus = 0;
     if (doubleBonus.has(fn)) qBonus += 4;
     else if (allBonus.has(fn)) qBonus += 2;
+
+    // If name doesn't alliterate with dog word, try a whimsy replacement
+    if (dogWord && !allit(fn, dogWord)) {
+      const letter = dogWord[0].toUpperCase();
+      const pool = WHIMSY[letter];
+      if (pool && pool.length > 0) {
+        const whimsyName = pool[(baseSeed + i * 7) % pool.length];
+        // Build a whimsy version and score it
+        const wParts = [...parts];
+        wParts[1] = whimsyName;
+        const wFull = wParts.join(" ");
+        // +5 for alliteration + 3 for short name (whimsy names are all 2-3 syl)
+        const wScore = r.score + 5 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
+        // Only use whimsy if it scores better
+        if (wScore > r.score + qBonus) {
+          return { ...r, full: wFull, nickname: r.nickname, score: wScore };
+        }
+      }
+    }
+
     return { ...r, score: r.score + qBonus };
   }).filter(Boolean) as Result[];
 
