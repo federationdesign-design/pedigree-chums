@@ -671,16 +671,19 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 
   if (styleRoll === 0 && validAbbrevs.length > 0) {
     const abbrev = pick(validAbbrevs, seed + 5);
-    full = `${abbrev.meaning} ${effectiveSurname}`;
+    const dottedCode = abbrev.code.split("").join(".");
+    full = `${dottedCode} (${abbrev.meaning}) ${effectiveSurname}`;
     nickname = abbrev.code;
   } else if (styleRoll === 1 && gender === "boy") {
     const letter = pick(DTRAIN_LETTERS, seed + 13);
     const suffix = pick(DTRAIN_SUFFIXES, seed + 19);
     full = `${letter}-${suffix} ${effectiveSurname}`;
+    nickname = getNickname(firstName.name);
   } else if (styleRoll === 2 && gender === "girl") {
     const fName = pick(MARIEJ_FIRSTS, seed + 7);
     const mInit = pick(MARIEJ_INITIALS, seed + 23);
     full = `${fName} ${mInit} ${effectiveSurname}`;
+    nickname = getNickname(fName);
   } else if (styleRoll === 3 && gender === "boy" && ["dachshund","character","terrier","collie"].includes(group2)) {
     // Reversed descriptor: "Extended General Burrow-Patterson" -- adjective before title
     const descriptors = ["Extended","Horizontal","Stretched","Relentless","Obsessive","Notorious","Incomparable","Frenetic","Unstoppable","Legendary","Indefatigable","Tenacious"];
@@ -697,7 +700,24 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     if (matched) {
       nickname = matched.code;
     } else {
-      nickname = getNickname(firstName.name);
+      const naturalNick = getNickname(firstName.name);
+      if (naturalNick) {
+        nickname = naturalNick;
+      } else {
+        // Try acronym from full name -- only use if pronounceable (has vowel, sounds like a word)
+        const acronym = full.split(" ").map(w => w[0]).join("").toUpperCase().replace(/[^A-Z]/g,"");
+        const hasVowel = /[AEIOU]/.test(acronym);
+        const notTooLong = acronym.length >= 2 && acronym.length <= 5;
+        const notAllConsonants = hasVowel;
+        if (hasVowel && notTooLong && notAllConsonants) {
+          // Make it pronounceable by inserting implied vowel sounds
+          // e.g. "BPJS" -> skip, "CATS" -> CATS, "FRD" -> skip
+          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / acronym.length;
+          if (vowelRatio >= 0.25) {
+            nickname = acronym;
+          }
+        }
+      }
     }
   }
 
