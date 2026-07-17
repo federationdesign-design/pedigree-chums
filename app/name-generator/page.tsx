@@ -461,7 +461,7 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   }
 
   // Title initial <-> first name
-  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
+  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
   if (tf === fl) score += 3;
 
   // Triple alliteration: title + name + dog word
@@ -588,7 +588,7 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Reina",reg:"grand",syllables:2},{title:"Reine",reg:"grand",syllables:1}],
   giant:      [{title:"Big",reg:"informal",syllables:1},{title:"Little",reg:"informal",syllables:2},{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Empress",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Titaness",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3}],
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Oracle",reg:"grand",syllables:3},{title:"Grande Dame",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3}],
-  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Enchantress",reg:"grand",syllables:3},{title:"Crystal Queen",reg:"grand",syllables:4},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Rose Queen",reg:"grand",syllables:2},{title:"Diamond Queen",reg:"grand",syllables:4},{title:"Pearl Queen",reg:"grand",syllables:2}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Enchantress",reg:"grand",syllables:3},{title:"Crystal Queen",reg:"grand",syllables:4},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Rose Queen",reg:"grand",syllables:2},{title:"Diamond Queen",reg:"grand",syllables:4},{title:"Pearl Queen",reg:"grand",syllables:2}],
   bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   boston:     [{title:"Madame",reg:"grand",syllables:2},{title:"Miss",reg:"mundane",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3}],
   asian:      [
@@ -2024,7 +2024,7 @@ function runPass(
       const parts    = r.full.split(" ");
       const firstWord = parts[0];
       const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Professor","Doctor","Chief Analyst"];
-      const informalTitles = ["Lil'","Baby","Little","Big","Ol'","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+      const informalTitles = ["Lil'","Baby","Little","Big","Ol'","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
       if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
       const isDTrain    = /^[A-Z]-/.test(firstWord);
       const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
