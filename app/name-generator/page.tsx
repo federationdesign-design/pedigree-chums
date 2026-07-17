@@ -2082,7 +2082,7 @@ function runPass(
   return raw;
 }
 
-type Stage = "inputs"|"question"|"reveal";
+type Stage = "inputs"|"question"|"reveal"|"exhausted";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
 
