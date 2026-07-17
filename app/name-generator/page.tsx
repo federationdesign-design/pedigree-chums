@@ -216,6 +216,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"Tpr",meaning:"Trooper",gender:"boy",breeds:["sighthound","retriever"]},
   {code:"Brig",meaning:"Brigadier",gender:"boy",breeds:["spaniel","german","giant"]},
   // ── NAVY RANKS ────────────────────────────────────────────────────────────────
+  {code:"Mid",meaning:"Midshipman",gender:"boy"},
   {code:"PO",meaning:"Petty Officer",gender:"boy",breeds:["spaniel","retriever"]},
   // ── RAF RANKS ─────────────────────────────────────────────────────────────────
   {code:"Sqn Ldr",meaning:"Squadron Leader",gender:"boy",breeds:["spaniel","retriever","collie"]},
@@ -1397,7 +1398,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   // Only hyphenate if dog word adds contrast against the first name
   const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
   const noHyphenGroups = ["sniffer"];
-  const useHyphen = !alreadyHyphenated && wordContrast >= 2 && !noHyphenGroups.includes(group);
+  const useHyphen = !alreadyHyphenated && wordContrast >= 3 && !noHyphenGroups.includes(group);
   const baseSurname = useHyphen ? `${dogWordEntry.word}-${surname}` : surname;
   const effectiveSurname = town || baseSurname;
   const group2 = getGroup(breed);
@@ -1769,12 +1770,12 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
 
 const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
 const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Nan","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
-const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Flaps","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Whiskers","Flops"];
+const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Flaps","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Flops"];
 
 const MCFACE_SUFFIX: Record<string, string[]> = {
   sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", "flaps"],
   retriever: ["chops", "tum", "bonce", "chomps", "jowls", "paws", "bum", "tail"],
-  terrier: ["butt", "chops", "bonce", "snoot", "paws", "tail", "whiskers", "ears"],
+  terrier: ["butt", "chops", "bonce", "snoot", "paws", "tail", "ears"],
   boxer: ["snout", "jowls", "chops", "bonce", "butt", "tum", "flaps", "face"],
   character: ["snout", "jowls", "butt", "bonce", "chops", "face", "tum", "flaps"],
   lapdog: ["bum", "bonce", "face", "paws", "ears", "tail", "chops", "snoot"],
@@ -2112,6 +2113,7 @@ export default function NameGeneratorPage() {
   const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
   const [qOpen, setQOpen] = useState(false);
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
+  const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
 
   function handleGenerate() {
@@ -2336,6 +2338,23 @@ export default function NameGeneratorPage() {
                       <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                     </div>
                   )}
+
+          {/* ── EXHAUSTED STAGE ── */}
+          {stage === "exhausted" && (
+            <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:40,padding:"clamp(24px,4vw,40px)",textAlign:"center",color:"#fff"}}>
+              <p style={{fontSize:"2rem",marginBottom:8}}>🐾</p>
+              <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We{"'"}ve run out of new names!</h2>
+              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:24,opacity:0.9}}>Answer a couple more questions and we{"'"}ll find some fresh ones.</p>
+              <button onClick={() => { setQOpen(true); setQIndices(pickThreeQuestions()); setQAnswers({}); setExhausted(false); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"1.1rem",cursor:"pointer",boxShadow:"0 4px 0 rgba(10,58,87,0.4)",fontFamily:"var(--font-display)",letterSpacing:"0.04em",marginBottom:12,display:"block",width:"100%"}}>
+                Answer more questions
+              </button>
+              <button onClick={() => { setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setExhausted(false); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"1rem",cursor:"pointer",fontFamily:"var(--font-display)",letterSpacing:"0.04em",display:"block",width:"100%"}}>
+                Start Over
+              </button>
+            </div>
+          )}
                   {/* Score badge */}
                   <div style={{ marginBottom:16 }}>
                     <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
@@ -2367,7 +2386,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setUsedNicknames(new Set()); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
