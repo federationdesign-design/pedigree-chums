@@ -376,14 +376,14 @@ const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }
   ]},
 ];
 
-function pickFiveQuestions(): number[] {
+function pickThreeQuestions(): number[] {
   const indices = Array.from({length: QUESTION_BANK.length}, (_: unknown, i: number) => i);
   const t = Date.now();
   for (let i = indices.length - 1; i > 0; i--) {
     const j = Math.floor(Math.abs(t * (i + 1) * 2654435761) / 1e12) % (i + 1);
     [indices[i], indices[j]] = [indices[j], indices[i]];
   }
-  return indices.slice(0, 5);
+  return indices.slice(0, 3);
 }
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
@@ -1608,7 +1608,7 @@ export default function NameGeneratorPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
-  const [qIndices, setQIndices] = useState<number[]>(() => pickFiveQuestions());
+  const [qIndices, setQIndices] = useState<number[]>(() => pickThreeQuestions());
   const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
   const [qOpen, setQOpen] = useState(false);
 
@@ -1732,7 +1732,7 @@ export default function NameGeneratorPage() {
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               {!fromCalculator && (<>
                 <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setQIndices(pickFiveQuestions()); setQAnswers({}); }}
+                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setQIndices(pickThreeQuestions()); setQAnswers({}); }}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                   <option value="">-- Select a breed --</option>
                   <optgroup label="Pedigree Chums Pack Breeds">
@@ -1766,7 +1766,7 @@ export default function NameGeneratorPage() {
                     Personalise your name?
                     {Object.keys(qAnswers).length > 0 && (
                       <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
-                        {Object.keys(qAnswers).length}/5
+                        {Object.keys(qAnswers).length}/3
                       </span>
                     )}
                   </span>
