@@ -1240,32 +1240,49 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       // ── ACRONYM WHITELIST ─────────────────────────────────────────────────────
       // Rule: BOTH letters must be visibly in the name (title initial + first name initial)
       // AND the combo must be genuinely culturally loaded -- people say it as a thing
-      const ACRONYM_PUNS: Record<string,string> = {
-        "DJ":"DJ",   // Doctor/Duke Jerome/James
-        "MC":"MC",   // Major/Master Charlie
-        "LL":"LL",   // Lord/Lady Larry/Louise
-        "OG":"O.G.", // Officer Gary
-        "TT":"TT",   // Titan/Trooper Tyler
-        "JR":"J.R.", // Judge Rex
-        "JK":"J.K.", // Judge Kenneth
-        "DC":"D.C.", // Doctor/Duke Charlie
-        "CJ":"C.J.", // Captain/Commander James
-        "AK":"A.K.", // Admiral Kenneth
-        "CV":"C.V.", // Commander Victor
-        "GB":"G.B.", // General Boris
-        "MP":"M.P.", // Major Percy
-        "GP":"G.P.", // General Percy
-        "PC":"P.C.", // Professor/Police Charlie
-        "VC":"V.C.", // Viscount Charlie
-        "PG":"P.G.", // Professor George
-        "NW":"N.W.", // Notorious Winston
-        "HM":"H.M.", // His Majesty
-        "BP":"B.P.", // Baron Percy
-        "BR":"B.R.", // Baron Rex
-        "BC":"B.C.", // Baron Charlie
-        "FC":"F.C.", // Field Marshal Charlie
-        "MK":"M.K.", // Major Kenneth
+      const ACRONYM_PUNS_BOY: Record<string,string> = {
+        "DJ":"DJ",   "MC":"MC",   "LL":"LL",   "OG":"O.G.", "TT":"TT",
+        "JR":"J.R.", "JK":"J.K.", "DC":"D.C.", "CJ":"C.J.", "AK":"A.K.",
+        "CV":"C.V.", "GB":"G.B.", "MP":"M.P.", "GP":"G.P.", "PC":"P.C.",
+        "VC":"V.C.", "PG":"P.G.", "NW":"N.W.", "HM":"H.M.", "BP":"B.P.",
+        "BR":"B.R.", "BC":"B.C.", "FC":"F.C.", "MK":"M.K.",
       };
+// Girl acronym puns -- queen/boss/diva energy, nothing male-coded
+const ACRONYM_PUNS_GIRL: Record<string,string> = {
+        "BQ":"B.Q.", // Boss Queen
+        "HQ":"H.Q.", // Her Queenness
+        "QC":"Q.C.", // Queen Commander
+        "QG":"Q.G.", // Queen Goddess
+        "QR":"Q.R.", // Queen Regent
+        "QB":"Q.B.", // Queen Boss
+        "QM":"Q.M.", // Queen Magnificent
+        "GQ":"G.Q.", // Goddess Queen
+        "GG":"G.G.", // Grand Goddess
+        "DQ":"D.Q.", // Drama Queen
+        "HH":"H.H.", // Her Highness
+        "LL":"LL",   // Lady Louise/Lavinia
+        "LD":"L.D.", // Lady Divine
+        "LB":"L.B.", // Lady Boss
+        "LG":"L.G.", // Lady Gorgeous
+        "DB":"D.B.", // Duchess Boss
+        "DG":"D.G.", // Duchess Gorgeous
+        "DL":"D.L.", // Duchess Lovely
+        "EB":"E.B.", // Empress Boss
+        "EG":"E.G.", // Empress Gorgeous
+        "EL":"E.L.", // Empress Lovely
+        "PR":"P.R.", // Princess Royal
+        "PB":"P.B.", // Princess Boss
+        "PG":"P.G.", // Princess Gorgeous
+        "RQ":"R.Q.", // Royal Queen
+        "CB":"C.B.", // Crown Boss
+        "CG":"C.G.", // Crown Gorgeous
+        "DC":"D.C.", // Divine Commander
+        "DJ":"DJ",   // Duchess/Divine Jackie
+        "MC":"MC",   // Magnificent/Majestic Clara
+        "NQ":"N.Q.", // Notable Queen
+      };
+const ACRONYM_PUNS: Record<string,string> = {...ACRONYM_PUNS_BOY, ...ACRONYM_PUNS_GIRL};
+
 
       // Hard rule: acronym only fires if BOTH letters appear in the full name
       // tI = title initial, nI = first name initial -- both must be present
@@ -1282,13 +1299,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
         nickname = `Dr ${nI}`;
       } else if (title.title === "Professor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
         nickname = `Prof ${nI}`;
-      } else if (!noAcronymTitles.has(title.title) && tI && nI && ACRONYM_PUNS[tI + nI] && !isWhimsy) {
+      } else if (!noAcronymTitles.has(title.title) && tI && nI && (gender === "girl" ? ACRONYM_PUNS_GIRL : ACRONYM_PUNS_BOY)[tI + nI] && !isWhimsy) {
         // Only fire if:
         // 1. First name is real (not whimsy compound)
         // 2. Both letters are genuinely in the name -- hard fail if either is missing
         const isRealish = firstName.reg === "mundane" || firstName.reg === "grand" || firstName.reg === "nature";
         const nameContainsBothLetters = full.toUpperCase().includes(tI) && full.toUpperCase().includes(nI);
-        if (isRealish && nameContainsBothLetters) nickname = ACRONYM_PUNS[tI + nI];
+        if (isRealish && nameContainsBothLetters) nickname = (gender === "girl" ? ACRONYM_PUNS_GIRL : ACRONYM_PUNS_BOY)[tI + nI];
       }
 
       // ── SOLUTION 1: MATE TEST ─────────────────────────────────────────────
