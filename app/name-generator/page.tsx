@@ -376,12 +376,14 @@ const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }
   ]},
 ];
 
-function pickTwoQuestions(seed: number): [number, number] {
-  const t = Date.now() & 0x7fffffff;
-  const q1 = Math.abs((seed ^ t) % QUESTION_BANK.length);
-  let q2 = Math.abs(((seed * 7 + 3) ^ (t >> 5)) % QUESTION_BANK.length);
-  if (q2 === q1) q2 = (q2 + 1) % QUESTION_BANK.length;
-  return [q1, q2];
+function pickFiveQuestions(): number[] {
+  const indices = Array.from({length: QUESTION_BANK.length}, (_: unknown, i: number) => i);
+  const t = Date.now();
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.abs(t * (i + 1) * 2654435761) / 1e12) % (i + 1);
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  return indices.slice(0, 5);
 }
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
@@ -1558,118 +1560,53 @@ export default function NameGeneratorPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
-  const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
-  const [q1Answer, setQ1Answer] = useState("");
-  const [activeQ, setActiveQ] = useState<1|2>(1);
+  const [qIndices, setQIndices] = useState<number[]>(() => pickFiveQuestions());
+  const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
+    if (Object.keys(qAnswers).length < 5) { alert("Please answer all five questions first"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only when a quick pre-pass shows potential for purple (20+)
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
     setResults([]);
-    // Quick pre-pass to check score potential
-    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
-    const preScore = prePass[0]?.score ?? 0;
-    if (preScore >= 20) {
-      setStage("question");
-    } else {
-      // Skip questions, generate directly with empty bonus pools
-      const townMatch2 = FUNNY_PLACES.has(town.trim());
-      const et = townMatch2 ? town.trim() : "";
-      const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], [], true);
-      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], [], true);
-      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], [], true);
-      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], [], true);
-      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], [], true);
-      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], [], true);
-      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], [], true);
-      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], [], true);
-      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], [], false);
-      const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
-      const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
-      const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 17);
-      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
-      setStage("reveal");
-    }
-  }
-
-  function handleAnswer(answer: string) {
-    const townMatch = FUNNY_PLACES.has(town.trim());
-    const effectiveTown = townMatch ? town.trim() : "";
-
-    // Question bonus pools (empty if no QUESTION_BANK yet)
     const bonus1: string[] = [];
     const bonus2: string[] = [];
-
-    // Three independent passes with offset seeds for maximum variety
-    const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
-    const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
-    const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
-    const pass4 = runPass(breed, surname.trim(), gender, seed + 3000,    effectiveTown, colour, bonus1, bonus2);
-    const pass5 = runPass(breed, surname.trim(), gender, seed + 4000,    effectiveTown, colour, bonus1, bonus2);
-    const pass6 = runPass(breed, surname.trim(), gender, seed + 5000,    effectiveTown, colour, bonus1, bonus2);
-    const pass7 = runPass(breed, surname.trim(), gender, seed + 6000,    effectiveTown, colour, bonus1, bonus2);
-    const pass8 = runPass(breed, surname.trim(), gender, seed + 7000,    effectiveTown, colour, bonus1, bonus2);
-    const pass9 = runPass(breed, surname.trim(), gender, seed + 8000,    effectiveTown, colour, bonus1, bonus2);
-
-    // Take top scorer from each pass, then merge all three full lists
-    // This guarantees the cream from each independent roll is represented
-    const topFromEach = [pass1[0], pass2[0], pass3[0], pass4[0], pass5[0], pass6[0], pass7[0], pass8[0], pass9[0]].filter(Boolean) as Result[];
-    const allCandidates = [...pass1, ...pass2, ...pass3, ...pass4, ...pass5, ...pass6, ...pass7, ...pass8, ...pass9];
-    allCandidates.sort((a,b) => b.score - a.score);
-
-    // Ensure top picks from each pass appear in results
-    const merged = [...topFromEach, ...allCandidates];
-    const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored21 = allDeduped.filter(r => r.score >= 17);
-    const ranked2 = rankResults(scored21, breed ? getGroup(breed) : "default");
-    setResults(ranked2.length > 0 ? ranked2.slice(0,5) : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,5));
+    qIndices.forEach((qi: number, pos: number) => {
+      const qItem = QUESTION_BANK[qi];
+      const chosen = qAnswers[pos];
+      if (!chosen || !qItem) return;
+      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
+      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
+      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
+        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
+    });
+    const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2);
+    const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
+    const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
+    const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
+    const sc21 = allD.filter(r=>r.score>=17);
+    const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
+    setResults(ranked.length>0 ? ranked.slice(0,3) : rankResults(allD,breed?getGroup(breed):"default").slice(0,3));
     setStage("reveal");
   }
 
+
+
   function handleRollAgain() {
-    const s = Math.floor(Math.random() * 10000);
-    setSeed(s);
-    // Questions only when a quick pre-pass shows potential for purple (20+)
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
+    setQIndices(pickFiveQuestions());
+    setQAnswers({});
     setResults([]);
-    // Quick pre-pass to check score potential
-    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
-    const preScore = prePass[0]?.score ?? 0;
-    if (preScore >= 20) {
-      setStage("question");
-    } else {
-      // Skip questions, generate directly with empty bonus pools
-      const townMatch2 = FUNNY_PLACES.has(town.trim().toLowerCase());
-      const et2 = townMatch2 ? town.trim() : "";
-      const p1 = runPass(breed, surname.trim(), gender, s,        et2, colour, [], [], true);
-      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et2, colour, [], [], true);
-      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et2, colour, [], [], true);
-      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et2, colour, [], [], true);
-      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et2, colour, [], [], true);
-      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et2, colour, [], [], true);
-      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et2, colour, [], [], true);
-      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et2, colour, [], [], true);
-      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et2, colour, [], [], false);
-      const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
-      const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
-      const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 17);
-      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
-      setStage("reveal");
-    }
+    setStage("inputs");
   }
 
   const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
@@ -1712,11 +1649,13 @@ export default function NameGeneratorPage() {
               </div>
             );
           })()}
-          {stage === "inputs" && (
+          {stage === "inputs" && (() => {
+            const allAnswered = Object.keys(qAnswers).length === 5;
+            return (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               {!fromCalculator && (<>
                 <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => setBreed(e.target.value)}
+                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setQIndices(pickFiveQuestions()); setQAnswers({}); }}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                   <option value="">-- Select a breed --</option>
                   <optgroup label="Pedigree Chums Pack Breeds">
@@ -1727,15 +1666,13 @@ export default function NameGeneratorPage() {
                   </optgroup>
                 </select>
               </>)}
-
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your surname</label>
               <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
-                placeholder="e.g. Jones, Clarke, Thompson-Alexander..."
-                maxLength={60} onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
+                placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
+                onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
                 style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
-
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
-              <div style={{ display:"flex", gap:10, marginBottom:24 }}>
+              <div style={{ display:"flex", gap:10, marginBottom:28 }}>
                 {(["boy","girl"] as const).map(g => (
                   <button key={g} onClick={() => setGender(g)}
                     style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${gender===g?"var(--yellow)":"rgba(255,255,255,0.15)"}`, background:gender===g?"var(--yellow)":"rgba(255,255,255,0.08)", color:gender===g?"var(--navy)":"#fff", fontFamily:"var(--font-body)", fontSize:"0.9rem", fontWeight:700, cursor:"pointer", textTransform:"capitalize" }}>
@@ -1743,37 +1680,43 @@ export default function NameGeneratorPage() {
                   </button>
                 ))}
               </div>
-
-              <button onClick={handleGenerate} className="display"
-                style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontSize:"1.3rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
-                Find my chum&apos;s name
-              </button>
-            </div>
-          )}
-
-          {/* ── STAGE 2: QUESTIONS ── */}
-          {stage === "question" && (() => {
-            const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
-            const qItem = QUESTION_BANK[qi];
-            return (
-              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", paddingTop:"clamp(80px,12vw,120px)" }}>
-                <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
-                  Question {activeQ} of 2
+              <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:22, marginBottom:22 }}>
+                <p style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14, fontFamily:"var(--font-body)" }}>
+                  Five quick questions — answer them all to unlock your name
                 </p>
-                <p className="display" style={{ fontSize:"clamp(1.2rem,3.5vw,1.8rem)", color:"#fff", marginBottom:32, lineHeight:1.3, textAlign:"center" }}>
-                  {qItem.text}
-                </p>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
-                  {qItem.options.map(opt => (
-                    <button key={opt.label} onClick={() => handleAnswer(opt.label)}
-                      style={{ padding:"12px 22px", borderRadius:12, border:"2px solid rgba(255,255,255,0.25)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}>
-                      {opt.label}
-                    </button>
-                  ))}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
+                  {qIndices.map((qi: number, pos: number) => {
+                    const qItem = QUESTION_BANK[qi];
+                    if (!qItem) return null;
+                    const chosen = qAnswers[pos];
+                    return (
+                      <div key={qi} style={{ background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"12px 10px", border:`1.5px solid ${chosen?"var(--yellow)":"rgba(255,255,255,0.12)"}`, display:"flex", flexDirection:"column", gap:7, transition:"border-color 0.2s" }}>
+                        <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.76rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32 }}>
+                          {qItem.text}
+                        </p>
+                        <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                          {qItem.options.map((opt: {label:string;bonus:string[]}) => (
+                            <button key={opt.label}
+                              onClick={() => setQAnswers((prev: Record<number,string>) => ({...prev, [pos]: opt.label}))}
+                              style={{ padding:"6px 9px", borderRadius:7, border:`1.5px solid ${chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.18)"}`, background:chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.05)", color:chosen===opt.label?"var(--navy)":"rgba(255,255,255,0.85)", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, cursor:"pointer", textAlign:"left", lineHeight:1.2, transition:"all 0.15s" }}>
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                        {chosen && <p style={{ color:"var(--yellow)", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)" }}>✓ {chosen}</p>}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+              <button onClick={handleGenerate} disabled={!allAnswered} className="display"
+                style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:allAnswered?"var(--yellow)":"rgba(255,255,255,0.12)", color:allAnswered?"var(--navy)":"rgba(255,255,255,0.3)", fontSize:"1.3rem", cursor:allAnswered?"pointer":"not-allowed", boxShadow:allAnswered?"0 4px 0 rgba(10,58,87,0.4)":"none", letterSpacing:"0.04em", transition:"all 0.25s" }}>
+                {allAnswered ? "Find my chum’s name" : `Answer all five questions — ${Object.keys(qAnswers).length}/5 done`}
+              </button>
+            </div>
             );
           })()}
+
 
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
@@ -1828,7 +1771,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQ1Answer(""); setActiveQ(1); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
