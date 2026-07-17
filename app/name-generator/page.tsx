@@ -1116,7 +1116,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   } else if (styleRoll === 1 && gender === "boy") {
     const letter = pick(DTRAIN_LETTERS, seed + 13);
     const suffix = pick(DTRAIN_SUFFIXES, seed + 19);
-    full = `${letter}-${suffix} ${effectiveSurname}`;
+    full = `${suffix}-${letter} ${effectiveSurname}`;
     nickname = getNickname(firstName.name);
   } else if (styleRoll === 2 && gender === "girl") {
     const fName = pick(MARIEJ_FIRSTS, seed + 7);
@@ -1206,6 +1206,19 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     if (regionalTerm && seed % 4 === 0) nickname = displayFirst;
     if (title.title === "Itsy") nickname = "Bitsy";
     if (title.title === "Hong Kong") nickname = "HK";
+    // Professional single-word titles get "Dr/Prof/Insp" + first name initial
+    const PROF_ABBREVS: Record<string,string> = {
+      "Doctor":"Dr","Professor":"Prof","Inspector":"Insp","General":"Gen",
+      "Sergeant":"Sgt","Commander":"Cmdr","Captain":"Cpt","Colonel":"Col",
+      "Commissioner":"Cmsr","Reverend":"Rev","Emperor":"Emp","Empress":"Emp",
+      "Baroness":"Bss","Baron":"Brn","Countess":"Css","Duchess":"Dss",
+      "Duke":"Dke","Dame":"Dme",
+    };
+    if (!nickname && PROF_ABBREVS[title.title]) {
+      const abbr = PROF_ABBREVS[title.title];
+      const fInit = firstName.name[0]?.toUpperCase() ?? "";
+      nickname = `${abbr} ${fInit}`;
+    }
     // Multi-word title → abbreviate title to initials, keep first name
     if (title.title.includes(" ") && !nickname) {
       const titleInitials = title.title.split(" ").map((w: string) => w[0]).join("");
