@@ -181,12 +181,12 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"LB",meaning:"Legendary Boss",gender:"boy"},{code:"LC",meaning:"Ladies Choice",gender:"boy"},
   {code:"LG",meaning:"Living Legend",gender:"any",breeds:["giant","sighthound"]},
   {code:"LH",meaning:"Ladies Hero",gender:"boy"},{code:"LK",meaning:"Lady Killer",gender:"boy"},
-  {code:"LL",meaning:"Ladies Lover",gender:"boy"},{code:"LM",meaning:"Living Legend",gender:"any"},
+  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},{code:"LM",meaning:"Living Legend",gender:"any"},
   {code:"LP",meaning:"Ladies Pick",gender:"boy"},{code:"MB",meaning:"Master Boss",gender:"boy"},
   {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"boy"},
   {code:"MVP",meaning:"Most Valued Player",gender:"any"},{code:"NA",meaning:"No Apologies",gender:"any"},
   {code:"NB",meaning:"Natural Boss",gender:"boy"},{code:"NF",meaning:"No Fear",gender:"any"},
-  {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier"]},
+  {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier","asian","boston"]},
   {code:"PC",meaning:"Power Commander",gender:"boy"},
   {code:"PG",meaning:"Power Gangster",gender:"boy",breeds:["character","boxer"]},
   {code:"PL",meaning:"Player for Life",gender:"boy"},{code:"QL",meaning:"Queen of Love",gender:"girl"},
@@ -744,7 +744,7 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
     girl: [{name:"Seren",reg:"grand",syllables:2},{name:"Elin",reg:"grand",syllables:2},{name:"Ffion",reg:"grand",syllables:2},{name:"Megan",reg:"grand",syllables:2},{name:"Bethan",reg:"grand",syllables:2},{name:"Rhiannon",reg:"grand",syllables:2},{name:"Ceridwen",reg:"grand",syllables:2},{name:"Branwen",reg:"grand",syllables:2},{name:"Morfudd",reg:"grand",syllables:2},{name:"Nest",reg:"grand",syllables:2},{name:"Tangwystl",reg:"grand",syllables:2},{name:"Gwenllian",reg:"grand",syllables:2},{name:"Olwen",reg:"grand",syllables:2},{name:"Arianrhod",reg:"grand",syllables:2},{name:"Blodwen",reg:"grand",syllables:2},{name:"Catrin",reg:"grand",syllables:2},{name:"Eluned",reg:"grand",syllables:2},{name:"Enid",reg:"grand",syllables:2},{name:"Nerys",reg:"grand",syllables:2},{name:"Siân",reg:"grand",syllables:2},{name:"Angharad",reg:"grand",syllables:2},{name:"Carys",reg:"grand",syllables:2},{name:"Dilys",reg:"grand",syllables:2},{name:"Enfys",reg:"grand",syllables:2},{name:"Glenda",reg:"grand",syllables:2},{name:"Gwen",reg:"grand",syllables:2},{name:"Gweneth",reg:"grand",syllables:2},{name:"Lowri",reg:"grand",syllables:2},{name:"Mair",reg:"grand",syllables:2},{name:"Mali",reg:"grand",syllables:2},{name:"Marged",reg:"grand",syllables:2},{name:"Nesta",reg:"grand",syllables:2},{name:"Non",reg:"grand",syllables:2},{name:"Nia",reg:"grand",syllables:2},{name:"Rhian",reg:"grand",syllables:2},{name:"Rowena",reg:"grand",syllables:2},{name:"Tegwen",reg:"grand",syllables:2},{name:"Tesni",reg:"grand",syllables:2},{name:"Wenna",reg:"grand",syllables:2},{name:"Eirlys",reg:"grand",syllables:2}],
   },
   asian: {
-    boy: [{name:"Phooey",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Philbert",reg:"chaos",syllables:2},{name:"Phreddy",reg:"chaos",syllables:2},{name:"Phoebe",reg:"chaos",syllables:2},{name:"Phumble",reg:"chaos",syllables:2},{name:"Louie",reg:"chaos",syllables:2},{name:"Lenny",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Mooy",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Mochi",reg:"chaos",syllables:2},{name:"Miso",reg:"chaos",syllables:2},{name:"Mongo",reg:"chaos",syllables:2},{name:"Tutu",reg:"chaos",syllables:2},{name:"Tater",reg:"chaos",syllables:2},{name:"Tumble",reg:"chaos",syllables:2},{name:"Tiger",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wumpus",reg:"chaos",syllables:2},{name:"Wonky",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Fumble",reg:"chaos",syllables:2},{name:"Fizz",reg:"chaos",syllables:2},{name:"Karate",reg:"chaos",syllables:2},{name:"Ninja",reg:"chaos",syllables:2},{name:"Ronin",reg:"chaos",syllables:2},{name:"Dragon",reg:"chaos",syllables:2},{name:"Mushu",reg:"chaos",syllables:2},{name:"Oogway",reg:"chaos",syllables:2},{name:"Po",reg:"chaos",syllables:2},{name:"Mantis",reg:"chaos",syllables:2},{name:"Crane",reg:"chaos",syllables:2},{name:"Viper",reg:"chaos",syllables:2},{name:"Confucius",reg:"chaos",syllables:2},{name:"Buddha",reg:"chaos",syllables:2},{name:"Zen",reg:"chaos",syllables:2},{name:"Koi",reg:"chaos",syllables:2},{name:"Jade",reg:"chaos",syllables:2},{name:"Penry",reg:"chaos",syllables:2},{name:"Spot",reg:"chaos",syllables:2},{name:"Batfink",reg:"chaos",syllables:2},{name:"Napoleon",reg:"chaos",syllables:2},{name:"Gus",reg:"chaos",syllables:2},{name:"Alf",reg:"chaos",syllables:2},{name:"Homer",reg:"chaos",syllables:2},{name:"Waldo",reg:"chaos",syllables:2}],
+    boy: [{name:"Phooey",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Philbert",reg:"chaos",syllables:2},{name:"Phreddy",reg:"chaos",syllables:2},{name:"Phumble",reg:"chaos",syllables:2},{name:"Louie",reg:"chaos",syllables:2},{name:"Lenny",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Mooy",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Mochi",reg:"chaos",syllables:2},{name:"Miso",reg:"chaos",syllables:2},{name:"Mongo",reg:"chaos",syllables:2},{name:"Tater",reg:"chaos",syllables:2},{name:"Tumble",reg:"chaos",syllables:2},{name:"Tiger",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wumpus",reg:"chaos",syllables:2},{name:"Wonky",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Fumble",reg:"chaos",syllables:2},{name:"Fizz",reg:"chaos",syllables:2},{name:"Spot",reg:"chaos",syllables:2},{name:"Napoleon",reg:"chaos",syllables:2},{name:"Gus",reg:"chaos",syllables:2},{name:"Alf",reg:"chaos",syllables:2},{name:"Homer",reg:"chaos",syllables:2},{name:"Waldo",reg:"chaos",syllables:2},{name:"Winston",reg:"mundane",syllables:2},{name:"Otto",reg:"mundane",syllables:2},{name:"Bertie",reg:"mundane",syllables:2},{name:"Monty",reg:"mundane",syllables:2},{name:"Percy",reg:"mundane",syllables:2},{name:"Reggie",reg:"mundane",syllables:2},{name:"Buster",reg:"chaos",syllables:2},{name:"Gruff",reg:"chaos",syllables:1},{name:"Grunt",reg:"chaos",syllables:1},{name:"Clive",reg:"mundane",syllables:1},{name:"Boris",reg:"mundane",syllables:2},{name:"Derek",reg:"mundane",syllables:2},{name:"Norman",reg:"mundane",syllables:2},{name:"Frank",reg:"mundane",syllables:1},{name:"Dennis",reg:"mundane",syllables:2},{name:"Stanley",reg:"mundane",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Ernest",reg:"mundane",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Noodle",reg:"food",syllables:2},{name:"Roly",reg:"chaos",syllables:2},{name:"Snorter",reg:"chaos",syllables:2}],
     girl: [{name:"Jade",reg:"grand",syllables:2},{name:"Jasmine",reg:"grand",syllables:2},{name:"Peony",reg:"grand",syllables:2},{name:"Plum",reg:"grand",syllables:2},{name:"Mochi",reg:"grand",syllables:2},{name:"Yuki",reg:"grand",syllables:2},{name:"Kiku",reg:"grand",syllables:2},{name:"Hana",reg:"grand",syllables:2},{name:"Mei",reg:"grand",syllables:2},{name:"Xiao",reg:"grand",syllables:2},{name:"Zhen",reg:"grand",syllables:2},{name:"Nori",reg:"grand",syllables:2},{name:"Suki",reg:"grand",syllables:2},{name:"Koi",reg:"grand",syllables:2},{name:"Tigress",reg:"grand",syllables:2},{name:"Viper",reg:"grand",syllables:2},{name:"Crane",reg:"grand",syllables:2},{name:"Mariposa",reg:"grand",syllables:2},{name:"Butterfly",reg:"grand",syllables:2},{name:"Booboo",reg:"grand",syllables:2},{name:"Gigi",reg:"grand",syllables:2},{name:"Mimi",reg:"grand",syllables:2},{name:"Fifi",reg:"grand",syllables:2},{name:"Lulu",reg:"grand",syllables:2},{name:"Coco",reg:"grand",syllables:2}],
   },
   default: {
@@ -822,6 +822,18 @@ const NICKNAMES: Record<string,string> = {
   microscopic:"Micro",diminutive:"Dimmy",gossamera:"Gossie",daintybell:"Bell",
   galumph:"Lumphy",kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",noodles:"Noods",
   chipmunk:"Chip",
+  winston:"Winnie",otto:"Ot",bertie:"Bert",monty:"Monty",percy:"Perce",
+  reggie:"Reg",buster:"Bus",gruff:"Gruff",grunt:"Grunt",clive:"Clive",
+  boris:"Bo",derek:"Del",norman:"Norm",frank:"Frank",dennis:"Den",
+  stanley:"Stan",herbert:"Herb",ernest:"Ernie",pudding:"Pudds",
+  noodle:"Noods",wobble:"Wobs",roly:"Roly",snorter:"Snort",
+  louie:"Lou",lenny:"Len",lummox:"Lumps",mooy:"Moo",mugsy:"Mugs",
+  mochi:"Mo",miso:"Mis",mongo:"Mo",tater:"Tate",tumble:"Tumbs",
+  tiger:"Tige",wumpus:"Wumps",wonky:"Wonks",fumble:"Fums",fizz:"Fizz",
+  homer:"Home",waldo:"Waldo",napoleon:"Naps",gus:"Gus",alf:"Alf",
+  phooey:"Phoo",philbert:"Phil",phreddy:"Fred",phumble:"Phum",
+  spot:"Spot",
+
   tutu:"Tutu",dizzy:"Dizzy",wizzle:"Wizz",wibble:"Wibs",womble:"Womby",
   bumblebean:"Lulz",tumblewick:"TumTum",gobblesnout:"Gobsnot",
   dafydd:"Daf",gruffudd:"Gruff",llewelyn:"Llew",cadwaladr:"Cad",llywarch:"Llyw",
@@ -1457,7 +1469,7 @@ function runPass(
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
-    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry"];
+    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry","asian","dalmatian","greatdane"];
     if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
