@@ -1146,13 +1146,14 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const useHyphen = !alreadyHyphenated && wordContrast >= 2 && !noHyphenGroups.includes(group);
   const compoundSuffixes = ["well","ford","by","ton","wick","worth","ley","son","man","sworth","berg","heim","mann","feld","dale","ington","sley","boy","girl","fast","foot","silver","stone","shaw","gate","worthy"];
   const isCompound = dogWordEntry.word.length > 8 || compoundSuffixes.some((s: string) => dogWordEntry.word.toLowerCase().endsWith(s));
-  const baseSurname = !surname.trim()
+  const _sn = surname.trim();
+  const baseSurname = !_sn
     ? dogWordEntry.word
     : (useHyphen && !isCompound)
-      ? `${dogWordEntry.word}-${surname}`
+      ? `${dogWordEntry.word}-${_sn}`
       : isCompound
-        ? `${dogWordEntry.word} ${surname}`
-        : surname;
+        ? `${dogWordEntry.word} ${_sn}`
+        : _sn;
   const effectiveSurname = town || baseSurname || dogWordEntry.word;
   const group2 = getGroup(breed);
 
