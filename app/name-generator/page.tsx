@@ -1308,31 +1308,34 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 const ONCE_ONLY_WORDS = new Set(["Track","Trace","Sleuth","Detect","Quest","Hunt","Scout","Find","Hound","Nose","Sniff","Snuffle"]);
 
 function dedupeResults(candidates: Result[], limit = 10): Result[] {
-  const usedFirstNames  = new Set<string>();
-  const usedTitles      = new Set<string>();
-  const usedDogWords    = new Set<string>();
+  const usedFirstNames = new Set<string>();
+  const usedDogWords   = new Set<string>();
+  const usedFirstSounds = new Set<string>(); // block same initial letter for first name
   const out: Result[] = [];
   for (const r of candidates) {
     if (!r) continue;
-    const parts   = r.full.split(" ");
-    const title   = parts[0];
-    // For abbrev style "B.O (Boss Original) Surname", treat whole meaning as firstName for dedup
+    const parts = r.full.split(" ");
+    const title = parts[0];
     const isAbbrevFull = /^[A-Z]\.[A-Z]/.test(title);
     const firstName = isAbbrevFull
-      ? parts.slice(1, parts.length - 1).join(" ")  // "(Boss Original)"
+      ? parts.slice(1, parts.length - 1).join(" ")
       : parts[1] ?? "";
-    // Extract dog word from hyphenated surname (e.g. "Sniff-Taylor" -> "Sniff")
     const surnamepart = parts[parts.length - 1] ?? "";
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
     const wordInName = [...ONCE_ONLY_WORDS].find(w => r.full.includes(" " + w + " ") || r.full.includes(" " + w + "-"));
-    if (wordInName && usedDogWords.has(wordInName)) continue;
-    if (wordInName) usedDogWords.add(wordInName);
+    // Block: same first name used twice
     if (usedFirstNames.has(firstName)) continue;
-    if (usedTitles.has(title)) continue;
+    // Block: same dog word used twice
     if (dogWord && usedDogWords.has(dogWord)) continue;
+    if (wordInName && usedDogWords.has(wordInName)) continue;
+    // Block: same first-name initial -- prevents Dame Dot / Dame Dorothy / Dame Daisy all appearing
+    const fnInitial = firstName[0]?.toLowerCase() ?? "";
+    if (fnInitial && usedFirstSounds.has(fnInitial)) continue;
+    // All clear -- add
     usedFirstNames.add(firstName);
-    usedTitles.add(title);
+    usedFirstSounds.add(fnInitial);
     if (dogWord) usedDogWords.add(dogWord);
+    if (wordInName) usedDogWords.add(wordInName);
     out.push(r);
     if (out.length >= limit) break;
   }
@@ -1768,7 +1771,7 @@ export default function NameGeneratorPage() {
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
       const sc21 = allD.filter(r => r.score >= 22);
       const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
+      setResults(ranked.length > 0 ? ranked.slice(0,3) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,3));
       setStage("reveal");
     }
   }
@@ -1803,7 +1806,7 @@ export default function NameGeneratorPage() {
     const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
     const scored21 = allDeduped.filter(r => r.score >= 17);
     const ranked2 = rankResults(scored21, breed ? getGroup(breed) : "default");
-    setResults(ranked2.length > 0 ? ranked2.slice(0,5) : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,5));
+    setResults(ranked2.length > 0 ? ranked2.slice(0,3) : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,3));
     setStage("reveal");
   }
 
@@ -1834,7 +1837,7 @@ export default function NameGeneratorPage() {
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
       const sc21 = allD.filter(r => r.score >= 22);
       const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
+      setResults(ranked.length > 0 ? ranked.slice(0,3) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,3));
       setStage("reveal");
     }
   }
