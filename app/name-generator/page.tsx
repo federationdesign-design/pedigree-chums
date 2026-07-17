@@ -1045,20 +1045,12 @@ function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.le
 function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set()) {
   const group = getGroup(breed);
   const rawNameBank = (NAMES[group] || NAMES.default)[gender];
-  // Inject bonus names that aren't already in this breed's pool
-  // So answering any question surfaces its names for ALL breeds, not just ones that already have them
-  const bonusInjected: NameEntry[] = allowBonus.size > 0
-    ? [...allowBonus]
-        .filter((n: string) => !rawNameBank.find((e: NameEntry) => e.name === n))
-        .map((n: string) => ({ name: n, reg: "nature" as Register, syllables: n.length > 6 ? 3 : 2 }))
-    : [];
-  const rawNameBankWithBonus = bonusInjected.length > 0 ? [...rawNameBank, ...bonusInjected] : rawNameBank;
   // Passes 1-8 exclude dominant names to force variety from the long tail
   const nameBank = excludeDominant
-    ? (rawNameBankWithBonus.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name)).length >= 3
-        ? rawNameBankWithBonus.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name))
-        : rawNameBankWithBonus)
-    : rawNameBankWithBonus;
+    ? (rawNameBank.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name)).length >= 3
+        ? rawNameBank.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name))
+        : rawNameBank)
+    : rawNameBank;
   const titleBank = gender === "boy" ? (BOY_TITLES[group] || BOY_TITLES.default) : (GIRL_TITLES[group] || GIRL_TITLES.default);
   const wordBank = DOG_WORDS[group] || DOG_WORDS.default;
   const reasoningBank = REASONING[group] || REASONING.default;
@@ -1190,10 +1182,12 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
       full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
     }
-    // McFace nickname: first 3-4 chars of stem + za/zy
-    const mcStemRaw = mc1[0].toLowerCase(); // e.g. "lollopy"
-    const mcNickStem = mcStemRaw.length > 5 ? mcStemRaw.slice(0,4) : mcStemRaw.slice(0,3);
-    nickname = mcNickStem.charAt(0).toUpperCase() + mcNickStem.slice(1) + "za";
+    // McFace nickname: use the clean stem (mc1[1]) + za
+    // mc1[1] is already the stripped stem e.g. ["Chompy","Chomp"] -> "Chomp" -> "Chompza"
+    const mcNickStem = mc1[1];
+    // Strip trailing "le" or "e" before adding "za" so Wobble->Wobbza, Bounce->Bouncza
+    const mcNickBase = mcNickStem.replace(/le$/i,"").replace(/e$/i,"");
+    nickname = mcNickBase.charAt(0).toUpperCase() + mcNickBase.slice(1).toLowerCase() + "za";
   } else if (styleRoll === 7) {
     // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
     const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
@@ -1464,21 +1458,21 @@ const MCFACE_POOL: Record<string, [string, string][]> = {
   retriever:  [["Chompy","Chomp"],["Slobbery","Slobber"],["Waggy","Wag"],["Fetchy","Fetch"],["Munchy","Munch"],["Gobby","Gob"],["Licky","Lick"],["Biscuity","Biscuit"]],
   terrier:    [["Diggy","Dig"],["Scratchy","Scratch"],["Nippy","Nip"],["Yappy","Yap"],["Scrappy","Scrap"],["Bolty","Bolt"],["Ratty","Rat"],["Snappy","Snap"],["Zippy","Zip"]],
   boxer:      [["Snorty","Snort"],["Wobbly","Wobble"],["Boingy","Boing"],["Bumpy","Bump"],["Clumsy","Clums"],["Blundery","Blunder"],["Crashy","Crash"]],
-  character:  [["Snorty","Snort"],["Wheezy","Wheeze"],["Puffy","Puff"],["Grumbly","Grumble"],["Waddly","Waddle"],["Squashy","Squash"],["Squishy","Squish"],["Wriggly","Wriggle"]],
-  lapdog:     [["Fluffy","Fluff"],["Bouncy","Bounce"],["Prancy","Prance"],["Squashy","Squash"],["Flouncy","Flounce"],["Shimmery","Shimmer"],["Pampery","Pamper"],["Glittery","Glitter"]],
+  character:  [["Snorty","Snort"],["Pufty","Puft"],["Puffy","Puff"],["Grumbly","Grumble"],["Waddly","Waddle"],["Squashy","Squash"],["Squishy","Squish"],["Wriggly","Wriggle"]],
+  lapdog:     [["Fluffy","Fluff"],["Boingy","Boing"],["Prancy","Pranc"],["Squashy","Squash"],["Flouncy","Floun"],["Shimmery","Shimmer"],["Pampery","Pamper"],["Glittery","Glitter"]],
   collie:     [["Herdy","Herd"],["Zippy","Zip"],["Circly","Circle"],["Darty","Dart"],["Sprinty","Sprint"],["Frenzy","Frenz"],["Intense","Intens"],["Obsessy","Obsess"]],
-  poodle:     [["Prancy","Prance"],["Strutty","Strutt"],["Swishy","Swish"],["Mincy","Mince"],["Posy","Pose"],["Primy","Prim"],["Flouncy","Flounce"],["Curly","Curl"]],
+  poodle:     [["Prancy","Prance"],["Strutty","Strutt"],["Swishy","Swish"],["Mincy","Mince"],["Posy","Pose"],["Primy","Prim"],["Flouncy","Floun"],["Curly","Curl"]],
   sighthound: [["Speedy","Speed"],["Slinky","Slink"],["Swoopy","Swoop"],["Darty","Dart"],["Flashy","Flash"],["Gleamy","Gleam"],["Streaky","Streak"],["Racy","Race"]],
   dachshund:  [["Stretchy","Stretch"],["Wiggly","Wiggle"],["Wormy","Worm"],["Scuttly","Scuttle"],["Squeezy","Squeeze"],["Wriggly","Wriggle"],["Stubby","Stubb"],["Squirmy","Squirm"]],
-  giant:      [["Massive","Massive"],["Stompy","Stomp"],["Loomy","Loom"],["Thumpy","Thump"],["Rumbly","Rumble"],["Lumpy","Lump"],["Shakey","Shake"],["Swavy","Sway"]],
-  greatdane:  [["Cosmic","Cosmic"],["Starry","Star"],["Massive","Massive"],["Orbital","Orbit"],["Stompy","Stomp"],["Galactic","Galactic"],["Loomy","Loom"],["Thumpy","Thump"]],
+  giant:      [["Massive","Mass"],["Stompy","Stomp"],["Loomy","Loom"],["Thumpy","Thump"],["Rumbly","Rumble"],["Lumpy","Lump"],["Shakey","Shake"],["Swavy","Sway"]],
+  greatdane:  [["Cosmic","Cosm"],["Starry","Star"],["Massive","Mass"],["Orbital","Orbit"],["Stompy","Stomp"],["Galactic","Galac"],["Loomy","Loom"],["Thumpy","Thump"]],
   spaniel:    [["Splashy","Splash"],["Waggy","Wag"],["Fetchy","Fetch"],["Frolicky","Frolic"],["Scampy","Scamp"],["Bouncy","Bounce"],["Gamby","Gamb"],["Rompy","Romp"]],
-  german:     [["Patrolly","Patrol"],["Marching","March"],["Drilley","Drill"],["Guardy","Guard"],["Securey","Secure"],["Breachy","Breach"],["Flanky","Flank"],["Strict","Strict"]],
-  asian:      [["Snorty","Snort"],["Waddly","Waddle"],["Grumbly","Grumble"],["Wheezy","Wheeze"],["Squishy","Squish"],["Puffy","Puff"],["Stumply","Stumpl"],["Rolly","Roll"]],
-  boston:     [["Strutty","Strutt"],["Hustly","Hustle"],["Scrappy","Scrap"],["Dodgy","Dodge"],["Rattly","Rattle"],["Jazzy","Jazz"],["Marching","March"],["Blusty","Blust"]],
+  german:     [["Patrolly","Patrol"],["Marching","March"],["Drilley","Drill"],["Guardy","Guard"],["Securey","Secure"],["Breachy","Breach"],["Flanky","Flank"],["Strict","Stric"]],
+  asian:      [["Snorty","Snort"],["Waddly","Waddle"],["Grumbly","Grumble"],["Pufty","Puft"],["Squishy","Squish"],["Puffy","Puff"],["Stumply","Stumpl"],["Rolly","Roll"]],
+  boston:     [["Strutty","Strutt"],["Hustly","Hustle"],["Scrappy","Scrap"],["Dodgy","Dodge"],["Rattly","Rattle"],["Jazzy","Jiv"],["Marching","March"],["Blusty","Blust"]],
   afghan:     [["Flowy","Flow"],["Swooshy","Swoosh"],["Glidy","Glide"],["Aloofy","Aloof"],["Drifty","Drift"],["Surgy","Surge"],["Sweepy","Sweep"],["Soary","Soar"]],
   bulldog:    [["Grumbly","Grumble"],["Snorty","Snort"],["Wobbly","Wobble"],["Jowly","Jowl"],["Stuffy","Stuff"],["Rolly","Roll"],["Blustey","Blust"],["Squashy","Squash"]],
-  default:    [["Trotty","Trot"],["Wandy","Wand"],["Prowly","Prowl"],["Lopy","Lop"],["Slinky","Slink"],["Stalky","Stalk"],["Sauntry","Sauntr"],["Lollopy","Lollop"]]
+  default:    [["Chompy","Chomp"],["Scrappy","Scrap"],["Waggy","Wag"],["Snappy","Snap"],["Bouncy","Bounce"],["Zippy","Zip"],["Moody","Mood"],["Nosy","Nose"]]
 };
 
 const SPONGEBOB_ADJ1: Record<string, string[]> = {
@@ -1718,7 +1712,7 @@ function runPass(
   }
 
   const raw = Array.from({length:20}, (_, i) => {
-    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(bonusPool1), excludeFirstNames);
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
     if (!r) return null;
     const parts = r.full.split(" ");
     const fn = parts[1] ?? "";
@@ -1768,7 +1762,7 @@ function runPass(
   if ((raw[0]?.score ?? 0) < THRESHOLD) {
     const group = getGroup(breed);
     const prefixed = Array.from({length:20}, (_, i) => {
-      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(bonusPool1), excludeFirstNames);
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
       if (!r) return null;
       let pe: { prefix: string; bonusContrast: number };
       if (gender === "boy") {
