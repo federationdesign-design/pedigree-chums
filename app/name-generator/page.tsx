@@ -1107,6 +1107,24 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     }
   }
 
+  // ── Universal nickname fallback -- fires for ALL styleRolls ─────────────────
+  // Any path that left nickname as "" gets the first name as a minimum
+  if (!nickname) {
+    const tableNick = getNickname(firstName.name);
+    if (tableNick) {
+      nickname = tableNick;
+    } else {
+      // Whimsy compound -- strip suffix, use stem
+      const isWhimsy2 = /[A-Z][a-z]+(wick|bean|boots|chops|snout|paws|bum|face|nose|bonce|flap|pants)$/.test(firstName.name);
+      if (isWhimsy2) {
+        const stem = firstName.name.replace(/(wick|bean|boots|chops|snout|paws|bum|face|flap|pants)$/i,"").trim();
+        nickname = stem.length >= 3 ? stem : firstName.name;
+      } else {
+        nickname = firstName.name;  // bare first name -- always valid
+      }
+    }
+  }
+
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname, colour);
 
