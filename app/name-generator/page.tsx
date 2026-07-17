@@ -1036,63 +1036,77 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     if (regionalTerm && seed % 4 === 0) nickname = displayFirst;
     if (title.title === "Itsy") nickname = "Bitsy";
     if (title.title === "Hong Kong") nickname = "HK";
-    // Multi-word title → abbreviate title to initials, keep first name
-    if (title.title.includes(" ") && !nickname) {
-      const titleInitials = title.title.split(" ").map((w: string) => w[0]).join("");
-      nickname = `${titleInitials} ${firstName.name}`;
-    }
-    const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
-    const nInit = firstName.name[0]?.toUpperCase() || "";
-    const initials2 = tInit + nInit;
-    const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
-    if (matched) {
-      // Some abbreviations have gender-specific nicknames
-      // Itsy title gets Bitsy as nickname
-      if (matched.code === "DC" && gender === "girl") nickname = "Dixy";
-      else if (matched.code === "DC" && gender === "boy") nickname = "Dicky";
-      else nickname = matched.code;
-    } else {
-      const naturalNick = getNickname(firstName.name);
-      if (naturalNick) {
-        nickname = naturalNick;
-      } else {
-        const fn = firstName.name;
-        // If the first name is short enough, use it directly as the nickname
-        if (fn.length <= 4) {
-          nickname = fn;
+
+    if (!nickname) {
+      const fn = firstName.name;
+      const isWhimsy = /[A-Z][a-z]+(wick|bean|boots|chops|snout|paws|bum|face|nose|bonce|flap|pants)$/.test(fn) ||
+                       /^(Noo-Noo|Squishface|Smooshface|Snugglebum|Cuddlekins|Fluffybum|Puddingkins|Babbycakes|Tiddlywink)$/.test(fn);
+
+      // ── SOLUTION 2: ACCIDENTAL ACRONYM ────────────────────────────────────
+      // Title initial + First name initial → reads as something mundane/funny
+      // Never fire on whimsy compound names -- the comedy brief says if a name
+      // won't survive the Mate Test, it's a signal the name itself is weak
+      const cleanTitle = title.title.replace(/^(The |Lil'|Ol'|Wee|Baby|Little|Scruffy|Fluffy|Grumpy|Noisy)\s*/,"");
+      const tI = cleanTitle[0]?.toUpperCase() ?? "";
+      const nI = fn[0]?.toUpperCase() ?? "";
+      const noAcronymTitles = new Set(["Mr","Mrs","Ms","Miss","Dr","Sir","Dame","Lord","Lady"]);
+
+      const ACRONYM_PUNS: Record<string,string> = {
+        "GG":"4G","GR":"4G","GI":"G.I.","GM":"G.M.","GB":"GB","GW":"G.W.",
+        "DJ":"DJ","DB":"D.B.","DW":"D.W.","DR":"D.R.","DN":"D.N.",
+        "MC":"MC","MB":"M.B.","MP":"M.P.","MF":"M.F.","MS":"M.S.","MM":"M.M.","MW":"M.W.",
+        "LC":"L.C.","LD":"L.D.","LE":"L.E.","LW":"L.W.","LB":"L.B.","LF":"L.F.","LG":"L.G.",
+        "BC":"B.C.","BF":"B.F.","BG":"B.G.","BH":"B.H.","BN":"B.N.","BO":"B.O.",
+        "BP":"B.P.","BR":"B.R.","BW":"B.W.",
+        "CB":"C.B.","CD":"C.D.","CF":"C.F.","CG":"C.G.","CH":"C.H.","CM":"C.M.","CN":"C.N.","CW":"C.W.",
+        "LL":"LL","OG":"O.G.","JB":"J.B.","JR":"J.R.","JP":"J.P.","JW":"J.W.",
+        "RB":"R.B.","SB":"S.B.","SC":"S.C.","SF":"S.F.","SG":"S.G.",
+        "SH":"S.H.","SM":"S.M.","SN":"S.N.","SW":"S.W.",
+        "HM":"H.M.","HB":"H.B.","HG":"H.G.","HR":"H.R.","HW":"H.W.",
+        "IB":"I.B.","IC":"I.C.","IF":"I.F.","IG":"I.G.","IW":"I.W.",
+        "NB":"N.B.","NC":"N.C.","ND":"N.D.","NF":"N.F.","NW":"N.W.",
+        "PB":"P.B.","PC":"P.C.","PD":"P.D.","PF":"P.F.","PG":"P.G.","PH":"P.H.","PW":"P.W.",
+        "EB":"E.B.","EC":"E.C.","EF":"E.F.","EG":"E.G.","EW":"E.W.",
+        "KC":"K.C.","KD":"K.D.","KG":"K.G.","KB":"K.B.","KW":"K.W.",
+        "AB":"A.B.","AC":"A.C.","AF":"A.F.","AG":"A.G.","AW":"A.W.",
+        "FB":"F.B.","FC":"F.C.","FD":"F.D.","FG":"F.G.","FW":"F.W.","FM":"F.M.",
+        "VB":"V.B.","VC":"V.C.","VW":"V.W.","VG":"V.G.",
+      };
+
+      // Special cases first
+      if (title.title === "General" && nI === "G") {
+        nickname = "4G";
+      } else if (title.title === "Doctor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
+        nickname = `Dr ${nI}`;
+      } else if (title.title === "Professor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
+        nickname = `Prof ${nI}`;
+      } else if (!noAcronymTitles.has(title.title) && tI && nI && ACRONYM_PUNS[tI + nI] && !isWhimsy) {
+        // Only fire if the first name is a real name, not a whimsy compound
+        const isRealish = firstName.reg === "mundane" || firstName.reg === "grand" || firstName.reg === "nature";
+        if (isRealish) nickname = ACRONYM_PUNS[tI + nI];
+      }
+
+      // ── SOLUTION 1: MATE TEST ─────────────────────────────────────────────
+      // Fallback -- ignore title, ignore dog-word, ignore surname entirely
+      // Take the first name. Shorten the way a British mate would.
+      // If it's a whimsy compound with no real shortening, just use the name.
+      if (!nickname) {
+        const naturalNick = getNickname(fn);
+        if (naturalNick) {
+          nickname = naturalNick;   // Trevor→Trev, Dorothy→Dot, Basil→Baz
         } else {
-          // Try acronym -- only if pronounceable, different from name, not a known abbreviation
-          const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
-          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
-          const acronymIsName = fn.toUpperCase().startsWith(acronym);
-          // Block acronyms that match well-known UK/common abbreviations
-          const blockedAcronyms = new Set(["JSA","ESA","PIP","DLA","NHS","BBC","ITV","VAT","DWP","MOT","MP","PM","GP","PC","DC","FC","AFC","CID","RAC","AA","RAC","HMRC","DVLA","DSS","CSA","ASBO","GCSE","BTEC"]);
-          if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25 && !acronymIsName && !blockedAcronyms.has(acronym)) {
-            nickname = acronym;
+          // For whimsy names: strip the compound suffix and use the stem
+          if (isWhimsy) {
+            const stem = fn.replace(/(wick|bean|boots|chops|snout|paws|bum|face|flap|pants)$/i,"").trim();
+            nickname = stem.length >= 3 ? stem : fn;
           } else {
-            // Shorten first name -- first 3-4 chars + s
-            const stem = fn.length > 6 ? fn.slice(0, 4) : fn.slice(0, 3);
-            nickname = (stem + "s").replace(/ss$/,"s").replace(/([aeiou])s$/i,"$1s");
-            nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+            nickname = fn;          // short real name stands alone: Dot, Rex, Gus, Pip
           }
         }
       }
     }
   }
 
-  // Fallback nickname -- always have one
-  if (!nickname) {
-    const firstNameStr = firstName.name;
-    // Try contracting to first syllable + y/ie
-    const vowelMatch = firstNameStr.match(/^([^aeiou]*[aeiou]+[^aeiou]*)/i);
-    if (vowelMatch && vowelMatch[1].length < firstNameStr.length) {
-      const stem = vowelMatch[1];
-      nickname = stem.length <= 3 ? stem + "y" : stem.slice(0, 4);
-      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
-    } else {
-      nickname = firstNameStr.slice(0, 3);
-    }
-  }
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname, colour);
 
