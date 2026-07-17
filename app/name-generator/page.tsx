@@ -1781,8 +1781,13 @@ export default function NameGeneratorPage() {
     const effectiveTown = townMatch ? town.trim() : "";
 
     const qItem = QUESTION_BANK[qIndex];
-    const bonus1: string[] = qItem?.options?.flatMap((o: {label:string;bonus:string[]}) => o.bonus) ?? [];
-    const bonus2: string[] = [];
+    // Only use bonus words from the CHOSEN answer, not all options
+    const chosenOption = qItem?.options?.find((o: {label:string;bonus:string[]}) => o.label === answer);
+    const bonus1: string[] = chosenOption?.bonus ?? [];
+    // Second pool: bonus words from the OTHER options (weaker signal -- only +2 vs +4)
+    const bonus2: string[] = qItem?.options
+      ?.filter((o: {label:string;bonus:string[]}) => o.label !== answer)
+      ?.flatMap((o: {label:string;bonus:string[]}) => o.bonus) ?? [];
 
     // Three independent passes with offset seeds for maximum variety
     const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
