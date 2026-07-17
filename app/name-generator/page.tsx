@@ -1360,28 +1360,24 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     : nameBank;
   const useFreshBank = freshBank.length >= 2 ? freshBank : nameBank; // fallback if all exhausted
 
-  // Three-tier name picking:
-  // Tier 1: alliterating names not yet seen (best -- alliteration + fresh)
-  // Tier 2: any name not yet seen (drop alliteration to avoid repeat)
-  // Tier 3: full bank (last resort -- all seen, allow repeat rather than crash)
+  // Name picking -- fresh names always preferred, alliteration is a bonus not a requirement
+  // Tier 1: fresh names that alliterate with surname (~60% of non-freeRange passes)
+  // Tier 2: any fresh name -- no alliteration requirement (always better than a repeat)
+  // Tier 3: full bank last resort -- only if everything has been seen
   const alliteratingFresh = useFreshBank.filter((n: NameEntry) =>
-    n.name[0].toUpperCase() === surnameInitial ||
-    (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
-  );
-  const matchingNames = nameBank.filter((n: NameEntry) =>
     n.name[0].toUpperCase() === surnameInitial ||
     (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
 
   let firstName: NameEntry;
   if (!freeRange && alliteratingFresh.length >= 1 && seed % 5 !== 0) {
-    // Tier 1: alliterating + not seen yet
+    // Tier 1: alliterating fresh -- preferred but not required
     firstName = alliteratingFresh[(seed + 3) % alliteratingFresh.length];
   } else if (useFreshBank.length >= 2) {
-    // Tier 2: any fresh name (alliteration exhausted or freeRange pass)
+    // Tier 2: any fresh name -- drop alliteration, never repeat
     firstName = useFreshBank[(seed + 3) % useFreshBank.length];
   } else {
-    // Tier 3: all fresh options exhausted -- use full bank (rare)
+    // Tier 3: truly exhausted -- use full bank (very rare with hundreds of names)
     firstName = pick(nameBank, seed + 3);
   }
 
