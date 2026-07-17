@@ -2124,7 +2124,9 @@ export default function NameGeneratorPage() {
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
     const sc21 = allD.filter(r=>r.score>=17);
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-    setResults(ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1));
+    const genResult = ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1);
+    setUsedNicknames(new Set(genResult.map((r: Result) => r.nickname)));
+    setResults(genResult);
     setStage("reveal");
   }
 
@@ -2163,7 +2165,12 @@ export default function NameGeneratorPage() {
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
     const sc21 = allD.filter(r=>r.score>=17);
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-    setResults(ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1));
+    // Filter out any result whose nickname has already been shown this session
+    const allRanked = ranked.length>0 ? ranked : rankResults(allD,breed?getGroup(breed):"default");
+    const fresh = allRanked.filter((r: Result) => !usedNicknames.has(r.nickname));
+    const rollResult = (fresh.length>0 ? fresh : allRanked).slice(0,1);
+    setUsedNicknames((prev: Set<string>) => new Set([...prev, ...rollResult.map((r: Result) => r.nickname)]));
+    setResults(rollResult);
     setStage("reveal");
   }
 
@@ -2338,7 +2345,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
