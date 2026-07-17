@@ -1599,7 +1599,7 @@ export default function NameGeneratorPage() {
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
     const sc21 = allD.filter(r=>r.score>=17);
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-    setResults(ranked.length>0 ? ranked.slice(0,3) : rankResults(allD,breed?getGroup(breed):"default").slice(0,3));
+    setResults(ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1));
     setStage("reveal");
   }
 
@@ -1723,50 +1723,49 @@ export default function NameGeneratorPage() {
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
-                {results.map((r: Result, i: number) => (
-                  <div key={i} style={{
-                    position:"relative",
-                    background:"linear-gradient(to top right, #00e2ff, #008eff)",
-                    borderRadius:40,
-                    padding:"clamp(20px,3.5vw,32px)",
-                    paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(20px,3.5vw,32px)",
-                    boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
-                    overflow:"visible"
-                  }}>
-                    {/* Breed card -- rotated 2deg, anchored to top-right corner of box */}
-                    {cardImg && (
-                      <div style={{
-                        position:"absolute",
-                        right:-12,
-                        top:-10,
-                        zIndex:2,
-                        transform:"rotate(2deg)",
-                        transformOrigin:"bottom right",
-                        filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))"
-                      }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
-                      </div>
-                    )}
-                    {/* Top pick pill + score badge */}
-                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-                      {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+              {results.slice(0,1).map((r: Result) => (
+                <div key={r.full} style={{
+                  position:"relative",
+                  background:"linear-gradient(to top right, #00e2ff, #008eff)",
+                  borderRadius:40,
+                  padding:"clamp(24px,4vw,40px)",
+                  paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(24px,4vw,40px)",
+                  boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
+                  overflow:"visible",
+                  marginBottom:20
+                }}>
+                  {/* Breed card */}
+                  {cardImg && (
+                    <div style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                     </div>
-                    {/* Name -- 2pt bigger, left aligned */}
-                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.3rem,5vw,1.9rem)", color:"#fff", marginBottom:8, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
-                    {/* Nickname -- 2pt bigger, left aligned */}
-                    {r.nickname && (
-                      <div style={{ fontSize:"clamp(1rem,3vw,1.1rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
-                        Known to friends as: {r.nickname}
-                      </div>
-                    )}
-                    {/* Reasoning -- 2pt bigger, left aligned */}
-                    <div style={{ fontSize:"clamp(1rem,3vw,1.15rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                  )}
+                  {/* Score badge */}
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
                   </div>
-                ))}
-              </div>
+                  {/* NICKNAME -- the hero name, big */}
+                  {r.nickname ? (
+                    <>
+                      <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(2rem,8vw,3.2rem)", color:"#fff", lineHeight:1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:10 }}>
+                        {r.nickname}
+                      </div>
+                      {/* Full name -- smaller, below */}
+                      <div style={{ fontSize:"clamp(0.85rem,2.5vw,1.05rem)", color:"rgba(10,58,87,0.75)", fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center", marginBottom:16, letterSpacing:"0.01em" }}>
+                        {r.full}
+                      </div>
+                    </>
+                  ) : (
+                    /* No nickname -- just show full name as hero */
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5vw,2.4rem)", color:"#fff", lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:16 }}>
+                      {r.full}
+                    </div>
+                  )}
+                  {/* Reasoning */}
+                  <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                </div>
+              ))}
 
               <div style={{ display:"flex", gap:12 }}>
                 <button onClick={handleRollAgain} className="display"
