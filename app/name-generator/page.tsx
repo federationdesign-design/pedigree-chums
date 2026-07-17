@@ -1656,9 +1656,13 @@ function runPass(
     const lastPart = parts[parts.length - 1] ?? "";
     const dogWord = lastPart.includes("-") ? lastPart.split("-")[0] : "";
 
+    // Check ALL name parts for bonus words (not just parts[1])
+    const nameWords = parts.slice(0, -1); // exclude surname
     let qBonus = 0;
-    if (doubleBonus.has(fn)) qBonus += 4;
-    else if (allBonus.has(fn)) qBonus += 2;
+    const hasDouble = nameWords.some(w => doubleBonus.has(w));
+    const hasBonus  = nameWords.some(w => allBonus.has(w));
+    if (hasDouble) qBonus += 8;       // was +4 -- make it meaningful
+    else if (hasBonus) qBonus += 5;   // was +2 -- make it meaningful
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
