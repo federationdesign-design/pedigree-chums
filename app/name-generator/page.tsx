@@ -1566,7 +1566,6 @@ export default function NameGeneratorPage() {
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     if (!surname.trim()) { alert("Please enter your surname"); return; }
-    if (Object.keys(qAnswers).length < 5) { alert("Please answer all five questions first"); return; }
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
     setResults([]);
@@ -1650,7 +1649,6 @@ export default function NameGeneratorPage() {
             );
           })()}
           {stage === "inputs" && (() => {
-            const allAnswered = Object.keys(qAnswers).length === 5;
             return (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               {!fromCalculator && (<>
@@ -1682,7 +1680,7 @@ export default function NameGeneratorPage() {
               </div>
               <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:22, marginBottom:22 }}>
                 <p style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14, fontFamily:"var(--font-body)" }}>
-                  Five quick questions — answer them all to unlock your name
+                  Personalise your name — answer any that feel right
                 </p>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
                   {qIndices.map((qi: number, pos: number) => {
@@ -1709,9 +1707,9 @@ export default function NameGeneratorPage() {
                   })}
                 </div>
               </div>
-              <button onClick={handleGenerate} disabled={!allAnswered} className="display"
-                style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:allAnswered?"var(--yellow)":"rgba(255,255,255,0.12)", color:allAnswered?"var(--navy)":"rgba(255,255,255,0.3)", fontSize:"1.3rem", cursor:allAnswered?"pointer":"not-allowed", boxShadow:allAnswered?"0 4px 0 rgba(10,58,87,0.4)":"none", letterSpacing:"0.04em", transition:"all 0.25s" }}>
-                {allAnswered ? "Find my chum’s name" : `Answer all five questions — ${Object.keys(qAnswers).length}/5 done`}
+              <button onClick={handleGenerate} className="display"
+                style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontSize:"1.3rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
+                Find my chum’s name
               </button>
             </div>
             );
