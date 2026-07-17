@@ -418,7 +418,7 @@ const COLOUR_BONUS: Record<DogColour, string[]> = {
   golden:  ["Goldie","Honey","Butter","Saffron","Sunny","Marigold","Primrose","Biscuit","Custard","Dandelion","Sandy","Gold","Sunshine","Buttercup","Caramel","Toffee","Harvest"],
   grey:    ["Silver","Sterling","Slate","Ash","Smoke","Misty","Dove","Steel","Pewter","Flint","Stone","Chrome","Mercury","Graphite","Smoky","Fog","Mist","Cloudy","Cinder"],
   blue:    ["Blue","Indigo","Cobalt","Slate","Steel","Denim","Azure","Ocean","Navy","Sapphire","Cerulean","Aqua","Teal","Marine","Storm","Rain","Ink"],
-  spotted: ["Patch","Freckle","Dapple","Motley","Domino","Checkers","Harlequin","Marble","Patches","Dot","Speckle","Pip","Splash","Calico"],
+  spotted: ["Patch","Freckle","Dapple","Motley","Domino","Checkers","Harlequin","Marble","Patches","Dot","Speckle","Splash","Calico"],
   "":      []
 };
 
@@ -574,15 +574,15 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   {title:"Grand Master",reg:"grand",syllables:3},
   {title:"Dragon",reg:"grand",syllables:2},
   {title:"Emperor",reg:"grand",syllables:4},
-  {title:"Notorious",reg:"grand",syllables:4},
+  
   {title:"Incomparable",reg:"grand",syllables:5}
 ],
   // Character breeds -- self-appointed grandeur
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
+  character:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
   // Gentry -- Dalmatian, OES etc
   gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1}],
   // Dachshund -- absurdly self-important
-  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3}],
+  dachshund:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3}],
   corgi:      [{title:"Prince",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Baron",reg:"grand",syllables:2},{title:"Archdruid",reg:"grand",syllables:3},{title:"Bard",reg:"grand",syllables:1},{title:"Captain",reg:"grand",syllables:2},{title:"Sergeant",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Mr",reg:"mundane",syllables:1}],
   default:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Inspector",reg:"grand",syllables:3},{title:"Baron",reg:"grand",syllables:2}]
 };
@@ -609,14 +609,14 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   {title:"Jade",reg:"grand",syllables:1},
   {title:"Lotus",reg:"grand",syllables:2},
   {title:"Goddess",reg:"grand",syllables:2},
-  {title:"Notorious",reg:"grand",syllables:4},
+  
   {title:"Incomparable",reg:"grand",syllables:5},
   {title:"Queen",reg:"grand",syllables:1},
   {title:"Geisha",reg:"grand",syllables:2},
   {title:"Madame",reg:"grand",syllables:2}
 ],
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3},{title:"Sorceress",reg:"grand",syllables:3},{title:"Huntress",reg:"grand",syllables:2},{title:"Amazon",reg:"grand",syllables:3},{title:"Oracle",reg:"grand",syllables:3},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Ice Queen",reg:"grand",syllables:3},{title:"Storm Queen",reg:"grand",syllables:3},{title:"Shadow Queen",reg:"grand",syllables:3},{title:"Fire Queen",reg:"grand",syllables:3}],
-  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Countess",reg:"grand",syllables:2}],
+  character:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3},{title:"Sorceress",reg:"grand",syllables:3},{title:"Huntress",reg:"grand",syllables:2},{title:"Amazon",reg:"grand",syllables:3},{title:"Oracle",reg:"grand",syllables:3},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Ice Queen",reg:"grand",syllables:3},{title:"Storm Queen",reg:"grand",syllables:3},{title:"Shadow Queen",reg:"grand",syllables:3},{title:"Fire Queen",reg:"grand",syllables:3}],
+  dachshund:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Countess",reg:"grand",syllables:2}],
   gentry:     [{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Most Honourable",reg:"grand",syllables:4},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Noble Lady",reg:"grand",syllables:3},{title:"Grande Dame",reg:"grand",syllables:3}],
   corgi:      [{title:"Princess",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Bardess",reg:"grand",syllables:2},{title:"Miss",reg:"mundane",syllables:1},{title:"Dame",reg:"grand",syllables:1},{title:"Queen",reg:"grand",syllables:1},{title:"Matriarch",reg:"grand",syllables:3}],
   default:    [{title:"Lady",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3}]
@@ -1847,12 +1847,8 @@ type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
 
 const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   { prefix: "Grand",    bonusContrast: 2 },
-  { prefix: "Supreme",  bonusContrast: 2 },
   { prefix: "Divine",   bonusContrast: 3 },
-  { prefix: "Imperial", bonusContrast: 2 },
-  { prefix: "Arch",     bonusContrast: 2 },
-  { prefix: "High",     bonusContrast: 2 },
-  { prefix: "Très",     bonusContrast: 3 }];
+  { prefix: "Imperial", bonusContrast: 2 }];
 
 const TITLE_PREFIXES: PrefixEntry[] = [
   { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
