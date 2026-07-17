@@ -1314,10 +1314,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 // Pick top results ensuring no repeated first names, titles, or dog words
 const ONCE_ONLY_WORDS = new Set(["Track","Trace","Sleuth","Detect","Quest","Hunt","Scout","Find","Hound","Nose","Sniff","Snuffle"]);
 
+const WHIMSY_DETECT = /paws|bean|boots|puff|whisk|wick|wink|snout|chops|bonce|flap|wiggle|wobble|bumble|scramble|grumble|noodle|puddle|doodle|fizzle|jiggle|toodle|mumble|rumble/i;
+
 function dedupeResults(candidates: Result[], limit = 10): Result[] {
-  const usedFirstNames = new Set<string>();
-  const usedDogWords   = new Set<string>();
-  const usedFirstSounds = new Set<string>(); // block same initial letter for first name
+  const usedFirstNames  = new Set<string>();
+  const usedDogWords    = new Set<string>();
+  const usedFirstSounds = new Set<string>();
+  let whimsyUsed = false;  // only one whimsy result allowed
   const out: Result[] = [];
   for (const r of candidates) {
     if (!r) continue;
@@ -1330,15 +1333,19 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
     const surnamepart = parts[parts.length - 1] ?? "";
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
     const wordInName = [...ONCE_ONLY_WORDS].find(w => r.full.includes(" " + w + " ") || r.full.includes(" " + w + "-"));
+    const isWhimsy = WHIMSY_DETECT.test(firstName);
+    // Block: more than one whimsy result
+    if (isWhimsy && whimsyUsed) continue;
     // Block: same first name used twice
     if (usedFirstNames.has(firstName)) continue;
     // Block: same dog word used twice
     if (dogWord && usedDogWords.has(dogWord)) continue;
     if (wordInName && usedDogWords.has(wordInName)) continue;
-    // Block: same first-name initial -- prevents Dame Dot / Dame Dorothy / Dame Daisy all appearing
+    // Block: same first-name initial
     const fnInitial = firstName[0]?.toLowerCase() ?? "";
     if (fnInitial && usedFirstSounds.has(fnInitial)) continue;
-    // All clear -- add
+    // All clear
+    if (isWhimsy) whimsyUsed = true;
     usedFirstNames.add(firstName);
     usedFirstSounds.add(fnInitial);
     if (dogWord) usedDogWords.add(dogWord);
@@ -1656,13 +1663,9 @@ function runPass(
     const lastPart = parts[parts.length - 1] ?? "";
     const dogWord = lastPart.includes("-") ? lastPart.split("-")[0] : "";
 
-    // Check ALL name parts for bonus words (not just parts[1])
-    const nameWords = parts.slice(0, -1); // exclude surname
     let qBonus = 0;
-    const hasDouble = nameWords.some(w => doubleBonus.has(w));
-    const hasBonus  = nameWords.some(w => allBonus.has(w));
-    if (hasDouble) qBonus += 8;       // was +4 -- make it meaningful
-    else if (hasBonus) qBonus += 5;   // was +2 -- make it meaningful
+    if (doubleBonus.has(fn)) qBonus += 4;
+    else if (allBonus.has(fn)) qBonus += 2;
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
