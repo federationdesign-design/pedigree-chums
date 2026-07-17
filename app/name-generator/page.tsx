@@ -880,7 +880,7 @@ const DOMINANT_NAMES = new Set(["William","Booboo","Luna","Klaus","Ernst","Norma
 
 function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.length]; }
 
-function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false) {
+function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false) {
   const group = getGroup(breed);
   const rawNameBank = (NAMES[group] || NAMES.default)[gender];
   // Passes 1-8 exclude dominant names to force variety from the long tail
@@ -906,9 +906,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     n.name[0].toUpperCase() === surnameInitial ||
     (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  // freeRange passes: skip alliteration filter entirely -- pick from full pool
-  // This gives the long tail (Basil, Harriet, Sherlock, Napoleon) a guaranteed slot
-  const useMatchingName = !freeRange && matchingNames.length >= 2 && (seed % 5 !== 0);
+  // Use matching names ~60% of passes (seeds divisible by 5 use random pick for variety)
+  const useMatchingName = matchingNames.length >= 2 && (seed % 5 !== 0);
   const firstName = useMatchingName
     ? matchingNames[(seed + 3) % matchingNames.length]
     : pick(nameBank, seed + 3);
@@ -918,7 +917,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     w.firstLetter.toUpperCase() === surnameInitial ||
     (soundFamily[w.firstLetter.toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  const useMatchingWord = !freeRange && matchingWords.length >= 2 && (seed % 7 !== 0);
+  const useMatchingWord = matchingWords.length >= 2 && (seed % 7 !== 0);
   const dogWordEntry = useMatchingWord
     ? matchingWords[(seed + 7) % matchingWords.length]
     : pick(wordBank, seed + 7);
@@ -1046,8 +1045,12 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       // Title initial + First name initial → reads as something mundane/funny
       // Never fire on whimsy compound names -- the comedy brief says if a name
       // won't survive the Mate Test, it's a signal the name itself is weak
+      // For multi-word titles, use the LAST word's initial to avoid false matches
+      // "Grand Duchess" → D (Duchess), "The Right Honourable" → H (Honourable)
+      // Single-word titles use their own initial as normal
       const cleanTitle = title.title.replace(/^(The |Lil'|Ol'|Wee|Baby|Little|Scruffy|Fluffy|Grumpy|Noisy)\s*/,"");
-      const tI = cleanTitle[0]?.toUpperCase() ?? "";
+      const titleWords = cleanTitle.trim().split(/\s+/);
+      const tI = (titleWords.length > 1 ? titleWords[titleWords.length - 1][0] : titleWords[0]?.[0] ?? "").toUpperCase();
       const nI = fn[0]?.toUpperCase() ?? "";
       const noAcronymTitles = new Set(["Mr","Mrs","Ms","Miss","Dr","Sir","Dame","Lord","Lady"]);
 
@@ -1055,7 +1058,6 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       // Rule: BOTH letters must be visibly in the name (title initial + first name initial)
       // AND the combo must be genuinely culturally loaded -- people say it as a thing
       const ACRONYM_PUNS: Record<string,string> = {
-        "GG":"4G",   // General Gordon/Gus/George
         "DJ":"DJ",   // Doctor/Duke Jerome/James
         "MC":"MC",   // Major/Master Charlie
         "LL":"LL",   // Lord/Lady Larry/Louise
@@ -1088,7 +1090,10 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       // really a sanity check against edge cases)
 
       // Special cases first
-      if (title.title === "General" && nI === "G") {
+      // 4G: only fires when ALL FOUR elements start with G -- General + G-name + G-word + G-surname
+      const dogWordInitial = dogWordEntry?.word?.[0]?.toUpperCase() ?? "";
+      const surnameInitialForNick = surname.replace(/-.*/, "")[0]?.toUpperCase() ?? "";
+      if (title.title === "General" && nI === "G" && dogWordInitial === "G" && surnameInitialForNick === "G") {
         nickname = "4G";
       } else if (title.title === "Doctor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
         nickname = `Dr ${nI}`;
@@ -1480,7 +1485,7 @@ function rankResults(results: Result[], group: string): Result[] {
 function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
   baseSeed: number, town: string, colour: DogColour,
-  bonusPool1: string[], bonusPool2: string[], excludeDominant = false, freeRange = false
+  bonusPool1: string[], bonusPool2: string[], excludeDominant = false
 ): Result[] {
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
@@ -1504,7 +1509,7 @@ function runPass(
   }
 
   const raw = Array.from({length:20}, (_, i) => {
-    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange);
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant);
     if (!r) return null;
     const parts = r.full.split(" ");
     const fn = parts[1] ?? "";
@@ -1550,7 +1555,7 @@ function runPass(
   if ((raw[0]?.score ?? 0) < THRESHOLD) {
     const group = getGroup(breed);
     const prefixed = Array.from({length:20}, (_, i) => {
-      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange);
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant);
       if (!r) return null;
       let pe: { prefix: string; bonusContrast: number };
       if (gender === "boy") {
@@ -1654,9 +1659,9 @@ export default function NameGeneratorPage() {
     const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2);
     const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2);
     const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2);
-    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true,true);
-    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true,true);
-    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2);
     const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
     const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
@@ -1693,9 +1698,9 @@ export default function NameGeneratorPage() {
     const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2);
     const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2);
     const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2);
-    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true,true);
-    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true,true);
-    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2);
     const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
     const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
