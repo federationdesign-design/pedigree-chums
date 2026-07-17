@@ -231,134 +231,149 @@ const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
 
 // ── RANDOM QUESTIONS ───────────────────────────────────────────────────────────
 const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }[] }[] = [
+  {
+    text: "Where are you from?",
+    options: [
+      {label:"Down South", bonus:["Treacle","Sweetheart","Darling","Dear","Doll","Dollface","Poppet","Petal","Flower","Lovely","Babe","Babes","Guv","Sonny","Lover","Maid","MyLover","MyHandsome","MyBeauty"]},
+      {label:"The Midlands", bonus:["Bab","Babby","Babs","OurKid","ArKid","Duck","Ducky","Duckie","Cock","Cocker","Chick","Chucky","Mucker","Youth","MeDuck","MyDuck"]},
+      {label:"Up North", bonus:["Chuck","Chucky","Pet","Petal","Hinny","Marra","BonnyLad","BonnyLass","Lad","Lass","Kidda","Cock","Cocker","Flower","Love","Luv","Bairn"]},
+      {label:"Scotland", bonus:["Hen","WeeHen","WeePal","Doll","Dollie","Dearie","Lassie","Laddie","Bairn","WeeYin","WeeMan","WeeLass","Bonny","Pal"]},
+      {label:"Somewhere else", bonus:["Love","Luv","Darling","Dear","Pet","Petal","Sweetheart","Honey","Sugar","Babe","Flower","Pal","Mate","Duck","Lovely"]}
+    ]
+  },
   { text:"Do you like space?", options:[
-    {label:"Yes",   bonus:["Comet","Nova","Astro","Luna","Apollo","Atlas","Orbit","Flash","Cosmo","Jupiter","Cassiopeia","Aurora","Eclipse","Astrid","Cosmos"]},
-    {label:"No",    bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Dumpling","Toffee","Wobble","Roly"]}
+    {label:"Yes",bonus:["Luna","Nova","Orion","Astro","Astrid","Comet","Nebula","Aurora","Cassiopeia","Cosmo","Cosimo","Galileo","Kepler","Eclipse","Stellar","Vega","Lyra","Polaris","Orbit","Cosmos","Titan","Atlas","Jupiter","Saturn","Darkstar","Moonbeam","Stardust","Celestia","Lunaris","Astra","Solaris","Quasar","Pulsar"]},
+    {label:"No", bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Sausage","Dumpling","Wobble"]},
   ]},
   { text:"Do you enjoy smells?", options:[
-    {label:"Yes",   bonus:["Heather","Sage","Basil","Clover","Sorrel","Flora","Lavender","Rosemary","Jasmine","Bracken","Gorse","Yarrow","Furze","Bramble","Thistle"]},
-    {label:"No",    bonus:["Flint","Grit","Gruff","Grunt","Steel","Boulder","Chrome","Cinder","Slate","Gravel"]}
+    {label:"Yes",bonus:["Jasmine","Heather","Sage","Basil","Clover","Juniper","Cedar","Sorrel","Flora","Lavender","Mint","Rosemary","Thyme","Blossom"]},
+    {label:"No", bonus:["Flint","Stone","Slate","Steel","Grit","Iron","Chrome","Cinder","Concrete"]},
   ]},
   { text:"Are you a morning person?", options:[
-    {label:"Yes",   bonus:["Dawn","Crisp","Lark","Bright","Zippy","Perky","Brisk","Chipper","Flash","Sprocket","Sparky","Robin"]},
-    {label:"No",    bonus:["Shadow","Raven","Midnight","Dusk","Mellow","Slumber","Vesper","Nocturne","Murk","Smudge"]}
+    {label:"Yes",bonus:["Dawn","Sparky","Sunny","Breezy","Zippy","Perky","Dewy","Lark","Robin","Crisp","Chipper","Bright","Fresh"]},
+    {label:"No", bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Slumber","Mellow"]},
   ]},
   { text:"Have you ever talked to a plant?", options:[
-    {label:"Yes",   bonus:["Willow","Fern","Rowan","Hazel","Birch","Clover","Bramble","Heather","Sorrel","Ivy","Skye","Moss","Briar","Bloom"]},
-    {label:"No",    bonus:["Flint","Grit","Boulder","Granite","Steel","Chrome","Cinder","Concrete","Slate","Iron"]}
+    {label:"Yes",bonus:["Fern","Ivy","Willow","Daisy","Skye","Moss","Briar","Bloom","Rowan","Clover","Hazel","Birch","Cedar","Ash","Bramble"]},
+    {label:"No", bonus:["Brick","Steel","Chrome","Concrete","Gravel","Slate","Cinder","Iron"]},
   ]},
   { text:"Have you ever worn a onesie in public?", options:[
-    {label:"Yes",   bonus:["Snugglebum","Fifi","Mimi","Lulu","Cuddlekins","Jellybean","Marshmallow","Babbycakes","Poppet","Pudding","Tiddlywink","Squishface"]},
-    {label:"No",    bonus:["Norman","Derek","Keith","Brian","Barry","Basil","Kevin","Clive","Trevor","Raymond"]}
+    {label:"Yes",bonus:["Snugglebum","Fluffy","Booboo","Fifi","Mimi","Puddingkins","Lulu","Noo-Noo","Cuddlekins","Fluffybum","Jellybean","Candyfloss","Tiddlywink"]},
+    {label:"No", bonus:["Dapper","Debonair","Suave","Sharp","Immaculate","Sterling","Pristine","Sleek","Trim","Tailored"]},
   ]},
   { text:"Do you believe in ghosts?", options:[
-    {label:"Yes",   bonus:["Shadow","Raven","Eclipse","Phantom","Wraith","Dusk","Midnight","Mist","Murk","Ghost","Spectre","Shade","Smoky","Smudge","Viper"]},
-    {label:"No",    bonus:["Norman","Derek","Keith","Brian","Barry","Basil","Kevin","Biscuit","Crumble","Custard"]}
+    {label:"Yes",bonus:["Ghost","Shadow","Phantom","Midnight","Eclipse","Misty","Spectre","Vesper","Wraith","Shade","Spirit","Wisp","Echo","Mist","Void"]},
+    {label:"No", bonus:["Solid","Grounded","Flint","Stone","Anchor","Boulder","Bedrock","Steadfast","Grit","Granite"]},
   ]},
   { text:"Do you take sugar in your tea?", options:[
-    {label:"Yes",   bonus:["Biscuit","Pudding","Treacle","Custard","Crumble","Toffee","Sherbet","Fudge","Caramel","Butterscotch","Bonbon","Crunchie","Smartie","Jammy","Marmalade"]},
-    {label:"No",    bonus:["Flint","Grit","Gruff","Granite","Slate","Steel","Sharp","Crisp","Bolt","Brisk"]}
+    {label:"Yes",bonus:["Honey","Toffee","Fudge","Caramel","Treacle","Sherbet","Bonbon","Butterscotch","Jellybean","Gumdrop","Sweetpea","Syrup","Custard","Pudding","Lollipop"]},
+    {label:"No", bonus:["Bitter","Tonic","Brisk","Sharp","Crisp","Earl","Assam","Pekoe","Darjeeling"]},
   ]},
   { text:"Do you like myths and legends?", options:[
-    {label:"Yes",   bonus:["Morgan","Merlin","Arthur","Gawain","Percival","Guinevere","Isolde","Camelot","Excalibur","Lancelot","Nimue","Bran","Boudica","Hecate","Circe","Medea"]},
-    {label:"No",    bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Biscuit","Pudding","Crumble","Wobble"]}
+    {label:"Yes",bonus:["Orpheus","Perseus","Achilles","Heracles","Theseus","Ajax","Odysseus","Circe","Phoenix","Griffin","Merlin","Lancelot","Morgan","Oberon","Avalon","Medusa","Pegasus","Icarus","Apollo","Artemis"]},
+    {label:"No", bonus:["Norman","Derek","Keith","Brian","Barry","Colin","Basil","Kevin","Biscuit","Custard"]},
   ]},
   { text:"Sugar or salt?", options:[
-    {label:"Sugar", bonus:["Toffee","Treacle","Custard","Crumble","Pudding","Fudge","Caramel","Sherbet","Smartie","Jammy","Butterscotch","Marmalade","Crunchie","Bonbon","Biscuit"]},
-    {label:"Salt",  bonus:["Crispy","Crusty","Gherkin","Pretzel","Pickles","Chips","Radish","Parsnip","Cabbage","Pepper","Paprika","Cracker","Sardine"]}
+    {label:"Sugar",bonus:["Honey","Fudge","Caramel","Toffee","Treacle","Butterscotch","Sherbet","Bonbon","Mellow","Syrup","Candy","Nectar","Praline"]},
+    {label:"Salt", bonus:["Brine","Flint","Gravel","Sharp","Crisp","Gruff","Stone","Slate","Tonic","Crag","Grit","Granite","Rust"]},
   ]},
   { text:"Autumn or summer?", options:[
-    {label:"Autumn",bonus:["Rowan","Hazel","Bramble","Conker","Bracken","Russet","Gorse","Birch","Yarrow","Sorrel","Heather","Furze","Thistle","Clover"]},
-    {label:"Summer",bonus:["Daisy","Flora","Blossom","Buttercup","Clover","Sunny","Skye","Blaze","Flash","Cricket","Shimmy","Prance","Frolic","Bounce"]}
+    {label:"Autumn",bonus:["Amber","Russet","Conker","Chestnut","Bramble","Hazel","Harvest","Ember","Copper","Acorn","Tawny","Sienna","Cinnamon","Mist","Dusk"]},
+    {label:"Summer",bonus:["Sunny","Blaze","Sandy","Breeze","Dazzle","Shimmer","Freckle","Goldie","Honey","Wildflower","Surf","Coral","Azure","Radiant","Glow","Lemon"]},
   ]},
   { text:"How many sides does a circle have?", options:[
-    {label:"One",   bonus:["Rumpus","Havoc","Chaos","Bonkers","Dingbat","Kerfuffle","Hullabaloo","Ruckus","Mayhem","Mischief","Zigzag","Bonkers","Loony"]},
-    {label:"Two",   bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Crisp","Flint","Grit"]}
+    {label:"None",bonus:["Ace","Boss","Stone","Flint","Blade","Steel","Iron","Frost","Sharp","Crisp","Direct","Decisive","Clean","Bolt"]},
+    {label:"One", bonus:["Infinite","Spiral","Orbit","Cycle","Curve","Eternal","Continuum","Loop","Cosmos","Omega","Zen","Endless","Void","Paradox"]},
   ]},
   { text:"Tea or coffee?", options:[
-    {label:"Tea",   bonus:["Willow","Skye","Moss","Rowan","Clover","Hazel","Bramble","Heather","Birch","Sorrel","Fern","Bracken","Thistle","Gorse","Yarrow"]},
-    {label:"Coffee",bonus:["Espresso","Mocha","Arabica","Crema","Roast","Grind","Dark","Press","Robust","Grounds","Bitter"]}
+    {label:"Tea",   bonus:["Earl","Darjeeling","Assam","Oolong","Chamomile","Pekoe","Brew","Steep","Mellow","Proper","Crumpet","Scone","Biscuit"]},
+    {label:"Coffee",bonus:["Espresso","Cortado","Arabica","Mocha","Crema","Grind","Press","Dark","Roast","Intense","Robust","Bold","Bitter","Jet"]},
   ]},
   { text:"Would you rather be invisible or fly?", options:[
-    {label:"Invisible",bonus:["Shadow","Ghost","Wraith","Shade","Murk","Mist","Phantom","Spectre","Smoky","Smudge","Eclipse","Dusk"]},
-    {label:"Fly",      bonus:["Falcon","Soar","Glide","Dart","Streak","Bolt","Sprint","Flash","Rocket","Blaze","Swoop","Skim"]}
+    {label:"Invisible",bonus:["Ghost","Shadow","Phantom","Spectre","Wraith","Shade","Mist","Wisp","Echo","Blur","Fade","Smoke"]},
+    {label:"Fly",      bonus:["Falcon","Hawk","Eagle","Icarus","Pegasus","Cloud","Nimbus","Soar","Glide","Swift","Dart","Streak","Apex"]},
   ]},
   { text:"Night owl or early bird?", options:[
-    {label:"Night owl",bonus:["Shadow","Raven","Midnight","Dusk","Mellow","Slumber","Vesper","Nocturne","Murk","Smudge","Smoky","Phantom"]},
-    {label:"Early bird",bonus:["Dawn","Lark","Robin","Crisp","Bright","Zippy","Perky","Brisk","Chipper","Flash","Sparky","Bounce"]}
+    {label:"Night owl",  bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Sable","Noir","Obsidian","Onyx"]},
+    {label:"Early bird", bonus:["Dawn","Lark","Robin","Crisp","Dewy","Sparky","Sunny","Chirpy","Bright","Breezy","Perky","Glow","Fresh","Zippy"]},
   ]},
   { text:"Are you cool?", options:[
-    {label:"Yes",   bonus:["Maverick","Diesel","Blaze","Flash","Rocket","Tank","Jax","Gunner","Kodak","Boss","Crusher","Hammer"]},
-    {label:"No",    bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Biscuit","Pudding","Crumble"]}
+    {label:"Yes",bonus:["Ace","Slick","Smooth","Ice","Frost","Suave","Sharp","Dapper","Blade","Shadow","Chrome","Silk","Velvet","Steel","Noir"]},
+    {label:"No", bonus:["Goofy","Doofus","Dingbat","Goofball","Wonky","Doolally","Bumbly","Topsy","Wibble","Clumsy","Wobble","Bumble","Scatty"]},
   ]},
   { text:"Are you a nerd?", options:[
-    {label:"Yes",   bonus:["Newton","Einstein","Galileo","Pascal","Kepler","Leibniz","Darwin","Faraday","Turing","Babbage","Archimedes","Fibonacci","Euler"]},
-    {label:"No",    bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Biscuit","Pudding","Wobble"]}
+    {label:"Yes",bonus:["Kepler","Copernicus","Turing","Pascal","Euler","Archimedes","Pythagoras","Worf","Spock","Data","Hubble","Fibonacci","Bohr","Lovelace"]},
+    {label:"No", bonus:["Maverick","Rebel","Wildcard","Outlaw","Renegade","Rogue","Hotshot","Bandit","Flash","Blaze","Bolt","Rocket","Dash"]},
   ]},
   { text:"Do you make your bed in the morning?", options:[
-    {label:"Yes",   bonus:["Crisp","Sharp","Flint","Grit","Brisk","Bolt","Sprint","Precise","Immaculate","Sterling","Dapper","Proper"]},
-    {label:"No",    bonus:["Snugglebum","Pudding","Wobble","Roly","Shuffle","Stumble","Mumble","Grumble","Slumber","Dozy"]}
+    {label:"Yes",bonus:["Pristine","Crisp","Sterling","Proper","Immaculate","Dapper","Sharp","Composed","Prim","Trim","Precise","Neat","Buff"]},
+    {label:"No", bonus:["Rumple","Tumble","Shambles","Chaos","Muddle","Scruffy","Slouch","Sprawl","Tangle","Topple","Wobble","Raggle","Jumble"]},
   ]},
   { text:"Do you read the terms and conditions?", options:[
-    {label:"Yes",   bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Clive","Raymond","Arthur","Harold"]},
-    {label:"No",    bonus:["Toffee","Treacle","Sherbet","Custard","Pudding","Crumble","Biscuit","Wobble","Roly","Rumpus"]}
+    {label:"Yes",bonus:["Prudence","Constance","Diligent","Earnest","Steadfast","Thorough","Scholar","Counsel","Careful","Measured","Exact","Vigilant"]},
+    {label:"No", bonus:["Maverick","Reckless","Wildcard","Rogue","Rebel","Outlaw","Carefree","Breezy","Blithe","Nonchalance","Audacious","Brazen"]},
   ]},
   { text:"New book -- break the spine?", options:[
-    {label:"Obviously",bonus:["Rumpus","Havoc","Chaos","Bonkers","Maverick","Reckless","Crash","Smash","Barrel","Charge"]},
-    {label:"Never",    bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Crisp","Proper","Prim"]}
+    {label:"Yes",bonus:["Battered","Beloved","Weathered","Story","Chapter","Thumbed","Worn","Creased","Dogear","Tattered","Frayed","Loved"]},
+    {label:"No", bonus:["Pristine","Ivory","Pearl","Gilt","Vellum","Parchment","Folio","Lacquer","Crisp","Mint","Immaculate"]},
   ]},
   { text:"Reply to texts immediately?", options:[
-    {label:"Yes",   bonus:["Zippy","Flash","Rocket","Sprint","Bolt","Dart","Dash","Blaze","Streak","Whizz","Charge"]},
-    {label:"No",    bonus:["Wobble","Roly","Shuffle","Stumble","Mumble","Plod","Lollop","Amble","Dawdle","Mooch"]}
+    {label:"Yes",bonus:["Swift","Prompt","Flash","Zip","Dart","Ready","Alert","Keen","Sprightly","Rapid","Instant","Snappy","Brisk"]},
+    {label:"No", bonus:["Languid","Aloof","Nonchalance","Glaciale","Unhurried","Mellow","Drift","Mosey","Saunter","Laze","Meander"]},
   ]},
   { text:"Do you eat the crusts?", options:[
-    {label:"Yes",   bonus:["Norman","Derek","Keith","Brian","Barry","Basil","Kevin","Biscuit","Crispy","Crusty","Grit","Flint","Sturdy"]},
-    {label:"No",    bonus:["Toffee","Pudding","Custard","Crumble","Wobble","Roly","Poppet","Fifi","Mimi","Lulu"]}
+    {label:"Yes",bonus:["Sturdy","Grit","Solid","Wholesome","Hearty","Stalwart","Steadfast","Biscuit","Dependable","Robust","Trusty","Stout"]},
+    {label:"No", bonus:["Delicate","Dainty","Precious","Refined","Particular","Fussy","Finicky","Petite","Prim","Gentle","Soft","Tender"]},
   ]},
   { text:"Ketchup -- fridge or cupboard?", options:[
-    {label:"Fridge",bonus:["Toffee","Treacle","Sherbet","Crumble","Custard","Biscuit","Pickle","Gherkin","Cracker","Chips"]},
-    {label:"Cupboard",bonus:["Norman","Derek","Kevin","Barry","Basil","Clive","Brian","Keith","Raymond","Arthur"]}
+    {label:"Fridge",   bonus:["Chilled","Crisp","Precise","Measured","Exact","Rigorous","Rational","Careful","Scientific","Correct","Orderly"]},
+    {label:"Cupboard", bonus:["Instinct","Bold","Brazen","Fearless","Reckless","Maverick","Audacious","Daring","Bravado","Gutsy","Rogue","Defiant"]},
   ]},
   { text:"Escalator -- walk or stand?", options:[
-    {label:"Walk",  bonus:["Zippy","Flash","Bolt","Sprint","Dash","Dart","Blaze","Streak","Rocket","Charge","Hustle","Surge"]},
-    {label:"Stand", bonus:["Plod","Mooch","Lollop","Amble","Shuffle","Dawdle","Waddle","Lumber","Trundle","Stumble"]}
+    {label:"Walk",  bonus:["Rocket","Dash","Sprint","Bolt","Charge","Hustle","Drive","Momentum","Relentless","Surge","Blaze","Flash","Rapid"]},
+    {label:"Stand", bonus:["Repose","Mellow","Saunter","Drift","Amble","Mosey","Languid","Unhurried","Serene","Composed","Placid","Still","Calm"]},
   ]},
   { text:"Party -- kitchen or dance floor?", options:[
-    {label:"Kitchen",bonus:["Biscuit","Pudding","Treacle","Custard","Crumble","Toffee","Gherkin","Chips","Pretzel","Pickles","Gravy","Dumpling"]},
-    {label:"Dance floor",bonus:["Waltz","Foxtrot","Tango","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Prance","Strut"]}
+    {label:"Kitchen",     bonus:["Sage","Thoughtful","Ember","Hearth","Warmth","Steady","Quiet","Considered","Mellow","Grounded","Earnest"]},
+    {label:"Dance floor", bonus:["Showtime","Dazzle","Shimmy","Foxtrot","Tango","Boogie","Ziggy","Sparkle","Strut","Glitter","Flash"]},
   ]},
   { text:"Rehearse conversations in your head?", options:[
-    {label:"Yes",   bonus:["Sherlock","Poirot","Marple","Watson","Foyle","Endeavour","Gamache","Alleyn","Tennison","Barnaby"]},
-    {label:"No",    bonus:["Rumpus","Havoc","Chaos","Bonkers","Dingbat","Kerfuffle","Ruckus","Mayhem","Mischief","Havoc"]}
+    {label:"Yes",bonus:["Considered","Measured","Ponder","Ruminate","Reflect","Muse","Contemplate","Deliberate","Thoughtful","Nuanced","Meticulous"]},
+    {label:"No", bonus:["Blurt","Spark","Candid","Frank","Brash","Forthright","Bold","Direct","Unfiltered","Raw","Spontaneous","Impulsive"]},
   ]},
   { text:"Do you believe in luck?", options:[
-    {label:"Yes",   bonus:["Clover","Rowan","Hazel","Bramble","Heather","Bracken","Thistle","Gorse","Yarrow","Birch","Willow","Fern"]},
-    {label:"No",    bonus:["Flint","Grit","Bolt","Granite","Steel","Crisp","Sharp","Brisk","Gruff","Grunt"]}
+    {label:"Yes",bonus:["Lucky","Fortune","Charm","Clover","Wishbone","Serendipity","Kismet","Fate","Fortuna","Star","Chance","Destiny","Omen"]},
+    {label:"No", bonus:["Grit","Hustle","Grind","Steel","Forge","Drive","Muscle","Tenacity","Earn","Build","Craft","Toil","Persist","Relentless"]},
   ]},
   { text:"Windows or Mac?", options:[
-    {label:"Windows",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Clive","Raymond","Arthur","Harold"]},
-    {label:"Mac",    bonus:["Maverick","Rocket","Blaze","Flash","Jax","Bolt","Diesel","Tank","Gunner","Kodak","Crusher"]}
+    {label:"Windows",bonus:["Pixel","Glitch","Buffer","Crash","Reboot","Patch","Clippy","Loading","Freeze","Spinner","Update","Error"]},
+    {label:"Mac",    bonus:["Retina","Safari","Sleek","Minimal","Studio","Render","Siri","Fusion","Carbon","Silicon","Spotlight","Aluminium"]},
   ]},
   { text:"Are you a good dancer?", options:[
-    {label:"Yes",   bonus:["Waltz","Foxtrot","Tango","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Prance","Salsa","Rumba","Jive","Swing"]},
-    {label:"No",    bonus:["Plod","Mooch","Shuffle","Stumble","Lumber","Waddle","Trundle","Wobble","Roly","Clomper"]}
+    {label:"Yes",bonus:["Foxtrot","Tango","Waltz","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Salsa","Rumba","Swing","Jive"]},
+    {label:"No", bonus:["Lumber","Shuffle","Plod","Stumble","Wobble","Trundle","Sway","Stomp","Clump","Blunder","Flail","Lurch","Stagger"]},
   ]},
   { text:"When did you last call your mother?", options:[
-    {label:"Recently",bonus:["Biscuit","Pudding","Custard","Crumble","Toffee","Poppet","Darling","Blossom","Petal","Rosie","Daisy","Flora"]},
-    {label:"...",    bonus:["Rumpus","Havoc","Chaos","Bonkers","Reckless","Kerfuffle","Mayhem","Ruckus","Mischief","Dingbat"]}
+    {label:"Recently",     bonus:["Loyal","Faithful","Devoted","True","Steadfast","Beloved","Darling","Treasure","Precious","Cherished","Noble","Gallant"]},
+    {label:"Not recently", bonus:["Rogue","Rebel","Outlaw","Maverick","Renegade","Wildcard","Trouble","Chaos","Rascal","Scamp","Scoundrel","Vagabond"]},
   ]},
   { text:"What music moves you?", options:[
-    {label:"Classical",bonus:["Mozart","Beethoven","Handel","Bach","Brahms","Chopin","Liszt","Schubert","Vivaldi","Purcell"]},
-    {label:"Rock",     bonus:["Maverick","Blaze","Bolt","Diesel","Tank","Crusher","Hammer","Flash","Rocket","Gunner","Jax"]},
-    {label:"Jazz",     bonus:["Miles","Duke","Ella","Billie","Dizzy","Monk","Coltrane","Mingus","Parker","Davis"]},
-    {label:"Pop",      bonus:["Zippy","Fizzy","Glitter","Shimmy","Sparkle","Boogie","Dazzle","Flash","Bounce","Toffee"]}
+    {label:"Classic / Jazz",    bonus:["Sinatra","Ella","Billie","Miles","Duke","Dizzy","Satchmo","Monk","Coltrane","Armstrong","Holiday"]},
+    {label:"Rock / Indie",      bonus:["Bowie","Jagger","Lennon","Hendrix","Cobain","Strummer","Iggy","Lemmy","Morrissey","Ziggy","Riff","Thunder"]},
+    {label:"Pop",               bonus:["Presley","Freddie","Elton","George","Prince","Kylie","Adele","Showtime","Glitter","Dazzle","Sparkle"]},
+    {label:"Hip Hop / R&B",     bonus:["Ghost","Shadow","Ice","Smooth","Phantom","Ace","Blaze","Hustle","Flex","Drip","Hype","Vibe","Wave"]},
+    {label:"Country",           bonus:["Dolly","Hank","Waylon","Willie","Cash","Loretta","Patsy","Emmylou","Harvest","Dusty","Rusty","Prairie"]},
+    {label:"Electronic / Dance",bonus:["Moby","Orbital","Prodigy","Massive","Tricky","Bass","Pulse","Beat","Rhythm","Tempo","Sync","Surge"]},
+    {label:"Metal",             bonus:["Ozzy","Lemmy","Dio","Riff","Thunder","Havoc","Chaos","Rampage","Iron","Steel","Blade","Hammer","Fury"]},
+    {label:"Classical",         bonus:["Mozart","Bach","Handel","Vivaldi","Chopin","Liszt","Mahler","Brahms","Elgar","Purcell","Cadence","Forte"]},
   ]},
   { text:"Favourite pizza?", options:[
-    {label:"Margherita",bonus:["Basil","Rosemary","Flora","Sage","Oregano","Thyme","Heather","Clover","Sorrel","Lavender"]},
-    {label:"Pepperoni", bonus:["Maverick","Rocket","Blaze","Tank","Crusher","Diesel","Gunner","Bolt","Flash","Jax"]},
-    {label:"Hawaiian",  bonus:["Mango","Kiwi","Lime","Melon","Peaches","Apricot","Mellow","Sunny","Tropical","Coconut"]},
-    {label:"Vegan",     bonus:["Willow","Fern","Rowan","Hazel","Clover","Bramble","Sorrel","Heather","Yarrow","Birch"]}
-  ]}
+    {label:"Margherita", bonus:["Pearl","Ivory","Simple","Pure","Classic","Refined","Elegant","Clean","Minimal","Pristine","Delicate","Noble"]},
+    {label:"Pepperoni",  bonus:["Biscuit","Buddy","Champ","Sunny","Lucky","Faithful","Happy","Reliable","Steady","True","Trusty","Solid","Warm"]},
+    {label:"Meat feast", bonus:["Boss","Havoc","Chaos","Thunder","Blaze","Savage","Titan","Goliath","Maximus","Beast","Rampage","Fury","Brute"]},
+    {label:"Vegetarian", bonus:["Flora","Basil","Sage","Clover","Bloom","Meadow","Willow","Fern","Ivy","Petal","Briar","Moss","Leaf","Blossom"]},
+    {label:"Hawaiian",   bonus:["Maverick","Wildcard","Renegade","Rebel","Outlaw","Bonkers","Doolally","Chaos","Rogue","Breezy","Carefree","Bold"]},
+  ]},
 ];
 
 function pickThreeQuestions(): number[] {
@@ -461,7 +476,7 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   }
 
   // Title initial <-> first name
-  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
+  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
   if (tf === fl) score += 3;
 
   // Triple alliteration: title + name + dog word
@@ -588,7 +603,7 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Reina",reg:"grand",syllables:2},{title:"Reine",reg:"grand",syllables:1}],
   giant:      [{title:"Empress",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Titaness",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3}],
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Oracle",reg:"grand",syllables:3},{title:"Grande Dame",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3}],
-  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Enchantress",reg:"grand",syllables:3},{title:"Crystal Queen",reg:"grand",syllables:4},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Rose Queen",reg:"grand",syllables:2},{title:"Diamond Queen",reg:"grand",syllables:4},{title:"Pearl Queen",reg:"grand",syllables:2}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Enchantress",reg:"grand",syllables:3},{title:"Crystal Queen",reg:"grand",syllables:4},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Rose Queen",reg:"grand",syllables:2},{title:"Diamond Queen",reg:"grand",syllables:4},{title:"Pearl Queen",reg:"grand",syllables:2}],
   bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   boston:     [{title:"Madame",reg:"grand",syllables:2},{title:"Miss",reg:"mundane",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3}],
   asian:      [
@@ -1553,7 +1568,7 @@ function runPass(
       const parts    = r.full.split(" ");
       const firstWord = parts[0];
       const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Professor","Doctor","Chief Analyst"];
-      const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+      const informalTitles = ["Lil'","Baby","Little","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
       if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
       const isDTrain    = /^[A-Z]-/.test(firstWord);
       const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
