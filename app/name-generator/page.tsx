@@ -172,19 +172,19 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"FB",meaning:"Fearless Boss",gender:"boy"},{code:"FL",meaning:"First Lady",gender:"girl"},
   {code:"GC",meaning:"Game Changer",gender:"any"},
   {code:"GM",meaning:"Grand Master",gender:"boy",breeds:["poodle","collie","german"]},
-  {code:"HB",meaning:"Head Boss",gender:"boy"},{code:"HC",meaning:"Heart Collector",gender:"boy"},{code:"HK",meaning:"Hong Kong",gender:"any",breeds:["asian","character"]},
+  {code:"HB",meaning:"Head Boss",gender:"boy"},{code:"HC",meaning:"Heart Collector",gender:"boy"},{code:"HK",meaning:"Hong Kong",gender:"boy",breeds:["asian","character"]},
   {code:"HK",meaning:"Hustle King",gender:"boy"},{code:"HL",meaning:"Heart Lover",gender:"boy"},
   {code:"KB",meaning:"King Boss",gender:"boy"},
   {code:"KC",meaning:"King of Chaos",gender:"boy",breeds:["terrier","character"]},
   {code:"KG",meaning:"King of the Game",gender:"boy"},{code:"KO",meaning:"Knockout",gender:"boy",breeds:["boxer"]},
   {code:"LB",meaning:"Legendary Boss",gender:"boy"},{code:"LC",meaning:"Ladies Choice",gender:"boy"},
-  {code:"LG",meaning:"Living Legend",gender:"any",breeds:["giant","sighthound"]},
+  {code:"LG",meaning:"Living Legend",gender:"boy",breeds:["giant","sighthound"]},
   {code:"LH",meaning:"Ladies Hero",gender:"boy"},{code:"LK",meaning:"Lady Killer",gender:"boy"},
-  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},{code:"LM",meaning:"Living Legend",gender:"any"},
+  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},{code:"LM",meaning:"Living Legend",gender:"boy"},
   {code:"LP",meaning:"Ladies Pick",gender:"boy"},{code:"MB",meaning:"Master Boss",gender:"boy"},
   {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"boy"},
-  {code:"MVP",meaning:"Most Valued Player",gender:"any"},{code:"NA",meaning:"No Apologies",gender:"any"},
-  {code:"NB",meaning:"Natural Boss",gender:"boy"},{code:"NF",meaning:"No Fear",gender:"any"},
+  {code:"MVP",meaning:"Most Valued Player",gender:"boy"},{code:"NA",meaning:"No Apologies",gender:"boy"},
+  {code:"NB",meaning:"Natural Boss",gender:"boy"},{code:"NF",meaning:"No Fear",gender:"boy"},
   {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier","asian","boston"]},
   {code:"PC",meaning:"Power Commander",gender:"boy"},
   {code:"PG",meaning:"Power Gangster",gender:"boy",breeds:["character","boxer"]},
@@ -193,7 +193,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"SC",meaning:"Supreme Commander",gender:"boy",breeds:["character"]},
   {code:"SG",meaning:"Street General",gender:"boy"},{code:"SK",meaning:"Supreme King",gender:"boy"},
   {code:"SL",meaning:"Smooth Lover",gender:"boy"},{code:"TB",meaning:"Top Boss",gender:"boy"},
-  {code:"TC",meaning:"Top Cat",gender:"any"},{code:"TG",meaning:"Top Gangster",gender:"boy",breeds:["character","boxer"]},
+  {code:"TC",meaning:"Top Cat",gender:"boy"},{code:"TG",meaning:"Top Gangster",gender:"boy",breeds:["character","boxer"]},
   {code:"TK",meaning:"The King",gender:"boy"},{code:"TL",meaning:"True Lover",gender:"boy"},
   {code:"TM",meaning:"Top Man",gender:"boy"},{code:"TR",meaning:"The Realest",gender:"boy"},
   {code:"VIP",meaning:"Very Important Person",gender:"any"},
@@ -203,7 +203,7 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"DC",meaning:"Detective Constable",gender:"boy",breeds:["sniffer","default"]},
   {code:"DS",meaning:"Detective Sergeant",gender:"boy",breeds:["sniffer","default"]},
   {code:"DCI",meaning:"Detective Chief Inspector",gender:"boy",breeds:["sniffer","poodle"]},
-  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","terrier","boxer"]},
+  {code:"PCSO",meaning:"Police Community Support Officer",gender:"boy",breeds:["character","terrier","boxer"]},
   {code:"Insp",meaning:"Inspector",gender:"boy",breeds:["sniffer","retriever"]},
   // ── ARMY RANKS ────────────────────────────────────────────────────────────────
   {code:"Pte",meaning:"Private",gender:"boy",breeds:["boxer","terrier","character"]},
@@ -220,7 +220,21 @@ const ABBREVS: AbbrevEntry[] = [
   {code:"Sqn Ldr",meaning:"Squadron Leader",gender:"boy",breeds:["spaniel","retriever","collie"]},
   {code:"Wg Cdr",meaning:"Wing Commander",gender:"boy",breeds:["spaniel","german","giant"]},
   {code:"Flt Lt",meaning:"Flight Lieutenant",gender:"boy",breeds:["collie","poodle","retriever"]},
-  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]}];
+  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]},
+  {code:"QC",meaning:"Queen Commander",gender:"girl"},
+  {code:"QB",meaning:"Queen Boss",gender:"girl"},
+  {code:"QG",meaning:"Queen of the Game",gender:"girl"},
+  {code:"HQ",meaning:"Her Queenness",gender:"girl"},
+  {code:"HH",meaning:"Her Highness",gender:"girl"},
+  {code:"BQ",meaning:"Boss Queen",gender:"girl"},
+  {code:"DQ",meaning:"Drama Queen",gender:"girl"},
+  {code:"GQ",meaning:"Gorgeous Queen",gender:"girl"},
+  {code:"LB",meaning:"Lady Boss",gender:"girl"},
+  {code:"LG",meaning:"Lady Gorgeous",gender:"girl"},
+  {code:"NA",meaning:"No Apologies",gender:"girl"},
+  {code:"NQ",meaning:"Notable Queen",gender:"girl"},
+  {code:"TC",meaning:"Top Cat",gender:"girl"},
+  {code:"GC",meaning:"Girl Champ",gender:"girl"}];
 
 const DTRAIN_LETTERS  = ["D"];  // D for Dog -- always
 const DTRAIN_SUFFIXES = ["Train","Prince","Money","King","Boss","Smooth","Real","Fresh","Young","Hype"];
@@ -806,7 +820,7 @@ const NICKNAMES: Record<string,string|string[]> = {
   fortunatus:"Forty",celestin:"Cel",florentine:["Flo","Florrie","Tina","Renty"],evangelina:"Evie",
   evangeline:["Eva","Evie","Angie","Lina","Vangie"],celestine:["Celi","Celly","Tina","Stina"],sophronia:"Soph",euphemia:["Effie","Euphie","Mia","Femie","Phemie"],
   wilhelmina:["Willa","Mina","Minnie","Wilma","Billie"],clementine:["Clem","Clemmie","Tiny","Minnie","Tina"],millicent:["Millie","Milly","Missy","Centa","Lissy"],frederica:"Freddie",
-  constance:["Connie","Con","Stancy","Cissy","Coco"],prudence:["Prue","Prudy","Pru","Denny"],dorothea:["Dora","Dory","Thea","Dotty","Dot"],theodosia:"Teddy",
+  constance:["Connie","Con","Cissy","Coco","Consta"],prudence:["Prue","Prudy","Pru","Denny"],dorothea:["Dora","Dory","Thea","Dotty","Dot"],theodosia:"Teddy",
   philomena:"Philly",seraphine:"Sera",arabella:["Ara","Bella","Belle","Ari","Arby"],georgiana:"Georgie",
   cassiopeia:"Cassie",isadora:"Izzy",pandemonium:"Panda",discombobulate:"Disco",
   hullabaloo:"Hully",pandemonia:"Panda",nonchalance:"Nona",glaciale:"Glayglay",
@@ -1498,7 +1512,7 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
 };
 
 const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
-const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
+const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Nan","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
 const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Flaps","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Flops"];
 
 const MCFACE_SUFFIX: Record<string, string[]> = {
