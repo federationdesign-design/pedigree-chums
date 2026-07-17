@@ -1345,7 +1345,7 @@ const DOMINANT_NAMES = new Set(["William","Booboo","Luna","Klaus","Ernst","Norma
 
 function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.length]; }
 
-function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set()) {
+function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set(), excludeDogWords: Set<string> = new Set()) {
   const group = getGroup(breed);
   const rawNameBank = (NAMES[group] || NAMES.default)[gender];
   // Passes 1-8 exclude dominant names to force variety from the long tail
@@ -1398,15 +1398,26 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     firstName = pick(nameBank, seed + 3);
   }
 
-  // Filter wordBank for dog words starting with surname initial or sound family
-  const matchingWords = wordBank.filter((w: WordEntry) =>
+  // Word picking -- three tiers matching the name picking logic
+  // Fresh words from group pool preferred; fall back to default pool when exhausted
+  const defaultWordBank = DOG_WORDS.default as WordEntry[];
+  const combinedWordBank = [...wordBank, ...defaultWordBank.filter(
+    (w: WordEntry) => !wordBank.find((gw: WordEntry) => gw.word === w.word)
+  )];
+
+  const freshWordBank = excludeDogWords.size > 0
+    ? combinedWordBank.filter((w: WordEntry) => !excludeDogWords.has(w.word))
+    : wordBank;  // first generate: only use group pool
+  const useFreshWordBank = freshWordBank.length >= 1 ? freshWordBank : combinedWordBank;
+
+  const matchingWords = useFreshWordBank.filter((w: WordEntry) =>
     w.firstLetter.toUpperCase() === surnameInitial ||
     (soundFamily[w.firstLetter.toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  const useMatchingWord = matchingWords.length >= 2 && (seed % 7 !== 0);
+  const useMatchingWord = matchingWords.length >= 1 && (seed % 7 !== 0);
   const dogWordEntry = useMatchingWord
     ? matchingWords[(seed + 7) % matchingWords.length]
-    : pick(wordBank, seed + 7);
+    : pick(useFreshWordBank, seed + 7);
   const alreadyHyphenated = surname.includes("-");
   // Only hyphenate if dog word adds contrast against the first name
   const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
@@ -1972,7 +1983,7 @@ function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
   baseSeed: number, town: string, colour: DogColour,
   bonusPool1: string[], bonusPool2: string[], excludeDominant = false, freeRange = false,
-  excludeFirstNames: Set<string> = new Set()
+  excludeFirstNames: Set<string> = new Set(), excludeDogWords: Set<string> = new Set()
 ): Result[] {
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
@@ -1996,7 +2007,7 @@ function runPass(
   }
 
   const raw = Array.from({length:20}, (_, i) => {
-    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames, excludeDogWords);
     if (!r) return null;
     const parts = r.full.split(" ");
     const fn = parts[1] ?? "";
@@ -2046,7 +2057,7 @@ function runPass(
   if ((raw[0]?.score ?? 0) < THRESHOLD) {
     const group = getGroup(breed);
     const prefixed = Array.from({length:20}, (_, i) => {
-      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames, excludeDogWords);
       if (!r) return null;
       let pe: { prefix: string; bonusContrast: number };
       if (gender === "boy") {
@@ -2127,6 +2138,7 @@ export default function NameGeneratorPage() {
   const [qOpen, setQOpen] = useState(false);
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
+  const [usedDogWords, setUsedDogWords] = useState<Set<string>>(new Set());
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
@@ -2146,15 +2158,15 @@ export default function NameGeneratorPage() {
         .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
     });
     const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
-    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames);
-    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
-    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
-    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames);
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames,usedDogWords);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames,usedDogWords);
     const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
     const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
@@ -2187,15 +2199,15 @@ export default function NameGeneratorPage() {
     });
 
     const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
-    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames);
-    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
-    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
-    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
-    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames);
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames,usedDogWords);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames,usedDogWords);
     const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
     const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
