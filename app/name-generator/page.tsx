@@ -1610,6 +1610,7 @@ export default function NameGeneratorPage() {
   const [colour, setColour] = useState<DogColour>("");
   const [qIndices, setQIndices] = useState<number[]>(() => pickFiveQuestions());
   const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
+  const [qOpen, setQOpen] = useState(false);
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
@@ -1756,34 +1757,50 @@ export default function NameGeneratorPage() {
                   </button>
                 ))}
               </div>
-              <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:22, marginBottom:22 }}>
-                <p style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14, fontFamily:"var(--font-body)" }}>
-                  Personalise your name — answer any that feel right
-                </p>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
-                  {qIndices.map((qi: number, pos: number) => {
-                    const qItem = QUESTION_BANK[qi];
-                    if (!qItem) return null;
-                    const chosen = qAnswers[pos];
-                    return (
-                      <div key={qi} style={{ background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"12px 10px", border:`1.5px solid ${chosen?"var(--yellow)":"rgba(255,255,255,0.12)"}`, display:"flex", flexDirection:"column", gap:7, transition:"border-color 0.2s" }}>
-                        <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.76rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32 }}>
-                          {qItem.text}
-                        </p>
-                        <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                          {qItem.options.map((opt: {label:string;bonus:string[]}) => (
-                            <button key={opt.label}
-                              onClick={() => setQAnswers((prev: Record<number,string>) => ({...prev, [pos]: opt.label}))}
-                              style={{ padding:"6px 9px", borderRadius:7, border:`1.5px solid ${chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.18)"}`, background:chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.05)", color:chosen===opt.label?"var(--navy)":"rgba(255,255,255,0.85)", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, cursor:"pointer", textAlign:"left", lineHeight:1.2, transition:"all 0.15s" }}>
-                              {opt.label}
-                            </button>
-                          ))}
+              <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom:22 }}>
+                {/* Collapsible header */}
+                <button
+                  onClick={() => setQOpen((o: boolean) => !o)}
+                  style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", cursor:"pointer", padding:0, marginBottom: qOpen ? 16 : 0 }}>
+                  <span style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
+                    Personalise your name?
+                    {Object.keys(qAnswers).length > 0 && (
+                      <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
+                        {Object.keys(qAnswers).length}/5
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color:"var(--yellow)", fontSize:"1rem", lineHeight:1, transform: qOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", display:"inline-block" }}>
+                    ▼
+                  </span>
+                </button>
+                {/* Questions grid -- hidden until open */}
+                {qOpen && (
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
+                    {qIndices.map((qi: number, pos: number) => {
+                      const qItem = QUESTION_BANK[qi];
+                      if (!qItem) return null;
+                      const chosen = qAnswers[pos];
+                      return (
+                        <div key={qi} style={{ background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"12px 10px", border:`1.5px solid ${chosen?"var(--yellow)":"rgba(255,255,255,0.12)"}`, display:"flex", flexDirection:"column", gap:7, transition:"border-color 0.2s" }}>
+                          <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.76rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32 }}>
+                            {qItem.text}
+                          </p>
+                          <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                            {qItem.options.map((opt: {label:string;bonus:string[]}) => (
+                              <button key={opt.label}
+                                onClick={() => setQAnswers((prev: Record<number,string>) => ({...prev, [pos]: opt.label}))}
+                                style={{ padding:"6px 9px", borderRadius:7, border:`1.5px solid ${chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.18)"}`, background:chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.05)", color:chosen===opt.label?"var(--navy)":"rgba(255,255,255,0.85)", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, cursor:"pointer", textAlign:"left", lineHeight:1.2, transition:"all 0.15s" }}>
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                          {chosen && <p style={{ color:"var(--yellow)", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)" }}>✓ {chosen}</p>}
                         </div>
-                        {chosen && <p style={{ color:"var(--yellow)", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)" }}>✓ {chosen}</p>}
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <button onClick={handleGenerate} className="display"
                 style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontSize:"1.3rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
