@@ -1024,77 +1024,86 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     if (regionalTerm && seed % 4 === 0) nickname = displayFirst;
     if (title.title === "Itsy") nickname = "Bitsy";
     if (title.title === "Hong Kong") nickname = "HK";
-
-    if (!nickname) {
-      // ── THE TWO NICKNAME RULES (from comedy brief) ──────────────────────────
-      //
-      // Rule 1 — Accidental Acronym (try first, funnier when it lands):
-      //   Title-initial + first-name-initial → read as mundane modern abbreviation
-      //   e.g. General Gerd → GG → 4G  |  Doctor Duncan → DD → Dr D
-      //   Only fire when the collision is genuinely funny. Never force it.
-      //
-      // Rule 2 — Mate Test (fallback, always works when first name is real):
-      //   Ignore title and dog-word entirely. Take first name only.
-      //   Shorten the way a British mate would. Trevor→Trev, Dorothy→Dot.
-      //   The laugh is: all that ceremony, and to her friends she's just "Dot."
-
-      const fn = firstName.name;
-      const tI = title.title.replace(/^(The |Lil'|Ol'|Wee|Baby|Little|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() ?? "";
-      const nI = fn[0]?.toUpperCase() ?? "";
-
-      // ── Rule 1: Accidental Acronym ──────────────────────────────────────────
-      // Specific known good collisions only -- don't auto-generate, only match
-      const acronymPuns: Record<string,string> = {
-        // Number-letter puns
-        "GG":"4G", "4G":"4G",
-        // Doctor/Professor combos
-        "DD":"Dr D", "DW":"Dr W", "DB":"Dr B", "DR":"Dr R",
-        "DM":"Dr M", "DJ":"DJ", "DC":"D.C.",
-        // Military rank collisions
-        "GS":"G.S.", "GB":"GB",
-        // Pop culture initials
-        "MC":"MC", "JR":"J.R.", "JB":"J.B.", "JP":"J.P.",
-        "BB":"B.B.", "CC":"C.C.", "RR":"R.R.",
-        // Specific title+initial combos
-        "SB":"S.B.", "SC":"S.C.",
-      };
-      // 4G special case: General + G-initial
-      if (title.title === "General" && nI === "G") {
-        nickname = "4G";
-      } else if (title.title === "Doctor" && firstName.syllables >= 3 && !getNickname(fn)) {
-        // Doctor + long name with no natural shortening → Dr [initial]
-        nickname = `Dr ${nI}`;
-      } else if (title.title === "Professor" && firstName.syllables >= 3 && !getNickname(fn)) {
-        nickname = `Prof ${nI}`;
-      } else if (tI && nI && acronymPuns[tI + nI] && !["Dame","Duke","Duchess","Dowager","Div","Dux"].includes(title.title)) {
-        nickname = acronymPuns[tI + nI];
-      }
-
-      // ── Rule 2: Mate Test -- always fires as fallback ───────────────────────
-      // Use the NICKNAMES table (stock British diminutives) first
-      // Then fall back to the first name itself -- short, blunt, warm
-      if (!nickname) {
-        const naturalNick = getNickname(fn);
-        if (naturalNick) {
-          nickname = naturalNick;  // table: Trevor→Trev, Dorothy→Dot, Basil→Baz
-        } else if (fn.length <= 4) {
-          nickname = fn;           // already short enough: Dot, Rex, Pip, Gus
+    // Multi-word title → abbreviate title to initials, keep first name
+    if (title.title.includes(" ") && !nickname) {
+      const titleInitials = title.title.split(" ").map((w: string) => w[0]).join("");
+      nickname = `${titleInitials} ${firstName.name}`;
+    }
+    const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
+    const nInit = firstName.name[0]?.toUpperCase() || "";
+    const initials2 = tInit + nInit;
+    const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
+    if (matched) {
+      // Some abbreviations have gender-specific nicknames
+      // Itsy title gets Bitsy as nickname
+      if (matched.code === "DC" && gender === "girl") nickname = "Dixy";
+      else if (matched.code === "DC" && gender === "boy") nickname = "Dicky";
+      else nickname = matched.code;
+    } else {
+      const naturalNick = getNickname(firstName.name);
+      if (naturalNick) {
+        nickname = naturalNick;
+      } else {
+        const fn = firstName.name;
+        // If the first name is short enough, use it directly as the nickname
+        if (fn.length <= 4) {
+          nickname = fn;
         } else {
-          nickname = fn;           // longer names: just use the name -- "Snugglebum"
-          // (if Snugglebum won't shorten to anything real, the name itself is the problem)
+          // Try acronym -- only if pronounceable, different from name, not a known abbreviation
+          const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
+          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
+          const acronymIsName = fn.toUpperCase().startsWith(acronym);
+          // Block acronyms that match well-known UK/common abbreviations
+          const blockedAcronyms = new Set(["JSA","ESA","PIP","DLA","NHS","BBC","ITV","VAT","DWP","MOT","MP","PM","GP","PC","DC","FC","AFC","CID","RAC","AA","RAC","HMRC","DVLA","DSS","CSA","ASBO","GCSE","BTEC"]);
+          if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25 && !acronymIsName && !blockedAcronyms.has(acronym)) {
+            nickname = acronym;
+          } else {
+            // Shorten first name -- first 3-4 chars + s
+            const stem = fn.length > 6 ? fn.slice(0, 4) : fn.slice(0, 3);
+            nickname = (stem + "s").replace(/ss$/,"s").replace(/([aeiou])s$/i,"$1s");
+            nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+          }
         }
       }
     }
   }
 
+  // Fallback nickname -- always have one
+  if (!nickname) {
+    const firstNameStr = firstName.name;
+    // Try contracting to first syllable + y/ie
+    const vowelMatch = firstNameStr.match(/^([^aeiou]*[aeiou]+[^aeiou]*)/i);
+    if (vowelMatch && vowelMatch[1].length < firstNameStr.length) {
+      const stem = vowelMatch[1];
+      nickname = stem.length <= 3 ? stem + "y" : stem.slice(0, 4);
+      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+    } else {
+      nickname = firstNameStr.slice(0, 3);
+    }
+  }
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname, colour);
 
-  // Fallback -- if nothing set nickname to first name from table or bare
-  if (!nickname) {
-    const naturalFallback = getNickname(firstName.name);
-    nickname = naturalFallback || firstName.name;
+  // ── RESCUE PASS: if score < 15 and name has a title, try bare name ─────────
+  // Strip the title and rescore -- sometimes the name is funnier without it
+  const RESCUE_THRESHOLD = 15;
+  if (score < RESCUE_THRESHOLD && styleRoll >= 4) {
+    // Already a no-title style -- return as-is
+    return { full, nickname, reasoning, score };
   }
+  if (score < RESCUE_THRESHOLD && full.startsWith(title.title + " ")) {
+    // Build bare version: just firstName + surname
+    const bareFull = `${firstName.name} ${effectiveSurname}`;
+    // Score the bare name using a dummy "no title" entry
+    const noTitle: TitleEntry = { title: "", reg: "mundane" as Register, syllables: 0 };
+    const bareScore = scoreName(noTitle, firstName, dogWordEntry, surname, colour);
+    if (bareScore > score) {
+      // Bare name scores better -- use it
+      const bareNick = getNickname(firstName.name) || nickname;
+      return { full: bareFull, nickname: bareNick, reasoning, score: bareScore };
+    }
+  }
+
   return { full, nickname, reasoning, score };
 }
 
@@ -1597,10 +1606,40 @@ export default function NameGeneratorPage() {
 
 
   function handleRollAgain() {
-    setQIndices(pickFiveQuestions());
-    setQAnswers({});
+    // Keep breed, surname, gender and current question answers -- just new seed
+    const s = Math.floor(Math.random() * 10000);
+    setSeed(s);
     setResults([]);
-    setStage("inputs");
+
+    const bonus1: string[] = [];
+    const bonus2: string[] = [];
+    qIndices.forEach((qi: number, pos: number) => {
+      const qItem = QUESTION_BANK[qi];
+      const chosen = qAnswers[pos];
+      if (!chosen || !qItem) return;
+      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
+      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
+      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
+        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
+    });
+
+    const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2);
+    const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
+    const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
+    const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
+    const sc21 = allD.filter(r=>r.score>=17);
+    const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
+    setResults(ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1));
+    setStage("reveal");
   }
 
   const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
