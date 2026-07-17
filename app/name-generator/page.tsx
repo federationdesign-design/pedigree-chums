@@ -1045,12 +1045,20 @@ function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.le
 function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set()) {
   const group = getGroup(breed);
   const rawNameBank = (NAMES[group] || NAMES.default)[gender];
+  // Inject bonus names that aren't already in this breed's pool
+  // So answering any question surfaces its names for ALL breeds, not just ones that already have them
+  const bonusInjected: NameEntry[] = allowBonus.size > 0
+    ? [...allowBonus]
+        .filter((n: string) => !rawNameBank.find((e: NameEntry) => e.name === n))
+        .map((n: string) => ({ name: n, reg: "nature" as Register, syllables: n.length > 6 ? 3 : 2 }))
+    : [];
+  const rawNameBankWithBonus = bonusInjected.length > 0 ? [...rawNameBank, ...bonusInjected] : rawNameBank;
   // Passes 1-8 exclude dominant names to force variety from the long tail
   const nameBank = excludeDominant
-    ? (rawNameBank.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name)).length >= 3
-        ? rawNameBank.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name))
-        : rawNameBank)
-    : rawNameBank;
+    ? (rawNameBankWithBonus.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name)).length >= 3
+        ? rawNameBankWithBonus.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name))
+        : rawNameBankWithBonus)
+    : rawNameBankWithBonus;
   const titleBank = gender === "boy" ? (BOY_TITLES[group] || BOY_TITLES.default) : (GIRL_TITLES[group] || GIRL_TITLES.default);
   const wordBank = DOG_WORDS[group] || DOG_WORDS.default;
   const reasoningBank = REASONING[group] || REASONING.default;
@@ -1710,7 +1718,7 @@ function runPass(
   }
 
   const raw = Array.from({length:20}, (_, i) => {
-    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(bonusPool1), excludeFirstNames);
     if (!r) return null;
     const parts = r.full.split(" ");
     const fn = parts[1] ?? "";
@@ -1760,7 +1768,7 @@ function runPass(
   if ((raw[0]?.score ?? 0) < THRESHOLD) {
     const group = getGroup(breed);
     const prefixed = Array.from({length:20}, (_, i) => {
-      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(bonusPool1), excludeFirstNames);
       if (!r) return null;
       let pe: { prefix: string; bonusContrast: number };
       if (gender === "boy") {
