@@ -1116,7 +1116,12 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   } else if (styleRoll === 1 && gender === "boy") {
     const letter = pick(DTRAIN_LETTERS, seed + 13);
     const suffix = pick(DTRAIN_SUFFIXES, seed + 19);
-    full = `${suffix}-${letter} ${effectiveSurname}`;
+    const letterFirstSuffixes = new Set(["Train","Money","Hype"]);
+    const alternating = suffix === "King";
+    const letterFirst = letterFirstSuffixes.has(suffix) || (alternating && seed % 2 === 0);
+    full = letterFirst
+      ? `${letter}-${suffix} ${effectiveSurname}`
+      : `${suffix}-${letter} ${effectiveSurname}`;
     nickname = getNickname(firstName.name);
   } else if (styleRoll === 2 && gender === "girl") {
     const fName = pick(MARIEJ_FIRSTS, seed + 7);
