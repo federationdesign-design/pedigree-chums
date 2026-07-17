@@ -77,3 +77,14 @@
   background: rgba(255,255,255,0.16);
   border-color: rgba(255,255,255,0.3);
 }
+
+.badgeRow {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(20px, 3vw, 32px);
+  margin-bottom: 4px;
+}
+.badgeRow img {
+  height: auto;
+  max-width: 160px;
+}
