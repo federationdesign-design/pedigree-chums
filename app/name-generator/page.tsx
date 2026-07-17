@@ -660,7 +660,7 @@ const OTHER_BREEDS = ["Airedale Terrier","Akita","Alaskan Malamute","Bedlington 
 // ── TITLE BANKS ────────────────────────────────────────────────────────────────
 const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Terriers -- Mr is the joke, no grand title needed
-  terrier:    [{title:"Mr",reg:"mundane",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"The Right Honourable",reg:"grand",syllables:5},{title:"Notorious",reg:"ironic",syllables:3},{title:"Legendary",reg:"ironic",syllables:4},{title:"The Inimitable",reg:"ironic",syllables:5}],
+  terrier:    [{title:"Mr",reg:"mundane",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Notorious",reg:"ironic",syllables:3},{title:"Legendary",reg:"ironic",syllables:4}],
   // Spaniels -- working military and police dogs
   spaniel:    [{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3},{title:"Admiral",reg:"grand",syllables:3},{title:"Brigadier",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Chief Inspector",reg:"grand",syllables:4},{title:"Ch.",reg:"grand",syllables:1}],
   // Retrievers / Labs -- guide dogs, detection dogs, civic service
@@ -716,7 +716,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
 };
 
 const GIRL_TITLES: Record<string, TitleEntry[]> = {
-  terrier:    [{title:"Miss",reg:"mundane",syllables:1},{title:"Dame",reg:"grand",syllables:1},{title:"The Right Honourable",reg:"grand",syllables:5},{title:"Notorious",reg:"ironic",syllables:3},{title:"Legendary",reg:"ironic",syllables:4}],
+  terrier:    [{title:"Miss",reg:"mundane",syllables:1},{title:"Dame",reg:"grand",syllables:1},{title:"Notorious",reg:"ironic",syllables:3},{title:"Legendary",reg:"ironic",syllables:4}],
   spaniel:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Princess",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Kaiserin",reg:"grand",syllables:3}],
   retriever:  [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Maharani",reg:"grand",syllables:4}],
   german:     [{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Empress",reg:"grand",syllables:3},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Shieldmaiden",reg:"grand",syllables:3}],
