@@ -633,7 +633,7 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
     girl: [{name:"Fabulous",reg:"absurd",syllables:3},{name:"Darling",reg:"baby",syllables:2},{name:"Precious",reg:"baby",syllables:2},{name:"Divine",reg:"grand",syllables:2},{name:"Dazzling",reg:"absurd",syllables:2},{name:"Ruby",reg:"grand",syllables:2},{name:"Diamond",reg:"grand",syllables:2},{name:"Pearl",reg:"grand",syllables:1},{name:"Sapphire",reg:"grand",syllables:2},{name:"Crystal",reg:"grand",syllables:2},{name:"Chanel",reg:"grand",syllables:2},{name:"Celestine",reg:"grand",syllables:3},{name:"Aurora",reg:"grand",syllables:3},{name:"Daphne",reg:"grand",syllables:2},{name:"Diana",reg:"grand",syllables:3},{name:"Flora",reg:"nature",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Iris",reg:"nature",syllables:2},{name:"Luna",reg:"grand",syllables:2},{name:"Maeve",reg:"grand",syllables:1},{name:"Ophelia",reg:"grand",syllables:4},{name:"Pandora",reg:"grand",syllables:3},{name:"Venus",reg:"grand",syllables:2},{name:"Violette",reg:"grand",syllables:3},{name:"Juliet",reg:"grand",syllables:3},{name:"Isabella",reg:"grand",syllables:4},{name:"Charlotte",reg:"grand",syllables:2},{name:"Olivia",reg:"mundane",syllables:4},{name:"Victoria",reg:"grand",syllables:4},{name:"Elizabeth",reg:"grand",syllables:4},{name:"Booboo",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Puddingkins",reg:"baby",syllables:3},{name:"Sprinkles",reg:"food",syllables:2},{name:"Marshmallow",reg:"food",syllables:2},{name:"Meringue",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Taffy",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Peaches",reg:"food",syllables:2},{name:"Cherry",reg:"food",syllables:2},{name:"Berry",reg:"food",syllables:2},{name:"Plum",reg:"food",syllables:2},{name:"Figgy",reg:"food",syllables:2},{name:"Apricot",reg:"food",syllables:2},{name:"Lime",reg:"food",syllables:2},{name:"Kiwi",reg:"food",syllables:2},{name:"Mango",reg:"food",syllables:2},{name:"Melon",reg:"food",syllables:2},{name:"Pumpkin",reg:"food",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Crunchie",reg:"food",syllables:2},{name:"Twixie",reg:"food",syllables:2},{name:"Rolo",reg:"food",syllables:2},{name:"Oreo",reg:"food",syllables:2},{name:"Jammy",reg:"food",syllables:2},{name:"Marmalade",reg:"food",syllables:2}],
   },
   boxer: {
-    boy: [{name:"Doofus",reg:"chaos",syllables:2},{name:"Galumph",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Dingbat",reg:"chaos",syllables:2},{name:"Rumpus",reg:"chaos",syllables:2},{name:"Kerfuffle",reg:"chaos",syllables:3},{name:"Hullabaloo",reg:"chaos",syllables:4},{name:"Nincompoop",reg:"chaos",syllables:3},{name:"Goofball",reg:"chaos",syllables:2},{name:"Chuckles",reg:"chaos",syllables:2},{name:"Bozo",reg:"chaos",syllables:2},{name:"Joker",reg:"chaos",syllables:2},{name:"Zebedee",reg:"absurd",syllables:3},{name:"Chaos",reg:"chaos",syllables:2},{name:"Havoc",reg:"chaos",syllables:2},{name:"Ruckus",reg:"chaos",syllables:2},{name:"Bumbles",reg:"chaos",syllables:2},{name:"Bumper",reg:"chaos",syllables:2},{name:"Bumpkin",reg:"chaos",syllables:2},{name:"Stomper",reg:"chaos",syllables:2},{name:"Clomper",reg:"chaos",syllables:2},{name:"Trooper",reg:"chaos",syllables:2},{name:"Rowdy",reg:"chaos",syllables:2},{name:"Bruiser",reg:"chaos",syllables:2},{name:"Bandit",reg:"chaos",syllables:2},{name:"Dodger",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Buster",reg:"chaos",syllables:2},{name:"Bruno",reg:"chaos",syllables:2},{name:"Butch",reg:"chaos",syllables:2},{name:"Spike",reg:"chaos",syllables:2},{name:"Bowser",reg:"chaos",syllables:2},{name:"Lobster",reg:"chaos",syllables:2},{name:"Chunk",reg:"chaos",syllables:2},{name:"Tubby",reg:"chaos",syllables:2},{name:"Pudgy",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Rex",reg:"mundane",syllables:1},{name:"Max",reg:"mundane",syllables:1},{name:"Tyson",reg:"mundane",syllables:2},{name:"Rocky",reg:"mundane",syllables:2},{name:"Duke",reg:"grand",syllables:1},{name:"Samson",reg:"mundane",syllables:2},{name:"Thor",reg:"grand",syllables:1},{name:"Titan",reg:"grand",syllables:2},{name:"Goliath",reg:"grand",syllables:3},{name:"Blaze",reg:"chaos",syllables:1},{name:"Flash",reg:"chaos",syllables:1},{name:"Rocket",reg:"chaos",syllables:2},{name:"Tank",reg:"chaos",syllables:1},{name:"Diesel",reg:"chaos",syllables:2},{name:"Crusher",reg:"chaos",syllables:2},{name:"Hammer",reg:"chaos",syllables:2},{name:"Maverick",reg:"chaos",syllables:3},{name:"Gunner",reg:"chaos",syllables:2},{name:"Jax",reg:"mundane",syllables:1},{name:"Kodak",reg:"chaos",syllables:2}],
+    boy: [{name:"Doofus",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Dingbat",reg:"chaos",syllables:2},{name:"Rumpus",reg:"chaos",syllables:2},{name:"Kerfuffle",reg:"chaos",syllables:3},{name:"Hullabaloo",reg:"chaos",syllables:4},{name:"Nincompoop",reg:"chaos",syllables:3},{name:"Goofball",reg:"chaos",syllables:2},{name:"Chuckles",reg:"chaos",syllables:2},{name:"Bozo",reg:"chaos",syllables:2},{name:"Joker",reg:"chaos",syllables:2},{name:"Zebedee",reg:"absurd",syllables:3},{name:"Chaos",reg:"chaos",syllables:2},{name:"Havoc",reg:"chaos",syllables:2},{name:"Ruckus",reg:"chaos",syllables:2},{name:"Bumbles",reg:"chaos",syllables:2},{name:"Bumper",reg:"chaos",syllables:2},{name:"Bumpkin",reg:"chaos",syllables:2},{name:"Stomper",reg:"chaos",syllables:2},{name:"Clomper",reg:"chaos",syllables:2},{name:"Trooper",reg:"chaos",syllables:2},{name:"Rowdy",reg:"chaos",syllables:2},{name:"Bruiser",reg:"chaos",syllables:2},{name:"Bandit",reg:"chaos",syllables:2},{name:"Dodger",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Buster",reg:"chaos",syllables:2},{name:"Bruno",reg:"chaos",syllables:2},{name:"Butch",reg:"chaos",syllables:2},{name:"Spike",reg:"chaos",syllables:2},{name:"Bowser",reg:"chaos",syllables:2},{name:"Lobster",reg:"chaos",syllables:2},{name:"Chunk",reg:"chaos",syllables:2},{name:"Tubby",reg:"chaos",syllables:2},{name:"Pudgy",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Rex",reg:"mundane",syllables:1},{name:"Max",reg:"mundane",syllables:1},{name:"Tyson",reg:"mundane",syllables:2},{name:"Rocky",reg:"mundane",syllables:2},{name:"Duke",reg:"grand",syllables:1},{name:"Samson",reg:"mundane",syllables:2},{name:"Thor",reg:"grand",syllables:1},{name:"Titan",reg:"grand",syllables:2},{name:"Goliath",reg:"grand",syllables:3},{name:"Blaze",reg:"chaos",syllables:1},{name:"Flash",reg:"chaos",syllables:1},{name:"Rocket",reg:"chaos",syllables:2},{name:"Tank",reg:"chaos",syllables:1},{name:"Diesel",reg:"chaos",syllables:2},{name:"Crusher",reg:"chaos",syllables:2},{name:"Hammer",reg:"chaos",syllables:2},{name:"Maverick",reg:"chaos",syllables:3},{name:"Gunner",reg:"chaos",syllables:2},{name:"Jax",reg:"mundane",syllables:1},{name:"Kodak",reg:"chaos",syllables:2}],
     girl: [{name:"Dizzy",reg:"chaos",syllables:2},{name:"Topsy",reg:"chaos",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Astra",reg:"grand",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Wibble",reg:"chaos",syllables:2},{name:"Doolally",reg:"chaos",syllables:3},{name:"Ramshackle",reg:"chaos",syllables:3},{name:"Twinkles",reg:"baby",syllables:2},{name:"Cornflake",reg:"food",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Babbycakes",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2}],
   },
 
@@ -756,7 +756,7 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
 // ── DOG WORDS ──────────────────────────────────────────────────────────────────
 const DOG_WORDS: Record<string, WordEntry[]> = {
   spaniel:    [{word:"Flush",reg:"nature",firstLetter:"f"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Waggle",reg:"chaos",firstLetter:"w"},{word:"Splash",reg:"chaos",firstLetter:"s"},{word:"Frolic",reg:"chaos",firstLetter:"f"},{word:"Gambol",reg:"chaos",firstLetter:"g"},{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Romp",reg:"chaos",firstLetter:"r"}],
-  retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Galumph",reg:"chaos",firstLetter:"g"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
+  retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
   collie:     [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Gather",reg:"grand",firstLetter:"g"},{word:"Border",reg:"grand",firstLetter:"b"}],
   boxer:     [{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Barge",reg:"chaos",firstLetter:"b"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Surge",reg:"chaos",firstLetter:"s"},{word:"Smash",reg:"chaos",firstLetter:"s"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Rush",reg:"chaos",firstLetter:"r"},{word:"Rampage",reg:"chaos",firstLetter:"r"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Pummel",reg:"chaos",firstLetter:"p"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Gallop",reg:"chaos",firstLetter:"g"},{word:"Jostle",reg:"chaos",firstLetter:"j"},{word:"Jolt",reg:"chaos",firstLetter:"j"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Waddle",reg:"chaos",firstLetter:"w"}],
   sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Sleuth",reg:"grand",firstLetter:"s"},{word:"Hunt",reg:"grand",firstLetter:"h"},{word:"Nose",reg:"mundane",firstLetter:"n"},{word:"Track",reg:"grand",firstLetter:"t"},{word:"Scout",reg:"grand",firstLetter:"s"},{word:"Trace",reg:"grand",firstLetter:"t"},{word:"Hound",reg:"grand",firstLetter:"h"},{word:"Quest",reg:"grand",firstLetter:"q"},{word:"Find",reg:"grand",firstLetter:"f"}],
@@ -820,7 +820,7 @@ const NICKNAMES: Record<string,string> = {
   candyfloss:"Candy",puddingkins:"Pudds",lambchop:"Lamby",pumpkinhead:"Pumps",
   hypervigilant:"Hyper",indefatigable:"Indy",infinitesimal:"Tiny",imperceptible:"Imp",
   microscopic:"Micro",diminutive:"Dimmy",gossamera:"Gossie",daintybell:"Bell",
-  galumph:"Lumphy",kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",noodles:"Noods",
+  kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",noodles:"Noods",
   chipmunk:"Chip",
   winston:"Winnie",otto:"Ot",bertie:"Bert",monty:"Monty",percy:"Perce",
   reggie:"Reg",buster:"Bus",gruff:"Gruff",grunt:"Grunt",clive:"Clive",
@@ -1051,26 +1051,39 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       const nI = fn[0]?.toUpperCase() ?? "";
       const noAcronymTitles = new Set(["Mr","Mrs","Ms","Miss","Dr","Sir","Dame","Lord","Lady"]);
 
+      // ── ACRONYM WHITELIST: only initials that are genuinely culturally loaded ──
+      // The test: would someone say these letters aloud as a thing? DC yes. CH no.
       const ACRONYM_PUNS: Record<string,string> = {
-        "GG":"4G","GR":"4G","GI":"G.I.","GM":"G.M.","GB":"GB","GW":"G.W.",
-        "DJ":"DJ","DB":"D.B.","DW":"D.W.","DR":"D.R.","DN":"D.N.",
-        "MC":"MC","MB":"M.B.","MP":"M.P.","MF":"M.F.","MS":"M.S.","MM":"M.M.","MW":"M.W.",
-        "LC":"L.C.","LD":"L.D.","LE":"L.E.","LW":"L.W.","LB":"L.B.","LF":"L.F.","LG":"L.G.",
-        "BC":"B.C.","BF":"B.F.","BG":"B.G.","BH":"B.H.","BN":"B.N.","BO":"B.O.",
-        "BP":"B.P.","BR":"B.R.","BW":"B.W.",
-        "CB":"C.B.","CD":"C.D.","CF":"C.F.","CG":"C.G.","CH":"C.H.","CM":"C.M.","CN":"C.N.","CW":"C.W.",
-        "LL":"LL","OG":"O.G.","JB":"J.B.","JR":"J.R.","JP":"J.P.","JW":"J.W.",
-        "RB":"R.B.","SB":"S.B.","SC":"S.C.","SF":"S.F.","SG":"S.G.",
-        "SH":"S.H.","SM":"S.M.","SN":"S.N.","SW":"S.W.",
-        "HM":"H.M.","HB":"H.B.","HG":"H.G.","HR":"H.R.","HW":"H.W.",
-        "IB":"I.B.","IC":"I.C.","IF":"I.F.","IG":"I.G.","IW":"I.W.",
-        "NB":"N.B.","NC":"N.C.","ND":"N.D.","NF":"N.F.","NW":"N.W.",
-        "PB":"P.B.","PC":"P.C.","PD":"P.D.","PF":"P.F.","PG":"P.G.","PH":"P.H.","PW":"P.W.",
-        "EB":"E.B.","EC":"E.C.","EF":"E.F.","EG":"E.G.","EW":"E.W.",
-        "KC":"K.C.","KD":"K.D.","KG":"K.G.","KB":"K.B.","KW":"K.W.",
-        "AB":"A.B.","AC":"A.C.","AF":"A.F.","AG":"A.G.","AW":"A.W.",
-        "FB":"F.B.","FC":"F.C.","FD":"F.D.","FG":"F.G.","FW":"F.W.","FM":"F.M.",
-        "VB":"V.B.","VC":"V.C.","VW":"V.W.","VG":"V.G.",
+        // Number puns
+        "GG":"4G",   // General Gordon → 4G (phone network)
+        "GR":"4G",   // General Rex → 4G
+        // Music / culture
+        "DJ":"DJ",   // Doctor/Duke Jerome → DJ
+        "MC":"MC",   // Major/Master Charlie → MC
+        "LL":"LL",   // Lord/Lady Larry → LL Cool J
+        "OG":"O.G.", // Officer Gary → Original Gangster
+        "TT":"TT",   // Titan/Trooper Tyler → TT (Isle of Man / Aston Martin)
+        // TV / pop
+        "JR":"J.R.", // Judge Rex → J.R. Ewing (Dallas)
+        "JK":"J.K.", // Judge Kenneth → J.K. Rowling
+        "CJ":"C.J.", // Commander/Captain James → CJ (Baywatch / The West Wing)
+        "DC":"D.C.", // Detective/Doctor Charlie → DC (comics / Detective Constable)
+        "AK":"A.K.", // Admiral Kenneth → AK (AK-47, well known)
+        "KL":"K.L.", // King Larry → KL (Kuala Lumpur, used casually)
+        "CV":"C.V.", // Commander Victor → CV (what everyone has)
+        "MK":"M.K.", // Major Kenneth → MK (Milton Keynes, very British)
+        "GB":"GB",   // General Boris → GB (Great Britain)
+        "MP":"M.P.", // Major Percy → Member of Parliament
+        "GP":"G.P.", // General Percy → General Practitioner
+        "PC":"P.C.", // Professor/Police Charlie → Police Constable
+        "VC":"V.C.", // Viscount Charlie → Victoria Cross
+        "PG":"P.G.", // Professor George → P.G. Wodehouse / PG Tips
+        "NW":"N.W.", // Notorious Winston → N.W.A
+        "HM":"H.M.", // His Majesty → H.M. (The King)
+        "BP":"B.P.", // Baron Percy → BP (British Petroleum)
+        "BR":"B.R.", // Baron Rex → BR (British Rail)
+        "BC":"B.C.", // Baron Charlie → BC (Before Christ)
+        "FC":"F.C.", // Field Marshal Charlie → FC (Football Club)
       };
 
       // Special cases first
@@ -1233,7 +1246,7 @@ const MCFACE_POOL: Record<string, [string, string][]> = {
   sniffer:    [["Sniffy","Sniff"],["Droopy","Droop"],["Slobbery","Slobber"],["Lollopy","Lollop"],["Nosey","Nose"],["Tracky","Track"],["Houndy","Hound"],["Questy","Quest"]],
   retriever:  [["Chompy","Chomp"],["Slobbery","Slobber"],["Waggy","Wag"],["Fetchy","Fetch"],["Munchy","Munch"],["Gobby","Gob"],["Licky","Lick"],["Biscuity","Biscuit"]],
   terrier:    [["Diggy","Dig"],["Scratchy","Scratch"],["Nippy","Nip"],["Yappy","Yap"],["Scrappy","Scrap"],["Bolty","Bolt"],["Ratty","Rat"],["Snappy","Snap"],["Zippy","Zip"]],
-  boxer:      [["Snorty","Snort"],["Wobbly","Wobble"],["Boingy","Boing"],["Bumpy","Bump"],["Clumsy","Clums"],["Galumphy","Galumph"],["Blundery","Blunder"],["Crashy","Crash"]],
+  boxer:      [["Snorty","Snort"],["Wobbly","Wobble"],["Boingy","Boing"],["Bumpy","Bump"],["Clumsy","Clums"],["Blundery","Blunder"],["Crashy","Crash"]],
   character:  [["Snorty","Snort"],["Wheezy","Wheeze"],["Puffy","Puff"],["Grumbly","Grumble"],["Waddly","Waddle"],["Squashy","Squash"],["Squishy","Squish"],["Wriggly","Wriggle"]],
   lapdog:     [["Fluffy","Fluff"],["Bouncy","Bounce"],["Prancy","Prance"],["Squashy","Squash"],["Flouncy","Flounce"],["Shimmery","Shimmer"],["Pampery","Pamper"],["Glittery","Glitter"]],
   collie:     [["Herdy","Herd"],["Zippy","Zip"],["Circly","Circle"],["Darty","Dart"],["Sprinty","Sprint"],["Frenzy","Frenz"],["Intense","Intens"],["Obsessy","Obsess"]],
@@ -1255,7 +1268,7 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
   sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Lollopy","Nosey","Wrinkly","Jowly"],
   retriever:  ["Slobby","Chompy","Waggy","Fluffy","Moppy","Scruffy","Soggy","Hungry"],
   terrier:    ["Scratchy","Nippy","Yappy","Scruffy","Wiry","Zippy","Grubby","Bolty"],
-  boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Galumphy","Boingy","Crashy"],
+  boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Boingy","Crashy"],
   character:  ["Snorty","Squashy","Puffy","Grumbly","Waddly","Squinty","Wrinkly","Squishy"],
   lapdog:     ["Fluffy","Prancy","Bouncy","Squashy","Flouncy","Glittery","Twinkly","Sparkly"],
   collie:     ["Zippy","Herdy","Frenzy","Darty","Sprinty","Circly","Intense","Obsessy"],
