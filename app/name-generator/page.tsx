@@ -50,7 +50,6 @@ const CARD_IMAGE: Record<string, string> = {
   "Poodle": "/poodle-card.jpg",
   "Pug": "/pug-card.jpg",
   "Rottweiler": "/rottweiler-card.jpg",
-  "Rough Collie": "/collie-card.jpg",
   "Saint Bernard": "/st-bernard-card.jpg",
   "Shih Tzu": "/shuh-tzu-card.jpg",
   "Siberian Husky": "/husky-card.jpg",
@@ -526,7 +525,7 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
 }
 
 // ── BREED LISTS ────────────────────────────────────────────────────────────────
-const PACK_BREEDS = ["Afghan Hound","Basset Hound","Beagle","Bichon Frise","Bloodhound","Border Collie","Border Terrier","Boston Terrier","Boxer","Bull Terrier","Bulldog","Cavalier King Charles Spaniel","Cavachon","Cavapoo","Chihuahua","Cocker Spaniel","Cockapoo","Corgi","Dachshund","Dalmatian","Doberman Pinscher","French Bulldog","German Shepherd","Golden Retriever","Goldendoodle","Great Dane","Greyhound","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Jackapoo","Labrador","Labradoodle","Lurcher","Maltese","Maltipoo","Mastiff","Miniature Schnauzer","Old English Sheepdog","Papillon","Pomeranian","Poodle","Pug","Rottweiler","Rough Collie","Saint Bernard","Shih Tzu","Siberian Husky","Springer Spaniel","Staffordshire Bull Terrier","Weimaraner","West Highland Terrier","Whippet","Yorkshire Terrier"];
+const PACK_BREEDS = ["Afghan Hound","Basset Hound","Beagle","Bichon Frise","Bloodhound","Border Collie","Border Terrier","Boston Terrier","Boxer","Bull Terrier","Bulldog","Cavalier King Charles Spaniel","Cavachon","Cavapoo","Chihuahua","Cocker Spaniel","Cockapoo","Corgi","Dachshund","Dalmatian","Doberman Pinscher","French Bulldog","German Shepherd","Golden Retriever","Goldendoodle","Great Dane","Greyhound","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Jackapoo","Labrador","Labradoodle","Lurcher","Maltese","Maltipoo","Mastiff","Miniature Schnauzer","Old English Sheepdog","Papillon","Pomeranian","Poodle","Pug","Rottweiler","Saint Bernard","Shih Tzu","Siberian Husky","Springer Spaniel","Staffordshire Bull Terrier","Weimaraner","West Highland Terrier","Whippet","Yorkshire Terrier"];
 
 // ── TITLE BANKS ────────────────────────────────────────────────────────────────
 const BOY_TITLES: Record<string, TitleEntry[]> = {
