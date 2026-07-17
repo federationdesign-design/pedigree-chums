@@ -1505,7 +1505,7 @@ const MCFACE_POOL: Record<string, [string, string][]> = {
   lapdog:     [["Fluffy","Fluff"],["Boingy","Boing"],["Prancy","Pranc"],["Squashy","Squash"],["Flouncy","Floun"],["Shimmery","Shimmer"],["Pampery","Pamper"],["Glittery","Glitter"]],
   collie:     [["Herdy","Herd"],["Zippy","Zip"],["Circly","Circle"],["Darty","Dart"],["Sprinty","Sprint"],["Frenzy","Frenz"],["Intense","Intens"],["Obsessy","Obsess"]],
   poodle:     [["Prancy","Prance"],["Strutty","Strutt"],["Swishy","Swish"],["Mincy","Mince"],["Posy","Pose"],["Primy","Prim"],["Flouncy","Floun"],["Curly","Curl"]],
-  sighthound: [["Speedy","Speed"],["Slinky","Slink"],["Swoopy","Swoop"],["Darty","Dart"],["Flashy","Flash"],["Gleamy","Gleam"],["Streaky","Streak"],["Racy","Race"]],
+  sighthound: [["Speedy","Speed"],["Swoopy","Swoop"],["Swoopy","Swoop"],["Darty","Dart"],["Flashy","Flash"],["Gleamy","Gleam"],["Streaky","Streak"],["Racy","Race"]],
   dachshund:  [["Stretchy","Stretch"],["Wiggly","Wiggle"],["Wormy","Worm"],["Scuttly","Scuttle"],["Squeezy","Squeeze"],["Wriggly","Wriggle"],["Stubby","Stubb"],["Squirmy","Squirm"]],
   giant:      [["Massive","Mass"],["Stompy","Stomp"],["Loomy","Loom"],["Thumpy","Thump"],["Rumbly","Rumble"],["Lumpy","Lump"],["Shakey","Shake"],["Swavy","Sway"]],
   greatdane:  [["Cosmic","Cosm"],["Starry","Star"],["Massive","Mass"],["Orbital","Orbit"],["Stompy","Stomp"],["Galactic","Galac"],["Loomy","Loom"],["Thumpy","Thump"]],
@@ -1515,6 +1515,10 @@ const MCFACE_POOL: Record<string, [string, string][]> = {
   boston:     [["Strutty","Strutt"],["Hustly","Hustle"],["Scrappy","Scrap"],["Dodgy","Dodge"],["Rattly","Rattle"],["Jazzy","Jiv"],["Marching","March"],["Blusty","Blust"]],
   afghan:     [["Flowy","Flow"],["Swooshy","Swoosh"],["Glidy","Glide"],["Aloofy","Aloof"],["Drifty","Drift"],["Surgy","Surge"],["Sweepy","Sweep"],["Soary","Soar"]],
   bulldog:    [["Grumbly","Grumble"],["Snorty","Snort"],["Wobbly","Wobble"],["Jowly","Jowl"],["Stuffy","Stuff"],["Rolly","Roll"],["Blustey","Blust"],["Squashy","Squash"]],
+  sheepdog:    [["Fluffy","Fluff"],["Shaggy","Shagg"],["Wobbly","Wobble"],["Lumbery","Lumber"],["Shuffly","Shuffl"],["Dozy","Doz"],["Floopy","Floop"],["Poofy","Poof"]],
+  dalmatian:   [["Spotty","Spot"],["Dotty","Dot"],["Dashing","Dash"],["Flashy","Flash"],["Streaky","Streak"],["Patchy","Patch"],["Blinky","Blink"],["Freckly","Freck"]],
+  labradoodle: [["Bouncy","Bounce"],["Waggy","Wag"],["Fluffy","Fluff"],["Curly","Curl"],["Floppy","Flop"],["Splashy","Splash"],["Wiggly","Wiggle"],["Noodly","Noodl"]],
+  corgi:       [["Waddy","Wadd"],["Stumpy","Stump"],["Bossy","Boss"],["Trotty","Trot"],["Nippy","Nip"],["Scurry","Scurr"],["Shuffly","Shuffl"],["Herdy","Herd"]],
   default:    [["Chompy","Chomp"],["Scrappy","Scrap"],["Waggy","Wag"],["Snappy","Snap"],["Bouncy","Bounce"],["Zippy","Zip"],["Moody","Mood"],["Nosy","Nose"]]
 };
 
@@ -1527,7 +1531,7 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
   lapdog:     ["Fluffy","Prancy","Bouncy","Squashy","Flouncy","Glittery","Twinkly","Sparkly"],
   collie:     ["Zippy","Herdy","Frenzy","Darty","Sprinty","Circly","Intense","Obsessy"],
   poodle:     ["Prancy","Strutty","Swishy","Mincy","Curly","Fluffy","Posy","Primy"],
-  sighthound: ["Speedy","Slinky","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy"],
+  sighthound: ["Speedy","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy"],
   dachshund:  ["Stretchy","Wiggly","Wormy","Scuttly","Squeezy","Stubby","Waggy","Longey"],
   giant:      ["Massive","Stompy","Loomy","Lumpy","Rumbly","Thumpy","Shakey","Swavy"],
   greatdane:  ["Cosmic","Starry","Massive","Orbital","Stompy","Galactic","Loomy","Thumpy"],
@@ -1537,7 +1541,11 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
   boston:     ["Strutty","Hustly","Scrappy","Dodgy","Rattly","Jazzy","Marcey","Blusty"],
   afghan:     ["Flowy","Swooshy","Glidy","Aloofy","Drifty","Surgy","Swoopy","Sweepy"],
   bulldog:    ["Grumbly","Snorty","Wobbly","Jowly","Stuffy","Rolly","Squashy","Blusty"],
-  default:    ["Trotty","Wandy","Prowly","Lopy","Slinky","Stalky","Canter","Sauntry"]
+  sheepdog:    ["Fluffy","Shaggy","Wobbly","Bumbling","Lumbery","Shuffly","Dozy","Floopy","Poofy","Drifty"],
+  dalmatian:    ["Spotty","Dotty","Dashing","Flashy","Streaky","Zippy","Patchy","Speedy","Blinky","Freckly"],
+  labradoodle:    ["Bouncy","Waggy","Fluffy","Scruffy","Curly","Floppy","Splashy","Wiggly","Noodly","Gambolly"],
+  corgi:    ["Waddy","Stumpy","Bossy","Trotty","Nippy","Patrolly","Scurry","Shuffly","Perky","Herdy"],
+  default:    ["Trotty","Wandy","Prowly","Lopy","Stalky","Canter","Sauntry"]
 };
 
 const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
