@@ -796,7 +796,7 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
   },
   collie: {
     boy: [{name:"Roy",reg:"mundane",syllables:1},{name:"Glen",reg:"mundane",syllables:1},{name:"Cap",reg:"mundane",syllables:1},{name:"Ben",reg:"mundane",syllables:1},{name:"Tam",reg:"mundane",syllables:1},{name:"Rob",reg:"mundane",syllables:1},{name:"Craig",reg:"mundane",syllables:1},{name:"Duncan",reg:"mundane",syllables:2},{name:"Angus",reg:"mundane",syllables:2},{name:"Hamish",reg:"mundane",syllables:2},{name:"Rory",reg:"mundane",syllables:2},{name:"Fergus",reg:"mundane",syllables:2},{name:"Malcolm",reg:"mundane",syllables:2},{name:"Alasdair",reg:"mundane",syllables:3},{name:"Callum",reg:"mundane",syllables:2},{name:"Fraser",reg:"mundane",syllables:2},{name:"Lachlan",reg:"mundane",syllables:2},{name:"Brodie",reg:"mundane",syllables:2},{name:"Gregor",reg:"mundane",syllables:2},{name:"Bracken",reg:"nature",syllables:2},{name:"Briar",reg:"nature",syllables:2},{name:"Flint",reg:"nature",syllables:1},{name:"Ash",reg:"nature",syllables:1},{name:"Storm",reg:"nature",syllables:1},{name:"Chase",reg:"mundane",syllables:1},{name:"Drift",reg:"mundane",syllables:1},{name:"Sage",reg:"mundane",syllables:1},{name:"Logic",reg:"mundane",syllables:2},{name:"Instinct",reg:"mundane",syllables:2},{name:"Focus",reg:"mundane",syllables:2},{name:"Radar",reg:"mundane",syllables:2},{name:"Tracker",reg:"mundane",syllables:2},{name:"Ovation",reg:"pedigree",syllables:3},{name:"Laureate",reg:"pedigree",syllables:3},{name:"Criterion",reg:"pedigree",syllables:4},{name:"Distinction",reg:"pedigree",syllables:3},{name:"True Grit",reg:"pedigree",syllables:2},{name:"Bold Ambition",reg:"pedigree",syllables:4},{name:"Standing Ovation",reg:"pedigree",syllables:5},{name:"Forever Young",reg:"pedigree",syllables:4},{name:"Dark Star",reg:"pedigree",syllables:2},{name:"Golden Moment",reg:"pedigree",syllables:4},{name:"First Edition",reg:"pedigree",syllables:4},{name:"Wild Rover",reg:"pedigree",syllables:3},{name:"Resolute",reg:"grand",syllables:3},{name:"Steadfast",reg:"grand",syllables:2},{name:"Valiant",reg:"grand",syllables:3},{name:"Gallant",reg:"grand",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Rocket",reg:"chaos",syllables:2},{name:"Dash",reg:"chaos",syllables:1}],
-    girl: [{name:"Meg",reg:"mundane",syllables:1},{name:"Nell",reg:"mundane",syllables:1},{name:"Jess",reg:"mundane",syllables:1},{name:"Tess",reg:"mundane",syllables:1},{name:"Bess",reg:"mundane",syllables:1},{name:"Fly",reg:"mundane",syllables:1},{name:"Dot",reg:"mundane",syllables:1},{name:"Moss",reg:"mundane",syllables:1},{name:"Glen",reg:"mundane",syllables:1},{name:"Shep",reg:"mundane",syllables:1},{name:"Catriona",reg:"mundane",syllables:4},{name:"Eilidh",reg:"mundane",syllables:2},{name:"Shona",reg:"mundane",syllables:2},{name:"Rhona",reg:"mundane",syllables:2},{name:"Fiona",reg:"mundane",syllables:3},{name:"Morag",reg:"mundane",syllables:2},{name:"Isla",reg:"mundane",syllables:2},{name:"Skye",reg:"mundane",syllables:1},{name:"Rona",reg:"mundane",syllables:2},{name:"Mirren",reg:"mundane",syllables:2},{name:"Lorna",reg:"mundane",syllables:2},{name:"Maisie",reg:"mundane",syllables:2},{name:"Fenella",reg:"mundane",syllables:3},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Briar",reg:"nature",syllables:2},{name:"Bracken",reg:"nature",syllables:2},{name:"Bramble",reg:"nature",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Rowan",reg:"nature",syllables:2},{name:"Hazel",reg:"nature",syllables:2},{name:"Thistle",reg:"nature",syllables:2},{name:"Clover",reg:"nature",syllables:2},{name:"Sorrel",reg:"nature",syllables:2},{name:"Sensation",reg:"pedigree",syllables:3},{name:"Fascination",reg:"pedigree",syllables:4},{name:"Distinction",reg:"pedigree",syllables:3},{name:"Celebration",reg:"pedigree",syllables:4},{name:"Anticipation",reg:"pedigree",syllables:5},{name:"Scarlett",reg:"pedigree",syllables:2},{name:"Moonraker",reg:"pedigree",syllables:3},{name:"Daydream",reg:"pedigree",syllables:2},{name:"Silver Lining",reg:"pedigree",syllables:4},{name:"Final Curtain",reg:"pedigree",syllables:4},{name:"Standing Ovation",reg:"pedigree",syllables:5},{name:"Rosalind",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:4},{name:"Guinevere",reg:"grand",syllables:4},{name:"Rowena",reg:"grand",syllables:3},{name:"Imogen",reg:"grand",syllables:3},{name:"Perdita",reg:"grand",syllables:3},{name:"Portia",reg:"grand",syllables:2},{name:"Beatrice",reg:"grand",syllables:3}],
+    girl: [{name:"Meg",reg:"mundane",syllables:1},{name:"Nell",reg:"mundane",syllables:1},{name:"Jess",reg:"mundane",syllables:1},{name:"Tess",reg:"mundane",syllables:1},{name:"Bess",reg:"mundane",syllables:1},{name:"Fly",reg:"mundane",syllables:1},{name:"Dot",reg:"mundane",syllables:1},{name:"Moss",reg:"mundane",syllables:1},{name:"Glen",reg:"mundane",syllables:1},{name:"Shep",reg:"mundane",syllables:1},{name:"Catriona",reg:"mundane",syllables:4},{name:"Eilidh",reg:"mundane",syllables:2},{name:"Shona",reg:"mundane",syllables:2},{name:"Rhona",reg:"mundane",syllables:2},{name:"Fiona",reg:"mundane",syllables:3},{name:"Morag",reg:"mundane",syllables:2},{name:"Isla",reg:"mundane",syllables:2},{name:"Skye",reg:"mundane",syllables:1},{name:"Rona",reg:"mundane",syllables:2},{name:"Mirren",reg:"mundane",syllables:2},{name:"Lorna",reg:"mundane",syllables:2},{name:"Maisie",reg:"mundane",syllables:2},{name:"Fenella",reg:"mundane",syllables:3},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Briar",reg:"nature",syllables:2},{name:"Bracken",reg:"nature",syllables:2},{name:"Bramble",reg:"nature",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Rowan",reg:"nature",syllables:2},{name:"Hazel",reg:"nature",syllables:2},{name:"Thistle",reg:"nature",syllables:2},{name:"Clover",reg:"nature",syllables:2},{name:"Sorrel",reg:"nature",syllables:2},{name:"Sensation",reg:"pedigree",syllables:3},{name:"Fascination",reg:"pedigree",syllables:4},{name:"Distinction",reg:"pedigree",syllables:3},{name:"Celebration",reg:"pedigree",syllables:4},{name:"Anticipation",reg:"pedigree",syllables:5},{name:"Scarlett",reg:"pedigree",syllables:2},{name:"Moonraker",reg:"pedigree",syllables:3},{name:"Daydream",reg:"pedigree",syllables:2},{name:"Silver Lining",reg:"pedigree",syllables:4},{name:"Final Curtain",reg:"pedigree",syllables:4},{name:"Standing Ovation",reg:"pedigree",syllables:5},{name:"Rosalind",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:4},{name:"Guinevere",reg:"grand",syllables:4},{name:"Rowena",reg:"grand",syllables:3},{name:"Imogen",reg:"grand",syllables:3},{name:"Perdita",reg:"grand",syllables:3},{name:"Portia",reg:"grand",syllables:2},{name:"Beatrice",reg:"grand",syllables:3},{name:"Dora",reg:"mundane",syllables:2},{name:"Dinah",reg:"mundane",syllables:2},{name:"Dolly",reg:"mundane",syllables:2},{name:"Della",reg:"mundane",syllables:2},{name:"Dawn",reg:"mundane",syllables:1},{name:"Dee",reg:"mundane",syllables:1},{name:"Dilly",reg:"mundane",syllables:2},{name:"Dulcie",reg:"mundane",syllables:2}],
   },
   poodle: {
     boy: [{name:"Existentiale",reg:"absurd",syllables:5},{name:"Paradoxe",reg:"absurd",syllables:3},{name:"Hermeneutique",reg:"absurd",syllables:5},{name:"Pierre",reg:"grand",syllables:1},{name:"Jacques",reg:"grand",syllables:1},{name:"François",reg:"grand",syllables:2},{name:"Henri",reg:"grand",syllables:2},{name:"Marcel",reg:"grand",syllables:2},{name:"Gaston",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Einstein",reg:"grand",syllables:2},{name:"Socrates",reg:"grand",syllables:3},{name:"Darwin",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Freud",reg:"grand",syllables:1},{name:"Waltz",reg:"grand",syllables:2},{name:"Wittgenstein",reg:"grand",syllables:2},{name:"Plato",reg:"grand",syllables:2},{name:"Pythagoras",reg:"grand",syllables:2},{name:"Poirot",reg:"grand",syllables:2},{name:"Proust",reg:"grand",syllables:2},{name:"Pascal",reg:"grand",syllables:2},{name:"Arsène",reg:"grand",syllables:2},{name:"Blaise",reg:"grand",syllables:2},{name:"César",reg:"grand",syllables:2},{name:"Émile",reg:"grand",syllables:2},{name:"Félix",reg:"grand",syllables:2},{name:"Guy",reg:"grand",syllables:2},{name:"Hervé",reg:"grand",syllables:2},{name:"Honoré",reg:"grand",syllables:2},{name:"Jules",reg:"grand",syllables:2},{name:"Léon",reg:"grand",syllables:2},{name:"Louis",reg:"grand",syllables:2},{name:"Noël",reg:"grand",syllables:2},{name:"Raoul",reg:"grand",syllables:2},{name:"René",reg:"grand",syllables:2},{name:"Yves",reg:"grand",syllables:2},{name:"Alphonse",reg:"grand",syllables:2},{name:"Anatole",reg:"grand",syllables:2},{name:"Antoine",reg:"grand",syllables:2},{name:"Camille",reg:"grand",syllables:2},{name:"Clément",reg:"grand",syllables:2},{name:"Désiré",reg:"grand",syllables:2},{name:"Edmond",reg:"grand",syllables:2},{name:"Étienne",reg:"grand",syllables:2},{name:"Eugène",reg:"grand",syllables:2},{name:"Gilles",reg:"grand",syllables:2},{name:"Jérôme",reg:"grand",syllables:2},{name:"Julien",reg:"grand",syllables:2},{name:"Léandre",reg:"grand",syllables:2},{name:"Léopold",reg:"grand",syllables:2},{name:"Lucien",reg:"grand",syllables:2},{name:"Séraphin",reg:"grand",syllables:2},{name:"Théodore",reg:"grand",syllables:2},{name:"Valentin",reg:"grand",syllables:2},{name:"Barthélemy",reg:"grand",syllables:2},{name:"Dieudonné",reg:"grand",syllables:2},{name:"Enguerrand",reg:"grand",syllables:2},{name:"Hyacinthe",reg:"grand",syllables:2},{name:"Théophile",reg:"grand",syllables:2},{name:"Toussaint",reg:"grand",syllables:2}],
@@ -1065,11 +1065,11 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     n.name[0].toUpperCase() === surnameInitial ||
     (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  // Use matching names ~60% of passes (seeds divisible by 5 use random pick for variety)
   const useMatchingName = matchingNames.length >= 2 && (seed % 5 !== 0);
+  const namePickSeed = seed * 7 + 3;
   const firstName = useMatchingName
-    ? matchingNames[(seed + 3) % matchingNames.length]
-    : pick(nameBank, seed + 3);
+    ? matchingNames[Math.abs(namePickSeed) % matchingNames.length]
+    : pick(nameBank, namePickSeed);
 
   // Filter wordBank for dog words starting with surname initial or sound family
   const matchingWords = wordBank.filter((w: WordEntry) =>
@@ -1077,9 +1077,10 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     (soundFamily[w.firstLetter.toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
   const useMatchingWord = matchingWords.length >= 2 && (seed % 7 !== 0);
+  const wordPickSeed = seed * 11 + 7;
   const dogWordEntry = useMatchingWord
-    ? matchingWords[(seed + 7) % matchingWords.length]
-    : pick(wordBank, seed + 7);
+    ? matchingWords[Math.abs(wordPickSeed) % matchingWords.length]
+    : pick(wordBank, wordPickSeed);
   const alreadyHyphenated = surname.includes("-");
   // Only hyphenate if dog word adds contrast against the first name
   const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
@@ -1322,7 +1323,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 
 // ── DEDUPLICATION ─────────────────────────────────────────────────────────────
 // Pick top results ensuring no repeated first names, titles, or dog words
-const ONCE_ONLY_WORDS = new Set(["Track","Trace","Sleuth","Detect","Quest","Hunt","Scout","Find","Hound","Nose","Sniff","Snuffle","Crystal","Sapphire","Diamond","Pearl","Ruby","Emerald","Amber","Jade","Opal"]);
+const ONCE_ONLY_WORDS = new Set(["Track","Trace","Sleuth","Detect","Quest","Hunt","Scout","Find","Hound","Nose","Sniff","Snuffle","Crystal","Sapphire","Diamond","Pearl","Ruby","Emerald","Amber","Jade","Opal","Dot","Dash","Dart"]);
 
 const WHIMSY_DETECT = /paws|bean|boots|puff|whisk|wick|wink|snout|chops|bonce|flap|wiggle|wobble|bumble|scramble|grumble|noodle|puddle|doodle|fizzle|jiggle|toodle|mumble|rumble/i;
 const INFORMAL_TITLES_SET = new Set(["Lil'","Baby","Little","Grumpy","Squishy","Itsy","Fluffy","Scruffy","Wee","Ol'"]);
@@ -1781,14 +1782,14 @@ export default function NameGeneratorPage() {
       const townMatch2 = FUNNY_PLACES.has(town.trim());
       const et = townMatch2 ? town.trim() : "";
       const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
-      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
-      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
-      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], []);
-      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], []);
-      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], []);
-      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], []);
-      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], []);
-      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], []);
+      const p2 = runPass(breed, surname.trim(), gender, s + 1009, et, colour, [], []);
+      const p3 = runPass(breed, surname.trim(), gender, s + 2003, et, colour, [], []);
+      const p4 = runPass(breed, surname.trim(), gender, s + 3001, et, colour, [], []);
+      const p5 = runPass(breed, surname.trim(), gender, s + 4007, et, colour, [], []);
+      const p6 = runPass(breed, surname.trim(), gender, s + 5003, et, colour, [], []);
+      const p7 = runPass(breed, surname.trim(), gender, s + 6011, et, colour, [], []);
+      const p8 = runPass(breed, surname.trim(), gender, s + 7013, et, colour, [], []);
+      const p9 = runPass(breed, surname.trim(), gender, s + 8009, et, colour, [], []);
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
@@ -1814,14 +1815,14 @@ export default function NameGeneratorPage() {
 
     // Three independent passes with offset seeds for maximum variety
     const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
-    const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
-    const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
-    const pass4 = runPass(breed, surname.trim(), gender, seed + 3000,    effectiveTown, colour, bonus1, bonus2);
-    const pass5 = runPass(breed, surname.trim(), gender, seed + 4000,    effectiveTown, colour, bonus1, bonus2);
-    const pass6 = runPass(breed, surname.trim(), gender, seed + 5000,    effectiveTown, colour, bonus1, bonus2);
-    const pass7 = runPass(breed, surname.trim(), gender, seed + 6000,    effectiveTown, colour, bonus1, bonus2);
-    const pass8 = runPass(breed, surname.trim(), gender, seed + 7000,    effectiveTown, colour, bonus1, bonus2);
-    const pass9 = runPass(breed, surname.trim(), gender, seed + 8000,    effectiveTown, colour, bonus1, bonus2);
+    const pass2 = runPass(breed, surname.trim(), gender, seed + 1009,    effectiveTown, colour, bonus1, bonus2);
+    const pass3 = runPass(breed, surname.trim(), gender, seed + 2003,    effectiveTown, colour, bonus1, bonus2);
+    const pass4 = runPass(breed, surname.trim(), gender, seed + 3001,    effectiveTown, colour, bonus1, bonus2);
+    const pass5 = runPass(breed, surname.trim(), gender, seed + 4007,    effectiveTown, colour, bonus1, bonus2);
+    const pass6 = runPass(breed, surname.trim(), gender, seed + 5003,    effectiveTown, colour, bonus1, bonus2);
+    const pass7 = runPass(breed, surname.trim(), gender, seed + 6011,    effectiveTown, colour, bonus1, bonus2);
+    const pass8 = runPass(breed, surname.trim(), gender, seed + 7013,    effectiveTown, colour, bonus1, bonus2);
+    const pass9 = runPass(breed, surname.trim(), gender, seed + 8009,    effectiveTown, colour, bonus1, bonus2);
 
     // Take top scorer from each pass, then merge all three full lists
     // This guarantees the cream from each independent roll is represented
@@ -1852,14 +1853,14 @@ export default function NameGeneratorPage() {
       const townMatch2 = FUNNY_PLACES.has(town.trim());
       const et = townMatch2 ? town.trim() : "";
       const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
-      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
-      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
-      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], []);
-      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], []);
-      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], []);
-      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], []);
-      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], []);
-      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], []);
+      const p2 = runPass(breed, surname.trim(), gender, s + 1009, et, colour, [], []);
+      const p3 = runPass(breed, surname.trim(), gender, s + 2003, et, colour, [], []);
+      const p4 = runPass(breed, surname.trim(), gender, s + 3001, et, colour, [], []);
+      const p5 = runPass(breed, surname.trim(), gender, s + 4007, et, colour, [], []);
+      const p6 = runPass(breed, surname.trim(), gender, s + 5003, et, colour, [], []);
+      const p7 = runPass(breed, surname.trim(), gender, s + 6011, et, colour, [], []);
+      const p8 = runPass(breed, surname.trim(), gender, s + 7013, et, colour, [], []);
+      const p9 = runPass(breed, surname.trim(), gender, s + 8009, et, colour, [], []);
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
