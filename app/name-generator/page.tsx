@@ -2357,22 +2357,6 @@ export default function NameGeneratorPage() {
                     </div>
                   )}
 
-          {/* ── EXHAUSTED STAGE ── */}
-          {stage === "exhausted" && (
-            <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:40,padding:"clamp(24px,4vw,40px)",textAlign:"center",color:"#fff"}}>
-              <p style={{fontSize:"2rem",marginBottom:8}}>🐾</p>
-              <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We{"'"}ve run out of new names!</h2>
-              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:24,opacity:0.9}}>Answer a couple more questions and we{"'"}ll find some fresh ones.</p>
-              <button onClick={() => { setQOpen(true); setQIndices(pickThreeQuestions()); setQAnswers({}); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
-                className="display" style={{padding:"14px 32px",borderRadius:14,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"1.1rem",cursor:"pointer",boxShadow:"0 4px 0 rgba(10,58,87,0.4)",fontFamily:"var(--font-display)",letterSpacing:"0.04em",marginBottom:12,display:"block",width:"100%"}}>
-                Answer more questions
-              </button>
-              <button onClick={() => { setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
-                className="display" style={{padding:"14px 32px",borderRadius:14,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"1rem",cursor:"pointer",fontFamily:"var(--font-display)",letterSpacing:"0.04em",display:"block",width:"100%"}}>
-                Start Over
-              </button>
-            </div>
-          )}
                   {/* Score badge */}
                   <div style={{ marginBottom:16 }}>
                     <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
@@ -2410,6 +2394,23 @@ export default function NameGeneratorPage() {
                 </button>
               </div>
             </>
+          )}
+
+          {/* ── EXHAUSTED STAGE ── */}
+          {stage === "exhausted" && (
+            <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:40,padding:"clamp(24px,4vw,40px)",textAlign:"center",color:"#fff"}}>
+              <p style={{fontSize:"2rem",marginBottom:8}}>🐾</p>
+              <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We{"'"}ve run out of new names!</h2>
+              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:24,opacity:0.9}}>Answer a couple more questions and we{"'"}ll find some fresh ones.</p>
+              <button onClick={() => { setQOpen(true); setQIndices(pickThreeQuestions()); setQAnswers({}); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"1.1rem",cursor:"pointer",boxShadow:"0 4px 0 rgba(10,58,87,0.4)",fontFamily:"var(--font-display)",letterSpacing:"0.04em",marginBottom:12,display:"block",width:"100%"}}>
+                Answer more questions
+              </button>
+              <button onClick={() => { setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"1rem",cursor:"pointer",fontFamily:"var(--font-display)",letterSpacing:"0.04em",display:"block",width:"100%"}}>
+                Start Over
+              </button>
+            </div>
           )}
         </div>
       </main>
