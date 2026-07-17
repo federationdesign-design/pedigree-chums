@@ -1345,7 +1345,7 @@ const DOMINANT_NAMES = new Set(["William","Booboo","Luna","Klaus","Ernst","Norma
 
 function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.length]; }
 
-function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set(), excludeDogWords: Set<string> = new Set()) {
+function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set()) {
   const group = getGroup(breed);
   const rawNameBank = (NAMES[group] || NAMES.default)[gender];
   // Passes 1-8 exclude dominant names to force variety from the long tail
@@ -1371,7 +1371,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const freshBank = excludeFirstNames.size > 0
     ? nameBank.filter((n: NameEntry) => !excludeFirstNames.has(n.name))
     : nameBank;
-  const useFreshBank = freshBank.length >= 2 ? freshBank : nameBank; // fallback if all exhausted
+  const useFreshBank = freshBank.length >= 1 ? freshBank : nameBank; // use fresh if ANY available
 
   // Three-tier name picking:
   // Tier 1: alliterating names not yet seen (best -- alliteration + fresh)
@@ -1394,30 +1394,19 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     // Tier 2: any fresh name (alliteration exhausted or freeRange pass)
     firstName = useFreshBank[(seed + 3) % useFreshBank.length];
   } else {
-    // Tier 3: all fresh options exhausted -- use full bank (rare)
-    firstName = pick(nameBank, seed + 3);
+    // Tier 3: use any name from fresh bank (should always have some)
+    firstName = pick(useFreshBank, seed + 3);
   }
 
-  // Word picking -- three tiers matching the name picking logic
-  // Fresh words from group pool preferred; fall back to default pool when exhausted
-  const defaultWordBank = DOG_WORDS.default as WordEntry[];
-  const combinedWordBank = [...wordBank, ...defaultWordBank.filter(
-    (w: WordEntry) => !wordBank.find((gw: WordEntry) => gw.word === w.word)
-  )];
-
-  const freshWordBank = excludeDogWords.size > 0
-    ? combinedWordBank.filter((w: WordEntry) => !excludeDogWords.has(w.word))
-    : wordBank;  // first generate: only use group pool
-  const useFreshWordBank = freshWordBank.length >= 1 ? freshWordBank : combinedWordBank;
-
-  const matchingWords = useFreshWordBank.filter((w: WordEntry) =>
+  // Filter wordBank for dog words starting with surname initial or sound family
+  const matchingWords = wordBank.filter((w: WordEntry) =>
     w.firstLetter.toUpperCase() === surnameInitial ||
     (soundFamily[w.firstLetter.toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  const useMatchingWord = matchingWords.length >= 1 && (seed % 7 !== 0);
+  const useMatchingWord = matchingWords.length >= 2 && (seed % 7 !== 0);
   const dogWordEntry = useMatchingWord
     ? matchingWords[(seed + 7) % matchingWords.length]
-    : pick(useFreshWordBank, seed + 7);
+    : pick(wordBank, seed + 7);
   const alreadyHyphenated = surname.includes("-");
   // Only hyphenate if dog word adds contrast against the first name
   const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
@@ -1983,7 +1972,7 @@ function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
   baseSeed: number, town: string, colour: DogColour,
   bonusPool1: string[], bonusPool2: string[], excludeDominant = false, freeRange = false,
-  excludeFirstNames: Set<string> = new Set(), excludeDogWords: Set<string> = new Set()
+  excludeFirstNames: Set<string> = new Set()
 ): Result[] {
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
@@ -2007,7 +1996,7 @@ function runPass(
   }
 
   const raw = Array.from({length:20}, (_, i) => {
-    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames, excludeDogWords);
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
     if (!r) return null;
     const parts = r.full.split(" ");
     const fn = parts[1] ?? "";
@@ -2057,7 +2046,7 @@ function runPass(
   if ((raw[0]?.score ?? 0) < THRESHOLD) {
     const group = getGroup(breed);
     const prefixed = Array.from({length:20}, (_, i) => {
-      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames, excludeDogWords);
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
       if (!r) return null;
       let pe: { prefix: string; bonusContrast: number };
       if (gender === "boy") {
@@ -2137,8 +2126,8 @@ export default function NameGeneratorPage() {
   const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
   const [qOpen, setQOpen] = useState(false);
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
+  const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
-  const [usedDogWords, setUsedDogWords] = useState<Set<string>>(new Set());
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
@@ -2158,15 +2147,15 @@ export default function NameGeneratorPage() {
         .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
     });
     const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
-    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames,usedDogWords);
-    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
-    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
-    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames,usedDogWords);
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames);
     const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
     const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
@@ -2199,25 +2188,30 @@ export default function NameGeneratorPage() {
     });
 
     const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
-    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames,usedDogWords);
-    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames,usedDogWords);
-    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
-    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames,usedDogWords);
-    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames,usedDogWords);
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames);
     const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
     const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
     const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
     const sc21 = allD.filter(r=>r.score>=17);
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-    // Filter out any result whose nickname has already been shown this session
     const allRanked = ranked.length>0 ? ranked : rankResults(allD,breed?getGroup(breed):"default");
     const fresh = allRanked.filter((r: Result) => !usedNicknames.has(r.nickname));
-    const rollResult = (fresh.length>0 ? fresh : allRanked).slice(0,1);
+    if (fresh.length === 0) {
+      setStage("exhausted");
+      return;
+    }
+    const rollResult = fresh.slice(0,1);
+    const rollFirstName = rollResult[0]?.full?.split(" ").find((w:string) => w.length > 1 && /^[A-Z]/.test(w) && !w.includes(".")) ?? "";
     setUsedNicknames((prev: Set<string>) => new Set([...prev, ...rollResult.map((r: Result) => r.nickname)]));
+    setUsedFirstNames((prev:Set<string>) => rollFirstName ? new Set([...prev, rollFirstName]) : prev);
     setResults(rollResult);
     setStage("reveal");
   }
@@ -2362,6 +2356,23 @@ export default function NameGeneratorPage() {
                       <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                     </div>
                   )}
+
+          {/* ── EXHAUSTED STAGE ── */}
+          {stage === "exhausted" && (
+            <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:40,padding:"clamp(24px,4vw,40px)",textAlign:"center",color:"#fff"}}>
+              <p style={{fontSize:"2rem",marginBottom:8}}>🐾</p>
+              <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We{"'"}ve run out of new names!</h2>
+              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:24,opacity:0.9}}>Answer a couple more questions and we{"'"}ll find some fresh ones.</p>
+              <button onClick={() => { setQOpen(true); setQIndices(pickThreeQuestions()); setQAnswers({}); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"1.1rem",cursor:"pointer",boxShadow:"0 4px 0 rgba(10,58,87,0.4)",fontFamily:"var(--font-display)",letterSpacing:"0.04em",marginBottom:12,display:"block",width:"100%"}}>
+                Answer more questions
+              </button>
+              <button onClick={() => { setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"1rem",cursor:"pointer",fontFamily:"var(--font-display)",letterSpacing:"0.04em",display:"block",width:"100%"}}>
+                Start Over
+              </button>
+            </div>
+          )}
                   {/* Score badge */}
                   <div style={{ marginBottom:16 }}>
                     <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
@@ -2393,7 +2404,7 @@ export default function NameGeneratorPage() {
                   style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Roll again
                 </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); }} className="display"
+                <button onClick={() => { setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setUsedNicknames(new Set()); }} className="display"
                   style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
                   Start over
                 </button>
