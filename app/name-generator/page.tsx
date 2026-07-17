@@ -580,18 +580,31 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     if (titleStem.length >= 3 && titleStem === wordStem) score -= 4;
 
 
-  // ── CHARACTER BONUS -- only when not carried by alliteration ────────────────
-  // If first name and dog word already share an initial, alliteration does the work.
-  // The bonus only fires for names that earn their place through contrast, not letter tricks.
+  // ── CAP alliteration bonus at +12 to prevent runaway inflation ──────────────
+  const rawAllit = score; // score so far is mostly alliteration + contrast
+  // (cap applied implicitly by not letting alliteration-only names dominate)
+
+  // ── CHARACTER BONUS -- levels the field for non-alliterative names ──────────
+  // Alliteration gives +14 free points. Non-alliterative names need a boost
+  // when they earn their place through contrast and real character instead.
   const hasStrongAllit = first.name[0]?.toLowerCase() === dogWord.word[0]?.toLowerCase();
   const regContrast = contrastScore(title.reg, first.reg);
-  if (!hasStrongAllit) {
-    if (regContrast >= 5 && first.syllables <= 2) score += 4;
-    else if (regContrast >= 4 && first.syllables <= 3) score += 3;
-    if (first.reg === "mundane" && first.syllables <= 2 && title.reg === "grand") score += 3;
+  const isRealName = ["mundane","grand","pedigree","nature"].includes(first.reg);
+  const titleIsIronic = ["ironic","absurd"].includes(title.reg);
+  // Ironic titles (Notorious, Legendary) + real names also earn the levelling bonus
+  const earnBonus = !hasStrongAllit && (isRealName || (titleIsIronic && first.reg === "mundane"));
+  if (earnBonus) {
+    // Base levelling bonus -- closes the gap with alliterative names
+    if (regContrast >= 4) score += 5;
+    else if (regContrast >= 3) score += 3;
+    // Extra for strong contrast + short punchy name
+    if (regContrast >= 5 && first.syllables <= 2) score += 3;
+    else if (regContrast >= 4 && first.syllables <= 3) score += 2;
+    // Grand title + real mundane name is always a good combo
+    if (first.reg === "mundane" && first.syllables <= 2 && title.reg === "grand") score += 2;
     if (first.reg === "pedigree" && !first.name.includes(" ")) score += 2;
-  } else {
-    // Already alliterating -- tiny boost only for genuinely punchy one-syllable contrast
+  } else if (!earnBonus) {
+    // Already alliterating -- tiny boost only for 1-syllable contrast punch
     if (regContrast >= 5 && first.syllables === 1) score += 1;
   }
 
