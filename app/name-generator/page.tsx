@@ -1992,7 +1992,11 @@ function runPass(
         // Whimsy gets a small bonus for alliteration but must genuinely beat the real name
         const wScore = r.score + 2 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
         if (wScore > r.score + qBonus) {
-          return { ...r, full: wFull, nickname: r.nickname, score: wScore };
+          const wNick = (() => {
+            const stem = whimsyName.replace(/(wick|bean|boots|chops|snout|paws|bum|face|nose|bonce|flap|pants|puff|ling|kins)$/i,"").trim();
+            return stem.length >= 3 && stem !== whimsyName ? stem : whimsyName;
+          })();
+          return { ...r, full: wFull, nickname: wNick, score: wScore };
         }
       }
     }
