@@ -1512,8 +1512,9 @@ function runPass(
     const dogWord = lastPart.includes("-") ? lastPart.split("-")[0] : "";
 
     let qBonus = 0;
-    if (doubleBonus.has(fn)) qBonus += 4;
-    else if (allBonus.has(fn)) qBonus += 2;
+    if (doubleBonus.has(fn)) qBonus += 12;  // answered multiple questions pointing here -- strong signal
+    else if (bonusPool1.includes(fn)) qBonus += 8;  // directly chosen answer
+    else if (bonusPool2.includes(fn)) qBonus += 3;  // appeared in unchosen answers
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
