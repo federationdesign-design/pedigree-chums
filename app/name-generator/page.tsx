@@ -1452,14 +1452,14 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
 
 const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
 const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Nan","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
-const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Flaps","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Whiskers","Flops"];
+const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Whiskers","Flops"];
 
 const MCFACE_SUFFIX: Record<string, string[]> = {
-  sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", "flaps"],
+  sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", ],
   retriever: ["chops", "tum", "bonce", "chomps", "jowls", "paws", "bum", "tail"],
   terrier: ["butt", "chops", "bonce", "snoot", "paws", "tail", "whiskers", "ears"],
-  boxer: ["snout", "jowls", "chops", "bonce", "butt", "tum", "flaps", "face"],
-  character: ["snout", "jowls", "butt", "bonce", "chops", "face", "tum", "flaps"],
+  boxer: ["snout", "jowls", "chops", "bonce", "butt", "tum", "face"],
+  character: ["snout", "jowls", "butt", "bonce", "chops", "face", "tum", ],
   lapdog: ["bum", "bonce", "face", "paws", "ears", "tail", "chops", "snoot"],
   collie: ["paws", "tail", "bonce", "butt", "chops", "ears", "face", "snoot"],
   poodle: ["bonce", "face", "snoot", "paws", "chops", "tail", "bum", "ears"],
@@ -1467,12 +1467,12 @@ const MCFACE_SUFFIX: Record<string, string[]> = {
   dachshund: ["bum", "butt", "tail", "bonce", "tum", "chops", "face", "snoot"],
   giant: ["bonce", "butt", "tum", "jowls", "chops", "paws", "face", "snout"],
   greatdane: ["bonce", "butt", "paws", "tail", "face", "chops", "snoot", "tum"],
-  spaniel: ["ears", "flaps", "paws", "tail", "bonce", "chops", "face", "snoot"],
+  spaniel: ["ears", "paws", "tail", "bonce", "chops", "face", "snoot"],
   german: ["bonce", "paws", "tail", "face", "chops", "butt", "snoot", "ears"],
-  asian: ["snout", "jowls", "tum", "bonce", "chops", "butt", "face", "flaps"],
+  asian: ["snout", "jowls", "tum", "bonce", "chops", "butt", "face", ],
   boston: ["bonce", "butt", "chops", "face", "snoot", "ears", "paws", "tail"],
   afghan: ["tail", "bonce", "face", "paws", "snoot", "butt", "ears", "chops"],
-  bulldog: ["jowls", "snout", "chops", "tum", "bonce", "butt", "face", "flaps"],
+  bulldog: ["jowls", "snout", "chops", "tum", "bonce", "butt", "face", ],
   default: ["bonce", "butt", "face", "chops", "paws", "tail", "snoot", "bum"],
 };
 
