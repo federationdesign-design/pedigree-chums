@@ -10,6 +10,7 @@ import runningCosts from "../../data/runningCosts";
 import groomingNeeds from "../../data/groomingNeeds";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
+import BreedResultRail from "./BreedResultRail";
 
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; info?: string; options: Option[] };
@@ -888,64 +889,59 @@ export default function ChumCalculator() {
         </div>
       )}
 
-      {/* ── Breed grid ── */}
-      <div className={styles.breedGrid}>
-        {scoredBreeds.map((b) => {
-          const cardImg = breedCard[b.slug];
-          const hidden = thresholdActive && b.score < THRESHOLD;
-          const isBest = b.slug === bestSlug;
-          // Hide good fits when great/perfect fits exist
-          if (hideTail && b.score < 100 && !isBest) return null;
-          // Hide great fits when perfect fits exist
-          if (hideGreat && b.score >= 100 && b.score < 120 && !isBest) return null;
-          // Cap perfect fits at 5
-          if (finished && b.score >= 120 && !isBest) {
-            shownPerfect++;
-            if (shownPerfect > 5) return null;
-          }
-          // Cap great fits at 5
-          if (finished && b.score >= 100 && b.score < 120 && !isBest) {
-            shownGreat++;
-            if (shownGreat > 5) return null;
-          }
-          return (
-            <div
-              key={b.slug}
-              className={`${styles.breedCard} ${hidden ? styles.breedCardHidden : ""}`}
-              onMouseEnter={(e) => { setHoveredBreed(b.slug); setTooltipPos({ x: e.clientX, y: e.clientY }); }}
-              onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
-              onMouseLeave={() => setHoveredBreed(null)}
-              style={{ position: "relative" }}
-            >
-              <Link href={`/chums/${b.slug}`} tabIndex={hidden ? -1 : 0} className={styles.breedCardInner}>
-                <img
-                  src={bust(cardImg || b.image)}
-                  alt={b.name}
-                  className={styles.cardImg}
-                  loading="lazy"
-                />
-                {answeredCount >= 5 && !hidden && (
-                  <div
-                    className={styles.cardScore}
-                    style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
-                  >
-                    {fitLabel(b.score, isBest)}
-                  </div>
-                )}
-              </Link>
-              {finished && !hidden && (isBest || b.score >= 120) && (
-                <Link
-                  href={`/name-generator?breed=${encodeURIComponent(b.name)}`}
-                  className={styles.nameThisChum}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  ★ Name this chum
+      {/* ── Breed grid (during quiz) / Result rail (when finished) ── */}
+      {finished ? (
+        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} />
+      ) : (
+        <div className={styles.breedGrid}>
+          {scoredBreeds.map((b) => {
+            const cardImg = breedCard[b.slug];
+            const hidden = thresholdActive && b.score < THRESHOLD;
+            const isBest = b.slug === bestSlug;
+            // Hide good fits when great/perfect fits exist
+            if (hideTail && b.score < 100 && !isBest) return null;
+            // Hide great fits when perfect fits exist
+            if (hideGreat && b.score >= 100 && b.score < 120 && !isBest) return null;
+            // Cap perfect fits at 5
+            if (finished && b.score >= 120 && !isBest) {
+              shownPerfect++;
+              if (shownPerfect > 5) return null;
+            }
+            // Cap great fits at 5
+            if (finished && b.score >= 100 && b.score < 120 && !isBest) {
+              shownGreat++;
+              if (shownGreat > 5) return null;
+            }
+            return (
+              <div
+                key={b.slug}
+                className={`${styles.breedCard} ${hidden ? styles.breedCardHidden : ""}`}
+                onMouseEnter={(e) => { setHoveredBreed(b.slug); setTooltipPos({ x: e.clientX, y: e.clientY }); }}
+                onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
+                onMouseLeave={() => setHoveredBreed(null)}
+                style={{ position: "relative" }}
+              >
+                <Link href={`/chums/${b.slug}`} tabIndex={hidden ? -1 : 0} className={styles.breedCardInner}>
+                  <img
+                    src={bust(cardImg || b.image)}
+                    alt={b.name}
+                    className={styles.cardImg}
+                    loading="lazy"
+                  />
+                  {answeredCount >= 5 && !hidden && (
+                    <div
+                      className={styles.cardScore}
+                      style={{ background: fitColour(b.score, isBest).bg, color: fitColour(b.score, isBest).text }}
+                    >
+                      {fitLabel(b.score, isBest)}
+                    </div>
+                  )}
                 </Link>
-              )}
-            </div>
-          );
-        })}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Global tooltip rendered at mouse position */}
       {hoveredBreed && (() => {

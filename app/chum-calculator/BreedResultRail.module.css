@@ -1,0 +1,188 @@
+/* ── Rail ─────────────────────────────────────────────────────────────────── */
+.railWrap {
+  position: relative;
+  margin-top: 24px;
+  padding-bottom: 32px;
+}
+
+.rail {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: clamp(12px, 2vw, 20px);
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px clamp(16px, 4vw, 40px) 16px;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+
+.item {
+  flex: 0 0 auto;
+}
+
+/* ── Custom scrollbar (matches CardRail exactly) ─────────────────────────── */
+.scrollbar {
+  position: absolute;
+  left: clamp(20px, 4vw, 40px);
+  right: clamp(20px, 4vw, 40px);
+  bottom: 0;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  transition: opacity 0.2s ease;
+}
+.scrollThumb {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: 999px;
+  background: var(--yellow);
+  cursor: grab;
+  touch-action: none;
+}
+.scrollThumb:active { cursor: grabbing; }
+
+/* ── Flip card container ─────────────────────────────────────────────────── */
+.flipOuter {
+  width: clamp(160px, 45vw, 220px);
+  aspect-ratio: 5 / 7;
+  perspective: 900px;
+  cursor: pointer;
+}
+
+.flipInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 14px;
+}
+
+/* Desktop: flip on hover */
+@media (hover: hover) {
+  .flipOuter:hover .flipInner {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Mobile: flip via .flipped class toggled by JS */
+.flipped .flipInner {
+  transform: rotateY(180deg);
+}
+
+/* ── Front face ──────────────────────────────────────────────────────────── */
+.flipFront {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 14px;
+  overflow: hidden;
+  display: block;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  text-decoration: none;
+}
+
+.cardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fitLabel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transform: rotate(-3deg) translateY(1px);
+}
+
+/* ── Back face ───────────────────────────────────────────────────────────── */
+.flipBack {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  border-radius: 14px;
+  background: var(--yellow, #ffe227);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  gap: 8px;
+  text-align: center;
+}
+
+.backBreedName {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1rem, 3.5vw, 1.3rem);
+  color: var(--navy, #0a3a57);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.backLabel {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: clamp(0.65rem, 1.8vw, 0.75rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--navy, #0a3a57);
+  margin: 0;
+  opacity: 0.7;
+}
+
+.backCta {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  margin: 8px 0 0;
+  line-height: 1.3;
+}
+
+.backArrow {
+  font-size: 1.4rem;
+  color: var(--navy, #0a3a57);
+  margin-top: 4px;
+  display: block;
+}
+
+/* Mobile flip-back button (top-left corner) */
+.flipBackBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(10,58,87,0.12);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--navy, #0a3a57);
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Hide flip-back button on desktop (hover handles it) */
+@media (hover: hover) {
+  .flipBackBtn { display: none; }
+}
