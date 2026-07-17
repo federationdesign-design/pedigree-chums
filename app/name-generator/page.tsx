@@ -543,7 +543,6 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
 
 // ── BREED LISTS ────────────────────────────────────────────────────────────────
 const PACK_BREEDS = ["Afghan Hound","Basset Hound","Beagle","Bichon Frise","Bloodhound","Border Collie","Border Terrier","Boston Terrier","Boxer","Bull Terrier","Bulldog","Cavalier King Charles Spaniel","Cavachon","Cavapoo","Chihuahua","Cocker Spaniel","Cockapoo","Corgi","Dachshund","Dalmatian","Doberman Pinscher","French Bulldog","German Shepherd","Golden Retriever","Goldendoodle","Great Dane","Greyhound","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Jackapoo","Labrador","Labradoodle","Lurcher","Maltese","Maltipoo","Mastiff","Miniature Schnauzer","Old English Sheepdog","Papillon","Pomeranian","Poodle","Pug","Rottweiler","Rough Collie","Saint Bernard","Shih Tzu","Siberian Husky","Springer Spaniel","Staffordshire Bull Terrier","Weimaraner","West Highland Terrier","Whippet","Yorkshire Terrier"];
-const OTHER_BREEDS = ["Airedale Terrier","Akita","Alaskan Malamute","Bedlington Terrier","Bernese Mountain Dog","Borzoi","Cairn Terrier","Chesapeake Bay Retriever","Chow Chow","Clumber Spaniel","Deerhound","English Setter","Field Spaniel","Flat-Coated Retriever","Fox Terrier","Gordon Setter","Havanese","Hungarian Vizsla","Leonberger","Lhasa Apso","Newfoundland","Norfolk Terrier","Pointer","Rhodesian Ridgeback","Saluki","Samoyed","Scottish Terrier","Shar Pei","Shiba Inu","Soft Coated Wheaten Terrier","Sussex Spaniel","Tibetan Mastiff","Welsh Springer Spaniel","Welsh Terrier"];
 
 // ── TITLE BANKS ────────────────────────────────────────────────────────────────
 const BOY_TITLES: Record<string, TitleEntry[]> = {
@@ -1752,12 +1751,7 @@ export default function NameGeneratorPage() {
                 <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setQIndices(pickThreeQuestions()); setQAnswers({}); }}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                   <option value="">-- Select a breed --</option>
-                  <optgroup label="Pedigree Chums Pack Breeds">
-                    {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
-                  </optgroup>
-                  <optgroup label="Other Breeds">
-                    {OTHER_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
-                  </optgroup>
+                  {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </>)}
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your surname</label>
