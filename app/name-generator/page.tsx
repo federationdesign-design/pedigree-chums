@@ -419,6 +419,16 @@ const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }
     {label:"Vegetarian", bonus:["Flora","Basil","Sage","Clover","Bloom","Meadow","Willow","Fern","Ivy","Petal","Briar","Moss","Leaf","Blossom"]},
     {label:"Hawaiian",   bonus:["Maverick","Wildcard","Renegade","Rebel","Outlaw","Bonkers","Doolally","Chaos","Rogue","Breezy","Carefree","Bold"]},
   ]},
+  {
+    text:"Pick a colour",
+    options:[
+      {label:"Red",   bonus:["Ruby","Scarlet","Crimson","Rosie","Garnet","Cherry","Poppy","Fleur","Claret","Coral","Russet","Ember"]},
+      {label:"Blue",  bonus:["Indigo","Azure","Cobalt","Navy","Slate","Storm","Sky","Sapphire","Iris","Marina","Cyan"]},
+      {label:"Green", bonus:["Emerald","Jade","Clover","Sage","Ivy","Fern","Moss","Basil","Juniper","Olive","Briar","Laurel"]},
+      {label:"Gold",  bonus:["Amber","Tawny","Honey","Saffron","Topaz","Goldie","Sunny","Marigold","Buttercup","Blondie","Flaxen"]},
+      {label:"Black", bonus:["Raven","Onyx","Shadow","Midnight","Jet","Dusk","Noir","Obsidian","Eclipse","Nightshade","Cinder"]}
+    ]
+  }
 ];
 
 function pickOneQuestion(seed: number): number {
@@ -1317,39 +1327,38 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 const ONCE_ONLY_WORDS = new Set(["Track","Trace","Sleuth","Detect","Quest","Hunt","Scout","Find","Hound","Nose","Sniff","Snuffle","Crystal","Sapphire","Diamond","Pearl","Ruby","Emerald","Amber","Jade","Opal"]);
 
 const WHIMSY_DETECT = /paws|bean|boots|puff|whisk|wick|wink|snout|chops|bonce|flap|wiggle|wobble|bumble|scramble|grumble|noodle|puddle|doodle|fizzle|jiggle|toodle|mumble|rumble/i;
+const INFORMAL_TITLES_SET = new Set(["Lil'","Baby","Little","Grumpy","Squishy","Itsy","Fluffy","Scruffy","Wee","Ol'"]);
+
+function getStyleCategory(full: string): string {
+  const parts = full.split(" ");
+  const title = parts[0] ?? "";
+  const firstName = parts[1] ?? "";
+  if (/^[A-Z]\.[A-Z]/.test(title))         return "abbrev";
+  if (WHIMSY_DETECT.test(firstName))         return "whimsy";
+  if (INFORMAL_TITLES_SET.has(title))        return "informal";
+  if (!title || !parts[2])                   return "bare";
+  if (firstName.includes(" "))               return "pedigree";
+  return "real";
+}
 
 function dedupeResults(candidates: Result[], limit = 10): Result[] {
-  const usedFirstNames  = new Set<string>();
-  const usedDogWords    = new Set<string>();
-  const usedFirstSounds = new Set<string>();
-  let whimsyUsed = false;  // only one whimsy result allowed
-  const out: Result[] = [];
+  const bestByStyle: Record<string, Result> = {};
   for (const r of candidates) {
     if (!r) continue;
-    const parts = r.full.split(" ");
-    const title = parts[0];
-    const isAbbrevFull = /^[A-Z]\.[A-Z]/.test(title);
-    const firstName = isAbbrevFull
-      ? parts.slice(1, parts.length - 1).join(" ")
-      : parts[1] ?? "";
-    const surnamepart = parts[parts.length - 1] ?? "";
+    const cat = getStyleCategory(r.full);
+    if (!bestByStyle[cat] || r.score > bestByStyle[cat].score) {
+      bestByStyle[cat] = r;
+    }
+  }
+  const winners = Object.values(bestByStyle).sort((a,b) => b.score - a.score);
+  const usedDogWords = new Set<string>();
+  const out: Result[] = [];
+  for (const r of winners) {
+    const surnamepart = r.full.split(" ").pop() ?? "";
     const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
     const wordInName = [...ONCE_ONLY_WORDS].find(w => r.full.includes(" " + w + " ") || r.full.includes(" " + w + "-"));
-    const isWhimsy = WHIMSY_DETECT.test(firstName);
-    // Block: more than one whimsy result
-    if (isWhimsy && whimsyUsed) continue;
-    // Block: same first name used twice
-    if (usedFirstNames.has(firstName)) continue;
-    // Block: same dog word used twice
     if (dogWord && usedDogWords.has(dogWord)) continue;
     if (wordInName && usedDogWords.has(wordInName)) continue;
-    // Block: same first-name initial
-    const fnInitial = firstName[0]?.toLowerCase() ?? "";
-    if (fnInitial && usedFirstSounds.has(fnInitial)) continue;
-    // All clear
-    if (isWhimsy) whimsyUsed = true;
-    usedFirstNames.add(firstName);
-    usedFirstSounds.add(fnInitial);
     if (dogWord) usedDogWords.add(dogWord);
     if (wordInName) usedDogWords.add(wordInName);
     out.push(r);
