@@ -1075,10 +1075,10 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       // really a sanity check against edge cases)
 
       // Special cases first
-      // 4G: any title starting with G + G-name + G-dogword + G-surname = four Gs
+      // 4G: only fires when ALL FOUR elements start with G -- General + G-name + G-word + G-surname
       const dogWordInitial = dogWordEntry?.word?.[0]?.toUpperCase() ?? "";
       const surnameInitialForNick = surname.replace(/-.*/, "")[0]?.toUpperCase() ?? "";
-      if (tI === "G" && nI === "G" && dogWordInitial === "G" && surnameInitialForNick === "G") {
+      if (title.title === "General" && nI === "G" && dogWordInitial === "G" && surnameInitialForNick === "G") {
         nickname = "4G";
       } else if (title.title === "Doctor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
         nickname = `Dr ${nI}`;
@@ -1510,20 +1510,20 @@ function runPass(
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
     const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry","asian","dalmatian","greatdane","boxer"];
-    if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
+    // Whimsy replacement: only on roughly 1 in 4 passes, and only when
+    // the real name is genuinely weak (not alliterating strongly)
+    const whimsySeed = (baseSeed + i * 7) % 4;  // 0,1,2,3 -- only fire on 0
+    if (whimsySeed === 0 && dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
       if (pool && pool.length > 0) {
-        const whimsyName = pool[(baseSeed + i * 7) % pool.length];
-        // Check breed restrictions on this whimsy word
+        const whimsyName = pool[(baseSeed + i * 13) % pool.length];
         if (!whimsyAllowed(whimsyName, getGroup(breed))) { return { ...r, score: r.score + qBonus }; }
-        // Build a whimsy version and score it
         const wParts = [...parts];
         wParts[1] = whimsyName;
         const wFull = wParts.join(" ");
-        // +5 for alliteration + 3 for short name (whimsy names are all 2-3 syl)
-        const wScore = r.score + 5 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
-        // Only use whimsy if it scores better
+        // Whimsy gets a small bonus for alliteration but must genuinely beat the real name
+        const wScore = r.score + 2 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
         if (wScore > r.score + qBonus) {
           return { ...r, full: wFull, nickname: r.nickname, score: wScore };
         }
