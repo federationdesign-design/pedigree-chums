@@ -580,6 +580,21 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     if (titleStem.length >= 3 && titleStem === wordStem) score -= 4;
 
 
+  // ── CHARACTER BONUS -- only when not carried by alliteration ────────────────
+  // If first name and dog word already share an initial, alliteration does the work.
+  // The bonus only fires for names that earn their place through contrast, not letter tricks.
+  const hasStrongAllit = first.name[0]?.toLowerCase() === dogWord.word[0]?.toLowerCase();
+  const regContrast = contrastScore(title.reg, first.reg);
+  if (!hasStrongAllit) {
+    if (regContrast >= 5 && first.syllables <= 2) score += 4;
+    else if (regContrast >= 4 && first.syllables <= 3) score += 3;
+    if (first.reg === "mundane" && first.syllables <= 2 && title.reg === "grand") score += 3;
+    if (first.reg === "pedigree" && !first.name.includes(" ")) score += 2;
+  } else {
+    // Already alliterating -- tiny boost only for genuinely punchy one-syllable contrast
+    if (regContrast >= 5 && first.syllables === 1) score += 1;
+  }
+
   // ── QUALITY FILTER -- breed character check ───────────────────────────────
   const dignifiedGroups = new Set(["collie","retriever","sighthound","german","spaniel",
     "giant","afghan","poodle","sniffer","greatdane","welsh","dalmatian","sheepdog","lurcher"]);
@@ -1253,7 +1268,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
 
   // ── RESCUE PASS: if score < 15 and name has a title, try bare name ─────────
   // Strip the title and rescore -- sometimes the name is funnier without it
-  const RESCUE_THRESHOLD = 15;
+  const RESCUE_THRESHOLD = 18;
   if (score < RESCUE_THRESHOLD && styleRoll >= 4) {
     // Already a no-title style -- return as-is
     return { full, nickname, reasoning, score };
@@ -1738,7 +1753,7 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 17);
+      const sc21 = allD.filter(r => r.score >= 22);
       const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
       setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
       setStage("reveal");
@@ -1804,7 +1819,7 @@ export default function NameGeneratorPage() {
       const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
       const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
       const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 17);
+      const sc21 = allD.filter(r => r.score >= 22);
       const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
       setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
       setStage("reveal");
