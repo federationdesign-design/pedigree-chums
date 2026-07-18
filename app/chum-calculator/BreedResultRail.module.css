@@ -80,10 +80,18 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: 14px;
-  overflow: hidden;
+  /* overflow visible so the rotated fit label isn't clipped */
+  overflow: visible;
   display: block;
   box-shadow: 0 4px 16px rgba(0,0,0,0.3);
   text-decoration: none;
+}
+
+.cardImgWrap {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 .cardImg {
@@ -93,19 +101,23 @@
   display: block;
 }
 
+/* Fit label -- exact Jul 14 style: rotated, Luckiest Guy, sits at bottom */
 .fitLabel {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 8px 0;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: clamp(0.7rem, 2vw, 0.8rem);
-  font-weight: 800;
-  text-align: center;
-  text-transform: uppercase;
+  transform: rotate(-3deg) translateY(2px);
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.7rem;
   letter-spacing: 0.06em;
-  transform: rotate(-3deg) translateY(1px);
+  text-transform: uppercase;
+  border-radius: 0 0 10px 10px;
+  padding: 11px 10px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  z-index: 2;
 }
 
 /* ── Back face ───────────────────────────────────────────────────────────── */
@@ -124,27 +136,19 @@
   padding: 20px 16px;
   text-decoration: none;
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  gap: 8px;
+  gap: 12px;
   text-align: center;
 }
 
+/* Big Luckiest Guy breed name -- matches about page card style */
 .backBreedName {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1rem, 3.5vw, 1.3rem);
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
   color: var(--navy, #0a3a57);
   margin: 0;
-  line-height: 1.1;
-}
-
-.backLabel {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: clamp(0.65rem, 1.8vw, 0.75rem);
-  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--navy, #0a3a57);
-  margin: 0;
-  opacity: 0.7;
 }
 
 .backCta {
@@ -152,14 +156,13 @@
   font-size: clamp(0.8rem, 2.5vw, 0.95rem);
   font-weight: 700;
   color: var(--navy, #0a3a57);
-  margin: 8px 0 0;
+  margin: 0;
   line-height: 1.3;
 }
 
 .backArrow {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   color: var(--navy, #0a3a57);
-  margin-top: 4px;
   display: block;
 }
 

@@ -858,11 +858,10 @@ export default function ChumCalculator() {
           </div>
         )}
 
-        {/* Finished */}
+        {/* Finished -- show heading only, no blue box */}
         {finished && (
-          <div className={styles.stepCard}>
-            <p className={styles.stepDoneIcon}>🐾</p>
-            <h2 className={styles.stepDoneTitle}>Here are your chums</h2>
+          <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
+            <h2 className={styles.stepDoneTitle}>Here are your chum{visibleCount !== 1 ? "s" : ""}</h2>
             <p className={styles.stepDoneSub}>
               {visibleCount > 0
                 ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match your lifestyle`

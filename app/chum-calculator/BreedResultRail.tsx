@@ -64,13 +64,15 @@ function FlipCard({ breed, isBest }: { breed: ScoredBreed; isBest: boolean }) {
 
         {/* ── FRONT ── */}
         <Link href={`/chums/${breed.slug}`} className={styles.flipFront}>
-          <img
-            src={bust(cardImg || breed.image)}
-            alt={breed.name}
-            className={styles.cardImg}
-            loading="lazy"
-            draggable={false}
-          />
+          <div className={styles.cardImgWrap}>
+            <img
+              src={bust(cardImg || breed.image)}
+              alt={breed.name}
+              className={styles.cardImg}
+              loading="lazy"
+              draggable={false}
+            />
+          </div>
           <div
             className={styles.fitLabel}
             style={{ background: colour.bg, color: colour.text }}
@@ -96,7 +98,6 @@ function FlipCard({ breed, isBest }: { breed: ScoredBreed; isBest: boolean }) {
             ←
           </button>
           <p className={styles.backBreedName}>{breed.name}</p>
-          <p className={styles.backLabel}>{label}</p>
           <p className={styles.backCta}>Want to name your chum next?</p>
           <span className={styles.backArrow}>→</span>
         </Link>
