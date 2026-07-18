@@ -28,7 +28,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
-  const [phase, setPhase] = useState<"intro" | "platform" | "fighting" | "share">("intro");
+  const [phase, setPhase] = useState<"platform" | "fighting" | "share">("platform");
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [remaining, setRemaining] = useState<ShortlistEntry[]>([]);
   const [pairIdx, setPairIdx] = useState(0);
