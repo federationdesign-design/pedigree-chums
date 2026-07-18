@@ -2046,7 +2046,7 @@ export default function NameGeneratorPage() {
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) { if (dx > 0) handleLike(); else handleNope(); }
   }
 
-  const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
+    const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
 
   return (
     <>
