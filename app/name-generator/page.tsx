@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import ShortlistBar, { type ShortlistEntry } from "./ShortlistBar";
+import KnockoutRound from "./KnockoutRound";
 
 // ── CARD IMAGE MAP ─────────────────────────────────────────────────────────────
 const CARD_IMAGE: Record<string, string> = {
@@ -50,7 +52,6 @@ const CARD_IMAGE: Record<string, string> = {
   "Poodle": "/poodle-card.jpg",
   "Pug": "/pug-card.jpg",
   "Rottweiler": "/rottweiler-card.jpg",
-  "Rough Collie": "/collie-card.jpg",
   "Saint Bernard": "/st-bernard-card.jpg",
   "Shih Tzu": "/shuh-tzu-card.jpg",
   "Siberian Husky": "/husky-card.jpg",
@@ -59,7 +60,7 @@ const CARD_IMAGE: Record<string, string> = {
   "Weimaraner": "/weinaraner-card.jpg",
   "West Highland Terrier": "/west-highland-card.jpg",
   "Whippet": "/whippet-card.jpg",
-  "Yorkshire Terrier": "/yorkshire-card.jpg",
+  "Yorkshire Terrier": "/yorkshire-card.jpg"
 };
 
 
@@ -159,70 +160,93 @@ const FUNNY_PLACES = new Set([
 // ── ABBREVIATION WHITELIST ─────────────────────────────────────────────────────
 interface AbbrevEntry { code: string; meaning: string; gender: "boy"|"girl"|"any"; breeds?: string[]; }
 const ABBREVS: AbbrevEntry[] = [
-  {code:"AC",meaning:"Ace Commander",gender:"boy"},{code:"BB",meaning:"Big Boss",gender:"boy"},
+  {code:"BB",meaning:"Big Boss",gender:"boy"},
+  {code:"BB",meaning:"Big Boss",gender:"boy"},
   {code:"BA",meaning:"Bad Attitude",gender:"boy",breeds:["character","boxer"]},
-  {code:"BC",meaning:"Boss Commander",gender:"boy"},{code:"BD",meaning:"Big Deal",gender:"boy"},
+  {code:"BA",meaning:"Bad Attitude",gender:"boy",breeds:["character","boxer"]},
+  {code:"BA",meaning:"Bad Attitude",gender:"boy",breeds:["character","boxer"]},
+  {code:"BA",meaning:"Bad Attitude",gender:"boy",breeds:["character","boxer"]},
+  {code:"BC",meaning:"Boss Commander",gender:"boy"},
+  {code:"BD",meaning:"Big Deal",gender:"boy"},
+  {code:"BD",meaning:"Big Deal",gender:"boy"},
   {code:"BG",meaning:"Big Gangster",gender:"boy",breeds:["character","boxer"]},
-  {code:"BK",meaning:"Boss King",gender:"boy"},{code:"BM",meaning:"Big Money",gender:"boy"},
-  {code:"BO",meaning:"Boss Original",gender:"boy"},{code:"BP",meaning:"Big Player",gender:"boy"},
-  {code:"CB",meaning:"Certified Boss",gender:"boy"},
+  {code:"BK",meaning:"Boss King",gender:"boy"},
+  {code:"BM",meaning:"Big Money",gender:"boy"},
+  {code:"BM",meaning:"Big Money",gender:"boy"},
+  {code:"BM",meaning:"Big Money",gender:"boy"},
+  {code:"BO",meaning:"Boss Original",gender:"boy"},
+  {code:"BO",meaning:"Boss Original",gender:"boy"},
+  {code:"BP",meaning:"Big Player",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
+  {code:"CB",meaning:"Certified Boss",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
   {code:"CK",meaning:"Chaos King",gender:"boy",breeds:["terrier","character"]},
-  {code:"CL",meaning:"Certified Lover",gender:"boy"},{code:"CLB",meaning:"Certified Lover Boy",gender:"boy"},
-  {code:"DB",meaning:"Da Boss",gender:"boy"},{code:"DC",meaning:"Dream Chaser",gender:"any"},
-  {code:"DM",meaning:"Don't Miss",gender:"any"},{code:"DR",meaning:"Da Realest",gender:"boy"},
-  {code:"FB",meaning:"Fearless Boss",gender:"boy"},{code:"FL",meaning:"First Lady",gender:"girl"},
+  {code:"CLB",meaning:"Certified Lover Boy",gender:"boy"},
+  {code:"DB",meaning:"Da Boss",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
+  {code:"DB",meaning:"Da Boss",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
+  {code:"DC",meaning:"Dream Chaser",gender:"any"},
+  {code:"FL",meaning:"First Lady",gender:"girl"},
   {code:"GC",meaning:"Game Changer",gender:"any"},
-  {code:"GM",meaning:"Grand Master",gender:"boy",breeds:["poodle","collie","german"]},
-  {code:"HB",meaning:"Head Boss",gender:"boy"},{code:"HC",meaning:"Heart Collector",gender:"boy"},{code:"HK",meaning:"Hong Kong",gender:"any",breeds:["asian","character"]},
-  {code:"HK",meaning:"Hustle King",gender:"boy"},{code:"HL",meaning:"Heart Lover",gender:"boy"},
+  {code:"HB",meaning:"Head Boss",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
+  {code:"HB",meaning:"Head Boss",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
+  {code:"HC",meaning:"Heart Collector",gender:"boy"},
+  {code:"HK",meaning:"Hong Kong",gender:"boy",breeds:["asian","character"]},
+  {code:"HK",meaning:"Hong Kong",gender:"boy",breeds:["asian","character"]},
+  {code:"KB",meaning:"King Boss",gender:"boy"},
   {code:"KB",meaning:"King Boss",gender:"boy"},
   {code:"KC",meaning:"King of Chaos",gender:"boy",breeds:["terrier","character"]},
-  {code:"KG",meaning:"King of the Game",gender:"boy"},{code:"KO",meaning:"Knockout",gender:"boy",breeds:["boxer"]},
-  {code:"LB",meaning:"Legendary Boss",gender:"boy"},{code:"LC",meaning:"Ladies Choice",gender:"boy"},
-  {code:"LG",meaning:"Living Legend",gender:"any",breeds:["giant","sighthound"]},
-  {code:"LH",meaning:"Ladies Hero",gender:"boy"},{code:"LK",meaning:"Lady Killer",gender:"boy"},
-  {code:"LL",meaning:"Ladies Lover",gender:"boy"},{code:"LM",meaning:"Living Legend",gender:"any"},
-  {code:"LP",meaning:"Ladies Pick",gender:"boy"},{code:"MB",meaning:"Master Boss",gender:"boy"},
-  {code:"MM",meaning:"Mystery Man",gender:"boy"},{code:"MR",meaning:"Most Respected",gender:"boy"},
-  {code:"MVP",meaning:"Most Valued Player",gender:"any"},{code:"NA",meaning:"No Apologies",gender:"any"},
-  {code:"NB",meaning:"Natural Boss",gender:"boy"},{code:"NF",meaning:"No Fear",gender:"any"},
-  {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier"]},
-  {code:"PC",meaning:"Power Commander",gender:"boy"},
+  {code:"KC",meaning:"King of Chaos",gender:"boy",breeds:["terrier","character"]},
+  {code:"KO",meaning:"Knockout",gender:"boy",breeds:["boxer"]},
+  {code:"LC",meaning:"Ladies Choice",gender:"boy"},
+  {code:"LH",meaning:"Ladies Hero",gender:"boy"},
+  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},
+  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},
+  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},
+  {code:"LL",meaning:"Ladies Lover",gender:"boy",breeds:["boxer","character","lapdog","asian","terrier","boston","dachshund"]},
+  {code:"LP",meaning:"Ladies Pick",gender:"boy"},
+  {code:"MB",meaning:"Master Boss",gender:"boy"},
+  {code:"MM",meaning:"Mystery Man",gender:"boy"},
+  {code:"MM",meaning:"Mystery Man",gender:"boy"},
+  {code:"MR",meaning:"Most Respected",gender:"boy"},
+  {code:"MVP",meaning:"Most Valued Player",gender:"boy"},
+  {code:"NF",meaning:"No Fear",gender:"boy"},
+  {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier","asian","boston"]},
+  {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier","asian","boston"]},
+  {code:"OG",meaning:"Original Gangster",gender:"boy",breeds:["character","boxer","terrier","asian","boston"]},
   {code:"PG",meaning:"Power Gangster",gender:"boy",breeds:["character","boxer"]},
-  {code:"PL",meaning:"Player for Life",gender:"boy"},{code:"QL",meaning:"Queen of Love",gender:"girl"},
-  {code:"RB",meaning:"Real Boss",gender:"boy"},{code:"RL",meaning:"Real Lover",gender:"boy"},
-  {code:"SC",meaning:"Supreme Commander",gender:"boy",breeds:["character"]},
-  {code:"SG",meaning:"Street General",gender:"boy"},{code:"SK",meaning:"Supreme King",gender:"boy"},
-  {code:"SL",meaning:"Smooth Lover",gender:"boy"},{code:"TB",meaning:"Top Boss",gender:"boy"},
-  {code:"TC",meaning:"Top Cat",gender:"any"},{code:"TG",meaning:"Top Gangster",gender:"boy",breeds:["character","boxer"]},
-  {code:"TK",meaning:"The King",gender:"boy"},{code:"TL",meaning:"True Lover",gender:"boy"},
-  {code:"TM",meaning:"Top Man",gender:"boy"},{code:"TR",meaning:"The Realest",gender:"boy"},
+  {code:"QL",meaning:"Queen of Love",gender:"girl"},
+  {code:"RB",meaning:"Real Boss",gender:"boy"},
+  {code:"RL",meaning:"Real Lover",gender:"boy"},
+  {code:"TB",meaning:"Top Boss",gender:"boy"},
+  {code:"TC",meaning:"Top Cat",gender:"boy"},
+  {code:"TC",meaning:"Top Cat",gender:"boy"},
+  {code:"TK",meaning:"The King",gender:"boy"},
   {code:"VIP",meaning:"Very Important Person",gender:"any"},
-  {code:"YG",meaning:"Young General",gender:"boy"},{code:"YK",meaning:"Young King",gender:"boy"},
-  // ── POLICE RANKS ─────────────────────────────────────────────────────────────
+  {code:"YG",meaning:"Young General",gender:"boy",breeds:["boxer","character","boston","terrier","asian"]},
+  {code:"YK",meaning:"Young King",gender:"boy"},
   {code:"PC",meaning:"Police Constable",gender:"boy",breeds:["boxer","retriever","default"]},
   {code:"DC",meaning:"Detective Constable",gender:"boy",breeds:["sniffer","default"]},
   {code:"DS",meaning:"Detective Sergeant",gender:"boy",breeds:["sniffer","default"]},
   {code:"DCI",meaning:"Detective Chief Inspector",gender:"boy",breeds:["sniffer","poodle"]},
-  {code:"PCSO",meaning:"Police Community Support Officer",gender:"any",breeds:["character","terrier","boxer"]},
+  {code:"PCSO",meaning:"Police Community Support Officer",gender:"boy",breeds:["character","terrier","boxer"]},
   {code:"Insp",meaning:"Inspector",gender:"boy",breeds:["sniffer","retriever"]},
-  // ── ARMY RANKS ────────────────────────────────────────────────────────────────
   {code:"Pte",meaning:"Private",gender:"boy",breeds:["boxer","terrier","character"]},
   {code:"Cpl",meaning:"Corporal",gender:"boy",breeds:["boxer","retriever","german"]},
-  {code:"Spr",meaning:"Sapper",gender:"boy",breeds:["terrier"]},
   {code:"Gnr",meaning:"Gunner",gender:"boy",breeds:["terrier","character","sniffer"]},
   {code:"Rfn",meaning:"Rifleman",gender:"boy",breeds:["sighthound","terrier"]},
-  {code:"Gdsm",meaning:"Guardsman",gender:"boy",breeds:["gentry","spaniel","german"]},
-  {code:"Tpr",meaning:"Trooper",gender:"boy",breeds:["sighthound","retriever"]},
-  {code:"Brig",meaning:"Brigadier",gender:"boy",breeds:["spaniel","german","giant"]},
-  // ── NAVY RANKS ────────────────────────────────────────────────────────────────
-  {code:"Mid",meaning:"Midshipman",gender:"boy"},
   {code:"PO",meaning:"Petty Officer",gender:"boy",breeds:["spaniel","retriever"]},
-  // ── RAF RANKS ─────────────────────────────────────────────────────────────────
-  {code:"Sqn Ldr",meaning:"Squadron Leader",gender:"boy",breeds:["spaniel","retriever","collie"]},
-  {code:"Wg Cdr",meaning:"Wing Commander",gender:"boy",breeds:["spaniel","german","giant"]},
-  {code:"Flt Lt",meaning:"Flight Lieutenant",gender:"boy",breeds:["collie","poodle","retriever"]},
-  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]}];
+  {code:"Plt Off",meaning:"Pilot Officer",gender:"boy",breeds:["collie","poodle"]},
+  {code:"QC",meaning:"Queen Commander",gender:"girl"},
+  {code:"QB",meaning:"Queen Boss",gender:"girl"},
+  {code:"QB",meaning:"Queen Boss",gender:"girl"},
+  {code:"QG",meaning:"Queen of the Game",gender:"girl"},
+  {code:"HQ",meaning:"Her Queenness",gender:"girl"},
+  {code:"HH",meaning:"Her Highness",gender:"girl"},
+  {code:"BQ",meaning:"Boss Queen",gender:"girl"},
+  {code:"DQ",meaning:"Drama Queen",gender:"girl"},
+  {code:"DQ",meaning:"Drama Queen",gender:"girl"},
+  {code:"GQ",meaning:"Gorgeous Queen",gender:"girl"},
+  {code:"LG",meaning:"Lady Gorgeous",gender:"girl"},
+  {code:"TC",meaning:"Top Cat",gender:"girl"}
+];
 
 const DTRAIN_LETTERS  = ["D"];  // D for Dog -- always
 const DTRAIN_SUFFIXES = ["Train","Prince","Money","King","Boss","Smooth","Real","Fresh","Young","Hype"];
@@ -231,157 +255,144 @@ const MARIEJ_INITIALS = "ABCDJKLMNRST".split("");
 
 // ── RANDOM QUESTIONS ───────────────────────────────────────────────────────────
 const QUESTION_BANK: { text: string; options: { label: string; bonus: string[] }[] }[] = [
-  {
-    text: "Where are you from?",
-    options: [
-      {label:"Down South", bonus:["Treacle","Sweetheart","Darling","Dear","Doll","Dollface","Poppet","Petal","Flower","Lovely","Babe","Babes","Guv","Sonny","Lover","Maid","MyLover","MyHandsome","MyBeauty"]},
-      {label:"The Midlands", bonus:["Bab","Babby","Babs","OurKid","ArKid","Duck","Ducky","Duckie","Cock","Cocker","Chick","Chucky","Mucker","Youth","MeDuck","MyDuck"]},
-      {label:"Up North", bonus:["Chuck","Chucky","Pet","Petal","Hinny","Marra","BonnyLad","BonnyLass","Lad","Lass","Kidda","Cock","Cocker","Flower","Love","Luv","Bairn"]},
-      {label:"Scotland", bonus:["Hen","WeeHen","WeePal","Doll","Dollie","Dearie","Lassie","Laddie","Bairn","WeeYin","WeeMan","WeeLass","Bonny","Pal"]},
-      {label:"Somewhere else", bonus:["Love","Luv","Darling","Dear","Pet","Petal","Sweetheart","Honey","Sugar","Babe","Flower","Pal","Mate","Duck","Lovely"]}
-    ]
-  },
   { text:"Do you like space?", options:[
-    {label:"Yes",bonus:["Luna","Nova","Orion","Astro","Astrid","Comet","Nebula","Aurora","Cassiopeia","Cosmo","Cosimo","Galileo","Kepler","Eclipse","Stellar","Vega","Lyra","Polaris","Orbit","Cosmos","Titan","Atlas","Jupiter","Saturn","Darkstar","Moonbeam","Stardust","Celestia","Lunaris","Astra","Solaris","Quasar","Pulsar"]},
-    {label:"No", bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Sausage","Dumpling","Wobble"]},
+    {label:"Yes",bonus:["Luna","Nova","Astro","Apollo","Comet","Orion","Atlas","Jupiter","Saturn","Nebula","Aurora","Eclipse","Cosmos","Titan","Galaxy","Orbit","Meteor","Sirius","Pulsar","Quasar","Vulcan","Pluto","Mercury","Neptune","Galileo","Kepler","Hubble","Vega","Elara","Stella","Astra","Andromeda","Midnight","Twilight","Stardust","Moonbeam","Darkstar","Supernova","Starburst"]},
+    {label:"No",bonus:["Biscuit","Pudding","Treacle","Custard","Gravy","Crumble","Dumpling","Toffee","Wobble","Roly","Benny","Norman","Derek"]}
   ]},
   { text:"Do you enjoy smells?", options:[
-    {label:"Yes",bonus:["Jasmine","Heather","Sage","Basil","Clover","Juniper","Cedar","Sorrel","Flora","Lavender","Mint","Rosemary","Thyme","Blossom"]},
-    {label:"No", bonus:["Flint","Stone","Slate","Steel","Grit","Iron","Chrome","Cinder","Concrete"]},
+    {label:"Yes",bonus:["Heather","Sage","Basil","Clover","Sorrel","Flora","Lavender","Rosemary","Jasmine","Bracken","Gorse","Yarrow","Furze","Bramble","Thistle","Hazel","Willow","Rowan","Birch","Thyme","Oregano"]},
+    {label:"No",bonus:["Flint","Grit","Gruff","Grunt"]}
   ]},
   { text:"Are you a morning person?", options:[
-    {label:"Yes",bonus:["Dawn","Sparky","Sunny","Breezy","Zippy","Perky","Dewy","Lark","Robin","Crisp","Chipper","Bright","Fresh"]},
-    {label:"No", bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Slumber","Mellow"]},
+    {label:"Yes",bonus:["Dawn","Robin","Lark","Crisp","Sparky","Brisk","Perky","Chipper","Sunny","Flash","Bolt","Dart","Dash","Nimble","Zippy","Blaze","Sprint","Rocket"]},
+    {label:"No",bonus:["Shadow","Raven","Midnight","Dusk","Mellow","Slumber","Vesper","Nocturne","Murk","Smudge","Umbra","Twilight"]}
   ]},
   { text:"Have you ever talked to a plant?", options:[
-    {label:"Yes",bonus:["Fern","Ivy","Willow","Daisy","Skye","Moss","Briar","Bloom","Rowan","Clover","Hazel","Birch","Cedar","Ash","Bramble"]},
-    {label:"No", bonus:["Brick","Steel","Chrome","Concrete","Gravel","Slate","Cinder","Iron"]},
+    {label:"Yes",bonus:["Willow","Rowan","Hazel","Birch","Clover","Bramble","Heather","Sorrel","Jasmine","Sage","Basil","Thyme","Blossom","Daisy","Flora","Thistle","Yarrow"]},
+    {label:"No",bonus:["Flint","Grit","Gruff","Grunt"]}
   ]},
   { text:"Have you ever worn a onesie in public?", options:[
-    {label:"Yes",bonus:["Snugglebum","Fluffy","Booboo","Fifi","Mimi","Puddingkins","Lulu","Noo-Noo","Cuddlekins","Fluffybum","Jellybean","Candyfloss","Tiddlywink"]},
-    {label:"No", bonus:["Dapper","Debonair","Suave","Sharp","Immaculate","Sterling","Pristine","Sleek","Trim","Tailored"]},
+    {label:"Yes",bonus:["Snugglebum","Fifi","Mimi","Lulu","Cuddlekins","Jellybean","Marshmallow","Babbycakes","Poppet","Pudding","Squishface","Booboo","Munchkin","Cupcake","Button","Coco"]},
+    {label:"No",bonus:["Norman","Derek","Keith","Brian","Barry","Basil","Kevin","Clive","Trevor","Raymond","Buster","Butch"]}
   ]},
   { text:"Do you believe in ghosts?", options:[
-    {label:"Yes",bonus:["Ghost","Shadow","Phantom","Midnight","Eclipse","Misty","Spectre","Vesper","Wraith","Shade","Spirit","Wisp","Echo","Mist","Void"]},
-    {label:"No", bonus:["Solid","Grounded","Flint","Stone","Anchor","Boulder","Bedrock","Steadfast","Grit","Granite"]},
+    {label:"Yes",bonus:["Shadow","Raven","Eclipse","Phantom","Wraith","Shade","Murk","Ghost","Spectre","Smoky","Smudge","Umbra","Nightshade","Shadowmoon","Darkstar","Darkside","Midnight","Twilight","Nightfall","Mist"]},
+    {label:"No",bonus:["Norman","Derek","Keith","Brian","Barry","Basil","Kevin","Biscuit","Crumble","Custard","Wobble","Roly"]}
   ]},
   { text:"Do you take sugar in your tea?", options:[
-    {label:"Yes",bonus:["Honey","Toffee","Fudge","Caramel","Treacle","Sherbet","Bonbon","Butterscotch","Jellybean","Gumdrop","Sweetpea","Syrup","Custard","Pudding","Lollipop"]},
-    {label:"No", bonus:["Bitter","Tonic","Brisk","Sharp","Crisp","Earl","Assam","Pekoe","Darjeeling"]},
+    {label:"Yes",bonus:["Biscuit","Pudding","Treacle","Custard","Crumble","Toffee","Sherbet","Smartie","Jammy","Marmalade","Crunchie"]},
+    {label:"No",bonus:["Flint","Grit","Gruff","Bolt","Brisk","Crisp"]}
   ]},
   { text:"Do you like myths and legends?", options:[
-    {label:"Yes",bonus:["Orpheus","Perseus","Achilles","Heracles","Theseus","Ajax","Odysseus","Circe","Phoenix","Griffin","Merlin","Lancelot","Morgan","Oberon","Avalon","Medusa","Pegasus","Icarus","Apollo","Artemis"]},
-    {label:"No", bonus:["Norman","Derek","Keith","Brian","Barry","Colin","Basil","Kevin","Biscuit","Custard"]},
+    {label:"Yes",bonus:["Morgan","Arthur","Percival","Guinevere","Hecate","Circe","Medea","Athena","Hera","Gaia","Calypso","Cassandra","Demeter"]},
+    {label:"No",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Biscuit","Pudding","Crumble","Wobble","Roly"]}
   ]},
   { text:"Sugar or salt?", options:[
-    {label:"Sugar",bonus:["Honey","Fudge","Caramel","Toffee","Treacle","Butterscotch","Sherbet","Bonbon","Mellow","Syrup","Candy","Nectar","Praline"]},
-    {label:"Salt", bonus:["Brine","Flint","Gravel","Sharp","Crisp","Gruff","Stone","Slate","Tonic","Crag","Grit","Granite","Rust"]},
+    {label:"Sugar",bonus:["Toffee","Treacle","Custard","Crumble","Pudding","Sherbet","Smartie","Jammy","Marmalade","Crunchie","Biscuit","Jellybean","Skittles"]},
+    {label:"Salt",bonus:["Crispy","Crusty","Gherkin","Pretzel","Pickles","Chips","Radish","Parsnip","Cabbage","Pepper","Paprika","Cracker","Sardine","Pickle"]}
   ]},
   { text:"Autumn or summer?", options:[
-    {label:"Autumn",bonus:["Amber","Russet","Conker","Chestnut","Bramble","Hazel","Harvest","Ember","Copper","Acorn","Tawny","Sienna","Cinnamon","Mist","Dusk"]},
-    {label:"Summer",bonus:["Sunny","Blaze","Sandy","Breeze","Dazzle","Shimmer","Freckle","Goldie","Honey","Wildflower","Surf","Coral","Azure","Radiant","Glow","Lemon"]},
+    {label:"Autumn",bonus:["Rowan","Hazel","Bramble","Conker","Bracken","Russet","Gorse","Birch","Yarrow","Sorrel","Heather","Furze","Thistle","Clover"]},
+    {label:"Summer",bonus:["Daisy","Flora","Blossom","Clover","Sunny","Blaze","Flash","Shimmy","Prance","Bounce","Zippy"]}
   ]},
   { text:"How many sides does a circle have?", options:[
-    {label:"None",bonus:["Ace","Boss","Stone","Flint","Blade","Steel","Iron","Frost","Sharp","Crisp","Direct","Decisive","Clean","Bolt"]},
-    {label:"One", bonus:["Infinite","Spiral","Orbit","Cycle","Curve","Eternal","Continuum","Loop","Cosmos","Omega","Zen","Endless","Void","Paradox"]},
+    {label:"One",bonus:["Rumpus","Havoc","Chaos","Bonkers","Dingbat","Kerfuffle","Hullabaloo","Ruckus","Mayhem","Mischief","Wobble","Wibble","Fizz","Tumble","Dizzy"]},
+    {label:"Two",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Crisp","Flint","Grit"]}
   ]},
   { text:"Tea or coffee?", options:[
-    {label:"Tea",   bonus:["Earl","Darjeeling","Assam","Oolong","Chamomile","Pekoe","Brew","Steep","Mellow","Proper","Crumpet","Scone","Biscuit"]},
-    {label:"Coffee",bonus:["Espresso","Cortado","Arabica","Mocha","Crema","Grind","Press","Dark","Roast","Intense","Robust","Bold","Bitter","Jet"]},
+    {label:"Tea",bonus:["Willow","Rowan","Clover","Hazel","Bramble","Heather","Birch","Sorrel","Bracken","Thistle","Gorse","Yarrow","Sage","Basil"]},
+    {label:"Coffee",bonus:["Espresso","Mocha","Arabica","Scrumpy","Gruff","Grunt","Brisk","Crisp"]}
   ]},
   { text:"Would you rather be invisible or fly?", options:[
-    {label:"Invisible",bonus:["Ghost","Shadow","Phantom","Spectre","Wraith","Shade","Mist","Wisp","Echo","Blur","Fade","Smoke"]},
-    {label:"Fly",      bonus:["Falcon","Hawk","Eagle","Icarus","Pegasus","Cloud","Nimbus","Soar","Glide","Swift","Dart","Streak","Apex"]},
+    {label:"Invisible",bonus:["Shadow","Ghost","Wraith","Shade","Murk","Mist","Phantom","Spectre","Smoky","Smudge","Eclipse","Dusk","Umbra","Nightshade"]},
+    {label:"Fly",bonus:["Falcon","Soar","Glide","Dart","Streak","Bolt","Sprint","Flash","Rocket","Blaze","Dash"]}
   ]},
   { text:"Night owl or early bird?", options:[
-    {label:"Night owl",  bonus:["Midnight","Vesper","Luna","Eclipse","Nocturne","Raven","Shadow","Dusk","Twilight","Phantom","Sable","Noir","Obsidian","Onyx"]},
-    {label:"Early bird", bonus:["Dawn","Lark","Robin","Crisp","Dewy","Sparky","Sunny","Chirpy","Bright","Breezy","Perky","Glow","Fresh","Zippy"]},
+    {label:"Night owl",bonus:["Shadow","Raven","Midnight","Dusk","Mellow","Slumber","Vesper","Nocturne","Murk","Smudge","Smoky","Phantom","Umbra","Twilight"]},
+    {label:"Early bird",bonus:["Dawn","Lark","Robin","Crisp","Brisk","Zippy","Perky","Chipper","Flash","Sparky","Bounce","Nimble","Sunny"]}
   ]},
   { text:"Are you cool?", options:[
-    {label:"Yes",bonus:["Ace","Slick","Smooth","Ice","Frost","Suave","Sharp","Dapper","Blade","Shadow","Chrome","Silk","Velvet","Steel","Noir"]},
-    {label:"No", bonus:["Goofy","Doofus","Dingbat","Goofball","Wonky","Doolally","Bumbly","Topsy","Wibble","Clumsy","Wobble","Bumble","Scatty"]},
+    {label:"Yes",bonus:["Maverick","Diesel","Blaze","Flash","Rocket","Tank","Jax","Gunner","Kodak","Crusher","Hammer","Viper","Falcon","Bolt","Dash"]},
+    {label:"No",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Biscuit","Pudding","Crumble","Wobble"]}
   ]},
   { text:"Are you a nerd?", options:[
-    {label:"Yes",bonus:["Kepler","Copernicus","Turing","Pascal","Euler","Archimedes","Pythagoras","Worf","Spock","Data","Hubble","Fibonacci","Bohr","Lovelace"]},
-    {label:"No", bonus:["Maverick","Rebel","Wildcard","Outlaw","Renegade","Rogue","Hotshot","Bandit","Flash","Blaze","Bolt","Rocket","Dash"]},
+    {label:"Yes",bonus:["Newton","Einstein","Darwin","Galileo","Kepler","Hubble","Pascal","Socrates","Plato","Pythagoras","Mercury","Bach","Handel"]},
+    {label:"No",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Biscuit","Pudding","Wobble","Roly"]}
   ]},
   { text:"Do you make your bed in the morning?", options:[
-    {label:"Yes",bonus:["Pristine","Crisp","Sterling","Proper","Immaculate","Dapper","Sharp","Composed","Prim","Trim","Precise","Neat","Buff"]},
-    {label:"No", bonus:["Rumple","Tumble","Shambles","Chaos","Muddle","Scruffy","Slouch","Sprawl","Tangle","Topple","Wobble","Raggle","Jumble"]},
+    {label:"Yes",bonus:["Crisp","Brisk","Bolt","Sprint","Nimble","Flint","Grit"]},
+    {label:"No",bonus:["Snugglebum","Pudding","Wobble","Roly","Shuffle","Grumble","Slumber","Mellow","Smudge"]}
   ]},
   { text:"Do you read the terms and conditions?", options:[
-    {label:"Yes",bonus:["Prudence","Constance","Diligent","Earnest","Steadfast","Thorough","Scholar","Counsel","Careful","Measured","Exact","Vigilant"]},
-    {label:"No", bonus:["Maverick","Reckless","Wildcard","Rogue","Rebel","Outlaw","Carefree","Breezy","Blithe","Nonchalance","Audacious","Brazen"]},
+    {label:"Yes",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Clive","Raymond","Arthur","Harold","Reginald"]},
+    {label:"No",bonus:["Toffee","Treacle","Sherbet","Custard","Pudding","Crumble","Biscuit","Wobble","Roly","Rumpus","Chaos","Havoc"]}
   ]},
   { text:"New book -- break the spine?", options:[
-    {label:"Yes",bonus:["Battered","Beloved","Weathered","Story","Chapter","Thumbed","Worn","Creased","Dogear","Tattered","Frayed","Loved"]},
-    {label:"No", bonus:["Pristine","Ivory","Pearl","Gilt","Vellum","Parchment","Folio","Lacquer","Crisp","Mint","Immaculate"]},
+    {label:"Obviously",bonus:["Rumpus","Havoc","Chaos","Bonkers","Maverick","Crash","Smash","Barrel","Charge","Rampage","Reckless","Barge"]},
+    {label:"Never",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Crisp","Reginald","Harold"]}
   ]},
   { text:"Reply to texts immediately?", options:[
-    {label:"Yes",bonus:["Swift","Prompt","Flash","Zip","Dart","Ready","Alert","Keen","Sprightly","Rapid","Instant","Snappy","Brisk"]},
-    {label:"No", bonus:["Languid","Aloof","Nonchalance","Glaciale","Unhurried","Mellow","Drift","Mosey","Saunter","Laze","Meander"]},
+    {label:"Yes",bonus:["Zippy","Flash","Rocket","Sprint","Bolt","Dart","Dash","Blaze","Streak","Charge","Nimble","Sparky","Brisk"]},
+    {label:"No",bonus:["Wobble","Roly","Shuffle","Plod","Mooch","Mellow","Slumber"]}
   ]},
   { text:"Do you eat the crusts?", options:[
-    {label:"Yes",bonus:["Sturdy","Grit","Solid","Wholesome","Hearty","Stalwart","Steadfast","Biscuit","Dependable","Robust","Trusty","Stout"]},
-    {label:"No", bonus:["Delicate","Dainty","Precious","Refined","Particular","Fussy","Finicky","Petite","Prim","Gentle","Soft","Tender"]},
+    {label:"Yes",bonus:["Norman","Derek","Keith","Brian","Barry","Basil","Kevin","Biscuit","Crispy","Crusty","Grit","Flint"]},
+    {label:"No",bonus:["Toffee","Pudding","Custard","Crumble","Wobble","Roly","Poppet","Fifi","Mimi","Lulu","Cupcake"]}
   ]},
   { text:"Ketchup -- fridge or cupboard?", options:[
-    {label:"Fridge",   bonus:["Chilled","Crisp","Precise","Measured","Exact","Rigorous","Rational","Careful","Scientific","Correct","Orderly"]},
-    {label:"Cupboard", bonus:["Instinct","Bold","Brazen","Fearless","Reckless","Maverick","Audacious","Daring","Bravado","Gutsy","Rogue","Defiant"]},
+    {label:"Fridge",bonus:["Toffee","Treacle","Sherbet","Crumble","Custard","Biscuit","Pickle","Gherkin","Cracker","Chips","Pickles"]},
+    {label:"Cupboard",bonus:["Norman","Derek","Kevin","Barry","Basil","Clive","Brian","Keith","Raymond","Arthur","Harold"]}
   ]},
   { text:"Escalator -- walk or stand?", options:[
-    {label:"Walk",  bonus:["Rocket","Dash","Sprint","Bolt","Charge","Hustle","Drive","Momentum","Relentless","Surge","Blaze","Flash","Rapid"]},
-    {label:"Stand", bonus:["Repose","Mellow","Saunter","Drift","Amble","Mosey","Languid","Unhurried","Serene","Composed","Placid","Still","Calm"]},
+    {label:"Walk",bonus:["Zippy","Flash","Bolt","Sprint","Dash","Dart","Blaze","Streak","Rocket","Charge","Hustle","Surge","Nimble","Brisk"]},
+    {label:"Stand",bonus:["Plod","Mooch","Shuffle","Waddle","Lumber","Trundle","Mellow","Wobble"]}
   ]},
   { text:"Party -- kitchen or dance floor?", options:[
-    {label:"Kitchen",     bonus:["Sage","Thoughtful","Ember","Hearth","Warmth","Steady","Quiet","Considered","Mellow","Grounded","Earnest"]},
-    {label:"Dance floor", bonus:["Showtime","Dazzle","Shimmy","Foxtrot","Sashay","Tango","Boogie","Ziggy","Sparkle","Strut","Glitter","Flash"]},
+    {label:"Kitchen",bonus:["Biscuit","Pudding","Treacle","Custard","Crumble","Toffee","Gherkin","Chips","Pretzel","Pickles","Gravy","Dumpling","Pickle","Sherbet"]},
+    {label:"Dance floor",bonus:["Waltz","Foxtrot","Tango","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Prance","Salsa","Rumba","Jive","Swing"]}
   ]},
   { text:"Rehearse conversations in your head?", options:[
-    {label:"Yes",bonus:["Considered","Measured","Ponder","Ruminate","Reflect","Muse","Contemplate","Deliberate","Thoughtful","Nuanced","Meticulous"]},
-    {label:"No", bonus:["Blurt","Spark","Candid","Frank","Brash","Forthright","Bold","Direct","Unfiltered","Raw","Spontaneous","Impulsive"]},
+    {label:"Yes",bonus:["Sherlock","Poirot","Marple","Foyle","Endeavour","Gamache","Alleyn","Tennison","Barnaby"]},
+    {label:"No",bonus:["Rumpus","Havoc","Chaos","Bonkers","Dingbat","Kerfuffle","Ruckus","Mayhem","Mischief","Wobble","Fizz"]}
   ]},
   { text:"Do you believe in luck?", options:[
-    {label:"Yes",bonus:["Lucky","Fortune","Charm","Clover","Wishbone","Serendipity","Kismet","Fate","Fortuna","Star","Chance","Destiny","Omen"]},
-    {label:"No", bonus:["Grit","Hustle","Grind","Steel","Forge","Drive","Muscle","Tenacity","Earn","Build","Craft","Toil","Persist","Relentless"]},
+    {label:"Yes",bonus:["Clover","Rowan","Hazel","Bramble","Heather","Bracken","Thistle","Gorse","Yarrow","Birch","Willow","Daisy","Blossom"]},
+    {label:"No",bonus:["Flint","Grit","Bolt","Crisp","Brisk","Gruff","Grunt"]}
   ]},
   { text:"Windows or Mac?", options:[
-    {label:"Windows",bonus:["Pixel","Glitch","Buffer","Crash","Reboot","Patch","Clippy","Loading","Freeze","Spinner","Update","Error"]},
-    {label:"Mac",    bonus:["Retina","Safari","Sleek","Minimal","Studio","Render","Siri","Fusion","Carbon","Silicon","Spotlight","Aluminium"]},
+    {label:"Windows",bonus:["Norman","Derek","Keith","Brian","Barry","Kevin","Basil","Clive","Raymond","Arthur","Harold","Reginald"]},
+    {label:"Mac",bonus:["Maverick","Rocket","Blaze","Flash","Jax","Bolt","Diesel","Tank","Gunner","Kodak","Crusher","Viper","Falcon"]}
   ]},
   { text:"Are you a good dancer?", options:[
-    {label:"Yes",bonus:["Foxtrot","Tango","Waltz","Sashay","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Salsa","Rumba","Swing","Jive"]},
-    {label:"No", bonus:["Lumber","Shuffle","Plod","Stumble","Wobble","Trundle","Sway","Stomp","Clump","Blunder","Flail","Lurch","Stagger"]},
+    {label:"Yes",bonus:["Waltz","Foxtrot","Tango","Shimmy","Twirl","Glide","Pirouette","Boogie","Strut","Prance","Salsa","Rumba","Jive","Swing"]},
+    {label:"No",bonus:["Plod","Mooch","Shuffle","Lumber","Waddle","Trundle","Wobble","Roly","Clomper","Bumble"]}
   ]},
   { text:"When did you last call your mother?", options:[
-    {label:"Recently",     bonus:["Loyal","Faithful","Devoted","True","Steadfast","Beloved","Darling","Treasure","Precious","Cherished","Noble","Gallant"]},
-    {label:"Not recently", bonus:["Rogue","Rebel","Outlaw","Maverick","Renegade","Wildcard","Trouble","Chaos","Rascal","Scamp","Scoundrel","Vagabond"]},
+    {label:"Recently",bonus:["Biscuit","Pudding","Custard","Crumble","Toffee","Poppet","Blossom","Petal","Rosie","Daisy","Flora","Peaches","Cherry","Berry"]},
+    {label:"...",bonus:["Rumpus","Havoc","Chaos","Bonkers","Reckless","Kerfuffle","Mayhem","Ruckus","Mischief","Dingbat","Wobble","Fizz"]}
   ]},
   { text:"What music moves you?", options:[
-    {label:"Classic / Jazz",    bonus:["Sinatra","Ella","Billie","Miles","Duke","Dizzy","Satchmo","Monk","Coltrane","Armstrong","Holiday"]},
-    {label:"Rock / Indie",      bonus:["Bowie","Jagger","Lennon","Hendrix","Cobain","Strummer","Iggy","Lemmy","Morrissey","Ziggy","Riff","Thunder"]},
-    {label:"Pop",               bonus:["Presley","Freddie","Elton","George","Prince","Kylie","Adele","Showtime","Glitter","Dazzle","Sparkle"]},
-    {label:"Hip Hop / R&B",     bonus:["Ghost","Shadow","Ice","Smooth","Phantom","Ace","Blaze","Hustle","Flex","Drip","Hype","Vibe","Wave"]},
-    {label:"Country",           bonus:["Dolly","Hank","Waylon","Willie","Cash","Loretta","Patsy","Emmylou","Harvest","Dusty","Rusty","Prairie"]},
-    {label:"Electronic / Dance",bonus:["Moby","Orbital","Prodigy","Massive","Tricky","Bass","Pulse","Beat","Rhythm","Tempo","Sync","Surge"]},
-    {label:"Metal",             bonus:["Ozzy","Lemmy","Dio","Riff","Thunder","Havoc","Chaos","Rampage","Iron","Steel","Blade","Hammer","Fury"]},
-    {label:"Classical",         bonus:["Mozart","Bach","Handel","Vivaldi","Chopin","Liszt","Mahler","Brahms","Elgar","Purcell","Cadence","Forte"]},
+    {label:"Classical",bonus:["Mozart","Beethoven","Handel","Bach","Brahms","Chopin","Liszt","Schubert","Vivaldi","Purcell","Galileo","Newton","Darwin","Pascal"]},
+    {label:"Rock",bonus:["Maverick","Blaze","Bolt","Diesel","Tank","Crusher","Hammer","Flash","Rocket","Gunner","Jax","Viper"]},
+    {label:"Jazz",bonus:["Miles","Duke","Billie","Dizzy","Ella","Waltz","Shimmy"]},
+    {label:"Pop",bonus:["Shimmy","Sparkle","Boogie","Dazzle","Flash","Bounce","Toffee","Zippy","Smartie","Skittles"]}
   ]},
   { text:"Favourite pizza?", options:[
-    {label:"Margherita", bonus:["Pearl","Ivory","Simple","Pure","Classic","Refined","Elegant","Clean","Minimal","Pristine","Delicate","Noble"]},
-    {label:"Pepperoni",  bonus:["Biscuit","Buddy","Champ","Sunny","Lucky","Faithful","Happy","Reliable","Steady","True","Trusty","Solid","Warm"]},
-    {label:"Meat feast", bonus:["Boss","Havoc","Chaos","Thunder","Blaze","Savage","Titan","Goliath","Maximus","Beast","Rampage","Fury","Brute"]},
-    {label:"Vegetarian", bonus:["Flora","Basil","Sage","Clover","Bloom","Meadow","Willow","Fern","Ivy","Petal","Briar","Moss","Leaf","Blossom"]},
-    {label:"Hawaiian",   bonus:["Maverick","Wildcard","Renegade","Rebel","Outlaw","Bonkers","Doolally","Chaos","Rogue","Breezy","Carefree","Bold"]},
-  ]},
+    {label:"Margherita",bonus:["Basil","Rosemary","Flora","Sage","Oregano","Thyme","Heather","Clover","Sorrel","Lavender","Jasmine"]},
+    {label:"Pepperoni",bonus:["Maverick","Rocket","Blaze","Tank","Crusher","Diesel","Gunner","Bolt","Flash","Jax","Viper"]},
+    {label:"Hawaiian",bonus:["Mango","Kiwi","Lime","Melon","Peaches","Apricot","Mellow","Sunny","Plum"]},
+    {label:"Vegan",bonus:["Willow","Rowan","Hazel","Clover","Bramble","Sorrel","Heather","Yarrow","Birch","Sage","Basil"]}
+  ]}
 ];
 
-function pickTwoQuestions(seed: number): [number, number] {
-  const t = Date.now() & 0x7fffffff;
-  const q1 = Math.abs((seed ^ t) % QUESTION_BANK.length);
-  let q2 = Math.abs(((seed * 7 + 3) ^ (t >> 5)) % QUESTION_BANK.length);
-  if (q2 === q1) q2 = (q2 + 1) % QUESTION_BANK.length;
-  return [q1, q2];
+function pickThreeQuestions(): number[] {
+  const indices = Array.from({length: QUESTION_BANK.length}, (_: unknown, i: number) => i);
+  const t = Date.now();
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.abs(t * (i + 1) * 2654435761) / 1e12) % (i + 1);
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  return indices.slice(0, 3);
 }
 // ── REGISTER TYPES ─────────────────────────────────────────────────────────────
 type DogColour = "black"|"white"|"brown"|"red"|"golden"|"grey"|"blue"|"spotted"|"";
@@ -404,7 +415,7 @@ const CONTRAST: Record<Register, Partial<Record<Register, number>>> = {
   ironic:   { grand:4, mundane:3, baby:3, chaos:3, absurd:3, informal:3, nature:2, aloof:2, food:2, pop:2, ironic:1 },
   nature:   { grand:3, mundane:2, baby:2, chaos:2, absurd:2, informal:2, ironic:2, aloof:2, food:1, pop:1, nature:1 },
   food:     { grand:3, mundane:2, baby:3, chaos:2, absurd:2, informal:2, ironic:2, aloof:1, nature:1, pop:1, food:1 },
-  pop:      { grand:3, mundane:2, baby:2, chaos:2, absurd:2, informal:2, ironic:2, aloof:1, nature:1, food:1, pop:1 },
+  pop:      { grand:3, mundane:2, baby:2, chaos:2, absurd:2, informal:2, ironic:2, aloof:1, nature:1, food:1, pop:1 }
 };
 
 function contrastScore(a: Register, b: Register): number {
@@ -419,8 +430,8 @@ const COLOUR_BONUS: Record<DogColour, string[]> = {
   golden:  ["Goldie","Honey","Butter","Saffron","Sunny","Marigold","Primrose","Biscuit","Custard","Dandelion","Sandy","Gold","Sunshine","Buttercup","Caramel","Toffee","Harvest"],
   grey:    ["Silver","Sterling","Slate","Ash","Smoke","Misty","Dove","Steel","Pewter","Flint","Stone","Chrome","Mercury","Graphite","Smoky","Fog","Mist","Cloudy","Cinder"],
   blue:    ["Blue","Indigo","Cobalt","Slate","Steel","Denim","Azure","Ocean","Navy","Sapphire","Cerulean","Aqua","Teal","Marine","Storm","Rain","Ink"],
-  spotted: ["Patch","Freckle","Dapple","Motley","Domino","Checkers","Harlequin","Marble","Patches","Dot","Speckle","Pip","Splash","Calico"],
-  "":      [],
+  spotted: ["Patch","Freckle","Dapple","Motley","Domino","Checkers","Harlequin","Marble","Patches","Dot","Speckle","Splash","Calico"],
+  "":      []
 };
 
 function colourScore(firstName: string, col: DogColour): number {
@@ -451,12 +462,12 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     f:"fric",v:"fric",
     s:"sib",z:"sib",x:"sib",
     l:"liquid",r:"liquid",
-    h:"glide",
-  };
+    h:"glide"
+};
   const sf2: Record<string,string> = {
     m:"nasal",n:"nasal",s:"sstop",t:"sstop",p:"sstop",k:"sstop",
-    g:"growl",b:"growl",d:"growl",r:"growl",w:"glide2",h:"glide2",
-  };
+    g:"growl",b:"growl",d:"growl",r:"growl",w:"glide2",h:"glide2"
+};
 
   // ── Surname participation in alliteration ──────────────────────────────────
   // Does the surname initial join the alliteration chain?
@@ -474,7 +485,7 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
   }
 
   // Title initial <-> first name
-  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
+  const tf = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toLowerCase() ?? "";
   if (tf === fl) score += 3;
 
   // Triple alliteration: title + name + dog word
@@ -515,12 +526,32 @@ function scoreName(title: TitleEntry, first: NameEntry, dogWord: WordEntry, surn
     if (dogContrast >= 3) score -= 2;
   }
 
+
+    // Cartoon-character names -- only work with Dawg as dog word, or chaos/baby title
+    const cartoonOnlyWithDawg = new Set(["Tubby","Pudgy","Porky","Wimpy","Doofus","Nincompoop","Scraggy"]);
+    if (cartoonOnlyWithDawg.has(first.name)) {
+      if (dogWord.word === "Dawg") score += 5;  // perfect match -- Porky Dawg-Jones
+      else if (["chaos","baby"].includes(title.reg)) score += 1;  // tolerable with silly title
+      else score -= 4;  // penalise -- Baron Tubby Wobble-Harris is wrong register
+    }
+
+  // ── Tautology: first name same as or derived from dog word ───────────────────
+  // Catches Dasher/Dash, Hunter/Hunt, Dart/Dart etc
+  if (first.name.toLowerCase() === dogWord.word.toLowerCase()) score -= 20;
+  else if (first.name.toLowerCase().startsWith(dogWord.word.toLowerCase()) ||
+           dogWord.word.toLowerCase().startsWith(first.name.toLowerCase())) {
+    if (Math.abs(first.name.length - dogWord.word.length) <= 3) score -= 15;
+  }
+
+  // ── Surname-fail words (don't hyphenate naturally) ────────────────────────────
+  const surnameFails = new Set(["Stalk","Enforce","Devour","Elongate","Extend","Secure","Advance","Launch","Stretch"]);
+  if (surnameFails.has(dogWord.word)) score -= 20;
+
   return score;
 }
 
 // ── BREED LISTS ────────────────────────────────────────────────────────────────
-const PACK_BREEDS = ["Afghan Hound","Basset Hound","Beagle","Bichon Frise","Bloodhound","Border Collie","Border Terrier","Boston Terrier","Boxer","Bull Terrier","Bulldog","Cavalier King Charles Spaniel","Cavachon","Cavapoo","Chihuahua","Cocker Spaniel","Cockapoo","Corgi","Dachshund","Dalmatian","Doberman Pinscher","French Bulldog","German Shepherd","Golden Retriever","Goldendoodle","Great Dane","Greyhound","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Jackapoo","Labrador","Labradoodle","Lurcher","Maltese","Maltipoo","Mastiff","Miniature Schnauzer","Old English Sheepdog","Papillon","Pomeranian","Poodle","Pug","Rottweiler","Rough Collie","Saint Bernard","Shih Tzu","Siberian Husky","Springer Spaniel","Staffordshire Bull Terrier","Weimaraner","West Highland Terrier","Whippet","Yorkshire Terrier"];
-const OTHER_BREEDS = ["Airedale Terrier","Akita","Alaskan Malamute","Bedlington Terrier","Bernese Mountain Dog","Borzoi","Cairn Terrier","Chesapeake Bay Retriever","Chow Chow","Clumber Spaniel","Deerhound","English Setter","Field Spaniel","Flat-Coated Retriever","Fox Terrier","Gordon Setter","Havanese","Hungarian Vizsla","Leonberger","Lhasa Apso","Newfoundland","Norfolk Terrier","Pointer","Rhodesian Ridgeback","Saluki","Samoyed","Scottish Terrier","Shar Pei","Shiba Inu","Soft Coated Wheaten Terrier","Sussex Spaniel","Tibetan Mastiff","Welsh Springer Spaniel","Welsh Terrier"];
+const PACK_BREEDS = ["Afghan Hound","Basset Hound","Beagle","Bichon Frise","Bloodhound","Border Collie","Border Terrier","Boston Terrier","Boxer","Bull Terrier","Bulldog","Cavalier King Charles Spaniel","Cavachon","Cavapoo","Chihuahua","Cocker Spaniel","Cockapoo","Corgi","Dachshund","Dalmatian","Doberman Pinscher","French Bulldog","German Shepherd","Golden Retriever","Goldendoodle","Great Dane","Greyhound","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Jackapoo","Labrador","Labradoodle","Lurcher","Maltese","Maltipoo","Mastiff","Miniature Schnauzer","Old English Sheepdog","Papillon","Pomeranian","Poodle","Pug","Rottweiler","Saint Bernard","Shih Tzu","Siberian Husky","Springer Spaniel","Staffordshire Bull Terrier","Weimaraner","West Highland Terrier","Whippet","Yorkshire Terrier"];
 
 // ── TITLE BANKS ────────────────────────────────────────────────────────────────
 const BOY_TITLES: Record<string, TitleEntry[]> = {
@@ -539,11 +570,11 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Sniffer dogs -- detectives
   sniffer:    [{title:"Inspector",reg:"grand",syllables:3},{title:"Chief Inspector",reg:"grand",syllables:4},{title:"Commissioner",reg:"grand",syllables:4},{title:"Judge",reg:"grand",syllables:1},{title:"DCI",reg:"grand",syllables:3},{title:"DS",reg:"grand",syllables:2}],
   // Sighthounds -- pure aristocracy
-  afghan:     [{title:"Khan",reg:"grand",syllables:1},{title:"Nawab",reg:"grand",syllables:2},{title:"Sultan",reg:"grand",syllables:2},{title:"Amir",reg:"grand",syllables:2},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Malik",reg:"grand",syllables:2}],
+  afghan:     [{title:"Khan",reg:"grand",syllables:1},{title:"Nawab",reg:"grand",syllables:2},{title:"Amir",reg:"grand",syllables:2},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Malik",reg:"grand",syllables:2}],
   sighthound: [{title:"Duke",reg:"grand",syllables:1},{title:"Earl",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2}],
-  greatdane:  [{title:"Emperor",reg:"grand",syllables:4},{title:"Commander",reg:"grand",syllables:3},{title:"Admiral",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3},{title:"Captain",reg:"grand",syllables:2},{title:"Commodore",reg:"grand",syllables:3},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Magnificent",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Unstoppable",reg:"grand",syllables:4}],
+  greatdane:  [{title:"Big",reg:"informal",syllables:1},{title:"Little",reg:"informal",syllables:2},{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Emperor",reg:"grand",syllables:4},{title:"Commander",reg:"grand",syllables:3},{title:"Admiral",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3},{title:"Captain",reg:"grand",syllables:2},{title:"Commodore",reg:"grand",syllables:3},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Magnificent",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Unstoppable",reg:"grand",syllables:4}],
   // Giants -- scale demands grandeur
-  giant:      [{title:"Emperor",reg:"grand",syllables:4},{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1}],
+  giant:      [{title:"Big",reg:"informal",syllables:1},{title:"Little",reg:"informal",syllables:2},{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Emperor",reg:"grand",syllables:4},{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duke",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1}],
   // Poodle -- academic only
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Chief Analyst",reg:"grand",syllables:4}],
   // Lapdog -- ecclesiastical pomp
@@ -551,46 +582,37 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Bulldog specifically -- Churchill energy
   bulldog:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Field Marshal",reg:"grand",syllables:3}],
   boston:     [{title:"Commissioner",reg:"grand",syllables:4},{title:"Alderman",reg:"grand",syllables:3},{title:"Senator",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2},{title:"Judge",reg:"grand",syllables:1},{title:"Captain",reg:"grand",syllables:2},{title:"Boss",reg:"grand",syllables:1},{title:"Chief",reg:"grand",syllables:1},{title:"Major",reg:"grand",syllables:2},{title:"Sheriff",reg:"grand",syllables:2},{title:"Marshal",reg:"grand",syllables:2},{title:"Commodore",reg:"grand",syllables:3}],
-  asian:      [
-  {title:"Hong Kong",reg:"grand",syllables:3},
-  {title:"Sifu",reg:"grand",syllables:2},
-  {title:"Sensei",reg:"grand",syllables:2},
-  {title:"Shifu",reg:"grand",syllables:2},
-  {title:"Shogun",reg:"grand",syllables:2},
-  {title:"Samurai",reg:"grand",syllables:3},
-  {title:"Ninja",reg:"grand",syllables:2},
-  {title:"Ronin",reg:"grand",syllables:2},
-  {title:"Master",reg:"grand",syllables:2},
+  asian:      [{title:"Hong Kong",reg:"grand",syllables:3},{title:"Ninja",reg:"grand",syllables:2},{title:"Ronin",reg:"grand",syllables:2},{title:"Master",reg:"grand",syllables:2},
   {title:"Grand Master",reg:"grand",syllables:3},
   {title:"Dragon",reg:"grand",syllables:2},
   {title:"Emperor",reg:"grand",syllables:4},
-  {title:"Notorious",reg:"grand",syllables:4},
+  
   {title:"Incomparable",reg:"grand",syllables:5}
 ],
   // Character breeds -- self-appointed grandeur
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
+  character:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
   // Gentry -- Dalmatian, OES etc
   gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1}],
   // Dachshund -- absurdly self-important
-  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3}],
-  welsh:      [{title:"Prince",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Baron",reg:"grand",syllables:2},{title:"Archdruid",reg:"grand",syllables:3},{title:"Bard",reg:"grand",syllables:1},{title:"Captain",reg:"grand",syllables:2},{title:"Sergeant",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Mr",reg:"mundane",syllables:1}],
-  default:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Inspector",reg:"grand",syllables:3},{title:"Baron",reg:"grand",syllables:2}],
+  dachshund:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3}],
+  corgi:      [{title:"Prince",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Baron",reg:"grand",syllables:2},{title:"Archdruid",reg:"grand",syllables:3},{title:"Bard",reg:"grand",syllables:1},{title:"Captain",reg:"grand",syllables:2},{title:"Sergeant",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Mr",reg:"mundane",syllables:1}],
+  default:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Inspector",reg:"grand",syllables:3},{title:"Baron",reg:"grand",syllables:2}]
 };
 
 const GIRL_TITLES: Record<string, TitleEntry[]> = {
   terrier:    [{title:"Miss",reg:"mundane",syllables:1}],
   spaniel:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Princess",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Kaiserin",reg:"grand",syllables:3}],
-  retriever:  [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Maharani",reg:"grand",syllables:4}],
+  retriever:  [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3}],
   german:     [{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Empress",reg:"grand",syllables:3},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Shieldmaiden",reg:"grand",syllables:3}],
-  greatdane:  [{title:"Empress",reg:"grand",syllables:3},{title:"Cosmic Queen",reg:"grand",syllables:4},{title:"Star Queen",reg:"grand",syllables:3},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Titaness",reg:"grand",syllables:3},{title:"Magnificent",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Duchess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Celestia",reg:"grand",syllables:4}],
+  greatdane:  [{title:"Big",reg:"informal",syllables:1},{title:"Little",reg:"informal",syllables:2},{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Empress",reg:"grand",syllables:3},{title:"Cosmic Queen",reg:"grand",syllables:4},{title:"Star Queen",reg:"grand",syllables:3},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Titaness",reg:"grand",syllables:3},{title:"Magnificent",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Duchess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Celestia",reg:"grand",syllables:4}],
   collie:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Queen",reg:"grand",syllables:1},{title:"Matriarch",reg:"grand",syllables:3},{title:"Oracle",reg:"grand",syllables:3},{title:"Huntress",reg:"grand",syllables:2}],
   boxer:      [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   sniffer:    [{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Countess",reg:"grand",syllables:2},{title:"Doctor",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Detective",reg:"grand",syllables:3},{title:"Duchess",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Sergeant",reg:"grand",syllables:2},{title:"Chief Inspector",reg:"grand",syllables:4}],
-  afghan:     [{title:"Begum",reg:"grand",syllables:2},{title:"Bibi",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Sultana",reg:"grand",syllables:3},{title:"Ranee",reg:"grand",syllables:2}],
-  sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Maharani",reg:"grand",syllables:4},{title:"Rani",reg:"grand",syllables:2},{title:"Tsarina",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Reina",reg:"grand",syllables:2},{title:"Reine",reg:"grand",syllables:1},{title:"Malika",reg:"grand",syllables:3}],
-  giant:      [{title:"Empress",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Titaness",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3},{title:"Maharani",reg:"grand",syllables:4}],
+  afghan:     [{title:"Begum",reg:"grand",syllables:2},{title:"Bibi",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2}],
+  sighthound: [{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Reina",reg:"grand",syllables:2},{title:"Reine",reg:"grand",syllables:1}],
+  giant:      [{title:"Big",reg:"informal",syllables:1},{title:"Little",reg:"informal",syllables:2},{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Empress",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Magnificent",reg:"grand",syllables:4},{title:"Formidable",reg:"grand",syllables:4},{title:"Legendary",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Titaness",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Great",reg:"grand",syllables:1},{title:"Duchess",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3}],
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Oracle",reg:"grand",syllables:3},{title:"Grande Dame",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3}],
-  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Daft",reg:"informal",syllables:1},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Enchantress",reg:"grand",syllables:3},{title:"Crystal Queen",reg:"grand",syllables:4},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Rose Queen",reg:"grand",syllables:2},{title:"Diamond Queen",reg:"grand",syllables:4},{title:"Pearl Queen",reg:"grand",syllables:2}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Goddess",reg:"grand",syllables:2},{title:"Enchantress",reg:"grand",syllables:3},{title:"Crystal Queen",reg:"grand",syllables:4},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Rose Queen",reg:"grand",syllables:2},{title:"Diamond Queen",reg:"grand",syllables:4},{title:"Pearl Queen",reg:"grand",syllables:2}],
   bulldog:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4}],
   boston:     [{title:"Madame",reg:"grand",syllables:2},{title:"Miss",reg:"mundane",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3}],
   asian:      [
@@ -599,88 +621,100 @@ const GIRL_TITLES: Record<string, TitleEntry[]> = {
   {title:"Jade",reg:"grand",syllables:1},
   {title:"Lotus",reg:"grand",syllables:2},
   {title:"Goddess",reg:"grand",syllables:2},
-  {title:"Notorious",reg:"grand",syllables:4},
+  
   {title:"Incomparable",reg:"grand",syllables:5},
   {title:"Queen",reg:"grand",syllables:1},
   {title:"Geisha",reg:"grand",syllables:2},
   {title:"Madame",reg:"grand",syllables:2}
 ],
-  character:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3},{title:"Sorceress",reg:"grand",syllables:3},{title:"Huntress",reg:"grand",syllables:2},{title:"Amazon",reg:"grand",syllables:3},{title:"Oracle",reg:"grand",syllables:3},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Ice Queen",reg:"grand",syllables:3},{title:"Storm Queen",reg:"grand",syllables:3},{title:"Shadow Queen",reg:"grand",syllables:3},{title:"Fire Queen",reg:"grand",syllables:3}],
-  dachshund:  [{title:"Notorious",reg:"grand",syllables:4},{title:"Incomparable",reg:"grand",syllables:5},{title:"Countess",reg:"grand",syllables:2}],
-  gentry:     [{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Most Honourable",reg:"grand",syllables:4},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Maharani",reg:"grand",syllables:4},{title:"Regina",reg:"grand",syllables:3},{title:"Noble Lady",reg:"grand",syllables:3},{title:"Grande Dame",reg:"grand",syllables:3}],
-  welsh:      [{title:"Princess",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Bardess",reg:"grand",syllables:2},{title:"Miss",reg:"mundane",syllables:1},{title:"Dame",reg:"grand",syllables:1},{title:"Queen",reg:"grand",syllables:1},{title:"Matriarch",reg:"grand",syllables:3}],
-  default:    [{title:"Lady",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Maharani",reg:"grand",syllables:4},{title:"Tsarina",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Rani",reg:"grand",syllables:2},{title:"Malika",reg:"grand",syllables:3}],
+  character:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Queen",reg:"grand",syllables:1},{title:"Goddess",reg:"grand",syllables:2},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Enchantress",reg:"grand",syllables:3},{title:"Sorceress",reg:"grand",syllables:3},{title:"Huntress",reg:"grand",syllables:2},{title:"Amazon",reg:"grand",syllables:3},{title:"Oracle",reg:"grand",syllables:3},{title:"Moon Queen",reg:"grand",syllables:3},{title:"Ice Queen",reg:"grand",syllables:3},{title:"Storm Queen",reg:"grand",syllables:3},{title:"Shadow Queen",reg:"grand",syllables:3},{title:"Fire Queen",reg:"grand",syllables:3}],
+  dachshund:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Countess",reg:"grand",syllables:2}],
+  gentry:     [{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Most Honourable",reg:"grand",syllables:4},{title:"Lady",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3},{title:"Noble Lady",reg:"grand",syllables:3},{title:"Grande Dame",reg:"grand",syllables:3}],
+  corgi:      [{title:"Princess",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Bardess",reg:"grand",syllables:2},{title:"Miss",reg:"mundane",syllables:1},{title:"Dame",reg:"grand",syllables:1},{title:"Queen",reg:"grand",syllables:1},{title:"Matriarch",reg:"grand",syllables:3}],
+  default:    [{title:"Lady",reg:"grand",syllables:2},{title:"Baroness",reg:"grand",syllables:3},{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Viscountess",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Regina",reg:"grand",syllables:3}]
 };
 
 // ── NAME BANKS (abbreviated for space -- key groups) ───────────────────────────
 const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
   lapdog: {
-    boy: [{name:"Marvellous",reg:"absurd",syllables:3},{name:"Glorious",reg:"absurd",syllables:3},{name:"Opulent",reg:"grand",syllables:3},{name:"Majestic",reg:"grand",syllables:3},{name:"Fortunatus",reg:"grand",syllables:4},{name:"Benedictus",reg:"grand",syllables:4},{name:"Casimir",reg:"grand",syllables:3},{name:"Florentine",reg:"grand",syllables:3},{name:"Celestin",reg:"grand",syllables:3},{name:"Alexander",reg:"grand",syllables:4},{name:"Vincent",reg:"grand",syllables:2},{name:"Henry",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Theodore",reg:"grand",syllables:3},{name:"Edward",reg:"grand",syllables:2},{name:"Charles",reg:"grand",syllables:1},{name:"Gabriel",reg:"grand",syllables:3},{name:"Oliver",reg:"mundane",syllables:3},{name:"William",reg:"mundane",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Maximillian",reg:"grand",syllables:5},{name:"Samuel",reg:"mundane",syllables:3},{name:"Neal",reg:"mundane",syllables:1},{name:"Boffin",reg:"baby",syllables:2},{name:"Grommet",reg:"baby",syllables:2},{name:"Widget",reg:"baby",syllables:2},{name:"Wotsit",reg:"baby",syllables:2},{name:"Thingy",reg:"baby",syllables:2},{name:"Gubbins",reg:"baby",syllables:2},{name:"Puckle",reg:"baby",syllables:2},{name:"Muddle",reg:"baby",syllables:2},{name:"Sprocket",reg:"baby",syllables:2},{name:"Binky",reg:"baby",syllables:2},{name:"Booper",reg:"baby",syllables:2},{name:"Button",reg:"baby",syllables:2},{name:"Pip",reg:"baby",syllables:2},{name:"Titch",reg:"baby",syllables:2},{name:"Squirt",reg:"baby",syllables:2},{name:"Tuppence",reg:"baby",syllables:2},{name:"Munchkin",reg:"baby",syllables:2},{name:"Roly",reg:"baby",syllables:2},{name:"Gizmo",reg:"baby",syllables:2},{name:"Doodle",reg:"baby",syllables:2},{name:"Goober",reg:"baby",syllables:2},{name:"Nugget",reg:"baby",syllables:2},{name:"Peanut",reg:"baby",syllables:2},{name:"Chumley",reg:"absurd",syllables:2},{name:"Peabody",reg:"absurd",syllables:2},{name:"Sherman",reg:"absurd",syllables:2},{name:"Wimpy",reg:"absurd",syllables:2},{name:"Huckleberry",reg:"absurd",syllables:2},{name:"Benny",reg:"absurd",syllables:2},{name:"Foghorn",reg:"absurd",syllables:2},{name:"Philibert",reg:"grand",syllables:2},{name:"Eustache",reg:"grand",syllables:2},{name:"Céléstin",reg:"grand",syllables:2},{name:"Aimé",reg:"grand",syllables:2},{name:"Alain",reg:"grand",syllables:2}],
-    girl: [{name:"Fabulous",reg:"absurd",syllables:3},{name:"Darling",reg:"baby",syllables:2},{name:"Precious",reg:"baby",syllables:2},{name:"Divine",reg:"grand",syllables:2},{name:"Dazzling",reg:"absurd",syllables:2},{name:"Ruby",reg:"grand",syllables:2},{name:"Diamond",reg:"grand",syllables:2},{name:"Pearl",reg:"grand",syllables:1},{name:"Sapphire",reg:"grand",syllables:2},{name:"Crystal",reg:"grand",syllables:2},{name:"Chanel",reg:"grand",syllables:2},{name:"Celestine",reg:"grand",syllables:3},{name:"Aurora",reg:"grand",syllables:3},{name:"Daphne",reg:"grand",syllables:2},{name:"Diana",reg:"grand",syllables:3},{name:"Flora",reg:"nature",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Iris",reg:"nature",syllables:2},{name:"Luna",reg:"grand",syllables:2},{name:"Maeve",reg:"grand",syllables:1},{name:"Ophelia",reg:"grand",syllables:4},{name:"Pandora",reg:"grand",syllables:3},{name:"Venus",reg:"grand",syllables:2},{name:"Violette",reg:"grand",syllables:3},{name:"Juliet",reg:"grand",syllables:3},{name:"Isabella",reg:"grand",syllables:4},{name:"Charlotte",reg:"grand",syllables:2},{name:"Olivia",reg:"mundane",syllables:4},{name:"Victoria",reg:"grand",syllables:4},{name:"Elizabeth",reg:"grand",syllables:4},{name:"Booboo",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Puddingkins",reg:"baby",syllables:3},{name:"Sprinkles",reg:"food",syllables:2},{name:"Marshmallow",reg:"food",syllables:2},{name:"Meringue",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Taffy",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Peaches",reg:"food",syllables:2},{name:"Cherry",reg:"food",syllables:2},{name:"Berry",reg:"food",syllables:2},{name:"Plum",reg:"food",syllables:2},{name:"Figgy",reg:"food",syllables:2},{name:"Apricot",reg:"food",syllables:2},{name:"Lime",reg:"food",syllables:2},{name:"Kiwi",reg:"food",syllables:2},{name:"Mango",reg:"food",syllables:2},{name:"Melon",reg:"food",syllables:2},{name:"Pumpkin",reg:"food",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Crunchie",reg:"food",syllables:2},{name:"Twixie",reg:"food",syllables:2},{name:"Rolo",reg:"food",syllables:2},{name:"Oreo",reg:"food",syllables:2},{name:"Jammy",reg:"food",syllables:2},{name:"Marmalade",reg:"food",syllables:2}],
-  },
+    boy: [{name:"Marvellous",reg:"absurd",syllables:3},{name:"Glorious",reg:"absurd",syllables:3},{name:"Opulent",reg:"grand",syllables:3},{name:"Majestic",reg:"grand",syllables:3},{name:"Fortunatus",reg:"grand",syllables:4},{name:"Casimir",reg:"grand",syllables:3},{name:"Florentine",reg:"grand",syllables:3},{name:"Celestin",reg:"grand",syllables:3},{name:"Alexander",reg:"grand",syllables:4},{name:"Vincent",reg:"grand",syllables:2},{name:"Henry",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Theodore",reg:"grand",syllables:3},{name:"Edward",reg:"grand",syllables:2},{name:"Charles",reg:"grand",syllables:1},{name:"Gabriel",reg:"grand",syllables:3},{name:"Oliver",reg:"mundane",syllables:3},{name:"William",reg:"mundane",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Maximillian",reg:"grand",syllables:5},{name:"Samuel",reg:"mundane",syllables:3},{name:"Neal",reg:"mundane",syllables:1},{name:"Boffin",reg:"baby",syllables:2},{name:"Grommet",reg:"baby",syllables:2},{name:"Widget",reg:"baby",syllables:2},{name:"Wotsit",reg:"baby",syllables:2},{name:"Thingy",reg:"baby",syllables:2},{name:"Gubbins",reg:"baby",syllables:2},{name:"Puckle",reg:"baby",syllables:2},{name:"Muddle",reg:"baby",syllables:2},{name:"Sprocket",reg:"baby",syllables:2},{name:"Binky",reg:"baby",syllables:2},{name:"Booper",reg:"baby",syllables:2},{name:"Button",reg:"baby",syllables:2},{name:"Pip",reg:"baby",syllables:2},{name:"Titch",reg:"baby",syllables:2},{name:"Squirt",reg:"baby",syllables:2},{name:"Tuppence",reg:"baby",syllables:2},{name:"Munchkin",reg:"baby",syllables:2},{name:"Roly",reg:"baby",syllables:2},{name:"Gizmo",reg:"baby",syllables:2},{name:"Doodle",reg:"baby",syllables:2},{name:"Goober",reg:"baby",syllables:2},{name:"Nugget",reg:"baby",syllables:2},{name:"Peanut",reg:"baby",syllables:2},{name:"Chumley",reg:"absurd",syllables:2},{name:"Peabody",reg:"absurd",syllables:2},{name:"Sherman",reg:"absurd",syllables:2},{name:"Wimpy",reg:"absurd",syllables:2},{name:"Huckleberry",reg:"absurd",syllables:2},{name:"Benny",reg:"absurd",syllables:2},{name:"Foghorn",reg:"absurd",syllables:2},{name:"Philibert",reg:"grand",syllables:2},{name:"Eustache",reg:"grand",syllables:2},{name:"Céléstin",reg:"grand",syllables:2},{name:"Aimé",reg:"grand",syllables:2},{name:"Alain",reg:"grand",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Jerome",reg:"grand",syllables:2},{name:"Julian",reg:"grand",syllables:3},{name:"Jupiter",reg:"grand",syllables:3},{name:"Joachim",reg:"grand",syllables:3},{name:"Whiskers",reg:"baby",syllables:2},{name:"Brioche",reg:"food",syllables:1},{name:"Donut",reg:"food",syllables:2},{name:"Sundae",reg:"food",syllables:1},{name:"Cheesecake",reg:"food",syllables:3},{name:"Pancake",reg:"food",syllables:2},{name:"Peach",reg:"food",syllables:1},{name:"Blueberry",reg:"food",syllables:3},{name:"Raspberry",reg:"food",syllables:3},{name:"Strawberry",reg:"food",syllables:3},{name:"Lemon",reg:"food",syllables:2},{name:"Apple",reg:"food",syllables:2},{name:"Pancakes",reg:"food",syllables:3},{name:"Cupcakes",reg:"food",syllables:3},{name:"Brownies",reg:"food",syllables:2},{name:"Lemons",reg:"food",syllables:2},{name:"Apples",reg:"food",syllables:2},{name:"Nuggets",reg:"food",syllables:2},{name:"Sardines",reg:"food",syllables:3},{name:"Dollymix",reg:"food",syllables:3},{name:"Malteser",reg:"food",syllables:3},{name:"Milkybar",reg:"food",syllables:3},{name:"Praline",reg:"food",syllables:2},{name:"Pastille",reg:"food",syllables:3},{name:"Fruitella",reg:"food",syllables:3},{name:"Loveheart",reg:"food",syllables:3},{name:"Foamie",reg:"food",syllables:1},{name:"Jellytot",reg:"food",syllables:3},{name:"Fruitgum",reg:"food",syllables:2},{name:"Sweetpea",reg:"food",syllables:2},{name:"Sugarplum",reg:"food",syllables:3},{name:"Sugarpuff",reg:"food",syllables:3},{name:"Sugarcube",reg:"food",syllables:3},{name:"Picnmix",reg:"food",syllables:2},{name:"FruitSalad",reg:"food",syllables:3},{name:"Marzipan",reg:"food",syllables:3},{name:"Icing",reg:"food",syllables:2},{name:"Refreshers",reg:"food",syllables:3}],
+    girl: [{name:"Fabulous",reg:"absurd",syllables:3},{name:"Darling",reg:"baby",syllables:2},{name:"Precious",reg:"baby",syllables:2},{name:"Divine",reg:"grand",syllables:2},{name:"Dazzling",reg:"absurd",syllables:2},{name:"Ruby",reg:"grand",syllables:2},{name:"Diamond",reg:"grand",syllables:2},{name:"Pearl",reg:"grand",syllables:1},{name:"Sapphire",reg:"grand",syllables:2},{name:"Crystal",reg:"grand",syllables:2},{name:"Chanel",reg:"grand",syllables:2},{name:"Celestine",reg:"grand",syllables:3},{name:"Aurora",reg:"grand",syllables:3},{name:"Daphne",reg:"grand",syllables:2},{name:"Diana",reg:"grand",syllables:3},{name:"Flora",reg:"nature",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Iris",reg:"nature",syllables:2},{name:"Luna",reg:"grand",syllables:2},{name:"Maeve",reg:"grand",syllables:1},{name:"Ophelia",reg:"grand",syllables:4},{name:"Pandora",reg:"grand",syllables:3},{name:"Venus",reg:"grand",syllables:2},{name:"Violette",reg:"grand",syllables:3},{name:"Juliet",reg:"grand",syllables:3},{name:"Isabella",reg:"grand",syllables:4},{name:"Charlotte",reg:"grand",syllables:2},{name:"Olivia",reg:"mundane",syllables:4},{name:"Victoria",reg:"grand",syllables:4},{name:"Elizabeth",reg:"grand",syllables:4},{name:"Booboo",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Puddingkins",reg:"baby",syllables:3},{name:"Sprinkles",reg:"food",syllables:2},{name:"Marshmallow",reg:"food",syllables:2},{name:"Meringue",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Taffy",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Peaches",reg:"food",syllables:2},{name:"Cherry",reg:"food",syllables:2},{name:"Berry",reg:"food",syllables:2},{name:"Plum",reg:"food",syllables:2},{name:"Figgy",reg:"food",syllables:2},{name:"Apricot",reg:"food",syllables:2},{name:"Lime",reg:"food",syllables:2},{name:"Kiwi",reg:"food",syllables:2},{name:"Mango",reg:"food",syllables:2},{name:"Melon",reg:"food",syllables:2},{name:"Pumpkin",reg:"food",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Crunchie",reg:"food",syllables:2},{name:"Twixie",reg:"food",syllables:2},{name:"Rolo",reg:"food",syllables:2},{name:"Oreo",reg:"food",syllables:2},{name:"Jammy",reg:"food",syllables:2},{name:"Marmalade",reg:"food",syllables:2},{name:"Jasmine",reg:"nature",syllables:2},{name:"Josephine",reg:"grand",syllables:4},{name:"Juliana",reg:"grand",syllables:4},{name:"Jemima",reg:"grand",syllables:3},{name:"Jacqueline",reg:"grand",syllables:3},{name:"Jessamine",reg:"nature",syllables:3},{name:"Juniper",reg:"nature",syllables:3},{name:"Jewel",reg:"grand",syllables:1},{name:"Whiskers",reg:"baby",syllables:2},{name:"Kitty",reg:"baby",syllables:2},{name:"Brioche",reg:"food",syllables:1},{name:"Donut",reg:"food",syllables:2},{name:"Sundae",reg:"food",syllables:1},{name:"Cheesecake",reg:"food",syllables:3},{name:"Pancake",reg:"food",syllables:2},{name:"Peach",reg:"food",syllables:1},{name:"Blueberry",reg:"food",syllables:3},{name:"Raspberry",reg:"food",syllables:3},{name:"Strawberry",reg:"food",syllables:3},{name:"Lemon",reg:"food",syllables:2},{name:"Apple",reg:"food",syllables:2},{name:"Pancakes",reg:"food",syllables:3},{name:"Cupcakes",reg:"food",syllables:3},{name:"Brownies",reg:"food",syllables:2},{name:"Lemons",reg:"food",syllables:2},{name:"Apples",reg:"food",syllables:2},{name:"Nuggets",reg:"food",syllables:2},{name:"Sardines",reg:"food",syllables:3},{name:"Dollymix",reg:"food",syllables:3},{name:"Malteser",reg:"food",syllables:3},{name:"Milkybar",reg:"food",syllables:3},{name:"Praline",reg:"food",syllables:2},{name:"Pastille",reg:"food",syllables:3},{name:"Fruitella",reg:"food",syllables:3},{name:"Loveheart",reg:"food",syllables:3},{name:"Foamie",reg:"food",syllables:1},{name:"Jellytot",reg:"food",syllables:3},{name:"Fruitgum",reg:"food",syllables:2},{name:"Sweetpea",reg:"food",syllables:2},{name:"Sugarplum",reg:"food",syllables:3},{name:"Sugarpuff",reg:"food",syllables:3},{name:"Sugarcube",reg:"food",syllables:3},{name:"Picnmix",reg:"food",syllables:2},{name:"FruitSalad",reg:"food",syllables:3},{name:"Marzipan",reg:"food",syllables:3},{name:"Icing",reg:"food",syllables:2},{name:"Refreshers",reg:"food",syllables:3}]
+},
   boxer: {
-    boy: [{name:"Doofus",reg:"chaos",syllables:2},{name:"Galumph",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Dingbat",reg:"chaos",syllables:2},{name:"Rumpus",reg:"chaos",syllables:2},{name:"Kerfuffle",reg:"chaos",syllables:3},{name:"Hullabaloo",reg:"chaos",syllables:4},{name:"Nincompoop",reg:"chaos",syllables:3},{name:"Goofball",reg:"chaos",syllables:2},{name:"Chuckles",reg:"chaos",syllables:2},{name:"Bozo",reg:"chaos",syllables:2},{name:"Pickles",reg:"baby",syllables:2},{name:"Noodles",reg:"baby",syllables:2},{name:"Chipmunk",reg:"baby",syllables:2},{name:"Kazoo",reg:"absurd",syllables:2},{name:"Joker",reg:"chaos",syllables:2},{name:"Pancake",reg:"food",syllables:2},{name:"Zebedee",reg:"absurd",syllables:3},{name:"Chaos",reg:"chaos",syllables:2},{name:"Havoc",reg:"chaos",syllables:2},{name:"Ruckus",reg:"chaos",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Noo-Noo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Bumbles",reg:"chaos",syllables:2},{name:"Bumper",reg:"chaos",syllables:2},{name:"Bumpkin",reg:"chaos",syllables:2},{name:"Stomper",reg:"chaos",syllables:2},{name:"Clomper",reg:"chaos",syllables:2},{name:"Trooper",reg:"chaos",syllables:2},{name:"Rowdy",reg:"chaos",syllables:2},{name:"Bruiser",reg:"chaos",syllables:2},{name:"Bandit",reg:"chaos",syllables:2},{name:"Dodger",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Buster",reg:"chaos",syllables:2},{name:"Bruno",reg:"chaos",syllables:2},{name:"Butch",reg:"chaos",syllables:2},{name:"Spike",reg:"chaos",syllables:2},{name:"Bowser",reg:"chaos",syllables:2},{name:"Lobster",reg:"chaos",syllables:2},{name:"Chunk",reg:"chaos",syllables:2},{name:"Tubby",reg:"chaos",syllables:2},{name:"Pudgy",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Munchie",reg:"food",syllables:2},{name:"Chewy",reg:"food",syllables:2},{name:"Cruncher",reg:"food",syllables:2},{name:"Scoffy",reg:"food",syllables:2},{name:"Nibbler",reg:"food",syllables:2},{name:"Bagel",reg:"food",syllables:2},{name:"Pretzel",reg:"food",syllables:2},{name:"Chips",reg:"food",syllables:2},{name:"Gherkin",reg:"food",syllables:2},{name:"Porridge",reg:"food",syllables:2},{name:"Granola",reg:"food",syllables:2},{name:"Toastie",reg:"food",syllables:2},{name:"Crusty",reg:"food",syllables:2},{name:"Crispy",reg:"food",syllables:2},{name:"Cobbler",reg:"food",syllables:2},{name:"Strudel",reg:"food",syllables:2},{name:"Radish",reg:"food",syllables:2},{name:"Cabbage",reg:"food",syllables:2},{name:"Lentil",reg:"food",syllables:2},{name:"Chickpea",reg:"food",syllables:2},{name:"Pistachio",reg:"food",syllables:2},{name:"Cashew",reg:"food",syllables:2},{name:"Molasses",reg:"food",syllables:2},{name:"Pepper",reg:"food",syllables:2},{name:"Paprika",reg:"food",syllables:2},{name:"Chutney",reg:"food",syllables:2},{name:"Marmalade",reg:"food",syllables:2},{name:"Jammy",reg:"food",syllables:2}],
-    girl: [{name:"Dizzy",reg:"chaos",syllables:2},{name:"Topsy",reg:"chaos",syllables:2},{name:"Moonbeam",reg:"grand",syllables:2},{name:"Starbeam",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Moonlight",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Moonglow",reg:"grand",syllables:2},{name:"Nightglow",reg:"grand",syllables:2},{name:"Moonstone",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Celestia",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Goldenmoon",reg:"grand",syllables:2},{name:"Bluemoon",reg:"grand",syllables:2},{name:"Crescent",reg:"grand",syllables:2},{name:"Andromeda",reg:"grand",syllables:2},{name:"Astra",reg:"grand",syllables:2},{name:"Solstice",reg:"grand",syllables:2},{name:"Penumbra",reg:"grand",syllables:2},{name:"Umbra",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Moonfire",reg:"grand",syllables:2},{name:"Starfire",reg:"grand",syllables:2},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Eventide",reg:"grand",syllables:2},{name:"Silvermoon",reg:"grand",syllables:2},{name:"Bloodmoon",reg:"grand",syllables:2},{name:"Twilight",reg:"grand",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Wibble",reg:"chaos",syllables:2},{name:"Doolally",reg:"chaos",syllables:3},{name:"Ramshackle",reg:"chaos",syllables:3},{name:"Twinkles",reg:"baby",syllables:2},{name:"Cornflake",reg:"food",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Babbycakes",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2}],
-  },
+    boy: [{name:"Doofus",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Dingbat",reg:"chaos",syllables:2},{name:"Rumpus",reg:"chaos",syllables:2},{name:"Kerfuffle",reg:"chaos",syllables:3},{name:"Hullabaloo",reg:"chaos",syllables:4},{name:"Nincompoop",reg:"chaos",syllables:3},{name:"Goofball",reg:"chaos",syllables:2},{name:"Chuckles",reg:"chaos",syllables:2},{name:"Bozo",reg:"chaos",syllables:2},{name:"Joker",reg:"chaos",syllables:2},{name:"Zebedee",reg:"absurd",syllables:3},{name:"Chaos",reg:"chaos",syllables:2},{name:"Havoc",reg:"chaos",syllables:2},{name:"Ruckus",reg:"chaos",syllables:2},{name:"Bumbles",reg:"chaos",syllables:2},{name:"Bumper",reg:"chaos",syllables:2},{name:"Bumpkin",reg:"chaos",syllables:2},{name:"Stomper",reg:"chaos",syllables:2},{name:"Clomper",reg:"chaos",syllables:2},{name:"Trooper",reg:"chaos",syllables:2},{name:"Rowdy",reg:"chaos",syllables:2},{name:"Bruiser",reg:"chaos",syllables:2},{name:"Bandit",reg:"chaos",syllables:2},{name:"Dodger",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Buster",reg:"chaos",syllables:2},{name:"Bruno",reg:"chaos",syllables:2},{name:"Butch",reg:"chaos",syllables:2},{name:"Spike",reg:"chaos",syllables:2},{name:"Bowser",reg:"chaos",syllables:2},{name:"Lobster",reg:"chaos",syllables:2},{name:"Chunk",reg:"chaos",syllables:2},{name:"Tubby",reg:"chaos",syllables:2},{name:"Pudgy",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Rex",reg:"mundane",syllables:1},{name:"Max",reg:"mundane",syllables:1},{name:"Tyson",reg:"mundane",syllables:2},{name:"Rocky",reg:"mundane",syllables:2},{name:"Duke",reg:"grand",syllables:1},{name:"Samson",reg:"mundane",syllables:2},{name:"Thor",reg:"grand",syllables:1},{name:"Titan",reg:"grand",syllables:2},{name:"Goliath",reg:"grand",syllables:3},{name:"Blaze",reg:"chaos",syllables:1},{name:"Flash",reg:"chaos",syllables:1},{name:"Rocket",reg:"chaos",syllables:2},{name:"Tank",reg:"chaos",syllables:1},{name:"Diesel",reg:"chaos",syllables:2},{name:"Crusher",reg:"chaos",syllables:2},{name:"Hammer",reg:"chaos",syllables:2},{name:"Maverick",reg:"chaos",syllables:3},{name:"Gunner",reg:"chaos",syllables:2},{name:"Jax",reg:"mundane",syllables:1},{name:"Kodak",reg:"chaos",syllables:2}],
+    girl: [{name:"Dizzy",reg:"chaos",syllables:2},{name:"Topsy",reg:"chaos",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Astra",reg:"grand",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Wibble",reg:"chaos",syllables:2},{name:"Doolally",reg:"chaos",syllables:3},{name:"Ramshackle",reg:"chaos",syllables:3},{name:"Twinkles",reg:"baby",syllables:2},{name:"Cornflake",reg:"food",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Babbycakes",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2},{name:"Athena",reg:"grand",syllables:3},{name:"Beatrix",reg:"grand",syllables:2},{name:"Bella",reg:"grand",syllables:2},{name:"Blaze",reg:"grand",syllables:2},{name:"Cleo",reg:"grand",syllables:1},{name:"Electra",reg:"grand",syllables:3},{name:"Empress",reg:"grand",syllables:2},{name:"Gloria",reg:"grand",syllables:2},{name:"Havoc",reg:"grand",syllables:2},{name:"Imogen",reg:"grand",syllables:3},{name:"Jade",reg:"grand",syllables:2},{name:"Jasmine",reg:"grand",syllables:3},{name:"Justice",reg:"grand",syllables:3},{name:"Kali",reg:"grand",syllables:2},{name:"Leona",reg:"grand",syllables:2},{name:"Liberty",reg:"grand",syllables:2},{name:"Maeve",reg:"grand",syllables:2},{name:"Maxine",reg:"grand",syllables:3},{name:"Nova",reg:"nature",syllables:2},{name:"Olympia",reg:"grand",syllables:2},{name:"Phoebe",reg:"grand",syllables:2},{name:"Rosa",reg:"grand",syllables:2},{name:"Roxanne",reg:"grand",syllables:3},{name:"Ruby",reg:"nature",syllables:1},{name:"Sadie",reg:"grand",syllables:2},{name:"Scarlett",reg:"grand",syllables:2},{name:"Sienna",reg:"grand",syllables:2},{name:"Stella",reg:"nature",syllables:2},{name:"Tara",reg:"grand",syllables:2}]
+},
 
   afghan: {
-    boy: [{name:"Aryan",reg:"aloof",syllables:2},{name:"Darius",reg:"aloof",syllables:2},{name:"Cyrus",reg:"aloof",syllables:2},{name:"Rustam",reg:"aloof",syllables:2},{name:"Zalmay",reg:"aloof",syllables:2},{name:"Tariq",reg:"aloof",syllables:2},{name:"Hamid",reg:"aloof",syllables:2},{name:"Khalid",reg:"aloof",syllables:2},{name:"Nawab",reg:"aloof",syllables:2},{name:"Sultan",reg:"aloof",syllables:2},{name:"Amir",reg:"aloof",syllables:2},{name:"Malik",reg:"aloof",syllables:2},{name:"Khan",reg:"aloof",syllables:2},{name:"Reza",reg:"aloof",syllables:2},{name:"Yusuf",reg:"aloof",syllables:2},{name:"Omar",reg:"aloof",syllables:2},{name:"Samir",reg:"aloof",syllables:2},{name:"Tarkan",reg:"aloof",syllables:2},{name:"Idris",reg:"aloof",syllables:2},{name:"Zafar",reg:"aloof",syllables:2},{name:"Bashir",reg:"aloof",syllables:2},{name:"Nasir",reg:"aloof",syllables:2},{name:"Kabir",reg:"aloof",syllables:2},{name:"Zahir",reg:"aloof",syllables:2},{name:"Qadir",reg:"aloof",syllables:2}],
-    girl: [{name:"Mina",reg:"aloof",syllables:1},{name:"Lema",reg:"aloof",syllables:1},{name:"Nila",reg:"aloof",syllables:1},{name:"Zari",reg:"aloof",syllables:1},{name:"Huma",reg:"aloof",syllables:1},{name:"Pari",reg:"aloof",syllables:1},{name:"Roya",reg:"aloof",syllables:1},{name:"Zoya",reg:"aloof",syllables:1},{name:"Wafa",reg:"aloof",syllables:1},{name:"Sana",reg:"aloof",syllables:1},{name:"Shab",reg:"aloof",syllables:1},{name:"Laleh",reg:"aloof",syllables:1},{name:"Arya",reg:"aloof",syllables:1},{name:"Mahsa",reg:"aloof",syllables:1},{name:"Nazo",reg:"aloof",syllables:1},{name:"Spogmai",reg:"aloof",syllables:1},{name:"Bibi",reg:"aloof",syllables:1},{name:"Gul",reg:"aloof",syllables:1},{name:"Naz",reg:"aloof",syllables:1},{name:"Rona",reg:"aloof",syllables:1},{name:"Noor",reg:"aloof",syllables:1},{name:"Aya",reg:"aloof",syllables:1},{name:"Amal",reg:"aloof",syllables:1},{name:"Hala",reg:"aloof",syllables:1},{name:"Hana",reg:"aloof",syllables:1},{name:"Lina",reg:"aloof",syllables:1},{name:"Lama",reg:"aloof",syllables:1},{name:"Leen",reg:"aloof",syllables:1},{name:"Reem",reg:"aloof",syllables:1},{name:"Rima",reg:"aloof",syllables:1},{name:"Dana",reg:"aloof",syllables:1},{name:"Dima",reg:"aloof",syllables:1},{name:"Maha",reg:"aloof",syllables:1},{name:"Mona",reg:"aloof",syllables:1},{name:"Nada",reg:"aloof",syllables:1},{name:"Ruba",reg:"aloof",syllables:1},{name:"Saba",reg:"aloof",syllables:1},{name:"Sama",reg:"aloof",syllables:1},{name:"Salma",reg:"aloof",syllables:1},{name:"Yara",reg:"aloof",syllables:1},{name:"Huda",reg:"aloof",syllables:1},{name:"Suha",reg:"aloof",syllables:1},{name:"May",reg:"aloof",syllables:1},{name:"Tala",reg:"aloof",syllables:1},{name:"Farah",reg:"aloof",syllables:1},{name:"Lujain",reg:"aloof",syllables:1},{name:"Maysa",reg:"aloof",syllables:1},{name:"Noura",reg:"aloof",syllables:1},{name:"Zahra",reg:"aloof",syllables:1}],
-  },
+    boy: [{name:"Aryan",reg:"aloof",syllables:2},{name:"Darius",reg:"aloof",syllables:2},{name:"Cyrus",reg:"aloof",syllables:2},{name:"Rustam",reg:"aloof",syllables:2},{name:"Zalmay",reg:"aloof",syllables:2},{name:"Tariq",reg:"aloof",syllables:2},{name:"Hamid",reg:"aloof",syllables:2},{name:"Khalid",reg:"aloof",syllables:2},{name:"Nawab",reg:"aloof",syllables:2},{name:"Amir",reg:"aloof",syllables:2},{name:"Malik",reg:"aloof",syllables:2},{name:"Khan",reg:"aloof",syllables:2},{name:"Reza",reg:"aloof",syllables:2},{name:"Yusuf",reg:"aloof",syllables:2},{name:"Omar",reg:"aloof",syllables:2},{name:"Samir",reg:"aloof",syllables:2},{name:"Tarkan",reg:"aloof",syllables:2},{name:"Idris",reg:"aloof",syllables:2},{name:"Zafar",reg:"aloof",syllables:2},{name:"Bashir",reg:"aloof",syllables:2},{name:"Nasir",reg:"aloof",syllables:2},{name:"Kabir",reg:"aloof",syllables:2},{name:"Zahir",reg:"aloof",syllables:2},{name:"Qadir",reg:"aloof",syllables:2},{name:"Jafar",reg:"grand",syllables:2},{name:"Karim",reg:"grand",syllables:2},{name:"Kian",reg:"grand",syllables:1},{name:"Latif",reg:"grand",syllables:2},{name:"Safi",reg:"grand",syllables:2}],
+    girl: [{name:"Mina",reg:"aloof",syllables:1},{name:"Lema",reg:"aloof",syllables:1},{name:"Nila",reg:"aloof",syllables:1},{name:"Zari",reg:"aloof",syllables:1},{name:"Huma",reg:"aloof",syllables:1},{name:"Pari",reg:"aloof",syllables:1},{name:"Roya",reg:"aloof",syllables:1},{name:"Zoya",reg:"aloof",syllables:1},{name:"Wafa",reg:"aloof",syllables:1},{name:"Sana",reg:"aloof",syllables:1},{name:"Shab",reg:"aloof",syllables:1},{name:"Laleh",reg:"aloof",syllables:1},{name:"Arya",reg:"aloof",syllables:1},{name:"Mahsa",reg:"aloof",syllables:1},{name:"Nazo",reg:"aloof",syllables:1},{name:"Spogmai",reg:"aloof",syllables:1},{name:"Bibi",reg:"aloof",syllables:1},{name:"Gul",reg:"aloof",syllables:1},{name:"Naz",reg:"aloof",syllables:1},{name:"Rona",reg:"aloof",syllables:1},{name:"Noor",reg:"aloof",syllables:1},{name:"Aya",reg:"aloof",syllables:1},{name:"Amal",reg:"aloof",syllables:1},{name:"Hala",reg:"aloof",syllables:1},{name:"Hana",reg:"aloof",syllables:1},{name:"Lina",reg:"aloof",syllables:1},{name:"Lama",reg:"aloof",syllables:1},{name:"Leen",reg:"aloof",syllables:1},{name:"Reem",reg:"aloof",syllables:1},{name:"Rima",reg:"aloof",syllables:1},{name:"Dana",reg:"aloof",syllables:1},{name:"Dima",reg:"aloof",syllables:1},{name:"Maha",reg:"aloof",syllables:1},{name:"Mona",reg:"aloof",syllables:1},{name:"Nada",reg:"aloof",syllables:1},{name:"Ruba",reg:"aloof",syllables:1},{name:"Saba",reg:"aloof",syllables:1},{name:"Sama",reg:"aloof",syllables:1},{name:"Salma",reg:"aloof",syllables:1},{name:"Yara",reg:"aloof",syllables:1},{name:"Huda",reg:"aloof",syllables:1},{name:"Suha",reg:"aloof",syllables:1},{name:"May",reg:"aloof",syllables:1},{name:"Tala",reg:"aloof",syllables:1},{name:"Farah",reg:"aloof",syllables:1},{name:"Lujain",reg:"aloof",syllables:1},{name:"Maysa",reg:"aloof",syllables:1},{name:"Noura",reg:"aloof",syllables:1},{name:"Zahra",reg:"aloof",syllables:1}]
+},
   sighthound: {
-    boy: [{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Indifference",reg:"aloof",syllables:4},{name:"Lassitude",reg:"aloof",syllables:3},{name:"Apathy",reg:"aloof",syllables:3},{name:"Sangfroid",reg:"aloof",syllables:2},{name:"Miles",reg:"mundane",syllables:1},{name:"Julian",reg:"grand",syllables:3},{name:"Lawrence",reg:"grand",syllables:2},{name:"Richard",reg:"grand",syllables:2},{name:"Quentin",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Vincent",reg:"grand",syllables:2},{name:"Leopold",reg:"grand",syllables:3},{name:"Edgar",reg:"grand",syllables:2},{name:"Dash",reg:"mundane",syllables:2},{name:"Drifter",reg:"mundane",syllables:2},{name:"Dancer",reg:"mundane",syllables:2},{name:"Dart",reg:"mundane",syllables:2},{name:"Duke",reg:"mundane",syllables:2},{name:"Flash",reg:"mundane",syllables:2},{name:"Fleet",reg:"mundane",syllables:2},{name:"Flint",reg:"mundane",syllables:2},{name:"Falcon",reg:"mundane",syllables:2},{name:"Fury",reg:"mundane",syllables:2}],
-    girl: [{name:"Ennui",reg:"aloof",syllables:2},{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Austère",reg:"aloof",syllables:2},{name:"Samantha",reg:"mundane",syllables:3},{name:"Bethany",reg:"mundane",syllables:3},{name:"Amanda",reg:"mundane",syllables:3},{name:"Megan",reg:"mundane",syllables:2},{name:"Hannah",reg:"mundane",syllables:2},{name:"Melissa",reg:"mundane",syllables:3},{name:"Nicole",reg:"mundane",syllables:2},{name:"Rachel",reg:"mundane",syllables:2},{name:"Betty",reg:"mundane",syllables:2},{name:"Amy",reg:"mundane",syllables:2},{name:"Emily",reg:"mundane",syllables:3},{name:"Jennifer",reg:"mundane",syllables:3},{name:"Sarah",reg:"mundane",syllables:2},{name:"Lucy",reg:"mundane",syllables:2},{name:"Bailey",reg:"mundane",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Jasmine",reg:"nature",syllables:2},{name:"Duchess",reg:"aloof",syllables:2},{name:"Drifter",reg:"aloof",syllables:2},{name:"Dazzle",reg:"aloof",syllables:2},{name:"Dancer",reg:"aloof",syllables:2},{name:"Fleur",reg:"aloof",syllables:2},{name:"Flair",reg:"aloof",syllables:2},{name:"Frost",reg:"aloof",syllables:2},{name:"Fauna",reg:"aloof",syllables:2},{name:"Flutter",reg:"aloof",syllables:2}],
-  },
+    boy: [{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Indifference",reg:"aloof",syllables:4},{name:"Lassitude",reg:"aloof",syllables:3},{name:"Apathy",reg:"aloof",syllables:3},{name:"Miles",reg:"mundane",syllables:1},{name:"Julian",reg:"grand",syllables:3},{name:"Lawrence",reg:"grand",syllables:2},{name:"Richard",reg:"grand",syllables:2},{name:"Quentin",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Vincent",reg:"grand",syllables:2},{name:"Leopold",reg:"grand",syllables:3},{name:"Edgar",reg:"grand",syllables:2},{name:"Dash",reg:"mundane",syllables:2},{name:"Drifter",reg:"mundane",syllables:2},{name:"Dancer",reg:"mundane",syllables:2},{name:"Dart",reg:"mundane",syllables:2},{name:"Duke",reg:"mundane",syllables:2},{name:"Flash",reg:"mundane",syllables:2},{name:"Fleet",reg:"mundane",syllables:2},{name:"Flint",reg:"mundane",syllables:2},{name:"Falcon",reg:"mundane",syllables:2},{name:"Fury",reg:"mundane",syllables:2},{name:"Altair",reg:"grand",syllables:2},{name:"Antimatter",reg:"grand",syllables:4},{name:"Apollo",reg:"grand",syllables:3},{name:"Asteroid",reg:"grand",syllables:3},{name:"Astro",reg:"grand",syllables:2},{name:"Atlas",reg:"grand",syllables:2},{name:"Blackstar",reg:"grand",syllables:2},{name:"Cosmic",reg:"grand",syllables:2},{name:"Cosmo",reg:"grand",syllables:2},{name:"Cosmos",reg:"grand",syllables:2},{name:"Darkside",reg:"grand",syllables:2},{name:"Darkstar",reg:"grand",syllables:2},{name:"Deepspace",reg:"grand",syllables:2},{name:"Draco",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Ganymede",reg:"grand",syllables:3},{name:"Hubble",reg:"grand",syllables:2},{name:"Jupiter",reg:"grand",syllables:3},{name:"Kepler",reg:"grand",syllables:2},{name:"Magnetar",reg:"grand",syllables:3},{name:"Mercury",reg:"grand",syllables:3},{name:"Meteor",reg:"grand",syllables:3},{name:"Neptune",reg:"grand",syllables:2},{name:"Orbit",reg:"grand",syllables:2},{name:"Orion",reg:"grand",syllables:3},{name:"Pluto",reg:"grand",syllables:2},{name:"Pulsar",reg:"grand",syllables:2},{name:"Quasar",reg:"grand",syllables:2},{name:"Saturn",reg:"grand",syllables:2},{name:"Sirius",reg:"grand",syllables:3},{name:"Starburst",reg:"grand",syllables:2},{name:"Starwalker",reg:"grand",syllables:3},{name:"Sunspot",reg:"grand",syllables:2},{name:"Titan",reg:"grand",syllables:2},{name:"Vulcan",reg:"grand",syllables:2},{name:"Bloodmoon",reg:"grand",syllables:2},{name:"Moonrock",reg:"grand",syllables:2},{name:"Moonwalker",reg:"grand",syllables:3},{name:"Astral",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:3},{name:"Galaxy",reg:"grand",syllables:3},{name:"Skyfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:3},{name:"Solstice",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:4},{name:"Whirlwind",reg:"grand",syllables:2},{name:"Bluemoon",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Moonfall",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:3}],
+    girl: [{name:"Ennui",reg:"aloof",syllables:2},{name:"Nonchalance",reg:"aloof",syllables:3},{name:"Austère",reg:"aloof",syllables:2},{name:"Samantha",reg:"mundane",syllables:3},{name:"Bethany",reg:"mundane",syllables:3},{name:"Amanda",reg:"mundane",syllables:3},{name:"Megan",reg:"mundane",syllables:2},{name:"Hannah",reg:"mundane",syllables:2},{name:"Melissa",reg:"mundane",syllables:3},{name:"Nicole",reg:"mundane",syllables:2},{name:"Rachel",reg:"mundane",syllables:2},{name:"Betty",reg:"mundane",syllables:2},{name:"Amy",reg:"mundane",syllables:2},{name:"Emily",reg:"mundane",syllables:3},{name:"Jennifer",reg:"mundane",syllables:3},{name:"Sarah",reg:"mundane",syllables:2},{name:"Lucy",reg:"mundane",syllables:2},{name:"Bailey",reg:"mundane",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Jasmine",reg:"nature",syllables:2},{name:"Duchess",reg:"aloof",syllables:2},{name:"Drifter",reg:"aloof",syllables:2},{name:"Dancer",reg:"aloof",syllables:2},{name:"Fleur",reg:"aloof",syllables:2},{name:"Flair",reg:"aloof",syllables:2},{name:"Frost",reg:"aloof",syllables:2},{name:"Fauna",reg:"aloof",syllables:2},{name:"Flutter",reg:"aloof",syllables:2},{name:"Andromeda",reg:"grand",syllables:4},{name:"Artemis",reg:"grand",syllables:3},{name:"Artemisia",reg:"grand",syllables:5},{name:"Astra",reg:"grand",syllables:2},{name:"Astrid",reg:"grand",syllables:2},{name:"Aurora",reg:"grand",syllables:4},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Elara",reg:"grand",syllables:3},{name:"Luna",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:3},{name:"Nebula",reg:"grand",syllables:3},{name:"Nightfall",reg:"grand",syllables:2},{name:"Nightglow",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Nova",reg:"grand",syllables:2},{name:"Penumbra",reg:"grand",syllables:3},{name:"Selene",reg:"grand",syllables:3},{name:"Shadowmoon",reg:"grand",syllables:3},{name:"Silvermoon",reg:"grand",syllables:3},{name:"Starbeam",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Stella",reg:"grand",syllables:2},{name:"Twilight",reg:"grand",syllables:2},{name:"Umbra",reg:"grand",syllables:2},{name:"Vega",reg:"grand",syllables:2},{name:"Vela",reg:"grand",syllables:2},{name:"Goldenmoon",reg:"grand",syllables:3},{name:"Moonbeam",reg:"grand",syllables:2},{name:"Moondust",reg:"grand",syllables:2},{name:"Moonglow",reg:"grand",syllables:2},{name:"Moonlight",reg:"grand",syllables:2},{name:"Astral",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:3},{name:"Galaxy",reg:"grand",syllables:3},{name:"Skyfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:3},{name:"Solstice",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:4},{name:"Whirlwind",reg:"grand",syllables:2},{name:"Bluemoon",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Moonfall",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:3}]
+},
   sniffer: {
-    boy: [{name:"Plodsworth",reg:"absurd",syllables:2},{name:"Glumley",reg:"absurd",syllables:2},{name:"Mourny",reg:"absurd",syllables:2},{name:"Woebegone",reg:"absurd",syllables:3},{name:"Lachrymose",reg:"absurd",syllables:3},{name:"Melancholy",reg:"absurd",syllables:4},{name:"Lugubrious",reg:"absurd",syllables:4},{name:"Gloopington",reg:"absurd",syllables:3},{name:"John",reg:"mundane",syllables:1},{name:"Brian",reg:"mundane",syllables:2},{name:"Raymond",reg:"mundane",syllables:2},{name:"George",reg:"mundane",syllables:1},{name:"Arthur",reg:"mundane",syllables:2},{name:"David",reg:"mundane",syllables:2},{name:"Keith",reg:"mundane",syllables:1},{name:"Derek",reg:"mundane",syllables:2},{name:"Kevin",reg:"mundane",syllables:2},{name:"Trevor",reg:"mundane",syllables:2},{name:"Barry",reg:"mundane",syllables:2},{name:"Norman",reg:"mundane",syllables:2},{name:"Basil",reg:"mundane",syllables:2},{name:"Mugsy",reg:"mundane",syllables:2},{name:"Peabody",reg:"mundane",syllables:2},{name:"Sherman",reg:"mundane",syllables:2},{name:"Scrappy",reg:"mundane",syllables:2},{name:"Spook",reg:"mundane",syllables:2},{name:"Brain",reg:"mundane",syllables:2},{name:"Hunter",reg:"mundane",syllables:2},{name:"Hector",reg:"mundane",syllables:2},{name:"Hugo",reg:"mundane",syllables:2},{name:"Harold",reg:"mundane",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Hound",reg:"mundane",syllables:2},{name:"Quest",reg:"mundane",syllables:2},{name:"Quincy",reg:"mundane",syllables:2},{name:"Quentin",reg:"mundane",syllables:2},{name:"Shadow",reg:"mundane",syllables:2},{name:"Sherlock",reg:"mundane",syllables:2},{name:"Sleuth",reg:"mundane",syllables:2},{name:"Scout",reg:"mundane",syllables:2},{name:"Snooper",reg:"mundane",syllables:2},{name:"Snout",reg:"mundane",syllables:2},{name:"Snuffle",reg:"mundane",syllables:2},{name:"Sage",reg:"mundane",syllables:2},{name:"Samson",reg:"mundane",syllables:2},{name:"Turnip",reg:"mundane",syllables:2},{name:"Parsnip",reg:"mundane",syllables:2},{name:"Radish",reg:"mundane",syllables:2},{name:"Cabbage",reg:"mundane",syllables:2},{name:"Lentil",reg:"mundane",syllables:2},{name:"Porridge",reg:"mundane",syllables:2},{name:"Granola",reg:"mundane",syllables:2},{name:"Crumpet",reg:"mundane",syllables:2},{name:"Cobbler",reg:"mundane",syllables:2}],
-    girl: [{name:"Woesworth",reg:"absurd",syllables:2},{name:"Lamentia",reg:"absurd",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:2},{name:"Lollypop",reg:"food",syllables:2},{name:"Gobstopper",reg:"food",syllables:2},{name:"Toffee",reg:"food",syllables:2},{name:"Sherbet",reg:"food",syllables:2},{name:"Humbug",reg:"food",syllables:2},{name:"Agatha",reg:"grand",syllables:2},{name:"Marple",reg:"grand",syllables:2},{name:"Christie",reg:"grand",syllables:2},{name:"Vera",reg:"grand",syllables:2},{name:"Tennison",reg:"grand",syllables:2},{name:"Foyle",reg:"grand",syllables:2},{name:"Cordelia",reg:"grand",syllables:2},{name:"Harriet",reg:"grand",syllables:2},{name:"Endeavour",reg:"grand",syllables:2},{name:"Gamache",reg:"grand",syllables:2},{name:"Cadfael",reg:"grand",syllables:2},{name:"Alleyn",reg:"grand",syllables:2},{name:"Billie",reg:"mundane",syllables:2},{name:"Bessie",reg:"mundane",syllables:2},{name:"Etta",reg:"mundane",syllables:2},{name:"Ella",reg:"mundane",syllables:2},{name:"Nina",reg:"mundane",syllables:2},{name:"Sarah",reg:"mundane",syllables:2},{name:"Dinah",reg:"mundane",syllables:2},{name:"Alberta",reg:"mundane",syllables:2},{name:"Memphis",reg:"mundane",syllables:2},{name:"Sippie",reg:"mundane",syllables:2},{name:"Gertrude",reg:"mundane",syllables:2},{name:"Theodora",reg:"grand",syllables:2},{name:"Araminta",reg:"grand",syllables:2},{name:"Lavinia",reg:"grand",syllables:2},{name:"Wilhelmina",reg:"grand",syllables:2},{name:"Clementine",reg:"grand",syllables:2},{name:"Octavia",reg:"grand",syllables:2},{name:"Millicent",reg:"grand",syllables:2},{name:"Dorothea",reg:"grand",syllables:2},{name:"Eugenia",reg:"grand",syllables:2},{name:"Henrietta",reg:"grand",syllables:2},{name:"Mathilda",reg:"grand",syllables:2},{name:"Rosalind",reg:"grand",syllables:2},{name:"Gwendolyn",reg:"grand",syllables:2},{name:"Arabella",reg:"grand",syllables:2},{name:"Beatrice",reg:"grand",syllables:2},{name:"Constance",reg:"grand",syllables:2},{name:"Prudence",reg:"mundane",syllables:2},{name:"Patience",reg:"mundane",syllables:2},{name:"Temperance",reg:"mundane",syllables:2},{name:"Tallulah",reg:"grand",syllables:2},{name:"Thomasina",reg:"grand",syllables:2},{name:"Thea",reg:"mundane",syllables:2},{name:"Tilda",reg:"mundane",syllables:2},{name:"Tabitha",reg:"mundane",syllables:2},{name:"Geraldine",reg:"mundane",syllables:2},{name:"Griselda",reg:"grand",syllables:2},{name:"Felicity",reg:"mundane",syllables:2},{name:"Florence",reg:"mundane",syllables:2},{name:"Helena",reg:"grand",syllables:2},{name:"Hortense",reg:"grand",syllables:2},{name:"Penelope",reg:"grand",syllables:2},{name:"Portia",reg:"grand",syllables:2},{name:"Beatrix",reg:"grand",syllables:2},{name:"Blanche",reg:"grand",syllables:2},{name:"Dorothy",reg:"mundane",syllables:2},{name:"Delilah",reg:"mundane",syllables:2},{name:"Winifred",reg:"mundane",syllables:2},{name:"Wanda",reg:"mundane",syllables:2},{name:"Clarissa",reg:"grand",syllables:2},{name:"Cressida",reg:"grand",syllables:2},{name:"Rosemary",reg:"mundane",syllables:2},{name:"Rowena",reg:"grand",syllables:2},{name:"Lavender",reg:"mundane",syllables:2},{name:"Leonora",reg:"grand",syllables:2},{name:"Mabel",reg:"mundane",syllables:2},{name:"Marjorie",reg:"mundane",syllables:2},{name:"Muriel",reg:"mundane",syllables:2},{name:"Margot",reg:"mundane",syllables:2},{name:"Edwina",reg:"mundane",syllables:2},{name:"Eleanor",reg:"grand",syllables:2},{name:"Sylvia",reg:"mundane",syllables:2},{name:"Simone",reg:"grand",syllables:2},{name:"Natasha",reg:"mundane",syllables:2},{name:"Nicolette",reg:"grand",syllables:2},{name:"Norma",reg:"mundane",syllables:2},{name:"Adelaide",reg:"grand",syllables:2},{name:"Allegra",reg:"grand",syllables:2}],
-  },
+    boy: [{name:"Plodsworth",reg:"absurd",syllables:2},{name:"Glumley",reg:"absurd",syllables:2},{name:"Mourny",reg:"absurd",syllables:2},{name:"Woebegone",reg:"absurd",syllables:3},{name:"Lachrymose",reg:"absurd",syllables:3},{name:"Melancholy",reg:"absurd",syllables:4},{name:"Lugubrious",reg:"absurd",syllables:4},{name:"Gloopington",reg:"absurd",syllables:3},{name:"John",reg:"mundane",syllables:1},{name:"Brian",reg:"mundane",syllables:2},{name:"Raymond",reg:"mundane",syllables:2},{name:"George",reg:"mundane",syllables:1},{name:"Arthur",reg:"mundane",syllables:2},{name:"David",reg:"mundane",syllables:2},{name:"Keith",reg:"mundane",syllables:1},{name:"Derek",reg:"mundane",syllables:2},{name:"Kevin",reg:"mundane",syllables:2},{name:"Trevor",reg:"mundane",syllables:2},{name:"Barry",reg:"mundane",syllables:2},{name:"Norman",reg:"mundane",syllables:2},{name:"Basil",reg:"mundane",syllables:2},{name:"Mugsy",reg:"mundane",syllables:2},{name:"Peabody",reg:"mundane",syllables:2},{name:"Sherman",reg:"mundane",syllables:2},{name:"Scrappy",reg:"mundane",syllables:2},{name:"Spook",reg:"mundane",syllables:2},{name:"Brain",reg:"mundane",syllables:2},{name:"Hunter",reg:"mundane",syllables:2},{name:"Hector",reg:"mundane",syllables:2},{name:"Hugo",reg:"mundane",syllables:2},{name:"Harold",reg:"mundane",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Hound",reg:"mundane",syllables:2},{name:"Quest",reg:"mundane",syllables:2},{name:"Quincy",reg:"mundane",syllables:2},{name:"Quentin",reg:"mundane",syllables:2},{name:"Shadow",reg:"mundane",syllables:2},{name:"Sherlock",reg:"mundane",syllables:2},{name:"Sleuth",reg:"mundane",syllables:2},{name:"Scout",reg:"mundane",syllables:2},{name:"Snooper",reg:"mundane",syllables:2},{name:"Snout",reg:"mundane",syllables:2},{name:"Snuffle",reg:"mundane",syllables:2},{name:"Sage",reg:"mundane",syllables:2},{name:"Samson",reg:"mundane",syllables:2},{name:"Turnip",reg:"mundane",syllables:2},{name:"Parsnip",reg:"mundane",syllables:2},{name:"Radish",reg:"mundane",syllables:2},{name:"Cabbage",reg:"mundane",syllables:2},{name:"Lentil",reg:"mundane",syllables:2},{name:"Porridge",reg:"mundane",syllables:2},{name:"Granola",reg:"mundane",syllables:2},{name:"Crumpet",reg:"mundane",syllables:2},{name:"Cobbler",reg:"mundane",syllables:2},{name:"Crumpets",reg:"food",syllables:2}],
+    girl: [{name:"Woesworth",reg:"absurd",syllables:2},{name:"Lamentia",reg:"absurd",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:2},{name:"Lollypop",reg:"food",syllables:2},{name:"Gobstopper",reg:"food",syllables:2},{name:"Toffee",reg:"food",syllables:2},{name:"Sherbet",reg:"food",syllables:2},{name:"Humbug",reg:"food",syllables:2},{name:"Agatha",reg:"grand",syllables:2},{name:"Marple",reg:"grand",syllables:2},{name:"Christie",reg:"grand",syllables:2},{name:"Vera",reg:"grand",syllables:2},{name:"Tennison",reg:"grand",syllables:2},{name:"Foyle",reg:"grand",syllables:2},{name:"Cordelia",reg:"grand",syllables:2},{name:"Harriet",reg:"grand",syllables:2},{name:"Endeavour",reg:"grand",syllables:2},{name:"Gamache",reg:"grand",syllables:2},{name:"Cadfael",reg:"grand",syllables:2},{name:"Alleyn",reg:"grand",syllables:2},{name:"Billie",reg:"mundane",syllables:2},{name:"Bessie",reg:"mundane",syllables:2},{name:"Etta",reg:"mundane",syllables:2},{name:"Ella",reg:"mundane",syllables:2},{name:"Nina",reg:"mundane",syllables:2},{name:"Sarah",reg:"mundane",syllables:2},{name:"Dinah",reg:"mundane",syllables:2},{name:"Alberta",reg:"mundane",syllables:2},{name:"Memphis",reg:"mundane",syllables:2},{name:"Sippie",reg:"mundane",syllables:2},{name:"Gertrude",reg:"mundane",syllables:2},{name:"Theodora",reg:"grand",syllables:2},{name:"Araminta",reg:"grand",syllables:2},{name:"Lavinia",reg:"grand",syllables:2},{name:"Wilhelmina",reg:"grand",syllables:2},{name:"Clementine",reg:"grand",syllables:2},{name:"Octavia",reg:"grand",syllables:2},{name:"Millicent",reg:"grand",syllables:2},{name:"Dorothea",reg:"grand",syllables:2},{name:"Eugenia",reg:"grand",syllables:2},{name:"Henrietta",reg:"grand",syllables:2},{name:"Mathilda",reg:"grand",syllables:2},{name:"Rosalind",reg:"grand",syllables:2},{name:"Gwendolyn",reg:"grand",syllables:2},{name:"Arabella",reg:"grand",syllables:2},{name:"Beatrice",reg:"grand",syllables:2},{name:"Constance",reg:"grand",syllables:2},{name:"Prudence",reg:"mundane",syllables:2},{name:"Patience",reg:"mundane",syllables:2},{name:"Temperance",reg:"mundane",syllables:2},{name:"Tallulah",reg:"grand",syllables:2},{name:"Thomasina",reg:"grand",syllables:2},{name:"Thea",reg:"mundane",syllables:2},{name:"Tilda",reg:"mundane",syllables:2},{name:"Tabitha",reg:"mundane",syllables:2},{name:"Geraldine",reg:"mundane",syllables:2},{name:"Griselda",reg:"grand",syllables:2},{name:"Felicity",reg:"mundane",syllables:2},{name:"Florence",reg:"mundane",syllables:2},{name:"Helena",reg:"grand",syllables:2},{name:"Hortense",reg:"grand",syllables:2},{name:"Penelope",reg:"grand",syllables:2},{name:"Portia",reg:"grand",syllables:2},{name:"Beatrix",reg:"grand",syllables:2},{name:"Blanche",reg:"grand",syllables:2},{name:"Dorothy",reg:"mundane",syllables:2},{name:"Delilah",reg:"mundane",syllables:2},{name:"Winifred",reg:"mundane",syllables:2},{name:"Wanda",reg:"mundane",syllables:2},{name:"Clarissa",reg:"grand",syllables:2},{name:"Cressida",reg:"grand",syllables:2},{name:"Rosemary",reg:"mundane",syllables:2},{name:"Rowena",reg:"grand",syllables:2},{name:"Lavender",reg:"mundane",syllables:2},{name:"Leonora",reg:"grand",syllables:2},{name:"Mabel",reg:"mundane",syllables:2},{name:"Marjorie",reg:"mundane",syllables:2},{name:"Muriel",reg:"mundane",syllables:2},{name:"Margot",reg:"mundane",syllables:2},{name:"Edwina",reg:"mundane",syllables:2},{name:"Eleanor",reg:"grand",syllables:2},{name:"Sylvia",reg:"mundane",syllables:2},{name:"Simone",reg:"grand",syllables:2},{name:"Natasha",reg:"mundane",syllables:2},{name:"Nicolette",reg:"grand",syllables:2},{name:"Norma",reg:"mundane",syllables:2},{name:"Adelaide",reg:"grand",syllables:2},{name:"Allegra",reg:"grand",syllables:2},{name:"Crumpets",reg:"food",syllables:2}]
+},
   greatdane: {
-    boy: [{name:"Astro",reg:"grand",syllables:2},{name:"Cosmo",reg:"grand",syllables:2},{name:"Orion",reg:"grand",syllables:2},{name:"Apollo",reg:"grand",syllables:2},{name:"Nova",reg:"grand",syllables:2},{name:"Nebula",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Meteor",reg:"grand",syllables:2},{name:"Asteroid",reg:"grand",syllables:2},{name:"Orbit",reg:"grand",syllables:2},{name:"Galaxy",reg:"grand",syllables:2},{name:"Zenith",reg:"grand",syllables:2},{name:"Quasar",reg:"grand",syllables:2},{name:"Pulsar",reg:"grand",syllables:2},{name:"Magnetar",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:2},{name:"Starburst",reg:"grand",syllables:2},{name:"Darkstar",reg:"grand",syllables:2},{name:"Shadowmoon",reg:"grand",syllables:2},{name:"Moonwalker",reg:"grand",syllables:2},{name:"Starwalker",reg:"grand",syllables:2},{name:"Voidwalker",reg:"grand",syllables:2},{name:"Draco",reg:"grand",syllables:2},{name:"Sirius",reg:"grand",syllables:2},{name:"Altair",reg:"grand",syllables:2},{name:"Altimeter",reg:"grand",syllables:2},{name:"Moonrock",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Moonfall",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Starfire",reg:"grand",syllables:2},{name:"Eventide",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:2},{name:"Polaris",reg:"grand",syllables:2},{name:"Cosmos",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:2},{name:"Kepler",reg:"grand",syllables:2},{name:"Hubble",reg:"grand",syllables:2},{name:"Titan",reg:"grand",syllables:2},{name:"Atlas",reg:"grand",syllables:2},{name:"Prometheus",reg:"grand",syllables:2},{name:"Jupiter",reg:"grand",syllables:2},{name:"Saturn",reg:"grand",syllables:2},{name:"Pluto",reg:"grand",syllables:2},{name:"Mercury",reg:"grand",syllables:2},{name:"Neptune",reg:"grand",syllables:2},{name:"Vulcan",reg:"grand",syllables:2},{name:"Moonbeam",reg:"grand",syllables:2},{name:"Starbeam",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Darkside",reg:"grand",syllables:2},{name:"Bloodmoon",reg:"grand",syllables:2},{name:"Outerrim",reg:"grand",syllables:2},{name:"Deepspace",reg:"grand",syllables:2},{name:"Antimatter",reg:"grand",syllables:2},{name:"Celestial",reg:"grand",syllables:2},{name:"Astral",reg:"grand",syllables:2},{name:"Crescent",reg:"grand",syllables:2},{name:"Sunspot",reg:"grand",syllables:2},{name:"Earthshine",reg:"grand",syllables:2},{name:"Moonrise",reg:"grand",syllables:2},{name:"Nightfall",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Shadowmoon",reg:"grand",syllables:2},{name:"Blackstar",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Teacup",reg:"grand",syllables:2},{name:"Dainty",reg:"grand",syllables:2},{name:"Pocket",reg:"grand",syllables:2},{name:"Dinky",reg:"grand",syllables:2},{name:"Nimble",reg:"grand",syllables:2},{name:"Smidgeon",reg:"grand",syllables:2},{name:"Titchy",reg:"grand",syllables:2},{name:"Lilliput",reg:"grand",syllables:2}],
-    girl: [{name:"Astra",reg:"grand",syllables:2},{name:"Luna",reg:"grand",syllables:2},{name:"Aurora",reg:"grand",syllables:2},{name:"Celestia",reg:"grand",syllables:2},{name:"Andromeda",reg:"grand",syllables:2},{name:"Cassiopeia",reg:"grand",syllables:2},{name:"Lyra",reg:"grand",syllables:2},{name:"Vega",reg:"grand",syllables:2},{name:"Nova",reg:"grand",syllables:2},{name:"Nebula",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Stella",reg:"grand",syllables:2},{name:"Solstice",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:2},{name:"Penumbra",reg:"grand",syllables:2},{name:"Umbra",reg:"grand",syllables:2},{name:"Hydra",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Moonlight",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Moonglow",reg:"grand",syllables:2},{name:"Starglow",reg:"grand",syllables:2},{name:"Moonbeam",reg:"grand",syllables:2},{name:"Starbeam",reg:"grand",syllables:2},{name:"Moonstone",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Celestia",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:2},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Eventide",reg:"grand",syllables:2},{name:"Twilight",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Crescent",reg:"grand",syllables:2},{name:"Bloodmoon",reg:"grand",syllables:2},{name:"Silvermoon",reg:"grand",syllables:2},{name:"Goldenmoon",reg:"grand",syllables:2},{name:"Nightglow",reg:"grand",syllables:2},{name:"Moonfire",reg:"grand",syllables:2},{name:"Starfire",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Cosmic",reg:"grand",syllables:2},{name:"Aurora",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:2},{name:"Astraea",reg:"grand",syllables:2},{name:"Vela",reg:"grand",syllables:2},{name:"Carina",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:2},{name:"Andromeda",reg:"grand",syllables:2},{name:"Titania",reg:"grand",syllables:2},{name:"Calypso",reg:"grand",syllables:2},{name:"Elara",reg:"grand",syllables:2},{name:"Callisto",reg:"grand",syllables:2},{name:"Ganymede",reg:"grand",syllables:2},{name:"Io",reg:"grand",syllables:2},{name:"Titchy",reg:"grand",syllables:2},{name:"Dainty",reg:"grand",syllables:2},{name:"Pixie",reg:"grand",syllables:2},{name:"Twiggy",reg:"grand",syllables:2},{name:"Petite",reg:"grand",syllables:2},{name:"Speck",reg:"grand",syllables:2},{name:"Smidge",reg:"grand",syllables:2}],
-  },
+    boy: [{name:"Astro",reg:"grand",syllables:2},{name:"Cosmo",reg:"grand",syllables:2},{name:"Apollo",reg:"grand",syllables:2},{name:"Nova",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Meteor",reg:"grand",syllables:2},{name:"Asteroid",reg:"grand",syllables:2},{name:"Orbit",reg:"grand",syllables:2},{name:"Galaxy",reg:"grand",syllables:2},{name:"Zenith",reg:"grand",syllables:2},{name:"Pulsar",reg:"grand",syllables:2},{name:"Magnetar",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:2},{name:"Starburst",reg:"grand",syllables:2},{name:"Darkstar",reg:"grand",syllables:2},{name:"Shadowmoon",reg:"grand",syllables:2},{name:"Draco",reg:"grand",syllables:2},{name:"Altimeter",reg:"grand",syllables:2},{name:"Moonfall",reg:"grand",syllables:2},{name:"Cosmos",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:2},{name:"Kepler",reg:"grand",syllables:2},{name:"Hubble",reg:"grand",syllables:2},{name:"Atlas",reg:"grand",syllables:2},{name:"Prometheus",reg:"grand",syllables:2},{name:"Jupiter",reg:"grand",syllables:2},{name:"Pluto",reg:"grand",syllables:2},{name:"Mercury",reg:"grand",syllables:2},{name:"Neptune",reg:"grand",syllables:2},{name:"Darkside",reg:"grand",syllables:2},{name:"Antimatter",reg:"grand",syllables:2},{name:"Shadowmoon",reg:"grand",syllables:2},{name:"Teacup",reg:"grand",syllables:2},{name:"Dainty",reg:"grand",syllables:2},{name:"Pocket",reg:"grand",syllables:2},{name:"Dinky",reg:"grand",syllables:2},{name:"Nimble",reg:"grand",syllables:2},{name:"Smidgeon",reg:"grand",syllables:2},{name:"Titchy",reg:"grand",syllables:2},{name:"Lilliput",reg:"grand",syllables:2},{name:"Altair",reg:"grand",syllables:2},{name:"Blackstar",reg:"grand",syllables:2},{name:"Cosmic",reg:"grand",syllables:2},{name:"Deepspace",reg:"grand",syllables:2},{name:"Ganymede",reg:"grand",syllables:3},{name:"Orion",reg:"grand",syllables:3},{name:"Quasar",reg:"grand",syllables:2},{name:"Saturn",reg:"grand",syllables:2},{name:"Sirius",reg:"grand",syllables:3},{name:"Starwalker",reg:"grand",syllables:3},{name:"Sunspot",reg:"grand",syllables:2},{name:"Titan",reg:"grand",syllables:2},{name:"Vulcan",reg:"grand",syllables:2},{name:"Bloodmoon",reg:"grand",syllables:2},{name:"Moonrock",reg:"grand",syllables:2},{name:"Moonwalker",reg:"grand",syllables:3},{name:"Astral",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:3},{name:"Skyfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:3},{name:"Solstice",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Whirlwind",reg:"grand",syllables:2},{name:"Bluemoon",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:3}],
+    girl: [{name:"Astra",reg:"grand",syllables:2},{name:"Luna",reg:"grand",syllables:2},{name:"Aurora",reg:"grand",syllables:2},{name:"Cassiopeia",reg:"grand",syllables:2},{name:"Nova",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Stella",reg:"grand",syllables:2},{name:"Hydra",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Cosmic",reg:"grand",syllables:2},{name:"Aurora",reg:"grand",syllables:2},{name:"Vela",reg:"grand",syllables:2},{name:"Carina",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:2},{name:"Calypso",reg:"grand",syllables:2},{name:"Elara",reg:"grand",syllables:2},{name:"Callisto",reg:"grand",syllables:2},{name:"Ganymede",reg:"grand",syllables:2},{name:"Io",reg:"grand",syllables:2},{name:"Titchy",reg:"grand",syllables:2},{name:"Dainty",reg:"grand",syllables:2},{name:"Pixie",reg:"grand",syllables:2},{name:"Twiggy",reg:"grand",syllables:2},{name:"Petite",reg:"grand",syllables:2},{name:"Speck",reg:"grand",syllables:2},{name:"Smidge",reg:"grand",syllables:2},{name:"Andromeda",reg:"grand",syllables:4},{name:"Artemis",reg:"grand",syllables:3},{name:"Artemisia",reg:"grand",syllables:5},{name:"Astrid",reg:"grand",syllables:2},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:3},{name:"Nebula",reg:"grand",syllables:3},{name:"Nightfall",reg:"grand",syllables:2},{name:"Nightglow",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Penumbra",reg:"grand",syllables:3},{name:"Selene",reg:"grand",syllables:3},{name:"Shadowmoon",reg:"grand",syllables:3},{name:"Silvermoon",reg:"grand",syllables:3},{name:"Starbeam",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Twilight",reg:"grand",syllables:2},{name:"Umbra",reg:"grand",syllables:2},{name:"Vega",reg:"grand",syllables:2},{name:"Goldenmoon",reg:"grand",syllables:3},{name:"Moonbeam",reg:"grand",syllables:2},{name:"Moondust",reg:"grand",syllables:2},{name:"Moonglow",reg:"grand",syllables:2},{name:"Moonlight",reg:"grand",syllables:2},{name:"Astral",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:3},{name:"Galaxy",reg:"grand",syllables:3},{name:"Skyfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:3},{name:"Solstice",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:4},{name:"Whirlwind",reg:"grand",syllables:2},{name:"Bluemoon",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Moonfall",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:3}]
+},
   giant: {
-    boy: [{name:"Teacup",reg:"ironic",syllables:2},{name:"Dainty",reg:"ironic",syllables:2},{name:"Nimble",reg:"ironic",syllables:2},{name:"Tinykins",reg:"ironic",syllables:3},{name:"Teeny",reg:"ironic",syllables:2},{name:"Petite",reg:"ironic",syllables:2},{name:"Gossamer",reg:"ironic",syllables:3},{name:"Smidgeon",reg:"ironic",syllables:2},{name:"Titchy",reg:"ironic",syllables:2},{name:"Dinky",reg:"ironic",syllables:2},{name:"Lilliput",reg:"ironic",syllables:3},{name:"Pocket",reg:"ironic",syllables:2},{name:"Otto",reg:"mundane",syllables:2},{name:"Otis",reg:"mundane",syllables:2},{name:"Remy",reg:"mundane",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Stomper",reg:"chaos",syllables:2},{name:"Clomper",reg:"chaos",syllables:2},{name:"Trooper",reg:"chaos",syllables:2},{name:"Trundles",reg:"chaos",syllables:2},{name:"Lolloper",reg:"chaos",syllables:2},{name:"Shambler",reg:"chaos",syllables:2},{name:"Rumble",reg:"chaos",syllables:2},{name:"Chunk",reg:"chaos",syllables:2},{name:"Tubby",reg:"chaos",syllables:2},{name:"Waddler",reg:"chaos",syllables:2},{name:"Waddles",reg:"chaos",syllables:2},{name:"Thunderpaws",reg:"chaos",syllables:2},{name:"Bumpkin",reg:"chaos",syllables:2},{name:"Goliath",reg:"chaos",syllables:2},{name:"Bruiser",reg:"chaos",syllables:2},{name:"Bowser",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2}],
-    girl: [{name:"Titchy",reg:"ironic",syllables:2},{name:"WeeDee",reg:"ironic",syllables:2},{name:"Petite",reg:"ironic",syllables:2},{name:"Dinky",reg:"ironic",syllables:2},{name:"Lilliput",reg:"ironic",syllables:3},{name:"Daintybell",reg:"ironic",syllables:3},{name:"Thistledown",reg:"ironic",syllables:3},{name:"Gossamera",reg:"ironic",syllables:3},{name:"Pixie",reg:"ironic",syllables:2},{name:"Twiggy",reg:"ironic",syllables:2},{name:"Speck",reg:"ironic",syllables:1},{name:"Smidge",reg:"ironic",syllables:1},{name:"Milly",reg:"mundane",syllables:2},{name:"Molly",reg:"mundane",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Boadicea",reg:"grand",syllables:2},{name:"Zenobia",reg:"grand",syllables:2},{name:"Cleopatra",reg:"grand",syllables:2},{name:"Hippolyta",reg:"grand",syllables:2},{name:"Artemisia",reg:"grand",syllables:2},{name:"Theodora",reg:"grand",syllables:2},{name:"Agrippina",reg:"grand",syllables:2},{name:"Livia",reg:"grand",syllables:2},{name:"Octavia",reg:"grand",syllables:2},{name:"Hypatia",reg:"grand",syllables:2},{name:"Aspasia",reg:"grand",syllables:2},{name:"Sappho",reg:"grand",syllables:2},{name:"Medea",reg:"grand",syllables:2},{name:"Titania",reg:"grand",syllables:2},{name:"Andromache",reg:"grand",syllables:2},{name:"Cassandra",reg:"grand",syllables:2},{name:"Calypso",reg:"grand",syllables:2},{name:"Circe",reg:"grand",syllables:2},{name:"Persephone",reg:"grand",syllables:2},{name:"Demeter",reg:"grand",syllables:2},{name:"Hera",reg:"grand",syllables:2},{name:"Athena",reg:"grand",syllables:2},{name:"Artemis",reg:"grand",syllables:2},{name:"Aphrodite",reg:"grand",syllables:2},{name:"Hecate",reg:"grand",syllables:2},{name:"Selene",reg:"grand",syllables:2},{name:"Rhea",reg:"grand",syllables:2},{name:"Gaia",reg:"grand",syllables:2},{name:"Matilda",reg:"grand",syllables:2},{name:"Eleanor",reg:"grand",syllables:2},{name:"Isabeau",reg:"grand",syllables:2},{name:"Blanche",reg:"grand",syllables:2},{name:"Radegund",reg:"grand",syllables:2},{name:"Bathilde",reg:"grand",syllables:2},{name:"Clothilde",reg:"grand",syllables:2},{name:"Etheldreda",reg:"grand",syllables:2},{name:"Victoria",reg:"grand",syllables:2},{name:"Adelaide",reg:"grand",syllables:2},{name:"Charlotte",reg:"grand",syllables:2},{name:"Sophia",reg:"grand",syllables:2},{name:"Helena",reg:"grand",syllables:2},{name:"Wilhelmina",reg:"grand",syllables:2},{name:"Alexandrina",reg:"grand",syllables:2},{name:"Thomasina",reg:"grand",syllables:2},{name:"Christabel",reg:"grand",syllables:2},{name:"Rosalind",reg:"grand",syllables:2},{name:"Guinevere",reg:"grand",syllables:2},{name:"Evangeline",reg:"grand",syllables:2},{name:"Josephine",reg:"grand",syllables:2},{name:"Hildegard",reg:"grand",syllables:2},{name:"Brunhilde",reg:"grand",syllables:2},{name:"Gertrude",reg:"grand",syllables:2},{name:"Ingeborg",reg:"grand",syllables:2},{name:"Elfriede",reg:"grand",syllables:2},{name:"Mathilde",reg:"grand",syllables:2},{name:"Hedwig",reg:"grand",syllables:2},{name:"Mechthild",reg:"grand",syllables:2},{name:"Walburga",reg:"grand",syllables:2},{name:"Kunigunde",reg:"grand",syllables:2},{name:"Sieglinde",reg:"grand",syllables:2},{name:"Kriemhild",reg:"grand",syllables:2},{name:"Gudrun",reg:"grand",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Sigrid",reg:"grand",syllables:2},{name:"Astrid",reg:"grand",syllables:2},{name:"Ragnhild",reg:"grand",syllables:2},{name:"Thyra",reg:"grand",syllables:2},{name:"Gunhild",reg:"grand",syllables:2},{name:"Bergljot",reg:"grand",syllables:2},{name:"Ursula",reg:"grand",syllables:2},{name:"Bjorna",reg:"grand",syllables:2},{name:"Mishka",reg:"grand",syllables:2},{name:"Nanuq",reg:"grand",syllables:2},{name:"Koda",reg:"grand",syllables:2},{name:"Callista",reg:"grand",syllables:2},{name:"Brunhilda",reg:"grand",syllables:2},{name:"Arabella",reg:"grand",syllables:2},{name:"Cordelia",reg:"grand",syllables:2},{name:"Millicent",reg:"grand",syllables:2},{name:"Clementine",reg:"grand",syllables:2},{name:"Hildegarde",reg:"grand",syllables:2},{name:"Constance",reg:"grand",syllables:2},{name:"Prudence",reg:"grand",syllables:2},{name:"Patience",reg:"grand",syllables:2},{name:"Temperance",reg:"grand",syllables:2},{name:"Sophronia",reg:"grand",syllables:2},{name:"Georgiana",reg:"grand",syllables:2},{name:"Frederica",reg:"grand",syllables:2},{name:"Imogen",reg:"grand",syllables:2},{name:"Lavinia",reg:"grand",syllables:2},{name:"Henrietta",reg:"grand",syllables:2},{name:"Beatrice",reg:"grand",syllables:2},{name:"Dorothea",reg:"grand",syllables:2},{name:"Gwendolyn",reg:"grand",syllables:2},{name:"Rowena",reg:"grand",syllables:2},{name:"Rosamund",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:2},{name:"Celestine",reg:"grand",syllables:2},{name:"Rhiannon",reg:"grand",syllables:2},{name:"Ceridwen",reg:"grand",syllables:2},{name:"Branwen",reg:"grand",syllables:2},{name:"Gwenllian",reg:"grand",syllables:2},{name:"Arianrhod",reg:"grand",syllables:2},{name:"Blodwen",reg:"grand",syllables:2},{name:"Morfudd",reg:"grand",syllables:2},{name:"Tabitha",reg:"grand",syllables:2},{name:"Tallulah",reg:"grand",syllables:2}],
-  },
+    boy: [{name:"Teacup",reg:"ironic",syllables:2},{name:"Nimble",reg:"ironic",syllables:2},{name:"Tinykins",reg:"ironic",syllables:3},{name:"Teeny",reg:"ironic",syllables:2},{name:"Smidgeon",reg:"ironic",syllables:2},{name:"Titchy",reg:"ironic",syllables:2},{name:"Dinky",reg:"ironic",syllables:2},{name:"Lilliput",reg:"ironic",syllables:3},{name:"Pocket",reg:"ironic",syllables:2},{name:"Otto",reg:"mundane",syllables:2},{name:"Otis",reg:"mundane",syllables:2},{name:"Remy",reg:"mundane",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Stomper",reg:"chaos",syllables:2},{name:"Clomper",reg:"chaos",syllables:2},{name:"Trooper",reg:"chaos",syllables:2},{name:"Trundles",reg:"chaos",syllables:2},{name:"Lollypop",reg:"chaos",syllables:2},{name:"Shambler",reg:"chaos",syllables:2},{name:"Rumble",reg:"chaos",syllables:2},{name:"Chunk",reg:"chaos",syllables:2},{name:"Tubby",reg:"chaos",syllables:2},{name:"Waddler",reg:"chaos",syllables:2},{name:"Waddles",reg:"chaos",syllables:2},{name:"Thunderpaws",reg:"chaos",syllables:2},{name:"Bumpkin",reg:"chaos",syllables:2},{name:"Goliath",reg:"chaos",syllables:2},{name:"Bruiser",reg:"chaos",syllables:2},{name:"Bowser",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Ajax",reg:"grand",syllables:2},{name:"Achilles",reg:"grand",syllables:3},{name:"Atlas",reg:"grand",syllables:2},{name:"Amos",reg:"mundane",syllables:2},{name:"Arnold",reg:"mundane",syllables:2},{name:"Albert",reg:"grand",syllables:2},{name:"Augustus",reg:"grand",syllables:3},{name:"Archibald",reg:"grand",syllables:3},{name:"Ernest",reg:"grand",syllables:2},{name:"Edmund",reg:"grand",syllables:2},{name:"Edgar",reg:"grand",syllables:2},{name:"Edward",reg:"grand",syllables:2},{name:"Elmer",reg:"mundane",syllables:2},{name:"Ezra",reg:"mundane",syllables:2},{name:"Ferdinand",reg:"grand",syllables:3},{name:"Frederick",reg:"grand",syllables:3},{name:"Franklin",reg:"grand",syllables:2},{name:"Fletcher",reg:"mundane",syllables:2},{name:"Floyd",reg:"mundane",syllables:1},{name:"Herbert",reg:"grand",syllables:2},{name:"Harold",reg:"grand",syllables:2},{name:"Henry",reg:"grand",syllables:2},{name:"Hugo",reg:"grand",syllables:2},{name:"Hector",reg:"grand",syllables:2},{name:"Hercules",reg:"grand",syllables:3},{name:"Humphrey",reg:"grand",syllables:2},{name:"Howard",reg:"mundane",syllables:2},{name:"Hamish",reg:"mundane",syllables:2},{name:"Hank",reg:"mundane",syllables:1},{name:"Harvey",reg:"mundane",syllables:2},{name:"Ivan",reg:"grand",syllables:2},{name:"Ignatius",reg:"grand",syllables:4},{name:"Irving",reg:"mundane",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Jericho",reg:"grand",syllables:3},{name:"Julius",reg:"grand",syllables:3},{name:"Jerome",reg:"grand",syllables:2},{name:"Jefferson",reg:"grand",syllables:3},{name:"Klaus",reg:"grand",syllables:1},{name:"Kristian",reg:"mundane",syllables:3},{name:"Kelvin",reg:"mundane",syllables:2},{name:"Magnus",reg:"grand",syllables:2},{name:"Maximus",reg:"grand",syllables:3},{name:"Malcolm",reg:"grand",syllables:2},{name:"Maurice",reg:"grand",syllables:2},{name:"Montgomery",reg:"grand",syllables:4},{name:"Mortimer",reg:"grand",syllables:3},{name:"Marshall",reg:"grand",syllables:2},{name:"Marco",reg:"grand",syllables:2},{name:"Quentin",reg:"grand",syllables:2},{name:"Ulysses",reg:"grand",syllables:3},{name:"Ursus",reg:"grand",syllables:2},{name:"Victor",reg:"grand",syllables:2},{name:"Vincent",reg:"grand",syllables:2},{name:"Vladimir",reg:"grand",syllables:3},{name:"Xavier",reg:"grand",syllables:3},{name:"Yusuf",reg:"mundane",syllables:2},{name:"Zephyr",reg:"grand",syllables:2},{name:"Zoro",reg:"grand",syllables:2},{name:"Barnaby",reg:"grand",syllables:3},{name:"Boris",reg:"mundane",syllables:2},{name:"Bruno",reg:"mundane",syllables:2},{name:"Caesar",reg:"grand",syllables:2},{name:"Cormac",reg:"grand",syllables:2},{name:"Conrad",reg:"grand",syllables:2},{name:"Desmond",reg:"mundane",syllables:2},{name:"Douglas",reg:"mundane",syllables:2},{name:"Drake",reg:"grand",syllables:1},{name:"Gordon",reg:"mundane",syllables:2},{name:"Graham",reg:"mundane",syllables:2},{name:"Gruff",reg:"grand",syllables:1},{name:"Leopold",reg:"grand",syllables:3},{name:"Lennox",reg:"grand",syllables:2},{name:"Lorenzo",reg:"grand",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Nelson",reg:"mundane",syllables:2},{name:"Nigel",reg:"mundane",syllables:2},{name:"Percival",reg:"grand",syllables:3},{name:"Patrick",reg:"mundane",syllables:2},{name:"Reginald",reg:"grand",syllables:3},{name:"Roland",reg:"grand",syllables:2},{name:"Rupert",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Solomon",reg:"grand",syllables:3},{name:"Stanley",reg:"mundane",syllables:2},{name:"Theodore",reg:"grand",syllables:4},{name:"Thaddeus",reg:"grand",syllables:3},{name:"Tobias",reg:"grand",syllables:3},{name:"Walter",reg:"grand",syllables:2},{name:"Winston",reg:"grand",syllables:2},{name:"Wilfred",reg:"grand",syllables:2}],
+    girl: [{name:"Titchy",reg:"ironic",syllables:2},{name:"WeeDee",reg:"ironic",syllables:2},{name:"Petite",reg:"ironic",syllables:2},{name:"Dinky",reg:"ironic",syllables:2},{name:"Lilliput",reg:"ironic",syllables:3},{name:"Daintybell",reg:"ironic",syllables:3},{name:"Thistledown",reg:"ironic",syllables:3},{name:"Gossamera",reg:"ironic",syllables:3},{name:"Pixie",reg:"ironic",syllables:2},{name:"Twiggy",reg:"ironic",syllables:2},{name:"Speck",reg:"ironic",syllables:1},{name:"Smidge",reg:"ironic",syllables:1},{name:"Milly",reg:"mundane",syllables:2},{name:"Molly",reg:"mundane",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Boadicea",reg:"grand",syllables:2},{name:"Zenobia",reg:"grand",syllables:2},{name:"Cleopatra",reg:"grand",syllables:2},{name:"Hippolyta",reg:"grand",syllables:2},{name:"Artemisia",reg:"grand",syllables:2},{name:"Theodora",reg:"grand",syllables:2},{name:"Agrippina",reg:"grand",syllables:2},{name:"Livia",reg:"grand",syllables:2},{name:"Octavia",reg:"grand",syllables:2},{name:"Hypatia",reg:"grand",syllables:2},{name:"Aspasia",reg:"grand",syllables:2},{name:"Medea",reg:"grand",syllables:2},{name:"Andromache",reg:"grand",syllables:2},{name:"Cassandra",reg:"grand",syllables:2},{name:"Calypso",reg:"grand",syllables:2},{name:"Circe",reg:"grand",syllables:2},{name:"Demeter",reg:"grand",syllables:2},{name:"Hera",reg:"grand",syllables:2},{name:"Athena",reg:"grand",syllables:2},{name:"Artemis",reg:"grand",syllables:2},{name:"Aphrodite",reg:"grand",syllables:2},{name:"Hecate",reg:"grand",syllables:2},{name:"Gaia",reg:"grand",syllables:2},{name:"Matilda",reg:"grand",syllables:2},{name:"Eleanor",reg:"grand",syllables:2},{name:"Isabeau",reg:"grand",syllables:2},{name:"Blanche",reg:"grand",syllables:2},{name:"Radegund",reg:"grand",syllables:2},{name:"Bathilde",reg:"grand",syllables:2},{name:"Clothilde",reg:"grand",syllables:2},{name:"Etheldreda",reg:"grand",syllables:2},{name:"Victoria",reg:"grand",syllables:2},{name:"Adelaide",reg:"grand",syllables:2},{name:"Charlotte",reg:"grand",syllables:2},{name:"Sophia",reg:"grand",syllables:2},{name:"Helena",reg:"grand",syllables:2},{name:"Wilhelmina",reg:"grand",syllables:2},{name:"Alexandrina",reg:"grand",syllables:2},{name:"Thomasina",reg:"grand",syllables:2},{name:"Christabel",reg:"grand",syllables:2},{name:"Rosalind",reg:"grand",syllables:2},{name:"Guinevere",reg:"grand",syllables:2},{name:"Evangeline",reg:"grand",syllables:2},{name:"Josephine",reg:"grand",syllables:2},{name:"Hildegard",reg:"grand",syllables:2},{name:"Brunhilde",reg:"grand",syllables:2},{name:"Gertrude",reg:"grand",syllables:2},{name:"Ingeborg",reg:"grand",syllables:2},{name:"Elfriede",reg:"grand",syllables:2},{name:"Mathilde",reg:"grand",syllables:2},{name:"Hedwig",reg:"grand",syllables:2},{name:"Mechthild",reg:"grand",syllables:2},{name:"Walburga",reg:"grand",syllables:2},{name:"Kunigunde",reg:"grand",syllables:2},{name:"Sieglinde",reg:"grand",syllables:2},{name:"Kriemhild",reg:"grand",syllables:2},{name:"Gudrun",reg:"grand",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Sigrid",reg:"grand",syllables:2},{name:"Astrid",reg:"grand",syllables:2},{name:"Ragnhild",reg:"grand",syllables:2},{name:"Thyra",reg:"grand",syllables:2},{name:"Gunhild",reg:"grand",syllables:2},{name:"Bergljot",reg:"grand",syllables:2},{name:"Ursula",reg:"grand",syllables:2},{name:"Bjorna",reg:"grand",syllables:2},{name:"Mishka",reg:"grand",syllables:2},{name:"Nanuq",reg:"grand",syllables:2},{name:"Koda",reg:"grand",syllables:2},{name:"Callista",reg:"grand",syllables:2},{name:"Brunhilda",reg:"grand",syllables:2},{name:"Arabella",reg:"grand",syllables:2},{name:"Cordelia",reg:"grand",syllables:2},{name:"Millicent",reg:"grand",syllables:2},{name:"Clementine",reg:"grand",syllables:2},{name:"Hildegarde",reg:"grand",syllables:2},{name:"Constance",reg:"grand",syllables:2},{name:"Prudence",reg:"grand",syllables:2},{name:"Patience",reg:"grand",syllables:2},{name:"Temperance",reg:"grand",syllables:2},{name:"Sophronia",reg:"grand",syllables:2},{name:"Georgiana",reg:"grand",syllables:2},{name:"Frederica",reg:"grand",syllables:2},{name:"Imogen",reg:"grand",syllables:2},{name:"Lavinia",reg:"grand",syllables:2},{name:"Henrietta",reg:"grand",syllables:2},{name:"Beatrice",reg:"grand",syllables:2},{name:"Dorothea",reg:"grand",syllables:2},{name:"Gwendolyn",reg:"grand",syllables:2},{name:"Rowena",reg:"grand",syllables:2},{name:"Rosamund",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:2},{name:"Celestine",reg:"grand",syllables:2},{name:"Rhiannon",reg:"grand",syllables:2},{name:"Ceridwen",reg:"grand",syllables:2},{name:"Branwen",reg:"grand",syllables:2},{name:"Gwenllian",reg:"grand",syllables:2},{name:"Arianrhod",reg:"grand",syllables:2},{name:"Blodwen",reg:"grand",syllables:2},{name:"Morfudd",reg:"grand",syllables:2},{name:"Tabitha",reg:"grand",syllables:2},{name:"Tallulah",reg:"grand",syllables:2}]
+},
   terrier: {
-    boy: [{name:"Chaos",reg:"chaos",syllables:2},{name:"Havoc",reg:"chaos",syllables:2},{name:"Mayhem",reg:"chaos",syllables:2},{name:"Bedlam",reg:"chaos",syllables:2},{name:"Ruckus",reg:"chaos",syllables:2},{name:"Pandemonium",reg:"chaos",syllables:5},{name:"Anarchy",reg:"chaos",syllables:3},{name:"Turmoil",reg:"chaos",syllables:2},{name:"Brouhaha",reg:"chaos",syllables:3},{name:"Kerfuffle",reg:"chaos",syllables:3},{name:"Uproar",reg:"chaos",syllables:2},{name:"Fracas",reg:"chaos",syllables:2},{name:"Commotion",reg:"chaos",syllables:3},{name:"Hullabaloo",reg:"chaos",syllables:4},{name:"Clamour",reg:"chaos",syllables:2},{name:"Rampage",reg:"chaos",syllables:2},{name:"Maelstrom",reg:"chaos",syllables:2},{name:"Melee",reg:"chaos",syllables:2},{name:"Scrumpy",reg:"chaos",syllables:2},{name:"Scamp",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Scrapper",reg:"chaos",syllables:2},{name:"Ripper",reg:"chaos",syllables:2},{name:"Skitter",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Rascal",reg:"chaos",syllables:2},{name:"Mischief",reg:"chaos",syllables:2},{name:"Trouble",reg:"chaos",syllables:2},{name:"Rowdy",reg:"chaos",syllables:2},{name:"Digger",reg:"chaos",syllables:2},{name:"Snapper",reg:"chaos",syllables:2},{name:"Scratchy",reg:"chaos",syllables:2},{name:"Scuttle",reg:"chaos",syllables:2},{name:"Sprocket",reg:"chaos",syllables:2},{name:"Spanner",reg:"chaos",syllables:2},{name:"Scamper",reg:"chaos",syllables:2},{name:"Snook",reg:"chaos",syllables:2},{name:"Bouncer",reg:"chaos",syllables:2},{name:"Ruffnut",reg:"chaos",syllables:2},{name:"Scrapper",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Ripper",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Taz",reg:"chaos",syllables:2},{name:"Dippy",reg:"chaos",syllables:2},{name:"Loony",reg:"chaos",syllables:2},{name:"Jinks",reg:"chaos",syllables:2},{name:"Ruff",reg:"chaos",syllables:2},{name:"Quickdraw",reg:"chaos",syllables:2}],
-    girl: [{name:"Frenzina",reg:"chaos",syllables:3},{name:"Rampeena",reg:"chaos",syllables:3},{name:"Pandemonia",reg:"chaos",syllables:4},{name:"Anarchia",reg:"chaos",syllables:4},{name:"Mischief",reg:"chaos",syllables:2},{name:"Turbulence",reg:"chaos",syllables:3},{name:"Whirlwind",reg:"chaos",syllables:2},{name:"Tempest",reg:"chaos",syllables:2},{name:"Gale",reg:"chaos",syllables:1},{name:"Tempesta",reg:"chaos",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Scrumpy",reg:"chaos",syllables:2},{name:"Scamp",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Skittles",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Ruffles",reg:"chaos",syllables:2},{name:"Tangles",reg:"chaos",syllables:2},{name:"Tufty",reg:"chaos",syllables:2},{name:"Pipsqueak",reg:"chaos",syllables:2},{name:"Titch",reg:"chaos",syllables:2},{name:"Snippy",reg:"chaos",syllables:2},{name:"Squirt",reg:"chaos",syllables:2},{name:"Scraggy",reg:"chaos",syllables:2},{name:"Wriggles",reg:"chaos",syllables:2}],
-  },
+    boy: [{name:"Chaos",reg:"chaos",syllables:2},{name:"Havoc",reg:"chaos",syllables:2},{name:"Mayhem",reg:"chaos",syllables:2},{name:"Bedlam",reg:"chaos",syllables:2},{name:"Ruckus",reg:"chaos",syllables:2},{name:"Pandemonium",reg:"chaos",syllables:5},{name:"Anarchy",reg:"chaos",syllables:3},{name:"Turmoil",reg:"chaos",syllables:2},{name:"Brouhaha",reg:"chaos",syllables:3},{name:"Kerfuffle",reg:"chaos",syllables:3},{name:"Uproar",reg:"chaos",syllables:2},{name:"Fracas",reg:"chaos",syllables:2},{name:"Commotion",reg:"chaos",syllables:3},{name:"Hullabaloo",reg:"chaos",syllables:4},{name:"Clamour",reg:"chaos",syllables:2},{name:"Rampage",reg:"chaos",syllables:2},{name:"Maelstrom",reg:"chaos",syllables:2},{name:"Melee",reg:"chaos",syllables:2},{name:"Scrumpy",reg:"chaos",syllables:2},{name:"Scamp",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Scrapper",reg:"chaos",syllables:2},{name:"Ripper",reg:"chaos",syllables:2},{name:"Skitter",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Rascal",reg:"chaos",syllables:2},{name:"Mischief",reg:"chaos",syllables:2},{name:"Trouble",reg:"chaos",syllables:2},{name:"Rowdy",reg:"chaos",syllables:2},{name:"Digger",reg:"chaos",syllables:2},{name:"Snapper",reg:"chaos",syllables:2},{name:"Scratchy",reg:"chaos",syllables:2},{name:"Scuttle",reg:"chaos",syllables:2},{name:"Sprocket",reg:"chaos",syllables:2},{name:"Spanner",reg:"chaos",syllables:2},{name:"Scamper",reg:"chaos",syllables:2},{name:"Snook",reg:"chaos",syllables:2},{name:"Bouncer",reg:"chaos",syllables:2},{name:"Ruffnut",reg:"chaos",syllables:2},{name:"Scrapper",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Ripper",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Taz",reg:"chaos",syllables:2},{name:"Dippy",reg:"chaos",syllables:2},{name:"Loony",reg:"chaos",syllables:2},{name:"Jinks",reg:"chaos",syllables:2},{name:"Ruff",reg:"chaos",syllables:2},{name:"Quickdraw",reg:"chaos",syllables:2},{name:"Spud",reg:"food",syllables:1},{name:"Chippy",reg:"food",syllables:2},{name:"Walnut",reg:"food",syllables:2},{name:"Chestnut",reg:"food",syllables:2},{name:"Almond",reg:"food",syllables:2},{name:"Squash",reg:"food",syllables:1},{name:"Carrot",reg:"food",syllables:2},{name:"Pea",reg:"food",syllables:1},{name:"Carrots",reg:"food",syllables:2},{name:"Liquorice",reg:"food",syllables:3},{name:"Curlywurly",reg:"food",syllables:4},{name:"Tunnock",reg:"food",syllables:2},{name:"Teacake",reg:"food",syllables:2},{name:"Toffo",reg:"food",syllables:2},{name:"Caramac",reg:"food",syllables:3},{name:"Treacletoffee",reg:"food",syllables:3},{name:"Pepperminty",reg:"food",syllables:4},{name:"Parma",reg:"food",syllables:2}],
+    girl: [{name:"Frenzina",reg:"chaos",syllables:3},{name:"Pandemonia",reg:"chaos",syllables:4},{name:"Anarchia",reg:"chaos",syllables:4},{name:"Mischief",reg:"chaos",syllables:2},{name:"Turbulence",reg:"chaos",syllables:3},{name:"Whirlwind",reg:"chaos",syllables:2},{name:"Tempest",reg:"chaos",syllables:2},{name:"Gale",reg:"chaos",syllables:1},{name:"Tempesta",reg:"chaos",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Tiddlywink",reg:"baby",syllables:3},{name:"Scrumpy",reg:"chaos",syllables:2},{name:"Scamp",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Skittles",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Ruffles",reg:"chaos",syllables:2},{name:"Tangles",reg:"chaos",syllables:2},{name:"Tufty",reg:"chaos",syllables:2},{name:"Pipsqueak",reg:"chaos",syllables:2},{name:"Titch",reg:"chaos",syllables:2},{name:"Snippy",reg:"chaos",syllables:2},{name:"Squirt",reg:"chaos",syllables:2},{name:"Scraggy",reg:"chaos",syllables:2},{name:"Wriggles",reg:"chaos",syllables:2},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Dottie",reg:"mundane",syllables:2},{name:"Dusty",reg:"mundane",syllables:1},{name:"Effie",reg:"mundane",syllables:2},{name:"Elsie",reg:"mundane",syllables:2},{name:"Feisty",reg:"chaos",syllables:1},{name:"Flick",reg:"chaos",syllables:1},{name:"Ginny",reg:"chaos",syllables:1},{name:"Hetty",reg:"mundane",syllables:1},{name:"Josie",reg:"mundane",syllables:2},{name:"Kitty",reg:"mundane",syllables:1},{name:"Lacey",reg:"mundane",syllables:2},{name:"Lassie",reg:"mundane",syllables:2},{name:"Lottie",reg:"mundane",syllables:2},{name:"Maggie",reg:"mundane",syllables:2},{name:"Maisie",reg:"grand",syllables:2},{name:"Meg",reg:"mundane",syllables:1},{name:"Minnie",reg:"mundane",syllables:2},{name:"Molly",reg:"mundane",syllables:1},{name:"Nell",reg:"nature",syllables:1},{name:"Nettle",reg:"chaos",syllables:2},{name:"Nip",reg:"chaos",syllables:1},{name:"Patch",reg:"mundane",syllables:1},{name:"Peggy",reg:"mundane",syllables:1},{name:"Pickle",reg:"mundane",syllables:2},{name:"Pip",reg:"mundane",syllables:1},{name:"Pippa",reg:"mundane",syllables:2},{name:"Plucky",reg:"chaos",syllables:1},{name:"Spud",reg:"food",syllables:1},{name:"Chippy",reg:"food",syllables:2},{name:"Walnut",reg:"food",syllables:2},{name:"Chestnut",reg:"food",syllables:2},{name:"Almond",reg:"food",syllables:2},{name:"Squash",reg:"food",syllables:1},{name:"Carrot",reg:"food",syllables:2},{name:"Pea",reg:"food",syllables:1},{name:"Carrots",reg:"food",syllables:2},{name:"Liquorice",reg:"food",syllables:3},{name:"Curlywurly",reg:"food",syllables:4},{name:"Tunnock",reg:"food",syllables:2},{name:"Teacake",reg:"food",syllables:2},{name:"Toffo",reg:"food",syllables:2},{name:"Caramac",reg:"food",syllables:3},{name:"Treacletoffee",reg:"food",syllables:3},{name:"Pepperminty",reg:"food",syllables:4},{name:"Parma",reg:"food",syllables:2}]
+},
   retriever: {
-    boy: [{name:"Biscuit",reg:"food",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Custard",reg:"food",syllables:2},{name:"Gravy",reg:"food",syllables:2},{name:"Crumble",reg:"food",syllables:2},{name:"Dumpling",reg:"food",syllables:2},{name:"Jelly",reg:"food",syllables:2},{name:"Sausage",reg:"food",syllables:2},{name:"Treacle",reg:"food",syllables:2},{name:"Syllabub",reg:"food",syllables:3},{name:"Douglas",reg:"mundane",syllables:2},{name:"Barnaby",reg:"grand",syllables:3},{name:"Edmund",reg:"grand",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Clarence",reg:"grand",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Stanley",reg:"mundane",syllables:2},{name:"Reginald",reg:"grand",syllables:3},{name:"Humphrey",reg:"grand",syllables:2},{name:"Archibald",reg:"grand",syllables:3},{name:"William",reg:"mundane",syllables:2},{name:"Oliver",reg:"mundane",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Scampi",reg:"food",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Popcorn",reg:"food",syllables:2},{name:"Beans",reg:"food",syllables:2},{name:"Sizzle",reg:"food",syllables:2},{name:"Banger",reg:"food",syllables:2},{name:"Crumbs",reg:"food",syllables:2},{name:"Meatball",reg:"food",syllables:2},{name:"Chip",reg:"food",syllables:2},{name:"Chops",reg:"food",syllables:2},{name:"Scraps",reg:"food",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Cracker",reg:"food",syllables:2},{name:"Sprat",reg:"food",syllables:2},{name:"Kipper",reg:"food",syllables:2},{name:"Truffles",reg:"food",syllables:2},{name:"Minnow",reg:"food",syllables:2},{name:"Goose",reg:"chaos",syllables:2},{name:"Fetcher",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Lolloper",reg:"chaos",syllables:2},{name:"Slobber",reg:"chaos",syllables:2},{name:"Chomper",reg:"chaos",syllables:2},{name:"Gobbler",reg:"chaos",syllables:2},{name:"Muncher",reg:"chaos",syllables:2},{name:"Barnacle",reg:"chaos",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Bagel",reg:"food",syllables:2},{name:"Pretzel",reg:"food",syllables:2},{name:"Chips",reg:"food",syllables:2},{name:"Gherkin",reg:"food",syllables:2},{name:"Porridge",reg:"food",syllables:2},{name:"Granola",reg:"food",syllables:2},{name:"Toastie",reg:"food",syllables:2},{name:"Crusty",reg:"food",syllables:2},{name:"Crispy",reg:"food",syllables:2},{name:"Cobbler",reg:"food",syllables:2},{name:"Strudel",reg:"food",syllables:2},{name:"Tartlet",reg:"food",syllables:2},{name:"Munchie",reg:"food",syllables:2},{name:"Chewy",reg:"food",syllables:2},{name:"Cruncher",reg:"food",syllables:2},{name:"Nibbler",reg:"food",syllables:2},{name:"Scoffy",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Molasses",reg:"food",syllables:2},{name:"Turnip",reg:"food",syllables:2},{name:"Parsnip",reg:"food",syllables:2},{name:"Cashew",reg:"food",syllables:2},{name:"Hazelnut",reg:"food",syllables:2},{name:"Nutmeg",reg:"food",syllables:2},{name:"Pepper",reg:"food",syllables:2},{name:"Paprika",reg:"food",syllables:2},{name:"Chutney",reg:"food",syllables:2}],
-    girl: [{name:"Treacle",reg:"food",syllables:2},{name:"Trifle",reg:"food",syllables:2},{name:"Muffin",reg:"food",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Eclair",reg:"food",syllables:2},{name:"Crumpet",reg:"food",syllables:2},{name:"Waffle",reg:"food",syllables:2},{name:"Biscuit",reg:"food",syllables:2},{name:"Brownie",reg:"food",syllables:2},{name:"Pavlova",reg:"food",syllables:3},{name:"Charlotte",reg:"mundane",syllables:2},{name:"Margaret",reg:"mundane",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Edith",reg:"mundane",syllables:2},{name:"Florence",reg:"mundane",syllables:2},{name:"Beatrice",reg:"grand",syllables:3},{name:"Constance",reg:"mundane",syllables:2},{name:"Millicent",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2},{name:"Truffle",reg:"food",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Popcorn",reg:"food",syllables:2},{name:"Beanbag",reg:"food",syllables:2},{name:"Nibbins",reg:"food",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Cracker",reg:"food",syllables:2},{name:"Kipper",reg:"food",syllables:2},{name:"Sardine",reg:"food",syllables:2},{name:"Prawn",reg:"food",syllables:2},{name:"Pickles",reg:"food",syllables:2},{name:"Pippin",reg:"food",syllables:2},{name:"Pip",reg:"food",syllables:2},{name:"Pipsqueak",reg:"food",syllables:2},{name:"Sprout",reg:"food",syllables:2},{name:"Goose",reg:"food",syllables:2},{name:"Smudge",reg:"food",syllables:2},{name:"Splodge",reg:"food",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Sprinkles",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Marshmallow",reg:"food",syllables:2},{name:"Meringue",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Peaches",reg:"food",syllables:2},{name:"Cherry",reg:"food",syllables:2},{name:"Berry",reg:"food",syllables:2},{name:"Plum",reg:"food",syllables:2},{name:"Apricot",reg:"food",syllables:2},{name:"Kiwi",reg:"food",syllables:2},{name:"Mango",reg:"food",syllables:2},{name:"Melon",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Taffy",reg:"food",syllables:2},{name:"Rolo",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Figgy",reg:"food",syllables:2},{name:"Pumpkin",reg:"food",syllables:2}],
-  },
+    boy: [{name:"Biscuit",reg:"food",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Custard",reg:"food",syllables:2},{name:"Gravy",reg:"food",syllables:2},{name:"Crumble",reg:"food",syllables:2},{name:"Dumpling",reg:"food",syllables:2},{name:"Jelly",reg:"food",syllables:2},{name:"Sausage",reg:"food",syllables:2},{name:"Treacle",reg:"food",syllables:2},{name:"Syllabub",reg:"food",syllables:3},{name:"Douglas",reg:"mundane",syllables:2},{name:"Barnaby",reg:"grand",syllables:3},{name:"Edmund",reg:"grand",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Clarence",reg:"grand",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Stanley",reg:"mundane",syllables:2},{name:"Reginald",reg:"grand",syllables:3},{name:"Humphrey",reg:"grand",syllables:2},{name:"Archibald",reg:"grand",syllables:3},{name:"William",reg:"mundane",syllables:2},{name:"Oliver",reg:"mundane",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Scampi",reg:"food",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Popcorn",reg:"food",syllables:2},{name:"Beans",reg:"food",syllables:2},{name:"Sizzle",reg:"food",syllables:2},{name:"Banger",reg:"food",syllables:2},{name:"Crumbs",reg:"food",syllables:2},{name:"Meatball",reg:"food",syllables:2},{name:"Chip",reg:"food",syllables:2},{name:"Chops",reg:"food",syllables:2},{name:"Scraps",reg:"food",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Cracker",reg:"food",syllables:2},{name:"Sprat",reg:"food",syllables:2},{name:"Kipper",reg:"food",syllables:2},{name:"Truffles",reg:"food",syllables:2},{name:"Minnow",reg:"food",syllables:2},{name:"Goose",reg:"chaos",syllables:2},{name:"Fetcher",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Lollypop",reg:"chaos",syllables:2},{name:"Slobber",reg:"chaos",syllables:2},{name:"Chomper",reg:"chaos",syllables:2},{name:"Gobbler",reg:"chaos",syllables:2},{name:"Muncher",reg:"chaos",syllables:2},{name:"Barnacle",reg:"chaos",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Bagel",reg:"food",syllables:2},{name:"Pretzel",reg:"food",syllables:2},{name:"Chips",reg:"food",syllables:2},{name:"Gherkin",reg:"food",syllables:2},{name:"Porridge",reg:"food",syllables:2},{name:"Granola",reg:"food",syllables:2},{name:"Toastie",reg:"food",syllables:2},{name:"Crusty",reg:"food",syllables:2},{name:"Crispy",reg:"food",syllables:2},{name:"Cobbler",reg:"food",syllables:2},{name:"Strudel",reg:"food",syllables:2},{name:"Tartlet",reg:"food",syllables:2},{name:"Munchie",reg:"food",syllables:2},{name:"Chewy",reg:"food",syllables:2},{name:"Cruncher",reg:"food",syllables:2},{name:"Nibbler",reg:"food",syllables:2},{name:"Scoffy",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Molasses",reg:"food",syllables:2},{name:"Turnip",reg:"food",syllables:2},{name:"Parsnip",reg:"food",syllables:2},{name:"Cashew",reg:"food",syllables:2},{name:"Hazelnut",reg:"food",syllables:2},{name:"Nutmeg",reg:"food",syllables:2},{name:"Pepper",reg:"food",syllables:2},{name:"Paprika",reg:"food",syllables:2},{name:"Chutney",reg:"food",syllables:2},{name:"Cyrus",reg:"grand",syllables:2},{name:"Darius",reg:"grand",syllables:3},{name:"Plato",reg:"grand",syllables:2},{name:"Prometheus",reg:"grand",syllables:4},{name:"Pythagoras",reg:"grand",syllables:4},{name:"Socrates",reg:"grand",syllables:3},{name:"Napoleon",reg:"grand",syllables:4},{name:"Pascal",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Darwin",reg:"grand",syllables:2},{name:"Einstein",reg:"grand",syllables:3},{name:"Cookies",reg:"food",syllables:2},{name:"Crackers",reg:"food",syllables:2},{name:"Sausages",reg:"food",syllables:3},{name:"Dumplings",reg:"food",syllables:2},{name:"Kippers",reg:"food",syllables:2},{name:"Freddo",reg:"food",syllables:2},{name:"Fudgey",reg:"food",syllables:2},{name:"Wagonwheel",reg:"food",syllables:3}],
+    girl: [{name:"Treacle",reg:"food",syllables:2},{name:"Trifle",reg:"food",syllables:2},{name:"Muffin",reg:"food",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Eclair",reg:"food",syllables:2},{name:"Crumpet",reg:"food",syllables:2},{name:"Waffle",reg:"food",syllables:2},{name:"Biscuit",reg:"food",syllables:2},{name:"Brownie",reg:"food",syllables:2},{name:"Pavlova",reg:"food",syllables:3},{name:"Charlotte",reg:"mundane",syllables:2},{name:"Margaret",reg:"mundane",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Edith",reg:"mundane",syllables:2},{name:"Florence",reg:"mundane",syllables:2},{name:"Beatrice",reg:"grand",syllables:3},{name:"Constance",reg:"mundane",syllables:2},{name:"Millicent",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Candyfloss",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2},{name:"Truffle",reg:"food",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Popcorn",reg:"food",syllables:2},{name:"Beanbag",reg:"food",syllables:2},{name:"Nibbins",reg:"food",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Cracker",reg:"food",syllables:2},{name:"Kipper",reg:"food",syllables:2},{name:"Sardine",reg:"food",syllables:2},{name:"Prawn",reg:"food",syllables:2},{name:"Pickles",reg:"food",syllables:2},{name:"Pippin",reg:"food",syllables:2},{name:"Pip",reg:"food",syllables:2},{name:"Pipsqueak",reg:"food",syllables:2},{name:"Sprout",reg:"food",syllables:2},{name:"Goose",reg:"food",syllables:2},{name:"Smudge",reg:"food",syllables:2},{name:"Splodge",reg:"food",syllables:2},{name:"Shortcake",reg:"food",syllables:2},{name:"Sprinkles",reg:"food",syllables:2},{name:"Doughnut",reg:"food",syllables:2},{name:"Marshmallow",reg:"food",syllables:2},{name:"Meringue",reg:"food",syllables:2},{name:"Latte",reg:"food",syllables:2},{name:"Peaches",reg:"food",syllables:2},{name:"Cherry",reg:"food",syllables:2},{name:"Berry",reg:"food",syllables:2},{name:"Plum",reg:"food",syllables:2},{name:"Apricot",reg:"food",syllables:2},{name:"Kiwi",reg:"food",syllables:2},{name:"Mango",reg:"food",syllables:2},{name:"Melon",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Taffy",reg:"food",syllables:2},{name:"Rolo",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Figgy",reg:"food",syllables:2},{name:"Pumpkin",reg:"food",syllables:2},{name:"Athena",reg:"grand",syllables:3},{name:"Calypso",reg:"grand",syllables:3},{name:"Carina",reg:"grand",syllables:3},{name:"Cassandra",reg:"grand",syllables:3},{name:"Circe",reg:"grand",syllables:2},{name:"Cleopatra",reg:"grand",syllables:4},{name:"Demeter",reg:"grand",syllables:3},{name:"Fauna",reg:"nature",syllables:2},{name:"Gaia",reg:"grand",syllables:2},{name:"Hecate",reg:"grand",syllables:3},{name:"Hera",reg:"grand",syllables:2},{name:"Hippolyta",reg:"grand",syllables:4},{name:"Medea",reg:"grand",syllables:3},{name:"Persephone",reg:"grand",syllables:4},{name:"Phoebe",reg:"grand",syllables:2},{name:"Rhea",reg:"grand",syllables:2},{name:"Sappho",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:4},{name:"Sophia",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Cookies",reg:"food",syllables:2},{name:"Crackers",reg:"food",syllables:2},{name:"Sausages",reg:"food",syllables:3},{name:"Dumplings",reg:"food",syllables:2},{name:"Kippers",reg:"food",syllables:2},{name:"Freddo",reg:"food",syllables:2},{name:"Fudgey",reg:"food",syllables:2},{name:"Wagonwheel",reg:"food",syllables:3}]
+},
   collie: {
-    boy: [{name:"Frenetic",reg:"chaos",syllables:3},{name:"Relentless",reg:"absurd",syllables:3},{name:"Obsessive",reg:"absurd",syllables:3},{name:"Tenacious",reg:"absurd",syllables:4},{name:"Resolute",reg:"grand",syllables:3},{name:"Duncan",reg:"mundane",syllables:2},{name:"Angus",reg:"mundane",syllables:2},{name:"Hamish",reg:"mundane",syllables:2},{name:"Rory",reg:"mundane",syllables:2},{name:"Fergus",reg:"mundane",syllables:2},{name:"Malcolm",reg:"mundane",syllables:2},{name:"Sprocket",reg:"chaos",syllables:2},{name:"Spanner",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Zoomer",reg:"chaos",syllables:2},{name:"Whizz",reg:"chaos",syllables:2},{name:"Rocket",reg:"chaos",syllables:2},{name:"Dasher",reg:"chaos",syllables:2},{name:"Scout",reg:"chaos",syllables:2},{name:"Tracker",reg:"chaos",syllables:2},{name:"Chaser",reg:"chaos",syllables:2},{name:"Boffin",reg:"chaos",syllables:2},{name:"Skitter",reg:"chaos",syllables:2},{name:"Badger",reg:"mundane",syllables:2},{name:"Gadget",reg:"absurd",syllables:2},{name:"Genius",reg:"absurd",syllables:2},{name:"Glider",reg:"absurd",syllables:2},{name:"Gatherer",reg:"absurd",syllables:2},{name:"Govern",reg:"absurd",syllables:2},{name:"Grid",reg:"absurd",syllables:2}],
-    girl: [],
-  },
+    boy: [{name:"Frenetic",reg:"chaos",syllables:3},{name:"Relentless",reg:"absurd",syllables:3},{name:"Obsessive",reg:"absurd",syllables:3},{name:"Tenacious",reg:"absurd",syllables:4},{name:"Resolute",reg:"grand",syllables:3},{name:"Duncan",reg:"mundane",syllables:2},{name:"Angus",reg:"mundane",syllables:2},{name:"Hamish",reg:"mundane",syllables:2},{name:"Rory",reg:"mundane",syllables:2},{name:"Fergus",reg:"mundane",syllables:2},{name:"Malcolm",reg:"mundane",syllables:2},{name:"Sprocket",reg:"chaos",syllables:2},{name:"Spanner",reg:"chaos",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Zoomer",reg:"chaos",syllables:2},{name:"Whizz",reg:"chaos",syllables:2},{name:"Rocket",reg:"chaos",syllables:2},{name:"Dasher",reg:"chaos",syllables:2},{name:"Scout",reg:"chaos",syllables:2},{name:"Tracker",reg:"chaos",syllables:2},{name:"Chaser",reg:"chaos",syllables:2},{name:"Boffin",reg:"chaos",syllables:2},{name:"Skitter",reg:"chaos",syllables:2},{name:"Badger",reg:"mundane",syllables:2},{name:"Gadget",reg:"absurd",syllables:2},{name:"Genius",reg:"absurd",syllables:2},{name:"Glider",reg:"absurd",syllables:2},{name:"Gatherer",reg:"absurd",syllables:2},{name:"Govern",reg:"absurd",syllables:2},{name:"Grid",reg:"absurd",syllables:2},{name:"Cyrus",reg:"grand",syllables:2},{name:"Darius",reg:"grand",syllables:3},{name:"Plato",reg:"grand",syllables:2},{name:"Prometheus",reg:"grand",syllables:4},{name:"Pythagoras",reg:"grand",syllables:4},{name:"Socrates",reg:"grand",syllables:3},{name:"Napoleon",reg:"grand",syllables:4},{name:"Pascal",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Darwin",reg:"grand",syllables:2},{name:"Einstein",reg:"grand",syllables:3},{name:"Archie",reg:"grand",syllables:2},{name:"Barney",reg:"grand",syllables:2},{name:"Callum",reg:"grand",syllables:2},{name:"Dougal",reg:"grand",syllables:2},{name:"Finn",reg:"grand",syllables:1},{name:"Fraser",reg:"grand",syllables:2},{name:"Hector",reg:"grand",syllables:2},{name:"Hunter",reg:"grand",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Jed",reg:"grand",syllables:1},{name:"Jet",reg:"grand",syllables:1},{name:"Lachlan",reg:"grand",syllables:2},{name:"Logan",reg:"grand",syllables:2},{name:"Mac",reg:"grand",syllables:1},{name:"Merlin",reg:"grand",syllables:2},{name:"Murray",reg:"grand",syllables:2},{name:"Oscar",reg:"grand",syllables:2},{name:"Scott",reg:"grand",syllables:1},{name:"Shep",reg:"grand",syllables:1}],
+    girl: [{name:"Athena",reg:"grand",syllables:3},{name:"Calypso",reg:"grand",syllables:3},{name:"Carina",reg:"grand",syllables:3},{name:"Cassandra",reg:"grand",syllables:3},{name:"Circe",reg:"grand",syllables:2},{name:"Cleopatra",reg:"grand",syllables:4},{name:"Demeter",reg:"grand",syllables:3},{name:"Fauna",reg:"nature",syllables:2},{name:"Gaia",reg:"grand",syllables:2},{name:"Hecate",reg:"grand",syllables:3},{name:"Hera",reg:"grand",syllables:2},{name:"Hippolyta",reg:"grand",syllables:4},{name:"Medea",reg:"grand",syllables:3},{name:"Persephone",reg:"grand",syllables:4},{name:"Phoebe",reg:"grand",syllables:2},{name:"Rhea",reg:"grand",syllables:2},{name:"Sappho",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:4},{name:"Sophia",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Bracken",reg:"nature",syllables:2},{name:"Bramble",reg:"nature",syllables:2},{name:"Bree",reg:"nature",syllables:1},{name:"Briar",reg:"nature",syllables:1},{name:"Brook",reg:"nature",syllables:1},{name:"Clover",reg:"nature",syllables:2},{name:"Coral",reg:"nature",syllables:2},{name:"Dawn",reg:"nature",syllables:1},{name:"Fern",reg:"nature",syllables:1},{name:"Flora",reg:"nature",syllables:2},{name:"Gracie",reg:"nature",syllables:2},{name:"Hazel",reg:"nature",syllables:2},{name:"Heather",reg:"nature",syllables:2},{name:"Holly",reg:"nature",syllables:1},{name:"Iris",reg:"nature",syllables:2},{name:"Lark",reg:"nature",syllables:1},{name:"Laurel",reg:"nature",syllables:2},{name:"Lily",reg:"nature",syllables:1},{name:"Luna",reg:"nature",syllables:2},{name:"Meadow",reg:"nature",syllables:2},{name:"Misty",reg:"nature",syllables:1},{name:"Nell",reg:"nature",syllables:1},{name:"Nova",reg:"nature",syllables:2},{name:"Olive",reg:"nature",syllables:3},{name:"Poppy",reg:"nature",syllables:1},{name:"River",reg:"nature",syllables:2},{name:"Robin",reg:"nature",syllables:2},{name:"Rose",reg:"nature",syllables:2},{name:"Rosie",reg:"nature",syllables:2},{name:"Ruby",reg:"nature",syllables:1},{name:"Sage",reg:"nature",syllables:2},{name:"Scout",reg:"nature",syllables:1},{name:"Skye",reg:"nature",syllables:1},{name:"Sorrel",reg:"nature",syllables:2},{name:"Stella",reg:"nature",syllables:2},{name:"Storm",reg:"nature",syllables:1},{name:"Teal",reg:"nature",syllables:1},{name:"Thistle",reg:"nature",syllables:2},{name:"Violet",reg:"nature",syllables:2},{name:"Willow",reg:"nature",syllables:2},{name:"Wren",reg:"nature",syllables:1},{name:"Yarrow",reg:"nature",syllables:2},{name:"Agatha",reg:"grand",syllables:3},{name:"Beatrix",reg:"grand",syllables:2},{name:"Celia",reg:"grand",syllables:2},{name:"Clara",reg:"grand",syllables:2},{name:"Diana",reg:"grand",syllables:2},{name:"Eleanor",reg:"grand",syllables:3},{name:"Elspeth",reg:"grand",syllables:2},{name:"Grace",reg:"grand",syllables:2},{name:"Harriet",reg:"grand",syllables:2},{name:"Imogen",reg:"grand",syllables:3},{name:"Lorna",reg:"grand",syllables:2},{name:"Maisie",reg:"grand",syllables:2}]
+},
   poodle: {
-    boy: [{name:"Existentiale",reg:"absurd",syllables:5},{name:"Paradoxe",reg:"absurd",syllables:3},{name:"Hermeneutique",reg:"absurd",syllables:5},{name:"Syllogisme",reg:"absurd",syllables:4},{name:"Pierre",reg:"grand",syllables:1},{name:"Jacques",reg:"grand",syllables:1},{name:"François",reg:"grand",syllables:2},{name:"Henri",reg:"grand",syllables:2},{name:"Marcel",reg:"grand",syllables:2},{name:"Gaston",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Einstein",reg:"grand",syllables:2},{name:"Socrates",reg:"grand",syllables:3},{name:"Darwin",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Freud",reg:"grand",syllables:1},{name:"Waltz",reg:"grand",syllables:2},{name:"Wittgenstein",reg:"grand",syllables:2},{name:"Wafture",reg:"grand",syllables:2},{name:"Plato",reg:"grand",syllables:2},{name:"Pythagoras",reg:"grand",syllables:2},{name:"Poirot",reg:"grand",syllables:2},{name:"Proust",reg:"grand",syllables:2},{name:"Pascal",reg:"grand",syllables:2},{name:"Arsène",reg:"grand",syllables:2},{name:"Blaise",reg:"grand",syllables:2},{name:"César",reg:"grand",syllables:2},{name:"Émile",reg:"grand",syllables:2},{name:"Félix",reg:"grand",syllables:2},{name:"Guy",reg:"grand",syllables:2},{name:"Hervé",reg:"grand",syllables:2},{name:"Honoré",reg:"grand",syllables:2},{name:"Jules",reg:"grand",syllables:2},{name:"Léon",reg:"grand",syllables:2},{name:"Louis",reg:"grand",syllables:2},{name:"Noël",reg:"grand",syllables:2},{name:"Raoul",reg:"grand",syllables:2},{name:"René",reg:"grand",syllables:2},{name:"Yves",reg:"grand",syllables:2},{name:"Alphonse",reg:"grand",syllables:2},{name:"Anatole",reg:"grand",syllables:2},{name:"Antoine",reg:"grand",syllables:2},{name:"Camille",reg:"grand",syllables:2},{name:"Clément",reg:"grand",syllables:2},{name:"Désiré",reg:"grand",syllables:2},{name:"Edmond",reg:"grand",syllables:2},{name:"Étienne",reg:"grand",syllables:2},{name:"Eugène",reg:"grand",syllables:2},{name:"Gilles",reg:"grand",syllables:2},{name:"Jérôme",reg:"grand",syllables:2},{name:"Julien",reg:"grand",syllables:2},{name:"Léandre",reg:"grand",syllables:2},{name:"Léopold",reg:"grand",syllables:2},{name:"Lucien",reg:"grand",syllables:2},{name:"Séraphin",reg:"grand",syllables:2},{name:"Théodore",reg:"grand",syllables:2},{name:"Valentin",reg:"grand",syllables:2},{name:"Barthélemy",reg:"grand",syllables:2},{name:"Dieudonné",reg:"grand",syllables:2},{name:"Enguerrand",reg:"grand",syllables:2},{name:"Hyacinthe",reg:"grand",syllables:2},{name:"Théophile",reg:"grand",syllables:2},{name:"Toussaint",reg:"grand",syllables:2}],
-    girl: [{name:"Colette",reg:"grand",syllables:2},{name:"Marguerite",reg:"grand",syllables:3},{name:"Simone",reg:"grand",syllables:2},{name:"Yvette",reg:"grand",syllables:2},{name:"Brigitte",reg:"grand",syllables:2},{name:"Claudette",reg:"grand",syllables:2},{name:"Giselle",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Waltz",reg:"grand",syllables:2},{name:"Wisteria",reg:"grand",syllables:2},{name:"Whimsy",reg:"grand",syllables:2},{name:"Wistful",reg:"grand",syllables:2},{name:"Wanderlust",reg:"grand",syllables:2},{name:"Catriona",reg:"mundane",syllables:2},{name:"Eilidh",reg:"mundane",syllables:2},{name:"Shona",reg:"mundane",syllables:2},{name:"Rhona",reg:"mundane",syllables:2},{name:"Sine",reg:"mundane",syllables:2},{name:"Mairead",reg:"mundane",syllables:2},{name:"Iseabail",reg:"mundane",syllables:2},{name:"Marsaili",reg:"mundane",syllables:2},{name:"Seonaid",reg:"mundane",syllables:2},{name:"Muireann",reg:"mundane",syllables:2},{name:"Sorcha",reg:"mundane",syllables:2},{name:"Deirdre",reg:"mundane",syllables:2},{name:"Aoife",reg:"mundane",syllables:2},{name:"Niamh",reg:"mundane",syllables:2},{name:"Grainne",reg:"mundane",syllables:2},{name:"Saoirse",reg:"mundane",syllables:2},{name:"Brigid",reg:"mundane",syllables:2},{name:"Siobhan",reg:"mundane",syllables:2},{name:"Roisin",reg:"mundane",syllables:2},{name:"Nell",reg:"mundane",syllables:2},{name:"Jess",reg:"mundane",syllables:2},{name:"Tess",reg:"mundane",syllables:2},{name:"Bess",reg:"mundane",syllables:2},{name:"Meg",reg:"mundane",syllables:2},{name:"Fleet",reg:"mundane",syllables:2},{name:"Fly",reg:"mundane",syllables:2},{name:"Pip",reg:"mundane",syllables:2},{name:"Dot",reg:"mundane",syllables:2},{name:"Moss",reg:"mundane",syllables:2},{name:"Bracken",reg:"mundane",syllables:2},{name:"Bramble",reg:"mundane",syllables:2},{name:"Sorrel",reg:"mundane",syllables:2},{name:"Clover",reg:"mundane",syllables:2},{name:"Thistle",reg:"mundane",syllables:2},{name:"Rowan",reg:"mundane",syllables:2},{name:"Hazel",reg:"mundane",syllables:2},{name:"Willow",reg:"mundane",syllables:2},{name:"Yarrow",reg:"mundane",syllables:2},{name:"Furze",reg:"mundane",syllables:2},{name:"Gorse",reg:"mundane",syllables:2},{name:"Skye",reg:"mundane",syllables:2},{name:"Scout",reg:"mundane",syllables:2},{name:"Sable",reg:"mundane",syllables:2},{name:"Selkie",reg:"mundane",syllables:2},{name:"Rona",reg:"mundane",syllables:2},{name:"Raven",reg:"mundane",syllables:2},{name:"Rowena",reg:"mundane",syllables:2},{name:"Lorna",reg:"mundane",syllables:2},{name:"Maisie",reg:"mundane",syllables:2},{name:"Mirren",reg:"mundane",syllables:2},{name:"Fenella",reg:"mundane",syllables:2},{name:"Perdita",reg:"mundane",syllables:2},{name:"Portia",reg:"mundane",syllables:2},{name:"Winsome",reg:"mundane",syllables:2},{name:"Wren",reg:"mundane",syllables:2},{name:"Waverly",reg:"mundane",syllables:2},{name:"Glenna",reg:"mundane",syllables:2},{name:"Grace",reg:"mundane",syllables:2},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Blair",reg:"mundane",syllables:2},{name:"Tara",reg:"mundane",syllables:2},{name:"Thea",reg:"mundane",syllables:2},{name:"Tess",reg:"mundane",syllables:2},{name:"Thistle",reg:"mundane",syllables:2},{name:"Nairn",reg:"mundane",syllables:2},{name:"Merna",reg:"mundane",syllables:2},{name:"Leith",reg:"mundane",syllables:2}],
-  },
+    boy: [{name:"Existentiale",reg:"absurd",syllables:5},{name:"Hermeneutique",reg:"absurd",syllables:5},{name:"Syllogisme",reg:"absurd",syllables:4},{name:"Pierre",reg:"grand",syllables:1},{name:"Jacques",reg:"grand",syllables:1},{name:"François",reg:"grand",syllables:2},{name:"Henri",reg:"grand",syllables:2},{name:"Marcel",reg:"grand",syllables:2},{name:"Gaston",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Einstein",reg:"grand",syllables:2},{name:"Socrates",reg:"grand",syllables:3},{name:"Darwin",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Freud",reg:"grand",syllables:1},{name:"Waltz",reg:"grand",syllables:2},{name:"Wittgenstein",reg:"grand",syllables:2},{name:"Wafture",reg:"grand",syllables:2},{name:"Pythagoras",reg:"grand",syllables:2},{name:"Poirot",reg:"grand",syllables:2},{name:"Arsène",reg:"grand",syllables:2},{name:"Blaise",reg:"grand",syllables:2},{name:"César",reg:"grand",syllables:2},{name:"Émile",reg:"grand",syllables:2},{name:"Félix",reg:"grand",syllables:2},{name:"Guy",reg:"grand",syllables:2},{name:"Hervé",reg:"grand",syllables:2},{name:"Honoré",reg:"grand",syllables:2},{name:"Jules",reg:"grand",syllables:2},{name:"Léon",reg:"grand",syllables:2},{name:"Louis",reg:"grand",syllables:2},{name:"Noël",reg:"grand",syllables:2},{name:"Raoul",reg:"grand",syllables:2},{name:"René",reg:"grand",syllables:2},{name:"Yves",reg:"grand",syllables:2},{name:"Alphonse",reg:"grand",syllables:2},{name:"Anatole",reg:"grand",syllables:2},{name:"Antoine",reg:"grand",syllables:2},{name:"Camille",reg:"grand",syllables:2},{name:"Clément",reg:"grand",syllables:2},{name:"Désiré",reg:"grand",syllables:2},{name:"Edmond",reg:"grand",syllables:2},{name:"Étienne",reg:"grand",syllables:2},{name:"Eugène",reg:"grand",syllables:2},{name:"Gilles",reg:"grand",syllables:2},{name:"Jérôme",reg:"grand",syllables:2},{name:"Julien",reg:"grand",syllables:2},{name:"Léandre",reg:"grand",syllables:2},{name:"Léopold",reg:"grand",syllables:2},{name:"Lucien",reg:"grand",syllables:2},{name:"Séraphin",reg:"grand",syllables:2},{name:"Théodore",reg:"grand",syllables:2},{name:"Valentin",reg:"grand",syllables:2},{name:"Barthélemy",reg:"grand",syllables:2},{name:"Dieudonné",reg:"grand",syllables:2},{name:"Enguerrand",reg:"grand",syllables:2},{name:"Hyacinthe",reg:"grand",syllables:2},{name:"Théophile",reg:"grand",syllables:2},{name:"Toussaint",reg:"grand",syllables:2}],
+    girl: [{name:"Colette",reg:"grand",syllables:2},{name:"Marguerite",reg:"grand",syllables:3},{name:"Simone",reg:"grand",syllables:2},{name:"Yvette",reg:"grand",syllables:2},{name:"Brigitte",reg:"grand",syllables:2},{name:"Claudette",reg:"grand",syllables:2},{name:"Giselle",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Waltz",reg:"grand",syllables:2},{name:"Wisteria",reg:"grand",syllables:2},{name:"Whimsy",reg:"grand",syllables:2},{name:"Wistful",reg:"grand",syllables:2},{name:"Wanderlust",reg:"grand",syllables:2},{name:"Catriona",reg:"mundane",syllables:2},{name:"Eilidh",reg:"mundane",syllables:2},{name:"Shona",reg:"mundane",syllables:2},{name:"Rhona",reg:"mundane",syllables:2},{name:"Sine",reg:"mundane",syllables:2},{name:"Mairead",reg:"mundane",syllables:2},{name:"Iseabail",reg:"mundane",syllables:2},{name:"Marsaili",reg:"mundane",syllables:2},{name:"Seonaid",reg:"mundane",syllables:2},{name:"Muireann",reg:"mundane",syllables:2},{name:"Sorcha",reg:"mundane",syllables:2},{name:"Deirdre",reg:"mundane",syllables:2},{name:"Aoife",reg:"mundane",syllables:2},{name:"Niamh",reg:"mundane",syllables:2},{name:"Grainne",reg:"mundane",syllables:2},{name:"Saoirse",reg:"mundane",syllables:2},{name:"Brigid",reg:"mundane",syllables:2},{name:"Siobhan",reg:"mundane",syllables:2},{name:"Roisin",reg:"mundane",syllables:2},{name:"Nell",reg:"mundane",syllables:2},{name:"Jess",reg:"mundane",syllables:2},{name:"Tess",reg:"mundane",syllables:2},{name:"Bess",reg:"mundane",syllables:2},{name:"Meg",reg:"mundane",syllables:2},{name:"Fleet",reg:"mundane",syllables:2},{name:"Fly",reg:"mundane",syllables:2},{name:"Pip",reg:"mundane",syllables:2},{name:"Dot",reg:"mundane",syllables:2},{name:"Moss",reg:"mundane",syllables:2},{name:"Bracken",reg:"mundane",syllables:2},{name:"Bramble",reg:"mundane",syllables:2},{name:"Sorrel",reg:"mundane",syllables:2},{name:"Clover",reg:"mundane",syllables:2},{name:"Thistle",reg:"mundane",syllables:2},{name:"Rowan",reg:"mundane",syllables:2},{name:"Hazel",reg:"mundane",syllables:2},{name:"Willow",reg:"mundane",syllables:2},{name:"Yarrow",reg:"mundane",syllables:2},{name:"Furze",reg:"mundane",syllables:2},{name:"Gorse",reg:"mundane",syllables:2},{name:"Skye",reg:"mundane",syllables:2},{name:"Scout",reg:"mundane",syllables:2},{name:"Sable",reg:"mundane",syllables:2},{name:"Selkie",reg:"mundane",syllables:2},{name:"Rona",reg:"mundane",syllables:2},{name:"Raven",reg:"mundane",syllables:2},{name:"Rowena",reg:"mundane",syllables:2},{name:"Lorna",reg:"mundane",syllables:2},{name:"Maisie",reg:"mundane",syllables:2},{name:"Mirren",reg:"mundane",syllables:2},{name:"Fenella",reg:"mundane",syllables:2},{name:"Perdita",reg:"mundane",syllables:2},{name:"Portia",reg:"mundane",syllables:2},{name:"Winsome",reg:"mundane",syllables:2},{name:"Wren",reg:"mundane",syllables:2},{name:"Waverly",reg:"mundane",syllables:2},{name:"Glenna",reg:"mundane",syllables:2},{name:"Grace",reg:"mundane",syllables:2},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Blair",reg:"mundane",syllables:2},{name:"Tara",reg:"mundane",syllables:2},{name:"Thea",reg:"mundane",syllables:2},{name:"Tess",reg:"mundane",syllables:2},{name:"Thistle",reg:"mundane",syllables:2},{name:"Nairn",reg:"mundane",syllables:2},{name:"Merna",reg:"mundane",syllables:2},{name:"Leith",reg:"mundane",syllables:2}]
+},
   dachshund: {
-    boy: [{name:"Elongated",reg:"absurd",syllables:4},{name:"Horizontal",reg:"absurd",syllables:4},{name:"Extended",reg:"absurd",syllables:3},{name:"Protracted",reg:"absurd",syllables:3},{name:"Oblong",reg:"absurd",syllables:2},{name:"Longitudinal",reg:"absurd",syllables:5},{name:"Accordion",reg:"absurd",syllables:4},{name:"Telescopic",reg:"absurd",syllables:4},{name:"Klaus",reg:"grand",syllables:1},{name:"Dieter",reg:"mundane",syllables:2},{name:"Franz",reg:"mundane",syllables:1},{name:"Hans",reg:"mundane",syllables:1},{name:"Otto",reg:"mundane",syllables:2},{name:"Wolfgang",reg:"grand",syllables:2},{name:"Napoleon",reg:"grand",syllables:4},{name:"Rasputin",reg:"grand",syllables:3}],
-    girl: [{name:"Slinky",reg:"absurd",syllables:2},{name:"Helga",reg:"mundane",syllables:2},{name:"Greta",reg:"mundane",syllables:2},{name:"Hilde",reg:"mundane",syllables:2},{name:"Ursula",reg:"mundane",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Gretel",reg:"mundane",syllables:2},{name:"Liesel",reg:"mundane",syllables:2},{name:"Anneliese",reg:"mundane",syllables:2},{name:"Hannelore",reg:"mundane",syllables:2},{name:"Wilhelmine",reg:"mundane",syllables:2},{name:"Trudel",reg:"mundane",syllables:2},{name:"Thekla",reg:"mundane",syllables:2},{name:"Therese",reg:"mundane",syllables:2},{name:"Traudel",reg:"mundane",syllables:2},{name:"Gretchen",reg:"mundane",syllables:2},{name:"Gerda",reg:"mundane",syllables:2},{name:"Friedel",reg:"mundane",syllables:2},{name:"Franzi",reg:"mundane",syllables:2},{name:"Hedwig",reg:"mundane",syllables:2},{name:"Inge",reg:"mundane",syllables:2},{name:"Ilse",reg:"mundane",syllables:2},{name:"Klara",reg:"mundane",syllables:2},{name:"Lotte",reg:"mundane",syllables:2},{name:"Leni",reg:"mundane",syllables:2},{name:"Marga",reg:"mundane",syllables:2},{name:"Mathilde",reg:"mundane",syllables:2},{name:"Nanni",reg:"mundane",syllables:2},{name:"Renate",reg:"mundane",syllables:2},{name:"Rosa",reg:"mundane",syllables:2},{name:"Susi",reg:"mundane",syllables:2},{name:"Ulla",reg:"mundane",syllables:2},{name:"Ursel",reg:"mundane",syllables:2},{name:"Vreni",reg:"mundane",syllables:2}],
+    boy: [{name:"Elongated",reg:"absurd",syllables:4},{name:"Horizontal",reg:"absurd",syllables:4},{name:"Extended",reg:"absurd",syllables:3},{name:"Protracted",reg:"absurd",syllables:3},{name:"Oblong",reg:"absurd",syllables:2},{name:"Longitudinal",reg:"absurd",syllables:5},{name:"Accordion",reg:"absurd",syllables:4},{name:"Telescopic",reg:"absurd",syllables:4},{name:"Klaus",reg:"grand",syllables:1},{name:"Dieter",reg:"mundane",syllables:2},{name:"Franz",reg:"mundane",syllables:1},{name:"Hans",reg:"mundane",syllables:1},{name:"Otto",reg:"mundane",syllables:2},{name:"Wolfgang",reg:"grand",syllables:2},{name:"Napoleon",reg:"grand",syllables:4},{name:"Rasputin",reg:"grand",syllables:3},{name:"Bruno",reg:"grand",syllables:2},{name:"Heinrich",reg:"grand",syllables:2},{name:"Konrad",reg:"grand",syllables:2},{name:"Helmut",reg:"grand",syllables:2},{name:"Gerhard",reg:"grand",syllables:2},{name:"Walther",reg:"grand",syllables:2},{name:"Bernhard",reg:"grand",syllables:2},{name:"Gottfried",reg:"grand",syllables:2},{name:"Albrecht",reg:"grand",syllables:2},{name:"Sigmund",reg:"grand",syllables:2},{name:"Reinhardt",reg:"grand",syllables:2},{name:"Manfred",reg:"grand",syllables:2},{name:"Dietrich",reg:"grand",syllables:2},{name:"Lothar",reg:"grand",syllables:2},{name:"Maximilian",reg:"grand",syllables:4},{name:"Friedrich",reg:"grand",syllables:2},{name:"Christoph",reg:"grand",syllables:2},{name:"Nikolaus",reg:"grand",syllables:3},{name:"Tobias",reg:"grand",syllables:2},{name:"Sebastian",reg:"grand",syllables:3},{name:"Philipp",reg:"grand",syllables:2},{name:"Matthias",reg:"grand",syllables:2},{name:"Stefan",reg:"grand",syllables:2},{name:"Slinky",reg:"food",syllables:1},{name:"Wurst",reg:"food",syllables:1},{name:"Banger",reg:"food",syllables:2},{name:"Chorizo",reg:"food",syllables:3},{name:"Salami",reg:"food",syllables:3},{name:"Plucky",reg:"chaos",syllables:1},{name:"Gnocchi",reg:"food",syllables:2},{name:"Ravioli",reg:"food",syllables:3},{name:"Tortellini",reg:"food",syllables:4},{name:"Linguine",reg:"food",syllables:2},{name:"Macaroni",reg:"food",syllables:4},{name:"Praline",reg:"food",syllables:2},{name:"Marzipan",reg:"food",syllables:3},{name:"Nougat",reg:"food",syllables:2},{name:"Fondant",reg:"food",syllables:2}],
+    girl: [{name:"Slinky",reg:"absurd",syllables:2},{name:"Helga",reg:"mundane",syllables:2},{name:"Greta",reg:"mundane",syllables:2},{name:"Hilde",reg:"mundane",syllables:2},{name:"Ursula",reg:"mundane",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Gretel",reg:"mundane",syllables:2},{name:"Liesel",reg:"mundane",syllables:2},{name:"Anneliese",reg:"mundane",syllables:2},{name:"Hannelore",reg:"mundane",syllables:2},{name:"Wilhelmine",reg:"mundane",syllables:2},{name:"Trudel",reg:"mundane",syllables:2},{name:"Thekla",reg:"mundane",syllables:2},{name:"Therese",reg:"mundane",syllables:2},{name:"Traudel",reg:"mundane",syllables:2},{name:"Gretchen",reg:"mundane",syllables:2},{name:"Gerda",reg:"mundane",syllables:2},{name:"Friedel",reg:"mundane",syllables:2},{name:"Franzi",reg:"mundane",syllables:2},{name:"Hedwig",reg:"mundane",syllables:2},{name:"Inge",reg:"mundane",syllables:2},{name:"Ilse",reg:"mundane",syllables:2},{name:"Klara",reg:"mundane",syllables:2},{name:"Lotte",reg:"mundane",syllables:2},{name:"Leni",reg:"mundane",syllables:2},{name:"Marga",reg:"mundane",syllables:2},{name:"Mathilde",reg:"mundane",syllables:2},{name:"Nanni",reg:"mundane",syllables:2},{name:"Renate",reg:"mundane",syllables:2},{name:"Rosa",reg:"mundane",syllables:2},{name:"Susi",reg:"mundane",syllables:2},{name:"Ulla",reg:"mundane",syllables:2},{name:"Ursel",reg:"mundane",syllables:2},{name:"Vreni",reg:"mundane",syllables:2},{name:"Mitzi",reg:"grand",syllables:2},{name:"Trudy",reg:"grand",syllables:1},{name:"Elfriede",reg:"grand",syllables:3},{name:"Rosalinde",reg:"grand",syllables:4},{name:"Waltraud",reg:"grand",syllables:2},{name:"Brunhilda",reg:"grand",syllables:3},{name:"Dorothea",reg:"grand",syllables:3},{name:"Christiane",reg:"grand",syllables:3},{name:"Brigitte",reg:"grand",syllables:3},{name:"Monika",reg:"grand",syllables:3},{name:"Ingrid",reg:"grand",syllables:2},{name:"Sigrid",reg:"grand",syllables:2},{name:"Frieda",reg:"grand",syllables:2},{name:"Margot",reg:"grand",syllables:2},{name:"Gertrude",reg:"grand",syllables:3},{name:"Trudi",reg:"grand",syllables:2},{name:"Gnocchi",reg:"food",syllables:2},{name:"Ravioli",reg:"food",syllables:3},{name:"Tortellini",reg:"food",syllables:4},{name:"Linguine",reg:"food",syllables:2},{name:"Macaroni",reg:"food",syllables:4},{name:"Praline",reg:"food",syllables:2},{name:"Marzipan",reg:"food",syllables:3},{name:"Nougat",reg:"food",syllables:2},{name:"Fondant",reg:"food",syllables:2}],
+  },
+  dalmatian: {
+    boy: [{name:"Domino",reg:"grand",syllables:3},{name:"Jasper",reg:"grand",syllables:2},{name:"Pongo",reg:"grand",syllables:2},{name:"Dice",reg:"chaos",syllables:2},{name:"Bandit",reg:"chaos",syllables:2},{name:"Inky",reg:"chaos",syllables:1},{name:"Speck",reg:"chaos",syllables:1},{name:"Jett",reg:"chaos",syllables:1},{name:"Pepper",reg:"food",syllables:2},{name:"Dash",reg:"chaos",syllables:1},{name:"Rolo",reg:"food",syllables:2},{name:"Oreo",reg:"food",syllables:2},{name:"Spot",reg:"mundane",syllables:1},{name:"Freckle",reg:"chaos",syllables:2},{name:"Patch",reg:"mundane",syllables:1},{name:"Freckles",reg:"chaos",syllables:2},{name:"Polka",reg:"mundane",syllables:2},{name:"Rorschach",reg:"grand",syllables:2},{name:"Milo",reg:"mundane",syllables:2},{name:"Checkers",reg:"chaos",syllables:2},{name:"Bingo",reg:"chaos",syllables:2},{name:"Marble",reg:"grand",syllables:2},{name:"Ziggy",reg:"chaos",syllables:1},{name:"Arlo",reg:"grand",syllables:2},{name:"Finn",reg:"mundane",syllables:1},{name:"Tux",reg:"chaos",syllables:1},{name:"Romeo",reg:"grand",syllables:2},{name:"Gatsby",reg:"grand",syllables:1},{name:"Ace",reg:"mundane",syllables:2},{name:"Ajax",reg:"grand",syllables:2},{name:"Blot",reg:"chaos",syllables:1},{name:"Bruno",reg:"mundane",syllables:2},{name:"Bullet",reg:"chaos",syllables:2},{name:"Chance",reg:"mundane",syllables:2},{name:"Chief",reg:"mundane",syllables:1},{name:"Cinder",reg:"mundane",syllables:2},{name:"Claude",reg:"mundane",syllables:2},{name:"Dex",reg:"chaos",syllables:1},{name:"Diego",reg:"grand",syllables:2},{name:"Dipper",reg:"chaos",syllables:2},{name:"Ditto",reg:"chaos",syllables:2},{name:"Dodger",reg:"chaos",syllables:2},{name:"Duke",reg:"mundane",syllables:2},{name:"Ember",reg:"mundane",syllables:2},{name:"Lance",reg:"mundane",syllables:2},{name:"Leo",reg:"mundane",syllables:1},{name:"Maverick",reg:"grand",syllables:3},{name:"Max",reg:"mundane",syllables:1},{name:"Nero",reg:"grand",syllables:2},{name:"Pablo",reg:"grand",syllables:2},{name:"Paco",reg:"grand",syllables:2},{name:"Pierre",reg:"grand",syllables:2},{name:"Prince",reg:"grand",syllables:2},{name:"Rascal",reg:"chaos",syllables:2},{name:"Rex",reg:"mundane",syllables:1},{name:"Rico",reg:"mundane",syllables:2},{name:"Roger",reg:"mundane",syllables:2},{name:"Roland",reg:"grand",syllables:2},{name:"Sketch",reg:"chaos",syllables:1},{name:"Stripes",reg:"chaos",syllables:2},{name:"Tango",reg:"mundane",syllables:2},{name:"Titan",reg:"grand",syllables:2}],
+    girl: [{name:"Perdita",reg:"grand",syllables:3},{name:"Dotty",reg:"chaos",syllables:1},{name:"Pepper",reg:"food",syllables:2},{name:"Minnie",reg:"mundane",syllables:2},{name:"Freckles",reg:"chaos",syllables:2},{name:"Pippa",reg:"mundane",syllables:2},{name:"Domino",reg:"grand",syllables:3},{name:"Cleo",reg:"grand",syllables:1},{name:"Lottie",reg:"mundane",syllables:2},{name:"Tilly",reg:"mundane",syllables:1},{name:"Dottie",reg:"chaos",syllables:2},{name:"Nelly",reg:"mundane",syllables:1},{name:"Pixie",reg:"chaos",syllables:2},{name:"Speckle",reg:"chaos",syllables:2},{name:"Daisy",reg:"mundane",syllables:1},{name:"Winnie",reg:"mundane",syllables:2},{name:"Stella",reg:"grand",syllables:2},{name:"Bonnie",reg:"grand",syllables:2},{name:"Poppy",reg:"mundane",syllables:1},{name:"Coco",reg:"mundane",syllables:2},{name:"Bessie",reg:"mundane",syllables:2},{name:"Esmeralda",reg:"grand",syllables:4},{name:"Vivienne",reg:"grand",syllables:3},{name:"Aurora",reg:"grand",syllables:3},{name:"Bea",reg:"mundane",syllables:1},{name:"Bella",reg:"mundane",syllables:2},{name:"Blanche",reg:"mundane",syllables:2},{name:"Callie",reg:"mundane",syllables:2},{name:"Carmen",reg:"grand",syllables:2},{name:"Cecilia",reg:"grand",syllables:3},{name:"Circe",reg:"grand",syllables:2},{name:"Clara",reg:"grand",syllables:2},{name:"Colette",reg:"grand",syllables:3},{name:"Delia",reg:"mundane",syllables:2},{name:"Dita",reg:"mundane",syllables:2},{name:"Dot",reg:"mundane",syllables:1},{name:"Fifi",reg:"mundane",syllables:2},{name:"Flora",reg:"mundane",syllables:2},{name:"Gala",reg:"grand",syllables:2},{name:"Gigi",reg:"mundane",syllables:2},{name:"Grace",reg:"grand",syllables:2},{name:"Holly",reg:"mundane",syllables:1},{name:"Honey",reg:"food",syllables:2},{name:"Ines",reg:"mundane",syllables:2},{name:"Isla",reg:"mundane",syllables:2},{name:"Josie",reg:"mundane",syllables:2},{name:"Lacy",reg:"mundane",syllables:1},{name:"Lila",reg:"mundane",syllables:2},{name:"Lily",reg:"mundane",syllables:1},{name:"Lulu",reg:"mundane",syllables:2},{name:"Magpie",reg:"mundane",syllables:2},{name:"Mia",reg:"mundane",syllables:1},{name:"Mimi",reg:"mundane",syllables:2},{name:"Misty",reg:"mundane",syllables:1},{name:"Molly",reg:"mundane",syllables:1},{name:"Nala",reg:"mundane",syllables:2},{name:"Nell",reg:"mundane",syllables:1},{name:"Opal",reg:"mundane",syllables:2},{name:"Orla",reg:"mundane",syllables:2}]
+  },
+  labradoodle: {
+    boy: [{name:"Rufus",reg:"mundane",syllables:2},{name:"Teddy",reg:"mundane",syllables:1},{name:"Murphy",reg:"mundane",syllables:1},{name:"Waffle",reg:"food",syllables:2},{name:"Barney",reg:"mundane",syllables:2},{name:"Alfie",reg:"mundane",syllables:2},{name:"Milo",reg:"mundane",syllables:2},{name:"Biscuit",reg:"food",syllables:2},{name:"Monty",reg:"mundane",syllables:1},{name:"Ziggy",reg:"chaos",syllables:1},{name:"Archie",reg:"mundane",syllables:2},{name:"Noodle",reg:"food",syllables:2},{name:"Bertie",reg:"mundane",syllables:2},{name:"Digby",reg:"mundane",syllables:1},{name:"Chester",reg:"mundane",syllables:2},{name:"Fozzy",reg:"chaos",syllables:1},{name:"Otis",reg:"mundane",syllables:2},{name:"Pickle",reg:"food",syllables:2},{name:"Toby",reg:"mundane",syllables:1},{name:"Wilbur",reg:"mundane",syllables:2},{name:"Cooper",reg:"mundane",syllables:2},{name:"Mungo",reg:"chaos",syllables:2},{name:"Sunny",reg:"mundane",syllables:1},{name:"Bruno",reg:"mundane",syllables:2},{name:"Albie",reg:"mundane",syllables:2},{name:"Bean",reg:"mundane",syllables:1},{name:"Benny",reg:"mundane",syllables:1},{name:"Bernie",reg:"mundane",syllables:2},{name:"Biscotti",reg:"food",syllables:3},{name:"Brody",reg:"mundane",syllables:1},{name:"Buddy",reg:"mundane",syllables:1},{name:"Bumper",reg:"chaos",syllables:2},{name:"Cheddar",reg:"food",syllables:2},{name:"Clancy",reg:"chaos",syllables:1},{name:"Cody",reg:"mundane",syllables:1},{name:"Cosmo",reg:"chaos",syllables:2},{name:"Croissant",reg:"food",syllables:2},{name:"Dougie",reg:"mundane",syllables:2},{name:"Finn",reg:"mundane",syllables:1},{name:"Gonzo",reg:"chaos",syllables:2},{name:"Gus",reg:"mundane",syllables:1},{name:"Harvey",reg:"mundane",syllables:2},{name:"Hugo",reg:"mundane",syllables:2},{name:"Jasper",reg:"mundane",syllables:2},{name:"Lenny",reg:"mundane",syllables:1},{name:"Louie",reg:"mundane",syllables:1},{name:"Marley",reg:"mundane",syllables:2},{name:"Max",reg:"mundane",syllables:1},{name:"Nugget",reg:"food",syllables:2},{name:"Ollie",reg:"mundane",syllables:2},{name:"Oscar",reg:"mundane",syllables:2},{name:"Ozzie",reg:"mundane",syllables:2},{name:"Peanut",reg:"food",syllables:2},{name:"Percy",reg:"mundane",syllables:1},{name:"Remy",reg:"mundane",syllables:1},{name:"Rolo",reg:"food",syllables:2},{name:"Rosco",reg:"chaos",syllables:2},{name:"Rusty",reg:"mundane",syllables:1},{name:"Sid",reg:"mundane",syllables:1},{name:"Smudge",reg:"chaos",syllables:2},{name:"Socks",reg:"chaos",syllables:1},{name:"Taffy",reg:"food",syllables:1},{name:"Woolly",reg:"chaos",syllables:1}],
+    girl: [{name:"Mabel",reg:"mundane",syllables:2},{name:"Winnie",reg:"mundane",syllables:2},{name:"Tilly",reg:"mundane",syllables:1},{name:"Daisy",reg:"mundane",syllables:1},{name:"Honey",reg:"food",syllables:2},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Poppy",reg:"mundane",syllables:1},{name:"Nellie",reg:"mundane",syllables:2},{name:"Maisie",reg:"mundane",syllables:2},{name:"Lottie",reg:"mundane",syllables:2},{name:"Maple",reg:"food",syllables:2},{name:"Millie",reg:"mundane",syllables:2},{name:"Betsy",reg:"mundane",syllables:1},{name:"Coco",reg:"mundane",syllables:2},{name:"Flossie",reg:"mundane",syllables:2},{name:"Fudge",reg:"food",syllables:2},{name:"Rosie",reg:"mundane",syllables:2},{name:"Dotty",reg:"mundane",syllables:1},{name:"Peggy",reg:"mundane",syllables:1},{name:"Biscuit",reg:"food",syllables:2},{name:"Caramel",reg:"food",syllables:3},{name:"Toffee",reg:"food",syllables:2},{name:"Truffle",reg:"food",syllables:2},{name:"Gertie",reg:"mundane",syllables:2},{name:"Ruby",reg:"mundane",syllables:1},{name:"Willow",reg:"mundane",syllables:2},{name:"Amber",reg:"food",syllables:2},{name:"Annie",reg:"mundane",syllables:2},{name:"Apricot",reg:"food",syllables:3},{name:"Autumn",reg:"mundane",syllables:2},{name:"Bailey",reg:"mundane",syllables:2},{name:"Biscotti",reg:"food",syllables:3},{name:"Bonbon",reg:"food",syllables:2},{name:"Bubbly",reg:"chaos",syllables:1},{name:"Butterscotch",reg:"food",syllables:3},{name:"Clover",reg:"mundane",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Curly",reg:"chaos",syllables:1},{name:"Ella",reg:"mundane",syllables:2},{name:"Goldie",reg:"mundane",syllables:2},{name:"Hazel",reg:"mundane",syllables:2},{name:"Jessie",reg:"mundane",syllables:2},{name:"Jilly",reg:"mundane",syllables:1},{name:"Lacey",reg:"chaos",syllables:2},{name:"Lola",reg:"mundane",syllables:2},{name:"Maggie",reg:"mundane",syllables:2},{name:"Mango",reg:"food",syllables:2},{name:"Marshmallow",reg:"food",syllables:3},{name:"Minty",reg:"food",syllables:1},{name:"Mocha",reg:"food",syllables:2},{name:"Muffin",reg:"food",syllables:2},{name:"Noodle",reg:"food",syllables:2},{name:"Nutmeg",reg:"food",syllables:2},{name:"Pebbles",reg:"mundane",syllables:2},{name:"Penny",reg:"mundane",syllables:1},{name:"Pepper",reg:"mundane",syllables:2},{name:"Pumpkin",reg:"food",syllables:2},{name:"Sandy",reg:"mundane",syllables:1},{name:"Sherbet",reg:"food",syllables:2},{name:"Sprout",reg:"food",syllables:1},{name:"Suzy",reg:"chaos",syllables:1},{name:"Twix",reg:"food",syllables:1},{name:"Waffles",reg:"food",syllables:2}]
+  },
+  sheepdog: {
+    boy: [{name:"Winston",reg:"grand",syllables:2},{name:"Bertie",reg:"mundane",syllables:2},{name:"Wilbur",reg:"mundane",syllables:2},{name:"Digby",reg:"mundane",syllables:1},{name:"Barnaby",reg:"grand",syllables:2},{name:"Rufus",reg:"mundane",syllables:2},{name:"Monty",reg:"mundane",syllables:1},{name:"Paddington",reg:"grand",syllables:3},{name:"Dougal",reg:"mundane",syllables:2},{name:"Humphrey",reg:"grand",syllables:2},{name:"Teddy",reg:"mundane",syllables:1},{name:"Alfie",reg:"mundane",syllables:2},{name:"Stanley",reg:"mundane",syllables:2},{name:"Mungo",reg:"chaos",syllables:2},{name:"Shaggy",reg:"chaos",syllables:1},{name:"Wally",reg:"chaos",syllables:1},{name:"Bumble",reg:"chaos",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Archie",reg:"mundane",syllables:2},{name:"Murphy",reg:"mundane",syllables:1},{name:"Bobbin",reg:"chaos",syllables:2},{name:"Wilf",reg:"mundane",syllables:1},{name:"Herbert",reg:"grand",syllables:2},{name:"Barney",reg:"mundane",syllables:2},{name:"Albert",reg:"mundane",syllables:2},{name:"Ambrose",reg:"grand",syllables:3},{name:"Archibald",reg:"grand",syllables:3},{name:"Arthur",reg:"mundane",syllables:2},{name:"Augustus",reg:"grand",syllables:3},{name:"Basil",reg:"grand",syllables:2},{name:"Benedict",reg:"grand",syllables:3},{name:"Bernard",reg:"mundane",syllables:2},{name:"Cecil",reg:"mundane",syllables:2},{name:"Clarence",reg:"mundane",syllables:3},{name:"Clement",reg:"grand",syllables:2},{name:"Clifford",reg:"mundane",syllables:2},{name:"Clive",reg:"mundane",syllables:2},{name:"Colin",reg:"mundane",syllables:2},{name:"Cornelius",reg:"grand",syllables:3},{name:"Desmond",reg:"mundane",syllables:2},{name:"Dudley",reg:"mundane",syllables:2},{name:"Edmund",reg:"mundane",syllables:2},{name:"Edward",reg:"mundane",syllables:2},{name:"Ernest",reg:"mundane",syllables:2},{name:"Fabian",reg:"grand",syllables:2},{name:"Ferdinand",reg:"grand",syllables:3},{name:"Fletcher",reg:"mundane",syllables:2},{name:"Francis",reg:"mundane",syllables:2},{name:"Freddie",reg:"mundane",syllables:2},{name:"Geoffrey",reg:"mundane",syllables:2},{name:"Gilbert",reg:"mundane",syllables:2},{name:"Gordon",reg:"mundane",syllables:2},{name:"Graham",reg:"mundane",syllables:2},{name:"Harold",reg:"mundane",syllables:2},{name:"Hector",reg:"mundane",syllables:2},{name:"Horace",reg:"mundane",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Oscar",reg:"mundane",syllables:2},{name:"Percy",reg:"mundane",syllables:1},{name:"Phineas",reg:"grand",syllables:2},{name:"Reginald",reg:"grand",syllables:3},{name:"Roland",reg:"grand",syllables:2},{name:"Rupert",reg:"mundane",syllables:2},{name:"Sylvester",reg:"grand",syllables:2}],
+    girl: [{name:"Winnie",reg:"mundane",syllables:2},{name:"Nellie",reg:"mundane",syllables:2},{name:"Flossie",reg:"mundane",syllables:2},{name:"Betsy",reg:"mundane",syllables:1},{name:"Peggy",reg:"mundane",syllables:1},{name:"Tilly",reg:"mundane",syllables:1},{name:"Dolly",reg:"mundane",syllables:1},{name:"Maudie",reg:"mundane",syllables:2},{name:"Hattie",reg:"mundane",syllables:2},{name:"Ethel",reg:"mundane",syllables:2},{name:"Connie",reg:"mundane",syllables:2},{name:"Lottie",reg:"mundane",syllables:2},{name:"Gertie",reg:"mundane",syllables:2},{name:"Doris",reg:"mundane",syllables:2},{name:"Bessie",reg:"mundane",syllables:2},{name:"Martha",reg:"mundane",syllables:2},{name:"Nancy",reg:"mundane",syllables:1},{name:"Olive",reg:"mundane",syllables:3},{name:"Woolly",reg:"chaos",syllables:1},{name:"Millie",reg:"mundane",syllables:2},{name:"Daisy",reg:"mundane",syllables:1},{name:"Ada",reg:"mundane",syllables:2},{name:"Agatha",reg:"mundane",syllables:3},{name:"Agnes",reg:"mundane",syllables:2},{name:"Arabella",reg:"grand",syllables:4},{name:"Beatrice",reg:"grand",syllables:3},{name:"Bertha",reg:"mundane",syllables:2},{name:"Bridget",reg:"mundane",syllables:2},{name:"Clara",reg:"grand",syllables:2},{name:"Clementine",reg:"grand",syllables:4},{name:"Constance",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:3},{name:"Dora",reg:"mundane",syllables:2},{name:"Dorothy",reg:"mundane",syllables:2},{name:"Edna",reg:"mundane",syllables:2},{name:"Edith",reg:"mundane",syllables:2},{name:"Elspeth",reg:"mundane",syllables:2},{name:"Fluffy",reg:"chaos",syllables:1},{name:"Freda",reg:"mundane",syllables:2},{name:"Gertrude",reg:"mundane",syllables:3},{name:"Grace",reg:"grand",syllables:2},{name:"Harriet",reg:"mundane",syllables:2},{name:"Hilda",reg:"mundane",syllables:2},{name:"Imogen",reg:"grand",syllables:3},{name:"Marjorie",reg:"mundane",syllables:3},{name:"Matilda",reg:"mundane",syllables:3},{name:"Mildred",reg:"mundane",syllables:2},{name:"Muriel",reg:"mundane",syllables:2},{name:"Nora",reg:"mundane",syllables:2},{name:"Patience",reg:"mundane",syllables:3},{name:"Penelope",reg:"grand",syllables:4},{name:"Priscilla",reg:"mundane",syllables:3},{name:"Prudence",reg:"grand",syllables:3},{name:"Rosamund",reg:"grand",syllables:3},{name:"Rosemary",reg:"grand",syllables:3},{name:"Rowena",reg:"mundane",syllables:3},{name:"Shaggy",reg:"chaos",syllables:1},{name:"Tabitha",reg:"mundane",syllables:3},{name:"Thelma",reg:"mundane",syllables:2},{name:"Vera",reg:"mundane",syllables:2},{name:"Winifred",reg:"mundane",syllables:3},{name:"Yvonne",reg:"mundane",syllables:2}]
   },
   german: {
     boy: [{name:"Heinrich",reg:"grand",syllables:2},{name:"Wolfgang",reg:"grand",syllables:2},{name:"Dieter",reg:"mundane",syllables:2},{name:"Klaus",reg:"mundane",syllables:1},{name:"Reinhard",reg:"grand",syllables:2},{name:"Manfred",reg:"mundane",syllables:2},{name:"Siegfried",reg:"grand",syllables:2},{name:"Konrad",reg:"grand",syllables:2},{name:"Ludwig",reg:"grand",syllables:2},{name:"Friedrich",reg:"grand",syllables:2},{name:"Maximilian",reg:"grand",syllables:5},{name:"Amadeus",reg:"grand",syllables:4},{name:"Beethoven",reg:"grand",syllables:3},{name:"Mozart",reg:"grand",syllables:2},{name:"Panzer",reg:"grand",syllables:2},{name:"Patton",reg:"grand",syllables:2},{name:"Pershing",reg:"grand",syllables:2},{name:"Prussian",reg:"grand",syllables:2},{name:"Praetorian",reg:"grand",syllables:2},{name:"Paladin",reg:"grand",syllables:2},{name:"Hans",reg:"mundane",syllables:2},{name:"Fritz",reg:"mundane",syllables:2},{name:"Heinz",reg:"mundane",syllables:2},{name:"Günther",reg:"mundane",syllables:2},{name:"Helmut",reg:"mundane",syllables:2},{name:"Horst",reg:"mundane",syllables:2},{name:"Jürgen",reg:"mundane",syllables:2},{name:"Bernd",reg:"mundane",syllables:2},{name:"Rolf",reg:"mundane",syllables:2},{name:"Uwe",reg:"mundane",syllables:2},{name:"Gerd",reg:"mundane",syllables:2},{name:"Detlef",reg:"mundane",syllables:2},{name:"Gottfried",reg:"mundane",syllables:2},{name:"Gerhard",reg:"mundane",syllables:2},{name:"Waldemar",reg:"mundane",syllables:2},{name:"Wilhelm",reg:"mundane",syllables:2},{name:"Ernst",reg:"mundane",syllables:2},{name:"Erich",reg:"mundane",syllables:2},{name:"Bruno",reg:"mundane",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Hubert",reg:"mundane",syllables:2},{name:"Norbert",reg:"mundane",syllables:2},{name:"Eberhard",reg:"mundane",syllables:2},{name:"Eckhard",reg:"mundane",syllables:2},{name:"Reinhold",reg:"mundane",syllables:2},{name:"Gerhardt",reg:"mundane",syllables:2},{name:"Hasso",reg:"mundane",syllables:2},{name:"Hartmut",reg:"mundane",syllables:2},{name:"Volkmar",reg:"mundane",syllables:2},{name:"Volkbert",reg:"mundane",syllables:2},{name:"Albrecht",reg:"mundane",syllables:2},{name:"Ruprecht",reg:"mundane",syllables:2},{name:"Rüdiger",reg:"mundane",syllables:2},{name:"Burkhard",reg:"mundane",syllables:2},{name:"Engelbert",reg:"mundane",syllables:2},{name:"Adalbert",reg:"mundane",syllables:2},{name:"Wulfhard",reg:"mundane",syllables:2},{name:"Baldur",reg:"mundane",syllables:2},{name:"Lothar",reg:"mundane",syllables:2},{name:"Knut",reg:"mundane",syllables:2},{name:"Kurt",reg:"mundane",syllables:2},{name:"Egon",reg:"mundane",syllables:2},{name:"Kaspar",reg:"mundane",syllables:2},{name:"Leopold",reg:"mundane",syllables:2},{name:"August",reg:"mundane",syllables:2},{name:"Gustav",reg:"mundane",syllables:2},{name:"Dietrich",reg:"mundane",syllables:2},{name:"Ulrich",reg:"mundane",syllables:2},{name:"Werner",reg:"mundane",syllables:2},{name:"Wolfram",reg:"mundane",syllables:2},{name:"Wendelin",reg:"mundane",syllables:2},{name:"Wigbert",reg:"mundane",syllables:2},{name:"Bodo",reg:"mundane",syllables:2},{name:"Hinnerk",reg:"mundane",syllables:2},{name:"Hinrich",reg:"mundane",syllables:2},{name:"Peer",reg:"mundane",syllables:2},{name:"Till",reg:"mundane",syllables:2},{name:"Torsten",reg:"mundane",syllables:2},{name:"Anselm",reg:"mundane",syllables:2},{name:"Armin",reg:"mundane",syllables:2},{name:"Hagen",reg:"mundane",syllables:2},{name:"Heiko",reg:"mundane",syllables:2},{name:"Jochen",reg:"mundane",syllables:2},{name:"Ludger",reg:"mundane",syllables:2},{name:"Rainer",reg:"mundane",syllables:2},{name:"Sönke",reg:"mundane",syllables:2},{name:"Veit",reg:"mundane",syllables:2},{name:"Wenzel",reg:"mundane",syllables:2},{name:"Xaver",reg:"mundane",syllables:2},{name:"Alois",reg:"mundane",syllables:2},{name:"Alfons",reg:"mundane",syllables:2},{name:"Sepp",reg:"mundane",syllables:2},{name:"Franzl",reg:"mundane",syllables:2},{name:"Hansi",reg:"mundane",syllables:2},{name:"Heinzi",reg:"mundane",syllables:2},{name:"Klausi",reg:"mundane",syllables:2},{name:"Günni",reg:"mundane",syllables:2},{name:"Willi",reg:"mundane",syllables:2},{name:"Rudi",reg:"mundane",syllables:2},{name:"Udo",reg:"mundane",syllables:2},{name:"Otfried",reg:"mundane",syllables:2},{name:"Ottokar",reg:"mundane",syllables:2},{name:"Tassilo",reg:"mundane",syllables:2},{name:"Quirin",reg:"mundane",syllables:2},{name:"Korbinian",reg:"mundane",syllables:2},{name:"Nepomuk",reg:"mundane",syllables:2},{name:"Ignaz",reg:"mundane",syllables:2},{name:"Pankraz",reg:"mundane",syllables:2},{name:"Bonifaz",reg:"mundane",syllables:2}],
-    girl: [{name:"Hildegard",reg:"grand",syllables:2},{name:"Brunhilde",reg:"grand",syllables:2},{name:"Lieselotte",reg:"grand",syllables:2},{name:"Gertrude",reg:"grand",syllables:2},{name:"Ingeborg",reg:"grand",syllables:2},{name:"Elfriede",reg:"grand",syllables:2},{name:"Mathilde",reg:"grand",syllables:2},{name:"Hedwig",reg:"grand",syllables:2},{name:"Mechthild",reg:"grand",syllables:2},{name:"Hannelore",reg:"grand",syllables:2},{name:"Hildegunde",reg:"grand",syllables:2},{name:"Walburga",reg:"grand",syllables:2},{name:"Kunigunde",reg:"grand",syllables:2},{name:"Liselotte",reg:"grand",syllables:2},{name:"Margarethe",reg:"grand",syllables:2},{name:"Ottilie",reg:"grand",syllables:2},{name:"Rosalinde",reg:"grand",syllables:2},{name:"Sieglinde",reg:"grand",syllables:2},{name:"Ursula",reg:"grand",syllables:2},{name:"Waltraud",reg:"grand",syllables:2},{name:"Friederike",reg:"grand",syllables:2},{name:"Gerhilde",reg:"grand",syllables:2},{name:"Ilsebill",reg:"grand",syllables:2},{name:"Klothilde",reg:"grand",syllables:2},{name:"Leokadia",reg:"grand",syllables:2},{name:"Notburga",reg:"grand",syllables:2},{name:"Petronella",reg:"grand",syllables:2},{name:"Richardis",reg:"grand",syllables:2},{name:"Traudel",reg:"grand",syllables:2},{name:"Trudel",reg:"grand",syllables:2},{name:"Therese",reg:"grand",syllables:2},{name:"Thekla",reg:"grand",syllables:2},{name:"Reserl",reg:"grand",syllables:2},{name:"Lieserl",reg:"grand",syllables:2},{name:"Friedl",reg:"grand",syllables:2},{name:"Christl",reg:"grand",syllables:2},{name:"Annerl",reg:"grand",syllables:2},{name:"Zenzi",reg:"grand",syllables:2},{name:"Vroni",reg:"grand",syllables:2},{name:"Seppie",reg:"grand",syllables:2},{name:"Leni",reg:"grand",syllables:2},{name:"Gretel",reg:"grand",syllables:2},{name:"Helga",reg:"grand",syllables:2},{name:"Hilde",reg:"grand",syllables:2},{name:"Inge",reg:"grand",syllables:2},{name:"Ilse",reg:"grand",syllables:2},{name:"Klara",reg:"grand",syllables:2},{name:"Lotte",reg:"grand",syllables:2},{name:"Marga",reg:"grand",syllables:2},{name:"Nanni",reg:"grand",syllables:2},{name:"Renate",reg:"grand",syllables:2},{name:"Rosa",reg:"grand",syllables:2},{name:"Susi",reg:"grand",syllables:2},{name:"Ulla",reg:"grand",syllables:2},{name:"Ursel",reg:"grand",syllables:2},{name:"Kriemhild",reg:"grand",syllables:2},{name:"Gudrun",reg:"grand",syllables:2},{name:"Gerhild",reg:"grand",syllables:2},{name:"Swanhild",reg:"grand",syllables:2},{name:"Hildrun",reg:"grand",syllables:2},{name:"Walpurga",reg:"grand",syllables:2},{name:"Radegund",reg:"grand",syllables:2},{name:"Clothilde",reg:"grand",syllables:2},{name:"Bertha",reg:"grand",syllables:2},{name:"Stefanie",reg:"grand",syllables:2},{name:"Franziska",reg:"grand",syllables:2},{name:"Veronika",reg:"grand",syllables:2},{name:"Katharina",reg:"grand",syllables:2},{name:"Theresia",reg:"grand",syllables:2},{name:"Josefine",reg:"grand",syllables:2},{name:"Leopoldine",reg:"grand",syllables:2},{name:"Maximiliane",reg:"grand",syllables:2},{name:"Wilhelmine",reg:"grand",syllables:2},{name:"Karolina",reg:"grand",syllables:2},{name:"Antoinette",reg:"grand",syllables:2},{name:"Trixi",reg:"grand",syllables:2},{name:"Traudl",reg:"grand",syllables:2},{name:"Valkyria",reg:"grand",syllables:2},{name:"Brunhilda",reg:"grand",syllables:2},{name:"Gertraud",reg:"grand",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Sigrid",reg:"grand",syllables:2},{name:"Astrid",reg:"grand",syllables:2},{name:"Ragnhild",reg:"grand",syllables:2},{name:"Thyra",reg:"grand",syllables:2},{name:"Gunhild",reg:"grand",syllables:2},{name:"Bergljot",reg:"grand",syllables:2},{name:"Hilda",reg:"grand",syllables:2},{name:"Ingrid",reg:"grand",syllables:2},{name:"Sigrun",reg:"grand",syllables:2},{name:"Gerd",reg:"grand",syllables:2},{name:"Gudrid",reg:"grand",syllables:2},{name:"Hertha",reg:"grand",syllables:2},{name:"Nanna",reg:"grand",syllables:2},{name:"Runa",reg:"grand",syllables:2},{name:"Svea",reg:"grand",syllables:2},{name:"Booboo",reg:"grand",syllables:2},{name:"Mimi",reg:"grand",syllables:2},{name:"Lulu",reg:"grand",syllables:2}],
-  },
+    girl: [{name:"Hildegard",reg:"grand",syllables:2},{name:"Brunhilde",reg:"grand",syllables:2},{name:"Lieselotte",reg:"grand",syllables:2},{name:"Gertrude",reg:"grand",syllables:2},{name:"Ingeborg",reg:"grand",syllables:2},{name:"Elfriede",reg:"grand",syllables:2},{name:"Mathilde",reg:"grand",syllables:2},{name:"Hedwig",reg:"grand",syllables:2},{name:"Mechthild",reg:"grand",syllables:2},{name:"Hannelore",reg:"grand",syllables:2},{name:"Hildegunde",reg:"grand",syllables:2},{name:"Walburga",reg:"grand",syllables:2},{name:"Kunigunde",reg:"grand",syllables:2},{name:"Liselotte",reg:"grand",syllables:2},{name:"Margarethe",reg:"grand",syllables:2},{name:"Ottilie",reg:"grand",syllables:2},{name:"Rosalinde",reg:"grand",syllables:2},{name:"Sieglinde",reg:"grand",syllables:2},{name:"Ursula",reg:"grand",syllables:2},{name:"Waltraud",reg:"grand",syllables:2},{name:"Friederike",reg:"grand",syllables:2},{name:"Gerhilde",reg:"grand",syllables:2},{name:"Ilsebill",reg:"grand",syllables:2},{name:"Klothilde",reg:"grand",syllables:2},{name:"Leokadia",reg:"grand",syllables:2},{name:"Notburga",reg:"grand",syllables:2},{name:"Petronella",reg:"grand",syllables:2},{name:"Richardis",reg:"grand",syllables:2},{name:"Traudel",reg:"grand",syllables:2},{name:"Trudel",reg:"grand",syllables:2},{name:"Therese",reg:"grand",syllables:2},{name:"Thekla",reg:"grand",syllables:2},{name:"Reserl",reg:"grand",syllables:2},{name:"Lieserl",reg:"grand",syllables:2},{name:"Friedl",reg:"grand",syllables:2},{name:"Christl",reg:"grand",syllables:2},{name:"Annerl",reg:"grand",syllables:2},{name:"Zenzi",reg:"grand",syllables:2},{name:"Vroni",reg:"grand",syllables:2},{name:"Seppie",reg:"grand",syllables:2},{name:"Leni",reg:"grand",syllables:2},{name:"Gretel",reg:"grand",syllables:2},{name:"Helga",reg:"grand",syllables:2},{name:"Hilde",reg:"grand",syllables:2},{name:"Inge",reg:"grand",syllables:2},{name:"Ilse",reg:"grand",syllables:2},{name:"Klara",reg:"grand",syllables:2},{name:"Lotte",reg:"grand",syllables:2},{name:"Marga",reg:"grand",syllables:2},{name:"Nanni",reg:"grand",syllables:2},{name:"Renate",reg:"grand",syllables:2},{name:"Rosa",reg:"grand",syllables:2},{name:"Susi",reg:"grand",syllables:2},{name:"Ulla",reg:"grand",syllables:2},{name:"Ursel",reg:"grand",syllables:2},{name:"Kriemhild",reg:"grand",syllables:2},{name:"Gudrun",reg:"grand",syllables:2},{name:"Gerhild",reg:"grand",syllables:2},{name:"Swanhild",reg:"grand",syllables:2},{name:"Hildrun",reg:"grand",syllables:2},{name:"Walpurga",reg:"grand",syllables:2},{name:"Radegund",reg:"grand",syllables:2},{name:"Clothilde",reg:"grand",syllables:2},{name:"Bertha",reg:"grand",syllables:2},{name:"Stefanie",reg:"grand",syllables:2},{name:"Franziska",reg:"grand",syllables:2},{name:"Veronika",reg:"grand",syllables:2},{name:"Katharina",reg:"grand",syllables:2},{name:"Theresia",reg:"grand",syllables:2},{name:"Josefine",reg:"grand",syllables:2},{name:"Leopoldine",reg:"grand",syllables:2},{name:"Maximiliane",reg:"grand",syllables:2},{name:"Wilhelmine",reg:"grand",syllables:2},{name:"Karolina",reg:"grand",syllables:2},{name:"Antoinette",reg:"grand",syllables:2},{name:"Trixi",reg:"grand",syllables:2},{name:"Traudl",reg:"grand",syllables:2},{name:"Valkyria",reg:"grand",syllables:2},{name:"Brunhilda",reg:"grand",syllables:2},{name:"Gertraud",reg:"grand",syllables:2},{name:"Freya",reg:"grand",syllables:2},{name:"Sigrid",reg:"grand",syllables:2},{name:"Astrid",reg:"grand",syllables:2},{name:"Ragnhild",reg:"grand",syllables:2},{name:"Thyra",reg:"grand",syllables:2},{name:"Gunhild",reg:"grand",syllables:2},{name:"Bergljot",reg:"grand",syllables:2},{name:"Hilda",reg:"grand",syllables:2},{name:"Ingrid",reg:"grand",syllables:2},{name:"Sigrun",reg:"grand",syllables:2},{name:"Gerd",reg:"grand",syllables:2},{name:"Gudrid",reg:"grand",syllables:2},{name:"Hertha",reg:"grand",syllables:2},{name:"Nanna",reg:"grand",syllables:2},{name:"Runa",reg:"grand",syllables:2},{name:"Svea",reg:"grand",syllables:2},{name:"Booboo",reg:"grand",syllables:2},{name:"Mimi",reg:"grand",syllables:2},{name:"Lulu",reg:"grand",syllables:2}]
+},
   spaniel: {
-    boy: [{name:"Archibald",reg:"grand",syllables:3},{name:"Wellington",reg:"grand",syllables:3},{name:"Rupert",reg:"grand",syllables:2},{name:"Cornelius",reg:"grand",syllables:4},{name:"Peregrine",reg:"grand",syllables:3},{name:"Humphrey",reg:"grand",syllables:2},{name:"Montgomery",reg:"grand",syllables:3},{name:"Algernon",reg:"grand",syllables:3},{name:"Bartholomew",reg:"grand",syllables:4},{name:"Reginald",reg:"grand",syllables:3},{name:"Auberon",reg:"grand",syllables:3},{name:"Lysander",reg:"grand",syllables:3},{name:"Skipper",reg:"chaos",syllables:2},{name:"Fetcher",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Splasher",reg:"chaos",syllables:2},{name:"Dasher",reg:"chaos",syllables:2},{name:"Scamper",reg:"chaos",syllables:2},{name:"Bouncer",reg:"chaos",syllables:2},{name:"Jumper",reg:"chaos",syllables:2},{name:"Pouncer",reg:"chaos",syllables:2},{name:"Rusher",reg:"chaos",syllables:2},{name:"Tumbler",reg:"chaos",syllables:2},{name:"Flipper",reg:"chaos",syllables:2},{name:"Dipper",reg:"chaos",syllables:2},{name:"Paddler",reg:"chaos",syllables:2},{name:"Scout",reg:"chaos",syllables:2},{name:"Tracker",reg:"chaos",syllables:2},{name:"Scooper",reg:"chaos",syllables:2},{name:"Springer",reg:"chaos",syllables:2},{name:"Armand",reg:"grand",syllables:2},{name:"Arnaud",reg:"grand",syllables:2},{name:"Auguste",reg:"grand",syllables:2},{name:"Bertrand",reg:"grand",syllables:2},{name:"Edmond",reg:"grand",syllables:2},{name:"Édouard",reg:"grand",syllables:2},{name:"Ferdinand",reg:"grand",syllables:2},{name:"Florent",reg:"grand",syllables:2},{name:"Frédéric",reg:"grand",syllables:2},{name:"Germain",reg:"grand",syllables:2},{name:"Gilbert",reg:"grand",syllables:2},{name:"Guillaume",reg:"grand",syllables:2},{name:"Hubert",reg:"grand",syllables:2},{name:"Hugues",reg:"grand",syllables:2},{name:"Joachim",reg:"grand",syllables:2},{name:"Jocelyn",reg:"grand",syllables:2},{name:"Léonard",reg:"grand",syllables:2},{name:"Marius",reg:"grand",syllables:2},{name:"Maurice",reg:"grand",syllables:2},{name:"Norbert",reg:"grand",syllables:2},{name:"Olivier",reg:"grand",syllables:2},{name:"Patrice",reg:"grand",syllables:2},{name:"Philippe",reg:"grand",syllables:2},{name:"Renaud",reg:"grand",syllables:2},{name:"Rodolphe",reg:"grand",syllables:2},{name:"Roland",reg:"grand",syllables:2},{name:"Sébastien",reg:"grand",syllables:2},{name:"Silvestre",reg:"grand",syllables:2},{name:"Urbain",reg:"grand",syllables:2},{name:"Valère",reg:"grand",syllables:2},{name:"Victor",reg:"grand",syllables:2},{name:"Xavier",reg:"grand",syllables:2}],
-    girl: [{name:"Georgiana",reg:"grand",syllables:4},{name:"Arabella",reg:"grand",syllables:4},{name:"Clementine",reg:"grand",syllables:3},{name:"Millicent",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:4},{name:"Beatrice",reg:"grand",syllables:3},{name:"Frederica",reg:"grand",syllables:4},{name:"Constance",reg:"grand",syllables:2},{name:"Imogen",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Henrietta",reg:"grand",syllables:4},{name:"Lavinia",reg:"grand",syllables:4},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3}],
-  },
+    boy: [{name:"Archibald",reg:"grand",syllables:3},{name:"Wellington",reg:"grand",syllables:3},{name:"Rupert",reg:"grand",syllables:2},{name:"Cornelius",reg:"grand",syllables:4},{name:"Peregrine",reg:"grand",syllables:3},{name:"Humphrey",reg:"grand",syllables:2},{name:"Montgomery",reg:"grand",syllables:3},{name:"Algernon",reg:"grand",syllables:3},{name:"Bartholomew",reg:"grand",syllables:4},{name:"Reginald",reg:"grand",syllables:3},{name:"Auberon",reg:"grand",syllables:3},{name:"Lysander",reg:"grand",syllables:3},{name:"Skipper",reg:"chaos",syllables:2},{name:"Fetcher",reg:"chaos",syllables:2},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wags",reg:"chaos",syllables:2},{name:"Splasher",reg:"chaos",syllables:2},{name:"Dasher",reg:"chaos",syllables:2},{name:"Scamper",reg:"chaos",syllables:2},{name:"Bouncer",reg:"chaos",syllables:2},{name:"Jumper",reg:"chaos",syllables:2},{name:"Pouncer",reg:"chaos",syllables:2},{name:"Rusher",reg:"chaos",syllables:2},{name:"Tumbler",reg:"chaos",syllables:2},{name:"Flipper",reg:"chaos",syllables:2},{name:"Dipper",reg:"chaos",syllables:2},{name:"Paddler",reg:"chaos",syllables:2},{name:"Scout",reg:"chaos",syllables:2},{name:"Tracker",reg:"chaos",syllables:2},{name:"Scooper",reg:"chaos",syllables:2},{name:"Springer",reg:"chaos",syllables:2},{name:"Armand",reg:"grand",syllables:2},{name:"Arnaud",reg:"grand",syllables:2},{name:"Auguste",reg:"grand",syllables:2},{name:"Bertrand",reg:"grand",syllables:2},{name:"Edmond",reg:"grand",syllables:2},{name:"Édouard",reg:"grand",syllables:2},{name:"Ferdinand",reg:"grand",syllables:2},{name:"Florent",reg:"grand",syllables:2},{name:"Frédéric",reg:"grand",syllables:2},{name:"Germain",reg:"grand",syllables:2},{name:"Gilbert",reg:"grand",syllables:2},{name:"Guillaume",reg:"grand",syllables:2},{name:"Hubert",reg:"grand",syllables:2},{name:"Hugues",reg:"grand",syllables:2},{name:"Joachim",reg:"grand",syllables:2},{name:"Jocelyn",reg:"grand",syllables:2},{name:"Léonard",reg:"grand",syllables:2},{name:"Marius",reg:"grand",syllables:2},{name:"Maurice",reg:"grand",syllables:2},{name:"Norbert",reg:"grand",syllables:2},{name:"Olivier",reg:"grand",syllables:2},{name:"Patrice",reg:"grand",syllables:2},{name:"Philippe",reg:"grand",syllables:2},{name:"Renaud",reg:"grand",syllables:2},{name:"Rodolphe",reg:"grand",syllables:2},{name:"Roland",reg:"grand",syllables:2},{name:"Sébastien",reg:"grand",syllables:2},{name:"Silvestre",reg:"grand",syllables:2},{name:"Urbain",reg:"grand",syllables:2},{name:"Valère",reg:"grand",syllables:2},{name:"Victor",reg:"grand",syllables:2},{name:"Xavier",reg:"grand",syllables:2},{name:"Cyrus",reg:"grand",syllables:2},{name:"Darius",reg:"grand",syllables:3},{name:"Plato",reg:"grand",syllables:2},{name:"Prometheus",reg:"grand",syllables:4},{name:"Pythagoras",reg:"grand",syllables:4},{name:"Socrates",reg:"grand",syllables:3},{name:"Napoleon",reg:"grand",syllables:4},{name:"Pascal",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Darwin",reg:"grand",syllables:2},{name:"Einstein",reg:"grand",syllables:3}],
+    girl: [{name:"Anna",reg:"grand",syllables:2},{name:"Athena",reg:"grand",syllables:3},{name:"Beatrice",reg:"grand",syllables:3},{name:"Bonnie",reg:"mundane",syllables:2},{name:"Bramble",reg:"nature",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Calypso",reg:"grand",syllables:2},{name:"Clover",reg:"nature",syllables:2},{name:"Carina",reg:"grand",syllables:3},{name:"Cassandra",reg:"grand",syllables:3},{name:"Circe",reg:"grand",syllables:2},{name:"Clementine",reg:"grand",syllables:4},{name:"Cleopatra",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:3},{name:"Daisy",reg:"nature",syllables:1},{name:"Dorothy",reg:"nature",syllables:2},{name:"Fauna",reg:"grand",syllables:2},{name:"Frederica",reg:"grand",syllables:4},{name:"Gaia",reg:"grand",syllables:1},{name:"Georgiana",reg:"grand",syllables:3},{name:"Grace",reg:"nature",syllables:2},{name:"Hecate",reg:"grand",syllables:3},{name:"Henrietta",reg:"grand",syllables:3},{name:"Lily",reg:"nature",syllables:1},{name:"Lucy",reg:"mundane",syllables:1},{name:"Lottie",reg:"mundane",syllables:2},{name:"Mabel",reg:"mundane",syllables:2},{name:"Maisie",reg:"mundane",syllables:2},{name:"Millicent",reg:"grand",syllables:3},{name:"Mimi",reg:"mundane",syllables:2},{name:"Molly",reg:"mundane",syllables:1},{name:"Nell",reg:"nature",syllables:1},{name:"Persephone",reg:"grand",syllables:4},{name:"Phoebe",reg:"grand",syllables:2},{name:"Poppy",reg:"nature",syllables:1},{name:"Penny",reg:"mundane",syllables:1},{name:"Rhea",reg:"grand",syllables:1},{name:"Ruby",reg:"nature",syllables:1},{name:"Sappho",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:4},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Sophia",reg:"grand",syllables:2},{name:"Cookie",reg:"food",syllables:2},{name:"Butterscotch",reg:"food",syllables:3},{name:"Bella",reg:"grand",syllables:2},{name:"Winnie",reg:"mundane",syllables:2},{name:"Lady",reg:"grand",syllables:1},{name:"Stella",reg:"grand",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Lola",reg:"mundane",syllables:2},{name:"Rosie",reg:"nature",syllables:2},{name:"Sadie",reg:"mundane",syllables:2},{name:"Ginny",reg:"mundane",syllables:1},{name:"Judy",reg:"mundane",syllables:1},{name:"Dori",reg:"mundane",syllables:2},{name:"Pebbles",reg:"nature",syllables:2}]
+},
   character: {
-    boy: [{name:"Napoleon",reg:"grand",syllables:4},{name:"Rasputin",reg:"grand",syllables:3},{name:"Churchill",reg:"grand",syllables:2},{name:"Waldo",reg:"mundane",syllables:2},{name:"Homer",reg:"mundane",syllables:2},{name:"Gus",reg:"mundane",syllables:1},{name:"Alf",reg:"mundane",syllables:1},{name:"Booboo",reg:"baby",syllables:2},{name:"Noo-Noo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Smooshface",reg:"baby",syllables:2},{name:"Goober",reg:"chaos",syllables:2},{name:"Doodle",reg:"chaos",syllables:2},{name:"Gizmo",reg:"chaos",syllables:2},{name:"Spot",reg:"chaos",syllables:2},{name:"Rex",reg:"chaos",syllables:2},{name:"Fido",reg:"chaos",syllables:2},{name:"Rover",reg:"chaos",syllables:2},{name:"Patch",reg:"chaos",syllables:2},{name:"Daffy",reg:"chaos",syllables:2},{name:"Droopy",reg:"chaos",syllables:2},{name:"Foghorn",reg:"chaos",syllables:2},{name:"Porky",reg:"chaos",syllables:2},{name:"Taz",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Brain",reg:"chaos",syllables:2},{name:"Spook",reg:"chaos",syllables:2},{name:"Muttley",reg:"chaos",syllables:2},{name:"Chopper",reg:"chaos",syllables:2},{name:"Scrappy",reg:"chaos",syllables:2},{name:"Dippy",reg:"chaos",syllables:2},{name:"Loony",reg:"chaos",syllables:2},{name:"Boink",reg:"chaos",syllables:2},{name:"Boffo",reg:"chaos",syllables:2},{name:"Nifty",reg:"chaos",syllables:2},{name:"Zowie",reg:"chaos",syllables:2},{name:"Wiley",reg:"chaos",syllables:2},{name:"Augie",reg:"chaos",syllables:2},{name:"Henery",reg:"chaos",syllables:2},{name:"Heckle",reg:"chaos",syllables:2},{name:"Jeckle",reg:"chaos",syllables:2},{name:"Woody",reg:"chaos",syllables:2},{name:"Jinks",reg:"chaos",syllables:2},{name:"Ruff",reg:"chaos",syllables:2},{name:"Reddy",reg:"chaos",syllables:2},{name:"Pooch",reg:"chaos",syllables:2},{name:"Bugsy",reg:"chaos",syllables:2},{name:"Cheepy",reg:"chaos",syllables:2},{name:"Peppo",reg:"chaos",syllables:2},{name:"Brutus",reg:"chaos",syllables:2},{name:"Poppet",reg:"chaos",syllables:2},{name:"Mighty",reg:"chaos",syllables:2},{name:"Bumblywink",reg:"chaos",syllables:2},{name:"Snaggleboss",reg:"chaos",syllables:2},{name:"Dastard",reg:"chaos",syllables:2},{name:"Mazilla",reg:"chaos",syllables:2},{name:"Ricochet",reg:"chaos",syllables:2},{name:"Yakker",reg:"chaos",syllables:2},{name:"Quickdraw",reg:"chaos",syllables:2},{name:"Topdog",reg:"chaos",syllables:2},{name:"Silvester",reg:"chaos",syllables:2},{name:"Elmo",reg:"chaos",syllables:2},{name:"Hootenanny",reg:"chaos",syllables:2},{name:"Snickerdoodle",reg:"chaos",syllables:2},{name:"Skedaddle",reg:"chaos",syllables:2},{name:"Benny",reg:"chaos",syllables:2},{name:"Chumley",reg:"chaos",syllables:2},{name:"Huckleberry",reg:"chaos",syllables:2},{name:"Peabody",reg:"chaos",syllables:2},{name:"Sherman",reg:"chaos",syllables:2},{name:"Wimpy",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Jitters",reg:"chaos",syllables:2},{name:"Boink",reg:"chaos",syllables:2},{name:"Bungle",reg:"chaos",syllables:2},{name:"Bingo",reg:"chaos",syllables:2},{name:"Snoopy",reg:"chaos",syllables:2},{name:"Scooby",reg:"chaos",syllables:2},{name:"Pluto",reg:"chaos",syllables:2},{name:"Goofy",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Clovis",reg:"grand",syllables:2},{name:"Gustave",reg:"grand",syllables:2},{name:"Isidore",reg:"grand",syllables:2},{name:"Narcisse",reg:"grand",syllables:2},{name:"Octave",reg:"grand",syllables:2},{name:"Prosper",reg:"grand",syllables:2},{name:"Modeste",reg:"grand",syllables:2},{name:"Pigeon",reg:"chaos",syllables:2},{name:"Goose",reg:"chaos",syllables:2},{name:"Weasel",reg:"chaos",syllables:2},{name:"Ferret",reg:"chaos",syllables:2},{name:"Otter",reg:"chaos",syllables:2},{name:"Lobster",reg:"chaos",syllables:2},{name:"Prawn",reg:"chaos",syllables:2},{name:"Sprat",reg:"chaos",syllables:2},{name:"Barnacle",reg:"chaos",syllables:2},{name:"Scrumpy",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Yapper",reg:"chaos",syllables:2},{name:"Snorter",reg:"chaos",syllables:2},{name:"Wriggler",reg:"chaos",syllables:2},{name:"Wobbler",reg:"chaos",syllables:2},{name:"Tumbler",reg:"chaos",syllables:2},{name:"Pogo",reg:"chaos",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Whizz",reg:"chaos",syllables:2},{name:"Radish",reg:"food",syllables:2},{name:"Cabbage",reg:"food",syllables:2},{name:"Turnip",reg:"food",syllables:2},{name:"Parsnip",reg:"food",syllables:2},{name:"Lentil",reg:"food",syllables:2},{name:"Chickpea",reg:"food",syllables:2},{name:"Pistachio",reg:"food",syllables:2},{name:"Hazelnut",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Crunchie",reg:"food",syllables:2},{name:"Oreo",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Granola",reg:"food",syllables:2},{name:"Porridge",reg:"food",syllables:2},{name:"Strudel",reg:"food",syllables:2},{name:"Cobbler",reg:"food",syllables:2},{name:"Pretzel",reg:"food",syllables:2},{name:"Bagel",reg:"food",syllables:2},{name:"Molasses",reg:"food",syllables:2},{name:"Marmalade",reg:"food",syllables:2},{name:"Jammy",reg:"food",syllables:2},{name:"Pepper",reg:"food",syllables:2},{name:"Paprika",reg:"food",syllables:2},{name:"Nutmeg",reg:"food",syllables:2}],
-    girl: [{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Jellybean",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2},{name:"Candyfloss",reg:"food",syllables:3},{name:"Wibble",reg:"chaos",syllables:2},{name:"Pixie",reg:"chaos",syllables:2},{name:"Dixie",reg:"chaos",syllables:2},{name:"Mopsy",reg:"chaos",syllables:2},{name:"Fizzle",reg:"chaos",syllables:2},{name:"Nibbles",reg:"chaos",syllables:2},{name:"Tuffy",reg:"chaos",syllables:2},{name:"Toodle",reg:"chaos",syllables:2},{name:"Wizzle",reg:"chaos",syllables:2},{name:"Pipsy",reg:"chaos",syllables:2},{name:"Penelope",reg:"chaos",syllables:2},{name:"Dizzy",reg:"chaos",syllables:2},{name:"Topsy",reg:"chaos",syllables:2}],
-  },
+    boy: [{name:"Napoleon",reg:"grand",syllables:4},{name:"Rasputin",reg:"grand",syllables:3},{name:"Churchill",reg:"grand",syllables:2},{name:"Waldo",reg:"mundane",syllables:2},{name:"Homer",reg:"mundane",syllables:2},{name:"Gus",reg:"mundane",syllables:1},{name:"Alf",reg:"mundane",syllables:1},{name:"Booboo",reg:"baby",syllables:2},{name:"Noo-Noo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Smooshface",reg:"baby",syllables:2},{name:"Goober",reg:"chaos",syllables:2},{name:"Doodle",reg:"chaos",syllables:2},{name:"Gizmo",reg:"chaos",syllables:2},{name:"Spot",reg:"chaos",syllables:2},{name:"Rex",reg:"chaos",syllables:2},{name:"Fido",reg:"chaos",syllables:2},{name:"Rover",reg:"chaos",syllables:2},{name:"Patch",reg:"chaos",syllables:2},{name:"Daffy",reg:"chaos",syllables:2},{name:"Droopy",reg:"chaos",syllables:2},{name:"Foghorn",reg:"chaos",syllables:2},{name:"Porky",reg:"chaos",syllables:2},{name:"Taz",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Brain",reg:"chaos",syllables:2},{name:"Spook",reg:"chaos",syllables:2},{name:"Muttley",reg:"chaos",syllables:2},{name:"Chopper",reg:"chaos",syllables:2},{name:"Scrappy",reg:"chaos",syllables:2},{name:"Dippy",reg:"chaos",syllables:2},{name:"Loony",reg:"chaos",syllables:2},{name:"Boink",reg:"chaos",syllables:2},{name:"Boffo",reg:"chaos",syllables:2},{name:"Nifty",reg:"chaos",syllables:2},{name:"Zowie",reg:"chaos",syllables:2},{name:"Wiley",reg:"chaos",syllables:2},{name:"Augie",reg:"chaos",syllables:2},{name:"Henery",reg:"chaos",syllables:2},{name:"Heckle",reg:"chaos",syllables:2},{name:"Jeckle",reg:"chaos",syllables:2},{name:"Woody",reg:"chaos",syllables:2},{name:"Jinks",reg:"chaos",syllables:2},{name:"Ruff",reg:"chaos",syllables:2},{name:"Reddy",reg:"chaos",syllables:2},{name:"Pooch",reg:"chaos",syllables:2},{name:"Bugsy",reg:"chaos",syllables:2},{name:"Cheepy",reg:"chaos",syllables:2},{name:"Peppo",reg:"chaos",syllables:2},{name:"Brutus",reg:"chaos",syllables:2},{name:"Poppet",reg:"chaos",syllables:2},{name:"Mighty",reg:"chaos",syllables:2},{name:"Bumblywink",reg:"chaos",syllables:2},{name:"Snaggleboss",reg:"chaos",syllables:2},{name:"Dastard",reg:"chaos",syllables:2},{name:"Mazilla",reg:"chaos",syllables:2},{name:"Ricochet",reg:"chaos",syllables:2},{name:"Yakker",reg:"chaos",syllables:2},{name:"Quickdraw",reg:"chaos",syllables:2},{name:"Topdog",reg:"chaos",syllables:2},{name:"Silvester",reg:"chaos",syllables:2},{name:"Elmo",reg:"chaos",syllables:2},{name:"Hootenanny",reg:"chaos",syllables:2},{name:"Snickerdoodle",reg:"chaos",syllables:2},{name:"Skedaddle",reg:"chaos",syllables:2},{name:"Benny",reg:"chaos",syllables:2},{name:"Chumley",reg:"chaos",syllables:2},{name:"Huckleberry",reg:"chaos",syllables:2},{name:"Peabody",reg:"chaos",syllables:2},{name:"Sherman",reg:"chaos",syllables:2},{name:"Wimpy",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Jitters",reg:"chaos",syllables:2},{name:"Boink",reg:"chaos",syllables:2},{name:"Bungle",reg:"chaos",syllables:2},{name:"Bingo",reg:"chaos",syllables:2},{name:"Snoopy",reg:"chaos",syllables:2},{name:"Scooby",reg:"chaos",syllables:2},{name:"Pluto",reg:"chaos",syllables:2},{name:"Goofy",reg:"chaos",syllables:2},{name:"Bonzo",reg:"chaos",syllables:2},{name:"Clovis",reg:"grand",syllables:2},{name:"Gustave",reg:"grand",syllables:2},{name:"Isidore",reg:"grand",syllables:2},{name:"Narcisse",reg:"grand",syllables:2},{name:"Octave",reg:"grand",syllables:2},{name:"Prosper",reg:"grand",syllables:2},{name:"Modeste",reg:"grand",syllables:2},{name:"Pigeon",reg:"chaos",syllables:2},{name:"Goose",reg:"chaos",syllables:2},{name:"Weasel",reg:"chaos",syllables:2},{name:"Ferret",reg:"chaos",syllables:2},{name:"Otter",reg:"chaos",syllables:2},{name:"Lobster",reg:"chaos",syllables:2},{name:"Prawn",reg:"chaos",syllables:2},{name:"Sprat",reg:"chaos",syllables:2},{name:"Barnacle",reg:"chaos",syllables:2},{name:"Scrumpy",reg:"chaos",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Yapper",reg:"chaos",syllables:2},{name:"Snorter",reg:"chaos",syllables:2},{name:"Wriggler",reg:"chaos",syllables:2},{name:"Wobbler",reg:"chaos",syllables:2},{name:"Tumbler",reg:"chaos",syllables:2},{name:"Pogo",reg:"chaos",syllables:2},{name:"Zippy",reg:"chaos",syllables:2},{name:"Whizz",reg:"chaos",syllables:2},{name:"Radish",reg:"food",syllables:2},{name:"Cabbage",reg:"food",syllables:2},{name:"Turnip",reg:"food",syllables:2},{name:"Parsnip",reg:"food",syllables:2},{name:"Lentil",reg:"food",syllables:2},{name:"Chickpea",reg:"food",syllables:2},{name:"Pistachio",reg:"food",syllables:2},{name:"Hazelnut",reg:"food",syllables:2},{name:"Gumball",reg:"food",syllables:2},{name:"Smartie",reg:"food",syllables:2},{name:"Crunchie",reg:"food",syllables:2},{name:"Oreo",reg:"food",syllables:2},{name:"Cheerio",reg:"food",syllables:2},{name:"Granola",reg:"food",syllables:2},{name:"Porridge",reg:"food",syllables:2},{name:"Strudel",reg:"food",syllables:2},{name:"Cobbler",reg:"food",syllables:2},{name:"Pretzel",reg:"food",syllables:2},{name:"Bagel",reg:"food",syllables:2},{name:"Molasses",reg:"food",syllables:2},{name:"Marmalade",reg:"food",syllables:2},{name:"Jammy",reg:"food",syllables:2},{name:"Pepper",reg:"food",syllables:2},{name:"Paprika",reg:"food",syllables:2},{name:"Nutmeg",reg:"food",syllables:2},{name:"Whiskers",reg:"baby",syllables:2},{name:"Taco",reg:"food",syllables:2},{name:"Nacho",reg:"food",syllables:2},{name:"Burrito",reg:"food",syllables:3},{name:"Mustard",reg:"food",syllables:2},{name:"Wham",reg:"food",syllables:1},{name:"Dibdab",reg:"food",syllables:2},{name:"BlackJack",reg:"food",syllables:2},{name:"ColaCube",reg:"food",syllables:3},{name:"Drumstick",reg:"food",syllables:2},{name:"Chewitt",reg:"food",syllables:2},{name:"Chewie",reg:"food",syllables:1},{name:"Wagonwheel",reg:"food",syllables:3},{name:"Aero",reg:"food",syllables:2},{name:"Bounty",reg:"food",syllables:2},{name:"Milkyway",reg:"food",syllables:3},{name:"Minstrel",reg:"food",syllables:2},{name:"Revel",reg:"food",syllables:2}],
+    girl: [{name:"Booboo",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Fifi",reg:"baby",syllables:2},{name:"Lulu",reg:"baby",syllables:2},{name:"Gigi",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Squishface",reg:"baby",syllables:2},{name:"Jellybean",reg:"food",syllables:3},{name:"Cupcake",reg:"food",syllables:2},{name:"Candyfloss",reg:"food",syllables:3},{name:"Wibble",reg:"chaos",syllables:2},{name:"Pixie",reg:"chaos",syllables:2},{name:"Dixie",reg:"chaos",syllables:2},{name:"Mopsy",reg:"chaos",syllables:2},{name:"Fizzle",reg:"chaos",syllables:2},{name:"Nibbles",reg:"chaos",syllables:2},{name:"Tuffy",reg:"chaos",syllables:2},{name:"Toodle",reg:"chaos",syllables:2},{name:"Wizzle",reg:"chaos",syllables:2},{name:"Pipsy",reg:"chaos",syllables:2},{name:"Penelope",reg:"chaos",syllables:2},{name:"Dizzy",reg:"chaos",syllables:2},{name:"Topsy",reg:"chaos",syllables:2},{name:"Whiskers",reg:"baby",syllables:2},{name:"Baguette",reg:"food",syllables:3},{name:"Bijou",reg:"food",syllables:2},{name:"Bonbon",reg:"food",syllables:2},{name:"Brie",reg:"food",syllables:1},{name:"Chanel",reg:"mundane",syllables:2},{name:"Chloe",reg:"mundane",syllables:1},{name:"Eclair",reg:"food",syllables:2},{name:"Jolie",reg:"mundane",syllables:2},{name:"Madeleine",reg:"mundane",syllables:4},{name:"Minette",reg:"mundane",syllables:3},{name:"Mochi",reg:"baby",syllables:2},{name:"Noisette",reg:"food",syllables:3},{name:"Peaches",reg:"baby",syllables:2},{name:"Petite",reg:"food",syllables:3},{name:"Princess",reg:"mundane",syllables:2},{name:"Queenie",reg:"baby",syllables:2},{name:"Ruffles",reg:"baby",syllables:2},{name:"Snorkel",reg:"baby",syllables:2},{name:"Squashy",reg:"baby",syllables:1},{name:"Squishy",reg:"baby",syllables:1},{name:"Stumpy",reg:"baby",syllables:1},{name:"Twiggy",reg:"mundane",syllables:1},{name:"Wobbles",reg:"baby",syllables:2},{name:"Wrinkles",reg:"baby",syllables:2},{name:"Taco",reg:"food",syllables:2},{name:"Nacho",reg:"food",syllables:2},{name:"Burrito",reg:"food",syllables:3},{name:"Mustard",reg:"food",syllables:2},{name:"Wham",reg:"food",syllables:1},{name:"Dibdab",reg:"food",syllables:2},{name:"BlackJack",reg:"food",syllables:2},{name:"ColaCube",reg:"food",syllables:3},{name:"Drumstick",reg:"food",syllables:2},{name:"Chewitt",reg:"food",syllables:2},{name:"Chewie",reg:"food",syllables:1},{name:"Wagonwheel",reg:"food",syllables:3},{name:"Aero",reg:"food",syllables:2},{name:"Bounty",reg:"food",syllables:2},{name:"Milkyway",reg:"food",syllables:3},{name:"Minstrel",reg:"food",syllables:2},{name:"Revel",reg:"food",syllables:2}]
+},
   boston: {
     boy: [
     // Gilded Age robber barons / politicians
     {name:"Cornelius",reg:"grand",syllables:4},{name:"Vanderbilt",reg:"grand",syllables:3},
     {name:"Tammany",reg:"grand",syllables:3},{name:"Rockefeller",reg:"grand",syllables:4},
-    {name:"Carnegie",reg:"grand",syllables:3},{name:"JP",reg:"mundane",syllables:2},
+    {name:"Carnegie",reg:"grand",syllables:3},
     {name:"Ulysses",reg:"grand",syllables:3},{name:"Rutherford",reg:"grand",syllables:3},
     {name:"Chester",reg:"mundane",syllables:2},{name:"Grover",reg:"mundane",syllables:2},
     {name:"Millard",reg:"mundane",syllables:2},{name:"Franklin",reg:"grand",syllables:3},
@@ -703,65 +737,57 @@ const NAMES: Record<string, { boy: NameEntry[]; girl: NameEntry[] }> = {
     {name:"Rascal",reg:"chaos",syllables:2},{name:"Scamp",reg:"chaos",syllables:2},
     {name:"Bandit",reg:"chaos",syllables:2},{name:"Wisecrack",reg:"chaos",syllables:2},
     {name:"Hotdog",reg:"chaos",syllables:2},{name:"Moxie",reg:"chaos",syllables:2},
-    {name:"Spunk",reg:"chaos",syllables:1},{name:"Grit",reg:"chaos",syllables:1}
+    {name:"Spark",reg:"chaos",syllables:1},{name:"Grit",reg:"chaos",syllables:1}
   ],
-    girl: [
-    // Gilded Age society women / Vaudeville stars
-    {name:"Arabella",reg:"grand",syllables:4},{name:"Cordelia",reg:"grand",syllables:4},
-    {name:"Millicent",reg:"grand",syllables:3},{name:"Clementine",reg:"grand",syllables:3},
-    {name:"Evangeline",reg:"grand",syllables:4},{name:"Josephine",reg:"grand",syllables:4},
-    {name:"Hildegarde",reg:"grand",syllables:3},{name:"Constance",reg:"grand",syllables:2},
-    {name:"Prudence",reg:"mundane",syllables:2},{name:"Patience",reg:"mundane",syllables:3},
-    {name:"Temperance",reg:"mundane",syllables:3},{name:"Florrie",reg:"mundane",syllables:2},
-    {name:"Maisie",reg:"mundane",syllables:2},{name:"Bessie",reg:"mundane",syllables:2},
-    {name:"Nellie",reg:"mundane",syllables:2},{name:"Sadie",reg:"mundane",syllables:2},
-    {name:"Mamie",reg:"mundane",syllables:2},{name:"Gracie",reg:"mundane",syllables:2},
-    // Vaudeville energy
-    {name:"Dixie",reg:"chaos",syllables:2},{name:"Lottie",reg:"chaos",syllables:2},
-    {name:"Flossie",reg:"chaos",syllables:2},{name:"Goldie",reg:"chaos",syllables:2},
-    {name:"Fanny",reg:"chaos",syllables:2},{name:"Dollie",reg:"chaos",syllables:2},
-    {name:"Trixie",reg:"chaos",syllables:2},{name:"Winnie",reg:"chaos",syllables:2},
-    {name:"Kitty",reg:"chaos",syllables:2},{name:"Peaches",reg:"food",syllables:2},
-    {name:"Moxie",reg:"chaos",syllables:2},{name:"Spunk",reg:"chaos",syllables:1},{name:"Moonbeam",reg:"grand",syllables:2},{name:"Starbeam",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Moonlight",reg:"grand",syllables:2},{name:"Midnight",reg:"grand",syllables:2},{name:"Darkstar",reg:"grand",syllables:2},{name:"Blackstar",reg:"grand",syllables:2},{name:"Moonstone",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Moonglow",reg:"grand",syllables:2},{name:"Starglow",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Nightfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Starfire",reg:"grand",syllables:2},{name:"Shadowmoon",reg:"grand",syllables:2},{name:"Moonwalker",reg:"grand",syllables:2},{name:"Starwalker",reg:"grand",syllables:2},{name:"Voidwalker",reg:"grand",syllables:2},{name:"Quasar",reg:"grand",syllables:2},{name:"Pulsar",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:2},{name:"Magnetar",reg:"grand",syllables:2},{name:"Starburst",reg:"grand",syllables:2},{name:"Sunspot",reg:"grand",syllables:2},{name:"Celestia",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:2},{name:"Zenith",reg:"grand",syllables:2},{name:"Draco",reg:"grand",syllables:2},{name:"Sirius",reg:"grand",syllables:2},{name:"Altair",reg:"grand",syllables:2},{name:"Andromeda",reg:"grand",syllables:2},{name:"Umbra",reg:"grand",syllables:2},{name:"Penumbra",reg:"grand",syllables:2},{name:"Eventide",reg:"grand",syllables:2},{name:"Skyfall",reg:"grand",syllables:2},{name:"Moonfire",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Moonshadow",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Moonrock",reg:"grand",syllables:2},{name:"Moondust",reg:"grand",syllables:2},{name:"Skydust",reg:"grand",syllables:2},{name:"Moonfall",reg:"grand",syllables:2},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Nightglow",reg:"grand",syllables:2},{name:"Moonflare",reg:"grand",syllables:2},{name:"Starflare",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Moonrise",reg:"grand",syllables:2},{name:"Crescent",reg:"grand",syllables:2},{name:"Darkside",reg:"grand",syllables:2},{name:"Bloodmoon",reg:"grand",syllables:2},{name:"Bluemoon",reg:"grand",syllables:2},{name:"Goldenmoon",reg:"grand",syllables:2},{name:"Silvermoon",reg:"grand",syllables:2}
-  ],
-  },
-  welsh: {
+    girl: [{name:"Bessie",reg:"mundane",syllables:2},{name:"Clementine",reg:"grand",syllables:4},{name:"Constance",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:3},{name:"Dixie",reg:"mundane",syllables:2},{name:"Dollie",reg:"mundane",syllables:2},{name:"Evangeline",reg:"grand",syllables:5},{name:"Florrie",reg:"mundane",syllables:2},{name:"Flossie",reg:"mundane",syllables:2},{name:"Gracie",reg:"mundane",syllables:2},{name:"Hildegarde",reg:"grand",syllables:4},{name:"Josephine",reg:"grand",syllables:4},{name:"Maisie",reg:"mundane",syllables:2},{name:"Mamie",reg:"mundane",syllables:2},{name:"Moxie",reg:"mundane",syllables:2},{name:"Nellie",reg:"mundane",syllables:2},{name:"Peaches",reg:"food",syllables:2},{name:"Sadie",reg:"mundane",syllables:2},{name:"Temperance",reg:"grand",syllables:4},{name:"Trixie",reg:"mundane",syllables:2},{name:"Kathleen",reg:"mundane",syllables:2},{name:"Winnie",reg:"mundane",syllables:2},{name:"Brenda",reg:"mundane",syllables:2},{name:"Priscilla",reg:"grand",syllables:3},{name:"Franny",reg:"mundane",syllables:1},{name:"Debbie",reg:"mundane",syllables:2},{name:"Eleanor",reg:"grand",syllables:3},{name:"Mabel",reg:"mundane",syllables:2},{name:"Doris",reg:"mundane",syllables:2},{name:"Edie",reg:"mundane",syllables:2},{name:"Elsie",reg:"mundane",syllables:2},{name:"Ethel",reg:"mundane",syllables:2},{name:"Hilda",reg:"mundane",syllables:2},{name:"Maudie",reg:"mundane",syllables:2},{name:"Peggy",reg:"mundane",syllables:1},{name:"Nancy",reg:"mundane",syllables:1},{name:"Dotty",reg:"mundane",syllables:1},{name:"Dolly",reg:"mundane",syllables:1},{name:"Rita",reg:"mundane",syllables:2},{name:"Vera",reg:"mundane",syllables:2},{name:"Jean",reg:"mundane",syllables:1},{name:"Joan",reg:"mundane",syllables:1},{name:"Joyce",reg:"mundane",syllables:2},{name:"Marjorie",reg:"grand",syllables:3},{name:"Muriel",reg:"grand",syllables:2},{name:"Audrey",reg:"grand",syllables:2},{name:"Edith",reg:"grand",syllables:2},{name:"Agnes",reg:"grand",syllables:2},{name:"Nora",reg:"mundane",syllables:2},{name:"Hetty",reg:"mundane",syllables:1},{name:"Gertie",reg:"mundane",syllables:2}]
+},
+  corgi: {
     boy: [{name:"Dai",reg:"grand",syllables:2},{name:"Huw",reg:"grand",syllables:2},{name:"Llew",reg:"grand",syllables:2},{name:"Rhys",reg:"grand",syllables:2},{name:"Bryn",reg:"grand",syllables:2},{name:"Glyn",reg:"grand",syllables:2},{name:"Gwyn",reg:"grand",syllables:2},{name:"Twm",reg:"grand",syllables:2},{name:"Wil",reg:"grand",syllables:2},{name:"Dafydd",reg:"grand",syllables:2},{name:"Dewi",reg:"grand",syllables:2},{name:"Denzil",reg:"grand",syllables:2},{name:"Guto",reg:"grand",syllables:2},{name:"Iolo",reg:"grand",syllables:2},{name:"Iwan",reg:"grand",syllables:2},{name:"Ieuan",reg:"grand",syllables:2},{name:"Iestyn",reg:"grand",syllables:2},{name:"Ifan",reg:"grand",syllables:2},{name:"Hywel",reg:"grand",syllables:2},{name:"Rhodri",reg:"grand",syllables:2},{name:"Gethin",reg:"grand",syllables:2},{name:"Gruff",reg:"grand",syllables:2},{name:"Owain",reg:"grand",syllables:2},{name:"Osian",reg:"grand",syllables:2},{name:"Meurig",reg:"grand",syllables:2},{name:"Mael",reg:"grand",syllables:2},{name:"Emrys",reg:"grand",syllables:2},{name:"Emyr",reg:"grand",syllables:2},{name:"Eurig",reg:"grand",syllables:2},{name:"Elfed",reg:"grand",syllables:2},{name:"Tudur",reg:"grand",syllables:2},{name:"Trefor",reg:"grand",syllables:2},{name:"Arwel",reg:"grand",syllables:2},{name:"Alun",reg:"grand",syllables:2},{name:"Geraint",reg:"grand",syllables:2},{name:"Gareth",reg:"grand",syllables:2},{name:"Idris",reg:"grand",syllables:2},{name:"Morgan",reg:"grand",syllables:2},{name:"Rhun",reg:"grand",syllables:2},{name:"Selwyn",reg:"grand",syllables:2},{name:"Wyn",reg:"grand",syllables:2},{name:"Wynford",reg:"grand",syllables:2},{name:"Carwyn",reg:"grand",syllables:2},{name:"Gwion",reg:"grand",syllables:2},{name:"Harri",reg:"grand",syllables:2},{name:"Llion",reg:"grand",syllables:2},{name:"Pedr",reg:"grand",syllables:2},{name:"Pryderi",reg:"grand",syllables:2},{name:"Sion",reg:"grand",syllables:2},{name:"Steffan",reg:"grand",syllables:2},{name:"Tomos",reg:"grand",syllables:2},{name:"Vaughan",reg:"grand",syllables:2},{name:"Gruffudd",reg:"grand",syllables:2},{name:"Gwilym",reg:"grand",syllables:2},{name:"Caradog",reg:"grand",syllables:2},{name:"Cadwaladr",reg:"grand",syllables:2},{name:"Cadwallon",reg:"grand",syllables:2},{name:"Llewelyn",reg:"grand",syllables:2},{name:"Llywarch",reg:"grand",syllables:2},{name:"Llyr",reg:"grand",syllables:2},{name:"Madoc",reg:"grand",syllables:2},{name:"Mabon",reg:"grand",syllables:2},{name:"Aneurin",reg:"grand",syllables:2},{name:"Dyfrig",reg:"grand",syllables:2},{name:"Talfryn",reg:"grand",syllables:2},{name:"Bleddyn",reg:"grand",syllables:2},{name:"Bedwyr",reg:"grand",syllables:2},{name:"Cledwyn",reg:"grand",syllables:2},{name:"Islwyn",reg:"grand",syllables:2},{name:"Ifor",reg:"grand",syllables:2},{name:"Taliesin",reg:"grand",syllables:2},{name:"Tegid",reg:"grand",syllables:2},{name:"Trystan",reg:"grand",syllables:2},{name:"Berwyn",reg:"grand",syllables:2},{name:"Delwyn",reg:"grand",syllables:2},{name:"Dilwyn",reg:"grand",syllables:2},{name:"Eifion",reg:"grand",syllables:2},{name:"Elidyr",reg:"grand",syllables:2},{name:"Gwyndaf",reg:"grand",syllables:2},{name:"Gwynfor",reg:"grand",syllables:2},{name:"Gwynne",reg:"grand",syllables:2},{name:"Heini",reg:"grand",syllables:2},{name:"Macsen",reg:"grand",syllables:2},{name:"Meredydd",reg:"grand",syllables:2},{name:"Morlais",reg:"grand",syllables:2},{name:"Rhydderch",reg:"grand",syllables:2},{name:"Tecwyn",reg:"grand",syllables:2},{name:"Wmffre",reg:"grand",syllables:2},{name:"Prys",reg:"grand",syllables:2},{name:"Gwilym",reg:"grand",syllables:2}],
-    girl: [{name:"Seren",reg:"grand",syllables:2},{name:"Elin",reg:"grand",syllables:2},{name:"Ffion",reg:"grand",syllables:2},{name:"Megan",reg:"grand",syllables:2},{name:"Bethan",reg:"grand",syllables:2},{name:"Rhiannon",reg:"grand",syllables:2},{name:"Ceridwen",reg:"grand",syllables:2},{name:"Branwen",reg:"grand",syllables:2},{name:"Morfudd",reg:"grand",syllables:2},{name:"Nest",reg:"grand",syllables:2},{name:"Tangwystl",reg:"grand",syllables:2},{name:"Gwenllian",reg:"grand",syllables:2},{name:"Olwen",reg:"grand",syllables:2},{name:"Arianrhod",reg:"grand",syllables:2},{name:"Blodwen",reg:"grand",syllables:2},{name:"Catrin",reg:"grand",syllables:2},{name:"Eluned",reg:"grand",syllables:2},{name:"Enid",reg:"grand",syllables:2},{name:"Nerys",reg:"grand",syllables:2},{name:"Siân",reg:"grand",syllables:2},{name:"Angharad",reg:"grand",syllables:2},{name:"Carys",reg:"grand",syllables:2},{name:"Dilys",reg:"grand",syllables:2},{name:"Enfys",reg:"grand",syllables:2},{name:"Glenda",reg:"grand",syllables:2},{name:"Gwen",reg:"grand",syllables:2},{name:"Gweneth",reg:"grand",syllables:2},{name:"Lowri",reg:"grand",syllables:2},{name:"Mair",reg:"grand",syllables:2},{name:"Mali",reg:"grand",syllables:2},{name:"Marged",reg:"grand",syllables:2},{name:"Nesta",reg:"grand",syllables:2},{name:"Non",reg:"grand",syllables:2},{name:"Nia",reg:"grand",syllables:2},{name:"Rhian",reg:"grand",syllables:2},{name:"Rowena",reg:"grand",syllables:2},{name:"Tegwen",reg:"grand",syllables:2},{name:"Tesni",reg:"grand",syllables:2},{name:"Wenna",reg:"grand",syllables:2},{name:"Eirlys",reg:"grand",syllables:2}],
-  },
+    girl: [{name:"Angharad",reg:"grand",syllables:3},{name:"Arianrhod",reg:"grand",syllables:3},{name:"Bethan",reg:"mundane",syllables:2},{name:"Blodwen",reg:"grand",syllables:2},{name:"Branwen",reg:"grand",syllables:2},{name:"Carys",reg:"mundane",syllables:1},{name:"Catrin",reg:"mundane",syllables:2},{name:"Ceinwen",reg:"mundane",syllables:2},{name:"Ceridwen",reg:"grand",syllables:3},{name:"Dilys",reg:"mundane",syllables:1},{name:"Eirlys",reg:"grand",syllables:1},{name:"Elin",reg:"mundane",syllables:2},{name:"Eluned",reg:"grand",syllables:3},{name:"Enfys",reg:"mundane",syllables:1},{name:"Enid",reg:"mundane",syllables:2},{name:"Ffion",reg:"grand",syllables:1},{name:"Glenda",reg:"mundane",syllables:2},{name:"Glenys",reg:"mundane",syllables:1},{name:"Gwen",reg:"mundane",syllables:1},{name:"Gweneth",reg:"mundane",syllables:2},{name:"Gwenllian",reg:"grand",syllables:2},{name:"Llio",reg:"mundane",syllables:1},{name:"Lowri",reg:"mundane",syllables:2},{name:"Mabli",reg:"mundane",syllables:2},{name:"Mair",reg:"mundane",syllables:1},{name:"Mali",reg:"mundane",syllables:2},{name:"Marged",reg:"mundane",syllables:2},{name:"Megan",reg:"mundane",syllables:2},{name:"Morfudd",reg:"grand",syllables:2},{name:"Nerys",reg:"mundane",syllables:1},{name:"Nest",reg:"mundane",syllables:1},{name:"Nesta",reg:"mundane",syllables:2},{name:"Nia",reg:"mundane",syllables:1},{name:"Non",reg:"mundane",syllables:1},{name:"Olwen",reg:"mundane",syllables:2},{name:"Rhian",reg:"mundane",syllables:1},{name:"Rhiannon",reg:"grand",syllables:2},{name:"Rowena",reg:"mundane",syllables:3},{name:"Seren",reg:"mundane",syllables:2},{name:"Sian",reg:"mundane",syllables:1},{name:"Siân",reg:"mundane",syllables:1},{name:"Tangwystl",reg:"grand",syllables:1},{name:"Tegwen",reg:"mundane",syllables:2},{name:"Tesni",reg:"mundane",syllables:2},{name:"Wenna",reg:"mundane",syllables:2}]
+},
   asian: {
-    boy: [{name:"Phooey",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Philbert",reg:"chaos",syllables:2},{name:"Phreddy",reg:"chaos",syllables:2},{name:"Phoebe",reg:"chaos",syllables:2},{name:"Phumble",reg:"chaos",syllables:2},{name:"Louie",reg:"chaos",syllables:2},{name:"Lenny",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Lotus",reg:"chaos",syllables:2},{name:"Lychee",reg:"chaos",syllables:2},{name:"Mooy",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Mochi",reg:"chaos",syllables:2},{name:"Miso",reg:"chaos",syllables:2},{name:"Mongo",reg:"chaos",syllables:2},{name:"Tutu",reg:"chaos",syllables:2},{name:"Tater",reg:"chaos",syllables:2},{name:"Tumble",reg:"chaos",syllables:2},{name:"Tiger",reg:"chaos",syllables:2},{name:"Tofu",reg:"chaos",syllables:2},{name:"Wonton",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wumpus",reg:"chaos",syllables:2},{name:"Wonky",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Fumble",reg:"chaos",syllables:2},{name:"Fizz",reg:"chaos",syllables:2},{name:"Karate",reg:"chaos",syllables:2},{name:"Ninja",reg:"chaos",syllables:2},{name:"Samurai",reg:"chaos",syllables:2},{name:"Shogun",reg:"chaos",syllables:2},{name:"Ronin",reg:"chaos",syllables:2},{name:"Dragon",reg:"chaos",syllables:2},{name:"Sifu",reg:"chaos",syllables:2},{name:"Sensei",reg:"chaos",syllables:2},{name:"Wukong",reg:"chaos",syllables:2},{name:"Mushu",reg:"chaos",syllables:2},{name:"Shifu",reg:"chaos",syllables:2},{name:"Oogway",reg:"chaos",syllables:2},{name:"Po",reg:"chaos",syllables:2},{name:"Mantis",reg:"chaos",syllables:2},{name:"Crane",reg:"chaos",syllables:2},{name:"Viper",reg:"chaos",syllables:2},{name:"Confucius",reg:"chaos",syllables:2},{name:"Buddha",reg:"chaos",syllables:2},{name:"Zen",reg:"chaos",syllables:2},{name:"Koi",reg:"chaos",syllables:2},{name:"Jade",reg:"chaos",syllables:2},{name:"Lotus",reg:"chaos",syllables:2},{name:"Penry",reg:"chaos",syllables:2},{name:"Spot",reg:"chaos",syllables:2},{name:"Batfink",reg:"chaos",syllables:2},{name:"Napoleon",reg:"chaos",syllables:2},{name:"Gus",reg:"chaos",syllables:2},{name:"Alf",reg:"chaos",syllables:2},{name:"Homer",reg:"chaos",syllables:2},{name:"Waldo",reg:"chaos",syllables:2}],
-    girl: [{name:"Lotus",reg:"grand",syllables:2},{name:"Jade",reg:"grand",syllables:2},{name:"Jasmine",reg:"grand",syllables:2},{name:"Peony",reg:"grand",syllables:2},{name:"Plum",reg:"grand",syllables:2},{name:"Lychee",reg:"grand",syllables:2},{name:"Mochi",reg:"grand",syllables:2},{name:"Yuki",reg:"grand",syllables:2},{name:"Sakura",reg:"grand",syllables:2},{name:"Kiku",reg:"grand",syllables:2},{name:"Hana",reg:"grand",syllables:2},{name:"Mei",reg:"grand",syllables:2},{name:"Xiao",reg:"grand",syllables:2},{name:"Zhen",reg:"grand",syllables:2},{name:"Nori",reg:"grand",syllables:2},{name:"Suki",reg:"grand",syllables:2},{name:"Koi",reg:"grand",syllables:2},{name:"Panda",reg:"grand",syllables:2},{name:"Tigress",reg:"grand",syllables:2},{name:"Viper",reg:"grand",syllables:2},{name:"Crane",reg:"grand",syllables:2},{name:"Mariposa",reg:"grand",syllables:2},{name:"Butterfly",reg:"grand",syllables:2},{name:"Booboo",reg:"grand",syllables:2},{name:"Gigi",reg:"grand",syllables:2},{name:"Mimi",reg:"grand",syllables:2},{name:"Fifi",reg:"grand",syllables:2},{name:"Lulu",reg:"grand",syllables:2},{name:"Coco",reg:"grand",syllables:2}],
-  },
+    boy: [{name:"Phooey",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Philbert",reg:"chaos",syllables:2},{name:"Phreddy",reg:"chaos",syllables:2},{name:"Phumble",reg:"chaos",syllables:2},{name:"Louie",reg:"chaos",syllables:2},{name:"Lenny",reg:"chaos",syllables:2},{name:"Lummox",reg:"chaos",syllables:2},{name:"Mooy",reg:"chaos",syllables:2},{name:"Mugsy",reg:"chaos",syllables:2},{name:"Mochi",reg:"chaos",syllables:2},{name:"Miso",reg:"chaos",syllables:2},{name:"Mongo",reg:"chaos",syllables:2},{name:"Tater",reg:"chaos",syllables:2},{name:"Tumble",reg:"chaos",syllables:2},{name:"Tiger",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wumpus",reg:"chaos",syllables:2},{name:"Wonky",reg:"chaos",syllables:2},{name:"Phony",reg:"chaos",syllables:2},{name:"Fumble",reg:"chaos",syllables:2},{name:"Fizz",reg:"chaos",syllables:2},{name:"Spot",reg:"chaos",syllables:2},{name:"Napoleon",reg:"chaos",syllables:2},{name:"Gus",reg:"chaos",syllables:2},{name:"Alf",reg:"chaos",syllables:2},{name:"Homer",reg:"chaos",syllables:2},{name:"Waldo",reg:"chaos",syllables:2},{name:"Winston",reg:"mundane",syllables:2},{name:"Otto",reg:"mundane",syllables:2},{name:"Bertie",reg:"mundane",syllables:2},{name:"Monty",reg:"mundane",syllables:2},{name:"Percy",reg:"mundane",syllables:2},{name:"Reggie",reg:"mundane",syllables:2},{name:"Buster",reg:"chaos",syllables:2},{name:"Gruff",reg:"chaos",syllables:1},{name:"Grunt",reg:"chaos",syllables:1},{name:"Clive",reg:"mundane",syllables:1},{name:"Boris",reg:"mundane",syllables:2},{name:"Derek",reg:"mundane",syllables:2},{name:"Norman",reg:"mundane",syllables:2},{name:"Frank",reg:"mundane",syllables:1},{name:"Dennis",reg:"mundane",syllables:2},{name:"Stanley",reg:"mundane",syllables:2},{name:"Herbert",reg:"mundane",syllables:2},{name:"Ernest",reg:"mundane",syllables:2},{name:"Pudding",reg:"food",syllables:2},{name:"Noodle",reg:"food",syllables:2},{name:"Roly",reg:"chaos",syllables:2},{name:"Snorter",reg:"chaos",syllables:2}],
+    girl: [{name:"Jade",reg:"grand",syllables:2},{name:"Jasmine",reg:"grand",syllables:2},{name:"Peony",reg:"grand",syllables:2},{name:"Plum",reg:"grand",syllables:2},{name:"Mochi",reg:"grand",syllables:2},{name:"Yuki",reg:"grand",syllables:2},{name:"Kiku",reg:"grand",syllables:2},{name:"Hana",reg:"grand",syllables:2},{name:"Mei",reg:"grand",syllables:2},{name:"Xiao",reg:"grand",syllables:2},{name:"Zhen",reg:"grand",syllables:2},{name:"Nori",reg:"grand",syllables:2},{name:"Suki",reg:"grand",syllables:2},{name:"Koi",reg:"grand",syllables:2},{name:"Tigress",reg:"grand",syllables:2},{name:"Viper",reg:"grand",syllables:2},{name:"Crane",reg:"grand",syllables:2},{name:"Mariposa",reg:"grand",syllables:2},{name:"Butterfly",reg:"grand",syllables:2},{name:"Booboo",reg:"grand",syllables:2},{name:"Gigi",reg:"grand",syllables:2},{name:"Mimi",reg:"grand",syllables:2},{name:"Fifi",reg:"grand",syllables:2},{name:"Lulu",reg:"grand",syllables:2},{name:"Coco",reg:"grand",syllables:2},{name:"Aiko",reg:"grand",syllables:2},{name:"Amaya",reg:"grand",syllables:3},{name:"Azuki",reg:"grand",syllables:3},{name:"Blossom",reg:"nature",syllables:2},{name:"Cherry",reg:"nature",syllables:1},{name:"Fuji",reg:"nature",syllables:2},{name:"Lotus",reg:"nature",syllables:2},{name:"Miho",reg:"grand",syllables:2},{name:"Misaki",reg:"grand",syllables:3},{name:"Momoko",reg:"grand",syllables:3},{name:"Naomi",reg:"grand",syllables:2},{name:"Orchid",reg:"nature",syllables:2},{name:"Sakura",reg:"nature",syllables:3},{name:"Sayuri",reg:"grand",syllables:3},{name:"Shizuka",reg:"grand",syllables:3},{name:"Sumiko",reg:"grand",syllables:3},{name:"Tamiko",reg:"grand",syllables:3},{name:"Tomoko",reg:"grand",syllables:3},{name:"Yoko",reg:"grand",syllables:2},{name:"Yumi",reg:"grand",syllables:2}]
+},
   default: {
-    boy: [{name:"Archibald",reg:"grand",syllables:3},{name:"Barnaby",reg:"grand",syllables:3},{name:"Cornelius",reg:"grand",syllables:4},{name:"Douglas",reg:"mundane",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Herbert",reg:"mundane",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Lionel",reg:"grand",syllables:3},{name:"Montgomery",reg:"grand",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Percival",reg:"grand",syllables:3},{name:"Reginald",reg:"grand",syllables:3},{name:"Stanley",reg:"mundane",syllables:2},{name:"Theodore",reg:"grand",syllables:3},{name:"Vincent",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3}],
-    girl: [{name:"Arabella",reg:"grand",syllables:4},{name:"Beatrice",reg:"grand",syllables:3},{name:"Clementine",reg:"grand",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Eleanor",reg:"grand",syllables:3},{name:"Georgiana",reg:"grand",syllables:4},{name:"Isadora",reg:"grand",syllables:4},{name:"Lavinia",reg:"grand",syllables:4},{name:"Millicent",reg:"grand",syllables:3},{name:"Nora",reg:"mundane",syllables:2},{name:"Prudence",reg:"mundane",syllables:2},{name:"Rosalind",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Tabitha",reg:"grand",syllables:3},{name:"Vivienne",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wriggle",reg:"chaos",syllables:2},{name:"Waddle",reg:"chaos",syllables:2},{name:"Wander",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2}],
-  },
+    boy: [{name:"Archibald",reg:"grand",syllables:3},{name:"Barnaby",reg:"grand",syllables:3},{name:"Cornelius",reg:"grand",syllables:4},{name:"Douglas",reg:"mundane",syllables:2},{name:"Frederick",reg:"grand",syllables:3},{name:"Herbert",reg:"mundane",syllables:2},{name:"Jasper",reg:"grand",syllables:2},{name:"Lionel",reg:"grand",syllables:3},{name:"Montgomery",reg:"grand",syllables:3},{name:"Norman",reg:"mundane",syllables:2},{name:"Percival",reg:"grand",syllables:3},{name:"Reginald",reg:"grand",syllables:3},{name:"Stanley",reg:"mundane",syllables:2},{name:"Theodore",reg:"grand",syllables:3},{name:"Vincent",reg:"grand",syllables:2},{name:"Booboo",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Altair",reg:"grand",syllables:2},{name:"Antimatter",reg:"grand",syllables:4},{name:"Apollo",reg:"grand",syllables:3},{name:"Asteroid",reg:"grand",syllables:3},{name:"Astro",reg:"grand",syllables:2},{name:"Atlas",reg:"grand",syllables:2},{name:"Blackstar",reg:"grand",syllables:2},{name:"Cosmic",reg:"grand",syllables:2},{name:"Cosmo",reg:"grand",syllables:2},{name:"Cosmos",reg:"grand",syllables:2},{name:"Darkside",reg:"grand",syllables:2},{name:"Darkstar",reg:"grand",syllables:2},{name:"Deepspace",reg:"grand",syllables:2},{name:"Draco",reg:"grand",syllables:2},{name:"Galileo",reg:"grand",syllables:4},{name:"Ganymede",reg:"grand",syllables:3},{name:"Hubble",reg:"grand",syllables:2},{name:"Jupiter",reg:"grand",syllables:3},{name:"Kepler",reg:"grand",syllables:2},{name:"Magnetar",reg:"grand",syllables:3},{name:"Mercury",reg:"grand",syllables:3},{name:"Meteor",reg:"grand",syllables:3},{name:"Neptune",reg:"grand",syllables:2},{name:"Orbit",reg:"grand",syllables:2},{name:"Orion",reg:"grand",syllables:3},{name:"Pluto",reg:"grand",syllables:2},{name:"Pulsar",reg:"grand",syllables:2},{name:"Quasar",reg:"grand",syllables:2},{name:"Saturn",reg:"grand",syllables:2},{name:"Sirius",reg:"grand",syllables:3},{name:"Starburst",reg:"grand",syllables:2},{name:"Starwalker",reg:"grand",syllables:3},{name:"Sunspot",reg:"grand",syllables:2},{name:"Titan",reg:"grand",syllables:2},{name:"Vulcan",reg:"grand",syllables:2},{name:"Astral",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:3},{name:"Galaxy",reg:"grand",syllables:3},{name:"Skyfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:3},{name:"Solstice",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:4},{name:"Whirlwind",reg:"grand",syllables:2},{name:"Cyrus",reg:"grand",syllables:2},{name:"Darius",reg:"grand",syllables:3},{name:"Plato",reg:"grand",syllables:2},{name:"Prometheus",reg:"grand",syllables:4},{name:"Pythagoras",reg:"grand",syllables:4},{name:"Socrates",reg:"grand",syllables:3},{name:"Napoleon",reg:"grand",syllables:4},{name:"Pascal",reg:"grand",syllables:2},{name:"Newton",reg:"grand",syllables:2},{name:"Darwin",reg:"grand",syllables:2},{name:"Einstein",reg:"grand",syllables:3},{name:"Alf",reg:"mundane",syllables:1},{name:"Benny",reg:"mundane",syllables:2},{name:"Blaise",reg:"grand",syllables:2},{name:"Charles",reg:"grand",syllables:2},{name:"Edgar",reg:"grand",syllables:2},{name:"Edmond",reg:"grand",syllables:2},{name:"Edward",reg:"grand",syllables:2},{name:"Gabriel",reg:"grand",syllables:3},{name:"Gus",reg:"mundane",syllables:1},{name:"Guy",reg:"mundane",syllables:1},{name:"Henry",reg:"grand",syllables:2},{name:"Homer",reg:"grand",syllables:2},{name:"Lawrence",reg:"grand",syllables:2},{name:"Lenny",reg:"mundane",syllables:2},{name:"Leopold",reg:"grand",syllables:3},{name:"Louie",reg:"mundane",syllables:3},{name:"Louis",reg:"grand",syllables:2},{name:"Miles",reg:"mundane",syllables:2},{name:"Oliver",reg:"mundane",syllables:3},{name:"Omar",reg:"mundane",syllables:2},{name:"Quentin",reg:"grand",syllables:2},{name:"Richard",reg:"mundane",syllables:2},{name:"Sebastian",reg:"grand",syllables:4},{name:"Sherman",reg:"mundane",syllables:2},{name:"Viper",reg:"grand",syllables:2},{name:"William",reg:"grand",syllables:3},{name:"Bailey",reg:"mundane",syllables:3},{name:"Binky",reg:"baby",syllables:2},{name:"Altimeter",reg:"absurd",syllables:4},{name:"Batfink",reg:"absurd",syllables:2},{name:"Boffin",reg:"absurd",syllables:2},{name:"Chumley",reg:"absurd",syllables:2},{name:"Cornflake",reg:"absurd",syllables:2},{name:"Dragon",reg:"grand",syllables:2},{name:"Drifter",reg:"absurd",syllables:2},{name:"Duke",reg:"grand",syllables:1},{name:"Enguerrand",reg:"grand",syllables:3},{name:"Falcon",reg:"grand",syllables:2},{name:"Fleet",reg:"grand",syllables:1},{name:"Foghorn",reg:"absurd",syllables:2},{name:"Fortunatus",reg:"grand",syllables:4},{name:"Fumble",reg:"chaos",syllables:2},{name:"Gaston",reg:"grand",syllables:2},{name:"Gizmo",reg:"absurd",syllables:2},{name:"Goober",reg:"absurd",syllables:2},{name:"Grommet",reg:"absurd",syllables:2},{name:"Gubbins",reg:"absurd",syllables:2},{name:"Hamid",reg:"mundane",syllables:2},{name:"Henri",reg:"grand",syllables:2},{name:"Huckleberry",reg:"absurd",syllables:4},{name:"Karate",reg:"absurd",syllables:3},{name:"Khalid",reg:"mundane",syllables:2},{name:"Khan",reg:"grand",syllables:1},{name:"Koda",reg:"mundane",syllables:2},{name:"Lummox",reg:"absurd",syllables:2},{name:"Mantis",reg:"absurd",syllables:2},{name:"Marcel",reg:"grand",syllables:2},{name:"Maximillian",reg:"grand",syllables:5},{name:"Mongo",reg:"absurd",syllables:2},{name:"Muddle",reg:"chaos",syllables:2},{name:"Mugsy",reg:"absurd",syllables:2},{name:"Nanuq",reg:"grand",syllables:2},{name:"Nipper",reg:"chaos",syllables:2},{name:"Peabody",reg:"grand",syllables:3},{name:"Penry",reg:"absurd",syllables:2},{name:"Philbert",reg:"absurd",syllables:2},{name:"Philibert",reg:"absurd",syllables:3},{name:"Phony",reg:"absurd",syllables:2},{name:"Phooey",reg:"absurd",syllables:2},{name:"Phreddy",reg:"absurd",syllables:2},{name:"Phumble",reg:"absurd",syllables:2},{name:"Pierre",reg:"grand",syllables:2},{name:"Pip",reg:"mundane",syllables:1},{name:"Puckle",reg:"absurd",syllables:2},{name:"Qadir",reg:"mundane",syllables:2},{name:"Ramshackle",reg:"absurd",syllables:3},{name:"Raoul",reg:"grand",syllables:2},{name:"René",reg:"grand",syllables:2},{name:"Reza",reg:"mundane",syllables:2},{name:"Roly",reg:"baby",syllables:2},{name:"Scamp",reg:"chaos",syllables:1},{name:"Scraggy",reg:"chaos",syllables:2},{name:"Scrumpy",reg:"food",syllables:2},{name:"Spot",reg:"mundane",syllables:1},{name:"Sprocket",reg:"absurd",syllables:2},{name:"Spark",reg:"chaos",syllables:1},{name:"Squirt",reg:"chaos",syllables:1},{name:"Tarkan",reg:"mundane",syllables:2},{name:"Tater",reg:"food",syllables:2},{name:"Tiger",reg:"grand",syllables:2},{name:"Turbulence",reg:"chaos",syllables:3},{name:"Waldo",reg:"absurd",syllables:2},{name:"WeeDee",reg:"absurd",syllables:2},{name:"Wimpy",reg:"absurd",syllables:2},{name:"Wittgenstein",reg:"absurd",syllables:4},{name:"Wonton",reg:"food",syllables:2},{name:"Wumpus",reg:"absurd",syllables:2},{name:"Zen",reg:"grand",syllables:1},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Booper",reg:"baby",syllables:2},{name:"Button",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Dazzle",reg:"absurd",syllables:2},{name:"Dinky",reg:"baby",syllables:2},{name:"Dizzy",reg:"chaos",syllables:2},{name:"Doodle",reg:"baby",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Fizz",reg:"chaos",syllables:1},{name:"Fury",reg:"grand",syllables:2},{name:"Gale",reg:"nature",syllables:1},{name:"Glorious",reg:"grand",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Lilliput",reg:"absurd",syllables:3},{name:"Majestic",reg:"grand",syllables:3},{name:"Marvellous",reg:"grand",syllables:3},{name:"Mischief",reg:"chaos",syllables:2},{name:"Moxie",reg:"chaos",syllables:2},{name:"Munchkin",reg:"baby",syllables:2},{name:"Nimble",reg:"chaos",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Opulent",reg:"grand",syllables:3},{name:"Peanut",reg:"food",syllables:2},{name:"Pipsqueak",reg:"baby",syllables:2},{name:"Pocket",reg:"baby",syllables:2},{name:"Skittles",reg:"food",syllables:2},{name:"Smidge",reg:"baby",syllables:1},{name:"Smidgeon",reg:"baby",syllables:2},{name:"Snippy",reg:"chaos",syllables:2},{name:"Speck",reg:"baby",syllables:1},{name:"Squishface",reg:"baby",syllables:2},{name:"Tangles",reg:"chaos",syllables:2},{name:"Teacup",reg:"baby",syllables:2},{name:"Tempest",reg:"grand",syllables:2},{name:"Thingy",reg:"absurd",syllables:2},{name:"Titch",reg:"baby",syllables:1},{name:"Titchy",reg:"baby",syllables:2},{name:"Tufty",reg:"baby",syllables:2},{name:"Tumble",reg:"chaos",syllables:2},{name:"Waltz",reg:"grand",syllables:1},{name:"Wibble",reg:"chaos",syllables:2},{name:"Widget",reg:"absurd",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wonky",reg:"chaos",syllables:2},{name:"Wriggles",reg:"chaos",syllables:2},{name:"Frost",reg:"nature",syllables:1},{name:"Phantom",reg:"grand",syllables:2},{name:"Ghost",reg:"grand",syllables:1},{name:"Wraith",reg:"grand",syllables:1},{name:"Shade",reg:"grand",syllables:1},{name:"Mist",reg:"nature",syllables:1},{name:"Smoky",reg:"nature",syllables:2},{name:"Spectre",reg:"grand",syllables:2},{name:"Murk",reg:"grand",syllables:1},{name:"Robin",reg:"nature",syllables:2},{name:"Lark",reg:"nature",syllables:1},{name:"Crisp",reg:"grand",syllables:1},{name:"Sparky",reg:"chaos",syllables:2},{name:"Brisk",reg:"grand",syllables:1},{name:"Perky",reg:"chaos",syllables:2},{name:"Chipper",reg:"chaos",syllables:2},{name:"Sunny",reg:"chaos",syllables:2},{name:"Handel",reg:"grand",syllables:2},{name:"Bach",reg:"grand",syllables:1},{name:"Brahms",reg:"grand",syllables:1},{name:"Chopin",reg:"grand",syllables:2},{name:"Liszt",reg:"grand",syllables:1},{name:"Schubert",reg:"grand",syllables:2},{name:"Vivaldi",reg:"grand",syllables:3},{name:"Purcell",reg:"grand",syllables:2},{name:"Foxtrot",reg:"grand",syllables:2},{name:"Tango",reg:"grand",syllables:2},{name:"Boogie",reg:"chaos",syllables:2},{name:"Rumba",reg:"grand",syllables:2},{name:"Jive",reg:"chaos",syllables:1},{name:"Swing",reg:"chaos",syllables:1},{name:"Conker",reg:"nature",syllables:2},{name:"Russet",reg:"nature",syllables:2},{name:"Birch",reg:"nature",syllables:1},{name:"Espresso",reg:"food",syllables:3},{name:"Mocha",reg:"food",syllables:2},{name:"Arabica",reg:"food",syllables:4},{name:"Pickle",reg:"food",syllables:2},{name:"Reckless",reg:"chaos",syllables:2},{name:"Oregano",reg:"nature",syllables:3},{name:"Thyme",reg:"nature",syllables:1},{name:"Nocturne",reg:"grand",syllables:2},{name:"Mellow",reg:"grand",syllables:2},{name:"Slumber",reg:"grand",syllables:2},{name:"Dusk",reg:"grand",syllables:1},{name:"Scone",reg:"food",syllables:1},{name:"Flapjack",reg:"food",syllables:2},{name:"Horlicks",reg:"food",syllables:2},{name:"Marmite",reg:"food",syllables:2},{name:"Bangers",reg:"food",syllables:2},{name:"Haggis",reg:"food",syllables:2},{name:"Ginger",reg:"food",syllables:2},{name:"Cinnamon",reg:"food",syllables:3},{name:"Scones",reg:"food",syllables:2},{name:"Flapjacks",reg:"food",syllables:2},{name:"Fizzy",reg:"food",syllables:2},{name:"Lolly",reg:"food",syllables:2},{name:"Lollipop",reg:"food",syllables:3},{name:"Jellybaby",reg:"food",syllables:4},{name:"Aniseed",reg:"food",syllables:3},{name:"Peppermint",reg:"food",syllables:3},{name:"Spearmint",reg:"food",syllables:2},{name:"Flake",reg:"food",syllables:1},{name:"Ripple",reg:"food",syllables:2},{name:"Wispa",reg:"food",syllables:2},{name:"Buttons",reg:"food",syllables:2},{name:"Chomp",reg:"food",syllables:1},{name:"Snowball",reg:"food",syllables:2},{name:"Fondant",reg:"food",syllables:2},{name:"Nougat",reg:"food",syllables:2},{name:"Mallow",reg:"food",syllables:2},{name:"Flump",reg:"food",syllables:1},{name:"Gummy",reg:"food",syllables:2},{name:"Winegum",reg:"food",syllables:3},{name:"Honeycomb",reg:"food",syllables:3},{name:"Tablet",reg:"food",syllables:2},{name:"Bubblegum",reg:"food",syllables:3},{name:"Sprinkle",reg:"food",syllables:2},{name:"Hundreds",reg:"food",syllables:2},{name:"Thousands",reg:"food",syllables:2}],
+    girl: [{name:"Arabella",reg:"grand",syllables:4},{name:"Beatrice",reg:"grand",syllables:3},{name:"Clementine",reg:"grand",syllables:3},{name:"Dorothy",reg:"mundane",syllables:3},{name:"Eleanor",reg:"grand",syllables:3},{name:"Georgiana",reg:"grand",syllables:4},{name:"Isadora",reg:"grand",syllables:4},{name:"Lavinia",reg:"grand",syllables:4},{name:"Millicent",reg:"grand",syllables:3},{name:"Nora",reg:"mundane",syllables:2},{name:"Prudence",reg:"mundane",syllables:2},{name:"Rosalind",reg:"grand",syllables:3},{name:"Sophronia",reg:"grand",syllables:4},{name:"Tabitha",reg:"grand",syllables:3},{name:"Vivienne",reg:"grand",syllables:3},{name:"Booboo",reg:"baby",syllables:2},{name:"Mimi",reg:"baby",syllables:2},{name:"Snugglebum",reg:"baby",syllables:3},{name:"Wagger",reg:"chaos",syllables:2},{name:"Wobble",reg:"chaos",syllables:2},{name:"Wriggle",reg:"chaos",syllables:2},{name:"Waddle",reg:"chaos",syllables:2},{name:"Wander",reg:"chaos",syllables:2},{name:"Wiggles",reg:"chaos",syllables:2},{name:"Andromeda",reg:"grand",syllables:4},{name:"Artemis",reg:"grand",syllables:3},{name:"Artemisia",reg:"grand",syllables:5},{name:"Astra",reg:"grand",syllables:2},{name:"Astrid",reg:"grand",syllables:2},{name:"Aurora",reg:"grand",syllables:4},{name:"Dawnstar",reg:"grand",syllables:2},{name:"Elara",reg:"grand",syllables:3},{name:"Luna",reg:"grand",syllables:2},{name:"Lunaris",reg:"grand",syllables:3},{name:"Nebula",reg:"grand",syllables:3},{name:"Nightfall",reg:"grand",syllables:2},{name:"Nightglow",reg:"grand",syllables:2},{name:"Nightshade",reg:"grand",syllables:2},{name:"Nova",reg:"grand",syllables:2},{name:"Penumbra",reg:"grand",syllables:3},{name:"Selene",reg:"grand",syllables:3},{name:"Shadowmoon",reg:"grand",syllables:3},{name:"Silvermoon",reg:"grand",syllables:3},{name:"Starbeam",reg:"grand",syllables:2},{name:"Stardust",reg:"grand",syllables:2},{name:"Starlight",reg:"grand",syllables:2},{name:"Stella",reg:"grand",syllables:2},{name:"Twilight",reg:"grand",syllables:2},{name:"Umbra",reg:"grand",syllables:2},{name:"Vega",reg:"grand",syllables:2},{name:"Vela",reg:"grand",syllables:2},{name:"Astral",reg:"grand",syllables:2},{name:"Comet",reg:"grand",syllables:2},{name:"Eclipse",reg:"grand",syllables:2},{name:"Equinox",reg:"grand",syllables:3},{name:"Galaxy",reg:"grand",syllables:3},{name:"Skyfall",reg:"grand",syllables:2},{name:"Skyfire",reg:"grand",syllables:2},{name:"Solaris",reg:"grand",syllables:3},{name:"Solstice",reg:"grand",syllables:2},{name:"Starfall",reg:"grand",syllables:2},{name:"Starshadow",reg:"grand",syllables:2},{name:"Starstone",reg:"grand",syllables:2},{name:"Sunflare",reg:"grand",syllables:2},{name:"Supernova",reg:"grand",syllables:4},{name:"Whirlwind",reg:"grand",syllables:2},{name:"Athena",reg:"grand",syllables:3},{name:"Calypso",reg:"grand",syllables:3},{name:"Carina",reg:"grand",syllables:3},{name:"Cassandra",reg:"grand",syllables:3},{name:"Circe",reg:"grand",syllables:2},{name:"Cleopatra",reg:"grand",syllables:4},{name:"Demeter",reg:"grand",syllables:3},{name:"Fauna",reg:"nature",syllables:2},{name:"Gaia",reg:"grand",syllables:2},{name:"Hecate",reg:"grand",syllables:3},{name:"Hera",reg:"grand",syllables:2},{name:"Hippolyta",reg:"grand",syllables:4},{name:"Medea",reg:"grand",syllables:3},{name:"Persephone",reg:"grand",syllables:4},{name:"Phoebe",reg:"grand",syllables:2},{name:"Rhea",reg:"grand",syllables:2},{name:"Sappho",reg:"grand",syllables:2},{name:"Seraphina",reg:"grand",syllables:4},{name:"Sophia",reg:"grand",syllables:3},{name:"Betty",reg:"mundane",syllables:2},{name:"Camille",reg:"grand",syllables:2},{name:"Christabel",reg:"grand",syllables:3},{name:"Cordelia",reg:"grand",syllables:4},{name:"Dorothea",reg:"grand",syllables:4},{name:"Emily",reg:"mundane",syllables:3},{name:"Florentine",reg:"grand",syllables:4},{name:"Frederica",reg:"grand",syllables:4},{name:"Gertrude",reg:"grand",syllables:2},{name:"Hana",reg:"mundane",syllables:2},{name:"Hannah",reg:"mundane",syllables:2},{name:"Henrietta",reg:"grand",syllables:4},{name:"Hildegard",reg:"grand",syllables:3},{name:"Hildegarde",reg:"grand",syllables:3},{name:"Lucy",reg:"mundane",syllables:2},{name:"Megan",reg:"mundane",syllables:2},{name:"Melissa",reg:"mundane",syllables:3},{name:"Milly",reg:"mundane",syllables:2},{name:"Molly",reg:"mundane",syllables:2},{name:"Patience",reg:"grand",syllables:3},{name:"Rowena",reg:"grand",syllables:3},{name:"Sarah",reg:"mundane",syllables:2},{name:"Sieglinde",reg:"grand",syllables:3},{name:"Sigrid",reg:"grand",syllables:2},{name:"Tallulah",reg:"grand",syllables:3},{name:"Temperance",reg:"grand",syllables:3},{name:"Theodora",reg:"grand",syllables:4},{name:"Thomasina",reg:"grand",syllables:4},{name:"Ursula",reg:"grand",syllables:3},{name:"Wilhelmina",reg:"grand",syllables:5},{name:"Bailey",reg:"mundane",syllables:3},{name:"Binky",reg:"baby",syllables:2},{name:"Babbycakes",reg:"baby",syllables:3},{name:"Boadicea",reg:"grand",syllables:5},{name:"Butterfly",reg:"baby",syllables:3},{name:"Candyfloss",reg:"baby",syllables:3},{name:"Cuddlekins",reg:"baby",syllables:3},{name:"Cupcake",reg:"baby",syllables:2},{name:"Dainty",reg:"baby",syllables:2},{name:"Daintybell",reg:"baby",syllables:3},{name:"Dancer",reg:"grand",syllables:2},{name:"Duchess",reg:"grand",syllables:2},{name:"Elfriede",reg:"grand",syllables:3},{name:"Fifi",reg:"baby",syllables:2},{name:"Flair",reg:"grand",syllables:1},{name:"Fleur",reg:"grand",syllables:1},{name:"Fluffybum",reg:"baby",syllables:3},{name:"Flutter",reg:"baby",syllables:2},{name:"Frenzina",reg:"chaos",syllables:3},{name:"Gigi",reg:"baby",syllables:2},{name:"Gossamera",reg:"absurd",syllables:3},{name:"Hedwig",reg:"grand",syllables:2},{name:"Helena",reg:"grand",syllables:3},{name:"Jade",reg:"mundane",syllables:1},{name:"Jasmine",reg:"nature",syllables:2},{name:"Kriemhild",reg:"grand",syllables:3},{name:"Kunigunde",reg:"grand",syllables:4},{name:"Livia",reg:"grand",syllables:3},{name:"Lulu",reg:"baby",syllables:2},{name:"Mishka",reg:"baby",syllables:2},{name:"Petite",reg:"baby",syllables:2},{name:"Pixie",reg:"baby",syllables:2},{name:"Plum",reg:"food",syllables:1},{name:"Ruffles",reg:"baby",syllables:2},{name:"Tempesta",reg:"grand",syllables:3},{name:"Thistledown",reg:"nature",syllables:3},{name:"Tigress",reg:"grand",syllables:2},{name:"Topsy",reg:"baby",syllables:2},{name:"Tuppence",reg:"baby",syllables:2},{name:"Tutu",reg:"baby",syllables:2},{name:"Twiggy",reg:"baby",syllables:2},{name:"Twinkles",reg:"baby",syllables:2},{name:"Xiao",reg:"mundane",syllables:2},{name:"Yuki",reg:"mundane",syllables:2},{name:"Bonkers",reg:"chaos",syllables:2},{name:"Booper",reg:"baby",syllables:2},{name:"Button",reg:"baby",syllables:2},{name:"Coco",reg:"baby",syllables:2},{name:"Dazzle",reg:"absurd",syllables:2},{name:"Dinky",reg:"baby",syllables:2},{name:"Dizzy",reg:"chaos",syllables:2},{name:"Doodle",reg:"baby",syllables:2},{name:"Fidget",reg:"chaos",syllables:2},{name:"Fizz",reg:"chaos",syllables:1},{name:"Fury",reg:"grand",syllables:2},{name:"Gale",reg:"nature",syllables:1},{name:"Glorious",reg:"grand",syllables:3},{name:"Jellybean",reg:"food",syllables:3},{name:"Lilliput",reg:"absurd",syllables:3},{name:"Majestic",reg:"grand",syllables:3},{name:"Marvellous",reg:"grand",syllables:3},{name:"Mischief",reg:"chaos",syllables:2},{name:"Moxie",reg:"chaos",syllables:2},{name:"Munchkin",reg:"baby",syllables:2},{name:"Nimble",reg:"chaos",syllables:2},{name:"Nugget",reg:"food",syllables:2},{name:"Opulent",reg:"grand",syllables:3},{name:"Peanut",reg:"food",syllables:2},{name:"Pipsqueak",reg:"baby",syllables:2},{name:"Pocket",reg:"baby",syllables:2},{name:"Skittles",reg:"food",syllables:2},{name:"Smidge",reg:"baby",syllables:1},{name:"Smidgeon",reg:"baby",syllables:2},{name:"Snippy",reg:"chaos",syllables:2},{name:"Speck",reg:"baby",syllables:1},{name:"Squishface",reg:"baby",syllables:2},{name:"Tangles",reg:"chaos",syllables:2},{name:"Teacup",reg:"baby",syllables:2},{name:"Tempest",reg:"grand",syllables:2},{name:"Thingy",reg:"absurd",syllables:2},{name:"Titch",reg:"baby",syllables:1},{name:"Titchy",reg:"baby",syllables:2},{name:"Tufty",reg:"baby",syllables:2},{name:"Tumble",reg:"chaos",syllables:2},{name:"Waltz",reg:"grand",syllables:1},{name:"Wibble",reg:"chaos",syllables:2},{name:"Widget",reg:"absurd",syllables:2},{name:"Wonky",reg:"chaos",syllables:2},{name:"Wriggles",reg:"chaos",syllables:2},{name:"Bathilde",reg:"grand",syllables:2},{name:"Branwen",reg:"grand",syllables:2},{name:"Brunhilda",reg:"grand",syllables:3},{name:"Brunhilde",reg:"grand",syllables:3},{name:"Gwenllian",reg:"grand",syllables:3},{name:"Morfudd",reg:"grand",syllables:2},{name:"Rhiannon",reg:"grand",syllables:3},{name:"Shade",reg:"grand",syllables:1},{name:"Mist",reg:"nature",syllables:1},{name:"Smoky",reg:"nature",syllables:2},{name:"Dawn",reg:"nature",syllables:1},{name:"Robin",reg:"nature",syllables:2},{name:"Lark",reg:"nature",syllables:1},{name:"Sparky",reg:"chaos",syllables:2},{name:"Perky",reg:"chaos",syllables:2},{name:"Sunny",reg:"chaos",syllables:2},{name:"Tango",reg:"grand",syllables:2},{name:"Boogie",reg:"chaos",syllables:2},{name:"Twirl",reg:"chaos",syllables:1},{name:"Salsa",reg:"chaos",syllables:2},{name:"Rumba",reg:"grand",syllables:2},{name:"Jive",reg:"chaos",syllables:1},{name:"Swing",reg:"chaos",syllables:1},{name:"Daisy",reg:"nature",syllables:2},{name:"Blossom",reg:"nature",syllables:2},{name:"Russet",reg:"nature",syllables:2},{name:"Birch",reg:"nature",syllables:1},{name:"Buttercup",reg:"nature",syllables:3},{name:"Mocha",reg:"food",syllables:2},{name:"Thyme",reg:"nature",syllables:1},{name:"Rosie",reg:"baby",syllables:2},{name:"Petal",reg:"baby",syllables:2},{name:"Vesper",reg:"grand",syllables:2},{name:"Nocturne",reg:"grand",syllables:2},{name:"Mellow",reg:"grand",syllables:2},{name:"Slumber",reg:"grand",syllables:2},{name:"Dusk",reg:"grand",syllables:1},{name:"Scone",reg:"food",syllables:1},{name:"Flapjack",reg:"food",syllables:2},{name:"Horlicks",reg:"food",syllables:2},{name:"Marmite",reg:"food",syllables:2},{name:"Bangers",reg:"food",syllables:2},{name:"Haggis",reg:"food",syllables:2},{name:"Ginger",reg:"food",syllables:2},{name:"Cinnamon",reg:"food",syllables:3},{name:"Scones",reg:"food",syllables:2},{name:"Flapjacks",reg:"food",syllables:2},{name:"Fizzy",reg:"food",syllables:2},{name:"Lolly",reg:"food",syllables:2},{name:"Lollipop",reg:"food",syllables:3},{name:"Jellybaby",reg:"food",syllables:4},{name:"Aniseed",reg:"food",syllables:3},{name:"Peppermint",reg:"food",syllables:3},{name:"Spearmint",reg:"food",syllables:2},{name:"Flake",reg:"food",syllables:1},{name:"Ripple",reg:"food",syllables:2},{name:"Wispa",reg:"food",syllables:2},{name:"Buttons",reg:"food",syllables:2},{name:"Chomp",reg:"food",syllables:1},{name:"Snowball",reg:"food",syllables:2},{name:"Fondant",reg:"food",syllables:2},{name:"Nougat",reg:"food",syllables:2},{name:"Mallow",reg:"food",syllables:2},{name:"Flump",reg:"food",syllables:1},{name:"Gummy",reg:"food",syllables:2},{name:"Winegum",reg:"food",syllables:3},{name:"Honeycomb",reg:"food",syllables:3},{name:"Tablet",reg:"food",syllables:2},{name:"Bubblegum",reg:"food",syllables:3},{name:"Sprinkle",reg:"food",syllables:2},{name:"Hundreds",reg:"food",syllables:2},{name:"Thousands",reg:"food",syllables:2}]
+}
 };
 
 // ── DOG WORDS ──────────────────────────────────────────────────────────────────
-const DOG_WORDS: Record<string, WordEntry[]> = {
-  spaniel:    [{word:"Flush",reg:"nature",firstLetter:"f"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Waggle",reg:"chaos",firstLetter:"w"},{word:"Splash",reg:"chaos",firstLetter:"s"},{word:"Frolic",reg:"chaos",firstLetter:"f"},{word:"Gambol",reg:"chaos",firstLetter:"g"},{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Romp",reg:"chaos",firstLetter:"r"}],
-  retriever:  [{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Wag",reg:"baby",firstLetter:"w"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Lollop",reg:"chaos",firstLetter:"l"},{word:"Galumph",reg:"chaos",firstLetter:"g"},{word:"Scoff",reg:"food",firstLetter:"s"},{word:"Snuffle",reg:"baby",firstLetter:"s"},{word:"Mooch",reg:"mundane",firstLetter:"m"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Devour",reg:"food",firstLetter:"d"},{word:"Bound",reg:"chaos",firstLetter:"b"}],
-  collie:     [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Gather",reg:"grand",firstLetter:"g"},{word:"Stalk",reg:"chaos",firstLetter:"s"},{word:"Border",reg:"grand",firstLetter:"b"}],
-  boxer:      [{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Stumble",reg:"chaos",firstLetter:"s"},{word:"Gallumph",reg:"chaos",firstLetter:"g"},{word:"Bumble",reg:"baby",firstLetter:"b"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
-  sniffer:    [{word:"Sniff",reg:"mundane",firstLetter:"s"},{word:"Sleuth",reg:"grand",firstLetter:"s"},{word:"Hunt",reg:"grand",firstLetter:"h"},{word:"Nose",reg:"mundane",firstLetter:"n"},{word:"Track",reg:"grand",firstLetter:"t"},{word:"Scout",reg:"grand",firstLetter:"s"},{word:"Trace",reg:"grand",firstLetter:"t"},{word:"Hound",reg:"grand",firstLetter:"h"},{word:"Quest",reg:"grand",firstLetter:"q"},{word:"Find",reg:"grand",firstLetter:"f"}],
-  afghan:     [{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Sweep",reg:"grand",firstLetter:"s"},{word:"Flow",reg:"grand",firstLetter:"f"},{word:"Drift",reg:"grand",firstLetter:"d"},{word:"Surge",reg:"grand",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Soar",reg:"grand",firstLetter:"s"}],
-  sighthound: [{word:"Sprint",reg:"grand",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Skim",reg:"grand",firstLetter:"s"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Sweep",reg:"grand",firstLetter:"s"}],
-  greatdane:  [{word:"Orbit",reg:"grand",firstLetter:"o"},{word:"Launch",reg:"grand",firstLetter:"l"},{word:"Soar",reg:"grand",firstLetter:"s"},{word:"Surge",reg:"grand",firstLetter:"s"},{word:"Blaze",reg:"chaos",firstLetter:"b"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Thunder",reg:"chaos",firstLetter:"t"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Loom",reg:"chaos",firstLetter:"l"}],
-  giant:      [{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Thud",reg:"chaos",firstLetter:"t"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Sway",reg:"grand",firstLetter:"s"},{word:"Loom",reg:"chaos",firstLetter:"l"},{word:"Thunder",reg:"chaos",firstLetter:"t"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Quake",reg:"chaos",firstLetter:"q"}],
-  poodle:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Mince",reg:"grand",firstLetter:"m"},{word:"Flourish",reg:"grand",firstLetter:"f"},{word:"Pirouette",reg:"grand",firstLetter:"p"},{word:"Pose",reg:"grand",firstLetter:"p"},{word:"Primp",reg:"grand",firstLetter:"p"}],
-  lapdog:     [{word:"Prance",reg:"grand",firstLetter:"p"},{word:"Bounce",reg:"baby",firstLetter:"b"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Flounce",reg:"grand",firstLetter:"f"},{word:"Sashay",reg:"grand",firstLetter:"s"},{word:"Fluff",reg:"baby",firstLetter:"f"},{word:"Shimmy",reg:"grand",firstLetter:"s"},{word:"Pamper",reg:"baby",firstLetter:"p"},{word:"Flutter",reg:"baby",firstLetter:"f"},{word:"Sparkle",reg:"grand",firstLetter:"s"}],
-  boston:     [{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Hustle",reg:"chaos",firstLetter:"h"},{word:"Brawl",reg:"chaos",firstLetter:"b"},{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Dodge",reg:"chaos",firstLetter:"d"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Jabber",reg:"chaos",firstLetter:"j"},{word:"Strut",reg:"grand",firstLetter:"s"},{word:"March",reg:"grand",firstLetter:"m"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
-  welsh:      [{word:"Herd",reg:"grand",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Round",reg:"grand",firstLetter:"r"},{word:"Trot",reg:"mundane",firstLetter:"t"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Circle",reg:"grand",firstLetter:"c"},{word:"Weave",reg:"grand",firstLetter:"w"},{word:"Gather",reg:"grand",firstLetter:"g"}],
-  asian:      [{word:"Strike",reg:"grand",firstLetter:"s"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Dodge",reg:"chaos",firstLetter:"d"},{word:"Prowl",reg:"grand",firstLetter:"p"},{word:"Stalk",reg:"grand",firstLetter:"s"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Shuffle",reg:"chaos",firstLetter:"s"}],
-  character:  [{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Totter",reg:"chaos",firstLetter:"t"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Wheeze",reg:"chaos",firstLetter:"w"},{word:"Puff",reg:"chaos",firstLetter:"p"}],
-  terrier:    [{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Dig",reg:"chaos",firstLetter:"d"},{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Rumpus",reg:"chaos",firstLetter:"r"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Snap",reg:"chaos",firstLetter:"s"},{word:"Yap",reg:"chaos",firstLetter:"y"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Burrow",reg:"chaos",firstLetter:"b"}],
-  german:     [{word:"March",reg:"grand",firstLetter:"m"},{word:"Drill",reg:"grand",firstLetter:"d"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Flank",reg:"grand",firstLetter:"f"},{word:"Advance",reg:"grand",firstLetter:"a"},{word:"Intercept",reg:"grand",firstLetter:"i"},{word:"Secure",reg:"grand",firstLetter:"s"},{word:"Enforce",reg:"grand",firstLetter:"e"},{word:"Breach",reg:"grand",firstLetter:"b"}],
-  dachshund:  [{word:"Scuttle",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Burrow",reg:"chaos",firstLetter:"b"},{word:"Squeeze",reg:"chaos",firstLetter:"s"},{word:"Tunnel",reg:"chaos",firstLetter:"t"},{word:"Wriggle",reg:"chaos",firstLetter:"w"},{word:"Slither",reg:"chaos",firstLetter:"s"},{word:"Stretch",reg:"absurd",firstLetter:"s"},{word:"Extend",reg:"absurd",firstLetter:"e"},{word:"Elongate",reg:"absurd",firstLetter:"e"}],
-  bulldog:    [{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"mundane",firstLetter:"p"},{word:"Trundle",reg:"chaos",firstLetter:"t"},{word:"Grunt",reg:"chaos",firstLetter:"g"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Barge",reg:"chaos",firstLetter:"b"}],
-  default:    [{word:"Trot",reg:"mundane",firstLetter:"t"},{word:"Lope",reg:"mundane",firstLetter:"l"},{word:"Prowl",reg:"grand",firstLetter:"p"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Roam",reg:"mundane",firstLetter:"r"},{word:"Slink",reg:"aloof",firstLetter:"s"},{word:"Stalk",reg:"grand",firstLetter:"s"},{word:"Saunter",reg:"mundane",firstLetter:"s"},{word:"Canter",reg:"grand",firstLetter:"c"},{word:"Wander",reg:"mundane",firstLetter:"w"}],
-};
+const DOG_WORDS: Record<string, {word:string,reg:Register,firstLetter:string}[]> = {
+  collie: [{word:"Stalk",reg:"nature",firstLetter:"s"},{word:"Crouch",reg:"nature",firstLetter:"c"},{word:"Focus",reg:"nature",firstLetter:"f"},{word:"Watch",reg:"nature",firstLetter:"w"},{word:"Drive",reg:"nature",firstLetter:"d"},{word:"Guide",reg:"nature",firstLetter:"g"},{word:"Nip",reg:"chaos",firstLetter:"n"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Cut",reg:"chaos",firstLetter:"c"},{word:"Sweep",reg:"chaos",firstLetter:"s"},{word:"Flank",reg:"nature",firstLetter:"f"},{word:"Pace",reg:"chaos",firstLetter:"p"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Corner",reg:"chaos",firstLetter:"c"},{word:"Signal",reg:"nature",firstLetter:"s"},{word:"Listen",reg:"nature",firstLetter:"l"},{word:"Command",reg:"grand",firstLetter:"c"},{word:"Shep",reg:"nature",firstLetter:"s"},{word:"Herd",reg:"nature",firstLetter:"h"},{word:"Weave",reg:"nature",firstLetter:"w"},{word:"Circle",reg:"nature",firstLetter:"c"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Track",reg:"nature",firstLetter:"t"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Border",reg:"nature",firstLetter:"b"}],
+  spaniel: [{word:"Flush",reg:"nature",firstLetter:"f"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Waggle",reg:"chaos",firstLetter:"w"},{word:"Splash",reg:"chaos",firstLetter:"s"},{word:"Frolic",reg:"chaos",firstLetter:"f"},{word:"Gambol",reg:"chaos",firstLetter:"g"},{word:"Prance",reg:"chaos",firstLetter:"p"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Romp",reg:"chaos",firstLetter:"r"},{word:"Sniff",reg:"nature",firstLetter:"s"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Wiggle",reg:"chaos",firstLetter:"w"},{word:"Swoop",reg:"chaos",firstLetter:"s"},{word:"Nose",reg:"nature",firstLetter:"n"},{word:"Seek",reg:"nature",firstLetter:"s"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Rustle",reg:"chaos",firstLetter:"r"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Explore",reg:"chaos",firstLetter:"e"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Trot",reg:"chaos",firstLetter:"t"},{word:"Dive",reg:"chaos",firstLetter:"d"},{word:"Skitter",reg:"chaos",firstLetter:"s"},{word:"Carry",reg:"nature",firstLetter:"c"}],
+  boxer: [{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Spring",reg:"chaos",firstLetter:"s"},{word:"Leap",reg:"chaos",firstLetter:"l"},{word:"Hop",reg:"chaos",firstLetter:"h"},{word:"Boing",reg:"chaos",firstLetter:"b"},{word:"Wrestle",reg:"chaos",firstLetter:"w"},{word:"Tussle",reg:"chaos",firstLetter:"t"},{word:"Spar",reg:"chaos",firstLetter:"s"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Strut",reg:"chaos",firstLetter:"s"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Huff",reg:"chaos",firstLetter:"h"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Bop",reg:"chaos",firstLetter:"b"},{word:"Butt",reg:"chaos",firstLetter:"b"},{word:"Nudge",reg:"chaos",firstLetter:"n"},{word:"Zoom",reg:"chaos",firstLetter:"z"},{word:"Clatter",reg:"chaos",firstLetter:"c"},{word:"Gallop",reg:"chaos",firstLetter:"g"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Shove",reg:"chaos",firstLetter:"s"},{word:"Skid",reg:"chaos",firstLetter:"s"},{word:"Slam",reg:"chaos",firstLetter:"s"},{word:"Jolt",reg:"chaos",firstLetter:"j"},{word:"Swagger",reg:"grand",firstLetter:"s"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Hurtle",reg:"chaos",firstLetter:"h"},{word:"Play",reg:"chaos",firstLetter:"p"},{word:"Clown",reg:"chaos",firstLetter:"c"},{word:"Wiggle",reg:"chaos",firstLetter:"w"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Snore",reg:"chaos",firstLetter:"s"},{word:"Sniff",reg:"nature",firstLetter:"s"},{word:"Wag",reg:"nature",firstLetter:"w"},{word:"Thump",reg:"chaos",firstLetter:"t"},{word:"Bowl",reg:"chaos",firstLetter:"b"},{word:"Romp",reg:"chaos",firstLetter:"r"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Punch",reg:"chaos",firstLetter:"p"},{word:"Jab",reg:"chaos",firstLetter:"j"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Thud",reg:"chaos",firstLetter:"t"},{word:"Barge",reg:"chaos",firstLetter:"b"},{word:"Bluster",reg:"chaos",firstLetter:"b"}],
+  sniffer: [{word:"Sniff",reg:"nature",firstLetter:"s"},{word:"Sleuth",reg:"chaos",firstLetter:"s"},{word:"Hunt",reg:"nature",firstLetter:"h"},{word:"Nose",reg:"nature",firstLetter:"n"},{word:"Track",reg:"nature",firstLetter:"t"},{word:"Scout",reg:"nature",firstLetter:"s"},{word:"Trace",reg:"chaos",firstLetter:"t"},{word:"Hound",reg:"chaos",firstLetter:"h"},{word:"Quest",reg:"chaos",firstLetter:"q"},{word:"Find",reg:"nature",firstLetter:"f"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Snout",reg:"chaos",firstLetter:"s"},{word:"Scent",reg:"nature",firstLetter:"s"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Follow",reg:"nature",firstLetter:"f"},{word:"Sniffle",reg:"chaos",firstLetter:"s"},{word:"Seek",reg:"nature",firstLetter:"s"},{word:"Search",reg:"chaos",firstLetter:"s"},{word:"Detect",reg:"nature",firstLetter:"d"},{word:"Pursue",reg:"grand",firstLetter:"p"},{word:"Snare",reg:"chaos",firstLetter:"s"},{word:"Roam",reg:"nature",firstLetter:"r"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Prowl",reg:"chaos",firstLetter:"p"},{word:"Probe",reg:"chaos",firstLetter:"p"},{word:"Snoop",reg:"chaos",firstLetter:"s"},{word:"Wander",reg:"chaos",firstLetter:"w"},{word:"Locate",reg:"chaos",firstLetter:"l"},{word:"Spy",reg:"chaos",firstLetter:"s"},{word:"Rootle",reg:"chaos",firstLetter:"r"},{word:"Rummage",reg:"chaos",firstLetter:"r"}],
+  afghan: [{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Sweep",reg:"chaos",firstLetter:"s"},{word:"Flow",reg:"nature",firstLetter:"f"},{word:"Drift",reg:"nature",firstLetter:"d"},{word:"Surge",reg:"grand",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Skim",reg:"nature",firstLetter:"s"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Soar",reg:"grand",firstLetter:"s"},{word:"Float",reg:"nature",firstLetter:"f"},{word:"Stream",reg:"nature",firstLetter:"s"},{word:"Ripple",reg:"nature",firstLetter:"r"},{word:"Whirl",reg:"chaos",firstLetter:"w"},{word:"Sail",reg:"nature",firstLetter:"s"},{word:"Feather",reg:"nature",firstLetter:"f"},{word:"Flicker",reg:"chaos",firstLetter:"f"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Prance",reg:"chaos",firstLetter:"p"},{word:"Swish",reg:"chaos",firstLetter:"s"},{word:"Shimmer",reg:"chaos",firstLetter:"s"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Lilt",reg:"chaos",firstLetter:"l"},{word:"Breeze",reg:"nature",firstLetter:"b"},{word:"Curve",reg:"chaos",firstLetter:"c"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Whisk",reg:"chaos",firstLetter:"w"},{word:"Wisp",reg:"nature",firstLetter:"w"},{word:"Fly",reg:"nature",firstLetter:"f"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Cruise",reg:"chaos",firstLetter:"c"}],
+  sighthound: [{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Sweep",reg:"chaos",firstLetter:"s"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Hurtle",reg:"chaos",firstLetter:"h"},{word:"Zoom",reg:"chaos",firstLetter:"z"},{word:"Stream",reg:"nature",firstLetter:"s"},{word:"Slice",reg:"chaos",firstLetter:"s"},{word:"Arrow",reg:"chaos",firstLetter:"a"},{word:"Whip",reg:"chaos",firstLetter:"w"},{word:"Zip",reg:"chaos",firstLetter:"z"},{word:"Surge",reg:"grand",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Leap",reg:"chaos",firstLetter:"l"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Pace",reg:"chaos",firstLetter:"p"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Cruise",reg:"chaos",firstLetter:"c"},{word:"Drift",reg:"nature",firstLetter:"d"},{word:"Float",reg:"nature",firstLetter:"f"},{word:"Flow",reg:"nature",firstLetter:"f"},{word:"Swoop",reg:"chaos",firstLetter:"s"},{word:"Curve",reg:"chaos",firstLetter:"c"},{word:"Arc",reg:"chaos",firstLetter:"a"},{word:"Cut",reg:"chaos",firstLetter:"c"},{word:"Pursue",reg:"grand",firstLetter:"p"},{word:"Course",reg:"chaos",firstLetter:"c"},{word:"Blaze",reg:"grand",firstLetter:"b"},{word:"Shoot",reg:"chaos",firstLetter:"s"}],
+  greatdane: [{word:"Orbit",reg:"grand",firstLetter:"o"},{word:"Soar",reg:"grand",firstLetter:"s"},{word:"Surge",reg:"grand",firstLetter:"s"},{word:"Blaze",reg:"grand",firstLetter:"b"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Thunder",reg:"grand",firstLetter:"t"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Loom",reg:"grand",firstLetter:"l"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Tower",reg:"grand",firstLetter:"t"},{word:"Gallop",reg:"chaos",firstLetter:"g"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Boom",reg:"chaos",firstLetter:"b"},{word:"Thump",reg:"chaos",firstLetter:"t"},{word:"Titan",reg:"grand",firstLetter:"t"},{word:"Giant",reg:"grand",firstLetter:"g"},{word:"Regal",reg:"grand",firstLetter:"r"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Plod",reg:"chaos",firstLetter:"p"},{word:"Barrel",reg:"chaos",firstLetter:"b"},{word:"Swagger",reg:"grand",firstLetter:"s"},{word:"Rise",reg:"chaos",firstLetter:"r"},{word:"Stretch",reg:"chaos",firstLetter:"s"},{word:"Gaze",reg:"chaos",firstLetter:"g"},{word:"Roam",reg:"nature",firstLetter:"r"},{word:"Crash",reg:"chaos",firstLetter:"c"},{word:"Quake",reg:"chaos",firstLetter:"q"},{word:"Boulder",reg:"grand",firstLetter:"b"},{word:"Colossus",reg:"grand",firstLetter:"c"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"March",reg:"grand",firstLetter:"m"},{word:"Drift",reg:"nature",firstLetter:"d"},{word:"Crown",reg:"grand",firstLetter:"c"},{word:"Stand",reg:"chaos",firstLetter:"s"},{word:"Pace",reg:"chaos",firstLetter:"p"},{word:"Sweep",reg:"chaos",firstLetter:"s"},{word:"Thunderclap",reg:"grand",firstLetter:"t"}],
+  giant: [{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"chaos",firstLetter:"p"},{word:"Stomp",reg:"chaos",firstLetter:"s"},{word:"Thud",reg:"chaos",firstLetter:"t"},{word:"Rumble",reg:"chaos",firstLetter:"r"},{word:"Sway",reg:"chaos",firstLetter:"s"},{word:"Loom",reg:"grand",firstLetter:"l"},{word:"Thunder",reg:"grand",firstLetter:"t"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Quake",reg:"chaos",firstLetter:"q"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Haul",reg:"chaos",firstLetter:"h"},{word:"Trudge",reg:"chaos",firstLetter:"t"},{word:"Trample",reg:"chaos",firstLetter:"t"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Boom",reg:"chaos",firstLetter:"b"},{word:"Bellow",reg:"chaos",firstLetter:"b"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Huff",reg:"chaos",firstLetter:"h"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Snore",reg:"chaos",firstLetter:"s"},{word:"Drool",reg:"food",firstLetter:"d"},{word:"Slobber",reg:"food",firstLetter:"s"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Watch",reg:"nature",firstLetter:"w"},{word:"Stand",reg:"chaos",firstLetter:"s"},{word:"Brace",reg:"chaos",firstLetter:"b"},{word:"Block",reg:"chaos",firstLetter:"b"},{word:"Shove",reg:"chaos",firstLetter:"s"},{word:"Barge",reg:"chaos",firstLetter:"b"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Hunker",reg:"chaos",firstLetter:"h"},{word:"Settle",reg:"chaos",firstLetter:"s"},{word:"Sprawl",reg:"chaos",firstLetter:"s"},{word:"Doze",reg:"chaos",firstLetter:"d"},{word:"Slump",reg:"chaos",firstLetter:"s"},{word:"Sag",reg:"chaos",firstLetter:"s"},{word:"Yawn",reg:"chaos",firstLetter:"y"},{word:"Grunt",reg:"chaos",firstLetter:"g"}],
+  poodle: [{word:"Prance",reg:"chaos",firstLetter:"p"},{word:"Strut",reg:"chaos",firstLetter:"s"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Glide",reg:"grand",firstLetter:"g"},{word:"Mince",reg:"chaos",firstLetter:"m"},{word:"Flourish",reg:"grand",firstLetter:"f"},{word:"Pirouette",reg:"grand",firstLetter:"p"},{word:"Pose",reg:"chaos",firstLetter:"p"},{word:"Primp",reg:"chaos",firstLetter:"p"},{word:"Twirl",reg:"chaos",firstLetter:"t"},{word:"Preen",reg:"chaos",firstLetter:"p"},{word:"Flounce",reg:"chaos",firstLetter:"f"},{word:"Parade",reg:"grand",firstLetter:"p"},{word:"Swish",reg:"chaos",firstLetter:"s"},{word:"Sparkle",reg:"chaos",firstLetter:"s"},{word:"Fancy",reg:"chaos",firstLetter:"f"},{word:"Curl",reg:"chaos",firstLetter:"c"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Trot",reg:"chaos",firstLetter:"t"},{word:"Clip",reg:"chaos",firstLetter:"c"},{word:"Groom",reg:"chaos",firstLetter:"g"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Plume",reg:"chaos",firstLetter:"p"},{word:"Frill",reg:"chaos",firstLetter:"f"},{word:"Swirl",reg:"chaos",firstLetter:"s"},{word:"Dazzle",reg:"grand",firstLetter:"d"},{word:"Skip",reg:"chaos",firstLetter:"s"},{word:"Show",reg:"grand",firstLetter:"s"},{word:"Charm",reg:"grand",firstLetter:"c"},{word:"Shine",reg:"grand",firstLetter:"s"},{word:"Flaunt",reg:"grand",firstLetter:"f"},{word:"Dance",reg:"chaos",firstLetter:"d"},{word:"Twinkle",reg:"grand",firstLetter:"t"},{word:"Poise",reg:"grand",firstLetter:"p"},{word:"Prim",reg:"chaos",firstLetter:"p"},{word:"Froufrou",reg:"chaos",firstLetter:"f"},{word:"Fluff",reg:"chaos",firstLetter:"f"}],
+  lapdog: [{word:"Prance",reg:"chaos",firstLetter:"p"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Waltz",reg:"grand",firstLetter:"w"},{word:"Flounce",reg:"chaos",firstLetter:"f"},{word:"Fluff",reg:"chaos",firstLetter:"f"},{word:"Shimmy",reg:"chaos",firstLetter:"s"},{word:"Pamper",reg:"chaos",firstLetter:"p"},{word:"Flutter",reg:"chaos",firstLetter:"f"},{word:"Sparkle",reg:"chaos",firstLetter:"s"},{word:"Snuggle",reg:"chaos",firstLetter:"s"},{word:"Cuddle",reg:"chaos",firstLetter:"c"},{word:"Perch",reg:"chaos",firstLetter:"p"},{word:"Preen",reg:"chaos",firstLetter:"p"},{word:"Twirl",reg:"chaos",firstLetter:"t"},{word:"Wiggle",reg:"chaos",firstLetter:"w"},{word:"Skip",reg:"chaos",firstLetter:"s"},{word:"Dainty",reg:"chaos",firstLetter:"d"},{word:"Trinket",reg:"chaos",firstLetter:"t"},{word:"Charm",reg:"grand",firstLetter:"c"},{word:"Coax",reg:"chaos",firstLetter:"c"},{word:"Beg",reg:"chaos",firstLetter:"b"},{word:"Nuzzle",reg:"chaos",firstLetter:"n"},{word:"Nestle",reg:"chaos",firstLetter:"n"},{word:"Doze",reg:"chaos",firstLetter:"d"},{word:"Snooze",reg:"chaos",firstLetter:"s"},{word:"Yip",reg:"chaos",firstLetter:"y"},{word:"Yap",reg:"chaos",firstLetter:"y"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Prim",reg:"chaos",firstLetter:"p"},{word:"Pose",reg:"chaos",firstLetter:"p"},{word:"Pout",reg:"chaos",firstLetter:"p"},{word:"Fidget",reg:"chaos",firstLetter:"f"},{word:"Flit",reg:"chaos",firstLetter:"f"},{word:"Glimmer",reg:"chaos",firstLetter:"g"},{word:"Dote",reg:"chaos",firstLetter:"d"},{word:"Spoil",reg:"chaos",firstLetter:"s"},{word:"Fuss",reg:"chaos",firstLetter:"f"}],
+  boston: [{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Hustle",reg:"chaos",firstLetter:"h"},{word:"Brawl",reg:"chaos",firstLetter:"b"},{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Dodge",reg:"chaos",firstLetter:"d"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Jabber",reg:"chaos",firstLetter:"j"},{word:"Strut",reg:"chaos",firstLetter:"s"},{word:"March",reg:"grand",firstLetter:"m"},{word:"Bluster",reg:"chaos",firstLetter:"b"},{word:"Box",reg:"chaos",firstLetter:"b"},{word:"Bob",reg:"chaos",firstLetter:"b"},{word:"Weave",reg:"nature",firstLetter:"w"},{word:"Skitter",reg:"chaos",firstLetter:"s"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Zip",reg:"chaos",firstLetter:"z"},{word:"Zoom",reg:"chaos",firstLetter:"z"},{word:"Scoot",reg:"chaos",firstLetter:"s"},{word:"Swagger",reg:"grand",firstLetter:"s"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Huff",reg:"chaos",firstLetter:"h"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Grin",reg:"chaos",firstLetter:"g"},{word:"Goggle",reg:"chaos",firstLetter:"g"},{word:"Wink",reg:"chaos",firstLetter:"w"},{word:"Clatter",reg:"chaos",firstLetter:"c"},{word:"Trot",reg:"chaos",firstLetter:"t"},{word:"Jolt",reg:"chaos",firstLetter:"j"},{word:"Jab",reg:"chaos",firstLetter:"j"},{word:"Spar",reg:"chaos",firstLetter:"s"},{word:"Tussle",reg:"chaos",firstLetter:"t"},{word:"Nudge",reg:"chaos",firstLetter:"n"},{word:"Barge",reg:"chaos",firstLetter:"b"},{word:"Clown",reg:"chaos",firstLetter:"c"},{word:"Chatter",reg:"chaos",firstLetter:"c"}],
+  corgi: [{word:"Herd",reg:"nature",firstLetter:"h"},{word:"Drive",reg:"nature",firstLetter:"d"},{word:"Round",reg:"chaos",firstLetter:"r"},{word:"Steer",reg:"chaos",firstLetter:"s"},{word:"Trot",reg:"chaos",firstLetter:"t"},{word:"Gather",reg:"chaos",firstLetter:"g"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Nip",reg:"chaos",firstLetter:"n"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Scoot",reg:"chaos",firstLetter:"s"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Circle",reg:"nature",firstLetter:"c"},{word:"Weave",reg:"nature",firstLetter:"w"},{word:"Watch",reg:"nature",firstLetter:"w"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Hustle",reg:"chaos",firstLetter:"h"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Tootle",reg:"chaos",firstLetter:"t"},{word:"Wiggle",reg:"chaos",firstLetter:"w"},{word:"Nudge",reg:"chaos",firstLetter:"n"},{word:"Bump",reg:"chaos",firstLetter:"b"},{word:"Bark",reg:"chaos",firstLetter:"b"},{word:"Boss",reg:"chaos",firstLetter:"b"},{word:"Command",reg:"grand",firstLetter:"c"},{word:"Muster",reg:"grand",firstLetter:"m"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Flank",reg:"nature",firstLetter:"f"},{word:"Corner",reg:"chaos",firstLetter:"c"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Sploot",reg:"chaos",firstLetter:"s"},{word:"Stump",reg:"chaos",firstLetter:"s"}],
+  terrier: [{word:"Dig",reg:"chaos",firstLetter:"d"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Scrap",reg:"chaos",firstLetter:"s"},{word:"Yap",reg:"chaos",firstLetter:"y"},{word:"Nip",reg:"chaos",firstLetter:"n"},{word:"Dart",reg:"chaos",firstLetter:"d"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Scratch",reg:"chaos",firstLetter:"s"},{word:"Rattle",reg:"chaos",firstLetter:"r"},{word:"Snap",reg:"chaos",firstLetter:"s"},{word:"Burrow",reg:"chaos",firstLetter:"b"},{word:"Tunnel",reg:"chaos",firstLetter:"t"},{word:"Scrabble",reg:"chaos",firstLetter:"s"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Skitter",reg:"chaos",firstLetter:"s"},{word:"Sniff",reg:"nature",firstLetter:"s"},{word:"Snoop",reg:"chaos",firstLetter:"s"},{word:"Snarl",reg:"chaos",firstLetter:"s"},{word:"Bark",reg:"chaos",firstLetter:"b"},{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Wrestle",reg:"chaos",firstLetter:"w"},{word:"Tussle",reg:"chaos",firstLetter:"t"},{word:"Tug",reg:"chaos",firstLetter:"t"},{word:"Shake",reg:"chaos",firstLetter:"s"},{word:"Rummage",reg:"chaos",firstLetter:"r"},{word:"Hustle",reg:"chaos",firstLetter:"h"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Spring",reg:"chaos",firstLetter:"s"},{word:"Patter",reg:"chaos",firstLetter:"p"},{word:"Clatter",reg:"chaos",firstLetter:"c"},{word:"Prowl",reg:"chaos",firstLetter:"p"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Challenge",reg:"chaos",firstLetter:"c"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Grit",reg:"chaos",firstLetter:"g"},{word:"Spark",reg:"chaos",firstLetter:"s"}],
+  dachshund: [{word:"Dig",reg:"chaos",firstLetter:"d"},{word:"Tunnel",reg:"chaos",firstLetter:"t"},{word:"Burrow",reg:"chaos",firstLetter:"b"},{word:"Sniff",reg:"nature",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Scuttle",reg:"chaos",firstLetter:"s"},{word:"Wriggle",reg:"chaos",firstLetter:"w"},{word:"Plod",reg:"chaos",firstLetter:"p"},{word:"Nose",reg:"nature",firstLetter:"n"},{word:"Stretch",reg:"chaos",firstLetter:"s"},{word:"Scrabble",reg:"chaos",firstLetter:"s"},{word:"Scoot",reg:"chaos",firstLetter:"s"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Wiggle",reg:"chaos",firstLetter:"w"},{word:"Creep",reg:"chaos",firstLetter:"c"},{word:"Crawl",reg:"chaos",firstLetter:"c"},{word:"Poke",reg:"chaos",firstLetter:"p"},{word:"Probe",reg:"chaos",firstLetter:"p"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Track",reg:"nature",firstLetter:"t"},{word:"Scent",reg:"nature",firstLetter:"s"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Rummage",reg:"chaos",firstLetter:"r"},{word:"Squeeze",reg:"chaos",firstLetter:"s"},{word:"Squirm",reg:"chaos",firstLetter:"s"},{word:"Twist",reg:"chaos",firstLetter:"t"},{word:"Tootle",reg:"chaos",firstLetter:"t"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Scurry",reg:"chaos",firstLetter:"s"},{word:"Patter",reg:"chaos",firstLetter:"p"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Sprawl",reg:"chaos",firstLetter:"s"},{word:"Curl",reg:"chaos",firstLetter:"c"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Bark",reg:"chaos",firstLetter:"b"},{word:"Boss",reg:"chaos",firstLetter:"b"},{word:"Brave",reg:"chaos",firstLetter:"b"}],
+  german: [{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"March",reg:"grand",firstLetter:"m"},{word:"Track",reg:"nature",firstLetter:"t"},{word:"Hunt",reg:"nature",firstLetter:"h"},{word:"Search",reg:"chaos",firstLetter:"s"},{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Defend",reg:"grand",firstLetter:"d"},{word:"Pursue",reg:"grand",firstLetter:"p"},{word:"Breach",reg:"chaos",firstLetter:"b"},{word:"Watch",reg:"nature",firstLetter:"w"},{word:"Work",reg:"chaos",firstLetter:"w"},{word:"Serve",reg:"chaos",firstLetter:"s"},{word:"Shield",reg:"chaos",firstLetter:"s"},{word:"Stand",reg:"chaos",firstLetter:"s"},{word:"Brace",reg:"chaos",firstLetter:"b"},{word:"Hold",reg:"chaos",firstLetter:"h"},{word:"Stalk",reg:"nature",firstLetter:"s"},{word:"Scout",reg:"nature",firstLetter:"s"},{word:"Detect",reg:"nature",firstLetter:"d"},{word:"Follow",reg:"nature",firstLetter:"f"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Scent",reg:"nature",firstLetter:"s"},{word:"Retrieve",reg:"nature",firstLetter:"r"},{word:"Herd",reg:"nature",firstLetter:"h"},{word:"Drive",reg:"nature",firstLetter:"d"},{word:"Obey",reg:"chaos",firstLetter:"o"},{word:"Command",reg:"grand",firstLetter:"c"},{word:"Attack",reg:"chaos",firstLetter:"a"},{word:"Strike",reg:"chaos",firstLetter:"s"},{word:"Leap",reg:"chaos",firstLetter:"l"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Grip",reg:"chaos",firstLetter:"g"},{word:"Haul",reg:"chaos",firstLetter:"h"},{word:"Pull",reg:"chaos",firstLetter:"p"},{word:"Haunt",reg:"chaos",firstLetter:"h"},{word:"Roam",reg:"nature",firstLetter:"r"},{word:"Assert",reg:"grand",firstLetter:"a"},{word:"Muster",reg:"grand",firstLetter:"m"}],
+  bulldog: [{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Snore",reg:"chaos",firstLetter:"s"},{word:"Drool",reg:"food",firstLetter:"d"},{word:"Slobber",reg:"food",firstLetter:"s"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Huff",reg:"chaos",firstLetter:"h"},{word:"Pant",reg:"chaos",firstLetter:"p"},{word:"Gruntle",reg:"chaos",firstLetter:"g"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Sway",reg:"chaos",firstLetter:"s"},{word:"Squat",reg:"chaos",firstLetter:"s"},{word:"Hunker",reg:"chaos",firstLetter:"h"},{word:"Slump",reg:"chaos",firstLetter:"s"},{word:"Sprawl",reg:"chaos",firstLetter:"s"},{word:"Doze",reg:"chaos",firstLetter:"d"},{word:"Snooze",reg:"chaos",firstLetter:"s"},{word:"Squish",reg:"chaos",firstLetter:"s"},{word:"Squash",reg:"chaos",firstLetter:"s"},{word:"Roll",reg:"chaos",firstLetter:"r"},{word:"Bump",reg:"chaos",firstLetter:"b"},{word:"Butt",reg:"chaos",firstLetter:"b"},{word:"Shove",reg:"chaos",firstLetter:"s"},{word:"Nudge",reg:"chaos",firstLetter:"n"},{word:"Bowl",reg:"chaos",firstLetter:"b"},{word:"Stump",reg:"chaos",firstLetter:"s"},{word:"Scoot",reg:"chaos",firstLetter:"s"},{word:"Clomp",reg:"chaos",firstLetter:"c"},{word:"Slouch",reg:"chaos",firstLetter:"s"},{word:"Yawn",reg:"chaos",firstLetter:"y"},{word:"Settle",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Plod",reg:"chaos",firstLetter:"p"},{word:"Trundle",reg:"chaos",firstLetter:"t"},{word:"Grunt",reg:"chaos",firstLetter:"g"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Barge",reg:"chaos",firstLetter:"b"}],
+  dalmatian: [{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Sprint",reg:"chaos",firstLetter:"s"},{word:"Streak",reg:"chaos",firstLetter:"s"},{word:"Bolt",reg:"chaos",firstLetter:"b"},{word:"Flash",reg:"chaos",firstLetter:"f"},{word:"Race",reg:"chaos",firstLetter:"r"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Blaze",reg:"grand",firstLetter:"b"},{word:"Thunder",reg:"grand",firstLetter:"t"},{word:"Charge",reg:"chaos",firstLetter:"c"},{word:"Spot",reg:"chaos",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Leap",reg:"chaos",firstLetter:"l"},{word:"Rocket",reg:"chaos",firstLetter:"r"},{word:"Zoom",reg:"chaos",firstLetter:"z"},{word:"Trail",reg:"nature",firstLetter:"t"},{word:"Coach",reg:"grand",firstLetter:"c"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Patrol",reg:"grand",firstLetter:"p"},{word:"Parade",reg:"grand",firstLetter:"p"},{word:"Pace",reg:"chaos",firstLetter:"p"},{word:"Trot",reg:"chaos",firstLetter:"t"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Flicker",reg:"chaos",firstLetter:"f"},{word:"Spark",reg:"chaos",firstLetter:"s"},{word:"Flare",reg:"chaos",firstLetter:"f"},{word:"Scorch",reg:"chaos",firstLetter:"s"},{word:"Whizz",reg:"chaos",firstLetter:"w"},{word:"Zip",reg:"chaos",firstLetter:"z"},{word:"Shoot",reg:"chaos",firstLetter:"s"},{word:"Skid",reg:"chaos",firstLetter:"s"},{word:"Rush",reg:"chaos",firstLetter:"r"},{word:"Whirl",reg:"chaos",firstLetter:"w"},{word:"Fleet",reg:"chaos",firstLetter:"f"},{word:"Cruise",reg:"chaos",firstLetter:"c"},{word:"Pursue",reg:"grand",firstLetter:"p"},{word:"Run",reg:"chaos",firstLetter:"r"}],
+  labradoodle: [{word:"Bounce",reg:"chaos",firstLetter:"b"},{word:"Waggle",reg:"chaos",firstLetter:"w"},{word:"Fetch",reg:"nature",firstLetter:"f"},{word:"Splosh",reg:"chaos",firstLetter:"s"},{word:"Gambol",reg:"chaos",firstLetter:"g"},{word:"Romp",reg:"chaos",firstLetter:"r"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Noodle",reg:"chaos",firstLetter:"n"},{word:"Paddle",reg:"chaos",firstLetter:"p"},{word:"Frolic",reg:"chaos",firstLetter:"f"},{word:"Wiggle",reg:"chaos",firstLetter:"w"},{word:"Splash",reg:"chaos",firstLetter:"s"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Skitter",reg:"chaos",firstLetter:"s"},{word:"Scoot",reg:"chaos",firstLetter:"s"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Sniff",reg:"nature",firstLetter:"s"},{word:"Nuzzle",reg:"chaos",firstLetter:"n"},{word:"Cuddle",reg:"chaos",firstLetter:"c"},{word:"Flop",reg:"chaos",firstLetter:"f"},{word:"Flump",reg:"chaos",firstLetter:"f"},{word:"Roll",reg:"chaos",firstLetter:"r"},{word:"Wriggle",reg:"chaos",firstLetter:"w"},{word:"Zoom",reg:"chaos",firstLetter:"z"},{word:"Dash",reg:"chaos",firstLetter:"d"},{word:"Chase",reg:"chaos",firstLetter:"c"},{word:"Retrieve",reg:"nature",firstLetter:"r"},{word:"Carry",reg:"nature",firstLetter:"c"},{word:"Shake",reg:"chaos",firstLetter:"s"},{word:"Drip",reg:"chaos",firstLetter:"d"},{word:"Slurp",reg:"food",firstLetter:"s"},{word:"Gobble",reg:"food",firstLetter:"g"},{word:"Munch",reg:"food",firstLetter:"m"},{word:"Plod",reg:"chaos",firstLetter:"p"},{word:"Trot",reg:"chaos",firstLetter:"t"},{word:"Skip",reg:"chaos",firstLetter:"s"},{word:"Play",reg:"chaos",firstLetter:"p"}],
+  sheepdog: [{word:"Lumber",reg:"chaos",firstLetter:"l"},{word:"Shamble",reg:"chaos",firstLetter:"s"},{word:"Bound",reg:"chaos",firstLetter:"b"},{word:"Wag",reg:"nature",firstLetter:"w"},{word:"Shuffle",reg:"chaos",firstLetter:"s"},{word:"Trundle",reg:"chaos",firstLetter:"t"},{word:"Amble",reg:"chaos",firstLetter:"a"},{word:"Plod",reg:"chaos",firstLetter:"p"},{word:"Mooch",reg:"chaos",firstLetter:"m"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Fluff",reg:"chaos",firstLetter:"f"},{word:"Floof",reg:"chaos",firstLetter:"f"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Sway",reg:"chaos",firstLetter:"s"},{word:"Bobble",reg:"chaos",firstLetter:"b"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Roll",reg:"chaos",firstLetter:"r"},{word:"Sprawl",reg:"chaos",firstLetter:"s"},{word:"Doze",reg:"chaos",firstLetter:"d"},{word:"Snooze",reg:"chaos",firstLetter:"s"},{word:"Snuffle",reg:"chaos",firstLetter:"s"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Gallop",reg:"chaos",firstLetter:"g"},{word:"Romp",reg:"chaos",firstLetter:"r"},{word:"Scamper",reg:"chaos",firstLetter:"s"},{word:"Scoot",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Heave",reg:"chaos",firstLetter:"h"},{word:"Loom",reg:"grand",firstLetter:"l"},{word:"Barge",reg:"chaos",firstLetter:"b"},{word:"Bump",reg:"chaos",firstLetter:"b"},{word:"Nudge",reg:"chaos",firstLetter:"n"},{word:"Herd",reg:"nature",firstLetter:"h"},{word:"Guard",reg:"grand",firstLetter:"g"},{word:"Watch",reg:"nature",firstLetter:"w"},{word:"Drift",reg:"nature",firstLetter:"d"},{word:"Drowse",reg:"chaos",firstLetter:"d"}],
+  asian: [{word:"Strike",reg:"grand",firstLetter:"s"},{word:"Pounce",reg:"chaos",firstLetter:"p"},{word:"Dodge",reg:"chaos",firstLetter:"d"},{word:"Prowl",reg:"grand",firstLetter:"p"},{word:"Lunge",reg:"chaos",firstLetter:"l"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Shuffle",reg:"chaos",firstLetter:"s"}],
+  character: [{word:"Snort",reg:"chaos",firstLetter:"s"},{word:"Waddle",reg:"chaos",firstLetter:"w"},{word:"Tumble",reg:"chaos",firstLetter:"t"},{word:"Bumble",reg:"chaos",firstLetter:"b"},{word:"Wobble",reg:"chaos",firstLetter:"w"},{word:"Totter",reg:"chaos",firstLetter:"t"},{word:"Blunder",reg:"chaos",firstLetter:"b"},{word:"Grumble",reg:"chaos",firstLetter:"g"},{word:"Wheeze",reg:"chaos",firstLetter:"w"},{word:"Puff",reg:"chaos",firstLetter:"p"},{word:"Dawg",reg:"chaos",firstLetter:"d"}],
+  default: [{word:"Trot",reg:"mundane",firstLetter:"t"},{word:"Lope",reg:"mundane",firstLetter:"l"},{word:"Prowl",reg:"grand",firstLetter:"p"},{word:"Stride",reg:"grand",firstLetter:"s"},{word:"Roam",reg:"mundane",firstLetter:"r"},{word:"Slink",reg:"aloof",firstLetter:"s"},{word:"Saunter",reg:"mundane",firstLetter:"s"},{word:"Canter",reg:"grand",firstLetter:"c"},{word:"Wander",reg:"mundane",firstLetter:"w"}]
+,
+  fluffy: [{word:"Fluffington",reg:"chaos",firstLetter:"f"},{word:"Puffsworth",reg:"chaos",firstLetter:"p"},{word:"Woolford",reg:"chaos",firstLetter:"w"},{word:"Cloudton",reg:"chaos",firstLetter:"c"},{word:"Plumeton",reg:"chaos",firstLetter:"p"},{word:"Pillowford",reg:"chaos",firstLetter:"p"},{word:"Silksworth",reg:"chaos",firstLetter:"s"},{word:"Frillford",reg:"chaos",firstLetter:"f"},{word:"Rufflesworth",reg:"chaos",firstLetter:"r"},{word:"Tuffleton",reg:"chaos",firstLetter:"t"},{word:"Marshmallowton",reg:"food",firstLetter:"m"},{word:"Curlsworth",reg:"chaos",firstLetter:"c"},{word:"Wavyford",reg:"chaos",firstLetter:"w"},{word:"Frizzleton",reg:"chaos",firstLetter:"f"},{word:"Bobblesworth",reg:"chaos",firstLetter:"b"},{word:"Poodlington",reg:"chaos",firstLetter:"p"},{word:"Floppington",reg:"chaos",firstLetter:"f"},{word:"Puffball",reg:"chaos",firstLetter:"p"},{word:"Puffling",reg:"chaos",firstLetter:"p"},{word:"Cottonworth",reg:"food",firstLetter:"c"},{word:"Meringueford",reg:"chaos",firstLetter:"m"},{word:"Wisperton",reg:"chaos",firstLetter:"w"},{word:"Wispford",reg:"chaos",firstLetter:"w"},{word:"Matton",reg:"chaos",firstLetter:"m"},{word:"Boingford",reg:"chaos",firstLetter:"b"},{word:"Wobbleton",reg:"chaos",firstLetter:"w"},{word:"Bobbleford",reg:"chaos",firstLetter:"b"},{word:"Pompleton",reg:"chaos",firstLetter:"p"},{word:"Flopsworth",reg:"chaos",firstLetter:"f"},{word:"Doodleton",reg:"chaos",firstLetter:"d"},{word:"Noodleton",reg:"chaos",firstLetter:"n"},{word:"Noodleford",reg:"chaos",firstLetter:"n"},{word:"Buntington",reg:"chaos",firstLetter:"b"}],
+  speckled: [{word:"Freckleton",reg:"chaos",firstLetter:"f"},{word:"Spotworth",reg:"chaos",firstLetter:"s"},{word:"Patchley",reg:"chaos",firstLetter:"p"},{word:"Mottleford",reg:"chaos",firstLetter:"m"},{word:"Fleckton",reg:"chaos",firstLetter:"f"},{word:"Brindleton",reg:"chaos",firstLetter:"b"},{word:"Dottington",reg:"chaos",firstLetter:"d"},{word:"Dotsworth",reg:"chaos",firstLetter:"d"},{word:"Spottington",reg:"chaos",firstLetter:"s"},{word:"Spotford",reg:"chaos",firstLetter:"s"},{word:"Splotchton",reg:"chaos",firstLetter:"s"},{word:"Blotton",reg:"chaos",firstLetter:"b"},{word:"Marbleford",reg:"chaos",firstLetter:"m"},{word:"Marbleton",reg:"chaos",firstLetter:"m"},{word:"Piebaldton",reg:"chaos",firstLetter:"p"},{word:"Stripeton",reg:"chaos",firstLetter:"s"},{word:"Dazzleton",reg:"chaos",firstLetter:"d"},{word:"Speckleston",reg:"chaos",firstLetter:"s"},{word:"Speckleton",reg:"chaos",firstLetter:"s"},{word:"Confettiford",reg:"chaos",firstLetter:"c"},{word:"Sprinkleford",reg:"chaos",firstLetter:"s"},{word:"Starryford",reg:"chaos",firstLetter:"s"},{word:"Mosaicton",reg:"chaos",firstLetter:"m"},{word:"Patchworkton",reg:"chaos",firstLetter:"p"},{word:"Patchford",reg:"chaos",firstLetter:"p"},{word:"Patchworthington",reg:"chaos",firstLetter:"p"},{word:"Inkton",reg:"chaos",firstLetter:"i"},{word:"Blobton",reg:"chaos",firstLetter:"b"},{word:"Dotford",reg:"chaos",firstLetter:"d"}],
+  scruff: [{word:"Scruffington",reg:"chaos",firstLetter:"s"},{word:"Scruffley",reg:"chaos",firstLetter:"s"},{word:"Scrubbleton",reg:"chaos",firstLetter:"s"},{word:"Ragamuffinton",reg:"chaos",firstLetter:"r"},{word:"Tattersall",reg:"chaos",firstLetter:"t"},{word:"Shaggleton",reg:"chaos",firstLetter:"s"},{word:"Shagford",reg:"chaos",firstLetter:"s"},{word:"Rufflesworth",reg:"chaos",firstLetter:"r"},{word:"Ruffton",reg:"chaos",firstLetter:"r"},{word:"Muddleton",reg:"chaos",firstLetter:"m"},{word:"Grubton",reg:"chaos",firstLetter:"g"},{word:"Muckwell",reg:"chaos",firstLetter:"m"},{word:"Muckton",reg:"chaos",firstLetter:"m"},{word:"Muckford",reg:"chaos",firstLetter:"m"},{word:"Grimton",reg:"chaos",firstLetter:"g"},{word:"Grungeford",reg:"chaos",firstLetter:"g"},{word:"Dishevelton",reg:"chaos",firstLetter:"d"},{word:"Unkempton",reg:"chaos",firstLetter:"u"},{word:"Rumpleford",reg:"chaos",firstLetter:"r"},{word:"Rascalton",reg:"chaos",firstLetter:"r"},{word:"Scampford",reg:"chaos",firstLetter:"s"},{word:"Waifton",reg:"chaos",firstLetter:"w"},{word:"Gutterton",reg:"chaos",firstLetter:"g"},{word:"Ramshackleton",reg:"chaos",firstLetter:"r"},{word:"Ramshacklewell",reg:"chaos",firstLetter:"r"},{word:"Scrumpton",reg:"chaos",firstLetter:"s"},{word:"Nimbleton",reg:"chaos",firstLetter:"n"},{word:"Nimbleford",reg:"chaos",firstLetter:"n"},{word:"Wanderton",reg:"chaos",firstLetter:"w"},{word:"Bedraggleton",reg:"chaos",firstLetter:"b"}],
+  hound: [{word:"Houndsley",reg:"chaos",firstLetter:"h"},{word:"Houndsworth",reg:"grand",firstLetter:"h"},{word:"Noseworthy",reg:"grand",firstLetter:"n"},{word:"Sniffington",reg:"chaos",firstLetter:"s"},{word:"Sleuthford",reg:"chaos",firstLetter:"s"},{word:"Trackford",reg:"chaos",firstLetter:"t"},{word:"Noseton",reg:"chaos",firstLetter:"n"},{word:"Scoutford",reg:"chaos",firstLetter:"s"},{word:"Huntington",reg:"grand",firstLetter:"h"},{word:"Huntford",reg:"chaos",firstLetter:"h"},{word:"Bayton",reg:"chaos",firstLetter:"b"},{word:"Bayford",reg:"chaos",firstLetter:"b"},{word:"Bellford",reg:"chaos",firstLetter:"b"},{word:"Bellton",reg:"chaos",firstLetter:"b"},{word:"Jowlsworth",reg:"chaos",firstLetter:"j"},{word:"Jowlton",reg:"chaos",firstLetter:"j"},{word:"Longearton",reg:"chaos",firstLetter:"l"},{word:"Flopearton",reg:"chaos",firstLetter:"f"},{word:"Droopington",reg:"chaos",firstLetter:"d"},{word:"Droolsworth",reg:"chaos",firstLetter:"d"},{word:"Snoutley",reg:"chaos",firstLetter:"s"},{word:"Snoutford",reg:"chaos",firstLetter:"s"},{word:"Snouton",reg:"chaos",firstLetter:"s"},{word:"Muzzleton",reg:"chaos",firstLetter:"m"},{word:"Wrinkleton",reg:"chaos",firstLetter:"w"},{word:"Ambleston",reg:"chaos",firstLetter:"a"},{word:"Snivelton",reg:"chaos",firstLetter:"s"},{word:"Sleepyton",reg:"chaos",firstLetter:"s"},{word:"Dozington",reg:"chaos",firstLetter:"d"},{word:"Slumberton",reg:"chaos",firstLetter:"s"},{word:"Plodlington",reg:"chaos",firstLetter:"p"},{word:"Plodwell",reg:"chaos",firstLetter:"p"},{word:"Earneston",reg:"chaos",firstLetter:"e"},{word:"Bassetford",reg:"chaos",firstLetter:"b"},{word:"Beaglesworth",reg:"chaos",firstLetter:"b"},{word:"Quarryford",reg:"chaos",firstLetter:"q"},{word:"Detectington",reg:"chaos",firstLetter:"d"},{word:"Tracerton",reg:"chaos",firstLetter:"t"},{word:"Trailford",reg:"chaos",firstLetter:"t"}],
+  zoom: [{word:"Zoomington",reg:"chaos",firstLetter:"z"},{word:"Zoomwell",reg:"chaos",firstLetter:"z"},{word:"Zoomford",reg:"chaos",firstLetter:"z"},{word:"Vroomton",reg:"chaos",firstLetter:"v"},{word:"Sprintford",reg:"chaos",firstLetter:"s"},{word:"Dashford",reg:"chaos",firstLetter:"d"},{word:"Flashford",reg:"chaos",firstLetter:"f"},{word:"Boltford",reg:"chaos",firstLetter:"b"},{word:"Hurtleton",reg:"chaos",firstLetter:"h"},{word:"Blurton",reg:"chaos",firstLetter:"b"},{word:"Rocketton",reg:"chaos",firstLetter:"r"},{word:"Streakford",reg:"chaos",firstLetter:"s"},{word:"Blazeford",reg:"chaos",firstLetter:"b"},{word:"Whizzton",reg:"chaos",firstLetter:"w"},{word:"Zipford",reg:"chaos",firstLetter:"z"},{word:"Quickton",reg:"chaos",firstLetter:"q"},{word:"Thunderfoot",reg:"chaos",firstLetter:"t"},{word:"Warpton",reg:"chaos",firstLetter:"w"},{word:"Fullpelton",reg:"chaos",firstLetter:"f"},{word:"Leggington",reg:"chaos",firstLetter:"l"},{word:"Legsworth",reg:"chaos",firstLetter:"l"},{word:"Legford",reg:"chaos",firstLetter:"l"},{word:"Streakton",reg:"chaos",firstLetter:"s"},{word:"Blazeton",reg:"chaos",firstLetter:"b"},{word:"Flashton",reg:"chaos",firstLetter:"f"},{word:"Dashton",reg:"chaos",firstLetter:"d"}],
+  longtail: [{word:"Wagglesworth",reg:"grand",firstLetter:"w"},{word:"Tailwag",reg:"chaos",firstLetter:"t"},{word:"Waggington",reg:"chaos",firstLetter:"w"},{word:"Tailford",reg:"chaos",firstLetter:"t"},{word:"Waggleton",reg:"chaos",firstLetter:"w"},{word:"Wagford",reg:"chaos",firstLetter:"w"},{word:"Swishton",reg:"chaos",firstLetter:"s"},{word:"Swishford",reg:"chaos",firstLetter:"s"},{word:"Swooshton",reg:"chaos",firstLetter:"s"},{word:"Swayton",reg:"chaos",firstLetter:"s"},{word:"Swayford",reg:"chaos",firstLetter:"s"},{word:"Plumeton",reg:"chaos",firstLetter:"p"},{word:"Plumeford",reg:"chaos",firstLetter:"p"},{word:"Featherton",reg:"chaos",firstLetter:"f"},{word:"Featherford",reg:"chaos",firstLetter:"f"},{word:"Flagford",reg:"chaos",firstLetter:"f"},{word:"Bannerton",reg:"chaos",firstLetter:"b"},{word:"Streamford",reg:"chaos",firstLetter:"s"},{word:"Flourishford",reg:"chaos",firstLetter:"f"},{word:"Fanford",reg:"chaos",firstLetter:"f"},{word:"Fanfare",reg:"chaos",firstLetter:"f"},{word:"Swirlford",reg:"chaos",firstLetter:"s"},{word:"Twizzleton",reg:"chaos",firstLetter:"t"},{word:"Waverton",reg:"chaos",firstLetter:"w"},{word:"Tailwick",reg:"chaos",firstLetter:"t"},{word:"Twizzleford",reg:"chaos",firstLetter:"t"},{word:"Whirlyton",reg:"chaos",firstLetter:"w"},{word:"Spinton",reg:"chaos",firstLetter:"s"},{word:"Spinford",reg:"chaos",firstLetter:"s"}],
+  goodboy: [{word:"Goodboy",reg:"chaos",firstLetter:"g"},{word:"Bestboy",reg:"chaos",firstLetter:"b"},{word:"Topboy",reg:"chaos",firstLetter:"t"},{word:"Championford",reg:"chaos",firstLetter:"c"},{word:"Prizeford",reg:"chaos",firstLetter:"p"},{word:"Biscuitwell",reg:"food",firstLetter:"b"},{word:"Welldonton",reg:"chaos",firstLetter:"w"},{word:"Cleverboy",reg:"chaos",firstLetter:"c"},{word:"Cleverton",reg:"chaos",firstLetter:"c"},{word:"Smarton",reg:"chaos",firstLetter:"s"},{word:"Steadfast",reg:"chaos",firstLetter:"s"},{word:"Nobleston",reg:"chaos",firstLetter:"n"},{word:"Gentleton",reg:"chaos",firstLetter:"g"},{word:"Loyalton",reg:"chaos",firstLetter:"l"},{word:"Trueton",reg:"chaos",firstLetter:"t"},{word:"Steadton",reg:"chaos",firstLetter:"s"},{word:"Faithfulton",reg:"chaos",firstLetter:"f"},{word:"Honourton",reg:"chaos",firstLetter:"h"},{word:"Braveton",reg:"chaos",firstLetter:"b"}],
+  goodgirl: [{word:"Goodgirl",reg:"chaos",firstLetter:"g"},{word:"Bestgirl",reg:"chaos",firstLetter:"b"},{word:"Topgirl",reg:"chaos",firstLetter:"t"},{word:"Queenton",reg:"chaos",firstLetter:"q"},{word:"Ladyton",reg:"chaos",firstLetter:"l"},{word:"Ladyford",reg:"chaos",firstLetter:"l"},{word:"Nobleton",reg:"chaos",firstLetter:"n"},{word:"Graceton",reg:"chaos",firstLetter:"g"},{word:"Sweeton",reg:"chaos",firstLetter:"s"},{word:"Preciouston",reg:"chaos",firstLetter:"p"},{word:"Cherishton",reg:"chaos",firstLetter:"c"},{word:"Treasureton",reg:"chaos",firstLetter:"t"},{word:"Jewelton",reg:"chaos",firstLetter:"j"},{word:"Gemon",reg:"chaos",firstLetter:"g"},{word:"Pearlon",reg:"chaos",firstLetter:"p"},{word:"Shineton",reg:"chaos",firstLetter:"s"},{word:"Glowton",reg:"chaos",firstLetter:"g"},{word:"Queenford",reg:"chaos",firstLetter:"q"},{word:"Graceford",reg:"chaos",firstLetter:"g"},{word:"Charmford",reg:"chaos",firstLetter:"c"},{word:"Sweetford",reg:"chaos",firstLetter:"s"}]};
 
 // ── REASONING ─────────────────────────────────────────────────────────────────
 const REASONING: Record<string, string[]> = {
@@ -778,55 +804,232 @@ const REASONING: Record<string, string[]> = {
   poodle:    ["The most intelligent dog in the world and considerably better dressed than you.","Originally a water retriever, now primarily a philosopher. The doctorate was inevitable.","Breeds above itself in intelligence and consistently knows it."],
   spaniel:   ["Spaniels have commanded hunting parties since the Tudor court. A generalship was long overdue.","Floppy ears and absolute authority -- the spaniel was born to lead.","The Field Marshal of the water meadow and the reed bed since 1600."],
   boston:    ["Born in a tuxedo, died in a tuxedo, conducted all affairs in between in a tuxedo.","The most opinionated small dog in American history. Has views on tariffs.","Carries itself like a Tammany Hall ward boss who has seen things.","Emerged from 1870s Boston with an air of civic authority entirely disproportionate to its size.","Looks like it once ran for alderman and nearly won."],
-  welsh:     ["A Welsh dog with a Welsh name feels like the natural order of things.","The Corgi has been a royal dog since before most European monarchies existed. Acts accordingly.","Compact, focused, and absolutely convinced it is in charge of everything within a three-mile radius.","Has herded sheep on hillsides that would make a mountain goat nervous.","Carries itself like a bard who has just composed something very good and knows it."],
+  corgi:     ["A Welsh dog with a Welsh name feels like the natural order of things.","The Corgi has been a royal dog since before most European monarchies existed. Acts accordingly.","Compact, focused, and absolutely convinced it is in charge of everything within a three-mile radius.","Has herded sheep on hillsides that would make a mountain goat nervous.","Carries itself like a bard who has just composed something very good and knows it."],
   asian:     ["Carries itself like a Shaolin monk who has taken a vow of snacks.","Two thousand years of Chinese imperial breeding. Acts accordingly.","Has a face that has seen empires rise and fall. Mostly unimpressed.","Hong Kong Phooey was a bumbling janitor dog who thought he was a kung fu master. This dog has no such doubts.","The ancient breeds of Asia were temple guardians. This one guards the sofa with equal dedication."],
   character: ["A face like a fist, a personality like a party.","Breathes loudly through every social occasion with complete conviction it is doing this correctly.","Believes it is a much larger dog trapped in a terrible administrative error."],
   dachshund: ["Two thousand years of German engineering went into a dog that cannot reach most surfaces.","Moves through the world like a very short scandal.","The proportions suggest an engineering compromise was made at some point. The dog disagrees."],
-  default:   ["A dog of considerable distinction that has earned its title through sheer presence.","The rank was awarded after careful consideration. The evidence was considerable."],
+  default:   ["A dog of considerable distinction that has earned its title through sheer presence.","The rank was awarded after careful consideration. The evidence was considerable."]
 };
 
 // ── NICKNAMES ─────────────────────────────────────────────────────────────────
-const NICKNAMES: Record<string,string> = {
-  archibald:"Archie",bartholomew:"Baz",cornelius:"Cornie",reginald:"Reggie",algernon:"Algie",
-  peregrine:"Perry",maximillian:"Max",maximilian:"Max",humphrey:"Humph",montgomery:"Monty",
-  ferdinand:"Ferdie",alexander:"Alex",sebastian:"Seb",theodore:"Teddy",frederick:"Freddie",
-  wellington:"Welly",percival:"Percy",wilfred:"Wilf",sherlock:"Sherl",hercule:"Herc",
-  augustus:"Gus",auberon:"Aubs",barnaby:"Barnie",benedictus:"Benny",fortunatus:"Forty",
-  celestin:"Cel",florentine:"Flo",evangelina:"Evie",evangeline:"Evie",celestine:"Celly",
-  sophronia:"Soph",euphemia:"Effie",wilhelmina:"Billie",clementine:"Clem",millicent:"Millie",
-  frederica:"Freddie",constance:"Connie",prudence:"Prue",dorothea:"Dot",theodosia:"Teddy",
-  philomena:"Philly",seraphine:"Sera",arabella:"Bella",georgiana:"Georgie",cassiopeia:"Cassie",
-  isadora:"Izzy",pandemonium:"Panda",discombobulate:"Disco",hullabaloo:"Hully",pandemonia:"Panda",
-  nonchalance:"Nona",glaciale:"Glayglay",langueur:"Langy",indifferencia:"Indie",aloofia:"Loofy",
-  lachrymose:"Lacky",plodsworth:"Plodsy",gloopington:"Gloops",frenzina:"Frenzy",woebegone:"Woeby",
-  maelstrom:"Maely",existentiale:"Exie",hermeneutique:"Hermy",elongated:"Longy",basil:"Baz",
-  nincompoop:"Ninnie",chumbawumba:"Chumba",zippadeedooda:"Zippy",snugglebum:"Snugs",
-  cuddlekins:"Cuddles",squishface:"Squish",babbycakes:"Babs",tiddlywink:"Tiddles",
-  fluffybum:"Fluffy",smooshface:"Smoosh",jellybean:"Jelly",marshmallow:"Marsh",
-  candyfloss:"Candy",puddingkins:"Pudds",lambchop:"Lamby",pumpkinhead:"Pumps",
-  hypervigilant:"Hyper",indefatigable:"Indy",infinitesimal:"Tiny",imperceptible:"Imp",
-  microscopic:"Micro",diminutive:"Dimmy",gossamera:"Gossie",daintybell:"Bell",
-  galumph:"Lumphy",kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",noodles:"Noods",
-  chipmunk:"Chip",
-  tutu:"Tutu",dizzy:"Dizzy",wizzle:"Wizz",wibble:"Wibs",womble:"Womby",
-  bumblebean:"Lulz",tumblewick:"TumTum",gobblesnout:"Gobsnot",
-  dafydd:"Daf",gruffudd:"Gruff",llewelyn:"Llew",cadwaladr:"Cad",llywarch:"Llyw",
-  meredydd:"Mered",rhydderch:"Rhyd",gwynfor:"Gwynn",taliesin:"Tali",
-  aneurin:"Nye",caradog:"Crad",bleddyn:"Bled",gwilym:"Gwil",
-  wmffre:"Wmff",tecwyn:"Tech",elidyr:"Eli",gwyndaf:"Gwyn",
-  moonbeam:"Moonie",starbeam:"Starby",starlight:"Starry",moonlight:"Moony",
-  shadowmoon:"Shadow",darkstar:"Darky",moonwalker:"Moonwalk",starwalker:"Starwalk",
-  voidwalker:"Void",eventhorizon:"Horizon",supernova:"Nova",magnetar:"Mag",
-  andromeda:"Romy",celestia:"Celi",lunaris:"Luna",penumbra:"Penny",
-  spogmai:"Spogi",laleh:"Lali",mahsa:"Mahi",noura:"Nouri",lujain:"Lulu",maysa:"Mays",zahra:"Zazi",farah:"Fari",sultan:"Sully",nawab:"Nabs",zalmay:"Zal",
+const NICKNAMES: Record<string,string|string[]> = {
+    archibald:["Archie","Arch","Baldie","Baldy"],bartholomew:"Baz",cornelius:"Cornie",reginald:"Reggie",
+  algernon:"Algie",peregrine:["Perry","Pip","Pippin","Greenie"],maximillian:"Max",maximilian:"Max",
+  humphrey:"Humph",montgomery:"Monty",ferdinand:["Ferdy","Fred","Nando","Fern"],alexander:"Alex",
+  sebastian:"Seb",theodore:"Teddy",frederick:"Freddie",wellington:"Welly",
+  percival:"Percy",wilfred:"Wilf",sherlock:"Sherl",hercule:"Herc",
+  augustus:["Gus","Augie","Auggie","Gussy"],auberon:"Aubs",barnaby:"Barnie",benedictus:"Benny",
+  fortunatus:"Forty",celestin:"Cel",florentine:["Flo","Florrie","Tina","Renty"],evangelina:"Evie",
+  evangeline:["Eva","Evie","Angie","Lina","Vangie"],celestine:["Celi","Celly","Tina","Stina"],sophronia:"Soph",euphemia:["Effie","Euphie","Mia","Femie","Phemie"],
+  wilhelmina:["Willa","Mina","Minnie","Wilma","Billie"],clementine:["Clem","Clemmie","Tiny","Minnie","Tina"],millicent:["Millie","Milly","Missy","Centa","Lissy"],frederica:"Freddie",
+  constance:["Connie","Con","Cissy","Coco","Consta"],prudence:["Prue","Prudy","Pru","Denny"],dorothea:["Dora","Dory","Thea","Dotty","Dot"],theodosia:"Teddy",
+  philomena:"Philly",seraphine:"Sera",arabella:["Ara","Bella","Belle","Ari","Arby"],georgiana:"Georgie",
+  cassiopeia:"Cassie",isadora:"Izzy",pandemonium:"Panda",discombobulate:"Disco",
+  hullabaloo:"Hully",pandemonia:"Panda",nonchalance:"Nona",glaciale:"Glayglay",
+  langueur:"Langy",indifferencia:"Indie",aloofia:"Loofy",lachrymose:"Lacky",
+  plodsworth:"Plodsy",gloopington:"Gloops",frenzina:"Frenzy",woebegone:"Woeby",
+  maelstrom:"Maely",existentiale:"Exie",hermeneutique:"Hermy",elongated:"Longy",
+  basil:"Baz",nincompoop:"Ninnie",chumbawumba:"Chumba",zippadeedooda:"Zippy",
+  snugglebum:"Snugs",cuddlekins:"Cuddles",squishface:"Squish",babbycakes:"Babs",
+  tiddlywink:"Tiddles",fluffybum:"Fluffy",smooshface:"Smoosh",jellybean:"Jelly",
+  marshmallow:"Marsh",candyfloss:"Candy",puddingkins:"Pudds",lambchop:"Lamby",
+  pumpkinhead:"Pumps",hypervigilant:"Hyper",indefatigable:"Indy",infinitesimal:"Tiny",
+  imperceptible:"Imp",microscopic:"Micro",diminutive:"Dimmy",gossamera:"Gossie",
+  daintybell:"Bell",kerfuffle:"Kerfie",chuckles:"Chuck",pickles:"Picks",
+  noodles:"Noods",chipmunk:"Chip",abigail:["Abby","Abbie","Gail","Gayle","Abi"],adelaide:["Addie","Ada","Adele","Lady","Della"],
+  adeline:["Addie","Ada","Adele","Lina","Delly"],alexandra:["Alex","Lexi","Lex","Sandra","Sandy"],alexandria:["Alex","Lexi","Andie","Sandra","Ria"],alice:["Ali","Ally","Lissy","Lise","Elsie"],
+  alicia:["Ali","Ally","Lissy","Leesh","Cia"],alison:["Ali","Ally","Allie","Sonny","Lissy"],amanda:["Mandy","Manda","Amy","Andie","Mands"],amelia:["Amy","Millie","Mia","Lia","Mel"],
+  anastasia:["Ana","Annie","Stasia","Stacey","Tasia"],angela:["Angie","Ange","Angel","Gela","Jelly"],angelica:["Angie","Angel","Jelly","Geli","Lica"],annabel:["Annie","Anna","Belle","Bella","Nabby"],
+  belinda:["Belle","Bella","Lindy","Linda","Bindi"],bernadette:["Bernie","Benny","Detta","Etta","Birdie"],bethany:["Beth","Bethy","Annie","Betty","Bess"],beverley:["Bev","Bevvie","Everly","Lee"],
+  bridget:["Bridie","Biddy","Bree","Jet","Birdie"],camilla:["Cam","Cammie","Millie","Mila","Cami"],caroline:["Carrie","Carol","Caz","Lina","Callie"],catherine:["Cathy","Cat","Kate","Katie","Kitty"],
+  charlotte:["Charlie","Lottie","Char","Lotta","Cherry"],christina:["Chris","Chrissie","Tina","Christy","Nina"],christine:["Chris","Chrissie","Tina","Christy","Teeny"],clarissa:["Clare","Clara","Clarry","Rissa","Issy"],
+  cordelia:["Cora","Cordie","Delia","Dilly","Lia"],cornelia:["Cora","Connie","Nell","Nelly","Lia"],danielle:["Dani","Danni","Elle","Ella","Nell"],deborah:["Deb","Debbie","Debs","Debby","Dora"],
+  dorothy:["Dot","Dottie","Dolly","Dora","Dory"],elisabeth:["Liz","Lizzie","Beth","Betty","Libby"],elizabeth:["Liz","Lizzie","Beth","Betty","Bess"],eloise:["Ellie","Elsie","Lo","Lulu","Weezy"],
+  evelyn:["Evie","Eve","Lyn","Lynn","Ev"],felicity:["Flick","Fliss","Lissy","Fee","City"],frances:["Fran","Franny","Frankie","Fanny","Chessie"],francesca:["Fran","Frankie","Cesca","Chessie","Franny"],
+  gabriella:["Gabby","Gabi","Bella","Bri","Ella"],georgina:["Georgie","Gina","Gigi","George","Gia"],geraldine:["Gerry","Geri","Dina","Diney","Deanie"],gillian:["Gill","Gilly","Jill","Jilly","Lian"],
+  gwendoline:["Gwen","Gwennie","Wendy","Dolly","Winnie"],harriet:["Hattie","Hatty","Harry","Etta","Harrie"],isabella:["Izzy","Izzie","Bella","Belle","Isa"],isobel:["Izzy","Izzie","Belle","Bella","Ibby"],
+  jacqueline:["Jackie","Jacqui","Jack","Lina","Queenie"],jennifer:["Jen","Jenny","Jenna","Jennie","Fer"],jemima:["Jem","Jemma","Mimi","Mima","Jim"],jessica:["Jess","Jessie","Jessa","Sica"],
+  juliana:["Jules","Julie","Ana","Annie","Lia"],juliet:["Jules","Julie","Jet","Etta","Lettie"],katherine:["Kathy","Kat","Kate","Katie","Kitty"],kathleen:["Kathy","Kath","Kat","Katie","Lena"],
+  kimberley:["Kim","Kimmy","Kimber","Kimi","Lee"],lavender:["Lav","Lavvy","Vendy","Vee","Lenny"],letitia:["Lettie","Letty","Tish","Titia","Tia"],lorraine:["Lori","Lorrie","Raine","Rainy","Lolly"],
+  lucinda:["Lucy","Lulu","Cindy","Cinda","Luce"],madeleine:["Maddie","Maddy","Mads","Lena","Delly"],margaret:["Maggie","Meg","Peggy","Daisy","Greta"],marianne:["Mary","Marie","Annie","Maz","Mari"],
+  matilda:["Tilly","Tilda","Mattie","Milly","Tils"],melanie:["Mel","Mellie","Lani","Annie","Laney"],meredith:["Merry","Meri","Edith","Edie","Red"],miranda:["Mira","Mandy","Randi","Andie","Mimi"],
+  natalia:["Nat","Talia","Tally","Lia","Tilly"],natalie:["Nat","Nattie","Tally","Talia","Lee"],nicola:["Nicki","Nicky","Nic","Cola","Nix"],olivia:["Liv","Livvy","Ollie","Livia","Via"],
+  patricia:["Pat","Patty","Trish","Tricia","Patsy"],penelope:["Penny","Nell","Nelly","Poppy","Pen"],philippa:["Pippa","Pip","Philly","Flip","Pips"],priscilla:["Prissy","Cilla","Prisc","Sissy","Rilla"],
+  rebecca:["Becky","Becca","Bex","Reba","Becks"],roberta:["Robbie","Bobby","Bobbie","Berta","Bertie"],rosamund:["Rosa","Rosie","Roz","Mundy","Romy"],rosemary:["Rose","Rosie","Romy","Mary","Ro"],
+  samantha:["Sam","Sammy","Sammie","Mantha","Mandy"],stephanie:["Steph","Stevie","Steffi","Fanny","Effie"],theresa:["Tess","Tessa","Terry","Resa","Teri"],veronica:["Vera","Ronnie","Roni","Nica","Vee"],
+  victoria:["Vicky","Vicki","Tori","Vic","Vix"],winifred:["Winnie","Win","Freddie","Freda","Wyn"],yasmin:["Yaz","Yazzy","Min","Minnie","Yas"],cecilia:["Cece","Cissy","Celia","Lia","Ceci"],
+  eugenie:["Genie","Jean","Jenny","Gigi","Eugie"],marigold:["Mari","Mary","Goldie","Maggie","Miggy"],primrose:["Prim","Rosie","Rose","Primmy","Posy"],aurora:["Rora","Rory","Auri","Dawn"],
+  diana:["Di","Diney","Annie","Dee"],flora:["Flo","Florrie","Flossie","Lo"],iris:["Rissie","Izzy","Ris","Issy"],ivy:["Ivie","Ive","Iv"],
+  rose:["Rosie","Ro","Roz","Posy"],ruby:["Rube","Rubes","Bee"],violet:["Vi","Ettie","Vee","Vio"],clara:["Clare","Clarry","Clary","Lara"],
+  vera:["Vee","Verie","Rara"],nora:["Norrie","Norie","Nor"],cora:["Corie","Corrie","Cor"],ada:["Addie","Adie","Dee"],
+  grace:["Gracie","Gracey","Ace"],maud:["Maudie","Maddy","Maudy"],edith:["Edie","Eadie","Eddie","Dithy"],ethel:["Ettie","Eth","Thelma","Thel"],
+  mabel:["Mab","Mabby","May","Belle"],sybil:["Sib","Sibby","Billie","Sybbie"],enid:["Edie","Niddy","Ena"],agnes:["Aggie","Nessie","Nessa","Aggy"],
+  agatha:["Aggie","Aggy","Gatha","Gathie"],dilys:["Dilly","Dil","Lissy"],nerys:["Nery","Nessa","Nerysie"],seren:["Serri","Ren","Sera"],
+  cerys:["Cez","Ceri","Rys"],carys:["Caz","Carrie","Cazzy"],lowri:["Lo","Lori","Low"],blodwen:["Blod","Winnie","Wen"],
+  bronwen:["Bron","Bronnie","Winnie","Wen"],morwenna:["Mor","Wenna","Morry","Mo"],elspeth:["Elsie","Beth","Effie"],nesta:["Ness","Nessie","Tess"],
+  alys:["Ally","Aly","Lissie"],eirlys:["Eira","Lys","Lissy"],mairwen:["Mair","Mary","Wen"],olwen:["Ollie","Winnie","Wen"],
+  eluned:["El","Luned","Nellie"],winona:["Winnie","Nona","Win"],maeve:["Mave","Meavy","Evie"],freya:["Frey","Fre","Rey"],
+  ingrid:["Ingy","Rid","Inga"],mathilde:["Tilly","Tilda","Mattie","Hildy"],cecily:["Cece","Cissy","Celia","Sissie"],alastair:["Al","Ali","Ally","Astie","Sandy"],
+  laurence:["Loz","Lozza","Laurie","Lawrie","Lawie"],llewellyn:["Llew","Lew","Lyn","Welly"],sebastien:["Seb","Sebby","Basty","Baz"],robert:["Rob","Robbie","Bob","Bobby","Bert"],
+  james:["Jim","Jimmy","Jamie","Jem"],john:"Jack",jonathan:["Jon","Johnny","Jonny","Nathan"],joseph:["Joe","Joey","Jojo","Seph"],
+  thomas:["Tom","Tommy","Thom","Tam"],charles:["Charlie","Charley","Chaz","Chuck"],michael:["Mike","Mikey","Mick","Micky"],david:["Dave","Davey","Davy","Dai"],
+  daniel:["Dan","Danny","Danno","Dani"],samuel:["Sam","Sammy","Sammie","Saul"],benjamin:["Ben","Benny","Benji","Benjy"],christopher:["Chris","Chrissy","Kit","Topher"],
+  nicholas:["Nick","Nicky","Nico","Cole"],andrew:["Andy","Drew","Ando","Dandy"],anthony:["Tony","Ant","Anton","Nino"],matthew:["Matt","Matty","Mats","Theo"],
+  patrick:["Pat","Paddy","Rick","Ricky"],peter:"Pete",stephen:["Steve","Stevie","Steph","Ste"],steven:["Steve","Stevie","Ste","Sven"],
+  philip:["Phil","Philly","Pip","Flip"],francis:["Frank","Frankie","Fran","Franny"],george:["Georgie","Geordie","Geo","Georgy"],albert:["Al","Bert","Bertie","Albie"],
+  alfred:["Alf","Alfie","Fred","Freddie"],arthur:["Art","Artie","Arty","Thor"],walter:["Walt","Wally","Wat","Wal"],kenneth:["Ken","Kenny","Kent","Kendo"],
+  donald:"Don",ronald:["Ron","Ronnie","Rolo","Naldo"],raymond:["Ray","Raymie","Raymo","Mondy"],gerald:["Gerry","Jerry","Gez","Geri"],
+  jeremiah:["Jerry","Jez","Jem","Jeremy"],jeremy:["Jez","Jezza","Jerry","Jem"],timothy:["Tim","Timmy","Timo","Mothy"],gregory:["Greg","Gregg","Greggy","Rory"],
+  douglas:["Doug","Dougie","Dug","Duggie"],vincent:["Vin","Vince","Vinnie","Vinny"],victor:"Vic",leonard:["Len","Lenny","Leo","Nard"],
+  leonardo:"Leo",dominic:["Dom","Dommy","Nick","Nico"],nathaniel:["Nate","Nat","Nathan","Niel"],nathan:"Nate",
+  zachary:["Zach","Zack","Zak","Zacky"],zachariah:"Zach",isaac:"Ike",isaiah:"Izzy",
+  elijah:"Eli",joshua:["Josh","Joshy","Joss","Jo"],jacob:"Jake",ezekiel:"Zeke",
+  emmanuel:["Manny","Manu","Em","Nuel"],maxwell:"Max",augustine:"Gus",bertram:"Bert",
+  bernard:["Bernie","Bern","Barney","Nard"],benedict:["Ben","Benny","Ned","Bendy"],brandon:"Bran",bradley:"Brad",
+  cameron:["Cam","Cammy","Ron","Ronny"],caspian:"Cas",cecil:"Cec",cedric:"Ced",
+  clarence:["Clare","Clarry","Larry","Ren"],clement:["Clem","Clemmy","Clemmie","Cley"],clifford:"Cliff",conrad:"Con",
+  cuthbert:"Bert",desmond:["Des","Desi","Dez","Mondy"],dexter:"Dex",edmund:["Ed","Eddie","Ned","Mundy"],
+  edwin:["Ed","Eddie","Ned","Winnie"],elliot:["Eli","Ell","Ellis","Lio"],elliott:"Eli",eugene:"Gene",
+  fletcher:"Fletch",franklin:"Frank",geoffrey:["Geoff","Jeff","Jeffy","Geo"],gideon:"Gid",
+  gilbert:["Gil","Gilly","Bert","Bertie"],gordon:"Gord",graham:"Gray",harold:["Harry","Hal","Haz","Haroldy"],
+  harrison:["Harry","Harris","Sonny","Hazza"],howard:"Howie",ignatius:["Iggy","Nate","Nacho","Ignas"],irving:"Irv",
+  jackson:"Jack",jasper:"Jas",jefferson:"Jeff",jordan:"Jord",
+  julian:"Jules",justin:"Jus",kelvin:"Kel",kendrick:"Ken",
+  kingston:"King",kingsley:"King",lachlan:"Lachie",lambert:"Bert",
+  lancelot:"Lance",lincoln:"Linc",lionel:"Lion",lucas:"Luke",
+  lucian:["Luke","Luc","Luca","Luce"],malcolm:["Mal","Malc","Colm","Malky"],marcus:["Marc","Mark","Marco","Mars"],martin:"Marty",
+  maurice:"Mo",mortimer:"Mort",neville:"Nev",nigel:"Nige",
+  orlando:["Lando","Orly","Rolly","Landy"],oswald:["Oz","Ozzie","Ossie","Wally"],oscar:"Oz",phineas:"Finn",
+  randolph:"Randy",raphael:["Raph","Raffy","Rafe","Raf"],reuben:"Rube",roderick:["Rod","Roddy","Rick","Rory"],
+  rodney:"Rod",roger:"Rog",roland:"Roly",rudolph:["Rudy","Rudi","Dolph","Dolf"],
+  rupert:["Roo","Rupes","Bertie","Rupe"],russell:"Russ",samson:"Sam",solomon:["Sol","Solly","Sonny","Solo"],
+  stuart:"Stu",sylvester:["Sly","Syl","Vester","Ves"],tobias:["Toby","Tobes","Tobe","Bias"],tristan:"Tris",
+  ulysses:"Uly",valentine:["Val","Vallie","Tiny","Tino"],vernon:"Vern",wilbert:"Will",
+  wilbur:"Will",xavier:"Xav",yorick:"Rick",abraham:["Abe","Bram","Abie","Hammy"],
+  adrian:["Ade","Adi","Aidy","Rian"],alan:"Al",alistair:"Al",ambrose:"Amby",
+  angus:["Gus","Angie","Angy","Gussy"],arnold:"Arnie",aubrey:"Aub",avery:"Ave",
+  baxter:"Bax",broderick:"Brodie",caleb:"Cal",calvin:"Cal",
+  carlton:"Carl",chester:"Chet",christian:["Chris","Kit","Christy","Ian"],colin:"Col",
+  connor:"Con",cyril:"Cy",damian:"Damo",damien:"Damo",
+  dean:"Deano",duncan:"Dunc",elias:"Eli",emanuel:"Manny",
+  everett:"Ev",felix:"Fee",finnegan:["Finn","Finny","Fin","Fionn"],finlay:"Finn",
+  fintan:"Finn",fitzgerald:"Fitz",gabrielle:"Gabby",gary:"Gaz",
+  gavin:"Gav",grayson:"Gray",griffin:"Griff",hadrian:"Ade",
+  jerome:"Jerry",joachim:"Jo",joel:"Joe",jonah:"Jo",
+  jonas:"Jo",josiah:"Joe",jude:"Judy",julius:"Jules",
+  keegan:"Kee",leon:"Leo",levi:"Lev",lorenzo:"Enzo",
+  lucius:"Luke",magnus:"Mag",manfred:"Manny",marcellus:"Marc",
+  matthias:"Matt",melvin:"Mel",miles:"Milo",milton:"Milt",
+  morgan:"Morg",murray:"Muz",nelson:"Nels",aldous:"Al",
+  aloysius:"Al",beethoven:"Ludwig",mozart:"Wolfie",handel:"George",
+  bach:"Johann",brahms:"Johannes",chopin:"Fred",liszt:"Franz",
+  vivaldi:"Antonio",purcell:"Henry",schubert:"Franz",poirot:"Herc",
+  endeavour:"Morse",gamache:"Armand",alleyn:"Rory",tennison:"Jane",
+  marple:"Miss M",aristotle:"Aris",archimedes:"Archie",artemisia:"Arte",
+  christabel:["Chrissie","Christa","Belle","Bella","Tabby"],josephine:"Jo",beatrice:"Bea",imogen:"Immy",
+  lavinia:["Liv","Vinnie","Lav","Nia","Vinny"],brunhilde:"Brunny",walburga:"Walby",mechthild:"Mecki",
+  etheldreda:"Ethel",vanderbilt:"Vandy",tammany:"Tammy",rockefeller:"Rocky",
+  carnegie:"Carnie",rutherford:"Ruthy",grover:"Grove",millard:"Mill",
+  beauregard:"Beau",thaddeus:"Thad",harrington:"Harry",roscoe:"Ros",
+  hiram:"Hi",elmer:"Elm",wisecrack:"Wise",gawain:"Gaw",
+  guinevere:["Gwen","Guin","Vera","Ginny"],brunhilda:"Brunny",ingeborg:"Inge",altair:"Al",
+  antimatter:"Anti",asteroid:"Rocky",astral:"Astral",astrid:["Asty","Rid","Asti"],
+  blackstar:"Star",bloodmoon:"Blood",bluemoon:"Blue",calypso:"Cal",
+  carina:"Cari",cassandra:"Cass",circe:"Circe",cleopatra:"Cleo",
+  cosmic:"Cos",cornflake:"Corny",cyrus:"Cy",darius:"Dari",
+  darkside:"Dark",dawnstar:"Dawn",deepspace:"Deep",demeter:"Demi",
+  dinky:"Dink",doodle:"Dood",draco:"Drake",drifter:"Drift",
+  duchess:"Duch",duke:"Duke",eclipse:"Clips",edgar:"Ed",
+  edmond:"Ed",edward:["Ed","Eddie","Ted","Teddy","Ned"],einstein:"Ein",elara:"El",
+  eleanor:"Ellie",elfriede:"Elfie",emily:"Em",enguerrand:"Eng",
+  equinox:"Equi",falcon:"Falk",fauna:"Fauna",fidget:"Fidge",
+  flair:"Flair",fleur:"Fleur",foghorn:"Foggy",frost:"Frost",
+  fury:"Fury",gabriel:["Gabe","Gabby","Bri","Gabs"],gaia:"Gaia",gale:"Gale",
+  galileo:"Gal",galaxy:"Gal",ganymede:"Gany",gaston:"Gus",
+  gertrude:"Gertie",gizmo:"Gizmo",glorious:"Glory",goober:"Goob",
+  grommet:"Grom",gubbins:"Gubb",gwendolyn:"Gwen",gwenllian:"Gwen",
+  hamid:"Ham",hannah:"Han",hana:"Han",hedwig:"Hedwig",
+  helena:"Hel",henrietta:["Hetty","Hettie","Etta","Henny","Henri"],henry:["Harry","Hank","Hal","Hen"],hildegard:"Hilde",
+  hildegarde:"Hilde",hippolyta:"Hippo",huckleberry:"Huck",jade:"Jade",
+  jasmine:"Jas",karate:"Kaz",kepler:"Kep",khalid:"Khal",
+  khan:"Khan",koda:"Kod",kriemhild:"Krie",kunigunde:"Kuni",
+  lawrence:["Loz","Lozza","Laurie","Larry","Lawie"],leopold:["Leo","Poldy","Lenny","Lee"],lilliput:"Lilli",livia:"Liv",
+  louis:"Lou",lucy:"Lu",lulu:"Lu",luna:["Lou","Lunie","Una","Lu"],
+  majestic:"Maj",mantis:"Manti",marcel:"Marc",marvellous:"Marv",
+  medea:"Med",megan:"Meg",melissa:"Mel",mercury:"Merc",
+  meteor:"Mete",milly:"Mil",mishka:"Mish",molly:"Mol",
+  moondust:"Moonie",moonglow:"Moonie",moonfall:"Moonie",moonrock:"Rock",
+  moonshadow:"Shadow",morfudd:"Mor",moxie:"Mox",muddle:"Mud",
+  munchkin:"Munch",nanuq:"Nan",neptune:"Nep",newton:"Newt",
+  nightfall:"Nighty",nightglow:"Nighty",nightshade:"Shade",nimble:"Nim",
+  nipper:"Nip",nugget:"Nugg",oliver:["Ollie","Olly","Oli","Liv"],omar:"Om",
+  opulent:"Op",orbit:"Orbit",orion:"Ori",pascal:"Pas",
+  patience:["Patty","Patsy","Tia","Pacey"],peabody:"Peabs",penry:"Pen",persephone:"Percy",
+  petite:"Petite",philibert:"Phil",phoebe:"Pheebs",phony:"Phon",
+  pierre:"Pete",pip:"Pip",pipsqueak:"Pip",pixie:"Pix",
+  plato:"Plato",plum:"Plum",prometheus:"Pro",puckle:"Puck",
+  pulsar:"Puls",pythagoras:"Pyth",qadir:"Qad",quasar:"Quas",
+  quentin:["Quent","Quin","Quinn","Quinny"],raoul:"Raoul",ramshackle:"Rammy",rené:"Ren",
+  reza:"Rez",rhea:"Rhea",rhiannon:["Rhi","Ria","Annie","Nonny"],richard:["Rich","Rick","Ricky","Dick"],
+  rosalind:["Rosa","Rosie","Roz","Lindy","Linda"],rowena:"Row",ruffles:"Ruff",sappho:"Saff",
+  sarah:"Sal",saturn:"Sat",scamp:"Scamp",scraggy:"Scragg",
+  scrumpy:"Scrump",selene:"Sel",seraphina:"Sera",sherman:"Sher",
+  sieglinde:"Siggy",sigrid:["Siggy","Rid","Sigi"],silvermoon:"Silver",sirius:"Sir",
+  skittles:"Skits",smidge:"Smidge",smidgeon:"Smidge",snippy:"Snip",
+  socrates:"Soc",sophia:["Sophie","Soph","Sofie","Phia"],speck:"Speck",sprocket:"Sproc",
+  starburst:"Burst",stardust:"Dusty",starfall:"Star",starshadow:"Shadow",
+  stella:"Stells",sunflare:"Sunny",sunspot:"Sunny",tabitha:"Tabby",
+  tallulah:"Lula",tangles:"Tang",tarkan:"Tark",teacup:"Cup",
+  temperance:["Tempy","Tempe","Tenny","Perrie"],tempest:"Temp",tempesta:"Temp",theodora:["Thea","Dora","Dory","Teddy","Theo"],
+  thistledown:"Thistle",thomasina:"Tommy",tigress:"Tiggy",titch:"Titch",
+  titchy:"Titchy",topsy:"Tops",tufty:"Tuft",tuppence:"Tup",
+  turbulence:"Turb",twilight:"Twi",umbra:"Umby",ursula:"Urs",
+  vega:"Vega",vela:"Vel",viper:"Vipe",vulcan:"Vulk",
+  waltz:"Waltzy",widget:"Widge",william:["Will","Willy","Bill","Billy","Liam"],wimpy:"Wimps",
+  wittgenstein:"Witty",wonton:"Won",wriggles:"Wrigg",xiao:"Xiao",
+  yuki:"Yuki",zen:"Zen",winston:["Win","Winnie","Sonny","Winty"],otto:"Ot",
+  bertie:"Bert",monty:"Monty",percy:"Perce",reggie:"Reg",
+  buster:"Bus",gruff:"Gruff",grunt:"Grunt",clive:"Clive",
+  boris:"Bo",derek:"Del",norman:"Norm",frank:"Frank",
+  dennis:"Den",stanley:["Stan","Stanny","Lee"],herbert:"Herb",ernest:"Ernie",
+  pudding:"Pudds",noodle:"Noods",wobble:"Wobs",roly:"Roly",
+  snorter:"Snort",louie:"Lou",lenny:"Len",lummox:"Lumps",
+  mooy:"Moo",mugsy:"Mugs",mochi:"Mo",miso:"Mis",
+  mongo:"Mo",tater:"Tate",tumble:"Tumbs",tiger:"Tige",
+  wumpus:"Wumps",wonky:"Wonks",fumble:"Fums",fizz:"Fizz",
+  homer:"Home",waldo:"Waldo",napoleon:"Naps",gus:"Gus",
+  alf:"Alf",phooey:"Phoo",philbert:"Phil",phreddy:"Fred",
+  phumble:"Phum",spot:"Spot",tutu:"Tutu",dizzy:"Dizzy",
+  wizzle:"Wizz",wibble:"Wibs",womble:"Womby",bumblebean:"Lulz",
+  tumblewick:"TumTum",gobblesnout:"Gobsnot",dafydd:"Daf",gruffudd:"Gruff",
+  llewelyn:"Llew",cadwaladr:"Cad",llywarch:"Llyw",meredydd:"Mered",
+  rhydderch:"Rhyd",gwynfor:"Gwynn",taliesin:"Tali",aneurin:"Nye",
+  caradog:"Crad",bleddyn:"Bled",gwilym:"Gwil",wmffre:"Wmff",
+  tecwyn:"Tech",elidyr:"Eli",gwyndaf:"Gwyn",moonbeam:"Moonie",
+  starbeam:"Starby",starlight:"Starry",moonlight:"Moony",shadowmoon:"Shadow",
+  darkstar:"Darky",moonwalker:"Moonwalk",starwalker:"Starwalk",voidwalker:"Void",
+  eventhorizon:"Horizon",supernova:"Nova",magnetar:"Mag",andromeda:"Romy",
+  celestia:"Celi",lunaris:"Luna",penumbra:"Penny",spogmai:"Spogi",
+  laleh:"Lali",mahsa:"Mahi",noura:"Nouri",lujain:"Lulu",
+  maysa:"Mays",zahra:"Zazi",farah:"Fari",sultan:"Sully",
+  nawab:"Nabs",zalmay:"Zal",
+
 };
 
-function getNickname(n: string): string { return NICKNAMES[n.toLowerCase().replace(/[^a-z]/g,"")] || ""; }
+function getNickname(n: string, seed = 0): string {
+  const val = NICKNAMES[n.toLowerCase().replace(/[^a-z]/g,"")];
+  if (!val) return "";
+  if (typeof val === "string") return val;
+  // Pick from array using seed so same name+seed always gives same nickname
+  // but different seeds (different rolls) give different nicknames
+  const idx = (seed + n.charCodeAt(0)) % val.length;
+  return val[idx];
+}
 
 function getGroup(breed: string): string {
   const b = breed.toLowerCase();
   if (b === "cavalier king charles spaniel") return "lapdog";
-  if (b === "welsh springer spaniel") return "welsh";
+  if (b === "welsh springer spaniel") return "spaniel";
   if (b.includes("spaniel")) return "spaniel";
   if (b.includes("retriever") || b === "labrador" || b === "labradoodle" || b === "goldendoodle") return "retriever";
   if (b === "border collie" || b === "rough collie") return "collie";
@@ -839,24 +1042,64 @@ function getGroup(breed: string): string {
   if (["mastiff","saint bernard","newfoundland","leonberger"].includes(b)) return "giant";
   if (b === "poodle") return "poodle";
   if (["bichon frise","shih tzu","pomeranian","papillon","maltese","maltipoo","cavapoo","cavachon"].includes(b)) return "lapdog";
+  if (b === "dalmatian") return "dalmatian";
   if (b === "dachshund") return "dachshund";
   if (["german shepherd","doberman pinscher","rottweiler","weimaraner"].includes(b)) return "german";
   if (b === "boston terrier") return "boston";
   if (["pug","chow chow","shar pei","shiba inu","akita","lhasa apso","tibetan mastiff","pekingese","japanese chin"].includes(b)) return "asian";
-  if (b === "corgi") return "welsh";
+  if (b === "corgi") return "corgi";
   if (["siberian husky","chihuahua"].includes(b)) return "character";
-  if (b === "welsh terrier") return "welsh";
+  if (b === "welsh terrier") return "terrier";
   if (b.includes("terrier") || b === "miniature schnauzer") return "terrier";
   return "default";
 }
 
+function getTraitGroup(breed: string): string[] {
+  const b = breed.toLowerCase();
+  const traits: string[] = [];
+  // fluffy
+  if (["poodle","bichon frise","pomeranian","maltese","maltipoo","cavachon",
+       "old english sheepdog","samoyed","cavapoo"].some(x => b.includes(x) || b === x)) traits.push("fluffy");
+  // speckled
+  if (["dalmatian","border collie","cocker spaniel"].some(x => b === x || b.includes(x))) traits.push("speckled");
+  // scruff
+  if (["lurcher","border terrier","jack russell","west highland","miniature schnauzer","jackapoo"].some(x => b.includes(x))) traits.push("scruff");
+  // hound
+  if (["basset hound","bloodhound","beagle","greyhound","whippet","afghan hound","irish wolfhound"].some(x => b.includes(x) || b === x)) traits.push("hound");
+  // zoom
+  if (["boxer","border collie","jack russell","greyhound","whippet","lurcher","italian greyhound",
+       "corgi","boston terrier"].some(x => b.includes(x) || b === x)) traits.push("zoom");
+  // longtail
+  if (["retriever","labrador","spaniel","setter","collie","labradoodle","goldendoodle"].some(x => b.includes(x) || b === x)) traits.push("longtail");
+  return traits;
+}
+
+// Names that dominate results -- excluded from passes 1-8, allowed only in final pass
+const DOMINANT_NAMES = new Set(["William","Booboo","Luna","Klaus","Ernst","Norman","Manfred","Gertrude","Ingeborg","Mayhem","Moonbeam","Flash","Miles","Megan","Maeve","Snugglebum","Venus","Neal","Mischief","Dash","Bolt","Max","Rex","Spot","Fido","Buddy","Bella","Molly","Shadow","Bruno","Lola","Sadie","Lucy","Sam","Zeus","Charlie","Cooper","Daisy","Bear","Astro","Apollo","Nova","Aurora","Cassiopeia","Atlas","Jupiter","Saturn","Cosmos","Comet","Orbit","Titan","Galileo","Kepler","Hubble","Neptune","Orion","Nebula","Sirius","Stardust","Midnight","Twilight","Starburst","Eclipse","Darkstar","Bloodmoon","Supernova","Andromeda","Artemis","Vega","Stella","Selene","Mercury","Pulsar","Quasar","Magnetar","Vulcan","Draco","Pluto","Meteor","Moonwalker","Moonshadow"]);
+
 function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed) % arr.length]; }
 
-function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "") {
+function generateScored(breed: string, surname: string, gender: "boy"|"girl", seed: number, town = "", colour: DogColour = "", excludeDominant = false, freeRange = false, allowBonus: Set<string> = new Set(), excludeFirstNames: Set<string> = new Set()) {
   const group = getGroup(breed);
-  const nameBank = (NAMES[group] || NAMES.default)[gender];
+  const rawNameBank = (NAMES[group] || NAMES.default)[gender];
+  // Passes 1-8 exclude dominant names to force variety from the long tail
+  const nameBank = excludeDominant
+    ? (rawNameBank.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name)).length >= 3
+        ? rawNameBank.filter((n: NameEntry) => !DOMINANT_NAMES.has(n.name))
+        : rawNameBank)
+    : rawNameBank;
   const titleBank = gender === "boy" ? (BOY_TITLES[group] || BOY_TITLES.default) : (GIRL_TITLES[group] || GIRL_TITLES.default);
-  const wordBank = DOG_WORDS[group] || DOG_WORDS.default;
+  const wordBank = (() => {
+    const base = DOG_WORDS[group] || DOG_WORDS.default;
+    const traits = getTraitGroup(breed);
+    const genderPool = gender === "girl" ? (DOG_WORDS.goodgirl || []) : (DOG_WORDS.goodboy || []);
+    const traitWords = traits.flatMap((t: string) => DOG_WORDS[t] || []);
+    const seen = new Set<string>();
+    return [...base, ...traitWords, ...genderPool].filter((w: {word:string,reg:string,firstLetter:string}) => {
+      if (seen.has(w.word)) return false;
+      seen.add(w.word); return true;
+    });
+  })();
   const reasoningBank = REASONING[group] || REASONING.default;
   const title = pick(titleBank, seed);
 
@@ -868,15 +1111,36 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const surnameFamily = soundFamily[surnameInitial] ?? surnameInitial;
 
   // Filter nameBank for names starting with surname initial or sound family
+  // excludeFirstNames: names already shown -- never repeat them
+  const freshBank = excludeFirstNames.size > 0
+    ? nameBank.filter((n: NameEntry) => !excludeFirstNames.has(n.name))
+    : nameBank;
+  const useFreshBank = freshBank.length >= 1 ? freshBank : nameBank; // use fresh if ANY available
+
+  // Three-tier name picking:
+  // Tier 1: alliterating names not yet seen (best -- alliteration + fresh)
+  // Tier 2: any name not yet seen (drop alliteration to avoid repeat)
+  // Tier 3: full bank (last resort -- all seen, allow repeat rather than crash)
+  const alliteratingFresh = useFreshBank.filter((n: NameEntry) =>
+    n.name[0].toUpperCase() === surnameInitial ||
+    (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
+  );
   const matchingNames = nameBank.filter((n: NameEntry) =>
     n.name[0].toUpperCase() === surnameInitial ||
     (soundFamily[n.name[0].toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  // Use matching names ~60% of passes (seeds divisible by 5 use random pick for variety)
-  const useMatchingName = matchingNames.length >= 2 && (seed % 5 !== 0);
-  const firstName = useMatchingName
-    ? matchingNames[(seed + 3) % matchingNames.length]
-    : pick(nameBank, seed + 3);
+
+  let firstName: NameEntry;
+  if (!freeRange && alliteratingFresh.length >= 1 && seed % 5 !== 0) {
+    // Tier 1: alliterating + not seen yet
+    firstName = alliteratingFresh[(seed + 3) % alliteratingFresh.length];
+  } else if (useFreshBank.length >= 2) {
+    // Tier 2: any fresh name (alliteration exhausted or freeRange pass)
+    firstName = useFreshBank[(seed + 3) % useFreshBank.length];
+  } else {
+    // Tier 3: use any name from fresh bank (should always have some)
+    firstName = pick(useFreshBank, seed + 3);
+  }
 
   // Filter wordBank for dog words starting with surname initial or sound family
   const matchingWords = wordBank.filter((w: WordEntry) =>
@@ -892,8 +1156,17 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
   const wordContrast = contrastScore(dogWordEntry.reg, firstName.reg);
   const noHyphenGroups = ["sniffer"];
   const useHyphen = !alreadyHyphenated && wordContrast >= 2 && !noHyphenGroups.includes(group);
-  const baseSurname = useHyphen ? `${dogWordEntry.word}-${surname}` : surname;
-  const effectiveSurname = town || baseSurname;
+  const compoundSuffixes = ["well","ford","by","ton","wick","worth","ley","son","man","sworth","berg","heim","mann","feld","dale","ington","sley","boy","girl","fast","foot","silver","stone","shaw","gate","worthy"];
+  const isCompound = dogWordEntry.word.length > 8 || compoundSuffixes.some((s: string) => dogWordEntry.word.toLowerCase().endsWith(s));
+  const _sn = surname.trim();
+  const baseSurname = !_sn
+    ? dogWordEntry.word
+    : (useHyphen && !isCompound)
+      ? `${dogWordEntry.word}-${_sn}`
+      : isCompound
+        ? `${dogWordEntry.word} ${_sn}`
+        : _sn;
+  const effectiveSurname = town || baseSurname || dogWordEntry.word;
   const group2 = getGroup(breed);
 
   const validAbbrevs = ABBREVS.filter((a: AbbrevEntry) =>
@@ -965,10 +1238,12 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
       full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
     }
-    // McFace nickname: first 3-4 chars of stem + za/zy
-    const mcStemRaw = mc1[0].toLowerCase(); // e.g. "lollopy"
-    const mcNickStem = mcStemRaw.length > 5 ? mcStemRaw.slice(0,4) : mcStemRaw.slice(0,3);
-    nickname = mcNickStem.charAt(0).toUpperCase() + mcNickStem.slice(1) + "za";
+    // McFace nickname: use the clean stem (mc1[1]) + za
+    // mc1[1] is already the stripped stem e.g. ["Chompy","Chomp"] -> "Chomp" -> "Chompza"
+    const mcNickStem = mc1[1];
+    // Strip trailing "le" or "e" before adding "za" so Wobble->Wobbza, Bounce->Bouncza
+    const mcNickBase = mcNickStem.replace(/le$/i,"").replace(/e$/i,"");
+    nickname = mcNickBase.charAt(0).toUpperCase() + mcNickBase.slice(1).toLowerCase() + "za";
   } else if (styleRoll === 7) {
     // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
     const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
@@ -988,8 +1263,8 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       Val:"Vally",Kay:"Kaykay",Di:"Didi",Mo:"Momo",Jo:"Jojo",
       Dot:"Dottie",Flo:"Florrie",Sue:"Suey",Jan:"Janny",Pam:"Pammy",
       Bev:"Bevvy",Bea:"Beabea",Fran:"Franny",Gail:"Gaily",Sal:"Sally",
-      Nan:"Nanny",Babs:"Babsy",Kim:"Kimmy",Lin:"Linny",May:"Maymay",
-    };
+      Nan:"Nanny",Babs:"Babsy",Kim:"Kimmy",Lin:"Linny",May:"Maymay"
+};
     nickname = sbNickMap[sbMid] || sbMid;
   } else {
     // Regional term override -- if town matches a region, use local endearment as first name
@@ -1001,63 +1276,135 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     if (regionalTerm && seed % 4 === 0) nickname = displayFirst;
     if (title.title === "Itsy") nickname = "Bitsy";
     if (title.title === "Hong Kong") nickname = "HK";
-    // Multi-word title → abbreviate title to initials, keep first name
-    if (title.title.includes(" ") && !nickname) {
-      const titleInitials = title.title.split(" ").map((w: string) => w[0]).join("");
-      nickname = `${titleInitials} ${firstName.name}`;
-    }
-    const tInit = title.title.replace(/^(Lil'|Ol'|Wee|Baby|Little|Daft|Cheeky|Silly|Scruffy|Fluffy|Grumpy|Noisy)\s/,"")[0]?.toUpperCase() || "";
-    const nInit = firstName.name[0]?.toUpperCase() || "";
-    const initials2 = tInit + nInit;
-    const matched = validAbbrevs.find((a: AbbrevEntry) => a.code === initials2);
-    if (matched) {
-      // Some abbreviations have gender-specific nicknames
-      // Itsy title gets Bitsy as nickname
-      if (matched.code === "DC" && gender === "girl") nickname = "Dixy";
-      else if (matched.code === "DC" && gender === "boy") nickname = "Dicky";
-      else nickname = matched.code;
-    } else {
-      const naturalNick = getNickname(firstName.name);
-      if (naturalNick) {
-        nickname = naturalNick;
-      } else {
-        const fn = firstName.name;
-        // If the first name is short enough, use it directly as the nickname
-        if (fn.length <= 4) {
-          nickname = fn;
+
+    if (!nickname) {
+      const fn = firstName.name;
+      const isWhimsy = /[A-Z][a-z]+(wick|bean|boots|chops|snout|paws|bum|face|nose|bonce|flap|pants)$/.test(fn) ||
+                       /^(Noo-Noo|Squishface|Smooshface|Snugglebum|Cuddlekins|Fluffybum|Puddingkins|Babbycakes|Tiddlywink)$/.test(fn);
+
+      // ── SOLUTION 2: ACCIDENTAL ACRONYM ────────────────────────────────────
+      // Title initial + First name initial → reads as something mundane/funny
+      // Never fire on whimsy compound names -- the comedy brief says if a name
+      // won't survive the Mate Test, it's a signal the name itself is weak
+      // For multi-word titles, use the LAST word's initial to avoid false matches
+      // "Grand Duchess" → D (Duchess), "The Right Honourable" → H (Honourable)
+      // Single-word titles use their own initial as normal
+      const cleanTitle = title.title.replace(/^(The |Lil'|Ol'|Wee|Baby|Little|Scruffy|Fluffy|Grumpy|Noisy)\s*/,"");
+      const titleWords = cleanTitle.trim().split(/\s+/);
+      const tI = (titleWords.length > 1 ? titleWords[titleWords.length - 1][0] : titleWords[0]?.[0] ?? "").toUpperCase();
+      const nI = fn[0]?.toUpperCase() ?? "";
+      const noAcronymTitles = new Set(["Mr","Mrs","Ms","Miss","Dr","Sir","Dame","Lord","Lady"]);
+
+      // ── ACRONYM WHITELIST ─────────────────────────────────────────────────────
+      // Rule: BOTH letters must be visibly in the name (title initial + first name initial)
+      // AND the combo must be genuinely culturally loaded -- people say it as a thing
+      const ACRONYM_PUNS_BOY: Record<string,string> = {
+        "DJ":"DJ",   "MC":"MC",   "LL":"LL",   "OG":"O.G.", "TT":"TT",
+        "JR":"J.R.", "JK":"J.K.", "DC":"D.C.", "CJ":"C.J.", "AK":"A.K.",
+        "CV":"C.V.", "GB":"G.B.", "MP":"M.P.", "GP":"G.P.", "PC":"P.C.",
+        "VC":"V.C.", "PG":"P.G.", "NW":"N.W.", "HM":"H.M.", "BP":"B.P.",
+        "BR":"B.R.", "BC":"B.C.", "FC":"F.C.", "MK":"M.K.",
+      };
+// Girl acronym puns -- queen/boss/diva energy, nothing male-coded
+const ACRONYM_PUNS_GIRL: Record<string,string> = {
+        "BQ":"B.Q.", // Boss Queen
+        "HQ":"H.Q.", // Her Queenness
+        "QC":"Q.C.", // Queen Commander
+        "QG":"Q.G.", // Queen Goddess
+        "QR":"Q.R.", // Queen Regent
+        "QB":"Q.B.", // Queen Boss
+        "QM":"Q.M.", // Queen Magnificent
+        "GQ":"G.Q.", // Goddess Queen
+        "GG":"G.G.", // Grand Goddess
+        "DQ":"D.Q.", // Drama Queen
+        "HH":"H.H.", // Her Highness
+        "LL":"LL",   // Lady Louise/Lavinia
+        "LD":"L.D.", // Lady Divine
+        "LB":"L.B.", // Lady Boss
+        "LG":"L.G.", // Lady Gorgeous
+        "DB":"D.B.", // Duchess Boss
+        "DG":"D.G.", // Duchess Gorgeous
+        "DL":"D.L.", // Duchess Lovely
+        "EB":"E.B.", // Empress Boss
+        "EG":"E.G.", // Empress Gorgeous
+        "EL":"E.L.", // Empress Lovely
+        "PR":"P.R.", // Princess Royal
+        "PB":"P.B.", // Princess Boss
+        "PG":"P.G.", // Princess Gorgeous
+        "RQ":"R.Q.", // Royal Queen
+        "CB":"C.B.", // Crown Boss
+        "CG":"C.G.", // Crown Gorgeous
+        "DC":"D.C.", // Divine Commander
+        "DJ":"DJ",   // Duchess/Divine Jackie
+        "MC":"MC",   // Magnificent/Majestic Clara
+        "NQ":"N.Q.", // Notable Queen
+      };
+const ACRONYM_PUNS: Record<string,string> = {...ACRONYM_PUNS_BOY, ...ACRONYM_PUNS_GIRL};
+
+
+      // Hard rule: acronym only fires if BOTH letters appear in the full name
+      // tI = title initial, nI = first name initial -- both must be present
+      // (they always will be since full = title + firstName + ..., so this is
+      // really a sanity check against edge cases)
+
+      // Special cases first
+      // 4G: only fires when ALL FOUR elements start with G -- General + G-name + G-word + G-surname
+      const dogWordInitial = dogWordEntry?.word?.[0]?.toUpperCase() ?? "";
+      const surnameInitialForNick = surname.replace(/-.*/, "")[0]?.toUpperCase() ?? "";
+      if (title.title === "General" && nI === "G" && dogWordInitial === "G" && surnameInitialForNick === "G") {
+        nickname = "4G";
+      } else if (title.title === "Doctor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
+        nickname = `Dr ${nI}`;
+      } else if (title.title === "Professor" && firstName.syllables >= 2 && !getNickname(fn) && !isWhimsy) {
+        nickname = `Prof ${nI}`;
+      } else if (!noAcronymTitles.has(title.title) && tI && nI && (gender === "girl" ? ACRONYM_PUNS_GIRL : ACRONYM_PUNS_BOY)[tI + nI] && !isWhimsy) {
+        // Only fire if:
+        // 1. First name is real (not whimsy compound)
+        // 2. Both letters are genuinely in the name -- hard fail if either is missing
+        const isRealish = firstName.reg === "mundane" || firstName.reg === "grand" || firstName.reg === "nature";
+        const nameContainsBothLetters = full.toUpperCase().includes(tI) && full.toUpperCase().includes(nI);
+        if (isRealish && nameContainsBothLetters) nickname = (gender === "girl" ? ACRONYM_PUNS_GIRL : ACRONYM_PUNS_BOY)[tI + nI];
+      }
+
+      // ── SOLUTION 1: MATE TEST ─────────────────────────────────────────────
+      // Fallback -- ignore title, ignore dog-word, ignore surname entirely
+      // Take the first name. Shorten the way a British mate would.
+      // If it's a whimsy compound with no real shortening, just use the name.
+      if (!nickname) {
+        const naturalNick = getNickname(fn);
+        if (naturalNick) {
+          nickname = naturalNick;   // Trevor→Trev, Dorothy→Dot, Basil→Baz
         } else {
-          // Try acronym -- only if pronounceable, different from name, not a known abbreviation
-          const acronym = full.split(" ").filter(w => /^[A-Za-z]/.test(w)).map(w => w[0]).join("").toUpperCase();
-          const vowelRatio = (acronym.match(/[AEIOU]/g) || []).length / Math.max(acronym.length, 1);
-          const acronymIsName = fn.toUpperCase().startsWith(acronym);
-          // Block acronyms that match well-known UK/common abbreviations
-          const blockedAcronyms = new Set(["JSA","ESA","PIP","DLA","NHS","BBC","ITV","VAT","DWP","MOT","MP","PM","GP","PC","DC","FC","AFC","CID","RAC","AA","RAC","HMRC","DVLA","DSS","CSA","ASBO","GCSE","BTEC"]);
-          if (acronym.length >= 2 && acronym.length <= 4 && vowelRatio >= 0.25 && !acronymIsName && !blockedAcronyms.has(acronym)) {
-            nickname = acronym;
+          // For whimsy names: strip the compound suffix and use the stem
+          if (isWhimsy) {
+            const stem = fn.replace(/(wick|bean|boots|chops|snout|paws|bum|face|flap|pants)$/i,"").trim();
+            nickname = stem.length >= 3 ? stem : fn;
           } else {
-            // Shorten first name -- first 3-4 chars + s
-            const stem = fn.length > 6 ? fn.slice(0, 4) : fn.slice(0, 3);
-            nickname = (stem + "s").replace(/ss$/,"s").replace(/([aeiou])s$/i,"$1s");
-            nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+            nickname = fn;          // short real name stands alone: Dot, Rex, Gus, Pip
           }
         }
       }
     }
   }
 
-  // Fallback nickname -- always have one
+  // ── Universal nickname fallback -- fires for ALL styleRolls ─────────────────
+  // Any path that left nickname as "" gets the first name as a minimum
   if (!nickname) {
-    const firstNameStr = firstName.name;
-    // Try contracting to first syllable + y/ie
-    const vowelMatch = firstNameStr.match(/^([^aeiou]*[aeiou]+[^aeiou]*)/i);
-    if (vowelMatch && vowelMatch[1].length < firstNameStr.length) {
-      const stem = vowelMatch[1];
-      nickname = stem.length <= 3 ? stem + "y" : stem.slice(0, 4);
-      nickname = nickname.charAt(0).toUpperCase() + nickname.slice(1).toLowerCase();
+    const tableNick = getNickname(firstName.name, seed);
+    if (tableNick) {
+      nickname = tableNick;
     } else {
-      nickname = firstNameStr.slice(0, 3);
+      // Whimsy compound -- strip suffix, use stem
+      const isWhimsy2 = /[A-Z][a-z]+(wick|bean|boots|chops|snout|paws|bum|face|nose|bonce|flap|pants)$/.test(firstName.name);
+      if (isWhimsy2) {
+        const stem = firstName.name.replace(/(wick|bean|boots|chops|snout|paws|bum|face|flap|pants)$/i,"").trim();
+        nickname = stem.length >= 3 ? stem : firstName.name;
+      } else {
+        nickname = firstName.name;  // bare first name -- always valid
+      }
     }
   }
+
   const reasoning = pick(reasoningBank, seed + 11);
   const score = scoreName(title, firstName, dogWordEntry, surname, colour);
 
@@ -1076,7 +1423,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const bareScore = scoreName(noTitle, firstName, dogWordEntry, surname, colour);
     if (bareScore > score) {
       // Bare name scores better -- use it
-      const bareNick = getNickname(firstName.name) || nickname;
+      const bareNick = getNickname(firstName.name, seed) || nickname;
       return { full: bareFull, nickname: bareNick, reasoning, score: bareScore };
     }
   }
@@ -1123,7 +1470,7 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
 
 
 const WHIMSY: Record<string, string[]> = {
-  B: ["Boffle", "Boffleboots", "Bofflewick", "Boogles", "Boondoggle", "Bumbershoot", "Bumblebean", "Bumbleboots", "Bumblebop", "Bumblebottom", "Bumblechops", "Bumblekins", "Bumblepaws", "Bumblepuff", "Bumblesnack", "Bumblesnout", "Bumblewhisk", "Bumblewick", "Bumblewink", "Bunglebean", "Bungleboots", "Bunglechops", "Bunglepaws", "Bunglepuff", "Bunglewink"],
+  B: ["Boffle", "Boffleboots", "Bofflewick", "Boogles", "Boondoggle", "Bumblebean", "Bumbleboots", "Bumblebop", "Bumblebottom", "Bumblechops", "Bumblekins", "Bumblepaws", "Bumblepuff", "Bumblesnack", "Bumblesnout", "Bumblewhisk", "Bumblewick", "Bumblewink", "Bunglebean", "Bungleboots", "Bunglechops", "Bunglepaws", "Bunglepuff", "Bunglewink"],
   C: ["Crankle", "Cranklebean", "Cranklesnout", "Cranklewhisk", "Crankypants", "Crinklebean", "Crinkleboots", "Crinklechops", "Crinklepaws", "Crinklepot", "Crinklepuff", "Crinklewhisk", "Crinklewink", "Crumbkins", "Crumblepaws", "Crumblewick", "Crumbly", "Crumblypaws", "Crumbsnout", "Crumpadoodle", "Crumpaloo", "Crumpetboots", "Crumpetchops", "Crumpetface", "Crumpetpuff", "Crumpetwhisk", "Crumpetwink", "Crumpkin", "Crumpypaws", "Crumpypuff", "Crumpysnout"],
   D: ["Dinglebean", "Dingleberry", "Dingleboots", "Dinglechops", "Dinglepaws", "Dinglepuff", "Dinglewhisk", "Dinglewick", "Dinglewink", "Doodlebean", "Doodleberry", "Doodleboots", "Doodlebug", "Doodlechops", "Doodlepaws", "Doodleplop", "Doodlepuff", "Doodlewhisk", "Doodlewick", "Doodlewink"],
   F: ["Fidgetbean", "Fidgetwick", "Fizzlebean", "Fizzlebiscuit", "Fizzleboots", "Fizzlebop", "Fizzlebump", "Fizzlechops", "Fizzlenose", "Fizzlepaws", "Fizzlepuff", "Fizzlewhisk", "Fizzlewink", "Fizzwick", "Flapdoodle", "Flapjack", "Flibbert", "Flopsydoo", "Fluffernugget", "Fumblebean", "Fumbleboots", "Fumblebum", "Fumblechops", "Fumblepaws", "Fumblepuff", "Fumblewhisk", "Fumblewick", "Fumblewink", "Fuzzlebean", "Fuzzleboots", "Fuzzlebug", "Fuzzlechops", "Fuzzlenoodle", "Fuzzlepaws", "Fuzzlepuff", "Fuzzleton", "Fuzzlewhisk", "Fuzzlewink", "Fuzzleworth"],
@@ -1136,7 +1483,7 @@ const WHIMSY: Record<string, string[]> = {
   R: ["Razzlebean", "Razzleboots", "Razzlechops", "Razzledazzle", "Razzlepaws", "Razzlepuff", "Razzlesnout", "Razzlewhisk", "Razzlewick", "Razzlewink", "Rumblebean", "Rumbleboots", "Rumblechops", "Rumblekins", "Rumblepaws", "Rumblepuff", "Rumblewhisk", "Rumblewink"],
   S: ["Scramblebean", "Scramblefoot", "Scritchyboo", "Scrufflebump", "Scrumble", "Scrumbleboots", "Scrumblepaws", "Scrumblewick", "Scrungle", "Skedoodle", "Snaffle", "Snazzle", "Snazzlebean", "Snazzleboots", "Snazzlechops", "Snazzlepaws", "Snazzlepuff", "Snazzlewhisk", "Snazzlewink", "Snickerbean", "Snickerboots", "Snickerchops", "Snickerpaws", "Snickerpuff", "Snickerwhisk", "Snickerwick", "Snickerwink", "Snorklebean", "Snortbucket", "Snortle", "Snortleberry", "Snortleboots", "Snortlepuff", "Snortlewick", "Snufflebean", "Snuffleboots", "Snufflechops", "Snufflepaws", "Snufflepot", "Snufflepuff", "Snufflewhisk", "Snufflewink", "Snuzzle", "Sprocketbean", "Sproing", "Squabblepaws", "Squibble", "Squibblebean", "Squibbleboots", "Squibblechops", "Squibblepaws", "Squibblepuff", "Squibblewhisk", "Squibblewink", "Squigglebean", "Squigglesnack", "Squiggleton", "Squigglewick"],
   T: ["Taterbean", "Taterboots", "Taterbug", "Taterchops", "Taterpaws", "Taterpuff", "Taterwhisk", "Taterwink", "Ticklewick", "Tizzy", "Tizzytoes", "Toodlebean", "Toodleboots", "Toodlebug", "Toodlechops", "Toodlepaws", "Toodlepop", "Toodlepuff", "Toodlewhisk", "Toodlewink", "Tootlesnout", "Tootlewick", "Tumblebean", "Tumbleboots", "Tumblechops", "Tumblepaws", "Tumblepuff", "Tumblewhisk", "Tumblewick", "Tumblewink"],
-  W: ["Waffleton", "Wafflewhisk", "Waggledorf", "Wagglenose", "Wagglesnack", "Wagglesnort", "Wagglesworth", "Wagglybean", "Wagglyboots", "Wagglychops", "Wagglypaws", "Wagglypuff", "Wagglywhisk", "Wagglywink", "Wibbleton", "Wibblewobble", "Wobblebean", "Wobbleboots", "Wobblebug", "Wobblechops", "Wobblekins", "Wobblepaws", "Wobblepot", "Wobblepuff", "Wobblewhisk", "Wobblewick", "Wobblewink", "Womble", "Womblepaws", "Wompadoodle", "Wompington", "Wompus", "Wompusbean", "Wompusboots", "Wompuschops", "Wompuspuff", "Wompuswhisk", "Wompuswink"],
+  W: ["Waffleton", "Wafflewhisk", "Waggledorf", "Wagglenose", "Wagglesnack", "Wagglesnort", "Wagglesworth", "Wagglybean", "Wagglyboots", "Wagglychops", "Wagglypaws", "Wagglypuff", "Wagglywhisk", "Wagglywink", "Wibbleton", "Wibblewobble", "Wobblebean", "Wobbleboots", "Wobblebug", "Wobblechops", "Wobblekins", "Wobblepaws", "Wobblepot", "Wobblepuff", "Wobblewhisk", "Wobblewick", "Wobblewink", "Womble", "Womblepaws", "Wompadoodle", "Wompington", "Wompus", "Wompusbean", "Wompusboots", "Wompuschops", "Wompuspuff", "Wompuswhisk", "Wompuswink"]
 };
 
 
@@ -1152,8 +1499,7 @@ const WHIMSY_RULES: { pattern: RegExp; groups: string[] }[] = [
   // Berry/plop -- character/lapdog only
   { pattern: /(berry$|plop$)/i, groups: ["character","lapdog","terrier"] },
   // Kins -- lapdog only, too cutesy
-  { pattern: /kins$/i, groups: ["lapdog","character"] },
-];
+  { pattern: /kins$/i, groups: ["lapdog","character"] }];
 
 function whimsyAllowed(word: string, group: string): boolean {
   for (const rule of WHIMSY_RULES) {
@@ -1163,37 +1509,41 @@ function whimsyAllowed(word: string, group: string): boolean {
 }
 
 const MCFACE_POOL: Record<string, [string, string][]> = {
-  sniffer:    [["Sniffy","Sniff"],["Droopy","Droop"],["Slobbery","Slobber"],["Lollopy","Lollop"],["Nosey","Nose"],["Tracky","Track"],["Houndy","Hound"],["Questy","Quest"]],
-  retriever:  [["Chompy","Chomp"],["Slobbery","Slobber"],["Waggy","Wag"],["Fetchy","Fetch"],["Munchy","Munch"],["Gobby","Gob"],["Licky","Lick"],["Biscuity","Biscuit"]],
-  terrier:    [["Diggy","Dig"],["Scratchy","Scratch"],["Nippy","Nip"],["Yappy","Yap"],["Scrappy","Scrap"],["Bolty","Bolt"],["Ratty","Rat"],["Snappy","Snap"],["Zippy","Zip"]],
-  boxer:      [["Snorty","Snort"],["Wobbly","Wobble"],["Boingy","Boing"],["Bumpy","Bump"],["Clumsy","Clums"],["Galumphy","Galumph"],["Blundery","Blunder"],["Crashy","Crash"]],
-  character:  [["Snorty","Snort"],["Wheezy","Wheeze"],["Puffy","Puff"],["Grumbly","Grumble"],["Waddly","Waddle"],["Squashy","Squash"],["Squishy","Squish"],["Wriggly","Wriggle"]],
-  lapdog:     [["Fluffy","Fluff"],["Bouncy","Bounce"],["Prancy","Prance"],["Squashy","Squash"],["Flouncy","Flounce"],["Shimmery","Shimmer"],["Pampery","Pamper"],["Glittery","Glitter"]],
-  collie:     [["Herdy","Herd"],["Zippy","Zip"],["Circly","Circle"],["Darty","Dart"],["Sprinty","Sprint"],["Frenzy","Frenz"],["Intense","Intens"],["Obsessy","Obsess"]],
-  poodle:     [["Prancy","Prance"],["Strutty","Strutt"],["Swishy","Swish"],["Mincy","Mince"],["Posy","Pose"],["Primy","Prim"],["Flouncy","Flounce"],["Curly","Curl"]],
-  sighthound: [["Speedy","Speed"],["Slinky","Slink"],["Swoopy","Swoop"],["Darty","Dart"],["Flashy","Flash"],["Gleamy","Gleam"],["Streaky","Streak"],["Racy","Race"]],
-  dachshund:  [["Stretchy","Stretch"],["Wiggly","Wiggle"],["Wormy","Worm"],["Scuttly","Scuttle"],["Squeezy","Squeeze"],["Wriggly","Wriggle"],["Stubby","Stubb"],["Squirmy","Squirm"]],
-  giant:      [["Massive","Massive"],["Stompy","Stomp"],["Loomy","Loom"],["Thumpy","Thump"],["Rumbly","Rumble"],["Lumpy","Lump"],["Shakey","Shake"],["Swavy","Sway"]],
-  greatdane:  [["Cosmic","Cosmic"],["Starry","Star"],["Massive","Massive"],["Orbital","Orbit"],["Stompy","Stomp"],["Galactic","Galactic"],["Loomy","Loom"],["Thumpy","Thump"]],
-  spaniel:    [["Splashy","Splash"],["Waggy","Wag"],["Fetchy","Fetch"],["Frolicky","Frolic"],["Scampy","Scamp"],["Bouncy","Bounce"],["Gamby","Gamb"],["Rompy","Romp"]],
-  german:     [["Patrolly","Patrol"],["Marcy","Marc"],["Drilley","Drill"],["Guardy","Guard"],["Securey","Secure"],["Breachy","Breach"],["Flanky","Flank"],["Strict","Strict"]],
-  asian:      [["Snorty","Snort"],["Waddly","Waddle"],["Grumbly","Grumble"],["Wheezy","Wheeze"],["Squishy","Squish"],["Puffy","Puff"],["Stumply","Stumpl"],["Rolly","Roll"]],
-  boston:     [["Strutty","Strutt"],["Hustly","Hustle"],["Scrappy","Scrap"],["Dodgy","Dodge"],["Rattly","Rattle"],["Jazzy","Jazz"],["Marcy","Marc"],["Blusty","Blust"]],
-  afghan:     [["Flowy","Flow"],["Swooshy","Swoosh"],["Glidy","Glide"],["Aloofy","Aloof"],["Drifty","Drift"],["Surgy","Surge"],["Sweepy","Sweep"],["Soary","Soar"]],
-  bulldog:    [["Grumbly","Grumble"],["Snorty","Snort"],["Wobbly","Wobble"],["Jowly","Jowl"],["Stuffy","Stuff"],["Rolly","Roll"],["Blustey","Blust"],["Squashy","Squash"]],
-  default:    [["Trotty","Trot"],["Wandy","Wand"],["Prowly","Prowl"],["Lopy","Lop"],["Slinky","Slink"],["Stalky","Stalk"],["Sauntry","Sauntr"],["Canty","Cant"]],
+  sniffer:    [["Droopy","Droop"],["Drooly","Drool"],["Nosey","Nose"],["Tracky","Track"],["Houndy","Hound"]],
+  retriever:  [["Chompy","Chomp"],["Waggy","Wag"],["Gobby","Gob"]],
+  terrier:    [["Scratchy","Scratch"],["Nippy","Nip"],["Scrappy","Scrap"],["Bolty","Bolt"],["Ratty","Rat"],["Snappy","Snap"],["Zippy","Zip"]],
+  boxer:      [["Snorty","Snort"],["Wobbly","Wobble"],["Boingy","Boing"],["Bumpy","Bump"]],
+  character:  [["Snorty","Snort"],["Puffy","Puff"],["Grumbly","Grumble"],["Waddly","Waddle"],["Squishy","Squish"]],
+  lapdog:     [["Fluffy","Fluff"],["Boingy","Boing"],["Prancy","Pranc"],["Shimmery","Shimmer"],["Glittery","Glitter"]],
+  collie:     [["Herdy","Herd"],["Zippy","Zip"],["Darty","Dart"],["Sprinty","Sprint"]],
+  poodle:     [["Prancy","Prance"],["Swishy","Swish"],["Curly","Curl"]],
+  sighthound: [["Speedy","Speed"],["Swoopy","Swoop"],["Swoopy","Swoop"],["Darty","Dart"],["Flashy","Flash"],["Gleamy","Gleam"],["Streaky","Streak"]],
+  dachshund:  [["Wiggly","Wiggle"],["Stubby","Stubb"]],
+  giant:      [["Stompy","Stomp"],["Thumpy","Thump"],["Shakey","Shake"],["Swavy","Sway"]],
+  greatdane:  [["Starry","Star"],["Stompy","Stomp"],["Thumpy","Thump"]],
+  spaniel:    [["Splashy","Splash"],["Waggy","Wag"],["Fetchy","Fetch"],["Frolicky","Frolic"],["Scampy","Scamp"],["Bouncy","Bounce"]],
+  german:     [["Strict","Stric"]],
+  asian:      [["Snorty","Snort"],["Waddly","Waddle"],["Grumbly","Grumble"],["Squishy","Squish"],["Puffy","Puff"],["Rolly","Roll"]],
+  boston:     [["Strutty","Strutt"],["Scrappy","Scrap"],["Dodgy","Dodge"]],
+  afghan:     [["Flowy","Flow"],["Swooshy","Swoosh"]],
+  bulldog:    [["Grumbly","Grumble"],["Wobbly","Wobble"],["Jowly","Jowl"],["Rolly","Roll"]],
+  sheepdog:    [["Fluffy","Fluff"],["Shaggy","Shagg"],["Wobbly","Wobble"],["Lumbery","Lumber"],["Dozy","Doz"],["Floopy","Floop"],["Poofy","Poof"]],
+  dalmatian:   [["Spotty","Spot"],["Dotty","Dot"],["Dashing","Dash"],["Flashy","Flash"],["Streaky","Streak"],["Patchy","Patch"],["Blinky","Blink"],["Freckly","Freck"]],
+  labradoodle: [["Bouncy","Bounce"],["Waggy","Wag"],["Fluffy","Fluff"],["Curly","Curl"],["Floppy","Flop"],["Splashy","Splash"],["Wiggly","Wiggle"],["Noodly","Noodl"]],
+  corgi:       [["Waddy","Wadd"],["Stumpy","Stump"],["Bossy","Boss"],["Trotty","Trot"],["Nippy","Nip"],["Herdy","Herd"]],
+  default:    [["Chompy","Chomp"],["Scrappy","Scrap"],["Waggy","Wag"],["Snappy","Snap"],["Bouncy","Bounce"],["Zippy","Zip"],["Nosy","Nose"]]
 };
 
 const SPONGEBOB_ADJ1: Record<string, string[]> = {
-  sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Saggy","Lollopy","Nosey","Wrinkly"],
+  sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Lollypop","Nosey","Wrinkly","Jowly"],
   retriever:  ["Slobby","Chompy","Waggy","Fluffy","Moppy","Scruffy","Soggy","Hungry"],
   terrier:    ["Scratchy","Nippy","Yappy","Scruffy","Wiry","Zippy","Grubby","Bolty"],
-  boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Galumphy","Boingy","Crashy"],
+  boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Boingy","Crashy"],
   character:  ["Snorty","Squashy","Puffy","Grumbly","Waddly","Squinty","Wrinkly","Squishy"],
   lapdog:     ["Fluffy","Prancy","Bouncy","Squashy","Flouncy","Glittery","Twinkly","Sparkly"],
   collie:     ["Zippy","Herdy","Frenzy","Darty","Sprinty","Circly","Intense","Obsessy"],
   poodle:     ["Prancy","Strutty","Swishy","Mincy","Curly","Fluffy","Posy","Primy"],
-  sighthound: ["Speedy","Slinky","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy"],
+  sighthound: ["Speedy","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy"],
   dachshund:  ["Stretchy","Wiggly","Wormy","Scuttly","Squeezy","Stubby","Waggy","Longey"],
   giant:      ["Massive","Stompy","Loomy","Lumpy","Rumbly","Thumpy","Shakey","Swavy"],
   greatdane:  ["Cosmic","Starry","Massive","Orbital","Stompy","Galactic","Loomy","Thumpy"],
@@ -1203,19 +1553,23 @@ const SPONGEBOB_ADJ1: Record<string, string[]> = {
   boston:     ["Strutty","Hustly","Scrappy","Dodgy","Rattly","Jazzy","Marcey","Blusty"],
   afghan:     ["Flowy","Swooshy","Glidy","Aloofy","Drifty","Surgy","Swoopy","Sweepy"],
   bulldog:    ["Grumbly","Snorty","Wobbly","Jowly","Stuffy","Rolly","Squashy","Blusty"],
-  default:    ["Trotty","Wandy","Prowly","Lopy","Slinky","Stalky","Canty","Sauntry"],
+  sheepdog:    ["Fluffy","Shaggy","Wobbly","Bumbling","Lumbery","Shuffly","Dozy","Floopy","Poofy","Drifty"],
+  dalmatian:    ["Spotty","Dotty","Dashing","Flashy","Streaky","Zippy","Patchy","Speedy","Blinky","Freckly"],
+  labradoodle:    ["Bouncy","Waggy","Fluffy","Scruffy","Curly","Floppy","Splashy","Wiggly","Noodly","Gambolly"],
+  corgi:    ["Waddy","Stumpy","Bossy","Trotty","Nippy","Patrolly","Scurry","Shuffly","Perky","Herdy"],
+  default:    ["Trotty","Wandy","Prowly","Lopy","Stalky","Canter","Sauntry"]
 };
 
 const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
 const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Nan","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
-const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Flaps","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Whiskers","Flops"];
+const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Flops"];
 
 const MCFACE_SUFFIX: Record<string, string[]> = {
-  sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", "flaps"],
+  sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", "sniff"],
   retriever: ["chops", "tum", "bonce", "chomps", "jowls", "paws", "bum", "tail"],
-  terrier: ["butt", "chops", "bonce", "snoot", "paws", "tail", "whiskers", "ears"],
-  boxer: ["snout", "jowls", "chops", "bonce", "butt", "tum", "flaps", "face"],
-  character: ["snout", "jowls", "butt", "bonce", "chops", "face", "tum", "flaps"],
+  terrier: ["butt", "chops", "bonce", "snoot", "paws", "tail", "ears"],
+  boxer: ["snout", "jowls", "chops", "bonce", "butt", "tum", "snort", "face"],
+  character: ["snout", "jowls", "butt", "bonce", "chops", "face", "tum", "belly"],
   lapdog: ["bum", "bonce", "face", "paws", "ears", "tail", "chops", "snoot"],
   collie: ["paws", "tail", "bonce", "butt", "chops", "ears", "face", "snoot"],
   poodle: ["bonce", "face", "snoot", "paws", "chops", "tail", "bum", "ears"],
@@ -1223,13 +1577,13 @@ const MCFACE_SUFFIX: Record<string, string[]> = {
   dachshund: ["bum", "butt", "tail", "bonce", "tum", "chops", "face", "snoot"],
   giant: ["bonce", "butt", "tum", "jowls", "chops", "paws", "face", "snout"],
   greatdane: ["bonce", "butt", "paws", "tail", "face", "chops", "snoot", "tum"],
-  spaniel: ["ears", "flaps", "paws", "tail", "bonce", "chops", "face", "snoot"],
+  spaniel: ["ears", "paws", "tail", "bonce", "chops", "face", "snoot", "belly"],
   german: ["bonce", "paws", "tail", "face", "chops", "butt", "snoot", "ears"],
-  asian: ["snout", "jowls", "tum", "bonce", "chops", "butt", "face", "flaps"],
+  asian: ["snout", "jowls", "tum", "bonce", "chops", "butt", "face", "snort"],
   boston: ["bonce", "butt", "chops", "face", "snoot", "ears", "paws", "tail"],
   afghan: ["tail", "bonce", "face", "paws", "snoot", "butt", "ears", "chops"],
-  bulldog: ["jowls", "snout", "chops", "tum", "bonce", "butt", "face", "flaps"],
-  default: ["bonce", "butt", "face", "chops", "paws", "tail", "snoot", "bum"],
+  bulldog: ["jowls", "snout", "chops", "tum", "bonce", "butt", "face", "belly"],
+  default: ["bonce", "butt", "face", "chops", "paws", "tail", "snoot", "bum"]
 };
 
 const MCFACE_PREFIX_BOY: string[]  = ["Mc","Mc","Mc","Mac","Mac","O'","O'","Fitz","Fitz","De","Von","Van","Le","Ap","Dal","Di"];
@@ -1278,31 +1632,31 @@ const REGIONAL_TOWNS: Record<string, string> = {
   "glasgow":"scotland","edinburgh":"scotland","aberdeen":"scotland",
   "dundee":"scotland","inverness":"scotland","stirling":"scotland",
   "perth":"scotland","falkirk":"scotland","kilmarnock":"scotland",
-  "paisley":"scotland","motherwell":"scotland","hamilton":"scotland",
+  "paisley":"scotland","motherwell":"scotland","hamilton":"scotland"
 };
 
 // Regional term pools -- these become first names or nicknames
 const REGIONAL_TERMS: Record<string, string[]> = {
-  brum: ["Bab","Babby","Babs","OurKid","ArKid","MeBab","Duck","Cock","Cocker","OldCock","Chick","Chucky","Mucker"],
+  brum: ["Bab","Babby","Babs","OurKid","ArKid","MeBab","Duck","Cock","Cocker","OldBean","Chick","Chucky","Mucker"],
   eastmids: ["Duck","Ducky","Duckie","MeDuck","MyDuck","Love","Luv","Bab","Youth","MeYouth"],
-  yorks: ["Love","Luv","Cock","Cocker","OldCock","Lad","Lass","Duck","Pet","Flower","Pal","Kidda"],
+  yorks: ["Love","Luv","Cock","Cocker","OldBean","Lad","Lass","Duck","Pet","Flower","Pal","Kidda"],
   nw: ["Chuck","Chucky","Chuckie","Love","Luv","OurKid","Kidda","Cock","Cocker","Mate","Pal","Mucker","Lad","Lass","Flower","Petal"],
   northeast: ["Pet","Petal","Hinny","Flower","Marra","Love","Luv","BonnyLad","BonnyLass","Lad","Lass","Bairn","Littleun","Youngblood"],
   westcountry: ["Lover","MyLover","MeLover","MyLovely","MeLovely","MyHandsome","MeHandsome","MyBeauty","Love","Luv","Darling","Maid","MyMaid"],
   london: ["Treacle","Sweetheart","Darling","Dear","Love","Luv","Lovely","Babe","Babes","Doll","Dollface","Poppet","Petal","Flower","Guv","Sonny"],
-  scotland: ["Hen","WeeHen","Pal","WeePal","Doll","Dollie","Dearie","Love","WeeMan","WeeLass","Lassie","Laddie","Bairn","WeeYin","Bonny"],
+  scotland: ["Hen","WeeHen","Pal","WeePal","Doll","Dollie","Dearie","Love","WeeMan","WeeLass","Lassie","Laddie","Bairn","WeeYin","Bonny"]
 };
 
 // Display form of compound terms (stored without spaces, displayed with)
 const REGIONAL_DISPLAY: Record<string, string> = {
-  OurKid:"Our Kid",ArKid:"Ar Kid",MeBab:"Me Bab",OldCock:"Old Cock",
+  OurKid:"Our Kid",ArKid:"Ar Kid",MeBab:"Me Bab",OldBean:"Old Bean",
   MeDuck:"Me Duck",MyDuck:"My Duck",MeYouth:"Me Youth",
   BonnyLad:"Bonny Lad",BonnyLass:"Bonny Lass",Littleun:"Little'un",
   Youngblood:"Young'un",MyLover:"My Lover",MeLover:"Me Lover",
   MyLovely:"My Lovely",MeLovely:"Me Lovely",MyHandsome:"My Handsome",
   MeHandsome:"Me Handsome",MyBeauty:"My Beauty",MyMaid:"My Maid",
   WeeHen:"Wee Hen",WeePal:"Wee Pal",WeeMan:"Wee Man",WeeLass:"Wee Lass",
-  WeeYin:"Wee Yin",Dollie:"Dollie",Dearie:"Dearie",Dollface:"Dollface",
+  WeeYin:"Wee Yin",Dollie:"Dollie",Dearie:"Dearie",Dollface:"Dollface"
 };
 
 function getRegionalTerm(town: string, seed: number, gender: "boy"|"girl"): string | null {
@@ -1313,7 +1667,7 @@ function getRegionalTerm(town: string, seed: number, gender: "boy"|"girl"): stri
   if (pool.length === 0) return null;
   // Filter by gender -- some terms are gender-specific
   const femPool = ["Lass","WeeYin","WeeLass","Lassie","Maid","MyMaid","Hen","WeeHen","BonnyLass","Dollie","Doll","Dollface"];
-  const mascPool = ["Lad","Laddie","WeeMan","BonnyLad","Guv","Sonny","OldCock"];
+  const mascPool = ["Lad","Laddie","WeeMan","BonnyLad","Guv","Sonny","OldBean"];
   const filtered = pool.filter(t => {
     if (gender === "girl" && mascPool.includes(t)) return false;
     if (gender === "boy" && femPool.includes(t)) return false;
@@ -1396,7 +1750,8 @@ function rankResults(results: Result[], group: string): Result[] {
 function runPass(
   breed: string, surname: string, gender: "boy"|"girl",
   baseSeed: number, town: string, colour: DogColour,
-  bonusPool1: string[], bonusPool2: string[]
+  bonusPool1: string[], bonusPool2: string[], excludeDominant = false, freeRange = false,
+  excludeFirstNames: Set<string> = new Set()
 ): Result[] {
   const doubleBonus = new Set(bonusPool1.filter(n => bonusPool2.includes(n)));
   const allBonus    = new Set([...bonusPool1, ...bonusPool2]);
@@ -1408,19 +1763,19 @@ function runPass(
     f:"fric",v:"fric",
     s:"sib",z:"sib",x:"sib",
     l:"liquid",r:"liquid",
-    h:"glide",
-  };
+    h:"glide"
+};
   const sf2: Record<string,string> = {
     m:"nasal",n:"nasal",s:"sstop",t:"sstop",p:"sstop",k:"sstop",
-    g:"growl",b:"growl",d:"growl",r:"growl",w:"glide2",h:"glide2",
-  };
+    g:"growl",b:"growl",d:"growl",r:"growl",w:"glide2",h:"glide2"
+};
   function allit(a: string, b: string): boolean {
     const f = a[0]?.toLowerCase() ?? "", w = b[0]?.toLowerCase() ?? "";
     return f === w || (!!sf[f] && sf[f] === sf[w]);
   }
 
   const raw = Array.from({length:20}, (_, i) => {
-    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+    const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
     if (!r) return null;
     const parts = r.full.split(" ");
     const fn = parts[1] ?? "";
@@ -1429,28 +1784,33 @@ function runPass(
     const dogWord = lastPart.includes("-") ? lastPart.split("-")[0] : "";
 
     let qBonus = 0;
-    if (doubleBonus.has(fn)) qBonus += 4;
-    else if (allBonus.has(fn)) qBonus += 2;
+    if (doubleBonus.has(fn)) qBonus += 12;  // answered multiple questions pointing here -- strong signal
+    else if (bonusPool1.includes(fn)) qBonus += 8;  // directly chosen answer
+    else if (bonusPool2.includes(fn)) qBonus += 3;  // appeared in unchosen answers
 
     // If name doesn't alliterate with dog word, try a whimsy replacement
     const isAbbrevStyle = /^[A-Z]\.[A-Z]/.test(parts[0] ?? "");
-    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry"];
-    if (dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
+    const noWhimsyGroups = ["sighthound","german","giant","afghan","poodle","sniffer","bulldog","gentry","asian","dalmatian","greatdane","boxer"];
+    // Whimsy replacement: only on roughly 1 in 4 passes, and only when
+    // the real name is genuinely weak (not alliterating strongly)
+    const whimsySeed = (baseSeed + i * 7) % 4;  // 0,1,2,3 -- only fire on 0
+    if (whimsySeed === 0 && dogWord && !allit(fn, dogWord) && !isAbbrevStyle && !noWhimsyGroups.includes(breed ? getGroup(breed) : "")) {
       const letter = dogWord[0].toUpperCase();
       const pool = WHIMSY[letter];
       if (pool && pool.length > 0) {
-        const whimsyName = pool[(baseSeed + i * 7) % pool.length];
-        // Check breed restrictions on this whimsy word
+        const whimsyName = pool[(baseSeed + i * 13) % pool.length];
         if (!whimsyAllowed(whimsyName, getGroup(breed))) { return { ...r, score: r.score + qBonus }; }
-        // Build a whimsy version and score it
         const wParts = [...parts];
         wParts[1] = whimsyName;
         const wFull = wParts.join(" ");
-        // +5 for alliteration + 3 for short name (whimsy names are all 2-3 syl)
-        const wScore = r.score + 5 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
-        // Only use whimsy if it scores better
+        // Whimsy gets a small bonus for alliteration but must genuinely beat the real name
+        const wScore = r.score + 2 + (doubleBonus.has(whimsyName) ? 4 : allBonus.has(whimsyName) ? 2 : 0);
         if (wScore > r.score + qBonus) {
-          return { ...r, full: wFull, nickname: r.nickname, score: wScore };
+          const wNick = (() => {
+            const stem = whimsyName.replace(/(wick|bean|boots|chops|snout|paws|bum|face|nose|bonce|flap|pants|puff|ling|kins)$/i,"").trim();
+            return stem.length >= 3 && stem !== whimsyName ? stem : whimsyName;
+          })();
+          return { ...r, full: wFull, nickname: wNick, score: wScore };
         }
       }
     }
@@ -1465,7 +1825,7 @@ function runPass(
   if ((raw[0]?.score ?? 0) < THRESHOLD) {
     const group = getGroup(breed);
     const prefixed = Array.from({length:20}, (_, i) => {
-      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour);
+      const r = generateScored(breed, surname, gender, baseSeed + i * 17, town, colour, excludeDominant, freeRange, new Set<string>(), excludeFirstNames);
       if (!r) return null;
       let pe: { prefix: string; bonusContrast: number };
       if (gender === "boy") {
@@ -1478,7 +1838,7 @@ function runPass(
       const parts    = r.full.split(" ");
       const firstWord = parts[0];
       const alreadyGrand   = ["Magnificent","Formidable","Legendary","Unstoppable","Great","Notorious","Incomparable","Professor","Doctor","Chief Analyst"];
-      const informalTitles = ["Lil'","Baby","Little","Daft","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
+      const informalTitles = ["Lil'","Baby","Little","Big","Ol'","Cheeky","Silly","Scruffy","Fluffy","Grumpy","Noisy","Squishy","Itsy","Teeny","Ol'"];
       if (alreadyGrand.includes(firstWord) || informalTitles.includes(firstWord)) return null;
       const isDTrain    = /^[A-Z]-/.test(firstWord);
       const isAbbrev    = /^[A-Z]{1,4}$/.test(firstWord);
@@ -1501,18 +1861,14 @@ function runPass(
   return raw;
 }
 
-type Stage = "inputs"|"question"|"reveal";
+type Stage = "inputs"|"question"|"reveal"|"exhausted";
 type Result = { full: string; nickname: string; reasoning: string; score: number };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
 
 const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
   { prefix: "Grand",    bonusContrast: 2 },
-  { prefix: "Supreme",  bonusContrast: 2 },
   { prefix: "Divine",   bonusContrast: 3 },
-  { prefix: "Imperial", bonusContrast: 2 },
-  { prefix: "Arch",     bonusContrast: 2 },
-  { prefix: "High",     bonusContrast: 2 },
-  { prefix: "Très",     bonusContrast: 3 }];
+  { prefix: "Imperial", bonusContrast: 2 }];
 
 const TITLE_PREFIXES: PrefixEntry[] = [
   { prefix: "Super",  breeds: ["retriever","spaniel","sniffer","lapdog","default","gentry","bulldog"], bonusContrast: 2 },
@@ -1541,124 +1897,166 @@ export default function NameGeneratorPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [seed, setSeed] = useState(0);
   const [colour, setColour] = useState<DogColour>("");
-  const [qIndices, setQIndices] = useState<[number,number]>([0,1]);
-  const [q1Answer, setQ1Answer] = useState("");
-  const [activeQ, setActiveQ] = useState<1|2>(1);
+  const [qIndices, setQIndices] = useState<number[]>(() => pickThreeQuestions());
+  const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
+  const [qOpen, setQOpen] = useState(false);
+  const [snOpen, setSnOpen] = useState(false);
+  const [shortlist, setShortlist] = useState<ShortlistEntry[]>(() => {
+    if (typeof window === "undefined") return [];
+    try { return JSON.parse(sessionStorage.getItem("pc_shortlist") || "[]"); } catch { return []; }
+  });
+  const [landingIdx, setLandingIdx] = useState<number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [showKnockout, setShowKnockout] = useState(false);
+  const [swipeDir, setSwipeDir] = useState<string | null>(null);
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+  const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
+  const [exhausted, setExhausted] = useState(false);
+  const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
     // surname is optional
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only when a quick pre-pass shows potential for purple (20+)
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
     setResults([]);
-    // Quick pre-pass to check score potential
-    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
-    const preScore = prePass[0]?.score ?? 0;
-    if (preScore >= 20) {
-      setStage("question");
-    } else {
-      // Skip questions, generate directly with empty bonus pools
-      const townMatch2 = FUNNY_PLACES.has(town.trim());
-      const et = townMatch2 ? town.trim() : "";
-      const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
-      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
-      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
-      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], []);
-      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], []);
-      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], []);
-      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], []);
-      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], []);
-      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], []);
-      const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
-      const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
-      const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 17);
-      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
-      setStage("reveal");
-    }
-  }
-
-  function handleAnswer(answer: string) {
-    const townMatch = FUNNY_PLACES.has(town.trim());
-    const effectiveTown = townMatch ? town.trim() : "";
-
-    // Question bonus pools (empty if no QUESTION_BANK yet)
     const bonus1: string[] = [];
     const bonus2: string[] = [];
-
-    // Three independent passes with offset seeds for maximum variety
-    const pass1 = runPass(breed, surname.trim(), gender, seed,           effectiveTown, colour, bonus1, bonus2);
-    const pass2 = runPass(breed, surname.trim(), gender, seed + 1000,    effectiveTown, colour, bonus1, bonus2);
-    const pass3 = runPass(breed, surname.trim(), gender, seed + 2000,    effectiveTown, colour, bonus1, bonus2);
-    const pass4 = runPass(breed, surname.trim(), gender, seed + 3000,    effectiveTown, colour, bonus1, bonus2);
-    const pass5 = runPass(breed, surname.trim(), gender, seed + 4000,    effectiveTown, colour, bonus1, bonus2);
-    const pass6 = runPass(breed, surname.trim(), gender, seed + 5000,    effectiveTown, colour, bonus1, bonus2);
-    const pass7 = runPass(breed, surname.trim(), gender, seed + 6000,    effectiveTown, colour, bonus1, bonus2);
-    const pass8 = runPass(breed, surname.trim(), gender, seed + 7000,    effectiveTown, colour, bonus1, bonus2);
-    const pass9 = runPass(breed, surname.trim(), gender, seed + 8000,    effectiveTown, colour, bonus1, bonus2);
-
-    // Take top scorer from each pass, then merge all three full lists
-    // This guarantees the cream from each independent roll is represented
-    const topFromEach = [pass1[0], pass2[0], pass3[0], pass4[0], pass5[0], pass6[0], pass7[0], pass8[0], pass9[0]].filter(Boolean) as Result[];
-    const allCandidates = [...pass1, ...pass2, ...pass3, ...pass4, ...pass5, ...pass6, ...pass7, ...pass8, ...pass9];
-    allCandidates.sort((a,b) => b.score - a.score);
-
-    // Ensure top picks from each pass appear in results
-    const merged = [...topFromEach, ...allCandidates];
-    const allDeduped = dedupeResults(merged.filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-    const scored21 = allDeduped.filter(r => r.score >= 17);
-    const ranked2 = rankResults(scored21, breed ? getGroup(breed) : "default");
-    setResults(ranked2.length > 0 ? ranked2.slice(0,5) : rankResults(allDeduped, breed ? getGroup(breed) : "default").slice(0,5));
+    qIndices.forEach((qi: number, pos: number) => {
+      const qItem = QUESTION_BANK[qi];
+      const chosen = qAnswers[pos];
+      if (!chosen || !qItem) return;
+      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
+      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
+      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
+        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
+    });
+    const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames);
+    const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
+    const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
+    const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
+    const sc21 = allD.filter(r=>r.score>=17);
+    const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
+    const genResult = ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1);
+    setUsedNicknames(new Set(genResult.map((r: Result) => r.nickname)));
+    setResults(genResult);
     setStage("reveal");
   }
 
+
+
   function handleRollAgain() {
+    // Keep breed, surname, gender and current question answers -- just new seed
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
-    // Questions only when a quick pre-pass shows potential for purple (20+)
-    const qi = pickTwoQuestions(s);
-    setQIndices(qi);
-    setQ1Answer("");
-    setActiveQ(1);
     setResults([]);
-    // Quick pre-pass to check score potential
-    const prePass = runPass(breed, surname.trim(), gender, s, FUNNY_PLACES.has(town.trim()) ? town.trim() : "", colour as DogColour, [], []);
-    const preScore = prePass[0]?.score ?? 0;
-    if (preScore >= 20) {
-      setStage("question");
-    } else {
-      // Skip questions, generate directly with empty bonus pools
-      const townMatch2 = FUNNY_PLACES.has(town.trim());
-      const et = townMatch2 ? town.trim() : "";
-      const p1 = runPass(breed, surname.trim(), gender, s,        et, colour, [], []);
-      const p2 = runPass(breed, surname.trim(), gender, s + 1000, et, colour, [], []);
-      const p3 = runPass(breed, surname.trim(), gender, s + 2000, et, colour, [], []);
-      const p4 = runPass(breed, surname.trim(), gender, s + 3000, et, colour, [], []);
-      const p5 = runPass(breed, surname.trim(), gender, s + 4000, et, colour, [], []);
-      const p6 = runPass(breed, surname.trim(), gender, s + 5000, et, colour, [], []);
-      const p7 = runPass(breed, surname.trim(), gender, s + 6000, et, colour, [], []);
-      const p8 = runPass(breed, surname.trim(), gender, s + 7000, et, colour, [], []);
-      const p9 = runPass(breed, surname.trim(), gender, s + 8000, et, colour, [], []);
-      const top3 = [p1[0], p2[0], p3[0], p4[0], p5[0], p6[0], p7[0], p8[0], p9[0]].filter(Boolean) as Result[];
-      const all3 = [...p1, ...p2, ...p3, ...p4, ...p5, ...p6, ...p7, ...p8, ...p9].sort((a,b) => b.score - a.score);
-      const allD = dedupeResults([...top3, ...all3].filter(Boolean) as Result[]).sort((a,b) => b.score - a.score);
-      const sc21 = allD.filter(r => r.score >= 17);
-      const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
-      setResults(ranked.length > 0 ? ranked.slice(0,5) : rankResults(allD, breed ? getGroup(breed) : "default").slice(0,5));
-      setStage("reveal");
+
+    const bonus1: string[] = [];
+    const bonus2: string[] = [];
+    qIndices.forEach((qi: number, pos: number) => {
+      const qItem = QUESTION_BANK[qi];
+      const chosen = qAnswers[pos];
+      if (!chosen || !qItem) return;
+      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
+      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
+      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
+        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
+    });
+
+    const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
+    const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p3 = runPass(breed,surname.trim(),gender,s+2003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p4 = runPass(breed,surname.trim(),gender,s+3001,  et,colour,bonus1,bonus2,false,false,usedFirstNames);
+    const p5 = runPass(breed,surname.trim(),gender,s+4007,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p6 = runPass(breed,surname.trim(),gender,s+5003,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
+    const p7 = runPass(breed,surname.trim(),gender,s+6011,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p8 = runPass(breed,surname.trim(),gender,s+7013,  et,colour,bonus1,bonus2,true, true, usedFirstNames);
+    const p9 = runPass(breed,surname.trim(),gender,s+8009,  et,colour,bonus1,bonus2,false,true, usedFirstNames);
+    const top = [p1[0],p2[0],p3[0],p4[0],p5[0],p6[0],p7[0],p8[0],p9[0]].filter(Boolean) as Result[];
+    const all = [...p1,...p2,...p3,...p4,...p5,...p6,...p7,...p8,...p9].sort((a,b)=>b.score-a.score);
+    const allD = dedupeResults([...top,...all].filter(Boolean) as Result[]).sort((a,b)=>b.score-a.score);
+    const sc21 = allD.filter(r=>r.score>=17);
+    const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
+    const allRanked = ranked.length>0 ? ranked : rankResults(allD,breed?getGroup(breed):"default");
+    const fresh = allRanked.filter((r: Result) => !usedNicknames.has(r.nickname));
+    if (fresh.length === 0) {
+      setStage("exhausted");
+      return;
     }
+    const rollResult = fresh.slice(0,1);
+    const rollFirstName = rollResult[0]?.full?.split(" ").find((w:string) => w.length > 1 && /^[A-Z]/.test(w) && !w.includes(".")) ?? "";
+    setUsedNicknames((prev: Set<string>) => new Set([...prev, ...rollResult.map((r: Result) => r.nickname)]));
+    setUsedFirstNames((prev:Set<string>) => rollFirstName ? new Set([...prev, rollFirstName]) : prev);
+    setResults(rollResult);
+    setStage("reveal");
+  }
+
+  function saveToShortlist(r: Result) {
+    setShortlist((prev: ShortlistEntry[]) => {
+      if (prev.length >= 12) return prev;
+      const entry: ShortlistEntry = { full: r.full, nickname: r.nickname, score: r.score, breed };
+      const next = [...prev, entry];
+      try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
+      if (next.length === 3) { setToast("📸 Instagram polls max at 2 options -- run a second poll if needed!"); setTimeout(() => setToast(null), 5000); }
+      if (next.length === 5) { setToast("𝕏 X/Twitter polls max at 4 options -- time to whittle down!"); setTimeout(() => setToast(null), 5000); }
+      setLandingIdx(next.length - 1);
+      setTimeout(() => setLandingIdx(null), 800);
+      return next;
+    });
+  }
+  function removeFromShortlist(idx: number) {
+    setShortlist((prev: ShortlistEntry[]) => {
+      const next = prev.filter((_: ShortlistEntry, i: number) => i !== idx);
+      try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+  function clearShortlist() { setShortlist([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} }
+  function handleLike() {
+    if (results.length > 0) saveToShortlist(results[0]);
+    setSwipeDir("right");
+    setTimeout(() => { setSwipeDir(null); handleRollAgain(); }, 350);
+  }
+  function handleNope() {
+    setSwipeDir("left");
+    setTimeout(() => { setSwipeDir(null); handleRollAgain(); }, 350);
+  }
+  function handleStartOver() {
+    if (shortlist.length > 0) { if (!window.confirm("Start over? Your liked names stay in your shortlist.")) return; }
+    setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false);
+  }
+  function onTouchStart(e: { touches: { clientX: number; clientY: number }[] }) {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }
+  function onTouchEnd(e: { changedTouches: { clientX: number; clientY: number }[] }) {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) { if (dx > 0) handleLike(); else handleNope(); }
   }
 
   const cardImg = breed ? CARD_IMAGE[breed] ?? null : null;
 
   return (
     <>
+      {showKnockout ? (
+        <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
+          <div style={{ maxWidth:600, margin:"0 auto" }}>
+            <KnockoutRound shortlist={shortlist} breed={breed} onBack={() => setShowKnockout(false)} />
+          </div>
+        </div>
+      ) : (<>
       <Nav />
       <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
         <div style={{ maxWidth:960, margin:"0 auto" }}>
@@ -1674,51 +2072,51 @@ export default function NameGeneratorPage() {
             const img = CARD_IMAGE[breed] ?? null;
             return (
               <div style={{
+                position:"relative",
                 display:"flex", alignItems:"center", gap:16, marginBottom:24,
-                background:"var(--navy)", borderRadius:16, padding:"14px 18px",
-                animation:"fadeInDown 0.4s ease"
+                background:"linear-gradient(to top right, #00e2ff, #008eff)",
+                borderRadius:24,
+                padding:"clamp(20px,4vw,32px)",
+                paddingLeft: img ? "clamp(160px,38vw,250px)" : "clamp(20px,4vw,32px)",
+                boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
+                overflow:"visible",
+                animation:"fadeInDown 0.4s ease",
+                minHeight:"clamp(100px,18vw,140px)"
               }}>
                 {img && (
                   <img src={img} alt={breed} style={{
-                    width:64, height:"auto", borderRadius:10, flexShrink:0,
-                    transform:"rotate(-2deg)", boxShadow:"0 4px 16px rgba(0,0,0,0.25)"
+                    position:"absolute",
+                    left:-12, top:"50%",
+                    transform:"translateY(-50%) rotate(-2deg)",
+                    width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14,
+                    boxShadow:"0 8px 24px rgba(10,58,87,0.28)",
+                    zIndex:2
                   }} />
                 )}
                 <div>
-                  <div style={{ fontFamily:"var(--font-display)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2.5vw,1.1rem)", lineHeight:1.2 }}>
-                    Found your best chum!
+                  <div style={{ fontFamily:"var(--font-display)", color:"var(--yellow)", fontSize:"clamp(1.8rem,5vw,2.4rem)", lineHeight:1.1 }}>
+                    Let’s get a great name for your favourite chum
                   </div>
-                  <div style={{ fontFamily:"var(--font-body)", color:"var(--blue-sky)", fontSize:"0.85rem", marginTop:4 }}>
+                  <div style={{ fontFamily:"var(--font-body)", color:"#ffffff", fontSize:"1rem", marginTop:6 }}>
                     Now let&apos;s give {breed} a name.
                   </div>
                 </div>
               </div>
             );
           })()}
-          {stage === "inputs" && (
+          {stage === "inputs" && (() => {
+            return (
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               {!fromCalculator && (<>
                 <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => setBreed(e.target.value)}
+                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setQIndices(pickThreeQuestions()); setQAnswers({}); }}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                   <option value="">-- Select a breed --</option>
-                  <optgroup label="Pedigree Chums Pack Breeds">
-                    {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
-                  </optgroup>
-                  <optgroup label="Other Breeds">
-                    {OTHER_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
-                  </optgroup>
+                  {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </>)}
-
-              <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your surname</label>
-              <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
-                placeholder="e.g. Jones, Clarke, Thompson-Alexander..."
-                maxLength={60} onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
-                style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
-
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
-              <div style={{ display:"flex", gap:10, marginBottom:24 }}>
+              <div style={{ display:"flex", gap:10, marginBottom:28 }}>
                 {(["boy","girl"] as const).map(g => (
                   <button key={g} onClick={() => setGender(g)}
                     style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${gender===g?"var(--yellow)":"rgba(255,255,255,0.15)"}`, background:gender===g?"var(--yellow)":"rgba(255,255,255,0.08)", color:gender===g?"var(--navy)":"#fff", fontFamily:"var(--font-body)", fontSize:"0.9rem", fontWeight:700, cursor:"pointer", textTransform:"capitalize" }}>
@@ -1726,100 +2124,164 @@ export default function NameGeneratorPage() {
                   </button>
                 ))}
               </div>
-
+<div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom: snOpen ? 0 : 22 }}>
+                <button
+                  onClick={() => setSnOpen((o: boolean) => !o)}
+                  style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", cursor:"pointer", padding:0, marginBottom: snOpen ? 16 : 0 }}>
+                  <span style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
+                    Want to personalise with your surname?
+                    {surname.trim().length > 0 && (
+                      <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
+                        {surname.trim()}
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color:"var(--yellow)", fontSize:"1rem", lineHeight:1, transform: snOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", display:"inline-block" }}>
+                    ▼
+                  </span>
+                </button>
+                {snOpen && (
+                  <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
+                    placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
+                    onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
+                    style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
+                )}
+              </div>
+                            <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom:22 }}>
+                {/* Collapsible header */}
+                <button
+                  onClick={() => setQOpen((o: boolean) => !o)}
+                  style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", cursor:"pointer", padding:0, marginBottom: qOpen ? 16 : 0 }}>
+                  <span style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
+                    Personalise your name?
+                    {Object.keys(qAnswers).length > 0 && (
+                      <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
+                        {Object.keys(qAnswers).length}/3
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color:"var(--yellow)", fontSize:"1rem", lineHeight:1, transform: qOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", display:"inline-block" }}>
+                    ▼
+                  </span>
+                </button>
+                {/* Questions grid -- hidden until open */}
+                {qOpen && (
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
+                    {qIndices.map((qi: number, pos: number) => {
+                      const qItem = QUESTION_BANK[qi];
+                      if (!qItem) return null;
+                      const chosen = qAnswers[pos];
+                      return (
+                        <div key={qi} style={{ background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"12px 10px", border:`1.5px solid ${chosen?"var(--yellow)":"rgba(255,255,255,0.12)"}`, display:"flex", flexDirection:"column", gap:7, transition:"border-color 0.2s" }}>
+                          <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.76rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32 }}>
+                            {qItem.text}
+                          </p>
+                          <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                            {qItem.options.map((opt: {label:string;bonus:string[]}) => (
+                              <button key={opt.label}
+                                onClick={() => setQAnswers((prev: Record<number,string>) => ({...prev, [pos]: opt.label}))}
+                                style={{ padding:"6px 9px", borderRadius:7, border:`1.5px solid ${chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.18)"}`, background:chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.05)", color:chosen===opt.label?"var(--navy)":"rgba(255,255,255,0.85)", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, cursor:"pointer", textAlign:"left", lineHeight:1.2, transition:"all 0.15s" }}>
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                          {chosen && <p style={{ color:"var(--yellow)", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)" }}>✓ {chosen}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
               <button onClick={handleGenerate} className="display"
                 style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontSize:"1.3rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
-                Find my chum&apos;s name
+                Find my chum’s name
               </button>
             </div>
-          )}
-
-          {/* ── STAGE 2: QUESTIONS ── */}
-          {stage === "question" && (() => {
-            const qi = activeQ === 1 ? qIndices[0] : qIndices[1];
-            const qItem = QUESTION_BANK[qi];
-            return (
-              <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(24px,5vw,48px)", paddingTop:"clamp(80px,12vw,120px)" }}>
-                <p style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:24, textAlign:"center" }}>
-                  Question {activeQ} of 2
-                </p>
-                <p className="display" style={{ fontSize:"clamp(1.2rem,3.5vw,1.8rem)", color:"#fff", marginBottom:32, lineHeight:1.3, textAlign:"center" }}>
-                  {qItem.text}
-                </p>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
-                  {qItem.options.map(opt => (
-                    <button key={opt.label} onClick={() => handleAnswer(opt.label)}
-                      style={{ padding:"12px 22px", borderRadius:12, border:"2px solid rgba(255,255,255,0.25)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
             );
           })()}
+
 
           {/* ── STAGE 3: REVEAL ── */}
           {stage === "reveal" && results.length > 0 && (
             <>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16, marginBottom:20 }}>
-                {results.map((r: Result, i: number) => (
-                  <div key={i} style={{
-                    position:"relative",
-                    background:"linear-gradient(to top right, #00e2ff, #008eff)",
-                    borderRadius:40,
-                    padding:"clamp(20px,3.5vw,32px)",
-                    paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(20px,3.5vw,32px)",
-                    boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
-                    overflow:"visible"
-                  }}>
-                    {/* Breed card -- rotated 2deg, anchored to top-right corner of box */}
-                    {cardImg && (
-                      <div style={{
-                        position:"absolute",
-                        right:-12,
-                        top:-10,
-                        zIndex:2,
-                        transform:"rotate(2deg)",
-                        transformOrigin:"bottom right",
-                        filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))"
-                      }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
-                      </div>
-                    )}
-                    {/* Top pick pill + score badge */}
-                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-                      {i === 0 && <div style={{ fontSize:"0.65rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", color:"var(--navy)", background:"var(--yellow)", padding:"4px 14px", borderRadius:999, fontFamily:"var(--font-body)" }}>Top pick</div>}
-                      <div style={{ fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+              {results.slice(0,1).map((r: Result) => (
+                <div key={r.full} style={{
+                  position:"relative",
+                  background:"linear-gradient(to top right, #00e2ff, #008eff)",
+                  borderRadius:40,
+                  padding:"clamp(24px,4vw,40px)",
+                  paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(24px,4vw,40px)",
+                  boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
+                  overflow:"visible",
+                  marginBottom:20
+                }}>
+                  {/* Breed card */}
+                  {cardImg && (
+                    <div style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
                     </div>
-                    {/* Name -- 2pt bigger, left aligned */}
-                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.3rem,5vw,1.9rem)", color:"#fff", marginBottom:8, lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 8px rgba(10,58,87,0.3)" }}>{r.full}</div>
-                    {/* Nickname -- 2pt bigger, left aligned */}
-                    {r.nickname && (
-                      <div style={{ fontSize:"clamp(1rem,3vw,1.1rem)", color:"var(--navy)", fontStyle:"italic", marginBottom:14, fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center" }}>
-                        Known to friends as: {r.nickname}
-                      </div>
-                    )}
-                    {/* Reasoning -- 2pt bigger, left aligned */}
-                    <div style={{ fontSize:"clamp(1rem,3vw,1.15rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:12, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
-                  </div>
-                ))}
-              </div>
+                  )}
 
-              <div style={{ display:"flex", gap:12 }}>
-                <button onClick={handleRollAgain} className="display"
-                  style={{ flex:1, padding:15, borderRadius:14, border:"3px solid var(--navy)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
-                  Roll again
-                </button>
-                <button onClick={() => { setStage("inputs"); setResults([]); setQ1Answer(""); setActiveQ(1); }} className="display"
-                  style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"var(--navy)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2vw,1.1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>
-                  Start over
-                </button>
+                  {/* Score badge */}
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+                  </div>
+                  {/* NICKNAME -- the hero name, big */}
+                  {r.nickname ? (
+                    <>
+                      <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(2rem,8vw,3.2rem)", color:"#fff", lineHeight:1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:10 }}>
+                        {r.nickname}
+                      </div>
+                      {/* Full name -- smaller, below */}
+                      <div style={{ fontSize:"clamp(0.85rem,2.5vw,1.05rem)", color:"rgba(10,58,87,0.75)", fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center", marginBottom:16, letterSpacing:"0.01em" }}>
+                        {r.full}
+                      </div>
+                    </>
+                  ) : (
+                    /* No nickname -- just show full name as hero */
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5vw,2.4rem)", color:"#fff", lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:16 }}>
+                      {r.full}
+                    </div>
+                  )}
+                  {/* Reasoning */}
+                  <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                </div>
+              ))}
+
+              <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
+                {swipeDir && (<div style={{ position:"absolute", inset:0, zIndex:10, display:"flex", alignItems:"center", justifyContent:"center", pointerEvents:"none", animation:"swipeFade 0.35s ease forwards", fontSize:"4rem" }}>{swipeDir === "right" ? "❤️" : "💨"}</div>)}
+                <div style={{ display:"flex", gap:12, marginBottom:12 }}>
+                  <button onClick={handleNope} className="display" style={{ flex:1, padding:15, borderRadius:14, border:"3px solid #ef4444", background:"transparent", color:"#ef4444", fontSize:"clamp(0.85rem,2vw,1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>✕ No way! Next</button>
+                  <button onClick={handleLike} className="display" style={{ flex:1, padding:15, borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:"clamp(0.85rem,2vw,1rem)", cursor:"pointer", letterSpacing:"0.04em" }}>✓ I like it</button>
+                </div>
+                <button onClick={handleStartOver} className="display" style={{ width:"100%", padding:12, borderRadius:14, border:"1.5px solid rgba(10,58,87,0.3)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.8rem,1.8vw,0.9rem)", cursor:"pointer", letterSpacing:"0.04em", opacity:0.7 }}>Start over</button>
               </div>
             </>
           )}
+
+          {/* ── EXHAUSTED STAGE ── */}
+          {stage === "exhausted" && (
+            <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:40,padding:"clamp(24px,4vw,40px)",textAlign:"center",color:"#fff"}}>
+              <p style={{fontSize:"2rem",marginBottom:8}}>🐾</p>
+              <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We{"'"}ve run out of new names!</h2>
+              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:24,opacity:0.9}}>Answer a couple more questions and we{"'"}ll find some fresh ones.</p>
+              <button onClick={() => { setQOpen(true); setQIndices(pickThreeQuestions()); setQAnswers({}); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"1.1rem",cursor:"pointer",boxShadow:"0 4px 0 rgba(10,58,87,0.4)",fontFamily:"var(--font-display)",letterSpacing:"0.04em",marginBottom:12,display:"block",width:"100%"}}>
+                Answer more questions
+              </button>
+              <button onClick={() => { setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
+                className="display" style={{padding:"14px 32px",borderRadius:14,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"1rem",cursor:"pointer",fontFamily:"var(--font-display)",letterSpacing:"0.04em",display:"block",width:"100%"}}>
+                Start Over
+              </button>
+            </div>
+          )}
         </div>
       </main>
+      </>
+      )}
+      {toast && (<div style={{ position:"fixed", bottom:80, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
+      <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => setShowKnockout(true)} landingIdx={landingIdx} />
       <Footer />
     </>
   );
