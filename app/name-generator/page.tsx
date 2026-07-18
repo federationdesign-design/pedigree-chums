@@ -2251,11 +2251,14 @@ export default function NameGeneratorPage() {
 
               <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
                 
-                <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:12 }}>
-                  <button onClick={handleNope} className="display" style={{ flex:1, padding:16, borderRadius:999, border:"none", background:"#ef4444", color:"#fff", fontSize:"clamp(1rem,2.5vw,1.2rem)", cursor:"pointer", letterSpacing:"0.04em", boxShadow:"0 4px 0 rgba(0,0,0,0.2)", fontFamily:"var(--font-display)" }}>✕ No way!</button>
-                  <button onClick={handleLike} className="display" style={{ flex:1, padding:16, borderRadius:999, border:"none", background:"#22c55e", color:"#fff", fontSize:"clamp(1rem,2.5vw,1.2rem)", cursor:"pointer", letterSpacing:"0.04em", boxShadow:"0 4px 0 rgba(0,0,0,0.2)", fontFamily:"var(--font-display)" }}>✓ I like it</button>
+                <div style={{ textAlign:"center", marginBottom:8 }}>
+                  <button onClick={handleStartOver} style={{ background:"none", border:"none", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"0.8rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", cursor:"pointer", opacity:0.7 }}>Start over</button>
                 </div>
-                <button onClick={handleStartOver} className="display" style={{ width:"100%", padding:12, borderRadius:999, border:"2px solid rgba(10,58,87,0.4)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.85rem,1.8vw,0.95rem)", cursor:"pointer", letterSpacing:"0.04em", fontFamily:"var(--font-display)" }}>Start over</button>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16 }}>
+                  <button onClick={handleNope} style={{ width:72, height:72, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"1.8rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+                  <div style={{ flex:1 }} />
+                  <button onClick={handleLike} style={{ width:72, height:72, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"1.8rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                </div>
               </div>
             </>
           )}
