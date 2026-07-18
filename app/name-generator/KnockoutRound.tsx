@@ -123,18 +123,24 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         </div>
       ) : (
         <>
-          <p className={styles.vsLabel}>VS</p>
           <div className={styles.pairWrap}>
-            {[pairA, pairB].filter(Boolean).map((entry, i) => (
-              <button key={entry.full}
-                className={`${styles.fightCard} ${chosen === i ? styles.winner : ""} ${chosen !== null && chosen !== i ? styles.loser : ""}`}
-                onClick={() => pick(entry)} disabled={chosen !== null}>
-                <p className={styles.fightName}>{entry.full}</p>
-                {entry.nickname && entry.nickname !== entry.full && (
-                  <p className={styles.fightNick}>"{entry.nickname}"</p>
-                )}
-              </button>
-            ))}
+            <button
+              className={`${styles.fightCard} ${chosen === 0 ? styles.winner : ""} ${chosen !== null && chosen !== 0 ? styles.loser : ""}`}
+              onClick={() => pick(pairA)} disabled={chosen !== null}>
+              <p className={styles.fightName}>{pairA.nickname && pairA.nickname !== pairA.full ? pairA.nickname : pairA.full}</p>
+              {pairA.nickname && pairA.nickname !== pairA.full && (
+                <p className={styles.fightNick}>{pairA.full}</p>
+              )}
+            </button>
+            <p className={styles.vsLabel}>VS</p>
+            <button
+              className={`${styles.fightCard} ${chosen === 1 ? styles.winner : ""} ${chosen !== null && chosen !== 1 ? styles.loser : ""}`}
+              onClick={() => pick(pairB)} disabled={chosen !== null}>
+              <p className={styles.fightName}>{pairB.nickname && pairB.nickname !== pairB.full ? pairB.nickname : pairB.full}</p>
+              {pairB.nickname && pairB.nickname !== pairB.full && (
+                <p className={styles.fightNick}>{pairB.full}</p>
+              )}
+            </button>
           </div>
         </>
       )}

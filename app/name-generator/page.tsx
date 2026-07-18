@@ -2052,14 +2052,14 @@ export default function NameGeneratorPage() {
     <>
       {showKnockout ? (
         <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
-          <div style={{ maxWidth:2000, margin:"0 auto" }}>
+          <div style={{ maxWidth:1800, margin:"0 auto" }}>
             <KnockoutRound shortlist={shortlist} breed={breed} onBack={() => setShowKnockout(false)} />
           </div>
         </div>
       ) : (<>
       <Nav />
       <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
-        <div style={{ maxWidth:2000, margin:"0 auto" }}>
+        <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator
           </h1>
