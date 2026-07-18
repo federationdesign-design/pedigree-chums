@@ -1998,14 +1998,25 @@ export default function NameGeneratorPage() {
             const img = CARD_IMAGE[breed] ?? null;
             return (
               <div style={{
+                position:"relative",
                 display:"flex", alignItems:"center", gap:16, marginBottom:24,
-                background:"var(--navy)", borderRadius:16, padding:"14px 18px",
-                animation:"fadeInDown 0.4s ease"
+                background:"linear-gradient(to top right, #00e2ff, #008eff)",
+                borderRadius:24,
+                padding:"clamp(20px,4vw,32px)",
+                paddingLeft: img ? "clamp(160px,38vw,250px)" : "clamp(20px,4vw,32px)",
+                boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
+                overflow:"visible",
+                animation:"fadeInDown 0.4s ease",
+                minHeight:"clamp(100px,18vw,140px)"
               }}>
                 {img && (
                   <img src={img} alt={breed} style={{
-                    width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, flexShrink:0,
-                    transform:"rotate(-2deg)", boxShadow:"0 8px 24px rgba(10,58,87,0.28)"
+                    position:"absolute",
+                    left:-12, top:"50%",
+                    transform:"translateY(-50%) rotate(-2deg)",
+                    width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14,
+                    boxShadow:"0 8px 24px rgba(10,58,87,0.28)",
+                    zIndex:2
                   }} />
                 )}
                 <div>
