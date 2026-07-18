@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import ShortlistBar, { type ShortlistEntry } from "./ShortlistBar";
+import KnockoutRound from "./KnockoutRound";
 
 // ── CARD IMAGE MAP ─────────────────────────────────────────────────────────────
 const CARD_IMAGE: Record<string, string> = {
@@ -1899,6 +1901,16 @@ export default function NameGeneratorPage() {
   const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
   const [qOpen, setQOpen] = useState(false);
   const [snOpen, setSnOpen] = useState(false);
+  const [shortlist, setShortlist] = useState<ShortlistEntry[]>(() => {
+    if (typeof window === "undefined") return [];
+    try { return JSON.parse(sessionStorage.getItem("pc_shortlist") || "[]"); } catch { return []; }
+  });
+  const [landingIdx, setLandingIdx] = useState<number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [showKnockout, setShowKnockout] = useState(false);
+  const [swipeDir, setSwipeDir] = useState<string | null>(null);
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
   const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
@@ -1994,6 +2006,14 @@ export default function NameGeneratorPage() {
 
   return (
     <>
+      {showKnockout ? (
+        <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
+          <div style={{ maxWidth:600, margin:"0 auto" }}>
+            <KnockoutRound shortlist={shortlist} breed={breed} onBack={() => setShowKnockout(false)} />
+          </div>
+        </div>
+      ) : (
+      <>
       <Nav />
       <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
         <div style={{ maxWidth:960, margin:"0 auto" }}>
@@ -2217,6 +2237,8 @@ export default function NameGeneratorPage() {
           )}
         </div>
       </main>
+      </>
+      )}
       <Footer />
     </>
   );

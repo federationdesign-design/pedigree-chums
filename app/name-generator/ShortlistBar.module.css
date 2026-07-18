@@ -1,0 +1,140 @@
+.bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--navy, #0a3a57);
+  border-top: 2px solid var(--yellow, #ffe227);
+  padding: 10px 16px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.label {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffe227);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+  padding: 4px 0;
+}
+.pills::-webkit-scrollbar { display: none; }
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid var(--yellow, #ffe227);
+  border-radius: 999px;
+  padding: 4px 10px 4px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Landing animation -- triggered when pill first appears */
+.landing {
+  animation: landPill 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes landPill {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Bubble rings -- pseudo-elements on landing pill */
+.landing::before,
+.landing::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid var(--yellow, #ffe227);
+  animation: ringOut 0.6s ease-out forwards;
+  pointer-events: none;
+}
+.landing::after { animation-delay: 0.15s; }
+@keyframes ringOut {
+  0%   { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.8); }
+}
+
+.pillName {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pillNick {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.7rem;
+  color: var(--yellow, #ffe227);
+}
+
+.pillRemove {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0 0 0 4px;
+  flex-shrink: 0;
+}
+.pillRemove:hover { color: #fff; }
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.knockoutBtn {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  background: var(--yellow, #ffe227);
+  color: var(--navy, #0a3a57);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s;
+}
+.knockoutBtn:hover { transform: scale(1.05); }
+
+.clearBtn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.clearBtn:hover { background: rgba(255,255,255,0.15); }
