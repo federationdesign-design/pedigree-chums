@@ -62,7 +62,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   // Fighting phase pick
   const pair = [remaining[pairIdx * 2], remaining[pairIdx * 2 + 1]].filter(Boolean);
   const hasBye = pair.length === 1;
-  const limit = PLATFORM_LIMIT[platform];
+  const limit = PLATFORM_LIMIT[platform ?? "none"];
 
   function pick(winner: ShortlistEntry) {
     const winnerIdx = pair.indexOf(winner);
