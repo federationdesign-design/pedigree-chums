@@ -2004,15 +2004,15 @@ export default function NameGeneratorPage() {
               }}>
                 {img && (
                   <img src={img} alt={breed} style={{
-                    width:64, height:"auto", borderRadius:10, flexShrink:0,
-                    transform:"rotate(-2deg)", boxShadow:"0 4px 16px rgba(0,0,0,0.25)"
+                    width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, flexShrink:0,
+                    transform:"rotate(-2deg)", boxShadow:"0 8px 24px rgba(10,58,87,0.28)"
                   }} />
                 )}
                 <div>
-                  <div style={{ fontFamily:"var(--font-display)", color:"var(--yellow)", fontSize:"clamp(0.9rem,2.5vw,1.1rem)", lineHeight:1.2 }}>
-                    Found your best chum!
+                  <div style={{ fontFamily:"var(--font-display)", color:"var(--yellow)", fontSize:"clamp(1.8rem,5vw,2.4rem)", lineHeight:1.1 }}>
+                    Let’s get a great name for your favourite chum
                   </div>
-                  <div style={{ fontFamily:"var(--font-body)", color:"var(--blue-sky)", fontSize:"0.85rem", marginTop:4 }}>
+                  <div style={{ fontFamily:"var(--font-body)", color:"#ffffff", fontSize:"1rem", marginTop:6 }}>
                     Now let&apos;s give {breed} a name.
                   </div>
                 </div>
@@ -2030,11 +2030,6 @@ export default function NameGeneratorPage() {
                   {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </>)}
-              <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4, fontFamily:"var(--font-body)" }}>Want to personalise with your surname? <span style={{ color:"rgba(255,255,255,0.4)", fontWeight:400, textTransform:"none", fontSize:"0.7rem" }}>(optional)</span></label>
-              <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
-                placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
-                onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
-                style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
               <div style={{ display:"flex", gap:10, marginBottom:28 }}>
                 {(["boy","girl"] as const).map(g => (
@@ -2044,7 +2039,12 @@ export default function NameGeneratorPage() {
                   </button>
                 ))}
               </div>
-              <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom:22 }}>
+<label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4, fontFamily:"var(--font-body)" }}>Want to personalise with your surname? <span style={{ color:"rgba(255,255,255,0.4)", fontWeight:400, textTransform:"none", fontSize:"0.7rem" }}>(optional)</span></label>
+              <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
+                placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
+                onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
+                style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
+                            <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom:22 }}>
                 {/* Collapsible header */}
                 <button
                   onClick={() => setQOpen((o: boolean) => !o)}
