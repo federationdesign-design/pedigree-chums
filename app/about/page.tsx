@@ -65,7 +65,12 @@ export default function About() {
           </ul>
         </PhotoSplit>
 
-        <StepCards />
+        <section style={{ padding: "48px 0 0" }}>
+          <div style={{ textAlign: "center", marginBottom: 8 }}>
+            <PopHeading className="display">How it plays</PopHeading>
+          </div>
+          <StepCards />
+        </section>
 
         <section className={styles.feedSection}>
           <PopHeading className={`display ${styles.feedTitle}`}>
