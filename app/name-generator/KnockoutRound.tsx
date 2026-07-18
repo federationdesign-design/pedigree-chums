@@ -158,31 +158,8 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         You&apos;ve saved {shortlist.length} name{shortlist.length !== 1 ? "s" : ""}. Tap your favourite to kick things off.
       </p>
 
-      {/* Our Picks -- CLICKABLE */}
-      <div className={styles.picksBox}>
-        <p className={styles.picksLabel}>Our picks</p>
-        <p className={styles.picksSub}>We love these two based on scoring. Tap the one you prefer most -- it goes straight through. The rest fight it out.</p>
-        <div className={styles.picksRow}>
-          {ourPicks.map((p) => (
-            <button
-              key={p.full}
-              className={styles.pickCard}
-              onClick={() => pickFavourite(p)}
-            >
-              <p className={styles.pickName}>{p.full}</p>
-              {p.nickname && p.nickname !== p.full && (
-                <p className={styles.pickNick}>"{p.nickname}"</p>
-              )}
-              <span className={styles.pickCta}>This one ★</span>
-            </button>
-          ))}
-        </div>
-        <p className={styles.picksNote}>Not feeling either? Scroll down to pick any name.</p>
-      </div>
-
-      {/* All names -- also clickable */}
       <div className={styles.allNamesBox}>
-        <p className={styles.allNamesLabel}>Or pick from all your names</p>
+        <p className={styles.allNamesLabel}>Pick your favourite to start</p>
         <div className={styles.allNamesList}>
           {shortlist.map((e) => (
             <button
