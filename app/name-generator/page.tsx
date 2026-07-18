@@ -1547,7 +1547,7 @@ export default function NameGeneratorPage() {
 
   function handleGenerate() {
     if (!breed) { alert("Please select a breed"); return; }
-    if (!surname.trim()) { alert("Please enter your surname"); return; }
+    // surname is optional
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
     // Questions only when a quick pre-pass shows potential for purple (20+)
