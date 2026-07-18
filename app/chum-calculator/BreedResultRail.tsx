@@ -33,26 +33,20 @@ function FlipCard({ breed, isBest }: { breed: ScoredBreed; isBest: boolean }) {
   const colour = fitColour(breed.score, isBest);
   const label = fitLabel(breed.score, isBest);
   const href = `/name-generator?breed=${encodeURIComponent(breed.name)}`;
+  const isTouchDevice = () => typeof window !== "undefined" && window.matchMedia("(hover: none)").matches;
 
-  // On mobile: first tap flips, second tap follows link.
-  // On desktop: hover handles the flip via CSS, tap follows link directly.
-  function handleClick(e: { preventDefault: () => void }) {
-    // If already flipped on mobile (touch), let the link fire naturally
-    if (flipped) return;
-    // Detect touch: if it's a genuine pointer click on a touch device, flip first
-    if (window.matchMedia("(hover: none)").matches) {
+  function handleBackClick(e: { preventDefault: () => void }) {
+    if (isTouchDevice() && !flipped) {
       e.preventDefault();
       setFlipped(true);
     }
-    // Desktop: hover already shows the back, click goes straight through
+    // On desktop hover handles it; click goes straight through to link
   }
 
   function handleFlipBack(e: { preventDefault: () => void; stopPropagation: () => void }) {
     e.preventDefault();
     e.stopPropagation();
-    if (window.matchMedia("(hover: none)").matches) {
-      setFlipped(false);
-    }
+    setFlipped(false);
   }
 
   return (
@@ -62,33 +56,30 @@ function FlipCard({ breed, isBest }: { breed: ScoredBreed; isBest: boolean }) {
     >
       <div className={styles.flipInner}>
 
-        {/* ── FRONT ── */}
-        <Link href={`/chums/${breed.slug}`} className={styles.flipFront}>
-          <div className={styles.cardImgWrap}>
-            <img
-              src={bust(cardImg || breed.image)}
-              alt={breed.name}
-              className={styles.cardImg}
-              loading="lazy"
-              draggable={false}
-            />
-          </div>
+        {/* FRONT -- exact Jul 14 breedCard */}
+        <Link href={`/chums/${breed.slug}`} className={styles.front}>
+          <img
+            src={bust(cardImg || breed.image)}
+            alt={breed.name}
+            className={styles.cardImg}
+            loading="lazy"
+            draggable={false}
+          />
           <div
-            className={styles.fitLabel}
+            className={styles.cardScore}
             style={{ background: colour.bg, color: colour.text }}
           >
             {label}
           </div>
         </Link>
 
-        {/* ── BACK ── */}
+        {/* BACK -- yellow panel */}
         <Link
           href={href}
-          className={styles.flipBack}
-          onClick={handleClick}
+          className={styles.back}
+          onClick={handleBackClick}
           tabIndex={flipped ? 0 : -1}
         >
-          {/* Flip-back button on mobile */}
           <button
             className={styles.flipBackBtn}
             onClick={handleFlipBack}
@@ -117,7 +108,6 @@ export default function BreedResultRail({ breeds, bestSlug }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
 
-  // Horizontal wheel scroll -- borrowed from CardRail
   useEffect(() => {
     const el = railRef.current;
     if (!el) return;
@@ -134,37 +124,22 @@ export default function BreedResultRail({ breeds, bestSlug }: Props) {
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
-  // Custom scrollbar -- borrowed from CardRail
   useEffect(() => {
     const el = railRef.current;
     const track = trackRef.current;
     const thumb = thumbRef.current;
     if (!el || !track || !thumb) return;
-
     const sync = () => {
       const max = el.scrollWidth - el.clientWidth;
       if (max <= 1) { track.style.opacity = "0"; return; }
       track.style.opacity = "1";
-      const widthPct = (el.clientWidth / el.scrollWidth) * 100;
-      const leftPct = (el.scrollLeft / el.scrollWidth) * 100;
-      thumb.style.width = `${widthPct}%`;
-      thumb.style.left = `${leftPct}%`;
+      thumb.style.width = `${(el.clientWidth / el.scrollWidth) * 100}%`;
+      thumb.style.left = `${(el.scrollLeft / el.scrollWidth) * 100}%`;
     };
-
-    let dragging = false;
-    let startX = 0;
-    let startScroll = 0;
-    const onDown = (e: PointerEvent) => {
-      dragging = true; startX = e.clientX; startScroll = el.scrollLeft;
-      thumb.setPointerCapture(e.pointerId); e.preventDefault();
-    };
-    const onMove = (e: PointerEvent) => {
-      if (!dragging) return;
-      const max = el.scrollWidth - el.clientWidth;
-      el.scrollLeft = Math.max(0, Math.min(startScroll + ((e.clientX - startX) / (track.clientWidth || 1)) * el.scrollWidth, max));
-    };
+    let dragging = false; let startX = 0; let startScroll = 0;
+    const onDown = (e: PointerEvent) => { dragging = true; startX = e.clientX; startScroll = el.scrollLeft; thumb.setPointerCapture(e.pointerId); e.preventDefault(); };
+    const onMove = (e: PointerEvent) => { if (!dragging) return; el.scrollLeft = Math.max(0, Math.min(startScroll + ((e.clientX - startX) / (track.clientWidth || 1)) * el.scrollWidth, el.scrollWidth - el.clientWidth)); };
     const onUp = () => { dragging = false; };
-
     sync();
     el.addEventListener("scroll", sync, { passive: true });
     window.addEventListener("resize", sync);
