@@ -123,7 +123,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         <button
           className={styles.startBtn}
           disabled={!platform}
-          onClick={() => { if (pendingPick) pickFavourite(pendingPick); }}
+          onClick={startKnockout}
         >
           Start the Knockout →
         </button>
