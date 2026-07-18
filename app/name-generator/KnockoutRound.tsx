@@ -28,20 +28,23 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
-  const [phase, setPhase] = useState<"intro" | "fighting" | "share">("intro");
-  const [platform] = useState<Platform>("none");
+  const [phase, setPhase] = useState<"intro" | "platform" | "fighting" | "share">("intro");
+  const [platform, setPlatform] = useState<Platform | null>(null);
   const [remaining, setRemaining] = useState<ShortlistEntry[]>([]);
   const [pairIdx, setPairIdx] = useState(0);
   const [byes, setByes] = useState<ShortlistEntry[]>([]);
   const [finalists, setFinalists] = useState<ShortlistEntry[]>([]);
   const [chosen, setChosen] = useState<number | null>(null);
   const [favePick, setFavePick] = useState<ShortlistEntry | null>(null);
+  const [pendingPick, setPendingPick] = useState<ShortlistEntry | null>(null);
 
-  // Top 2 by score
   const ourPicks = [...shortlist].sort((a, b) => b.score - a.score).slice(0, 2);
 
-  // User taps one of Our Picks -- that's their declared favourite
-  // It gets a bye straight to the end; the rest fight it out
+  function selectName(pick: ShortlistEntry) {
+    setPendingPick(pick);
+    setPhase("platform" as any);
+  }
+
   function pickFavourite(pick: ShortlistEntry) {
     setFavePick(pick);
     const rest = shuffle(shortlist.filter(e => e.full !== pick.full));
@@ -91,6 +94,43 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     }, 400);
   }
 
+  // ── PLATFORM SELECTION ──────────────────────────────────────────────────
+  if ((phase as string) === "platform") {
+    return (
+      <div className={styles.wrap}>
+        <h2 className={`display ${styles.title}`}>
+          The <span className={styles.yellow}>Knockout</span> Round
+        </h2>
+        <p className={styles.sub}>Where are you sharing your poll?</p>
+        <div className={styles.platformGrid}>
+          {([
+            { id: "instagram", emoji: "📸", name: "Instagram", limit: "stops at 2" },
+            { id: "twitter",   emoji: "𝕏",  name: "X / Twitter", limit: "stops at 4" },
+            { id: "tiktok",    emoji: "🎵", name: "TikTok", limit: "stops at 2" },
+            { id: "none",      emoji: "📋", name: "No platform", limit: "up to 4" },
+          ] as { id: Platform; emoji: string; name: string; limit: string }[]).map((p) => (
+            <button
+              key={p.id}
+              className={`${styles.platformBtn} ${platform === p.id ? styles.platformSelected : ""}`}
+              onClick={() => setPlatform(p.id)}
+            >
+              <span className={styles.platformEmoji}>{p.emoji}</span>
+              <span className={styles.platformName}>{p.name}</span>
+              <span className={styles.platformLimit}>{p.limit}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          className={styles.startBtn}
+          disabled={!platform}
+          onClick={() => { if (pendingPick) pickFavourite(pendingPick); }}
+        >
+          Start the Knockout →
+        </button>
+      </div>
+    );
+  }
+
   if (phase === "share") {
     return <ShareScreen finalists={finalists} breed={breed} platform={platform} onBack={onBack} />;
   }
@@ -101,7 +141,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
 
     return (
       <div className={styles.wrap}>
-        <button className={styles.backBtn} onClick={onBack}>← Back</button>
         <h2 className={`display ${styles.title}`}>
           The <span className={styles.yellow}>Knockout</span> Round
         </h2>
@@ -149,8 +188,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   // ── INTRO ────────────────────────────────────────────────────────────────
   return (
     <div className={styles.wrap}>
-      <button className={styles.backBtn} onClick={onBack}>← Back</button>
-
       <h2 className={`display ${styles.title}`}>
         The <span className={styles.yellow}>Knockout</span> Round
       </h2>
@@ -165,7 +202,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
             <button
               key={e.full}
               className={styles.allNameBtn}
-              onClick={() => pickFavourite(e)}
+              onClick={() => selectName(e)}
             >
               {e.full}
             </button>
