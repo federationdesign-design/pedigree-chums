@@ -354,9 +354,7 @@
   transition: background 0.15s ease, transform 0.1s ease;
 }
 .readMore:hover { background: #ffe566; transform: scale(1.03); }
-.tagMisjudged { background: var(--yellow, #ffd23e); color: var(--navy, #0a3a57); }
 .tagGood { background: #22c55e; color: #ffffff; }
-.tagReal { background: #3b82f6; color: #ffffff; }
 .essayPage {
   min-height: 100vh;
   padding-bottom: 80px;

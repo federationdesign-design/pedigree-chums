@@ -69,7 +69,7 @@ export default function GreyfriarsBobbyPage() {
               <p>The Hound of the Baskervilles reflects the fear that dogs can be turned into monsters. Gelert reflects the fear that we might condemn an innocent animal. Lassie reflects the desire that dogs might be better than we are.</p>
               <p>Greyfriars Bobby reflects something else: the human need to believe that love can outlast the person who inspired it.</p>
               <p>That need is genuine. The story that serves it may be partly shaped. And the small terrier at the centre of both has been transformed into something that no living dog could ever quite become. An idea of faithfulness, preserved in bronze.</p>
-              <p className={styles.verdict}><strong>The verdict:</strong> Real dog transformed into a moral symbol. Genuine attachment simplified by legend into something closer to perfection than any living animal could sustain.</p>
+              <p className={styles.verdict}><strong>The verdict:</strong> Good dog. Genuine attachment simplified by legend into something closer to perfection than any living animal could sustain.</p>
             </div>
           </article>
 

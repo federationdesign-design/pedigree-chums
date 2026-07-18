@@ -20,7 +20,7 @@ const ESSAYS = [
   },
   {
     slug: "gelert",
-    tag: "Misjudged dog", tagStyle: "tagMisjudged",
+    tag: "Good dog", tagStyle: "tagGood",
     breed: "Irish Wolfhound",
     title: "Gelert: The Dog Who Couldn't Explain Himself",
     summary: "Llywelyn the Great returns from the hunt to find his hound covered in blood and the cradle empty. He draws his sword. Only after Gelert is dead does the truth become clear. A legend about what happens when a powerful dog cannot defend itself against the story told about it.",
@@ -41,7 +41,7 @@ const ESSAYS = [
   },
   {
     slug: "greyfriars-bobby",
-    tag: "Real dog", tagStyle: "tagReal",
+    tag: "Good dog", tagStyle: "tagGood",
     breed: "Skye Terrier",
     title: "Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog",
     summary: "A small terrier lived near Greyfriars Kirkyard for fourteen years after his master's death. A city watched, fed him, photographed him and eventually cast him in bronze. An essay on what happens when a real dog is gradually transformed into the perfect good dog.",
