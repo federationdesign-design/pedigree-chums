@@ -175,17 +175,16 @@
 }
 
 .pairWrap {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
 }
 
 .fightCard {
-  flex: 1;
-  min-width: 200px;
-  max-width: 360px;
+  width: 100%;
+  min-height: 200px;
   background: var(--navy, #0a3a57);
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: 20px;
@@ -237,13 +236,11 @@
 
 .vsLabel {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   color: var(--yellow, #ffe227);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  margin-top: -80px;
+  text-align: center;
+  margin: 0 0 20px;
+  letter-spacing: 0.08em;
 }
 
 .byeCard {
