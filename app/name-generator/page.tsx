@@ -2250,10 +2250,10 @@ export default function NameGeneratorPage() {
               ))}
 
               <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
-                {swipeDir && (<div style={{ position:"absolute", inset:0, zIndex:10, display:"flex", alignItems:"center", justifyContent:"center", pointerEvents:"none", animation:"swipeFade 0.35s ease forwards", fontSize:"4rem" }}>{swipeDir === "right" ? "❤️" : "💨"}</div>)}
-                <div style={{ display:"flex", gap:12, marginBottom:12 }}>
+                
+                <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:12 }}>
                   <button onClick={handleNope} className="display" style={{ flex:1, padding:16, borderRadius:999, border:"none", background:"#ef4444", color:"#fff", fontSize:"clamp(1rem,2.5vw,1.2rem)", cursor:"pointer", letterSpacing:"0.04em", boxShadow:"0 4px 0 rgba(0,0,0,0.2)", fontFamily:"var(--font-display)" }}>✕ No way!</button>
-                  <button onClick={handleLike} className="display" style={{ flex:1, padding:16, borderRadius:999, border:"none", background:"var(--yellow)", color:"var(--navy)", fontSize:"clamp(1rem,2.5vw,1.2rem)", cursor:"pointer", letterSpacing:"0.04em", boxShadow:"0 4px 0 rgba(0,0,0,0.2)", fontFamily:"var(--font-display)" }}>✓ I like it</button>
+                  <button onClick={handleLike} className="display" style={{ flex:1, padding:16, borderRadius:999, border:"none", background:"#22c55e", color:"#fff", fontSize:"clamp(1rem,2.5vw,1.2rem)", cursor:"pointer", letterSpacing:"0.04em", boxShadow:"0 4px 0 rgba(0,0,0,0.2)", fontFamily:"var(--font-display)" }}>✓ I like it</button>
                 </div>
                 <button onClick={handleStartOver} className="display" style={{ width:"100%", padding:12, borderRadius:999, border:"2px solid rgba(10,58,87,0.4)", background:"transparent", color:"var(--navy)", fontSize:"clamp(0.85rem,1.8vw,0.95rem)", cursor:"pointer", letterSpacing:"0.04em", fontFamily:"var(--font-display)" }}>Start over</button>
               </div>
