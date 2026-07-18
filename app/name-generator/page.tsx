@@ -2228,6 +2228,11 @@ export default function NameGeneratorPage() {
                     <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
                   </div>
                   {/* NICKNAME -- the hero name, big */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
+                  <button onClick={handleNope} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+                  <button onClick={handleStartOver} style={{ background:"none", border:"none", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", cursor:"pointer" }}>Start over</button>
+                  <button onClick={handleLike} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                </div>
                   {r.nickname ? (
                     <>
                       <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(2rem,8vw,3.2rem)", color:"#fff", lineHeight:1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:10 }}>
@@ -2251,11 +2256,6 @@ export default function NameGeneratorPage() {
 
               <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
                 
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
-                  <button onClick={handleNope} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
-                  <button onClick={handleStartOver} style={{ background:"none", border:"none", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", cursor:"pointer" }}>Start over</button>
-                  <button onClick={handleLike} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
-                </div>
               </div>
             </>
           )}
