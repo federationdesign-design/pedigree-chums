@@ -1898,6 +1898,7 @@ export default function NameGeneratorPage() {
   const [qIndices, setQIndices] = useState<number[]>(() => pickThreeQuestions());
   const [qAnswers, setQAnswers] = useState<Record<number,string>>({});
   const [qOpen, setQOpen] = useState(false);
+  const [snOpen, setSnOpen] = useState(false);
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
   const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
@@ -2060,11 +2061,29 @@ export default function NameGeneratorPage() {
                   </button>
                 ))}
               </div>
-<label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:4, fontFamily:"var(--font-body)" }}>Want to personalise with your surname? <span style={{ color:"rgba(255,255,255,0.4)", fontWeight:400, textTransform:"none", fontSize:"0.7rem" }}>(optional)</span></label>
-              <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
-                placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
-                onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
-                style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
+<div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom: snOpen ? 0 : 22 }}>
+                <button
+                  onClick={() => setSnOpen((o: boolean) => !o)}
+                  style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", cursor:"pointer", padding:0, marginBottom: snOpen ? 16 : 0 }}>
+                  <span style={{ color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
+                    Want to personalise with your surname?
+                    {surname.trim().length > 0 && (
+                      <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
+                        {surname.trim()}
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color:"var(--yellow)", fontSize:"1rem", lineHeight:1, transform: snOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", display:"inline-block" }}>
+                    ▼
+                  </span>
+                </button>
+                {snOpen && (
+                  <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
+                    placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
+                    onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
+                    style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
+                )}
+              </div>
                             <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom:22 }}>
                 {/* Collapsible header */}
                 <button
