@@ -160,7 +160,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
 
       {/* Our Picks -- CLICKABLE */}
       <div className={styles.picksBox}>
-        <p className={styles.picksLabel}>⭐ Our picks</p>
+        <p className={styles.picksLabel}>Our picks</p>
         <p className={styles.picksSub}>We love these two based on scoring. Tap the one you prefer most -- it goes straight through. The rest fight it out.</p>
         <div className={styles.picksRow}>
           {ourPicks.map((p) => (

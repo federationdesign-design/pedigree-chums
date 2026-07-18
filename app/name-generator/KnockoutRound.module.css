@@ -35,7 +35,7 @@
 
 /* Our Picks box */
 .picksBox {
-  background: rgba(255,226,39,0.1);
+  background: var(--navy, #0a3a57);
   border: 2px solid var(--yellow, #ffe227);
   border-radius: 20px;
   padding: 20px;
@@ -247,7 +247,7 @@
 }
 
 .byeCard {
-  background: rgba(255,226,39,0.1);
+  background: var(--navy, #0a3a57);
   border: 2px solid var(--yellow, #ffe227);
   border-radius: 20px;
   padding: 28px 32px;
