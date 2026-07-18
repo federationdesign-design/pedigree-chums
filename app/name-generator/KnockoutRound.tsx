@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
 import { ShortlistEntry } from "./ShortlistBar";
@@ -29,39 +29,39 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   const [phase, setPhase] = useState<"intro" | "fighting" | "share">("intro");
-  const [platform, setPlatform] = useState<Platform | null>(null);
+  const [platform] = useState<Platform>("none");
   const [remaining, setRemaining] = useState<ShortlistEntry[]>([]);
   const [pairIdx, setPairIdx] = useState(0);
   const [byes, setByes] = useState<ShortlistEntry[]>([]);
   const [finalists, setFinalists] = useState<ShortlistEntry[]>([]);
-  const [chosen, setChosen] = useState<number | null>(null); // 0 or 1, for animation
+  const [chosen, setChosen] = useState<number | null>(null);
+  const [favePick, setFavePick] = useState<ShortlistEntry | null>(null);
 
-  // Top 2 by score -- our picks
+  // Top 2 by score
   const ourPicks = [...shortlist].sort((a, b) => b.score - a.score).slice(0, 2);
 
-  function startKnockout() {
-    if (!platform) return;
-    const limit = PLATFORM_LIMIT[platform];
-    // If already at or below limit, go straight to share
-    if (shortlist.length <= limit) {
-      setFinalists(shortlist);
+  // User taps one of Our Picks -- that's their declared favourite
+  // It gets a bye straight to the end; the rest fight it out
+  function pickFavourite(pick: ShortlistEntry) {
+    setFavePick(pick);
+    const rest = shuffle(shortlist.filter(e => e.full !== pick.full));
+    if (rest.length === 0) {
+      setFinalists([pick]);
       setPhase("share");
       return;
     }
-    const shuffled = shuffle(shortlist);
-    setRemaining(shuffled);
+    setRemaining(rest);
     setPairIdx(0);
-    setByes([]);
+    setByes([pick]); // favourite gets a bye
     setPhase("fighting");
   }
 
-  // Current pair
+  // Fighting phase pick
   const pair = [remaining[pairIdx * 2], remaining[pairIdx * 2 + 1]].filter(Boolean);
   const hasBye = pair.length === 1;
-  const limit = platform ? PLATFORM_LIMIT[platform] : 4;
+  const limit = PLATFORM_LIMIT[platform];
 
   function pick(winner: ShortlistEntry) {
-    // Animate briefly then advance
     const winnerIdx = pair.indexOf(winner);
     setChosen(winnerIdx);
     setTimeout(() => {
@@ -71,9 +71,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
       const totalPairs = Math.floor(remaining.length / 2);
 
       if (nextPairIdx >= totalPairs) {
-        // End of round -- collect all winners + remaining byes
         const roundWinners = [...winners];
-        // If odd number, last item gets a bye
         if (remaining.length % 2 === 1) {
           roundWinners.push(remaining[remaining.length - 1]);
         }
@@ -81,10 +79,10 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           setFinalists(roundWinners);
           setPhase("share");
         } else {
-          // Next round
-          setRemaining(shuffle(roundWinners));
+          setRemaining(shuffle(roundWinners.filter(e => e.full !== (favePick?.full ?? ""))));
+          const fave = roundWinners.find(e => e.full === favePick?.full);
           setPairIdx(0);
-          setByes([]);
+          setByes(fave ? [fave] : []);
         }
       } else {
         setByes(winners);
@@ -98,7 +96,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   }
 
   if (phase === "fighting") {
-    const totalRounds = Math.ceil(Math.log2(shortlist.length / limit));
     const currentWinners = byes.length + pairIdx;
     const progress = currentWinners / (shortlist.length - limit);
 
@@ -119,10 +116,10 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
             <div className={styles.byeCard}>
               <p className={styles.byeLabel}>🎉 Free pass!</p>
               <p className={styles.byeName}>{pair[0].full}</p>
-              <p className={styles.byeNick}>"{pair[0].nickname}"</p>
-              <button className={styles.byeBtn} onClick={() => pick(pair[0])}>
-                Advance →
-              </button>
+              {pair[0].nickname && pair[0].nickname !== pair[0].full && (
+                <p className={styles.byeNick}>"{pair[0].nickname}"</p>
+              )}
+              <button className={styles.byeBtn} onClick={() => pick(pair[0])}>Advance →</button>
             </div>
           ) : (
             pair.map((entry, i) => (
@@ -143,13 +140,13 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         </div>
 
         {!hasBye && pair.length === 2 && (
-          <div className={styles.vsLabel}>VS</div>
+          <p className={styles.vsLabel}>VS</p>
         )}
       </div>
     );
   }
 
-  // Intro phase
+  // ── INTRO ────────────────────────────────────────────────────────────────
   return (
     <div className={styles.wrap}>
       <button className={styles.backBtn} onClick={onBack}>← Back</button>
@@ -158,58 +155,46 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         The <span className={styles.yellow}>Knockout</span> Round
       </h2>
       <p className={styles.sub}>
-        You&apos;ve saved {shortlist.length} name{shortlist.length !== 1 ? "s" : ""}. Time to find your favourite.
+        You&apos;ve saved {shortlist.length} name{shortlist.length !== 1 ? "s" : ""}. Tap your favourite to kick things off.
       </p>
 
-      {/* Our Picks */}
+      {/* Our Picks -- CLICKABLE */}
       <div className={styles.picksBox}>
         <p className={styles.picksLabel}>⭐ Our picks</p>
-        <p className={styles.picksSub}>Based on how well the names scored, we love these two</p>
+        <p className={styles.picksSub}>We love these two based on scoring. Tap the one you prefer most -- it goes straight through. The rest fight it out.</p>
         <div className={styles.picksRow}>
           {ourPicks.map((p) => (
-            <div key={p.full} className={styles.pickCard}>
+            <button
+              key={p.full}
+              className={styles.pickCard}
+              onClick={() => pickFavourite(p)}
+            >
               <p className={styles.pickName}>{p.full}</p>
               {p.nickname && p.nickname !== p.full && (
                 <p className={styles.pickNick}>"{p.nickname}"</p>
               )}
-            </div>
+              <span className={styles.pickCta}>This one ★</span>
+            </button>
           ))}
         </div>
-        <p className={styles.picksNote}>They still have to earn it though 🏆</p>
+        <p className={styles.picksNote}>Not feeling either? Scroll down to pick any name.</p>
       </div>
 
-      {/* Platform selector */}
-      <div className={styles.platformBox}>
-        <p className={styles.platformLabel}>Where are you sharing?</p>
-        <div className={styles.platformGrid}>
-          {([
-            { id: "instagram", emoji: "📸", name: "Instagram", limit: "2 names" },
-            { id: "twitter",   emoji: "𝕏",  name: "X / Twitter", limit: "4 names" },
-            { id: "tiktok",    emoji: "🎵", name: "TikTok", limit: "2 names" },
-            { id: "none",      emoji: "📋", name: "No platform", limit: "up to 4" },
-          ] as { id: Platform; emoji: string; name: string; limit: string }[]).map((p) => (
+      {/* All names -- also clickable */}
+      <div className={styles.allNamesBox}>
+        <p className={styles.allNamesLabel}>Or pick from all your names</p>
+        <div className={styles.allNamesList}>
+          {shortlist.map((e) => (
             <button
-              key={p.id}
-              className={`${styles.platformBtn} ${platform === p.id ? styles.platformSelected : ""}`}
-              onClick={() => setPlatform(p.id)}
+              key={e.full}
+              className={styles.allNameBtn}
+              onClick={() => pickFavourite(e)}
             >
-              <span className={styles.platformEmoji}>{p.emoji}</span>
-              <span className={styles.platformName}>{p.name}</span>
-              <span className={styles.platformLimit}>{p.limit}</span>
+              {e.full}
             </button>
           ))}
         </div>
       </div>
-
-      <button
-        className={styles.startBtn}
-        onClick={startKnockout}
-        disabled={!platform}
-      >
-        {platform && shortlist.length <= PLATFORM_LIMIT[platform]
-          ? "Share my shortlist →"
-          : "Start the Knockout →"}
-      </button>
     </div>
   );
 }

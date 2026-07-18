@@ -19,7 +19,7 @@
 .backBtn:hover { color: #fff; }
 
 .title {
-  font-size: clamp(3rem, 10vw, 6.5rem);
+  font-size: clamp(2rem, 6vw, 3.5rem);
   color: #fff;
   margin: 0 0 8px;
   line-height: 1;
@@ -63,8 +63,16 @@
 .pickCard {
   background: var(--yellow, #ffe227);
   border-radius: 14px;
-  padding: 12px 20px;
-  min-width: 120px;
+  padding: 16px 24px;
+  min-width: 160px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-align: center;
+}
+.pickCard:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
 }
 .pickName {
   font-family: var(--font-display, "Luckiest Guy", cursive);
@@ -267,4 +275,52 @@
   padding: 10px 24px;
   cursor: pointer;
   font-size: 0.9rem;
+}
+
+.pickCta {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 0.85rem;
+  color: var(--navy, #0a3a57);
+  letter-spacing: 0.04em;
+  opacity: 1;
+}
+
+/* All names section */
+.allNamesBox {
+  margin-top: 24px;
+}
+.allNamesLabel {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  margin: 0 0 12px;
+}
+.allNamesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.allNameBtn {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  letter-spacing: 0.03em;
+  background: var(--navy, #0a3a57);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, border-color 0.15s;
+}
+.allNameBtn:hover {
+  background: var(--yellow, #ffe227);
+  color: var(--navy, #0a3a57);
+  border-color: var(--yellow, #ffe227);
+  transform: scale(1.04);
 }
