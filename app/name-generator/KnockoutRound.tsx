@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
 import { ShortlistEntry } from "./ShortlistBar";
@@ -80,32 +81,34 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   if (phase === "share") return <ShareScreen finalists={finalists} breed={breed} platform={platform} onBack={onBack} />;
 
   if (phase === "platform") return (
+    <>
+    <Nav />
     <div className={styles.wrap}>
       <h2 className={`display ${styles.title}`}>The <span className={styles.yellow}>Knockout</span> Round</h2>
       <p className={styles.sub}>{shortlist.length} names saved. Where are you sharing?</p>
       <div className={styles.platformGrid}>
         {([
-          { id: "instagram", emoji: "📸", name: "Instagram", note: "Final 2" },
-          { id: "twitter",   emoji: "𝕏",  name: "X / Twitter", note: "Final 4" },
-          { id: "tiktok",    emoji: "🎵", name: "TikTok", note: "Final 2" },
-          { id: "none",      emoji: "📋", name: "No platform", note: "Final 4" },
+          { id: "instagram", emoji: "📸", name: "Instagram", note: "Allowed 2 results max" },
+          { id: "twitter",   emoji: "𝕏",  name: "X / Twitter", note: "Allowed 4 results max" },
+          { id: "tiktok",    emoji: "🎵", name: "TikTok", note: "Allowed 2 results max" },
+          { id: "none",      emoji: "📋", name: "Skip", note: "Allowed 4 results max" },
         ] as { id: Platform; emoji: string; name: string; note: string }[]).map(p => (
           <button key={p.id}
             className={`${styles.platformBtn} ${platform === p.id ? styles.platformSelected : ""}`}
-            onClick={() => setPlatform(p.id)}>
+            onClick={() => { setPlatform(p.id); setBracket(shuffle(shortlist)); setPairIdx(0); setRoundWinners([]); setRoundNum(1); setPhase("fighting"); }}>
             <span className={styles.platformEmoji}>{p.emoji}</span>
             <span className={styles.platformName}>{p.name}</span>
             <span className={styles.platformLimit}>{p.note}</span>
           </button>
         ))}
       </div>
-      <button className={styles.startBtn} disabled={!platform} onClick={startKnockout}>
-        Start the Knockout →
-      </button>
     </div>
+    </>
   );
 
   return (
+    <>
+    <Nav />
     <div className={styles.wrap}>
       <h2 className={`display ${styles.title}`}>The <span className={styles.yellow}>Knockout</span> Round</h2>
       <p className={styles.sub}>Round {roundNum} — tap to pick the winner</p>
@@ -136,5 +139,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         </>
       )}
     </div>
+    </>
   );
 }

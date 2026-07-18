@@ -1,7 +1,7 @@
 .wrap {
   max-width: 960px;
   margin: 0 auto;
-  padding: clamp(20px, 4vw, 40px);
+  padding: clamp(60px, 10vw, 120px) clamp(16px, 5vw, 48px) 80px;
   text-align: center;
 }
 
@@ -107,34 +107,34 @@
   margin: 0 0 12px;
 }
 .platformGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 28px;
 }
 .platformBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 14px 10px;
+  gap: 8px;
+  padding: 12px 8px;
   border-radius: 16px;
-  border: 2px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06);
+  border: none;
+  background: none;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  transition: transform 0.15s;
+  flex: 1;
+  max-width: 140px;
 }
-.platformBtn:hover { border-color: var(--yellow, #ffe227); background: rgba(255,226,39,0.08); }
-.platformSelected {
-  border-color: var(--yellow, #ffe227) !important;
-  background: rgba(255,226,39,0.15) !important;
-  transform: scale(1.03);
-}
-.platformEmoji { font-size: 1.4rem; }
+.platformBtn:hover { transform: scale(1.08); }
+.platformSelected { transform: scale(1.08); }
+.platformEmoji { font-size: 5.5rem; line-height: 1; }
 .platformName {
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
   color: #fff;
+  letter-spacing: 0.04em;
 }
 .platformLimit {
   font-family: var(--font-body), sans-serif;
@@ -142,21 +142,6 @@
   color: #ffffff;
 }
 
-.startBtn {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1rem;
-  letter-spacing: 0.04em;
-  background: var(--yellow, #ffe227);
-  color: var(--navy, #0a3a57);
-  border: none;
-  border-radius: 999px;
-  padding: 14px 32px;
-  cursor: pointer;
-  width: 100%;
-  transition: transform 0.15s, opacity 0.15s;
-}
-.startBtn:hover:not(:disabled) { transform: scale(1.03); }
-.startBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Fighting phase */
 .progress {
