@@ -2251,13 +2251,10 @@ export default function NameGeneratorPage() {
 
               <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
                 
-                <div style={{ textAlign:"center", marginBottom:8 }}>
-                  <button onClick={handleStartOver} style={{ background:"none", border:"none", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"0.8rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", cursor:"pointer", opacity:0.7 }}>Start over</button>
-                </div>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16 }}>
-                  <button onClick={handleNope} style={{ width:72, height:72, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"1.8rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
-                  <div style={{ flex:1 }} />
-                  <button onClick={handleLike} style={{ width:72, height:72, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"1.8rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
+                  <button onClick={handleNope} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+                  <button onClick={handleStartOver} style={{ background:"none", border:"none", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", cursor:"pointer" }}>Start over</button>
+                  <button onClick={handleLike} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
                 </div>
               </div>
             </>
