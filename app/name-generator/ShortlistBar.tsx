@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useRef } from "react";
 import styles from "./ShortlistBar.module.css";
 
 export type ShortlistEntry = { full: string; nickname: string; score: number; breed: string };
@@ -13,12 +12,6 @@ type Props = {
 };
 
 export default function ShortlistBar({ shortlist, onRemove, onClear, onKnockout, landingIdx }: Props) {
-  const barRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to end when new name added
-  useEffect(() => {
-    if (barRef.current) barRef.current.scrollLeft = barRef.current.scrollWidth;
-  }, [shortlist.length]);
 
   if (shortlist.length === 0) return null;
 
@@ -26,7 +19,7 @@ export default function ShortlistBar({ shortlist, onRemove, onClear, onKnockout,
     <div className={styles.bar}>
       <div className={styles.inner}>
         <span className={styles.label}>Liked</span>
-        <div ref={barRef} className={styles.pills}>
+        <div className={styles.pills}>
           {shortlist.map((e, i) => (
             <div
               key={`${e.full}-${i}`}

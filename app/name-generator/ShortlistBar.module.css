@@ -3,16 +3,17 @@
   z-index: 90;
   background: var(--navy, #0a3a57);
   border-top: 2px solid var(--yellow, #ffe227);
-  padding: 20px 24px;
+  padding: 16px clamp(20px, 6vw, 90px);
   box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
 }
 
 .inner {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+  flex-wrap: wrap;
 }
 
 .label {
@@ -28,13 +29,11 @@
 
 .pills {
   display: flex;
-  gap: 16px;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  gap: 10px;
   flex: 1;
-  scrollbar-width: none;
-  padding: 8px 0;
+  padding: 4px 0;
 }
-.pills::-webkit-scrollbar { display: none; }
 
 .pill {
   display: flex;
