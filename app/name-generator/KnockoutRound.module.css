@@ -334,8 +334,8 @@
 
 .bracketSlotActive {
   border-color: var(--yellow, #ffe227) !important;
-  background: rgba(255,226,39,0.12) !important;
-  color: var(--yellow, #ffe227) !important;
+  background: rgba(255,226,39,0.15) !important;
+  color: #ffffff !important;
 }
 
 .bracketWinner {
@@ -345,9 +345,9 @@
 }
 
 .bracketLoser {
-  background: rgba(10,58,87,0.4) !important;
-  border-color: rgba(10,58,87,0.6) !important;
-  color: rgba(255,255,255,0.3) !important;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: rgba(255,255,255,0.6) !important;
   text-decoration: line-through;
 }
 

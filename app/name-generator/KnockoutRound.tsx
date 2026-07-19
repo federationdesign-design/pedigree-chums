@@ -397,22 +397,34 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
               <div key={rIdx} className={styles.bracketRound}>
                 <p className={styles.bracketRoundLabel}>{getRoundName(totalRounds - rIdx)}</p>
                 <div className={styles.bracketMatchGroup}>
-                  {roundSlots.map((matchSlots, mIdx) => (
-                    <div key={mIdx} className={styles.bracketMatch}>
-                      {matchSlots.map((slot, sIdx) => (
-                        <div key={sIdx}
-                          className={[
-                            styles.bracketSlot,
-                            slot.state === "winner" ? styles.bracketWinner : "",
-                            slot.state === "loser" ? styles.bracketLoser : "",
-                            slot.state === "bye" ? styles.bracketBye : "",
-                            rIdx === currentRound && mIdx === currentMatch ? styles.bracketSlotActive : "",
-                          ].filter(Boolean).join(" ")}>
-                          {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
+                  {roundSlots.map((matchSlots, mIdx) => {
+                    // Hide pure-bye matches (null vs null) that are just bracket padding
+                    const hasAnyEntry = matchSlots.some(s => s.entry !== null);
+                    const bothNull = matchSlots.every(s => s.entry === null);
+                    // In future rounds, always show (they fill in as tournament progresses)
+                    // In round 0, hide if both are null (pure padding byes)
+                    if (rIdx === 0 && bothNull) return null;
+                    return (
+                      <div key={mIdx} className={styles.bracketMatch}>
+                        {matchSlots.map((slot, sIdx) => {
+                          // In round 0, hide empty bye slot (the null side of a real bye)
+                          if (rIdx === 0 && !slot.entry && hasAnyEntry) return null;
+                          return (
+                            <div key={sIdx}
+                              className={[
+                                styles.bracketSlot,
+                                slot.state === "winner" ? styles.bracketWinner : "",
+                                slot.state === "loser" ? styles.bracketLoser : "",
+                                slot.state === "bye" ? styles.bracketBye : "",
+                                rIdx === currentRound && mIdx === currentMatch ? styles.bracketSlotActive : "",
+                              ].filter(Boolean).join(" ")}>
+                              {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
