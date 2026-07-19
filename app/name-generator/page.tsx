@@ -2356,7 +2356,7 @@ export default function NameGeneratorPage() {
           })()}
           {stage === "inputs" && (() => {
             return (
-            <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
+            <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)", maxWidth:"60%", margin:"0 auto", width:"100%" }}>
               {!fromCalculator && (<>
                 <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
                 <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} setQIndices(pickThreeQuestions()); setQAnswers({}); }}
