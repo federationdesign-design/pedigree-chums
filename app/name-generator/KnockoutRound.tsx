@@ -133,9 +133,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         "irish setter":           "/podiums/setter-podium.jpg",
         "cockapoo":               "/podiums/cockapoo-podium.jpg",
         "border collie":          "/podiums/collie-podium.jpg",
-        "collie":                 "/podiums/collie-podium.jpg",
         "dachshund":              "/podiums/dachshund-podium.jpg",
-        "miniature dachshund":    "/podiums/dachshund-podium.jpg",
       };
       const breedKey = (breed || "").toLowerCase().trim();
       img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
