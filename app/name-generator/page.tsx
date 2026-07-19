@@ -1927,6 +1927,12 @@ export default function NameGeneratorPage() {
   const [landingIdx, setLandingIdx] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [showKnockout, setShowKnockout] = useState(false);
+  // Quick-fire question state for exhausted mode
+  const [qfActive, setQfActive] = useState(false);
+  const [qfIndex, setQfIndex] = useState(0);   // which question in RANKED_ORDER we're on
+  const [qfCount, setQfCount] = useState(0);   // how many answered this session
+  const [qfShowChoice, setQfShowChoice] = useState(false); // show "keep going / see results" after 3rd
+  const RANKED_QUESTION_ORDER = [0,29,30,5,2,4,23,8,13,14,28,1,9,10,12,26,7,15,17,27,20,11,18,21,22,3,19,24,25,6,16];
   const [swipeDir, setSwipeDir] = useState<string | null>(null);
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -1934,12 +1940,13 @@ export default function NameGeneratorPage() {
   const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
 
-  function handleGenerate() {
+  function handleGenerate(answersOverride?: Record<number, string>) {
     if (!breed) { alert("Please select a breed"); return; }
     // surname is optional
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
     setResults([]);
+    const effectiveAnswers = answersOverride ?? qAnswers;
     const bonus1: string[] = [];
     const bonus2: string[] = [];
     qIndices.forEach((qi: number, pos: number) => {
@@ -2062,7 +2069,64 @@ export default function NameGeneratorPage() {
     setSwipeDir("left");
     setTimeout(() => { setSwipeDir(null); handleRollAgain(); }, 350);
   }
-  function handleStartOver() {
+  function startQuickFire() {
+    // Find first unanswered question in ranked order
+    const firstUnanswered = RANKED_QUESTION_ORDER.find(qi => !(qi in qAnswers));
+    if (firstUnanswered === undefined) return; // all answered, nothing to show
+    setQfIndex(firstUnanswered);
+    setQfCount(0);
+    setQfShowChoice(false);
+    setQfActive(true);
+    setExhausted(false);
+    setStage("reveal"); // stay on reveal, quickfire overlay will show
+  }
+
+  function answerQuickFire(qi: number, label: string) {
+    // Record the answer
+    setQAnswers((prev: Record<number, string>) => ({ ...prev, [qi]: label }));
+    const newCount = qfCount + 1;
+    setQfCount(newCount);
+
+    if (newCount % 3 === 0) {
+      // Every 3rd answer -- show "keep going / see results" choice
+      setQfShowChoice(true);
+    } else {
+      // Advance to next unanswered question
+      const nextQ = RANKED_QUESTION_ORDER.find((q, i) =>
+        RANKED_QUESTION_ORDER.indexOf(q) > RANKED_QUESTION_ORDER.indexOf(qi) && !(q in qAnswers) && q !== qi
+      );
+      if (nextQ !== undefined) {
+        setQfIndex(nextQ);
+      } else {
+        // No more questions -- auto show results
+        fireQuickFireResults({ ...qAnswers, [qi]: label });
+      }
+    }
+  }
+
+  function continueQuickFire() {
+    setQfShowChoice(false);
+    const nextQ = RANKED_QUESTION_ORDER.find(q => !(q in qAnswers));
+    if (nextQ !== undefined) {
+      setQfIndex(nextQ);
+    } else {
+      fireQuickFireResults(qAnswers);
+    }
+  }
+
+  function fireQuickFireResults(answers: Record<number, string>) {
+    setQfActive(false);
+    setQfShowChoice(false);
+    // Re-run generator with updated answers
+    const s = Math.floor(Math.random() * 10000);
+    setSeed(s);
+    setResults([]);
+    setExhausted(false);
+    // Trigger generation with new qAnswers already set
+    setTimeout(() => handleGenerate(answers), 50);
+  }
+
+    function handleStartOver() {
     if (shortlist.length > 0) { if (!window.confirm("Start over? Your liked names stay in your shortlist.")) return; }
     setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false);
   }
@@ -2247,6 +2311,48 @@ export default function NameGeneratorPage() {
 
 
           {/* ── STAGE 3: REVEAL ── */}
+          {qfActive && (() => {
+            const qfQ = QUESTION_BANK[qfIndex];
+            return qfQ ? (
+              <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,30,60,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
+                <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
+                  {!qfShowChoice ? (<>
+                    <p style={{fontFamily:"var(--font-body)",fontSize:"0.75rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(255,255,255,0.7)",marginBottom:12}}>
+                      Quick question {qfCount + 1}
+                    </p>
+                    <p className="display" style={{fontSize:"clamp(1.4rem,4vw,2rem)",color:"#fff",marginBottom:28,lineHeight:1.2}}>
+                      {qfQ.text}
+                    </p>
+                    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                      {qfQ.options.map((opt:{label:string;bonus:string[]}) => (
+                        <button key={opt.label} onClick={() => answerQuickFire(qfIndex, opt.label)}
+                          style={{padding:"14px 24px",borderRadius:999,border:"2px solid rgba(255,255,255,0.3)",background:"rgba(255,255,255,0.1)",color:"#fff",fontFamily:"var(--font-body)",fontSize:"1rem",fontWeight:700,cursor:"pointer",transition:"background 0.15s"}}>
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>) : (<>
+                    <p className="display" style={{fontSize:"clamp(1.4rem,4vw,2rem)",color:"#fff",marginBottom:8}}>Nice one!</p>
+                    <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",color:"rgba(255,255,255,0.85)",marginBottom:28}}>
+                      You&apos;ve answered {qfCount} questions. Ready to see fresh names?
+                    </p>
+                    <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+                      <button onClick={() => fireQuickFireResults(qAnswers)} className="display"
+                        style={{padding:"14px 28px",borderRadius:999,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"clamp(0.9rem,2vw,1rem)",cursor:"pointer",letterSpacing:"0.04em"}}>
+                        See results now
+                      </button>
+                      {QUESTION_BANK.some((_:unknown, qi:number) => !(qi in qAnswers)) && (
+                        <button onClick={continueQuickFire} className="display"
+                          style={{padding:"14px 28px",borderRadius:999,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"clamp(0.9rem,2vw,1rem)",cursor:"pointer",letterSpacing:"0.04em"}}>
+                          Keep answering
+                        </button>
+                      )}
+                    </div>
+                  </>)}
+                </div>
+              </div>
+            ) : null;
+          })()}
           {stage === "reveal" && results.length > 0 && (
             <>
               {results.slice(0,1).map((r: Result) => (
@@ -2306,19 +2412,22 @@ export default function NameGeneratorPage() {
           )}
 
           {/* ── EXHAUSTED STAGE ── */}
-          {stage === "exhausted" && (
+          {stage === "exhausted" && !qfActive && (
             <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:40,padding:"clamp(24px,4vw,40px)",textAlign:"center",color:"#fff"}}>
-              <p style={{fontSize:"2rem",marginBottom:8}}>🐾</p>
-              <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We{"'"}ve run out of new names!</h2>
-              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:24,opacity:0.9}}>Answer a couple more questions and we{"'"}ll find some fresh ones.</p>
-              <button onClick={() => { setQOpen(true); setQIndices(pickThreeQuestions()); setQAnswers({}); setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
-                className="display" style={{padding:"14px 32px",borderRadius:14,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"1.1rem",cursor:"pointer",boxShadow:"0 4px 0 rgba(10,58,87,0.4)",fontFamily:"var(--font-display)",letterSpacing:"0.04em",marginBottom:12,display:"block",width:"100%"}}>
-                Answer more questions
-              </button>
-              <button onClick={() => { setUsedFirstNames(new Set()); setUsedNicknames(new Set()); setStage("inputs"); }}
-                className="display" style={{padding:"14px 32px",borderRadius:14,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"1rem",cursor:"pointer",fontFamily:"var(--font-display)",letterSpacing:"0.04em",display:"block",width:"100%"}}>
-                Start Over
-              </button>
+              <p className="display" style={{fontSize:"clamp(1.4rem,4vw,2rem)",marginBottom:12}}>We&apos;ve run out of new names!</p>
+              <p style={{fontFamily:"var(--font-body)",fontSize:"0.95rem",marginBottom:28,opacity:0.85}}>Answer a few quick questions and we&apos;ll find some fresh ones.</p>
+              <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+                {QUESTION_BANK.some((_:unknown, qi:number) => !(qi in qAnswers)) && (
+                  <button onClick={startQuickFire} className="display"
+                    style={{padding:"14px 28px",borderRadius:999,border:"none",background:"var(--yellow)",color:"var(--navy)",fontSize:"clamp(0.9rem,2vw,1rem)",cursor:"pointer",letterSpacing:"0.04em"}}>
+                    Answer more questions
+                  </button>
+                )}
+                <button onClick={handleStartOver} className="display"
+                  style={{padding:"14px 28px",borderRadius:999,border:"2px solid rgba(255,255,255,0.4)",background:"transparent",color:"#fff",fontSize:"clamp(0.9rem,2vw,1rem)",cursor:"pointer",letterSpacing:"0.04em"}}>
+                  Start over
+                </button>
+              </div>
             </div>
           )}
         </div>
