@@ -1668,7 +1668,7 @@ export default function NameGeneratorPage() {
   return (
     <>
       <Nav />
-      <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
+      <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 50px" }}>
         <div style={{ maxWidth:960, margin:"0 auto" }}>
           <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"var(--navy)", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator

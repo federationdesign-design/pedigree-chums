@@ -3,7 +3,7 @@
   z-index: 90;
   background: var(--navy, #0a3a57);
   border-top: 2px solid var(--yellow, #ffe227);
-  padding: 10px 16px;
+  padding: 20px 24px;
   box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
 }
 
@@ -17,7 +17,7 @@
 
 .label {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.7rem;
+  font-size: 1.4rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -28,22 +28,22 @@
 
 .pills {
   display: flex;
-  gap: 8px;
+  gap: 16px;
   overflow-x: auto;
   flex: 1;
   scrollbar-width: none;
-  padding: 4px 0;
+  padding: 8px 0;
 }
 .pills::-webkit-scrollbar { display: none; }
 
 .pill {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   background: rgba(255,255,255,0.1);
   border: 1.5px solid var(--yellow, #ffe227);
   border-radius: 999px;
-  padding: 4px 10px 4px 12px;
+  padding: 8px 20px 8px 24px;
   white-space: nowrap;
   flex-shrink: 0;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -78,14 +78,14 @@
 
 .pillName {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #fff;
 }
 
 .pillNick {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.7rem;
+  font-size: 1.4rem;
   color: var(--yellow, #ffe227);
 }
 
@@ -94,9 +94,9 @@
   border: none;
   color: rgba(255,255,255,0.5);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.8rem;
   line-height: 1;
-  padding: 0 0 0 4px;
+  padding: 0 0 0 8px;
   flex-shrink: 0;
 }
 .pillRemove:hover { color: #fff; }
@@ -109,13 +109,13 @@
 
 .knockoutBtn {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 0.8rem;
+  font-size: 1.6rem;
   letter-spacing: 0.04em;
   background: var(--yellow, #ffe227);
   color: var(--navy, #0a3a57);
   border: none;
   border-radius: 999px;
-  padding: 6px 14px;
+  padding: 12px 28px;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.15s;
@@ -126,10 +126,10 @@
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1.7rem;
   display: flex;
   align-items: center;
   justify-content: center;
