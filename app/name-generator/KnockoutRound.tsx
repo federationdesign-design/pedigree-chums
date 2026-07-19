@@ -24,6 +24,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   const [bracket, setBracket] = useState<ShortlistEntry[]>(() => shuffle(shortlist));
   const [pairIdx, setPairIdx] = useState(0);
   const [roundWinners, setRoundWinners] = useState<ShortlistEntry[]>([]);
+  const [roundLosers, setRoundLosers] = useState<ShortlistEntry[]>([]);
   const [chosen, setChosen] = useState<number | null>(null);
   const [roundNum, setRoundNum] = useState(1);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -42,27 +43,34 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   const pairB = bracket[pairIdx * 2 + 1];
   const hasBye = pairA && !pairB;
   const isLastPair = pairIdx + 1 >= Math.floor(bracket.length / 2);
-  const isSemiFinal = bracket.length === 4 || bracket.length === 3;
+  // Semi-final is the round whose winners will number exactly 2
+  const nextRoundSize = Math.ceil(bracket.length / 2);
+  const isSemiFinal = nextRoundSize === 2;
+  // Final is the round with exactly 2 names
+  const isFinal = bracket.length === 2;
 
-  function endRound(winners: ShortlistEntry[], losers: ShortlistEntry[]) {
+  function endRound(allWinners: ShortlistEntry[], allLosers: ShortlistEntry[]) {
     const odd = bracket.length % 2 === 1 ? bracket[bracket.length - 1] : null;
-    const next = odd ? [...winners, odd] : winners;
+    const next = odd ? [...allWinners, odd] : allWinners;
 
     if (isSemiFinal) {
-      setSemiFinalLosers(prev => [...prev, ...losers]);
+      // Track all losers from the semi-final for 3rd place
+      setSemiFinalLosers(prev => [...prev, ...allLosers]);
     }
 
-    if (next.length === 1) {
-      // We have our winner
-      const winner = next[0];
-      setFirst(winner);
-      // second is the last loser (losing finalist)
-      // third is highest scored semi-final loser
+    if (isFinal) {
+      // The winner is allWinners[0], loser is 2nd place
+      setFirst(allWinners[0]);
+      setSecond(allLosers[0] || null);
+      setPhase("podium");
+    } else if (next.length === 1) {
+      setFirst(next[0]);
       setPhase("podium");
     } else {
       setBracket(shuffle(next));
       setPairIdx(0);
       setRoundWinners([]);
+      setRoundLosers([]);
       setRoundNum(r => r + 1);
     }
   }
@@ -73,14 +81,13 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     setTimeout(() => {
       setChosen(null);
       const nextWinners = [...roundWinners, winner];
-      const nextLosers = [loser];
+      const nextLosers = [...roundLosers, loser];
 
       if (isLastPair) {
-        // Collect all losers this round
-        const allLosers = isSemiFinal ? [loser] : [];
-        endRound(nextWinners, allLosers);
+        endRound(nextWinners, nextLosers);
       } else {
         setRoundWinners(nextWinners);
+        setRoundLosers(nextLosers);
         setPairIdx(i => i + 1);
       }
     }, 400);
@@ -88,7 +95,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
 
   function advanceBye() {
     const next = [...roundWinners, pairA];
-    if (isLastPair) endRound(next, []);
+    if (isLastPair) endRound(next, roundLosers);
     else { setRoundWinners(next); setPairIdx(i => i + 1); }
   }
 
@@ -144,11 +151,29 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         const ctx = canvas.getContext("2d")!;
         ctx.drawImage(img, 0, 0);
 
+        function wrapText(text: string, maxWidth: number): string[] {
+          const words = text.split(" ");
+          const lines: string[] = [];
+          let current = "";
+          for (const word of words) {
+            const test = current ? `${current} ${word}` : word;
+            if (ctx.measureText(test).width > maxWidth && current) {
+              lines.push(current);
+              current = word;
+            } else {
+              current = test;
+            }
+          }
+          if (current) lines.push(current);
+          return lines;
+        }
+
         function drawPlacard(
           nickname: string, fullName: string,
           cx: number, cy: number,
           nickSize: number, fullSize: number,
-          rotateDeg: number
+          rotateDeg: number,
+          maxW: number
         ) {
           ctx.save();
           ctx.translate(cx, cy + 10);
@@ -158,13 +183,31 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           ctx.fillStyle = "#0a3a57";
 
           const hasFullName = fullName && fullName !== nickname;
-          ctx.font = `normal ${nickSize}px 'Luckiest Guy', cursive`;
-          const nickY = hasFullName ? -(fullSize * 0.9) : 0;
+
+          // Nickname -- scale down if too wide
+          let ns = nickSize;
+          ctx.font = `normal ${ns}px 'Luckiest Guy', cursive`;
+          while (ctx.measureText(nickname).width > maxW && ns > 24) {
+            ns -= 2;
+            ctx.font = `normal ${ns}px 'Luckiest Guy', cursive`;
+          }
+          const nickY = hasFullName ? -(fullSize * 1.1) : 0;
           ctx.fillText(nickname, 0, nickY);
 
+          // Full name -- smaller, word wrapped to fit
           if (hasFullName) {
-            ctx.font = `700 ${fullSize}px Montserrat, sans-serif`;
-            ctx.fillText(fullName, 0, nickSize * 0.55);
+            let fs = fullSize;
+            ctx.font = `700 ${fs}px Montserrat, sans-serif`;
+            while (ctx.measureText(fullName).width > maxW && fs > 14) {
+              fs -= 1;
+              ctx.font = `700 ${fs}px Montserrat, sans-serif`;
+            }
+            const lines = wrapText(fullName, maxW);
+            const lineH = fs * 1.3;
+            const startY = ns * 0.5;
+            lines.forEach((line, i) => {
+              ctx.fillText(line, 0, startY + i * lineH);
+            });
           }
           ctx.restore();
         }
@@ -172,17 +215,17 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         drawPlacard(
           getLabel(first),
           first.full !== getLabel(first) ? first.full : "",
-          627, 472, 72, 32, 2
+          627, 472, 72, 32, 2, 460
         );
         if (p2) drawPlacard(
           getLabel(p2),
           p2.full !== getLabel(p2) ? p2.full : "",
-          275, 734, 44, 20, -2
+          275, 734, 44, 20, -2, 270
         );
         if (p3) drawPlacard(
           getLabel(p3),
           p3.full !== getLabel(p3) ? p3.full : "",
-          978, 734, 44, 20, -2
+          978, 734, 44, 20, -2, 270
         );
 
         setPodiumReady(true);
