@@ -2356,6 +2356,7 @@ export default function NameGeneratorPage() {
           {stage === "reveal" && results.length > 0 && (
             <>
               {results.slice(0,1).map((r: Result) => (
+                <div style={{ maxWidth:"60%", margin:"0 auto", width:"100%" }}>
                 <div key={r.full} style={{
                   position:"relative",
                   background:"linear-gradient(to top right, #00e2ff, #008eff)",
@@ -2402,6 +2403,7 @@ export default function NameGeneratorPage() {
                   )}
                   {/* Reasoning */}
                   <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                </div>
                 </div>
               ))}
 
