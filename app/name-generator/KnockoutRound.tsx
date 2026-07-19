@@ -74,7 +74,7 @@ function seedBracket(entries: ShortlistEntry[]): ShortlistEntry[] {
 }
 
 // ── Bracket slot types ────────────────────────────────────────────────────
-type SlotState = "pending" | "winner" | "loser" | "bye" | "recycle";
+type SlotState = "pending" | "winner" | "loser" | "bye" | "recycle" | "recommended";
 type BracketSlot = { entry: ShortlistEntry | null; state: SlotState };
 type BracketRound = BracketSlot[][];  // round[matchIdx][0|1]
 
@@ -552,11 +552,18 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
                                 slot.state === "loser" ? styles.bracketLoser : "",
                                 slot.state === "bye" ? styles.bracketBye : "",
                                 slot.state === "recycle" ? styles.bracketRecycle : "",
+                                slot.state === "recommended" && slot.entry ? styles.bracketRecommended : "",
                                 rIdx === currentRound && mIdx === currentMatch ? styles.bracketSlotActive : "",
                                 (!slot.entry && slot.state === "pending") ? styles.bracketSlotTBD : "",
                                 (!slot.entry && slot.state !== "winner" && slot.state !== "loser" && slot.state !== "bye" && slot.state !== "recycle" && slot.state !== "pending") ? styles.bracketGhost : "",
                               ].filter(Boolean).join(" ")}>
-                              {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
+                              {slot.entry ? (
+                              <>
+                                {getLabel(slot.entry)}
+                                {slot.state === "recycle" && <span className={styles.bracketTag}>2nd chance</span>}
+                                {slot.state === "recommended" && <span className={styles.bracketTagRec}>recommended</span>}
+                              </>
+                            ) : <span className={styles.bracketEmpty}>TBD</span>}
                             </div>
                           );
                         })}
