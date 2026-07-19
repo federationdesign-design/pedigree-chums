@@ -2301,7 +2301,7 @@ export default function NameGeneratorPage() {
                   </div>
                 )}
               </div>
-              <button onClick={handleGenerate} className="display"
+              <button onClick={() => handleGenerate()} className="display"
                 style={{ width:"100%", padding:16, borderRadius:14, border:"none", background:"var(--yellow)", color:"var(--navy)", fontSize:"1.3rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
                 Find my chum’s name
               </button>
