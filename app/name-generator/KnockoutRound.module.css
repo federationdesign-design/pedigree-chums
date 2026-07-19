@@ -75,6 +75,12 @@
   transform: scale(1.02);
   transition-delay: 0.3s;
 }
+.hoverGreen .fightNick {
+  color: var(--navy, #0a3a57);
+}
+.hoverRed .fightNick {
+  color: var(--navy, #0a3a57);
+}
 .hoverRed {
   background: #ef4444 !important;
   border-color: #ef4444 !important;

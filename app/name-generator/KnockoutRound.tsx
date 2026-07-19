@@ -123,7 +123,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
       };
       const breedKey = (breed || "").toLowerCase().trim();
       img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
-      img.crossOrigin = "anonymous";
       img.onload = () => {
         const W = img.width, H = img.height;
         canvas.width = W;
