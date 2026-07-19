@@ -131,6 +131,8 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [phase, setPhase] = useState<"fighting" | "podium">("fighting");
   const [chosen, setChosen] = useState<number | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [fallingIdx, setFallingIdx] = useState<number | null>(null);
+  const [pulsingIdx, setPulsingIdx] = useState<number | null>(null);
   const [first, setFirst] = useState<ShortlistEntry | null>(null);
   const [second, setSecond] = useState<ShortlistEntry | null>(null);
   const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
@@ -261,7 +263,11 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
 
   function pick(winner: ShortlistEntry, loser: ShortlistEntry, e?: React.MouseEvent) {
     if (chosen !== null) return;
-    setChosen(pairA === winner ? 0 : 1);
+    const winnerIdx = pairA === winner ? 0 : 1;
+    const loserIdx = winnerIdx === 0 ? 1 : 0;
+    setChosen(winnerIdx);
+    setFallingIdx(loserIdx);
+    setPulsingIdx(winnerIdx);
     // Fire confetti from click point
     if (e && confettiRef.current) {
       const x = e.clientX / window.innerWidth;
@@ -273,8 +279,10 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     const snapMatch = currentMatch;
     setTimeout(() => {
       setChosen(null);
+      setFallingIdx(null);
+      setPulsingIdx(null);
       doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
-    }, 400);
+    }, 700);
   }
 
   // ── Canvas podium drawing ─────────────────────────────────────────────
@@ -415,7 +423,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         {!hasBye && pairA && pairB ? (
           <div className={styles.pairWrap} onMouseLeave={() => setHoveredIdx(null)}>
             <button
-              className={`${styles.fightCard} ${chosen === 0 ? styles.winner : ""} ${chosen !== null && chosen !== 0 ? styles.loser : ""} ${hoveredIdx === 0 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 0 ? styles.hoverRed : ""}`}
+              className={[styles.fightCard, chosen === 0 ? styles.winner : "", chosen !== null && chosen !== 0 ? styles.loser : "", hoveredIdx === 0 ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 0 ? styles.hoverRed : "", fallingIdx === 0 ? styles.falling : "", pulsingIdx === 0 ? styles.winnerPulse : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairA, pairB, e)} disabled={chosen !== null}
               onMouseEnter={() => setHoveredIdx(0)}>
               <p className={styles.fightName}>{getLabel(pairA)}</p>
@@ -425,7 +433,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
             </button>
             <p className={styles.vsLabel}>VS</p>
             <button
-              className={`${styles.fightCard} ${chosen === 1 ? styles.winner : ""} ${chosen !== null && chosen !== 1 ? styles.loser : ""} ${hoveredIdx === 1 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 1 ? styles.hoverRed : ""}`}
+              className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
               onMouseEnter={() => setHoveredIdx(1)}>
               <p className={styles.fightName}>{getLabel(pairB)}</p>
