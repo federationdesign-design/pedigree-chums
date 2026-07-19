@@ -288,8 +288,8 @@
   content: "";
   position: absolute;
   right: 16px;
-  top: calc(25% + 10px);
-  height: calc(50% - 20px);
+  top: 25%;
+  height: 50%;
   width: 3px;
   background: #fff;
 }

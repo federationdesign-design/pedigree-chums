@@ -7,6 +7,7 @@ import { ShortlistEntry } from "./ShortlistBar";
 
 type Props = {
   shortlist: ShortlistEntry[];
+  recommended?: ShortlistEntry[];
   breed: string;
   onBack: () => void;
   onRestart: () => void;
@@ -78,36 +79,62 @@ type SlotState = "pending" | "winner" | "loser" | "bye" | "recycle" | "recommend
 type BracketSlot = { entry: ShortlistEntry | null; state: SlotState };
 type BracketRound = BracketSlot[][];  // round[matchIdx][0|1]
 
-function buildBracket(seeded: ShortlistEntry[]): BracketRound[] {
-  // No padding -- if odd, last entry will be recycled from losers at match time
+function buildBracket(seeded: ShortlistEntry[], rec: ShortlistEntry[]): BracketRound[] {
+  // Simulate how many names reach each round (with recycle filling odd slots)
+  const roundSizes: number[] = [];
+  let size = seeded.length;
+  while (size > 1) {
+    roundSizes.push(size);
+    size = Math.ceil(size / 2); // winners + 1 recycled if odd
+  }
+
+  // Filter recommended -- exclude names already in shortlist
+  const shortlistFulls = new Set(seeded.map(e => e.full));
+  const availableRec = rec.filter(e => !shortlistFulls.has(e.full));
+  let recIdx = 0;
+
+  const rounds: BracketRound[] = [];
+
+  // Round 1: pair entries, fill odd slot from recommended or mark recycle
   const n = seeded.length;
   const round1: BracketSlot[][] = [];
   for (let i = 0; i < n; i += 2) {
     const a = seeded[i];
-    const b = seeded[i + 1] || null; // may be null if odd -- will be filled by recycled loser
-    round1.push([
-      { entry: a, state: "pending" },
-      { entry: b, state: b ? "pending" : "recycle" }, // "recycle" = waiting for a loser
-    ]);
+    const b = seeded[i + 1] || null;
+    if (!b) {
+      const fill = availableRec[recIdx] || null;
+      if (fill) recIdx++;
+      round1.push([
+        { entry: a, state: "pending" },
+        { entry: fill, state: fill ? "recommended" : "recycle" },
+      ]);
+    } else {
+      round1.push([
+        { entry: a, state: "pending" },
+        { entry: b, state: "pending" },
+      ]);
+    }
   }
+  rounds.push(round1);
 
-  // Build subsequent rounds -- size based on ceil(n/2) winners per round
-  const rounds: BracketRound[] = [round1];
-  let prevSize = Math.ceil(n / 2);
-  while (prevSize > 1) {
-    const nextSize = Math.ceil(prevSize / 2);
+  // Subsequent rounds: build correct slot count, mark odd slots as recycle
+  for (let r = 1; r < roundSizes.length; r++) {
+    const thisSize = roundSizes[r];
+    const numMatches = Math.ceil(thisSize / 2);
     const round: BracketSlot[][] = [];
-    for (let i = 0; i < nextSize; i++) {
+    for (let i = 0; i < numMatches; i++) {
+      const needsRecycle = (thisSize % 2 === 1) && (i === numMatches - 1);
       round.push([
         { entry: null, state: "pending" },
-        { entry: null, state: "pending" },
+        { entry: null, state: needsRecycle ? "recycle" : "pending" },
       ]);
     }
     rounds.push(round);
-    prevSize = nextSize;
   }
+
   return rounds;
 }
+
 
 function getRoundNameStatic(roundsRemaining: number): string {
   if (roundsRemaining === 1) return "The Final";
@@ -120,9 +147,9 @@ function getLabel(e: ShortlistEntry) {
   return e.nickname && e.nickname !== e.full ? e.nickname : e.full;
 }
 
-export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: Props) {
+export default function KnockoutRound({ shortlist, recommended = [], breed, onBack, onRestart }: Props) {
   const seeded = seedBracket(shortlist);
-  const [bracket, setBracket] = useState<BracketRound[]>(() => buildBracket(seeded));
+  const [bracket, setBracket] = useState<BracketRound[]>(() => buildBracket(seeded, recommended));
   const [currentRound, setCurrentRound] = useState(0);
   const [currentMatch, setCurrentMatch] = useState(0);
   const [phase, setPhase] = useState<"fighting" | "podium">("fighting");
@@ -272,29 +299,27 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       }
       setTimeout(() => setRoundFlash(null), 1500);
     }
-    // Fill any "recycle" slot in next position with highest-scoring loser
+    // Fill any "recycle" slot -- losers first, then recommended as fallback
     const nextMatchSlots2 = newBracket[nextR]?.[nextM];
     if (nextMatchSlots2) {
       const [sa2, sb2] = nextMatchSlots2;
       if (sb2 && sb2.state === "recycle" && sa2.entry) {
-        setAllRoundLosers(prev => {
-          const sorted = [...prev].sort((a, b) => b.score - a.score);
-          const recycled = sorted[0];
-          if (recycled) {
-            sb2.entry = recycled;
-            sb2.state = "pending";
-            setBracket(newBracket);
-            return prev.filter(l => l.full !== recycled.full);
+        const usedFulls = new Set(newBracket.flatMap(r => r.flatMap(m => m.map(s => s.entry?.full).filter(Boolean))));
+        const sorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
+        const recycled = sorted.find(l => !usedFulls.has(l.full));
+        if (recycled) {
+          sb2.entry = recycled;
+          sb2.state = "recycle";
+          setAllRoundLosers(prev => prev.filter(l => l.full !== recycled.full));
+        } else {
+          const fallback = recommended.find(r => !usedFulls.has(r.full));
+          if (fallback) {
+            sb2.entry = fallback;
+            sb2.state = "recommended";
           }
-          return prev;
-        });
-      } else {
-        setBracket(newBracket);
+        }
       }
-    } else {
-      setBracket(newBracket);
     }
-
     setCurrentRound(nextR);
     setCurrentMatch(nextM);
   }

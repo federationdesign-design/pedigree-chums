@@ -556,7 +556,7 @@ const PACK_BREEDS = ["Afghan Hound","Basset Hound","Beagle","Bichon Frise","Bloo
 // ── TITLE BANKS ────────────────────────────────────────────────────────────────
 const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Terriers -- Mr is the joke, no grand title needed
-  terrier:    [{title:"Mr",reg:"mundane",syllables:1}],
+  terrier:    [{title:"Mr",reg:"mundane",syllables:1},{title:"Gobby",reg:"absurd",syllables:2},{title:"Ar Kid",reg:"absurd",syllables:2},{title:"Gaffer",reg:"mundane",syllables:2},{title:"Skipper",reg:"mundane",syllables:2},{title:"Squire",reg:"mundane",syllables:1},{title:"Uncle",reg:"mundane",syllables:2},{title:"Yay Big",reg:"absurd",syllables:2},{title:"Chuddy",reg:"absurd",syllables:2},{title:"Brassic",reg:"absurd",syllables:2},{title:"Two Dogs",reg:"absurd",syllables:2},{title:"Dibble",reg:"absurd",syllables:2},{title:"Hop'along",reg:"absurd",syllables:3},{title:"Jammy",reg:"absurd",syllables:2},{title:"Mucker",reg:"mundane",syllables:2},{title:"Nah Then",reg:"absurd",syllables:2},{title:"Ow Much",reg:"absurd",syllables:2},{title:"Faffin",reg:"absurd",syllables:2}],
   // Spaniels -- working military and police dogs
   spaniel:    [{title:"Field Marshal",reg:"grand",syllables:3},{title:"General",reg:"grand",syllables:3},{title:"Admiral",reg:"grand",syllables:3},{title:"Brigadier",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2},{title:"Inspector",reg:"grand",syllables:3},{title:"Chief Inspector",reg:"grand",syllables:4}],
   // Retrievers / Labs -- guide dogs, detection dogs, civic service
@@ -600,7 +600,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
 };
 
 const GIRL_TITLES: Record<string, TitleEntry[]> = {
-  terrier:    [{title:"Miss",reg:"mundane",syllables:1}],
+  terrier:    [{title:"Miss",reg:"mundane",syllables:1},{title:"Ar Girl",reg:"absurd",syllables:2},{title:"Chook",reg:"absurd",syllables:1},{title:"Lady Muck",reg:"grand",syllables:3},{title:"Lass",reg:"mundane",syllables:1},{title:"Tatty",reg:"absurd",syllables:2},{title:"Belta",reg:"absurd",syllables:2},{title:"Sweets",reg:"absurd",syllables:1},{title:"Bappy",reg:"absurd",syllables:2}],
   spaniel:    [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Duchess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Marchioness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Princess",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Kaiserin",reg:"grand",syllables:3}],
   retriever:  [{title:"Dame",reg:"grand",syllables:1},{title:"Lady",reg:"grand",syllables:2},{title:"Countess",reg:"grand",syllables:2},{title:"Viscountess",reg:"grand",syllables:3},{title:"Baroness",reg:"grand",syllables:3},{title:"Queen",reg:"grand",syllables:1},{title:"Princess",reg:"grand",syllables:3},{title:"Matriarch",reg:"grand",syllables:3}],
   german:     [{title:"Countess",reg:"grand",syllables:2},{title:"Dame",reg:"grand",syllables:1},{title:"Baroness",reg:"grand",syllables:3},{title:"Lady",reg:"grand",syllables:2},{title:"Kaiserin",reg:"grand",syllables:3},{title:"Tsarina",reg:"grand",syllables:3},{title:"Empress",reg:"grand",syllables:3},{title:"Grand Duchess",reg:"grand",syllables:3},{title:"Valkyrie",reg:"grand",syllables:3},{title:"Warrior Queen",reg:"grand",syllables:4},{title:"Shieldmaiden",reg:"grand",syllables:3}],
