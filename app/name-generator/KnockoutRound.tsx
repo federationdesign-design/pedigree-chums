@@ -89,10 +89,18 @@ function buildBracket(seeded: ShortlistEntry[]): BracketRound[] {
   for (let i = 0; i < size; i += 2) {
     const a = slots[i];
     const b = slots[i + 1];
-    round1.push([
-      { entry: a, state: a ? (b ? "pending" : "bye") : "pending" },
-      { entry: b, state: b ? (a ? "pending" : "pending") : "pending" },
-    ]);
+    // Both null = pure padding, mark as skip
+    if (!a && !b) {
+      round1.push([
+        { entry: null, state: "bye" },
+        { entry: null, state: "bye" },
+      ]);
+    } else {
+      round1.push([
+        { entry: a, state: a ? (b ? "pending" : "bye") : "pending" },
+        { entry: b, state: b ? (a ? "pending" : "bye") : "pending" },
+      ]);
+    }
   }
 
   // Subsequent rounds: empty pending slots
@@ -235,9 +243,26 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     const nextMatchSlots = newBracket[nextR]?.[nextM];
     if (nextMatchSlots) {
       const [sa, sb] = nextMatchSlots;
-      if (sa.entry && !sb.entry) {
+      if (!sa.entry && !sb.entry) {
+        // Pure padding slot -- skip it and find next real match
+        let skipR = nextR;
+        let skipM = nextM + 1;
+        while (skipR < newBracket.length) {
+          if (skipM < (newBracket[skipR]?.length ?? 0)) {
+            const ss = newBracket[skipR][skipM];
+            if (ss[0].entry || ss[1].entry) break;
+            skipM++;
+          } else {
+            skipR++;
+            skipM = 0;
+          }
+        }
+        setBracket(newBracket);
+        setCurrentRound(skipR);
+        setCurrentMatch(skipM);
+        return;
+      } else if (sa.entry && !sb.entry) {
         sa.state = "bye";
-        // Recurse immediately with the updated bracket -- no setTimeout
         doAdvance(sa.entry, null, true, newBracket, nextR, nextM);
         return;
       } else if (!sa.entry && sb.entry) {

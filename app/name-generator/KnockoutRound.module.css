@@ -305,14 +305,14 @@
 
 .bracketSlot {
   font-family: var(--font-body), sans-serif;
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 14px 16px;
+  padding: 12px 14px;
   background: var(--navy, #0a3a57);
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   border-left: 3px solid #0a3a57;
   border-top: 2px solid #0a3a57;
   border-bottom: 2px solid #0a3a57;
