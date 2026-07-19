@@ -42,7 +42,7 @@ export default function ShortlistBar({ shortlist, onRemove, onClear, onKnockout,
           ))}
         </div>
         <div className={styles.actions}>
-          {shortlist.length >= 2 && (
+          {shortlist.length >= 3 && (
             <button className={styles.knockoutBtn} onClick={onKnockout}>
               🏆 Knockout
             </button>

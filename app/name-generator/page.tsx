@@ -2023,10 +2023,20 @@ export default function NameGeneratorPage() {
 
   function saveToShortlist(r: Result) {
     setShortlist((prev: ShortlistEntry[]) => {
-      if (prev.length >= 12) return prev;
+      if (prev.length >= 16) return prev;
       const entry: ShortlistEntry = { full: r.full, nickname: r.nickname, score: r.score, breed };
       const next = [...prev, entry];
       try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
+      if (next.length === 4) {
+        setToast("You have 4 names! Tap 🏆 Knockout to start, or keep swiping to build a longer list.");
+        setTimeout(() => setToast(null), 6000);
+      } else if (next.length === 8) {
+        setToast("8 names saved! Ready to start the knockout, or keep going up to 16.");
+        setTimeout(() => setToast(null), 6000);
+      } else if (next.length === 12) {
+        setToast("12 names saved -- choose carefully, you have 4 slots left!");
+        setTimeout(() => setToast(null), 6000);
+      }
       setLandingIdx(next.length - 1);
       setTimeout(() => setLandingIdx(null), 800);
       return next;

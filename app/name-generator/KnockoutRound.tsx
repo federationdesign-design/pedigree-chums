@@ -191,8 +191,6 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       }
     }
 
-    setBracket(newBracket);
-
     // Advance match or round
     const nextMatch = curMatch + 1;
     let nextR = curRound;
@@ -210,28 +208,23 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       }
     }
 
-    // Check if the next position is a bye -- handle it immediately
+    // Check if the next position is a bye -- chain synchronously
     const nextMatchSlots = newBracket[nextR]?.[nextM];
     if (nextMatchSlots) {
       const [sa, sb] = nextMatchSlots;
       if (sa.entry && !sb.entry) {
-        // sa gets bye -- mark and advance
         sa.state = "bye";
-        setBracket(newBracket);
-        setCurrentRound(nextR);
-        setCurrentMatch(nextM);
-        setTimeout(() => doAdvance(sa.entry!, null, true, newBracket, nextR, nextM), 60);
+        // Recurse immediately with the updated bracket -- no setTimeout
+        doAdvance(sa.entry, null, true, newBracket, nextR, nextM);
         return;
       } else if (!sa.entry && sb.entry) {
         sb.state = "bye";
-        setBracket(newBracket);
-        setCurrentRound(nextR);
-        setCurrentMatch(nextM);
-        setTimeout(() => doAdvance(sb.entry!, null, true, newBracket, nextR, nextM), 60);
+        doAdvance(sb.entry, null, true, newBracket, nextR, nextM);
         return;
       }
     }
 
+    setBracket(newBracket);
     setCurrentRound(nextR);
     setCurrentMatch(nextM);
   }
