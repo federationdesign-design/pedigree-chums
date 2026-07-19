@@ -790,6 +790,24 @@ const DOG_WORDS: Record<string, {word:string,reg:Register,firstLetter:string}[]>
   goodgirl: [{word:"Goodgirl",reg:"chaos",firstLetter:"g"},{word:"Bestgirl",reg:"chaos",firstLetter:"b"},{word:"Topgirl",reg:"chaos",firstLetter:"t"},{word:"Queenton",reg:"chaos",firstLetter:"q"},{word:"Ladyton",reg:"chaos",firstLetter:"l"},{word:"Ladyford",reg:"chaos",firstLetter:"l"},{word:"Nobleton",reg:"chaos",firstLetter:"n"},{word:"Graceton",reg:"chaos",firstLetter:"g"},{word:"Sweeton",reg:"chaos",firstLetter:"s"},{word:"Preciouston",reg:"chaos",firstLetter:"p"},{word:"Cherishton",reg:"chaos",firstLetter:"c"},{word:"Treasureton",reg:"chaos",firstLetter:"t"},{word:"Jewelton",reg:"chaos",firstLetter:"j"},{word:"Gemon",reg:"chaos",firstLetter:"g"},{word:"Pearlon",reg:"chaos",firstLetter:"p"},{word:"Shineton",reg:"chaos",firstLetter:"s"},{word:"Glowton",reg:"chaos",firstLetter:"g"},{word:"Queenford",reg:"chaos",firstLetter:"q"},{word:"Graceford",reg:"chaos",firstLetter:"g"},{word:"Charmford",reg:"chaos",firstLetter:"c"},{word:"Sweetford",reg:"chaos",firstLetter:"s"}]};
 
 // ── REASONING ─────────────────────────────────────────────────────────────────
+// -- BANNED WORDS: force-excluded from every generated name --------------
+const BANNED_WORDS = new Set<string>([
+  "ambleby", "bannerby", "bedraggleby", "bellowby", "blazeby", "blurby", "bobbleby", "boltby",
+  "bonusby", "braveby", "brightby", "brushby", "bulletby", "cannonby", "champby", "charmby",
+  "cherishby", "cleverby", "confettiby", "cottonby", "countessby", "dappleby", "dashby", "dazzleby",
+  "dearby", "diamondby", "doodleby", "drifterby", "duchessby", "dusterby", "earnestby", "eleganceby",
+  "faithfulby", "fanby", "featherby", "flagby", "flashby", "floofby", "flourishby", "galaxyby",
+  "gemby", "gentleby", "glowby", "goldstarby", "graceby", "heroby", "honourby", "huntby",
+  "hurtleby", "jewelby", "ladyby", "legendby", "lightningby", "loyalby", "marbleby", "mosaicby",
+  "mucksby", "muddleby", "nobleby", "pearlby", "pennantby", "pepperby", "plumeby", "preciousby",
+  "princessby", "prizeby", "queenby", "ragtagby", "rewardby", "rhythmby", "roanby", "rocketby",
+  "rumpleby", "scroungeby", "shineby", "slumberby", "smartby", "snowdriftby", "spatterby", "speckleby",
+  "spinby", "spottyby", "sprinkleby", "sprintby", "starby", "starmapby", "starryby", "steadby",
+  "streamby", "swayby", "sweepby", "sweetby", "swishby", "tangleby", "tattersby", "torpedoby",
+  "trailby", "treasureby", "treatby", "trueby", "tuftyby", "turboby", "twizzleby", "vagabondby",
+  "waifby", "warpby", "waverby", "welldoneby", "whirlyby", "whizzby", "zipby",
+]);
+
 const REASONING: Record<string, string[]> = {
   lapdog:    ["Looks like a small cloud that someone has given opinions.","Perpetually groomed, permanently cheerful, mildly judgmental.","Has maintained this exact hairstyle for several centuries.","Arrives in a room the way a bishop arrives at a christening -- expected, overdressed, and faintly disapproving.","Four hundred years of palace living leaves a dog with very particular ideas about ceremony."],
   boxer:     ["Approaches every situation with maximum enthusiasm and minimum strategy.","Loyal, loud, and absolutely convinced that sitting on your lap is a human right.","Looks permanently surprised, even at things it caused.","Never met a stranger. This is not always helpful on military exercises.","Approaches every day as though something brilliant is about to happen. It usually involves a sock."],
@@ -1096,6 +1114,7 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const traitWords = traits.flatMap((t: string) => DOG_WORDS[t] || []);
     const seen = new Set<string>();
     return [...base, ...traitWords, ...genderPool].filter((w: {word:string,reg:string,firstLetter:string}) => {
+      if (BANNED_WORDS.has(w.word.toLowerCase())) return false;
       if (seen.has(w.word)) return false;
       seen.add(w.word); return true;
     });

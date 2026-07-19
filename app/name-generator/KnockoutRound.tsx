@@ -128,7 +128,8 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [podiumReady, setPodiumReady] = useState(false);
   const [sharing, setSharing] = useState(false);
 
-  // Advance through byes automatically
+  // Advance through byes automatically -- with guard to prevent loops
+  const byeProcessedRef = useRef<string>("");
   useEffect(() => {
     if (phase !== "fighting") return;
     const round = bracket[currentRound];
@@ -136,13 +137,16 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     const match = round[currentMatch];
     if (!match) return;
     const [slotA, slotB] = match;
-    // If one slot is null (bye), advance the other automatically
+    const byeKey = `${currentRound}-${currentMatch}`;
+    if (byeProcessedRef.current === byeKey) return; // already handled
     if (slotA.entry && !slotB.entry) {
-      advanceWinner(slotA.entry, null, true);
+      byeProcessedRef.current = byeKey;
+      setTimeout(() => advanceWinner(slotA.entry!, null, true), 50);
     } else if (!slotA.entry && slotB.entry) {
-      advanceWinner(slotB.entry, null, true);
+      byeProcessedRef.current = byeKey;
+      setTimeout(() => advanceWinner(slotB.entry!, null, true), 50);
     }
-  }, [currentRound, currentMatch, bracket, phase]);
+  }, [currentRound, currentMatch, phase]);
 
   const round = bracket[currentRound];
   const match = round?.[currentMatch];
@@ -293,9 +297,9 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
           ctx.restore();
         }
 
-        drawPlacard(getLabel(first), first.full !== getLabel(first) ? first.full : "", 627, 512, 72, 32, 5, 460);
+        drawPlacard(getLabel(first), first.full !== getLabel(first) ? first.full : "", 627, 522, 72, 32, 5, 460);
         if (p2) drawPlacard(getLabel(p2), p2.full !== getLabel(p2) ? p2.full : "", 275, 754, 44, 20, -6, 270);
-        if (p3) drawPlacard(getLabel(p3), p3.full !== getLabel(p3) ? p3.full : "", 978, 754, 44, 20, -5, 270);
+        if (p3) drawPlacard(getLabel(p3), p3.full !== getLabel(p3) ? p3.full : "", 973, 764, 44, 20, -5, 270);
         setPodiumReady(true);
       };
     });
