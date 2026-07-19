@@ -36,13 +36,17 @@ function similarity(a: ShortlistEntry, b: ShortlistEntry): number {
 
 // ── Seeded bracket pairing ────────────────────────────────────────────────
 function seedBracket(entries: ShortlistEntry[]): ShortlistEntry[] {
-  const n = entries.length;
-  if (n <= 1) return entries;
+  // Deduplicate by full name
+  const seen = new Set<string>();
+  const deduped = entries.filter(e => { if (seen.has(e.full)) return false; seen.add(e.full); return true; });
+  const n = deduped.length;
+  if (n <= 1) return deduped;
+  const entries2 = deduped;
   const used = new Array(n).fill(false);
   const paired: ShortlistEntry[] = [];
   // Build similarity matrix
-  const scores: number[][] = entries.map((a, i) =>
-    entries.map((b, j) => i === j ? -1 : similarity(a, b))
+  const scores: number[][] = entries2.map((a, i) =>
+    entries2.map((b, j) => i === j ? -1 : similarity(a, b))
   );
   // Greedy: find highest similarity pair, add to list, repeat
   while (paired.length < n) {
@@ -57,11 +61,10 @@ function seedBracket(entries: ShortlistEntry[]): ShortlistEntry[] {
       }
     }
     if (bestI === -1) {
-      // No more pairs -- add remaining singles
-      for (let i = 0; i < n; i++) if (!used[i]) { paired.push(entries[i]); used[i] = true; }
+      for (let i = 0; i < n; i++) if (!used[i]) { paired.push(entries2[i]); used[i] = true; }
       break;
     }
-    paired.push(entries[bestI], entries[bestJ]);
+    paired.push(entries2[bestI], entries2[bestJ]);
     used[bestI] = used[bestJ] = true;
   }
   return paired;
@@ -393,20 +396,24 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
             {bracket.map((roundSlots, rIdx) => (
               <div key={rIdx} className={styles.bracketRound}>
                 <p className={styles.bracketRoundLabel}>{getRoundName(totalRounds - rIdx)}</p>
-                {roundSlots.map((matchSlots, mIdx) => (
-                  <div key={mIdx} className={styles.bracketMatch}>
-                    {matchSlots.map((slot, sIdx) => (
-                      <div key={sIdx}
-                        className={`${styles.bracketSlot}
-                          ${slot.state === "winner" ? styles.bracketWinner : ""}
-                          ${slot.state === "loser" ? styles.bracketLoser : ""}
-                          ${slot.state === "bye" ? styles.bracketBye : ""}
-                          ${rIdx === currentRound && mIdx === currentMatch ? styles.bracketActive : ""}`}>
-                        {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
-                      </div>
-                    ))}
-                  </div>
-                ))}
+                <div className={styles.bracketMatchGroup}>
+                  {roundSlots.map((matchSlots, mIdx) => (
+                    <div key={mIdx} className={styles.bracketMatch}>
+                      {matchSlots.map((slot, sIdx) => (
+                        <div key={sIdx}
+                          className={[
+                            styles.bracketSlot,
+                            slot.state === "winner" ? styles.bracketWinner : "",
+                            slot.state === "loser" ? styles.bracketLoser : "",
+                            slot.state === "bye" ? styles.bracketBye : "",
+                            rIdx === currentRound && mIdx === currentMatch ? styles.bracketSlotActive : "",
+                          ].filter(Boolean).join(" ")}>
+                          {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

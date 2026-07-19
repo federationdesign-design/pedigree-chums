@@ -225,29 +225,31 @@
   letter-spacing: 0.08em;
 }
 
+
 /* ── Bracket tree ─────────────────────────────────────────────────────── */
 .bracketScroll {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-top: 40px;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
+  padding-top: 8px;
 }
 
 .bracketTree {
   display: flex;
   flex-direction: row;
-  gap: 0;
+  align-items: stretch;
   min-width: max-content;
-  align-items: center;
+  gap: 0;
 }
 
 .bracketRound {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  min-width: 160px;
-  padding: 0 8px;
+  width: 180px;
+  flex-shrink: 0;
 }
 
 .bracketRoundLabel {
@@ -255,71 +257,108 @@
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.1em;
+  color: #ffffff;
   text-align: center;
-  margin: 0 0 8px;
+  padding: 6px 0 10px;
+  border-bottom: 2px solid var(--navy, #0a3a57);
+  margin-bottom: 8px;
+}
+
+.bracketMatchGroup {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-around;
 }
 
 .bracketMatch {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 16px;
   position: relative;
+  padding: 0 16px 0 8px;
+  flex: 1;
+  justify-content: center;
+  gap: 0;
 }
 
-/* Connector lines between rounds */
+/* Vertical line connecting the two slots in a match */
+.bracketMatch::before {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 25%;
+  height: 50%;
+  width: 2px;
+  background: #0a3a57;
+}
+
+/* Horizontal line going right from midpoint */
 .bracketMatch::after {
   content: "";
   position: absolute;
-  right: -8px;
+  right: 8px;
   top: 50%;
-  width: 8px;
-  height: 1px;
-  background: rgba(255,255,255,0.25);
+  width: 16px;
+  height: 2px;
+  background: #0a3a57;
 }
 
 .bracketSlot {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: #fff;
+  padding: 7px 12px;
+  background: var(--navy, #0a3a57);
+  color: #ffffff;
   white-space: nowrap;
   min-width: 140px;
-  transition: all 0.3s ease;
+  border-left: 3px solid #0a3a57;
+  border-top: 2px solid #0a3a57;
+  border-bottom: 2px solid #0a3a57;
+  border-right: none;
+  margin: 2px 0;
+  position: relative;
 }
 
-.bracketActive .bracketSlot,
-.bracketActive {
+/* Horizontal lead-in line on left of each slot */
+.bracketSlot::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  background: #0a3a57;
+}
+
+.bracketSlotActive {
   border-color: var(--yellow, #ffe227) !important;
+  background: rgba(255,226,39,0.12) !important;
+  color: var(--yellow, #ffe227) !important;
 }
 
 .bracketWinner {
-  background: rgba(34,197,94,0.2) !important;
+  background: #22c55e !important;
   border-color: #22c55e !important;
-  color: #22c55e !important;
+  color: #fff !important;
 }
 
 .bracketLoser {
-  background: rgba(239,68,68,0.1) !important;
-  border-color: rgba(239,68,68,0.3) !important;
+  background: rgba(10,58,87,0.4) !important;
+  border-color: rgba(10,58,87,0.6) !important;
   color: rgba(255,255,255,0.3) !important;
   text-decoration: line-through;
 }
 
 .bracketBye {
-  background: rgba(255,226,39,0.1) !important;
+  background: rgba(255,226,39,0.15) !important;
   border-color: var(--yellow, #ffe227) !important;
   color: var(--yellow, #ffe227) !important;
 }
 
 .bracketEmpty {
-  color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.35);
   font-style: italic;
   font-weight: 400;
 }
