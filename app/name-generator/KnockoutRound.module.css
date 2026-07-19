@@ -229,6 +229,7 @@
 .bracketScroll {
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   margin-top: 40px;
   padding-bottom: 24px;
@@ -312,10 +313,10 @@
   background: var(--navy, #0a3a57);
   color: #ffffff;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   min-width: 0;
   position: relative;
+  isolation: isolate;
   border-left: 3px solid #0a3a57;
   border-top: 2px solid #0a3a57;
   border-bottom: 2px solid #0a3a57;
@@ -433,30 +434,30 @@
 .bracketSlot[title]:hover::after {
   content: attr(title);
   position: absolute;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--navy, #0a3a57);
+  background: #0a3a57;
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
   white-space: nowrap;
-  z-index: 100;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.2);
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.3);
   pointer-events: none;
 }
 .bracketSlot[title]:hover::before {
   content: "";
   position: absolute;
-  bottom: calc(100% + 0px);
+  bottom: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: var(--navy, #0a3a57);
-  z-index: 100;
+  border-top-color: #0a3a57;
+  z-index: 9999;
   pointer-events: none;
 }
 
