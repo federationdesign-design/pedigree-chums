@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
@@ -112,6 +112,13 @@ function buildBracket(seeded: ShortlistEntry[]): BracketRound[] {
   return rounds;
 }
 
+function getRoundNameStatic(roundsRemaining: number): string {
+  if (roundsRemaining === 1) return "The Final";
+  if (roundsRemaining === 2) return "Semi Final";
+  if (roundsRemaining === 3) return "Quarter Final";
+  return "Round";
+}
+
 function getLabel(e: ShortlistEntry) {
   return e.nickname && e.nickname !== e.full ? e.nickname : e.full;
 }
@@ -127,8 +134,17 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [first, setFirst] = useState<ShortlistEntry | null>(null);
   const [second, setSecond] = useState<ShortlistEntry | null>(null);
   const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
+  const [roundFlash, setRoundFlash] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [podiumReady, setPodiumReady] = useState(false);
+  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
+    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>)["confetti"] as (opts: Record<string, unknown>) => void; };
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
   const [sharing, setSharing] = useState(false);
 
 
@@ -226,6 +242,15 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     }
 
     setBracket(newBracket);
+    // Show round complete flash if this was the last match of a round
+    if (nextM === 0 && nextR > curRound) {
+      const justFinished = getRoundNameStatic(totalRounds - curRound);
+      setRoundFlash(justFinished + " complete!");
+      if (confettiRef.current) {
+        confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
+      }
+      setTimeout(() => setRoundFlash(null), 1500);
+    }
     setCurrentRound(nextR);
     setCurrentMatch(nextM);
   }
@@ -234,9 +259,15 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     doAdvance(winner, loser, isBye, bracket, currentRound, currentMatch);
   }
 
-  function pick(winner: ShortlistEntry, loser: ShortlistEntry) {
+  function pick(winner: ShortlistEntry, loser: ShortlistEntry, e?: React.MouseEvent) {
     if (chosen !== null) return;
     setChosen(pairA === winner ? 0 : 1);
+    // Fire confetti from click point
+    if (e && confettiRef.current) {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      confettiRef.current({ particleCount: 80, spread: 70, origin: { x, y }, colors: ["#22c55e","#ffe227","#ffffff","#60d394"] });
+    }
     const snapBracket = bracket;
     const snapRound = currentRound;
     const snapMatch = currentMatch;
@@ -385,21 +416,21 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
           <div className={styles.pairWrap} onMouseLeave={() => setHoveredIdx(null)}>
             <button
               className={`${styles.fightCard} ${chosen === 0 ? styles.winner : ""} ${chosen !== null && chosen !== 0 ? styles.loser : ""} ${hoveredIdx === 0 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 0 ? styles.hoverRed : ""}`}
-              onClick={() => pick(pairA, pairB)} disabled={chosen !== null}
+              onClick={(e) => pick(pairA, pairB, e)} disabled={chosen !== null}
               onMouseEnter={() => setHoveredIdx(0)}>
               <p className={styles.fightName}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: "color 0.3s ease 0.3s" }}>{pairA.full}</p>
+                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
               )}
             </button>
             <p className={styles.vsLabel}>VS</p>
             <button
               className={`${styles.fightCard} ${chosen === 1 ? styles.winner : ""} ${chosen !== null && chosen !== 1 ? styles.loser : ""} ${hoveredIdx === 1 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 1 ? styles.hoverRed : ""}`}
-              onClick={() => pick(pairB, pairA)} disabled={chosen !== null}
+              onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
               onMouseEnter={() => setHoveredIdx(1)}>
               <p className={styles.fightName}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: "color 0.3s ease 0.3s" }}>{pairB.full}</p>
+                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairB.full}</p>
               )}
             </button>
           </div>
@@ -452,6 +483,19 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
           </div>
         </div>
       </div>
+
+      {/* Round complete flash */}
+      {roundFlash && (
+        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(0,0,0,0.4)", animation:"flashFadeOut 1.5s ease forwards" }}>
+          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashText 1.5s ease forwards" }}>
+            {roundFlash.toUpperCase()}
+          </p>
+        </div>
+      )}
+      <style>{`
+        @keyframes flashFadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
+        @keyframes flashText { 0%{transform:scale(0.5)} 20%{transform:scale(1.1)} 35%{transform:scale(1)} 100%{transform:scale(1)} }
+      `}</style>
     </>
   );
 }
