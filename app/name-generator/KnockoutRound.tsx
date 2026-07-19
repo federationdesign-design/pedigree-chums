@@ -89,10 +89,23 @@ function buildBracket(seeded: ShortlistEntry[], rec: ShortlistEntry[]): BracketR
   const availableRec = rec.filter(e => !shortlistFulls.has(e.full));
   let recIdx = 0;
 
+  const realPairs = Math.floor(n / 2);
+  const oddUser = n % 2;
+
+  // How many recycle pairs can we make?
+  // Each recycle pair needs 2 losers from real matches.
+  // Max losers = realPairs (one per real match).
+  // Each recycle pair uses 2 losers → max recycle pairs = floor(realPairs / 2)
+  // But we can only use as many recycle pairs as fit in the remaining padding
+  const slotsAfterOdd = padding - (oddUser ? 1 : 0); // slots left after odd-user partner
+  const maxRecyclePairs = Math.floor(realPairs / 2);
+  const recyclePairs = Math.min(maxRecyclePairs, Math.floor(slotsAfterOdd / 2));
+  const recycleSlots = recyclePairs * 2;
+  const recSlots = slotsAfterOdd - recycleSlots; // remainder filled by recommended
+
   const round1: BracketSlot[][] = [];
 
-  // Step 1: pair all user names in order (may leave 1 unpaired if n is odd)
-  const realPairs = Math.floor(n / 2);
+  // Step 1: real user pairs
   for (let i = 0; i + 1 < n; i += 2) {
     round1.push([
       { entry: seeded[i], state: "pending" },
@@ -100,13 +113,7 @@ function buildBracket(seeded: ShortlistEntry[], rec: ShortlistEntry[]): BracketR
     ]);
   }
 
-  // Step 2: how many extra slots need filling?
-  // padding slots total. Fill from recommended first, then mark rest as recycle.
-  // Slots are added in pairs (full matches).
-  // If n is odd, last user name needs a partner -- try recommended first, else recycle
-  const oddUser = n % 2;
-  let slotsRemaining = padding;
-
+  // Step 2: odd user + recommended partner (if n is odd)
   if (oddUser) {
     const fill = availableRec[recIdx] || null;
     if (fill) recIdx++;
@@ -114,21 +121,27 @@ function buildBracket(seeded: ShortlistEntry[], rec: ShortlistEntry[]): BracketR
       { entry: seeded[n - 1], state: "pending" },
       { entry: fill, state: fill ? "recommended" : "recycle" },
     ]);
-    slotsRemaining -= 1; // one slot filled (the partner)
   }
 
-  // Step 3: fill remaining padding slots with recommended pairs, then recycle pairs
-  while (slotsRemaining >= 2) {
+  // Step 3: recommended pairs (fills any gap between real pairs and recycle pairs)
+  for (let i = 0; i < recSlots; i += 2) {
     const a = availableRec[recIdx] || null; if (a) recIdx++;
     const b = availableRec[recIdx] || null; if (b) recIdx++;
     round1.push([
       { entry: a, state: a ? "recommended" : "recycle" },
       { entry: b, state: b ? "recommended" : "recycle" },
     ]);
-    slotsRemaining -= 2;
   }
 
-  // Subsequent rounds -- all clean powers of 2, no recycle needed
+  // Step 4: recycle pairs LAST -- filled dynamically as earlier matches produce losers
+  for (let i = 0; i < recyclePairs; i++) {
+    round1.push([
+      { entry: null, state: "recycle" },
+      { entry: null, state: "recycle" },
+    ]);
+  }
+
+  // Subsequent rounds -- all clean powers of 2
   const rounds: BracketRound[] = [round1];
   let size = target / 2;
   while (size >= 2) {
