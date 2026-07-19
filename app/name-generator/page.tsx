@@ -1020,6 +1020,134 @@ const NICKNAMES: Record<string,string|string[]> = {
 
 };
 
+
+// ── GENERATED NICKNAMES (British hypocorism) ──────────────────────────────
+
+const PLACE_SUFFIXES = [
+  "ington","ingham","borough","bury","sworth","worth",
+  "ford","ton","by","ley","well","ham","stone","gate",
+  "wick","dale","field","don","shaw","thorpe","combe","bourne","mere"
+];
+
+function plusY(s: string): string {
+  if (s.endsWith("y")) return "";
+  if (s.endsWith("e")) return s.slice(0,-1) + "y";
+  return s + "y";
+}
+function plusS(s: string): string {
+  if (/[sxz]$/i.test(s) || /sh$/i.test(s) || /ch$/i.test(s)) return "";
+  return s + "s";
+}
+function cap(s: string): string {
+  return s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : "";
+}
+function syllableCount(s: string): number {
+  return (s.toLowerCase().match(/[aeiou]+/g) || []).length;
+}
+function pronounceable(s: string): boolean {
+  return !/^[^aeiou]{3}/i.test(s);
+}
+
+// (a) Compound-surname nickname
+function compoundNick(word: string): string[] {
+  const w = word.toLowerCase();
+  for (const suf of PLACE_SUFFIXES) {
+    if (w.endsWith(suf) && w.length > suf.length + 2) {
+      const stem = word.slice(0, word.length - suf.length);
+      const candidates: string[] = [];
+      const y = plusY(stem); if (y && y.toLowerCase() !== w) candidates.push(cap(y));
+      if (cap(stem).toLowerCase() !== w) candidates.push(cap(stem));
+      const s = plusS(stem); if (s && s.toLowerCase() !== w) candidates.push(cap(s));
+      const o = stem + "o"; if (o.toLowerCase() !== w) candidates.push(cap(o));
+      return candidates.filter(Boolean);
+    }
+  }
+  return [];
+}
+
+// (b) Real-surname nickname
+function surnameNick(sn: string): string[] {
+  const s = sn.toLowerCase();
+  // strip any compound part (e.g. "Smith-Waggleton" → "smith")
+  const base = s.split(/[-\s]/)[0];
+  const firstSyll = base.match(/^[^aeiou]*[aeiou]+[^aeiou]*/)?.[0] || base.slice(0,4);
+  if (base.endsWith("son")) {
+    const stem = base.slice(0, -3);
+    return [cap(stem+"s"), cap(stem+"o"), cap(stem+"co")].filter(c => c.toLowerCase() !== s);
+  }
+  if (base.endsWith("es") || base.endsWith("s")) {
+    const stem = base.endsWith("es") ? base.slice(0,-2) : base.slice(0,-1);
+    return [cap(firstSyll+"o"), cap(firstSyll+"ey"), cap(stem+"za")].filter(c => c.toLowerCase() !== s);
+  }
+  return [cap(firstSyll+"o"), cap(firstSyll+"y"), cap(firstSyll+"za")].filter(c => c.toLowerCase() !== s);
+}
+
+// (c) First-name nickname (whimsy compound)
+const WHIMSY_SUFFIXES = /^(.+?)(bum|face|kins|paws|chops|snout|wick|bean|boots|pants)$/i;
+function whimsyNick(name: string): string[] {
+  const m = name.match(WHIMSY_SUFFIXES);
+  if (!m) return [];
+  const stem = m[1];
+  return [cap(stem), cap(plusS(stem)||""), cap(plusY(stem)||"")].filter(Boolean);
+}
+
+// Score a nickname candidate
+function scoreNick(cand: string, fullName: string, firstName: string): number {
+  if (!cand) return -99;
+  let s = 0;
+  const sylls = syllableCount(cand);
+  s += sylls <= 2 ? 2 : -2;
+  if (/[yosi]e?$|ers$/.test(cand.toLowerCase())) s += 1;
+  const fullWords = fullName.toLowerCase().split(/[\s\-]+/);
+  if (fullWords.includes(cand.toLowerCase())) s -= 3;
+  if (cand.toLowerCase() === firstName.toLowerCase()) s -= 2;
+  if (pronounceable(cand)) s += 1;
+  return s;
+}
+
+function bestNickname(params: {
+  firstNameStr: string;
+  dogWord: string;
+  realSurname: string;
+  current: string;
+  fullName: string;
+}): string {
+  const { firstNameStr, dogWord, realSurname, current, fullName } = params;
+
+  // Don't override a good existing nickname
+  const fullWords = fullName.toLowerCase().split(/[\s\-]+/);
+  const currentIsGood = current &&
+    current !== firstNameStr &&
+    !fullWords.includes(current.toLowerCase());
+  if (currentIsGood) return current;
+
+  // Gather candidates
+  const candidates: Array<{nick: string; priority: number}> = [];
+
+  // Existing lookup (priority 0)
+  if (current && current !== firstNameStr) candidates.push({nick: current, priority: 0});
+
+  // (c) First-name whimsy
+  whimsyNick(firstNameStr).forEach(n => candidates.push({nick: n, priority: 1}));
+
+  // (a) Compound-surname from dogWord
+  compoundNick(dogWord).forEach(n => candidates.push({nick: n, priority: 2}));
+
+  // (b) Real-surname nick
+  if (realSurname) surnameNick(realSurname).forEach(n => candidates.push({nick: n, priority: 3}));
+
+  if (!candidates.length) return current || firstNameStr;
+
+  // Score and pick best
+  let best = candidates[0];
+  let bestScore = -99;
+  for (const cand of candidates) {
+    const sc = scoreNick(cand.nick, fullName, firstNameStr) - cand.priority * 0.1;
+    if (sc > bestScore) { bestScore = sc; best = cand; }
+  }
+  return best.nick || current || firstNameStr;
+}
+
 function getNickname(n: string, seed = 0): string {
   const val = NICKNAMES[n.toLowerCase().replace(/[^a-z]/g,"")];
   if (!val) return "";
@@ -1438,6 +1566,16 @@ const ACRONYM_PUNS: Record<string,string> = {...ACRONYM_PUNS_BOY, ...ACRONYM_PUN
       return { full: bareFull, nickname: bareNick, reasoning, score: bareScore };
     }
   }
+
+  // ── GENERATED NICKNAME: improve sparse/echo nicknames ────────────────────
+  const improvedNick = bestNickname({
+    firstNameStr: firstName.name,
+    dogWord: dogWordEntry.word,
+    realSurname: _sn,
+    current: nickname,
+    fullName: full,
+  });
+  if (improvedNick) nickname = improvedNick;
 
   return { full, nickname, reasoning, score };
 }
