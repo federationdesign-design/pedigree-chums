@@ -116,10 +116,21 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     }).catch(() => {}).finally(() => {
       const img = new window.Image();
       const PODIUM_MAP: Record<string, string> = {
-        "bichon frise":  "/podiums/bichon-podium.jpg",
-        "bichon":        "/podiums/bichon-podium.jpg",
-        "lurcher":       "/podiums/lurcher-podium.jpg",
-        "whippet":       "/podiums/whippet-podium.jpg",
+        "bichon frise":           "/podiums/bichon-podium.jpg",
+        "bichon":                 "/podiums/bichon-podium.jpg",
+        "lurcher":                "/podiums/lurcher-podium.jpg",
+        "whippet":                "/podiums/whippet-podium.jpg",
+        "afghan hound":           "/podiums/afgan-podium.jpg",
+        "beagle":                 "/podiums/beagle-podium.jpg",
+        "bloodhound":             "/podiums/bloodhound-podium.jpg",
+        "border terrier":         "/podiums/border-terrier-podium.jpg",
+        "boxer":                  "/podiums/boxer-podium.jpg",
+        "bull terrier":           "/podiums/bull-terrier-podium.jpg",
+        "cavachon":               "/podiums/cavachon-podium.jpg",
+        "chihuahua":              "/podiums/chihuahua-podium.jpg",
+        "greyhound":              "/podiums/greyhound-podium.jpg",
+        "jack russell":           "/podiums/jack-russel-podium.jpg",
+        "irish setter":           "/podiums/setter-podium.jpg",
       };
       const breedKey = (breed || "").toLowerCase().trim();
       img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
@@ -201,6 +212,11 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
       <>
         <Nav />
         <div className={styles.wrapPodium}>
+          {podiumReady && (
+            <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
+              {sharing ? "Sharing..." : "Share your podium"}
+            </button>
+          )}
           <h2 className={`display ${styles.title}`}>
             We have a <span className={styles.yellow}>winner!</span>
           </h2>
@@ -209,11 +225,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           </p>
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
-            {podiumReady && (
-              <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
-                {sharing ? "Sharing..." : "Share your podium"}
-              </button>
-            )}
           </div>
           <button className={styles.startAgainBtn} onClick={onBack}>
             Start again
