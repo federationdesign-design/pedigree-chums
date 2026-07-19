@@ -215,17 +215,17 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         drawPlacard(
           getLabel(first),
           first.full !== getLabel(first) ? first.full : "",
-          627, 472, 72, 32, 2, 460
+          627, 492, 72, 32, 2, 460
         );
         if (p2) drawPlacard(
           getLabel(p2),
           p2.full !== getLabel(p2) ? p2.full : "",
-          275, 734, 44, 20, -2, 270
+          275, 754, 44, 20, -2, 270
         );
         if (p3) drawPlacard(
           getLabel(p3),
           p3.full !== getLabel(p3) ? p3.full : "",
-          978, 734, 44, 20, -2, 270
+          978, 754, 44, 20, -2, 270
         );
 
         setPodiumReady(true);
