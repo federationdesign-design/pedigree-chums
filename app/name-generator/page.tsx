@@ -2151,7 +2151,7 @@ export default function NameGeneratorPage() {
         </div>
       ) : (<>
       <Nav />
-      <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 20px" }}>
+      <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 0" }}>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator
@@ -2421,8 +2421,10 @@ export default function NameGeneratorPage() {
       </>
       )}
       {toast && (<div style={{ position:"fixed", bottom:80, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
-      {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
-      <Footer />
+      <div style={{ position:"sticky", bottom:0, zIndex:90 }}>
+        {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
+        <Footer />
+      </div>
     </>
   );
 }

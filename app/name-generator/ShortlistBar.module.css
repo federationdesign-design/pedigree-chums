@@ -1,6 +1,5 @@
 .bar {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
+  position: static;
   z-index: 90;
   background: var(--navy, #0a3a57);
   border-top: 2px solid var(--yellow, #ffe227);
