@@ -1058,7 +1058,8 @@ function compoundNick(word: string): string[] {
       const y = plusY(stem); if (y && y.toLowerCase() !== w) candidates.push(cap(y));
       if (cap(stem).toLowerCase() !== w) candidates.push(cap(stem));
       const s = plusS(stem); if (s && s.toLowerCase() !== w) candidates.push(cap(s));
-      const o = stem + "o"; if (o.toLowerCase() !== w) candidates.push(cap(o));
+      // Only add -o for short stems -- "Fluffo" fine but "Pillowo" ugly
+      if (stem.length <= 5) { const o = stem + "o"; if (o.toLowerCase() !== w) candidates.push(cap(o)); }
       return candidates.filter(Boolean);
     }
   }
