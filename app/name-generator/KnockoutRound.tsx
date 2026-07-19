@@ -381,7 +381,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         "cavachon": "/podiums/cavachon-podium.jpg", "chihuahua": "/podiums/chihuahua-podium.jpg",
         "greyhound": "/podiums/greyhound-podium.jpg", "jack russell": "/podiums/jack-russel-podium.jpg",
         "irish setter": "/podiums/setter-podium.jpg", "cockapoo": "/podiums/cockapoo-podium.jpg",
-        "border collie": "/podiums/collie-podium.jpg", "dachshund": "/podiums/dachshund-podium.jpg",
+        "border collie": "/podiums/collie-podium.jpg", "dachshund": "/podiums/dachshund-podium.jpg", "basset hound": "/podiums/basset-podium.jpg", "boston terrier": "/podiums/boston-podium.jpg", "bulldog": "/podiums/bulldog-podium.jpg", "german shepherd": "/podiums/german-sheperd-podium.jpg", "german sheperd": "/podiums/german-sheperd-podium.jpg",
       };
       img.src = PODIUM_MAP[(breed || "").toLowerCase().trim()] || "/name-podium.jpg";
       img.onload = () => {
