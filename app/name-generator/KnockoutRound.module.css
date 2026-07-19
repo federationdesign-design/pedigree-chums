@@ -341,6 +341,11 @@
   color: #ffffff !important;
 }
 
+.bracketSlotTBD {
+  background: #ffffff !important;
+  color: var(--navy, #0a3a57) !important;
+  border-color: var(--navy, #0a3a57) !important;
+}
 .bracketWinner {
   background: #22c55e !important;
   border-color: #22c55e !important;
@@ -361,7 +366,7 @@
 }
 
 .bracketEmpty {
-  color: rgba(255,255,255,0.4);
+  color: var(--navy, #0a3a57);
   font-style: italic;
   font-weight: 400;
 }

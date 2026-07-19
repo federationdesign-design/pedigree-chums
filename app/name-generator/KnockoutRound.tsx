@@ -74,48 +74,37 @@ function seedBracket(entries: ShortlistEntry[]): ShortlistEntry[] {
 }
 
 // ── Bracket slot types ────────────────────────────────────────────────────
-type SlotState = "pending" | "winner" | "loser" | "bye";
+type SlotState = "pending" | "winner" | "loser" | "bye" | "recycle";
 type BracketSlot = { entry: ShortlistEntry | null; state: SlotState };
 type BracketRound = BracketSlot[][];  // round[matchIdx][0|1]
 
 function buildBracket(seeded: ShortlistEntry[]): BracketRound[] {
-  // Pad to next power of 2
-  const size = Math.pow(2, Math.ceil(Math.log2(Math.max(seeded.length, 2))));
-  const slots: (ShortlistEntry | null)[] = [...seeded];
-  while (slots.length < size) slots.push(null); // null = bye slot
-
-  // Round 1: pair adjacent slots
+  // No padding -- if odd, last entry will be recycled from losers at match time
+  const n = seeded.length;
   const round1: BracketSlot[][] = [];
-  for (let i = 0; i < size; i += 2) {
-    const a = slots[i];
-    const b = slots[i + 1];
-    // Both null = pure padding, mark as skip
-    if (!a && !b) {
-      round1.push([
-        { entry: null, state: "bye" },
-        { entry: null, state: "bye" },
-      ]);
-    } else {
-      round1.push([
-        { entry: a, state: a ? (b ? "pending" : "bye") : "pending" },
-        { entry: b, state: b ? (a ? "pending" : "bye") : "pending" },
-      ]);
-    }
+  for (let i = 0; i < n; i += 2) {
+    const a = seeded[i];
+    const b = seeded[i + 1] || null; // may be null if odd -- will be filled by recycled loser
+    round1.push([
+      { entry: a, state: "pending" },
+      { entry: b, state: b ? "pending" : "recycle" }, // "recycle" = waiting for a loser
+    ]);
   }
 
-  // Subsequent rounds: empty pending slots
+  // Build subsequent rounds -- size based on ceil(n/2) winners per round
   const rounds: BracketRound[] = [round1];
-  let matchCount = size / 2;
-  while (matchCount > 1) {
-    matchCount /= 2;
+  let prevSize = Math.ceil(n / 2);
+  while (prevSize > 1) {
+    const nextSize = Math.ceil(prevSize / 2);
     const round: BracketSlot[][] = [];
-    for (let i = 0; i < matchCount; i++) {
+    for (let i = 0; i < nextSize; i++) {
       round.push([
         { entry: null, state: "pending" },
         { entry: null, state: "pending" },
       ]);
     }
     rounds.push(round);
+    prevSize = nextSize;
   }
   return rounds;
 }
@@ -141,6 +130,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [fallingIdx, setFallingIdx] = useState<number | null>(null);
   const [pulsingIdx, setPulsingIdx] = useState<number | null>(null);
+  const [roundLosers, setRoundLosers] = useState<ShortlistEntry[]>([]); // for recycling
   const [puffingIdx, setPuffingIdx] = useState<number | null>(null);
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [cardsReady, setCardsReady] = useState(true);
@@ -282,6 +272,29 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       }
       setTimeout(() => setRoundFlash(null), 1500);
     }
+    // Fill any "recycle" slot in next position with highest-scoring loser
+    const nextMatchSlots2 = newBracket[nextR]?.[nextM];
+    if (nextMatchSlots2) {
+      const [sa2, sb2] = nextMatchSlots2;
+      if (sb2 && sb2.state === "recycle" && sa2.entry) {
+        setAllRoundLosers(prev => {
+          const sorted = [...prev].sort((a, b) => b.score - a.score);
+          const recycled = sorted[0];
+          if (recycled) {
+            sb2.entry = recycled;
+            sb2.state = "pending";
+            setBracket(newBracket);
+            return prev.filter(l => l.full !== recycled.full);
+          }
+          return prev;
+        });
+      } else {
+        setBracket(newBracket);
+      }
+    } else {
+      setBracket(newBracket);
+    }
+
     setCurrentRound(nextR);
     setCurrentMatch(nextM);
   }
