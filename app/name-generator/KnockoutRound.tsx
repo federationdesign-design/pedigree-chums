@@ -80,69 +80,44 @@ type BracketSlot = { entry: ShortlistEntry | null; state: SlotState };
 type BracketRound = BracketSlot[][];  // round[matchIdx][0|1]
 
 function buildBracket(seeded: ShortlistEntry[], rec: ShortlistEntry[]): BracketRound[] {
-  // Simulate how many names reach each round (with recycle filling odd slots)
-  const roundSizes: number[] = [];
-  let size = seeded.length;
-  while (size > 1) {
-    roundSizes.push(size);
-    size = Math.ceil(size / 2); // winners + 1 recycled if odd
-  }
-
-  // Filter recommended -- exclude names already in shortlist
+  const n = seeded.length;
+  const target = n <= 2 ? 2 : n <= 4 ? 4 : n <= 8 ? 8 : 16;
   const shortlistFulls = new Set(seeded.map(e => e.full));
   const availableRec = rec.filter(e => !shortlistFulls.has(e.full));
   let recIdx = 0;
-
-  const rounds: BracketRound[] = [];
-
-  // Round 1: pair entries, fill odd slot from recommended or mark recycle
-  const n = seeded.length;
+  const realPairs = Math.floor(n / 2);
+  const oddUser = n % 2;
+  const padding = target - n;
+  const recycledSlots = Math.min(Math.floor(realPairs / 2) * 2, padding - oddUser);
+  const recSlots = padding - oddUser - recycledSlots;
   const round1: BracketSlot[][] = [];
-  for (let i = 0; i < n; i += 2) {
-    const a = seeded[i];
-    const b = seeded[i + 1] || null;
-    if (!b) {
-      const fill = availableRec[recIdx] || null;
-      if (fill) recIdx++;
-      round1.push([
-        { entry: a, state: "pending" },
-        { entry: fill, state: fill ? "recommended" : "recycle" },
-      ]);
-    } else {
-      round1.push([
-        { entry: a, state: "pending" },
-        { entry: b, state: "pending" },
-      ]);
-    }
+  for (let i = 0; i + 1 < n; i += 2) {
+    round1.push([{ entry: seeded[i], state: "pending" }, { entry: seeded[i + 1], state: "pending" }]);
   }
-  rounds.push(round1);
-
-  // Subsequent rounds: build correct slot count, mark odd slots as recycle
-  for (let r = 1; r < roundSizes.length; r++) {
-    const thisSize = roundSizes[r];
-    const numMatches = Math.ceil(thisSize / 2);
+  if (oddUser) {
+    const fill = availableRec[recIdx] || null; if (fill) recIdx++;
+    round1.push([{ entry: seeded[n - 1], state: "pending" }, { entry: fill, state: fill ? "recommended" : "recycle" }]);
+  }
+  for (let i = 0; i < recSlots; i += 2) {
+    const a = availableRec[recIdx] || null; if (a) recIdx++;
+    const b = availableRec[recIdx] || null; if (b) recIdx++;
+    round1.push([{ entry: a, state: a ? "recommended" : "recycle" }, { entry: b, state: b ? "recommended" : "recycle" }]);
+  }
+  for (let i = 0; i < recycledSlots; i += 2) {
+    round1.push([{ entry: null, state: "recycle" }, { entry: null, state: "recycle" }]);
+  }
+  const rounds: BracketRound[] = [round1];
+  let size = target / 2;
+  while (size >= 2) {
     const round: BracketSlot[][] = [];
-    for (let i = 0; i < numMatches; i++) {
-      const needsRecycle = (thisSize % 2 === 1) && (i === numMatches - 1);
-      round.push([
-        { entry: null, state: "pending" },
-        { entry: null, state: needsRecycle ? "recycle" : "pending" },
-      ]);
+    for (let i = 0; i < size / 2; i++) {
+      round.push([{ entry: null, state: "pending" }, { entry: null, state: "pending" }]);
     }
     rounds.push(round);
+    size = size / 2;
   }
-
   return rounds;
 }
-
-
-function getRoundNameStatic(roundsRemaining: number): string {
-  if (roundsRemaining === 1) return "The Final";
-  if (roundsRemaining === 2) return "Semi Final";
-  if (roundsRemaining === 3) return "Quarter Final";
-  return "Round";
-}
-
 function getLabel(e: ShortlistEntry) {
   return e.nickname && e.nickname !== e.full ? e.nickname : e.full;
 }
@@ -292,33 +267,24 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     setBracket(newBracket);
     // Show round complete flash if this was the last match of a round
     if (nextM === 0 && nextR > curRound) {
-      const nextRoundName = getRoundNameStatic(totalRounds - curRound - 1);
+      const _r=totalRounds-curRound-1; const nextRoundName=_r===1?"The Final":_r===2?"Semi Final":_r===3?"Quarter Final":`Round ${curRound+2}`;
       setRoundFlash("Next up: " + nextRoundName + "!");
       if (confettiRef.current) {
         confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
       }
       setTimeout(() => setRoundFlash(null), 1500);
     }
-    // Fill any "recycle" slot -- losers first, then recommended as fallback
-    const nextMatchSlots2 = newBracket[nextR]?.[nextM];
-    if (nextMatchSlots2) {
-      const [sa2, sb2] = nextMatchSlots2;
-      if (sb2 && sb2.state === "recycle" && sa2.entry) {
-        const usedFulls = new Set(newBracket.flatMap(r => r.flatMap(m => m.map(s => s.entry?.full).filter(Boolean))));
-        const sorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
-        const recycled = sorted.find(l => !usedFulls.has(l.full));
-        if (recycled) {
-          sb2.entry = recycled;
-          sb2.state = "recycle";
-          setAllRoundLosers(prev => prev.filter(l => l.full !== recycled.full));
-        } else {
-          const fallback = recommended.find(r => !usedFulls.has(r.full));
-          if (fallback) {
-            sb2.entry = fallback;
-            sb2.state = "recommended";
-          }
-        }
-      }
+    // Fill recycle slots in next match from accumulated losers
+    const nms = newBracket[nextR]?.[nextM];
+    if (nms) {
+      const usedF = new Set(newBracket.flatMap(r => r.flatMap(m => m.map(s => s.entry?.full).filter(Boolean))));
+      const fillSlot = (slot: BracketSlot) => {
+        if (slot.state !== "recycle" || slot.entry) return;
+        const pick = [...allRoundLosers].sort((a,b)=>b.score-a.score).find(l=>!usedF.has(l.full));
+        if (pick) { slot.entry=pick; slot.state="recycle"; usedF.add(pick.full); setAllRoundLosers(prev=>prev.filter(l=>l.full!==pick.full)); }
+        else { const fb=recommended.find(r=>!usedF.has(r.full)); if(fb){slot.entry=fb;slot.state="recommended";usedF.add(fb.full);} }
+      };
+      fillSlot(nms[0]); fillSlot(nms[1]);
     }
     setCurrentRound(nextR);
     setCurrentMatch(nextM);
