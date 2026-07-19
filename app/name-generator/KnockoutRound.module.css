@@ -306,14 +306,16 @@
 
 .bracketSlot {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   font-weight: 700;
-  padding: 10px 12px;
+  padding: 10px 14px;
   background: var(--navy, #0a3a57);
   color: #ffffff;
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 0;
+  position: relative;
   border-left: 3px solid #0a3a57;
   border-top: 2px solid #0a3a57;
   border-bottom: 2px solid #0a3a57;
@@ -425,4 +427,35 @@
   color: var(--yellow, #ffe227);
   letter-spacing: 0.05em;
   opacity: 0.8;
+}
+
+/* Bracket slot hover tooltip -- shows full name */
+.bracketSlot[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy, #0a3a57);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  pointer-events: none;
+}
+.bracketSlot[title]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 0px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--navy, #0a3a57);
+  z-index: 100;
+  pointer-events: none;
 }

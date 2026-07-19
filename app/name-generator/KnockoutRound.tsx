@@ -265,8 +265,8 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     setBracket(newBracket);
     // Show round complete flash if this was the last match of a round
     if (nextM === 0 && nextR > curRound) {
-      const justFinished = getRoundNameStatic(totalRounds - curRound);
-      setRoundFlash(justFinished + " complete!");
+      const nextRoundName = getRoundNameStatic(totalRounds - curRound - 1);
+      setRoundFlash("Next up: " + nextRoundName + "!");
       if (confettiRef.current) {
         confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
       }
@@ -545,12 +545,16 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
                           if (rIdx === 0 && !slot.entry && hasAnyEntry) return null;
                           return (
                             <div key={sIdx}
+                              title={slot.entry ? slot.entry.full : undefined}
                               className={[
                                 styles.bracketSlot,
                                 slot.state === "winner" ? styles.bracketWinner : "",
                                 slot.state === "loser" ? styles.bracketLoser : "",
                                 slot.state === "bye" ? styles.bracketBye : "",
+                                slot.state === "recycle" ? styles.bracketRecycle : "",
                                 rIdx === currentRound && mIdx === currentMatch ? styles.bracketSlotActive : "",
+                                (!slot.entry && slot.state === "pending") ? styles.bracketSlotTBD : "",
+                                (!slot.entry && slot.state !== "winner" && slot.state !== "loser" && slot.state !== "bye" && slot.state !== "recycle" && slot.state !== "pending") ? styles.bracketGhost : "",
                               ].filter(Boolean).join(" ")}>
                               {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
                             </div>
