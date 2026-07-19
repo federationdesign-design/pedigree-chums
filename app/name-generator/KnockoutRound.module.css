@@ -240,7 +240,7 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  min-width: max-content;
+  width: 100%;
   gap: 0;
 }
 
@@ -248,8 +248,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: 180px;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .bracketRoundLabel {
@@ -306,13 +306,14 @@
 
 .bracketSlot {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  padding: 7px 12px;
+  padding: 7px 10px;
   background: var(--navy, #0a3a57);
   color: #ffffff;
   white-space: nowrap;
-  min-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border-left: 3px solid #0a3a57;
   border-top: 2px solid #0a3a57;
   border-bottom: 2px solid #0a3a57;
@@ -334,8 +335,8 @@
 
 .bracketSlotActive {
   border-color: var(--yellow, #ffe227) !important;
-  background: rgba(255,226,39,0.15) !important;
-  color: #ffffff !important;
+  background: rgba(255,226,39,0.12) !important;
+  color: var(--yellow, #ffe227) !important;
 }
 
 .bracketWinner {
@@ -345,9 +346,9 @@
 }
 
 .bracketLoser {
-  background: #ef4444 !important;
-  border-color: #ef4444 !important;
-  color: rgba(255,255,255,0.6) !important;
+  background: rgba(10,58,87,0.4) !important;
+  border-color: rgba(10,58,87,0.6) !important;
+  color: rgba(255,255,255,0.3) !important;
   text-decoration: line-through;
 }
 
