@@ -4,6 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import ShortlistBar, { type ShortlistEntry } from "./ShortlistBar";
 import KnockoutRound from "./KnockoutRound";
+import { BANNED_WORDS } from "./bannedWords";
 
 // ── CARD IMAGE MAP ─────────────────────────────────────────────────────────────
 const CARD_IMAGE: Record<string, string> = {
@@ -590,7 +591,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   {title:"Incomparable",reg:"grand",syllables:5}
 ],
   // Character breeds -- self-appointed grandeur
-  character:  [{title:"Incomparable",reg:"grand",syllables:5},{title:"Baron",reg:"grand",syllables:2}],
+  character:  [{title:"Baron",reg:"grand",syllables:2},{title:"Emperor",reg:"grand",syllables:4},{title:"Señor",reg:"grand",syllables:2},{title:"Bandito",reg:"absurd",syllables:3},{title:"Loco",reg:"absurd",syllables:2},{title:"Gremlin",reg:"absurd",syllables:2},{title:"Turbo",reg:"absurd",syllables:2},{title:"Corporal",reg:"grand",syllables:3},{title:"Duke",reg:"grand",syllables:1},{title:"Prince",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1},{title:"Boss",reg:"grand",syllables:1},{title:"Big",reg:"informal",syllables:1},{title:"Lil'",reg:"informal",syllables:1},{title:"Ol'",reg:"informal",syllables:1},{title:"Mr",reg:"mundane",syllables:1},{title:"Mayhem",reg:"absurd",syllables:2},{title:"Don",reg:"grand",syllables:1}],
   // Gentry -- Dalmatian, OES etc
   gentry:     [{title:"Viscount",reg:"grand",syllables:2},{title:"Baron",reg:"grand",syllables:2},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Lord",reg:"grand",syllables:1},{title:"Sir",reg:"grand",syllables:1}],
   // Dachshund -- absurdly self-important
@@ -790,23 +791,6 @@ const DOG_WORDS: Record<string, {word:string,reg:Register,firstLetter:string}[]>
   goodgirl: [{word:"Goodgirl",reg:"chaos",firstLetter:"g"},{word:"Bestgirl",reg:"chaos",firstLetter:"b"},{word:"Topgirl",reg:"chaos",firstLetter:"t"},{word:"Queenton",reg:"chaos",firstLetter:"q"},{word:"Ladyton",reg:"chaos",firstLetter:"l"},{word:"Ladyford",reg:"chaos",firstLetter:"l"},{word:"Nobleton",reg:"chaos",firstLetter:"n"},{word:"Graceton",reg:"chaos",firstLetter:"g"},{word:"Sweeton",reg:"chaos",firstLetter:"s"},{word:"Preciouston",reg:"chaos",firstLetter:"p"},{word:"Cherishton",reg:"chaos",firstLetter:"c"},{word:"Treasureton",reg:"chaos",firstLetter:"t"},{word:"Jewelton",reg:"chaos",firstLetter:"j"},{word:"Gemon",reg:"chaos",firstLetter:"g"},{word:"Pearlon",reg:"chaos",firstLetter:"p"},{word:"Shineton",reg:"chaos",firstLetter:"s"},{word:"Glowton",reg:"chaos",firstLetter:"g"},{word:"Queenford",reg:"chaos",firstLetter:"q"},{word:"Graceford",reg:"chaos",firstLetter:"g"},{word:"Charmford",reg:"chaos",firstLetter:"c"},{word:"Sweetford",reg:"chaos",firstLetter:"s"}]};
 
 // ── REASONING ─────────────────────────────────────────────────────────────────
-// -- BANNED WORDS: force-excluded from every generated name --------------
-const BANNED_WORDS = new Set<string>([
-  "ambleby", "bannerby", "bedraggleby", "bellowby", "blazeby", "blurby", "bobbleby", "boltby",
-  "bonusby", "braveby", "brightby", "brushby", "bulletby", "cannonby", "champby", "charmby",
-  "cherishby", "cleverby", "confettiby", "cottonby", "countessby", "dappleby", "dashby", "dazzleby",
-  "dearby", "diamondby", "doodleby", "drifterby", "duchessby", "dusterby", "earnestby", "eleganceby",
-  "faithfulby", "fanby", "featherby", "flagby", "flashby", "floofby", "flourishby", "galaxyby",
-  "gemby", "gentleby", "glowby", "goldstarby", "graceby", "heroby", "honourby", "huntby",
-  "hurtleby", "jewelby", "ladyby", "legendby", "lightningby", "loyalby", "marbleby", "mosaicby",
-  "mucksby", "muddleby", "nobleby", "pearlby", "pennantby", "pepperby", "plumeby", "preciousby",
-  "princessby", "prizeby", "queenby", "ragtagby", "rewardby", "rhythmby", "roanby", "rocketby",
-  "rumpleby", "scroungeby", "shineby", "slumberby", "smartby", "snowdriftby", "spatterby", "speckleby",
-  "spinby", "spottyby", "sprinkleby", "sprintby", "starby", "starmapby", "starryby", "steadby",
-  "streamby", "swayby", "sweepby", "sweetby", "swishby", "tangleby", "tattersby", "torpedoby",
-  "trailby", "treasureby", "treatby", "trueby", "tuftyby", "turboby", "twizzleby", "vagabondby",
-  "waifby", "warpby", "waverby", "welldoneby", "whirlyby", "whizzby", "zipby",
-]);
 
 const REASONING: Record<string, string[]> = {
   lapdog:    ["Looks like a small cloud that someone has given opinions.","Perpetually groomed, permanently cheerful, mildly judgmental.","Has maintained this exact hairstyle for several centuries.","Arrives in a room the way a bishop arrives at a christening -- expected, overdressed, and faintly disapproving.","Four hundred years of palace living leaves a dog with very particular ideas about ceremony."],
