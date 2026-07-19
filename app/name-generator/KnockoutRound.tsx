@@ -322,7 +322,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
 
         drawPlacard(getLabel(first), first.full !== getLabel(first) ? first.full : "", 627, 522, 72, 32, 5, 460);
         if (p2) drawPlacard(getLabel(p2), p2.full !== getLabel(p2) ? p2.full : "", 275, 754, 44, 20, -6, 270);
-        if (p3) drawPlacard(getLabel(p3), p3.full !== getLabel(p3) ? p3.full : "", 973, 764, 44, 20, -5, 270);
+        if (p3) drawPlacard(getLabel(p3), p3.full !== getLabel(p3) ? p3.full : "", 963, 774, 44, 20, -5, 270);
         setPodiumReady(true);
       };
     });
