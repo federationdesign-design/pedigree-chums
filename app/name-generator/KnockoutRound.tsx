@@ -33,7 +33,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [first, setFirst] = useState<ShortlistEntry | null>(null);
   const [second, setSecond] = useState<ShortlistEntry | null>(null);
   const [third, setThird] = useState<ShortlistEntry | null>(null);
-  const [semiFinalLosers, setSemiFinalLosers] = useState<ShortlistEntry[]>([]);
+  const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [sharing, setSharing] = useState(false);
@@ -72,15 +72,16 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
 
     if (isSemiFinal) {
       // Track all losers from the semi-final for 3rd place
-      setSemiFinalLosers(prev => [...prev, ...allLosers]);
     }
 
     if (isFinal) {
       // The winner is allWinners[0], loser is 2nd place
       setFirst(allWinners[0]);
       setSecond(allLosers[0] || null);
+      try { sessionStorage.removeItem("pc_shortlist"); } catch {}
       setPhase("podium");
     } else if (next.length === 1) {
+      try { sessionStorage.removeItem("pc_shortlist"); } catch {}
       setFirst(next[0]);
       setPhase("podium");
     } else {
@@ -120,7 +121,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   useEffect(() => {
     if (phase !== "podium" || !first) return;
 
-    const sorted = [...semiFinalLosers].sort((a, b) => b.score - a.score);
+    const sorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
     const p2 = sorted[0] || null;
     const p3 = sorted[1] || null;
     setSecond(p2);
@@ -232,12 +233,12 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         drawPlacard(
           getLabel(first),
           first.full !== getLabel(first) ? first.full : "",
-          627, 502, 72, 32, 5, 460
+          627, 512, 72, 32, 5, 460
         );
         if (p2) drawPlacard(
           getLabel(p2),
           p2.full !== getLabel(p2) ? p2.full : "",
-          275, 754, 44, 20, -5, 270
+          275, 754, 44, 20, -6, 270
         );
         if (p3) drawPlacard(
           getLabel(p3),
@@ -248,7 +249,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         setPodiumReady(true);
       };
     });
-  }, [phase, first, semiFinalLosers]);
+  }, [phase, first, allRoundLosers]);
 
   async function handleShare() {
     setSharing(true);
@@ -275,9 +276,6 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       <>
         <Nav />
         <div className={styles.wrapPodium}>
-          <h2 className={`display ${styles.title}`}>
-            We have a <span className={styles.yellow}>winner!</span>
-          </h2>
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
             {podiumReady && (
@@ -286,7 +284,10 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
               </button>
             )}
           </div>
-          <p className={styles.sub} style={{ marginTop: 16 }}>
+          <h2 className={`display ${styles.title}`}>
+            We have a <span className={styles.yellow}>winner!</span>
+          </h2>
+          <p className={styles.sub}>
             {first ? getLabel(first) : ""} takes the top spot
           </p>
           <button className={styles.startAgainBtn} onClick={onRestart}>
