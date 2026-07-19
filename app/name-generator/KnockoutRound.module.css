@@ -9,6 +9,7 @@
   margin: 0 auto;
   padding: 0 clamp(16px, 5vw, 48px) 80px;
   text-align: center;
+  padding-top: 0;
 }
 
 .title {
@@ -155,10 +156,11 @@
 /* Podium */
 .podiumWrap {
   margin: 0 auto 32px;
-  max-width: 100%;
+  max-width: 85%;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  position: relative;
 }
 .podiumCanvas {
   width: 100%;
@@ -168,18 +170,20 @@
 
 .shareBtn {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-size: clamp(0.8rem, 1.8vw, 1rem);
   letter-spacing: 0.04em;
   background: var(--yellow, #ffe227);
   color: var(--navy, #0a3a57);
   border: none;
   border-radius: 999px;
-  padding: 14px 36px;
+  padding: 10px 22px;
   cursor: pointer;
-  display: block;
-  margin: 0 auto 24px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
   transition: transform 0.15s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
 }
 .shareBtn:hover:not(:disabled) { transform: scale(1.04); }
 .shareBtn:disabled { opacity: 0.5; }

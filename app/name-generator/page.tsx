@@ -2107,7 +2107,7 @@ export default function NameGeneratorPage() {
             <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)" }}>
               {!fromCalculator && (<>
                 <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setQIndices(pickThreeQuestions()); setQAnswers({}); }}
+                <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} setQIndices(pickThreeQuestions()); setQAnswers({}); }}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                   <option value="">-- Select a breed --</option>
                   {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
@@ -2116,7 +2116,7 @@ export default function NameGeneratorPage() {
               <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
               <div style={{ display:"flex", gap:10, marginBottom:28 }}>
                 {(["boy","girl"] as const).map(g => (
-                  <button key={g} onClick={() => { setGender(g); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); }}
+                  <button key={g} onClick={() => { setGender(g); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {}; }}
                     style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${gender===g?"var(--yellow)":"rgba(255,255,255,0.15)"}`, background:gender===g?"var(--yellow)":"rgba(255,255,255,0.08)", color:gender===g?"var(--navy)":"#fff", fontFamily:"var(--font-body)", fontSize:"0.9rem", fontWeight:700, cursor:"pointer", textTransform:"capitalize" }}>
                     {g === "boy" ? "Boy" : "Girl"}
                   </button>

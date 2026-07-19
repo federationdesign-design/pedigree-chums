@@ -258,11 +258,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
       <>
         <Nav />
         <div className={styles.wrapPodium}>
-          {podiumReady && (
-            <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
-              {sharing ? "Sharing..." : "Share your podium"}
-            </button>
-          )}
           <h2 className={`display ${styles.title}`}>
             We have a <span className={styles.yellow}>winner!</span>
           </h2>
@@ -271,6 +266,11 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           </p>
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
+            {podiumReady && (
+              <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
+                {sharing ? "Sharing..." : "Share your podium"}
+              </button>
+            )}
           </div>
           <button className={styles.startAgainBtn} onClick={onBack}>
             Start again
@@ -314,7 +314,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
             >
               <p className={styles.fightName}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)" }}>{pairA.full}</p>
+                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: "color 0.3s ease 0.3s" }}>{pairA.full}</p>
               )}
             </button>
             <p className={styles.vsLabel}>VS</p>
@@ -326,7 +326,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
             >
               <p className={styles.fightName}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)" }}>{pairB.full}</p>
+                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: "color 0.3s ease 0.3s" }}>{pairB.full}</p>
               )}
             </button>
           </div>
