@@ -107,7 +107,16 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     if (!canvas) return;
 
     const img = new window.Image();
-    img.src = "/name-podium.jpg";
+
+    // Breed → podium image mapping
+    const PODIUM_MAP: Record<string, string> = {
+      "bichon frise":  "/podiums/bichon-podium.jpg",
+      "bichon":        "/podiums/bichon-podium.jpg",
+      "lurcher":       "/podiums/lurcher-podium.jpg",
+      "whippet":       "/podiums/whippet-podium.jpg",
+    };
+    const breedKey = (breed || "").toLowerCase().trim();
+    img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
     img.onload = () => {
       const W = img.width, H = img.height;
       canvas.width = W;
