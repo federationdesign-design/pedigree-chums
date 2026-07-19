@@ -311,28 +311,35 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       setPulsingIdx(null);
       setPuffingIdx(winnerIdx);
     }, 400);
-    // Step 3 (700ms): hide cards, show "Next matchup"
+    const snapBracket = bracket;
+    const snapRound = currentRound;
+    const snapMatch = currentMatch;
+    const isFinalMatch = bracket.length === 2;
+
+    // Step 3 (700ms): hide cards, show interstitial (skip on final)
     setTimeout(() => {
       setChosen(null);
       setFallingIdx(null);
       setPuffingIdx(null);
-      setCardsReady(false);
-      setShowInterstitial(true);
+      if (!isFinalMatch) {
+        setCardsReady(false);
+        setShowInterstitial(true);
+      }
     }, 700);
-    // Step 4 (1400ms): advance bracket
-    const snapBracket = bracket;
-    const snapRound = currentRound;
-    const snapMatch = currentMatch;
+
+    // Step 4: advance bracket
+    const delay = isFinalMatch ? 800 : 1400;
     setTimeout(() => {
       setShowInterstitial(false);
       doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
-      setCardsReady(true);
-      // Give cards 500ms before allowing hover
-      setTimeout(() => {
-        setCardsInteractive(true);
-        setHoveredIdx(null);
-      }, 500);
-    }, 1400);
+      if (!isFinalMatch) {
+        setCardsReady(true);
+        setTimeout(() => {
+          setCardsInteractive(true);
+          setHoveredIdx(null);
+        }, 500);
+      }
+    }, delay);
   }
 
   // ── Canvas podium drawing ─────────────────────────────────────────────
