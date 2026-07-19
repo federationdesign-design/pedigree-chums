@@ -96,7 +96,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   useEffect(() => {
     if (phase !== "podium" || !first) return;
 
-    // Determine 2nd and 3rd from semiFinalLosers
     const sorted = [...semiFinalLosers].sort((a, b) => b.score - a.score);
     const p2 = sorted[0] || null;
     const p3 = sorted[1] || null;
@@ -106,78 +105,76 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const img = new window.Image();
+    // Load Luckiest Guy for canvas then draw
+    const luckiestGuy = new FontFace(
+      "Luckiest Guy",
+      "url(https://fonts.gstatic.com/s/luckiestguy/v22/_gP_1RrxsjcxVyin9l9n_j2RStC3yts.woff2)"
+    );
 
-    // Breed → podium image mapping
-    const PODIUM_MAP: Record<string, string> = {
-      "bichon frise":  "/podiums/bichon-podium.jpg",
-      "bichon":        "/podiums/bichon-podium.jpg",
-      "lurcher":       "/podiums/lurcher-podium.jpg",
-      "whippet":       "/podiums/whippet-podium.jpg",
-    };
-    const breedKey = (breed || "").toLowerCase().trim();
-    img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const W = img.width, H = img.height;
-      canvas.width = W;
-      canvas.height = H;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
+    luckiestGuy.load().then(font => {
+      document.fonts.add(font);
+    }).catch(() => {}).finally(() => {
+      const img = new window.Image();
+      const PODIUM_MAP: Record<string, string> = {
+        "bichon frise":  "/podiums/bichon-podium.jpg",
+        "bichon":        "/podiums/bichon-podium.jpg",
+        "lurcher":       "/podiums/lurcher-podium.jpg",
+        "whippet":       "/podiums/whippet-podium.jpg",
+      };
+      const breedKey = (breed || "").toLowerCase().trim();
+      img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const W = img.width, H = img.height;
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
 
-      // Draw nickname + full name on a placard
-      function drawPlacard(
-        nickname: string, fullName: string,
-        cx: number, cy: number,
-        nickSize: number, fullSize: number,
-        rotateDeg: number
-      ) {
-        ctx.save();
-        ctx.translate(cx, cy + 10); // shift down 10px
-        ctx.rotate((rotateDeg * Math.PI) / 180);
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = "#0a3a57";
+        function drawPlacard(
+          nickname: string, fullName: string,
+          cx: number, cy: number,
+          nickSize: number, fullSize: number,
+          rotateDeg: number
+        ) {
+          ctx.save();
+          ctx.translate(cx, cy + 10);
+          ctx.rotate((rotateDeg * Math.PI) / 180);
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "#0a3a57";
 
-        const hasFullName = fullName && fullName !== nickname;
+          const hasFullName = fullName && fullName !== nickname;
+          ctx.font = `normal ${nickSize}px 'Luckiest Guy', cursive`;
+          const nickY = hasFullName ? -(fullSize * 0.9) : 0;
+          ctx.fillText(nickname, 0, nickY);
 
-        // Line 1: nickname in Luckiest Guy (normal weight -- font has one weight)
-        ctx.font = `normal ${nickSize}px 'Luckiest Guy', cursive`;
-        const nickY = hasFullName ? -(fullSize * 0.9) : 0;
-        ctx.fillText(nickname, 0, nickY);
-
-        // Line 2: full name in Montserrat bold
-        if (hasFullName) {
-          ctx.font = `700 ${fullSize}px Montserrat, sans-serif`;
-          ctx.fillText(fullName, 0, nickSize * 0.55);
+          if (hasFullName) {
+            ctx.font = `700 ${fullSize}px Montserrat, sans-serif`;
+            ctx.fillText(fullName, 0, nickSize * 0.55);
+          }
+          ctx.restore();
         }
 
-        ctx.restore();
-      }
+        drawPlacard(
+          getLabel(first),
+          first.full !== getLabel(first) ? first.full : "",
+          627, 472, 72, 32, 2
+        );
+        if (p2) drawPlacard(
+          getLabel(p2),
+          p2.full !== getLabel(p2) ? p2.full : "",
+          275, 734, 44, 20, -2
+        );
+        if (p3) drawPlacard(
+          getLabel(p3),
+          p3.full !== getLabel(p3) ? p3.full : "",
+          978, 734, 44, 20, -2
+        );
 
-      // 1st place -- white placard centre, larger font, +2deg clockwise
-      drawPlacard(
-        getLabel(first),
-        first.full !== getLabel(first) ? first.full : "",
-        627, 472, 72, 32, 2
-      );
-
-      // 2nd place -- yellow left placard, smaller, -2deg anticlockwise
-      if (p2) drawPlacard(
-        getLabel(p2),
-        p2.full !== getLabel(p2) ? p2.full : "",
-        275, 734, 48, 22, -2
-      );
-
-      // 3rd place -- yellow right placard, smaller, -2deg anticlockwise
-      if (p3) drawPlacard(
-        getLabel(p3),
-        p3.full !== getLabel(p3) ? p3.full : "",
-        978, 734, 48, 22, -2
-      );
-
-      setPodiumReady(true);
-    };
+        setPodiumReady(true);
+      };
+    });
   }, [phase, first, semiFinalLosers]);
 
   async function handleShare() {
@@ -204,7 +201,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     return (
       <>
         <Nav />
-        <div className={styles.wrap}>
+        <div className={styles.wrapPodium}>
           <h2 className={`display ${styles.title}`}>
             We have a <span className={styles.yellow}>winner!</span>
           </h2>
@@ -213,12 +210,12 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           </p>
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
+            {podiumReady && (
+              <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
+                {sharing ? "Sharing..." : "Share your podium"}
+              </button>
+            )}
           </div>
-          {podiumReady && (
-            <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
-              {sharing ? "Sharing..." : "📤 Share your podium"}
-            </button>
-          )}
           <button className={styles.startAgainBtn} onClick={onBack}>
             Start again
           </button>

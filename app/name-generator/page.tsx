@@ -2008,8 +2008,6 @@ export default function NameGeneratorPage() {
       const entry: ShortlistEntry = { full: r.full, nickname: r.nickname, score: r.score, breed };
       const next = [...prev, entry];
       try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
-      if (next.length === 3) { setToast("📸 Instagram polls max at 2 options -- run a second poll if needed!"); setTimeout(() => setToast(null), 5000); }
-      if (next.length === 5) { setToast("𝕏 X/Twitter polls max at 4 options -- time to whittle down!"); setTimeout(() => setToast(null), 5000); }
       setLandingIdx(next.length - 1);
       setTimeout(() => setLandingIdx(null), 800);
       return next;
