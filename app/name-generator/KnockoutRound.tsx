@@ -133,6 +133,10 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [fallingIdx, setFallingIdx] = useState<number | null>(null);
   const [pulsingIdx, setPulsingIdx] = useState<number | null>(null);
+  const [puffingIdx, setPuffingIdx] = useState<number | null>(null);
+  const [showInterstitial, setShowInterstitial] = useState(false);
+  const [cardsReady, setCardsReady] = useState(true);
+  const [cardsInteractive, setCardsInteractive] = useState(true);
   const [first, setFirst] = useState<ShortlistEntry | null>(null);
   const [second, setSecond] = useState<ShortlistEntry | null>(null);
   const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
@@ -268,21 +272,42 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     setChosen(winnerIdx);
     setFallingIdx(loserIdx);
     setPulsingIdx(winnerIdx);
+    setCardsInteractive(false);
+    setHoveredIdx(null);
     // Fire confetti from click point
     if (e && confettiRef.current) {
       const x = e.clientX / window.innerWidth;
       const y = e.clientY / window.innerHeight;
       confettiRef.current({ particleCount: 80, spread: 70, origin: { x, y }, colors: ["#22c55e","#ffe227","#ffffff","#60d394"] });
     }
+    // Step 1 (400ms): loser falls, winner pulses
+    // Step 2 (500ms): winner puffs out
+    setTimeout(() => {
+      setPulsingIdx(null);
+      setPuffingIdx(winnerIdx);
+    }, 400);
+    // Step 3 (700ms): hide cards, show "Next matchup"
+    setTimeout(() => {
+      setChosen(null);
+      setFallingIdx(null);
+      setPuffingIdx(null);
+      setCardsReady(false);
+      setShowInterstitial(true);
+    }, 700);
+    // Step 4 (1400ms): advance bracket
     const snapBracket = bracket;
     const snapRound = currentRound;
     const snapMatch = currentMatch;
     setTimeout(() => {
-      setChosen(null);
-      setFallingIdx(null);
-      setPulsingIdx(null);
+      setShowInterstitial(false);
       doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
-    }, 700);
+      setCardsReady(true);
+      // Give cards 500ms before allowing hover
+      setTimeout(() => {
+        setCardsInteractive(true);
+        setHoveredIdx(null);
+      }, 500);
+    }, 1400);
   }
 
   // ── Canvas podium drawing ─────────────────────────────────────────────
@@ -420,12 +445,16 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         <p className={styles.matchLabel}>{matchLabel}</p>
 
         {/* VS cards */}
-        {!hasBye && pairA && pairB ? (
-          <div className={styles.pairWrap} onMouseLeave={() => setHoveredIdx(null)}>
+        {showInterstitial ? (
+          <div className={styles.nextMatchup}>
+            <p className={styles.nextMatchupText}>Next matchup</p>
+          </div>
+        ) : !hasBye && pairA && pairB ? (
+          <div className={`${styles.pairWrap} ${cardsReady ? styles.cardsVisible : styles.cardsHidden}`} onMouseLeave={() => setHoveredIdx(null)}>
             <button
-              className={[styles.fightCard, chosen === 0 ? styles.winner : "", chosen !== null && chosen !== 0 ? styles.loser : "", hoveredIdx === 0 ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 0 ? styles.hoverRed : "", fallingIdx === 0 ? styles.falling : "", pulsingIdx === 0 ? styles.winnerPulse : ""].filter(Boolean).join(" ")}
+              className={[styles.fightCard, chosen === 0 ? styles.winner : "", chosen !== null && chosen !== 0 ? styles.loser : "", hoveredIdx === 0 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 0 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 0 ? styles.falling : "", pulsingIdx === 0 ? styles.winnerPulse : "", puffingIdx === 0 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairA, pairB, e)} disabled={chosen !== null}
-              onMouseEnter={() => setHoveredIdx(0)}>
+              onMouseEnter={() => cardsInteractive && setHoveredIdx(0)}>
               <p className={styles.fightName}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
@@ -433,9 +462,9 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
             </button>
             <p className={styles.vsLabel}>VS</p>
             <button
-              className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : ""].filter(Boolean).join(" ")}
+              className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : "", puffingIdx === 1 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
-              onMouseEnter={() => setHoveredIdx(1)}>
+              onMouseEnter={() => cardsInteractive && setHoveredIdx(1)}>
               <p className={styles.fightName}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairB.full}</p>
