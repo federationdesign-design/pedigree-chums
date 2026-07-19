@@ -200,6 +200,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
       if (nextRoundIdx >= newBracket.length) {
         setFirst(winner);
         try { sessionStorage.removeItem("pc_shortlist"); } catch {}
+        try { window.scrollTo(0, 0); } catch {}
         setPhase("podium");
         return;
       } else {
