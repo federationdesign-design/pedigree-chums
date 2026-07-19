@@ -141,10 +141,16 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     if (byeProcessedRef.current === byeKey) return; // already handled
     if (slotA.entry && !slotB.entry) {
       byeProcessedRef.current = byeKey;
-      setTimeout(() => advanceWinner(slotA.entry!, null, true), 50);
+      const snapBracket = bracket;
+      const snapRound = currentRound;
+      const snapMatch = currentMatch;
+      setTimeout(() => doAdvance(slotA.entry!, null, true, snapBracket, snapRound, snapMatch), 50);
     } else if (!slotA.entry && slotB.entry) {
       byeProcessedRef.current = byeKey;
-      setTimeout(() => advanceWinner(slotB.entry!, null, true), 50);
+      const snapBracket = bracket;
+      const snapRound = currentRound;
+      const snapMatch = currentMatch;
+      setTimeout(() => doAdvance(slotB.entry!, null, true, snapBracket, snapRound, snapMatch), 50);
     }
   }, [currentRound, currentMatch, phase]);
 
@@ -172,44 +178,48 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     completedRoundNames.push(getRoundName(totalRounds - r));
   }
 
-  function advanceWinner(winner: ShortlistEntry, loser: ShortlistEntry | null, isBye = false) {
-    const newBracket = bracket.map(r => r.map(m => m.map(s => ({ ...s }))));
-    const curMatch = newBracket[currentRound][currentMatch];
+  function doAdvance(
+    winner: ShortlistEntry,
+    loser: ShortlistEntry | null,
+    isBye: boolean,
+    curBracket: BracketRound[],
+    curRound: number,
+    curMatch: number
+  ) {
+    const newBracket = curBracket.map(r => r.map(m => m.map(s => ({ ...s }))));
+    const matchSlots = newBracket[curRound]?.[curMatch];
+    if (!matchSlots) return;
 
-    // Mark winner/loser in current round
-    curMatch[0].state = curMatch[0].entry === winner ? "winner" : (curMatch[0].entry ? "loser" : "pending");
-    curMatch[1].state = curMatch[1].entry === winner ? "winner" : (curMatch[1].entry ? "loser" : "pending");
+    // Mark winner/loser
+    matchSlots[0].state = matchSlots[0].entry === winner ? "winner" : (matchSlots[0].entry ? "loser" : "pending");
+    matchSlots[1].state = matchSlots[1].entry === winner ? "winner" : (matchSlots[1].entry ? "loser" : "pending");
 
     // Place winner in next round
-    const nextRoundIdx = currentRound + 1;
+    const nextRoundIdx = curRound + 1;
     if (nextRoundIdx < newBracket.length) {
-      const nextMatchIdx = Math.floor(currentMatch / 2);
-      const nextSlotIdx = currentMatch % 2;
-      newBracket[nextRoundIdx][nextMatchIdx][nextSlotIdx].entry = winner;
-      newBracket[nextRoundIdx][nextMatchIdx][nextSlotIdx].state = "pending";
+      const nextMatchIdx = Math.floor(curMatch / 2);
+      const nextSlotIdx = curMatch % 2;
+      const nextSlot = newBracket[nextRoundIdx]?.[nextMatchIdx]?.[nextSlotIdx];
+      if (nextSlot) { nextSlot.entry = winner; nextSlot.state = "pending"; }
     }
 
-    // Track losers for 3rd place
+    // Track losers
     if (loser && !isBye) {
-      const isFinalRound = currentRound === totalRounds - 1;
-      if (!isFinalRound) {
-        setAllRoundLosers(prev => [...prev, loser]);
-      } else {
-        // Final loser = 2nd place
+      if (curRound === totalRounds - 1) {
         setSecond(loser);
+      } else {
+        setAllRoundLosers(prev => [...prev, loser]);
       }
     }
 
     setBracket(newBracket);
 
-    // Advance to next match or next round
-    const nextMatchInRound = currentMatch + 1;
-    if (nextMatchInRound < (newBracket[currentRound]?.length ?? 0)) {
-      setCurrentMatch(nextMatchInRound);
+    // Advance match or round
+    const nextMatch = curMatch + 1;
+    if (nextMatch < (newBracket[curRound]?.length ?? 0)) {
+      setCurrentMatch(nextMatch);
     } else {
-      // Round complete
       if (nextRoundIdx >= newBracket.length) {
-        // Tournament over
         setFirst(winner);
         try { sessionStorage.removeItem("pc_shortlist"); } catch {}
         setPhase("podium");
@@ -220,12 +230,19 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
     }
   }
 
+  function advanceWinner(winner: ShortlistEntry, loser: ShortlistEntry | null, isBye = false) {
+    doAdvance(winner, loser, isBye, bracket, currentRound, currentMatch);
+  }
+
   function pick(winner: ShortlistEntry, loser: ShortlistEntry) {
     if (chosen !== null) return;
     setChosen(pairA === winner ? 0 : 1);
+    const snapBracket = bracket;
+    const snapRound = currentRound;
+    const snapMatch = currentMatch;
     setTimeout(() => {
       setChosen(null);
-      advanceWinner(winner, loser);
+      doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
     }, 400);
   }
 
