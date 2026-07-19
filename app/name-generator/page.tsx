@@ -2051,7 +2051,22 @@ export default function NameGeneratorPage() {
       {showKnockout ? (
         <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
           <div style={{ maxWidth:1800, margin:"0 auto" }}>
-            <KnockoutRound shortlist={shortlist} breed={breed} onBack={() => setShowKnockout(false)} />
+            <KnockoutRound
+              shortlist={shortlist}
+              breed={breed}
+              onBack={() => setShowKnockout(false)}
+              onRestart={() => {
+                setShowKnockout(false);
+                setShortlist([]);
+                setStage("inputs");
+                setResults([]);
+                setQAnswers({});
+                setUsedNicknames(new Set());
+                setUsedFirstNames(new Set());
+                setExhausted(false);
+                try { sessionStorage.removeItem("pc_shortlist"); } catch {}
+              }}
+            />
           </div>
         </div>
       ) : (<>

@@ -4,7 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import { ShortlistEntry } from "./ShortlistBar";
 
-type Props = { shortlist: ShortlistEntry[]; breed: string; onBack: () => void; };
+type Props = { shortlist: ShortlistEntry[]; breed: string; onBack: () => void; onRestart: () => void; };
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -19,7 +19,7 @@ function getLabel(e: ShortlistEntry) {
   return e.nickname && e.nickname !== e.full ? e.nickname : e.full;
 }
 
-export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
+export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: Props) {
   const [phase, setPhase] = useState<"fighting" | "podium">("fighting");
   const [bracket, setBracket] = useState<ShortlistEntry[]>(() => shuffle(shortlist));
   const [pairIdx, setPairIdx] = useState(0);
@@ -38,6 +38,23 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [sharing, setSharing] = useState(false);
   const [podiumReady, setPodiumReady] = useState(false);
+
+  // Compute round label based on total names and rounds remaining
+  const totalRounds = Math.ceil(Math.log2(Math.max(shortlist.length, 2)));
+  const roundsRemaining = totalRounds - roundNum + 1;
+  function getRoundName(remaining: number): string {
+    if (remaining === 1) return "The Final";
+    if (remaining === 2) return "Semi Final";
+    if (remaining === 3) return "Quarter Final";
+    return `Round ${roundNum}`;
+  }
+  const roundLabel = getRoundName(roundsRemaining);
+  const matchLabel = `Match up ${pairIdx + 1}`;
+  const completedRoundNames: string[] = [];
+  for (let r = 1; r < roundNum; r++) {
+    const rem = totalRounds - r + 1;
+    completedRoundNames.push(getRoundName(rem));
+  }
 
   const pairA = bracket[pairIdx * 2];
   const pairB = bracket[pairIdx * 2 + 1];
@@ -215,17 +232,17 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
         drawPlacard(
           getLabel(first),
           first.full !== getLabel(first) ? first.full : "",
-          627, 492, 72, 32, 2, 460
+          627, 502, 72, 32, 5, 460
         );
         if (p2) drawPlacard(
           getLabel(p2),
           p2.full !== getLabel(p2) ? p2.full : "",
-          275, 754, 44, 20, -2, 270
+          275, 754, 44, 20, -5, 270
         );
         if (p3) drawPlacard(
           getLabel(p3),
           p3.full !== getLabel(p3) ? p3.full : "",
-          978, 754, 44, 20, -2, 270
+          978, 754, 44, 20, -5, 270
         );
 
         setPodiumReady(true);
@@ -261,9 +278,6 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           <h2 className={`display ${styles.title}`}>
             We have a <span className={styles.yellow}>winner!</span>
           </h2>
-          <p className={styles.sub}>
-            {first ? getLabel(first) : ""} takes the top spot
-          </p>
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
             {podiumReady && (
@@ -272,7 +286,10 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
               </button>
             )}
           </div>
-          <button className={styles.startAgainBtn} onClick={onBack}>
+          <p className={styles.sub} style={{ marginTop: 16 }}>
+            {first ? getLabel(first) : ""} takes the top spot
+          </p>
+          <button className={styles.startAgainBtn} onClick={onRestart}>
             Start again
           </button>
         </div>
@@ -289,11 +306,15 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
           The <span className={styles.yellow}>Knockout</span> Round
         </h2>
         <p className={styles.sub}>
-          Round {roundNum} — tap to pick the winner
+          {roundLabel}
         </p>
-        <div className={styles.progress}>
-          <div className={styles.progressBar} style={{ width: `${Math.min(((roundNum - 1) / Math.ceil(Math.log2(Math.max(shortlist.length, 2)))) * 100, 95)}%` }} />
+        <div className={styles.pillTrail}>
+          {completedRoundNames.map((name, i) => (
+            <span key={i} className={styles.pillDone}>{name}</span>
+          ))}
+          <span className={styles.pillCurrent}>{roundLabel}</span>
         </div>
+        <p className={styles.matchLabel}>{matchLabel}</p>
 
         {hasBye ? (
           <div className={styles.byeCard}>
