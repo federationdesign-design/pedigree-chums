@@ -61,12 +61,15 @@ function seedBracket(entries: ShortlistEntry[]): ShortlistEntry[] {
       }
     }
     if (bestI === -1) {
-      for (let i = 0; i < n; i++) if (!used[i]) { paired.push(entries2[i]); used[i] = true; }
+      // Remaining unpaired names -- sort by score descending so highest gets bye (last slot)
+      const remaining = entries2.filter((_, i) => !used[i]).sort((a, b) => b.score - a.score);
+      paired.push(...remaining);
       break;
     }
     paired.push(entries2[bestI], entries2[bestJ]);
     used[bestI] = used[bestJ] = true;
   }
+  // If odd total, the last entry gets the bye -- ensure it's the highest scorer among unpaired
   return paired;
 }
 
@@ -128,31 +131,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   const [podiumReady, setPodiumReady] = useState(false);
   const [sharing, setSharing] = useState(false);
 
-  // Advance through byes automatically -- with guard to prevent loops
-  const byeProcessedRef = useRef<string>("");
-  useEffect(() => {
-    if (phase !== "fighting") return;
-    const round = bracket[currentRound];
-    if (!round) return;
-    const match = round[currentMatch];
-    if (!match) return;
-    const [slotA, slotB] = match;
-    const byeKey = `${currentRound}-${currentMatch}`;
-    if (byeProcessedRef.current === byeKey) return; // already handled
-    if (slotA.entry && !slotB.entry) {
-      byeProcessedRef.current = byeKey;
-      const snapBracket = bracket;
-      const snapRound = currentRound;
-      const snapMatch = currentMatch;
-      setTimeout(() => doAdvance(slotA.entry!, null, true, snapBracket, snapRound, snapMatch), 50);
-    } else if (!slotA.entry && slotB.entry) {
-      byeProcessedRef.current = byeKey;
-      const snapBracket = bracket;
-      const snapRound = currentRound;
-      const snapMatch = currentMatch;
-      setTimeout(() => doAdvance(slotB.entry!, null, true, snapBracket, snapRound, snapMatch), 50);
-    }
-  }, [currentRound, currentMatch, phase]);
+
 
   const round = bracket[currentRound];
   const match = round?.[currentMatch];
@@ -216,18 +195,45 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
 
     // Advance match or round
     const nextMatch = curMatch + 1;
-    if (nextMatch < (newBracket[curRound]?.length ?? 0)) {
-      setCurrentMatch(nextMatch);
-    } else {
+    let nextR = curRound;
+    let nextM = nextMatch;
+
+    if (nextMatch >= (newBracket[curRound]?.length ?? 0)) {
       if (nextRoundIdx >= newBracket.length) {
         setFirst(winner);
         try { sessionStorage.removeItem("pc_shortlist"); } catch {}
         setPhase("podium");
+        return;
       } else {
-        setCurrentRound(nextRoundIdx);
-        setCurrentMatch(0);
+        nextR = nextRoundIdx;
+        nextM = 0;
       }
     }
+
+    // Check if the next position is a bye -- handle it immediately
+    const nextMatchSlots = newBracket[nextR]?.[nextM];
+    if (nextMatchSlots) {
+      const [sa, sb] = nextMatchSlots;
+      if (sa.entry && !sb.entry) {
+        // sa gets bye -- mark and advance
+        sa.state = "bye";
+        setBracket(newBracket);
+        setCurrentRound(nextR);
+        setCurrentMatch(nextM);
+        setTimeout(() => doAdvance(sa.entry!, null, true, newBracket, nextR, nextM), 60);
+        return;
+      } else if (!sa.entry && sb.entry) {
+        sb.state = "bye";
+        setBracket(newBracket);
+        setCurrentRound(nextR);
+        setCurrentMatch(nextM);
+        setTimeout(() => doAdvance(sb.entry!, null, true, newBracket, nextR, nextM), 60);
+        return;
+      }
+    }
+
+    setCurrentRound(nextR);
+    setCurrentMatch(nextM);
   }
 
   function advanceWinner(winner: ShortlistEntry, loser: ShortlistEntry | null, isBye = false) {
