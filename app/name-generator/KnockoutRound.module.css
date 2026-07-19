@@ -224,3 +224,102 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
+/* ── Bracket tree ─────────────────────────────────────────────────────── */
+.bracketScroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 40px;
+  padding-bottom: 16px;
+}
+
+.bracketTree {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  min-width: max-content;
+  align-items: center;
+}
+
+.bracketRound {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 160px;
+  padding: 0 8px;
+}
+
+.bracketRoundLabel {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.bracketMatch {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* Connector lines between rounds */
+.bracketMatch::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: rgba(255,255,255,0.25);
+}
+
+.bracketSlot {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  white-space: nowrap;
+  min-width: 140px;
+  transition: all 0.3s ease;
+}
+
+.bracketActive .bracketSlot,
+.bracketActive {
+  border-color: var(--yellow, #ffe227) !important;
+}
+
+.bracketWinner {
+  background: rgba(34,197,94,0.2) !important;
+  border-color: #22c55e !important;
+  color: #22c55e !important;
+}
+
+.bracketLoser {
+  background: rgba(239,68,68,0.1) !important;
+  border-color: rgba(239,68,68,0.3) !important;
+  color: rgba(255,255,255,0.3) !important;
+  text-decoration: line-through;
+}
+
+.bracketBye {
+  background: rgba(255,226,39,0.1) !important;
+  border-color: var(--yellow, #ffe227) !important;
+  color: var(--yellow, #ffe227) !important;
+}
+
+.bracketEmpty {
+  color: rgba(255,255,255,0.25);
+  font-style: italic;
+  font-weight: 400;
+}

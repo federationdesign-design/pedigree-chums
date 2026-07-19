@@ -2,17 +2,108 @@
 import { useState, useRef, useEffect } from "react";
 import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
+import ShareScreen from "./ShareScreen";
 import { ShortlistEntry } from "./ShortlistBar";
 
-type Props = { shortlist: ShortlistEntry[]; breed: string; onBack: () => void; onRestart: () => void; };
+type Props = {
+  shortlist: ShortlistEntry[];
+  breed: string;
+  onBack: () => void;
+  onRestart: () => void;
+};
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+// ── Similarity scoring ────────────────────────────────────────────────────
+function sharedWords(a: string, b: string): number {
+  const wa = new Set(a.toLowerCase().split(/\s+/));
+  const wb = b.toLowerCase().split(/\s+/);
+  return wb.filter(w => w.length > 2 && wa.has(w)).length;
+}
+function nickSimilarity(a: string, b: string): number {
+  const x = a.toLowerCase(), y = b.toLowerCase();
+  if (x === y) return 10;
+  if (x.startsWith(y) || y.startsWith(x)) return 5;
+  if (x.includes(y) || y.includes(x)) return 3;
+  // shared prefix of 3+
+  let prefix = 0;
+  for (let i = 0; i < Math.min(x.length, y.length); i++) {
+    if (x[i] === y[i]) prefix++; else break;
   }
-  return a;
+  return prefix >= 3 ? 2 : 0;
+}
+function similarity(a: ShortlistEntry, b: ShortlistEntry): number {
+  return sharedWords(a.full, b.full) * 3 + nickSimilarity(a.nickname || a.full, b.nickname || b.full);
+}
+
+// ── Seeded bracket pairing ────────────────────────────────────────────────
+function seedBracket(entries: ShortlistEntry[]): ShortlistEntry[] {
+  const n = entries.length;
+  if (n <= 1) return entries;
+  const used = new Array(n).fill(false);
+  const paired: ShortlistEntry[] = [];
+  // Build similarity matrix
+  const scores: number[][] = entries.map((a, i) =>
+    entries.map((b, j) => i === j ? -1 : similarity(a, b))
+  );
+  // Greedy: find highest similarity pair, add to list, repeat
+  while (paired.length < n) {
+    let bestScore = -1, bestI = -1, bestJ = -1;
+    for (let i = 0; i < n; i++) {
+      if (used[i]) continue;
+      for (let j = i + 1; j < n; j++) {
+        if (used[j]) continue;
+        if (scores[i][j] > bestScore) {
+          bestScore = scores[i][j]; bestI = i; bestJ = j;
+        }
+      }
+    }
+    if (bestI === -1) {
+      // No more pairs -- add remaining singles
+      for (let i = 0; i < n; i++) if (!used[i]) { paired.push(entries[i]); used[i] = true; }
+      break;
+    }
+    paired.push(entries[bestI], entries[bestJ]);
+    used[bestI] = used[bestJ] = true;
+  }
+  return paired;
+}
+
+// ── Bracket slot types ────────────────────────────────────────────────────
+type SlotState = "pending" | "winner" | "loser" | "bye";
+type BracketSlot = { entry: ShortlistEntry | null; state: SlotState };
+type BracketRound = BracketSlot[][];  // round[matchIdx][0|1]
+
+function buildBracket(seeded: ShortlistEntry[]): BracketRound[] {
+  // Pad to next power of 2
+  const size = Math.pow(2, Math.ceil(Math.log2(Math.max(seeded.length, 2))));
+  const slots: (ShortlistEntry | null)[] = [...seeded];
+  while (slots.length < size) slots.push(null); // null = bye slot
+
+  // Round 1: pair adjacent slots
+  const round1: BracketSlot[][] = [];
+  for (let i = 0; i < size; i += 2) {
+    const a = slots[i];
+    const b = slots[i + 1];
+    round1.push([
+      { entry: a, state: a ? (b ? "pending" : "bye") : "pending" },
+      { entry: b, state: b ? (a ? "pending" : "pending") : "pending" },
+    ]);
+  }
+
+  // Subsequent rounds: empty pending slots
+  const rounds: BracketRound[] = [round1];
+  let matchCount = size / 2;
+  while (matchCount > 1) {
+    matchCount /= 2;
+    const round: BracketSlot[][] = [];
+    for (let i = 0; i < matchCount; i++) {
+      round.push([
+        { entry: null, state: "pending" },
+        { entry: null, state: "pending" },
+      ]);
+    }
+    rounds.push(round);
+  }
+  return rounds;
 }
 
 function getLabel(e: ShortlistEntry) {
@@ -20,250 +111,203 @@ function getLabel(e: ShortlistEntry) {
 }
 
 export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: Props) {
+  const seeded = seedBracket(shortlist);
+  const [bracket, setBracket] = useState<BracketRound[]>(() => buildBracket(seeded));
+  const [currentRound, setCurrentRound] = useState(0);
+  const [currentMatch, setCurrentMatch] = useState(0);
   const [phase, setPhase] = useState<"fighting" | "podium">("fighting");
-  const [bracket, setBracket] = useState<ShortlistEntry[]>(() => shuffle(shortlist));
-  const [pairIdx, setPairIdx] = useState(0);
-  const [roundWinners, setRoundWinners] = useState<ShortlistEntry[]>([]);
-  const [roundLosers, setRoundLosers] = useState<ShortlistEntry[]>([]);
   const [chosen, setChosen] = useState<number | null>(null);
-  const [roundNum, setRoundNum] = useState(1);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-
-  // Podium tracking
   const [first, setFirst] = useState<ShortlistEntry | null>(null);
   const [second, setSecond] = useState<ShortlistEntry | null>(null);
-  const [third, setThird] = useState<ShortlistEntry | null>(null);
   const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [sharing, setSharing] = useState(false);
   const [podiumReady, setPodiumReady] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
-  // Compute round label based on total names and rounds remaining
-  const totalRounds = Math.ceil(Math.log2(Math.max(shortlist.length, 2)));
-  const roundsRemaining = totalRounds - roundNum + 1;
+  // Advance through byes automatically
+  useEffect(() => {
+    if (phase !== "fighting") return;
+    const round = bracket[currentRound];
+    if (!round) return;
+    const match = round[currentMatch];
+    if (!match) return;
+    const [slotA, slotB] = match;
+    // If one slot is null (bye), advance the other automatically
+    if (slotA.entry && !slotB.entry) {
+      advanceWinner(slotA.entry, null, true);
+    } else if (!slotA.entry && slotB.entry) {
+      advanceWinner(slotB.entry, null, true);
+    }
+  }, [currentRound, currentMatch, bracket, phase]);
+
+  const round = bracket[currentRound];
+  const match = round?.[currentMatch];
+  const pairA = match?.[0]?.entry ?? null;
+  const pairB = match?.[1]?.entry ?? null;
+  const hasBye = (pairA && !pairB) || (!pairA && pairB);
+  const totalRounds = bracket.length;
+  const roundsRemaining = totalRounds - currentRound;
+
+  // Round label
   function getRoundName(remaining: number): string {
     if (remaining === 1) return "The Final";
     if (remaining === 2) return "Semi Final";
     if (remaining === 3) return "Quarter Final";
-    return `Round ${roundNum}`;
+    return `Round ${currentRound + 1}`;
   }
   const roundLabel = getRoundName(roundsRemaining);
-  const matchLabel = `Match up ${pairIdx + 1}`;
+  const matchLabel = `Match up ${currentMatch + 1} of ${round?.length ?? 1}`;
+
+  // Completed round pills
   const completedRoundNames: string[] = [];
-  for (let r = 1; r < roundNum; r++) {
-    const rem = totalRounds - r + 1;
-    completedRoundNames.push(getRoundName(rem));
+  for (let r = 0; r < currentRound; r++) {
+    completedRoundNames.push(getRoundName(totalRounds - r));
   }
 
-  const pairA = bracket[pairIdx * 2];
-  const pairB = bracket[pairIdx * 2 + 1];
-  const hasBye = pairA && !pairB;
-  const isLastPair = pairIdx + 1 >= Math.floor(bracket.length / 2);
-  // Semi-final is the round whose winners will number exactly 2
-  const nextRoundSize = Math.ceil(bracket.length / 2);
-  const isSemiFinal = nextRoundSize === 2;
-  // Final is the round with exactly 2 names
-  const isFinal = bracket.length === 2;
+  function advanceWinner(winner: ShortlistEntry, loser: ShortlistEntry | null, isBye = false) {
+    const newBracket = bracket.map(r => r.map(m => m.map(s => ({ ...s }))));
+    const curMatch = newBracket[currentRound][currentMatch];
 
-  function endRound(allWinners: ShortlistEntry[], allLosers: ShortlistEntry[]) {
-    const odd = bracket.length % 2 === 1 ? bracket[bracket.length - 1] : null;
-    const next = odd ? [...allWinners, odd] : allWinners;
+    // Mark winner/loser in current round
+    curMatch[0].state = curMatch[0].entry === winner ? "winner" : (curMatch[0].entry ? "loser" : "pending");
+    curMatch[1].state = curMatch[1].entry === winner ? "winner" : (curMatch[1].entry ? "loser" : "pending");
 
-    if (isSemiFinal) {
-      // Track all losers from the semi-final for 3rd place
+    // Place winner in next round
+    const nextRoundIdx = currentRound + 1;
+    if (nextRoundIdx < newBracket.length) {
+      const nextMatchIdx = Math.floor(currentMatch / 2);
+      const nextSlotIdx = currentMatch % 2;
+      newBracket[nextRoundIdx][nextMatchIdx][nextSlotIdx].entry = winner;
+      newBracket[nextRoundIdx][nextMatchIdx][nextSlotIdx].state = "pending";
     }
 
-    if (isFinal) {
-      // The winner is allWinners[0], loser is 2nd place
-      setFirst(allWinners[0]);
-      setSecond(allLosers[0] || null);
-      try { sessionStorage.removeItem("pc_shortlist"); } catch {}
-      setPhase("podium");
-    } else if (next.length === 1) {
-      try { sessionStorage.removeItem("pc_shortlist"); } catch {}
-      setFirst(next[0]);
-      setPhase("podium");
+    // Track losers for 3rd place
+    if (loser && !isBye) {
+      const isFinalRound = currentRound === totalRounds - 1;
+      if (!isFinalRound) {
+        setAllRoundLosers(prev => [...prev, loser]);
+      } else {
+        // Final loser = 2nd place
+        setSecond(loser);
+      }
+    }
+
+    setBracket(newBracket);
+
+    // Advance to next match or next round
+    const nextMatchInRound = currentMatch + 1;
+    if (nextMatchInRound < (newBracket[currentRound]?.length ?? 0)) {
+      setCurrentMatch(nextMatchInRound);
     } else {
-      setBracket(shuffle(next));
-      setPairIdx(0);
-      setRoundWinners([]);
-      setRoundLosers([]);
-      setRoundNum(r => r + 1);
+      // Round complete
+      if (nextRoundIdx >= newBracket.length) {
+        // Tournament over
+        setFirst(winner);
+        try { sessionStorage.removeItem("pc_shortlist"); } catch {}
+        setPhase("podium");
+      } else {
+        setCurrentRound(nextRoundIdx);
+        setCurrentMatch(0);
+      }
     }
   }
 
   function pick(winner: ShortlistEntry, loser: ShortlistEntry) {
     if (chosen !== null) return;
-    setChosen([pairA, pairB].indexOf(winner));
+    setChosen(pairA === winner ? 0 : 1);
     setTimeout(() => {
       setChosen(null);
-      const nextWinners = [...roundWinners, winner];
-      const nextLosers = [...roundLosers, loser];
-
-      if (isLastPair) {
-        endRound(nextWinners, nextLosers);
-      } else {
-        setRoundWinners(nextWinners);
-        setRoundLosers(nextLosers);
-        setPairIdx(i => i + 1);
-      }
+      advanceWinner(winner, loser);
     }, 400);
   }
 
-  function advanceBye() {
-    const next = [...roundWinners, pairA];
-    if (isLastPair) endRound(next, roundLosers);
-    else { setRoundWinners(next); setPairIdx(i => i + 1); }
-  }
-
-  // Draw podium canvas
+  // ── Canvas podium drawing ─────────────────────────────────────────────
   useEffect(() => {
     if (phase !== "podium" || !first) return;
-
-    const sorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
-    const p2 = sorted[0] || null;
-    const p3 = sorted[1] || null;
-    setSecond(p2);
-    setThird(p3);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Load Luckiest Guy for canvas then draw
+    const sorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
+    const p2 = second;
+    const p3 = sorted[0] || null;
+
     const luckiestGuy = new FontFace(
       "Luckiest Guy",
       "url(https://fonts.gstatic.com/s/luckiestguy/v22/_gP_1RrxsjcxVyin9l9n_j2RStC3yts.woff2)"
     );
-
-    luckiestGuy.load().then(font => {
-      document.fonts.add(font);
-    }).catch(() => {}).finally(() => {
+    luckiestGuy.load().then(f => document.fonts.add(f)).catch(() => {}).finally(() => {
       const img = new window.Image();
       const PODIUM_MAP: Record<string, string> = {
-        "bichon frise":           "/podiums/bichon-podium.jpg",
-        "bichon":                 "/podiums/bichon-podium.jpg",
-        "lurcher":                "/podiums/lurcher-podium.jpg",
-        "whippet":                "/podiums/whippet-podium.jpg",
-        "afghan hound":           "/podiums/afgan-podium.jpg",
-        "beagle":                 "/podiums/beagle-podium.jpg",
-        "bloodhound":             "/podiums/bloodhound-podium.jpg",
-        "border terrier":         "/podiums/border-terrier-podium.jpg",
-        "boxer":                  "/podiums/boxer-podium.jpg",
-        "bull terrier":           "/podiums/bull-terrier-podium.jpg",
-        "cavachon":               "/podiums/cavachon-podium.jpg",
-        "chihuahua":              "/podiums/chihuahua-podium.jpg",
-        "greyhound":              "/podiums/greyhound-podium.jpg",
-        "jack russell":           "/podiums/jack-russel-podium.jpg",
-        "irish setter":           "/podiums/setter-podium.jpg",
-        "cockapoo":               "/podiums/cockapoo-podium.jpg",
-        "border collie":          "/podiums/collie-podium.jpg",
-        "dachshund":              "/podiums/dachshund-podium.jpg",
+        "bichon frise": "/podiums/bichon-podium.jpg", "bichon": "/podiums/bichon-podium.jpg",
+        "lurcher": "/podiums/lurcher-podium.jpg", "whippet": "/podiums/whippet-podium.jpg",
+        "afghan hound": "/podiums/afgan-podium.jpg", "beagle": "/podiums/beagle-podium.jpg",
+        "bloodhound": "/podiums/bloodhound-podium.jpg", "border terrier": "/podiums/border-terrier-podium.jpg",
+        "boxer": "/podiums/boxer-podium.jpg", "bull terrier": "/podiums/bull-terrier-podium.jpg",
+        "cavachon": "/podiums/cavachon-podium.jpg", "chihuahua": "/podiums/chihuahua-podium.jpg",
+        "greyhound": "/podiums/greyhound-podium.jpg", "jack russell": "/podiums/jack-russel-podium.jpg",
+        "irish setter": "/podiums/setter-podium.jpg", "cockapoo": "/podiums/cockapoo-podium.jpg",
+        "border collie": "/podiums/collie-podium.jpg", "dachshund": "/podiums/dachshund-podium.jpg",
       };
-      const breedKey = (breed || "").toLowerCase().trim();
-      img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
+      img.src = PODIUM_MAP[(breed || "").toLowerCase().trim()] || "/name-podium.jpg";
       img.onload = () => {
         const W = img.width, H = img.height;
-        canvas.width = W;
-        canvas.height = H;
+        canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext("2d")!;
         ctx.drawImage(img, 0, 0);
 
-        function wrapText(text: string, maxWidth: number): string[] {
+        function wrapText(text: string, maxW: number): string[] {
           const words = text.split(" ");
           const lines: string[] = [];
-          let current = "";
-          for (const word of words) {
-            const test = current ? `${current} ${word}` : word;
-            if (ctx.measureText(test).width > maxWidth && current) {
-              lines.push(current);
-              current = word;
-            } else {
-              current = test;
-            }
+          let cur = "";
+          for (const w of words) {
+            const test = cur ? `${cur} ${w}` : w;
+            if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
+            else cur = test;
           }
-          if (current) lines.push(current);
+          if (cur) lines.push(cur);
           return lines;
         }
 
-        function drawPlacard(
-          nickname: string, fullName: string,
-          cx: number, cy: number,
-          nickSize: number, fullSize: number,
-          rotateDeg: number,
-          maxW: number
-        ) {
+        function drawPlacard(nickname: string, fullName: string, cx: number, cy: number, nickSize: number, fullSize: number, rotateDeg: number, maxW: number) {
           ctx.save();
           ctx.translate(cx, cy + 10);
           ctx.rotate((rotateDeg * Math.PI) / 180);
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "#0a3a57";
-
+          ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#0a3a57";
           const hasFullName = fullName && fullName !== nickname;
-
-          // Nickname -- scale down if too wide
           let ns = nickSize;
           ctx.font = `normal ${ns}px 'Luckiest Guy', cursive`;
-          while (ctx.measureText(nickname).width > maxW && ns > 24) {
-            ns -= 2;
-            ctx.font = `normal ${ns}px 'Luckiest Guy', cursive`;
-          }
-          const nickY = hasFullName ? -(fullSize * 1.1) : 0;
-          ctx.fillText(nickname, 0, nickY);
-
-          // Full name -- smaller, word wrapped to fit
+          while (ctx.measureText(nickname).width > maxW && ns > 24) { ns -= 2; ctx.font = `normal ${ns}px 'Luckiest Guy', cursive`; }
+          ctx.fillText(nickname, 0, hasFullName ? -(fullSize * 1.1) : 0);
           if (hasFullName) {
             let fs = fullSize;
             ctx.font = `700 ${fs}px Montserrat, sans-serif`;
-            while (ctx.measureText(fullName).width > maxW && fs > 14) {
-              fs -= 1;
-              ctx.font = `700 ${fs}px Montserrat, sans-serif`;
-            }
+            while (ctx.measureText(fullName).width > maxW && fs > 14) { fs -= 1; ctx.font = `700 ${fs}px Montserrat, sans-serif`; }
             const lines = wrapText(fullName, maxW);
-            const lineH = fs * 1.3;
-            const startY = ns * 0.5;
-            lines.forEach((line, i) => {
-              ctx.fillText(line, 0, startY + i * lineH);
-            });
+            lines.forEach((line, i) => ctx.fillText(line, 0, ns * 0.5 + i * fs * 1.3));
           }
           ctx.restore();
         }
 
-        drawPlacard(
-          getLabel(first),
-          first.full !== getLabel(first) ? first.full : "",
-          627, 512, 72, 32, 5, 460
-        );
-        if (p2) drawPlacard(
-          getLabel(p2),
-          p2.full !== getLabel(p2) ? p2.full : "",
-          275, 754, 44, 20, -6, 270
-        );
-        if (p3) drawPlacard(
-          getLabel(p3),
-          p3.full !== getLabel(p3) ? p3.full : "",
-          978, 754, 44, 20, -5, 270
-        );
-
+        drawPlacard(getLabel(first), first.full !== getLabel(first) ? first.full : "", 627, 512, 72, 32, 5, 460);
+        if (p2) drawPlacard(getLabel(p2), p2.full !== getLabel(p2) ? p2.full : "", 275, 754, 44, 20, -6, 270);
+        if (p3) drawPlacard(getLabel(p3), p3.full !== getLabel(p3) ? p3.full : "", 978, 754, 44, 20, -5, 270);
         setPodiumReady(true);
       };
     });
-  }, [phase, first, allRoundLosers]);
+  }, [phase, first, second, allRoundLosers]);
 
   async function handleShare() {
     setSharing(true);
     try {
-      const canvas = canvasRef.current!;
-      const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), "image/jpeg", 0.92));
+      const blob = await new Promise<Blob>(res => canvasRef.current!.toBlob(b => res(b!), "image/jpeg", 0.92));
       const file = new File([blob], "my-dog-name.jpg", { type: "image/jpeg" });
-      const caption = `Meet my new pup! What do you think of the name? 🐾\n\nGenerated at pedigreechums.co.uk`;
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], text: caption });
+        await navigator.share({ files: [file], text: `Meet my new pup! 🐾\n\npedigreechums.co.uk` });
       } else {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "my-dog-name.jpg"; a.click();
+        const a = document.createElement("a"); a.href = url; a.download = "my-dog-name.jpg"; a.click();
         URL.revokeObjectURL(url);
       }
     } catch {}
@@ -274,7 +318,7 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
   if (phase === "podium") {
     return (
       <>
-        <Nav />
+        <Nav showLogo={true} />
         <div className={styles.wrapPodium}>
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
@@ -287,12 +331,8 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
           <h2 className={`display ${styles.title}`}>
             We have a <span className={styles.yellow}>winner!</span>
           </h2>
-          <p className={styles.sub}>
-            {first ? getLabel(first) : ""} takes the top spot
-          </p>
-          <button className={styles.startAgainBtn} onClick={onRestart}>
-            Start again
-          </button>
+          <p className={styles.sub}>{first ? getLabel(first) : ""} takes the top spot</p>
+          <button className={styles.startAgainBtn} onClick={onRestart}>Start again</button>
         </div>
       </>
     );
@@ -306,9 +346,8 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         <h2 className={`display ${styles.title}`}>
           The <span className={styles.yellow}>Knockout</span> Round
         </h2>
-        <p className={styles.sub}>
-          {roundLabel}
-        </p>
+
+        {/* Round pills */}
         <div className={styles.pillTrail}>
           {completedRoundNames.map((name, i) => (
             <span key={i} className={styles.pillDone}>{name}</span>
@@ -317,23 +356,13 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
         </div>
         <p className={styles.matchLabel}>{matchLabel}</p>
 
-        {hasBye ? (
-          <div className={styles.byeCard}>
-            <p className={styles.byeLabel}>🎉 Free pass!</p>
-            <p className={styles.byeName}>{getLabel(pairA)}</p>
-            <button className={styles.byeBtn} onClick={advanceBye}>Through →</button>
-          </div>
-        ) : (
-          <div
-            className={styles.pairWrap}
-            onMouseLeave={() => setHoveredIdx(null)}
-          >
+        {/* VS cards */}
+        {!hasBye && pairA && pairB ? (
+          <div className={styles.pairWrap} onMouseLeave={() => setHoveredIdx(null)}>
             <button
               className={`${styles.fightCard} ${chosen === 0 ? styles.winner : ""} ${chosen !== null && chosen !== 0 ? styles.loser : ""} ${hoveredIdx === 0 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 0 ? styles.hoverRed : ""}`}
-              onClick={() => pick(pairA, pairB)}
-              disabled={chosen !== null}
-              onMouseEnter={() => setHoveredIdx(0)}
-            >
+              onClick={() => pick(pairA, pairB)} disabled={chosen !== null}
+              onMouseEnter={() => setHoveredIdx(0)}>
               <p className={styles.fightName}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: "color 0.3s ease 0.3s" }}>{pairA.full}</p>
@@ -342,17 +371,46 @@ export default function KnockoutRound({ shortlist, breed, onBack, onRestart }: P
             <p className={styles.vsLabel}>VS</p>
             <button
               className={`${styles.fightCard} ${chosen === 1 ? styles.winner : ""} ${chosen !== null && chosen !== 1 ? styles.loser : ""} ${hoveredIdx === 1 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 1 ? styles.hoverRed : ""}`}
-              onClick={() => pick(pairB, pairA)}
-              disabled={chosen !== null}
-              onMouseEnter={() => setHoveredIdx(1)}
-            >
+              onClick={() => pick(pairB, pairA)} disabled={chosen !== null}
+              onMouseEnter={() => setHoveredIdx(1)}>
               <p className={styles.fightName}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: "color 0.3s ease 0.3s" }}>{pairB.full}</p>
               )}
             </button>
           </div>
+        ) : (
+          <div className={styles.byeCard}>
+            <p className={styles.byeLabel}>🎉 Free pass!</p>
+            <p className={styles.byeName}>{getLabel((pairA || pairB)!)}</p>
+            <button className={styles.byeBtn} onClick={() => advanceWinner((pairA || pairB)!, null, true)}>Through →</button>
+          </div>
         )}
+
+        {/* Bracket tree */}
+        <div className={styles.bracketScroll}>
+          <div className={styles.bracketTree}>
+            {bracket.map((roundSlots, rIdx) => (
+              <div key={rIdx} className={styles.bracketRound}>
+                <p className={styles.bracketRoundLabel}>{getRoundName(totalRounds - rIdx)}</p>
+                {roundSlots.map((matchSlots, mIdx) => (
+                  <div key={mIdx} className={styles.bracketMatch}>
+                    {matchSlots.map((slot, sIdx) => (
+                      <div key={sIdx}
+                        className={`${styles.bracketSlot}
+                          ${slot.state === "winner" ? styles.bracketWinner : ""}
+                          ${slot.state === "loser" ? styles.bracketLoser : ""}
+                          ${slot.state === "bye" ? styles.bracketBye : ""}
+                          ${rIdx === currentRound && mIdx === currentMatch ? styles.bracketActive : ""}`}>
+                        {slot.entry ? getLabel(slot.entry) : <span className={styles.bracketEmpty}>TBD</span>}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );
