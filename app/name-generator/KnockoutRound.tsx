@@ -117,6 +117,7 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
     };
     const breedKey = (breed || "").toLowerCase().trim();
     img.src = PODIUM_MAP[breedKey] || "/name-podium.jpg";
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       const W = img.width, H = img.height;
       canvas.width = W;
@@ -124,37 +125,56 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(img, 0, 0);
 
-      function drawText(text: string, cx: number, cy: number, fontSize: number, rotateDeg: number) {
+      // Draw nickname + full name on a placard
+      function drawPlacard(
+        nickname: string, fullName: string,
+        cx: number, cy: number,
+        nickSize: number, fullSize: number,
+        rotateDeg: number
+      ) {
         ctx.save();
-        ctx.translate(cx, cy);
+        ctx.translate(cx, cy + 10); // shift down 10px
         ctx.rotate((rotateDeg * Math.PI) / 180);
-        ctx.font = `900 ${fontSize}px 'Luckiest Guy', cursive`;
-        ctx.fillStyle = "#0a3a57";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        // Word wrap if needed
-        const maxW = fontSize * 8;
-        const words = text.split(" ");
-        if (ctx.measureText(text).width > maxW && words.length > 1) {
-          const mid = Math.ceil(words.length / 2);
-          const line1 = words.slice(0, mid).join(" ");
-          const line2 = words.slice(mid).join(" ");
-          ctx.fillText(line1, 0, -fontSize * 0.6);
-          ctx.fillText(line2, 0, fontSize * 0.6);
-        } else {
-          ctx.fillText(text, 0, 0);
+        ctx.fillStyle = "#0a3a57";
+
+        const hasFullName = fullName && fullName !== nickname;
+
+        // Line 1: nickname in Luckiest Guy (normal weight -- font has one weight)
+        ctx.font = `normal ${nickSize}px 'Luckiest Guy', cursive`;
+        const nickY = hasFullName ? -(fullSize * 0.9) : 0;
+        ctx.fillText(nickname, 0, nickY);
+
+        // Line 2: full name in Montserrat bold
+        if (hasFullName) {
+          ctx.font = `700 ${fullSize}px Montserrat, sans-serif`;
+          ctx.fillText(fullName, 0, nickSize * 0.55);
         }
+
         ctx.restore();
       }
 
       // 1st place -- white placard centre, larger font, +2deg clockwise
-      drawText(getLabel(first), 627, 472, 72, 2);
+      drawPlacard(
+        getLabel(first),
+        first.full !== getLabel(first) ? first.full : "",
+        627, 472, 72, 32, 2
+      );
 
-      // 2nd place -- yellow left placard, smaller, -2deg
-      if (p2) drawText(getLabel(p2), 275, 734, 48, -2);
+      // 2nd place -- yellow left placard, smaller, -2deg anticlockwise
+      if (p2) drawPlacard(
+        getLabel(p2),
+        p2.full !== getLabel(p2) ? p2.full : "",
+        275, 734, 48, 22, -2
+      );
 
-      // 3rd place -- yellow right placard, smaller, -2deg
-      if (p3) drawText(getLabel(p3), 978, 734, 48, -2);
+      // 3rd place -- yellow right placard, smaller, -2deg anticlockwise
+      if (p3) drawPlacard(
+        getLabel(p3),
+        p3.full !== getLabel(p3) ? p3.full : "",
+        978, 734, 48, 22, -2
+      );
 
       setPodiumReady(true);
     };
@@ -233,21 +253,29 @@ export default function KnockoutRound({ shortlist, breed, onBack }: Props) {
             className={styles.pairWrap}
             onMouseLeave={() => setHoveredIdx(null)}
           >
-            {[pairA, pairB].filter(Boolean).map((entry, i) => (
-              <button
-                key={entry.full}
-                className={`${styles.fightCard} ${chosen === i ? styles.winner : ""} ${chosen !== null && chosen !== i ? styles.loser : ""} ${hoveredIdx === i ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== i ? styles.hoverRed : ""}`}
-                onClick={() => pick(entry, i === 0 ? pairB : pairA)}
-                disabled={chosen !== null}
-                onMouseEnter={() => setHoveredIdx(i)}
-              >
-                <p className={styles.fightName}>{getLabel(entry)}</p>
-                {entry.nickname && entry.nickname !== entry.full && (
-                  <p className={styles.fightNick}>{entry.full}</p>
-                )}
-              </button>
-            ))}
+            <button
+              className={`${styles.fightCard} ${chosen === 0 ? styles.winner : ""} ${chosen !== null && chosen !== 0 ? styles.loser : ""} ${hoveredIdx === 0 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 0 ? styles.hoverRed : ""}`}
+              onClick={() => pick(pairA, pairB)}
+              disabled={chosen !== null}
+              onMouseEnter={() => setHoveredIdx(0)}
+            >
+              <p className={styles.fightName}>{getLabel(pairA)}</p>
+              {pairA.nickname && pairA.nickname !== pairA.full && (
+                <p className={styles.fightNick}>{pairA.full}</p>
+              )}
+            </button>
             <p className={styles.vsLabel}>VS</p>
+            <button
+              className={`${styles.fightCard} ${chosen === 1 ? styles.winner : ""} ${chosen !== null && chosen !== 1 ? styles.loser : ""} ${hoveredIdx === 1 ? styles.hoverGreen : ""} ${hoveredIdx !== null && hoveredIdx !== 1 ? styles.hoverRed : ""}`}
+              onClick={() => pick(pairB, pairA)}
+              disabled={chosen !== null}
+              onMouseEnter={() => setHoveredIdx(1)}
+            >
+              <p className={styles.fightName}>{getLabel(pairB)}</p>
+              {pairB.nickname && pairB.nickname !== pairB.full && (
+                <p className={styles.fightNick}>{pairB.full}</p>
+              )}
+            </button>
           </div>
         )}
       </div>
