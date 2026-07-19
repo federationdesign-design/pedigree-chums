@@ -1,4 +1,6 @@
 .footer {
+  position: relative;
+  z-index: 95;
   background: var(--blue-deep);
   color: var(--white);
   padding: clamp(40px, 6vw, 72px) clamp(20px, 6vw, 90px) 28px;

@@ -2129,7 +2129,7 @@ export default function NameGeneratorPage() {
   return (
     <>
       {showKnockout ? (
-        <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
+        <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 20px" }}>
           <div style={{ maxWidth:1800, margin:"0 auto" }}>
             <KnockoutRound
               shortlist={shortlist}
@@ -2151,7 +2151,7 @@ export default function NameGeneratorPage() {
         </div>
       ) : (<>
       <Nav />
-      <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
+      <main style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 20px" }}>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator
@@ -2181,7 +2181,7 @@ export default function NameGeneratorPage() {
                     position:"absolute",
                     left:-12, top:"50%",
                     transform:"translateY(-50%) rotate(-2deg)",
-                    width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14,
+                    width:"clamp(180px,42vw,320px)", height:"auto", borderRadius:14,
                     boxShadow:"0 8px 24px rgba(10,58,87,0.28)",
                     zIndex:2
                   }} />
@@ -2346,7 +2346,7 @@ export default function NameGeneratorPage() {
                   background:"linear-gradient(to top right, #00e2ff, #008eff)",
                   borderRadius:40,
                   padding:"clamp(24px,4vw,40px)",
-                  paddingRight: cardImg ? "clamp(150px,38vw,240px)" : "clamp(24px,4vw,40px)",
+                  paddingRight: cardImg ? "clamp(190px,45vw,340px)" : "clamp(24px,4vw,40px)",
                   boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
                   overflow:"visible",
                   marginBottom:20
@@ -2355,19 +2355,19 @@ export default function NameGeneratorPage() {
                   {cardImg && (
                     <div style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={cardImg} alt={breed} style={{ width:"clamp(140px,35vw,220px)", height:"auto", borderRadius:14, display:"block" }} />
+                      <img src={cardImg} alt={breed} style={{ width:"clamp(180px,42vw,320px)", height:"auto", borderRadius:14, display:"block" }} />
                     </div>
                   )}
 
                   {/* Score badge */}
                   <div style={{ marginBottom:16 }}>
-                    <div style={{ display:"inline-block", fontSize:"0.65rem", fontWeight:700, fontFamily:"var(--font-body)", color:"#fff", background: r.score >= 22 ? "rgba(147,51,234,0.7)" : "rgba(10,58,87,0.3)", padding:"4px 10px", borderRadius:999 }}>{r.score}</div>
+                    
                   </div>
                   {/* NICKNAME -- the hero name, big */}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
-                  <button onClick={handleNope} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
-                  <button onClick={handleStartOver} style={{ background:"none", border:"none", color:"var(--navy)", fontFamily:"var(--font-body)", fontSize:"0.75rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", cursor:"pointer" }}>Start over</button>
-                  <button onClick={handleLike} style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"1.5rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                  <button onClick={handleNope} style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+                  <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
+                  <button onClick={handleLike} style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
                 </div>
                   {r.nickname ? (
                     <>
