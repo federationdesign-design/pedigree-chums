@@ -2347,6 +2347,7 @@ export default function NameGeneratorPage() {
       <Nav />
       <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 50px" }}>
         <style>{`
+          .pcm-h1br { display: none; }
           @media (max-width: 768px) {
             .pcm-panel { max-width: 100% !important; }
             .pcm-qgrid { grid-template-columns: 1fr !important; }
@@ -2355,14 +2356,15 @@ export default function NameGeneratorPage() {
             .pcm-action { width: 76px !important; height: 76px !important; font-size: 2rem !important; }
             .pcm-calc-banner { padding-left: clamp(20px,4vw,32px) !important; flex-direction: column !important; text-align: center !important; }
             .pcm-calc-img { display: none !important; }
-            .pcm-h1 { font-size: clamp(2.9rem, 8vw, 5.2rem) !important; }
-            .pcm-nick { font-size: clamp(2.25rem, 8vw, 3.2rem) !important; margin-top: 10px !important; }
+            .pcm-h1br { display: inline !important; }
+            .pcm-h1 { font-size: clamp(3.5rem, 12vw, 5.4rem) !important; }
+            .pcm-nick { font-size: clamp(2.9rem, 11vw, 3.6rem) !important; margin-top: 10px !important; }
             .pcm-sub { margin-bottom: 20px !important; }
           }
         `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
-            Chum <span className="display-yellow">Name</span> Generator
+            Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> Generator
           </h1>
           <p className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
             Give your chum the truly 1 in a million personalised to you name
