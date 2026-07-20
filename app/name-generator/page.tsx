@@ -2358,7 +2358,7 @@ export default function NameGeneratorPage() {
             .pcm-calc-img { display: none !important; }
             .pcm-h1br { display: inline !important; }
             .pcm-h1 { font-size: clamp(3.5rem, 12vw, 5.4rem) !important; }
-            .pcm-nick { font-size: clamp(2.9rem, 11vw, 3.6rem) !important; margin-top: 10px !important; }
+            .pcm-nick { font-size: clamp(2.98rem, 11vw, 3.6rem) !important; margin-top: 10px !important; }
             .pcm-sub { margin-bottom: 20px !important; }
           }
         `}</style>
@@ -2581,7 +2581,7 @@ export default function NameGeneratorPage() {
                     </div>
                   )}
                   {/* Reasoning */}
-                  <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                  <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
                 </div>
                 </div>
               ))}
@@ -2602,7 +2602,7 @@ export default function NameGeneratorPage() {
       </main>
       </>
       )}
-      {toast && (<div style={{ position:"fixed", bottom:80, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
+      {toast && (<div style={{ position:"fixed", top:84, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
       <div style={{ position:"sticky", bottom:0, zIndex:90 }}>
         {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
         <Footer />
