@@ -2540,7 +2540,11 @@ export default function NameGeneratorPage() {
                   {/* NICKNAME -- the hero name, big */}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
                   <button onClick={handleNope} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
-                  <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
+                  {shortlist.length >= 3 ? (
+                    <button onClick={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} style={{ background:"var(--yellow)", border:"2px solid var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 22px" }}>🏆 Knockout</button>
+                  ) : (
+                    <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
+                  )}
                   <button onClick={handleLike} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
                 </div>
                   {r.nickname ? (

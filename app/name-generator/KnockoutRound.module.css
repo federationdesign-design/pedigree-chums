@@ -344,9 +344,9 @@
 }
 
 .bracketSlotActive {
-  border-color: #ffffff !important;
-  background: rgba(255,255,255,0.1) !important;
-  color: #ffffff !important;
+  border-color: var(--yellow, #ffe227) !important;
+  background: var(--yellow, #ffe227) !important;
+  color: var(--navy, #0a3a57) !important;
 }
 
 .bracketSlotTBD {
@@ -469,7 +469,7 @@
 .bracketTag {
   display: inline-block;
   margin-left: 6px;
-  font-size: 0.6rem;
+  font-size: 0.475rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -483,7 +483,7 @@
 .bracketTagRec {
   display: inline-block;
   margin-left: 6px;
-  font-size: 0.6rem;
+  font-size: 0.475rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
