@@ -2355,14 +2355,15 @@ export default function NameGeneratorPage() {
             .pcm-action { width: 76px !important; height: 76px !important; font-size: 2rem !important; }
             .pcm-calc-banner { padding-left: clamp(20px,4vw,32px) !important; flex-direction: column !important; text-align: center !important; }
             .pcm-calc-img { display: none !important; }
-            .pcm-h1 { font-size: clamp(2.4rem, 8vw, 5.2rem) !important; }
+            .pcm-h1 { font-size: clamp(2.65rem, 8vw, 5.2rem) !important; }
+            .pcm-sub { margin-bottom: 20px !important; }
           }
         `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator
           </h1>
-          <p style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
+          <p className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
             Give your chum the truly 1 in a million personalised to you name
           </p>
 
@@ -2577,7 +2578,7 @@ export default function NameGeneratorPage() {
                     </div>
                   )}
                   {/* Reasoning */}
-                  <div style={{ fontSize:"clamp(0.95rem,2.5vw,1.1rem)", color:"var(--navy)", lineHeight:1.6, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
+                  <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:500 }}>{r.reasoning}</div>
                 </div>
                 </div>
               ))}
