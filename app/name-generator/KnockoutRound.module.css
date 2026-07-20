@@ -504,6 +504,16 @@
   .vsLabel { font-size: clamp(2rem, 9vw, 3rem); }
   .fightName { font-size: clamp(1.9rem, 11vw, 3rem); }
   .fightCard { min-height: 120px; padding: 18px 12px; }
-  .bracketSlot { font-size: 0.8rem; padding: 8px 10px; }
   .byeCard { padding: 20px 18px; }
+}
+
+/* Bracket tree on small screens: don't cram the columns to fit the viewport --
+   let the tree grow to its natural width and scroll horizontally inside
+   .bracketScroll, so the pill boxes stay full size and every name is readable
+   (same idea as the lifespan diagram on the breed pages). */
+@media (max-width: 820px) {
+  .bracketTree { width: max-content; min-width: 100%; }
+  .bracketRound { flex: 0 0 auto; min-width: 150px; }
+  .bracketSlot { font-size: 0.9rem; padding: 10px 14px; }
+  .bracketRoundLabel { padding-left: 8px; padding-right: 8px; }
 }
