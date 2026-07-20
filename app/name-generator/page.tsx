@@ -2345,7 +2345,7 @@ export default function NameGeneratorPage() {
         </div>
       ) : (<>
       <Nav />
-      <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 50px" }}>
+      <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 10px" }}>
         <style>{`
           .pcm-h1br { display: none; }
           @media (max-width: 768px) {
@@ -2570,7 +2570,7 @@ export default function NameGeneratorPage() {
                         {r.nickname}
                       </div>
                       {/* Full name -- smaller, below */}
-                      <div style={{ fontSize:"clamp(0.85rem,2.5vw,1.05rem)", color:"rgba(10,58,87,0.75)", fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center", marginBottom:16, letterSpacing:"0.01em" }}>
+                      <div style={{ fontSize:"clamp(0.85rem,2.5vw,1.05rem)", color:"var(--navy)", fontFamily:"var(--font-body)", fontWeight:700, textAlign:"center", marginBottom:16, letterSpacing:"0.01em" }}>
                         {r.full}
                       </div>
                     </>
@@ -2602,7 +2602,7 @@ export default function NameGeneratorPage() {
       </main>
       </>
       )}
-      {toast && (<div style={{ position:"fixed", top:84, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
+      {toast && (<div style={{ position:"fixed", top:134, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
       <div style={{ position:"sticky", bottom:0, zIndex:90 }}>
         {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
         <Footer />
