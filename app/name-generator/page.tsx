@@ -1101,13 +1101,20 @@ function surnameNick(sn: string, gender: "boy"|"girl"): string[] {
   }
   if (base.endsWith("es") || base.endsWith("s")) {
     const stem = base.endsWith("es") ? base.slice(0,-2) : base.slice(0,-1);
-    const outA = [cap(firstSyll+"o"), cap(firstSyll+"ey")];
+    const outA = [cap(firstSyll+"o"), cap(firstSyll+"ey"), cap(firstSyll+"ie")];
     if (gender === "boy") outA.push(cap(stem+"za"));
     return outA.filter(c => c.toLowerCase() !== s);
   }
-  const outB = [cap(firstSyll+"o"), cap(firstSyll+"y")];
+  const outB = [cap(firstSyll+"o"), cap(firstSyll+"y"), cap(firstSyll+"ie")];
   if (gender === "boy") outB.push(cap(firstSyll+"za"));
   return outB.filter(c => c.toLowerCase() !== s);
+}
+
+// Aussie-style nickname suffix: "za" (boys), plus "o" and "ie" for both.
+// Bazil -> Baz -> Bazza / Bazo / Bazie. Seed picks which, adding nickname variety.
+function aussieSuffix(gender: "boy"|"girl", seed: number): string {
+  const pool = gender === "boy" ? ["za", "o", "ie"] : ["y", "o", "ie"];
+  return pool[Math.abs(seed) % pool.length];
 }
 
 // (c) First-name nickname (whimsy compound)
@@ -1402,20 +1409,26 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     const mc2 = mcPool6[(seed + 37) % mcPool6.length];
     const mcSuffixPool = MCFACE_SUFFIX[group2] || MCFACE_SUFFIX.default;
     const mcSuffix = mcSuffixPool[(seed + 41) % mcSuffixPool.length];
+    // ~1 in 3: emit only the silly middle word + surname (shorter, doubles variety)
+    const mcSingle = Math.floor(seed / 13) % 3 === 1;
     if (surnameHasPrefix) {
       // Surname already has a prefix -- use bare compound name, no extra prefix
-      full = `${mc1[0]} ${mc2[1]}${mcSuffix} ${effectiveSurname}`;
+      full = mcSingle
+        ? `${mc2[1]}${mcSuffix} ${effectiveSurname}`
+        : `${mc1[0]} ${mc2[1]}${mcSuffix} ${effectiveSurname}`;
     } else {
       const mcPrefixPool = gender === "girl" ? MCFACE_PREFIX_GIRL : MCFACE_PREFIX_BOY;
       const mcPrefix = mcPrefixPool[(seed + 67) % mcPrefixPool.length];
-      full = `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
+      full = mcSingle
+        ? `${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`
+        : `${mc1[0]} ${mcPrefix}${mc2[1]}${mcSuffix} ${effectiveSurname}`;
     }
-    // McFace nickname: use the clean stem (mc1[1]) + za
+    // McFace nickname: use the clean stem (mc1[1]) + aussie suffix (za / o / ie)
     // mc1[1] is already the stripped stem e.g. ["Chompy","Chomp"] -> "Chomp" -> "Chompza"
     const mcNickStem = mc1[1];
-    // Strip trailing "le" or "e" before adding "za" so Wobble->Wobbza, Bounce->Bouncza
+    // Strip trailing "le" or "e" before adding the suffix so Wobble->Wobbza, Bounce->Bouncza
     const mcNickBase = mcNickStem.replace(/le$/i,"").replace(/e$/i,"");
-    nickname = mcNickBase.charAt(0).toUpperCase() + mcNickBase.slice(1).toLowerCase() + (gender === "boy" ? "za" : "y");
+    nickname = mcNickBase.charAt(0).toUpperCase() + mcNickBase.slice(1).toLowerCase() + aussieSuffix(gender, seed);
   } else if (styleRoll === 7) {
     // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
     const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
@@ -1425,7 +1438,16 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       ? SPONGEBOB_MID_GIRL[(seed + 53) % SPONGEBOB_MID_GIRL.length]
       : SPONGEBOB_MID_BOY[(seed + 53) % SPONGEBOB_MID_BOY.length];
     const sbBody = SPONGEBOB_BODY[(seed + 59) % SPONGEBOB_BODY.length];
-    full = `${sbAdj1}${sbMid} ${sbAdj2}${sbBody} ${effectiveSurname}`;
+    // ~2 in 3: emit only ONE silly compound (+ surname) instead of both.
+    // "DodgyLin BlustyEars Gemon" -> "DodgyLin Gemon" or "BlustyEars Gemon".
+    const sbMode = Math.floor(seed / 13) % 3;
+    if (sbMode === 1) {
+      full = `${sbAdj1}${sbMid} ${effectiveSurname}`;
+    } else if (sbMode === 2) {
+      full = `${sbAdj2}${sbBody} ${effectiveSurname}`;
+    } else {
+      full = `${sbAdj1}${sbMid} ${sbAdj2}${sbBody} ${effectiveSurname}`;
+    }
     // Bob → Bobby etc -- always use the expanded form, no fusion
     const sbNickMap: Record<string,string> = {
       Bob:"Bobby",Tom:"Tommy",Tim:"Timmy",Sam:"Sammy",Jim:"Jimmy",
@@ -1437,7 +1459,11 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
       Bev:"Bevvy",Bea:"Beabea",Fran:"Franny",Gail:"Gaily",Sal:"Sally",
       Nan:"Nanny",Babs:"Babsy",Kim:"Kimmy",Lin:"Linny",May:"Maymay"
 };
-    nickname = sbNickMap[sbMid] || sbMid;
+    // Half the time use the friendly map (Baz->Bazza), otherwise an aussie suffix
+    // on the stem for variety (Baz->Bazo / Bazie), roughly doubling nickname output.
+    nickname = (Math.abs(seed) % 2 === 0)
+      ? (sbNickMap[sbMid] || sbMid)
+      : (sbMid + aussieSuffix(gender, seed));
   } else {
     // Regional term override -- if town matches a region, use local endearment as first name
     const regionalTerm = getRegionalTerm(town, seed, gender);
@@ -2115,6 +2141,21 @@ export default function NameGeneratorPage() {
   });
   const [landingIdx, setLandingIdx] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // --- Pool growth tracking (how many names/combinations unlocked so far) ---
+  const poolNamesRef = useRef<Set<string>>(new Set());   // distinct nicknames
+  const poolCombosRef = useRef<Set<string>>(new Set());  // distinct full names
+  const [poolStats, setPoolStats] = useState<{ namesAdded: number; namesTotal: number } | null>(null);
+  function trackPool(pool: { nickname: string; full: string }[]) {
+    const beforeNames = poolNamesRef.current.size;
+    pool.forEach(r => {
+      if (r.nickname) poolNamesRef.current.add(r.nickname.toLowerCase());
+      if (r.full) poolCombosRef.current.add(r.full.toLowerCase());
+    });
+    setPoolStats({
+      namesAdded: poolNamesRef.current.size - beforeNames,
+      namesTotal: poolNamesRef.current.size,
+    });
+  }
   const [showKnockout, setShowKnockout] = useState(false);
   // Quick-fire question state for exhausted mode
   const [qfActive, setQfActive] = useState(false);
@@ -2178,6 +2219,7 @@ export default function NameGeneratorPage() {
     const sc21 = allD.filter(r=>r.score>=17);
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
     const genResult = ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1);
+    trackPool(allD);
     setUsedNicknames(new Set(genResult.map((r: Result) => r.nickname)));
     setResults(genResult);
     setStage("reveal");
@@ -2225,6 +2267,7 @@ export default function NameGeneratorPage() {
       return;
     }
     const rollResult = fresh.slice(0,1);
+    trackPool(allD);
     const rollFirstName = rollResult[0]?.full?.split(" ").find((w:string) => w.length > 1 && /^[A-Z]/.test(w) && !w.includes(".")) ?? "";
     setUsedNicknames((prev: Set<string>) => new Set([...prev, ...rollResult.map((r: Result) => r.nickname)]));
     setUsedFirstNames((prev:Set<string>) => rollFirstName ? new Set([...prev, rollFirstName]) : prev);
@@ -2527,7 +2570,7 @@ export default function NameGeneratorPage() {
                 {/* Questions grid -- hidden until open */}
                 {qOpen && (
                   <div className="pcm-qgrid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
-                    {qIndices.map((qi: number, pos: number) => {
+                    {qIndices.slice(0,2).map((qi: number, pos: number) => {
                       const qItem = QUESTION_BANK[qi];
                       if (!qItem) return null;
                       const chosen = qAnswers[pos];
@@ -2549,6 +2592,24 @@ export default function NameGeneratorPage() {
                         </div>
                       );
                     })}
+                    {/* 3rd slot is always the surname personalisation field */}
+                    <div style={{ background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"12px 10px", border:`1.5px solid ${snError?"#ef4444":(surname.trim()?"var(--yellow)":"rgba(255,255,255,0.12)")}`, display:"flex", flexDirection:"column", gap:7, transition:"border-color 0.2s" }}>
+                      <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"1rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32, textAlign:"center" }}>
+                        Add your surname to personalise the name
+                      </p>
+                      <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => { const v = e.target.value; setSurname(v); setSnError(hasProfanity(v)); }}
+                        placeholder="e.g. Jones..." maxLength={60}
+                        onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
+                        style={{ width:"100%", padding:"10px 12px", borderRadius:999, border:`1.5px solid ${snError?"#ef4444":"rgba(255,255,255,0.18)"}`, background:"rgba(255,255,255,0.05)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, textAlign:"center", outline:"none", boxSizing:"border-box", animation:"pcAnswerIn 0.35s ease both", animationDelay:"0.36s" }} />
+                      {snError && (
+                        <p style={{ color:"#ff8f8f", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)", textAlign:"center" }}>
+                          Let&apos;s keep it clean! 🐾
+                        </p>
+                      )}
+                      {!snError && surname.trim() && (
+                        <p style={{ color:"var(--yellow)", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)" }}>✓ {surname.trim()}</p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -2566,10 +2627,21 @@ export default function NameGeneratorPage() {
             const qfQ = QUESTION_BANK[qfIndex];
             return qfQ ? (
               <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,30,60,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
-                <div style={{background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
+                <div style={{position:"relative",background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
+                  {qfCount >= 5 && (
+                    <button onClick={() => fireQuickFireResults(qAnswers)} aria-label="Done -- show my names"
+                      style={{position:"absolute",top:14,right:14,width:40,height:40,borderRadius:"50%",border:"2px solid rgba(255,255,255,0.6)",background:"rgba(255,255,255,0.15)",color:"#fff",fontSize:"1.4rem",fontWeight:900,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      ×
+                    </button>
+                  )}
                   <p style={{fontFamily:"var(--font-body)",fontSize:"0.75rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(255,255,255,0.7)",marginBottom:12}}>
                     Quick question {qfCount + 1}
                   </p>
+                  {qfCount >= 5 && (
+                    <p style={{fontFamily:"var(--font-body)",fontSize:"0.72rem",fontWeight:600,color:"rgba(255,255,255,0.85)",marginBottom:12}}>
+                      Tap the ✕ any time to see your names now.
+                    </p>
+                  )}
                   <p className="display" style={{fontSize:"clamp(1.4rem,4vw,2rem)",color:"#fff",marginBottom:28,lineHeight:1.2}}>
                     {qfQ.text}
                   </p>
@@ -2643,8 +2715,19 @@ export default function NameGeneratorPage() {
                 </div>
               ))}
 
+              {poolStats && poolStats.namesTotal > 0 && (
+                <div className="pcm-panel" style={{ maxWidth:"60%", margin:"14px auto 0", width:"100%" }}>
+                  <div style={{ display:"flex", flexWrap:"wrap", justifyContent:"center", alignItems:"center", gap:"6px 14px", background:"rgba(10,58,87,0.06)", border:"1px solid rgba(10,58,87,0.15)", borderRadius:999, padding:"8px 16px", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, color:"var(--navy)", textAlign:"center" }}>
+                    {poolStats.namesAdded > 0 && (
+                      <span>🎁 +{poolStats.namesAdded.toLocaleString()} new names added to the pool</span>
+                    )}
+                    <span>🐾 ~{(poolStats.namesTotal * 100).toLocaleString()} possible combinations in your pool</span>
+                  </div>
+                </div>
+              )}
+
               <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
-                
+
               </div>
             </>
           )}
