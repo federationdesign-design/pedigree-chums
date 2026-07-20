@@ -271,6 +271,36 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     // Check if the next position is a bye -- chain synchronously
     const nextMatchSlots = newBracket[nextR]?.[nextM];
     if (nextMatchSlots) {
+      // Fill an empty RECYCLE match BEFORE the skip/bye checks below, so a padded
+      // slot becomes a real "2nd chance loser vs recommended" matchup rather than a bye.
+      const isRecycleMatch = nextMatchSlots.some(s => s.state === "recycle");
+      if (isRecycleMatch && nextMatchSlots.some(s => !s.entry)) {
+        // Names already active (exclude eliminated losers so they CAN be recycled).
+        const usedF = new Set(
+          newBracket.flatMap(r => r.flatMap(m => m.filter(s => s.state !== "loser").map(s => s.entry?.full).filter(Boolean)))
+        );
+        // Losers eligible for a 2nd chance: accumulated + the one just produced
+        // (setAllRoundLosers is async, so the current loser isn't in the closure yet).
+        const poolLosers = [...allRoundLosers];
+        if (loser && !isBye && curRound !== totalRounds - 1) poolLosers.push(loser);
+        const losersSorted = [...poolLosers].sort((a, b) => b.score - a.score);
+        let li = 0, ri = 0;
+        const takeLoser = (): { entry: ShortlistEntry; state: SlotState } | null => {
+          while (li < losersSorted.length) { const c = losersSorted[li++]; if (!usedF.has(c.full)) { usedF.add(c.full); return { entry: c, state: "recycle" }; } }
+          return null;
+        };
+        const takeRec = (): { entry: ShortlistEntry; state: SlotState } | null => {
+          while (ri < recommended.length) { const c = recommended[ri++]; if (!usedF.has(c.full)) { usedF.add(c.full); return { entry: c, state: "recommended" }; } }
+          return null;
+        };
+        const fillRecycle = (slot: BracketSlot, preferLoser: boolean) => {
+          if (slot.entry) return;
+          const picked = preferLoser ? (takeLoser() || takeRec()) : (takeRec() || takeLoser());
+          if (picked) { slot.entry = picked.entry; slot.state = picked.state; }
+        };
+        fillRecycle(nextMatchSlots[0], true);   // slot 0 -> recycled loser (2nd chance)
+        fillRecycle(nextMatchSlots[1], false);  // slot 1 -> recommended name
+      }
       const [sa, sb] = nextMatchSlots;
       if (!sa.entry && !sb.entry) {
         // Pure padding slot -- skip it and find next real match

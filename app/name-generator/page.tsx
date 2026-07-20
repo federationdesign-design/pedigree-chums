@@ -2333,6 +2333,18 @@ export default function NameGeneratorPage() {
       ) : (<>
       <Nav />
       <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 50px" }}>
+        <style>{`
+          @media (max-width: 768px) {
+            .pcm-panel { max-width: 100% !important; }
+            .pcm-qgrid { grid-template-columns: 1fr !important; }
+            .pcm-reveal-card { padding-right: clamp(20px,5vw,40px) !important; }
+            .pcm-breed-img { position: static !important; transform: none !important; text-align: center !important; margin: 0 0 8px !important; }
+            .pcm-breed-img img { width: min(200px, 60%) !important; height: auto !important; margin: 0 auto !important; transform: rotate(-2deg); }
+            .pcm-action { width: 76px !important; height: 76px !important; font-size: 2rem !important; }
+            .pcm-calc-banner { padding-left: clamp(20px,4vw,32px) !important; flex-direction: column !important; text-align: center !important; }
+            .pcm-calc-img { position: static !important; top: auto !important; left: auto !important; transform: rotate(-2deg) !important; width: min(200px,60%) !important; height: auto !important; margin: 0 auto 8px !important; }
+          }
+        `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
             Chum <span className="display-yellow">Name</span> Generator
@@ -2345,7 +2357,7 @@ export default function NameGeneratorPage() {
           {fromCalculator && breed && stage === "inputs" && (() => {
             const img = CARD_IMAGE[breed] ?? null;
             return (
-              <div style={{
+              <div className="pcm-calc-banner" style={{
                 position:"relative",
                 display:"flex", alignItems:"center", gap:16, marginBottom:24,
                 background:"linear-gradient(to top right, #00e2ff, #008eff)",
@@ -2358,7 +2370,7 @@ export default function NameGeneratorPage() {
                 minHeight:"clamp(100px,18vw,140px)"
               }}>
                 {img && (
-                  <img src={img} alt={breed} style={{
+                  <img src={img} alt={breed} className="pcm-calc-img" style={{
                     position:"absolute",
                     left:-12, top:"50%",
                     transform:"translateY(-50%) rotate(-2deg)",
@@ -2380,7 +2392,7 @@ export default function NameGeneratorPage() {
           })()}
           {stage === "inputs" && (() => {
             return (
-            <div style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)", maxWidth:"60%", margin:"0 auto", width:"100%" }}>
+            <div className="pcm-panel" style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)", maxWidth:"60%", margin:"0 auto", width:"100%" }}>
               {!fromCalculator && (<>
                 <label style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
                 <select value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} setQIndices(pickThreeQuestions()); setQAnswers({}); }}
@@ -2440,7 +2452,7 @@ export default function NameGeneratorPage() {
                 </button>
                 {/* Questions grid -- hidden until open */}
                 {qOpen && (
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
+                  <div className="pcm-qgrid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
                     {qIndices.map((qi: number, pos: number) => {
                       const qItem = QUESTION_BANK[qi];
                       if (!qItem) return null;
@@ -2502,8 +2514,8 @@ export default function NameGeneratorPage() {
                     {stage === "reveal" && results.length > 0 && (
             <>
               {results.slice(0,1).map((r: Result) => (
-                <div style={{ maxWidth:"60%", margin:"0 auto", width:"100%" }}>
-                <div key={r.full} style={{
+                <div className="pcm-panel" style={{ maxWidth:"60%", margin:"0 auto", width:"100%" }}>
+                <div key={r.full} className="pcm-reveal-card" style={{
                   position:"relative",
                   background:"linear-gradient(to top right, #00e2ff, #008eff)",
                   borderRadius:40,
@@ -2515,7 +2527,7 @@ export default function NameGeneratorPage() {
                 }}>
                   {/* Breed card */}
                   {cardImg && (
-                    <div style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
+                    <div className="pcm-breed-img" style={{ position:"absolute", right:-12, top:-10, zIndex:2, transform:"rotate(2deg)", transformOrigin:"bottom right", filter:"drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={cardImg} alt={breed} style={{ width:"clamp(180px,42vw,320px)", height:"auto", borderRadius:14, display:"block" }} />
                     </div>
@@ -2527,9 +2539,9 @@ export default function NameGeneratorPage() {
                   </div>
                   {/* NICKNAME -- the hero name, big */}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
-                  <button onClick={handleNope} style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+                  <button onClick={handleNope} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
                   <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
-                  <button onClick={handleLike} style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                  <button onClick={handleLike} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
                 </div>
                   {r.nickname ? (
                     <>

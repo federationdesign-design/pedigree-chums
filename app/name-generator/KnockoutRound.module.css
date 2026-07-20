@@ -497,3 +497,13 @@
 .bracketRecommended {
   border-color: #a855f7 !important;
 }
+
+/* ── Mobile ─────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .pairWrap { grid-template-columns: 1fr; gap: 12px; }
+  .vsLabel { font-size: clamp(2rem, 9vw, 3rem); }
+  .fightName { font-size: clamp(1.9rem, 11vw, 3rem); }
+  .fightCard { min-height: 120px; padding: 18px 12px; }
+  .bracketSlot { font-size: 0.8rem; padding: 8px 10px; }
+  .byeCard { padding: 20px 18px; }
+}
