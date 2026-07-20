@@ -1,5 +1,5 @@
 .bar {
-  position: static;
+  position: relative;
   z-index: 90;
   background: var(--navy, #0a3a57);
   border-top: 2px solid var(--yellow, #ffe227);
@@ -101,6 +101,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 900;
   line-height: 1;
   padding: 0;
   display: flex;
@@ -148,7 +149,33 @@
 }
 .clearBtn:hover { background: rgba(255,255,255,0.15); }
 
-/* Hide the 'Liked' label on mobile */
+/* Mobile shortlist bar */
 @media (max-width: 768px) {
   .label { display: none; }
+  .knockoutBtn { display: none; }
+  /* horizontal scroll instead of stacking */
+  .pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 0;
+    padding: 12px 8px 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* trash: out of the bar, top-right corner, larger, no circle */
+  .clearBtn {
+    position: absolute;
+    top: -46px;
+    right: 14px;
+    width: auto;
+    height: auto;
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 4px;
+    color: #fff;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.45));
+  }
+  .clearBtn:hover { background: none; }
+  .clearBtn svg { width: 34px; height: 34px; }
 }
