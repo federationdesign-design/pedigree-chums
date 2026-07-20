@@ -79,3 +79,26 @@
   background: rgba(255,255,255,0.16);
   border-color: rgba(255,255,255,0.3);
 }
+
+/* Slimmer footer on mobile */
+@media (max-width: 768px) {
+  .footer {
+    padding: clamp(24px, 6vw, 36px) clamp(16px, 5vw, 32px) 18px;
+  }
+  /* logo 10% smaller */
+  .logoCol img {
+    width: clamp(234px, 32.4vw, 306px);
+  }
+  /* hide the nav pill menu items below the logo */
+  .nav,
+  .links {
+    display: none;
+  }
+  /* small print: 1pt smaller + tighter line height */
+  .legal {
+    font-size: 0.72rem;
+    line-height: 1.25;
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+}
