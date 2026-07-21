@@ -542,3 +542,44 @@
     gap: 72px;
   }
 }
+
+/* ── Pull quotes ────────────────────────────────────────────── */
+.pullquote {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 300;
+  font-style: italic;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 48px 0;
+  padding: 32px 0 32px 28px;
+  border-left: 4px solid var(--yellow, #ffd23e);
+  max-width: 100%;
+}
+
+.pullquote::before {
+  content: "\201C";
+  font-size: 1.2em;
+  color: var(--yellow, #ffd23e);
+  font-style: normal;
+  margin-right: 4px;
+  line-height: 0;
+  vertical-align: -0.3em;
+}
+
+.pullquote::after {
+  content: "\201D";
+  font-size: 1.2em;
+  color: var(--yellow, #ffd23e);
+  font-style: normal;
+  margin-left: 4px;
+  line-height: 0;
+  vertical-align: -0.3em;
+}
+
+@media (min-width: 1300px) {
+  .pullquote {
+    font-size: clamp(1.8rem, 2.5vw, 2.8rem);
+    margin: 56px 0;
+  }
+}

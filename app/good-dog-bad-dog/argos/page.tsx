@@ -91,6 +91,7 @@ export default function ArgosPage() {
               <p>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly. He cannot kneel beside him, call his name, or comfort him without risking his disguise. Argos has enough strength left to recognise him, but not enough to reach him. Then, as Odysseus goes inside, Argos dies.</p>
 
               <p>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</p>
+              <p className={styles.pullquote}>Humans recognise status. Dogs recognise presence.</p>
 
               <h2 className={styles.subhead}>Why we need Odysseus to go to him</h2>
 
@@ -121,6 +122,8 @@ export default function ArgosPage() {
               <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
+
+              <p className={styles.pullquote}>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
 
@@ -163,6 +166,7 @@ export default function ArgosPage() {
               <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
 
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
+              <p className={styles.pullquote}>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</p>
 
               <div
                 id="smellofhome-video-wrap"
@@ -241,6 +245,7 @@ export default function ArgosPage() {
               <p>That belief is relatively recent in the long history of dogs and people. For most of that history, dogs lived and died in conditions we would now find distressing, not always out of cruelty, but because the emotional contract was different. The dog was valued first for what it did, not for what it felt.</p>
 
               <p>What Argos quietly demands, for modern readers, is a question the ancient world never quite asked in the same way: what do we owe, in return, for that kind of love?</p>
+              <p className={styles.pullquote}>A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond.</p>
 
               <h2 className={styles.subhead}>Why Argos couldn&apos;t really have lived twenty years &mdash; and why it matters</h2>
 
