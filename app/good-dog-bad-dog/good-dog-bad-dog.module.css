@@ -503,32 +503,42 @@
     font-size: 1.8125rem;
   }
 
-  /* Sidebar -- scale all text, icons, pills, bullets proportionally */
+  /* Sidebar -- scale everything uniformly via transform.
+     transform-origin top right anchors to the column edge.
+     overflow: visible lets scaled content breathe without clipping.
+     The grid column is narrowed to compensate for the scale footprint. */
   .sidebar {
-    font-size: 1.1em;
+    transform: scale(1.12);
+    transform-origin: top right;
+    overflow: visible;
   }
 
-  /* Widen sidebar column */
   .essayLayout {
-    grid-template-columns: 1fr minmax(420px, 28vw);
+    grid-template-columns: 1fr minmax(340px, 26vw);
+    gap: 56px;
   }
 }
 
 @media (min-width: 1600px) {
-  .essayLayout {
-    grid-template-columns: 1fr minmax(500px, 28vw);
-    gap: 64px;
-  }
   .sidebar {
-    font-size: 1.2em;
+    transform: scale(1.2);
+    transform-origin: top right;
+  }
+
+  .essayLayout {
+    grid-template-columns: 1fr minmax(320px, 24vw);
+    gap: 64px;
   }
 }
 
 @media (min-width: 1900px) {
-  .essayLayout {
-    grid-template-columns: 1fr minmax(560px, 28vw);
-  }
   .sidebar {
-    font-size: 1.3em;
+    transform: scale(1.28);
+    transform-origin: top right;
+  }
+
+  .essayLayout {
+    grid-template-columns: 1fr minmax(300px, 22vw);
+    gap: 72px;
   }
 }
