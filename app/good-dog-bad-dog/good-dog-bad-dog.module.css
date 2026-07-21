@@ -490,18 +490,45 @@
   }
 }
 
-@media (min-width: 1400px) {
-  .sidebarCard {
+/* ── Wide viewport scaling (>1300px) ───────────────────────── */
+@media (min-width: 1300px) {
+
+  /* Para text +3pt */
+  .essayBody p {
+    font-size: 1.4375rem;
+  }
+
+  /* Intro first para +3pt on top of the bump */
+  .essayBody p:first-child {
+    font-size: 1.8125rem;
+  }
+
+  /* Sidebar -- scale all text, icons, pills, bullets proportionally */
+  .sidebar {
     font-size: 1.1em;
+  }
+
+  /* Widen sidebar column */
+  .essayLayout {
+    grid-template-columns: 1fr minmax(420px, 28vw);
   }
 }
 
-@media (min-width: 1800px) {
+@media (min-width: 1600px) {
   .essayLayout {
-    grid-template-columns: 1fr minmax(480px, 28vw);
+    grid-template-columns: 1fr minmax(500px, 28vw);
     gap: 64px;
   }
-  .sidebarCard {
+  .sidebar {
     font-size: 1.2em;
+  }
+}
+
+@media (min-width: 1900px) {
+  .essayLayout {
+    grid-template-columns: 1fr minmax(560px, 28vw);
+  }
+  .sidebar {
+    font-size: 1.3em;
   }
 }

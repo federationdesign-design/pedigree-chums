@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -140,20 +141,6 @@ export default function ArgosPage() {
 
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
 
-              <video
-                src="/smellofhome-montage.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                style={{
-                  width: "100%",
-                  maxWidth: "720px",
-                  borderRadius: "12px",
-                  display: "block",
-                  marginBottom: "32px",
-                }}
-              />
               <h2 className={styles.subhead}>The smell of home</h2>
 
               <p>Ask someone what home smells like and they will almost always be able to tell you. Not think about it. Tell you. Immediately, from somewhere that bypasses conscious thought entirely.</p>
@@ -178,6 +165,43 @@ export default function ArgosPage() {
 
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
 
+              <div
+                id="smellofhome-video-wrap"
+                style={{ width: "100%", marginBottom: "32px", position: "relative" }}
+              >
+                <video
+                  id="smellofhome-video"
+                  src="/smellofhome-montage.mp4"
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    borderRadius: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={(e: React.MouseEvent<HTMLVideoElement>) => {
+                    const v = e.currentTarget;
+                    v.paused ? v.play() : v.pause();
+                  }}
+                />
+              </div>
+              <script dangerouslySetInnerHTML={{ __html: `(function(){
+                var v = document.getElementById('smellofhome-video');
+                if(!v) return;
+                var started = false;
+                var obs = new IntersectionObserver(function(entries){
+                  entries.forEach(function(e){
+                    if(!started && e.intersectionRatio >= 0.5){
+                      v.play();
+                      started = true;
+                      obs.disconnect();
+                    }
+                  });
+                }, { threshold: 0.5 });
+                obs.observe(v);
+              })();` }} />
               <h2 className={styles.subhead}>The dog as home</h2>
 
               <p>Argos is not just a dog at the house. In a way, Argos is the house.</p>
@@ -377,7 +401,7 @@ export default function ArgosPage() {
                 <img
                   src="/history/homer-bust.jpeg"
                   alt="Bust of Homer, Farnese collection, Naples"
-                  style={{ width: "100%", display: "block", maxHeight: 260, objectFit: "cover", objectPosition: "center top" }}
+                  style={{ width: "100%", display: "block" }}
                 />
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
