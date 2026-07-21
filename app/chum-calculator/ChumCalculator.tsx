@@ -38,25 +38,14 @@ const QUESTIONS: Question[] = [
     ],
   },
   {
-    id: "home",
-    question: "What kind of home do you live in?",
-    info: "Upper floor flats without lifts limit large breeds significantly. A ground floor flat with outdoor access is quite different to a third floor flat with stairs.",
+    id: "living",
+    question: "Where do you live, and how much outdoor space is there?",
+    info: "A flat opposite a big park can beat a house with a tiny paved yard. What matters is home size and the quality of regular outdoor access -- together they rule some breeds firmly in or out.",
     options: [
-      { label: "Flat or apartment -- upper floor", value: "flat_upper" },
-      { label: "Flat or apartment -- ground floor", value: "flat_ground" },
-      { label: "Terraced or semi-detached house", value: "terraced" },
-      { label: "Detached house", value: "detached" },
-    ],
-  },
-  {
-    id: "garden",
-    question: "Do you have access to outdoor space?",
-    info: "A dog living opposite a big park with no garden can be better off than one with a tiny paved yard. What matters is the quality and regularity of outdoor access.",
-    options: [
-      { label: "Yes -- a private garden", value: "private" },
-      { label: "Yes -- shared or communal garden", value: "shared" },
-      { label: "No garden, but green space nearby -- park, common or fields", value: "nearby" },
-      { label: "No -- mostly urban streets and no regular green space", value: "none" },
+      { label: "City or town flat, no garden -- streets and the odd small park", value: "city_flat" },
+      { label: "Built-up area, but I have a garden or yard", value: "town_garden" },
+      { label: "Suburban -- a garden, with green space a short walk away", value: "suburban" },
+      { label: "Rural or semi-rural -- fields and open space on the doorstep", value: "rural" },
     ],
   },
   {
@@ -117,11 +106,11 @@ const QUESTIONS: Question[] = [
   {
     id: "grooming",
     question: "How much grooming are you happy with?",
-    info: "Some breeds need professional grooming every six weeks or they become matted and uncomfortable. Others need nothing more than a wipe with a damp cloth.",
+    info: "Some breeds need a professional salon every 6-8 weeks (around £40-55 a time) or they mat and get uncomfortable. Others need nothing more than a wipe with a damp cloth.",
     options: [
-      { label: "Minimal -- a quick brush now and then", value: "low" },
+      { label: "Minimal -- a quick brush or wipe, no salon trips", value: "low" },
       { label: "Some -- weekly brushing is fine", value: "medium" },
-      { label: "Lots -- happy to groom regularly", value: "high" },
+      { label: "Lots -- happy to groom often, salon visits included", value: "high" },
     ],
   },
   {
@@ -134,16 +123,6 @@ const QUESTIONS: Question[] = [
       { label: "£1,200 -- £1,800 per year (£100-£150/month)", value: "medium" },
       { label: "£1,800 -- £2,500 per year (£150-£210/month)", value: "high" },
       { label: "Over £2,500 per year -- cost is not a concern", value: "any" },
-    ],
-  },
-  {
-    id: "shedding",
-    question: "How do you feel about dog hair?",
-    info: "Shedding means hair -- on your sofa, your clothes, your food. Heavy shedders like German Shepherds and Golden Retrievers lose fur year-round. Low-shedding breeds like Poodles and Bichons barely drop a hair.",
-    options: [
-      { label: "I need a low-shedding breed -- hair is a dealbreaker", value: "low" },
-      { label: "I can live with some hair", value: "medium" },
-      { label: "I like the smell and taste of dog hair -- bring it on", value: "high" },
     ],
   },
   {
@@ -171,15 +150,6 @@ const QUESTIONS: Question[] = [
     ],
   },
   {
-    id: "destructive",
-    question: "Do you have expensive soft furnishings or things you really treasure?",
-    sub: "Some breeds chew, dig or destroy when bored or anxious -- puppyhood aside, some never grow out of it",
-    options: [
-      { label: "Yes -- I need a calmer, less destructive breed", value: "yes" },
-      { label: "No -- I'm not precious about my home", value: "no" },
-    ],
-  },
-  {
     id: "mobility",
     question: "Do you have any physical limitations that affect how far or fast you can walk?",
     sub: "There is no wrong answer -- this helps us match you to a breed that genuinely suits your daily life",
@@ -190,30 +160,23 @@ const QUESTIONS: Question[] = [
     ],
   },
   {
-    id: "allergies",
-    question: "Does anyone in the household have dog allergies or asthma that could be triggered by pet hair or dander?",
-    info: "No dog is fully hypoallergenic, but low-shedding breeds like Poodles and Bichons produce far less of the proteins that trigger reactions.",
+    id: "coat",
+    question: "How do you feel about dog hair -- and does anyone react to it?",
+    info: "No dog is fully hypoallergenic, but low-shedding breeds like Poodles and Bichons produce far less of the proteins that trigger reactions -- and far less hair on your sofa, clothes and food.",
     options: [
-      { label: "No -- we are all fine", value: "none" },
-      { label: "Mild -- we would prefer a lower-shedding breed", value: "mild" },
-      { label: "Yes, significant -- we need a breed known to be low-allergen", value: "significant" },
+      { label: "Someone's allergic or asthmatic -- we need a low-allergen breed", value: "significant" },
+      { label: "No allergies, but hair is a dealbreaker -- low-shedding please", value: "low_shed" },
+      { label: "We can live with some hair", value: "some" },
+      { label: "I like the smell and taste of dog hair -- bring it on", value: "love" },
     ],
   },
   {
-    id: "tb_substance",
-    question: "When you imagine you and your dog, what do you see?",
+    id: "tb_build",
+    question: "At the park, dogs play rough -- jumping, barging, tumbling.",
+    sub: "Do you want a dog that can pile in and look after itself, or one you'd keep more of an eye on? Some fine-boned breeds injure easily.",
     options: [
-      { label: "A proper dog -- substantial, grounded, takes up space", value: "substantial" },
-      { label: "Something small and light -- easy to carry, happy on a lap", value: "lap" },
-    ],
-  },
-  {
-    id: "tb_park",
-    question: "At the park, dogs play rough -- jumping, barging, tumbling",
-    sub: "Would you rather have a dog that can pile in and take care of itself, or one you need to keep an eye on?",
-    options: [
-      { label: "Pile in -- I want a sturdy dog that can handle boisterous play", value: "sturdy" },
-      { label: "Keep an eye on -- I'd manage the environment around a more delicate dog", value: "delicate" },
+      { label: "Pile in -- a sturdy dog that can handle boisterous play", value: "sturdy" },
+      { label: "Keep an eye on -- I'd manage things around a more delicate dog", value: "delicate" },
     ],
   },
   {
@@ -234,53 +197,6 @@ const QUESTIONS: Question[] = [
       { label: "Charming -- I'd love a dog with real instincts and drive", value: "working" },
       { label: "That would frustrate me -- I want a calm, obedient dog that listens", value: "biddable" },
       { label: "Somewhere in between", value: "any" },
-    ],
-  },
-  {
-    id: "tb_looks",
-    question: "Some dogs stop the show -- double takes and rubber-necking from the general public. Others are just dogs.",
-    sub: "Does the aesthetic matter to you?",
-    options: [
-      { label: "Yes -- I'd love something visually striking that turns heads", value: "striking" },
-      { label: "No -- temperament and practicality matter far more than looks", value: "practical" },
-      { label: "No strong feelings either way", value: "any" },
-    ],
-  },
-  {
-    id: "tb_roughplay",
-    question: "Do you like rough and tumble play with your dog?",
-    sub: "Some breeds have very fine bones and can be seriously injured by boisterous play",
-    options: [
-      { label: "Yes -- I want a sturdy dog that can handle it", value: "yes" },
-      { label: "No -- I prefer gentle, calm interaction", value: "no" },
-    ],
-  },
-  {
-    id: "tb_location",
-    question: "Where do you live?",
-    sub: "Some breeds need open countryside -- others are happiest on city streets",
-    options: [
-      { label: "City or large town -- mostly pavements and parks", value: "city" },
-      { label: "Suburban -- some green space nearby", value: "suburban" },
-      { label: "Rural -- countryside, fields and open space", value: "rural" },
-    ],
-  },
-  {
-    id: "tb_openspace",
-    question: "Do you have easy access to open space for off-lead running?",
-    options: [
-      { label: "Yes -- fields, woodland or a large park nearby", value: "yes" },
-      { label: "No -- mostly streets and small urban parks", value: "no" },
-    ],
-  },
-  {
-    id: "tb_salon",
-    question: "Would you be happy booking your dog into a grooming salon every 6-8 weeks?",
-    sub: "For some breeds it is not optional -- it is part of the deal, at around £40-55 a month",
-    options: [
-      { label: "Yes -- I do not mind regular appointments and the cost", value: "yes" },
-      { label: "I would prefer a breed I can maintain at home with a brush", value: "home" },
-      { label: "I want something really low maintenance -- a quick wipe down is enough", value: "minimal" },
     ],
   },
   {
@@ -308,12 +224,51 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
 
   if (!suit && !ex) return 30;
 
+  // Breed sets reused across several questions (defined once here)
+  const cityFriendly = new Set(["french-bulldog","pug","shih-tzu","cavalier-king-charles-spaniel",
+    "bichon-frise","poodle","boston-terrier","maltese","chihuahua","yorkshire-terrier",
+    "cockapoo","cavapoo","maltipoo","cavachon","pomeranian","italian-greyhound",
+    "staffordshire-bull-terrier","bulldog"]);
+  const spaceNeeding = new Set(["border-collie","greyhound","lurcher","siberian-husky",
+    "weimaraner","irish-setter","springer-spaniel","dalmatian","afghan-hound",
+    "german-shepherd","golden-retriever","labrador","rough-collie","whippet"]);
+  const salonBreeds = new Set(["bichon-frise","shih-tzu","cavapoo","maltese","maltipoo",
+    "yorkshire-terrier","cavalier-king-charles-spaniel","cavachon","pomeranian",
+    "labradoodle","goldendoodle","cockapoo","jackapoo","poodle","miniature-schnauzer"]);
+  const wipeBreeds = new Set(["chihuahua","italian-greyhound","boston-terrier",
+    "french-bulldog","pug","bulldog","whippet","greyhound","lurcher",
+    "staffordshire-bull-terrier","doberman-pinscher","weimaraner","dalmatian"]);
+  const lowAllergen = new Set(["poodle","cockapoo","labradoodle","goldendoodle","cavapoo",
+    "maltipoo","jackapoo","bichon-frise","maltese","yorkshire-terrier",
+    "shih-tzu","west-highland-terrier","miniature-schnauzer",
+    "border-terrier","boston-terrier"]);
+  const highAllergen = new Set(["german-shepherd","siberian-husky","golden-retriever",
+    "labrador","old-english-sheepdog","rottweiler","boxer","dalmatian",
+    "great-dane","saint-bernard","bloodhound","rough-collie",
+    "springer-spaniel","basset-hound","corgi"]);
+
+  // Size -- strong signal, tightened
   if (answers.size && answers.size !== "any" && breed?.sizeBand) {
-    if (breed.sizeBand !== answers.size) score -= 40;
+    if (breed.sizeBand !== answers.size) score -= 48;
   }
-  if (suit && answers.home) {
-    if (answers.home === "flat") score += (suit.smallHome - 3) * 12;
-    else if (answers.home === "small_garden") score += (suit.smallHome - 3) * 6;
+
+  // Living environment -- home size + urban/rural + open space (merged from home/garden/location/openspace)
+  if (answers.living) {
+    const v = answers.living;
+    if (suit) {
+      if (v === "city_flat") score += (suit.smallHome - 3) * 13;
+      else if (v === "town_garden") score += (suit.smallHome - 3) * 6;
+    }
+    if (v === "city_flat") {
+      if (spaceNeeding.has(slug)) score -= 38;
+      if (cityFriendly.has(slug)) score += 14;
+    } else if (v === "town_garden") {
+      if (spaceNeeding.has(slug)) score -= 16;
+      if (cityFriendly.has(slug)) score += 8;
+    } else if (v === "rural") {
+      if (spaceNeeding.has(slug)) score += 12;
+      if (cityFriendly.has(slug)) score -= 6;
+    }
   }
   if (suit && answers.children) {
     if (answers.children === "young") score += (suit.children - 3) * 15;
@@ -358,10 +313,12 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     const max = budgetMap[answers.budget] ?? 2500;
     score += annual > max ? -(annual - max) * 0.04 : 10;
   }
-  if (groom && answers.shedding) {
-    if (answers.shedding === "low" && groom.sheddingLevel >= 4) score -= 20;
-    if (answers.shedding === "low" && groom.sheddingLevel <= 2) score += 10;
-    if (answers.shedding === "medium" && groom.sheddingLevel >= 5) score -= 10;
+  // Salon vs low-maintenance -- folded into the grooming answer
+  if (answers.grooming === "low") {
+    if (wipeBreeds.has(slug)) score += 12;
+    if (salonBreeds.has(slug)) score -= 28;
+  } else if (answers.grooming === "high") {
+    if (salonBreeds.has(slug)) score += 12;
   }
   const onePersonBreeds = new Set(["dachshund", "corgi", "weimaraner", "rough-collie", "afghan-hound", "greyhound", "lurcher", "doberman-pinscher", "german-shepherd", "siberian-husky", "whippet"]);
   const everyonesFriend = new Set(["labrador", "golden-retriever", "labradoodle", "goldendoodle", "beagle", "cocker-spaniel", "springer-spaniel", "cavalier-king-charles-spaniel", "cockapoo", "cavapoo", "bichon-frise", "boxer", "staffordshire-bull-terrier"]);
@@ -380,11 +337,6 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.vocal === "yes" && flags.vocal) score -= 40;
     if (answers.vocal === "no" && !flags.vocal) score += 8;
   }
-  if (flags && answers.destructive) {
-    if (answers.destructive === "yes" && flags.destructive) score -= 40;
-    if (answers.destructive === "no" && !flags.destructive) score += 8;
-  }
-
   // ── Mobility scoring ────────────────────────────────────────────────────
   const minimalWalkOk = new Set(["maltese","chihuahua","bulldog","french-bulldog","pug",
     "bichon-frise","shih-tzu","yorkshire-terrier","pomeranian","maltipoo",
@@ -406,22 +358,17 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (largeHard.has(slug)) score -= 15;
   }
 
-  // ── Allergy scoring ─────────────────────────────────────────────────────
-  const lowAllergen = new Set(["poodle","cockapoo","labradoodle","goldendoodle","cavapoo",
-    "maltipoo","jackapoo","bichon-frise","maltese","yorkshire-terrier",
-    "shih-tzu","west-highland-terrier","miniature-schnauzer",
-    "border-terrier","boston-terrier"]);
-  const highAllergen = new Set(["german-shepherd","siberian-husky","golden-retriever",
-    "labrador","old-english-sheepdog","rottweiler","boxer","dalmatian",
-    "great-dane","saint-bernard","bloodhound","rough-collie",
-    "springer-spaniel","basset-hound","corgi"]);
-  if (answers.allergies === "significant") {
+  // ── Coat: shedding + allergy (merged) ───────────────────────────────────
+  if (answers.coat === "significant") {
     if (lowAllergen.has(slug)) score += 20;
     else if (highAllergen.has(slug)) score -= 50;
     else score -= 20;
-  } else if (answers.allergies === "mild") {
-    if (highAllergen.has(slug)) score -= 25;
-    if (lowAllergen.has(slug)) score += 8;
+  } else if (answers.coat === "low_shed") {
+    if (groom && groom.sheddingLevel >= 4) score -= 24;
+    if (groom && groom.sheddingLevel <= 2) score += 10;
+    if (lowAllergen.has(slug)) score += 6;
+  } else if (answers.coat === "some") {
+    if (groom && groom.sheddingLevel >= 5) score -= 10;
   }
 
   // ── Tiebreaker scoring ──────────────────────────────────────────────────
@@ -459,26 +406,12 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     "bulldog","rough-collie","poodle",
   ]);
 
-  // tb_park -- rough park play
-  if (answers.tb_park) {
-    if (answers.tb_park === "sturdy" && fragile.has(slug)) score -= 35;
-    if (answers.tb_park === "sturdy" && sturdy.has(slug)) score += 10;
-    if (answers.tb_park === "delicate" && fragile.has(slug)) score += 10;
-    if (answers.tb_park === "delicate" && sturdy.has(slug)) score -= 10;
-  }
-  // tb_roughplay -- rough and tumble play
-  if (answers.tb_roughplay) {
-    if (answers.tb_roughplay === "yes" && fragile.has(slug)) score -= 35;
-    if (answers.tb_roughplay === "yes" && sturdy.has(slug)) score += 8;
-    if (answers.tb_roughplay === "no" && fragile.has(slug)) score += 8;
-    if (answers.tb_roughplay === "no" && sturdy.has(slug)) score -= 8;
-  }
-  // tb_substance -- proper dog vs lap dog
-  if (answers.tb_substance && breed?.sizeBand) {
-    const isToy = ["toy","small"].includes(breed.sizeBand);
-    if (answers.tb_substance === "substantial" && isToy) score -= 30;
-    if (answers.tb_substance === "lap" && !isToy) score -= 15;
-    if (answers.tb_substance === "lap" && isToy) score += 10;
+  // tb_build -- sturdy vs delicate (merged park + rough play)
+  if (answers.tb_build) {
+    if (answers.tb_build === "sturdy" && fragile.has(slug)) score -= 38;
+    if (answers.tb_build === "sturdy" && sturdy.has(slug)) score += 10;
+    if (answers.tb_build === "delicate" && fragile.has(slug)) score += 10;
+    if (answers.tb_build === "delicate" && sturdy.has(slug)) score -= 12;
   }
   // tb_dogperson -- animal vs companion
   const workingBreeds = new Set(["border-collie","springer-spaniel","cocker-spaniel",
@@ -508,46 +441,6 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.tb_instincts === "working" && highInstinct.has(slug)) score += 15;
     if (answers.tb_instincts === "biddable" && highInstinct.has(slug)) score -= 25;
     if (answers.tb_instincts === "working" && companionBreeds.has(slug)) score -= 15;
-  }
-  // tb_looks -- striking vs practical
-  const strikingBreeds = new Set(["afghan-hound","dalmatian","irish-setter","rough-collie",
-    "old-english-sheepdog","siberian-husky","weimaraner","papillon","pomeranian",
-    "shih-tzu","maltese","bichon-frise","great-dane","irish-wolfhound","golden-retriever"]);
-  if (answers.tb_looks && answers.tb_looks !== "any") {
-    if (answers.tb_looks === "striking" && strikingBreeds.has(slug)) score += 12;
-    if (answers.tb_looks === "practical" && strikingBreeds.has(slug)) score -= 8;
-  }
-  // tb_location / tb_openspace -- city vs rural
-  const cityFriendly = new Set(["french-bulldog","pug","shih-tzu","cavalier-king-charles-spaniel",
-    "bichon-frise","poodle","boston-terrier","maltese","chihuahua","yorkshire-terrier",
-    "cockapoo","cavapoo","maltipoo","cavachon","pomeranian","italian-greyhound",
-    "staffordshire-bull-terrier","bulldog"]);
-  const spaceNeeding = new Set(["border-collie","greyhound","lurcher","siberian-husky",
-    "weimaraner","irish-setter","springer-spaniel","dalmatian","afghan-hound",
-    "german-shepherd","golden-retriever","labrador","rough-collie","whippet"]);
-  if (answers.tb_location) {
-    if (answers.tb_location === "city" && spaceNeeding.has(slug)) score -= 25;
-    if (answers.tb_location === "city" && cityFriendly.has(slug)) score += 12;
-    if (answers.tb_location === "rural" && cityFriendly.has(slug)) score -= 8;
-    if (answers.tb_location === "rural" && spaceNeeding.has(slug)) score += 10;
-  }
-  if (answers.tb_openspace) {
-    if (answers.tb_openspace === "no" && spaceNeeding.has(slug)) score -= 30;
-    if (answers.tb_openspace === "yes" && spaceNeeding.has(slug)) score += 10;
-  }
-  // tb_salon -- grooming salon
-  const salonBreeds = new Set(["bichon-frise","shih-tzu","cavapoo","maltese","maltipoo",
-    "yorkshire-terrier","cavalier-king-charles-spaniel","cavachon","pomeranian",
-    "labradoodle","goldendoodle","cockapoo","jackapoo","poodle","miniature-schnauzer"]);
-  const wipeBreeds = new Set(["chihuahua","italian-greyhound","boston-terrier",
-    "french-bulldog","pug","bulldog","whippet","greyhound","lurcher",
-    "staffordshire-bull-terrier","doberman-pinscher","weimaraner","dalmatian"]);
-  if (answers.tb_salon) {
-    if (answers.tb_salon === "yes" && salonBreeds.has(slug)) score += 15;
-    if (answers.tb_salon === "yes" && wipeBreeds.has(slug)) score -= 10;
-    if (answers.tb_salon === "home" && salonBreeds.has(slug)) score -= 20;
-    if (answers.tb_salon === "minimal" && wipeBreeds.has(slug)) score += 20;
-    if (answers.tb_salon === "minimal" && salonBreeds.has(slug)) score -= 35;
   }
   // tb_smallchar -- bold vs gentle
   const boldBreeds = new Set(["chihuahua","yorkshire-terrier","miniature-schnauzer",
@@ -652,12 +545,12 @@ function fitReason(breed: { name: string; score: number; slug: string }, answers
   if (answers.velcro === "yes" && flags.velcro) parts.push(`loves being close to you`);
   if (answers.velcro === "no" && !flags.velcro) parts.push(`gives you space`);
 
-  // Shedding
-  if (answers.shedding === "low") {
+  // Coat / shedding
+  if (answers.coat === "low_shed" || answers.coat === "significant") {
     const lowShed = new Set(["poodle","cockapoo","labradoodle","goldendoodle","cavapoo","maltipoo",
       "jackapoo","bichon-frise","maltese","yorkshire-terrier","shih-tzu",
       "west-highland-terrier","miniature-schnauzer","border-terrier","boston-terrier"]);
-    if (lowShed.has(breed.slug)) parts.push(`low shedding coat`);
+    if (lowShed.has(breed.slug)) parts.push(answers.coat === "significant" ? `low-allergen coat` : `low shedding coat`);
   }
 
   // Alone time
@@ -671,7 +564,7 @@ function fitReason(breed: { name: string; score: number; slug: string }, answers
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
-const THRESHOLD = 80;
+const THRESHOLD = 85;
 
 export default function ChumCalculator() {
   const [step, setStep] = useState(0); // 0 = not started, 1..N = question index (1-based)
@@ -681,7 +574,7 @@ export default function ChumCalculator() {
   const [infoOpen, setInfoOpen] = useState(false);
 
   const answeredCount = Object.keys(answers).length;
-  const CORE_COUNT = 17;
+  const CORE_COUNT = 14;
   const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_")).length;
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
   const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
@@ -739,9 +632,6 @@ export default function ChumCalculator() {
       }).slice(0, 16)
     : visibleBreeds;
   const visibleCount = thresholdActive ? shownBreeds.length : ALL_BREEDS.length;
-  // Track how many of each tier we have shown so far (used in render)
-  let shownPerfect = 0;
-  let shownGreat = 0;
 
   function handleAnswer(qId: string, value: string) {
     setInfoOpen(false);
@@ -789,7 +679,7 @@ export default function ChumCalculator() {
           <div className={styles.stepCard}>
             <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
             <button className={styles.startBtn} onClick={() => setStep(1)}>
-              Let's go →
+              Let&apos;s go →
             </button>
           </div>
         )}
@@ -814,15 +704,11 @@ export default function ChumCalculator() {
         {currentQ && !(needsTiebreakers && step === CORE_COUNT + 1) && (
           <div className={styles.stepCard}>
             <div className={styles.stepProgress}>
-              <div className={styles.stepDots}>
-                {QUESTIONS.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`${styles.stepDot} ${i < step - 1 ? styles.stepDotDone : ""} ${i === step - 1 ? styles.stepDotActive : ""}`}
-                  />
-                ))}
+              <span className={styles.stepCount}>Question {step} of {total}</span>
+              <div className={styles.stepBar}>
+                <div className={styles.stepBarFill} style={{ width: `${Math.round((step / total) * 100)}%` }} />
               </div>
-              <span className={styles.stepCount}>{step} / {total}</span>
+              <span className={styles.stepPct}>{Math.round((step / total) * 100)}%</span>
             </div>
 
             <div className={styles.questionHeader}>
@@ -872,18 +758,15 @@ export default function ChumCalculator() {
         )}
       </div>
 
-      {/* ── Progress bar + count ── */}
-      {started && (
-        <div className={styles.progressRow}>
-          <div className={styles.progressTrack}>
-            <div className={styles.progressFill} style={{ width: `${Math.round((answeredCount / total) * 100)}%` }} />
-          </div>
+      {/* ── Live breed count ── */}
+      {started && !finished && (
+        <div className={styles.countRow}>
           <p className={styles.breedCount}>
             {!thresholdActive
-              ? `All ${ALL_BREEDS.length} breeds`
+              ? `All ${ALL_BREEDS.length} breeds still in the pack`
               : visibleCount === 0
-              ? "No matches yet"
-              : `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match`}
+              ? "No matches yet -- keep going"
+              : `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} still match`}
           </p>
         </div>
       )}
