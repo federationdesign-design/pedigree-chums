@@ -289,7 +289,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE · The Book</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
               </div>
               <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 {[
@@ -313,7 +313,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026 &mdash; The Film</p>
               </div>
               <div style={{ padding: "12px 20px 4px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
@@ -352,7 +352,49 @@ export default function ArgosPage() {
               <div style={{ height: 16 }} />
             </div>
 
-            {/* Card 5: Likely Origins */}
+            {/* Card 5: About Homer */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+              </div>
+              <div style={{ overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/history/homer-bust.jpeg"
+                  alt="Bust of Homer, Farnese collection, Naples"
+                  style={{ width: "100%", display: "block", maxHeight: 260, objectFit: "cover", objectPosition: "center top" }}
+                />
+              </div>
+              <div style={{ padding: "14px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
+                {[
+                  {
+                    title: "The Iliad",
+                    detail: "c. 750 BCE · 24 books · 15,693 lines",
+                    desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
+                  },
+                  {
+                    title: "The Odyssey",
+                    detail: "c. 700 BCE · 24 books · 12,109 lines",
+                    desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos.",
+                  },
+
+                ].map(({ title, detail, desc }) => (
+                  <div key={title} style={{ marginBottom: 14 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
+                  </div>
+                ))}
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8, marginTop: 4 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
+              </div>
+            </div>
+
+            {/* Card 6: Likely Origins */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
@@ -363,7 +405,7 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 6: Estimated Size */}
+            {/* Card 7: Estimated Size */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
@@ -383,7 +425,7 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 7: Build & Appearance */}
+            {/* Card 8: Build & Appearance */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build & Appearance</p>
@@ -397,15 +439,15 @@ export default function ArgosPage() {
                   "Likely brindle, grey, fawn or dark-coated",
                   "Worn, scarred and aged after years of neglect",
                 ].map((item) => (
-                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start", paddingLeft: 16, paddingRight: 16 }}>
+                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start", paddingLeft: 16, paddingRight: 20 }}>
                     <span style={{ color: "var(--yellow)", fontSize: "0.8rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0 }}>{item}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0, hyphens: "none" as const, overflowWrap: "normal" as const }}>{item}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Card 8: In Context */}
+            {/* Card 9: In Context */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
@@ -415,7 +457,7 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 9: Ancestral Lineage -- extended and enriched */}
+            {/* Card 10: Ancestral Lineage -- extended and enriched */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Ancestral Lineage</p>
@@ -516,7 +558,14 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 10: What We Know */}
+            {/* Card 11: Research note */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
+              </div>
+            </div>
+
+            {/* Card 12: What We Know */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
@@ -557,7 +606,7 @@ export default function ArgosPage() {
               <div style={{ height: 8 }} />
             </div>
 
-            {/* Card 11: Living Descendant */}
+            {/* Card 13: Living Descendant */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
@@ -577,53 +626,9 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 12: About the Author */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About the Author</p>
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/history/homer-bust.jpeg"
-                  alt="Bust of Homer, Farnese collection, Naples"
-                  style={{ width: "100%", display: "block", maxHeight: 260, objectFit: "cover", objectPosition: "center top" }}
-                />
-              </div>
-              <div style={{ padding: "14px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
-                {[
-                  {
-                    title: "The Iliad",
-                    detail: "c. 750 BCE · 24 books · 15,693 lines",
-                    desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
-                  },
-                  {
-                    title: "The Odyssey",
-                    detail: "c. 700 BCE · 24 books · 12,109 lines",
-                    desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos.",
-                  },
-                  {
-                    title: "The Homeric Hymns",
-                    detail: "c. 700–400 BCE · attribution disputed",
-                    desc: "Hymns to Apollo, Demeter, Hermes and Aphrodite. Attributed to Homer in antiquity but almost certainly composed by different poets in the Homeric tradition.",
-                  },
-                ].map(({ title, detail, desc }) => (
-                  <div key={title} style={{ marginBottom: 14 }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
-                  </div>
-                ))}
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8, marginTop: 4 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
-              </div>
-            </div>
 
-            {/* Card 13: Penelope's Dream */}
+
+            {/* Card 14: Penelope's Dream */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Penelope&apos;s Dream</p>
@@ -638,12 +643,7 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 14: Research note */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
-              </div>
-            </div>
+
 
           </aside>
         </div>
