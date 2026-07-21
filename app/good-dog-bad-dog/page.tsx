@@ -40,6 +40,13 @@ const ESSAYS = [
     summary: "Lassie never makes a mistake. She knows when someone is in danger, travels hundreds of miles to find help and always does the right thing. She is not a dog. She is a heroic design. And that is where the real breed pays the price.",
   },
   {
+    slug: "argos",
+    tag: "Good dog", tagStyle: "tagGood",
+    breed: "Ancient Greek Hunting Hound",
+    title: "Argos: The Dog Who Knew His Master",
+    summary: "Before Lassie, before Greyfriars Bobby, there was Argos. Homer's dog from The Odyssey waited twenty years for his master to return. An essay on loyalty, home, the smell of memory, and what the oldest dog reunion in literature still tells us about ourselves.",
+  },
+  {
     slug: "greyfriars-bobby",
     tag: "Good dog", tagStyle: "tagGood",
     breed: "Skye Terrier",

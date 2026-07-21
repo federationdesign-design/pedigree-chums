@@ -354,6 +354,45 @@ export default function ArgosPage() {
               </div>
             </div>
 
+            {/* What We Know -- source facts card */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px", borderBottom: "1.5px solid rgba(255,255,255,0.08)" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 4 }}>Argos — What We Know</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>Ancient Greek Hunting Hound · Homer&apos;s Odyssey, Book 17</p>
+              </div>
+              {[
+                { label: "Source", value: "The Odyssey, Homer, Book 17" },
+                { label: "Approx. date", value: "c.800–700 BC (composition); story set c.1200 BC" },
+                { label: "Age at death", value: "Twenty years — almost certainly mythic for a large hunting dog. Aristotle noted this was exceptional and recorded that critics praised Homer for giving Argos exactly this lifespan." },
+                { label: "Most probable type", value: "The Laconian Hound (Spartan Hound) — the premier hunting dog of ancient Greece. Lean, fast, agile and prized across the Mediterranean for its scenting ability and stamina." },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.72)", lineHeight: 1.5 }}>{value}</p>
+                </div>
+              ))}
+              <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 8 }}>Probable lineage into modern breeds</p>
+                {[
+                  { breed: "Greyhound", via: "via the Laconian Hound" },
+                  { breed: "Saluki", via: "via the Laconian Hound" },
+                  { breed: "Whippet", via: "via the Laconian Hound" },
+                  { breed: "Ibizan Hound", via: "via the Cretan Hound" },
+                  { breed: "Pharaoh Hound", via: "via the Cretan Hound" },
+                  { breed: "English Mastiff", via: "via the Molossian Hound" },
+                ].map(({ breed, via }) => (
+                  <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6, gap: 8 }}>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.76rem", fontWeight: 700, color: "#fff" }}>{breed}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.62rem", color: "rgba(255,255,255,0.4)", textAlign: "right", flexShrink: 0 }}>{via}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "12px 20px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 6 }}>Living descendant</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.72)", lineHeight: 1.5 }}>The <strong style={{ color: "#fff" }}>Greek Harehound</strong> (<em>Hellenikos Ichnilatis</em>) is the only FCI-recognised Greek breed today, believed to descend directly from the ancient hunting dogs of the classical period.</p>
+              </div>
+            </div>
+
             {/* Research note */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px" }}>
