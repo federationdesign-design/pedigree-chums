@@ -616,12 +616,13 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
           {(() => {
             const name = first ? (first.full || getLabel(first)) : "";
             const url = "https://pedigreechums.co.uk";
-            const captions = [
-              `I had such fun creating my dog's name! The result is: ${name} #MyChum #PedigreeChums ${url}`,
-              `This was a hoot! My new puppy's name is going to be: ${name} #MyChum #PedigreeChums ${url}`,
-              `Try this dog name generator, I just got: ${name} #MyChum #PedigreeChums ${url}`,
-              `I love my dog so much but now I've made this name I might just get a new one so I can use it: ${name} #MyChum #PedigreeChums ${url}`,
-              `I don't even have a dog but I just got: ${name} on a dog name generator #MyChum #PedigreeChums ${url}`,
+            const tags = `#MyChum #PedigreeChums ${url}`;
+            const messages = [
+              `I had such fun creating my dog's name! The result is: ${name}`,
+              `This was a hoot! My new puppy's name is going to be: ${name}`,
+              `Try this dog name generator, I just got: ${name}`,
+              `I love my dog so much but now I've made this name I might just get a new one so I can use it: ${name}`,
+              `I don't even have a dog but I just got: ${name} on a dog name generator`,
             ];
             return (
               <div style={{ position:"relative", display:"inline-block", margin:"0 auto" }}>
@@ -631,15 +632,16 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
                 {shareOpen && (
                   <>
                     <div onClick={() => setShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />
-                    <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"#ffffff", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.35)", padding:"12px 10px 10px", textAlign:"left" }}>
-                      <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy,#0a3a57)", fontFamily:"var(--font-body,sans-serif)" }}>Pick a caption to share</p>
-                      {captions.map((cap, i) => (
-                        <button key={i} onClick={() => shareWithCaption(cap)}
-                          style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(10,58,87,0.05)", border:"none", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body,sans-serif)", fontSize:"0.8rem", lineHeight:1.35, color:"var(--navy,#0a3a57)" }}>
-                          {cap}
+                    <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"var(--navy, #0a3a57)", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.45)", padding:"12px 10px 10px", textAlign:"left" }}>
+                      <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--yellow)", fontFamily:"var(--font-body,sans-serif)" }}>Pick a caption to share</p>
+                      {messages.map((msg, i) => (
+                        <button key={i} onClick={() => shareWithCaption(`${msg}\n${tags}`)}
+                          style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body,sans-serif)", fontSize:"0.8rem", lineHeight:1.4 }}>
+                          <span style={{ display:"block", color:"#ffffff", fontWeight:700 }}>{msg}</span>
+                          <span style={{ display:"block", marginTop:4, color:"var(--yellow)", fontWeight:600 }}>{tags}</span>
                         </button>
                       ))}
-                      <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid #ffffff" }} />
+                      <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid var(--navy, #0a3a57)" }} />
                     </div>
                   </>
                 )}
