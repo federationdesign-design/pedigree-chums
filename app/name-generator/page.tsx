@@ -1475,7 +1475,13 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     nickname = mcNickBase.charAt(0).toUpperCase() + mcNickBase.slice(1).toLowerCase() + aussieSuffix(gender, seed);
   } else if (styleRoll === 7) {
     // SpongeBob: [Adj][ShortName] [Adj][BodyPart] Surname
-    const sbAdjPool = SPONGEBOB_ADJ1[group2] || SPONGEBOB_ADJ1.default;
+    const __sbBk = breed.toLowerCase().trim();
+    const __sbCombined = [
+      ...(SB_ADJ_BREED[__sbBk] || []),
+      ...(SPONGEBOB_ADJ1[group2] || []),
+      ...(GREEDY_BREEDS.has(__sbBk) ? SB_ADJ_GREEDY : []),
+    ];
+    const sbAdjPool = __sbCombined.length > 0 ? __sbCombined : SPONGEBOB_ADJ1.default;
     const sbAdj1 = sbAdjPool[(seed + 43) % sbAdjPool.length];
     const sbAdj2 = sbAdjPool[(seed + 47) % sbAdjPool.length];
     const sbMid = gender === "girl"
@@ -1788,34 +1794,69 @@ const MCFACE_POOL: Record<string, [string, string][]> = {
 };
 
 const SPONGEBOB_ADJ1: Record<string, string[]> = {
-  sniffer:    ["Droopy","Slobby","Flappy","Snuffly","Lollypop","Nosey","Wrinkly","Jowly"],
-  retriever:  ["Slobby","Chompy","Waggy","Fluffy","Moppy","Scruffy","Soggy","Hungry"],
-  terrier:    ["Scratchy","Nippy","Yappy","Scruffy","Wiry","Zippy","Grubby","Bolty"],
-  boxer:      ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Boingy","Crashy"],
-  character:  ["Snorty","Squashy","Puffy","Grumbly","Waddly","Squinty","Wrinkly","Squishy"],
-  lapdog:     ["Fluffy","Prancy","Bouncy","Squashy","Flouncy","Glittery","Twinkly","Sparkly"],
-  collie:     ["Zippy","Herdy","Frenzy","Darty","Sprinty","Circly","Intense","Obsessy"],
-  poodle:     ["Prancy","Strutty","Swishy","Mincy","Curly","Fluffy","Posy","Primy"],
-  sighthound: ["Speedy","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy"],
-  dachshund:  ["Stretchy","Wiggly","Wormy","Scuttly","Squeezy","Stubby","Waggy","Longey"],
-  giant:      ["Massive","Stompy","Loomy","Lumpy","Rumbly","Thumpy","Shakey","Swavy"],
-  greatdane:  ["Cosmic","Starry","Massive","Orbital","Stompy","Galactic","Loomy","Thumpy"],
-  spaniel:    ["Splashy","Waggy","Floppy","Bouncy","Scampy","Frolicky","Gamby","Rompy"],
-  german:     ["Patrolly","Strict","Marcey","Guardy","Drilley","Securey","Flanky","Breachy"],
-  asian:      ["Snorty","Grumbly","Waddly","Squishy","Puffy","Wrinkly","Rolly","Stumply"],
-  boston:     ["Strutty","Hustly","Scrappy","Dodgy","Rattly","Jazzy","Marcey","Blusty"],
-  afghan:     ["Flowy","Swooshy","Glidy","Aloofy","Drifty","Surgy","Swoopy","Sweepy"],
-  bulldog:    ["Grumbly","Snorty","Wobbly","Jowly","Stuffy","Rolly","Squashy","Blusty"],
-  sheepdog:    ["Fluffy","Shaggy","Wobbly","Bumbling","Lumbery","Shuffly","Dozy","Floopy","Poofy","Drifty"],
-  dalmatian:    ["Spotty","Dotty","Dashing","Flashy","Streaky","Zippy","Patchy","Speedy","Blinky","Freckly"],
-  labradoodle:    ["Bouncy","Waggy","Fluffy","Scruffy","Curly","Floppy","Splashy","Wiggly","Noodly","Gambolly"],
-  corgi:    ["Waddy","Stumpy","Bossy","Trotty","Nippy","Patrolly","Scurry","Shuffly","Perky","Herdy"],
-  default:    ["Trotty","Wandy","Prowly","Lopy","Stalky","Canter","Sauntry"]
+  sniffer: ["Droopy","Slobby","Flappy","Snuffly","Lolly","Nosey","Wrinkly","Jowly","Nosebag","Snifter","Bisto","Gravy"],
+  retriever: ["Slobby","Chompy","Waggy","Fluffy","Moppy","Scruffy","Soggy","Hungry","Sandy","Biscuit","Crumpet","Muddy","Splashy","Supper","Gobble","Muncher","Scoffy","Doorstop","Dipper","Paddle"],
+  terrier: ["Scratchy","Nippy","Yappy","Scruffy","Wiry","Zippy","Grubby","Bolty","Scrappy","Nipper","Titch","Ratty"],
+  boxer: ["Wobbly","Clumsy","Bumpy","Bouncy","Snorty","Boingy","Crashy","Biff","Boff","Bonkers","Bouncer","Thumper","Bumble","Clonker","Crashley","Foghorn","Rumble","Jabber","Knuckly","Wobble","Tussle","Pudding"],
+  character: ["Snorty","Squashy","Puffy","Grumbly","Waddly","Squinty","Wrinkly","Squishy","Sooty","Sweep","Clanger"],
+  lapdog: ["Fluffy","Prancy","Bouncy","Squashy","Flouncy","Glittery","Twinkly","Sparkly","Tuppence","Button","Bunty","Mitten","Poppet","Titch","Mopsy","Flossy","Dolly","Binky","Twinkle","Crumpet","Sugarplum","Dainty","Biscuit"],
+  collie: ["Zippy","Herdy","Fidgety","Darty","Sprinty","Circly","Starey","Fixey","Boffin","Fidget","Whizz","Nimble","Weaver","Twitchy","Pacey","Shepster","Bendy","Muster","Corner","Nipley","Brainy","Watchit"],
+  poodle: ["Prancy","Strutty","Swishy","Mincy","Curly","Fluffy","Posy","Primmy","Pompon","Froufrou","Prissy","Crimper","Bouffant","Flossy","Mincie","Twizzle","Fancy","Taffeta","Poodlewick","Frilly"],
+  sighthound: ["Speedy","Swoopy","Flashy","Streaky","Swishy","Darty","Gleamy","Lanky","Needle","Whippetty","Longshanks","Slinky","Swoosh","Breezy","Twiglet"],
+  dachshund: ["Stretchy","Wiggly","Wormy","Scuttly","Squeezy","Stubby","Waggy","Sausagey","Slinky","Doorstop","Longboy","Wriggler","Tunnel","Badger","Stumpy","Scooter","Welly","Stretch","Noodle","Pootle","Banger","Chippy"],
+  giant: ["Biggles","Stompy","Loomy","Lumpy","Rumbly","Thumpy","Shakey","Swayzy","Lumber","Hulkley","Boulder","Bargey","Trundle","Clomper","Thudder","Whopper","Dozer"],
+  greatdane: ["Cosmo","Starry","Biggles","Orby","Stompy","Loomy","Thumpy","Lofty","Lanky","Tower","Beanstalk","Hagridy","Giantly","Ceiling","Whopper","Loomer"],
+  spaniel: ["Splashy","Waggy","Floppy","Bouncy","Scampy","Frolicky","Gambolly","Rompy","Soggy","Flopsy","Mopsy","Splasher","Puddle","Feathery","Waggle","Bouncer","Bracken","Snuffler","Gambol","Scamper","Rustle","Springy"],
+  german: ["Patrolly","Stricty","Marchy","Guardy","Drilley","Sentry","Flanky","Breachy"],
+  asian: ["Snorty","Grumbly","Waddly","Squishy","Puffy","Wrinkly","Rolly","Stumply","Pekoe","Bunty","Mochi","Dumpling","Snooty","Squidge","Button","Noodle","Pebbly","TeaLeaf","Pagoda","Poppet","Puffin","Squinty","Crinkly"],
+  boston: ["Strutty","Hustly","Scrappy","Dodgy","Rattly","Jazzy","Marchy","Blusty","Beanie","Peepers","Goggles","Blinky","Bowtie"],
+  afghan: ["Flowy","Swooshy","Glidy","Aloofy","Drifty","Surgy","Swoopy","Sweepy","Silky","Swishy","Fringey","Velvety","Curtain","Topknot","Flicky","Floaty","Regally","Duchess","Shampoo","Glamour","Wispy","Flouncey","Breezy"],
+  bulldog: ["Grumbly","Snorty","Wobbly","Jowly","Stuffy","Rolly","Squashy","Blusty"],
+  sheepdog: ["Fluffy","Shaggy","Wobbly","Bumbly","Lumbery","Shuffly","Dozy","Floppy","Poofy","Drifty"],
+  dalmatian: ["Spotty","Dotty","Dashing","Flashy","Streaky","Zippy","Patchy","Speedy","Blinky","Freckly"],
+  labradoodle: ["Bouncy","Waggy","Fluffy","Scruffy","Curly","Floppy","Splashy","Wiggly","Noodly","Gambolly"],
+  corgi: ["Waddly","Stumpy","Bossy","Trotty","Nippy","Patrolly","Scurry","Shuffly","Perky","Herdy","Crumpet","Teacake","Tuppence","Waddle","BossyBoots","Titch","Pasty","Cobbler","Biscuit","Hobnob","Nipper","Trotter","Pootle","Butty"],
+  default: ["Trotty","Wandy","Prowly","Lopy","Stalky","Canter","Sauntry","Thingummy","Whatsit"]
 };
 
-const SPONGEBOB_MID_BOY: string[]  = ["Bob","Tom","Tim","Sam","Jim","Max","Rex","Ned","Ted","Sid","Baz","Reg","Len","Ken","Mick","Rick","Nick","Pip","Alf","Kev","Dez","Gav","Ron","Don"];
-const SPONGEBOB_MID_GIRL: string[] = ["Sue","Jan","Pam","Bev","Dot","Flo","Kay","May","Kim","Lin","Nan","Val","Babs","Bea","Fran","Gail","Sal","Di","Mo","Jo"];
-const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Ears","Nose","Tail","Snout","Chops","Feet","Tum","Belly","Bonce","Jowls","Snoot","Chomps","Flops"];
+// Breed-specific SpongeBob adjective/name pools (combined with group + greedy).
+const SB_ADJ_BREED: Record<string, string[]> = {
+  "basset hound": ["Droopy","Flappy","Doormat","Snuffle","Lowry","SoggyEars","Longface","Pudding","Wobble"],
+  "bichon frise": ["Flossy","Powderpuff","Meringue","Snowdrop","Bubbles","Bonbon","Dolly","Cotton","Pompon","Cupcake","Flumpy"],
+  "bloodhound": ["Snooper","Sherlock","Nosebag","Snifter","Cluey","Pongle","Wrinkles","Snout","Truffle","Bisto","Gravy","Rootle"],
+  "border terrier": ["Grizzle","Twiggy","Rascal","Bramble","Nipper","Scruff","Hedgerow","Wiry","Tweedle","Badger"],
+  "bulldog": ["Churchill","Grumble","Jowlsy","Stodge","Clumper","Bargey","Huffers","Dumpty","Squidge","Porkpie","Dozer"],
+  "dalmatian": ["Dotty","Freckles","Spotsy","Domino","Pongoish","Coachie","Blinker"],
+  "doberman pinscher": ["Sentry","Sharpish","Slicker","Watchman","Boots","Gripper","Bastion"],
+  "french bulldog": ["Baguette","Truffle","Snorty","Squidge","Bunty","Button","Grumble"],
+  "greyhound": ["Noodlelegs","Longshanks","Snoozy","Faintly","Drafty","Bony","Lanky","Blanket","Skimmy","Whizzy"],
+  "italian greyhound": ["Twiglet","Noodle","Tippy","Skimpy","Drafty","Whippy","Needle","Slinky","Faintly","Teacup"],
+  "jack russell terrier": ["Nipper","Scrappy","Boltie","Digby","Yapper","Pickle","Titch"],
+  "labrador": ["Biscuit","Supper","Scoffy","Muddy","Soggy","Welly","Puddle","Bouncer","Taster","Crumb","Gobble","Snaffle","Toastie","Muncher"],
+  "lurcher": ["Scruffhound","Hedgerow","Slinky","Poacher","Brindle","Longshanks","Twiglet"],
+  "maltese": ["Pearl","Flossy","Cotton","Dolly","Bunty","Mopsy","Sugar","Tuppence","Teacake"],
+  "maltipoo": ["Marshmallow","Flump","Bubbles","Mopsy","Biscuit","Poppet","Cupcake"],
+  "mastiff": ["Boulder","Dozer","Clumper","Bargey","Tankard"],
+  "miniature schnauzer": ["Whiskers","Bristle","Tache","Grizzle","Tweedle","Boffin","Sprocket"],
+  "old english sheepdog": ["Dougal","Shaggy","Womble","Bobble","Mopsey","Sooty","Floof"],
+  "papillon": ["Flutter","Butterfly","Froufrou","Tippy","Fancy","Ribbon","Bunty","Perky","Flit","Pixie"],
+  "pomeranian": ["PomPom","Fluffkin","TinyPuff","Biscuit","Bunty","Dandelion","Fizzy","Tassel","Peppy","Button","Powderpuff"],
+  "poodle": ["Pompon","Froufrou","Prissy","Crimper","Bouffant","Flossy","Mincie","Twizzle","Fancy","Taffeta","Frilly"],
+  "pug": ["Squidge","Wrinkles","Snorty","Pudding","Crumpet","Dumpling","Button"],
+  "rottweiler": ["Bouncer","Sentry","Boots","Bruiser","Tankard","Brock","Gripper","Lockley","Brass","Hobnail","Muzzle","Watchman","Truncheon","Bastion","Clanker","Gunner","Blocker","Boltlock","Grizzle","Stanch","Bramble","Ironpaw","Sprocket","Gatehouse","Keeper"],
+  "saint bernard": ["Barrel","Blanket","Biggles","Avalanche","Craggy","Muggy","Dozer","Snowdrift","Boulder"],
+  "shih tzu": ["Topknot","Mopsy","Flossy","Bunty","Fringe","Dolly","Tassel"],
+  "siberian husky": ["Snowball","Musher","Howly","Frosty","Blizzard","Biscuit","Woolly","Yodel","Sledgy","Icicle"],
+  "staffordshire bull terrier": ["Biff","Chunky","Squaddie","Nugget","Bouncer","Tanky","Wagstaff","Brickie","Smiler","Pudding","Bodger","Bossy"],
+  "weimaraner": ["Velvet","Silver","Ghostly","Misty","Shadow","Slinker","Gunner","Snooty","Pewter","Moonish"],
+  "west highland terrier": ["Cracker","Scrappy","Thistle","Sooty","Shortbread","Nipper","Tattie","Fidget","Bramble"],
+  "whippet": ["Whippy","Twiglet","Snoozy","Slinky","Drafty","Lanky","Blanket","Skimmy","Faintly","Needle","Zoomy"],
+};
+const SB_ADJ_GREEDY: string[] = ["Cracklin","Doorstop","Porkpie","Butty","Bap","Cobbler","Sarnie","Chipolata","Bangers","Mashy","Gravy","Yorkie","Pudding","Crumble","Custard","Trifle","Biscuit","Hobnob","Digestive","Crumpet","Teacake","Toastie","Marmite","Pickledilly","Snaffle","Scoffy","Gobble","Niblet","Chomper","Greedyboots"];
+
+const SPONGEBOB_MID_BOY: string[]  = ["Boboth","Tommy","Timmy","Sammy Sam","Jimithy","Maxspeed","Oscar","Ned","Ted","Sid","Bazanold","Reggy","Len","Ken","Mick","Rick","Nick","Steve","Alf","Kev","Dez","Cuthbert","Ron","Don"];
+const SPONGEBOB_MID_GIRL: string[] = ["Susan","Jamula","Pamela","Bev","Dot","Abigail","Kay","Joy","Liz","Linette","Peggy","Valary","Babs","Bea","Francis","Gail","Sally","Annie","Mo","Jenny"];
+const SPONGEBOB_BODY: string[]     = ["Pants","Paws","Face","Bum","Draws","Nose","Tail","Snout","Chops","Chomps","Feet","Tum","Belly","Jowls","Bark","Toes","Howl","Woof","Growl","Wag"];
 
 const MCFACE_SUFFIX: Record<string, string[]> = {
   sniffer: ["nose", "snoot", "snout", "find", "track", "hound", "jowls", "sniff"],
