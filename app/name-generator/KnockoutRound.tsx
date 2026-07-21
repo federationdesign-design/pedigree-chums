@@ -344,11 +344,11 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     // Show round complete flash if this was the last match of a round
     if (nextM === 0 && nextR > curRound) {
       const _r=totalRounds-curRound-1; const nextRoundName=_r===1?"The Final":_r===2?"Semi Final":_r===3?"Quarter Final":`Round ${curRound+2}`;
-      setRoundFlash("Next up: " + nextRoundName + "!");
+      setRoundFlash(nextRoundName + " coming up!");
       if (confettiRef.current) {
         confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
       }
-      setTimeout(() => setRoundFlash(null), 1500);
+      setTimeout(() => setRoundFlash(null), 1900);
     }
     // Fill recycle slots in next match from accumulated losers
     const nms = newBracket[nextR]?.[nextM];
@@ -705,15 +705,20 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
 
       {/* Round complete flash */}
       {roundFlash && (
-        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(0,0,0,0.4)", animation:"flashFadeOut 1.5s ease forwards" }}>
-          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashText 1.5s ease forwards" }}>
+        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(0,0,0,0.4)", animation:"flashBg 1.9s ease forwards" }}>
+          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashPop 1.9s ease forwards" }}>
             {roundFlash.toUpperCase()}
           </p>
         </div>
       )}
       <style>{`
-        @keyframes flashFadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
-        @keyframes flashText { 0%{transform:scale(0.5)} 20%{transform:scale(1.1)} 35%{transform:scale(1)} 100%{transform:scale(1)} }
+        @keyframes flashBg { 0%{opacity:0} 22%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
+        @keyframes flashPop {
+          0%   { opacity:0; transform:scale(0.85); }
+          26%  { opacity:1; transform:scale(1); }
+          79%  { opacity:1; transform:scale(1); }
+          100% { opacity:0; transform:scale(1.5) rotate(5deg); }
+        }
       `}</style>
     </>
   );

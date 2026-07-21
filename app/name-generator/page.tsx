@@ -581,7 +581,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
   // Poodle -- academic only
   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Chief Analyst",reg:"grand",syllables:4},{title:"Maestro",reg:"grand",syllables:3},{title:"Monsieur",reg:"grand",syllables:2},{title:"French",reg:"grand",syllables:1},{title:"Onion",reg:"absurd",syllables:2},{title:"Garlic",reg:"absurd",syllables:2},{title:"Menu",reg:"grand",syllables:2},{title:"Chef",reg:"grand",syllables:1},{title:"C'est la vie",reg:"absurd",syllables:3},{title:"À la",reg:"absurd",syllables:2},{title:"Baguette",reg:"absurd",syllables:2},{title:"Canapé",reg:"absurd",syllables:3},{title:"Chic",reg:"absurd",syllables:1},{title:"Crêpe",reg:"absurd",syllables:1},{title:"Film noir",reg:"absurd",syllables:2},{title:"Parkour",reg:"absurd",syllables:2},{title:"Raconteur",reg:"grand",syllables:3},{title:"Sans",reg:"absurd",syllables:1},{title:"Touché",reg:"absurd",syllables:2},{title:"Après",reg:"absurd",syllables:2},{title:"Début",reg:"absurd",syllables:2},{title:"En suite",reg:"absurd",syllables:2},{title:"Pan Pan",reg:"absurd",syllables:2}],
   // Lapdog -- ecclesiastical pomp
-  lapdog:     [{title:"Reverend",reg:"grand",syllables:3},{title:"Bishop",reg:"grand",syllables:2},{title:"Archdeacon",reg:"grand",syllables:3},{title:"Sir",reg:"grand",syllables:1}],
+  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Prince",reg:"grand",syllables:1},{title:"Duke",reg:"grand",syllables:1},{title:"Count",reg:"grand",syllables:1},{title:"Baron",reg:"grand",syllables:2},{title:"Master",reg:"grand",syllables:2},{title:"Little Lord",reg:"grand",syllables:3},{title:"Reverend",reg:"grand",syllables:3},{title:"Bishop",reg:"grand",syllables:2},{title:"Archdeacon",reg:"grand",syllables:3}],
   // Bulldog specifically -- Churchill energy
   bulldog:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Field Marshal",reg:"grand",syllables:3}],
   boston:     [{title:"Commissioner",reg:"grand",syllables:4},{title:"Alderman",reg:"grand",syllables:3},{title:"Senator",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2},{title:"Judge",reg:"grand",syllables:1},{title:"Captain",reg:"grand",syllables:2},{title:"Boss",reg:"grand",syllables:1},{title:"Chief",reg:"grand",syllables:1},{title:"Major",reg:"grand",syllables:2},{title:"Sheriff",reg:"grand",syllables:2},{title:"Marshal",reg:"grand",syllables:2},{title:"Commodore",reg:"grand",syllables:3}],
@@ -2190,6 +2190,7 @@ export default function NameGeneratorPage() {
     try { return JSON.parse(sessionStorage.getItem("pc_shortlist") || "[]"); } catch { return []; }
   });
   const [landingIdx, setLandingIdx] = useState<number | null>(null);
+  const [showLikeCount, setShowLikeCount] = useState(false); // briefly show shortlist count in the heart button
   const [toast, setToast] = useState<string | null>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const [toastTop, setToastTop] = useState(134);
@@ -2330,6 +2331,9 @@ export default function NameGeneratorPage() {
       const entry: ShortlistEntry = { full: r.full, nickname: r.nickname, score: r.score, breed };
       const next = [...prev, entry];
       try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
+      // Briefly flash the count in the heart button, then revert to the heart
+      setShowLikeCount(true);
+      setTimeout(() => setShowLikeCount(false), 1200);
       if (next.length === 16) {
         // Auto-launch knockout at 16
         setTimeout(() => setShowKnockout(true), 800);
@@ -2516,8 +2520,8 @@ export default function NameGeneratorPage() {
             Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> Generator
           </h1>
           <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
-            {shortlist.length > 0
-              ? `You have ${shortlist.length} name${shortlist.length === 1 ? "" : "s"}! Hit 🏆 Knockout below, or keep swiping to add more.`
+            {shortlist.length >= 4 && stage !== "inputs"
+              ? `You have ${shortlist.length} names! Tap 🏆 Knockout button to decide`
               : "Give your chum the truly 1 in a million personalised to you name"}
           </p>
 
@@ -2778,7 +2782,7 @@ export default function NameGeneratorPage() {
                   ) : (
                     <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
                   )}
-                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", fontFamily: shortlist.length > 0 ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{shortlist.length > 0 ? shortlist.length : "♥"}</button>
+                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", fontFamily: showLikeCount ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{showLikeCount ? shortlist.length : "♥"}</button>
                 </div>
                   {r.nickname ? (
                     <>
