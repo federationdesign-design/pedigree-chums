@@ -8,15 +8,21 @@ import { BANNED_WORDS } from "./bannedWords";
 
 // ── SHARE CAPTIONS + PNG METADATA ───────────────────────────────────────────────
 const SITE_URL = "https://pedigreechums.co.uk";
-// The five taglines the user picks from before sharing (name is spliced in).
-function shareCaptions(name: string): string[] {
+const SHARE_TAGS = `#MyChum #PedigreeChums ${SITE_URL}`;
+// The five taglines the user picks from (message only). Tags/link are appended
+// separately (fullCaption) so they can be shown on their own line, in yellow.
+function shareMessages(name: string): string[] {
   return [
-    `I had such fun creating my dog's name! The result is: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
-    `This was a hoot! My new puppy's name is going to be: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
-    `Try this dog name generator, I just got: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
-    `I love my dog so much but now I've made this name I might just get a new one so I can use it: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
-    `I don't even have a dog but I just got: ${name} on a dog name generator #MyChum #PedigreeChums ${SITE_URL}`,
+    `I had such fun creating my dog's name! The result is: ${name}`,
+    `This was a hoot! My new puppy's name is going to be: ${name}`,
+    `Try this dog name generator, I just got: ${name}`,
+    `I love my dog so much but now I've made this name I might just get a new one so I can use it: ${name}`,
+    `I don't even have a dog but I just got: ${name} on a dog name generator`,
   ];
+}
+// The full text that actually gets shared: chosen message, then tags/link below.
+function fullCaption(message: string): string {
+  return `${message}\n${SHARE_TAGS}`;
 }
 // Turn a dog name into a safe file stem, e.g. "Baroness Gudrun Gemon" -> "Baroness-Gudrun-Gemon".
 function nameToFilename(name: string): string {
@@ -2469,6 +2475,13 @@ export default function NameGeneratorPage() {
     const node = revealCardRef.current;
     if (!node || cardSharing) return;
     setCardShareOpen(false);
+    // Copy the caption to the clipboard up-front (inside the tap) so it's always
+    // available to paste -- photo-first apps (Instagram etc.) drop the share text.
+    try {
+      await navigator.clipboard?.writeText(caption);
+      setToast("📋 Caption copied — paste it into your post!");
+      setTimeout(() => setToast(null), 4000);
+    } catch {}
     setCardSharing(true);
     try {
       try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch {}
@@ -2574,13 +2587,12 @@ export default function NameGeneratorPage() {
   }
 
   function fireQuickFireResults(qfAnswersNow: Record<number, string>) {
+    // Regenerate synchronously (no setTimeout / no interim setResults([])) so the
+    // overlay closing and the new card appearing batch into ONE render -- this
+    // removes the flash of the empty, half-built page the user saw on skip.
     setQfActive(false);
-    // Re-run generator with the quick-fire answers folded into the word pool.
-    const s = Math.floor(Math.random() * 10000);
-    setSeed(s);
-    setResults([]);
     setExhausted(false);
-    setTimeout(() => handleGenerate(qfAnswersNow), 50);
+    handleGenerate(qfAnswersNow);
   }
 
     function handleStartOver() {
@@ -2630,6 +2642,8 @@ export default function NameGeneratorPage() {
       <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 10px" }}>
         <style>{`
           .pcm-h1br { display: none; }
+          .pcm-pool { text-decoration: none; }
+          .pcm-pool:hover { text-decoration: underline; text-underline-offset: 3px; }
           @keyframes pcAnswerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
           @keyframes pcJiggle { 0%,100% { transform: rotate(calc(-1 * var(--jiggle, 0deg))); } 50% { transform: rotate(var(--jiggle, 0deg)); } }
           @media (max-width: 768px) {
@@ -2957,8 +2971,8 @@ export default function NameGeneratorPage() {
               ))}
 
               <div className="pcm-panel" style={{ maxWidth:"60%", margin:"14px auto 0", width:"100%" }}>
-                <button onClick={() => startQuickFire()}
-                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer", textDecoration:"underline", textUnderlineOffset:"3px" }}>
+                <button onClick={() => startQuickFire()} className="pcm-pool"
+                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer" }}>
                   ✨ {outcomes.toLocaleString()} possible names in your pool
                 </button>
               </div>
@@ -2974,15 +2988,16 @@ export default function NameGeneratorPage() {
                   {cardShareOpen && !cardSharing && (
                     <>
                       <div onClick={() => setCardShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />
-                      <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"#ffffff", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.35)", padding:"12px 10px 10px", textAlign:"left" }}>
-                        <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy)", fontFamily:"var(--font-body), sans-serif" }}>Pick a caption to share</p>
-                        {shareCaptions(results[0].full).map((cap, i) => (
-                          <button key={i} onClick={() => captureAndShare(results[0], cap)}
-                            style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(10,58,87,0.05)", border:"none", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body), sans-serif", fontSize:"0.8rem", lineHeight:1.35, color:"var(--navy)" }}>
-                            {cap}
+                      <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"var(--navy, #0a3a57)", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.45)", padding:"12px 10px 10px", textAlign:"left" }}>
+                        <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--yellow)", fontFamily:"var(--font-body), sans-serif" }}>Pick a caption to share</p>
+                        {shareMessages(results[0].full).map((msg, i) => (
+                          <button key={i} onClick={() => captureAndShare(results[0], fullCaption(msg))}
+                            style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body), sans-serif", fontSize:"0.8rem", lineHeight:1.4 }}>
+                            <span style={{ display:"block", color:"#ffffff", fontWeight:700 }}>{msg}</span>
+                            <span style={{ display:"block", marginTop:4, color:"var(--yellow)", fontWeight:600 }}>{SHARE_TAGS}</span>
                           </button>
                         ))}
-                        <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid #ffffff" }} />
+                        <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid var(--navy, #0a3a57)" }} />
                       </div>
                     </>
                   )}
