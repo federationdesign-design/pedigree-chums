@@ -503,7 +503,71 @@ export default function ArgosPage() {
               </div>
             </div>
 
-            {/* Card 12: Research note */}
+            {/* Card 12: About the Author */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About the Author</p>
+              </div>
+              <div style={{ overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Homer_bust%2C_Farnese_collection_%28Naples%29.jpg/400px-Homer_bust%2C_Farnese_collection_%28Naples%29.jpg"
+                  alt="Bust of Homer, Farnese collection, Naples"
+                  style={{ width: "100%", display: "block", maxHeight: 260, objectFit: "cover", objectPosition: "center top" }}
+                />
+              </div>
+              <div style={{ padding: "14px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.9rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition and finally written down by someone we simply call Homer.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 12 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. Whether this is autobiography or coincidence, nobody knows. He most likely came from Ionia on the western coast of what is now Turkey, and he composed in an archaic form of Greek that became the model for all subsequent epic poetry.</p>
+                <div style={{ marginBottom: 14 }}>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 10 }}>Major Works</p>
+                  {[
+                    {
+                      title: "The Iliad",
+                      detail: "c. 750 BCE · 24 books · 15,693 lines",
+                      desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. The Iliad is the older of the two epics and arguably the more brutal. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
+                    },
+                    {
+                      title: "The Odyssey",
+                      detail: "c. 700 BCE · 24 books · 12,109 lines",
+                      desc: "The journey home. Ten years of storms, monsters and gods after ten years of war. The Odyssey is the poem that contains Argos.",
+                    },
+                    {
+                      title: "The Homeric Hymns",
+                      detail: "c. 700–400 BCE · attribution disputed",
+                      desc: "A collection of hymns to the Greek gods — to Apollo, Demeter, Hermes, Aphrodite and others. Attributed to Homer in antiquity but almost certainly composed by different poets in the Homeric tradition.",
+                    },
+                  ].map(({ title, detail, desc }) => (
+                    <div key={title} style={{ marginBottom: 14, paddingLeft: 0 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", fontWeight: 500, color: "#fff", lineHeight: 1.55 }}>{desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.7 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
+              </div>
+            </div>
+
+            {/* Card 13: Penelope's dream */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Penelope&apos;s Dream</p>
+              </div>
+              <div style={{ padding: "12px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>While Argos waited outside, Penelope was inside the palace doing something that tends to get overlooked: she kept a flock of twenty geese. She fed them, watched them, and told the disguised Odysseus, &ldquo;I love to watch them.&rdquo;</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>The night before Odysseus&apos;s return, Penelope dreamed that an eagle descended and killed all twenty geese. She wept in the dream — grieving the geese even though she was told the dream meant good news, that the eagle was Odysseus and the geese were the suitors.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>Scholars have argued that the geese represent the twenty years of waiting itself — everything Penelope had preserved and protected. Their death in the dream is the ending of the long stasis, the moment the holding-together finally breaks open.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 14 }}>But what is also true is that Penelope wept for the geese as creatures, not only as symbols. She loved watching them. She did not want them killed, even in a dream, even in the service of her husband&apos;s return.</p>
+                <div style={{ borderLeft: "3px solid var(--yellow)", paddingLeft: 14 }}>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, fontStyle: "italic" }}>Argos and Penelope&apos;s geese are not the same thing, but they belong to the same household of feeling. In a poem full of gods and violence, they are the small, living things that make a home a home.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 14: Research note */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, fontStyle: "italic" }}>The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
