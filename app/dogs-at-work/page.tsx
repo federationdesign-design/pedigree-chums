@@ -28,6 +28,14 @@ const ARTICLES = [
     summary:
       "A medical alert dog learns one person so completely it can warn them their own body is about to go wrong -- often before they know themselves. That's not a pet. That's a colleague. Even if the only wages are dinner and the occasional stolen sausage.",
   },
+  {
+    slug: "the-electronic-nose",
+    tag: "Medical",
+    breed: "The machine the dogs built",
+    title: "The Electronic Nose: The Machine That May Owe Dogs a Biscuit",
+    summary:
+      "In Milton Keynes, scientists are building an electronic nose to sniff out prostate cancer -- trained on data the dogs gathered first. The dog wrote the manual for its own replacement, and it could not care less. It just wants its biscuit. This is the last piece of the medical trilogy.",
+  },
 ];
 
 const COMING = [
