@@ -564,8 +564,8 @@
 
 .pullquote::before {
   content: "\201C";
+  font-family: var(--font-oi, serif);
   font-size: 5em;
-  font-weight: 900;
   color: var(--navy, #0a3a57);
   font-style: normal;
   line-height: 0;
@@ -575,8 +575,8 @@
 
 .pullquote::after {
   content: "\201D";
+  font-family: var(--font-oi, serif);
   font-size: 5em;
-  font-weight: 900;
   color: var(--navy, #0a3a57);
   font-style: normal;
   line-height: 0;
