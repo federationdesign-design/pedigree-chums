@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -270,7 +271,7 @@ export default function ArgosPage() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
               </div>
               <div style={{ padding: "0 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
               </div>
             </div>
 
@@ -278,10 +279,10 @@ export default function ArgosPage() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
               </div>
             </div>
 
@@ -289,7 +290,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE · The Book</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE · The Book</p>
               </div>
               <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 {[
@@ -305,15 +306,15 @@ export default function ArgosPage() {
                 ))}
               </div>
               <div style={{ padding: "12px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.6 }}>*The often-cited 9-hour figure assumes mechanical reading at 250 wpm. In practice, The Odyssey demands real concentration — archaic structures, unfamiliar names and dense mythological content mean most readers need considerably longer. Allow at least 30 hours for a considered read.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>*The often-cited 9-hour figure assumes mechanical reading at 250 wpm. In practice, The Odyssey demands real concentration. Allow at least 30 hours for a considered read.</p>
               </div>
             </div>
 
-            {/* Card 4: Nolan film -- moved up directly after book facts */}
+            {/* Card 4: Nolan film */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026</p>
               </div>
               <div style={{ padding: "12px 20px 4px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
@@ -324,7 +325,7 @@ export default function ArgosPage() {
                       </svg>
                     ))}
                   </div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 700, color: "#fff" }}>5 / 5</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>5 / 5</p>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
                   {[
@@ -340,8 +341,8 @@ export default function ArgosPage() {
                   ))}
                 </div>
                 <div style={{ background: "#ef4444", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.5 }}>Rated 15 in the UK for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 in the UK for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Zendaya", "Charlize Theron"].map(name => (
@@ -358,8 +359,8 @@ export default function ArgosPage() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6 }}>Larger, strong-boned, with short coats and great endurance.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Larger, strong-boned, with short coats and great endurance.</p>
               </div>
             </div>
 
@@ -377,7 +378,7 @@ export default function ArgosPage() {
                   <div key={label} style={{ textAlign: "center" }}>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
                     <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1, marginBottom: 2 }}>{value}</p>
-                    {sub && <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 500, color: "#fff" }}>{sub}</p>}
+                    {sub && <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 500, color: "#fff" }}>{sub}</p>}
                   </div>
                 ))}
               </div>
@@ -397,9 +398,9 @@ export default function ArgosPage() {
                   "Likely brindle, grey, fawn or dark-coated",
                   "Worn, scarred and aged after years of neglect",
                 ].map((item) => (
-                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start", paddingLeft: 16, paddingRight: 16 }}>
-                    <span style={{ color: "var(--yellow)", fontSize: "0.75rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0 }}>{item}</p>
+                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start", paddingLeft: 16, paddingRight: 16 }}>
+                    <span style={{ color: "var(--yellow)", fontSize: "0.8rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0 }}>{item}</p>
                   </div>
                 ))}
               </div>
@@ -411,31 +412,105 @@ export default function ArgosPage() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.7, fontStyle: "italic" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
               </div>
             </div>
 
-            {/* Card 9: Ancestral Lineage */}
+            {/* Card 9: Ancestral Lineage -- extended and enriched */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Ancestral Lineage</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
                 {[
-                  { era: "3000–1200 BCE", name: "Ancient Near Eastern Molosser", context: "Era of the Trojan War & Egyptian pharaohs" },
-                  { era: "1600–1100 BCE", name: "Mycenaean / Aegean Molosser", context: "Tutankhamun reigns in Egypt (c.1341 BCE)" },
-                  { era: "800–300 BCE", name: "Greek Molossian Type", context: "Pythagoras alive (c.570 BCE), Plato teaching (c.390 BCE)" },
-                  { era: "c. 8th century BCE", name: "Argos — Odysseus' Dog", context: "Homer composing The Odyssey", highlight: true },
-                ].map(({ era, name, context, highlight }, i) => (
-                  <div key={era} style={{ display: "flex", gap: 14 }}>
+                  {
+                    era: "3000–1200 BCE",
+                    name: "Ancient Near Eastern Molosser",
+                    context: "Era of the Egyptian pharaohs. Tutankhamun reigns c.1341 BCE. The Trojan War c.1200 BCE.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "1600–1100 BCE",
+                    name: "Mycenaean / Aegean Molosser",
+                    context: "Mycenaean Greece at its height. These dogs guard palaces at Tiryns and Mycenae.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "800–300 BCE",
+                    name: "Greek Molossian Type",
+                    context: "Pythagoras born c.570 BCE. Confucius teaching in China c.500 BCE. Plato writing c.390 BCE.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "c. 8th century BCE",
+                    name: "Argos — Odysseus' Dog",
+                    context: "Homer composing The Odyssey. The founding of Rome c.753 BCE.",
+                    highlight: true, end: false,
+                  },
+                  {
+                    era: "247–183 BCE",
+                    name: "Molossian spreads west",
+                    context: "Hannibal of Carthage uses war dogs crossing the Alps. The breed reaches North Africa and Iberia.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "221 BCE",
+                    name: "Qin Dynasty unifies China",
+                    context: "The Silk Road opens. Molosser-type dogs travel trade routes into Central Asia.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "100 BCE–400 CE",
+                    name: "Roman Molosser in Britain",
+                    context: "Julius Caesar invades Britain 55 BCE. Roman legions bring Molossian dogs. The breed roots across northern Europe.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "1324–1325 CE",
+                    name: "Mansa Musa’s pilgrimage",
+                    context: "The Mali emperor’s journey to Mecca introduces West African courts to Mediterranean sighthound types.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "Modern · UK",
+                    name: "Greyhound",
+                    context: "Descended via the Laconian Hound. The fastest dog breed in existence. One of our 54 Chums.",
+                    highlight: false, end: false, isBreed: true, slug: "greyhound",
+                  },
+                  {
+                    era: "Modern · UK",
+                    name: "Whippet",
+                    context: "Descended via the Laconian Hound and later refined in northern England for racing.",
+                    highlight: false, end: false, isBreed: true, slug: "whippet",
+                  },
+                  {
+                    era: "Modern · UK",
+                    name: "English Mastiff",
+                    context: "Descended via the Molossian Hound. One of the heaviest dog breeds in the world. One of our 54 Chums.",
+                    highlight: false, end: true, isBreed: true, slug: "mastiff",
+                  },
+                ].map(({ era, name, context, highlight, end, isBreed, slug }, i) => (
+                  <div key={era + name} style={{ display: "flex", gap: 14 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
-                      <div style={{ width: 12, height: 12, borderRadius: "50%", background: highlight ? "var(--yellow)" : "#fff", marginTop: 4, flexShrink: 0 }} />
-                      {i < 3 && <div style={{ width: 2, flex: 1, background: "#fff", minHeight: 56 }} />}
+                      <div style={{
+                        width: highlight ? 14 : isBreed ? 12 : 11,
+                        height: highlight ? 14 : isBreed ? 12 : 11,
+                        borderRadius: "50%",
+                        background: isBreed ? "#22c55e" : highlight ? "var(--yellow)" : "#fff",
+                        marginTop: 4,
+                        flexShrink: 0,
+                        boxShadow: highlight ? "0 0 0 3px rgba(255,210,62,0.3)" : "none",
+                      }} />
+                      {!end && <div style={{ width: 2, flex: 1, background: "rgba(255,255,255,0.3)", minHeight: 64 }} />}
                     </div>
-                    <div style={{ paddingBottom: i < 3 ? 32 : 0 }}>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, color: "var(--yellow)", letterSpacing: "0.06em", marginBottom: 2 }}>{era}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "0.9rem" : "0.85rem", fontWeight: highlight ? 700 : 600, color: "#fff", marginBottom: 3 }}>{name}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", lineHeight: 1.4, opacity: 0.8 }}>{context}</p>
+                    <div style={{ paddingBottom: end ? 0 : 36 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", letterSpacing: "0.05em", marginBottom: 3, textTransform: "uppercase" }}>{era}</p>
+                      {isBreed && slug ? (
+                        <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#22c55e", textDecoration: "underline", textUnderlineOffset: "3px", display: "block", marginBottom: 4 }}>{name}</a>
+                      ) : (
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "1rem" : "0.95rem", fontWeight: highlight ? 700 : 600, color: highlight ? "var(--yellow)" : "#fff", marginBottom: 4 }}>{name}</p>
+                      )}
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{context}</p>
                     </div>
                   </div>
                 ))}
@@ -456,7 +531,7 @@ export default function ArgosPage() {
                 ].map(({ label, value }) => (
                   <div key={label} style={{ marginBottom: 14 }}>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.5 }}>{value}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{value}</p>
                   </div>
                 ))}
               </div>
@@ -470,20 +545,20 @@ export default function ArgosPage() {
                   { breed: "Pharaoh Hound", via: "via Cretan Hound", slug: null, linked: false },
                   { breed: "English Mastiff", via: "via Molossian Hound", slug: "mastiff", linked: true },
                 ].map(({ breed, via, slug, linked }) => (
-                  <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, gap: 8 }}>
+                  <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
                     {linked && slug ? (
-                      <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 700, color: "var(--yellow)", textDecoration: "underline", textUnderlineOffset: "3px" }}>{breed}</a>
+                      <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "var(--yellow)", textDecoration: "underline", textUnderlineOffset: "3px" }}>{breed}</a>
                     ) : (
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>{breed}</span>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{breed}</span>
                     )}
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "#fff", textAlign: "right", flexShrink: 0 }}>{via}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", fontWeight: 500, color: "#fff", textAlign: "right", flexShrink: 0 }}>{via}</span>
                   </div>
                 ))}
               </div>
               <div style={{ height: 8 }} />
             </div>
 
-            {/* Card 11: Living descendant -- own card with image */}
+            {/* Card 11: Living Descendant */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
@@ -491,15 +566,16 @@ export default function ArgosPage() {
               <div style={{ overflow: "hidden" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hellenic_Hound_aka_Hellinikos_Ichnilatis_2.JPG/567px-Hellenic_Hound_aka_Hellinikos_Ichnilatis_2.JPG"
+                  src="/history/greek-harehound.jpg"
                   alt="Greek Harehound (Hellinikos Ichnilatis)"
                   style={{ width: "100%", display: "block", maxHeight: 220, objectFit: "cover" }}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hellenic_Hound_aka_Hellinikos_Ichnilatis_2.JPG/567px-Hellenic_Hound_aka_Hellinikos_Ichnilatis_2.JPG"; }}
                 />
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.7 }}>Image: Wikimedia Commons / CC BY-SA 3.0</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8 }}>Image: Wikimedia Commons / CC BY-SA 3.0</p>
               </div>
             </div>
 
@@ -511,58 +587,56 @@ export default function ArgosPage() {
               <div style={{ overflow: "hidden" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Homer_bust%2C_Farnese_collection_%28Naples%29.jpg/400px-Homer_bust%2C_Farnese_collection_%28Naples%29.jpg"
+                  src="/history/homer-bust.jpg"
                   alt="Bust of Homer, Farnese collection, Naples"
                   style={{ width: "100%", display: "block", maxHeight: 260, objectFit: "cover", objectPosition: "center top" }}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Homer_bust%2C_Farnese_collection_%28Naples%29.jpg/400px-Homer_bust%2C_Farnese_collection_%28Naples%29.jpg"; }}
                 />
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.9rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition and finally written down by someone we simply call Homer.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 12 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. Whether this is autobiography or coincidence, nobody knows. He most likely came from Ionia on the western coast of what is now Turkey, and he composed in an archaic form of Greek that became the model for all subsequent epic poetry.</p>
-                <div style={{ marginBottom: 14 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 10 }}>Major Works</p>
-                  {[
-                    {
-                      title: "The Iliad",
-                      detail: "c. 750 BCE · 24 books · 15,693 lines",
-                      desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. The Iliad is the older of the two epics and arguably the more brutal. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
-                    },
-                    {
-                      title: "The Odyssey",
-                      detail: "c. 700 BCE · 24 books · 12,109 lines",
-                      desc: "The journey home. Ten years of storms, monsters and gods after ten years of war. The Odyssey is the poem that contains Argos.",
-                    },
-                    {
-                      title: "The Homeric Hymns",
-                      detail: "c. 700–400 BCE · attribution disputed",
-                      desc: "A collection of hymns to the Greek gods — to Apollo, Demeter, Hermes, Aphrodite and others. Attributed to Homer in antiquity but almost certainly composed by different poets in the Homeric tradition.",
-                    },
-                  ].map(({ title, detail, desc }) => (
-                    <div key={title} style={{ marginBottom: 14, paddingLeft: 0 }}>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", fontWeight: 500, color: "#fff", lineHeight: 1.55 }}>{desc}</p>
-                    </div>
-                  ))}
-                </div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.7 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
+                {[
+                  {
+                    title: "The Iliad",
+                    detail: "c. 750 BCE · 24 books · 15,693 lines",
+                    desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
+                  },
+                  {
+                    title: "The Odyssey",
+                    detail: "c. 700 BCE · 24 books · 12,109 lines",
+                    desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos.",
+                  },
+                  {
+                    title: "The Homeric Hymns",
+                    detail: "c. 700–400 BCE · attribution disputed",
+                    desc: "Hymns to Apollo, Demeter, Hermes and Aphrodite. Attributed to Homer in antiquity but almost certainly composed by different poets in the Homeric tradition.",
+                  },
+                ].map(({ title, detail, desc }) => (
+                  <div key={title} style={{ marginBottom: 14 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
+                  </div>
+                ))}
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8, marginTop: 4 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
               </div>
             </div>
 
-            {/* Card 13: Penelope's dream */}
+            {/* Card 13: Penelope's Dream */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Penelope&apos;s Dream</p>
               </div>
               <div style={{ padding: "12px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>While Argos waited outside, Penelope was inside the palace doing something that tends to get overlooked: she kept a flock of twenty geese. She fed them, watched them, and told the disguised Odysseus, &ldquo;I love to watch them.&rdquo;</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>The night before Odysseus&apos;s return, Penelope dreamed that an eagle descended and killed all twenty geese. She wept in the dream — grieving the geese even though she was told the dream meant good news, that the eagle was Odysseus and the geese were the suitors.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 10 }}>Scholars have argued that the geese represent the twenty years of waiting itself — everything Penelope had preserved and protected. Their death in the dream is the ending of the long stasis, the moment the holding-together finally breaks open.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, marginBottom: 14 }}>But what is also true is that Penelope wept for the geese as creatures, not only as symbols. She loved watching them. She did not want them killed, even in a dream, even in the service of her husband&apos;s return.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>While Argos waited outside, Penelope was inside the palace doing something that tends to get overlooked: she kept a flock of twenty geese. She fed them, watched them, and told the disguised Odysseus, &ldquo;I love to watch them.&rdquo;</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>The night before Odysseus&apos;s return, she dreamed that an eagle descended and killed all twenty geese. She wept in the dream — grieving the geese even after being told it meant good news, that the eagle was Odysseus and the geese were the suitors.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Scholars have argued the geese represent the twenty years of waiting itself. Their death in the dream is the moment the holding-together finally breaks open. But Penelope wept for them as creatures, not symbols. She loved watching them.</p>
                 <div style={{ borderLeft: "3px solid var(--yellow)", paddingLeft: 14 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, fontStyle: "italic" }}>Argos and Penelope&apos;s geese are not the same thing, but they belong to the same household of feeling. In a poem full of gods and violence, they are the small, living things that make a home a home.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>Argos and Penelope&apos;s geese are not the same thing, but they belong to the same household of feeling. In a poem full of gods and violence, they are the small, living things that make a home a home.</p>
                 </div>
               </div>
             </div>
@@ -570,7 +644,7 @@ export default function ArgosPage() {
             {/* Card 14: Research note */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, fontStyle: "italic" }}>The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
               </div>
             </div>
 
