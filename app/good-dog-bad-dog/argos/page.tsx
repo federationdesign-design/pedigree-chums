@@ -168,23 +168,31 @@ export default function ArgosPage() {
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
               <p className={styles.pullquote}>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</p>
 
-              <div
-                id="smellofhome-video-wrap"
-                style={{ width: "100%", marginBottom: "32px", position: "relative" }}
-              >
-                <video
-                  id="smellofhome-video"
-                  src="/smellofhome-montage.mp4"
-                  muted
-                  loop
-                  playsInline
-                  style={{
-                    width: "100%",
-                    display: "block",
-                    borderRadius: "12px",
-                  }}
-                />
-              </div>
+              <figure style={{ margin: "0 0 32px", padding: 0 }}>
+                <div id="smellofhome-video-wrap" style={{ width: "100%", position: "relative" }}>
+                  <video
+                    id="smellofhome-video"
+                    src="/smellofhome-montage.mp4"
+                    muted
+                    loop
+                    playsInline
+                    style={{ width: "100%", display: "block", borderRadius: "12px 12px 0 0" }}
+                  />
+                </div>
+                <figcaption style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  fontStyle: "italic",
+                  color: "var(--yellow)",
+                  background: "var(--navy)",
+                  padding: "14px 20px",
+                  borderRadius: "0 0 12px 12px",
+                  lineHeight: 1.4,
+                }}>
+                  The dog doesn&apos;t live in the home. The dog is the home.
+                </figcaption>
+              </figure>
               <script dangerouslySetInnerHTML={{ __html: `(function(){
                 var v = document.getElementById('smellofhome-video');
                 if(!v) return;
