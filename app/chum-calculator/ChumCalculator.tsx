@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { breeds, breedCard, personalityFlags, robustFlags, cityScore } from "../../data/breeds";
 import { bust } from "../../data/imgVersion";
@@ -22,36 +22,36 @@ const QUESTIONS: Question[] = [
     sub: "First -- what brings you here today?",
     options: [
       { label: "I'm actively looking for my perfect dog", value: "looking" },
-      { label: "I'd love a dog one day -- just exploring for now", value: "exploring" },
+      { label: "I'd love a dog one day", value: "exploring" },
       { label: "I've never really thought about getting a dog", value: "curious" },
       { label: "I already have a dog", value: "have_dog" },
     ],
   },
   {
     id: "size",
-    question: "What size dogs do you like most?",
+    question: "What size do you like?",
     info: "Size affects everything -- how much they eat, how much space they need, how much they cost to insure, and how much of the sofa they claim.",
     options: [
-      { label: "Small -- light, easy to manage, good for smaller spaces", value: "small" },
-      { label: "Medium -- the classic family dog, not too big, not too small", value: "medium" },
-      { label: "Large -- a proper big dog that you can really feel beside you", value: "large" },
+      { label: "Light / Easy / Good for smaller spaces", value: "small" },
+      { label: "Medium / Classic family dog", value: "medium" },
+      { label: "Large / Proper big dog", value: "large" },
     ],
   },
   {
     id: "living",
-    question: "Where do you live, and how much outdoor space is there?",
-    info: "An upper-floor flat with no lift means stairs every single time -- which rules out big and giant breeds. Beyond that, home size and the quality of regular outdoor access rule other breeds in or out.",
+    question: "What about your home?",
+    info: "Home size and outdoor access rule some breeds in or out. And tick the stairs box below if you have them -- lots of stairs every day rules out big and giant breeds.",
     options: [
-      { label: "Upper-floor flat, no lift -- stairs every time", value: "flat_upper" },
-      { label: "Ground-floor or lift flat -- no garden", value: "flat_ground" },
-      { label: "House in a built-up area, with a garden or yard", value: "town_garden" },
-      { label: "Suburban -- a garden, with green space a short walk away", value: "suburban" },
-      { label: "Rural or semi-rural -- fields and open space on the doorstep", value: "rural" },
+      { label: "1st floor Apartment", value: "flat_upper" },
+      { label: "Ground floor Flat", value: "flat_ground" },
+      { label: "House with private garden", value: "town_garden" },
+      { label: "Suburban with garden", value: "suburban" },
+      { label: "Rural / semi-rural, fields a plenty", value: "rural" },
     ],
   },
   {
     id: "children",
-    question: "Do you have young children at home?",
+    question: "Young children at home?",
     info: "Very young children and fragile toy breeds are a risky combination. Some breeds are wonderfully patient with children; others find unpredictable small humans stressful.",
     options: [
       { label: "Yes -- toddlers or under 5", value: "young" },
@@ -61,12 +61,12 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "other_pets",
-    question: "Do you have other animals in the home?",
+    question: "Other animals at home?",
     info: "High prey drive breeds can be dangerous around small animals. Some dogs are fine with cats they grew up with but will chase a stranger's cat relentlessly.",
     options: [
       { label: "Other dogs", value: "dogs" },
       { label: "Cats", value: "cats" },
-      { label: "Small animals -- rabbits, guinea pigs, hamsters or similar", value: "small_animals" },
+      { label: "Rabbits, guinea pigs, hamsters", value: "small_animals" },
       { label: "Both dogs and cats", value: "both" },
       { label: "No other pets", value: "none" },
     ],
@@ -262,11 +262,6 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
       if (noGarden) score += (suit.smallHome - 3) * 13;
       else if (v === "town_garden") score += (suit.smallHome - 3) * 6;
     }
-    // Upper-floor flat, no lift -- stairs every time rule out big and giant breeds
-    if (v === "flat_upper" && breed?.sizeBand) {
-      if (breed.sizeBand === "giant") score -= 55;
-      else if (breed.sizeBand === "large") score -= 40;
-    }
     // Urban vs rural + open-space access
     if (noGarden) {
       if (spaceNeeding.has(slug)) score -= 38;
@@ -279,6 +274,11 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
       if (cityFriendly.has(slug)) score -= 6;
     }
     // suburban = neutral
+  }
+  // Stairs -- lots of stairs every day rules out big and giant breeds
+  if (answers.stairs === "yes" && breed?.sizeBand) {
+    if (breed.sizeBand === "giant") score -= 55;
+    else if (breed.sizeBand === "large") score -= 40;
   }
   if (suit && answers.children) {
     if (answers.children === "young") score += (suit.children - 3) * 15;
@@ -583,10 +583,23 @@ export default function ChumCalculator() {
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [infoOpen, setInfoOpen] = useState(false);
+  const [wobble, setWobble] = useState(false);
+  const confettiRef = useRef<((o: Record<string, unknown>) => void) | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as Record<string, unknown>;
+    if (w.confetti) { confettiRef.current = w.confetti as (o: Record<string, unknown>) => void; return; }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
+    script.async = true;
+    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>).confetti as (o: Record<string, unknown>) => void; };
+    document.body.appendChild(script);
+  }, []);
 
   const answeredCount = Object.keys(answers).length;
   const CORE_COUNT = 14;
-  const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_")).length;
+  const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_") && k !== "stairs").length;
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
   const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
   // After core questions, show tiebreakers only if >5 breeds remain
@@ -650,6 +663,37 @@ export default function ChumCalculator() {
     setStep((s) => s + 1);
   }
 
+  // Manual-advance screens (intent, living): select an option, then click the button
+  function select(qId: string, value: string) {
+    setInfoOpen(false);
+    setAnswers((prev) => ({ ...prev, [qId]: value }));
+  }
+  function advance() {
+    setInfoOpen(false);
+    setStep((s) => s + 1);
+  }
+  function fireConfetti() {
+    confettiRef.current?.({ particleCount: 60, spread: 65, startVelocity: 30, origin: { y: 0.72 }, colors: ["#22c55e", "#ffd23e", "#ffffff", "#0a3a57"] });
+  }
+  function doWobble() {
+    setWobble(true);
+    window.setTimeout(() => setWobble(false), 650);
+  }
+  function toggleStairs() {
+    const willCheck = answers.stairs !== "yes";
+    setAnswers((prev) => {
+      const next = { ...prev };
+      if (next.stairs === "yes") delete next.stairs;
+      else next.stairs = "yes";
+      return next;
+    });
+    if (willCheck) fireConfetti();
+  }
+  function tryAdvanceLiving() {
+    if (!answers.living) { doWobble(); return; }
+    advance();
+  }
+
   function goBack() {
     if (step > 1) {
       // Remove the previous answer so it doesn't score
@@ -699,9 +743,31 @@ export default function ChumCalculator() {
       {/* ── Question stepper ── */}
       <div className={styles.stepperWrap}>
 
-        {/* First screen -- intent question merged with the welcome + go button */}
+        {/* First screen -- intent merged with the welcome; select then click go (no auto-advance, no bar) */}
         {currentQ && currentQ.id === "intent" && (
           <div className={styles.stepCard}>
+            <p className={styles.cardKicker}>Find your perfect match</p>
+            <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
+            <div className={styles.stepOptions}>
+              {currentQ.options.map((opt) => (
+                <button
+                  key={opt.value}
+                  className={`${styles.option} ${answers.intent === opt.value ? styles.optionSelected : ""}`}
+                  onClick={() => select("intent", opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <button className={styles.startBtn} onClick={advance}>
+              Let&apos;s go →
+            </button>
+          </div>
+        )}
+
+        {/* Home question -- select then Next, plus the stairs checkbox */}
+        {currentQ && currentQ.id === "living" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
+          <div className={`${styles.stepCard} ${wobble ? styles.wobble : ""}`}>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>{step}/{total}</span>
               <div className={styles.stepBar}>
@@ -709,22 +775,49 @@ export default function ChumCalculator() {
               </div>
               <span className={styles.stepPct}>{Math.round((step / total) * 100)}%</span>
             </div>
-            <p className={styles.cardKicker}>Find your perfect match</p>
-            <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
+
+            <div className={styles.questionHeader}>
+              <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
+              {currentQ.info && (
+                <div className={styles.infoIcon} onClick={() => setInfoOpen(o => !o)}>
+                  i
+                  {infoOpen && (
+                    <div className={styles.infoPopup}>
+                      <p className={styles.infoPopupText}>{currentQ.info}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className={styles.stepOptions}>
               {currentQ.options.map((opt) => (
                 <button
                   key={opt.value}
-                  className={styles.option}
-                  onClick={() => handleAnswer(currentQ.id, opt.value)}
+                  className={`${styles.option} ${answers.living === opt.value ? styles.optionSelected : ""}`}
+                  onClick={() => select("living", opt.value)}
                 >
                   {opt.label}
                 </button>
               ))}
             </div>
-            <button className={styles.startBtn} onClick={() => setStep(2)}>
-              Let&apos;s go →
+
+            <label className={styles.stairsRow}>
+              <input
+                type="checkbox"
+                className={styles.stairsCheck}
+                checked={answers.stairs === "yes"}
+                onChange={toggleStairs}
+              />
+              <span>I have stairs (lots, every day)</span>
+            </label>
+
+            <button className={styles.startBtn} onClick={tryAdvanceLiving}>
+              Next →
             </button>
+            {step > 1 && (
+              <button className={styles.backBtn} onClick={goBack} style={{ marginTop: 14 }}>← Back</button>
+            )}
           </div>
         )}
 
@@ -744,8 +837,8 @@ export default function ChumCalculator() {
           </div>
         )}
 
-        {/* Active question */}
-        {currentQ && currentQ.id !== "intent" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
+        {/* Active question (auto-advance) */}
+        {currentQ && currentQ.id !== "intent" && currentQ.id !== "living" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
           <div className={styles.stepCard}>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>{step}/{total}</span>
