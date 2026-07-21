@@ -2645,12 +2645,29 @@ export default function NameGeneratorPage() {
           .pcm-h1br { display: none; }
           .pcm-h1br2 { display: inline; }               /* forced break after "Name" (desktop + mobile) */
           .pcm-breed-img { display: none; }             /* breed chum card hidden on desktop too */
+          /* ── Form styling — applied at ALL widths so desktop matches the mobile form ── */
           .pcm-boy-btn { background: #1e90ff !important; color: #ffffff !important; }
           .pcm-girl-btn { background: #ff4fa3 !important; color: #ffffff !important; }
+          .pcm-breed-label { display: none !important; }   /* hide "Your dog's breed" label on desktop too */
+          .pcm-gender-label { display: none !important; }  /* hide "Boy or girl?" label on desktop too */
+          .pcm-breed-select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            text-align: center !important;
+            text-align-last: center !important;
+            font-size: 1.15rem !important;
+            padding-right: 44px !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 15px center !important;
+          }
+          .pcm-breed-select option { font-size: 1.05rem; text-align: center; }
           .pcm-pool { text-decoration: none; }
           .pcm-pool:hover { text-decoration: underline; text-underline-offset: 3px; }
           @media (min-width: 769px) {
-            .pcm-inputs { padding-top: 56px !important; padding-bottom: 56px !important; margin-top: 24px !important; margin-bottom: 24px !important; }
+            /* Keep the desktop form compact like mobile (so buttons/dropdown don't stretch) */
+            .pcm-inputs { padding-top: 56px !important; padding-bottom: 56px !important; margin-top: 24px !important; margin-bottom: 24px !important; max-width: 460px !important; }
           }
           @keyframes pcAnswerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
           @keyframes pcJiggle { 0%,100% { transform: rotate(calc(-1 * var(--jiggle, 0deg))); } 50% { transform: rotate(var(--jiggle, 0deg)); } }
@@ -2666,23 +2683,6 @@ export default function NameGeneratorPage() {
             .pcm-h1 { font-size: clamp(3.5rem, 12vw, 5.4rem) !important; }
             .pcm-nick { font-size: clamp(2.98rem, 11vw, 3.6rem) !important; margin-top: 18px !important; }
             .pcm-sub { margin-bottom: 20px !important; }
-            .pcm-breed-label { display: none !important; }
-            .pcm-gender-label { display: none !important; }
-            .pcm-breed-select {
-              -webkit-appearance: none !important;
-              -moz-appearance: none !important;
-              appearance: none !important;
-              text-align: center !important;
-              text-align-last: center !important;
-              font-size: 1.15rem !important;
-              padding-right: 44px !important;
-              background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
-              background-repeat: no-repeat !important;
-              background-position: right 15px center !important;
-            }
-            .pcm-breed-select option { font-size: 1.05rem; text-align: center; }
-            .pcm-boy-btn { background: #1e90ff !important; color: #ffffff !important; }
-            .pcm-girl-btn { background: #ff4fa3 !important; color: #ffffff !important; }
           }
         `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
