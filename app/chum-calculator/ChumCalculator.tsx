@@ -23,8 +23,8 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "I'm actively looking for my perfect dog", value: "looking" },
       { label: "I'd love a dog one day -- just exploring for now", value: "exploring" },
-      { label: "I've never really thought about getting a dog -- just curious", value: "curious" },
-      { label: "I already have a dog -- let's see if the finder agrees", value: "have_dog" },
+      { label: "I've never really thought about getting a dog", value: "curious" },
+      { label: "I already have a dog", value: "have_dog" },
     ],
   },
   {
@@ -578,7 +578,7 @@ const THRESHOLD = 90;
 const MAX_RESULTS = 8;
 
 export default function ChumCalculator() {
-  const [step, setStep] = useState(0); // 0 = not started, 1..N = question index (1-based)
+  const [step, setStep] = useState(1); // 1..N = question index (1-based); step 1 = intent/welcome
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
@@ -665,14 +665,14 @@ export default function ChumCalculator() {
 
   function reset() {
     setAnswers({});
-    setStep(0);
+    setStep(1);
   }
 
   // Contextual line above the card -- changes as you move through the quiz
-  const progressMsg = !started
-    ? `Answer ${CORE_COUNT} questions and watch the pack filter to your ideal chums in real time.`
-    : finished
+  const progressMsg = finished
     ? "Here are your best-matched chums."
+    : step <= 1
+    ? `Answer ${CORE_COUNT} questions`
     : step > CORE_COUNT
     ? "Just breaking the tie -- a couple more"
     : step <= 3
@@ -699,12 +699,30 @@ export default function ChumCalculator() {
       {/* ── Question stepper ── */}
       <div className={styles.stepperWrap}>
 
-        {/* Not started */}
-        {!started && (
-          <div className={`${styles.stepCard} ${styles.stepCardCenter}`}>
+        {/* First screen -- intent question merged with the welcome + go button */}
+        {currentQ && currentQ.id === "intent" && (
+          <div className={styles.stepCard}>
+            <div className={styles.stepProgress}>
+              <span className={styles.stepCount}>{step}/{total}</span>
+              <div className={styles.stepBar}>
+                <div className={styles.stepBarFill} style={{ width: `${Math.round((step / total) * 100)}%` }} />
+              </div>
+              <span className={styles.stepPct}>{Math.round((step / total) * 100)}%</span>
+            </div>
             <p className={styles.cardKicker}>Find your perfect match</p>
             <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
-            <button className={styles.startBtn} onClick={() => setStep(1)}>
+            <div className={styles.stepOptions}>
+              {currentQ.options.map((opt) => (
+                <button
+                  key={opt.value}
+                  className={styles.option}
+                  onClick={() => handleAnswer(currentQ.id, opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <button className={styles.startBtn} onClick={() => setStep(2)}>
               Let&apos;s go →
             </button>
           </div>
@@ -727,7 +745,7 @@ export default function ChumCalculator() {
         )}
 
         {/* Active question */}
-        {currentQ && !(needsTiebreakers && step === CORE_COUNT + 1) && (
+        {currentQ && currentQ.id !== "intent" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
           <div className={styles.stepCard}>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>{step}/{total}</span>

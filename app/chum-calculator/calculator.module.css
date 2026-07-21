@@ -155,15 +155,14 @@
   border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   padding: 14px 20px;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .option:hover {
   background: rgba(255,210,62,0.14);
   border-color: var(--yellow, #ffd23e);
-  transform: translateX(4px);
 }
 
 /* ── Back btn ────────────────────────────────────────────────── */
