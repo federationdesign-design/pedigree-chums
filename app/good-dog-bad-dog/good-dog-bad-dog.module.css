@@ -546,9 +546,10 @@
 }
 
 /* ── Pull quotes ────────────────────────────────────────────── */
+/* ── Pull quotes -- blockquote tag escapes essayBody p rule ─ */
 .pullquote {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(4.5rem, 9vw, 7.2rem);
+  font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 300;
   font-style: italic;
   color: var(--navy, #0a3a57);
@@ -558,31 +559,33 @@
   border-left: 10px solid var(--yellow, #ffd23e);
   border-radius: 6px;
   max-width: 100%;
+  display: block;
 }
 
 .pullquote::before {
   content: "\201C";
-  font-size: 0.9em;
+  font-size: 10em;
   color: var(--navy, #0a3a57);
   font-style: normal;
-  margin-right: 4px;
   line-height: 0;
-  vertical-align: -0.2em;
+  vertical-align: -0.15em;
+  margin-right: 6px;
 }
 
 .pullquote::after {
   content: "\201D";
-  font-size: 0.9em;
+  font-size: 10em;
   color: var(--navy, #0a3a57);
   font-style: normal;
-  margin-left: 4px;
   line-height: 0;
-  vertical-align: -0.2em;
+  vertical-align: -0.15em;
+  margin-left: 6px;
 }
 
 @media (min-width: 1300px) {
   .pullquote {
-    font-size: clamp(5rem, 8vw, 8rem);
-    margin: 64px 0;
+    font-size: clamp(3.5rem, 5vw, 6rem);
+    margin: 72px 0;
   }
 }
+
