@@ -192,7 +192,7 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "tb_instincts",
-    question: "A Beagle that catches an interesting scent will follow it with total commitment -- your recall becomes irrelevant. A Border Collie without a job will invent one, usually involving your furniture.",
+    question: "Some dogs are ruled by instinct -- a Beagle follows a scent and forgets you exist; a bored Collie invents its own job.",
     sub: "Working breeds live out their instincts every day. Would that feel charming, or drive you mad?",
     options: [
       { label: "Charming -- I'd love a dog with real instincts and drive", value: "working" },
@@ -691,7 +691,7 @@ export default function ChumCalculator() {
       {/* ── Header ── */}
       <div className={styles.header}>
         <h1 className={styles.title}>
-          Chum <span className={styles.titleAccent}>Finder</span>
+          Chum<br /><span className={styles.titleAccent}>Finder</span>
         </h1>
         <p className={styles.headerSub}>{progressMsg}</p>
       </div>
@@ -701,7 +701,7 @@ export default function ChumCalculator() {
 
         {/* Not started */}
         {!started && (
-          <div className={styles.stepCard}>
+          <div className={`${styles.stepCard} ${styles.stepCardCenter}`}>
             <p className={styles.cardKicker}>Find your perfect match</p>
             <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
             <button className={styles.startBtn} onClick={() => setStep(1)}>
@@ -729,9 +729,8 @@ export default function ChumCalculator() {
         {/* Active question */}
         {currentQ && !(needsTiebreakers && step === CORE_COUNT + 1) && (
           <div className={styles.stepCard}>
-            <p className={styles.cardKicker}>Find your perfect match</p>
             <div className={styles.stepProgress}>
-              <span className={styles.stepCount}>Question {step} of {total}</span>
+              <span className={styles.stepCount}>{step}/{total}</span>
               <div className={styles.stepBar}>
                 <div className={styles.stepBarFill} style={{ width: `${Math.round((step / total) * 100)}%` }} />
               </div>
@@ -771,7 +770,7 @@ export default function ChumCalculator() {
           </div>
         )}
 
-        {/* Finished -- show heading only, no blue box */}
+        {/* Finished -- heading only; results + start-again render below */}
         {finished && (
           <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
             <h2 className={styles.stepDoneTitle}>Here are your chum{visibleCount !== 1 ? "s" : ""}</h2>
@@ -780,7 +779,6 @@ export default function ChumCalculator() {
                 ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match your lifestyle`
                 : "No strong matches -- try relaxing your answers"}
             </p>
-            <button className={styles.resetBtn} onClick={reset}>Start again</button>
           </div>
         )}
       </div>
@@ -798,9 +796,16 @@ export default function ChumCalculator() {
         </div>
       )}
 
-      {/* ── Result rail -- only shown when calculator is finished ── */}
+      {/* ── Result rail -- only shown when finished ── */}
       {finished && (
         <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} />
+      )}
+
+      {/* ── Start again -- below the results ── */}
+      {finished && (
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <button className={styles.resetBtn} onClick={reset}>Start again</button>
+        </div>
       )}
 
       {/* Global tooltip rendered at mouse position */}

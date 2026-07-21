@@ -88,7 +88,7 @@ function FlipCard({ breed, isBest }: { breed: ScoredBreed; isBest: boolean }) {
           >
             ←
           </button>
-          <p className={styles.backBreedName}>Give your chum a name, with our name generator now</p>
+          <p className={styles.backBreedName}>Name your chum now</p>
           <span className={styles.backArrow}>→</span>
         </Link>
 
