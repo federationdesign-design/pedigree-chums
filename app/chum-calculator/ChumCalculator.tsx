@@ -40,10 +40,11 @@ const QUESTIONS: Question[] = [
   {
     id: "living",
     question: "Where do you live, and how much outdoor space is there?",
-    info: "A flat opposite a big park can beat a house with a tiny paved yard. What matters is home size and the quality of regular outdoor access -- together they rule some breeds firmly in or out.",
+    info: "An upper-floor flat with no lift means stairs every single time -- which rules out big and giant breeds. Beyond that, home size and the quality of regular outdoor access rule other breeds in or out.",
     options: [
-      { label: "City or town flat, no garden -- streets and the odd small park", value: "city_flat" },
-      { label: "Built-up area, but I have a garden or yard", value: "town_garden" },
+      { label: "Upper-floor flat, no lift -- stairs every time", value: "flat_upper" },
+      { label: "Ground-floor or lift flat -- no garden", value: "flat_ground" },
+      { label: "House in a built-up area, with a garden or yard", value: "town_garden" },
       { label: "Suburban -- a garden, with green space a short walk away", value: "suburban" },
       { label: "Rural or semi-rural -- fields and open space on the doorstep", value: "rural" },
     ],
@@ -252,14 +253,22 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (breed.sizeBand !== answers.size) score -= 48;
   }
 
-  // Living environment -- home size + urban/rural + open space (merged from home/garden/location/openspace)
+  // Living environment -- home type + size + urban/rural + open space (merged from home/garden/location/openspace)
   if (answers.living) {
     const v = answers.living;
+    const noGarden = v === "flat_upper" || v === "flat_ground";
+    // Small-home suitability
     if (suit) {
-      if (v === "city_flat") score += (suit.smallHome - 3) * 13;
+      if (noGarden) score += (suit.smallHome - 3) * 13;
       else if (v === "town_garden") score += (suit.smallHome - 3) * 6;
     }
-    if (v === "city_flat") {
+    // Upper-floor flat, no lift -- stairs every time rule out big and giant breeds
+    if (v === "flat_upper" && breed?.sizeBand) {
+      if (breed.sizeBand === "giant") score -= 55;
+      else if (breed.sizeBand === "large") score -= 40;
+    }
+    // Urban vs rural + open-space access
+    if (noGarden) {
       if (spaceNeeding.has(slug)) score -= 38;
       if (cityFriendly.has(slug)) score += 14;
     } else if (v === "town_garden") {
@@ -269,6 +278,7 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
       if (spaceNeeding.has(slug)) score += 12;
       if (cityFriendly.has(slug)) score -= 6;
     }
+    // suburban = neutral
   }
   if (suit && answers.children) {
     if (answers.children === "young") score += (suit.children - 3) * 15;
