@@ -2953,8 +2953,19 @@ export default function NameGeneratorPage() {
                   {/* Reasoning */}
                   <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
                 </div>
-                {/* Cut-down share: snapshots the card above and shares it as an image,
-                    after the user picks one of five taglines. */}
+                </div>
+              ))}
+
+              <div className="pcm-panel" style={{ maxWidth:"60%", margin:"14px auto 0", width:"100%" }}>
+                <button onClick={() => startQuickFire()}
+                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer", textDecoration:"underline", textUnderlineOffset:"3px" }}>
+                  ✨ {outcomes.toLocaleString()} possible names in your pool
+                </button>
+              </div>
+
+              {/* Cut-down share: snapshots the result card and shares it after the
+                  user picks one of five taglines. Sits below the pool counter. */}
+              {results[0] && (
                 <div style={{ position:"relative", display:"flex", justifyContent:"center", margin:"12px auto 0" }}>
                   <button onClick={() => setCardShareOpen(o => !o)} disabled={cardSharing}
                     style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"var(--yellow)", color:"var(--navy)", border:"none", borderRadius:999, padding:"11px 26px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor: cardSharing ? "default" : "pointer", opacity: cardSharing ? 0.6 : 1, boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
@@ -2965,8 +2976,8 @@ export default function NameGeneratorPage() {
                       <div onClick={() => setCardShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />
                       <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"#ffffff", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.35)", padding:"12px 10px 10px", textAlign:"left" }}>
                         <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy)", fontFamily:"var(--font-body), sans-serif" }}>Pick a caption to share</p>
-                        {shareCaptions(r.full).map((cap, i) => (
-                          <button key={i} onClick={() => captureAndShare(r, cap)}
+                        {shareCaptions(results[0].full).map((cap, i) => (
+                          <button key={i} onClick={() => captureAndShare(results[0], cap)}
                             style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(10,58,87,0.05)", border:"none", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body), sans-serif", fontSize:"0.8rem", lineHeight:1.35, color:"var(--navy)" }}>
                             {cap}
                           </button>
@@ -2976,15 +2987,7 @@ export default function NameGeneratorPage() {
                     </>
                   )}
                 </div>
-                </div>
-              ))}
-
-              <div className="pcm-panel" style={{ maxWidth:"60%", margin:"14px auto 0", width:"100%" }}>
-                <button onClick={() => startQuickFire()}
-                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer" }}>
-                  ✨ {outcomes.toLocaleString()} possible names in your pool
-                </button>
-              </div>
+              )}
 
               <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ position:"relative" }}>
 
