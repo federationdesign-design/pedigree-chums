@@ -1,7 +1,7 @@
 /* ── Page ───────────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
-  padding: clamp(84px, 12vw, 120px) clamp(16px, 4vw, 24px) 80px;
+  padding: 120px clamp(16px, 4vw, 24px) 80px;
   max-width: 1300px;
   margin: 0 auto;
 }
@@ -24,11 +24,9 @@
 
 .title {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-size: clamp(3rem, 10vw, 6.5rem);
   color: #ffffff;
-  line-height: 1;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  line-height: 0.95;
   margin: 0 0 16px;
 }
 
@@ -36,8 +34,8 @@
 
 .headerSub {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  font-weight: 600;
   color: #ffffff;
   margin: 0;
 }
@@ -443,7 +441,7 @@
 /* ── Mobile (matches the name generator's 768px breakpoint) ──── */
 @media (max-width: 768px) {
   .header { margin-bottom: 32px; }
-  .headerSub { font-size: 0.85rem; }
+  .title { font-size: clamp(3.5rem, 12vw, 5.4rem); }
   .stepperWrap { margin-bottom: 28px; }
   .stepProgress { gap: 10px; margin-bottom: 22px; }
   .stepCount { font-size: 0.6rem; }
