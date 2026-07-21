@@ -2232,6 +2232,7 @@ export default function NameGeneratorPage() {
   });
   const [landingIdx, setLandingIdx] = useState<number | null>(null);
   const [showLikeCount, setShowLikeCount] = useState(false); // briefly show shortlist count in the heart button
+  const [sharedCopied, setSharedCopied] = useState(false);   // brief "Copied!" feedback on the share row
   const [toast, setToast] = useState<string | null>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const [toastTop, setToastTop] = useState(134);
@@ -2843,6 +2844,37 @@ export default function NameGeneratorPage() {
                   )}
                   {/* Reasoning */}
                   <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
+                  {/* Share row -- zero-friction social sharing with a prebuilt caption */}
+                  {(() => {
+                    const shareName = r.full || r.nickname;
+                    const caption = `Just found out my dog's pedigree name is ${shareName}. What's yours? #MyChum #PedigreeChums`;
+                    const url = "https://pedigreechums.co.uk";
+                    const enc = encodeURIComponent;
+                    const xHref = `https://twitter.com/intent/tweet?text=${enc(caption)}&url=${enc(url)}`;
+                    const waHref = `https://wa.me/?text=${enc(caption + " " + url)}`;
+                    const pill: React.CSSProperties = { display:"inline-flex", alignItems:"center", gap:6, border:"none", borderRadius:999, padding:"9px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:800, cursor:"pointer", textDecoration:"none", lineHeight:1, boxShadow:"0 3px 10px rgba(10,58,87,0.18)" };
+                    const primary: React.CSSProperties = { ...pill, background:"var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", letterSpacing:"0.03em", padding:"10px 20px" };
+                    const ghost: React.CSSProperties = { ...pill, background:"rgba(255,255,255,0.92)", color:"var(--navy)" };
+                    const doNative = () => {
+                      if (typeof navigator !== "undefined" && (navigator as Navigator & { share?: (d: unknown) => Promise<void> }).share) {
+                        (navigator as Navigator & { share: (d: unknown) => Promise<void> }).share({ text: caption, url }).catch(() => {});
+                      } else {
+                        try { navigator.clipboard?.writeText(caption + " " + url); setSharedCopied(true); setTimeout(() => setSharedCopied(false), 1800); } catch {}
+                      }
+                    };
+                    const doCopy = () => { try { navigator.clipboard?.writeText(caption + " " + url); setSharedCopied(true); setTimeout(() => setSharedCopied(false), 1800); } catch {} };
+                    return (
+                      <div style={{ marginTop:16, paddingTop:14, borderTop:"1px solid rgba(10,58,87,0.2)" }}>
+                        <div style={{ fontSize:"0.7rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy)", textAlign:"center", marginBottom:10, fontFamily:"var(--font-body)" }}>Show off your chum&rsquo;s name</div>
+                        <div style={{ display:"flex", gap:8, justifyContent:"center", flexWrap:"wrap" }}>
+                          <button onClick={doNative} style={primary} aria-label="Share this name">📣 Share</button>
+                          <a href={xHref} target="_blank" rel="noopener noreferrer" style={ghost} aria-label="Share on X">𝕏</a>
+                          <a href={waHref} target="_blank" rel="noopener noreferrer" style={ghost} aria-label="Share on WhatsApp">WhatsApp</a>
+                          <button onClick={doCopy} style={ghost} aria-label="Copy caption">{sharedCopied ? "✓ Copied!" : "Copy caption"}</button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
                 </div>
               ))}
