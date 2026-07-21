@@ -2643,8 +2643,15 @@ export default function NameGeneratorPage() {
       <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 10px" }}>
         <style>{`
           .pcm-h1br { display: none; }
+          .pcm-h1br2 { display: inline; }               /* forced break after "Name" (desktop + mobile) */
+          .pcm-breed-img { display: none; }             /* breed chum card hidden on desktop too */
+          .pcm-boy-btn { background: #1e90ff !important; color: #ffffff !important; }
+          .pcm-girl-btn { background: #ff4fa3 !important; color: #ffffff !important; }
           .pcm-pool { text-decoration: none; }
           .pcm-pool:hover { text-decoration: underline; text-underline-offset: 3px; }
+          @media (min-width: 769px) {
+            .pcm-inputs { padding-top: 56px !important; padding-bottom: 56px !important; margin-top: 24px !important; margin-bottom: 24px !important; }
+          }
           @keyframes pcAnswerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
           @keyframes pcJiggle { 0%,100% { transform: rotate(calc(-1 * var(--jiggle, 0deg))); } 50% { transform: rotate(var(--jiggle, 0deg)); } }
           @media (max-width: 768px) {
@@ -2680,7 +2687,7 @@ export default function NameGeneratorPage() {
         `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
           <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
-            Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> Generator
+            Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> <br className="pcm-h1br2" />Generator
           </h1>
           <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
             {shortlist.length >= 4 && stage !== "inputs"
@@ -2727,7 +2734,7 @@ export default function NameGeneratorPage() {
           })()}
           {stage === "inputs" && (() => {
             return (
-            <div className="pcm-panel" style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)", maxWidth:"60%", margin:"0 auto", width:"100%" }}>
+            <div className="pcm-panel pcm-inputs" style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)", maxWidth:"60%", margin:"0 auto", width:"100%" }}>
               {!fromCalculator && (<>
                 <label className="pcm-breed-label" style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
                 <select className="pcm-breed-select" value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} setQIndices(pickThreeQuestions()); setQAnswers({}); setQfAnswers({}); setQStep(0); setBonusWordsCount(0); }}
@@ -2911,7 +2918,7 @@ export default function NameGeneratorPage() {
                   background:"linear-gradient(to top right, #00e2ff, #008eff)",
                   borderRadius:40,
                   padding:"clamp(24px,4vw,40px)",
-                  paddingRight: cardImg ? "clamp(190px,45vw,340px)" : "clamp(24px,4vw,40px)",
+                  paddingRight: "clamp(24px,4vw,40px)",
                   boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
                   overflow:"visible",
                   marginBottom:20
