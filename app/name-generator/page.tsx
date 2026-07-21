@@ -2234,6 +2234,8 @@ export default function NameGeneratorPage() {
   const [showLikeCount, setShowLikeCount] = useState(false); // briefly show shortlist count in the heart button
   const [toast, setToast] = useState<string | null>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
+  const revealCardRef = useRef<HTMLDivElement>(null); // the result card, snapshotted for sharing
+  const [cardSharing, setCardSharing] = useState(false);
   const [toastTop, setToastTop] = useState(134);
   useEffect(() => {
     if (toast && subRef.current) {
@@ -2397,6 +2399,32 @@ export default function NameGeneratorPage() {
     });
   }
   function clearShortlist() { setShortlist([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} }
+  // Snapshot the whole result card to an image and share it, so social viewers
+  // see exactly what the generator produces (name, breed, the choose mechanic).
+  async function shareCard(r: Result) {
+    const node = revealCardRef.current;
+    if (!node || cardSharing) return;
+    setCardSharing(true);
+    try {
+      try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch {}
+      const { default: html2canvas } = await import("html2canvas-pro");
+      const canvas = await html2canvas(node, { backgroundColor: null, scale: 2, useCORS: true });
+      const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b as Blob), "image/png"));
+      const caption = `Try this dog name generator, I just got: ${r.full} #MyChum #PedigreeChums https://pedigreechums.co.uk`;
+      const file = new File([blob], "my-chum-name.png", { type: "image/png" });
+      const nav = navigator as Navigator & { share?: (d: unknown) => Promise<void>; canShare?: (d: unknown) => boolean };
+      if (nav.share && nav.canShare?.({ files: [file] })) {
+        await nav.share({ files: [file], text: caption });
+      } else if (nav.share) {
+        await nav.share({ text: caption });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = "my-chum-name.png"; a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch {}
+    setCardSharing(false);
+  }
   function handleLike(e?: React.MouseEvent) {
     if (confettiRef.current) {
       let x = 0.5, y = 0.62;
@@ -2569,7 +2597,7 @@ export default function NameGeneratorPage() {
           </h1>
           <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
             {shortlist.length >= 4 && stage !== "inputs"
-              ? `You have ${shortlist.length} names! Tap 🏆 Knockout button to decide`
+              ? <>You have {shortlist.length} names!<br />Tap 🏆 Knockout button to decide</>
               : "Give your chum the truly 1 in a million personalised to you name"}
           </p>
 
@@ -2791,7 +2819,7 @@ export default function NameGeneratorPage() {
             <>
               {results.slice(0,1).map((r: Result) => (
                 <div className="pcm-panel" style={{ maxWidth:"60%", margin:"0 auto", width:"100%" }}>
-                <div key={r.full} className="pcm-reveal-card" style={{
+                <div key={r.full} ref={revealCardRef} className="pcm-reveal-card" style={{
                   position:"relative",
                   background:"linear-gradient(to top right, #00e2ff, #008eff)",
                   borderRadius:40,
@@ -2853,6 +2881,11 @@ export default function NameGeneratorPage() {
                   {/* Reasoning */}
                   <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
                 </div>
+                {/* Cut-down share: snapshots the card above and shares it as an image */}
+                <button onClick={() => shareCard(r)} disabled={cardSharing}
+                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"12px auto 0", background:"var(--yellow)", color:"var(--navy)", border:"none", borderRadius:999, padding:"11px 26px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor: cardSharing ? "default" : "pointer", opacity: cardSharing ? 0.6 : 1, boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
+                  {cardSharing ? "Preparing…" : "📣 Share this name"}
+                </button>
                 </div>
               ))}
 
