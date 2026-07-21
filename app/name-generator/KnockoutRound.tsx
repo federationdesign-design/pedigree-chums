@@ -595,7 +595,6 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
           ))}
           <span className={styles.pillCurrent}>{roundLabel}</span>
         </div>
-        <p className={styles.matchLabel}>{matchLabel}</p>
 
         {/* VS cards */}
         {showInterstitial ? (
@@ -610,7 +609,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
               onMouseEnter={() => cardsInteractive && setHoveredIdx(0)}>
               <p className={styles.fightName}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
+                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
               )}
             </button>
             <p className={styles.vsLabel}>VS</p>
@@ -620,7 +619,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
               onMouseEnter={() => cardsInteractive && setHoveredIdx(1)}>
               <p className={styles.fightName}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "var(--yellow, #ffe227)", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairB.full}</p>
+                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairB.full}</p>
               )}
             </button>
           </div>
@@ -631,6 +630,8 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
             <button className={styles.byeBtn} onClick={() => advanceWinner((pairA || pairB)!, null, true)}>Through →</button>
           </div>
         )}
+
+        <p className={styles.matchLabel}>{matchLabel}</p>
 
         {/* Bracket tree */}
         <div className={styles.bracketScroll}>
@@ -669,7 +670,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
                               <>
                                 {getLabel(slot.entry)}
                                 {slot.state === "recycle" && <span className={styles.bracketTag}>2nd chance</span>}
-                                {slot.state === "recommended" && <span className={styles.bracketTagRec}>recommended</span>}
+                                {slot.state === "recommended" && <span className={styles.bracketTagRec}>our choice</span>}
                               </>
                             ) : <span className={styles.bracketEmpty}>TBD</span>}
                             </div>
