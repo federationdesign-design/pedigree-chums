@@ -605,14 +605,12 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
           <h2 className={`display ${styles.title}`}>
             We<br />have a <span className={styles.yellow}>winner!</span>
           </h2>
-          {podiumReady && (
-            <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
-              {sharing ? "Sharing..." : "Share your podium"}
-            </button>
-          )}
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
           </div>
+          <button className={styles.shareBtn} onClick={handleShare} disabled={sharing || !podiumReady}>
+            {sharing ? "Sharing..." : "Share your podium"}
+          </button>
           <p className={styles.sub}>{first ? getLabel(first) : ""} takes the top spot</p>
           <button className={styles.startAgainBtn} onClick={onRestart}>Start again</button>
         </div>

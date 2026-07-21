@@ -95,7 +95,7 @@
 .hoverGreen {
   background: #22c55e !important;
   border-color: #22c55e !important;
-  transform: scale(1.02);
+  transform: scale(1.05);
   transition-delay: 0.3s;
 }
 .hoverGreen .fightNick {
@@ -107,6 +107,7 @@
 .hoverRed {
   background: #ef4444 !important;
   border-color: #ef4444 !important;
+  transform: scale(0.95);
   transition-delay: 0.3s;
 }
 
@@ -144,7 +145,7 @@
   font-size: clamp(0.92rem, 2.2vw, 1.4rem);
   font-weight: 800;
   color: #ffffff;
-  margin: 36px 0 0;
+  margin: 18px 0 0;
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
@@ -204,6 +205,10 @@
   width: 100%;
   height: auto;
   display: block;
+  /* Reserve the real podium image ratio (all podium art is 1254x1006) so the
+     canvas paints at its correct height on first render instead of starting at
+     the browser default 300x150 and shoving everything below it down. */
+  aspect-ratio: 1254 / 1006;
 }
 
 .shareBtn {
