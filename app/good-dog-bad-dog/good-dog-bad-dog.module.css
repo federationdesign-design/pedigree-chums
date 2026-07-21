@@ -549,11 +549,11 @@
 /* ── Pull quotes -- blockquote tag escapes essayBody p rule ─ */
 .pullquote {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
   font-weight: 300;
   font-style: italic;
   color: var(--navy, #0a3a57);
-  line-height: 1.15;
+  line-height: 1.2;
   margin: 56px 0;
   padding: 24px 0 24px 40px;
   border-left: 10px solid var(--yellow, #ffd23e);
@@ -564,7 +564,8 @@
 
 .pullquote::before {
   content: "\201C";
-  font-size: 10em;
+  font-size: 5em;
+  font-weight: 900;
   color: var(--navy, #0a3a57);
   font-style: normal;
   line-height: 0;
@@ -574,7 +575,8 @@
 
 .pullquote::after {
   content: "\201D";
-  font-size: 10em;
+  font-size: 5em;
+  font-weight: 900;
   color: var(--navy, #0a3a57);
   font-style: normal;
   line-height: 0;
@@ -584,7 +586,7 @@
 
 @media (min-width: 1300px) {
   .pullquote {
-    font-size: clamp(3.5rem, 5vw, 6rem);
+    font-size: clamp(1.75rem, 2.5vw, 3rem);
     margin: 72px 0;
   }
 }
