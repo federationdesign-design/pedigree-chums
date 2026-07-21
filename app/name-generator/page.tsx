@@ -6,6 +6,68 @@ import ShortlistBar, { type ShortlistEntry } from "./ShortlistBar";
 import KnockoutRound from "./KnockoutRound";
 import { BANNED_WORDS } from "./bannedWords";
 
+// ── SHARE CAPTIONS + PNG METADATA ───────────────────────────────────────────────
+const SITE_URL = "https://pedigreechums.co.uk";
+// The five taglines the user picks from before sharing (name is spliced in).
+function shareCaptions(name: string): string[] {
+  return [
+    `I had such fun creating my dog's name! The result is: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
+    `This was a hoot! My new puppy's name is going to be: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
+    `Try this dog name generator, I just got: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
+    `I love my dog so much but now I've made this name I might just get a new one so I can use it: ${name} #MyChum #PedigreeChums ${SITE_URL}`,
+    `I don't even have a dog but I just got: ${name} on a dog name generator #MyChum #PedigreeChums ${SITE_URL}`,
+  ];
+}
+// Turn a dog name into a safe file stem, e.g. "Baroness Gudrun Gemon" -> "Baroness-Gudrun-Gemon".
+function nameToFilename(name: string): string {
+  const stem = (name || "my-chum-name").normalize("NFKD").replace(/[^\w]+/g, "-").replace(/^-+|-+$/g, "");
+  return (stem || "my-chum-name") + ".png";
+}
+// Latin-1 bytes for a string (PNG tEXt is ISO-8859-1); out-of-range chars -> '?'.
+function latin1(str: string): Uint8Array {
+  const out = new Uint8Array(str.length);
+  for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); out[i] = c <= 0xff ? c : 0x3f; }
+  return out;
+}
+function crc32(bytes: Uint8Array): number {
+  let c = 0xffffffff;
+  for (let i = 0; i < bytes.length; i++) {
+    c ^= bytes[i];
+    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+  }
+  return (c ^ 0xffffffff) >>> 0;
+}
+// Build a PNG tEXt chunk (keyword\0text).
+function pngTextChunk(keyword: string, text: string): Uint8Array {
+  const kw = latin1(keyword), tx = latin1(text);
+  const body = new Uint8Array(4 + kw.length + 1 + tx.length);
+  body.set([0x74, 0x45, 0x58, 0x74], 0);          // "tEXt"
+  body.set(kw, 4); body[4 + kw.length] = 0; body.set(tx, 4 + kw.length + 1);
+  const chunk = new Uint8Array(4 + body.length + 4);
+  const dv = new DataView(chunk.buffer);
+  dv.setUint32(0, body.length - 4);               // length excludes type+data? no: data length only
+  chunk.set(body, 4);
+  dv.setUint32(4 + body.length, crc32(body));
+  return chunk;
+}
+// Insert tEXt chunks (website links etc.) right after IHDR in a PNG blob.
+async function embedPngMetadata(blob: Blob, fields: [string, string][]): Promise<Blob> {
+  try {
+    const src = new Uint8Array(await blob.arrayBuffer());
+    // 8-byte signature + IHDR chunk (4 len + 4 type + 13 data + 4 crc = 25) => insert at 33
+    const insertAt = 33;
+    if (src.length < insertAt || src[12] !== 0x49 || src[13] !== 0x48) return blob; // not IHDR -> bail
+    const chunks = fields.map(([k, v]) => pngTextChunk(k, v));
+    const extra = chunks.reduce((n, c) => n + c.length, 0);
+    const out = new Uint8Array(src.length + extra);
+    out.set(src.subarray(0, insertAt), 0);
+    let off = insertAt;
+    for (const c of chunks) { out.set(c, off); off += c.length; }
+    out.set(src.subarray(insertAt), off);
+    return new Blob([out], { type: "image/png" });
+  } catch { return blob; }
+}
+
 // ── CARD IMAGE MAP ─────────────────────────────────────────────────────────────
 const CARD_IMAGE: Record<string, string> = {
   "Afghan Hound": "/afghan-card.jpg",
@@ -2236,6 +2298,7 @@ export default function NameGeneratorPage() {
   const subRef = useRef<HTMLParagraphElement>(null);
   const revealCardRef = useRef<HTMLDivElement>(null); // the result card, snapshotted for sharing
   const [cardSharing, setCardSharing] = useState(false);
+  const [cardShareOpen, setCardShareOpen] = useState(false); // caption-picker popout on the result card
   const [toastTop, setToastTop] = useState(134);
   useEffect(() => {
     if (toast && subRef.current) {
@@ -2399,19 +2462,28 @@ export default function NameGeneratorPage() {
     });
   }
   function clearShortlist() { setShortlist([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} }
-  // Snapshot the whole result card to an image and share it, so social viewers
-  // see exactly what the generator produces (name, breed, the choose mechanic).
-  async function shareCard(r: Result) {
+  // Snapshot the whole result card to an image and share it with the caption the
+  // user picked. The file is named after the dog, and website links are embedded
+  // in the PNG metadata so they travel with the image.
+  async function captureAndShare(r: Result, caption: string) {
     const node = revealCardRef.current;
     if (!node || cardSharing) return;
+    setCardShareOpen(false);
     setCardSharing(true);
     try {
       try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch {}
       const { default: html2canvas } = await import("html2canvas-pro");
       const canvas = await html2canvas(node, { backgroundColor: null, scale: 2, useCORS: true });
-      const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b as Blob), "image/png"));
-      const caption = `Try this dog name generator, I just got: ${r.full} #MyChum #PedigreeChums https://pedigreechums.co.uk`;
-      const file = new File([blob], "my-chum-name.png", { type: "image/png" });
+      let blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b as Blob), "image/png"));
+      blob = await embedPngMetadata(blob, [
+        ["Title", r.full],
+        ["Description", caption],
+        ["Source", SITE_URL],
+        ["Author", "Pedigree Chums"],
+        ["Software", `Pedigree Chums Dog Name Generator (${SITE_URL})`],
+      ]);
+      const filename = nameToFilename(r.full);
+      const file = new File([blob], filename, { type: "image/png" });
       const nav = navigator as Navigator & { share?: (d: unknown) => Promise<void>; canShare?: (d: unknown) => boolean };
       if (nav.share && nav.canShare?.({ files: [file] })) {
         await nav.share({ files: [file], text: caption });
@@ -2419,7 +2491,7 @@ export default function NameGeneratorPage() {
         await nav.share({ text: caption });
       } else {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "my-chum-name.png"; a.click();
+        const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
         URL.revokeObjectURL(url);
       }
     } catch {}
@@ -2570,7 +2642,7 @@ export default function NameGeneratorPage() {
             .pcm-calc-img { display: none !important; }
             .pcm-h1br { display: inline !important; }
             .pcm-h1 { font-size: clamp(3.5rem, 12vw, 5.4rem) !important; }
-            .pcm-nick { font-size: clamp(2.98rem, 11vw, 3.6rem) !important; margin-top: 10px !important; }
+            .pcm-nick { font-size: clamp(2.98rem, 11vw, 3.6rem) !important; margin-top: 18px !important; }
             .pcm-sub { margin-bottom: 20px !important; }
             .pcm-breed-label { display: none !important; }
             .pcm-gender-label { display: none !important; }
@@ -2837,10 +2909,10 @@ export default function NameGeneratorPage() {
                     </div>
                   )}
 
-                  {/* Breed name -- bold Montserrat, bracketed, solid (not uppercase, not transparent) */}
-                  <div style={{ marginBottom:16 }}>
+                  {/* Breed name -- bold Montserrat, bracketed, centred, solid (not uppercase, not transparent) */}
+                  <div style={{ marginBottom:16, textAlign:"center" }}>
                     {breed && (
-                      <span style={{ fontFamily:"var(--font-body), sans-serif", fontWeight:800, fontSize:"clamp(0.95rem,2.8vw,1.3rem)", color:"var(--navy)", letterSpacing:"0.01em", lineHeight:1 }}>({breed})</span>
+                      <span style={{ fontFamily:"var(--font-body), sans-serif", fontWeight:800, fontSize:"clamp(0.82rem,2.5vw,1.17rem)", color:"var(--navy)", letterSpacing:"0.01em", lineHeight:1 }}>({breed})</span>
                     )}
                   </div>
                   {/* NICKNAME -- the hero name, big */}
@@ -2864,7 +2936,7 @@ export default function NameGeneratorPage() {
                 </div>
                   {r.nickname ? (
                     <>
-                      <div className="pcm-nick" style={{ fontFamily:"var(--font-display)", fontSize:"clamp(2rem,8vw,3.2rem)", color:"#fff", lineHeight:1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:10 }}>
+                      <div className="pcm-nick" style={{ fontFamily:"var(--font-display)", fontSize:"clamp(2rem,8vw,3.2rem)", color:"#fff", lineHeight:1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginTop:8, marginBottom:10 }}>
                         {r.nickname}
                       </div>
                       {/* Full name -- smaller, below */}
@@ -2874,18 +2946,36 @@ export default function NameGeneratorPage() {
                     </>
                   ) : (
                     /* No nickname -- just show full name as hero */
-                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5vw,2.4rem)", color:"#fff", lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginBottom:16 }}>
+                    <div style={{ fontFamily:"var(--font-display)", fontSize:"clamp(1.5rem,5vw,2.4rem)", color:"#fff", lineHeight:1.1, letterSpacing:"0.01em", textAlign:"center", textShadow:"0 2px 12px rgba(10,58,87,0.3)", marginTop:8, marginBottom:16 }}>
                       {r.full}
                     </div>
                   )}
                   {/* Reasoning */}
                   <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
                 </div>
-                {/* Cut-down share: snapshots the card above and shares it as an image */}
-                <button onClick={() => shareCard(r)} disabled={cardSharing}
-                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"12px auto 0", background:"var(--yellow)", color:"var(--navy)", border:"none", borderRadius:999, padding:"11px 26px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor: cardSharing ? "default" : "pointer", opacity: cardSharing ? 0.6 : 1, boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
-                  {cardSharing ? "Preparing…" : "📣 Share this name"}
-                </button>
+                {/* Cut-down share: snapshots the card above and shares it as an image,
+                    after the user picks one of five taglines. */}
+                <div style={{ position:"relative", display:"flex", justifyContent:"center", margin:"12px auto 0" }}>
+                  <button onClick={() => setCardShareOpen(o => !o)} disabled={cardSharing}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"var(--yellow)", color:"var(--navy)", border:"none", borderRadius:999, padding:"11px 26px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor: cardSharing ? "default" : "pointer", opacity: cardSharing ? 0.6 : 1, boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
+                    {cardSharing ? "Preparing…" : "📣 Share this name"}
+                  </button>
+                  {cardShareOpen && !cardSharing && (
+                    <>
+                      <div onClick={() => setCardShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />
+                      <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"#ffffff", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.35)", padding:"12px 10px 10px", textAlign:"left" }}>
+                        <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy)", fontFamily:"var(--font-body), sans-serif" }}>Pick a caption to share</p>
+                        {shareCaptions(r.full).map((cap, i) => (
+                          <button key={i} onClick={() => captureAndShare(r, cap)}
+                            style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(10,58,87,0.05)", border:"none", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body), sans-serif", fontSize:"0.8rem", lineHeight:1.35, color:"var(--navy)" }}>
+                            {cap}
+                          </button>
+                        ))}
+                        <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid #ffffff" }} />
+                      </div>
+                    </>
+                  )}
+                </div>
                 </div>
               ))}
 
