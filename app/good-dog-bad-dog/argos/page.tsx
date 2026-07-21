@@ -1,4 +1,3 @@
-import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -569,7 +568,6 @@ export default function ArgosPage() {
                   src="/history/greek-harehound.jpg"
                   alt="Greek Harehound (Hellinikos Ichnilatis)"
                   style={{ width: "100%", display: "block", maxHeight: 220, objectFit: "cover" }}
-                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hellenic_Hound_aka_Hellinikos_Ichnilatis_2.JPG/567px-Hellenic_Hound_aka_Hellinikos_Ichnilatis_2.JPG"; }}
                 />
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
@@ -587,10 +585,9 @@ export default function ArgosPage() {
               <div style={{ overflow: "hidden" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/history/homer-bust.jpg"
+                  src="/history/homer-bust.jpeg"
                   alt="Bust of Homer, Farnese collection, Naples"
                   style={{ width: "100%", display: "block", maxHeight: 260, objectFit: "cover", objectPosition: "center top" }}
-                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => { e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Homer_bust%2C_Farnese_collection_%28Naples%29.jpg/400px-Homer_bust%2C_Farnese_collection_%28Naples%29.jpg"; }}
                 />
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
