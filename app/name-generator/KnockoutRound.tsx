@@ -202,6 +202,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     return () => { document.head.removeChild(script); };
   }, []);
   const [sharing, setSharing] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false); // caption-picker popout on the podium
   // Entry stopper: title + round pill show first, cards pop in after a beat and
   // only become clickable once they've landed -- stops accidental rapid clicks
   // carrying straight through into the first matchup.
@@ -580,17 +581,21 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     });
   }, [phase, first, second, allRoundLosers]);
 
-  async function handleShare() {
+  // Share the podium image together with the caption the user picked. On mobile
+  // this opens the native share sheet (image + caption); on desktop it opens X
+  // with the caption prefilled.
+  async function shareWithCaption(caption: string) {
+    setShareOpen(false);
     setSharing(true);
     try {
       const blob = await new Promise<Blob>(res => canvasRef.current!.toBlob(b => res(b!), "image/jpeg", 0.92));
       const file = new File([blob], "my-dog-name.jpg", { type: "image/jpeg" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], text: `Meet my new pup! 🐾\n\npedigreechums.co.uk` });
+        await navigator.share({ files: [file], text: caption });
+      } else if (navigator.share) {
+        await navigator.share({ text: caption });
       } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "my-dog-name.jpg"; a.click();
-        URL.revokeObjectURL(url);
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}`, "_blank", "noopener,noreferrer");
       }
     } catch {}
     setSharing(false);
@@ -608,9 +613,39 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
           <div className={styles.podiumWrap}>
             <canvas ref={canvasRef} className={styles.podiumCanvas} />
           </div>
-          <button className={styles.shareBtn} onClick={handleShare} disabled={sharing || !podiumReady}>
-            {sharing ? "Sharing..." : "Share your podium"}
-          </button>
+          {(() => {
+            const name = first ? (first.full || getLabel(first)) : "";
+            const url = "https://pedigreechums.co.uk";
+            const captions = [
+              `I had such fun creating my dog's name! The result is: ${name} #MyChum #PedigreeChums ${url}`,
+              `This was a hoot! My new puppy's name is going to be: ${name} #MyChum #PedigreeChums ${url}`,
+              `Try this dog name generator, I just got: ${name} #MyChum #PedigreeChums ${url}`,
+              `I love my dog so much but now I've made this name I might just get a new one so I can use it: ${name} #MyChum #PedigreeChums ${url}`,
+              `I don't even have a dog but I just got: ${name} on a dog name generator #MyChum #PedigreeChums ${url}`,
+            ];
+            return (
+              <div style={{ position:"relative", display:"inline-block", margin:"0 auto" }}>
+                <button className={styles.shareBtn} onClick={() => setShareOpen(o => !o)} disabled={sharing || !podiumReady}>
+                  {sharing ? "Sharing..." : "📣 Share your chum"}
+                </button>
+                {shareOpen && (
+                  <>
+                    <div onClick={() => setShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />
+                    <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"#ffffff", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.35)", padding:"12px 10px 10px", textAlign:"left" }}>
+                      <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy,#0a3a57)", fontFamily:"var(--font-body,sans-serif)" }}>Pick a caption to share</p>
+                      {captions.map((cap, i) => (
+                        <button key={i} onClick={() => shareWithCaption(cap)}
+                          style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(10,58,87,0.05)", border:"none", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body,sans-serif)", fontSize:"0.8rem", lineHeight:1.35, color:"var(--navy,#0a3a57)" }}>
+                          {cap}
+                        </button>
+                      ))}
+                      <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid #ffffff" }} />
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })()}
           <p className={styles.sub}>{first ? getLabel(first) : ""} takes the top spot</p>
           <button className={styles.startAgainBtn} onClick={onRestart}>Start again</button>
         </div>

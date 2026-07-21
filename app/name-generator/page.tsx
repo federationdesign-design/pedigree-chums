@@ -2232,7 +2232,6 @@ export default function NameGeneratorPage() {
   });
   const [landingIdx, setLandingIdx] = useState<number | null>(null);
   const [showLikeCount, setShowLikeCount] = useState(false); // briefly show shortlist count in the heart button
-  const [sharedCopied, setSharedCopied] = useState(false);   // brief "Copied!" feedback on the share row
   const [toast, setToast] = useState<string | null>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const [toastTop, setToastTop] = useState(134);
@@ -2253,6 +2252,9 @@ export default function NameGeneratorPage() {
   const [qfIndex, setQfIndex] = useState(0);   // which question in RANKED_ORDER we're on
   const [qfCount, setQfCount] = useState(0);   // how many answered this session
   const [qfHadSurname, setQfHadSurname] = useState(false); // surname already set when quick-fire began
+  // Quick-fire answers, keyed by QUESTION_BANK index (kept separate from the
+  // inline input-screen answers, which are keyed by position in qIndices).
+  const [qfAnswers, setQfAnswers] = useState<Record<number, string>>({});
   const RANKED_QUESTION_ORDER = [0,29,30,5,2,4,23,8,13,14,28,1,9,10,12,26,7,15,17,27,20,11,18,21,22,3,19,24,25,6,16];
   const [swipeDir, setSwipeDir] = useState<string | null>(null);
   const touchStartX = useRef<number>(0);
@@ -2269,7 +2271,30 @@ export default function NameGeneratorPage() {
     return () => { try { document.head.removeChild(script); } catch {} };
   }, []);
 
-  function handleGenerate(answersOverride?: Record<number, string>) {
+  // Gather the bonus words from every answered question -- both the inline
+  // input-screen questions (keyed by position in qIndices) AND the quick-fire
+  // questions (keyed by QUESTION_BANK index). bonus1 = chosen answers' words
+  // (weighted in), bonus2 = the not-chosen options' words (lightly in play).
+  function collectBonusWords(qfOverride?: Record<number, string>) {
+    const bonus1: string[] = [];
+    const bonus2: string[] = [];
+    const add = (qi: number, chosen: string | undefined) => {
+      const qItem = QUESTION_BANK[qi];
+      if (!chosen || !qItem) return;
+      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
+      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
+      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
+        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
+    };
+    // Inline questions: qAnswers is keyed by position within qIndices.
+    qIndices.forEach((qi: number, pos: number) => add(qi, qAnswers[pos]));
+    // Quick-fire questions: keyed by the actual QUESTION_BANK index.
+    const qf = qfOverride ?? qfAnswers;
+    Object.keys(qf).forEach((k: string) => add(Number(k), qf[Number(k)]));
+    return { bonus1, bonus2 };
+  }
+
+  function handleGenerate(qfOverride?: Record<number, string>) {
     if (!breed) { alert("Please select a breed"); return; }
     // block obscene surnames
     if (hasProfanity(surname)) {
@@ -2283,18 +2308,7 @@ export default function NameGeneratorPage() {
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
     setResults([]);
-    const effectiveAnswers = answersOverride ?? qAnswers;
-    const bonus1: string[] = [];
-    const bonus2: string[] = [];
-    qIndices.forEach((qi: number, pos: number) => {
-      const qItem = QUESTION_BANK[qi];
-      const chosen = qAnswers[pos];
-      if (!chosen || !qItem) return;
-      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
-      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
-      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
-        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
-    });
+    const { bonus1, bonus2 } = collectBonusWords(qfOverride);
     const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
     const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
     const p2 = runPass(breed,surname.trim(),gender,s+1009,  et,colour,bonus1,bonus2,true, false,usedFirstNames);
@@ -2326,17 +2340,7 @@ export default function NameGeneratorPage() {
     setSeed(s);
     setResults([]);
 
-    const bonus1: string[] = [];
-    const bonus2: string[] = [];
-    qIndices.forEach((qi: number, pos: number) => {
-      const qItem = QUESTION_BANK[qi];
-      const chosen = qAnswers[pos];
-      if (!chosen || !qItem) return;
-      const chosenOpt = qItem.options.find((o: {label:string;bonus:string[]}) => o.label === chosen);
-      if (chosenOpt) bonus1.push(...chosenOpt.bonus);
-      qItem.options.filter((o: {label:string;bonus:string[]}) => o.label !== chosen)
-        .forEach((o: {label:string;bonus:string[]}) => bonus2.push(...o.bonus));
-    });
+    const { bonus1, bonus2 } = collectBonusWords();
 
     const et = FUNNY_PLACES.has(town.trim().toLowerCase()) ? town.trim() : "";
     const p1 = runPass(breed,surname.trim(),gender,s,       et,colour,bonus1,bonus2,true, false,usedFirstNames);
@@ -2417,7 +2421,7 @@ export default function NameGeneratorPage() {
   }
   function startQuickFire() {
     // Find first unanswered question in ranked order
-    const firstUnanswered = RANKED_QUESTION_ORDER.find(qi => !(qi in qAnswers));
+    const firstUnanswered = RANKED_QUESTION_ORDER.find(qi => !(qi in qfAnswers));
     if (firstUnanswered === undefined) return; // all answered, nothing to show
     setQfIndex(firstUnanswered);
     setQfCount(0);
@@ -2428,8 +2432,8 @@ export default function NameGeneratorPage() {
   }
 
   function answerQuickFire(qi: number, label: string) {
-    // Record the answer
-    setQAnswers((prev: Record<number, string>) => ({ ...prev, [qi]: label }));
+    // Record the answer (quick-fire answers are keyed by QUESTION_BANK index)
+    setQfAnswers((prev: Record<number, string>) => ({ ...prev, [qi]: label }));
     const qItem = QUESTION_BANK[qi];
     const opt = qItem?.options.find((o: {label:string;bonus:string[]}) => o.label === label);
     setBonusWordsCount((c: number) => c + Math.max(opt ? opt.bonus.length : 0, 3));
@@ -2438,13 +2442,14 @@ export default function NameGeneratorPage() {
 
     // Always advance to next question -- no interstitial choice
     const nextQ = RANKED_QUESTION_ORDER.find((q: number) =>
-      RANKED_QUESTION_ORDER.indexOf(q) > RANKED_QUESTION_ORDER.indexOf(qi) && !(q in qAnswers) && q !== qi
+      RANKED_QUESTION_ORDER.indexOf(q) > RANKED_QUESTION_ORDER.indexOf(qi) && !(q in qfAnswers) && q !== qi
     );
     if (nextQ !== undefined) {
       setQfIndex(nextQ);
     } else {
-      // No more questions -- fire results immediately
-      fireQuickFireResults({ ...qAnswers, [qi]: label });
+      // No more questions -- fire results immediately (pass the just-answered
+      // set so its words feed the regeneration without waiting on state).
+      fireQuickFireResults({ ...qfAnswers, [qi]: label });
     }
   }
 
@@ -2460,28 +2465,27 @@ export default function NameGeneratorPage() {
   }
 
   function continueQuickFire() {
-    const nextQ = RANKED_QUESTION_ORDER.find(q => !(q in qAnswers));
+    const nextQ = RANKED_QUESTION_ORDER.find(q => !(q in qfAnswers));
     if (nextQ !== undefined) {
       setQfIndex(nextQ);
     } else {
-      fireQuickFireResults(qAnswers);
+      fireQuickFireResults(qfAnswers);
     }
   }
 
-  function fireQuickFireResults(answers: Record<number, string>) {
+  function fireQuickFireResults(qfAnswersNow: Record<number, string>) {
     setQfActive(false);
-    // Re-run generator with updated answers
+    // Re-run generator with the quick-fire answers folded into the word pool.
     const s = Math.floor(Math.random() * 10000);
     setSeed(s);
     setResults([]);
     setExhausted(false);
-    // Trigger generation with new qAnswers already set
-    setTimeout(() => handleGenerate(answers), 50);
+    setTimeout(() => handleGenerate(qfAnswersNow), 50);
   }
 
     function handleStartOver() {
     if (shortlist.length > 0) { if (!window.confirm("Start over? Your liked names stay in your shortlist.")) return; }
-    setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setQStep(0); setBonusWordsCount(0);
+    setStage("inputs"); setResults([]); setQAnswers({}); setQfAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setQStep(0); setBonusWordsCount(0);
   }
   function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
     touchStartX.current = e.touches[0].clientX;
@@ -2511,6 +2515,8 @@ export default function NameGeneratorPage() {
                 setStage("inputs");
                 setResults([]);
                 setQAnswers({});
+                setQfAnswers({});
+                setBonusWordsCount(0);
                 setUsedNicknames(new Set());
                 setUsedFirstNames(new Set());
                 setExhausted(false);
@@ -2609,7 +2615,7 @@ export default function NameGeneratorPage() {
             <div className="pcm-panel" style={{ background:"var(--navy)", borderRadius:20, padding:"clamp(20px,4vw,36px)", maxWidth:"60%", margin:"0 auto", width:"100%" }}>
               {!fromCalculator && (<>
                 <label className="pcm-breed-label" style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8, fontFamily:"var(--font-body)" }}>Your dog&apos;s breed</label>
-                <select className="pcm-breed-select" value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} setQIndices(pickThreeQuestions()); setQAnswers({}); setQStep(0); setBonusWordsCount(0); }}
+                <select className="pcm-breed-select" value={breed} onChange={(e: { target: HTMLSelectElement }) => { setBreed(e.target.value); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} setQIndices(pickThreeQuestions()); setQAnswers({}); setQfAnswers({}); setQStep(0); setBonusWordsCount(0); }}
                   style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:breed?"#fff":"rgba(255,255,255,0.4)", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }}>
                   <option value="">-- Select a breed --</option>
                   {PACK_BREEDS.map(b => <option key={b} value={b}>{b}</option>)}
@@ -2618,7 +2624,7 @@ export default function NameGeneratorPage() {
               <label className="pcm-gender-label" style={{ display:"block", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:10, fontFamily:"var(--font-body)" }}>Boy or girl?</label>
               <div style={{ display:"flex", gap:10, marginBottom:28 }}>
                 {(["boy","girl"] as const).map(g => (
-                  <button key={g} className={g==="boy" ? "pcm-boy-btn" : "pcm-girl-btn"} onClick={() => { setGender(g); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {}; }}
+                  <button key={g} className={g==="boy" ? "pcm-boy-btn" : "pcm-girl-btn"} onClick={() => { setGender(g); setStage("inputs"); setResults([]); setQAnswers({}); setQfAnswers({}); setBonusWordsCount(0); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {}; }}
                     style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${gender===g?"#ffffff":"rgba(255,255,255,0.15)"}`, background:gender===g?"var(--yellow)":"rgba(255,255,255,0.08)", color:gender===g?"var(--navy)":"#fff", fontFamily:"var(--font-body)", fontSize:"0.9rem", fontWeight:700, cursor:"pointer", textTransform:"capitalize" }}>
                     {g === "boy" ? "Boy" : "Girl"}
                   </button>
@@ -2728,7 +2734,7 @@ export default function NameGeneratorPage() {
               <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(20,151,214,0.8)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
                 <div style={{position:"relative",background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
                   {qfCount >= 5 && (
-                    <button onClick={() => fireQuickFireResults(qAnswers)} aria-label="Done -- show my names"
+                    <button onClick={() => fireQuickFireResults(qfAnswers)} aria-label="Done -- show my names"
                       style={{position:"absolute",top:14,right:14,width:40,height:40,borderRadius:"50%",border:"2px solid rgba(255,255,255,0.6)",background:"rgba(255,255,255,0.15)",color:"#fff",fontSize:"1.4rem",fontWeight:900,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
                       ×
                     </button>
@@ -2757,7 +2763,7 @@ export default function NameGeneratorPage() {
                       {snError && (
                         <p style={{fontFamily:"var(--font-body)",fontSize:"0.8rem",fontWeight:700,color:"#ffe0e0",marginBottom:12}}>Let&apos;s keep it clean! 🐾</p>
                       )}
-                      <button onClick={() => submitQuickFireSurname()}
+                      <button onClick={() => { if (surname.trim()) submitQuickFireSurname(); else fireQuickFireResults(qfAnswers); }}
                         style={{width:"100%",padding:"14px 24px",borderRadius:999,border:"none",background:"var(--yellow)",color:"var(--navy)",fontFamily:"var(--font-display,'Luckiest Guy',cursive)",fontSize:"1.1rem",letterSpacing:"0.04em",cursor:"pointer"}}>
                         {surname.trim() ? "Add name →" : "Skip →"}
                       </button>
@@ -2844,37 +2850,6 @@ export default function NameGeneratorPage() {
                   )}
                   {/* Reasoning */}
                   <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
-                  {/* Share row -- zero-friction social sharing with a prebuilt caption */}
-                  {(() => {
-                    const shareName = r.full || r.nickname;
-                    const caption = `Just found out my dog's pedigree name is ${shareName}. What's yours? #MyChum #PedigreeChums`;
-                    const url = "https://pedigreechums.co.uk";
-                    const enc = encodeURIComponent;
-                    const xHref = `https://twitter.com/intent/tweet?text=${enc(caption)}&url=${enc(url)}`;
-                    const waHref = `https://wa.me/?text=${enc(caption + " " + url)}`;
-                    const pill: React.CSSProperties = { display:"inline-flex", alignItems:"center", gap:6, border:"none", borderRadius:999, padding:"9px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:800, cursor:"pointer", textDecoration:"none", lineHeight:1, boxShadow:"0 3px 10px rgba(10,58,87,0.18)" };
-                    const primary: React.CSSProperties = { ...pill, background:"var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", letterSpacing:"0.03em", padding:"10px 20px" };
-                    const ghost: React.CSSProperties = { ...pill, background:"rgba(255,255,255,0.92)", color:"var(--navy)" };
-                    const doNative = () => {
-                      if (typeof navigator !== "undefined" && (navigator as Navigator & { share?: (d: unknown) => Promise<void> }).share) {
-                        (navigator as Navigator & { share: (d: unknown) => Promise<void> }).share({ text: caption, url }).catch(() => {});
-                      } else {
-                        try { navigator.clipboard?.writeText(caption + " " + url); setSharedCopied(true); setTimeout(() => setSharedCopied(false), 1800); } catch {}
-                      }
-                    };
-                    const doCopy = () => { try { navigator.clipboard?.writeText(caption + " " + url); setSharedCopied(true); setTimeout(() => setSharedCopied(false), 1800); } catch {} };
-                    return (
-                      <div style={{ marginTop:16, paddingTop:14, borderTop:"1px solid rgba(10,58,87,0.2)" }}>
-                        <div style={{ fontSize:"0.7rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--navy)", textAlign:"center", marginBottom:10, fontFamily:"var(--font-body)" }}>Show off your chum&rsquo;s name</div>
-                        <div style={{ display:"flex", gap:8, justifyContent:"center", flexWrap:"wrap" }}>
-                          <button onClick={doNative} style={primary} aria-label="Share this name">📣 Share</button>
-                          <a href={xHref} target="_blank" rel="noopener noreferrer" style={ghost} aria-label="Share on X">𝕏</a>
-                          <a href={waHref} target="_blank" rel="noopener noreferrer" style={ghost} aria-label="Share on WhatsApp">WhatsApp</a>
-                          <button onClick={doCopy} style={ghost} aria-label="Copy caption">{sharedCopied ? "✓ Copied!" : "Copy caption"}</button>
-                        </div>
-                      </div>
-                    );
-                  })()}
                 </div>
                 </div>
               ))}
