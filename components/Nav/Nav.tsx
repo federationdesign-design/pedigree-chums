@@ -12,6 +12,8 @@ const customerLinks = [
   { label: "Hot/Dogs", href: "/hot-dogs" },
   { label: "Competitions", href: "/chumspot" },
   { label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog" },
+  { label: "Dogs at Work", href: "/dogs-at-work" },
+  { label: "Smarter Than the Test", href: "/smarter-than-the-test" },
   { label: "Chum Drop", href: "/" },
   { label: "Chum Calculator", href: "/chum-calculator" },
   { label: "Name Generator", href: "/name-generator" },
