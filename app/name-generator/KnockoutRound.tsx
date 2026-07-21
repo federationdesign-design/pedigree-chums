@@ -394,7 +394,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     const snapBracket = bracket;
     const snapRound = currentRound;
     const snapMatch = currentMatch;
-    const isFinalMatch = bracket.length === 2;
+    const isFinalMatch = currentRound === totalRounds - 1;
 
     // Step 3 (700ms): hide cards, show interstitial (skip on final)
     setTimeout(() => {
@@ -621,7 +621,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
               )}
             </button>
-            <p className={styles.vsLabel}>VS</p>
+            <p className={styles.vsLabel} style={{ color: hoveredIdx !== null ? "#000000" : undefined }}>VS</p>
             <button
               className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : "", puffingIdx === 1 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
@@ -645,8 +645,8 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
         {/* Bracket tree -- collapsed behind an accordion to reduce scrolling */}
         <button
           onClick={() => setTreeOpen((o) => !o)}
-          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.1rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
-          {treeOpen ? "Hide" : "View"} knockout tree
+          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.3rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
+          {treeOpen ? "Hide" : "View"} <span style={{ color:"var(--yellow)" }}>knockout</span> tree
           <span style={{ display:"inline-block", transform: treeOpen ? "rotate(180deg)" : "none", transition:"transform 0.2s" }}>▼</span>
         </button>
 
@@ -705,8 +705,8 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
 
       {/* Round complete flash */}
       {roundFlash && (
-        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(28,117,199,0.82)", animation:"flashBg 1.9s ease forwards" }}>
-          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashPop 1.9s ease forwards" }}>
+        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"var(--blue)", animation:"flashBg 1.9s ease forwards" }}>
+          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashPop 1.9s ease forwards" }}>
             {roundFlash.toUpperCase()}
           </p>
         </div>

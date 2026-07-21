@@ -438,7 +438,7 @@
 }
 .nextMatchupText {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(2rem, 5vw, 3rem);
+  font-size: clamp(2.3rem, 5.5vw, 3.3rem);
   color: #ffffff;
   letter-spacing: 0.05em;
   opacity: 1;
