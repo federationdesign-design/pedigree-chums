@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function ChumCalculatorPage() {
   return (
     <>
-      <Nav showLogo />
+      <Nav />
       <ChumCalculator />
       <Footer />
     </>

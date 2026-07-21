@@ -24,7 +24,7 @@ const QUESTIONS: Question[] = [
       { label: "I'm actively looking for my perfect dog", value: "looking" },
       { label: "I'd love a dog one day -- just exploring for now", value: "exploring" },
       { label: "I've never really thought about getting a dog -- just curious", value: "curious" },
-      { label: "I already have a dog -- let's see if the calculator agrees", value: "have_dog" },
+      { label: "I already have a dog -- let's see if the finder agrees", value: "have_dog" },
     ],
   },
   {
@@ -564,7 +564,8 @@ function fitReason(breed: { name: string; score: number; slug: string }, answers
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
-const THRESHOLD = 85;
+const THRESHOLD = 90;
+const MAX_RESULTS = 8;
 
 export default function ChumCalculator() {
   const [step, setStep] = useState(0); // 0 = not started, 1..N = question index (1-based)
@@ -629,7 +630,7 @@ export default function ChumCalculator() {
         if (hideGreat && b.score >= 100 && b.score < 120) return false;
         if (hideTail && b.score < 100) return false;
         return true;
-      }).slice(0, 16)
+      }).slice(0, MAX_RESULTS)
     : visibleBreeds;
   const visibleCount = thresholdActive ? shownBreeds.length : ALL_BREEDS.length;
 
@@ -657,18 +658,32 @@ export default function ChumCalculator() {
     setStep(0);
   }
 
+  // Contextual line above the card -- changes as you move through the quiz
+  const progressMsg = !started
+    ? `Answer ${CORE_COUNT} questions and watch the pack filter to your ideal chums in real time.`
+    : finished
+    ? "Here are your best-matched chums."
+    : step > CORE_COUNT
+    ? "Just breaking the tie -- a couple more"
+    : step <= 3
+    ? "Start the quiz now"
+    : step <= 7
+    ? "What about your home?"
+    : step <= 10
+    ? "What about the dog?"
+    : step <= 12
+    ? "Nearly there, just a couple more"
+    : "Last two";
+
   return (
     <main className={styles.page}>
 
       {/* ── Header ── */}
       <div className={styles.header}>
-        <p className={styles.eyebrow}>Find your perfect match</p>
         <h1 className={styles.title}>
-          Chum <span className={styles.titleAccent}>Calculator</span>
+          Chum <span className={styles.titleAccent}>Finder</span>
         </h1>
-        <p className={styles.headerSub}>
-          Answer {total} questions and watch the pack filter to your ideal chums in real time.
-        </p>
+        <p className={styles.headerSub}>{progressMsg}</p>
       </div>
 
       {/* ── Question stepper ── */}
@@ -677,6 +692,7 @@ export default function ChumCalculator() {
         {/* Not started */}
         {!started && (
           <div className={styles.stepCard}>
+            <p className={styles.cardKicker}>Find your perfect match</p>
             <p className={styles.stepIntro}>Ready to find your ideal chum?</p>
             <button className={styles.startBtn} onClick={() => setStep(1)}>
               Let&apos;s go →
@@ -703,6 +719,7 @@ export default function ChumCalculator() {
         {/* Active question */}
         {currentQ && !(needsTiebreakers && step === CORE_COUNT + 1) && (
           <div className={styles.stepCard}>
+            <p className={styles.cardKicker}>Find your perfect match</p>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>Question {step} of {total}</span>
               <div className={styles.stepBar}>
