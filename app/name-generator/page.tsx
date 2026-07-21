@@ -2497,7 +2497,7 @@ export default function NameGeneratorPage() {
   return (
     <>
       {showKnockout ? (
-        <div style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 0" }}>
+        <div style={{ padding:"clamp(60px,10vw,120px) clamp(6px,1.5vw,40px) 0" }}>
           <div style={{ maxWidth:1800, margin:"0 auto" }}>
             <KnockoutRound
               shortlist={shortlist}
@@ -2709,7 +2709,7 @@ export default function NameGeneratorPage() {
                 })()}
               </div>
               <button onClick={() => handleGenerate()} className="display"
-                style={{ width:"100%", padding:"26px 16px", borderRadius:14, border:"none", background: breed ? "#22c55e" : "var(--yellow)", color:"var(--navy)", fontSize:"1.9rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
+                style={{ width:"100%", padding:"26px 16px", borderRadius:14, border:"none", background: breed ? "#22c55e" : "var(--yellow)", color: breed ? "#ffffff" : "var(--navy)", fontSize:"1.9rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
                 Go
               </button>
             </div>
@@ -2724,7 +2724,7 @@ export default function NameGeneratorPage() {
             // surname was already entered, in which case we don't ask twice.
             const showSurnameStep = qfCount === 2 && !qfHadSurname;
             return qfQ ? (
-              <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,30,60,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
+              <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(28,117,199,0.82)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
                 <div style={{position:"relative",background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
                   {qfCount >= 5 && (
                     <button onClick={() => fireQuickFireResults(qAnswers)} aria-label="Done -- show my names"

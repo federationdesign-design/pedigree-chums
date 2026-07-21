@@ -130,7 +130,7 @@
 }
 .fightNick {
   font-family: var(--font-body), sans-serif;
-  font-size: clamp(1rem, 2.4vw, 1.5rem);
+  font-size: clamp(0.92rem, 2.2vw, 1.4rem);
   font-weight: 800;
   color: #ffffff;
   margin: 6px 0 0;
@@ -141,7 +141,7 @@
 /* VS */
 .vsLabel {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(3.3rem, 8.5vw, 6.3rem);
+  font-size: clamp(3.46rem, 8.5vw, 6.46rem);
   color: #ffffff;
   text-align: center;
   margin: 0;
@@ -439,9 +439,9 @@
 .nextMatchupText {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--yellow, #ffe227);
+  color: #ffffff;
   letter-spacing: 0.05em;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 /* Bracket slot hover tooltip -- shows full name */
@@ -512,7 +512,7 @@
   /* match the main page h1 sizing */
   .title { font-size: clamp(3.5rem, 12vw, 5.4rem); }
   /* tighter container so the two cards get more room */
-  .wrap { padding: clamp(16px, 3vw, 32px) 10px 80px; }
+  .wrap { padding: clamp(16px, 3vw, 32px) 5px 80px; }
   /* two cards side by side on the same axis, VS overlaid between them */
   .pairWrap {
     grid-template-columns: 1fr 1fr;
@@ -520,13 +520,13 @@
     position: relative;
     align-items: stretch;
   }
-  .fightCard { min-height: 240px; padding: 30px 8px 20px; }
+  .fightCard { min-height: 240px; padding: 80px 5px 20px; }
   .fightName {
     font-size: clamp(1.2rem, 6.5vw, 2.2rem);
     overflow-wrap: anywhere;
     word-break: break-word;
   }
-  .fightNick { font-size: clamp(0.85rem, 3.4vw, 1.1rem); }
+  .fightNick { font-size: clamp(0.78rem, 3.2vw, 1.0rem); }
   /* VS overlaid on top of the two boxes -- plain white text, no circle */
   .vsLabel {
     position: absolute;
@@ -535,7 +535,7 @@
     transform: translate(-50%, -50%) rotate(-2deg);
     z-index: 5;
     margin: 0;
-    font-size: clamp(1.7rem, 7vw, 2.6rem);
+    font-size: clamp(1.86rem, 7vw, 2.76rem);
     color: #ffffff;
     text-shadow: 0 3px 10px rgba(0,0,0,0.55);
   }
