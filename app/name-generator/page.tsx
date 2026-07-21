@@ -2153,6 +2153,11 @@ function hasProfanity(raw: string): boolean {
   return false;
 }
 
+// Capitalise the first letter of each word (so "smith jones" -> "Smith Jones").
+function capWords(s: string): string {
+  return s.replace(/(^|[\s-])([a-z])/g, (_m, p, c) => p + c.toUpperCase());
+}
+
 export default function NameGeneratorPage() {
   const [breed, setBreed] = useState("");
   const [fromCalculator, setFromCalculator] = useState(false);
@@ -2325,16 +2330,7 @@ export default function NameGeneratorPage() {
       const entry: ShortlistEntry = { full: r.full, nickname: r.nickname, score: r.score, breed };
       const next = [...prev, entry];
       try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
-      if (next.length === 4) {
-        setToast("You have 4 names! Hit 🏆 Start Knockout below, or keep swiping to add more.");
-        setTimeout(() => setToast(null), 6000);
-      } else if (next.length === 8) {
-        setToast("8 names saved! Hit 🏆 Start Knockout below, or keep going up to 16.");
-        setTimeout(() => setToast(null), 6000);
-      } else if (next.length === 12) {
-        setToast("12 names saved -- choose carefully, you have 4 slots left!");
-        setTimeout(() => setToast(null), 6000);
-      } else if (next.length === 16) {
+      if (next.length === 16) {
         // Auto-launch knockout at 16
         setTimeout(() => setShowKnockout(true), 800);
       }
@@ -2520,7 +2516,9 @@ export default function NameGeneratorPage() {
             Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> Generator
           </h1>
           <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
-            Give your chum the truly 1 in a million personalised to you name
+            {shortlist.length > 0
+              ? `You have ${shortlist.length} name${shortlist.length === 1 ? "" : "s"}! Hit 🏆 Knockout below, or keep swiping to add more.`
+              : "Give your chum the truly 1 in a million personalised to you name"}
           </p>
 
           {/* ── STAGE 1: INPUTS ── */}
@@ -2598,7 +2596,7 @@ export default function NameGeneratorPage() {
                 </button>
                 {snOpen && (
                   <>
-                  <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => { const v = e.target.value; setSurname(v); setSnError(hasProfanity(v)); }}
+                  <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => { const v = capWords(e.target.value); setSurname(v); setSnError(hasProfanity(v)); }}
                     placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
                     onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
                     style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${snError?"#ef4444":"rgba(255,255,255,0.15)"}`, background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom: snError ? 8 : 20, outline:"none", boxSizing:"border-box" }} />
@@ -2689,8 +2687,11 @@ export default function NameGeneratorPage() {
                       ×
                     </button>
                   )}
-                  <p style={{fontFamily:"var(--font-body)",fontSize:"0.75rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(255,255,255,0.7)",marginBottom:12}}>
-                    Quick question {qfCount + 1}
+                  <p style={{fontFamily:"var(--font-body)",fontSize:"0.9rem",fontWeight:700,color:"#fff",marginBottom:14}}>
+                    Answer some more questions to unlock more names
+                  </p>
+                  <p style={{fontFamily:"var(--font-body)",fontSize:"0.75rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"#ffffff",marginBottom:12}}>
+                    Stupid question {qfCount + 1}
                   </p>
                   {qfCount >= 5 && (
                     <p style={{fontFamily:"var(--font-body)",fontSize:"0.72rem",fontWeight:600,color:"rgba(255,255,255,0.85)",marginBottom:12}}>
@@ -2703,7 +2704,7 @@ export default function NameGeneratorPage() {
                         Add your name to personalise the results
                       </p>
                       <input type="text" value={surname} autoFocus
-                        onChange={(e: { target: HTMLInputElement }) => { const v = e.target.value; setSurname(v); setSnError(hasProfanity(v)); }}
+                        onChange={(e: { target: HTMLInputElement }) => { const v = capWords(e.target.value); setSurname(v); setSnError(hasProfanity(v)); }}
                         onKeyDown={(e: { key: string }) => e.key === "Enter" && submitQuickFireSurname()}
                         placeholder="e.g. Jones..." maxLength={60}
                         style={{width:"100%",padding:"14px 20px",borderRadius:999,border:`2px solid ${snError?"#ef4444":"rgba(255,255,255,0.4)"}`,background:"rgba(255,255,255,0.12)",color:"#fff",fontFamily:"var(--font-body)",fontSize:"1.05rem",fontWeight:700,textAlign:"center",outline:"none",boxSizing:"border-box",marginBottom:12}} />
@@ -2770,14 +2771,14 @@ export default function NameGeneratorPage() {
                       const jiggle = n >= 8;
                       const angle = (2 + (t - 8) * 0.34).toFixed(2);   // 8 -> 2deg, 14 -> ~4deg
                       const dur = Math.max(0.34, 0.7 - (t - 8) * 0.06).toFixed(2); // 8 -> 0.7s, 14 -> ~0.34s
-                      const koStyle: React.CSSProperties = { background:"var(--yellow)", border:"2px solid var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"18px 22px 23px", transformOrigin:"center", animation: jiggle ? `pcJiggle ${dur}s ease-in-out infinite` : undefined };
+                      const koStyle: React.CSSProperties = { background:"var(--yellow)", border:"2px solid var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"23px 22px 18px", transformOrigin:"center", animation: jiggle ? `pcJiggle ${dur}s ease-in-out infinite` : undefined };
                       (koStyle as Record<string, string>)["--jiggle"] = `${angle}deg`;
                       return <button onClick={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} style={koStyle}>🏆 Knockout</button>;
                     })()
                   ) : (
                     <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
                   )}
-                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", fontFamily: shortlist.length > 0 ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{shortlist.length > 0 ? shortlist.length : "♥"}</button>
                 </div>
                   {r.nickname ? (
                     <>
@@ -2803,9 +2804,8 @@ export default function NameGeneratorPage() {
 
               <div className="pcm-panel" style={{ maxWidth:"60%", margin:"14px auto 0", width:"100%" }}>
                 <button onClick={() => startQuickFire()}
-                  style={{ display:"flex", flexWrap:"wrap", justifyContent:"center", alignItems:"center", gap:"4px 8px", width:"100%", background:"rgba(10,58,87,0.06)", border:"1px solid rgba(10,58,87,0.2)", borderRadius:999, padding:"10px 16px", fontFamily:"var(--font-body)", fontSize:"0.78rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer" }}>
-                  <span>✨ {outcomes.toLocaleString()} possible names in your pool</span>
-                  <span style={{ textDecoration:"underline", opacity:0.85 }}>answer more to unlock more →</span>
+                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer" }}>
+                  ✨ {outcomes.toLocaleString()} possible names in your pool
                 </button>
               </div>
 

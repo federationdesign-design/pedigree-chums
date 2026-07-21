@@ -172,8 +172,9 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
   const [roundLosers, setRoundLosers] = useState<ShortlistEntry[]>([]); // for recycling
   const [puffingIdx, setPuffingIdx] = useState<number | null>(null);
   const [showInterstitial, setShowInterstitial] = useState(false);
-  const [cardsReady, setCardsReady] = useState(true);
-  const [cardsInteractive, setCardsInteractive] = useState(true);
+  const [cardsReady, setCardsReady] = useState(false);
+  const [cardsInteractive, setCardsInteractive] = useState(false);
+  const [treeOpen, setTreeOpen] = useState(false);
   const [first, setFirst] = useState<ShortlistEntry | null>(null);
   const [second, setSecond] = useState<ShortlistEntry | null>(null);
   const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
@@ -189,6 +190,14 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     return () => { document.head.removeChild(script); };
   }, []);
   const [sharing, setSharing] = useState(false);
+  // Entry stopper: title + round pill show first, cards pop in after a beat and
+  // only become clickable once they've landed -- stops accidental rapid clicks
+  // carrying straight through into the first matchup.
+  useEffect(() => {
+    const t1 = setTimeout(() => setCardsReady(true), 550);
+    const t2 = setTimeout(() => setCardsInteractive(true), 1150);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
 
 
 
@@ -633,8 +642,16 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
 
         <p className={styles.matchLabel}>{matchLabel}</p>
 
+        {/* Bracket tree -- collapsed behind an accordion to reduce scrolling */}
+        <button
+          onClick={() => setTreeOpen((o) => !o)}
+          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-body), sans-serif", fontSize:"0.85rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
+          {treeOpen ? "Hide" : "View"} knockout tree
+          <span style={{ display:"inline-block", transform: treeOpen ? "rotate(180deg)" : "none", transition:"transform 0.2s" }}>▼</span>
+        </button>
+
         {/* Bracket tree */}
-        <div className={styles.bracketScroll}>
+        <div className={styles.bracketScroll} style={{ display: treeOpen ? undefined : "none" }}>
           <div className={styles.bracketTree}>
             {bracket.map((roundSlots, rIdx) => (
               <div key={rIdx} className={styles.bracketRound}>
