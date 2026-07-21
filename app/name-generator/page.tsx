@@ -2456,7 +2456,7 @@ export default function NameGeneratorPage() {
   return (
     <>
       {showKnockout ? (
-        <div style={{ minHeight:"100vh", padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 80px" }}>
+        <div style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 0" }}>
           <div style={{ maxWidth:1800, margin:"0 auto" }}>
             <KnockoutRound
               shortlist={shortlist}
