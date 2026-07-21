@@ -2809,9 +2809,11 @@ export default function NameGeneratorPage() {
                     </div>
                   )}
 
-                  {/* Score badge */}
+                  {/* Breed name -- bold Montserrat, bracketed, solid (not uppercase, not transparent) */}
                   <div style={{ marginBottom:16 }}>
-                    
+                    {breed && (
+                      <span style={{ fontFamily:"var(--font-body), sans-serif", fontWeight:800, fontSize:"clamp(0.95rem,2.8vw,1.3rem)", color:"var(--navy)", letterSpacing:"0.01em", lineHeight:1 }}>({breed})</span>
+                    )}
                   </div>
                   {/* NICKNAME -- the hero name, big */}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
