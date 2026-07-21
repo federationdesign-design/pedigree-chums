@@ -174,7 +174,6 @@ export default function ArgosPage() {
                     id="smellofhome-video"
                     src="/smellofhome-montage.mp4"
                     muted
-                    loop
                     playsInline
                     style={{ width: "100%", display: "block", borderRadius: "12px 12px 0 0" }}
                   />
@@ -207,6 +206,12 @@ export default function ArgosPage() {
                   });
                 }, { threshold: 0.5 });
                 obs.observe(v);
+                v.addEventListener('timeupdate', function(){
+                  if(v.duration && v.currentTime >= v.duration - 0.1){
+                    v.pause();
+                    v.currentTime = v.duration;
+                  }
+                });
               })();` }} />
               <h2 className={styles.subhead}>The dog as home</h2>
 
