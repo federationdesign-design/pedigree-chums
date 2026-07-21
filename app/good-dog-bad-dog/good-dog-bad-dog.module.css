@@ -503,82 +503,84 @@
     font-size: 1.8125rem;
   }
 
-  /* Sidebar -- transform-origin top left so scale expands rightward
-     into the page margin, never leftward into the article column.
-     Gap handles the visual gutter between columns. */
+  /* Sidebar -- scale everything uniformly via transform.
+     transform-origin top right anchors to the column edge.
+     overflow: visible lets scaled content breathe without clipping.
+     The grid column is narrowed to compensate for the scale footprint. */
   .sidebar {
-    transform: scale(1.1);
-    transform-origin: top left;
+    transform: scale(1.12);
+    transform-origin: top right;
     overflow: visible;
   }
 
   .essayLayout {
-    grid-template-columns: 1fr minmax(380px, 26vw);
-    gap: 80px;
+    grid-template-columns: 1fr minmax(340px, 26vw);
+    gap: 56px;
   }
 }
 
 @media (min-width: 1600px) {
   .sidebar {
-    transform: scale(1.15);
-    transform-origin: top left;
+    transform: scale(1.2);
+    transform-origin: top right;
   }
 
   .essayLayout {
-    grid-template-columns: 1fr minmax(400px, 26vw);
-    gap: 100px;
+    grid-template-columns: 1fr minmax(320px, 24vw);
+    gap: 64px;
   }
 }
 
 @media (min-width: 1900px) {
   .sidebar {
-    transform: scale(1.2);
-    transform-origin: top left;
+    transform: scale(1.28);
+    transform-origin: top right;
   }
 
   .essayLayout {
-    grid-template-columns: 1fr minmax(420px, 26vw);
-    gap: 120px;
+    grid-template-columns: 1fr minmax(300px, 22vw);
+    gap: 72px;
   }
 }
 
 /* ── Pull quotes ────────────────────────────────────────────── */
 .pullquote {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-size: clamp(4.5rem, 9vw, 7.2rem);
   font-weight: 300;
   font-style: italic;
-  color: #ffffff;
-  line-height: 1.35;
-  margin: 48px 0;
-  padding: 32px 0 32px 28px;
-  border-left: 4px solid var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  line-height: 1.15;
+  margin: 56px 0;
+  padding: 24px 0 24px 40px;
+  border-left: 10px solid var(--yellow, #ffd23e);
+  border-radius: 6px;
   max-width: 100%;
 }
 
 .pullquote::before {
   content: "\201C";
-  font-size: 1.2em;
-  color: var(--yellow, #ffd23e);
+  font-size: 0.9em;
+  color: var(--navy, #0a3a57);
   font-style: normal;
   margin-right: 4px;
   line-height: 0;
-  vertical-align: -0.3em;
+  vertical-align: -0.2em;
 }
 
 .pullquote::after {
   content: "\201D";
-  font-size: 1.2em;
-  color: var(--yellow, #ffd23e);
+  font-size: 0.9em;
+  color: var(--navy, #0a3a57);
   font-style: normal;
   margin-left: 4px;
   line-height: 0;
-  vertical-align: -0.3em;
+  vertical-align: -0.2em;
 }
 
 @media (min-width: 1300px) {
   .pullquote {
-    font-size: clamp(1.8rem, 2.5vw, 2.8rem);
-    margin: 56px 0;
+    font-size: clamp(5rem, 8vw, 8rem);
+    margin: 64px 0;
   }
 }
