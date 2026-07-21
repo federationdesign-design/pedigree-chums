@@ -585,7 +585,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
       <Nav />
       <div className={styles.wrap}>
         <h2 className={`display ${styles.title}`}>
-          The <span className={styles.yellow}>Knockout</span> Round
+          The<br /><span className={styles.yellow}>Knockout</span> Rounds
         </h2>
 
         {/* Round pills */}

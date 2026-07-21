@@ -15,7 +15,7 @@
   font-size: clamp(3rem, 10vw, 6.5rem);
   color: #fff;
   margin: 0 0 8px;
-  line-height: 1;
+  line-height: 0.95;
 }
 .yellow { color: var(--yellow, #ffe227); }
 
@@ -500,10 +500,44 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .pairWrap { grid-template-columns: 1fr; gap: 12px; }
-  .vsLabel { font-size: clamp(2rem, 9vw, 3rem); }
-  .fightName { font-size: clamp(1.9rem, 11vw, 3rem); }
-  .fightCard { min-height: 120px; padding: 18px 12px; }
+  /* match the main page h1 sizing */
+  .title { font-size: clamp(3.5rem, 12vw, 5.4rem); }
+  /* tighter container so the two cards get more room */
+  .wrap { padding: clamp(16px, 3vw, 32px) 10px 80px; }
+  /* two cards side by side on the same axis, VS overlaid between them */
+  .pairWrap {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    position: relative;
+    align-items: stretch;
+  }
+  .fightCard { min-height: 120px; padding: 18px 8px; }
+  .fightName {
+    font-size: clamp(1.2rem, 6.5vw, 2.2rem);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .fightNick { font-size: clamp(0.7rem, 2.6vw, 0.9rem); }
+  /* VS as a badge overlaid on top of the two boxes */
+  .vsLabel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    margin: 0;
+    width: 2.3em;
+    height: 2.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.3rem, 6vw, 1.9rem);
+    color: var(--yellow, #ffe227);
+    background: var(--navy, #0a3a57);
+    border: 2px solid var(--yellow, #ffe227);
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  }
   .byeCard { padding: 20px 18px; }
 }
 
