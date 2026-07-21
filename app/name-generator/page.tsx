@@ -2305,6 +2305,8 @@ export default function NameGeneratorPage() {
   const revealCardRef = useRef<HTMLDivElement>(null); // the result card, snapshotted for sharing
   const [cardSharing, setCardSharing] = useState(false);
   const [cardShareOpen, setCardShareOpen] = useState(false); // caption-picker popout on the result card
+  const [copiedCaption, setCopiedCaption] = useState<string | null>(null); // full-screen "caption copied" overlay
+  const [copiedAgain, setCopiedAgain] = useState(false); // brief feedback on the overlay's re-copy button
   const [toastTop, setToastTop] = useState(134);
   useEffect(() => {
     if (toast && subRef.current) {
@@ -2477,11 +2479,7 @@ export default function NameGeneratorPage() {
     setCardShareOpen(false);
     // Copy the caption to the clipboard up-front (inside the tap) so it's always
     // available to paste -- photo-first apps (Instagram etc.) drop the share text.
-    try {
-      await navigator.clipboard?.writeText(caption);
-      setToast("📋 Caption copied — paste it into your post!");
-      setTimeout(() => setToast(null), 4000);
-    } catch {}
+    try { await navigator.clipboard?.writeText(caption); } catch {}
     setCardSharing(true);
     try {
       try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch {}
@@ -2509,6 +2507,9 @@ export default function NameGeneratorPage() {
       }
     } catch {}
     setCardSharing(false);
+    // Show the full-screen "caption copied" overlay AFTER the share/download so it
+    // isn't hidden behind the share sheet or the downloaded image.
+    setCopiedCaption(caption);
   }
   function handleLike(e?: React.MouseEvent) {
     if (confettiRef.current) {
@@ -3021,6 +3022,29 @@ export default function NameGeneratorPage() {
       </>
       )}
       {toast && (<div style={{ position:"fixed", top:toastTop, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, minWidth:"80vw", maxWidth:"90vw", boxSizing:"border-box", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
+
+      {/* Full-screen "caption copied" overlay -- shown after a card share so the
+          message can't be hidden behind the share sheet or downloaded image. */}
+      {copiedCaption && (
+        <div style={{ position:"fixed", inset:0, zIndex:2000, background:"linear-gradient(to top right, #00e2ff, #008eff)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"clamp(24px,6vw,64px)", textAlign:"center", animation:"toastIn 0.25s ease" }}>
+          <button onClick={() => setCopiedCaption(null)} aria-label="Close"
+            style={{ position:"absolute", top:20, right:20, width:52, height:52, borderRadius:"50%", border:"2px solid rgba(255,255,255,0.7)", background:"rgba(255,255,255,0.15)", color:"#fff", fontSize:"1.6rem", lineHeight:1, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+          <div style={{ fontSize:"clamp(2.6rem,10vw,4rem)", lineHeight:1 }}>📋</div>
+          <h2 className="display" style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(2.4rem,9vw,4.2rem)", color:"#fff", margin:"14px 0 6px", lineHeight:1.02, textShadow:"0 3px 16px rgba(10,58,87,0.35)" }}>Caption copied!</h2>
+          <p style={{ fontFamily:"var(--font-body)", fontSize:"clamp(1rem,3.6vw,1.4rem)", color:"#fff", fontWeight:700, maxWidth:560, margin:"0 0 16px" }}>Paste it into your post to go alongside your dog&apos;s picture.</p>
+          <p style={{ fontFamily:"var(--font-body)", fontSize:"clamp(0.8rem,2.6vw,0.95rem)", color:"var(--navy)", background:"rgba(255,255,255,0.92)", borderRadius:14, padding:"14px 18px", maxWidth:520, width:"100%", margin:"0 auto 22px", whiteSpace:"pre-wrap", lineHeight:1.45, boxSizing:"border-box" }}>{copiedCaption}</p>
+          <div style={{ display:"flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
+            <button onClick={() => { try { navigator.clipboard?.writeText(copiedCaption); } catch {} setCopiedAgain(true); setTimeout(() => setCopiedAgain(false), 1600); }}
+              style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--yellow)", color:"var(--navy)", border:"none", borderRadius:999, padding:"13px 28px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor:"pointer", boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
+              {copiedAgain ? "✓ Copied!" : "📋 Copy again"}
+            </button>
+            <button onClick={() => setCopiedCaption(null)}
+              style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.85)", color:"#fff", borderRadius:999, padding:"13px 28px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor:"pointer" }}>
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
       <div style={{ position:"sticky", bottom:0, zIndex:90 }}>
         {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
         <Footer />
