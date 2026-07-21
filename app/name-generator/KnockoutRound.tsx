@@ -439,9 +439,10 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
       setTimeout(() => {
         setShowInterstitial(false);
         doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
-        // A new round just started -> wait ~1.5s for the "coming up!" flash to
-        // clear before the first matchup of the new round pops in.
-        const cardDelay = roundFlashedRef.current ? 1500 : 0;
+        // A new round just started -> the "coming up!" flash runs 1.9s from the
+        // moment doAdvance sets it, so wait 2s for it to fully clear before the
+        // first matchup of the new round pops in (no card peeking through it).
+        const cardDelay = roundFlashedRef.current ? 2000 : 0;
         setTimeout(() => {
           setCardsReady(true);
           setTimeout(() => {
@@ -647,9 +648,10 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
               className={[styles.fightCard, chosen === 0 ? styles.winner : "", chosen !== null && chosen !== 0 ? styles.loser : "", hoveredIdx === 0 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 0 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 0 ? styles.falling : "", pulsingIdx === 0 ? styles.winnerPulse : "", puffingIdx === 0 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairA, pairB, e)} disabled={chosen !== null}
               onMouseEnter={() => cardsInteractive && setHoveredIdx(0)}>
+              <p className={styles.contenderLabel}>Contender 1</p>
               <p className={styles.fightName} style={{ fontSize: nickFontSize(getLabel(pairA)), whiteSpace:"nowrap" }}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
+                <p className={styles.fightNick} style={{ color: "#ffffff", transition: "color 0.3s ease 0.3s" }}>{pairA.full}</p>
               )}
             </button>
             <p className={styles.vsLabel} style={{ color: (hoveredIdx !== null || chosen !== null) ? "#000000" : undefined, textShadow: (hoveredIdx !== null || chosen !== null) ? "none" : undefined, ["--vs-scale" as string]: (hoveredIdx !== null || chosen !== null) ? 1.5 : 1 } as React.CSSProperties}>VS</p>
@@ -657,9 +659,10 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
               className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : "", puffingIdx === 1 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
               onMouseEnter={() => cardsInteractive && setHoveredIdx(1)}>
+              <p className={styles.contenderLabel}>Contender 2</p>
               <p className={styles.fightName} style={{ fontSize: nickFontSize(getLabel(pairB)), whiteSpace:"nowrap" }}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
-                <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairB.full}</p>
+                <p className={styles.fightNick} style={{ color: "#ffffff", transition: "color 0.3s ease 0.3s" }}>{pairB.full}</p>
               )}
             </button>
           </div>

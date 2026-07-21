@@ -77,11 +77,11 @@
 /* Fight cards */
 .fightCard {
   width: 100%;
-  min-height: 360px;
+  min-height: 345px;
   background: var(--navy, #0a3a57);
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: 20px;
-  padding: 48px 16px 28px;
+  padding: 53px 21px 33px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -99,10 +99,10 @@
   transition-delay: 0.3s;
 }
 .hoverGreen .fightNick {
-  color: var(--navy, #0a3a57) !important;
+  color: #ffffff !important;
 }
 .hoverRed .fightNick {
-  color: var(--navy, #0a3a57) !important;
+  color: #ffffff !important;
 }
 .hoverRed {
   background: #ef4444 !important;
@@ -120,6 +120,17 @@
   transform: scale(0.95) !important;
 }
 
+.contenderLabel {
+  font-family: var(--font-body), sans-serif;
+  font-size: clamp(0.6rem, 1.6vw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffffff;
+  opacity: 0.75;
+  margin: 0 0 4px;
+  line-height: 1;
+}
 .fightName {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(2.6rem, 7vw, 4.5rem);
@@ -133,7 +144,7 @@
   font-size: clamp(0.92rem, 2.2vw, 1.4rem);
   font-weight: 800;
   color: #ffffff;
-  margin: 6px 0 0;
+  margin: 36px 0 0;
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
@@ -521,7 +532,7 @@
     position: relative;
     align-items: stretch;
   }
-  .fightCard { min-height: 240px; padding: 80px 5px 20px; }
+  .fightCard { min-height: 225px; padding: 85px 10px 25px; }
   .fightName {
     font-size: clamp(1.2rem, 6.5vw, 2.2rem);
     overflow-wrap: anywhere;
