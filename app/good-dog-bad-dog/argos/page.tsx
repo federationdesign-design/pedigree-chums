@@ -263,44 +263,86 @@ export default function ArgosPage() {
 
           {/* ── Custom Argos sidebar ── */}
           <aside className={styles.sidebar}>
+
+            {/* Identity card */}
             <div className={styles.sidebarCard}>
-              <div style={{ padding: "20px 20px 4px", borderBottom: "1.5px solid rgba(255,255,255,0.08)" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 6 }}>Argos — What We Know</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.4 }}>Ancient Greek Hunting Hound · Homer&apos;s <em>Odyssey</em>, Book 17</p>
+              <div style={{ padding: "18px 20px 14px", borderBottom: "1.5px solid rgba(255,255,255,0.08)" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", letterSpacing: "0.06em", color: "var(--yellow)", marginBottom: 2 }}>ARGOS</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: 10, letterSpacing: "0.04em" }}>The Dog of Odysseus</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.6 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
               </div>
 
-              {[
-                { label: "Source", value: "The Odyssey, Homer, Book 17" },
-                { label: "Approx. date", value: "c.800–700 BC (composition); story set c.1200 BC" },
-                { label: "Age at death", value: "Twenty years — almost certainly mythic for a large hunting dog. Aristotle noted this was exceptional and recorded that critics praised Homer for giving Argos exactly this lifespan." },
-                { label: "Most probable type", value: "The Laconian Hound (Spartan Hound) — the premier hunting dog of ancient Greece. Lean, fast, agile and prized across the Mediterranean for its scenting ability and stamina." },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>{value}</p>
-                </div>
-              ))}
-
+              {/* Likely origins */}
               <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 8 }}>Probable lineage into modern breeds</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 8 }}>Likely Origins</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.6, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong style={{ color: "#fff" }}>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>Larger, strong-boned, with short coats and great endurance.</p>
+              </div>
+
+              {/* Size */}
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 10 }}>Estimated Size</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                  {[
+                    { label: "Height", value: "65–75 cm", sub: "at shoulder" },
+                    { label: "Length", value: "130–150 cm", sub: "nose to tail" },
+                    { label: "Weight", value: "45–65 kg", sub: "" },
+                  ].map(({ label, value, sub }) => (
+                    <div key={label} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 8px", textAlign: "center" }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>{label}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 2 }}>{value}</p>
+                      {sub && <p style={{ fontFamily: "var(--font-body)", fontSize: "0.58rem", color: "rgba(255,255,255,0.35)" }}>{sub}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Physical appearance */}
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 10 }}>Build & Appearance</p>
                 {[
-                  { breed: "Greyhound", via: "via the Laconian Hound" },
-                  { breed: "Saluki", via: "via the Laconian Hound" },
-                  { breed: "Whippet", via: "via the Laconian Hound" },
-                  { breed: "Ibizan Hound", via: "via the Cretan Hound (Laconian × Molossian cross)" },
-                  { breed: "Pharaoh Hound", via: "via the Cretan Hound" },
-                  { breed: "English Mastiff", via: "via the Molossian Hound of Epirus" },
-                ].map(({ breed, via }) => (
-                  <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6, gap: 8 }}>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 700, color: "#fff" }}>{breed}</span>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", color: "rgba(255,255,255,0.45)", textAlign: "right", flexShrink: 0 }}>{via}</span>
+                  "Broad head, powerful jaw, drop ears, thick neck",
+                  "Powerful, muscular and deep-chested",
+                  "Built for endurance, strength and protection",
+                  "Short, dense coat suited to heat and outdoor life",
+                  "Likely brindle, grey, fawn or dark-coated",
+                  "Worn, scarred and aged after years of neglect",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+                    <span style={{ color: "var(--yellow)", fontSize: "0.6rem", marginTop: 3, flexShrink: 0 }}>▸</span>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.5, margin: 0 }}>{item}</p>
                   </div>
                 ))}
               </div>
 
-              <div style={{ padding: "14px 20px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 6 }}>Living descendant</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>The <strong style={{ color: "#fff" }}>Greek Harehound</strong> (<em>Hellenikos Ichnilatis</em>) is the only FCI-recognised Greek breed today, believed to descend directly from the ancient hunting dogs of the classical period. If Argos existed now, he might look something like this.</p>
+              {/* In context */}
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.03)" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 8 }}>In Context</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.6, fontStyle: "italic" }}>Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.</p>
+              </div>
+
+              {/* Ancestral lineage timeline */}
+              <div style={{ padding: "16px 20px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--yellow)", marginBottom: 14 }}>Ancestral Lineage</p>
+                {[
+                  { era: "3000–1200 BCE", name: "Ancient Near Eastern Molosser", top: true },
+                  { era: "1600–1100 BCE", name: "Mycenaean / Aegean Molosser", top: false },
+                  { era: "800–300 BCE", name: "Greek Molossian Type", top: false },
+                  { era: "c. 8th century BCE", name: "Argos — Odysseus' Dog", top: false, highlight: true },
+                ].map(({ era, name, top, highlight }, i) => (
+                  <div key={era} style={{ display: "flex", gap: 12, marginBottom: i === 3 ? 0 : 0 }}>
+                    {/* Line and dot */}
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: "50%", background: highlight ? "var(--yellow)" : "rgba(255,255,255,0.3)", flexShrink: 0, marginTop: 3 }} />
+                      {i < 3 && <div style={{ width: 1.5, flex: 1, background: "rgba(255,255,255,0.12)", minHeight: 28 }} />}
+                    </div>
+                    {/* Text */}
+                    <div style={{ paddingBottom: i < 3 ? 16 : 0 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em", marginBottom: 2 }}>{era}</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "0.8rem" : "0.75rem", fontWeight: highlight ? 700 : 500, color: highlight ? "#fff" : "rgba(255,255,255,0.7)", lineHeight: 1.3 }}>{name}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -311,8 +353,15 @@ export default function ArgosPage() {
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.6, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
               </div>
             </div>
-          </aside>
-        </div>
+
+            {/* Research note */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", lineHeight: 1.6, fontStyle: "italic" }}>The lineage and physical description above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
+              </div>
+            </div>
+
+          </aside>        </div>
       </main>
       <Footer />
     </>
