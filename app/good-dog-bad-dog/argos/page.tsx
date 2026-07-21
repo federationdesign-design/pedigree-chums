@@ -140,6 +140,20 @@ export default function ArgosPage() {
 
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
 
+              <video
+                src="/smellofhome-montage.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{
+                  width: "100%",
+                  maxWidth: "720px",
+                  borderRadius: "12px",
+                  display: "block",
+                  marginBottom: "32px",
+                }}
+              />
               <h2 className={styles.subhead}>The smell of home</h2>
 
               <p>Ask someone what home smells like and they will almost always be able to tell you. Not think about it. Tell you. Immediately, from somewhere that bypasses conscious thought entirely.</p>
