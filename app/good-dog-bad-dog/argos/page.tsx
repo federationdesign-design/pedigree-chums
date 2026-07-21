@@ -46,12 +46,14 @@ export default function ArgosPage() {
           <img src="/history/Argos-hero.jpg" alt="Argos — The Dog Who Knew His Master" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
-            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
+            <h1 className={styles.essayHeroTitle}>
+              <span className={styles.essayHeroTitleWhite}>Argos:</span> The Dog Who Knew His Master
+            </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Ancient Greek Hunting Hound</span>
             </div>
-            <h1 className={styles.essayHeroTitle}>Argos: The Dog Who Knew His Master</h1>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
@@ -256,7 +258,6 @@ export default function ArgosPage() {
 
               <p>A dog does not need you to look like yourself. A dog does not need your status restored. A dog does not need the world to know who you are.</p>
 
-              <p className={styles.verdict}><strong>The verdict:</strong> A dog knows. And sometimes, after twenty years of storms and blood and distance, that is what finally makes a man home.</p>
 
             </div>
           </article>
@@ -646,6 +647,11 @@ export default function ArgosPage() {
 
 
           </aside>
+        </div>
+
+        {/* ── Verdict -- full bleed ── */}
+        <div className={styles.verdict}>
+          <strong>The verdict:</strong> A dog knows. And sometimes, after twenty years of storms and blood and distance, that is what finally makes a man home.
         </div>
       </main>
       <Footer />

@@ -9,7 +9,7 @@
 .hero {
   max-width: 1100px;
   margin: 0 auto 80px;
-  padding: 0 24px;
+  padding: 0 clamp(18px,4vw,48px);
 }
 
 .eyebrow {
@@ -50,7 +50,7 @@
 .essay {
   max-width: 900px;
   margin: 0 auto 80px;
-  padding: 0 24px;
+  padding: 0 clamp(18px,4vw,48px);
 }
 
 .essayMeta {
@@ -69,7 +69,7 @@
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 14px 20px;
 }
 
 .tagBreed {
@@ -82,7 +82,7 @@
   color: #ffffff;
   border: 1.5px solid rgba(255,255,255,0.4);
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 14px 20px;
 }
 
 .tagBad {
@@ -94,13 +94,13 @@
   background: #ef4444;
   color: #ffffff;
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 14px 20px;
 }
 
 .essayDivider {
   max-width: 900px;
   margin: 0 auto 80px;
-  padding: 0 24px;
+  padding: 0 clamp(18px,4vw,48px);
   border-top: 2px solid rgba(255,255,255,0.15);
 }
 
@@ -125,14 +125,21 @@
   max-width: 720px;
 }
 
+/* First paragraph treatment */
+.essayBody p:first-child {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 .subhead {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 2.0rem;
+  font-size: clamp(2rem, 4vw, 4rem);
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 48px 0 16px;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .evidenceList {
@@ -188,29 +195,27 @@
   margin-bottom: 0;
 }
 
+/* ── Verdict bar -- true full bleed below grid ──────────────── */
 .verdict {
-  background: rgba(255,210,62,0.12);
-  border: 1.5px solid var(--yellow, #ffd23e);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-top: 48px;
+  background: #22c55e;
+  width: 100%;
+  padding: 40px clamp(18px,4vw,48px);
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1.4rem;
+  font-weight: 700;
   color: #ffffff;
-  line-height: 1.7;
-  max-width: 720px;
+  line-height: 1.6;
 }
 
 .verdict strong {
-  color: var(--yellow, #ffd23e);
+  color: #ffffff;
 }
 
 /* ── Coming soon ────────────────────────────────────────────── */
 .coming {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(18px,4vw,48px);
 }
 
 .comingTitle {
@@ -292,7 +297,7 @@
 .grid {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 24px 80px;
+  padding: 0 clamp(18px,4vw,48px) 80px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
@@ -355,10 +360,13 @@
 }
 .readMore:hover { background: #ffe566; transform: scale(1.03); }
 .tagGood { background: #22c55e; color: #ffffff; }
+
+/* ── Essay page shell ───────────────────────────────────────── */
 .essayPage {
   min-height: 100vh;
-  padding-bottom: 80px;
+  padding-bottom: 0;
 }
+
 .backLink {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.75rem;
@@ -374,52 +382,11 @@
 }
 .backLink:hover { color: #ffffff; }
 
-/* ── Hero content (h1 + pills inside hero) ──────────────────── */
-.essayHeroContent {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 1300px;
-  margin: auto auto 0;
-  padding: 24px 24px 40px;
-  align-self: flex-end;
-  box-sizing: border-box;
-}
-
-.essayHeroMeta {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.essayHeroTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  color: var(--yellow, #ffd23e);
-  margin: 0;
-  line-height: 1.1;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
-}
-
-/* ── Essay two-column layout ────────────────────────────────── */
-.essayLayout {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 48px 24px;
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 48px;
-  align-items: start;
-}
-
+/* ── Hero image + content ───────────────────────────────────── */
 .essayHero {
   position: relative;
   width: 100%;
-  min-height: clamp(340px, 50vh, 560px);
+  min-height: clamp(500px, 65vh, 740px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -442,7 +409,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(10,58,87,0.05) 0%, rgba(10,58,87,0.6) 100%);
+  background: linear-gradient(180deg, rgba(10,58,87,0.05) 0%, rgba(10,58,87,0.75) 100%);
 }
 
 .essayHeroImgFallback {
@@ -452,6 +419,53 @@
   height: 100%;
   background: var(--navy, #0a3a57);
   z-index: 0;
+}
+
+/* Hero content -- liquid, nav-matched padding */
+.essayHeroContent {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 24px clamp(18px,4vw,48px) 40px;
+  align-self: flex-end;
+  box-sizing: border-box;
+}
+
+/* Title first -- meta + back link below */
+.essayHeroTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 20px;
+  line-height: 1.0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.5);
+}
+
+/* First word + colon in white */
+.essayHeroTitleWhite {
+  color: #ffffff;
+}
+
+.essayHeroMeta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* ── Essay two-column layout -- liquid ──────────────────────── */
+.essayLayout {
+  width: 100%;
+  margin: 0 auto;
+  padding: 48px clamp(18px,4vw,48px);
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
+  align-items: start;
+  box-sizing: border-box;
 }
 
 .sidebar {
