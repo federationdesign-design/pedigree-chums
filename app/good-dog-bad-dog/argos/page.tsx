@@ -1,4 +1,3 @@
-import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -179,11 +178,6 @@ export default function ArgosPage() {
                     width: "100%",
                     display: "block",
                     borderRadius: "12px",
-                    cursor: "pointer",
-                  }}
-                  onClick={(e: React.MouseEvent<HTMLVideoElement>) => {
-                    const v = e.currentTarget;
-                    v.paused ? v.play() : v.pause();
                   }}
                 />
               </div>
