@@ -2724,7 +2724,7 @@ export default function NameGeneratorPage() {
             // surname was already entered, in which case we don't ask twice.
             const showSurnameStep = qfCount === 2 && !qfHadSurname;
             return qfQ ? (
-              <div style={{position:"fixed",inset:0,zIndex:500,background:"var(--blue)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
+              <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(20,151,214,0.8)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
                 <div style={{position:"relative",background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
                   {qfCount >= 5 && (
                     <button onClick={() => fireQuickFireResults(qAnswers)} aria-label="Done -- show my names"

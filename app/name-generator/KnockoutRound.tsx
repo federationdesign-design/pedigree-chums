@@ -159,6 +159,17 @@ function getLabel(e: ShortlistEntry) {
   return e.nickname && e.nickname !== e.full ? e.nickname : e.full;
 }
 
+// Nickname font size scales down as the name gets longer so long ones (10+ chars)
+// still fit on a single line inside the box.
+function nickFontSize(label: string): string {
+  const n = (label || "").length;
+  if (n <= 5)  return "clamp(1.9rem, 9vw, 4.9rem)";
+  if (n <= 7)  return "clamp(1.6rem, 7.6vw, 4.3rem)";
+  if (n <= 9)  return "clamp(1.3rem, 6vw, 3.7rem)";
+  if (n <= 11) return "clamp(1.05rem, 4.9vw, 3.1rem)";
+  return "clamp(0.85rem, 4vw, 2.7rem)";
+}
+
 export default function KnockoutRound({ shortlist, recommended = [], breed, onBack, onRestart }: Props) {
   const seeded = seedBracket(shortlist);
   const [bracket, setBracket] = useState<BracketRound[]>(() => buildBracket(seeded, recommended));
@@ -616,17 +627,17 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
               className={[styles.fightCard, chosen === 0 ? styles.winner : "", chosen !== null && chosen !== 0 ? styles.loser : "", hoveredIdx === 0 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 0 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 0 ? styles.falling : "", pulsingIdx === 0 ? styles.winnerPulse : "", puffingIdx === 0 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairA, pairB, e)} disabled={chosen !== null}
               onMouseEnter={() => cardsInteractive && setHoveredIdx(0)}>
-              <p className={styles.fightName}>{getLabel(pairA)}</p>
+              <p className={styles.fightName} style={{ fontSize: nickFontSize(getLabel(pairA)), whiteSpace:"nowrap" }}>{getLabel(pairA)}</p>
               {pairA.nickname && pairA.nickname !== pairA.full && (
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
               )}
             </button>
-            <p className={styles.vsLabel} style={{ color: (hoveredIdx !== null || chosen !== null) ? "#000000" : undefined }}>VS</p>
+            <p className={styles.vsLabel} style={{ color: (hoveredIdx !== null || chosen !== null) ? "#000000" : undefined, ["--vs-scale" as string]: (hoveredIdx !== null || chosen !== null) ? 1.5 : 1 } as React.CSSProperties}>VS</p>
             <button
               className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : "", puffingIdx === 1 ? styles.puffOut : ""].filter(Boolean).join(" ")}
               onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
               onMouseEnter={() => cardsInteractive && setHoveredIdx(1)}>
-              <p className={styles.fightName}>{getLabel(pairB)}</p>
+              <p className={styles.fightName} style={{ fontSize: nickFontSize(getLabel(pairB)), whiteSpace:"nowrap" }}>{getLabel(pairB)}</p>
               {pairB.nickname && pairB.nickname !== pairB.full && (
                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairB.full}</p>
               )}
@@ -645,9 +656,11 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
         {/* Bracket tree -- collapsed behind an accordion to reduce scrolling */}
         <button
           onClick={() => setTreeOpen((o) => !o)}
-          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.3rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
+          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.45rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
           {treeOpen ? "Hide" : "View"} <span style={{ color:"var(--yellow)" }}>knockout</span> tree
-          <span style={{ display:"inline-block", transform: treeOpen ? "rotate(180deg)" : "none", transition:"transform 0.2s" }}>▼</span>
+          {treeOpen
+            ? <span style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:"1.35em", height:"1.35em", borderRadius:"50%", border:"2px solid currentColor", fontSize:"0.72em", lineHeight:1, flexShrink:0 }}>✕</span>
+            : <span style={{ display:"inline-block" }}>▼</span>}
         </button>
 
         {/* Bracket tree */}
@@ -705,7 +718,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
 
       {/* Round complete flash */}
       {roundFlash && (
-        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"var(--blue)", animation:"flashBg 1.9s ease forwards" }}>
+        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(20,151,214,0.8)", animation:"flashBg 1.9s ease forwards" }}>
           <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashPop 1.9s ease forwards" }}>
             {roundFlash.toUpperCase()}
           </p>
