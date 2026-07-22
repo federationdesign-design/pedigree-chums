@@ -562,26 +562,16 @@
   display: block;
 }
 
-.pullquote::before {
-  content: "\201C";
+.pullquoteMark {
   font-family: var(--font-stack-notch, serif);
   font-size: 5em;
   color: var(--navy, #0a3a57);
   font-style: normal;
-  line-height: 0;
-  vertical-align: -0.25em;
-  margin-right: 6px;
-}
-
-.pullquote::after {
-  content: "\201D";
-  font-family: var(--font-stack-notch, serif);
-  font-size: 5em;
-  color: var(--navy, #0a3a57);
-  font-style: normal;
-  line-height: 0;
-  vertical-align: -0.25em;
-  margin-left: 6px;
+  line-height: 1;
+  position: relative;
+  top: 40px;
+  display: inline-block;
+  margin: 0 6px;
 }
 
 @media (min-width: 1300px) {
