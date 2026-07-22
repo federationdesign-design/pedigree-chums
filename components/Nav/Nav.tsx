@@ -2,19 +2,26 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import ChumDropTile from "./ChumDropTile";
 import styles from "./Nav.module.css";
 
 // ── Featured tiles (the launcher grid). Order = DOM order = grid flow. ──
+// Titles are two-tone: labelA shows in yellow, labelB in white.
 // img: real hero image for the tile. Falls back to the emoji when absent.
-type Tile = { key: string; label: string; href: string; cta: string; size: string; emoji: string; img?: string };
+type Tile = { key: string; labelA: string; labelB?: string; href: string; cta: string; size: string; emoji: string; img?: string };
+// Two big square cards -- rendered in their own flex row so they stay square.
+const BIG: Tile[] = [
+  { key: "name-generator", labelA: "Name", labelB: "Generator", href: "/name-generator", cta: "Name your chum", size: "tileSquare", emoji: "🐶", img: "/name-gen-bento-menu-img.jpg" },
+  { key: "product", labelA: "The Card", labelB: "Game", href: "/", cta: "Get yours", size: "tileSquare", emoji: "🃏", img: "/product-img.jpg" },
+];
+
 const TILES: Tile[] = [
-  { key: "name-generator", label: "Name Generator", href: "/name-generator", cta: "Name your chum", size: "tileBig", emoji: "🐶", img: "/name-podium.jpg" },
-  { key: "chum-finder", label: "Chum Finder", href: "/chum-calculator", cta: "Find your perfect dog", size: "tileWide", emoji: "🔍" },
-  { key: "chum-drop", label: "Chum Drop", href: "/", cta: "Play the game", size: "tileWide", emoji: "🎯", img: "/home-hero.jpg" },
-  { key: "dogs-at-work", label: "Dogs at Work", href: "/dogs-at-work", cta: "Meet the workers", size: "tileSmall", emoji: "🦺" },
-  { key: "good-dog-bad-dog", label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog", cta: "Read the essays", size: "tileSmall", emoji: "📖" },
-  { key: "britains-dog-history", label: "Britain's Dog History", href: "/britains-dog-history", cta: "Travel back", size: "tileSmall", emoji: "🏰", img: "/history-hero.jpg" },
-  { key: "about", label: "About", href: "/about", cta: "Who we are", size: "tileSmall", emoji: "🐾", img: "/initial-preload-hero-img.jpg" },
+  { key: "chum-finder", labelA: "Chum", labelB: "Finder", href: "/chum-calculator", cta: "Find your perfect dog", size: "tileWide", emoji: "🔍" },
+  { key: "chum-drop", labelA: "Chum", labelB: "Drop", href: "/", cta: "Play the game", size: "tileWide", emoji: "🎯" },
+  { key: "dogs-at-work", labelA: "Dogs", labelB: "at Work", href: "/dogs-at-work", cta: "Meet the workers", size: "tileSmall", emoji: "🦺" },
+  { key: "good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", href: "/good-dog-bad-dog", cta: "Read the essays", size: "tileSmall", emoji: "📖" },
+  { key: "britains-dog-history", labelA: "Britain's", labelB: "Dog History", href: "/britains-dog-history", cta: "Travel back", size: "tileSmall", emoji: "🏰", img: "/history-hero.jpg" },
+  { key: "about", labelA: "About", href: "/about", cta: "Who we are", size: "tileSmall", emoji: "🐾", img: "/initial-preload-hero-img.jpg" },
 ];
 
 // Secondary pages -- kept reachable as plain text links
@@ -130,12 +137,12 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 </div>
               </Link>
 
-              <div className={styles.bentoGrid}>
-                {TILES.map((t) => (
+              <div className={styles.bigRow}>
+                {BIG.map((t) => (
                   <Link
                     key={t.key}
                     href={t.href}
-                    className={`${styles.tile} ${styles[t.size as keyof typeof styles]}`}
+                    className={`${styles.tile} ${styles.tileSquare}`}
                     onClick={() => setOpen(false)}
                   >
                     <span className={styles.tileImg} aria-hidden>
@@ -147,16 +154,58 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                       )}
                     </span>
                     <span className={styles.tileMeta}>
-                      <span className={styles.tileLabel}>{t.label}</span>
+                      <span className={styles.tileLabel}>
+                        <span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}
+                      </span>
                       <span className={styles.tileCta}>{t.cta} →</span>
                     </span>
                   </Link>
                 ))}
+              </div>
+
+              <div className={styles.bentoGrid}>
+                {TILES.map((t) =>
+                  t.key === "chum-drop" ? (
+                    <ChumDropTile
+                      key={t.key}
+                      href={t.href}
+                      labelA={t.labelA}
+                      labelB={t.labelB}
+                      cta={t.cta}
+                      sizeClass={styles[t.size as keyof typeof styles]}
+                      onNavigate={() => setOpen(false)}
+                    />
+                  ) : (
+                    <Link
+                      key={t.key}
+                      href={t.href}
+                      className={`${styles.tile} ${styles[t.size as keyof typeof styles]}`}
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className={styles.tileImg} aria-hidden>
+                        {t.img ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={t.img} alt="" className={styles.tileImgTag} loading="lazy" />
+                        ) : (
+                          <span className={styles.tileEmoji}>{t.emoji}</span>
+                        )}
+                      </span>
+                      <span className={styles.tileMeta}>
+                        <span className={styles.tileLabel}>
+                          <span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}
+                        </span>
+                        <span className={styles.tileCta}>{t.cta} →</span>
+                      </span>
+                    </Link>
+                  )
+                )}
 
                 {/* Discount -- full-width action strip */}
                 <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
                   <span className={styles.tileMeta}>
-                    <span className={styles.tileLabel}>Discount code</span>
+                    <span className={styles.tileLabel}>
+                      <span className={styles.tileLabelAccent}>Discount</span> code
+                    </span>
                     <span className={styles.tileCta}>Grab your code →</span>
                   </span>
                 </button>
