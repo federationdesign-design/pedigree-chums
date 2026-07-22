@@ -5,15 +5,16 @@ import Link from "next/link";
 import styles from "./Nav.module.css";
 
 // ── Featured tiles (the launcher grid). Order = DOM order = grid flow. ──
-type Tile = { key: string; label: string; href: string; cta: string; size: string; emoji: string };
+// img: real hero image for the tile. Falls back to the emoji when absent.
+type Tile = { key: string; label: string; href: string; cta: string; size: string; emoji: string; img?: string };
 const TILES: Tile[] = [
-  { key: "name-generator", label: "Name Generator", href: "/name-generator", cta: "Name your chum", size: "tileBig", emoji: "🐶" },
+  { key: "name-generator", label: "Name Generator", href: "/name-generator", cta: "Name your chum", size: "tileBig", emoji: "🐶", img: "/name-podium.jpg" },
   { key: "chum-finder", label: "Chum Finder", href: "/chum-calculator", cta: "Find your perfect dog", size: "tileWide", emoji: "🔍" },
-  { key: "chum-drop", label: "Chum Drop", href: "/", cta: "Play the game", size: "tileWide", emoji: "🎯" },
+  { key: "chum-drop", label: "Chum Drop", href: "/", cta: "Play the game", size: "tileWide", emoji: "🎯", img: "/home-hero.jpg" },
   { key: "dogs-at-work", label: "Dogs at Work", href: "/dogs-at-work", cta: "Meet the workers", size: "tileSmall", emoji: "🦺" },
   { key: "good-dog-bad-dog", label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog", cta: "Read the essays", size: "tileSmall", emoji: "📖" },
-  { key: "britains-dog-history", label: "Britain's Dog History", href: "/britains-dog-history", cta: "Travel back", size: "tileSmall", emoji: "🏰" },
-  { key: "about", label: "About", href: "/about", cta: "Who we are", size: "tileSmall", emoji: "🐾" },
+  { key: "britains-dog-history", label: "Britain's Dog History", href: "/britains-dog-history", cta: "Travel back", size: "tileSmall", emoji: "🏰", img: "/history-hero.jpg" },
+  { key: "about", label: "About", href: "/about", cta: "Who we are", size: "tileSmall", emoji: "🐾", img: "/initial-preload-hero-img.jpg" },
 ];
 
 // Secondary pages -- kept reachable as plain text links
@@ -59,14 +60,13 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
 
   return (
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
-      {hideLogo ? (
-        <span aria-hidden />
-      ) : (
+      {/* Header contents hide while the menu is open -- no logo, no hamburger. */}
+      {!open && !hideLogo && (
         <Link href="/" className={styles.logo} aria-label="Pedigree Chums™ home">
           <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={150} height={64} priority />
         </Link>
       )}
-      {!dockBottomLeft && (
+      {!open && !dockBottomLeft && (
         <button type="button" className={styles.burger} onClick={() => setOpen(true)} aria-label="Open menu">
           <span />
           <span />
@@ -87,11 +87,19 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
             </nav>
           ) : (
             <div className={styles.bentoWrap}>
-              {/* Hero animation slot -- drop a looping muted video / animation here */}
-              <div className={styles.heroSlot}>
-                <span className={styles.heroSlotTag}>Featured</span>
-                <p className={styles.heroSlotNote}>Hero animation slot</p>
-              </div>
+              {/* Featured hero -- Argos letterbox animation, click-through to the essay */}
+              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={() => setOpen(false)}>
+                <video className={styles.heroVideo} src="/menuflash-argos-opt.mp4" autoPlay muted loop playsInline aria-hidden />
+                <div className={styles.heroContent}>
+                  <div className={styles.heroTags}>
+                    <span className={styles.heroTagGood}>Good dog</span>
+                    <span className={styles.heroTagOutline}>Homer</span>
+                    <span className={styles.heroTagOutline}>The Odyssey</span>
+                  </div>
+                  <p className={styles.heroTitle}>Argos: The Dog Who Knew His Master</p>
+                  <span className={styles.heroBtn}>Read the essay</span>
+                </div>
+              </Link>
 
               <div className={styles.bentoGrid}>
                 {TILES.map((t) => (
@@ -102,7 +110,12 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                     onClick={() => setOpen(false)}
                   >
                     <span className={styles.tileImg} aria-hidden>
-                      <span className={styles.tileEmoji}>{t.emoji}</span>
+                      {t.img ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={t.img} alt="" className={styles.tileImgTag} loading="lazy" />
+                      ) : (
+                        <span className={styles.tileEmoji}>{t.emoji}</span>
+                      )}
                     </span>
                     <span className={styles.tileMeta}>
                       <span className={styles.tileLabel}>{t.label}</span>

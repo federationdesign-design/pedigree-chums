@@ -1,0 +1,102 @@
+diff --git a/app/name-generator/page.tsx b/app/name-generator/page.tsx
+index 7a16c08..2d66528 100644
+--- a/app/name-generator/page.tsx
++++ b/app/name-generator/page.tsx
+@@ -2141,6 +2141,13 @@ export default function NameGeneratorPage() {
+   });
+   const [landingIdx, setLandingIdx] = useState<number | null>(null);
+   const [toast, setToast] = useState<string | null>(null);
++  const subRef = useRef<HTMLParagraphElement>(null);
++  const [toastTop, setToastTop] = useState(134);
++  useEffect(() => {
++    if (toast && subRef.current) {
++      setToastTop(subRef.current.getBoundingClientRect().top);
++    }
++  }, [toast]);
+   // --- Pool growth tracking (how many names/combinations unlocked so far) ---
+   const poolNamesRef = useRef<Set<string>>(new Set());   // distinct nicknames
+   const poolCombosRef = useRef<Set<string>>(new Set());  // distinct full names
+@@ -2223,6 +2230,8 @@ export default function NameGeneratorPage() {
+     setUsedNicknames(new Set(genResult.map((r: Result) => r.nickname)));
+     setResults(genResult);
+     setStage("reveal");
++    // Jump back to the top so the reveal (not the footer) is in view after Go
++    try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {}
+   }
+ 
+ 
+@@ -2424,6 +2433,7 @@ export default function NameGeneratorPage() {
+         <style>{`
+           .pcm-h1br { display: none; }
+           @keyframes pcAnswerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
++          @keyframes pcJiggle { 0%,100% { transform: rotate(calc(-1 * var(--jiggle, 0deg))); } 50% { transform: rotate(var(--jiggle, 0deg)); } }
+           @media (max-width: 768px) {
+             .pcm-panel { max-width: 100% !important; }
+             .pcm-qgrid { grid-template-columns: 1fr !important; }
+@@ -2459,7 +2469,7 @@ export default function NameGeneratorPage() {
+           <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
+             Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> Generator
+           </h1>
+-          <p className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
++          <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
+             Give your chum the truly 1 in a million personalised to you name
+           </p>
+ 
+@@ -2687,7 +2697,16 @@ export default function NameGeneratorPage() {
+                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, marginBottom:4 }}>
+                   <button onClick={handleNope} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#ef4444", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+                   {shortlist.length >= 3 ? (
+-                    <button onClick={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} style={{ background:"var(--yellow)", border:"2px solid var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 22px" }}>🏆 Knockout</button>
++                    (() => {
++                      const n = shortlist.length;
++                      const t = Math.min(Math.max(n, 8), 16);
++                      const jiggle = n >= 8;
++                      const angle = (2 + (t - 8) * 0.34).toFixed(2);   // 8 -> 2deg, 14 -> ~4deg
++                      const dur = Math.max(0.34, 0.7 - (t - 8) * 0.06).toFixed(2); // 8 -> 0.7s, 14 -> ~0.34s
++                      const koStyle: React.CSSProperties = { background:"var(--yellow)", border:"2px solid var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"18px 22px 8px", transformOrigin:"center", animation: jiggle ? `pcJiggle ${dur}s ease-in-out infinite` : undefined };
++                      (koStyle as Record<string, string>)["--jiggle"] = `${angle}deg`;
++                      return <button onClick={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} style={koStyle}>🏆 Knockout</button>;
++                    })()
+                   ) : (
+                     <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
+                   )}
+@@ -2742,7 +2761,7 @@ export default function NameGeneratorPage() {
+       </main>
+       </>
+       )}
+-      {toast && (<div style={{ position:"fixed", top:134, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, maxWidth:"90vw", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
++      {toast && (<div style={{ position:"fixed", top:toastTop, left:"50%", transform:"translateX(-50%)", background:"var(--navy)", color:"#fff", padding:"12px 20px", borderRadius:14, border:"2px solid var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:600, zIndex:200, minWidth:"80vw", maxWidth:"90vw", boxSizing:"border-box", textAlign:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>{toast}</div>)}
+       <div style={{ position:"sticky", bottom:0, zIndex:90 }}>
+         {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
+         <Footer />
+diff --git a/components/Footer/Footer.module.css b/components/Footer/Footer.module.css
+index 70ee05b..4d9972b 100644
+--- a/components/Footer/Footer.module.css
++++ b/components/Footer/Footer.module.css
+@@ -79,3 +79,26 @@
+   background: rgba(255,255,255,0.16);
+   border-color: rgba(255,255,255,0.3);
+ }
++
++/* Slimmer footer on mobile */
++@media (max-width: 768px) {
++  .footer {
++    padding: clamp(24px, 6vw, 36px) clamp(16px, 5vw, 32px) 18px;
++  }
++  /* logo 10% smaller */
++  .logoCol img {
++    width: clamp(234px, 32.4vw, 306px);
++  }
++  /* hide the nav pill menu items below the logo */
++  .nav,
++  .links {
++    display: none;
++  }
++  /* small print: 1pt smaller + tighter line height */
++  .legal {
++    font-size: 0.72rem;
++    line-height: 1.25;
++    margin-top: 14px;
++    padding-top: 12px;
++  }
++}

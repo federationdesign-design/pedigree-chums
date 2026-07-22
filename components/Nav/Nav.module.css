@@ -154,49 +154,93 @@
   pointer-events: auto;
 }
 
+
 /* ── Bento launcher menu (customer overlay) ─────────────────── */
 .overlayScroll {
   justify-content: flex-start;
   align-items: stretch;
   overflow-y: auto;
-  padding: clamp(96px, 13vh, 140px) clamp(16px, 4vw, 48px) 60px;
+  /* Header + hamburger are hidden while open, so content sits near the top.
+     Top pad only clears the floating close button. */
+  padding: clamp(64px, 8vh, 96px) clamp(12px, 3vw, 32px) 60px;
 }
 .overlayScroll .close { position: fixed; }
 
+/* Full-bleed: never constrained to a max width. */
 .bentoWrap {
   pointer-events: auto;
   width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Hero animation slot (placeholder) */
+/* ── Featured hero -- Argos letterbox animation (1470x630) with caption bar ── */
 .heroSlot {
   position: relative;
-  width: 100%;
-  min-height: clamp(160px, 26vh, 300px);
-  border-radius: 24px;
-  border: 3px dashed rgba(255,255,255,0.5);
-  background: linear-gradient(135deg, rgba(255,210,62,0.28), rgba(10,58,87,0.4));
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  text-decoration: none;
+  background: #0a3a57;
+  box-shadow: 0 6px 0 rgba(10,58,87,0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.heroSlotTag {
+.heroSlot:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(0,0,0,0.34); }
+.heroSlot:active { transform: translateY(0); }
+/* Letterbox video shown in full -- its natural 2.33:1 shape sets the height */
+.heroVideo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1470 / 630;
+  object-fit: cover;
+  background: linear-gradient(135deg, #0b78bd, #0a3a57);
+}
+/* Text + button sit in a panel directly beneath the letterbox */
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: clamp(16px, 2.6vw, 26px) clamp(18px, 3.2vw, 32px) clamp(18px, 2.8vw, 28px);
+  background: #0a3a57;
+}
+.heroTags { display: flex; flex-wrap: wrap; gap: 8px; }
+.heroTagGood {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
-  color: var(--navy); background: var(--yellow); border-radius: 999px; padding: 5px 14px;
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #fff; background: #22c55e; border-radius: 999px; padding: 6px 15px;
 }
-.heroSlotNote {
+.heroTagOutline {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+  color: #fff; background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.55); border-radius: 999px; padding: 5px 14px;
+}
+.heroTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.1rem, 3vw, 1.9rem); color: #fff; letter-spacing: 0.04em;
-  text-transform: uppercase; margin: 0;
+  font-size: clamp(1.3rem, 3.4vw, 2.6rem); color: #fff; line-height: 1.05;
+  letter-spacing: 0.02em; margin: 0; max-width: 20ch;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.35);
 }
+/* Green Luckiest Guy button with the raised top-shadow -- matches Name Generator */
+.heroBtn {
+  display: inline-block;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: #22c55e;
+  border-radius: 14px;
+  padding: 12px 26px;
+  box-shadow: 0 4px 0 rgba(10,58,87,0.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+.heroSlot:hover .heroBtn { background: #2fd46b; }
 
 /* Grid */
 .bentoGrid {
@@ -226,11 +270,16 @@
 .tile:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 18px rgba(0,0,0,0.32); }
 .tile:active { transform: translateY(0) scale(0.99); }
 
-/* Placeholder image area -- swap for a real <img>/<video> per tile */
+/* Image area -- real <img> when supplied, else a tinted emoji placeholder */
 .tileImg {
   position: absolute; inset: 0; z-index: 0;
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(150deg, var(--blue-deep, #0b78bd), var(--navy, #0a3a57));
+}
+.tileImgTag {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
 }
 .tileEmoji { font-size: clamp(2rem, 6vw, 3.6rem); opacity: 0.9; }
 
@@ -264,7 +313,7 @@
 .tileStrip .tileMeta { background: none; align-items: center; text-align: center; }
 .tileStrip .tileCta { color: #eafff1; }
 
-/* subtle tint variety behind the placeholder emoji */
+/* subtle tint variety behind the placeholder emoji (only shows when no image) */
 .tileBig .tileImg { background: linear-gradient(150deg, #0b78bd, #0a3a57); }
 .tileWide .tileImg { background: linear-gradient(150deg, #1f6f9c, #0a3a57); }
 
@@ -285,5 +334,5 @@
   .bentoGrid { grid-template-columns: 1fr; grid-auto-rows: 108px; }
   .tileBig, .tileWide, .tileSmall { grid-column: span 1; grid-row: span 1; }
   .tileStrip { grid-column: span 1; }
-  .heroSlot { min-height: 180px; }
+  .heroSlot { min-height: 190px; }
 }

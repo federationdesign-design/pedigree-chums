@@ -1,0 +1,143 @@
+diff --git a/app/name-generator/KnockoutRound.module.css b/app/name-generator/KnockoutRound.module.css
+index fb1712f..fde9df9 100644
+--- a/app/name-generator/KnockoutRound.module.css
++++ b/app/name-generator/KnockoutRound.module.css
+@@ -77,16 +77,16 @@
+ /* Fight cards */
+ .fightCard {
+   width: 100%;
+-  min-height: 180px;
++  min-height: 360px;
+   background: var(--navy, #0a3a57);
+   border: 2px solid rgba(255,255,255,0.3);
+   border-radius: 20px;
+-  padding: 28px 16px;
++  padding: 48px 16px 28px;
+   cursor: pointer;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+-  justify-content: center;
++  justify-content: flex-start;
+   gap: 6px;
+   transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+ }
+@@ -130,7 +130,7 @@
+ }
+ .fightNick {
+   font-family: var(--font-body), sans-serif;
+-  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
++  font-size: clamp(1rem, 2.4vw, 1.5rem);
+   font-weight: 800;
+   color: #ffffff;
+   margin: 6px 0 0;
+@@ -520,13 +520,13 @@
+     position: relative;
+     align-items: stretch;
+   }
+-  .fightCard { min-height: 120px; padding: 18px 8px; }
++  .fightCard { min-height: 240px; padding: 30px 8px 20px; }
+   .fightName {
+     font-size: clamp(1.2rem, 6.5vw, 2.2rem);
+     overflow-wrap: anywhere;
+     word-break: break-word;
+   }
+-  .fightNick { font-size: clamp(0.92rem, 3.6vw, 1.2rem); }
++  .fightNick { font-size: clamp(0.85rem, 3.4vw, 1.1rem); }
+   /* VS overlaid on top of the two boxes -- plain white text, no circle */
+   .vsLabel {
+     position: absolute;
+diff --git a/app/name-generator/KnockoutRound.tsx b/app/name-generator/KnockoutRound.tsx
+index f926ccc..1d00d19 100644
+--- a/app/name-generator/KnockoutRound.tsx
++++ b/app/name-generator/KnockoutRound.tsx
+@@ -344,11 +344,11 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+     // Show round complete flash if this was the last match of a round
+     if (nextM === 0 && nextR > curRound) {
+       const _r=totalRounds-curRound-1; const nextRoundName=_r===1?"The Final":_r===2?"Semi Final":_r===3?"Quarter Final":`Round ${curRound+2}`;
+-      setRoundFlash("Next up: " + nextRoundName + "!");
++      setRoundFlash(nextRoundName + " coming up!");
+       if (confettiRef.current) {
+         confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
+       }
+-      setTimeout(() => setRoundFlash(null), 1500);
++      setTimeout(() => setRoundFlash(null), 1900);
+     }
+     // Fill recycle slots in next match from accumulated losers
+     const nms = newBracket[nextR]?.[nextM];
+@@ -705,15 +705,20 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+ 
+       {/* Round complete flash */}
+       {roundFlash && (
+-        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(0,0,0,0.4)", animation:"flashFadeOut 1.5s ease forwards" }}>
+-          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashText 1.5s ease forwards" }}>
++        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(0,0,0,0.4)", animation:"flashBg 1.9s ease forwards" }}>
++          <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashPop 1.9s ease forwards" }}>
+             {roundFlash.toUpperCase()}
+           </p>
+         </div>
+       )}
+       <style>{`
+-        @keyframes flashFadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
+-        @keyframes flashText { 0%{transform:scale(0.5)} 20%{transform:scale(1.1)} 35%{transform:scale(1)} 100%{transform:scale(1)} }
++        @keyframes flashBg { 0%{opacity:0} 22%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
++        @keyframes flashPop {
++          0%   { opacity:0; transform:scale(0.85); }
++          26%  { opacity:1; transform:scale(1); }
++          79%  { opacity:1; transform:scale(1); }
++          100% { opacity:0; transform:scale(1.5) rotate(5deg); }
++        }
+       `}</style>
+     </>
+   );
+diff --git a/app/name-generator/page.tsx b/app/name-generator/page.tsx
+index cd540f8..7ecfa58 100644
+--- a/app/name-generator/page.tsx
++++ b/app/name-generator/page.tsx
+@@ -581,7 +581,7 @@ const BOY_TITLES: Record<string, TitleEntry[]> = {
+   // Poodle -- academic only
+   poodle:     [{title:"Professor",reg:"grand",syllables:3},{title:"Doctor",reg:"grand",syllables:2},{title:"Chief Analyst",reg:"grand",syllables:4},{title:"Maestro",reg:"grand",syllables:3},{title:"Monsieur",reg:"grand",syllables:2},{title:"French",reg:"grand",syllables:1},{title:"Onion",reg:"absurd",syllables:2},{title:"Garlic",reg:"absurd",syllables:2},{title:"Menu",reg:"grand",syllables:2},{title:"Chef",reg:"grand",syllables:1},{title:"C'est la vie",reg:"absurd",syllables:3},{title:"À la",reg:"absurd",syllables:2},{title:"Baguette",reg:"absurd",syllables:2},{title:"Canapé",reg:"absurd",syllables:3},{title:"Chic",reg:"absurd",syllables:1},{title:"Crêpe",reg:"absurd",syllables:1},{title:"Film noir",reg:"absurd",syllables:2},{title:"Parkour",reg:"absurd",syllables:2},{title:"Raconteur",reg:"grand",syllables:3},{title:"Sans",reg:"absurd",syllables:1},{title:"Touché",reg:"absurd",syllables:2},{title:"Après",reg:"absurd",syllables:2},{title:"Début",reg:"absurd",syllables:2},{title:"En suite",reg:"absurd",syllables:2},{title:"Pan Pan",reg:"absurd",syllables:2}],
+   // Lapdog -- ecclesiastical pomp
+-  lapdog:     [{title:"Reverend",reg:"grand",syllables:3},{title:"Bishop",reg:"grand",syllables:2},{title:"Archdeacon",reg:"grand",syllables:3},{title:"Sir",reg:"grand",syllables:1}],
++  lapdog:     [{title:"Lil'",reg:"informal",syllables:1},{title:"Baby",reg:"informal",syllables:2},{title:"Little",reg:"informal",syllables:2},{title:"Cheeky",reg:"informal",syllables:2},{title:"Silly",reg:"informal",syllables:2},{title:"Scruffy",reg:"informal",syllables:2},{title:"Fluffy",reg:"informal",syllables:2},{title:"Grumpy",reg:"informal",syllables:2},{title:"Squishy",reg:"informal",syllables:2},{title:"Itsy",reg:"informal",syllables:2},{title:"Teeny",reg:"informal",syllables:2},{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Prince",reg:"grand",syllables:1},{title:"Duke",reg:"grand",syllables:1},{title:"Count",reg:"grand",syllables:1},{title:"Baron",reg:"grand",syllables:2},{title:"Master",reg:"grand",syllables:2},{title:"Little Lord",reg:"grand",syllables:3},{title:"Reverend",reg:"grand",syllables:3},{title:"Bishop",reg:"grand",syllables:2},{title:"Archdeacon",reg:"grand",syllables:3}],
+   // Bulldog specifically -- Churchill energy
+   bulldog:    [{title:"Sir",reg:"grand",syllables:1},{title:"Lord",reg:"grand",syllables:1},{title:"Right Honourable",reg:"grand",syllables:4},{title:"Field Marshal",reg:"grand",syllables:3}],
+   boston:     [{title:"Commissioner",reg:"grand",syllables:4},{title:"Alderman",reg:"grand",syllables:3},{title:"Senator",reg:"grand",syllables:3},{title:"Colonel",reg:"grand",syllables:2},{title:"Judge",reg:"grand",syllables:1},{title:"Captain",reg:"grand",syllables:2},{title:"Boss",reg:"grand",syllables:1},{title:"Chief",reg:"grand",syllables:1},{title:"Major",reg:"grand",syllables:2},{title:"Sheriff",reg:"grand",syllables:2},{title:"Marshal",reg:"grand",syllables:2},{title:"Commodore",reg:"grand",syllables:3}],
+@@ -2190,6 +2190,7 @@ export default function NameGeneratorPage() {
+     try { return JSON.parse(sessionStorage.getItem("pc_shortlist") || "[]"); } catch { return []; }
+   });
+   const [landingIdx, setLandingIdx] = useState<number | null>(null);
++  const [showLikeCount, setShowLikeCount] = useState(false); // briefly show shortlist count in the heart button
+   const [toast, setToast] = useState<string | null>(null);
+   const subRef = useRef<HTMLParagraphElement>(null);
+   const [toastTop, setToastTop] = useState(134);
+@@ -2330,6 +2331,9 @@ export default function NameGeneratorPage() {
+       const entry: ShortlistEntry = { full: r.full, nickname: r.nickname, score: r.score, breed };
+       const next = [...prev, entry];
+       try { sessionStorage.setItem("pc_shortlist", JSON.stringify(next)); } catch {}
++      // Briefly flash the count in the heart button, then revert to the heart
++      setShowLikeCount(true);
++      setTimeout(() => setShowLikeCount(false), 1200);
+       if (next.length === 16) {
+         // Auto-launch knockout at 16
+         setTimeout(() => setShowKnockout(true), 800);
+@@ -2516,8 +2520,8 @@ export default function NameGeneratorPage() {
+             Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> Generator
+           </h1>
+           <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
+-            {shortlist.length > 0
+-              ? `You have ${shortlist.length} name${shortlist.length === 1 ? "" : "s"}! Hit 🏆 Knockout below, or keep swiping to add more.`
++            {shortlist.length >= 4 && stage !== "inputs"
++              ? `You have ${shortlist.length} names! Tap 🏆 Knockout button to decide`
+               : "Give your chum the truly 1 in a million personalised to you name"}
+           </p>
+ 
+@@ -2778,7 +2782,7 @@ export default function NameGeneratorPage() {
+                   ) : (
+                     <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
+                   )}
+-                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", fontFamily: shortlist.length > 0 ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{shortlist.length > 0 ? shortlist.length : "♥"}</button>
++                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", fontFamily: showLikeCount ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{showLikeCount ? shortlist.length : "♥"}</button>
+                 </div>
+                   {r.nickname ? (
+                     <>

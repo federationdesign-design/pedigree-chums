@@ -1,0 +1,93 @@
+diff --git a/app/name-generator/KnockoutRound.tsx b/app/name-generator/KnockoutRound.tsx
+index b4dfca3..69f3377 100644
+--- a/app/name-generator/KnockoutRound.tsx
++++ b/app/name-generator/KnockoutRound.tsx
+@@ -190,6 +190,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+   const [second, setSecond] = useState<ShortlistEntry | null>(null);
+   const [allRoundLosers, setAllRoundLosers] = useState<ShortlistEntry[]>([]);
+   const [roundFlash, setRoundFlash] = useState<string | null>(null);
++  const roundFlashedRef = useRef(false); // did the last doAdvance start a new round?
+   const canvasRef = useRef<HTMLCanvasElement>(null);
+   const [podiumReady, setPodiumReady] = useState(false);
+   const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
+@@ -244,6 +245,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+     curRound: number,
+     curMatch: number
+   ) {
++    roundFlashedRef.current = false;
+     const newBracket = curBracket.map(r => r.map(m => m.map(s => ({ ...s }))));
+     const matchSlots = newBracket[curRound]?.[curMatch];
+     if (!matchSlots) return;
+@@ -354,6 +356,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+     setBracket(newBracket);
+     // Show round complete flash if this was the last match of a round
+     if (nextM === 0 && nextR > curRound) {
++      roundFlashedRef.current = true;
+       const _r=totalRounds-curRound-1; const nextRoundName=_r===1?"The Final":_r===2?"Semi Final":_r===3?"Quarter Final":`Round ${curRound+2}`;
+       setRoundFlash(nextRoundName + " coming up!");
+       if (confettiRef.current) {
+@@ -419,18 +422,35 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+     }, 700);
+ 
+     // Step 4: advance bracket
+-    const delay = isFinalMatch ? 800 : 1400;
+-    setTimeout(() => {
+-      setShowInterstitial(false);
+-      doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
+-      if (!isFinalMatch) {
+-        setCardsReady(true);
++    if (isFinalMatch) {
++      // Final done -> "And the winner is..." overlay, then reveal the podium
++      setTimeout(() => {
++        setShowInterstitial(false);
++        setRoundFlash("And the winner is...");
++        if (confettiRef.current) {
++          confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
++        }
+         setTimeout(() => {
+-          setCardsInteractive(true);
+-          setHoveredIdx(null);
+-        }, 500);
+-      }
+-    }, delay);
++          setRoundFlash(null);
++          doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch); // -> podium
++        }, 1900);
++      }, 800);
++    } else {
++      setTimeout(() => {
++        setShowInterstitial(false);
++        doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch);
++        // A new round just started -> wait ~1.5s for the "coming up!" flash to
++        // clear before the first matchup of the new round pops in.
++        const cardDelay = roundFlashedRef.current ? 1500 : 0;
++        setTimeout(() => {
++          setCardsReady(true);
++          setTimeout(() => {
++            setCardsInteractive(true);
++            setHoveredIdx(null);
++          }, 500);
++        }, cardDelay);
++      }, 1400);
++    }
+   }
+ 
+   // ── Canvas podium drawing ─────────────────────────────────────────────
+@@ -632,7 +652,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+                 <p className={styles.fightNick} style={{ color: hoveredIdx !== null ? "var(--navy, #0a3a57)" : "#ffffff", transition: hoveredIdx !== null ? "color 0.3s ease 0.3s" : "color 0s" }}>{pairA.full}</p>
+               )}
+             </button>
+-            <p className={styles.vsLabel} style={{ color: (hoveredIdx !== null || chosen !== null) ? "#000000" : undefined, ["--vs-scale" as string]: (hoveredIdx !== null || chosen !== null) ? 1.5 : 1 } as React.CSSProperties}>VS</p>
++            <p className={styles.vsLabel} style={{ color: (hoveredIdx !== null || chosen !== null) ? "#000000" : undefined, textShadow: (hoveredIdx !== null || chosen !== null) ? "none" : undefined, ["--vs-scale" as string]: (hoveredIdx !== null || chosen !== null) ? 1.5 : 1 } as React.CSSProperties}>VS</p>
+             <button
+               className={[styles.fightCard, chosen === 1 ? styles.winner : "", chosen !== null && chosen !== 1 ? styles.loser : "", hoveredIdx === 1 && cardsInteractive ? styles.hoverGreen : "", hoveredIdx !== null && hoveredIdx !== 1 && cardsInteractive ? styles.hoverRed : "", fallingIdx === 1 ? styles.falling : "", pulsingIdx === 1 ? styles.winnerPulse : "", puffingIdx === 1 ? styles.puffOut : ""].filter(Boolean).join(" ")}
+               onClick={(e) => pick(pairB, pairA, e)} disabled={chosen !== null}
+@@ -659,7 +679,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+           style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.45rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
+           {treeOpen ? "Hide" : "View"} <span style={{ color:"var(--yellow)" }}>knockout</span> tree
+           {treeOpen
+-            ? <span style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:"1.35em", height:"1.35em", borderRadius:"50%", border:"2px solid currentColor", fontSize:"0.72em", lineHeight:1, flexShrink:0 }}>✕</span>
++            ? <span style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:"27px", height:"27px", borderRadius:"50%", border:"2px solid currentColor", fontSize:"12px", lineHeight:1, flexShrink:0 }}>✕</span>
+             : <span style={{ display:"inline-block" }}>▼</span>}
+         </button>
+ 

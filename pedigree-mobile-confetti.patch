@@ -1,0 +1,62 @@
+diff --git a/app/name-generator/page.tsx b/app/name-generator/page.tsx
+index fd780fa..45f709c 100644
+--- a/app/name-generator/page.tsx
++++ b/app/name-generator/page.tsx
+@@ -2103,6 +2103,14 @@ export default function NameGeneratorPage() {
+   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
+   const [exhausted, setExhausted] = useState(false);
+   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
++  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
++  useEffect(() => {
++    const script = document.createElement("script");
++    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
++    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>)["confetti"] as (opts: Record<string, unknown>) => void; };
++    document.head.appendChild(script);
++    return () => { try { document.head.removeChild(script); } catch {} };
++  }, []);
+ 
+   function handleGenerate(answersOverride?: Record<number, string>) {
+     if (!breed) { alert("Please select a breed"); return; }
+@@ -2224,7 +2232,12 @@ export default function NameGeneratorPage() {
+     });
+   }
+   function clearShortlist() { setShortlist([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {} }
+-  function handleLike() {
++  function handleLike(e?: React.MouseEvent) {
++    if (confettiRef.current) {
++      let x = 0.5, y = 0.62;
++      if (e && typeof e.clientX === "number") { x = e.clientX / window.innerWidth; y = e.clientY / window.innerHeight; }
++      confettiRef.current({ particleCount: 90, spread: 75, origin: { x, y }, colors: ["#22c55e","#ffe227","#ffffff","#60d394"] });
++    }
+     if (results.length > 0) saveToShortlist(results[0]);
+     setSwipeDir("right");
+     setTimeout(() => { setSwipeDir(null); handleRollAgain(); }, 350);
+@@ -2338,15 +2351,15 @@ export default function NameGeneratorPage() {
+             .pcm-panel { max-width: 100% !important; }
+             .pcm-qgrid { grid-template-columns: 1fr !important; }
+             .pcm-reveal-card { padding-right: clamp(20px,5vw,40px) !important; }
+-            .pcm-breed-img { position: static !important; transform: none !important; text-align: center !important; margin: 0 0 8px !important; }
+-            .pcm-breed-img img { width: min(200px, 60%) !important; height: auto !important; margin: 0 auto !important; transform: rotate(-2deg); }
++            .pcm-breed-img { display: none !important; }
+             .pcm-action { width: 76px !important; height: 76px !important; font-size: 2rem !important; }
+             .pcm-calc-banner { padding-left: clamp(20px,4vw,32px) !important; flex-direction: column !important; text-align: center !important; }
+-            .pcm-calc-img { position: static !important; top: auto !important; left: auto !important; transform: rotate(-2deg) !important; width: min(200px,60%) !important; height: auto !important; margin: 0 auto 8px !important; }
++            .pcm-calc-img { display: none !important; }
++            .pcm-h1 { font-size: clamp(2.4rem, 8vw, 5.2rem) !important; }
+           }
+         `}</style>
+         <div style={{ maxWidth:1800, margin:"0 auto" }}>
+-          <h1 className="display" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
++          <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
+             Chum <span className="display-yellow">Name</span> Generator
+           </h1>
+           <p style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
+@@ -2545,7 +2558,7 @@ export default function NameGeneratorPage() {
+                   ) : (
+                     <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
+                   )}
+-                  <button onClick={handleLike} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
++                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>♥</button>
+                 </div>
+                   {r.nickname ? (
+                     <>

@@ -1,0 +1,121 @@
+diff --git a/app/name-generator/KnockoutRound.module.css b/app/name-generator/KnockoutRound.module.css
+index fde9df9..2f949d6 100644
+--- a/app/name-generator/KnockoutRound.module.css
++++ b/app/name-generator/KnockoutRound.module.css
+@@ -130,7 +130,7 @@
+ }
+ .fightNick {
+   font-family: var(--font-body), sans-serif;
+-  font-size: clamp(1rem, 2.4vw, 1.5rem);
++  font-size: clamp(0.92rem, 2.2vw, 1.4rem);
+   font-weight: 800;
+   color: #ffffff;
+   margin: 6px 0 0;
+@@ -141,7 +141,7 @@
+ /* VS */
+ .vsLabel {
+   font-family: var(--font-display, "Luckiest Guy", cursive);
+-  font-size: clamp(3.3rem, 8.5vw, 6.3rem);
++  font-size: clamp(3.46rem, 8.5vw, 6.46rem);
+   color: #ffffff;
+   text-align: center;
+   margin: 0;
+@@ -439,9 +439,9 @@
+ .nextMatchupText {
+   font-family: var(--font-display, "Luckiest Guy", cursive);
+   font-size: clamp(2rem, 5vw, 3rem);
+-  color: var(--yellow, #ffe227);
++  color: #ffffff;
+   letter-spacing: 0.05em;
+-  opacity: 0.8;
++  opacity: 1;
+ }
+ 
+ /* Bracket slot hover tooltip -- shows full name */
+@@ -512,7 +512,7 @@
+   /* match the main page h1 sizing */
+   .title { font-size: clamp(3.5rem, 12vw, 5.4rem); }
+   /* tighter container so the two cards get more room */
+-  .wrap { padding: clamp(16px, 3vw, 32px) 10px 80px; }
++  .wrap { padding: clamp(16px, 3vw, 32px) 5px 80px; }
+   /* two cards side by side on the same axis, VS overlaid between them */
+   .pairWrap {
+     grid-template-columns: 1fr 1fr;
+@@ -520,13 +520,13 @@
+     position: relative;
+     align-items: stretch;
+   }
+-  .fightCard { min-height: 240px; padding: 30px 8px 20px; }
++  .fightCard { min-height: 240px; padding: 80px 5px 20px; }
+   .fightName {
+     font-size: clamp(1.2rem, 6.5vw, 2.2rem);
+     overflow-wrap: anywhere;
+     word-break: break-word;
+   }
+-  .fightNick { font-size: clamp(0.85rem, 3.4vw, 1.1rem); }
++  .fightNick { font-size: clamp(0.78rem, 3.2vw, 1.0rem); }
+   /* VS overlaid on top of the two boxes -- plain white text, no circle */
+   .vsLabel {
+     position: absolute;
+@@ -535,7 +535,7 @@
+     transform: translate(-50%, -50%) rotate(-2deg);
+     z-index: 5;
+     margin: 0;
+-    font-size: clamp(1.7rem, 7vw, 2.6rem);
++    font-size: clamp(1.86rem, 7vw, 2.76rem);
+     color: #ffffff;
+     text-shadow: 0 3px 10px rgba(0,0,0,0.55);
+   }
+diff --git a/app/name-generator/KnockoutRound.tsx b/app/name-generator/KnockoutRound.tsx
+index 1d00d19..e0b2199 100644
+--- a/app/name-generator/KnockoutRound.tsx
++++ b/app/name-generator/KnockoutRound.tsx
+@@ -645,7 +645,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+         {/* Bracket tree -- collapsed behind an accordion to reduce scrolling */}
+         <button
+           onClick={() => setTreeOpen((o) => !o)}
+-          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-body), sans-serif", fontSize:"0.85rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
++          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, margin:"8px auto 0", background:"none", border:"none", cursor:"pointer", color:"#fff", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.1rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>
+           {treeOpen ? "Hide" : "View"} knockout tree
+           <span style={{ display:"inline-block", transform: treeOpen ? "rotate(180deg)" : "none", transition:"transform 0.2s" }}>▼</span>
+         </button>
+@@ -705,7 +705,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
+ 
+       {/* Round complete flash */}
+       {roundFlash && (
+-        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(0,0,0,0.4)", animation:"flashBg 1.9s ease forwards" }}>
++        <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, pointerEvents:"none", background:"rgba(28,117,199,0.82)", animation:"flashBg 1.9s ease forwards" }}>
+           <p style={{ fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"clamp(3rem,10vw,6rem)", color:"#fff", textShadow:"0 0 30px rgba(0,0,0,0.8), 0 4px 0 rgba(0,0,0,0.5)", margin:0, textAlign:"center", letterSpacing:"0.05em", animation:"flashPop 1.9s ease forwards" }}>
+             {roundFlash.toUpperCase()}
+           </p>
+diff --git a/app/name-generator/page.tsx b/app/name-generator/page.tsx
+index 6a568fa..15fb259 100644
+--- a/app/name-generator/page.tsx
++++ b/app/name-generator/page.tsx
+@@ -2497,7 +2497,7 @@ export default function NameGeneratorPage() {
+   return (
+     <>
+       {showKnockout ? (
+-        <div style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 0" }}>
++        <div style={{ padding:"clamp(60px,10vw,120px) clamp(6px,1.5vw,40px) 0" }}>
+           <div style={{ maxWidth:1800, margin:"0 auto" }}>
+             <KnockoutRound
+               shortlist={shortlist}
+@@ -2709,7 +2709,7 @@ export default function NameGeneratorPage() {
+                 })()}
+               </div>
+               <button onClick={() => handleGenerate()} className="display"
+-                style={{ width:"100%", padding:"26px 16px", borderRadius:14, border:"none", background: breed ? "#22c55e" : "var(--yellow)", color:"var(--navy)", fontSize:"1.9rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
++                style={{ width:"100%", padding:"26px 16px", borderRadius:14, border:"none", background: breed ? "#22c55e" : "var(--yellow)", color: breed ? "#ffffff" : "var(--navy)", fontSize:"1.9rem", cursor:"pointer", boxShadow:"0 4px 0 rgba(10,58,87,0.4)", letterSpacing:"0.04em" }}>
+                 Go
+               </button>
+             </div>
+@@ -2724,7 +2724,7 @@ export default function NameGeneratorPage() {
+             // surname was already entered, in which case we don't ask twice.
+             const showSurnameStep = qfCount === 2 && !qfHadSurname;
+             return qfQ ? (
+-              <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,30,60,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
++              <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(28,117,199,0.82)",display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(16px,4vw,40px)"}}>
+                 <div style={{position:"relative",background:"linear-gradient(to top right,#00e2ff,#008eff)",borderRadius:32,padding:"clamp(24px,5vw,48px)",maxWidth:560,width:"100%",textAlign:"center"}}>
+                   {qfCount >= 5 && (
+                     <button onClick={() => fireQuickFireResults(qAnswers)} aria-label="Done -- show my names"

@@ -1,0 +1,131 @@
+diff --git a/app/name-generator/page.tsx b/app/name-generator/page.tsx
+index f67bc25..913db3e 100644
+--- a/app/name-generator/page.tsx
++++ b/app/name-generator/page.tsx
+@@ -2060,6 +2060,29 @@ const TITLE_PREFIXES: PrefixEntry[] = [
+   { prefix: "Mega",   breeds: ["giant","character","dachshund"], bonusContrast: 2 },
+   { prefix: "Ultra",  breeds: ["german","sighthound"], bonusContrast: 2 }];
+ 
++// --- Surname profanity filter ------------------------------------------
++// Substrings that are extremely unlikely to appear inside a real surname.
++const PROFANITY_SUBSTR = ["fuck","shit","cunt","bitch","bastard","pussy","asshole","arsehole","wanker","bollock","prick","twat","slut","whore","nigger","nigga","faggot","dickhead","cocksuck","motherfuck","jizz","dildo","minge","wank","spastic","retard","rape","nazi","hitler","paedo","pedo","bellend","fuk","phuck"];
++// Words that DO appear inside legitimate surnames (Hancock, Cassidy, Dickens...),
++// so only block them when the whole surname IS exactly that word.
++const PROFANITY_EXACT = ["dick","cock","ass","arse","tit","tits","fag","cum","knob","fanny","piss","crap","damn","hoe","shite","turd","bum","dyke","git"];
++
++// Real names/places that contain a flagged substring -- never block these.
++const PROFANITY_ALLOW = ["scunthorpe","clitheroe","penistone","lightwater","cockermouth","shitterton","assington","cockfosters","cockburn"];
++
++function hasProfanity(raw: string): boolean {
++  if (!raw) return false;
++  const norm = raw.toLowerCase()
++    .replace(/[@4]/g, "a").replace(/3/g, "e").replace(/[1!|]/g, "i")
++    .replace(/0/g, "o").replace(/[5$]/g, "s").replace(/7/g, "t")
++    .replace(/[^a-z]/g, "");
++  if (!norm) return false;
++  if (PROFANITY_ALLOW.includes(norm)) return false;
++  if (PROFANITY_SUBSTR.some(w => norm.includes(w))) return true;
++  if (PROFANITY_EXACT.includes(norm)) return true;
++  return false;
++}
++
+ export default function NameGeneratorPage() {
+   const [breed, setBreed] = useState("");
+   const [fromCalculator, setFromCalculator] = useState(false);
+@@ -2074,6 +2097,7 @@ export default function NameGeneratorPage() {
+   }, []);
+ 
+   const [surname, setSurname] = useState("");
++  const [snError, setSnError] = useState(false);
+   const [town, setTown] = useState("");
+   const [gender, setGender] = useState<"boy"|"girl">("boy");
+   const [stage, setStage] = useState<Stage>("inputs");
+@@ -2114,6 +2138,14 @@ export default function NameGeneratorPage() {
+ 
+   function handleGenerate(answersOverride?: Record<number, string>) {
+     if (!breed) { alert("Please select a breed"); return; }
++    // block obscene surnames
++    if (hasProfanity(surname)) {
++      setSnError(true);
++      setSnOpen(true);
++      setToast("Let's keep it clean! Please choose a different surname. 🐾");
++      setTimeout(() => setToast(null), 5000);
++      return;
++    }
+     // surname is optional
+     const s = Math.floor(Math.random() * 10000);
+     setSeed(s);
+@@ -2348,6 +2380,7 @@ export default function NameGeneratorPage() {
+       <main style={{ padding:"clamp(60px,10vw,120px) clamp(16px,5vw,48px) 10px" }}>
+         <style>{`
+           .pcm-h1br { display: none; }
++          @keyframes pcAnswerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+           @media (max-width: 768px) {
+             .pcm-panel { max-width: 100% !important; }
+             .pcm-qgrid { grid-template-columns: 1fr !important; }
+@@ -2439,7 +2472,7 @@ export default function NameGeneratorPage() {
+               <div style={{ display:"flex", gap:10, marginBottom:28 }}>
+                 {(["boy","girl"] as const).map(g => (
+                   <button key={g} className={g==="boy" ? "pcm-boy-btn" : "pcm-girl-btn"} onClick={() => { setGender(g); setStage("inputs"); setResults([]); setQAnswers({}); setUsedNicknames(new Set()); setUsedFirstNames(new Set()); setExhausted(false); setShortlist([]); setUnkeptNames([]); try { sessionStorage.removeItem("pc_shortlist"); } catch {}; }}
+-                    style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${gender===g?"var(--yellow)":"rgba(255,255,255,0.15)"}`, background:gender===g?"var(--yellow)":"rgba(255,255,255,0.08)", color:gender===g?"var(--navy)":"#fff", fontFamily:"var(--font-body)", fontSize:"0.9rem", fontWeight:700, cursor:"pointer", textTransform:"capitalize" }}>
++                    style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${gender===g?"#ffffff":"rgba(255,255,255,0.15)"}`, background:gender===g?"var(--yellow)":"rgba(255,255,255,0.08)", color:gender===g?"var(--navy)":"#fff", fontFamily:"var(--font-body)", fontSize:"0.9rem", fontWeight:700, cursor:"pointer", textTransform:"capitalize" }}>
+                     {g === "boy" ? "Boy" : "Girl"}
+                   </button>
+                 ))}
+@@ -2448,7 +2481,7 @@ export default function NameGeneratorPage() {
+                 <button
+                   onClick={() => setSnOpen((o: boolean) => !o)}
+                   style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", cursor:"pointer", padding:0, marginBottom: snOpen ? 16 : 0 }}>
+-                  <span style={{ color:"#ffffff", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
++                  <span style={{ flex:1, textAlign:"center", color:"#ffffff", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
+                     Personalise surname
+                     {surname.trim().length > 0 && (
+                       <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
+@@ -2461,10 +2494,17 @@ export default function NameGeneratorPage() {
+                   </span>
+                 </button>
+                 {snOpen && (
+-                  <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => setSurname(e.target.value)}
++                  <>
++                  <input type="text" value={surname} onChange={(e: { target: HTMLInputElement }) => { const v = e.target.value; setSurname(v); setSnError(hasProfanity(v)); }}
+                     placeholder="e.g. Jones, Clarke, Thompson..." maxLength={60}
+                     onKeyDown={(e: { key: string }) => e.key === "Enter" && handleGenerate()}
+-                    style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom:20, outline:"none", boxSizing:"border-box" }} />
++                    style={{ width:"100%", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${snError?"#ef4444":"rgba(255,255,255,0.15)"}`, background:"rgba(255,255,255,0.08)", color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.95rem", marginBottom: snError ? 8 : 20, outline:"none", boxSizing:"border-box" }} />
++                  {snError && (
++                    <p style={{ color:"#ff8f8f", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, margin:"0 0 16px", textAlign:"center" }}>
++                      Let&apos;s keep it clean! Please choose a different surname. 🐾
++                    </p>
++                  )}
++                  </>
+                 )}
+               </div>
+                             <div style={{ borderTop:"1px solid rgba(255,255,255,0.12)", paddingTop:18, marginBottom:22 }}>
+@@ -2472,7 +2512,7 @@ export default function NameGeneratorPage() {
+                 <button
+                   onClick={() => setQOpen((o: boolean) => !o)}
+                   style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", background:"none", border:"none", cursor:"pointer", padding:0, marginBottom: qOpen ? 16 : 0 }}>
+-                  <span style={{ flex:1, textAlign:"center", color:"var(--yellow)", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
++                  <span style={{ flex:1, textAlign:"center", color:"#ffffff", fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"var(--font-body)" }}>
+                     answer some stupid questions
+                     {Object.keys(qAnswers).length > 0 && (
+                       <span style={{ marginLeft:8, background:"var(--yellow)", color:"var(--navy)", borderRadius:999, padding:"1px 7px", fontSize:"0.6rem" }}>
+@@ -2493,14 +2533,14 @@ export default function NameGeneratorPage() {
+                       const chosen = qAnswers[pos];
+                       return (
+                         <div key={qi} style={{ background:"rgba(255,255,255,0.05)", borderRadius:12, padding:"12px 10px", border:`1.5px solid ${chosen?"var(--yellow)":"rgba(255,255,255,0.12)"}`, display:"flex", flexDirection:"column", gap:7, transition:"border-color 0.2s" }}>
+-                          <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"0.76rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32 }}>
++                          <p style={{ color:"#fff", fontFamily:"var(--font-body)", fontSize:"1rem", fontWeight:700, lineHeight:1.3, margin:0, minHeight:32, textAlign:"center" }}>
+                             {qItem.text}
+                           </p>
+-                          <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+-                            {qItem.options.map((opt: {label:string;bonus:string[]}) => (
++                          <div style={{ display:"flex", flexWrap:"wrap", gap:8, justifyContent:"center" }}>
++                            {qItem.options.map((opt: {label:string;bonus:string[]}, optIdx: number) => (
+                               <button key={opt.label}
+                                 onClick={() => setQAnswers((prev: Record<number,string>) => ({...prev, [pos]: opt.label}))}
+-                                style={{ padding:"6px 9px", borderRadius:7, border:`1.5px solid ${chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.18)"}`, background:chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.05)", color:chosen===opt.label?"var(--navy)":"rgba(255,255,255,0.85)", fontFamily:"var(--font-body)", fontSize:"0.72rem", fontWeight:700, cursor:"pointer", textAlign:"left", lineHeight:1.2, transition:"all 0.15s" }}>
++                                style={{ padding:"10px 16px", borderRadius:999, border:`1.5px solid ${chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.18)"}`, background:chosen===opt.label?"var(--yellow)":"rgba(255,255,255,0.05)", color:chosen===opt.label?"var(--navy)":"rgba(255,255,255,0.85)", fontFamily:"var(--font-body)", fontSize:"0.78rem", fontWeight:700, cursor:"pointer", textAlign:"center", lineHeight:1.2, transition:"background 0.15s, border-color 0.15s, color 0.15s", animation:"pcAnswerIn 0.35s ease both", animationDelay:`${(pos*0.18)+(optIdx*0.09)}s` }}>
+                                 {opt.label}
+                               </button>
+                             ))}
