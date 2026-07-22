@@ -101,6 +101,28 @@ export default function GoodDogBadDogPage() {
 
         {/* ── Mobile carousel ── */}
         <section className={styles.mobileCarousel}>
+
+          {/* Intro slide -- first card */}
+          <div className={styles.mobileSlide}>
+            <div className={styles.mobileIntroSlide}>
+              <p className={styles.eyebrow}>An essay series</p>
+              <h1 className={styles.mobileIntroTitle}>
+                Good Dog,<br />
+                <span className={styles.titleAccent}>Bad Dog</span>
+              </h1>
+              <p className={styles.mobileIntroText}>
+                Fictional dogs are rarely just dogs. They get cast as heroes, monsters,
+                loyal companions and dangerous outsiders. Their size, breed and appearance
+                become shorthand for the role the story needs them to play.
+              </p>
+              <p className={styles.mobileIntroText}>
+                This series looks at some of the most famous dog stories and legends
+                and asks what effect this has had on our conceptions of the actual breeds.
+              </p>
+              <p className={styles.mobileIntroHint}>Swipe to read the essays →</p>
+            </div>
+          </div>
+
           {ESSAYS.map((essay, i) => (
             <div key={essay.slug} className={styles.mobileSlide}>
               {/* Top half: hero image */}
