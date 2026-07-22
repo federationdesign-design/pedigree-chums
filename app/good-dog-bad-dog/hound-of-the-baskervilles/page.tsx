@@ -31,12 +31,14 @@ export default function HoundPage() {
           <img src="/hound-of-the-baskervilles.jpg" alt="The Hound of the Baskervilles" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
-            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
+            <h1 className={styles.essayHeroTitle}>
+              <span className={styles.essayHeroTitleWhite}>The Hound of the Baskervilles:</span> How a Dog Was Made into a Monster
+            </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagBad}`}>Bad dog</span>
-              <span className={styles.tagBreed}>Bloodhound / Mastiff</span>
+              <span className={styles.tagBreed}>Bloodhound</span>
             </div>
-            <h1 className={styles.essayHeroTitle}>The Hound of the Baskervilles: How a Dog Was Made into a Monster</h1>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
@@ -73,7 +75,6 @@ export default function HoundPage() {
               <p>The Hound of the Baskervilles appears to ask whether a supernatural dog exists. Its deeper question is why people are so ready to believe in one.</p>
               <p>Fear does not need much help. Give people a legend, a death they cannot fully explain and a glimpse of something enormous and luminous in the fog -- and they will do the rest themselves.</p>
               <p>Stapleton does not create the fear. He finds it already there, in the family history, in local belief, in the dark reputation of the moor itself. He simply gives it a body. That body happens to be a dog. There is no ancient curse. There is only a person who recognised the usefulness of an animal, a legend and other people's readiness to believe.</p>
-              <p className={styles.verdict}><strong>The verdict:</strong> Manufactured monster. The hound's danger was real. Its monstrosity was built by a human being who knew exactly what he was doing -- and who let the dog carry the blame.</p>
             </div>
           </article>
 
@@ -85,6 +86,8 @@ export default function HoundPage() {
             {exerciseNeeds[SLUG] && <div className={styles.sidebarCard}><ExerciseCard data={exerciseNeeds[SLUG]} /></div>}
           </aside>
         </div>
+
+        <div className={styles.verdict}><strong>The verdict:</strong> Manufactured monster. The hound's danger was real. Its monstrosity was built by a human being who knew exactly what he was doing -- and who let the dog carry the blame.</div>
       </main>
       <Footer />
     </>

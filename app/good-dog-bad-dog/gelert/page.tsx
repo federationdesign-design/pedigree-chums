@@ -31,12 +31,14 @@ export default function GelertPage() {
           <img src="/gelert-painting.jpg" alt="Gelert" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
-            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
+            <h1 className={styles.essayHeroTitle}>
+              <span className={styles.essayHeroTitleWhite}>Gelert:</span> The Dog Who Couldn’t Explain Himself
+            </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Irish Wolfhound</span>
             </div>
-            <h1 className={styles.essayHeroTitle}>Gelert: The Dog Who Couldn't Explain Himself</h1>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
@@ -77,7 +79,6 @@ export default function GelertPage() {
               <p>The mistake Llywelyn makes isn't an unusual one. It's the mistake of looking at incomplete evidence, feeling certain, and acting before the full picture is available. We do this with dogs all the time. A large dog that barks becomes "aggressive." A breed that appears in news coverage of attacks becomes "dangerous" regardless of what any individual dog has actually done.</p>
               <p>He was the same dog the whole time. Before the sword, he was Llywelyn's most trusted hound, responding to a genuine threat exactly as he had been bred to do. After the sword, those same facts were finally understood. Nothing about Gelert changed between those two moments except the human story told about him.</p>
               <p>A dog covered in blood, in a wrecked room, next to an empty cradle, is a frightening sight. It is also not, by itself, a verdict.</p>
-              <p className={styles.verdict}><strong>The verdict:</strong> Good dog. Gelert was condemned not for what he did, but for what his appearance led a person to assume. He was the same dog before and after the truth came to light. Only the human story changed.</p>
             </div>
           </article>
 
@@ -90,6 +91,8 @@ export default function GelertPage() {
             {exerciseNeeds[SLUG] && <div className={styles.sidebarCard}><ExerciseCard data={exerciseNeeds[SLUG]} /></div>}
           </aside>
         </div>
+
+        <div className={styles.verdict}><strong>The verdict:</strong> Good dog. Gelert was condemned not for what he did, but for what his appearance led a person to assume. He was the same dog before and after the truth came to light. Only the human story changed.</div>
       </main>
       <Footer />
     </>

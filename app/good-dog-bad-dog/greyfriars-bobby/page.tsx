@@ -31,12 +31,14 @@ export default function GreyfriarsBobbyPage() {
           <img src="/greyfryers-bobby.jpg" alt="Greyfriars Bobby" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
-            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
+            <h1 className={styles.essayHeroTitle}>
+              <span className={styles.essayHeroTitleWhite}>Greyfriars Bobby:</span> Loyalty, Legend and the Making of a Nation
+            </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Skye Terrier</span>
             </div>
-            <h1 className={styles.essayHeroTitle}>Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog</h1>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
@@ -69,7 +71,6 @@ export default function GreyfriarsBobbyPage() {
               <p>The Hound of the Baskervilles reflects the fear that dogs can be turned into monsters. Gelert reflects the fear that we might condemn an innocent animal. Lassie reflects the desire that dogs might be better than we are.</p>
               <p>Greyfriars Bobby reflects something else: the human need to believe that love can outlast the person who inspired it.</p>
               <p>That need is genuine. The story that serves it may be partly shaped. And the small terrier at the centre of both has been transformed into something that no living dog could ever quite become. An idea of faithfulness, preserved in bronze.</p>
-              <p className={styles.verdict}><strong>The verdict:</strong> Good dog. Genuine attachment simplified by legend into something closer to perfection than any living animal could sustain.</p>
             </div>
           </article>
 
@@ -81,6 +82,8 @@ export default function GreyfriarsBobbyPage() {
             {exerciseNeeds[SLUG] && <div className={styles.sidebarCard}><ExerciseCard data={exerciseNeeds[SLUG]} /></div>}
           </aside>
         </div>
+
+        <div className={styles.verdict}><strong>The verdict:</strong> Good dog. Genuine attachment simplified by legend into something closer to perfection than any living animal could sustain.</div>
       </main>
       <Footer />
     </>

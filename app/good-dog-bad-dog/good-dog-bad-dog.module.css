@@ -493,6 +493,11 @@
 /* ── Wide viewport scaling (>1300px) ───────────────────────── */
 @media (min-width: 1300px) {
 
+  /* H1 hero title +4pt */
+  .essayHeroTitle {
+    font-size: clamp(3.5rem, 8vw, 4.625rem);
+  }
+
   /* Para text +3pt */
   .essayBody p {
     font-size: 1.4375rem;

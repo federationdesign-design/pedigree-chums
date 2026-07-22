@@ -31,12 +31,14 @@ export default function LassiePage() {
           <img src="/lassie-img.jpg" alt="Lassie" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
-            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
+            <h1 className={styles.essayHeroTitle}>
+              <span className={styles.essayHeroTitleWhite}>Lassie:</span> The Burden of Being the Perfect Dog
+            </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Rough Collie</span>
             </div>
-            <h1 className={styles.essayHeroTitle}>Lassie: The Burden of Being the Perfect Dog</h1>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
@@ -70,7 +72,6 @@ export default function LassiePage() {
               <p>The Hound of the Baskervilles reflects the fear that dogs can become monsters. Gelert reflects the fear that we might condemn an innocent animal. Lassie reflects something different -- the desire that dogs might be better than we are.</p>
               <p>The character works because genuine Collie qualities are real. The story takes those qualities and elevates them until the dog seems incapable of error. That is the gap between the story and the breed. And it is why the good dog can be as misleading as the bad one.</p>
               <p>She is a believable Collie made unbelievable through perfection.</p>
-              <p className={styles.verdict}><strong>The verdict:</strong> Positive stereotype. Lassie is rooted in genuine Collie qualities -- then elevated into an ideal no individual dog can meet. The danger is not that she made the breed look bad. It is that she made it look impossibly good.</p>
             </div>
           </article>
 
@@ -82,6 +83,8 @@ export default function LassiePage() {
             {exerciseNeeds[SLUG] && <div className={styles.sidebarCard}><ExerciseCard data={exerciseNeeds[SLUG]} /></div>}
           </aside>
         </div>
+
+        <div className={styles.verdict}><strong>The verdict:</strong> Positive stereotype. Lassie is rooted in genuine Collie qualities -- then elevated into an ideal no individual dog can meet. The danger is not that she made the breed look bad. It is that she made it look impossibly good.</div>
       </main>
       <Footer />
     </>

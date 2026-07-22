@@ -31,12 +31,14 @@ export default function BullsEyePage() {
           <img src="/bulls-eye-img.jpg" alt="Bull's-eye" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
-            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
+            <h1 className={styles.essayHeroTitle}>
+              <span className={styles.essayHeroTitleWhite}>Bull’s-eye:</span> The Dog as the Owner’s Shadow
+            </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagBad}`}>Bad dog</span>
               <span className={styles.tagBreed}>Bull Terrier</span>
             </div>
-            <h1 className={styles.essayHeroTitle}>Bull's-eye: The Dog as the Owner's Shadow</h1>
+            <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
@@ -106,8 +108,6 @@ export default function BullsEyePage() {
               <p>Bull's-eye is remembered as a bad dog because he walks beside a bad man. The real lesson is not that Bull Terriers are dangerous. It is that any powerful dog can be morally disfigured by the story a human attaches to it.</p>
               <p>And when that happens, the dog does not merely reflect the owner's shadow. It has to live inside it.</p>
 
-              <p className={styles.verdict}><strong>The verdict:</strong> A bad dog made by a bad man. Bull's-eye is not morally corrupt in the way Sikes is morally corrupt. He is an animal shaped by his owner's world and used to carry his owner's threat. The breed pays a price it did nothing to earn.</p>
-
             </div>
           </article>
 
@@ -119,6 +119,8 @@ export default function BullsEyePage() {
             {exerciseNeeds[SLUG] && <div className={styles.sidebarCard}><ExerciseCard data={exerciseNeeds[SLUG]} /></div>}
           </aside>
         </div>
+
+        <div className={styles.verdict}><strong>The verdict:</strong> A bad dog made by a bad man. Bull's-eye is not morally corrupt in the way Sikes is morally corrupt. He is an animal shaped by his owner's world and used to carry his owner's threat. The breed pays a price it did nothing to earn.</div>
       </main>
       <Footer />
     </>
