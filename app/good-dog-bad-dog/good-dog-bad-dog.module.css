@@ -692,13 +692,13 @@
   .mobileIntroBtn {
     align-self: flex-start;
     margin-top: 8px;
-    padding: 14px 30px;
+    padding: 16px 44px;
     border: none;
     border-radius: 14px;
     background: #22c55e;
     color: #ffffff;
     font-family: var(--font-display, "Luckiest Guy", cursive);
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     letter-spacing: 0.04em;
     cursor: pointer;
     box-shadow: 0 4px 0 #16a34a;

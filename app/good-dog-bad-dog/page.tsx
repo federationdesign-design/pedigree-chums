@@ -12,6 +12,15 @@ export const metadata: Metadata = {
 
 const ESSAYS = [
   {
+    slug: "argos",
+    tag: "Good dog", tagStyle: "tagGood",
+    breed: "Ancient Greek Hunting Hound",
+    author: "Homer", work: "The Odyssey",
+    title: "Argos: The Dog Who Knew His Master",
+    summary: "Before Lassie, before Greyfriars Bobby, there was Argos. Homer's dog from The Odyssey waited twenty years for his master to return.",
+    image: "/history/Argos-hero.jpg",
+  },
+  {
     slug: "bulls-eye",
     tag: "Bad dog", tagStyle: "tagBad",
     breed: "Bull Terrier",
@@ -21,9 +30,19 @@ const ESSAYS = [
     image: "/bulls-eye-img.jpg",
   },
   {
+    slug: "anubis",
+    tag: "Bad dog", tagStyle: "tagBad",
+    breed: "Egyptian jackal / African golden wolf",
+    author: "Egyptian myth",
+    title: "Anubis: The Grave-Robber We Made a God",
+    summary: "The Egyptians made a dog the god of death -- and it turns out almost everyone did. From a jackal digging up desert graves to a Suffolk hellhound, an essay on the dog we keep posting at the door of the dark, and why we thanked it by turning its name into an insult.",
+    image: "/history/Anubis-hero.jpg",
+  },
+  {
     slug: "gelert",
     tag: "Good dog", tagStyle: "tagGood",
     breed: "Irish Wolfhound",
+    author: "Welsh legend",
     title: "Gelert: The Dog Who Couldn't Explain Himself",
     summary: "Llywelyn the Great returns from the hunt to find his hound covered in blood and the cradle empty. A legend about what happens when a powerful dog cannot defend itself against the story told about it.",
     image: "/gelert-painting.jpg",
@@ -47,18 +66,10 @@ const ESSAYS = [
     image: "/lassie-img.jpg",
   },
   {
-    slug: "argos",
-    tag: "Good dog", tagStyle: "tagGood",
-    breed: "Ancient Greek Hunting Hound",
-    author: "Homer", work: "The Odyssey",
-    title: "Argos: The Dog Who Knew His Master",
-    summary: "Before Lassie, before Greyfriars Bobby, there was Argos. Homer's dog from The Odyssey waited twenty years for his master to return.",
-    image: "/history/Argos-hero.jpg",
-  },
-  {
     slug: "greyfriars-bobby",
     tag: "Good dog", tagStyle: "tagGood",
     breed: "Skye Terrier",
+    author: "Atkinson",
     title: "Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog",
     summary: "A small terrier lived near Greyfriars Kirkyard for fourteen years after his master's death. An essay on what happens when a real dog is gradually transformed into the perfect good dog.",
     image: "/greyfryers-bobby.jpg",
