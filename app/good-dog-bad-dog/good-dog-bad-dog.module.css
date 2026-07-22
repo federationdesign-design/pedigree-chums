@@ -587,3 +587,149 @@
   }
 }
 
+/* ── Mobile carousel (hidden on desktop) ───────────────────── */
+.mobileCarousel {
+  display: none;
+}
+
+@media (max-width: 768px) {
+
+  /* Hide desktop grid, show carousel */
+  .grid {
+    display: none;
+  }
+
+  /* Page on mobile: no top padding gap, full height */
+  .page {
+    padding-top: 0;
+    padding-bottom: 0;
+    min-height: 100dvh;
+  }
+
+  /* Hide desktop header on mobile */
+  .hero {
+    display: none;
+  }
+
+  /* Carousel: full viewport, horizontal snap scroll */
+  .mobileCarousel {
+    display: flex;
+    flex-direction: row;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    height: 100dvh;
+    width: 100vw;
+  }
+
+  .mobileCarousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Each slide: full viewport width, full height, snap */
+  .mobileSlide {
+    flex: 0 0 100vw;
+    width: 100vw;
+    height: 100dvh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Top 50%: image */
+  .mobileSlideImg {
+    position: relative;
+    flex: 0 0 50%;
+    overflow: hidden;
+  }
+
+  .mobileSlideImgTint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,58,87,0.1) 0%, rgba(10,58,87,0.5) 100%);
+    z-index: 1;
+  }
+
+  /* Slide counter pill top right */
+  .mobileSlideCount {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    background: rgba(10,58,87,0.75);
+    color: #fff;
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Bottom 50%: navy info panel */
+  .mobileSlideInfo {
+    flex: 0 0 50%;
+    background: var(--navy, #0a3a57);
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  .mobileSlideTag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .mobileSlideBreed {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #aac4d4;
+  }
+
+  .mobileSlideTitle {
+    font-family: var(--font-display, "Luckiest Guy", cursive);
+    font-size: clamp(1.2rem, 5vw, 1.6rem);
+    color: var(--yellow, #ffd23e);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .mobileSlideSummary {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  /* Swipe hint on first slide */
+  .mobileCarousel .mobileSlide:first-child .mobileSlideInfo::after {
+    content: "Swipe to explore →";
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 4px;
+  }
+}
