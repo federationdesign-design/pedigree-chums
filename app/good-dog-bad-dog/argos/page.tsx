@@ -114,40 +114,39 @@ function NolanFilmCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026 &mdash; The Film</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026</p>
               </div>
               <div style={{ padding: "12px 20px 4px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                   <div style={{ display: "flex", gap: 4 }}>
                     {[1,2,3,4,5].map(i => (
-                      <svg key={i} width="20" height="20" viewBox="0 0 24 24" fill="var(--yellow)" xmlns="http://www.w3.org/2000/svg">
+                      <svg key={i} width="48" height="48" viewBox="0 0 24 24" fill="var(--yellow)" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                       </svg>
                     ))}
                   </div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>5 / 5</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1.1rem", fontWeight: 700, color: "#fff" }}>5 / 5</p>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-                  {[
-                    { label: "Runtime", value: "173 min" },
-                    { label: "Released", value: "17 Jul 2026" },
-                    { label: "UK certificate", value: "15" },
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+                  {([
+                    { label: "Runtime", value: <>173 <span style={{ fontSize: "75%" }}>min</span></> },
+                    { label: "Released", value: "July 26" },
                     { label: "US rating", value: "R" },
-                  ].map(({ label, value }) => (
+                  ] as { label: string; value: React.ReactNode }[]).map(({ label, value }) => (
                     <div key={label} style={{ textAlign: "center" }}>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 3 }}>{label}</p>
-                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1 }}>{value}</p>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.7rem", color: "#fff", lineHeight: 1 }}>{value}</p>
                     </div>
                   ))}
                 </div>
                 <div style={{ background: "#ef4444", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 in the UK for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated R (US) and 15 (UK) for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Zendaya", "Charlize Theron"].map(name => (
-                    <span key={name} style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 700, color: "var(--navy)", background: "var(--yellow)", borderRadius: 999, padding: "8px 18px", display: "inline-block" }}>{name}</span>
+                    <span key={name} style={{ fontFamily: "var(--font-body)", fontSize: "0.52rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--navy)", background: "var(--yellow)", borderRadius: 999, padding: "4px 10px", display: "inline-block" }}>{name}</span>
                   ))}
                 </div>
               </div>
@@ -160,7 +159,7 @@ function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
               </div>
               {showImage && (
               <div style={{ overflow: "hidden" }}>
@@ -185,7 +184,7 @@ function EditorsNoteCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
               </div>
               <div style={{ padding: "0 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
@@ -198,7 +197,7 @@ function ArgosIdentityCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
@@ -212,7 +211,7 @@ function InContextCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
@@ -225,16 +224,15 @@ function BookFactsCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
               </div>
-              <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                {[
+              <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+                {([
                   { label: "Books", value: "24" },
                   { label: "Lines", value: "12,109" },
-                  { label: "Words", value: "134,560" },
-                  { label: "Read time*", value: "30 hrs" },
-                ].map(({ label, value }) => (
+                  { label: "Read time*", value: <>30 <span style={{ fontSize: "75%" }}>hrs</span></> },
+                ] as { label: string; value: React.ReactNode }[]).map(({ label, value }) => (
                   <div key={label} style={{ textAlign: "center" }}>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
                     <p style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 }}>{value}</p>
@@ -242,7 +240,7 @@ function BookFactsCard() {
                 ))}
               </div>
               <div style={{ padding: "12px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>*The often-cited 9-hour figure assumes mechanical reading at 250 wpm. In practice, The Odyssey demands real concentration. Allow at least 30 hours for a considered read.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>*The often-cited 9-hour figure assumes mechanical reading at 250 wpm. In practice, The Odyssey demands real concentration and a considered read. Reader beware!</p>
               </div>
             </div>
   );
@@ -252,15 +250,16 @@ function AboutHomerCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
               </div>
-              <div style={{ overflow: "hidden" }}>
+              <div style={{ overflow: "hidden", position: "relative" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/history/homer-bust.jpeg"
                   alt="Bust of Homer, Farnese collection, Naples"
                   style={{ width: "100%", display: "block" }}
                 />
+                <p style={{ position: "absolute", left: 12, right: 12, bottom: 8, fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 600, color: "var(--navy)", margin: 0 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
@@ -287,7 +286,6 @@ function AboutHomerCard() {
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
                   </div>
                 ))}
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8, marginTop: 4 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
               </div>
             </div>
   );
@@ -297,12 +295,12 @@ function WhatWeKnowCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
               </div>
               <div style={{ padding: "10px 20px 4px" }}>
                 {[
                   { label: "Source", value: "The Odyssey, Homer, Book 17" },
-                  { label: "Approx. date", value: "c.800–700 BC (composition); story set c.1200 BC" },
+                  { label: "Approx. date", value: "Story set c.1200 BC" },
                   { label: "Age at death", value: "Twenty years — almost certainly mythic for a large hunting dog. Aristotle noted this was exceptional and recorded that critics praised Homer for giving Argos exactly this lifespan." },
                   { label: "Most probable type", value: "The Laconian Hound (Spartan Hound) — the premier hunting dog of ancient Greece. Lean, fast, agile and prized across the Mediterranean for its scenting ability and stamina." },
                 ].map(({ label, value }) => (
@@ -313,13 +311,10 @@ function WhatWeKnowCard() {
                 ))}
               </div>
               <div style={{ padding: "4px 20px 8px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 10 }}>Modern descendants</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 10 }}>Modern chum descendants</p>
                 {[
                   { breed: "Greyhound", via: "via Laconian Hound", slug: "greyhound", linked: true },
-                  { breed: "Saluki", via: "via Laconian Hound", slug: null, linked: false },
                   { breed: "Whippet", via: "via Laconian Hound", slug: "whippet", linked: true },
-                  { breed: "Ibizan Hound", via: "via Cretan Hound", slug: null, linked: false },
-                  { breed: "Pharaoh Hound", via: "via Cretan Hound", slug: null, linked: false },
                   { breed: "English Mastiff", via: "via Molossian Hound", slug: "mastiff", linked: true },
                 ].map(({ breed, via, slug, linked }) => (
                   <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
@@ -341,7 +336,7 @@ function LikelyOriginsCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
@@ -355,7 +350,7 @@ function BuildAppearanceCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build & Appearance</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build & Appearance</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
                 {[
@@ -382,7 +377,7 @@ function EstimatedSizeCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
               </div>
               <div style={{ padding: "0 20px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 {[
@@ -394,6 +389,43 @@ function EstimatedSizeCard() {
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
                     <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1, marginBottom: 2 }}>{value}</p>
                     {sub && <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 500, color: "#fff" }}>{sub}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+  );
+}
+
+function SizeBuildCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 12px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Size & Build</p>
+              </div>
+              <div style={{ padding: "0 20px 16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                {[
+                  { label: "Height", value: "90 cm" },
+                  { label: "Length", value: "130 cm" },
+                  { label: "Weight", value: "65 kg" },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ textAlign: "center" }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1 }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "0 20px 16px" }}>
+                {[
+                  "Broad head, powerful jaw, drop ears, thick neck",
+                  "Powerful, muscular and deep-chested",
+                  "Built for endurance, strength and protection",
+                  "Short, dense coat suited to heat and outdoor life",
+                  "Likely brindle, grey, fawn or dark-coated",
+                  "Worn, scarred and aged after years of neglect",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+                    <span style={{ color: "var(--yellow)", fontSize: "0.9rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "1.12rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0, textAlign: "left" }}>{item}</p>
                   </div>
                 ))}
               </div>
@@ -440,7 +472,8 @@ export default function ArgosPage() {
             <div className={styles.essayBody}>
 
               <div className={styles.sceneMobile}>
-                <EditorsNoteCard />
+                <p className={styles.editorsNoteTitle}>Editor&apos;s Note</p>
+                <p className={styles.editorsNoteText}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
               </div>
 
               <p>Before Lassie ran for help, before Greyfriars Bobby waited by a grave, before the internet discovered videos of dogs greeting soldiers home from war, there was Argos.</p>
@@ -463,7 +496,7 @@ export default function ArgosPage() {
 
               <p>But when he arrives, he cannot simply walk through the door and announce himself. His palace has been overrun by suitors who want to marry his wife, consume his wealth and take his place. Odysseus returns disguised as a beggar. His survival depends on being unrecognised.</p>
 
-              <p>Then he sees the dog.</p>
+              <p className={styles.heavyLine}>Then he sees the dog.</p>
 
               <div className={`${styles.sceneMobile} ${styles.parallaxScene}`} data-scrub-scene>
                 <div className={styles.parallaxImgWrap}>
@@ -479,11 +512,7 @@ export default function ArgosPage() {
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
 
               <div className={styles.sceneMobile}>
-                <EstimatedSizeCard />
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <BuildAppearanceCard />
+                <SizeBuildCard />
               </div>
 
               <ul className={styles.essayBullets}>
@@ -503,7 +532,7 @@ export default function ArgosPage() {
                     {
                       src: "/history/jurrisicbark-shialebuff.jpg",
                       alt: "Jurassic Bark",
-                      caption: "PLACEHOLDER — Jurassic Bark: Hollywood understands the rule. The dog gets greeted.",
+                      caption: "Jurassic Bark: every good show or story will use this as a trope, some more successfully than others",
                     },
                   ]}
                 />
@@ -527,10 +556,11 @@ export default function ArgosPage() {
 
               <div className={styles.sceneMobile}>
                 <DogPoll
-                  question="Nolan has the whole of The Odyssey in his hands. Should he change the story so Odysseus finally gets to pet his dog?"
+                  title="What do you think?"
+                  question="Should he change the story so Argos gets head strokes?"
                   options={[
-                    { label: "Pet the dog. Homer had 2,800 years to fix this", pct: 96 },
-                    { label: "Stay faithful to the text", pct: 4 },
+                    { label: "Yes, I love schmaltz", pct: 96, resultLabel: "Pet the dog", color: "green" },
+                    { label: "No, stay true to the author", pct: 4, resultLabel: "People with hearts of stone", color: "red" },
                   ]}
                   footnote="*Poll results independently verified by a panel of very good boys."
                 />
@@ -561,22 +591,22 @@ export default function ArgosPage() {
                     {
                       src: "/history/odysseus-dog-argos-in-death.webp",
                       alt: "The death of Argos",
-                      caption: "PLACEHOLDER — Argos in death: the wait ends the moment it is rewarded.",
+                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
                     },
                     {
                       src: "/history/nolans-king-odyssus.webp",
                       alt: "Nolan's Odysseus",
-                      caption: "PLACEHOLDER — Nolan's king: Odysseus returns to cinemas in 2026.",
+                      caption: "Odysseus probably has PTSD, as his core ideology of family, loyalty and legacy has been destroyed",
                     },
                     {
                       src: "/history/nolans-king-odyssus-painting-remake.jpg",
                       alt: "Odysseus painting remake",
-                      caption: "PLACEHOLDER — The classical Odysseus, remade.",
+                      caption: "When he fails to get the acknowledgment he needed, and with his colossal old age, he dies",
                     },
                     {
                       src: "/history/odyssusand-argos-painting-remake.jpg",
                       alt: "Odysseus and Argos painting remake",
-                      caption: "PLACEHOLDER — Man and dog: the original artwork, remade.",
+                      caption: "A tale as old as time; a dog&apos;s love for their human. The original story, remade and remade",
                     },
                   ]}
                 />
@@ -595,6 +625,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" />
+                <p className={styles.imageCaption}>Republican denarius serratus minted in 82 BC by the moneyer Gaius Mamilius Limetanus - a depiction of Odysseus and Argos, www.harneycoins.com</p>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -634,7 +665,7 @@ export default function ArgosPage() {
               </div>
 
               <div className={`${styles.sceneMobile} ${styles.timelineScene} ${styles.tightTop}`} id="tl-scene">
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
                 <div className={styles.tlBody} id="tl-body">
                   <div className={styles.tlTrack} />
                   <div className={styles.tlFill} id="tl-fill" />
@@ -745,12 +776,12 @@ export default function ArgosPage() {
                     {
                       src: "/history/odyssusand-argos-statue-2.jpg",
                       alt: "Odysseus and Argos statue",
-                      caption: "PLACEHOLDER — Odysseus and Argos: the reunion in stone.",
+                      caption: "Nolan is the only one to reimagine this moment",
                     },
                     {
                       src: "/history/odyssusand-argos-statue-1.jpg",
                       alt: "Odysseus and Argos statue, second view",
-                      caption: "PLACEHOLDER — The moment of recognition, another view.",
+                      caption: "Odysseus and Argos: the reunion in stone.",
                     },
                   ]}
                 />
@@ -759,6 +790,11 @@ export default function ArgosPage() {
               <h2 className={styles.subhead}>The dog as home</h2>
 
               <p>Argos is not just a dog at the house. In a way, Argos is the house.</p>
+
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/dogsinthehome.jpg" alt="Dogs in the home" loading="lazy" />
+              </div>
 
               <p>For people who grow up with dogs, home is not only a place. It is a set of sounds and sensations. Paws in the hallway. A bowl on the kitchen floor. The soft weight of a dog settling beside you. Wet paws by the back door. A dog bed tucked into a corner.</p>
 
@@ -890,7 +926,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarOnly}>
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Ancestral Lineage</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Ancestral Lineage</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
                 {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }, i) => (
@@ -936,9 +972,10 @@ export default function ArgosPage() {
             <div className={styles.sidebarOnly}><LivingDescendantCard showImage /></div>
 
             {/* Card 14: Penelope's Dream */}
+            <div className={styles.sidebarOnly}>
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Penelope&apos;s Dream</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Penelope&apos;s Dream</p>
               </div>
               <div style={{ padding: "12px 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>While Argos waited outside, Penelope was inside the palace doing something that tends to get overlooked: she kept a flock of twenty geese. She fed them, watched them, and told the disguised Odysseus, &ldquo;I love to watch them.&rdquo;</p>
@@ -948,6 +985,7 @@ export default function ArgosPage() {
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>Argos and Penelope&apos;s geese are not the same thing, but they belong to the same household of feeling. In a poem full of gods and violence, they are the small, living things that make a home a home.</p>
                 </div>
               </div>
+            </div>
             </div>
 
 
@@ -1003,7 +1041,7 @@ export default function ArgosPage() {
               if (pin < 0) pin = 0;
               if (pin > 1) pin = 1;
               var hi = document.getElementById('hound-img');
-              if (hi) hi.style.transform = 'translateY(' + (-pin * 32) + '%)';
+              if (hi) hi.style.transform = 'translateY(' + (-(12 + pin * 20)) + '%)';
             }
           }
           window.addEventListener('scroll', function(){

@@ -7,6 +7,8 @@ import styles from "./DogPoll.module.css";
 export type PollOption = {
   label: string;
   pct: number;
+  resultLabel?: string;
+  color?: "green" | "red";
 };
 
 /*
@@ -15,10 +17,12 @@ export type PollOption = {
   via the footnote.
 */
 export default function DogPoll({
+  title = "What do you think?",
   question,
   options,
   footnote,
 }: {
+  title?: string;
   question: string;
   options: PollOption[];
   footnote?: string;
@@ -27,13 +31,18 @@ export default function DogPoll({
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.kicker}>Quick poll</p>
+      <p className={styles.kicker}>{title}</p>
       <p className={styles.question}>{question}</p>
 
       {picked === null ? (
         <div className={styles.options}>
           {options.map((opt, i) => (
-            <button key={opt.label} type="button" className={styles.option} onClick={() => setPicked(i)}>
+            <button
+              key={opt.label}
+              type="button"
+              className={opt.color === "red" ? styles.optionRed : styles.option}
+              onClick={() => setPicked(i)}
+            >
               {opt.label}
             </button>
           ))}
@@ -44,14 +53,14 @@ export default function DogPoll({
             <div key={opt.label} className={styles.resultRow}>
               <div className={styles.resultHead}>
                 <span className={i === picked ? styles.resultLabelPicked : styles.resultLabel}>
-                  {opt.label}
-                  {i === picked ? " — you" : ""}
+                  {opt.resultLabel || opt.label}
+                  {i === picked ? " - you" : ""}
                 </span>
                 <span className={styles.resultPct}>{opt.pct}%</span>
               </div>
               <div className={styles.barTrack}>
                 <div
-                  className={i === 0 ? styles.barFillLead : styles.barFill}
+                  className={opt.color === "red" ? styles.barFillRed : styles.barFillLead}
                   style={{ width: `${opt.pct}%` }}
                 />
               </div>

@@ -978,7 +978,43 @@
   }
 
   .subhead {
-    font-size: clamp(1.7rem, 7vw, 2.2rem);
+    font-size: clamp(3.4rem, 14vw, 4.4rem);
+    text-shadow: 0 3px 12px rgba(10, 58, 87, 0.35);
+  }
+
+  .essayBody .editorsNoteTitle {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--navy, #0a3a57);
+    margin: 0 0 6px;
+  }
+
+  .essayBody .editorsNoteText {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.83rem;
+    font-weight: 600;
+    font-style: italic;
+    color: #ffffff;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .heavyLine {
+    font-weight: 800 !important;
+  }
+
+  .essayBody .imageCaption {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.78rem;
+    font-weight: 500;
+    font-style: italic;
+    color: #ffffff;
+    line-height: 1.3;
+    margin: 8px 0 0;
+    padding: 0 20px;
   }
 
   .pullquote {
