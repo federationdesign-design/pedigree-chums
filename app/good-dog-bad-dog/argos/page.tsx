@@ -376,6 +376,31 @@ function BuildAppearanceCard() {
   );
 }
 
+const RESEARCH_NOTE = "The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer\u2019s world.";
+
+function EstimatedSizeCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 12px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
+              </div>
+              <div style={{ padding: "0 20px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                {[
+                  { label: "Full height", value: "75–90 cm", sub: "ear to ground" },
+                  { label: "Full length", value: "110–130 cm", sub: "nose to tail base" },
+                  { label: "Weight", value: "45–65 kg", sub: "" },
+                ].map(({ label, value, sub }) => (
+                  <div key={label} style={{ textAlign: "center" }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1, marginBottom: 2 }}>{value}</p>
+                    {sub && <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 500, color: "#fff" }}>{sub}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+  );
+}
+
 export default function ArgosPage() {
   return (
     <>
@@ -452,6 +477,10 @@ export default function ArgosPage() {
               <p>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
+
+              <div className={styles.sceneMobile}>
+                <EstimatedSizeCard />
+              </div>
 
               <div className={styles.sceneMobile}>
                 <BuildAppearanceCard />
@@ -652,6 +681,7 @@ export default function ArgosPage() {
                   </div>
                 ))}
                 </div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", opacity: 0.85, margin: "20px 0 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.2)" }}>{RESEARCH_NOTE}</p>
               </div>
 
               <figure style={{ margin: "0 0 32px", padding: 0 }}>
@@ -848,24 +878,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarOnly}><LikelyOriginsCard /></div>
 
             {/* Card 7: Estimated Size */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
-              </div>
-              <div style={{ padding: "0 20px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                {[
-                  { label: "Full height", value: "75–90 cm", sub: "ear to ground" },
-                  { label: "Full length", value: "110–130 cm", sub: "nose to tail base" },
-                  { label: "Weight", value: "45–65 kg", sub: "" },
-                ].map(({ label, value, sub }) => (
-                  <div key={label} style={{ textAlign: "center" }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
-                    <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1, marginBottom: 2 }}>{value}</p>
-                    {sub && <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 500, color: "#fff" }}>{sub}</p>}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><EstimatedSizeCard /></div>
 
             {/* Card 8: Build & Appearance */}
             <div className={styles.sidebarOnly}><BuildAppearanceCard /></div>
@@ -912,7 +925,7 @@ export default function ArgosPage() {
             {/* Card 11: Research note */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>The physical description and lineage above are historical reconstructions based on archaeological finds, ancient art and written accounts. Argos is a literary character, but his depiction is grounded in the types of dogs that likely existed in Homer&apos;s world.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>{RESEARCH_NOTE}</p>
               </div>
             </div>
 
