@@ -1,12 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Manrope } from "next/font/google";
 import styles from "./Nav.module.css";
+
+// Big chunky arrow glyphs use Manrope.
+const manrope = Manrope({ subsets: ["latin"], weight: ["800"] });
 
 type Slide = {
   href: string;
   video?: string;      // mp4 source
-  videoWebm?: string;  // optional webm source (played in preference where supported)
   img?: string;        // used when there is no video
   tagGood?: string;    // green pill
   tagBad?: string;     // red pill
@@ -16,8 +19,8 @@ type Slide = {
   btn: string;
 };
 
-// Featured hero slides. Slide 1 is the original Argos clip; slides 2 and 3 add
-// the Anubis and Hound of the Baskervilles essays.
+// Featured hero slides. Slide 1 is the Argos clip; slides 2 and 3 add the Anubis
+// and Hound of the Baskervilles essays. Manual navigation only (arrows).
 const SLIDES: Slide[] = [
   {
     href: "/good-dog-bad-dog/argos",
@@ -48,15 +51,20 @@ const SLIDES: Slide[] = [
   },
 ];
 
-export default function HeroCarousel({ active, onNavigate }: { active: boolean; onNavigate: () => void }) {
+export default function HeroCarousel({ onNavigate }: { onNavigate: () => void }) {
   const [index, setIndex] = useState(0);
   const vids = useRef<(HTMLVideoElement | null)[]>([]);
-  const hoverRef = useRef(false);
+  const rafRef = useRef(0);
+  const reversingRef = useRef(false);
+  const lastTsRef = useRef(0);
 
   const go = (n: number) => setIndex(((n % SLIDES.length) + SLIDES.length) % SLIDES.length);
 
-  // Play only the active slide's video; pause the rest.
+  // Play the active slide's clip once (no loop -> freezes on the last frame);
+  // pause every other slide.
   useEffect(() => {
+    reversingRef.current = false;
+    cancelAnimationFrame(rafRef.current);
     vids.current.forEach((v, i) => {
       if (!v) return;
       if (i === index) {
@@ -66,41 +74,61 @@ export default function HeroCarousel({ active, onNavigate }: { active: boolean; 
         v.pause();
       }
     });
+    return () => cancelAnimationFrame(rafRef.current);
   }, [index]);
 
-  // Auto-advance every 7s; pause while the pointer is over the carousel.
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => {
-      if (!hoverRef.current) setIndex((i) => (i + 1) % SLIDES.length);
-    }, 7000);
-    return () => clearInterval(id);
-  }, [active]);
+  // Rewind (play backwards) the active clip while hovered; forward again on leave.
+  const step = (ts: number) => {
+    const v = vids.current[index];
+    if (!v || !reversingRef.current) return;
+    if (lastTsRef.current) {
+      const dt = (ts - lastTsRef.current) / 1000;
+      v.currentTime = Math.max(0, v.currentTime - dt);
+    }
+    lastTsRef.current = ts;
+    if (v.currentTime <= 0.02) { reversingRef.current = false; return; }
+    rafRef.current = requestAnimationFrame(step);
+  };
+  function handleEnter(i: number) {
+    if (i !== index) return;
+    const v = vids.current[i];
+    if (!v) return;
+    v.pause();
+    reversingRef.current = true;
+    lastTsRef.current = 0;
+    rafRef.current = requestAnimationFrame(step);
+  }
+  function handleLeave(i: number) {
+    if (i !== index) return;
+    reversingRef.current = false;
+    cancelAnimationFrame(rafRef.current);
+    vids.current[i]?.play().catch(() => {});
+  }
 
   const stop = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); };
 
   return (
-    <div
-      className={styles.carousel}
-      onMouseEnter={() => { hoverRef.current = true; }}
-      onMouseLeave={() => { hoverRef.current = false; }}
-    >
+    <div className={styles.carousel}>
       <div className={styles.carTrack} style={{ transform: `translateX(-${index * 100}%)` }}>
         {SLIDES.map((s, i) => (
-          <Link key={s.href} href={s.href} className={`${styles.heroSlot} ${styles.carSlide}`} onClick={onNavigate}>
+          <Link
+            key={s.href}
+            href={s.href}
+            className={`${styles.heroSlot} ${styles.carSlide}`}
+            onClick={onNavigate}
+            onMouseEnter={() => handleEnter(i)}
+            onMouseLeave={() => handleLeave(i)}
+          >
             {s.video ? (
               <video
                 ref={(el) => { vids.current[i] = el; }}
                 className={styles.heroVideo}
+                src={s.video}
                 muted
                 playsInline
-                loop
                 preload="auto"
                 aria-hidden
-              >
-                {s.videoWebm ? <source src={s.videoWebm} type="video/webm" /> : null}
-                <source src={s.video} type="video/mp4" />
-              </video>
+              />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={s.img} alt="" className={styles.heroVideo} />
@@ -124,20 +152,18 @@ export default function HeroCarousel({ active, onNavigate }: { active: boolean; 
         ))}
       </div>
 
-      <button type="button" className={`${styles.carArrow} ${styles.carPrev}`} onClick={(e) => { stop(e); go(index - 1); }} aria-label="Previous">‹</button>
-      <button type="button" className={`${styles.carArrow} ${styles.carNext}`} onClick={(e) => { stop(e); go(index + 1); }} aria-label="Next">›</button>
-
-      <div className={styles.carDots}>
-        {SLIDES.map((s, i) => (
-          <button
-            key={s.href}
-            type="button"
-            className={`${styles.carDot} ${i === index ? styles.carDotActive : ""}`}
-            onClick={(e) => { stop(e); go(i); }}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
+      <button
+        type="button"
+        className={`${styles.carArrow} ${styles.carPrev} ${manrope.className}`}
+        onClick={(e) => { stop(e); go(index - 1); }}
+        aria-label="Previous"
+      >{"<"}</button>
+      <button
+        type="button"
+        className={`${styles.carArrow} ${styles.carNext} ${manrope.className}`}
+        onClick={(e) => { stop(e); go(index + 1); }}
+        aria-label="Next"
+      >{">"}</button>
     </div>
   );
 }

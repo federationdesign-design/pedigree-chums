@@ -278,28 +278,20 @@
    radius and hover-lift (the carousel frame owns those now). */
 .carSlide { flex: 0 0 100%; min-width: 0; margin-top: 0; border-radius: 0; box-shadow: none; }
 .carSlide:hover { transform: none; box-shadow: none; }
+/* Big chunky < > arrows (Manrope, applied via className on the buttons) */
 .carArrow {
   position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-  width: clamp(40px, 4vw, 54px); height: clamp(40px, 4vw, 54px);
   display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.7);
-  background: rgba(10, 58, 87, 0.5); color: #fff;
-  font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1; font-family: var(--font-body, sans-serif);
-  cursor: pointer; pointer-events: auto; transition: background 0.15s, color 0.15s;
+  border: none; background: none; color: #fff;
+  font-size: clamp(40px, 6vw, 70px); font-weight: 800; line-height: 0.8;
+  padding: 0 clamp(6px, 1.4vw, 16px); cursor: pointer; pointer-events: auto;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  transition: color 0.15s ease, transform 0.1s ease;
 }
-.carArrow:hover { background: var(--yellow, #ffd23e); color: var(--navy, #0a3a57); }
-.carPrev { left: clamp(10px, 1.6vw, 18px); }
-.carNext { right: clamp(10px, 1.6vw, 18px); }
-.carDots {
-  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 5;
-  display: flex; gap: 10px; pointer-events: auto;
-}
-.carDot {
-  width: 12px; height: 12px; padding: 0; border: none; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.55); cursor: pointer; transition: background 0.15s, transform 0.15s;
-}
-.carDot:hover { transform: scale(1.15); }
-.carDotActive { background: var(--yellow, #ffd23e); }
+.carArrow:hover { color: var(--yellow, #ffd23e); }
+.carArrow:active { transform: translateY(-50%) scale(0.88); }
+.carPrev { left: clamp(6px, 1.4vw, 20px); }
+.carNext { right: clamp(6px, 1.4vw, 20px); }
 
 /* ── Row layout: a big image-fit card beside a matched-height cluster ── */
 .rowBlock {

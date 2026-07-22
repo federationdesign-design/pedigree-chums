@@ -178,7 +178,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           ) : (
             <div className={`${styles.bentoWrap} ${styles.overlayIn}`}>
               {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles */}
-              <HeroCarousel active={open} onNavigate={closeMenu} />
+              <HeroCarousel onNavigate={closeMenu} />
 
               {/* Row 1 -- Name Generator (left) beside the Chum Drop / Britain's / About cluster */}
               <div className={styles.rowBlock}>
