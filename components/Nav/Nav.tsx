@@ -5,24 +5,17 @@ import Link from "next/link";
 import ChumDropTile from "./ChumDropTile";
 import styles from "./Nav.module.css";
 
-// ── Featured tiles (the launcher grid). Order = DOM order = grid flow. ──
-// Titles are two-tone: labelA shows in yellow, labelB in white.
-// img: real hero image for the tile. Falls back to the emoji when absent.
-type Tile = { key: string; labelA: string; labelB?: string; href: string; cta: string; size: string; emoji: string; img?: string };
-// Two big square cards -- rendered in their own flex row so they stay square.
-const BIG: Tile[] = [
-  { key: "name-generator", labelA: "Name", labelB: "Generator", href: "/name-generator", cta: "Name your chum", size: "tileSquare", emoji: "🐶", img: "/name-gen-bento-menu-img.jpg" },
-  { key: "product", labelA: "The Card", labelB: "Game", href: "/", cta: "Get yours", size: "tileSquare", emoji: "🃏", img: "/product-img.jpg" },
-];
-
-const TILES: Tile[] = [
-  { key: "chum-finder", labelA: "Chum", labelB: "Finder", href: "/chum-calculator", cta: "Find your perfect dog", size: "tileWide", emoji: "🔍" },
-  { key: "chum-drop", labelA: "Chum", labelB: "Drop", href: "/", cta: "Play the game", size: "tileWide", emoji: "🎯" },
-  { key: "dogs-at-work", labelA: "Dogs", labelB: "at Work", href: "/dogs-at-work", cta: "Meet the workers", size: "tileSmall", emoji: "🦺" },
-  { key: "good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", href: "/good-dog-bad-dog", cta: "Read the essays", size: "tileSmall", emoji: "📖" },
-  { key: "britains-dog-history", labelA: "Britain's", labelB: "Dog History", href: "/britains-dog-history", cta: "Travel back", size: "tileSmall", emoji: "🏰", img: "/history-hero.jpg" },
-  { key: "about", labelA: "About", href: "/about", cta: "Who we are", size: "tileSmall", emoji: "🐾", img: "/initial-preload-hero-img.jpg" },
-];
+// ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
+type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string };
+const NAV_TILES: Record<string, TileData> = {
+  nameGen: { href: "/name-generator", labelA: "Name", labelB: "Generator", cta: "Name your chum", img: "/name-gen-bento-menu-img.jpg" },
+  product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
+  chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
+  britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
+  about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
+  gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Read the essays", emoji: "📖" },
+  dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", emoji: "🦺" },
+};
 
 // Secondary pages -- kept reachable as plain text links
 const UTILITY = [
@@ -45,32 +38,6 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   const [scrolled, setScrolled] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Featured hero: wait 2s after the menu opens, then play the clip through once.
-  useEffect(() => {
-    if (!open) return;
-    const v = videoRef.current;
-    if (!v) return;
-    try { v.currentTime = 0; } catch {}
-    const t = setTimeout(() => { v.play().catch(() => {}); }, 2000);
-    return () => clearTimeout(t);
-  }, [open]);
-
-  // Hover: if it has finished, replay from the start; if it is playing, pause;
-  // if it is paused part-way, resume.
-  function handleHeroHover() {
-    const v = videoRef.current;
-    if (!v) return;
-    const atEnd = v.ended || (v.duration > 0 && v.currentTime >= v.duration - 0.05);
-    if (atEnd) {
-      v.currentTime = 0;
-      v.play().catch(() => {});
-    } else if (!v.paused) {
-      v.pause();
-    } else {
-      v.play().catch(() => {});
-    }
-  }
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
     const raf = requestAnimationFrame(onScroll);
@@ -87,10 +54,75 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     return () => window.removeEventListener("pc:open-menu", openMenu);
   }, []);
 
+  // Featured hero: wait 2s after the menu opens, then play the clip through once.
+  useEffect(() => {
+    if (!open) return;
+    const v = videoRef.current;
+    if (!v) return;
+    try { v.currentTime = 0; } catch {}
+    const t = setTimeout(() => { v.play().catch(() => {}); }, 2000);
+    return () => clearTimeout(t);
+  }, [open]);
+
+  // Hover: replay if finished, pause if playing, resume if paused part-way.
+  function handleHeroHover() {
+    const v = videoRef.current;
+    if (!v) return;
+    const atEnd = v.ended || (v.duration > 0 && v.currentTime >= v.duration - 0.05);
+    if (atEnd) {
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    } else if (!v.paused) {
+      v.pause();
+    } else {
+      v.play().catch(() => {});
+    }
+  }
+
   function openOffer() {
     setOpen(false);
     window.dispatchEvent(new CustomEvent("pc:open-offer"));
   }
+
+  const closeMenu = () => setOpen(false);
+
+  // Two-tone title: first word(s) yellow, remainder white.
+  const twoTone = (a: string, b?: string) => (
+    <span className={styles.tileLabel}>
+      <span className={styles.tileLabelAccent}>{a}</span>{b ? ` ${b}` : ""}
+    </span>
+  );
+
+  // Standard tile: image (or emoji) fills as a cropped backdrop, label overlaid.
+  const coverTile = (t: TileData, cls: string) => (
+    <Link href={t.href} className={`${styles.tile} ${cls}`} onClick={closeMenu}>
+      <span className={styles.tileImg} aria-hidden>
+        {t.img ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={t.img} alt="" className={styles.tileImgTag} loading="lazy" />
+        ) : (
+          <span className={styles.tileEmoji}>{t.emoji}</span>
+        )}
+      </span>
+      <span className={styles.tileMeta}>
+        {twoTone(t.labelA, t.labelB)}
+        <span className={styles.tileCta}>{t.cta} →</span>
+      </span>
+    </Link>
+  );
+
+  // Image-fit tile: box scales to the image width and takes the image's height,
+  // so 100% of the artwork shows. Label overlays the bottom.
+  const fitTile = (t: TileData) => (
+    <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={closeMenu}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={t.img} alt="" className={styles.tileFitImg} />
+      <span className={`${styles.tileMeta} ${styles.tileMetaOverlay}`}>
+        {twoTone(t.labelA, t.labelB)}
+        <span className={styles.tileCta}>{t.cta} →</span>
+      </span>
+    </Link>
+  );
 
   return (
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
@@ -122,7 +154,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           ) : (
             <div className={styles.bentoWrap}>
               {/* Featured hero -- Argos letterbox animation, click-through to the essay */}
-              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={() => setOpen(false)} onMouseEnter={handleHeroHover}>
+              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={closeMenu} onMouseEnter={handleHeroHover}>
                 <video ref={videoRef} className={styles.heroVideo} src="/menuflash-argos-opt.mp4" muted playsInline preload="auto" aria-hidden />
                 <div className={styles.heroContent}>
                   <div className={styles.heroTags}>
@@ -137,83 +169,43 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 </div>
               </Link>
 
-              <div className={styles.bigRow}>
-                {BIG.map((t) => (
-                  <Link
-                    key={t.key}
-                    href={t.href}
-                    className={`${styles.tile} ${styles.tileSquare}`}
-                    onClick={() => setOpen(false)}
-                  >
-                    <span className={styles.tileImg} aria-hidden>
-                      {t.img ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.img} alt="" className={styles.tileImgTag} loading="lazy" />
-                      ) : (
-                        <span className={styles.tileEmoji}>{t.emoji}</span>
-                      )}
-                    </span>
-                    <span className={styles.tileMeta}>
-                      <span className={styles.tileLabel}>
-                        <span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}
-                      </span>
-                      <span className={styles.tileCta}>{t.cta} →</span>
-                    </span>
-                  </Link>
-                ))}
+              {/* Row 1 -- Name Generator beside the Chum Drop / Britain's / About cluster */}
+              <div className={styles.rowBlock}>
+                {fitTile(NAV_TILES.nameGen)}
+                <div className={styles.cluster}>
+                  <ChumDropTile href="/" labelA="Chum" labelB="Drop" cta="Play the game" sizeClass={styles.clusterWide} onNavigate={closeMenu} />
+                  <div className={styles.clusterRow}>
+                    {coverTile(NAV_TILES.britains, styles.clusterCell)}
+                    {coverTile(NAV_TILES.about, styles.clusterCell)}
+                  </div>
+                </div>
               </div>
 
-              <div className={styles.bentoGrid}>
-                {TILES.map((t) =>
-                  t.key === "chum-drop" ? (
-                    <ChumDropTile
-                      key={t.key}
-                      href={t.href}
-                      labelA={t.labelA}
-                      labelB={t.labelB}
-                      cta={t.cta}
-                      sizeClass={styles[t.size as keyof typeof styles]}
-                      onNavigate={() => setOpen(false)}
-                    />
-                  ) : (
-                    <Link
-                      key={t.key}
-                      href={t.href}
-                      className={`${styles.tile} ${styles[t.size as keyof typeof styles]}`}
-                      onClick={() => setOpen(false)}
-                    >
-                      <span className={styles.tileImg} aria-hidden>
-                        {t.img ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={t.img} alt="" className={styles.tileImgTag} loading="lazy" />
-                        ) : (
-                          <span className={styles.tileEmoji}>{t.emoji}</span>
-                        )}
-                      </span>
-                      <span className={styles.tileMeta}>
-                        <span className={styles.tileLabel}>
-                          <span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}
-                        </span>
-                        <span className={styles.tileCta}>{t.cta} →</span>
-                      </span>
-                    </Link>
-                  )
-                )}
+              {/* Row 2 -- The Card Game beside the Chum Finder / Good Dog / Dogs cluster */}
+              <div className={styles.rowBlock}>
+                {fitTile(NAV_TILES.product)}
+                <div className={styles.cluster}>
+                  {coverTile(NAV_TILES.chumFinder, styles.clusterWide)}
+                  <div className={styles.clusterRow}>
+                    {coverTile(NAV_TILES.gdbd, styles.clusterCell)}
+                    {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell)}
+                  </div>
+                </div>
+              </div>
 
-                {/* Discount -- full-width action strip */}
-                <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
-                  <span className={styles.tileMeta}>
-                    <span className={styles.tileLabel}>
-                      <span className={styles.tileLabelAccent}>Discount</span> code
-                    </span>
-                    <span className={styles.tileCta}>Grab your code →</span>
+              {/* Discount -- full-width action strip */}
+              <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
+                <span className={styles.tileMeta}>
+                  <span className={styles.tileLabel}>
+                    <span className={styles.tileLabelAccent}>Discount</span> code
                   </span>
-                </button>
-              </div>
+                  <span className={styles.tileCta}>Grab your code →</span>
+                </span>
+              </button>
 
               <div className={styles.utilityRow}>
                 {UTILITY.map((l) => (
-                  <Link key={l.href} href={l.href} className={styles.utilityLink} onClick={() => setOpen(false)}>{l.label}</Link>
+                  <Link key={l.href} href={l.href} className={styles.utilityLink} onClick={closeMenu}>{l.label}</Link>
                 ))}
               </div>
             </div>
