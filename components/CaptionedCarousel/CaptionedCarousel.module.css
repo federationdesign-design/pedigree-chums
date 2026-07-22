@@ -27,6 +27,10 @@
 }
 
 /* 86% width leaves the next slide peeking in as the swipe affordance */
+.slide:only-child {
+  flex-basis: 100%;
+}
+
 .slide {
   flex: 0 0 86%;
   scroll-snap-align: center;

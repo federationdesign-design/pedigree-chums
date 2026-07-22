@@ -1,0 +1,103 @@
+/* Mobile-only for now -- flip the media query to enable on desktop */
+.wrap {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 26px;
+    z-index: 500;
+    pointer-events: none;
+  }
+
+  .track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(10, 58, 87, 0.28);
+  }
+
+  .notch {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.55);
+    z-index: 1;
+  }
+
+  .fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--yellow, #ffd23e);
+    z-index: 2;
+  }
+
+  .bone {
+    position: absolute;
+    top: 6px;
+    right: 3px;
+    filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.4));
+  }
+
+  .dog {
+    position: absolute;
+    top: 3px;
+    transform: translateX(-55%);
+    filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
+    will-change: left;
+  }
+
+  /* legs: B pair hidden at rest; alternate while walking */
+  .legsB {
+    opacity: 0;
+  }
+
+  .dogWalking .legsA {
+    animation: stepA 0.32s steps(1) infinite;
+  }
+
+  .dogWalking .legsB {
+    animation: stepB 0.32s steps(1) infinite;
+  }
+
+  @keyframes stepA {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  @keyframes stepB {
+    0%, 49% { opacity: 0; }
+    50%, 100% { opacity: 1; }
+  }
+
+  /* a little bounce in the walk */
+  .dogWalking svg {
+    animation: trot 0.32s ease-in-out infinite;
+  }
+
+  @keyframes trot {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1.5px); }
+  }
+
+  /* made it to the bone: wag */
+  .dogDone .tail {
+    animation: wag 0.35s ease-in-out infinite;
+    transform-origin: 7px 11px;
+  }
+
+  @keyframes wag {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(28deg); }
+  }
+}

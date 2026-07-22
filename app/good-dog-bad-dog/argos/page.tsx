@@ -5,6 +5,8 @@ import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
 import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCarousel";
 import DogPoll from "../../../components/DogPoll/DogPoll";
+import ReadingProgress from "../../../components/ReadingProgress/ReadingProgress";
+import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
 
 export const metadata: Metadata = {
   title: "Argos: Homer's Dog in The Odyssey — Loyalty, Home and the Nolan Film",
@@ -335,11 +337,52 @@ function WhatWeKnowCard() {
   );
 }
 
+function LikelyOriginsCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
+              </div>
+              <div style={{ padding: "10px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Larger, strong-boned, with short coats and great endurance.</p>
+              </div>
+            </div>
+  );
+}
+
+function BuildAppearanceCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build & Appearance</p>
+              </div>
+              <div style={{ padding: "10px 20px 16px" }}>
+                {[
+                  "Broad head, powerful jaw, drop ears, thick neck",
+                  "Powerful, muscular and deep-chested",
+                  "Built for endurance, strength and protection",
+                  "Short, dense coat suited to heat and outdoor life",
+                  "Likely brindle, grey, fawn or dark-coated",
+                  "Worn, scarred and aged after years of neglect",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start", paddingLeft: 16, paddingRight: 20 }}>
+                    <span style={{ color: "var(--yellow)", fontSize: "0.8rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0, hyphens: "none" as const, overflowWrap: "normal" as const }}>{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+  );
+}
+
 export default function ArgosPage() {
   return (
     <>
       <Nav showLogo />
       <main className={styles.essayPage}>
+
+        <ReadingProgress />
 
         {/* ── Hero ── */}
         <div className={`${styles.essayHero} ${styles.heroScene}`}>
@@ -397,10 +440,9 @@ export default function ArgosPage() {
 
               <p>Then he sees the dog.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`}>
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`} data-scrub-scene>
                 <div className={styles.parallaxImgWrap}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/history/Argos-hero.jpg" alt="Argos waiting for Odysseus" loading="lazy" />
+                  <ScrollVideo src="/menuflash-argos-opt.mp4" className={styles.parallaxVideo} />
                 </div>
                 <div className={styles.parallaxContent}>
                   <ArgosIdentityCard />
@@ -410,6 +452,10 @@ export default function ArgosPage() {
               <p>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
+
+              <div className={styles.sceneMobile}>
+                <BuildAppearanceCard />
+              </div>
 
               <ul className={styles.essayBullets}>
                 <li>But Argos recognises Odysseus.</li>
@@ -429,16 +475,6 @@ export default function ArgosPage() {
                       src: "/history/jurrisicbark-shialebuff.jpg",
                       alt: "Jurassic Bark",
                       caption: "PLACEHOLDER — Jurassic Bark: Hollywood understands the rule. The dog gets greeted.",
-                    },
-                    {
-                      src: "/history/odyssusand-argos-statue-2.jpg",
-                      alt: "Odysseus and Argos statue",
-                      caption: "PLACEHOLDER — Odysseus and Argos: the reunion in stone.",
-                    },
-                    {
-                      src: "/history/odyssusand-argos-statue-.jpg",
-                      alt: "Odysseus and Argos statue, second view",
-                      caption: "PLACEHOLDER — The moment of recognition, another view.",
                     },
                   ]}
                 />
@@ -550,11 +586,32 @@ export default function ArgosPage() {
 
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
 
+              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
+                <CaptionedCarousel
+                  slides={[
+                    {
+                      src: "/history/odyssusand-argos-statue-2.jpg",
+                      alt: "Odysseus and Argos statue",
+                      caption: "PLACEHOLDER — Odysseus and Argos: the reunion in stone.",
+                    },
+                    {
+                      src: "/history/odyssusand-argos-statue-1.jpg",
+                      alt: "Odysseus and Argos statue, second view",
+                      caption: "PLACEHOLDER — The moment of recognition, another view.",
+                    },
+                  ]}
+                />
+              </div>
+
               <div className={styles.sceneMobile}>
+                <LikelyOriginsCard />
+              </div>
+
+              <div className={`${styles.sceneMobile} ${styles.overlapNext}`} id="wwk-scene">
                 <WhatWeKnowCard />
               </div>
 
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`}>
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.tightBottom}`} id="harehound-scene">
                 <div className={styles.parallaxImgWrap}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/history/greek-harehound.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" />
@@ -564,7 +621,7 @@ export default function ArgosPage() {
                 </div>
               </div>
 
-              <div className={`${styles.sceneMobile} ${styles.timelineScene}`} id="tl-scene">
+              <div className={`${styles.sceneMobile} ${styles.timelineScene} ${styles.tightTop}`} id="tl-scene">
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
                 <div className={styles.tlBody} id="tl-body">
                   <div className={styles.tlTrack} />
@@ -596,32 +653,6 @@ export default function ArgosPage() {
                 ))}
                 </div>
               </div>
-
-              <h2 className={styles.subhead}>The smell of home</h2>
-
-              <p>Ask someone what home smells like and they will almost always be able to tell you. Not think about it. Tell you. Immediately, from somewhere that bypasses conscious thought entirely.</p>
-
-              <p>For many people, that smell includes a dog.</p>
-
-              <p>Not everyone welcomes this. There are people who notice dog smell the moment they step through a front door. To them it is intrusion: animal, persistent, worked into curtains, carpets and cushions.</p>
-
-              <p>But for people who grew up with dogs, that same smell does something completely different. It opens a door. Not a metaphorical door, but a specific one, in a specific house, at a specific age. The smell of dog is the smell of Saturday mornings, school holidays, wet paws by the back door, warm fur, old blankets and a particular kind of safety that belongs almost entirely to childhood.</p>
-
-              <p>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</p>
-
-              <p>This is not just sentimentality. It is biology.</p>
-
-              <p>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
-
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</blockquote>
-
-              <p>That matters here because dogs live in scent in a way humans barely do. Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence. A path is not just a path. It is a recent history of who has passed, when, in what condition and in what direction.</p>
-
-              <p>Argos belongs to that world.</p>
-
-              <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
-
-              <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
 
               <figure style={{ margin: "0 0 32px", padding: 0 }}>
                 <div id="smellofhome-video-wrap" style={{ width: "100%", position: "relative" }}>
@@ -668,6 +699,33 @@ export default function ArgosPage() {
                   }
                 });
               })();` }} />
+
+              <h2 className={styles.subhead}>The smell of home</h2>
+
+              <p>Ask someone what home smells like and they will almost always be able to tell you. Not think about it. Tell you. Immediately, from somewhere that bypasses conscious thought entirely.</p>
+
+              <p>For many people, that smell includes a dog.</p>
+
+              <p>Not everyone welcomes this. There are people who notice dog smell the moment they step through a front door. To them it is intrusion: animal, persistent, worked into curtains, carpets and cushions.</p>
+
+              <p>But for people who grew up with dogs, that same smell does something completely different. It opens a door. Not a metaphorical door, but a specific one, in a specific house, at a specific age. The smell of dog is the smell of Saturday mornings, school holidays, wet paws by the back door, warm fur, old blankets and a particular kind of safety that belongs almost entirely to childhood.</p>
+
+              <p>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</p>
+
+              <p>This is not just sentimentality. It is biology.</p>
+
+              <p>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</blockquote>
+
+              <p>That matters here because dogs live in scent in a way humans barely do. Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence. A path is not just a path. It is a recent history of who has passed, when, in what condition and in what direction.</p>
+
+              <p>Argos belongs to that world.</p>
+
+              <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
+
+              <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
+
               <h2 className={styles.subhead}>The dog as home</h2>
 
               <p>Argos is not just a dog at the house. In a way, Argos is the house.</p>
@@ -787,15 +845,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarOnly}><AboutHomerCard /></div>
 
             {/* Card 6: Likely Origins */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
-              </div>
-              <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Larger, strong-boned, with short coats and great endurance.</p>
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><LikelyOriginsCard /></div>
 
             {/* Card 7: Estimated Size */}
             <div className={styles.sidebarCard}>
@@ -818,26 +868,7 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 8: Build & Appearance */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build & Appearance</p>
-              </div>
-              <div style={{ padding: "10px 20px 16px" }}>
-                {[
-                  "Broad head, powerful jaw, drop ears, thick neck",
-                  "Powerful, muscular and deep-chested",
-                  "Built for endurance, strength and protection",
-                  "Short, dense coat suited to heat and outdoor life",
-                  "Likely brindle, grey, fawn or dark-coated",
-                  "Worn, scarred and aged after years of neglect",
-                ].map((item) => (
-                  <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start", paddingLeft: 16, paddingRight: 20 }}>
-                    <span style={{ color: "var(--yellow)", fontSize: "0.8rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0, hyphens: "none" as const, overflowWrap: "normal" as const }}>{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><BuildAppearanceCard /></div>
 
             {/* Card 9: In Context */}
             <div className={styles.sidebarOnly}><InContextCard /></div>
@@ -920,34 +951,44 @@ export default function ArgosPage() {
           if (!scene || !('IntersectionObserver' in window)) return;
           scene.className += ' tl-js';
           var items = scene.querySelectorAll('[data-tl-item]');
-          /* entries reveal as they cross the top 62% of the viewport, so on
-             arrival only the first ~3 are lit and scrolling paces the rest */
-          var obs = new IntersectionObserver(function(entries){
-            entries.forEach(function(en){
-              if (en.isIntersecting) { en.target.className += ' tl-in'; obs.unobserve(en.target); }
-            });
-          }, { rootMargin: '0px 0px -38% 0px', threshold: 0.05 });
-          items.forEach(function(el){ obs.observe(el); });
-
-          /* the yellow spine grows with scroll progress through the timeline */
           var tlBody = document.getElementById('tl-body');
           var fill = document.getElementById('tl-fill');
-          if (tlBody && fill) {
-            var tick = false;
-            function grow() {
-              tick = false;
+          var wwk = document.getElementById('wwk-scene');
+          var hound = document.getElementById('harehound-scene');
+          var tick = false;
+          function update() {
+            tick = false;
+            var vh = window.innerHeight;
+            /* entries fade continuously: alpha 0 at the bottom edge of the
+               viewport, fully solid by halfway up -- both scroll directions */
+            items.forEach(function(el){
+              var t = el.getBoundingClientRect().top;
+              var o = (vh - t) / (vh * 0.5);
+              if (o < 0) o = 0;
+              if (o > 1) o = 1;
+              el.style.opacity = o;
+            });
+            /* the yellow spine grows with scroll progress through the timeline */
+            if (tlBody && fill) {
               var r = tlBody.getBoundingClientRect();
-              var anchor = window.innerHeight * 0.62;
-              var pct = (anchor - r.top) / r.height;
+              var pct = (vh * 0.62 - r.top) / r.height;
               if (pct < 0) pct = 0;
               if (pct > 1) pct = 1;
               fill.style.height = (pct * 100) + '%';
             }
-            window.addEventListener('scroll', function(){
-              if (!tick) { tick = true; requestAnimationFrame(grow); }
-            }, { passive: true });
-            grow();
+            /* What We Know nudges gently down onto the harehound image */
+            if (wwk && hound) {
+              var hr = hound.getBoundingClientRect();
+              var np = (vh - hr.top) / vh;
+              if (np < 0) np = 0;
+              if (np > 1) np = 1;
+              wwk.style.transform = 'translateY(' + (np * 18) + 'px)';
+            }
           }
+          window.addEventListener('scroll', function(){
+            if (!tick) { tick = true; requestAnimationFrame(update); }
+          }, { passive: true });
+          update();
         })();` }} />
       </main>
       <Footer />
