@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./Nav.module.css";
@@ -36,6 +36,33 @@ const tradeNavLinks = [
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Featured hero: wait 2s after the menu opens, then play the clip through once.
+  useEffect(() => {
+    if (!open) return;
+    const v = videoRef.current;
+    if (!v) return;
+    try { v.currentTime = 0; } catch {}
+    const t = setTimeout(() => { v.play().catch(() => {}); }, 2000);
+    return () => clearTimeout(t);
+  }, [open]);
+
+  // Hover: if it has finished, replay from the start; if it is playing, pause;
+  // if it is paused part-way, resume.
+  function handleHeroHover() {
+    const v = videoRef.current;
+    if (!v) return;
+    const atEnd = v.ended || (v.duration > 0 && v.currentTime >= v.duration - 0.05);
+    if (atEnd) {
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    } else if (!v.paused) {
+      v.pause();
+    } else {
+      v.play().catch(() => {});
+    }
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -88,16 +115,18 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           ) : (
             <div className={styles.bentoWrap}>
               {/* Featured hero -- Argos letterbox animation, click-through to the essay */}
-              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={() => setOpen(false)}>
-                <video className={styles.heroVideo} src="/menuflash-argos-opt.mp4" autoPlay muted loop playsInline aria-hidden />
+              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={() => setOpen(false)} onMouseEnter={handleHeroHover}>
+                <video ref={videoRef} className={styles.heroVideo} src="/menuflash-argos-opt.mp4" muted playsInline preload="auto" aria-hidden />
                 <div className={styles.heroContent}>
                   <div className={styles.heroTags}>
                     <span className={styles.heroTagGood}>Good dog</span>
                     <span className={styles.heroTagOutline}>Homer</span>
                     <span className={styles.heroTagOutline}>The Odyssey</span>
                   </div>
-                  <p className={styles.heroTitle}>Argos: The Dog Who Knew His Master</p>
-                  <span className={styles.heroBtn}>Read the essay</span>
+                  <div className={styles.heroBottom}>
+                    <p className={styles.heroTitle}><span className={styles.heroTitleAccent}>Argos:</span> The Dog Who Knew His Master</p>
+                    <span className={styles.heroBtn}>About this dog</span>
+                  </div>
                 </div>
               </Link>
 
