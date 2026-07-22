@@ -7,9 +7,9 @@ import VideoTile from "./VideoTile";
 import styles from "./Nav.module.css";
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
-type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string };
+type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
 const NAV_TILES: Record<string, TileData> = {
-  nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", img: "/name-gen-bento-menu-img.jpg" },
+  nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", video: "/podium-video-menu.mp4", videoAspect: "650 / 542" },
   product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
@@ -40,6 +40,9 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroRaf = useRef(0);
+  const heroReversing = useRef(false);
+  const heroLastTs = useRef(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -69,22 +72,33 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     if (!v) return;
     try { v.currentTime = 0; } catch {}
     const t = setTimeout(() => { v.play().catch(() => {}); }, 2000);
-    return () => clearTimeout(t);
+    return () => { clearTimeout(t); heroReversing.current = false; cancelAnimationFrame(heroRaf.current); };
   }, [open]);
 
-  // Hover: replay if finished, pause if playing, resume if paused part-way.
-  function handleHeroHover() {
+  // Hero hover: rewind (play backwards) while hovering, play forward on leave.
+  const heroStep = (ts: number) => {
+    const v = videoRef.current;
+    if (!v || !heroReversing.current) return;
+    if (heroLastTs.current) {
+      const dt = (ts - heroLastTs.current) / 1000;
+      v.currentTime = Math.max(0, v.currentTime - dt);
+    }
+    heroLastTs.current = ts;
+    if (v.currentTime <= 0.02) { heroReversing.current = false; return; }
+    heroRaf.current = requestAnimationFrame(heroStep);
+  };
+  function handleHeroEnter() {
     const v = videoRef.current;
     if (!v) return;
-    const atEnd = v.ended || (v.duration > 0 && v.currentTime >= v.duration - 0.05);
-    if (atEnd) {
-      v.currentTime = 0;
-      v.play().catch(() => {});
-    } else if (!v.paused) {
-      v.pause();
-    } else {
-      v.play().catch(() => {});
-    }
+    v.pause();
+    heroReversing.current = true;
+    heroLastTs.current = 0;
+    heroRaf.current = requestAnimationFrame(heroStep);
+  }
+  function handleHeroLeave() {
+    heroReversing.current = false;
+    cancelAnimationFrame(heroRaf.current);
+    videoRef.current?.play().catch(() => {});
   }
 
   function openOffer() {
@@ -114,18 +128,29 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       </span>
       <span className={styles.tileMeta}>
         {twoTone(t.labelA, t.labelB)}
-        <span className={styles.tileCta}>{t.cta} →</span>
+        <span className={styles.ctaBtn}>{t.cta}</span>
       </span>
     </Link>
   );
 
-  // Image-fit tile: box scales to the image width and takes the image's height,
+  // Image-fit tile: box scales to the image (or video) and takes its height,
   // so 100% of the artwork shows. Green CTA button top-right, title bottom.
   const fitTile = (t: TileData) => (
-    <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={closeMenu}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={t.img} alt="" className={styles.tileFitImg} />
-      <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta} →</span>
+    <Link
+      href={t.href}
+      className={`${styles.tile} ${styles.tileFit}`}
+      onClick={closeMenu}
+      style={t.video ? { aspectRatio: t.videoAspect } : undefined}
+    >
+      {t.video ? (
+        <span className={styles.tileImg} aria-hidden>
+          <video className={styles.tileImgTag} src={t.video} muted loop autoPlay playsInline preload="auto" />
+        </span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={t.img} alt="" className={styles.tileFitImg} />
+      )}
+      <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>
       <span className={`${styles.tileMeta} ${styles.tileMetaOverlay} ${styles.tileMetaFit}`}>
         {twoTone(t.labelA, t.labelB)}
       </span>
@@ -162,7 +187,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           ) : (
             <div className={`${styles.bentoWrap} ${styles.overlayIn}`}>
               {/* Featured hero -- Argos letterbox animation, click-through to the essay */}
-              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={closeMenu} onMouseEnter={handleHeroHover}>
+              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={closeMenu} onMouseEnter={handleHeroEnter} onMouseLeave={handleHeroLeave}>
                 <video ref={videoRef} className={styles.heroVideo} src="/menuflash-argos-opt.mp4" muted playsInline preload="auto" aria-hidden />
                 <div className={styles.heroContent}>
                   <div className={styles.heroTags}>
@@ -183,7 +208,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <div className={styles.cluster}>
                   <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
-                    {coverTile(NAV_TILES.britains, styles.clusterCell)}
+                    {coverTile(NAV_TILES.britains, `${styles.clusterCell} ${styles.zoomHover}`)}
                     <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   </div>
                 </div>
@@ -205,24 +230,26 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
                 {/* Left: Competitions video + Smarter / Home */}
                 <div className={styles.cluster}>
-                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Competitions" cta="Win prizes" sizeClass={styles.sqTile} onNavigate={closeMenu} />
+                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Competitions" cta="Win prizes" sizeClass={styles.sqTile} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
                     {coverTile(NAV_TILES.smarter, styles.miniCell)}
                     {coverTile(NAV_TILES.home, styles.miniCell)}
                   </div>
                 </div>
-                {/* Right: Know Your Chums square + Discount (half width) + Hot/Dogs */}
+                {/* Right: Know Your Chums square + Discount / Hot/Dogs side by side */}
                 <div className={styles.cluster}>
                   {coverTile(NAV_TILES.knowYourChums, styles.sqTile)}
-                  <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
-                    <span className={styles.tileMeta}>
-                      <span className={styles.tileLabel}>
-                        <span className={styles.tileLabelAccent}>Discount</span> code
+                  <div className={styles.miniRow}>
+                    <button type="button" className={`${styles.tile} ${styles.tileStrip} ${styles.miniCell}`} onClick={openOffer}>
+                      <span className={styles.tileMeta}>
+                        <span className={styles.tileLabel}>
+                          <span className={styles.tileLabelAccent}>Discount</span> code
+                        </span>
+                        <span className={styles.tileCta}>Grab your code →</span>
                       </span>
-                      <span className={styles.tileCta}>Grab your code →</span>
-                    </span>
-                  </button>
-                  {coverTile(NAV_TILES.hotDogs, styles.wideBottom)}
+                    </button>
+                    {coverTile(NAV_TILES.hotDogs, styles.miniCell)}
+                  </div>
                 </div>
               </div>
             </div>

@@ -379,19 +379,23 @@
 /* Strip is full width, so cap its title instead of using container units. */
 .tileStrip .tileLabel { font-size: clamp(1.6rem, 3.2vw, 2.8rem); }
 
-/* ── Green CTA button (matches the hero button) ── */
+/* ── Green CTA button (same size as the hero button) ── */
 .ctaBtn {
-  display: inline-flex; align-items: center; gap: 4px; align-self: flex-start;
+  display: inline-flex; align-items: center; align-self: flex-start;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(0.85rem, 1.4vw, 1.2rem); letter-spacing: 0.02em;
+  font-size: clamp(1rem, 1.8vw, 1.3rem); letter-spacing: 0.03em;
   color: #fff; white-space: nowrap;
-  background: #22c55e; border-radius: 12px; padding: 9px 18px;
+  background: #22c55e; border-radius: 14px; padding: 12px 26px;
   box-shadow: 0 4px 0 rgba(10,58,87,0.4);
   transition: background 0.15s, transform 0.1s;
 }
 .tile:hover .ctaBtn { background: #2fd46b; }
 /* On the image cards the button floats over the top-right of the artwork */
 .ctaTopRight { position: absolute; top: 16px; right: 16px; z-index: 3; align-self: auto; }
+
+/* Zoom the image 15% on hover (Britain's Dog History) */
+.zoomHover .tileImgTag { transition: transform 0.35s ease; }
+.zoomHover:hover .tileImgTag { transform: scale(1.15); }
 
 /* Image-card title -- a little breathing room above it */
 .tileMetaFit .tileLabel { margin-top: 5px; }

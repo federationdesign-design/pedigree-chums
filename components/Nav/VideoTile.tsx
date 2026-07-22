@@ -79,7 +79,7 @@ export default function VideoTile({
         <span className={styles.tileLabel}>
           <span className={styles.tileLabelAccent}>{labelA}</span>{labelB ? ` ${labelB}` : ""}
         </span>
-        <span className={styles.tileCta}>{cta} →</span>
+        <span className={styles.ctaBtn}>{cta}</span>
       </span>
     </Link>
   );
