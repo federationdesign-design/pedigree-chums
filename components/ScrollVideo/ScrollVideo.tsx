@@ -30,8 +30,13 @@ export default function ScrollVideo({ src, className }: { src: string; className
       raf.current = false;
       if (!duration || !scene) return;
       const r = (scene as HTMLElement).getBoundingClientRect();
-      const total = r.height + window.innerHeight;
-      const progress = Math.min(1, Math.max(0, (window.innerHeight - r.top) / total));
+      /* if the scene has pin travel, map playback to the pinned phase so the
+         video runs while it is actually holding the screen */
+      const travel = r.height - window.innerHeight;
+      const progress =
+        travel > 0
+          ? Math.min(1, Math.max(0, -r.top / travel))
+          : Math.min(1, Math.max(0, (window.innerHeight - r.top) / (r.height + window.innerHeight)));
       const t = progress * duration;
       if (Math.abs(video.currentTime - t) > 0.02) video.currentTime = t;
     };

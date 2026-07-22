@@ -7,6 +7,7 @@ import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCa
 import DogPoll from "../../../components/DogPoll/DogPoll";
 import ReadingProgress from "../../../components/ReadingProgress/ReadingProgress";
 import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
+import { QuoteBuild, StatueBulletsChoreo, HomerCrossfade, GatedVideo } from "../../../components/ArgosChoreo/ArgosChoreo";
 
 export const metadata: Metadata = {
   title: "Argos: Homer's Dog in The Odyssey — Loyalty, Home and the Nolan Film",
@@ -498,45 +499,59 @@ export default function ArgosPage() {
 
               <p className={styles.heavyLine}>Then he sees the dog.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`} data-scrub-scene>
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.videoPinScene}`} data-scrub-scene id="menuflash-scene">
                 <div className={styles.parallaxImgWrap}>
                   <ScrollVideo src="/menuflash-argos-opt.mp4" className={styles.parallaxVideo} />
-                </div>
-                <div className={styles.parallaxContent}>
-                  <ArgosIdentityCard />
+                  <div className={styles.videoCard} id="menu-card">
+                    <ArgosIdentityCard />
+                  </div>
                 </div>
               </div>
 
+              <div className={styles.desktopOnly}>
               <p>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <QuoteBuild
+                  pinned={<p style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
+                  quote="Humans recognise status. Dogs recognise presence."
+                />
+              </div>
 
               <div className={styles.sceneMobile}>
                 <SizeBuildCard />
               </div>
 
+              <div className={styles.desktopOnly}>
               <ul className={styles.essayBullets}>
                 <li>But Argos recognises Odysseus.</li>
                 <li>The humans see a beggar.</li>
                 <li>The dog knows his master.</li>
                 <li>That is the whole power of the scene.</li>
               </ul>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <StatueBulletsChoreo
+                  slides={[
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
+                  ]}
+                  bullets={[
+                    "But Argos recognises Odysseus.",
+                    "The humans see a beggar.",
+                    "The dog knows his master.",
+                    "That is the whole power of the scene.",
+                  ]}
+                />
+              </div>
 
               <p>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly. He cannot kneel beside him, call his name, or comfort him without risking his disguise. Argos has enough strength left to recognise him, but not enough to reach him. Then, as Odysseus goes inside, Argos dies.</p>
 
               <p>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</p>
-
-              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
-                <CaptionedCarousel
-                  slides={[
-                    {
-                      src: "/history/jurrisicbark-shialebuff.jpg",
-                      alt: "Jurassic Bark",
-                      caption: "Jurassic Bark: every good show or story will use this as a trope, some more successfully than others",
-                    },
-                  ]}
-                />
-              </div>
 
               <h2 className={styles.subhead}>Why we need Odysseus to go to him</h2>
 
@@ -548,7 +563,22 @@ export default function ArgosPage() {
 
               <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. An ancient audience may have been more prepared to admire that restraint: Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
 
+              <div className={styles.desktopOnly}>
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <QuoteBuild
+                  pinned={
+                    <figure style={{ margin: 0 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/history/jurrisicbark-shialebuff.jpg" alt="Jurassic Bark" loading="lazy" />
+                      <figcaption className={styles.choreoCaption}>Jurassic Bark: every good show or story will use this as a trope, some more successfully than others</figcaption>
+                    </figure>
+                  }
+                  quote="The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present."
+                />
+              </div>
 
               <p>Modern audiences do something different. We do not only watch Odysseus. We become him. We enter the scene emotionally, and once we have done that, walking past the dog feels almost impossible.</p>
 
@@ -643,7 +673,45 @@ export default function ArgosPage() {
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
 
               <div className={styles.sceneMobile}>
-                <AboutHomerCard />
+                <HomerCrossfade
+                  header={
+                    <>
+                      <div style={{ padding: "16px 20px 4px" }}>
+                        <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                      </div>
+                      <div style={{ overflow: "hidden", position: "relative" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/history/homer-bust.jpeg" alt="Bust of Homer, Farnese collection, Naples" style={{ width: "100%", display: "block" }} />
+                        <p style={{ position: "absolute", left: 12, right: 12, bottom: 8, fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 600, color: "var(--navy)", margin: 0 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
+                      </div>
+                      <div style={{ padding: "14px 20px 0" }}>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 0 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                      </div>
+                    </>
+                  }
+                  history={
+                    <>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 0 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
+                    </>
+                  }
+                  works={
+                    <>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
+                      {[
+                        { title: "The Iliad", detail: "c. 750 BCE · 24 books · 15,693 lines", desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs." },
+                        { title: "The Odyssey", detail: "c. 700 BCE · 24 books · 12,109 lines", desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos." },
+                      ].map(({ title, detail, desc }) => (
+                        <div key={title} style={{ marginBottom: 14 }}>
+                          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
+                          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
+                          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
+                        </div>
+                      ))}
+                    </>
+                  }
+                />
               </div>
 
               <div className={styles.sceneMobile}>
@@ -698,6 +766,7 @@ export default function ArgosPage() {
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", opacity: 0.85, margin: "20px 0 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.2)" }}>{RESEARCH_NOTE}</p>
               </div>
 
+              <GatedVideo>
               <figure style={{ margin: "0 0 32px", padding: 0 }}>
                 <div id="smellofhome-video-wrap" style={{ width: "100%", position: "relative" }}>
                   <video
@@ -722,27 +791,7 @@ export default function ArgosPage() {
                   The dog doesn&apos;t live in the home. The dog is the home.
                 </figcaption>
               </figure>
-              <script dangerouslySetInnerHTML={{ __html: `(function(){
-                var v = document.getElementById('smellofhome-video');
-                if(!v) return;
-                var started = false;
-                var obs = new IntersectionObserver(function(entries){
-                  entries.forEach(function(e){
-                    if(!started && e.intersectionRatio >= 0.5){
-                      v.play();
-                      started = true;
-                      obs.disconnect();
-                    }
-                  });
-                }, { threshold: 0.5 });
-                obs.observe(v);
-                v.addEventListener('timeupdate', function(){
-                  if(v.duration && v.currentTime >= v.duration - 0.1){
-                    v.pause();
-                    v.currentTime = v.duration;
-                  }
-                });
-              })();` }} />
+              </GatedVideo>
 
               <h2 className={styles.subhead}>The smell of home</h2>
 
@@ -769,23 +818,6 @@ export default function ArgosPage() {
               <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
 
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
-
-              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
-                <CaptionedCarousel
-                  slides={[
-                    {
-                      src: "/history/odyssusand-argos-statue-2.jpg",
-                      alt: "Odysseus and Argos statue",
-                      caption: "Nolan is the only one to reimagine this moment",
-                    },
-                    {
-                      src: "/history/odyssusand-argos-statue-1.jpg",
-                      alt: "Odysseus and Argos statue, second view",
-                      caption: "Odysseus and Argos: the reunion in stone.",
-                    },
-                  ]}
-                />
-              </div>
 
               <h2 className={styles.subhead}>The dog as home</h2>
 
@@ -1026,6 +1058,14 @@ export default function ArgosPage() {
               if (pct < 0) pct = 0;
               if (pct > 1) pct = 1;
               fill.style.height = (pct * 100) + '%';
+            }
+            /* Argos identity card pops in the moment the video pins */
+            var mfScene = document.getElementById('menuflash-scene');
+            var mfCard = document.getElementById('menu-card');
+            if (mfScene && mfCard) {
+              if (mfScene.getBoundingClientRect().top <= 0) {
+                if (mfCard.className.indexOf('mf-show') < 0) mfCard.className += ' mf-show';
+              }
             }
             /* What We Know nudges gently down onto the harehound image */
             if (hound) {
