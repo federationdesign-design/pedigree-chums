@@ -73,7 +73,7 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "alone",
-    question: "How long are you out for?",
+    question: "Are you out for much?",
     info: "Dogs are social animals. Some breeds develop severe separation anxiety if left alone regularly -- barking, destruction, or self-harm. Others are surprisingly independent.",
     options: [
       { label: "Hardly ever", value: "rarely" },
@@ -85,57 +85,57 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "exercise",
-    question: "How active is your household?",
+    question: "How active are you?",
     sub: "Be honest -- a dog's needs will outlast your good intentions",
     info: "A Border Collie given one short walk a day will redecorate your home. A Bulldog taken on a five-mile run will struggle to breathe. The match matters.",
     options: [
-      { label: "Very -- daily runs, long walks in the countryside", value: "high" },
-      { label: "Moderate -- good walks every day", value: "medium" },
-      { label: "Fairly relaxed -- shorter walks, mostly home", value: "low" },
+      { label: "Very - run/bike regularly", value: "high" },
+      { label: "Yes - regular walking every day", value: "medium" },
+      { label: "Shorter, infrequent walks", value: "low" },
     ],
   },
   {
     id: "experience",
-    question: "Have you owned a dog before?",
+    question: "Owned a dog before?",
     info: "Some breeds are wilful, stubborn or highly strung in ways that catch first-time owners off guard. Others seem almost to train themselves.",
     options: [
       { label: "First time dog owner", value: "first" },
-      { label: "Some experience -- had dogs growing up", value: "some" },
-      { label: "Experienced -- confident with any breed", value: "experienced" },
+      { label: "Some experience", value: "some" },
+      { label: "Confident with any dog", value: "experienced" },
     ],
   },
   {
     id: "grooming",
-    question: "How much grooming are you happy with?",
+    question: "How much grooming?",
     info: "Some breeds need a professional salon every 6-8 weeks (around £40-55 a time) or they mat and get uncomfortable. Others need nothing more than a wipe with a damp cloth.",
     options: [
-      { label: "Minimal -- a quick brush or wipe, no salon trips", value: "low" },
-      { label: "Some -- weekly brushing is fine", value: "medium" },
+      { label: "Minimal, a quick brush", value: "low" },
+      { label: "Some, a good weekly", value: "medium" },
       { label: "Lots -- happy to groom often, salon visits included", value: "high" },
     ],
   },
   {
     id: "budget",
-    question: "What's your rough annual budget?",
+    question: "What's your budget?",
     sub: "All-in: food, insurance, vet bills, grooming and boarding",
     info: "Giant breeds eat more, insure for more and cost more to board. Brachycephalic breeds (flat-faced dogs) have higher vet bills on average due to breathing issues.",
     options: [
-      { label: "Under £1,200 per year (around £100/month)", value: "low" },
-      { label: "£1,200 -- £1,800 per year (£100-£150/month)", value: "medium" },
-      { label: "£1,800 -- £2,500 per year (£150-£210/month)", value: "high" },
-      { label: "Over £2,500 per year -- cost is not a concern", value: "any" },
+      { label: "Low: around £100 per month (average)", value: "low" },
+      { label: "Moderate: around £150 per month (average)", value: "medium" },
+      { label: "Average: around £210 per month (average)", value: "high" },
+      { label: "High: over £2,500 a year", value: "any" },
     ],
   },
   {
     id: "velcro",
-    question: "How closely attached do you want your dog to be?",
+    question: "How attached are you happy with?",
     sub: "Some breeds follow their owner from room to room and genuinely cannot cope alone",
     info: "Velcro dogs are devoted and deeply bonded -- but they can also be exhausting. Independent dogs are easier to leave but may seem aloof.",
     options: [
-      { label: "Like brand-new Velcro -- stuck to me at all times", value: "yes" },
-      { label: "Like ten-year-old Velcro -- close but not obsessive", value: "medium" },
-      { label: "Mine and mine alone -- devoted to me, not bothered about everyone else", value: "mine" },
-      { label: "I need my space -- an independent dog suits me better", value: "no" },
+      { label: "Stuck to me at all times", value: "yes" },
+      { label: "Close but not obsessive", value: "medium" },
+      { label: "Devoted to me, not bothered about everyone else", value: "mine" },
+      { label: "An independent dog suits me", value: "no" },
     ],
   },
   {
@@ -583,8 +583,10 @@ export default function ChumCalculator() {
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [infoOpen, setInfoOpen] = useState(false);
-  const [wobble, setWobble] = useState(false);
+  const [livingStage, setLivingStage] = useState<"home" | "stairs">("home");
+  const [stairsChosen, setStairsChosen] = useState<"yes" | "no" | null>(null);
   const confettiRef = useRef<((o: Record<string, unknown>) => void) | null>(null);
+  const busyRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -675,17 +677,25 @@ export default function ChumCalculator() {
   function fireConfetti() {
     confettiRef.current?.({ particleCount: 60, spread: 65, startVelocity: 30, origin: { y: 0.72 }, colors: ["#22c55e", "#ffd23e", "#ffffff", "#0a3a57"] });
   }
-  function doWobble() {
-    setWobble(true);
-    window.setTimeout(() => setWobble(false), 650);
-  }
-  // The stairs boxes double as the "next" button -- clicking one records stairs and advances
-  function chooseStairs(value: "yes" | "no") {
-    if (!answers.living) { doWobble(); return; }   // must pick a home option first
+  // Home question, part 1: pick a home type -> move to the stairs part (same question 3)
+  function pickHome(value: string) {
     setInfoOpen(false);
+    setAnswers((prev) => ({ ...prev, living: value }));
+    setLivingStage("stairs");
+  }
+  // Home question, part 2: the stairs boxes double as the submit -- loser falls away, then advance
+  function chooseStairs(value: "yes" | "no") {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setStairsChosen(value);
     setAnswers((prev) => ({ ...prev, stairs: value }));
     fireConfetti();
-    setStep((s) => s + 1);
+    window.setTimeout(() => {
+      setStairsChosen(null);
+      setLivingStage("home");
+      setStep((s) => s + 1);
+      busyRef.current = false;
+    }, 520);
   }
 
   function goBack() {
@@ -704,6 +714,9 @@ export default function ChumCalculator() {
   function reset() {
     setAnswers({});
     setStep(1);
+    setLivingStage("home");
+    setStairsChosen(null);
+    busyRef.current = false;
   }
 
   // Contextual line above the card -- changes as you move through the quiz
@@ -759,9 +772,9 @@ export default function ChumCalculator() {
           </div>
         )}
 
-        {/* Home question -- select then Next, plus the stairs checkbox */}
+        {/* Question 3 -- part 1: home type, part 2: stairs (split so neither box is too long) */}
         {currentQ && currentQ.id === "living" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
-          <div className={`${styles.stepCard} ${wobble ? styles.wobble : ""}`}>
+          <div className={styles.stepCard}>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>{step}/{total}</span>
               <div className={styles.stepBar}>
@@ -770,43 +783,56 @@ export default function ChumCalculator() {
               <span className={styles.stepPct}>{Math.round((step / total) * 100)}%</span>
             </div>
 
-            <div className={styles.questionHeader}>
-              <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
-              {currentQ.info && (
-                <div className={styles.infoIcon} onClick={() => setInfoOpen(o => !o)}>
-                  i
-                  {infoOpen && (
-                    <div className={styles.infoPopup}>
-                      <p className={styles.infoPopupText}>{currentQ.info}</p>
+            {livingStage === "home" ? (
+              <>
+                <div className={styles.questionHeader}>
+                  <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
+                  {currentQ.info && (
+                    <div className={styles.infoIcon} onClick={() => setInfoOpen(o => !o)}>
+                      i
+                      {infoOpen && (
+                        <div className={styles.infoPopup}>
+                          <p className={styles.infoPopupText}>{currentQ.info}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-
-            <div className={styles.stepOptions}>
-              {currentQ.options.map((opt) => (
-                <button
-                  key={opt.value}
-                  className={`${styles.option} ${answers.living === opt.value ? styles.optionSelected : ""}`}
-                  onClick={() => select("living", opt.value)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            <p className={styles.stairsPrompt}>Last thing -- do you have lots of stairs?</p>
-            <div className={styles.stairsChoice}>
-              <button type="button" className={styles.stairsYes} onClick={() => chooseStairs("yes")}>
-                ✓ I have stairs
-              </button>
-              <button type="button" className={styles.stairsNo} onClick={() => chooseStairs("no")}>
-                ✗ No stairs
-              </button>
-            </div>
-            {step > 1 && (
-              <button className={styles.backBtn} onClick={goBack} style={{ marginTop: 14 }}>← Back</button>
+                <div className={styles.stepOptions}>
+                  {currentQ.options.map((opt) => (
+                    <button key={opt.value} className={styles.option} onClick={() => pickHome(opt.value)}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                {step > 1 && (
+                  <button className={styles.backBtn} onClick={goBack}>← Back</button>
+                )}
+              </>
+            ) : (
+              <>
+                <div className={styles.questionHeader}>
+                  <h2 className={styles.stepQuestion}>Do you have lots of stairs?</h2>
+                </div>
+                <p className={styles.stairsPrompt}>Lots of stairs every day rules out the big, heavy breeds.</p>
+                <div className={styles.stairsChoice}>
+                  <button
+                    type="button"
+                    className={`${styles.stairsYes} ${stairsChosen === "yes" ? styles.stairsPulse : stairsChosen === "no" ? styles.stairsFall : ""}`}
+                    onClick={() => chooseStairs("yes")}
+                  >
+                    ✓ I have stairs
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.stairsNo} ${stairsChosen === "no" ? styles.stairsPulse : stairsChosen === "yes" ? styles.stairsFall : ""}`}
+                    onClick={() => chooseStairs("no")}
+                  >
+                    ✗ No stairs
+                  </button>
+                </div>
+                <button className={styles.backBtn} onClick={() => setLivingStage("home")} style={{ marginTop: 14 }}>← Back</button>
+              </>
             )}
           </div>
         )}
