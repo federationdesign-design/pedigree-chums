@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ChumDropTile from "./ChumDropTile";
+import VideoTile from "./VideoTile";
 import styles from "./Nav.module.css";
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
@@ -169,11 +170,11 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 </div>
               </Link>
 
-              {/* Row 1 -- Name Generator beside the Chum Drop / Britain's / About cluster */}
+              {/* Row 1 -- Name Generator (left) beside the Chum Drop / Britain's / About cluster */}
               <div className={styles.rowBlock}>
                 {fitTile(NAV_TILES.nameGen)}
                 <div className={styles.cluster}>
-                  <ChumDropTile href="/" labelA="Chum" labelB="Drop" cta="Play the game" sizeClass={styles.clusterWide} onNavigate={closeMenu} />
+                  <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.britains, styles.clusterCell)}
                     {coverTile(NAV_TILES.about, styles.clusterCell)}
@@ -181,16 +182,16 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 </div>
               </div>
 
-              {/* Row 2 -- The Card Game beside the Chum Finder / Good Dog / Dogs cluster */}
+              {/* Row 2 -- alternated: cluster (left) beside The Card Game (right) */}
               <div className={styles.rowBlock}>
-                {fitTile(NAV_TILES.product)}
                 <div className={styles.cluster}>
-                  {coverTile(NAV_TILES.chumFinder, styles.clusterWide)}
+                  <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Find your perfect dog" sizeClass={styles.clusterWide} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.gdbd, styles.clusterCell)}
                     {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell)}
                   </div>
                 </div>
+                {fitTile(NAV_TILES.product)}
               </div>
 
               {/* Discount -- full-width action strip */}
