@@ -117,7 +117,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
 
   // Standard tile: image (or emoji) fills as a cropped backdrop, label overlaid.
   // ctaTop floats the green button over the top-right instead of by the title.
-  const coverTile = (t: TileData, cls: string, ctaTop = false) => (
+  const coverTile = (t: TileData, cls: string, ctaTop = false, noCta = false) => (
     <Link href={t.href} className={`${styles.tile} ${cls}`} onClick={closeMenu}>
       <span className={styles.tileImg} aria-hidden>
         {t.img ? (
@@ -127,21 +127,23 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           <span className={styles.tileEmoji}>{t.emoji}</span>
         )}
       </span>
-      {ctaTop && <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>}
+      {ctaTop && !noCta && <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>}
       <span className={styles.tileMeta}>
         {twoTone(t.labelA, t.labelB)}
-        {!ctaTop && <span className={styles.ctaBtn}>{t.cta}</span>}
+        {!ctaTop && !noCta && <span className={styles.ctaBtn}>{t.cta}</span>}
       </span>
     </Link>
   );
 
   // Image-fit tile: media on top (100% shown), title in a solid navy box below.
-  // Green CTA button floats top-right. revealAccent hides labelA until hover.
+  // Green CTA button floats top-right. revealAccent shows labelA over the image
+  // on hover, keeping only labelB in the caption box.
   const fitTile = (t: TileData, revealAccent = false) => (
     <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={closeMenu}>
       {t.video ? (
         <span className={styles.fitVideoBox} style={{ aspectRatio: t.videoAspect }} aria-hidden>
-          <video className={styles.tileImgTag} src={t.video} muted loop autoPlay playsInline preload="auto" />
+          <video className={styles.tileImgTag} src={t.video} muted autoPlay playsInline preload="auto" />
+          {revealAccent && <span className={`${styles.fitAccent} ${styles.accentReveal}`}>{t.labelA}</span>}
         </span>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
@@ -151,7 +153,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       <span className={styles.fitCaption}>
         <span className={styles.tileLabel}>
           {revealAccent ? (
-            <><span className={`${styles.tileLabelAccent} ${styles.accentReveal}`}>{t.labelA} </span>{t.labelB}</>
+            t.labelB
           ) : (
             <><span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}</>
           )}
@@ -178,7 +180,26 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
 
       {open && (
         <div className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`} role="dialog" aria-modal="true">
-          <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close menu">{"×"}</button>
+          {tradeLinks ? (
+            <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close menu">{"×"}</button>
+          ) : (
+            <>
+              <button type="button" className={styles.backLink} onClick={() => setOpen(false)}>← Back to page</button>
+              <nav className={styles.topNav} aria-label="Site links">
+                <Link href="/home" className={styles.topNavLink} onClick={closeMenu}>Home</Link>
+                <span className={styles.topNavSep}>|</span>
+                <Link href="/about" className={styles.topNavLink} onClick={closeMenu}>About</Link>
+                <span className={styles.topNavSep}>|</span>
+                <Link href="/preorder" className={styles.topNavLink} onClick={closeMenu}>Pre-order</Link>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Instagram">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-.75a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+                </a>
+                <a href="https://www.tiktok.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="TikTok">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 3c.26 2.07 1.42 3.3 3.5 3.44v2.4c-1.2.12-2.25-.27-3.47-1.01v6.63a5.62 5.62 0 1 1-4.85-5.57v2.53a2.98 2.98 0 1 0 2.08 2.85V3h2.74Z"/></svg>
+                </a>
+              </nav>
+            </>
+          )}
 
           {tradeLinks ? (
             <nav className={styles.menu}>
@@ -233,7 +254,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
                 {/* Left: Competitions video + Smarter / Home */}
                 <div className={styles.cluster}>
-                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={styles.sqTile} loop={false} reverseOnHover onNavigate={closeMenu} />
+                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
                     {coverTile(NAV_TILES.smarter, styles.miniCell)}
                     {coverTile(NAV_TILES.hotDogs, styles.miniCell)}
@@ -251,7 +272,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                         <span className={styles.tileCta}>Grab your code →</span>
                       </span>
                     </button>
-                    {coverTile(NAV_TILES.home, styles.miniCell)}
+                    {coverTile(NAV_TILES.home, styles.miniCell, false, true)}
                   </div>
                 </div>
               </div>

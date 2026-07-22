@@ -306,12 +306,20 @@
 .fitVideoBox { position: relative; width: 100%; overflow: hidden; }
 .fitCaption {
   background: var(--navy, #0a3a57);
-  padding: clamp(14px, 1.8vw, 22px) clamp(16px, 2.2vw, 28px);
+  padding: clamp(26px, 3vw, 40px) clamp(16px, 2.2vw, 28px) clamp(16px, 1.8vw, 22px);
   display: flex; flex-direction: column;
 }
-/* Name Generator: "Try the Dog" hidden until hover, then pops in */
-.accentReveal { display: none; }
-.tileFit:hover .accentReveal { display: inline; }
+/* Name Generator: "Try the Dog" over the image, pops in on hover */
+.fitAccent {
+  position: absolute; left: clamp(16px, 2vw, 26px); bottom: clamp(16px, 2vw, 26px);
+  z-index: 2; pointer-events: none; margin: 0;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.6rem, 9cqi, 3.4rem); line-height: 1;
+  color: var(--yellow, #ffd23e);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.55);
+}
+.accentReveal { opacity: 0; transform: translateY(10px) scale(0.92); transition: opacity 0.22s ease, transform 0.22s ease; }
+.tileFit:hover .accentReveal { opacity: 1; transform: none; }
 
 /* ── Bottom bento: square Competitions/KYC, mini row, half-width discount ── */
 .rowBlockStart { align-items: flex-start; }
@@ -368,7 +376,6 @@
   /* Scales with each tile's own width (container units) so big cards get big
      titles without a low viewport cap holding them back. */
   font-size: clamp(1.4rem, 13cqi, 5rem); color: #fff; letter-spacing: 0.02em; line-height: 0.98;
-  text-shadow: 0 2px 14px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.6);
 }
 /* First word(s) of each title in brand yellow */
 .tileLabelAccent { color: var(--yellow, #ffd23e); }
@@ -391,7 +398,7 @@
 .tileStrip .tileMeta { background: none; align-items: center; text-align: center; }
 .tileStrip .tileCta { color: #eafff1; }
 /* Strip is full width, so cap its title instead of using container units. */
-.tileStrip .tileLabel { font-size: clamp(1.6rem, 3.2vw, 2.8rem); }
+.tileStrip .tileLabel { font-size: clamp(2.1rem, 4.6vw, 3.6rem); }
 
 /* ── Green CTA button (same size as the hero button) ── */
 .ctaBtn {
@@ -410,6 +417,33 @@
 /* Zoom the image 15% on hover (Britain's Dog History) */
 .zoomHover .tileImgTag { transition: transform 0.35s ease; }
 .zoomHover:hover .tileImgTag { transform: scale(1.15); }
+
+/* Centre the title + button (Current Competitions) */
+.centerMeta .tileMeta { align-items: center; text-align: center; }
+.centerMeta .ctaBtn { align-self: center; }
+
+/* ── Top bar: Back to page (left) + site links (right) ── */
+.backLink {
+  position: fixed; top: clamp(20px, 2.6vh, 32px); left: clamp(18px, 4vw, 44px); z-index: 200;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem); font-weight: 700; letter-spacing: 0.02em;
+  color: #fff; background: none; border: 0; cursor: pointer; pointer-events: auto;
+}
+.backLink:hover { color: var(--yellow, #ffd23e); }
+.topNav {
+  position: fixed; top: clamp(20px, 2.6vh, 32px); right: clamp(18px, 4vw, 44px); z-index: 200;
+  display: flex; align-items: center; gap: clamp(8px, 1vw, 14px); pointer-events: auto;
+}
+.topNavLink {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem); font-weight: 700; letter-spacing: 0.02em;
+  color: #fff; text-decoration: none;
+}
+.topNavLink:hover { color: var(--yellow, #ffd23e); }
+.topNavSep { color: rgba(255,255,255,0.4); }
+.socialIcon { display: inline-flex; align-items: center; color: #fff; }
+.socialIcon:hover { color: var(--yellow, #ffd23e); }
+.socialIcon svg { width: clamp(20px, 2vw, 24px); height: clamp(20px, 2vw, 24px); display: block; }
 
 /* Image-card title -- a little breathing room above it */
 .tileMetaFit .tileLabel { margin-top: 5px; }
