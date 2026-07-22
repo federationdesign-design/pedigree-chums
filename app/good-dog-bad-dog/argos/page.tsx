@@ -42,7 +42,7 @@ export default function ArgosPage() {
       <main className={styles.essayPage}>
 
         {/* ── Hero ── */}
-        <div className={styles.essayHero}>
+        <div className={`${styles.essayHero} ${styles.heroScene}`}>
           <img src="/history/Argos-hero.jpg" alt="Argos — The Dog Who Knew His Master" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
@@ -53,12 +53,22 @@ export default function ArgosPage() {
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
               <span className={styles.tagBreed}>Ancient Greek Hunting Hound</span>
             </div>
+            <p className={styles.heroStandfirst}>
+              Homer&apos;s dog waited twenty years for one moment of recognition.
+              Three thousand years on, we still haven&apos;t got over it.
+            </p>
+            <a href="#article-start" id="hero-arrow" className={styles.heroArrow} aria-label="Read the essay">
+              <svg width="36" height="21" viewBox="0 0 36 21" fill="none" aria-hidden="true">
+                <path d="M3 3l15 15L33 3" stroke="#ffd23e" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
 
+
         {/* ── Two-column layout ── */}
-        <div className={styles.essayLayout}>
+        <div className={styles.essayLayout} id="article-start">
           <article className={styles.essay}>
             <div className={styles.essayBody}>
 

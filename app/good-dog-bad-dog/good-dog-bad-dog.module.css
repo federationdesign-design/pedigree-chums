@@ -119,7 +119,7 @@
   font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
-  line-height: 1.8;
+  line-height: 1.3;
   margin: 0 0 18px;
 }
 
@@ -127,7 +127,7 @@
 .essayBody p:first-child {
   font-size: 1.625rem;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.3;
 }
 
 .subhead {
@@ -837,5 +837,78 @@
     border-radius: 0 3px 3px 0;
     transition: width 0.08s linear;
     pointer-events: none;
+  }
+}
+
+/* ── Essay mobile scenes (Phase 1: hero) ────────────────────── */
+.heroStandfirst,
+.heroArrow {
+  display: none;
+}
+
+@keyframes heroArrowPulse {
+  from { opacity: 0.35; }
+  to   { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  /* Full-screen hero scene -- opt-in per essay via .heroScene */
+  .heroScene {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+  }
+
+  .heroScene .essayHeroTint {
+    background: linear-gradient(180deg, rgba(10, 58, 87, 0.05) 0%, rgba(10, 58, 87, 0.88) 100%);
+  }
+
+  .heroScene .essayHeroTitle {
+    font-size: clamp(2.3rem, 9.5vw, 3rem);
+  }
+
+  .heroScene .heroStandfirst {
+    display: block;
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 1.02rem;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.3;
+    margin: 14px 0 0;
+  }
+
+  .heroScene .heroArrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 44px;
+    margin: 18px auto 6px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    animation: heroArrowPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  /* Article scene comfort */
+  .essayLayout {
+    padding: 36px 20px;
+  }
+
+  .essayBody p {
+    font-size: 1.05rem;
+  }
+
+  .essayBody p:first-child {
+    font-size: 1.35rem;
+  }
+
+  .subhead {
+    font-size: clamp(1.7rem, 7vw, 2.2rem);
+  }
+
+  .pullquote {
+    font-size: clamp(1.25rem, 5vw, 1.6rem);
   }
 }
