@@ -626,7 +626,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.tightBottom}`} id="harehound-scene">
                 <div className={styles.parallaxImgWrap}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/history/Greek Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" id="hound-img" className={styles.driftImg} />
+                  <img src="/history/Greek-Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" id="hound-img" className={styles.driftImg} />
                 </div>
                 <div className={styles.parallaxContent}>
                   <LivingDescendantCard />
