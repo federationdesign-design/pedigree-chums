@@ -371,6 +371,34 @@
 /* Strip is full width, so cap its title instead of using container units. */
 .tileStrip .tileLabel { font-size: clamp(1.6rem, 3.2vw, 2.8rem); }
 
+/* ── Green CTA button (matches the hero button) ── */
+.ctaBtn {
+  display: inline-flex; align-items: center; gap: 4px; align-self: flex-start;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(0.85rem, 1.4vw, 1.2rem); letter-spacing: 0.02em;
+  color: #fff; white-space: nowrap;
+  background: #22c55e; border-radius: 12px; padding: 9px 18px;
+  box-shadow: 0 4px 0 rgba(10,58,87,0.4);
+  transition: background 0.15s, transform 0.1s;
+}
+.tile:hover .ctaBtn { background: #2fd46b; }
+/* On the image cards the button floats over the top-right of the artwork */
+.ctaTopRight { position: absolute; top: 16px; right: 16px; z-index: 3; align-self: auto; }
+
+/* Image-card title -- a little breathing room above it */
+.tileMetaFit .tileLabel { margin-top: 5px; }
+
+/* About tile title -- roughly 2x bigger */
+.aboutBig .tileLabel { font-size: clamp(2.4rem, 26cqi, 5.5rem); }
+
+/* Extra page blocks */
+.pageRow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.pageTile { height: clamp(150px, 17vh, 200px); }
+
+/* Menu appears with a ~0.3s fade so preloaded content settles in */
+.overlayIn { animation: pcMenuIn 0.3s ease both; }
+@keyframes pcMenuIn { from { opacity: 0; } to { opacity: 1; } }
+
 /* subtle tint variety behind the placeholder emoji (only shows when no image) */
 .tileBig .tileImg { background: linear-gradient(150deg, #0b78bd, #0a3a57); }
 .tileWide .tileImg { background: linear-gradient(150deg, #1f6f9c, #0a3a57); }
@@ -396,4 +424,5 @@
   .cluster { flex: none; width: 100%; }
   .clusterWide { flex: none; height: 150px; }
   .clusterRow { flex: none; height: 128px; }
+  .pageRow { grid-template-columns: repeat(2, 1fr); }
 }

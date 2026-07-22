@@ -11,6 +11,7 @@ export default function VideoTile({
   labelB,
   cta,
   sizeClass,
+  loop = true,
   onNavigate,
 }: {
   href: string;
@@ -19,6 +20,7 @@ export default function VideoTile({
   labelB?: string;
   cta: string;
   sizeClass: string;
+  loop?: boolean;
   onNavigate: () => void;
 }) {
   const vref = useRef<HTMLVideoElement>(null);
@@ -30,7 +32,7 @@ export default function VideoTile({
   return (
     <Link href={href} className={`${styles.tile} ${sizeClass}`} onClick={onNavigate}>
       <span className={styles.tileImg} aria-hidden>
-        <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline loop autoPlay preload="auto" />
+        <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline loop={loop} autoPlay preload="auto" />
       </span>
       <span className={styles.tileMeta}>
         <span className={styles.tileLabel}>

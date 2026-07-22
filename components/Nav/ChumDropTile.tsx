@@ -103,9 +103,9 @@ export default function ChumDropTile({
       </span>
       <span className={styles.tileMeta}>
         <span className={styles.tileLabel}>
-          <span className={styles.tileLabelAccent}>{labelA}</span>{labelB ? ` ${labelB}` : ""}
+          <span className={styles.tileLabelAccent}>{labelA}</span>{labelB ? <><br />{labelB}</> : null}
         </span>
-        <span className={styles.tileCta}>{cta} →</span>
+        <span className={styles.ctaBtn}>{cta} →</span>
       </span>
     </Link>
   );

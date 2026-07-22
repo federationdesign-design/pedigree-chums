@@ -9,7 +9,7 @@ import styles from "./Nav.module.css";
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
 type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string };
 const NAV_TILES: Record<string, TileData> = {
-  nameGen: { href: "/name-generator", labelA: "Name", labelB: "Generator", cta: "Name your chum", img: "/name-gen-bento-menu-img.jpg" },
+  nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", img: "/name-gen-bento-menu-img.jpg" },
   product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
@@ -18,13 +18,21 @@ const NAV_TILES: Record<string, TileData> = {
   dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", img: "/never-clocking-off.jpg" },
 };
 
-// Secondary pages -- kept reachable as plain text links
-const UTILITY = [
-  { label: "Home", href: "/home" },
-  { label: "Competitions", href: "/chumspot" },
-  { label: "Know Your Chums", href: "/know-your-chums" },
-  { label: "Hot/Dogs", href: "/hot-dogs" },
-  { label: "Smarter Than the Test", href: "/smarter-than-the-test" },
+// Extra page blocks -- one tile each.
+const PAGES: TileData[] = [
+  { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
+  { href: "/chumspot", labelA: "Competitions", cta: "Win prizes", img: "/lab-animation-1stframe.jpg" },
+  { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg" },
+  { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "Keep cool", img: "/hot-dog-hearo-img.jpg" },
+  { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Find out", img: "/inteligent-dogs.jpg" },
+];
+
+// Menu images worth preloading so the launcher opens without pop-in.
+const PRELOAD_IMAGES = [
+  "/name-gen-bento-menu-img.jpg", "/product-img.jpg", "/history-hero.jpg",
+  "/bulls-eye-img.jpg", "/never-clocking-off.jpg", "/home-hero.jpg",
+  "/lab-animation-1stframe.jpg", "/know-your-chums.jpg",
+  "/hot-dog-hearo-img.jpg", "/inteligent-dogs.jpg",
 ];
 
 const tradeNavLinks = [
@@ -53,6 +61,11 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     const openMenu = () => setOpen(true);
     window.addEventListener("pc:open-menu", openMenu);
     return () => window.removeEventListener("pc:open-menu", openMenu);
+  }, []);
+
+  // Preload the menu images on page load so the launcher opens without pop-in.
+  useEffect(() => {
+    PRELOAD_IMAGES.forEach((s) => { const im = new window.Image(); im.src = s; });
   }, []);
 
   // Featured hero: wait 2s after the menu opens, then play the clip through once.
@@ -113,14 +126,14 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   );
 
   // Image-fit tile: box scales to the image width and takes the image's height,
-  // so 100% of the artwork shows. Label overlays the bottom.
+  // so 100% of the artwork shows. Green CTA button top-right, title bottom.
   const fitTile = (t: TileData) => (
     <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={closeMenu}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={t.img} alt="" className={styles.tileFitImg} />
-      <span className={`${styles.tileMeta} ${styles.tileMetaOverlay}`}>
+      <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta} →</span>
+      <span className={`${styles.tileMeta} ${styles.tileMetaOverlay} ${styles.tileMetaFit}`}>
         {twoTone(t.labelA, t.labelB)}
-        <span className={styles.tileCta}>{t.cta} →</span>
       </span>
     </Link>
   );
@@ -153,7 +166,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <Link href="/preorder" className={styles.menuLink} onClick={() => setOpen(false)}>Get pre-order discount code</Link>
             </nav>
           ) : (
-            <div className={styles.bentoWrap}>
+            <div className={`${styles.bentoWrap} ${styles.overlayIn}`}>
               {/* Featured hero -- Argos letterbox animation, click-through to the essay */}
               <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={closeMenu} onMouseEnter={handleHeroHover}>
                 <video ref={videoRef} className={styles.heroVideo} src="/menuflash-argos-opt.mp4" muted playsInline preload="auto" aria-hidden />
@@ -177,7 +190,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                   <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.britains, styles.clusterCell)}
-                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={styles.clusterCell} onNavigate={closeMenu} />
+                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} onNavigate={closeMenu} />
                   </div>
                 </div>
               </div>
@@ -204,10 +217,9 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 </span>
               </button>
 
-              <div className={styles.utilityRow}>
-                {UTILITY.map((l) => (
-                  <Link key={l.href} href={l.href} className={styles.utilityLink} onClick={closeMenu}>{l.label}</Link>
-                ))}
+              {/* Extra page blocks */}
+              <div className={styles.pageRow}>
+                {PAGES.map((p) => coverTile(p, styles.pageTile))}
               </div>
             </div>
           )}
