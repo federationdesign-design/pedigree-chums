@@ -14,6 +14,7 @@ export default function VideoTile({
   sizeClass,
   loop = true,
   reverseOnHover = false,
+  noCta = false,
   onNavigate,
 }: {
   href: string;
@@ -24,6 +25,7 @@ export default function VideoTile({
   sizeClass: string;
   loop?: boolean;
   reverseOnHover?: boolean;
+  noCta?: boolean;
   onNavigate: () => void;
 }) {
   const vref = useRef<HTMLVideoElement>(null);
@@ -79,7 +81,7 @@ export default function VideoTile({
         <span className={styles.tileLabel}>
           <span className={styles.tileLabelAccent}>{labelA}</span>{labelB ? ` ${labelB}` : ""}
         </span>
-        <span className={styles.ctaBtn}>{cta}</span>
+        {!noCta && <span className={styles.ctaBtn}>{cta}</span>}
       </span>
     </Link>
   );

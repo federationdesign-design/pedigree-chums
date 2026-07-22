@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ChumDropTile from "./ChumDropTile";
 import VideoTile from "./VideoTile";
+import HeroCarousel from "./HeroCarousel";
 import styles from "./Nav.module.css";
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
@@ -14,12 +15,12 @@ const NAV_TILES: Record<string, TileData> = {
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
   about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
-  gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Read the essays", img: "/bulls-eye-img.jpg" },
-  dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", img: "/never-clocking-off.jpg" },
+  gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Learn", img: "/bulls-eye-img.jpg" },
+  dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Learn", img: "/never-clocking-off.jpg" },
   knowYourChums: { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg" },
   home: { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
-  hotDogs: { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "Keep cool", img: "/hot-dog-hearo-img.jpg" },
-  smarter: { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Find out", img: "/inteligent-dogs.jpg" },
+  hotDogs: { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "What??", img: "/hot-dog-hearo-img.jpg" },
+  smarter: { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Learn", img: "/inteligent-dogs.jpg" },
 };
 
 // Menu images worth preloading so the launcher opens without pop-in.
@@ -39,10 +40,6 @@ const tradeNavLinks = [
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const heroRaf = useRef(0);
-  const heroReversing = useRef(false);
-  const heroLastTs = useRef(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -64,42 +61,6 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   useEffect(() => {
     PRELOAD_IMAGES.forEach((s) => { const im = new window.Image(); im.src = s; });
   }, []);
-
-  // Featured hero: wait 2s after the menu opens, then play the clip through once.
-  useEffect(() => {
-    if (!open) return;
-    const v = videoRef.current;
-    if (!v) return;
-    try { v.currentTime = 0; } catch {}
-    const t = setTimeout(() => { v.play().catch(() => {}); }, 2000);
-    return () => { clearTimeout(t); heroReversing.current = false; cancelAnimationFrame(heroRaf.current); };
-  }, [open]);
-
-  // Hero hover: rewind (play backwards) while hovering, play forward on leave.
-  const heroStep = (ts: number) => {
-    const v = videoRef.current;
-    if (!v || !heroReversing.current) return;
-    if (heroLastTs.current) {
-      const dt = (ts - heroLastTs.current) / 1000;
-      v.currentTime = Math.max(0, v.currentTime - dt);
-    }
-    heroLastTs.current = ts;
-    if (v.currentTime <= 0.02) { heroReversing.current = false; return; }
-    heroRaf.current = requestAnimationFrame(heroStep);
-  };
-  function handleHeroEnter() {
-    const v = videoRef.current;
-    if (!v) return;
-    v.pause();
-    heroReversing.current = true;
-    heroLastTs.current = 0;
-    heroRaf.current = requestAnimationFrame(heroStep);
-  }
-  function handleHeroLeave() {
-    heroReversing.current = false;
-    cancelAnimationFrame(heroRaf.current);
-    videoRef.current?.play().catch(() => {});
-  }
 
   function openOffer() {
     setOpen(false);
@@ -191,11 +152,17 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <Link href="/about" className={styles.topNavLink} onClick={closeMenu}>About</Link>
                 <span className={styles.topNavSep}>|</span>
                 <Link href="/preorder" className={styles.topNavLink} onClick={closeMenu}>Pre-order</Link>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Instagram">
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-.75a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+                <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Instagram">
+                  <svg viewBox="440 0 261 341" fill="currentColor" aria-hidden="true">
+                    <path d="M476.4,15.5v15.2h146.5c9.2,0,17.9,1.9,25.9,5.2,11.9,5,22.1,13.5,29.2,24.1,7.2,10.6,11.3,23.3,11.3,37.1v146.5c0,9.2-1.8,17.9-5.2,25.9-5,11.9-13.5,22.1-24.1,29.2-10.6,7.2-23.3,11.3-37.1,11.4h-146.5c-9.2,0-17.9-1.9-25.9-5.2-11.9-5-22.1-13.5-29.2-24.1-7.2-10.6-11.4-23.3-11.4-37.1V97.2c0-9.2,1.9-17.9,5.2-25.9,5-11.9,13.5-22.1,24.1-29.2,10.6-7.2,23.3-11.3,37.1-11.4V.4c-13.3,0-26.1,2.7-37.7,7.6-17.4,7.4-32.1,19.6-42.6,35.1-10.4,15.4-16.6,34.1-16.6,54.1v146.5c0,13.3,2.7,26.1,7.6,37.7,7.4,17.4,19.6,32.1,35.1,42.6,15.4,10.4,34.1,16.6,54.1,16.5h146.5c13.3,0,26.1-2.7,37.7-7.6,17.4-7.4,32.2-19.6,42.6-35,10.4-15.4,16.5-34.1,16.5-54.1V97.2c0-13.3-2.7-26.1-7.6-37.7-7.4-17.4-19.6-32.1-35-42.6-15.4-10.4-34.1-16.6-54.1-16.5h-146.5v15.2Z"/>
+                    <path d="M549.6,98.2v15.2c7.9,0,15.4,1.6,22.2,4.5,10.2,4.3,18.9,11.6,25.1,20.7,3.1,4.5,5.5,9.6,7.2,14.9,1.7,5.3,2.6,11,2.6,17s-1.6,15.4-4.5,22.2c-4.3,10.2-11.6,18.9-20.7,25.1-4.5,3.1-9.6,5.5-14.9,7.2-5.3,1.7-11,2.6-17,2.6s-15.4-1.6-22.2-4.5c-10.2-4.3-18.9-11.6-25.1-20.7-3.1-4.5-5.5-9.6-7.2-14.9-1.7-5.3-2.6-11-2.6-17s1.6-15.4,4.5-22.2c4.3-10.2,11.6-18.9,20.7-25.1,4.5-3.1,9.6-5.5,14.9-7.2,5.3-1.7,11-2.6,17-2.6v-30.3c-12,0-23.6,2.4-34,6.9-15.7,6.6-29,17.7-38.4,31.7-9.4,13.9-15,30.8-14.9,48.9,0,12,2.4,23.6,6.9,34,6.6,15.7,17.7,29,31.7,38.4,13.9,9.4,30.8,15,48.9,15s23.6-2.5,34-6.9c15.7-6.6,29-17.7,38.4-31.6,9.4-13.9,15-30.8,14.9-48.9,0-12-2.4-23.6-6.9-34-6.6-15.7-17.7-29-31.7-38.4-13.9-9.4-30.8-15-48.9-14.9v15.2Z"/>
+                    <path d="M640.7,59.5c11,0,19.9,8.9,19.9,19.9s-8.9,19.9-19.9,19.9-19.9-8.9-19.9-19.9,8.9-19.9,19.9-19.9"/>
+                  </svg>
                 </a>
-                <a href="https://www.tiktok.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="TikTok">
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 3c.26 2.07 1.42 3.3 3.5 3.44v2.4c-1.2.12-2.25-.27-3.47-1.01v6.63a5.62 5.62 0 1 1-4.85-5.57v2.53a2.98 2.98 0 1 0 2.08 2.85V3h2.74Z"/></svg>
+                <a href="https://www.tiktok.com/@pedigree_chums" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="TikTok">
+                  <svg viewBox="0 0 285 341" fill="currentColor" aria-hidden="true">
+                    <path d="M239.9,76.8c-21.8-14.3-35-38.6-35-64.8h-55.3v222.6c-1.1,25.7-22.7,45.8-48.3,44.8-25.6-1-45.7-22.7-44.6-48.4.9-25.1,21.5-44.9,46.4-44.9s9.3.8,13.7,2.2v-56.7c-4.6-.7-9.1-1-13.7-1C47,130.6,1.3,176.4,1.3,232.8c.1,56.4,45.6,102.2,101.8,102.2,56.1,0,101.8-45.8,101.8-102.2v-112.8c22.4,16.2,49.3,24.9,76.9,24.9v-55.5c-14.9,0-29.5-4.3-41.9-12.5"/>
+                  </svg>
                 </a>
               </nav>
             </>
@@ -210,21 +177,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
             </nav>
           ) : (
             <div className={`${styles.bentoWrap} ${styles.overlayIn}`}>
-              {/* Featured hero -- Argos letterbox animation, click-through to the essay */}
-              <Link href="/good-dog-bad-dog/argos" className={styles.heroSlot} onClick={closeMenu} onMouseEnter={handleHeroEnter} onMouseLeave={handleHeroLeave}>
-                <video ref={videoRef} className={styles.heroVideo} src="/menuflash-argos-opt.mp4" muted playsInline preload="auto" aria-hidden />
-                <div className={styles.heroContent}>
-                  <div className={styles.heroTags}>
-                    <span className={styles.heroTagGood}>Good dog</span>
-                    <span className={styles.heroTagOutline}>Homer</span>
-                    <span className={styles.heroTagOutline}>The Odyssey</span>
-                  </div>
-                  <div className={styles.heroBottom}>
-                    <p className={styles.heroTitle}><span className={styles.heroTitleAccent}>Argos:</span> The Dog Who Knew His Master</p>
-                    <span className={styles.heroBtn}>About this dog</span>
-                  </div>
-                </div>
-              </Link>
+              {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles */}
+              <HeroCarousel active={open} onNavigate={closeMenu} />
 
               {/* Row 1 -- Name Generator (left) beside the Chum Drop / Britain's / About cluster */}
               <div className={styles.rowBlock}>
@@ -232,8 +186,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <div className={styles.cluster}>
                   <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
-                    {coverTile(NAV_TILES.britains, `${styles.clusterCell} ${styles.zoomHover}`)}
-                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} reverseOnHover onNavigate={closeMenu} />
+                    {coverTile(NAV_TILES.britains, `${styles.clusterCell} ${styles.zoomHover}`, false, true)}
+                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" noCta sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   </div>
                 </div>
               </div>
@@ -241,7 +195,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               {/* Row 2 -- alternated: cluster (left) beside The Card Game (right) */}
               <div className={styles.rowBlock}>
                 <div className={styles.cluster}>
-                  <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Find your perfect dog" sizeClass={styles.clusterWide} loop={false} reverseOnHover onNavigate={closeMenu} />
+                  <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWide} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.gdbd, styles.clusterCell)}
                     {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell)}
@@ -254,10 +208,10 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
                 {/* Left: Competitions video + Smarter / Home */}
                 <div className={styles.cluster}>
-                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta}`} loop={false} reverseOnHover onNavigate={closeMenu} />
+                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
-                    {coverTile(NAV_TILES.smarter, styles.miniCell)}
-                    {coverTile(NAV_TILES.hotDogs, styles.miniCell)}
+                    {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.metaTop}`)}
+                    {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.metaTop}`, true)}
                   </div>
                 </div>
                 {/* Right: Know Your Chums square + Discount / Home side by side */}
