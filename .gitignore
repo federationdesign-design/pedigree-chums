@@ -42,3 +42,4 @@ next-env.d.ts
 patch_*.py
 =
 public/chumdrrop-minigame.mov
+public/_to_delete/
