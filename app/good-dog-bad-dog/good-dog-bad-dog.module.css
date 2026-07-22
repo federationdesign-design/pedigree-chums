@@ -358,6 +358,7 @@
 }
 .readMore:hover { background: #ffe566; transform: scale(1.03); }
 .tagGood { background: #22c55e; color: #ffffff; }
+.tagLit { background: var(--navy, #0a3a57); color: #ffffff; }
 
 /* ── Essay page shell ───────────────────────────────────────── */
 .essayPage {
@@ -700,11 +701,11 @@
     font-size: 1.15rem;
     letter-spacing: 0.04em;
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(10, 58, 87, 0.4);
+    box-shadow: 0 4px 0 #16a34a;
   }
   .mobileIntroBtn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(10, 58, 87, 0.4);
+    box-shadow: 0 2px 0 #16a34a;
   }
 
   /* Image: top 60% */
@@ -817,11 +818,11 @@
     letter-spacing: 0.04em;
     text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(10, 58, 87, 0.4);
+    box-shadow: 0 4px 0 #16a34a;
   }
   .mobileSlideBtn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(10, 58, 87, 0.4);
+    box-shadow: 0 2px 0 #16a34a;
   }
 
   /* Progress bar */

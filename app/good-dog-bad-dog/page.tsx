@@ -15,6 +15,7 @@ const ESSAYS = [
     slug: "bulls-eye",
     tag: "Bad dog", tagStyle: "tagBad",
     breed: "Bull Terrier",
+    author: "Dickens", work: "Oliver Twist",
     title: "Bull's-eye: The Dog as the Owner's Shadow",
     summary: "Bull's-eye belongs to Bill Sikes, one of Dickens's most violent characters. He is not simply a bad dog -- he is a dog made to carry a bad man's reputation.",
     image: "/bulls-eye-img.jpg",
@@ -31,6 +32,7 @@ const ESSAYS = [
     slug: "hound-of-the-baskervilles",
     tag: "Bad dog", tagStyle: "tagBad",
     breed: "Bloodhound / Mastiff",
+    author: "Conan Doyle", work: "The Hound of the Baskervilles",
     title: "The Hound of the Baskervilles: How a Dog Was Made into a Monster",
     summary: "The hound is eventually revealed to be a real animal -- kept, coated in phosphorus and deliberately released by a human murderer. The dog supplies the teeth. The human supplies the motive.",
     image: "/hound-of-the-baskervilles.jpg",
@@ -39,6 +41,7 @@ const ESSAYS = [
     slug: "lassie",
     tag: "Good dog", tagStyle: "tagGood",
     breed: "Rough Collie",
+    author: "Eric Knight", work: "Lassie Come-Home",
     title: "Lassie: The Burden of Being the Perfect Dog",
     summary: "Lassie never makes a mistake. She is not a dog. She is a heroic design. And that is where the real breed pays the price.",
     image: "/lassie-img.jpg",
@@ -47,6 +50,7 @@ const ESSAYS = [
     slug: "argos",
     tag: "Good dog", tagStyle: "tagGood",
     breed: "Ancient Greek Hunting Hound",
+    author: "Homer", work: "The Odyssey",
     title: "Argos: The Dog Who Knew His Master",
     summary: "Before Lassie, before Greyfriars Bobby, there was Argos. Homer's dog from The Odyssey waited twenty years for his master to return.",
     image: "/history/Argos-hero.jpg",
@@ -89,6 +93,8 @@ export default function GoodDogBadDogPage() {
             <article key={essay.slug} className={styles.card}>
               <div className={styles.cardMeta}>
                 <span className={`${styles.tag} ${styles[essay.tagStyle as keyof typeof styles]}`}>{essay.tag}</span>
+                {"author" in essay && <span className={`${styles.tag} ${styles.tagLit}`}>{essay.author}</span>}
+                {"work" in essay && <span className={`${styles.tag} ${styles.tagLit}`}>{essay.work}</span>}
                 <span className={styles.cardBreed}>{essay.breed}</span>
               </div>
               <h2 className={styles.cardTitle}>{essay.title}</h2>
@@ -138,6 +144,8 @@ export default function GoodDogBadDogPage() {
                   <div className={styles.mobileSlideCount}>{i + 1} / {ESSAYS.length}</div>
                   <div className={styles.mobileSlideTagOverlay}>
                     <span className={`${styles.mobileSlideTagPill} ${styles[essay.tagStyle as keyof typeof styles]}`}>{essay.tag}</span>
+                    {"author" in essay && <span className={`${styles.mobileSlideTagPill} ${styles.tagLit}`}>{essay.author}</span>}
+                    {"work" in essay && <span className={`${styles.mobileSlideTagPill} ${styles.tagLit}`}>{essay.work}</span>}
                     <span className={styles.mobileSlideBreed}>{essay.breed}</span>
                   </div>
                 </div>
