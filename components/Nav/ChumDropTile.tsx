@@ -31,17 +31,17 @@ export default function ChumDropTile({
   const activeRef = useRef(0);
   const startedRef = useRef(false);
   const [active, setActive] = useState(0);
+  const [entered, setEntered] = useState(false);
 
-  // 4-second delay after the menu opens, then start the sequence.
+  // Start almost immediately and fade the clip in from 0 -> 100% over 0.5s.
   useEffect(() => {
-    const t = setTimeout(() => {
-      startedRef.current = true;
-      const v = vids.current[0];
-      if (v) {
-        try { v.currentTime = 0; } catch {}
-        v.play().catch(() => {});
-      }
-    }, 4000);
+    startedRef.current = true;
+    const v = vids.current[0];
+    if (v) {
+      try { v.currentTime = 0; } catch {}
+      v.play().catch(() => {});
+    }
+    const t = setTimeout(() => setEntered(true), 30);
     return () => clearTimeout(t);
   }, []);
 
@@ -85,7 +85,7 @@ export default function ChumDropTile({
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <span className={styles.tileImg} aria-hidden>
+      <span className={styles.tileImg} aria-hidden style={{ opacity: entered ? 1 : 0, transition: "opacity 0.5s ease" }}>
         {CLIPS.map((src, i) => (
           <video
             key={src}

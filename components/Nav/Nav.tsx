@@ -14,8 +14,8 @@ const NAV_TILES: Record<string, TileData> = {
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
   about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
-  gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Read the essays", emoji: "📖" },
-  dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", emoji: "🦺" },
+  gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Read the essays", img: "/bulls-eye-img.jpg" },
+  dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", img: "/never-clocking-off.jpg" },
 };
 
 // Secondary pages -- kept reachable as plain text links
@@ -177,7 +177,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                   <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.britains, styles.clusterCell)}
-                    {coverTile(NAV_TILES.about, styles.clusterCell)}
+                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={styles.clusterCell} onNavigate={closeMenu} />
                   </div>
                 </div>
               </div>
