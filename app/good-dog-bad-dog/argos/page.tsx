@@ -177,6 +177,46 @@ function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
   );
 }
 
+function EditorsNoteCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
+              </div>
+              <div style={{ padding: "0 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
+              </div>
+            </div>
+  );
+}
+
+function ArgosIdentityCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
+              </div>
+              <div style={{ padding: "10px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
+              </div>
+            </div>
+  );
+}
+
+function InContextCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
+              </div>
+              <div style={{ padding: "10px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
+              </div>
+            </div>
+  );
+}
+
 export default function ArgosPage() {
   return (
     <>
@@ -217,11 +257,23 @@ export default function ArgosPage() {
 
               <p>He appears only briefly in <em>The Odyssey</em>. He does not fight a monster. He does not save a child. He does not lead anyone out of danger. He simply lifts his head, recognises the man he has waited for, wags his tail, and dies.</p>
 
+              <div className={styles.sceneMobile}>
+                <EditorsNoteCard />
+              </div>
+
               <p>And somehow, nearly three thousand years later, that is enough.</p>
 
               <p>Now that Christopher Nolan has brought <em>The Odyssey</em> back into cinemas, Argos has returned too. Nolan has described <em>The Odyssey</em> as &quot;the ultimate dog movie&quot;, and has linked his own recent experience of becoming a dog owner to the importance of Argos in the story. In Homer, Argos is a tiny scene. In emotional terms, he is enormous.</p>
 
+              <div className={styles.sceneMobile}>
+                <NolanFilmCard />
+              </div>
+
               <p>That may be because Argos is not just a loyal dog. He is something more complicated. He is the dog as memory. The dog as home. The dog as witness. The dog as proof that someone can be changed by war, time, disguise and suffering, and still be known by the creature who loved him before all of it.</p>
+
+              <div className={styles.sceneMobile}>
+                <ArgosIdentityCard />
+              </div>
 
               <h2 className={styles.subhead}>The oldest dog reunion in literature</h2>
 
@@ -231,17 +283,23 @@ export default function ArgosPage() {
 
               <p>Then he sees the dog.</p>
 
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/history/Argos-hero.jpg" alt="Argos waiting for Odysseus" loading="lazy" />
+              </div>
+
               <p>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
 
-              <p>But Argos recognises Odysseus.</p>
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
 
-              <p>The humans see a beggar. The dog knows his master.</p>
-
-              <p>That is the whole power of the scene.</p>
+              <ul className={styles.essayBullets}>
+                <li>But Argos recognises Odysseus.</li>
+                <li>The humans see a beggar.</li>
+                <li>The dog knows his master.</li>
+                <li>That is the whole power of the scene.</li>
+              </ul>
 
               <p>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly. He cannot kneel beside him, call his name, or comfort him without risking his disguise. Argos has enough strength left to recognise him, but not enough to reach him. Then, as Odysseus goes inside, Argos dies.</p>
-
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
 
               <p>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</p>
 
@@ -253,7 +311,13 @@ export default function ArgosPage() {
 
               <p>Modern audiences do not just want Argos to recognise Odysseus. They want Odysseus to recognise Argos back. They want the reunion to be mutual. They want the dog&apos;s loyalty to be answered with something visible: a hand on the head, a moment beside him, acknowledgement.</p>
 
+              <div className={styles.sceneMobile}>
+                <InContextCard />
+              </div>
+
               <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. An ancient audience may have been more prepared to admire that restraint: Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
+
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
 
               <p>Modern audiences do something different. We do not only watch Odysseus. We become him. We enter the scene emotionally, and once we have done that, walking past the dog feels almost impossible.</p>
 
@@ -261,8 +325,6 @@ export default function ArgosPage() {
 
               <p>That instinct has become much more visible in the age of social media. Audiences no longer wait silently for a story to happen to them. They talk back. They speculate, demand, dread and rewrite in real time. The Reddit users asking Nolan to pet the dog are doing what audiences have always done, only louder: asking an old story to answer a modern emotional need.</p>
 
-
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
 
               <p>Part of why that need is so strong is that the dog&apos;s position in our lives has changed so completely. Over the last century, and dramatically over the last few decades, the dog has moved from the yard to the house, from the house to the sofa, from the sofa to the bedroom. Dogs now have beds chosen for their joint health, food chosen for their digestion, coats chosen for cold mornings. We arrange our holidays around them. We grieve them publicly, with the same language we use for people, because the loss genuinely feels like the same kind of thing.</p>
 
@@ -277,10 +339,6 @@ export default function ArgosPage() {
               <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
-
-              <div className={styles.sceneMobile}>
-                <NolanFilmCard />
-              </div>
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
 
@@ -514,25 +572,10 @@ export default function ArgosPage() {
           <aside className={styles.sidebar}>
 
             {/* Card 1: Editor's note */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
-              </div>
-              <div style={{ padding: "0 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><EditorsNoteCard /></div>
 
             {/* Card 2: Identity */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
-              </div>
-              <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><ArgosIdentityCard /></div>
 
             {/* Card 3: The Odyssey book facts */}
             <div className={styles.sidebarCard}>
@@ -657,14 +700,7 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 9: In Context */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
-              </div>
-              <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><InContextCard /></div>
 
             {/* Card 10: Ancestral Lineage -- extended and enriched */}
             <div className={styles.sidebarOnly}>
