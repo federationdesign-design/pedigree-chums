@@ -569,7 +569,7 @@
   color: var(--navy, #0a3a57);
   font-style: normal;
   line-height: 0;
-  vertical-align: -0.15em;
+  vertical-align: -0.25em;
   margin-right: 6px;
 }
 
@@ -580,7 +580,7 @@
   color: var(--navy, #0a3a57);
   font-style: normal;
   line-height: 0;
-  vertical-align: -0.15em;
+  vertical-align: -0.25em;
   margin-left: 6px;
 }
 
