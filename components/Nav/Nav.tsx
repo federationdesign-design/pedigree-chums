@@ -7,7 +7,7 @@ import VideoTile from "./VideoTile";
 import styles from "./Nav.module.css";
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
-type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string };
+type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string };
 const NAV_TILES: Record<string, TileData> = {
   nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", img: "/name-gen-bento-menu-img.jpg" },
   product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
@@ -18,13 +18,13 @@ const NAV_TILES: Record<string, TileData> = {
   dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", img: "/never-clocking-off.jpg" },
 };
 
-// Extra page blocks -- one tile each.
+// Extra page blocks -- bento-styled: Competitions + Know Your Chums are big.
 const PAGES: TileData[] = [
-  { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
-  { href: "/chumspot", labelA: "Competitions", cta: "Win prizes", img: "/lab-animation-1stframe.jpg" },
-  { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg" },
-  { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "Keep cool", img: "/hot-dog-hearo-img.jpg" },
-  { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Find out", img: "/inteligent-dogs.jpg" },
+  { href: "/chumspot", labelA: "Competitions", cta: "Win prizes", img: "/lab-animation-1stframe.jpg", size: "pageBig" },
+  { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg", size: "pageBig" },
+  { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg", size: "pageSmall" },
+  { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "Keep cool", img: "/hot-dog-hearo-img.jpg", size: "pageWide" },
+  { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Find out", img: "/inteligent-dogs.jpg", size: "pageSmall" },
 ];
 
 // Menu images worth preloading so the launcher opens without pop-in.
@@ -217,9 +217,9 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 </span>
               </button>
 
-              {/* Extra page blocks */}
+              {/* Extra page blocks -- bento grid */}
               <div className={styles.pageRow}>
-                {PAGES.map((p) => coverTile(p, styles.pageTile))}
+                {PAGES.map((p) => coverTile(p, `${styles.pageTile} ${styles[(p.size ?? "pageSmall") as keyof typeof styles]}`))}
               </div>
             </div>
           )}
