@@ -4,6 +4,7 @@ import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
 import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCarousel";
+import DogPoll from "../../../components/DogPoll/DogPoll";
 
 export const metadata: Metadata = {
   title: "Argos: Homer's Dog in The Odyssey — Loyalty, Home and the Nolan Film",
@@ -218,6 +219,33 @@ function InContextCard() {
   );
 }
 
+function BookFactsCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 12px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
+              </div>
+              <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                {[
+                  { label: "Books", value: "24" },
+                  { label: "Lines", value: "12,109" },
+                  { label: "Words", value: "134,560" },
+                  { label: "Read time*", value: "30 hrs" },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ textAlign: "center" }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "12px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>*The often-cited 9-hour figure assumes mechanical reading at 250 wpm. In practice, The Odyssey demands real concentration. Allow at least 30 hours for a considered read.</p>
+              </div>
+            </div>
+  );
+}
+
 export default function ArgosPage() {
   return (
     <>
@@ -254,13 +282,13 @@ export default function ArgosPage() {
           <article className={styles.essay}>
             <div className={styles.essayBody}>
 
-              <p>Before Lassie ran for help, before Greyfriars Bobby waited by a grave, before the internet discovered videos of dogs greeting soldiers home from war, there was Argos.</p>
-
-              <p>He appears only briefly in <em>The Odyssey</em>. He does not fight a monster. He does not save a child. He does not lead anyone out of danger. He simply lifts his head, recognises the man he has waited for, wags his tail, and dies.</p>
-
               <div className={styles.sceneMobile}>
                 <EditorsNoteCard />
               </div>
+
+              <p>Before Lassie ran for help, before Greyfriars Bobby waited by a grave, before the internet discovered videos of dogs greeting soldiers home from war, there was Argos.</p>
+
+              <p>He appears only briefly in <em>The Odyssey</em>. He does not fight a monster. He does not save a child. He does not lead anyone out of danger. He simply lifts his head, recognises the man he has waited for, wags his tail, and dies.</p>
 
               <p>And somehow, nearly three thousand years later, that is enough.</p>
 
@@ -272,10 +300,6 @@ export default function ArgosPage() {
 
               <p>That may be because Argos is not just a loyal dog. He is something more complicated. He is the dog as memory. The dog as home. The dog as witness. The dog as proof that someone can be changed by war, time, disguise and suffering, and still be known by the creature who loved him before all of it.</p>
 
-              <div className={styles.sceneMobile}>
-                <ArgosIdentityCard />
-              </div>
-
               <h2 className={styles.subhead}>The oldest dog reunion in literature</h2>
 
               <p>The Argos scene comes late in <em>The Odyssey</em>, when Odysseus has finally returned to Ithaca after twenty years away. Ten years were spent at Troy. Another ten were spent trying to get home.</p>
@@ -284,9 +308,14 @@ export default function ArgosPage() {
 
               <p>Then he sees the dog.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/history/Argos-hero.jpg" alt="Argos waiting for Odysseus" loading="lazy" />
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`}>
+                <div className={styles.parallaxImgWrap}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/history/Argos-hero.jpg" alt="Argos waiting for Odysseus" loading="lazy" />
+                </div>
+                <div className={styles.parallaxContent}>
+                  <ArgosIdentityCard />
+                </div>
               </div>
 
               <p>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
@@ -304,6 +333,28 @@ export default function ArgosPage() {
 
               <p>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</p>
 
+              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
+                <CaptionedCarousel
+                  slides={[
+                    {
+                      src: "/history/jurrisicbark-shialebuff.jpg",
+                      alt: "Jurassic Bark",
+                      caption: "PLACEHOLDER — Jurassic Bark: Hollywood understands the rule. The dog gets greeted.",
+                    },
+                    {
+                      src: "/history/odyssusand-argos-statue-2.jpg",
+                      alt: "Odysseus and Argos statue",
+                      caption: "PLACEHOLDER — Odysseus and Argos: the reunion in stone.",
+                    },
+                    {
+                      src: "/history/odyssusand-argos-statue-.jpg",
+                      alt: "Odysseus and Argos statue, second view",
+                      caption: "PLACEHOLDER — The moment of recognition, another view.",
+                    },
+                  ]}
+                />
+              </div>
+
               <h2 className={styles.subhead}>Why we need Odysseus to go to him</h2>
 
               <p>Around the time Nolan&apos;s film was announced, something interesting happened online. Fans were discussing the Argos scene before the film was even released. One Reddit thread asked whether Nolan would include the moment, with users remembering it as one of the most emotional parts of the poem. One comment put the modern demand bluntly: &quot;Pet.The.Dog Nolan.&quot;</p>
@@ -311,6 +362,17 @@ export default function ArgosPage() {
               <p>That reaction tells us something real.</p>
 
               <p>Modern audiences do not just want Argos to recognise Odysseus. They want Odysseus to recognise Argos back. They want the reunion to be mutual. They want the dog&apos;s loyalty to be answered with something visible: a hand on the head, a moment beside him, acknowledgement.</p>
+
+              <div className={styles.sceneMobile}>
+                <DogPoll
+                  question="Nolan has the whole of The Odyssey in his hands. Should he change the story so Odysseus finally gets to pet his dog?"
+                  options={[
+                    { label: "Pet the dog. Homer had 2,800 years to fix this", pct: 96 },
+                    { label: "Stay faithful to the text", pct: 4 },
+                  ]}
+                  footnote="*Poll results independently verified by a panel of very good boys."
+                />
+              </div>
 
               <div className={styles.sceneMobile}>
                 <InContextCard />
@@ -329,6 +391,33 @@ export default function ArgosPage() {
 
               <p>Part of why that need is so strong is that the dog&apos;s position in our lives has changed so completely. Over the last century, and dramatically over the last few decades, the dog has moved from the yard to the house, from the house to the sofa, from the sofa to the bedroom. Dogs now have beds chosen for their joint health, food chosen for their digestion, coats chosen for cold mornings. We arrange our holidays around them. We grieve them publicly, with the same language we use for people, because the loss genuinely feels like the same kind of thing.</p>
 
+              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
+                <CaptionedCarousel
+                  slides={[
+                    {
+                      src: "/history/odysseus-dog-argos-in-death.webp",
+                      alt: "The death of Argos",
+                      caption: "PLACEHOLDER — Argos in death: the wait ends the moment it is rewarded.",
+                    },
+                    {
+                      src: "/history/nolans-king-odyssus.webp",
+                      alt: "Nolan's Odysseus",
+                      caption: "PLACEHOLDER — Nolan's king: Odysseus returns to cinemas in 2026.",
+                    },
+                    {
+                      src: "/history/nolans-king-odyssus-painting-remake.jpg",
+                      alt: "Odysseus painting remake",
+                      caption: "PLACEHOLDER — The classical Odysseus, remade.",
+                    },
+                    {
+                      src: "/history/odyssusand-argos-painting-remake.jpg",
+                      alt: "Odysseus and Argos painting remake",
+                      caption: "PLACEHOLDER — Man and dog: the original artwork, remade.",
+                    },
+                  ]}
+                />
+              </div>
+
               <p>The old contract &mdash; I keep you, you serve me &mdash; has been replaced by something closer to mutual love, and that love now feels like a moral obligation. When Odysseus walks past Argos without stopping, modern audiences feel it not as a tactical necessity but as a failure. That is the distance between Homer&apos;s world and ours.</p>
 
               <p>Which puts Nolan in an interesting position.</p>
@@ -338,6 +427,15 @@ export default function ArgosPage() {
               <p>And early discussion of the film suggests that Argos has not been treated as a disposable detail. Coverage of Nolan&apos;s adaptation notes that Argos appears in the film, and viewers have already singled out the dog scene as one of the moments that affected them most.</p>
 
               <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
+
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" />
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <BookFactsCard />
+              </div>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
 
@@ -603,28 +701,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarOnly}><ArgosIdentityCard /></div>
 
             {/* Card 3: The Odyssey book facts */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
-              </div>
-              <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                {[
-                  { label: "Books", value: "24" },
-                  { label: "Lines", value: "12,109" },
-                  { label: "Words", value: "134,560" },
-                  { label: "Read time*", value: "30 hrs" },
-                ].map(({ label, value }) => (
-                  <div key={label} style={{ textAlign: "center" }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
-                    <p style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 }}>{value}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{ padding: "12px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>*The often-cited 9-hour figure assumes mechanical reading at 250 wpm. In practice, The Odyssey demands real concentration. Allow at least 30 hours for a considered read.</p>
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><BookFactsCard /></div>
 
             {/* Card 4: Nolan film */}
             <div className={styles.sidebarOnly}><NolanFilmCard /></div>

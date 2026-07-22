@@ -1,0 +1,121 @@
+.wrap {
+  background: var(--navy, #0a3a57);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.kicker {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 8px;
+}
+
+.question {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 14px;
+  background: #22c55e;
+  color: #ffffff;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #16a34a;
+}
+
+.option:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #16a34a;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.resultRow {
+  width: 100%;
+}
+
+.resultHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.resultLabel,
+.resultLabelPicked {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.resultLabelPicked {
+  color: var(--yellow, #ffd23e);
+}
+
+.resultPct {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.barTrack {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.barFill,
+.barFillLead {
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  animation: pollGrow 0.7s ease-out;
+  transform-origin: left;
+}
+
+.barFillLead {
+  background: #22c55e;
+}
+
+@keyframes pollGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.footnote {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--yellow, #ffd23e);
+  opacity: 0.85;
+  margin: 4px 0 0;
+}
