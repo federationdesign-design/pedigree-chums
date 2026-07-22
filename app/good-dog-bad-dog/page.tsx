@@ -114,12 +114,13 @@ export default function GoodDogBadDogPage() {
                 </h1>
                 <p className={styles.mobileIntroText}>
                   Fictional dogs are rarely just dogs. They get cast as heroes, monsters,
-                  loyal companions and dangerous outsiders.
+                  loyal companions and dangerous outsiders. Their size, breed and appearance
+                  become shorthand for the role the story needs them to play.
                 </p>
                 <p className={styles.mobileIntroText}>
                   This series looks at some of the most famous dog stories and legends and asks what effect this has had on our conceptions of the actual breeds and the effect of that portrayal.
                 </p>
-                <button type="button" id="intro-next-btn" className={styles.readMore}>Read the essays →</button>
+                <button type="button" id="intro-next-btn" className={styles.mobileIntroBtn}>Go to first dog</button>
               </div>
             </div>
 
@@ -178,30 +179,59 @@ export default function GoodDogBadDogPage() {
             if (idx > count - 1) idx = count - 1;
             carousel.scrollTo({ left: idx * carousel.clientWidth, behavior: 'smooth' });
           }
-          function currentIndex() {
-            return Math.round(carousel.scrollLeft / carousel.clientWidth);
-          }
 
           var btn = document.getElementById('intro-next-btn');
           if (btn) btn.addEventListener('click', function(){ goTo(1); });
 
-          var sx = 0, sy = 0, st = 0;
+          /* Continuous vertical drag -> horizontal movement.
+             touch-action: pan-x means the browser has no default action for
+             vertical touches, so passive listeners are safe: no preventDefault,
+             no interference with native horizontal swiping. */
+          var GAIN = 1.6;           /* px of horizontal travel per px of vertical drag */
+          var startX = 0, startY = 0, startLeft = 0, lastY = 0, lastT = 0, vel = 0;
+          var axis = null;          /* null | 'v' | 'h' */
+
           carousel.addEventListener('touchstart', function(e){
             if (e.touches.length !== 1) return;
-            sx = e.touches[0].clientX;
-            sy = e.touches[0].clientY;
-            st = Date.now();
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            startLeft = carousel.scrollLeft;
+            lastY = startY; lastT = Date.now(); vel = 0;
+            axis = null;
           }, { passive: true });
-          carousel.addEventListener('touchend', function(e){
-            var t = e.changedTouches && e.changedTouches[0];
-            if (!t) return;
-            var dx = t.clientX - sx;
-            var dy = t.clientY - sy;
-            var dt = Date.now() - st;
-            /* vertical flick: clearly more vertical than horizontal, decisive, quick */
-            if (Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx) * 1.2 && dt < 600) {
-              goTo(currentIndex() + (dy < 0 ? 1 : -1));
+
+          carousel.addEventListener('touchmove', function(e){
+            var t = e.touches[0];
+            if (!axis) {
+              var adx = Math.abs(t.clientX - startX);
+              var ady = Math.abs(t.clientY - startY);
+              if (adx < 6 && ady < 6) return;           /* not decided yet */
+              axis = ady > adx ? 'v' : 'h';
+              if (axis === 'v') carousel.style.scrollSnapType = 'none';
             }
+            if (axis !== 'v') return;                    /* horizontal: native handles it */
+            var now = Date.now();
+            if (now > lastT) vel = (lastY - t.clientY) / (now - lastT);
+            lastY = t.clientY; lastT = now;
+            carousel.scrollLeft = startLeft + (startY - t.clientY) * GAIN;
+          }, { passive: true });
+
+          carousel.addEventListener('touchend', function(){
+            if (axis !== 'v') return;
+            axis = null;
+            var w = carousel.clientWidth;
+            var idx;
+            if (Math.abs(vel) > 0.35) {
+              /* decisive flick at release: continue one slide in that direction */
+              idx = (vel > 0 ? Math.ceil : Math.floor)(carousel.scrollLeft / w);
+            } else {
+              idx = Math.round(carousel.scrollLeft / w);
+            }
+            var count = carousel.children.length;
+            if (idx < 0) idx = 0;
+            if (idx > count - 1) idx = count - 1;
+            carousel.scrollTo({ left: idx * w, behavior: 'smooth' });
+            setTimeout(function(){ carousel.style.scrollSnapType = ''; }, 450);
           }, { passive: true });
         })();` }} />
 
