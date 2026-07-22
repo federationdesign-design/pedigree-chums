@@ -1027,6 +1027,33 @@
     background: var(--navy, #0a3a57);
   }
 
+  /* Timeline body: faint track + yellow spine that grows with scroll */
+  .tlBody {
+    position: relative;
+  }
+
+  .tlTrack,
+  .tlFill {
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .tlFill {
+    bottom: auto;
+    height: 0%;
+    background: var(--yellow, #ffd23e);
+    transition: height 0.15s linear;
+  }
+
+  .tlItem {
+    position: relative;
+    z-index: 1;
+  }
+
   /* Scroll reveal -- only once JS confirms (tl-js), so no-JS users see everything */
   :global(.tl-js) .tlItem {
     opacity: 0;

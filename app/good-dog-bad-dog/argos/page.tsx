@@ -246,6 +246,95 @@ function BookFactsCard() {
   );
 }
 
+function AboutHomerCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+              </div>
+              <div style={{ overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/history/homer-bust.jpeg"
+                  alt="Bust of Homer, Farnese collection, Naples"
+                  style={{ width: "100%", display: "block" }}
+                />
+              </div>
+              <div style={{ padding: "14px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
+                {[
+                  {
+                    title: "The Iliad",
+                    detail: "c. 750 BCE · 24 books · 15,693 lines",
+                    desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
+                  },
+                  {
+                    title: "The Odyssey",
+                    detail: "c. 700 BCE · 24 books · 12,109 lines",
+                    desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos.",
+                  },
+
+                ].map(({ title, detail, desc }) => (
+                  <div key={title} style={{ marginBottom: 14 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
+                  </div>
+                ))}
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8, marginTop: 4 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
+              </div>
+            </div>
+  );
+}
+
+function WhatWeKnowCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
+              </div>
+              <div style={{ padding: "10px 20px 4px" }}>
+                {[
+                  { label: "Source", value: "The Odyssey, Homer, Book 17" },
+                  { label: "Approx. date", value: "c.800–700 BC (composition); story set c.1200 BC" },
+                  { label: "Age at death", value: "Twenty years — almost certainly mythic for a large hunting dog. Aristotle noted this was exceptional and recorded that critics praised Homer for giving Argos exactly this lifespan." },
+                  { label: "Most probable type", value: "The Laconian Hound (Spartan Hound) — the premier hunting dog of ancient Greece. Lean, fast, agile and prized across the Mediterranean for its scenting ability and stamina." },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ marginBottom: 14 }}>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "4px 20px 8px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 10 }}>Modern descendants</p>
+                {[
+                  { breed: "Greyhound", via: "via Laconian Hound", slug: "greyhound", linked: true },
+                  { breed: "Saluki", via: "via Laconian Hound", slug: null, linked: false },
+                  { breed: "Whippet", via: "via Laconian Hound", slug: "whippet", linked: true },
+                  { breed: "Ibizan Hound", via: "via Cretan Hound", slug: null, linked: false },
+                  { breed: "Pharaoh Hound", via: "via Cretan Hound", slug: null, linked: false },
+                  { breed: "English Mastiff", via: "via Molossian Hound", slug: "mastiff", linked: true },
+                ].map(({ breed, via, slug, linked }) => (
+                  <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
+                    {linked && slug ? (
+                      <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "var(--yellow)", textDecoration: "underline", textUnderlineOffset: "3px" }}>{breed}</a>
+                    ) : (
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{breed}</span>
+                    )}
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", fontWeight: 500, color: "#fff", textAlign: "right", flexShrink: 0 }}>{via}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ height: 8 }} />
+            </div>
+  );
+}
+
 export default function ArgosPage() {
   return (
     <>
@@ -447,6 +536,10 @@ export default function ArgosPage() {
 
               <p>That restraint is why the scene still works. The poem understands something every dog owner knows: a dog&apos;s recognition goes deeper than sight. Dogs read the world differently from us. They notice changes in posture, rhythm, emotional atmosphere and routine. They know when you are about to leave before you pick up your keys. They understand the difference between a playful voice and a tense one. And they live in a world thick with scent: identity, presence, absence, age, stress and memory that no costume can entirely erase.</p>
 
+              <div className={styles.sceneMobile}>
+                <AboutHomerCard />
+              </div>
+
               <p>A person changed by twenty years of war and sea-crossing can put on different clothes. But to a dog, identity is not only visual. Scent, movement, voice and old association may survive a disguise in ways human recognition cannot.</p>
 
               <p>Odysseus&apos;s appearance has changed. His status has changed. His clothes are false.</p>
@@ -457,28 +550,51 @@ export default function ArgosPage() {
 
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
-                <CaptionedCarousel
-                  title="Argos in Art"
-                  slides={[
-                    {
-                      src: "/history/homer-bust.jpeg",
-                      alt: "Marble bust of Homer",
-                      caption: "PLACEHOLDER — Homer, the blind poet credited with composing The Odyssey around the 8th century BCE.",
-                    },
-                    {
-                      src: "/history/Argos-hero.jpg",
-                      alt: "Argos waiting for Odysseus",
-                      caption: "PLACEHOLDER — Argos on the dung heap, the moment of recognition.",
-                    },
-                    {
-                      src: "/history/greek-harehound.jpg",
-                      alt: "Greek Harehound",
-                      caption: "PLACEHOLDER — The Greek Harehound, closest living relative of the hounds of Homer's world.",
-                      credit: "Image: Wikimedia Commons / CC BY-SA 3.0",
-                    },
-                  ]}
-                />
+              <div className={styles.sceneMobile}>
+                <WhatWeKnowCard />
+              </div>
+
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`}>
+                <div className={styles.parallaxImgWrap}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/history/greek-harehound.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" />
+                </div>
+                <div className={styles.parallaxContent}>
+                  <LivingDescendantCard />
+                </div>
+              </div>
+
+              <div className={`${styles.sceneMobile} ${styles.timelineScene}`} id="tl-scene">
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
+                <div className={styles.tlBody} id="tl-body">
+                  <div className={styles.tlTrack} />
+                  <div className={styles.tlFill} id="tl-fill" />
+                {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }) => (
+                  <div key={"tl-" + era + name} data-tl-item className={styles.tlItem} style={{ display: "flex", gap: 14 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
+                      <div style={{
+                        width: highlight ? 14 : isBreed ? 12 : 11,
+                        height: highlight ? 14 : isBreed ? 12 : 11,
+                        borderRadius: "50%",
+                        background: isBreed ? "#22c55e" : highlight ? "var(--yellow)" : "#fff",
+                        marginTop: 4,
+                        flexShrink: 0,
+                        boxShadow: highlight ? "0 0 0 3px rgba(255,210,62,0.3)" : "none",
+                      }} />
+                      {!end && <div style={{ width: 2, flex: 1, minHeight: 48 }} />}
+                    </div>
+                    <div style={{ paddingBottom: end ? 0 : 28 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", letterSpacing: "0.05em", marginBottom: 3, textTransform: "uppercase" }}>{era}</p>
+                      {isBreed && slug ? (
+                        <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#22c55e", textDecoration: "underline", textUnderlineOffset: "3px", display: "block", marginBottom: 4 }}>{name}</a>
+                      ) : (
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "1rem" : "0.95rem", fontWeight: highlight ? 700 : 600, color: highlight ? "var(--yellow)" : "#fff", marginBottom: 4 }}>{name}</p>
+                      )}
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{context}</p>
+                    </div>
+                  </div>
+                ))}
+                </div>
               </div>
 
               <h2 className={styles.subhead}>The smell of home</h2>
@@ -598,35 +714,6 @@ export default function ArgosPage() {
 
               <p>What Argos quietly demands, for modern readers, is a question the ancient world never quite asked in the same way: what do we owe, in return, for that kind of love?</p>
 
-              <div className={`${styles.sceneMobile} ${styles.timelineScene}`} id="tl-scene">
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
-                {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }) => (
-                  <div key={"tl-" + era + name} data-tl-item className={styles.tlItem} style={{ display: "flex", gap: 14 }}>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
-                      <div style={{
-                        width: highlight ? 14 : isBreed ? 12 : 11,
-                        height: highlight ? 14 : isBreed ? 12 : 11,
-                        borderRadius: "50%",
-                        background: isBreed ? "#22c55e" : highlight ? "var(--yellow)" : "#fff",
-                        marginTop: 4,
-                        flexShrink: 0,
-                        boxShadow: highlight ? "0 0 0 3px rgba(255,210,62,0.3)" : "none",
-                      }} />
-                      {!end && <div style={{ width: 2, flex: 1, background: "rgba(255,255,255,0.3)", minHeight: 48 }} />}
-                    </div>
-                    <div style={{ paddingBottom: end ? 0 : 28 }}>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", letterSpacing: "0.05em", marginBottom: 3, textTransform: "uppercase" }}>{era}</p>
-                      {isBreed && slug ? (
-                        <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#22c55e", textDecoration: "underline", textUnderlineOffset: "3px", display: "block", marginBottom: 4 }}>{name}</a>
-                      ) : (
-                        <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "1rem" : "0.95rem", fontWeight: highlight ? 700 : 600, color: highlight ? "var(--yellow)" : "#fff", marginBottom: 4 }}>{name}</p>
-                      )}
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{context}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
               <h2 className={styles.subhead}>Why Argos couldn&apos;t really have lived twenty years &mdash; and why it matters</h2>
 
               <p>There is one more problem with Argos that is easy to overlook because the story is so moving.</p>
@@ -660,16 +747,6 @@ export default function ArgosPage() {
               <p>Once he has seen Odysseus, once he has known him, once he has confirmed that the man beneath the disguise is still the man who left, Argos can go. In a story full of monsters, storms, gods, violence and tricks, the dog&apos;s gift is simple.</p>
 
               <p>He knows who has come home. That is not a broken heart. That is a completed one.</p>
-
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`}>
-                <div className={styles.parallaxImgWrap}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/history/greek-harehound.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" />
-                </div>
-                <div className={styles.parallaxContent}>
-                  <LivingDescendantCard />
-                </div>
-              </div>
 
               <h2 className={styles.subhead}>Why Argos still matters</h2>
 
@@ -707,46 +784,7 @@ export default function ArgosPage() {
             <div className={styles.sidebarOnly}><NolanFilmCard /></div>
 
             {/* Card 5: About Homer */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/history/homer-bust.jpeg"
-                  alt="Bust of Homer, Farnese collection, Naples"
-                  style={{ width: "100%", display: "block" }}
-                />
-              </div>
-              <div style={{ padding: "14px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
-                {[
-                  {
-                    title: "The Iliad",
-                    detail: "c. 750 BCE · 24 books · 15,693 lines",
-                    desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs.",
-                  },
-                  {
-                    title: "The Odyssey",
-                    detail: "c. 700 BCE · 24 books · 12,109 lines",
-                    desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos.",
-                  },
-
-                ].map(({ title, detail, desc }) => (
-                  <div key={title} style={{ marginBottom: 14 }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 2 }}>{title}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.75rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 4, letterSpacing: "0.04em" }}>{detail}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{desc}</p>
-                  </div>
-                ))}
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8, marginTop: 4 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
-              </div>
-            </div>
+            <div className={styles.sidebarOnly}><AboutHomerCard /></div>
 
             {/* Card 6: Likely Origins */}
             <div className={styles.sidebarCard}>
@@ -848,45 +886,7 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 12: What We Know */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
-              </div>
-              <div style={{ padding: "10px 20px 4px" }}>
-                {[
-                  { label: "Source", value: "The Odyssey, Homer, Book 17" },
-                  { label: "Approx. date", value: "c.800–700 BC (composition); story set c.1200 BC" },
-                  { label: "Age at death", value: "Twenty years — almost certainly mythic for a large hunting dog. Aristotle noted this was exceptional and recorded that critics praised Homer for giving Argos exactly this lifespan." },
-                  { label: "Most probable type", value: "The Laconian Hound (Spartan Hound) — the premier hunting dog of ancient Greece. Lean, fast, agile and prized across the Mediterranean for its scenting ability and stamina." },
-                ].map(({ label, value }) => (
-                  <div key={label} style={{ marginBottom: 14 }}>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 }}>{label}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{value}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{ padding: "4px 20px 8px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 10 }}>Modern descendants</p>
-                {[
-                  { breed: "Greyhound", via: "via Laconian Hound", slug: "greyhound", linked: true },
-                  { breed: "Saluki", via: "via Laconian Hound", slug: null, linked: false },
-                  { breed: "Whippet", via: "via Laconian Hound", slug: "whippet", linked: true },
-                  { breed: "Ibizan Hound", via: "via Cretan Hound", slug: null, linked: false },
-                  { breed: "Pharaoh Hound", via: "via Cretan Hound", slug: null, linked: false },
-                  { breed: "English Mastiff", via: "via Molossian Hound", slug: "mastiff", linked: true },
-                ].map(({ breed, via, slug, linked }) => (
-                  <div key={breed} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
-                    {linked && slug ? (
-                      <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "var(--yellow)", textDecoration: "underline", textUnderlineOffset: "3px" }}>{breed}</a>
-                    ) : (
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{breed}</span>
-                    )}
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.8rem", fontWeight: 500, color: "#fff", textAlign: "right", flexShrink: 0 }}>{via}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ height: 8 }} />
-            </div>
+            <div className={styles.sidebarOnly}><WhatWeKnowCard /></div>
 
             {/* Card 13: Living Descendant */}
             <div className={styles.sidebarOnly}><LivingDescendantCard showImage /></div>
@@ -920,12 +920,34 @@ export default function ArgosPage() {
           if (!scene || !('IntersectionObserver' in window)) return;
           scene.className += ' tl-js';
           var items = scene.querySelectorAll('[data-tl-item]');
+          /* entries reveal as they cross the top 62% of the viewport, so on
+             arrival only the first ~3 are lit and scrolling paces the rest */
           var obs = new IntersectionObserver(function(entries){
             entries.forEach(function(en){
               if (en.isIntersecting) { en.target.className += ' tl-in'; obs.unobserve(en.target); }
             });
-          }, { threshold: 0.3 });
+          }, { rootMargin: '0px 0px -38% 0px', threshold: 0.05 });
           items.forEach(function(el){ obs.observe(el); });
+
+          /* the yellow spine grows with scroll progress through the timeline */
+          var tlBody = document.getElementById('tl-body');
+          var fill = document.getElementById('tl-fill');
+          if (tlBody && fill) {
+            var tick = false;
+            function grow() {
+              tick = false;
+              var r = tlBody.getBoundingClientRect();
+              var anchor = window.innerHeight * 0.62;
+              var pct = (anchor - r.top) / r.height;
+              if (pct < 0) pct = 0;
+              if (pct > 1) pct = 1;
+              fill.style.height = (pct * 100) + '%';
+            }
+            window.addEventListener('scroll', function(){
+              if (!tick) { tick = true; requestAnimationFrame(grow); }
+            }, { passive: true });
+            grow();
+          }
         })();` }} />
       </main>
       <Footer />
