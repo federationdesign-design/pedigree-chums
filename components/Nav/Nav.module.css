@@ -300,6 +300,14 @@
 .tileFitImg { display: block; width: 100%; height: auto; }
 .tileMetaOverlay { position: absolute; left: 0; right: 0; bottom: 0; }
 
+/* ── Bottom bento: square Competitions/KYC, mini row, half-width discount ── */
+.rowBlockStart { align-items: flex-start; }
+.sqTile { flex: none; aspect-ratio: 1 / 1; }   /* Competitions video + Know Your Chums */
+.miniRow { display: flex; gap: 14px; }
+.miniRow > * { flex: 1 1 0; min-width: 0; }
+.miniCell { height: clamp(150px, 17vh, 200px); }
+.wideBottom { height: clamp(150px, 17vh, 200px); }
+
 /* Tile base */
 .tile {
   position: relative;

@@ -16,23 +16,17 @@ const NAV_TILES: Record<string, TileData> = {
   about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
   gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Read the essays", img: "/bulls-eye-img.jpg" },
   dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Meet the workers", img: "/never-clocking-off.jpg" },
+  knowYourChums: { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg" },
+  home: { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
+  hotDogs: { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "Keep cool", img: "/hot-dog-hearo-img.jpg" },
+  smarter: { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Find out", img: "/inteligent-dogs.jpg" },
 };
-
-// Extra page blocks -- bento-styled: Competitions + Know Your Chums are big.
-const PAGES: TileData[] = [
-  { href: "/chumspot", labelA: "Competitions", cta: "Win prizes", img: "/lab-animation-1stframe.jpg", size: "pageBig" },
-  { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg", size: "pageBig" },
-  { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg", size: "pageSmall" },
-  { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "Keep cool", img: "/hot-dog-hearo-img.jpg", size: "pageWide" },
-  { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Find out", img: "/inteligent-dogs.jpg", size: "pageSmall" },
-];
 
 // Menu images worth preloading so the launcher opens without pop-in.
 const PRELOAD_IMAGES = [
   "/name-gen-bento-menu-img.jpg", "/product-img.jpg", "/history-hero.jpg",
   "/bulls-eye-img.jpg", "/never-clocking-off.jpg", "/home-hero.jpg",
-  "/lab-animation-1stframe.jpg", "/know-your-chums.jpg",
-  "/hot-dog-hearo-img.jpg", "/inteligent-dogs.jpg",
+  "/know-your-chums.jpg", "/hot-dog-hearo-img.jpg", "/inteligent-dogs.jpg",
 ];
 
 const tradeNavLinks = [
@@ -190,7 +184,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                   <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.britains, styles.clusterCell)}
-                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} onNavigate={closeMenu} />
+                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   </div>
                 </div>
               </div>
@@ -198,7 +192,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               {/* Row 2 -- alternated: cluster (left) beside The Card Game (right) */}
               <div className={styles.rowBlock}>
                 <div className={styles.cluster}>
-                  <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Find your perfect dog" sizeClass={styles.clusterWide} onNavigate={closeMenu} />
+                  <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Find your perfect dog" sizeClass={styles.clusterWide} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
                     {coverTile(NAV_TILES.gdbd, styles.clusterCell)}
                     {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell)}
@@ -207,19 +201,29 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 {fitTile(NAV_TILES.product)}
               </div>
 
-              {/* Discount -- full-width action strip */}
-              <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
-                <span className={styles.tileMeta}>
-                  <span className={styles.tileLabel}>
-                    <span className={styles.tileLabelAccent}>Discount</span> code
-                  </span>
-                  <span className={styles.tileCta}>Grab your code →</span>
-                </span>
-              </button>
-
-              {/* Extra page blocks -- bento grid */}
-              <div className={styles.pageRow}>
-                {PAGES.map((p) => coverTile(p, `${styles.pageTile} ${styles[(p.size ?? "pageSmall") as keyof typeof styles]}`))}
+              {/* Bottom bento -- Competitions (square video) + Know Your Chums (square) */}
+              <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
+                {/* Left: Competitions video + Smarter / Home */}
+                <div className={styles.cluster}>
+                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Competitions" cta="Win prizes" sizeClass={styles.sqTile} onNavigate={closeMenu} />
+                  <div className={styles.miniRow}>
+                    {coverTile(NAV_TILES.smarter, styles.miniCell)}
+                    {coverTile(NAV_TILES.home, styles.miniCell)}
+                  </div>
+                </div>
+                {/* Right: Know Your Chums square + Discount (half width) + Hot/Dogs */}
+                <div className={styles.cluster}>
+                  {coverTile(NAV_TILES.knowYourChums, styles.sqTile)}
+                  <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
+                    <span className={styles.tileMeta}>
+                      <span className={styles.tileLabel}>
+                        <span className={styles.tileLabelAccent}>Discount</span> code
+                      </span>
+                      <span className={styles.tileCta}>Grab your code →</span>
+                    </span>
+                  </button>
+                  {coverTile(NAV_TILES.hotDogs, styles.wideBottom)}
+                </div>
               </div>
             </div>
           )}
