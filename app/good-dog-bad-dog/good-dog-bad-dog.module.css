@@ -960,3 +960,68 @@
     font-size: clamp(1.25rem, 5vw, 1.6rem);
   }
 }
+
+/* ── Phase 2: inline scenes (mobile) ────────────────────────── */
+.sceneMobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebarOnly {
+    display: none;
+  }
+
+  .sceneMobile {
+    display: block;
+    margin: 30px 0;
+  }
+
+  /* Timeline scene: full-bleed navy panel */
+  .timelineScene {
+    margin: 34px -20px;
+    padding: 26px 20px 20px;
+    background: var(--navy, #0a3a57);
+  }
+
+  /* Scroll reveal -- only once JS confirms (tl-js), so no-JS users see everything */
+  :global(.tl-js) .tlItem {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  :global(.tl-js) :global(.tl-in) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Parallax scene: image pins, card scrolls over it */
+  .parallaxScene {
+    margin: 34px -20px;
+    position: relative;
+  }
+
+  .parallaxImgWrap {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .parallaxImgWrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .parallaxContent {
+    position: relative;
+    z-index: 1;
+    margin-top: -42vh;
+    margin-top: -42svh;
+    padding: 0 20px 40px;
+  }
+}

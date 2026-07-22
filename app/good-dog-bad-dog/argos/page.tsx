@@ -35,6 +35,148 @@ export const metadata: Metadata = {
   },
 };
 
+type TimelineEntry = { era: string; name: string; context: string; highlight: boolean; end: boolean; isBreed?: boolean; slug?: string };
+
+const TIMELINE: TimelineEntry[] = [
+                  {
+                    era: "3000–1200 BCE",
+                    name: "Ancient Near Eastern Molosser",
+                    context: "Era of the Egyptian pharaohs. Tutankhamun reigns c.1341 BCE. The Trojan War c.1200 BCE.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "1600–1100 BCE",
+                    name: "Mycenaean / Aegean Molosser",
+                    context: "Mycenaean Greece at its height. These dogs guard palaces at Tiryns and Mycenae.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "800–300 BCE",
+                    name: "Greek Molossian Type",
+                    context: "Pythagoras born c.570 BCE. Confucius teaching in China c.500 BCE. Plato writing c.390 BCE.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "c. 8th century BCE",
+                    name: "Argos — Odysseus' Dog",
+                    context: "Homer composing The Odyssey. The founding of Rome c.753 BCE.",
+                    highlight: true, end: false,
+                  },
+                  {
+                    era: "247–183 BCE",
+                    name: "Molossian spreads west",
+                    context: "Hannibal of Carthage uses war dogs crossing the Alps. The breed reaches North Africa and Iberia.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "221 BCE",
+                    name: "Qin Dynasty unifies China",
+                    context: "The Silk Road opens. Molosser-type dogs travel trade routes into Central Asia.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "100 BCE–400 CE",
+                    name: "Roman Molosser in Britain",
+                    context: "Julius Caesar invades Britain 55 BCE. Roman legions bring Molossian dogs. The breed roots across northern Europe.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "1324–1325 CE",
+                    name: "Mansa Musa’s pilgrimage",
+                    context: "The Mali emperor’s journey to Mecca introduces West African courts to Mediterranean sighthound types.",
+                    highlight: false, end: false,
+                  },
+                  {
+                    era: "Modern · UK",
+                    name: "Greyhound",
+                    context: "Descended via the Laconian Hound. The fastest dog breed in existence. One of our 54 Chums.",
+                    highlight: false, end: false, isBreed: true, slug: "greyhound",
+                  },
+                  {
+                    era: "Modern · UK",
+                    name: "Whippet",
+                    context: "Descended via the Laconian Hound and later refined in northern England for racing.",
+                    highlight: false, end: false, isBreed: true, slug: "whippet",
+                  },
+                  {
+                    era: "Modern · UK",
+                    name: "English Mastiff",
+                    context: "Descended via the Molossian Hound. One of the heaviest dog breeds in the world. One of our 54 Chums.",
+                    highlight: false, end: true, isBreed: true, slug: "mastiff",
+                  },
+];
+
+function NolanFilmCard() {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026 &mdash; The Film</p>
+              </div>
+              <div style={{ padding: "12px 20px 4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1,2,3,4,5].map(i => (
+                      <svg key={i} width="20" height="20" viewBox="0 0 24 24" fill="var(--yellow)" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>5 / 5</p>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                  {[
+                    { label: "Runtime", value: "173 min" },
+                    { label: "Released", value: "17 Jul 2026" },
+                    { label: "UK certificate", value: "15" },
+                    { label: "US rating", value: "R" },
+                  ].map(({ label, value }) => (
+                    <div key={label} style={{ textAlign: "center" }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 3 }}>{label}</p>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1 }}>{value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background: "#ef4444", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 in the UK for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Zendaya", "Charlize Theron"].map(name => (
+                    <span key={name} style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 700, color: "var(--navy)", background: "var(--yellow)", borderRadius: 999, padding: "8px 18px", display: "inline-block" }}>{name}</span>
+                  ))}
+                </div>
+              </div>
+              <div style={{ height: 16 }} />
+            </div>
+  );
+}
+
+function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
+  return (
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
+              </div>
+              {showImage && (
+              <div style={{ overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/history/greek-harehound.jpg"
+                  alt="Greek Harehound (Hellinikos Ichnilatis)"
+                  style={{ width: "100%", display: "block", maxHeight: 220, objectFit: "cover" }}
+                />
+              </div>
+              )}
+              <div style={{ padding: "14px 20px 16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8 }}>Image: Wikimedia Commons / CC BY-SA 3.0</p>
+              </div>
+            </div>
+  );
+}
+
 export default function ArgosPage() {
   return (
     <>
@@ -135,6 +277,10 @@ export default function ArgosPage() {
               <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
+
+              <div className={styles.sceneMobile}>
+                <NolanFilmCard />
+              </div>
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
 
@@ -271,6 +417,35 @@ export default function ArgosPage() {
 
               <p>What Argos quietly demands, for modern readers, is a question the ancient world never quite asked in the same way: what do we owe, in return, for that kind of love?</p>
 
+              <div className={`${styles.sceneMobile} ${styles.timelineScene}`} id="tl-scene">
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
+                {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }) => (
+                  <div key={"tl-" + era + name} data-tl-item className={styles.tlItem} style={{ display: "flex", gap: 14 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
+                      <div style={{
+                        width: highlight ? 14 : isBreed ? 12 : 11,
+                        height: highlight ? 14 : isBreed ? 12 : 11,
+                        borderRadius: "50%",
+                        background: isBreed ? "#22c55e" : highlight ? "var(--yellow)" : "#fff",
+                        marginTop: 4,
+                        flexShrink: 0,
+                        boxShadow: highlight ? "0 0 0 3px rgba(255,210,62,0.3)" : "none",
+                      }} />
+                      {!end && <div style={{ width: 2, flex: 1, background: "rgba(255,255,255,0.3)", minHeight: 48 }} />}
+                    </div>
+                    <div style={{ paddingBottom: end ? 0 : 28 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", letterSpacing: "0.05em", marginBottom: 3, textTransform: "uppercase" }}>{era}</p>
+                      {isBreed && slug ? (
+                        <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#22c55e", textDecoration: "underline", textUnderlineOffset: "3px", display: "block", marginBottom: 4 }}>{name}</a>
+                      ) : (
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "1rem" : "0.95rem", fontWeight: highlight ? 700 : 600, color: highlight ? "var(--yellow)" : "#fff", marginBottom: 4 }}>{name}</p>
+                      )}
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{context}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <h2 className={styles.subhead}>Why Argos couldn&apos;t really have lived twenty years &mdash; and why it matters</h2>
 
               <p>There is one more problem with Argos that is easy to overlook because the story is so moving.</p>
@@ -304,6 +479,16 @@ export default function ArgosPage() {
               <p>Once he has seen Odysseus, once he has known him, once he has confirmed that the man beneath the disguise is still the man who left, Argos can go. In a story full of monsters, storms, gods, violence and tricks, the dog&apos;s gift is simple.</p>
 
               <p>He knows who has come home. That is not a broken heart. That is a completed one.</p>
+
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene}`}>
+                <div className={styles.parallaxImgWrap}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/history/greek-harehound.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" />
+                </div>
+                <div className={styles.parallaxContent}>
+                  <LivingDescendantCard />
+                </div>
+              </div>
 
               <h2 className={styles.subhead}>Why Argos still matters</h2>
 
@@ -374,47 +559,7 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 4: Nolan film */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026 &mdash; The Film</p>
-              </div>
-              <div style={{ padding: "12px 20px 4px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {[1,2,3,4,5].map(i => (
-                      <svg key={i} width="20" height="20" viewBox="0 0 24 24" fill="var(--yellow)" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    ))}
-                  </div>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>5 / 5</p>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-                  {[
-                    { label: "Runtime", value: "173 min" },
-                    { label: "Released", value: "17 Jul 2026" },
-                    { label: "UK certificate", value: "15" },
-                    { label: "US rating", value: "R" },
-                  ].map(({ label, value }) => (
-                    <div key={label} style={{ textAlign: "center" }}>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 3 }}>{label}</p>
-                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", lineHeight: 1 }}>{value}</p>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ background: "#ef4444", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 in the UK for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
-                </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Zendaya", "Charlize Theron"].map(name => (
-                    <span key={name} style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 700, color: "var(--navy)", background: "var(--yellow)", borderRadius: 999, padding: "8px 18px", display: "inline-block" }}>{name}</span>
-                  ))}
-                </div>
-              </div>
-              <div style={{ height: 16 }} />
-            </div>
+            <div className={styles.sidebarOnly}><NolanFilmCard /></div>
 
             {/* Card 5: About Homer */}
             <div className={styles.sidebarCard}>
@@ -522,79 +667,13 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 10: Ancestral Lineage -- extended and enriched */}
+            <div className={styles.sidebarOnly}>
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Ancestral Lineage</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
-                {[
-                  {
-                    era: "3000–1200 BCE",
-                    name: "Ancient Near Eastern Molosser",
-                    context: "Era of the Egyptian pharaohs. Tutankhamun reigns c.1341 BCE. The Trojan War c.1200 BCE.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "1600–1100 BCE",
-                    name: "Mycenaean / Aegean Molosser",
-                    context: "Mycenaean Greece at its height. These dogs guard palaces at Tiryns and Mycenae.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "800–300 BCE",
-                    name: "Greek Molossian Type",
-                    context: "Pythagoras born c.570 BCE. Confucius teaching in China c.500 BCE. Plato writing c.390 BCE.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "c. 8th century BCE",
-                    name: "Argos — Odysseus' Dog",
-                    context: "Homer composing The Odyssey. The founding of Rome c.753 BCE.",
-                    highlight: true, end: false,
-                  },
-                  {
-                    era: "247–183 BCE",
-                    name: "Molossian spreads west",
-                    context: "Hannibal of Carthage uses war dogs crossing the Alps. The breed reaches North Africa and Iberia.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "221 BCE",
-                    name: "Qin Dynasty unifies China",
-                    context: "The Silk Road opens. Molosser-type dogs travel trade routes into Central Asia.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "100 BCE–400 CE",
-                    name: "Roman Molosser in Britain",
-                    context: "Julius Caesar invades Britain 55 BCE. Roman legions bring Molossian dogs. The breed roots across northern Europe.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "1324–1325 CE",
-                    name: "Mansa Musa’s pilgrimage",
-                    context: "The Mali emperor’s journey to Mecca introduces West African courts to Mediterranean sighthound types.",
-                    highlight: false, end: false,
-                  },
-                  {
-                    era: "Modern · UK",
-                    name: "Greyhound",
-                    context: "Descended via the Laconian Hound. The fastest dog breed in existence. One of our 54 Chums.",
-                    highlight: false, end: false, isBreed: true, slug: "greyhound",
-                  },
-                  {
-                    era: "Modern · UK",
-                    name: "Whippet",
-                    context: "Descended via the Laconian Hound and later refined in northern England for racing.",
-                    highlight: false, end: false, isBreed: true, slug: "whippet",
-                  },
-                  {
-                    era: "Modern · UK",
-                    name: "English Mastiff",
-                    context: "Descended via the Molossian Hound. One of the heaviest dog breeds in the world. One of our 54 Chums.",
-                    highlight: false, end: true, isBreed: true, slug: "mastiff",
-                  },
-                ].map(({ era, name, context, highlight, end, isBreed, slug }, i) => (
+                {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }, i) => (
                   <div key={era + name} style={{ display: "flex", gap: 14 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
                       <div style={{
@@ -620,6 +699,7 @@ export default function ArgosPage() {
                   </div>
                 ))}
               </div>
+            </div>
             </div>
 
             {/* Card 11: Research note */}
@@ -671,26 +751,7 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 13: Living Descendant */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/history/greek-harehound.jpg"
-                  alt="Greek Harehound (Hellinikos Ichnilatis)"
-                  style={{ width: "100%", display: "block", maxHeight: 220, objectFit: "cover" }}
-                />
-              </div>
-              <div style={{ padding: "14px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8 }}>Image: Wikimedia Commons / CC BY-SA 3.0</p>
-              </div>
-            </div>
-
-
+            <div className={styles.sidebarOnly}><LivingDescendantCard showImage /></div>
 
             {/* Card 14: Penelope's Dream */}
             <div className={styles.sidebarCard}>
@@ -716,6 +777,18 @@ export default function ArgosPage() {
         <div className={styles.verdict}>
           <strong>The verdict:</strong> A dog knows. And sometimes, after twenty years of storms and blood and distance, that is what finally makes a man home.
         </div>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){
+          var scene = document.getElementById('tl-scene');
+          if (!scene || !('IntersectionObserver' in window)) return;
+          scene.className += ' tl-js';
+          var items = scene.querySelectorAll('[data-tl-item]');
+          var obs = new IntersectionObserver(function(entries){
+            entries.forEach(function(en){
+              if (en.isIntersecting) { en.target.className += ' tl-in'; obs.unobserve(en.target); }
+            });
+          }, { threshold: 0.3 });
+          items.forEach(function(el){ obs.observe(el); });
+        })();` }} />
       </main>
       <Footer />
     </>
