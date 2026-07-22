@@ -116,7 +116,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   );
 
   // Standard tile: image (or emoji) fills as a cropped backdrop, label overlaid.
-  const coverTile = (t: TileData, cls: string) => (
+  // ctaTop floats the green button over the top-right instead of by the title.
+  const coverTile = (t: TileData, cls: string, ctaTop = false) => (
     <Link href={t.href} className={`${styles.tile} ${cls}`} onClick={closeMenu}>
       <span className={styles.tileImg} aria-hidden>
         {t.img ? (
@@ -126,24 +127,20 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           <span className={styles.tileEmoji}>{t.emoji}</span>
         )}
       </span>
+      {ctaTop && <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>}
       <span className={styles.tileMeta}>
         {twoTone(t.labelA, t.labelB)}
-        <span className={styles.ctaBtn}>{t.cta}</span>
+        {!ctaTop && <span className={styles.ctaBtn}>{t.cta}</span>}
       </span>
     </Link>
   );
 
-  // Image-fit tile: box scales to the image (or video) and takes its height,
-  // so 100% of the artwork shows. Green CTA button top-right, title bottom.
-  const fitTile = (t: TileData) => (
-    <Link
-      href={t.href}
-      className={`${styles.tile} ${styles.tileFit}`}
-      onClick={closeMenu}
-      style={t.video ? { aspectRatio: t.videoAspect } : undefined}
-    >
+  // Image-fit tile: media on top (100% shown), title in a solid navy box below.
+  // Green CTA button floats top-right. revealAccent hides labelA until hover.
+  const fitTile = (t: TileData, revealAccent = false) => (
+    <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={closeMenu}>
       {t.video ? (
-        <span className={styles.tileImg} aria-hidden>
+        <span className={styles.fitVideoBox} style={{ aspectRatio: t.videoAspect }} aria-hidden>
           <video className={styles.tileImgTag} src={t.video} muted loop autoPlay playsInline preload="auto" />
         </span>
       ) : (
@@ -151,8 +148,14 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
         <img src={t.img} alt="" className={styles.tileFitImg} />
       )}
       <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>
-      <span className={`${styles.tileMeta} ${styles.tileMetaOverlay} ${styles.tileMetaFit}`}>
-        {twoTone(t.labelA, t.labelB)}
+      <span className={styles.fitCaption}>
+        <span className={styles.tileLabel}>
+          {revealAccent ? (
+            <><span className={`${styles.tileLabelAccent} ${styles.accentReveal}`}>{t.labelA} </span>{t.labelB}</>
+          ) : (
+            <><span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}</>
+          )}
+        </span>
       </span>
     </Link>
   );
@@ -204,7 +207,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
 
               {/* Row 1 -- Name Generator (left) beside the Chum Drop / Britain's / About cluster */}
               <div className={styles.rowBlock}>
-                {fitTile(NAV_TILES.nameGen)}
+                {fitTile(NAV_TILES.nameGen, true)}
                 <div className={styles.cluster}>
                   <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
@@ -230,15 +233,15 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
                 {/* Left: Competitions video + Smarter / Home */}
                 <div className={styles.cluster}>
-                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Competitions" cta="Win prizes" sizeClass={styles.sqTile} reverseOnHover onNavigate={closeMenu} />
+                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={styles.sqTile} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
                     {coverTile(NAV_TILES.smarter, styles.miniCell)}
-                    {coverTile(NAV_TILES.home, styles.miniCell)}
+                    {coverTile(NAV_TILES.hotDogs, styles.miniCell)}
                   </div>
                 </div>
-                {/* Right: Know Your Chums square + Discount / Hot/Dogs side by side */}
+                {/* Right: Know Your Chums square + Discount / Home side by side */}
                 <div className={styles.cluster}>
-                  {coverTile(NAV_TILES.knowYourChums, styles.sqTile)}
+                  {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
                   <div className={styles.miniRow}>
                     <button type="button" className={`${styles.tile} ${styles.tileStrip} ${styles.miniCell}`} onClick={openOffer}>
                       <span className={styles.tileMeta}>
@@ -248,7 +251,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                         <span className={styles.tileCta}>Grab your code →</span>
                       </span>
                     </button>
-                    {coverTile(NAV_TILES.hotDogs, styles.miniCell)}
+                    {coverTile(NAV_TILES.home, styles.miniCell)}
                   </div>
                 </div>
               </div>

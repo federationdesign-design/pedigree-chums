@@ -279,7 +279,7 @@
 }
 .clusterWide { flex: 1.7 1 0; min-height: 0; }   /* Chum Finder (cover video) */
 .clusterRow { flex: 1 1 0; min-height: 0; display: flex; gap: 14px; }
-.clusterCell { flex: 1 1 0; min-width: 0; }
+.clusterCell { flex: 1 1 0; min-width: 0; min-height: clamp(150px, 18vh, 205px); }
 
 /* Chum Drop -- box matches the clips' width and fills (cover), so every clip
    fills consistently. Aspect uses the 438-tall clips (2-4 exact; clip 1 loses a
@@ -294,18 +294,31 @@
 .chumDrop .tileImg { background: var(--navy, #0a3a57); }
 /* No gradient scrim on Chum Drop -- keep the clip clean */
 .chumDrop .tileMeta { background: none; }
+/* Chum Drop title hidden until hover */
+.chumDrop .tileLabel { opacity: 0; transition: opacity 0.2s ease; }
+.chumDrop:hover .tileLabel { opacity: 1; }
 
 /* Image-fit card: image defines the box; label overlays the bottom. */
 .tileFit { display: block; }
 .tileFitImg { display: block; width: 100%; height: auto; }
 .tileMetaOverlay { position: absolute; left: 0; right: 0; bottom: 0; }
+/* Fit card: video sits in an aspect box; title in a solid navy caption below */
+.fitVideoBox { position: relative; width: 100%; overflow: hidden; }
+.fitCaption {
+  background: var(--navy, #0a3a57);
+  padding: clamp(14px, 1.8vw, 22px) clamp(16px, 2.2vw, 28px);
+  display: flex; flex-direction: column;
+}
+/* Name Generator: "Try the Dog" hidden until hover, then pops in */
+.accentReveal { display: none; }
+.tileFit:hover .accentReveal { display: inline; }
 
 /* ── Bottom bento: square Competitions/KYC, mini row, half-width discount ── */
 .rowBlockStart { align-items: flex-start; }
 .sqTile { flex: none; aspect-ratio: 1 / 1; }   /* Competitions video + Know Your Chums */
 .miniRow { display: flex; gap: 14px; }
 .miniRow > * { flex: 1 1 0; min-width: 0; }
-.miniCell { height: clamp(150px, 17vh, 200px); }
+.miniCell { height: clamp(225px, 25vh, 300px); }   /* 1.5x taller */
 .wideBottom { height: clamp(150px, 17vh, 200px); }
 
 /* Tile base */
@@ -346,7 +359,8 @@
   position: relative; z-index: 1;
   width: 100%;
   padding: 14px 16px;
-  background: linear-gradient(180deg, rgba(10,58,87,0) 0%, rgba(10,58,87,0.92) 58%);
+  /* No gradient overlay -- title reads via its own text-shadow */
+  background: none;
   display: flex; flex-direction: column; gap: 3px;
 }
 .tileLabel {
@@ -354,7 +368,7 @@
   /* Scales with each tile's own width (container units) so big cards get big
      titles without a low viewport cap holding them back. */
   font-size: clamp(1.4rem, 13cqi, 5rem); color: #fff; letter-spacing: 0.02em; line-height: 0.98;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  text-shadow: 0 2px 14px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.6);
 }
 /* First word(s) of each title in brand yellow */
 .tileLabelAccent { color: var(--yellow, #ffd23e); }
