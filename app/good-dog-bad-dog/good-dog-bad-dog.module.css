@@ -269,7 +269,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.35;
 }
 
 .comingBreed {
@@ -330,7 +330,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.35;
 }
 .cardSummary {
   font-family: var(--font-body, "Montserrat", sans-serif);
@@ -553,7 +553,7 @@
   font-weight: 300;
   font-style: italic;
   color: var(--navy, #0a3a57);
-  line-height: 1.2;
+  line-height: 1.35;
   margin: 56px 0;
   padding: 24px 0 24px 40px;
   border-left: 10px solid var(--yellow, #ffd23e);
@@ -569,7 +569,7 @@
   font-style: normal;
   line-height: 0;
   position: relative;
-  top: 40px;
+  top: 45px;
   display: inline-block;
   margin: 0 6px;
   overflow: visible;
