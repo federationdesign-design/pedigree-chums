@@ -1168,8 +1168,8 @@
   .parallaxScene.driftScene::after {
     content: "";
     display: block;
-    height: 55vh;
-    height: 55svh;
+    height: 75vh;
+    height: 75svh;
   }
 
   /* Tall image drifts vertically inside the pinned frame */
@@ -1193,9 +1193,9 @@
 
   .parallaxImgWrap {
     position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100svh;
+    top: 100px;
+    height: calc(100vh - 100px);
+    height: calc(100svh - 100px);
     z-index: 0;
     overflow: hidden;
   }

@@ -3,19 +3,18 @@
 
 .stage {
   position: sticky;
-  top: 0;
-  min-height: 100vh;
-  min-height: 100svh;
+  top: 100px;
+  min-height: calc(100vh - 100px);
+  min-height: calc(100svh - 100px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 34px;
 }
 
 /* ── Quote build ── */
 .quoteScene {
-  height: 250vh;
-  height: 250svh;
+  height: 300vh;
+  height: 300svh;
 }
 
 .pinned {
@@ -72,11 +71,11 @@
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.quoteText {
+.quoteBody .quoteText {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-style: italic;
   font-weight: 300;
-  font-size: clamp(1.25rem, 5vw, 1.6rem);
+  font-size: clamp(1.4rem, 5.6vw, 1.8rem);
   color: var(--navy, #0a3a57);
   line-height: 1.35;
   margin: 0;
@@ -86,8 +85,8 @@
 
 /* ── Statue carousel + bullets ── */
 .bulletScene {
-  height: 280vh;
-  height: 280svh;
+  height: 230vh;
+  height: 230svh;
 }
 
 .statueTrack {
@@ -176,9 +175,16 @@
   height: 240svh;
 }
 
+.homerStage img {
+  max-height: 28vh;
+  max-height: 28svh;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
 .homerStage {
   position: sticky;
-  top: 12px;
+  top: 100px;
   background: var(--navy, #0a3a57);
   border-radius: 16px;
   overflow: hidden;
@@ -214,7 +220,7 @@
   .videoGate .videoStage,
   .videoGateDone .videoStage {
     position: sticky;
-    top: 0;
+    top: 100px;
   }
 
   .videoGateDone .videoStage {

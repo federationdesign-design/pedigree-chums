@@ -590,7 +590,7 @@ export default function ArgosPage() {
                   question="Should he change the story so Argos gets head strokes?"
                   options={[
                     { label: "Yes, I love schmaltz", pct: 96, resultLabel: "Pet the dog", color: "green" },
-                    { label: "No, stay true to the author", pct: 4, resultLabel: "People with hearts of stone", color: "red" },
+                    { label: "No, stay true", pct: 4, resultLabel: "People with hearts of stone", color: "red" },
                   ]}
                   footnote="*Poll results independently verified by a panel of very good boys."
                 />
@@ -1074,7 +1074,7 @@ export default function ArgosPage() {
               var np = (vh - hr.top) / vh;
               if (np < 0) np = 0;
               if (np > 1) np = 1;
-              if (wwk) wwk.style.transform = 'translateY(' + (np * 36) + 'px)';
+              if (wwk) wwk.style.transform = 'translateY(' + (np * 10) + 'px)';
               /* image drift: paced by the PIN window only, so the pan happens
                  while the reader is actually looking at the pinned image */
               var pin = (hr.height > vh) ? (-hr.top) / (hr.height - vh) : 0;

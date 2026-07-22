@@ -1,5 +1,5 @@
 .wrap {
-  background: var(--yellow, #ffd23e);
+  background: #ffffff;
   border-radius: 16px;
   padding: 22px 20px;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.25);
@@ -17,7 +17,7 @@
 
 .question {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1.05rem;
+  font-size: 0.97rem;
   font-weight: 700;
   color: var(--navy, #0a3a57);
   line-height: 1.3;
@@ -33,13 +33,13 @@
 
 .option,
 .optionRed {
-  padding: 16px 12px;
+  padding: 24px 12px;
   border: none;
   border-radius: 14px;
   background: #22c55e;
   color: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   letter-spacing: 0.04em;
   text-align: center;
   line-height: 1.15;

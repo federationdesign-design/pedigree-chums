@@ -46,9 +46,11 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
    line completes, then the text de-blurs from zero alpha to solid. */
 export function QuoteBuild({ pinned, quote }: { pinned: React.ReactNode; quote: string }) {
   const { sceneRef, p } = useSceneProgress();
-  const line = clamp01(p / 0.35);
-  const mark = p >= 0.36;
-  const text = clamp01((p - 0.45) / 0.5);
+  const line = clamp01(p / 0.3);
+  const mark = p >= 0.31;
+  const text = clamp01((p - 0.38) / 0.32);
+  /* p 0.7 -> 1.0 is a dwell zone: the finished quote holds the screen so the
+     release does not feel like being fired out of the scene */
   return (
     <div ref={sceneRef} className={styles.quoteScene}>
       <div className={styles.stage}>
@@ -127,7 +129,7 @@ export function StatueBulletsChoreo({
         </div>
         <ul className={styles.choreoBullets}>
           {bullets.map((b, i) => {
-            const start = 0.28 + i * 0.16;
+            const start = 0.3 + i * 0.15;
             const o = clamp01((p - start) / 0.12);
             return (
               <li key={b} style={{ opacity: o, transform: `translateY(${(1 - o) * 14}px)` }}>
