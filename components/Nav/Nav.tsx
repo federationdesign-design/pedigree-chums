@@ -4,19 +4,25 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./Nav.module.css";
 
-const customerLinks = [
+// ── Featured tiles (the launcher grid). Order = DOM order = grid flow. ──
+type Tile = { key: string; label: string; href: string; cta: string; size: string; emoji: string };
+const TILES: Tile[] = [
+  { key: "name-generator", label: "Name Generator", href: "/name-generator", cta: "Name your chum", size: "tileBig", emoji: "🐶" },
+  { key: "chum-finder", label: "Chum Finder", href: "/chum-calculator", cta: "Find your perfect dog", size: "tileWide", emoji: "🔍" },
+  { key: "chum-drop", label: "Chum Drop", href: "/", cta: "Play the game", size: "tileWide", emoji: "🎯" },
+  { key: "dogs-at-work", label: "Dogs at Work", href: "/dogs-at-work", cta: "Meet the workers", size: "tileSmall", emoji: "🦺" },
+  { key: "good-dog-bad-dog", label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog", cta: "Read the essays", size: "tileSmall", emoji: "📖" },
+  { key: "britains-dog-history", label: "Britain's Dog History", href: "/britains-dog-history", cta: "Travel back", size: "tileSmall", emoji: "🏰" },
+  { key: "about", label: "About", href: "/about", cta: "Who we are", size: "tileSmall", emoji: "🐾" },
+];
+
+// Secondary pages -- kept reachable as plain text links
+const UTILITY = [
   { label: "Home", href: "/home" },
-  { label: "About", href: "/about" },
-  { label: "Britain's Dog History", href: "/britains-dog-history" },
+  { label: "Competitions", href: "/chumspot" },
   { label: "Know Your Chums", href: "/know-your-chums" },
   { label: "Hot/Dogs", href: "/hot-dogs" },
-  { label: "Competitions", href: "/chumspot" },
-  { label: "Good Dog, Bad Dog", href: "/good-dog-bad-dog" },
-  { label: "Dogs at Work", href: "/dogs-at-work" },
   { label: "Smarter Than the Test", href: "/smarter-than-the-test" },
-  { label: "Chum Drop", href: "/" },
-  { label: "Chum Calculator", href: "/chum-calculator" },
-  { label: "Name Generator", href: "/name-generator" },
 ];
 
 const tradeNavLinks = [
@@ -27,14 +33,11 @@ const tradeNavLinks = [
 ];
 
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
-  const links = tradeLinks ? tradeNavLinks : customerLinks;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
-    // Defer the first read out of the effect body (avoids set-state-in-effect)
-    // and covers the case of loading already scrolled down the page.
     const raf = requestAnimationFrame(onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
@@ -49,6 +52,11 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     return () => window.removeEventListener("pc:open-menu", openMenu);
   }, []);
 
+  function openOffer() {
+    setOpen(false);
+    window.dispatchEvent(new CustomEvent("pc:open-offer"));
+  }
+
   return (
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
       {hideLogo ? (
@@ -59,12 +67,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
         </Link>
       )}
       {!dockBottomLeft && (
-        <button
-          type="button"
-          className={styles.burger}
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-        >
+        <button type="button" className={styles.burger} onClick={() => setOpen(true)} aria-label="Open menu">
           <span />
           <span />
           <span />
@@ -72,38 +75,58 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       )}
 
       {open && (
-        <div className={styles.overlay} role="dialog" aria-modal="true">
-          <button
-            type="button"
-            className={styles.close}
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-          >
-            {"\u00D7"}
-          </button>
-          <nav className={styles.menu}>
-            {links.map((l) => (
-              <Link key={l.href} href={l.href} className={styles.menuLink} onClick={() => setOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-            {tradeLinks ? (
-              <Link href="/preorder" className={styles.menuLink} onClick={() => setOpen(false)}>
-                Get pre-order discount code
-              </Link>
-            ) : (
-              <button
-                type="button"
-                className={styles.menuLink}
-                onClick={() => {
-                  setOpen(false);
-                  window.dispatchEvent(new CustomEvent("pc:open-offer"));
-                }}
-              >
-                Get discount code
-              </button>
-            )}
-          </nav>
+        <div className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`} role="dialog" aria-modal="true">
+          <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close menu">{"×"}</button>
+
+          {tradeLinks ? (
+            <nav className={styles.menu}>
+              {tradeNavLinks.map((l) => (
+                <Link key={l.href} href={l.href} className={styles.menuLink} onClick={() => setOpen(false)}>{l.label}</Link>
+              ))}
+              <Link href="/preorder" className={styles.menuLink} onClick={() => setOpen(false)}>Get pre-order discount code</Link>
+            </nav>
+          ) : (
+            <div className={styles.bentoWrap}>
+              {/* Hero animation slot -- drop a looping muted video / animation here */}
+              <div className={styles.heroSlot}>
+                <span className={styles.heroSlotTag}>Featured</span>
+                <p className={styles.heroSlotNote}>Hero animation slot</p>
+              </div>
+
+              <div className={styles.bentoGrid}>
+                {TILES.map((t) => (
+                  <Link
+                    key={t.key}
+                    href={t.href}
+                    className={`${styles.tile} ${styles[t.size as keyof typeof styles]}`}
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className={styles.tileImg} aria-hidden>
+                      <span className={styles.tileEmoji}>{t.emoji}</span>
+                    </span>
+                    <span className={styles.tileMeta}>
+                      <span className={styles.tileLabel}>{t.label}</span>
+                      <span className={styles.tileCta}>{t.cta} →</span>
+                    </span>
+                  </Link>
+                ))}
+
+                {/* Discount -- full-width action strip */}
+                <button type="button" className={`${styles.tile} ${styles.tileStrip}`} onClick={openOffer}>
+                  <span className={styles.tileMeta}>
+                    <span className={styles.tileLabel}>Discount code</span>
+                    <span className={styles.tileCta}>Grab your code →</span>
+                  </span>
+                </button>
+              </div>
+
+              <div className={styles.utilityRow}>
+                {UTILITY.map((l) => (
+                  <Link key={l.href} href={l.href} className={styles.utilityLink} onClick={() => setOpen(false)}>{l.label}</Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </header>

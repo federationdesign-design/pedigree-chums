@@ -153,3 +153,137 @@
   transform: translateY(0);
   pointer-events: auto;
 }
+
+/* ── Bento launcher menu (customer overlay) ─────────────────── */
+.overlayScroll {
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow-y: auto;
+  padding: clamp(96px, 13vh, 140px) clamp(16px, 4vw, 48px) 60px;
+}
+.overlayScroll .close { position: fixed; }
+
+.bentoWrap {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Hero animation slot (placeholder) */
+.heroSlot {
+  position: relative;
+  width: 100%;
+  min-height: clamp(160px, 26vh, 300px);
+  border-radius: 24px;
+  border: 3px dashed rgba(255,255,255,0.5);
+  background: linear-gradient(135deg, rgba(255,210,62,0.28), rgba(10,58,87,0.4));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.heroSlotTag {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--navy); background: var(--yellow); border-radius: 999px; padding: 5px 14px;
+}
+.heroSlotNote {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.1rem, 3vw, 1.9rem); color: #fff; letter-spacing: 0.04em;
+  text-transform: uppercase; margin: 0;
+}
+
+/* Grid */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: clamp(120px, 15vh, 165px);
+  gap: 14px;
+}
+
+/* Tile base */
+.tile {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  background: var(--navy);
+  box-shadow: 0 4px 0 rgba(10,58,87,0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  text-align: left;
+  padding: 0;
+}
+.tile:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 18px rgba(0,0,0,0.32); }
+.tile:active { transform: translateY(0) scale(0.99); }
+
+/* Placeholder image area -- swap for a real <img>/<video> per tile */
+.tileImg {
+  position: absolute; inset: 0; z-index: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(150deg, var(--blue-deep, #0b78bd), var(--navy, #0a3a57));
+}
+.tileEmoji { font-size: clamp(2rem, 6vw, 3.6rem); opacity: 0.9; }
+
+.tileMeta {
+  position: relative; z-index: 1;
+  width: 100%;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(10,58,87,0) 0%, rgba(10,58,87,0.92) 58%);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.tileLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(0.98rem, 1.6vw, 1.4rem); color: #fff; letter-spacing: 0.03em; line-height: 1.08;
+}
+.tileCta {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--yellow);
+}
+
+/* Sizes */
+.tileBig { grid-column: span 2; grid-row: span 2; }
+.tileWide { grid-column: span 2; }
+.tileSmall { grid-column: span 1; }
+.tileStrip {
+  grid-column: span 4;
+  min-height: 78px;
+  background: #22c55e;
+  box-shadow: 0 4px 0 #16833f;
+  justify-content: center;
+}
+.tileStrip .tileMeta { background: none; align-items: center; text-align: center; }
+.tileStrip .tileCta { color: #eafff1; }
+
+/* subtle tint variety behind the placeholder emoji */
+.tileBig .tileImg { background: linear-gradient(150deg, #0b78bd, #0a3a57); }
+.tileWide .tileImg { background: linear-gradient(150deg, #1f6f9c, #0a3a57); }
+
+/* Utility text links */
+.utilityRow {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px;
+  margin-top: 6px; padding-top: 18px; border-top: 1.5px solid rgba(255,255,255,0.18);
+}
+.utilityLink {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.82); text-decoration: none; transition: color 0.15s ease;
+}
+.utilityLink:hover { color: var(--yellow); }
+
+/* Mobile: full-width stacked slides, same tiles laid down single-column */
+@media (max-width: 640px) {
+  .bentoGrid { grid-template-columns: 1fr; grid-auto-rows: 108px; }
+  .tileBig, .tileWide, .tileSmall { grid-column: span 1; grid-row: span 1; }
+  .tileStrip { grid-column: span 1; }
+  .heroSlot { min-height: 180px; }
+}
