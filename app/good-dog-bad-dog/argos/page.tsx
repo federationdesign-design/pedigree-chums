@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
+import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCarousel";
 
 export const metadata: Metadata = {
   title: "Argos: Homer's Dog in The Odyssey — Loyalty, Home and the Nolan Film",
@@ -357,6 +358,30 @@ export default function ArgosPage() {
               <p>That is why the returning soldier videos hit so hard online. A person comes home from deployment, changed by distance and time and experience. The dog does not understand war or politics. But it understands return, sometimes before the person is fully through the door.</p>
 
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
+
+              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
+                <CaptionedCarousel
+                  title="Argos in Art"
+                  slides={[
+                    {
+                      src: "/history/homer-bust.jpeg",
+                      alt: "Marble bust of Homer",
+                      caption: "PLACEHOLDER — Homer, the blind poet credited with composing The Odyssey around the 8th century BCE.",
+                    },
+                    {
+                      src: "/history/Argos-hero.jpg",
+                      alt: "Argos waiting for Odysseus",
+                      caption: "PLACEHOLDER — Argos on the dung heap, the moment of recognition.",
+                    },
+                    {
+                      src: "/history/greek-harehound.jpg",
+                      alt: "Greek Harehound",
+                      caption: "PLACEHOLDER — The Greek Harehound, closest living relative of the hounds of Homer's world.",
+                      credit: "Image: Wikimedia Commons / CC BY-SA 3.0",
+                    },
+                  ]}
+                />
+              </div>
 
               <h2 className={styles.subhead}>The smell of home</h2>
 

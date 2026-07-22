@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P } from "next/font/google";
+import { Dela_Gothic_One, Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P } from "next/font/google";
 import localFont from "next/font/local";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
@@ -11,6 +11,16 @@ const display = Luckiest_Guy({
   weight: "400",
   variable: "--font-display",
   display: "swap",
+});
+
+// Dela Gothic One supplies chunky arrow glyphs (from its Japanese set) for UI arrows.
+const arrowFont = Dela_Gothic_One({
+  // no subsets declared -> all available subsets included; the arrow glyph
+  // (U+2190) lives in the Japanese slices, which the latin subset excludes
+  weight: "400",
+  variable: "--font-arrow",
+  display: "swap",
+  preload: false,
 });
 
 const body = Montserrat({
@@ -81,7 +91,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable}`}>
       <body>
         {children}
         <OfferLauncher />

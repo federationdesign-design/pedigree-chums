@@ -878,7 +878,11 @@
 
 .backArrow {
   color: var(--yellow, #ffd23e);
-  font-weight: 800;
+  font-family: var(--font-arrow, "Dela Gothic One"), var(--font-body, "Montserrat", sans-serif);
+  font-weight: 400; /* single-weight font; avoids browser faux-bold distortion */
+  font-size: 0.95rem;
+  line-height: 1;
+  vertical-align: -1px;
 }
 
 @keyframes heroArrowPulse {
@@ -996,6 +1000,11 @@
 
   .essayBullets li {
     font-size: 1.05rem;
+  }
+
+  /* Carousel scene: full-bleed, component handles inner padding */
+  .carouselScene {
+    margin: 30px -20px;
   }
 
   /* Full-bleed inline image scene */
