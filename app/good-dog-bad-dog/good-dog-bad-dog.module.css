@@ -1082,6 +1082,12 @@
     margin-top: 0;
   }
 
+  /* Tall image drifts vertically inside the pinned frame */
+  .parallaxImgWrap .driftImg {
+    height: 130%;
+    will-change: transform;
+  }
+
   .parallaxVideo {
     width: 100%;
     height: 100%;

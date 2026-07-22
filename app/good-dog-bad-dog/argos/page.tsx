@@ -517,6 +517,14 @@ export default function ArgosPage() {
 
               <p>Modern audiences do not just want Argos to recognise Odysseus. They want Odysseus to recognise Argos back. They want the reunion to be mutual. They want the dog&apos;s loyalty to be answered with something visible: a hand on the head, a moment beside him, acknowledgement.</p>
 
+              <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. An ancient audience may have been more prepared to admire that restraint: Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
+
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
+
+              <p>Modern audiences do something different. We do not only watch Odysseus. We become him. We enter the scene emotionally, and once we have done that, walking past the dog feels almost impossible.</p>
+
+              <p>Psychologists often describe this kind of absorption as narrative transportation: the process by which people become mentally and emotionally drawn into a story world. It is why we wince when a character is hurt, why fictional grief can produce real tears, and why the death of a dog on screen can feel almost personally unfair.</p>
+
               <div className={styles.sceneMobile}>
                 <DogPoll
                   question="Nolan has the whole of The Odyssey in his hands. Should he change the story so Odysseus finally gets to pet his dog?"
@@ -532,18 +540,20 @@ export default function ArgosPage() {
                 <InContextCard />
               </div>
 
-              <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. An ancient audience may have been more prepared to admire that restraint: Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
-
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
-
-              <p>Modern audiences do something different. We do not only watch Odysseus. We become him. We enter the scene emotionally, and once we have done that, walking past the dog feels almost impossible.</p>
-
-              <p>Psychologists often describe this kind of absorption as narrative transportation: the process by which people become mentally and emotionally drawn into a story world. It is why we wince when a character is hurt, why fictional grief can produce real tears, and why the death of a dog on screen can feel almost personally unfair.</p>
-
               <p>That instinct has become much more visible in the age of social media. Audiences no longer wait silently for a story to happen to them. They talk back. They speculate, demand, dread and rewrite in real time. The Reddit users asking Nolan to pet the dog are doing what audiences have always done, only louder: asking an old story to answer a modern emotional need.</p>
 
 
               <p>Part of why that need is so strong is that the dog&apos;s position in our lives has changed so completely. Over the last century, and dramatically over the last few decades, the dog has moved from the yard to the house, from the house to the sofa, from the sofa to the bedroom. Dogs now have beds chosen for their joint health, food chosen for their digestion, coats chosen for cold mornings. We arrange our holidays around them. We grieve them publicly, with the same language we use for people, because the loss genuinely feels like the same kind of thing.</p>
+
+              <p>The old contract &mdash; I keep you, you serve me &mdash; has been replaced by something closer to mutual love, and that love now feels like a moral obligation. When Odysseus walks past Argos without stopping, modern audiences feel it not as a tactical necessity but as a failure. That is the distance between Homer&apos;s world and ours.</p>
+
+              <p>Which puts Nolan in an interesting position.</p>
+
+              <p>He is adapting an ancient scene built on restraint for a modern audience that craves emotional acknowledgement. If Nolan allows Odysseus to acknowledge Argos more directly than Homer does, that is not simply sentimentality. It is cultural translation. Homer&apos;s Argos belongs to a world of hunting dogs, households, duty and restraint. Nolan&apos;s Argos belongs to an audience that sees an old dog and thinks: he should be comforted.</p>
+
+              <p>And early discussion of the film suggests that Argos has not been treated as a disposable detail. Coverage of Nolan&apos;s adaptation notes that Argos appears in the film, and viewers have already singled out the dog scene as one of the moments that affected them most.</p>
+
+              <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
 
               <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
                 <CaptionedCarousel
@@ -572,25 +582,6 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <p>The old contract &mdash; I keep you, you serve me &mdash; has been replaced by something closer to mutual love, and that love now feels like a moral obligation. When Odysseus walks past Argos without stopping, modern audiences feel it not as a tactical necessity but as a failure. That is the distance between Homer&apos;s world and ours.</p>
-
-              <p>Which puts Nolan in an interesting position.</p>
-
-              <p>He is adapting an ancient scene built on restraint for a modern audience that craves emotional acknowledgement. If Nolan allows Odysseus to acknowledge Argos more directly than Homer does, that is not simply sentimentality. It is cultural translation. Homer&apos;s Argos belongs to a world of hunting dogs, households, duty and restraint. Nolan&apos;s Argos belongs to an audience that sees an old dog and thinks: he should be comforted.</p>
-
-              <p>And early discussion of the film suggests that Argos has not been treated as a disposable detail. Coverage of Nolan&apos;s adaptation notes that Argos appears in the film, and viewers have already singled out the dog scene as one of the moments that affected them most.</p>
-
-              <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
-
-              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" />
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <BookFactsCard />
-              </div>
-
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
@@ -601,8 +592,13 @@ export default function ArgosPage() {
 
               <p>That restraint is why the scene still works. The poem understands something every dog owner knows: a dog&apos;s recognition goes deeper than sight. Dogs read the world differently from us. They notice changes in posture, rhythm, emotional atmosphere and routine. They know when you are about to leave before you pick up your keys. They understand the difference between a playful voice and a tense one. And they live in a world thick with scent: identity, presence, absence, age, stress and memory that no costume can entirely erase.</p>
 
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" />
+              </div>
+
               <div className={styles.sceneMobile}>
-                <AboutHomerCard />
+                <BookFactsCard />
               </div>
 
               <p>A person changed by twenty years of war and sea-crossing can put on different clothes. But to a dog, identity is not only visual. Scent, movement, voice and old association may survive a disguise in ways human recognition cannot.</p>
@@ -615,21 +611,8 @@ export default function ArgosPage() {
 
               <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
-                <CaptionedCarousel
-                  slides={[
-                    {
-                      src: "/history/odyssusand-argos-statue-2.jpg",
-                      alt: "Odysseus and Argos statue",
-                      caption: "PLACEHOLDER — Odysseus and Argos: the reunion in stone.",
-                    },
-                    {
-                      src: "/history/odyssusand-argos-statue-1.jpg",
-                      alt: "Odysseus and Argos statue, second view",
-                      caption: "PLACEHOLDER — The moment of recognition, another view.",
-                    },
-                  ]}
-                />
+              <div className={styles.sceneMobile}>
+                <AboutHomerCard />
               </div>
 
               <div className={styles.sceneMobile}>
@@ -643,7 +626,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.tightBottom}`} id="harehound-scene">
                 <div className={styles.parallaxImgWrap}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/history/greek-harehound.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" />
+                  <img src="/history/Greek Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" id="hound-img" className={styles.driftImg} />
                 </div>
                 <div className={styles.parallaxContent}>
                   <LivingDescendantCard />
@@ -755,6 +738,23 @@ export default function ArgosPage() {
               <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
 
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
+
+              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
+                <CaptionedCarousel
+                  slides={[
+                    {
+                      src: "/history/odyssusand-argos-statue-2.jpg",
+                      alt: "Odysseus and Argos statue",
+                      caption: "PLACEHOLDER — Odysseus and Argos: the reunion in stone.",
+                    },
+                    {
+                      src: "/history/odyssusand-argos-statue-1.jpg",
+                      alt: "Odysseus and Argos statue, second view",
+                      caption: "PLACEHOLDER — The moment of recognition, another view.",
+                    },
+                  ]}
+                />
+              </div>
 
               <h2 className={styles.subhead}>The dog as home</h2>
 
@@ -990,12 +990,14 @@ export default function ArgosPage() {
               fill.style.height = (pct * 100) + '%';
             }
             /* What We Know nudges gently down onto the harehound image */
-            if (wwk && hound) {
+            if (hound) {
               var hr = hound.getBoundingClientRect();
-              var np = (vh - hr.top) / vh;
+              var np = (vh - hr.top) / (vh + hr.height);
               if (np < 0) np = 0;
               if (np > 1) np = 1;
-              wwk.style.transform = 'translateY(' + (np * 18) + 'px)';
+              if (wwk) wwk.style.transform = 'translateY(' + (np * 36) + 'px)';
+              var hi = document.getElementById('hound-img');
+              if (hi) hi.style.transform = 'translateY(' + (-np * 24) + '%)';
             }
           }
           window.addEventListener('scroll', function(){
