@@ -117,10 +117,9 @@ export default function GoodDogBadDogPage() {
                   loyal companions and dangerous outsiders.
                 </p>
                 <p className={styles.mobileIntroText}>
-                  This series looks at some of the most famous dog stories and asks what
-                  those portrayals say about the real breeds behind the image.
+                  This series looks at some of the most famous dog stories and legends and asks what effect this has had on our conceptions of the actual breeds and the effect of that portrayal.
                 </p>
-                <p className={styles.mobileIntroHint}>Swipe to read the essays →</p>
+                <button type="button" id="intro-next-btn" className={styles.readMore}>Read the essays →</button>
               </div>
             </div>
 
@@ -147,7 +146,7 @@ export default function GoodDogBadDogPage() {
                   <h2 className={styles.mobileSlideTitle}>{essay.title}</h2>
                   <p className={styles.mobileSlideSummary}>{essay.summary}</p>
                   <Link href={`/good-dog-bad-dog/${essay.slug}`} className={styles.readMore}>
-                    Read the essay →
+                    Learn more
                   </Link>
                 </div>
               </div>
@@ -159,7 +158,9 @@ export default function GoodDogBadDogPage() {
           <div className={styles.mobileProgress} id="mobile-progress" />
         </div>
 
-        {/* Progress bar script -- no scroll hijack, native touch only */}
+        {/* Carousel script -- progress bar, intro button, vertical-flick advance.
+            No preventDefault, no scroll hijack: touch-action pan-x in CSS lets the
+            browser own horizontal panning; vertical flicks are read passively. */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
           var carousel = document.getElementById('mobile-carousel');
           var bar = document.getElementById('mobile-progress');
@@ -170,6 +171,38 @@ export default function GoodDogBadDogPage() {
           }
           carousel.addEventListener('scroll', update, { passive: true });
           update();
+
+          function goTo(idx) {
+            var count = carousel.children.length;
+            if (idx < 0) idx = 0;
+            if (idx > count - 1) idx = count - 1;
+            carousel.scrollTo({ left: idx * carousel.clientWidth, behavior: 'smooth' });
+          }
+          function currentIndex() {
+            return Math.round(carousel.scrollLeft / carousel.clientWidth);
+          }
+
+          var btn = document.getElementById('intro-next-btn');
+          if (btn) btn.addEventListener('click', function(){ goTo(1); });
+
+          var sx = 0, sy = 0, st = 0;
+          carousel.addEventListener('touchstart', function(e){
+            if (e.touches.length !== 1) return;
+            sx = e.touches[0].clientX;
+            sy = e.touches[0].clientY;
+            st = Date.now();
+          }, { passive: true });
+          carousel.addEventListener('touchend', function(e){
+            var t = e.changedTouches && e.changedTouches[0];
+            if (!t) return;
+            var dx = t.clientX - sx;
+            var dy = t.clientY - sy;
+            var dt = Date.now() - st;
+            /* vertical flick: clearly more vertical than horizontal, decisive, quick */
+            if (Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx) * 1.2 && dt < 600) {
+              goTo(currentIndex() + (dy < 0 ? 1 : -1));
+            }
+          }, { passive: true });
         })();` }} />
 
       </main>

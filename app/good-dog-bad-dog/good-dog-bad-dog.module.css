@@ -625,6 +625,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    touch-action: pan-x;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     height: 100%;
@@ -648,8 +649,8 @@
   .mobileIntroSlide {
     width: 100%;
     height: 100%;
-    background: linear-gradient(160deg, var(--navy, #0a3a57) 0%, #0b78bd 100%);
-    padding: 80px 28px 40px;
+    background: linear-gradient(160deg, rgba(10, 58, 87, 0.88) 0%, rgba(11, 120, 189, 0.78) 100%);
+    padding: 60px 28px 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -672,7 +673,7 @@
     font-size: 0.95rem;
     font-weight: 500;
     color: #ffffff;
-    line-height: 1.6;
+    line-height: 1.3;
     margin: 0;
   }
 
@@ -777,7 +778,6 @@
     color: #ffffff;
     line-height: 1.45;
     margin: 0;
-    flex: 1;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
