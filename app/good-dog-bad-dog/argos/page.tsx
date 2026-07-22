@@ -51,6 +51,8 @@ export default function ArgosPage() {
             </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
+              <span className={`${styles.tag} ${styles.tagLit}`}>Homer</span>
+              <span className={`${styles.tag} ${styles.tagLit}`}>The Odyssey</span>
               <span className={styles.tagBreed}>Ancient Greek Hunting Hound</span>
             </div>
             <a href="#article-start" id="hero-arrow" className={styles.heroArrow} aria-label="Read the essay">
@@ -65,7 +67,7 @@ export default function ArgosPage() {
 
         {/* ── Two-column layout ── */}
         <div className={styles.essayLayout} id="article-start">
-          <Link href="/good-dog-bad-dog" className={styles.backLinkArticle}>← Back to Good Dog, Bad Dog</Link>
+          <Link href="/good-dog-bad-dog" className={styles.backLinkArticle}><span className={styles.backArrow}>←</span> Back to Good Dog, Bad Dog</Link>
           <article className={styles.essay}>
             <div className={styles.essayBody}>
 

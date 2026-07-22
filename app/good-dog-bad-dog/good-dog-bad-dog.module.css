@@ -848,6 +848,19 @@
 /* Mobile-only back link at the top of the article panel */
 .backLinkArticle {
   display: none;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.backArrow {
+  color: var(--yellow, #ffd23e);
+  font-weight: 800;
 }
 
 @keyframes heroArrowPulse {
@@ -861,6 +874,7 @@
     height: 100vh;
     height: 100svh;
     min-height: 0;
+    margin-bottom: 0;
   }
 
   .heroScene .essayHeroTint {
@@ -896,12 +910,13 @@
   }
 
   .heroScene .tagBreed {
-    font-size: 0.62rem;
+    font-size: 0.52rem;
+    padding: 4px 10px;
   }
 
   .backLinkArticle {
     display: inline-block;
-    margin-bottom: 10px;
+    justify-self: start;
   }
 
   .heroScene .essayHeroTitle {
@@ -925,7 +940,8 @@
 
   /* Article scene comfort */
   .essayLayout {
-    padding: 36px 20px;
+    padding: 10px 20px 36px;
+    gap: 25px;
   }
 
   .essayBody p {
