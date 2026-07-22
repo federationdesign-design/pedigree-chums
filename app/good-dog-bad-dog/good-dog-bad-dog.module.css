@@ -588,71 +588,119 @@
 }
 
 /* ── Mobile carousel (hidden on desktop) ───────────────────── */
-.mobileCarousel {
+.mobileCarouselWrap {
+  display: none;
+}
+
+.mobileProgress {
   display: none;
 }
 
 @media (max-width: 768px) {
 
-  /* Hide desktop grid, show carousel */
-  .grid {
-    display: none;
-  }
+  /* Hide desktop elements */
+  .hero { display: none; }
+  .grid { display: none; }
 
-  /* Page on mobile: no top padding gap, full height */
+  /* Page: no padding, full height */
   .page {
     padding-top: 0;
     padding-bottom: 0;
     min-height: 100dvh;
   }
 
-  /* Hide desktop header on mobile */
-  .hero {
-    display: none;
+  /* Outer wrap: full viewport, clips overflow */
+  .mobileCarouselWrap {
+    display: block;
+    width: 100vw;
+    height: 100dvh;
+    position: relative;
+    overflow: hidden;
   }
 
-  /* Carousel: full viewport, horizontal snap scroll */
+  /* Inner scroll container */
   .mobileCarousel {
     display: flex;
     flex-direction: row;
-    overflow-x: scroll;
+    overflow-x: auto;
+    overflow-y: hidden;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    height: 100dvh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
   }
 
-  .mobileCarousel::-webkit-scrollbar {
-    display: none;
-  }
+  .mobileCarousel::-webkit-scrollbar { display: none; }
 
-  /* Each slide: full viewport width, full height, snap */
+  /* Each slide */
   .mobileSlide {
-    flex: 0 0 100vw;
-    width: 100vw;
-    height: 100dvh;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
     scroll-snap-align: start;
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
 
-  /* Top 50%: image */
+  /* Intro slide: full height, navy gradient */
+  .mobileIntroSlide {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(160deg, var(--navy, #0a3a57) 0%, #0b78bd 100%);
+    padding: 80px 28px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    box-sizing: border-box;
+  }
+
+  .mobileIntroTitle {
+    font-family: var(--font-display, "Luckiest Guy", cursive);
+    font-size: clamp(3rem, 14vw, 5rem);
+    color: #ffffff;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .mobileIntroText {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .mobileIntroHint {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--yellow, #ffd23e);
+    margin-top: 8px;
+  }
+
+  /* Image: top 60% */
   .mobileSlideImg {
     position: relative;
-    flex: 0 0 50%;
+    flex: 0 0 60%;
     overflow: hidden;
   }
 
   .mobileSlideImgTint {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(10,58,87,0.1) 0%, rgba(10,58,87,0.5) 100%);
+    background: linear-gradient(180deg, rgba(10,58,87,0.1) 0%, rgba(10,58,87,0.6) 100%);
     z-index: 1;
   }
 
-  /* Slide counter pill top right */
+  /* Slide counter */
   .mobileSlideCount {
     position: absolute;
     top: 16px;
@@ -669,67 +717,7 @@
     backdrop-filter: blur(4px);
   }
 
-  /* Bottom 50%: navy info panel */
-  .mobileSlideInfo {
-    flex: 0 0 40%;
-    background: var(--navy, #0a3a57);
-    padding: 20px 24px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    overflow: hidden;
-  }
-
-  .mobileSlideTag {
-    display: none;
-  }
-
-  .mobileSlideBreed {
-    font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #aac4d4;
-  }
-
-  .mobileSlideTitle {
-    font-family: var(--font-display, "Luckiest Guy", cursive);
-    font-size: clamp(1.325rem, 5.5vw, 1.725rem);
-    color: var(--yellow, #ffd23e);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    line-height: 1.1;
-    margin: 0;
-  }
-
-  .mobileSlideSummary {
-    font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: #ffffff;
-    line-height: 1.5;
-    margin: 0;
-    flex: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-  }
-
-  /* Swipe hint on first slide */
-  .mobileCarousel .mobileSlide:first-child .mobileSlideInfo::after {
-    content: "Swipe to explore →";
-    font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: rgba(255,255,255,0.4);
-    text-transform: uppercase;
-    display: block;
-    margin-top: 4px;
-  }
-  /* Tag overlay at bottom of image */
+  /* Tag + breed overlay at bottom of image */
   .mobileSlideTagOverlay {
     position: absolute;
     bottom: 14px;
@@ -741,50 +729,72 @@
     flex-wrap: wrap;
   }
 
-  /* Tag pill -- 25% smaller than standard */
   .mobileSlideTagPill {
     font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.49rem;
+    font-size: 0.52rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     border-radius: 999px;
-    padding: 3px 10px;
+    padding: 4px 10px;
   }
 
-  .mobileSlideTagPill.tagGood {
-    background: #22c55e;
-    color: #ffffff;
+  .mobileSlideBreed {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.9);
   }
 
-  .mobileSlideTagPill.tagBad {
-    background: #ef4444;
+  /* Info panel: bottom 40% */
+  .mobileSlideInfo {
+    flex: 0 0 40%;
+    background: var(--navy, #0a3a57);
+    padding: 18px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .mobileSlideTitle {
+    font-family: var(--font-display, "Luckiest Guy", cursive);
+    font-size: clamp(1.2rem, 5.5vw, 1.6rem);
+    color: var(--yellow, #ffd23e);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .mobileSlideSummary {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 0.78rem;
+    font-weight: 500;
     color: #ffffff;
+    line-height: 1.45;
+    margin: 0;
+    flex: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
   }
 
   /* Progress bar */
   .mobileProgress {
-    display: none;
-  }
-
-}
-
-/* Mobile progress bar -- yellow, fixed to bottom */
-.mobileProgress {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .mobileProgress {
     display: block;
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 0;
-    height: 5px;
+    height: 4px;
     width: 0%;
     background: var(--yellow, #ffd23e);
-    z-index: 100;
-    transition: width 0.1s linear;
     border-radius: 0 3px 3px 0;
+    transition: width 0.08s linear;
+    pointer-events: none;
   }
 }

@@ -66,6 +66,8 @@ export default function GoodDogBadDogPage() {
     <>
       <Nav showLogo />
       <main className={styles.page}>
+
+        {/* ── Desktop: header + grid ── */}
         <header className={styles.hero}>
           <p className={styles.eyebrow}>An essay series</p>
           <h1 className={styles.title}>
@@ -82,7 +84,6 @@ export default function GoodDogBadDogPage() {
           </p>
         </header>
 
-        {/* ── Desktop grid ── */}
         <section className={styles.grid}>
           {ESSAYS.map((essay) => (
             <article key={essay.slug} className={styles.card}>
@@ -100,63 +101,77 @@ export default function GoodDogBadDogPage() {
         </section>
 
         {/* ── Mobile carousel ── */}
-        <section className={styles.mobileCarousel}>
-          {ESSAYS.map((essay, i) => (
-            <div key={essay.slug} className={styles.mobileSlide}>
-              {/* Top 60%: hero image with tag/breed overlay at bottom */}
-              <div className={styles.mobileSlideImg}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={essay.image} alt={essay.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div className={styles.mobileSlideImgTint} />
-                {/* Slide counter */}
-                <div className={styles.mobileSlideCount}>
-                  {i + 1} / {ESSAYS.length}
-                </div>
-                {/* Tag + breed overlaid at bottom of image */}
-                <div className={styles.mobileSlideTagOverlay}>
-                  <span className={`${styles.mobileSlideTagPill} ${styles[essay.tagStyle as keyof typeof styles]}`}>{essay.tag}</span>
-                  <span className={styles.mobileSlideBreed}>{essay.breed}</span>
-                </div>
-              </div>
-              {/* Bottom 40%: info panel */}
-              <div className={styles.mobileSlideInfo}>
-                <h2 className={styles.mobileSlideTitle}>{essay.title}</h2>
-                <p className={styles.mobileSlideSummary}>{essay.summary}</p>
-                <Link href={`/good-dog-bad-dog/${essay.slug}`} className={styles.readMore}>
-                  Read the essay →
-                </Link>
+        <div className={styles.mobileCarouselWrap} id="carousel-wrap">
+          <div className={styles.mobileCarousel} id="mobile-carousel">
+
+            {/* Slide 0: intro */}
+            <div className={styles.mobileSlide}>
+              <div className={styles.mobileIntroSlide}>
+                <p className={styles.eyebrow}>An essay series</p>
+                <h1 className={styles.mobileIntroTitle}>
+                  Good Dog,<br />
+                  <span className={styles.titleAccent}>Bad Dog</span>
+                </h1>
+                <p className={styles.mobileIntroText}>
+                  Fictional dogs are rarely just dogs. They get cast as heroes, monsters,
+                  loyal companions and dangerous outsiders.
+                </p>
+                <p className={styles.mobileIntroText}>
+                  This series looks at some of the most famous dog stories and asks what
+                  those portrayals say about the real breeds behind the image.
+                </p>
+                <p className={styles.mobileIntroHint}>Swipe to read the essays →</p>
               </div>
             </div>
-          ))}
-        </section>
 
-        {/* Yellow progress bar -- mobile only */}
-        <div className={styles.mobileProgress} id="mobile-progress" />
+            {/* Essay slides */}
+            {ESSAYS.map((essay, i) => (
+              <div key={essay.slug} className={styles.mobileSlide}>
+                {/* Top 60%: image */}
+                <div className={styles.mobileSlideImg}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={essay.image}
+                    alt={essay.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                  <div className={styles.mobileSlideImgTint} />
+                  <div className={styles.mobileSlideCount}>{i + 1} / {ESSAYS.length}</div>
+                  <div className={styles.mobileSlideTagOverlay}>
+                    <span className={`${styles.mobileSlideTagPill} ${styles[essay.tagStyle as keyof typeof styles]}`}>{essay.tag}</span>
+                    <span className={styles.mobileSlideBreed}>{essay.breed}</span>
+                  </div>
+                </div>
+                {/* Bottom 40%: info */}
+                <div className={styles.mobileSlideInfo}>
+                  <h2 className={styles.mobileSlideTitle}>{essay.title}</h2>
+                  <p className={styles.mobileSlideSummary}>{essay.summary}</p>
+                  <Link href={`/good-dog-bad-dog/${essay.slug}`} className={styles.readMore}>
+                    Read the essay →
+                  </Link>
+                </div>
+              </div>
+            ))}
 
-        {/* Scroll hijack + progress bar script */}
+          </div>
+
+          {/* Yellow progress bar */}
+          <div className={styles.mobileProgress} id="mobile-progress" />
+        </div>
+
+        {/* Progress bar script -- no scroll hijack, native touch only */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
-          var carousel = document.querySelector('[class*="mobileCarousel"]');
+          var carousel = document.getElementById('mobile-carousel');
           var bar = document.getElementById('mobile-progress');
           if(!carousel || !bar) return;
-
-          // Update progress bar
-          function updateProgress() {
+          function update() {
             var max = carousel.scrollWidth - carousel.clientWidth;
-            var pct = max > 0 ? (carousel.scrollLeft / max) * 100 : 0;
-            bar.style.width = pct + '%';
+            bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
           }
-          carousel.addEventListener('scroll', updateProgress, { passive: true });
-          updateProgress();
-
-          // Hijack vertical scroll to drive horizontal scroll
-          window.addEventListener('wheel', function(e) {
-            var rect = carousel.getBoundingClientRect();
-            var inView = rect.top <= window.innerHeight && rect.bottom >= 0;
-            if(!inView) return;
-            e.preventDefault();
-            carousel.scrollLeft += e.deltaY + e.deltaX;
-          }, { passive: false });
+          carousel.addEventListener('scroll', update, { passive: true });
+          update();
         })();` }} />
+
       </main>
       <Footer />
     </>
