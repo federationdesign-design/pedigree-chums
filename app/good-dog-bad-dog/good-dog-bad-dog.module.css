@@ -671,7 +671,7 @@
 
   /* Bottom 50%: navy info panel */
   .mobileSlideInfo {
-    flex: 0 0 50%;
+    flex: 0 0 40%;
     background: var(--navy, #0a3a57);
     padding: 20px 24px 24px;
     display: flex;
@@ -681,10 +681,7 @@
   }
 
   .mobileSlideTag {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    display: none;
   }
 
   .mobileSlideBreed {
@@ -698,7 +695,7 @@
 
   .mobileSlideTitle {
     font-family: var(--font-display, "Luckiest Guy", cursive);
-    font-size: clamp(1.2rem, 5vw, 1.6rem);
+    font-size: clamp(1.325rem, 5.5vw, 1.725rem);
     color: var(--yellow, #ffd23e);
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -732,45 +729,62 @@
     display: block;
     margin-top: 4px;
   }
-  /* Intro slide */
-  .mobileIntroSlide {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(160deg, var(--navy, #0a3a57) 0%, #0b78bd 100%);
-    padding: 80px 28px 40px;
+  /* Tag overlay at bottom of image */
+  .mobileSlideTagOverlay {
+    position: absolute;
+    bottom: 14px;
+    left: 16px;
+    z-index: 2;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 16px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
-  .mobileIntroTitle {
-    font-family: var(--font-display, "Luckiest Guy", cursive);
-    font-size: clamp(3rem, 14vw, 5rem);
-    color: #ffffff;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    line-height: 1;
-    margin: 0;
-  }
-
-  .mobileIntroText {
+  /* Tag pill -- 25% smaller than standard */
+  .mobileSlideTagPill {
     font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #ffffff;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .mobileIntroHint {
-    font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.7rem;
+    font-size: 0.49rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--yellow, #ffd23e);
-    margin-top: 8px;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
+    padding: 3px 10px;
   }
 
+  .mobileSlideTagPill.tagGood {
+    background: #22c55e;
+    color: #ffffff;
+  }
+
+  .mobileSlideTagPill.tagBad {
+    background: #ef4444;
+    color: #ffffff;
+  }
+
+  /* Progress bar */
+  .mobileProgress {
+    display: none;
+  }
+
+}
+
+/* Mobile progress bar -- yellow, fixed to bottom */
+.mobileProgress {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileProgress {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 5px;
+    width: 0%;
+    background: var(--yellow, #ffd23e);
+    z-index: 100;
+    transition: width 0.1s linear;
+    border-radius: 0 3px 3px 0;
+  }
 }
