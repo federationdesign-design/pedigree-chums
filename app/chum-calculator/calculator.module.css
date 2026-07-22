@@ -174,28 +174,76 @@
   font-weight: 700;
 }
 
-/* Stairs checkbox row -- smaller, below the options */
-.stairsRow {
+/* Stairs -- creative pill toggle, starts centred (unset), slide No / Yes */
+.stairsToggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin: 4px 0 18px;
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #ffffff;
-  cursor: pointer;
-  user-select: none;
+  gap: 14px;
+  margin: 6px 0 18px;
 }
 
-.stairsCheck {
-  width: 20px;
-  height: 20px;
-  accent-color: #22c55e;
-  cursor: pointer;
-  flex-shrink: 0;
+.stairsLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow, #ffd23e);
 }
+
+.toggle {
+  position: relative;
+  display: flex;
+  width: 180px;
+  height: 44px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.28);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.toggleOptNo,
+.toggleOptYes {
+  flex: 1;
+  z-index: 2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  transition: color 0.2s;
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 4px;
+  left: calc(50% - 16px);          /* centred = unset */
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: left 0.28s cubic-bezier(0.5, 1.7, 0.4, 1);
+  z-index: 1;
+}
+
+.toggleNo {
+  background: rgba(239,68,68,0.28);
+  border-color: rgba(239,68,68,0.75);
+}
+.toggleNo .toggleKnob { left: calc(25% - 16px); }
+.toggleNo .toggleOptNo { color: var(--navy, #0a3a57); }
+
+.toggleYes {
+  background: rgba(34,197,94,0.32);
+  border-color: #22c55e;
+}
+.toggleYes .toggleKnob { left: calc(75% - 16px); }
+.toggleYes .toggleOptYes { color: var(--navy, #0a3a57); }
 
 /* Wobble nudge (used on the home card when Next is clicked with no home picked) */
 @keyframes pcWobble {

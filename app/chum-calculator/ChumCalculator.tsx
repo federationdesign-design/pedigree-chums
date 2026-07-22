@@ -23,7 +23,7 @@ const QUESTIONS: Question[] = [
     options: [
       { label: "I'm actively looking for my perfect dog", value: "looking" },
       { label: "I'd love a dog one day", value: "exploring" },
-      { label: "I've never really thought about getting a dog", value: "curious" },
+      { label: "I don't want to have a dog", value: "curious" },
       { label: "I already have a dog", value: "have_dog" },
     ],
   },
@@ -679,18 +679,14 @@ export default function ChumCalculator() {
     setWobble(true);
     window.setTimeout(() => setWobble(false), 650);
   }
-  function toggleStairs() {
-    const willCheck = answers.stairs !== "yes";
-    setAnswers((prev) => {
-      const next = { ...prev };
-      if (next.stairs === "yes") delete next.stairs;
-      else next.stairs = "yes";
-      return next;
-    });
-    if (willCheck) fireConfetti();
+  function setStairs(value: "yes" | "no") {
+    const changed = answers.stairs !== value;
+    setAnswers((prev) => ({ ...prev, stairs: value }));
+    if (changed) fireConfetti();
   }
   function tryAdvanceLiving() {
-    if (!answers.living) { doWobble(); return; }
+    // Home option and the stairs toggle are both mandatory
+    if (!answers.living || !answers.stairs) { doWobble(); return; }
     advance();
   }
 
@@ -802,15 +798,18 @@ export default function ChumCalculator() {
               ))}
             </div>
 
-            <label className={styles.stairsRow}>
-              <input
-                type="checkbox"
-                className={styles.stairsCheck}
-                checked={answers.stairs === "yes"}
-                onChange={toggleStairs}
-              />
-              <span>I have stairs (lots, every day)</span>
-            </label>
+            <div className={`${styles.stairsToggle} ${wobble && !answers.stairs ? styles.wobble : ""}`}>
+              <span className={styles.stairsLabel}>Stairs?</span>
+              <div
+                className={`${styles.toggle} ${answers.stairs === "yes" ? styles.toggleYes : answers.stairs === "no" ? styles.toggleNo : ""}`}
+                role="group"
+                aria-label="Do you have lots of stairs?"
+              >
+                <button type="button" className={styles.toggleOptNo} onClick={() => setStairs("no")}>No</button>
+                <button type="button" className={styles.toggleOptYes} onClick={() => setStairs("yes")}>Yes</button>
+                <span className={styles.toggleKnob} aria-hidden />
+              </div>
+            </div>
 
             <button className={styles.startBtn} onClick={tryAdvanceLiving}>
               Next →
