@@ -1047,9 +1047,11 @@
   }
 
   /* Menuflash video pin: travel for the scroll-scrub playback */
-  .parallaxScene.videoPinScene {
-    padding-bottom: 160vh;
-    padding-bottom: 160svh;
+  .parallaxScene.videoPinScene::after {
+    content: "";
+    display: block;
+    height: 160vh;
+    height: 160svh;
   }
 
   .videoCard {
@@ -1161,9 +1163,13 @@
 
   /* Drift scenes need scroll travel: extra room after the card during
      which the pinned image pans, before handing over to the next scene */
-  .parallaxScene.driftScene {
-    padding-bottom: 55vh;
-    padding-bottom: 55svh;
+  /* travel must be CONTENT (::after), not padding: sticky children are
+     constrained to the parent's content box, so padding gives no stick room */
+  .parallaxScene.driftScene::after {
+    content: "";
+    display: block;
+    height: 55vh;
+    height: 55svh;
   }
 
   /* Tall image drifts vertically inside the pinned frame */

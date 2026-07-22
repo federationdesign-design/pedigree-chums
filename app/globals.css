@@ -31,7 +31,9 @@ html,
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  /* clip, not hidden: hidden on html+body promotes body to the scroll
+     container and silently breaks position: sticky everywhere */
+  overflow-x: clip;
   width: 100%;
 }
 
