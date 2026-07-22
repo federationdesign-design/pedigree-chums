@@ -174,76 +174,45 @@
   font-weight: 700;
 }
 
-/* Stairs -- creative pill toggle, starts centred (unset), slide No / Yes */
-.stairsToggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin: 6px 0 18px;
-}
-
-.stairsLabel {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.05rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--yellow, #ffd23e);
-}
-
-.toggle {
-  position: relative;
-  display: flex;
-  width: 180px;
-  height: 44px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.12);
-  border: 2px solid rgba(255,255,255,0.28);
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.toggleOptNo,
-.toggleOptYes {
-  flex: 1;
-  z-index: 2;
-  background: none;
-  border: none;
-  cursor: pointer;
+/* Stairs -- two boxes that double as the submit button (green = have, red = none) */
+.stairsPrompt {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-weight: 700;
   font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-style: italic;
   color: #ffffff;
-  transition: color 0.2s;
+  text-align: center;
+  margin: 6px 0 12px;
 }
 
-.toggleKnob {
-  position: absolute;
-  top: 4px;
-  left: calc(50% - 16px);          /* centred = unset */
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  transition: left 0.28s cubic-bezier(0.5, 1.7, 0.4, 1);
-  z-index: 1;
+.stairsChoice {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.toggleNo {
-  background: rgba(239,68,68,0.28);
-  border-color: rgba(239,68,68,0.75);
+.stairsYes,
+.stairsNo {
+  flex: 1;
+  min-width: 140px;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  padding: 18px 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10,58,87,0.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
 }
-.toggleNo .toggleKnob { left: calc(25% - 16px); }
-.toggleNo .toggleOptNo { color: var(--navy, #0a3a57); }
 
-.toggleYes {
-  background: rgba(34,197,94,0.32);
-  border-color: #22c55e;
-}
-.toggleYes .toggleKnob { left: calc(75% - 16px); }
-.toggleYes .toggleOptYes { color: var(--navy, #0a3a57); }
+.stairsYes { background: #22c55e; }
+.stairsYes:hover { background: #2fd46b; }
+.stairsNo { background: #ef4444; }
+.stairsNo:hover { background: #f26363; }
+.stairsYes:active,
+.stairsNo:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(10,58,87,0.4); }
 
 /* Wobble nudge (used on the home card when Next is clicked with no home picked) */
 @keyframes pcWobble {

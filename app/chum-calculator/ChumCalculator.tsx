@@ -51,7 +51,7 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "children",
-    question: "Young children at home?",
+    question: "Children at home?",
     info: "Very young children and fragile toy breeds are a risky combination. Some breeds are wonderfully patient with children; others find unpredictable small humans stressful.",
     options: [
       { label: "Yes -- toddlers or under 5", value: "young" },
@@ -73,14 +73,14 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "alone",
-    question: "How long are you out of the house normally?",
+    question: "How long are you out for?",
     info: "Dogs are social animals. Some breeds develop severe separation anxiety if left alone regularly -- barking, destruction, or self-harm. Others are surprisingly independent.",
     options: [
-      { label: "Hardly ever -- someone is almost always home", value: "rarely" },
-      { label: "A few hours max -- back before it becomes an issue", value: "sometimes" },
-      { label: "Sometimes over half the day", value: "often" },
-      { label: "Regularly half a day or more", value: "lots" },
-      { label: "Most of the day -- long working hours are the norm", value: "always" },
+      { label: "Hardly ever", value: "rarely" },
+      { label: "A few hours max", value: "sometimes" },
+      { label: "Sometimes; over half a day", value: "often" },
+      { label: "Regularly over half a day", value: "lots" },
+      { label: "Most, long working days are the norm", value: "always" },
     ],
   },
   {
@@ -679,15 +679,13 @@ export default function ChumCalculator() {
     setWobble(true);
     window.setTimeout(() => setWobble(false), 650);
   }
-  function setStairs(value: "yes" | "no") {
-    const changed = answers.stairs !== value;
+  // The stairs boxes double as the "next" button -- clicking one records stairs and advances
+  function chooseStairs(value: "yes" | "no") {
+    if (!answers.living) { doWobble(); return; }   // must pick a home option first
+    setInfoOpen(false);
     setAnswers((prev) => ({ ...prev, stairs: value }));
-    if (changed) fireConfetti();
-  }
-  function tryAdvanceLiving() {
-    // Home option and the stairs toggle are both mandatory
-    if (!answers.living || !answers.stairs) { doWobble(); return; }
-    advance();
+    fireConfetti();
+    setStep((s) => s + 1);
   }
 
   function goBack() {
@@ -798,22 +796,15 @@ export default function ChumCalculator() {
               ))}
             </div>
 
-            <div className={`${styles.stairsToggle} ${wobble && !answers.stairs ? styles.wobble : ""}`}>
-              <span className={styles.stairsLabel}>Stairs?</span>
-              <div
-                className={`${styles.toggle} ${answers.stairs === "yes" ? styles.toggleYes : answers.stairs === "no" ? styles.toggleNo : ""}`}
-                role="group"
-                aria-label="Do you have lots of stairs?"
-              >
-                <button type="button" className={styles.toggleOptNo} onClick={() => setStairs("no")}>No</button>
-                <button type="button" className={styles.toggleOptYes} onClick={() => setStairs("yes")}>Yes</button>
-                <span className={styles.toggleKnob} aria-hidden />
-              </div>
+            <p className={styles.stairsPrompt}>Last thing -- do you have lots of stairs?</p>
+            <div className={styles.stairsChoice}>
+              <button type="button" className={styles.stairsYes} onClick={() => chooseStairs("yes")}>
+                ✓ I have stairs
+              </button>
+              <button type="button" className={styles.stairsNo} onClick={() => chooseStairs("no")}>
+                ✗ No stairs
+              </button>
             </div>
-
-            <button className={styles.startBtn} onClick={tryAdvanceLiving}>
-              Next →
-            </button>
             {step > 1 && (
               <button className={styles.backBtn} onClick={goBack} style={{ marginTop: 14 }}>← Back</button>
             )}
