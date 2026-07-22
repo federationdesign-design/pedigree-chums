@@ -135,7 +135,6 @@ export default function GoodDogBadDogPage() {
                     alt={essay.title}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
-                  <div className={styles.mobileSlideImgTint} />
                   <div className={styles.mobileSlideCount}>{i + 1} / {ESSAYS.length}</div>
                   <div className={styles.mobileSlideTagOverlay}>
                     <span className={`${styles.mobileSlideTagPill} ${styles[essay.tagStyle as keyof typeof styles]}`}>{essay.tag}</span>
@@ -144,9 +143,12 @@ export default function GoodDogBadDogPage() {
                 </div>
                 {/* Bottom 40%: info */}
                 <div className={styles.mobileSlideInfo}>
-                  <h2 className={styles.mobileSlideTitle}>{essay.title}</h2>
+                  <h2 className={styles.mobileSlideTitle}>
+                    <span className={styles.mobileSlideTitleWhite}>{essay.title.slice(0, essay.title.indexOf(":") + 1)}</span>
+                    {essay.title.slice(essay.title.indexOf(":") + 1)}
+                  </h2>
                   <p className={styles.mobileSlideSummary}>{essay.summary}</p>
-                  <Link href={`/good-dog-bad-dog/${essay.slug}`} className={styles.readMore}>
+                  <Link href={`/good-dog-bad-dog/${essay.slug}`} className={styles.mobileSlideBtn}>
                     Learn more
                   </Link>
                 </div>

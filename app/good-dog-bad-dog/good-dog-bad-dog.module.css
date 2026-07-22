@@ -714,13 +714,6 @@
     overflow: hidden;
   }
 
-  .mobileSlideImgTint {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(10,58,87,0.1) 0%, rgba(10,58,87,0.6) 100%);
-    z-index: 1;
-  }
-
   /* Slide counter */
   .mobileSlideCount {
     position: absolute;
@@ -766,7 +759,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: rgba(255,255,255,0.9);
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(10, 58, 87, 0.8);
   }
 
   /* Info panel: bottom 40% */
@@ -783,12 +777,16 @@
 
   .mobileSlideTitle {
     font-family: var(--font-display, "Luckiest Guy", cursive);
-    font-size: clamp(1.2rem, 5.5vw, 1.6rem);
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
     color: var(--yellow, #ffd23e);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     line-height: 1.1;
     margin: 0;
+  }
+
+  .mobileSlideTitleWhite {
+    color: #ffffff;
   }
 
   .mobileSlideSummary {
@@ -802,6 +800,28 @@
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+  }
+
+  /* Green CTA on essay slides -- name selector Go style, 2x the old pill */
+  .mobileSlideBtn {
+    display: inline-block;
+    align-self: flex-start;
+    margin-top: 10px;
+    padding: 16px 44px;
+    border: none;
+    border-radius: 14px;
+    background: #22c55e;
+    color: #ffffff;
+    font-family: var(--font-display, "Luckiest Guy", cursive);
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(10, 58, 87, 0.4);
+  }
+  .mobileSlideBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(10, 58, 87, 0.4);
   }
 
   /* Progress bar */
