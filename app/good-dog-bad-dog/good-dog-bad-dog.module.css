@@ -567,11 +567,12 @@
   font-size: 5em;
   color: var(--navy, #0a3a57);
   font-style: normal;
-  line-height: 1;
+  line-height: 0;
   position: relative;
   top: 40px;
   display: inline-block;
   margin: 0 6px;
+  overflow: visible;
 }
 
 @media (min-width: 1300px) {
