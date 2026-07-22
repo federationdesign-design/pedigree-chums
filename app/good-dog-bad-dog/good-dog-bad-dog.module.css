@@ -841,8 +841,12 @@
 }
 
 /* ── Essay mobile scenes (Phase 1: hero) ────────────────────── */
-.heroStandfirst,
 .heroArrow {
+  display: none;
+}
+
+/* Mobile-only back link at the top of the article panel */
+.backLinkArticle {
   display: none;
 }
 
@@ -860,30 +864,58 @@
   }
 
   .heroScene .essayHeroTint {
-    background: linear-gradient(180deg, rgba(10, 58, 87, 0.05) 0%, rgba(10, 58, 87, 0.88) 100%);
+    display: none;
+  }
+
+  /* Scene order: arrow above title, tags pinned to the very bottom */
+  .heroScene .essayHeroContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 16px;
+  }
+
+  .heroScene .essayHeroTitle {
+    order: 1;
+    margin: 0 0 14px;
+  }
+
+  .heroScene .essayHeroMeta {
+    order: 2;
+    margin: 0;
+  }
+
+  .heroScene .backLink {
+    display: none;
+  }
+
+  /* Tags match the index carousel pills */
+  .heroScene .tag {
+    font-size: 0.52rem;
+    padding: 4px 10px;
+  }
+
+  .heroScene .tagBreed {
+    font-size: 0.62rem;
+  }
+
+  .backLinkArticle {
+    display: inline-block;
+    margin-bottom: 10px;
   }
 
   .heroScene .essayHeroTitle {
     font-size: clamp(2.3rem, 9.5vw, 3rem);
   }
 
-  .heroScene .heroStandfirst {
-    display: block;
-    font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 1.02rem;
-    font-weight: 500;
-    color: #ffffff;
-    line-height: 1.3;
-    margin: 14px 0 0;
-  }
-
   .heroScene .heroArrow {
+    order: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 56px;
     height: 44px;
-    margin: 18px auto 6px;
+    margin: 0 auto 16px;
     padding: 0;
     background: transparent;
     border: none;
