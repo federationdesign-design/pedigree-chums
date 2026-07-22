@@ -30,8 +30,7 @@ const SLIDES: Slide[] = [
   },
   {
     href: "/good-dog-bad-dog/anubis",
-    video: "/cerberous%20dog%20video.mp4",
-    videoWebm: "/cerberous%20dog%20video.webm",
+    video: "/history/Anubis-hero-vid.mp4",
     tagBad: "Bad dog",
     tags: ["Egypt", "Myth"],
     titleAccent: "Anubis:",
