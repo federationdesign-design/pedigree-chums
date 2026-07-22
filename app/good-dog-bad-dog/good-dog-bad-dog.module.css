@@ -1082,9 +1082,16 @@
     margin-top: 0;
   }
 
+  /* Drift scenes need scroll travel: extra room after the card during
+     which the pinned image pans, before handing over to the next scene */
+  .parallaxScene.driftScene {
+    padding-bottom: 55vh;
+    padding-bottom: 55svh;
+  }
+
   /* Tall image drifts vertically inside the pinned frame */
   .parallaxImgWrap .driftImg {
-    height: 130%;
+    height: 150%;
     will-change: transform;
   }
 

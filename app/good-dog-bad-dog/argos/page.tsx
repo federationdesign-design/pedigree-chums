@@ -623,7 +623,7 @@ export default function ArgosPage() {
                 <WhatWeKnowCard />
               </div>
 
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.tightBottom}`} id="harehound-scene">
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.tightBottom} ${styles.driftScene}`} id="harehound-scene">
                 <div className={styles.parallaxImgWrap}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/history/Greek-Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" id="hound-img" className={styles.driftImg} />
@@ -992,12 +992,18 @@ export default function ArgosPage() {
             /* What We Know nudges gently down onto the harehound image */
             if (hound) {
               var hr = hound.getBoundingClientRect();
-              var np = (vh - hr.top) / (vh + hr.height);
+              /* card nudge: paced by the scene entering the viewport */
+              var np = (vh - hr.top) / vh;
               if (np < 0) np = 0;
               if (np > 1) np = 1;
               if (wwk) wwk.style.transform = 'translateY(' + (np * 36) + 'px)';
+              /* image drift: paced by the PIN window only, so the pan happens
+                 while the reader is actually looking at the pinned image */
+              var pin = (hr.height > vh) ? (-hr.top) / (hr.height - vh) : 0;
+              if (pin < 0) pin = 0;
+              if (pin > 1) pin = 1;
               var hi = document.getElementById('hound-img');
-              if (hi) hi.style.transform = 'translateY(' + (-np * 24) + '%)';
+              if (hi) hi.style.transform = 'translateY(' + (-pin * 32) + '%)';
             }
           }
           window.addEventListener('scroll', function(){
