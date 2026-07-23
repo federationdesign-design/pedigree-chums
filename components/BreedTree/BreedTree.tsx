@@ -7,6 +7,7 @@ import type { LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
+import LearnLayer from "./LearnLayer";
 
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
@@ -234,6 +235,8 @@ export default function BreedTree({
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
+  const [learnNode, setLearnNode] = useState<Node | null>(null);
+  const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
   const runFallRef = useRef<(() => void) | null>(null);
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
@@ -456,6 +459,16 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
+    // once dropped, a circle that owns a body lifts out to the learn layer
+    if (fellRef.current) {
+      const pb = pitBodiesRef.current;
+      const body = pb?.owned.has(d) ? pb.find(d) : undefined;
+      if (body) {
+        body.held = true;
+        setLearnNode(d);
+        return;
+      }
+    }
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -566,7 +579,7 @@ export default function BreedTree({
       const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
       const yF0 = yF;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Map<Body, number>; a: number; va: number; ia: number; iva: number };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Map<Body, number>; a: number; va: number; ia: number; iva: number; held?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0 }));
@@ -610,6 +623,10 @@ export default function BreedTree({
       const all = bodies.concat(badges);
       // nodes that have their own body: their subtrees no longer ride a parent
       const owned = new Set<Node>(bodies.map((b) => b.n as Node));
+      pitBodiesRef.current = {
+        find: (n: Node) => all.find((b) => b.n === n),
+        owned,
+      };
       const moveSubtree = (root: Node, dxm: number, dym: number) => {
         const stack: Node[] = [root];
         while (stack.length) {
@@ -726,6 +743,7 @@ export default function BreedTree({
         const dt = Math.min(0.032, (now - last) / 1000);
         last = now;
         for (const b of all) {
+          if (b.held) continue; // lifted out onto the learn layer
           if (isDragged(b)) continue; // position driven by the pointer
           b.vy += G * dt;
           b.x += b.vx * dt;
@@ -753,6 +771,7 @@ export default function BreedTree({
         for (let i = 0; i < all.length; i++) {
           for (let j = i + 1; j < all.length; j++) {
             const a = all[i], c = all[j];
+            if (a.held || c.held) continue;
             const dx = c.x - a.x, dy = c.y - a.y;
             const dist = Math.hypot(dx, dy) || 0.001;
             const gBorn = a.ghosts.get(c) ?? c.ghosts.get(a);
@@ -807,6 +826,7 @@ export default function BreedTree({
               if (u.x + u.r > xR) { u.x = xR - u.r; u.vx = -u.vx * WALL_REST; }
             }
             for (const b of all) {
+              if (b.held) continue;
               const dx = b.x - u.x, dy = b.y - u.y;
               const dist = Math.hypot(dx, dy) || 0.001;
               const overlap = b.r + u.r - dist;
@@ -855,6 +875,7 @@ export default function BreedTree({
           }
           const mp = prW * (LW + prW) * 2.5; // heavier than it looks, so it is not batted about
           for (const b of all) {
+            if (b.held) continue;
             const cxp = Math.max(pill.x - LW, Math.min(pill.x + LW, b.x));
             const dx = b.x - cxp, dy = b.y - pill.y;
             const dist = Math.hypot(dx, dy) || 0.001;
@@ -889,6 +910,7 @@ export default function BreedTree({
         if (uis) for (const u of uis) if (!u.fixed && Math.hypot(u.vx, u.vy) > worldH * 0.012) still = false;
         if (pill && !pill.stuck && Math.hypot(pill.vx, pill.vy) > worldH * 0.012) still = false;
         for (const b of all) {
+          if (b.held) { continue; }
           if (b.n) {
             const dxm = b.x - b.n.x, dym = b.y - b.n.y;
             if (dxm || dym) moveSubtree(b.n, dxm, dym);
@@ -1062,7 +1084,8 @@ export default function BreedTree({
                   : styles.tintB
                 : "";
               const cls = hasImg && tinted ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
-              const buried = !!buriedSet && d !== hovered && buriedSet.has(d);
+              const heldHidden = !!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)));
+              const buried = (!!buriedSet && d !== hovered && buriedSet.has(d)) || heldHidden;
               return (
                 <circle
                   key={i}
@@ -1238,6 +1261,29 @@ export default function BreedTree({
         </svg>
       </div>
 
+      {learnNode && (
+        <LearnLayer
+          root={learnNode}
+          onScore={onScore}
+          onClose={() => {
+            const pb = pitBodiesRef.current;
+            const body = learnNode ? pb?.find(learnNode) : undefined;
+            if (body) {
+              const v = viewRef.current;
+              const k = SIZE / v[2];
+              const st = stageRef.current;
+              const asp = st ? st.clientWidth / Math.max(st.clientHeight, 1) : 1;
+              const vbHf = asp >= 1 ? SIZE : SIZE / asp;
+              body.x = v[0];
+              body.y = v[1] + (-vbHf * 0.3) / k;
+              body.vx = 0; body.vy = 0;
+              body.held = false;
+            }
+            setLearnNode(null);
+            wakeRef.current?.();
+          }}
+        />
+      )}
       <div className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`} style={{ position: "relative", display: hideCaption ? "none" : undefined }}>
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
