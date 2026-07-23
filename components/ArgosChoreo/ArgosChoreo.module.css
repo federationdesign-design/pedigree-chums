@@ -3,9 +3,9 @@
 
 .stage {
   position: sticky;
-  top: 100px;
-  min-height: calc(100vh - 100px);
-  min-height: calc(100svh - 100px);
+  top: 120px;
+  min-height: calc(100vh - 120px);
+  min-height: calc(100svh - 120px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -37,10 +37,16 @@
   margin: 8px 0 0;
 }
 
-.quoteArea {
-  display: flex;
-  gap: 30px;
-  padding: 24px 0;
+.quoteHolder {
+  position: relative;
+}
+
+.quoteLineTrack {
+  position: absolute;
+  left: 0;
+  top: 24px;
+  bottom: 24px;
+  width: 10px;
 }
 
 .quoteLineTrack {
@@ -52,36 +58,9 @@
 .quoteLine {
   width: 10px;
   background: var(--yellow, #ffd23e);
-  border-radius: 2px;
+  border-radius: 6px;
 }
 
-.quoteBody {
-  position: relative;
-  padding-top: 30px;
-}
-
-.quoteMark {
-  font-family: var(--font-stack-notch, serif);
-  font-size: 4em;
-  line-height: 0;
-  color: var(--navy, #0a3a57);
-  position: absolute;
-  top: 26px;
-  left: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.quoteBody .quoteText {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-style: italic;
-  font-weight: 300;
-  font-size: clamp(1.4rem, 5.6vw, 1.8rem);
-  color: var(--navy, #0a3a57);
-  line-height: 1.35;
-  margin: 0;
-  padding-left: 44px;
-  will-change: opacity, filter;
-}
 
 /* ── Statue carousel + bullets ── */
 .bulletScene {
@@ -150,23 +129,20 @@
 
 .choreoBullets {
   margin: 0;
-  padding-left: 26px;
-  list-style: disc;
+  padding: 0;
+  list-style: none;
+  text-align: center;
 }
 
 .choreoBullets li {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #ffffff;
-  line-height: 1.55;
-  margin-bottom: 14px;
-  list-style: disc;
+  line-height: 1.5;
+  margin-bottom: 28px;
+  list-style: none;
   will-change: opacity, transform;
-}
-
-.choreoBullets li::marker {
-  color: var(--yellow, #ffd23e);
 }
 
 /* ── Homer crossfade ── */
@@ -176,17 +152,18 @@
 }
 
 .homerStage img {
-  max-height: 28vh;
-  max-height: 28svh;
+  max-height: 34vh;
+  max-height: 34svh;
+  width: 100%;
   object-fit: cover;
   object-position: center 20%;
 }
 
 .homerStage {
   position: sticky;
-  top: 100px;
+  top: 0;
   background: var(--navy, #0a3a57);
-  border-radius: 16px;
+  border-radius: 0 0 16px 16px;
   overflow: hidden;
 }
 

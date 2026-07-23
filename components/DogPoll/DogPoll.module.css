@@ -5,7 +5,7 @@
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.25);
 }
 
-.kicker {
+.wrap .kicker {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.7rem;
   letter-spacing: 0.06em;
@@ -15,7 +15,7 @@
   margin: 0 0 10px;
 }
 
-.question {
+.wrap .question {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.97rem;
   font-weight: 700;
@@ -33,13 +33,13 @@
 
 .option,
 .optionRed {
-  padding: 24px 12px;
+  padding: 30px 12px;
   border: none;
   border-radius: 14px;
   background: #22c55e;
   color: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   letter-spacing: 0.04em;
   text-align: center;
   line-height: 1.15;
@@ -83,8 +83,8 @@
   margin-bottom: 5px;
 }
 
-.resultLabel,
-.resultLabelPicked {
+.wrap .resultLabel,
+.wrap .resultLabelPicked {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.9rem;
   font-weight: 700;
@@ -96,7 +96,7 @@
   text-underline-offset: 3px;
 }
 
-.resultPct {
+.wrap .resultPct {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 2.4rem;
   color: var(--navy, #0a3a57);
@@ -129,7 +129,7 @@
   to { transform: scaleX(1); }
 }
 
-.footnote {
+.wrap .footnote {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.68rem;
   font-weight: 600;

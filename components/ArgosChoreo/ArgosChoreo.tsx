@@ -44,35 +44,37 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
    Pinned content on top; below it the quote assembles as the reader
    scrolls: yellow square grows into the line, the mark pops the moment the
    line completes, then the text de-blurs from zero alpha to solid. */
-export function QuoteBuild({ pinned, quote }: { pinned: React.ReactNode; quote: string }) {
+export function QuoteBuild({
+  pinned,
+  quote,
+  blockClass,
+  markClass,
+}: {
+  pinned: React.ReactNode;
+  quote: string;
+  blockClass: string;
+  markClass: string;
+}) {
   const { sceneRef, p } = useSceneProgress();
   const line = clamp01(p / 0.3);
   const mark = p >= 0.31;
   const text = clamp01((p - 0.38) / 0.32);
-  /* p 0.7 -> 1.0 is a dwell zone: the finished quote holds the screen so the
-     release does not feel like being fired out of the scene */
+  /* p 0.7 -> 1.0 is a dwell zone: the finished quote holds the screen. The
+     blockquote uses the article's own pullquote classes so the final state is
+     pixel-identical to the static version; its yellow border is made
+     transparent and our growing bar sits exactly in its place. */
   return (
     <div ref={sceneRef} className={styles.quoteScene}>
       <div className={styles.stage}>
         <div className={styles.pinned}>{pinned}</div>
-        <div className={styles.quoteArea}>
+        <div className={styles.quoteHolder}>
           <div className={styles.quoteLineTrack}>
             <div className={styles.quoteLine} style={{ height: `${Math.max(3, line * 100)}%` }} />
           </div>
-          <div className={styles.quoteBody}>
-            <span
-              className={styles.quoteMark}
-              style={{ opacity: mark ? 1 : 0, transform: mark ? "scale(1)" : "scale(0.4)" }}
-            >
-              {"\u201c"}
-            </span>
-            <p
-              className={styles.quoteText}
-              style={{ opacity: text, filter: `blur(${(1 - text) * 14}px)` }}
-            >
-              {quote}
-            </p>
-          </div>
+          <blockquote className={blockClass} style={{ borderLeftColor: "transparent", margin: "24px 0" }}>
+            <span className={markClass} style={{ opacity: mark ? 1 : 0, transition: "opacity 0.2s ease" }}>{"\u201c"}</span>
+            <span style={{ opacity: text, filter: `blur(${(1 - text) * 14}px)`, willChange: "opacity, filter" }}>{quote}</span>
+          </blockquote>
         </div>
       </div>
     </div>
@@ -147,10 +149,12 @@ export function StatueBulletsChoreo({
    The card pins; Homer's history fades away and Major Works replaces it as
    the reader scrolls. */
 export function HomerCrossfade({
+  title,
   header,
   history,
   works,
 }: {
+  title: React.ReactNode;
   header: React.ReactNode;
   history: React.ReactNode;
   works: React.ReactNode;
@@ -159,6 +163,7 @@ export function HomerCrossfade({
   const o2 = clamp01((p - 0.3) / 0.35);
   return (
     <div ref={sceneRef} className={styles.homerScene}>
+      {title}
       <div className={styles.homerStage}>
         {header}
         <div className={styles.homerLayers}>

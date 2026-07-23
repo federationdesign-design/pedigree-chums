@@ -175,7 +175,6 @@ function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
               <div style={{ padding: "14px 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 500, color: "var(--yellow)", opacity: 0.8 }}>Image: Wikimedia Commons / CC BY-SA 3.0</p>
               </div>
             </div>
   );
@@ -215,7 +214,7 @@ function InContextCard() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
               </div>
               <div style={{ padding: "10px 20px 16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", textAlign: "center" }}>&ldquo;Argos in <em>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
               </div>
             </div>
   );
@@ -231,7 +230,7 @@ function BookFactsCard() {
               <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
                 {([
                   { label: "Books", value: "24" },
-                  { label: "Lines", value: "12,109" },
+                  { label: "Lines", value: "12k" },
                   { label: "Read time*", value: <>30 <span style={{ fontSize: "75%" }}>hrs</span></> },
                 ] as { label: string; value: React.ReactNode }[]).map(({ label, value }) => (
                   <div key={label} style={{ textAlign: "center" }}>
@@ -260,11 +259,10 @@ function AboutHomerCard() {
                   alt="Bust of Homer, Farnese collection, Naples"
                   style={{ width: "100%", display: "block" }}
                 />
-                <p style={{ position: "absolute", left: 12, right: 12, bottom: 8, fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 600, color: "var(--navy)", margin: 0 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
               </div>
               <div style={{ padding: "14px 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 12 }}>c. 800–700 BCE</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 10 }}>Homer is one of the great mysteries of literature. Almost nothing is known about him with certainty — not where he was born, not when he lived, not even whether he was one person or many. Some scholars believe the epics were composed by a single genius; others think they were assembled over generations of oral tradition.</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 14 }}>Ancient tradition held that he was blind — a detail derived from a character in the Odyssey itself, a blind bard called Demodokos who sings of the Trojan War. He most likely came from Ionia and composed in an archaic Greek that became the model for all subsequent epic poetry.</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
@@ -426,7 +424,7 @@ function SizeBuildCard() {
                 ].map((item) => (
                   <div key={item} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
                     <span style={{ color: "var(--yellow)", fontSize: "0.9rem", marginTop: 2, flexShrink: 0, fontWeight: 600 }}>▸</span>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "1.12rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0, textAlign: "left" }}>{item}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "0.87rem", fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: 0, textAlign: "left" }}>{item}</p>
                   </div>
                 ))}
               </div>
@@ -472,12 +470,13 @@ export default function ArgosPage() {
           <article className={styles.essay}>
             <div className={styles.essayBody}>
 
-              <div className={styles.sceneMobile}>
+              <div className={`${styles.sceneMobile} ${styles.noteScene}`}>
                 <p className={styles.editorsNoteTitle}>Editor&apos;s Note</p>
                 <p className={styles.editorsNoteText}>This piece was written before the release of Christopher Nolan&apos;s <em>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
+                <div className={styles.noteDivider} />
               </div>
 
-              <p>Before Lassie ran for help, before Greyfriars Bobby waited by a grave, before the internet discovered videos of dogs greeting soldiers home from war, there was Argos.</p>
+              <p className={styles.introPara}>Before Lassie ran for help, before Greyfriars Bobby waited by a grave, before the internet discovered videos of dogs greeting soldiers home from war, there was Argos.</p>
 
               <p>He appears only briefly in <em>The Odyssey</em>. He does not fight a monster. He does not save a child. He does not lead anyone out of danger. He simply lifts his head, recognises the man he has waited for, wags his tail, and dies.</p>
 
@@ -516,6 +515,8 @@ export default function ArgosPage() {
 
               <div className={styles.sceneMobile}>
                 <QuoteBuild
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
                   pinned={<p style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
                   quote="Humans recognise status. Dogs recognise presence."
                 />
@@ -564,11 +565,13 @@ export default function ArgosPage() {
               <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. An ancient audience may have been more prepared to admire that restraint: Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
 
               <div className={styles.desktopOnly}>
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
                 <QuoteBuild
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
                   pinned={
                     <figure style={{ margin: 0 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -576,13 +579,15 @@ export default function ArgosPage() {
                       <figcaption className={styles.choreoCaption}>Jurassic Bark: every good show or story will use this as a trope, some more successfully than others</figcaption>
                     </figure>
                   }
-                  quote="The people demanding that Argos be petted are not doing something new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present."
+                  quote="The people demanding that Argos be petted are not doing something new."
                 />
               </div>
 
               <p>Modern audiences do something different. We do not only watch Odysseus. We become him. We enter the scene emotionally, and once we have done that, walking past the dog feels almost impossible.</p>
 
               <p>Psychologists often describe this kind of absorption as narrative transportation: the process by which people become mentally and emotionally drawn into a story world. It is why we wince when a character is hurt, why fictional grief can produce real tears, and why the death of a dog on screen can feel almost personally unfair.</p>
+
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
 
               <div className={styles.sceneMobile}>
                 <DogPoll
@@ -607,7 +612,7 @@ export default function ArgosPage() {
 
               <p>The old contract &mdash; I keep you, you serve me &mdash; has been replaced by something closer to mutual love, and that love now feels like a moral obligation. When Odysseus walks past Argos without stopping, modern audiences feel it not as a tactical necessity but as a failure. That is the distance between Homer&apos;s world and ours.</p>
 
-              <p>Which puts Nolan in an interesting position.</p>
+              <h3>Which puts Nolan in an interesting position.</h3>
 
               <p>He is adapting an ancient scene built on restraint for a modern audience that craves emotional acknowledgement. If Nolan allows Odysseus to acknowledge Argos more directly than Homer does, that is not simply sentimentality. It is cultural translation. Homer&apos;s Argos belongs to a world of hunting dogs, households, duty and restraint. Nolan&apos;s Argos belongs to an audience that sees an old dog and thinks: he should be comforted.</p>
 
@@ -636,7 +641,7 @@ export default function ArgosPage() {
                     {
                       src: "/history/odyssusand-argos-painting-remake.jpg",
                       alt: "Odysseus and Argos painting remake",
-                      caption: "A tale as old as time; a dog&apos;s love for their human. The original story, remade and remade",
+                      caption: "A tale as old as time; a dog's love for their human. The original story, remade and remade",
                     },
                   ]}
                 />
@@ -654,7 +659,7 @@ export default function ArgosPage() {
 
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" />
+                <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" style={{ width: "85%", margin: "0 auto" }} />
                 <p className={styles.imageCaption}>Republican denarius serratus minted in 82 BC by the moneyer Gaius Mamilius Limetanus - a depiction of Odysseus and Argos, www.harneycoins.com</p>
               </div>
 
@@ -674,19 +679,20 @@ export default function ArgosPage() {
 
               <div className={styles.sceneMobile}>
                 <HomerCrossfade
+                  title={
+                    <div style={{ padding: "16px 20px 12px" }}>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                    </div>
+                  }
                   header={
                     <>
-                      <div style={{ padding: "16px 20px 4px" }}>
-                        <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
-                      </div>
                       <div style={{ overflow: "hidden", position: "relative" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="/history/homer-bust.jpeg" alt="Bust of Homer, Farnese collection, Naples" style={{ width: "100%", display: "block" }} />
-                        <p style={{ position: "absolute", left: 12, right: 12, bottom: 8, fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 600, color: "var(--navy)", margin: 0 }}>Image: Bust of Homer, Farnese collection, Naples. Wikimedia Commons / CC BY-SA 4.0</p>
                       </div>
                       <div style={{ padding: "14px 20px 0" }}>
                         <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Homer</p>
-                        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 0 }}>c. 800–700 BCE · Ionia (western coast of modern Turkey)</p>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 700, color: "var(--yellow)", marginBottom: 0 }}>c. 800–700 BCE</p>
                       </div>
                     </>
                   }
@@ -727,7 +733,7 @@ export default function ArgosPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/history/Greek-Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" id="hound-img" className={styles.driftImg} />
                 </div>
-                <div className={styles.parallaxContent}>
+                <div className={styles.parallaxContent} id="ld-card">
                   <LivingDescendantCard />
                 </div>
               </div>
@@ -766,6 +772,14 @@ export default function ArgosPage() {
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", opacity: 0.85, margin: "20px 0 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.2)" }}>{RESEARCH_NOTE}</p>
               </div>
 
+
+              <h2 className={styles.subhead}>The smell of home</h2>
+
+              <p>Ask someone what home smells like and they will almost always be able to tell you. Not think about it. Tell you. Immediately, from somewhere that bypasses conscious thought entirely.</p>
+
+              <p>For many people, that smell includes a dog.</p>
+
+              <p>Not everyone welcomes this. There are people who notice dog smell the moment they step through a front door. To them it is intrusion: animal, persistent, worked into curtains, carpets and cushions.</p>
               <GatedVideo>
               <figure style={{ margin: "0 0 32px", padding: 0 }}>
                 <div id="smellofhome-video-wrap" style={{ width: "100%", position: "relative" }}>
@@ -793,23 +807,26 @@ export default function ArgosPage() {
               </figure>
               </GatedVideo>
 
-              <h2 className={styles.subhead}>The smell of home</h2>
-
-              <p>Ask someone what home smells like and they will almost always be able to tell you. Not think about it. Tell you. Immediately, from somewhere that bypasses conscious thought entirely.</p>
-
-              <p>For many people, that smell includes a dog.</p>
-
-              <p>Not everyone welcomes this. There are people who notice dog smell the moment they step through a front door. To them it is intrusion: animal, persistent, worked into curtains, carpets and cushions.</p>
-
               <p>But for people who grew up with dogs, that same smell does something completely different. It opens a door. Not a metaphorical door, but a specific one, in a specific house, at a specific age. The smell of dog is the smell of Saturday mornings, school holidays, wet paws by the back door, warm fur, old blankets and a particular kind of safety that belongs almost entirely to childhood.</p>
 
               <p>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</p>
 
               <p>This is not just sentimentality. It is biology.</p>
 
+              <div className={styles.desktopOnly}>
               <p>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <QuoteBuild
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
+                  pinned={<p style={{ margin: 0 }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>}
+                  quote="People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home."
+                />
+              </div>
 
               <p>That matters here because dogs live in scent in a way humans barely do. Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence. A path is not just a path. It is a recent history of who has passed, when, in what condition and in what direction.</p>
 
@@ -878,9 +895,20 @@ export default function ArgosPage() {
 
               <p>For a small terrier or toy breed, reaching eighteen or nineteen is rare but not impossible. For a large hunting dog, especially in the ancient world without modern veterinary care, pain relief, parasite control or senior diets, twenty years is almost certainly mythic. Argos would not have been a pampered senior dog carefully managed through his final years. He was a neglected working hound lying outside.</p>
 
+              <div className={styles.desktopOnly}>
               <p>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond.</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <QuoteBuild
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
+                  pinned={<p style={{ margin: 0 }}>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>}
+                  quote="A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond."
+                />
+              </div>
 
               <p>Yet real dogs do not need impossible longevity to be good.</p>
 
@@ -1080,8 +1108,18 @@ export default function ArgosPage() {
               var pin = (hr.height > vh) ? (-hr.top) / (hr.height - vh) : 0;
               if (pin < 0) pin = 0;
               if (pin > 1) pin = 1;
+              /* two-way parallax: image eases DOWN as the card rises */
               var hi = document.getElementById('hound-img');
-              if (hi) hi.style.transform = 'translateY(' + (-(12 + pin * 20)) + '%)';
+              if (hi) hi.style.transform = 'translateY(' + (-(26 - pin * 12)) + '%)';
+              /* the descendant card fades out as it climbs past halfway */
+              var ld = document.getElementById('ld-card');
+              if (ld) {
+                var lr = ld.getBoundingClientRect();
+                var lo = (lr.top - vh * 0.2) / (vh * 0.3);
+                if (lo < 0) lo = 0;
+                if (lo > 1) lo = 1;
+                ld.style.opacity = lo;
+              }
             }
           }
           window.addEventListener('scroll', function(){
