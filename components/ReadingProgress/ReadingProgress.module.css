@@ -7,7 +7,7 @@
   .wrap {
     display: block;
     position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
     height: 36px;
@@ -22,7 +22,7 @@
     left: 0;
     right: 0;
     height: 12px;
-    background: rgba(10, 58, 87, 0.28);
+    background: var(--navy, #0a3a57);
   }
 
   /* Milestone notches: solid dark blue (no transparency), thicker and
