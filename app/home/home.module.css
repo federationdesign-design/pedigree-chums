@@ -412,6 +412,15 @@
   .stripDivider {
     display: none;
   }
+
+  /* Hero text: 3px bigger subtitle, pushed to the bottom with a 10px gap. */
+  .heroSub {
+    font-size: 17px;
+    margin-bottom: 0;
+  }
+  .heroContent {
+    padding-bottom: 10px;
+  }
 }
 
 
