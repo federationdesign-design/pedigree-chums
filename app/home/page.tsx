@@ -20,6 +20,7 @@ export default function HomePage() {
       <HomeClient />
 
       {/* FAQ sits directly below the product area */}
+      <div className={styles.divider} />
       <FAQ />
 
       {/* Video + 54 cards section - text left, video right */}

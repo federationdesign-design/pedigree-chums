@@ -1,7 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import styles from "./home.module.css";
 import { breeds } from "../../data/breeds";
 
@@ -42,7 +41,7 @@ export default function HomeClient() {
       <section className={styles.searchHero}>
         <p className={styles.searchEyebrow}>54 breeds to discover</p>
         <h1 className={styles.searchTitle}>
-          Explore Britain's most <span>popular breeds</span>
+          Explore Britain&apos;s most <span>popular breeds</span>
         </h1>
         <p className={styles.searchSub}>
           Type a breed to explore its family tree, history, and personality
@@ -91,7 +90,6 @@ export default function HomeClient() {
           <span className={styles.productCorner}>Pre-order</span>
         </div>
         <div className={styles.productContent}>
-          <span className={styles.productTag}>The Dog Bingo Game</span>
           <h2 className={styles.productTitle}>
             Pedigree <span>Chums</span>
           </h2>
@@ -120,9 +118,6 @@ export default function HomeClient() {
             >
               Pre-order now
             </button>
-            <Link href="/about" className={styles.btnSecondary}>
-              Learn more
-            </Link>
           </div>
         </div>
       </section>

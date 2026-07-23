@@ -31,7 +31,16 @@ const FAQS: QA[] = [
   },
   {
     q: "Are there any other game modes to keep it fresh?",
-    a: "Yes. Beyond the core spotting game you can play bingo-style (first to complete a row of chums), Top Trumps-style stat battles, or invent your own house rules. There’s also a growing set of extras on this site — a dog name generator, the Chum Finder and mini-games — to keep things fun between walks.",
+    a: (
+      <>
+        Plenty. There’s <strong>Hot Dogs</strong> — a memory twist where everyone shows their
+        hand for a few seconds after the draw, then hides it again. If you remember which dog
+        another player is holding and you spot that breed in real life first, you steal their
+        chum. You can also play bingo-style (first to complete a row of chums), Top Trumps-style
+        stat battles, or make up your own house rules. There’s a whole page on{" "}
+        <a href="/hot-dogs" className={styles.answerLink}>Hot Dogs here</a>.
+      </>
+    ),
   },
   {
     q: "What’s the advice when approaching a dog for the first time?",
@@ -39,7 +48,7 @@ const FAQS: QA[] = [
   },
   {
     q: "How much does the game cost, and when will it be released?",
-    a: "A pack of Pedigree Chums is £6.99, with free UK mainland delivery included. We’re launching very soon — pre-order now to reserve your pack, and we’ll email you a discount code to use on launch day and let you know the release date the moment it’s confirmed.",
+    a: "The retail price is £9.99, but right now we’re running a pre-launch discount that brings it down to £6.99 — with free UK mainland delivery included. You can only get the £6.99 price if you pre-order before the game is released; once it’s out, it’s full price. We’re launching very soon — pre-order now to lock in the discount, and we’ll email you a code to use on launch day along with the release date the moment it’s confirmed.",
   },
   {
     q: "Is there any postage cost applied?",
