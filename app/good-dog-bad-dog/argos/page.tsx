@@ -539,14 +539,14 @@ export default function ArgosPage() {
                 <StatueBulletsChoreo
                   slides={[
                     {
-                      src: "/history/odysseus-dog-argos-in-death.webp",
-                      alt: "The death of Argos",
-                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
-                    },
-                    {
                       src: "/history/nolans-king-odyssus.webp",
                       alt: "Nolan's Odysseus",
                       caption: "Odysseus probably has PTSD, as his core ideology of family, loyalty and legacy has been destroyed",
+                    },
+                    {
+                      src: "/history/odysseus-dog-argos-in-death.webp",
+                      alt: "The death of Argos",
+                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
                     },
                     {
                       src: "/history/nolans-king-odyssus-painting-remake.jpg",
@@ -642,25 +642,25 @@ export default function ArgosPage() {
 
               <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
 
-              <div className={styles.sceneMobile}>
+              <div className={styles.desktopOnly}>
                 <StatueBulletsChoreo
                   slides={[
                     { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
                     { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
                   ]}
                 />
-              </div>
-
-              <div className={styles.desktopOnly}>
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
+                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
-                <QuoteBuild
+                <StatueBulletsChoreo
+                  slides={[
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
+                  ]}
+                  quote="Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next."
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<></>}
-                  quote="Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next."
                 />
               </div>
 
@@ -833,8 +833,8 @@ export default function ArgosPage() {
               <div style={{ borderTop: "1px solid #fff", margin: "25px 0" }} />
 
               <div className={styles.desktopOnly}>
-              <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
-              <p className={styles.plainPara}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+              <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, the Proust phenomenon, shows that smells trigger unusually vivid, emotional memories.</p>
+              <p className={styles.plainPara}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, feeling already attached before you have had time to prepare.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</blockquote>
               </div>
@@ -845,8 +845,8 @@ export default function ArgosPage() {
                   markClass={styles.pullquoteMark}
                   pinned={
                     <>
-                      <p className={styles.pinnedQuoteText} style={{ margin: "0 0 10px" }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
-                      <p style={{ margin: 0, fontWeight: 500 }}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+                      <p className={styles.pinnedQuoteText} style={{ margin: "0 0 10px" }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, the Proust phenomenon, shows that smells trigger unusually vivid, emotional memories.</p>
+                      <p style={{ margin: 0, fontWeight: 500 }}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, feeling already attached before you have had time to prepare.</p>
                     </>
                   }
                   quote="People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home."

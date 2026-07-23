@@ -71,8 +71,8 @@
 /* Galleries with no bullets need far less pin-and-release travel -- this
    was the source of the dead-air gap before the quote that followed. */
 .bulletSceneNoBullets {
-  height: 130vh;
-  height: 130svh;
+  height: 220vh;
+  height: 220svh;
 }
 
 .statueTrack {
@@ -156,6 +156,7 @@
   font-weight: 600 !important;
   font-size: 1.55rem !important;
   color: var(--yellow, #ffd23e) !important;
+  line-height: 1.3em !important;
 }
 
 /* ── Homer crossfade ── */

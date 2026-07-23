@@ -213,9 +213,18 @@ export function QuotePollScene({
 export function StatueBulletsChoreo({
   slides,
   bullets,
+  quote,
+  blockClass,
+  markClass,
 }: {
   slides: { src: string; alt: string; caption: string }[];
   bullets?: string[];
+  /* When provided, an animated quote shares this SAME pinned scene and
+     scroll progress, so its build begins as soon as the gallery itself
+     starts moving -- not after a separate later scene is reached. */
+  quote?: string;
+  blockClass?: string;
+  markClass?: string;
 }) {
   const { sceneRef, p } = useSceneProgress();
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -245,8 +254,13 @@ export function StatueBulletsChoreo({
 
   const n = slides.length;
 
+  // quote build progress, starting almost immediately (p ~ 0)
+  const qLine = clamp01(p / 0.5);
+  const qMark = p >= 0.5;
+  const qText = clamp01((p - 0.55) / 0.35);
+
   return (
-    <div ref={sceneRef} className={bullets ? styles.bulletScene : styles.bulletSceneNoBullets}>
+    <div ref={sceneRef} className={bullets ? styles.bulletScene : quote ? styles.bulletSceneNoBullets : styles.bulletSceneNoBullets}>
       <div className={styles.stage}>
         <div ref={trackRef} className={styles.statueTrack}>
           {slides.map((sl, i) => (
@@ -263,9 +277,14 @@ export function StatueBulletsChoreo({
         {bullets && (
           <ul className={styles.choreoBullets}>
             {bullets.map((b, i) => {
+              const isFirst = i === 0;
               const isLast = i === bullets.length - 1;
               let o: number;
-              if (isLast) {
+              if (isFirst) {
+                // first bullet is already visible on arrival -- only the
+                // others are scroll-triggered
+                o = 1;
+              } else if (isLast) {
                 // final bullet: reveals after the gallery finishes, as the
                 // reader resumes ordinary scrolling
                 o = clamp01((p - 0.65) / 0.15);
@@ -286,6 +305,17 @@ export function StatueBulletsChoreo({
               );
             })}
           </ul>
+        )}
+        {quote && (
+          <div className={styles.quoteHolder} style={{ marginTop: 22 }}>
+            <div className={styles.quoteLineTrack}>
+              <div className={styles.quoteLine} style={{ height: `${Math.max(3, qLine * 100)}%` }} />
+            </div>
+            <blockquote className={blockClass} style={{ borderLeftColor: "transparent", margin: "0" }}>
+              <span className={markClass} style={{ opacity: qMark ? 1 : 0, transition: "opacity 0.2s ease" }}>{"\u201c"}</span>
+              <span style={{ opacity: qText, filter: `blur(${(1 - qText) * 14}px)`, willChange: "opacity, filter" }}>{quote}</span>
+            </blockquote>
+          </div>
         )}
       </div>
     </div>
@@ -331,7 +361,7 @@ export function GatedVideo({ children }: { children: React.ReactNode }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [unlocked, setUnlocked] = useState(false);
 
-  /* Pin releases once playback passes 60%, or immediately if the video was
+  /* Pin releases once playback passes 40%, or immediately if the video was
      already past that point on a previous visit. Pin and spacer are removed
      together (both gated by the same `unlocked` flag) so there is never a
      mismatch between how much scroll room is reserved and whether anything
@@ -344,7 +374,7 @@ export function GatedVideo({ children }: { children: React.ReactNode }) {
 
     const checkProgress = () => {
       const dur = video.duration;
-      if (dur && isFinite(dur) && video.currentTime / dur >= 0.6) {
+      if (dur && isFinite(dur) && video.currentTime / dur >= 0.4) {
         setUnlocked(true);
       }
     };
