@@ -397,19 +397,49 @@ export default function BreedTree({
       const xR = v[0] + (xMinF + vbWf - M) / k;
       const yF = v[1] + (vbHf / 2 - M) / k;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body> };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
-      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0 }));
+      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Set<Body>() }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = 38 / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0,
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(),
       }));
       badgeBodiesRef.current = badges;
       const all = bodies.concat(badges);
+      // nodes that have their own body: their subtrees no longer ride a parent
+      const owned = new Set<Node>(bodies.map((b) => b.n as Node));
+      const moveSubtree = (root: Node, dxm: number, dym: number) => {
+        const stack: Node[] = [root];
+        while (stack.length) {
+          const d = stack.pop() as Node;
+          d.x += dxm; d.y += dym;
+          for (const ch of d.children ?? []) if (!owned.has(ch)) stack.push(ch);
+        }
+      };
+      // First floor hit pops a circle's direct children out as their own
+      // bodies (their subtrees riding along), inheriting some momentum plus
+      // an upward-outward burst. Ancestor bodies are ghosts to a fresh child
+      // until it has fully cleared them, so it escapes without an explosion.
+      const popChildren = (b: Body) => {
+        if (!b.n || b.popped) return;
+        b.popped = true;
+        for (const ch of b.n.children ?? []) {
+          const nb: Body = {
+            n: ch, x: ch.x, y: ch.y,
+            vx: b.vx * 0.4 + (Math.random() - 0.5) * worldH * 0.7,
+            vy: b.vy * 0.3 - worldH * (0.45 + Math.random() * 0.35),
+            r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false,
+            ghosts: new Set<Body>(),
+          };
+          for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.add(other);
+          owned.add(ch);
+          all.push(nb);
+        }
+      };
       const G = worldH * 2.4; // per s^2
       const REST = 0.48;
       const WALL_REST = 0.35;
@@ -457,7 +487,9 @@ export default function BreedTree({
           b.y += b.vy * dt;
           if (b.y + b.r > yF) {
             if (b.vy > FX_MIN && now - b.lastFx > FX_COOLDOWN) { numAt(b.x, yF - b.r, b.pct, now); b.lastFx = now; }
+            const hitSpeed = b.vy;
             b.y = yF - b.r; b.vy = -b.vy * REST; b.vx *= 0.96;
+            if (hitSpeed > FX_MIN * 0.6) popChildren(b);
           }
           if (b.x - b.r < xL) { b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
           if (b.x + b.r > xR) { b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
@@ -467,6 +499,10 @@ export default function BreedTree({
             const a = all[i], c = all[j];
             const dx = c.x - a.x, dy = c.y - a.y;
             const dist = Math.hypot(dx, dy) || 0.001;
+            if (a.ghosts.has(c) || c.ghosts.has(a)) {
+              if (dist >= a.r + c.r) { a.ghosts.delete(c); c.ghosts.delete(a); }
+              continue;
+            }
             const overlap = a.r + c.r - dist;
             if (overlap > 0) {
               const nx = dx / dist, ny = dy / dist;
@@ -491,14 +527,17 @@ export default function BreedTree({
         for (const b of all) {
           if (b.n) {
             const dxm = b.x - b.n.x, dym = b.y - b.n.y;
-            if (dxm || dym) b.n.descendants().forEach((d) => { d.x += dxm; d.y += dym; });
+            if (dxm || dym) moveSubtree(b.n, dxm, dym);
           }
+          const sp = Math.hypot(b.vx, b.vy);
+          const cap = worldH * 2.5;
+          if (sp > cap) { b.vx *= cap / sp; b.vy *= cap / sp; }
           const onFloorish = b.y + b.r > yF - worldH * 0.02;
           if (Math.hypot(b.vx, b.vy) > worldH * 0.012 || !onFloorish) still = false;
         }
         zoomTo(viewRef.current);
         drawNumbers(now, viewRef.current);
-        if ((!still || numbers.length > 0) && now - started < 6000) {
+        if ((!still || numbers.length > 0) && now - started < 9000) {
           fallRafRef.current = requestAnimationFrame(step);
         } else {
           numbers.forEach((n) => n.el.remove());
