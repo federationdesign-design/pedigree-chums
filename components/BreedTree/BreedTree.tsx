@@ -143,6 +143,8 @@ export default function BreedTree({
   fill = false,
   dockAside = false,
   gravity = false,
+  stroke = "#ffd23e",
+  tinted = true,
   rootNote,
 }: {
   root: LineageNode;
@@ -156,6 +158,8 @@ export default function BreedTree({
   fill?: boolean;
   dockAside?: boolean;
   gravity?: boolean;
+  stroke?: string;
+  tinted?: boolean;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -646,20 +650,20 @@ export default function BreedTree({
               // the images nested on top of it are tinted, alternating inward.
               // The root (depth 0) is hidden, so depth 1 is the first visible
               // ring and stays full colour; depth 2 is the first tinted ring.
-              const tinted = hasImg && d.depth % 2 === 0;
-              const tintClass = tinted
+              const tintThis = tinted && hasImg && d.depth % 2 === 0;
+              const tintClass = tintThis
                 ? Math.floor((d.depth - 2) / 2) % 2 === 0
                   ? styles.tintA
                   : styles.tintB
                 : "";
-              const cls = hasImg ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
+              const cls = hasImg && tinted ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
               const buried = !!buriedSet && d !== hovered && buriedSet.has(d);
               return (
                 <circle
                   key={i}
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
-                  stroke={hidden ? "none" : "#ffd23e"}
+                  stroke={hidden ? "none" : stroke}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",

@@ -22,18 +22,19 @@
   flex: 0 0 auto;
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
+  justify-content: flex-end;
 }
 
 .title {
+  flex: 0 0 auto;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.8rem, 4.5vw, 3.4rem);
+  font-size: clamp(3.6rem, 9vw, 6.8rem);
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin: 0;
+  margin: 6px 0 0;
   line-height: 1.05;
+  text-align: center;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
@@ -68,7 +69,7 @@
     padding: 12px 14px 14px;
   }
   .title {
-    font-size: clamp(1.5rem, 7vw, 2.2rem);
+    font-size: clamp(2.6rem, 14vw, 4rem);
   }
   .close {
     width: 44px;

@@ -36,9 +36,8 @@ export default function LineageModal({ name, image, character, lineage, onClose 
 
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
-      {/* Header: breed name left, close right */}
+      {/* Header: close only, top right; the name lives below the circles */}
       <div className={css.header}>
-        <h3 className={css.title}>{name}</h3>
         <button type="button" className={css.close} onClick={onClose} aria-label="Close">
           <svg viewBox="0 0 32 32" aria-hidden="true">
             <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
@@ -59,10 +58,15 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           fill
           dockAside
           gravity
+          stroke="var(--navy)"
+          tinted={false}
           rootNote={character}
           onClose={onClose}
         />
       </div>
+
+      {/* Breed name: centred, below the circles */}
+      <h3 className={css.title}>{name}</h3>
     </div>,
     document.body,
   );
