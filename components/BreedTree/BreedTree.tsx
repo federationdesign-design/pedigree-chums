@@ -570,16 +570,16 @@ export default function BreedTree({
       const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
       const yF0 = yF;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body>; a: number; va: number; ia: number; iva: number };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Map<Body, number>; a: number; va: number; ia: number; iva: number };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
-      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Set<Body>(), a: 0, va: 0, ia: 0, iva: 0 }));
+      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = 46 / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(), a: 0, va: 0, ia: 0, iva: 0,
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0,
       }));
       badgeBodiesRef.current = badges;
       setBadgePcts(d1.map((n) => pctOf(n)));
@@ -635,9 +635,9 @@ export default function BreedTree({
             vx: b.vx * 0.4 + (Math.random() - 0.5) * worldH * 0.7,
             vy: b.vy * 0.3 - worldH * (0.45 + Math.random() * 0.35),
             r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false,
-            ghosts: new Set<Body>(), a: 0, va: (Math.random() - 0.5) * 0.8, ia: 0, iva: 0,
+            ghosts: new Map<Body, number>(), a: 0, va: (Math.random() - 0.5) * 0.8, ia: 0, iva: 0,
           };
-          for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.add(other);
+          for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.set(other, performance.now());
           owned.add(ch);
           all.push(nb);
           // the child's yellow % badge pops out with it
@@ -648,7 +648,7 @@ export default function BreedTree({
               vx: nb.vx * 0.8 + (Math.random() - 0.5) * worldH * 0.3,
               vy: nb.vy * 0.8,
               r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0,
-              popped: true, ghosts: new Set<Body>(nb.ghosts), a: 0, va: 0, ia: 0, iva: 0,
+              popped: true, ghosts: new Map<Body, number>(nb.ghosts), a: 0, va: 0, ia: 0, iva: 0,
             };
             bl.push(bb);
             all.push(bb);
@@ -759,9 +759,13 @@ export default function BreedTree({
             const a = all[i], c = all[j];
             const dx = c.x - a.x, dy = c.y - a.y;
             const dist = Math.hypot(dx, dy) || 0.001;
-            if (a.ghosts.has(c) || c.ghosts.has(a)) {
-              if (dist >= a.r + c.r) { a.ghosts.delete(c); c.ghosts.delete(a); }
-              continue;
+            const gBorn = a.ghosts.get(c) ?? c.ghosts.get(a);
+            if (gBorn !== undefined) {
+              if (dist >= a.r + c.r || now - gBorn > 650) {
+                a.ghosts.delete(c); c.ghosts.delete(a); // immunity over: solid from here
+              } else {
+                continue;
+              }
             }
             const overlap = a.r + c.r - dist;
             if (overlap > 0) {
@@ -1004,7 +1008,7 @@ export default function BreedTree({
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
   // Moving onto one of those inner circles re-hovers it and brings it back.
-  const buriedSet = hovered ? new Set(hovered.descendants()) : null;
+  const buriedSet = hovered && !dropped ? new Set(hovered.descendants()) : null;
 
   return (
     <div className={`${styles.tree}${fill ? " " + styles.treeFill : ""}`} ref={wrapRef} style={fill ? undefined : { width: size, height: size }}>
@@ -1107,8 +1111,8 @@ export default function BreedTree({
                   )}
                   {pct !== null && !(dropped && d.depth === 1) && (
                     <g>
-                      <circle cx={0} cy={50} r={46} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
-                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "31px" }}>
+                      <circle cx={0} cy={50} r={46} style={{ fill: "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 }} />
+                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px` }}>
                         {`${pct}%`}
                       </text>
                     </g>
@@ -1127,13 +1131,15 @@ export default function BreedTree({
               const b = badgeBodiesRef.current?.[i];
               const bx = b ? b.x : v[0];
               const by = b ? b.y : v[1] - 99999;
+              const st2 = stageRef.current;
+              const upp2 = st2 ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st2.clientHeight, 1) : 1;
               return (
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
                 style={{ cursor: "grab", pointerEvents: "auto" }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => startDrag(e, badgeBodiesRef.current?.[i])}>
-                <circle cx={0} cy={0} r={46} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
-                <text x={0} y={0} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "31px" }}>
+                <circle cx={0} cy={0} r={46} style={{ fill: "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 * upp2 }} />
+                <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px` }}>
                   {`${pct}%`}
                 </text>
               </g>
