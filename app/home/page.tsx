@@ -19,6 +19,9 @@ export default function HomePage() {
       <Nav />
       <HomeClient />
 
+      {/* FAQ sits directly below the product area */}
+      <FAQ />
+
       {/* Video + 54 cards section - text left, video right */}
       <section className={styles.videoSection}>
         <div className={styles.textCol}>
@@ -39,8 +42,6 @@ export default function HomePage() {
       </section>
 
       <StepCards />
-
-      <FAQ />
 
       <Footer />
     </div>
