@@ -3,12 +3,18 @@
   overflow: hidden;
 }
 
+.wrap {
+  position: relative;
+}
+
 .row {
   display: flex;
+  flex-wrap: nowrap;
   gap: 20px;
-  padding: 40px 40px 24px;
+  padding: 40px clamp(24px, 6vw, 90px) 24px;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -16,9 +22,9 @@
 
 .card {
   position: relative;
-  /* Grow to fill the row on wide windows (so 6 cards stretch full-width instead
-     of bunching left); keep the min basis and scroll when they don't all fit. */
-  flex: 1 0 clamp(140px, 22vw, 200px);
+  /* Fixed gallery width so the six cards overflow and scroll horizontally
+     (wheel-hijacked in StepCards.tsx), like the breed strips elsewhere. */
+  flex: 0 0 clamp(240px, 26vw, 340px);
   background: #ffed00;
   border: 6px solid #ffed00;
   border-radius: 16px;
@@ -63,12 +69,38 @@
 }
 
 .caption {
-  padding: 10px 10px 12px;
+  padding: 12px 12px 14px;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(11px, 1.2vw, 14px);
+  font-size: clamp(13px, 1.4vw, 18px);
   color: #0a3a57;
   text-align: center;
   line-height: 1.25;
+}
+
+/* Yellow draggable scrollbar under the gallery (driven in StepCards.tsx). */
+.scrollbar {
+  position: relative;
+  height: 12px;
+  margin: 8px clamp(40px, 8vw, 120px) 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  cursor: grab;
+  touch-action: none;
+}
+.thumb:active {
+  cursor: grabbing;
 }
 
 @media (max-width: 600px) {
@@ -78,6 +110,6 @@
   }
   .card {
     /* Mobile: fixed width, no grow, so the row stays a horizontal scroll. */
-    flex: 0 0 clamp(130px, 55vw, 170px);
+    flex: 0 0 clamp(160px, 62vw, 220px);
   }
 }
