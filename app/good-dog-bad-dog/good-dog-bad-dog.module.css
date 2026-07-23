@@ -196,7 +196,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 48px 0 16px;
-  line-height: 1.2em;
+  line-height: 0.9em;
 }
 
 .evidenceList {
@@ -1039,7 +1039,6 @@
 
   .subhead {
     font-size: clamp(3.04rem, 12.5vw, 4.04rem);
-    line-height: 1.2em;
     text-shadow: 0 3px 12px rgba(10, 58, 87, 0.35);
   }
 

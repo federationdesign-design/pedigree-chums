@@ -254,10 +254,12 @@ export function StatueBulletsChoreo({
 
   const n = slides.length;
 
-  // quote build progress, starting almost immediately (p ~ 0)
-  const qLine = clamp01(p / 0.5);
-  const qMark = p >= 0.5;
-  const qText = clamp01((p - 0.55) / 0.35);
+  // quote build progress, starting almost immediately (p ~ 0) and
+  // finishing well before the scene ends, so there is minimal dwell
+  // before release into the next paragraph
+  const qLine = clamp01(p / 0.45);
+  const qMark = p >= 0.46;
+  const qText = clamp01((p - 0.5) / 0.35);
 
   return (
     <div ref={sceneRef} className={bullets ? styles.bulletScene : quote ? styles.bulletSceneNoBullets : styles.bulletSceneNoBullets}>
@@ -289,9 +291,11 @@ export function StatueBulletsChoreo({
                 // reader resumes ordinary scrolling
                 o = clamp01((p - 0.65) / 0.15);
               } else {
-                // bullet i reveals when image (i+2) becomes current, i.e.
-                // gallery progress crosses (i+1)/(n-1)
-                const threshold = (i + 1) / (n - 1);
+                // bullet i reveals when image (i+1) becomes current, i.e.
+                // gallery progress crosses i/(n-1). (Bullet 0 is now always
+                // shown from arrival, so the chain shifts down by one: the
+                // second bullet ties to the second image, not the third.)
+                const threshold = i / (n - 1);
                 o = clamp01((galleryP - threshold + 0.06) / 0.1);
               }
               return (

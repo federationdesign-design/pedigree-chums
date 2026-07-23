@@ -13,8 +13,8 @@
 
 /* ── Quote build ── */
 .quoteScene {
-  height: 300vh;
-  height: 300svh;
+  height: 190vh;
+  height: 190svh;
 }
 
 .pinned {
@@ -71,8 +71,8 @@
 /* Galleries with no bullets need far less pin-and-release travel -- this
    was the source of the dead-air gap before the quote that followed. */
 .bulletSceneNoBullets {
-  height: 220vh;
-  height: 220svh;
+  height: 140vh;
+  height: 140svh;
 }
 
 .statueTrack {
