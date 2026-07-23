@@ -29,13 +29,13 @@
 
 .item {
   background: rgba(255, 255, 255, 0.08);
-  /* Solid 2px stroke: white when closed, yellow when open. */
-  border: 2px solid #fff;
+  /* Solid 3px stroke: white closed, dark blue on hover, yellow when open. */
+  border: 3px solid #fff;
   border-radius: 16px;
   overflow: hidden;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
-.item:hover { border-color: var(--yellow, #ffd23e); }
+.item:hover { border-color: var(--navy, #0a3a57); }
 .itemOpen {
   background: rgba(255, 255, 255, 0.12);
   border-color: var(--yellow, #ffd23e);

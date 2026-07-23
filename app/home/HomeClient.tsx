@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import VideoGrid from "../../components/VideoGrid/VideoGrid";
 import styles from "./home.module.css";
 import { breeds } from "../../data/breeds";
 
@@ -36,6 +37,9 @@ export default function HomeClient() {
           <p className={styles.heroSub}>The on-the-go dog spotting game. 54 breeds to discover.</p>
         </div>
       </section>
+
+      {/* 3 x 2 grid of breed videos */}
+      <VideoGrid />
 
       {/* Search hero */}
       <section className={styles.searchHero}>
