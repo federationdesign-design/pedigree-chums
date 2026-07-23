@@ -16,8 +16,9 @@
 
 .card {
   position: relative;
-  flex: 0 0 auto;
-  width: clamp(140px, 22vw, 200px);
+  /* Grow to fill the row on wide windows (so 6 cards stretch full-width instead
+     of bunching left); keep the min basis and scroll when they don't all fit. */
+  flex: 1 0 clamp(140px, 22vw, 200px);
   background: #ffed00;
   border: 6px solid #ffed00;
   border-radius: 16px;
@@ -76,6 +77,7 @@
     gap: 16px;
   }
   .card {
-    width: clamp(130px, 55vw, 170px);
+    /* Mobile: fixed width, no grow, so the row stays a horizontal scroll. */
+    flex: 0 0 clamp(130px, 55vw, 170px);
   }
 }
