@@ -218,6 +218,72 @@ export default function BreedTree({
   type PillBody = { x: number; y: number; vx: number; vy: number; L: number; pr: number; stuck: boolean };
   const pillRef = useRef<SVGGElement>(null);
   const pillBodyRef = useRef<PillBody | null>(null);
+  // Drag support: badges and the name pill can be picked up and flung, like
+  // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
+  // a wake() so a drag can restart physics after everything has settled.
+  const wakeRef = useRef<(() => void) | null>(null);
+  const simRunningRef = useRef(false);
+  const dragRef = useRef<{
+    body: { x: number; y: number; vx: number; vy: number };
+    dx: number; dy: number; lx: number; ly: number; lt: number;
+  } | null>(null);
+
+  const svgPointToWorld = (e: { clientX: number; clientY: number; currentTarget: any }) => {
+    const svg: SVGSVGElement | null = (e.currentTarget as SVGGElement).ownerSVGElement;
+    if (!svg) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    const sp = pt.matrixTransform(ctm.inverse());
+    const v = viewRef.current;
+    const k = SIZE / v[2];
+    return { x: v[0] + sp.x / k, y: v[1] + sp.y / k };
+  };
+
+  const startDrag = (e: React.PointerEvent, body: { x: number; y: number; vx: number; vy: number } | null | undefined) => {
+    if (!body) return;
+    e.stopPropagation();
+    const w = svgPointToWorld(e);
+    if (!w) return;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragRef.current = { body, dx: body.x - w.x, dy: body.y - w.y, lx: w.x, ly: w.y, lt: performance.now() };
+    body.vx = 0; body.vy = 0;
+    const pb = pillBodyRef.current;
+    if (pb && (body as unknown) === (pb as unknown)) pb.stuck = false; // picking it up knocks it loose
+    wakeRef.current?.();
+    const move = (ev: PointerEvent) => {
+      const d = dragRef.current;
+      if (!d) return;
+      const svg = (e.currentTarget as SVGGElement).ownerSVGElement;
+      if (!svg) return;
+      const pt = svg.createSVGPoint();
+      pt.x = ev.clientX; pt.y = ev.clientY;
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      const sp = pt.matrixTransform(ctm.inverse());
+      const v = viewRef.current;
+      const k = SIZE / v[2];
+      const wx = v[0] + sp.x / k, wy = v[1] + sp.y / k;
+      const now = performance.now();
+      const dt = Math.max(0.008, (now - d.lt) / 1000);
+      d.body.vx = d.body.vx * 0.4 + ((wx - d.lx) / dt) * 0.6;
+      d.body.vy = d.body.vy * 0.4 + ((wy - d.ly) / dt) * 0.6;
+      d.body.x = wx + d.dx; d.body.y = wy + d.dy;
+      d.lx = wx; d.ly = wy; d.lt = now;
+      wakeRef.current?.();
+    };
+    const up = () => {
+      dragRef.current = null;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      wakeRef.current?.();
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  };
   const [ready, setReady] = useState(false);
 
   function nodeImg(d: Node): string | undefined {
@@ -290,6 +356,7 @@ export default function BreedTree({
 
   function zoom(d: Node) {
     cancelAnimationFrame(fallRafRef.current);
+    simRunningRef.current = false;
     setFalling(false);
     focusRef.current = d;
     setFocus(d);
@@ -510,11 +577,13 @@ export default function BreedTree({
       const FX_COOLDOWN = 220;
       const FX_MIN = worldH * 0.05; // minimum impact speed to flash
       let last = performance.now();
-      const started = last;
+      let started = last;
+      const isDragged = (b: unknown) => dragRef.current?.body === b;
       const step = (now: number) => {
         const dt = Math.min(0.032, (now - last) / 1000);
         last = now;
         for (const b of all) {
+          if (isDragged(b)) continue; // position driven by the pointer
           b.vy += G * dt;
           b.x += b.vx * dt;
           b.y += b.vy * dt;
@@ -539,7 +608,10 @@ export default function BreedTree({
             const overlap = a.r + c.r - dist;
             if (overlap > 0) {
               const nx = dx / dist, ny = dy / dist;
-              const ma = a.r * a.r, mc = c.r * c.r, mt = ma + mc;
+              let ma = a.r * a.r, mc = c.r * c.r;
+              if (isDragged(a)) ma = ma * 1e6;
+              if (isDragged(c)) mc = mc * 1e6;
+              const mt = ma + mc;
               a.x -= nx * overlap * (mc / mt); a.y -= ny * overlap * (mc / mt);
               c.x += nx * overlap * (ma / mt); c.y += ny * overlap * (ma / mt);
               const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
@@ -561,7 +633,7 @@ export default function BreedTree({
         if (pill) {
           const prW = pill.pr / k;
           const LW = pill.L / k;
-          if (!pill.stuck) {
+          if (!pill.stuck && !isDragged(pill)) {
             pill.vy += G * dt;
             pill.x += pill.vx * dt;
             pill.y += pill.vy * dt;
@@ -585,20 +657,23 @@ export default function BreedTree({
                 if (now - b.lastFx > FX_COOLDOWN) { numAt(cxp, pill.y - prW, b.pct, now); b.lastFx = now; }
                 pill.stuck = false;
               } else {
-                const mb = b.r * b.r, mt = mb + mp;
-                b.x += nx * overlap * (mp / mt); b.y += ny * overlap * (mp / mt);
+                const mb = isDragged(b) ? b.r * b.r * 1e6 : b.r * b.r;
+                const mpe = isDragged(pill) ? mp * 1e6 : mp;
+                const mt = mb + mpe;
+                b.x += nx * overlap * (mpe / mt); b.y += ny * overlap * (mpe / mt);
                 pill.x -= nx * overlap * (mb / mt); pill.y -= ny * overlap * (mb / mt);
                 const rel = (b.vx - pill.vx) * nx + (b.vy - pill.vy) * ny;
                 if (rel < 0) {
-                  const imp = (-(1 + REST) * rel) / (1 / mb + 1 / mp);
+                  const imp = (-(1 + REST) * rel) / (1 / mb + 1 / mpe);
                   b.vx += (imp / mb) * nx; b.vy += (imp / mb) * ny;
-                  pill.vx -= (imp / mp) * nx; pill.vy -= (imp / mp) * ny;
+                  pill.vx -= (imp / mpe) * nx; pill.vy -= (imp / mpe) * ny;
                 }
               }
             }
           }
         }
         let still = true;
+        if (dragRef.current) still = false;
         if (pill && !pill.stuck && Math.hypot(pill.vx, pill.vy) > worldH * 0.012) still = false;
         for (const b of all) {
           if (b.n) {
@@ -613,15 +688,24 @@ export default function BreedTree({
         }
         zoomTo(viewRef.current);
         drawNumbers(now, viewRef.current);
-        if ((!still || numbers.length > 0) && now - started < 9000) {
+        if ((!still || numbers.length > 0) && now - started < 30000) {
           fallRafRef.current = requestAnimationFrame(step);
         } else {
+          simRunningRef.current = false;
           numbers.forEach((n) => n.el.remove());
           numbers.length = 0;
           setFalling(false);
         }
       };
-      fallRafRef.current = requestAnimationFrame(step);
+      const wake = () => {
+        if (simRunningRef.current) return;
+        simRunningRef.current = true;
+        last = performance.now();
+        started = last; // fresh time budget each wake
+        fallRafRef.current = requestAnimationFrame(step);
+      };
+      wakeRef.current = wake;
+      wake();
     }, 2000);
     return () => { window.clearTimeout(timer); cancelAnimationFrame(fallRafRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -785,7 +869,7 @@ export default function BreedTree({
 
           {/* Physics badges: once dropped, the yellow % chips live here and are
               positioned by the sim / zoomTo from their body coordinates. */}
-          <g ref={badgesRef} style={{ display: dropped ? "inline" : "none", pointerEvents: "none" }} textAnchor="middle">
+          <g ref={badgesRef} style={{ display: dropped ? "inline" : "none" }} textAnchor="middle">
             {nodes.filter((n) => n.depth === 1).map((d, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
@@ -793,7 +877,9 @@ export default function BreedTree({
               const bx = b ? b.x : d.x + d.r * 0.6;
               const by = b ? b.y : d.y + d.r * 0.6;
               return (
-              <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}>
+              <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
+                style={{ cursor: "grab", pointerEvents: "auto" }}
+                onPointerDown={(e) => startDrag(e, badgeBodiesRef.current?.[i])}>
                 <circle cx={0} cy={0} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
                 <text x={0} y={0} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
                   {`${d.parent ? Math.round(((d.value ?? 0) / (d.parent.value || 1)) * 100) : 0}%`}
@@ -823,11 +909,13 @@ export default function BreedTree({
             const wx = pb ? pb.x : v[0] + (xMinR + vbWr / 2) / kk;
             const wy = pb ? pb.y : v[1] + (vbHr / 2 - 14) / kk - pr / kk;
             return (
-              <g ref={pillRef} transform={`translate(${(wx - v[0]) * kk},${(wy - v[1]) * kk})`} style={{ pointerEvents: "none" }}>
+              <g ref={pillRef} transform={`translate(${(wx - v[0]) * kk},${(wy - v[1]) * kk})`}
+                style={{ cursor: pb ? "grab" : "default", pointerEvents: pb ? "auto" : "none" }}
+                onPointerDown={(e) => startDrag(e, pillBodyRef.current)}>
                 <rect x={-L - pr} y={-pr} width={(L + pr) * 2} height={pr * 2} rx={pr}
                   style={{ fill: "var(--blue-sky, #5cc4ee)", stroke: "var(--navy)", strokeWidth: 3 }} />
                 <text x={0} y={0} textAnchor="middle" dominantBaseline="central"
-                  style={{ fill: "var(--navy)", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "1px" }}>
+                  style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${fs}px`, letterSpacing: "0.5px" }}>
                   {label}
                 </text>
               </g>

@@ -263,13 +263,24 @@
   order: 0;
 }
 
-/* Docked caption: centred column, 80% width, sitting right under the title. */
+/* Docked caption: centred, 80% wide, condensed so the pit gets the room.
+   Breadcrumbs are hidden here: the live title and pill carry the name now. */
 .asideDocked {
   align-items: center;
+  gap: 0;
 }
 .asideDocked .crumbs {
-  justify-content: center;
+  display: none;
 }
 .asideDocked .caption {
   width: 80%;
+  padding: 9px 14px;
+}
+.asideDocked .cNote {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+.asideDocked .cName {
+  font-size: 0.78rem;
 }
