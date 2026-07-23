@@ -210,8 +210,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <div className={styles.cluster}>
                   <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
-                    {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.metaTop}`, false, true)}
-                    {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.metaTop}`, false, true)}
+                    {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+                    {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
                   </div>
                 </div>
                 {/* Right: Know Your Chums square + Discount / Home side by side */}
@@ -226,7 +226,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                         <span className={styles.tileCta}>Grab your code →</span>
                       </span>
                     </button>
-                    {coverTile(NAV_TILES.home, `${styles.miniCell} ${styles.homeLabel}`, false, true)}
+                    {coverTile(NAV_TILES.home, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
                   </div>
                 </div>
               </div>
