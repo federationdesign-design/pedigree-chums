@@ -2,10 +2,15 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Montserrat } from "next/font/google";
 import ChumDropTile from "./ChumDropTile";
 import VideoTile from "./VideoTile";
 import HeroCarousel from "./HeroCarousel";
 import styles from "./Nav.module.css";
+
+// Montserrat 900 loaded explicitly -- the global --font-body only ships 400-800,
+// so a plain font-weight:900 would fall back. This guarantees the heavy face.
+const backFont = Montserrat({ subsets: ["latin"], weight: ["900"] });
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
 type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
@@ -145,7 +150,10 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
             <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close menu">{"×"}</button>
           ) : (
             <>
-              <button type="button" className={styles.backLink} onClick={() => setOpen(false)}>← Back to page</button>
+              <button type="button" className={styles.backLink} onClick={() => setOpen(false)}>
+                <span className={`${styles.backArrow} ${backFont.className}`} aria-hidden>←</span>
+                <span className={styles.backText}>Back to page</span>
+              </button>
               <nav className={styles.topNav} aria-label="Site links">
                 <Link href="/home" className={styles.topNavLink} onClick={closeMenu}>Home</Link>
                 <span className={styles.topNavSep}>|</span>
@@ -208,7 +216,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
                 {/* Left: Competitions video + Smarter / Home */}
                 <div className={styles.cluster}>
-                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover}`} loop={false} reverseOnHover onNavigate={closeMenu} />
+                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover} ${styles.compTile}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
                     {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
                     {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}

@@ -74,6 +74,10 @@
   inset: 0;
   z-index: 100;
   background: var(--blue-deep);
+  /* Stop iOS Safari from auto-inflating the menu's small text (e.g. the hero
+     pill tags) so mobile matches desktop sizing. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -477,11 +481,13 @@
 /* ── Top bar: Back to page (left) + site links (right) ── */
 .backLink {
   position: absolute; top: clamp(20px, 2.6vh, 32px); left: clamp(18px, 4vw, 44px); z-index: 200;
+  display: inline-flex; align-items: center; gap: 0.35em;
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(0.9rem, 1.3vw, 1.05rem); font-weight: 700; letter-spacing: 0.02em;
   color: #fff; background: none; border: 0; cursor: pointer; pointer-events: auto;
 }
 .backLink:hover { color: var(--yellow, #ffd23e); }
+.backArrow { font-weight: 900; line-height: 1; }
 .topNav {
   position: absolute; top: clamp(20px, 2.6vh, 32px); right: clamp(18px, 4vw, 44px); z-index: 200;
   display: flex; align-items: center; gap: clamp(8px, 1vw, 14px); pointer-events: auto;
@@ -536,14 +542,26 @@
 
 /* Mobile: full-width stacked slides, same tiles laid down single-column */
 @media (max-width: 640px) {
+  /* A touch more breathing room between the stacked rows. */
+  .bentoWrap { gap: 20px; }
   /* Stack the big card above its cluster; give each an explicit/auto height
      (the desktop flex:1 basis-0 would collapse them in a column). */
   .rowBlock { flex-direction: column; }
   .rowBlock > .tileFit { flex: none; width: 100%; }
   .cluster { flex: none; width: 100%; }
-  .clusterWide { flex: none; height: 150px; }
-  .clusterRow { flex: none; height: 128px; }
+  .clusterWide { flex: none; height: 200px; }
+  /* Let the paired-image rows grow to fit their cells instead of forcing a
+     short height the cells overflow (which made them overlap the row below). */
+  .clusterRow { flex: none; height: auto; }
+  .clusterCell { min-height: 150px; }
   /* Page blocks stack full-width on mobile */
   .pageRow { grid-template-columns: 1fr; grid-auto-rows: 150px; }
   .pageBig, .pageWide, .pageSmall { grid-column: span 1; grid-row: span 1; }
+
+  /* Back link: arrow only, a little larger so it reads on its own. */
+  .backText { display: none; }
+  .backArrow { font-size: 1.5rem; }
+
+  /* Current Competitions -> just "Competitions" on mobile. */
+  .compTile .tileLabelAccent { display: none; }
 }
