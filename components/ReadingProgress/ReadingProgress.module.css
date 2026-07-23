@@ -15,10 +15,13 @@
     pointer-events: none;
   }
 
-  /* 3x taller, as requested -- was 4px */
+  /* 3x taller, as requested -- was 4px. bottom:0 so the track's own
+     bottom edge sits flush with the true screen edge -- it was
+     previously anchored to the top of the 36px wrap, leaving 24px of
+     genuinely empty space below it before the real bottom of the screen. */
   .track {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
     height: 12px;
@@ -29,7 +32,7 @@
      taller than the track itself so they read clearly against the fill */
   .notch {
     position: absolute;
-    top: -3px;
+    bottom: 0;
     width: 4px;
     height: 18px;
     background: var(--navy, #0a3a57);
@@ -38,7 +41,7 @@
 
   .fill {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     height: 100%;
     background: var(--yellow, #ffd23e);
@@ -47,7 +50,7 @@
 
   .dog {
     position: absolute;
-    top: -7px;
+    bottom: 4px;
     transform: translateX(-55%) scaleX(-1);
     filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
     will-change: left;

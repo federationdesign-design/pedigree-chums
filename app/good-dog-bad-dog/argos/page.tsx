@@ -531,7 +531,7 @@ export default function ArgosPage() {
               <ul className={styles.essayBullets}>
                 <li>But Argos recognises Odysseus.</li>
                 <li style={{ color: "var(--navy)" }}>The humans see a beggar.</li>
-                <li style={{ color: "#22c55e" }}>The dog knows his master.</li>
+                <li>The dog knows his master.</li>
                 <li>That is the whole power of the scene.</li>
               </ul>
               </div>
@@ -563,7 +563,7 @@ export default function ArgosPage() {
                   bullets={[
                     "But Argos recognises Odysseus.",
                     <span key="beggar" style={{ color: "var(--navy)" }}>The humans see a beggar.</span>,
-                    <span key="knows" style={{ color: "#22c55e" }}>The dog knows his master.</span>,
+                    "The dog knows his master.",
                     <>That is the whole power <br />of the scene.</>,
                   ]}
                 />
