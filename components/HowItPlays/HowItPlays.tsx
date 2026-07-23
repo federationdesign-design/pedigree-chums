@@ -14,16 +14,6 @@ const STEPS: Step[] = [
   { n: 6, caption: "MOST CHUMS WINS",      img: "/step6-redue.jpg", video: null },
 ];
 
-// Timeline tuning — each value is a fraction of the viewport height of page
-// scroll spent on that phase. Video holds scrub the clip 0 -> end; image holds
-// just dwell; slides move the rail from one centred card to the next.
-const HOLD_VIDEO = 0.62;
-const HOLD_IMAGE = 0.26;
-const SLIDE = 0.34;
-
-const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-
 export default function HowItPlays() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
@@ -33,6 +23,26 @@ export default function HowItPlays() {
   const thumbRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
+  // Auto-play each step video while it is on screen (looping), pause off screen.
+  useEffect(() => {
+    const vids = videoRefs.current.filter(Boolean) as HTMLVideoElement[];
+    if (!vids.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const v = e.target as HTMLVideoElement;
+          if (e.isIntersecting) v.play().catch(() => {});
+          else v.pause();
+        });
+      },
+      { threshold: 0.35 }
+    );
+    vids.forEach((v) => io.observe(v));
+    return () => io.disconnect();
+  }, []);
+
+  // Sticky pin: freeze the section and translate the card row horizontally with
+  // vertical scroll (left-aligned, several cards visible), then release.
   useEffect(() => {
     const section = sectionRef.current;
     const pin = pinRef.current;
@@ -53,98 +63,31 @@ export default function HowItPlays() {
       body.style.overflowX = "clip";
     }
 
-    type Seg =
-      | { type: "hold"; index: number; hasVideo: boolean; len: number }
-      | { type: "slide"; from: number; to: number; len: number };
-
-    let centres: number[] = []; // rail translateX that centres each card
-    let segs: Seg[] = [];
-    let timeline = 0;
+    let distance = 0;
     let raf = 0;
 
-    const activeVideo = { i: -1 };
-
-    const pauseAllVideos = () => {
-      videoRefs.current.forEach((v) => v && !v.paused && v.pause());
-    };
-
-    const scrubVideo = (i: number, p: number) => {
-      const v = videoRefs.current[i];
-      if (!v) return;
-      if (activeVideo.i !== i) {
-        pauseAllVideos();
-        activeVideo.i = i;
-      }
-      const dur = v.duration;
-      if (!isFinite(dur) || dur <= 0) return;
-      // keep just shy of the very end so the last frame stays painted
-      const t = Math.min(dur * 0.999, p * dur);
-      if (Math.abs(v.currentTime - t) > 0.01) {
-        try { v.currentTime = t; } catch {}
-      }
-    };
-
     const update = () => {
-      if (timeline <= 0 || centres.length === 0) {
+      if (distance <= 0) {
         rail.style.transform = "none";
         if (track) track.style.opacity = "0";
         return;
       }
       const rect = section.getBoundingClientRect();
-      const scrolled = Math.min(Math.max(-rect.top, 0), timeline);
-
-      let acc = 0;
-      let tx = centres[0];
-      for (let s = 0; s < segs.length; s++) {
-        const seg = segs[s];
-        const isLast = s === segs.length - 1;
-        if (scrolled <= acc + seg.len || isLast) {
-          const local = clamp01((scrolled - acc) / seg.len);
-          if (seg.type === "slide") {
-            pauseAllVideos();
-            activeVideo.i = -1;
-            tx = centres[seg.from] + (centres[seg.to] - centres[seg.from]) * easeInOut(local);
-          } else {
-            tx = centres[seg.index];
-            if (seg.hasVideo) scrubVideo(seg.index, local);
-            else { pauseAllVideos(); activeVideo.i = -1; }
-          }
-          break;
-        }
-        acc += seg.len;
-      }
-      rail.style.transform = `translate3d(${tx}px, 0, 0)`;
-
+      const scrolled = Math.min(Math.max(-rect.top, 0), distance);
+      rail.style.transform = `translate3d(${-scrolled}px, 0, 0)`;
       if (track && thumb) {
         track.style.opacity = "1";
         const maxLeft = Math.max(0, track.clientWidth - thumb.offsetWidth);
-        thumb.style.left = `${(scrolled / timeline) * maxLeft}px`;
+        thumb.style.left = `${(scrolled / distance) * maxLeft}px`;
       }
     };
 
     const layout = () => {
-      const cards = rail.querySelectorAll<HTMLElement>("[data-card]");
-      const stageW = stage.clientWidth;
-      centres = Array.from(cards).map(
-        (c) => stageW / 2 - (c.offsetLeft + c.offsetWidth / 2)
-      );
-
+      distance = Math.max(0, rail.offsetWidth - stage.clientWidth);
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      segs = [];
-      STEPS.forEach((step, i) => {
-        segs.push({
-          type: "hold",
-          index: i,
-          hasVideo: !!step.video,
-          len: (step.video ? HOLD_VIDEO : HOLD_IMAGE) * vh,
-        });
-        if (i < STEPS.length - 1) segs.push({ type: "slide", from: i, to: i + 1, len: SLIDE * vh });
-      });
-      timeline = segs.reduce((a, s) => a + s.len, 0);
-
-      if (timeline > 0 && centres.length > 0) {
+      if (distance > 0) {
         pin.style.height = `${vh}px`;
-        section.style.height = `${vh + timeline}px`;
+        section.style.height = `${vh + distance}px`;
       } else {
         pin.style.height = "";
         section.style.height = "";
@@ -180,9 +123,16 @@ export default function HowItPlays() {
     <div className={styles.root}>
       <section ref={sectionRef} className={styles.section}>
         <div ref={pinRef} className={styles.pin}>
+          <div className={styles.spacer} aria-hidden="true" />
+
           <h2 className={styles.heading}>
             How it <span className={styles.headingYellow}>plays</span>
           </h2>
+
+          {/* Progress bar sits above the cards so they hug the bento below. */}
+          <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
+            <div ref={thumbRef} className={styles.thumb} />
+          </div>
 
           <div ref={stageRef} className={styles.stage}>
             <div ref={railRef} className={styles.rail}>
@@ -196,6 +146,7 @@ export default function HowItPlays() {
                         src={s.video}
                         poster={s.img}
                         muted
+                        loop
                         playsInline
                         preload="auto"
                         className={styles.mediaInner}
@@ -210,15 +161,10 @@ export default function HowItPlays() {
               ))}
             </div>
           </div>
-
-          <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
-            <div ref={thumbRef} className={styles.thumb} />
-          </div>
         </div>
       </section>
 
-      {/* Bento sits directly beneath the pinned section, so it rises in with
-          minimal gap the moment the horizontal sequence releases. */}
+      {/* Bento sits directly beneath, so it rises in as the sequence releases. */}
       <div className={styles.bento}>
         <BentoBoard />
       </div>

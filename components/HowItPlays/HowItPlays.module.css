@@ -3,30 +3,33 @@
   position: relative;
 }
 
-/* Tall spacer: height (viewport + timeline) is set in HowItPlays.tsx to give
-   the sticky pin scroll room for the video-gated card sequence. */
+/* Tall spacer: height (viewport + horizontal overflow) is set in HowItPlays.tsx
+   so the sticky pin has scroll room to translate the card row. */
 .section {
   position: relative;
 }
 
-/* The pinned viewport: heading on top, the card stage in the middle, the
-   progress bar at the bottom. Height (100vh) is set in JS. */
+/* Pinned viewport. A flexible spacer at the top pushes the heading, progress bar
+   and cards to the BOTTOM, so the cards hug the bento that follows. */
 .pin {
   position: sticky;
   top: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: clamp(12px, 2vw, 24px) 0 clamp(10px, 1.6vw, 18px);
+  padding: clamp(64px, 9vw, 88px) 0 clamp(8px, 1.4vw, 18px);
   box-sizing: border-box;
+}
+.spacer {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .heading {
   flex: none;
-  margin: 0 0 clamp(8px, 1.4vw, 16px);
+  margin: 0 0 clamp(10px, 1.4vw, 18px);
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(40px, 6vw, 84px);
+  font-size: clamp(36px, 5.4vw, 76px);
   line-height: 1.02;
   color: #ffffff;
   text-align: center;
@@ -34,95 +37,13 @@
 }
 .headingYellow { color: var(--yellow, #ffd23e); }
 
-/* The middle band that holds the cards; the rail is translated across it. */
-.stage {
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  overflow: hidden;
-}
-
-.rail {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  width: max-content;
-  gap: clamp(28px, 5vw, 72px);
-  padding: 0 clamp(20px, 6vw, 80px);
-  will-change: transform;
-}
-
-.card {
-  position: relative;
-  flex: 0 0 auto;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  background: #ffed00;
-  border: 6px solid #ffed00;
-  border-radius: 20px;
-  box-shadow: 0 10px 34px rgba(10, 58, 87, 0.22);
-}
-
-/* Square media so the square source videos show in full, sized as large as the
-   viewport allows and capped at native x1.25 (~1200px). */
-.media {
-  position: relative;
-  width: max(220px, min(88vw, calc(100svh - 340px), 1200px));
-  aspect-ratio: 1 / 1;
-  border-radius: 14px 14px 0 0;
-  overflow: hidden;
-  background: #e8f4f8;
-}
-.mediaInner {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.caption {
-  flex: none;
-  padding: clamp(10px, 1vw, 16px) 12px clamp(12px, 1.1vw, 18px);
-  font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(16px, 1.8vw, 26px);
-  color: #0a3a57;
-  text-align: center;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-}
-
-.badge {
-  position: absolute;
-  top: -22px;
-  left: -22px;
-  width: clamp(48px, 5vw, 64px);
-  height: clamp(48px, 5vw, 64px);
-  background: var(--blue, #1497d6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(20px, 2.2vw, 28px);
-  color: #fff;
-  box-shadow: 0 3px 8px rgba(10, 58, 87, 0.3);
-  z-index: 2;
-}
-
-/* Short, centred progress bar (driven in HowItPlays.tsx). */
+/* Progress bar — short, centred, ABOVE the cards. */
 .scrollbar {
   position: relative;
   flex: none;
-  width: clamp(180px, 30vw, 380px);
+  width: clamp(180px, 28vw, 360px);
   height: 10px;
-  margin: clamp(10px, 1.4vw, 18px) auto 0;
+  margin: 0 auto clamp(16px, 2vw, 28px);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.22);
   opacity: 0;
@@ -138,20 +59,108 @@
   background: var(--yellow, #ffd23e);
 }
 
-/* Bento immediately below, so it rises in as the sequence releases. */
-.bento {
-  padding: clamp(8px, 1.5vw, 20px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
+/* The row band; the rail is translated across it, several cards visible. */
+.stage {
+  flex: none;
+  width: 100%;
+  overflow: hidden;
+}
+.rail {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  width: max-content;
+  gap: clamp(24px, 3vw, 48px);
+  /* Left padding matches the bento below so card 1 lines up with it. */
+  padding: 0 clamp(20px, 6vw, 80px);
+  will-change: transform;
 }
 
-/* Phones: drop the heading clear of the floating nav button, size it down. */
+.card {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffed00;
+  /* Chunky yellow frame (was 6px). */
+  border: 14px solid #ffed00;
+  border-radius: 22px;
+  box-shadow: 0 12px 36px rgba(10, 58, 87, 0.24);
+}
+
+/* Square media (matches the square source videos), ~25% smaller than before. */
+.media {
+  position: relative;
+  width: clamp(240px, 30vw, 440px);
+  aspect-ratio: 1 / 1;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  background: #e8f4f8;
+}
+.mediaInner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Taller yellow caption band with much bigger text. */
+.caption {
+  flex: none;
+  padding: clamp(16px, 1.8vw, 30px) 14px clamp(18px, 2vw, 32px);
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(22px, 2.2vw, 34px);
+  color: #0a3a57;
+  text-align: center;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+}
+
+/* Big blue number sticker, ~3x the old size. */
+.badge {
+  position: absolute;
+  top: -30px;
+  left: -18px;
+  width: clamp(130px, 13vw, 190px);
+  height: clamp(130px, 13vw, 190px);
+  background: var(--blue, #1497d6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(56px, 6.5vw, 90px);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(10, 58, 87, 0.35);
+  z-index: 2;
+}
+
+/* Bento immediately below, so it rises in tight as the sequence releases. */
+.bento {
+  padding: clamp(6px, 1.2vw, 16px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
+}
+
 @media (max-width: 700px) {
   .pin {
-    padding-top: 76px;
+    padding-top: 72px;
   }
   .heading {
-    font-size: clamp(30px, 8vw, 44px);
+    font-size: clamp(28px, 8vw, 44px);
   }
   .media {
-    width: max(200px, min(88vw, calc(100svh - 300px), 1200px));
+    width: clamp(200px, 66vw, 300px);
+  }
+  .badge {
+    width: clamp(84px, 22vw, 120px);
+    height: clamp(84px, 22vw, 120px);
+    font-size: clamp(40px, 11vw, 60px);
+    top: -20px;
+    left: -12px;
+  }
+  .caption {
+    font-size: clamp(18px, 5vw, 26px);
   }
 }
