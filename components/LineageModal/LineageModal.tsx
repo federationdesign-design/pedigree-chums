@@ -17,6 +17,7 @@ type Props = {
 
 export default function LineageModal({ name, image, character, lineage, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
+  const [shownName, setShownName] = useState(name);
 
   useEffect(() => setMounted(true), []);
 
@@ -36,7 +37,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
 
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
-      {/* Header: close only, top right; the name lives below the circles */}
+      {/* Header: close top right; centred title follows the hovered circle */}
       <div className={css.header}>
         <button type="button" className={css.close} onClick={onClose} aria-label="Close">
           <svg viewBox="0 0 32 32" aria-hidden="true">
@@ -45,6 +46,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           </svg>
         </button>
       </div>
+      <h3 className={css.title}>{shownName}</h3>
 
       {/* The diagram owns everything below the header. BreedTree runs in
           fill + dockAside mode: caption and breadcrumbs docked at the top,
@@ -60,13 +62,12 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           gravity
           stroke="var(--navy)"
           tinted={false}
+          namePill
+          onShownChange={setShownName}
           rootNote={character}
           onClose={onClose}
         />
       </div>
-
-      {/* Breed name: centred, below the circles */}
-      <h3 className={css.title}>{name}</h3>
     </div>,
     document.body,
   );

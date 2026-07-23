@@ -262,3 +262,14 @@
   min-height: 0;
   order: 0;
 }
+
+/* Docked caption: centred column, 80% width, sitting right under the title. */
+.asideDocked {
+  align-items: center;
+}
+.asideDocked .crumbs {
+  justify-content: center;
+}
+.asideDocked .caption {
+  width: 80%;
+}

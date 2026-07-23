@@ -145,6 +145,8 @@ export default function BreedTree({
   gravity = false,
   stroke = "#ffd23e",
   tinted = true,
+  namePill = false,
+  onShownChange,
   rootNote,
 }: {
   root: LineageNode;
@@ -160,6 +162,8 @@ export default function BreedTree({
   gravity?: boolean;
   stroke?: string;
   tinted?: boolean;
+  namePill?: boolean;
+  onShownChange?: (name: string) => void;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -208,6 +212,12 @@ export default function BreedTree({
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
+  // The name pill: light-blue capsule at the foot of the pit showing the
+  // hovered/focused breed. Sticky (static) until one falling body hits it,
+  // then it drops and joins the pile. L/pr are view units; x/y world units.
+  type PillBody = { x: number; y: number; vx: number; vy: number; L: number; pr: number; stuck: boolean };
+  const pillRef = useRef<SVGGElement>(null);
+  const pillBodyRef = useRef<PillBody | null>(null);
   const [ready, setReady] = useState(false);
 
   function nodeImg(d: Node): string | undefined {
@@ -235,6 +245,10 @@ export default function BreedTree({
         const el = bg?.children[b.idx] as SVGGElement | undefined;
         if (el) el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k})`);
       }
+    }
+    const pb = pillBodyRef.current;
+    if (pb && pillRef.current) {
+      pillRef.current.setAttribute("transform", `translate(${(pb.x - v[0]) * k},${(pb.y - v[1]) * k})`);
     }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
@@ -370,6 +384,12 @@ export default function BreedTree({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes]);
 
+  // Let the shell mirror the hovered/focused breed (title + pill text).
+  useEffect(() => {
+    onShownChange?.(((hovered ?? focus) as Node).data.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hovered, focus]);
+
   // Gravity: 2s after the entrance settles, the top-level ancestor circles
   // AND their yellow % badges disconnect and fall as physics bodies (nested
   // circles ride inside their parent), bounce off the container floor like
@@ -400,6 +420,7 @@ export default function BreedTree({
       const xL = v[0] + (xMinF + M) / k;
       const xR = v[0] + (xMinF + vbWf - M) / k;
       const yF = v[1] + (vbHf / 2 - M) / k;
+      const yF0 = yF;
       const worldH = vbHf / k;
       type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body> };
       const d1 = nodes.filter((n) => n.depth === 1);
@@ -413,6 +434,14 @@ export default function BreedTree({
         r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(),
       }));
       badgeBodiesRef.current = badges;
+      // The name pill enters the pit as a sticky capsule at the bottom centre.
+      if (namePill && !pillBodyRef.current) {
+        pillBodyRef.current = {
+          x: v[0] + (xMinF + vbWf / 2) / k,
+          y: yF0 - 27 / k,
+          vx: 0, vy: 0, L: 120, pr: 27, stuck: true,
+        };
+      }
       const all = bodies.concat(badges);
       // nodes that have their own body: their subtrees no longer ride a parent
       const owned = new Set<Node>(bodies.map((b) => b.n as Node));
@@ -527,7 +556,50 @@ export default function BreedTree({
             }
           }
         }
+        // name pill: capsule vs every ball; static until its first hit
+        const pill = pillBodyRef.current;
+        if (pill) {
+          const prW = pill.pr / k;
+          const LW = pill.L / k;
+          if (!pill.stuck) {
+            pill.vy += G * dt;
+            pill.x += pill.vx * dt;
+            pill.y += pill.vy * dt;
+            if (pill.y + prW > yF) { pill.y = yF - prW; pill.vy = -pill.vy * REST; pill.vx *= 0.94; }
+            if (pill.x - LW - prW < xL) { pill.x = xL + LW + prW; pill.vx = -pill.vx * WALL_REST; }
+            if (pill.x + LW + prW > xR) { pill.x = xR - LW - prW; pill.vx = -pill.vx * WALL_REST; }
+          }
+          const mp = prW * (LW + prW) * 2.5; // heavier than it looks, so it is not batted about
+          for (const b of all) {
+            const cxp = Math.max(pill.x - LW, Math.min(pill.x + LW, b.x));
+            const dx = b.x - cxp, dy = b.y - pill.y;
+            const dist = Math.hypot(dx, dy) || 0.001;
+            const overlap = b.r + prW - dist;
+            if (overlap > 0) {
+              const nx = dx / dist, ny = dy / dist;
+              if (pill.stuck) {
+                // first contact knocks it loose; resolve as a static bounce
+                b.x += nx * overlap; b.y += ny * overlap;
+                const rel = b.vx * nx + b.vy * ny;
+                if (rel < 0) { b.vx -= (1 + REST) * rel * nx; b.vy -= (1 + REST) * rel * ny; }
+                if (now - b.lastFx > FX_COOLDOWN) { numAt(cxp, pill.y - prW, b.pct, now); b.lastFx = now; }
+                pill.stuck = false;
+              } else {
+                const mb = b.r * b.r, mt = mb + mp;
+                b.x += nx * overlap * (mp / mt); b.y += ny * overlap * (mp / mt);
+                pill.x -= nx * overlap * (mb / mt); pill.y -= ny * overlap * (mb / mt);
+                const rel = (b.vx - pill.vx) * nx + (b.vy - pill.vy) * ny;
+                if (rel < 0) {
+                  const imp = (-(1 + REST) * rel) / (1 / mb + 1 / mp);
+                  b.vx += (imp / mb) * nx; b.vy += (imp / mb) * ny;
+                  pill.vx -= (imp / mp) * nx; pill.vy -= (imp / mp) * ny;
+                }
+              }
+            }
+          }
+        }
         let still = true;
+        if (pill && !pill.stuck && Math.hypot(pill.vx, pill.vy) > worldH * 0.012) still = false;
         for (const b of all) {
           if (b.n) {
             const dxm = b.x - b.n.x, dym = b.y - b.n.y;
@@ -733,6 +805,34 @@ export default function BreedTree({
 
           {/* Collision number flashes, appended imperatively by the sim. */}
           <g ref={fxRef} style={{ pointerEvents: "none" }} />
+
+          {/* The name pill: light-blue capsule at the pit floor, showing the
+              hovered/focused breed. Sticky until first hit, then it falls. */}
+          {namePill && (() => {
+            const v = viewRef.current;
+            const kk = SIZE / v[2];
+            const label = shown.data.name.toUpperCase();
+            const fs = 30;
+            const pr = 27;
+            const L = Math.max(50, (label.length * fs * 0.34) / 2);
+            const pb = pillBodyRef.current;
+            if (pb) { pb.L = L; pb.pr = pr; }
+            const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
+            const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
+            const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
+            const wx = pb ? pb.x : v[0] + (xMinR + vbWr / 2) / kk;
+            const wy = pb ? pb.y : v[1] + (vbHr / 2 - 14) / kk - pr / kk;
+            return (
+              <g ref={pillRef} transform={`translate(${(wx - v[0]) * kk},${(wy - v[1]) * kk})`} style={{ pointerEvents: "none" }}>
+                <rect x={-L - pr} y={-pr} width={(L + pr) * 2} height={pr * 2} rx={pr}
+                  style={{ fill: "var(--blue-sky, #5cc4ee)", stroke: "var(--navy)", strokeWidth: 3 }} />
+                <text x={0} y={0} textAnchor="middle" dominantBaseline="central"
+                  style={{ fill: "var(--navy)", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "1px" }}>
+                  {label}
+                </text>
+              </g>
+            );
+          })()}
         </svg>
       </div>
 
