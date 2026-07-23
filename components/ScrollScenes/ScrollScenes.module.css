@@ -21,9 +21,12 @@
 /* ── Quote scene ── */
 .quoteScene {
   /* pin (100vh) + a fixed, modest reading pause -- not scroll-distance
-     dependent, so this number never has to chase an animation's timing */
-  height: 145vh;
-  height: 145svh;
+     dependent, so this number never has to chase an animation's timing.
+     Cut further after review: the fixed ~1.1s build animation eats into
+     this pause too (it plays out while pinned, before the pause even
+     starts), so the pause itself only needs to be short. */
+  height: 118vh;
+  height: 118svh;
 }
 
 .quoteHolder {

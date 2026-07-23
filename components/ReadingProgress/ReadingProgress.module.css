@@ -10,26 +10,29 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 26px;
+    height: 36px;
     z-index: 500;
     pointer-events: none;
   }
 
+  /* 3x taller, as requested -- was 4px */
   .track {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 12px;
     background: rgba(10, 58, 87, 0.28);
   }
 
+  /* Milestone notches: solid dark blue (no transparency), thicker and
+     taller than the track itself so they read clearly against the fill */
   .notch {
     position: absolute;
-    top: 0;
-    width: 2px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.55);
+    top: -3px;
+    width: 4px;
+    height: 18px;
+    background: var(--navy, #0a3a57);
     z-index: 1;
   }
 
@@ -42,62 +45,42 @@
     z-index: 2;
   }
 
-  .bone {
-    position: absolute;
-    top: 6px;
-    right: 3px;
-    filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.4));
-  }
-
   .dog {
     position: absolute;
-    top: 3px;
-    transform: translateX(-55%);
+    top: -7px;
+    transform: translateX(-55%) scaleX(-1);
     filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
     will-change: left;
   }
 
-  /* legs: B pair hidden at rest; alternate while walking */
-  .legsB {
-    opacity: 0;
+  .dogImg {
+    width: 34px;
+    height: auto;
+    display: block;
   }
 
-  .dogWalking .legsA {
-    animation: stepA 0.32s steps(1) infinite;
+  /* Recolour the black silhouette GIF. Default: white (exact and
+     reliable via invert). Swap to .dogYellow for the approximate yellow
+     recipe -- CSS filters can only approximate a specific hex from a
+     black source, so if exact brand yellow matters, the cleanest fix is
+     exporting the GIF pre-coloured from the same pipeline that made it. */
+  .dogWhite {
+    filter: invert(1) drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
   }
 
-  .dogWalking .legsB {
-    animation: stepB 0.32s steps(1) infinite;
+  .dogYellow {
+    filter: invert(85%) sepia(45%) saturate(900%) hue-rotate(358deg) brightness(101%) contrast(101%)
+      drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
   }
 
-  @keyframes stepA {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
+  /* Reaching the end: since a tail can't be targeted inside a raster
+     GIF, the whole dog gives a small celebratory wobble instead */
+  .dogDone {
+    animation: rpWobble 0.4s ease-in-out infinite;
   }
 
-  @keyframes stepB {
-    0%, 49% { opacity: 0; }
-    50%, 100% { opacity: 1; }
-  }
-
-  /* a little bounce in the walk */
-  .dogWalking svg {
-    animation: trot 0.32s ease-in-out infinite;
-  }
-
-  @keyframes trot {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-1.5px); }
-  }
-
-  /* made it to the bone: wag */
-  .dogDone .tail {
-    animation: wag 0.35s ease-in-out infinite;
-    transform-origin: 7px 11px;
-  }
-
-  @keyframes wag {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(28deg); }
+  @keyframes rpWobble {
+    0%, 100% { transform: translateX(-55%) scaleX(-1) rotate(0deg); }
+    50% { transform: translateX(-55%) scaleX(-1) rotate(-6deg); }
   }
 }

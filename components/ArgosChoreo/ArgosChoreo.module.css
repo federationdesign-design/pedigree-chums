@@ -93,6 +93,9 @@
 .statueSlide {
   flex: 0 0 86%;
   scroll-snap-align: center;
+  /* forces one slide at a time: a fast fling can't skip past several
+     images in one go, the browser stops at each snap point in turn */
+  scroll-snap-stop: always;
   margin: 0;
 }
 

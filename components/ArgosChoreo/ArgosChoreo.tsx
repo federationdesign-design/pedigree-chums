@@ -218,7 +218,7 @@ export function StatueBulletsChoreo({
   markClass,
 }: {
   slides: { src: string; alt: string; caption: string }[];
-  bullets?: string[];
+  bullets?: React.ReactNode[];
   /* When provided, an animated quote shares this SAME pinned scene and
      scroll progress, so its build begins as soon as the gallery itself
      starts moving -- not after a separate later scene is reached. */
@@ -303,7 +303,7 @@ export function StatueBulletsChoreo({
               const o = clamp01((trackFrac - threshold + 0.1) / 0.1);
               return (
                 <li
-                  key={b}
+                  key={i}
                   className={isLast ? styles.choreoBulletLast : undefined}
                   style={{ opacity: o, transform: `translateY(${(1 - o) * 14}px)` }}
                 >
