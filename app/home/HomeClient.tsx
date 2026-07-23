@@ -1,14 +1,23 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import VideoGrid from "../../components/VideoGrid/VideoGrid";
 import styles from "./home.module.css";
 import { breeds } from "../../data/breeds";
 
 export default function HomeClient() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  const goToTopMatch = () => {
+    if (filtered.length > 0) {
+      router.push(`/chums/${filtered[0].slug}`);
+      setOpen(false);
+    }
+  };
 
   const filtered = query.trim().length === 0
     ? []
@@ -58,10 +67,10 @@ export default function HomeClient() {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
             onFocus={() => setOpen(true)}
+            onKeyDown={(e) => { if (e.key === "Enter") goToTopMatch(); }}
             autoComplete="off"
             spellCheck={false}
           />
-          <span className={styles.searchIcon}>🐾</span>
           {open && query.trim().length > 0 && (
             <div className={styles.dropdown}>
               {filtered.length > 0 ? filtered.map((b) => (
@@ -85,6 +94,14 @@ export default function HomeClient() {
             </div>
           )}
         </div>
+        <button
+          type="button"
+          className={styles.searchBtn}
+          onClick={goToTopMatch}
+          disabled={filtered.length === 0}
+        >
+          Search
+        </button>
       </section>
 
 

@@ -9,7 +9,7 @@
 .hero {
   position: relative;
   width: 100%;
-  min-height: clamp(420px, 64vh, 920px);
+  min-height: clamp(460px, 80vh, 1000px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -102,7 +102,7 @@
 
 .searchInput {
   width: 100%;
-  padding: 40px 96px 40px 56px;
+  padding: 40px 56px;
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(32px, 4.4vw, 44px);
   letter-spacing: 0.04em;
@@ -120,19 +120,46 @@
   opacity: 1;
 }
 
+/* Placeholder clears the instant the field is focused (cursor enters). */
+.searchInput:focus::placeholder {
+  color: transparent;
+}
+
 .searchInput:focus {
   border-color: var(--yellow, #ffd23e);
   background: rgba(255,255,255,0.12);
 }
 
-.searchIcon {
-  position: absolute;
-  right: 34px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255,255,255,0.4);
-  pointer-events: none;
-  font-size: 40px;
+/* Big green Search button below the field, matching .startBtn / .btnPrimary. */
+.searchBtn {
+  display: inline-block;
+  margin: 28px auto 0;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 1.9rem;
+  letter-spacing: 0.04em;
+  background: #22c55e;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  padding: 26px 56px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10,58,87,0.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+
+.searchBtn:hover {
+  background: #2fd46b;
+}
+
+.searchBtn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(10,58,87,0.4);
+}
+
+.searchBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
 }
 
 .dropdown {
@@ -428,7 +455,7 @@
   display: grid;
   grid-template-columns: 3fr 7fr;
   gap: clamp(32px, 6vw, 64px);
-  align-items: center;
+  align-items: start;
   width: 100%;
   padding: 0 clamp(20px, 6vw, 80px);
 }
@@ -441,7 +468,7 @@
 
 .cardsHeading {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(64px, 10vw, 128px);
+  font-size: clamp(51px, 8vw, 102px);
   letter-spacing: 0.04em;
   color: #ffffff;
   line-height: 1.05;
