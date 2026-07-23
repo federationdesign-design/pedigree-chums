@@ -257,8 +257,13 @@ export function StatueBulletsChoreo({
             {bullets.map((b, i) => {
               const start = 0.3 + i * 0.15;
               const o = clamp01((p - start) / 0.12);
+              const isLast = i === bullets.length - 1;
               return (
-                <li key={b} style={{ opacity: o, transform: `translateY(${(1 - o) * 14}px)` }}>
+                <li
+                  key={b}
+                  className={isLast ? styles.choreoBulletLast : undefined}
+                  style={{ opacity: o, transform: `translateY(${(1 - o) * 14}px)` }}
+                >
                   {b}
                 </li>
               );
@@ -321,12 +326,18 @@ export function GatedVideo({ children }: { children: React.ReactNode }) {
     if (!video) return;
 
     const checkProgress = () => {
-      if (video.duration && video.currentTime / video.duration >= 0.6) {
+      const dur = video.duration;
+      if (dur && isFinite(dur) && video.currentTime / dur >= 0.6) {
         setUnlocked(true);
       }
     };
-    if (video.duration && video.currentTime / video.duration >= 0.6) setUnlocked(true);
+    // Belt-and-suspenders: timeupdate should fire reliably during playback,
+    // but a poll interval guarantees the unlock even if an event is missed
+    // (e.g. duration not yet known when playback starts on some devices).
+    const poll = setInterval(checkProgress, 400);
     video.addEventListener("timeupdate", checkProgress);
+    video.addEventListener("loadedmetadata", checkProgress);
+    checkProgress();
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -338,7 +349,9 @@ export function GatedVideo({ children }: { children: React.ReactNode }) {
     );
     io.observe(video);
     return () => {
+      clearInterval(poll);
       video.removeEventListener("timeupdate", checkProgress);
+      video.removeEventListener("loadedmetadata", checkProgress);
       io.disconnect();
     };
   }, []);

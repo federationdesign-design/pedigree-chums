@@ -156,6 +156,18 @@
   font-weight: 700;
 }
 
+/* The bold intro paragraph pinned above a scroll-choreographed quote */
+.pinnedQuoteText {
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .pinnedQuoteText {
+    font-size: 0.98rem;
+    line-height: 1.1em;
+  }
+}
+
 .essayBody h3 {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.56rem;
@@ -244,7 +256,17 @@
   font-size: 1.4rem;
   font-weight: 700;
   color: #ffffff;
-  line-height: 1.6;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.verdict strong {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.3em;
+  font-weight: 400;
+  display: block;
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
 }
 
 .verdict strong {
@@ -1010,7 +1032,7 @@
   }
 
   .subhead {
-    font-size: clamp(3.18rem, 13.1vw, 4.18rem);
+    font-size: clamp(3.11rem, 12.8vw, 4.11rem);
     text-shadow: 0 3px 12px rgba(10, 58, 87, 0.35);
   }
 
@@ -1220,8 +1242,8 @@
   .parallaxScene.driftScene::after {
     content: "";
     display: block;
-    height: 75vh;
-    height: 75svh;
+    height: 38vh;
+    height: 38svh;
   }
 
   /* Tall image drifts vertically inside the pinned frame */

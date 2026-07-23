@@ -42,6 +42,7 @@ export default function DogPoll({
   shakeAttempts?: number;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const handlePick = (i: number) => {
     setPicked(i);
@@ -81,21 +82,33 @@ export default function DogPoll({
 
       {picked === null ? (
         <div className={styles.options}>
-          {options.map((opt, i) => (
-            <button
-              key={opt.label}
-              ref={(el) => { btnRefs.current[i] = el; }}
-              type="button"
-              className={`${opt.color === "red" ? styles.optionRed : styles.option} ${locked ? styles.optionLocked : ""}`}
-              onClick={() => handlePick(i)}
-              style={{
-                opacity: buttonsProgress,
-                transform: `translateY(${(1 - buttonsProgress) * 14}px) scale(${0.9 + buttonsProgress * 0.1})`,
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
+          {options.map((opt, i) => {
+            const base = 0.9 + buttonsProgress * 0.1;
+            const hoverScale = hovered === i && picked === null ? 1.1 : 1;
+            const isFallingAway = picked !== null && picked !== i;
+            return (
+              <button
+                key={opt.label}
+                ref={(el) => { btnRefs.current[i] = el; }}
+                type="button"
+                className={[
+                  opt.color === "red" ? styles.optionRed : styles.option,
+                  locked && picked === null ? styles.optionLocked : "",
+                  opt.color === "red" ? styles.optionLockedRed : "",
+                  isFallingAway ? styles.optionFalling : "",
+                ].filter(Boolean).join(" ")}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                onClick={() => handlePick(i)}
+                style={{
+                  opacity: buttonsProgress,
+                  transform: `translateY(${(1 - buttonsProgress) * 14}px) scale(${base * hoverScale})`,
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className={styles.results}>

@@ -517,7 +517,7 @@ export default function ArgosPage() {
                 <QuoteBuild
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<p style={{ margin: 0, fontWeight: 700 }}>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
+                  pinned={<p className={styles.pinnedQuoteText} style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
                   quote="Humans recognise status. Dogs recognise presence."
                 />
               </div>
@@ -538,8 +538,26 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
-                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
+                    {
+                      src: "/history/odysseus-dog-argos-in-death.webp",
+                      alt: "The death of Argos",
+                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
+                    },
+                    {
+                      src: "/history/nolans-king-odyssus.webp",
+                      alt: "Nolan's Odysseus",
+                      caption: "Odysseus probably has PTSD, as his core ideology of family, loyalty and legacy has been destroyed",
+                    },
+                    {
+                      src: "/history/nolans-king-odyssus-painting-remake.jpg",
+                      alt: "Odysseus painting remake",
+                      caption: "When he fails to get the acknowledgment he needed, and with his colossal old age, he dies",
+                    },
+                    {
+                      src: "/history/odyssusand-argos-painting-remake.jpg",
+                      alt: "Odysseus and Argos painting remake",
+                      caption: "A tale as old as time; a dog's love for their human. The original story, remade and remade",
+                    },
                   ]}
                   bullets={[
                     "But Argos recognises Odysseus.",
@@ -627,31 +645,15 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <StatueBulletsChoreo
                   slides={[
-                    {
-                      src: "/history/odysseus-dog-argos-in-death.webp",
-                      alt: "The death of Argos",
-                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
-                    },
-                    {
-                      src: "/history/nolans-king-odyssus.webp",
-                      alt: "Nolan's Odysseus",
-                      caption: "Odysseus probably has PTSD, as his core ideology of family, loyalty and legacy has been destroyed",
-                    },
-                    {
-                      src: "/history/nolans-king-odyssus-painting-remake.jpg",
-                      alt: "Odysseus painting remake",
-                      caption: "When he fails to get the acknowledgment he needed, and with his colossal old age, he dies",
-                    },
-                    {
-                      src: "/history/odyssusand-argos-painting-remake.jpg",
-                      alt: "Odysseus and Argos painting remake",
-                      caption: "A tale as old as time; a dog's love for their human. The original story, remade and remade",
-                    },
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
                   ]}
                 />
               </div>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
+
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
 
@@ -679,7 +681,7 @@ export default function ArgosPage() {
 
               <p>That is why the returning soldier videos hit so hard online. A person comes home from deployment, changed by distance and time and experience. The dog does not understand war or politics. But it understands return, sometimes before the person is fully through the door.</p>
 
-              <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</p>
+              <p>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. <strong style={{ fontWeight: 600 }}>He knows.</strong></p>
 
               <div className={styles.sceneMobile}>
                 <HomerCrossfade
@@ -818,6 +820,8 @@ export default function ArgosPage() {
 
               <p>This is not just sentimentality. It is biology.</p>
 
+              <div style={{ borderTop: "1px solid #fff", margin: "25px 0" }} />
+
               <div className={styles.desktopOnly}>
               <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
               <p className={styles.plainPara}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
@@ -831,8 +835,8 @@ export default function ArgosPage() {
                   markClass={styles.pullquoteMark}
                   pinned={
                     <>
-                      <p style={{ margin: "0 0 10px", fontWeight: 700 }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
-                      <p style={{ margin: 0, fontWeight: 700 }}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+                      <p className={styles.pinnedQuoteText} style={{ margin: "0 0 10px" }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
+                      <p style={{ margin: 0, fontWeight: 500 }}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
                     </>
                   }
                   quote="People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home."
@@ -916,7 +920,7 @@ export default function ArgosPage() {
                 <QuoteBuild
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<p style={{ margin: 0, fontWeight: 700 }}>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>}
+                  pinned={<p className={styles.pinnedQuoteText} style={{ margin: 0 }}>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>}
                   quote="A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond."
                 />
               </div>
@@ -1124,11 +1128,12 @@ export default function ArgosPage() {
               /* two-way parallax: image eases DOWN as the card rises */
               var hi = document.getElementById('hound-img');
               if (hi) hi.style.transform = 'translateY(' + (-(15 - pin * 4)) + '%)';
-              /* the descendant card fades out as it climbs past halfway */
+              /* the descendant card stays fully visible while it moves, and
+                 only starts fading in the final stretch of the pin window,
+                 once its movement has essentially finished */
               var ld = document.getElementById('ld-card');
               if (ld) {
-                var lr = ld.getBoundingClientRect();
-                var lo = (lr.top - vh * 0.2) / (vh * 0.3);
+                var lo = 1 - Math.max(0, (pin - 0.8) / 0.2);
                 if (lo < 0) lo = 0;
                 if (lo > 1) lo = 1;
                 ld.style.opacity = lo;

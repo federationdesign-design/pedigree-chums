@@ -145,6 +145,12 @@
   will-change: opacity, transform;
 }
 
+.choreoBulletLast {
+  font-weight: 600 !important;
+  font-size: 1.55rem !important;
+  color: var(--yellow, #ffd23e) !important;
+}
+
 /* ── Homer crossfade ── */
 .homerScene {
   height: 240vh;
@@ -203,7 +209,7 @@
 
   .videoGate figure,
   .videoGateUnlocked figure {
-    margin: 0 0 10px !important;
+    margin: 0 0 30px !important;
   }
 }
 
