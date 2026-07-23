@@ -8,8 +8,8 @@
 
 .heading {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  /* Same size as the Pedigree Chums product title. */
-  font-size: clamp(2rem, 5vw, 4rem);
+  /* Same size as the Pedigree Chums product title (2x). */
+  font-size: clamp(4rem, 10vw, 8rem);
   line-height: 1.05;
   color: var(--white, #fff);
   text-align: center;

@@ -33,7 +33,8 @@
 .heroContent {
   position: relative;
   z-index: 2;
-  padding: clamp(32px, 6vw, 64px) clamp(20px, 6vw, 80px) clamp(40px, 8vw, 80px);
+  /* No bottom padding -- text sits flush to the bottom of the hero. */
+  padding: clamp(32px, 6vw, 64px) clamp(20px, 6vw, 80px) 0;
   max-width: 720px;
 }
 
@@ -52,7 +53,7 @@
 .heroSub {
   font-size: clamp(14px, 1.8vw, 18px);
   color: #ffffff;
-  margin: 0 0 28px;
+  margin: 0;
   font-weight: 500;
   max-width: 480px;
 }
@@ -75,7 +76,7 @@
 
 .searchTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.4rem, 7vw, 5.5rem);
+  font-size: clamp(4.8rem, 14vw, 11rem);
   color: #fff;
   margin: 0 0 12px;
   line-height: 1;
@@ -261,7 +262,7 @@
 
 .productTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(4rem, 10vw, 8rem);
   line-height: 1;
   margin: 0;
   color: #fff;
@@ -413,13 +414,13 @@
     display: none;
   }
 
-  /* Hero text: 3px bigger subtitle, pushed to the bottom with a 10px gap. */
+  /* Hero text: 3px bigger subtitle, sitting flush at the bottom of the hero. */
   .heroSub {
     font-size: 17px;
     margin-bottom: 0;
   }
   .heroContent {
-    padding-bottom: 10px;
+    padding-bottom: 0;
   }
 }
 
@@ -442,7 +443,7 @@
 
 .cardsHeading {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(32px, 5vw, 64px);
+  font-size: clamp(64px, 10vw, 128px);
   letter-spacing: 0.04em;
   color: #ffffff;
   line-height: 1.05;
@@ -454,15 +455,18 @@
   color: var(--yellow, #ffd23e);
 }
 
-/* Bento launcher section embedded at the foot of the page */
+/* Bento launcher section embedded at the foot of the page. Negative top margin
+   pulls it up under the step cards so the gap matches the bento's own 16px
+   internal spacing instead of the step section's large bottom padding. */
 .bentoHome {
+  margin-top: -64px;
   padding: 0 clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
 }
 
 /* "How it plays" title above the instructional step cards */
 .stepsHeading {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(32px, 5vw, 64px);
+  font-size: clamp(64px, 10vw, 128px);
   line-height: 1.05;
   color: #ffffff;
   text-align: center;

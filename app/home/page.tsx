@@ -49,9 +49,6 @@ export default function HomePage() {
       <StepCards />
 
       {/* The full bento launcher, embedded at the foot of the page */}
-      <h2 className={styles.stepsHeading}>
-        Explore <span className={styles.cardsHeadingYellow}>Pedigree Chums</span>
-      </h2>
       <section className={styles.bentoHome}>
         <BentoBoard />
       </section>
