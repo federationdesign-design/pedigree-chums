@@ -631,7 +631,7 @@
   color: var(--navy, #0a3a57);
   line-height: 1.35;
   margin: 56px 0;
-  padding: 24px 0 24px 40px;
+  padding: 24px 0 24px 20px;
   border-left: 10px solid var(--yellow, #ffd23e);
   border-radius: 6px;
   max-width: 100%;
@@ -647,7 +647,7 @@
   position: relative;
   top: 45px;
   display: inline-block;
-  margin: 0 6px;
+  margin: 0 3px;
   overflow: visible;
 }
 

@@ -139,7 +139,7 @@
   font-size: 1.3rem;
   font-weight: 600;
   color: #ffffff;
-  line-height: 1.5;
+  line-height: 0.75;
   margin-bottom: 28px;
   list-style: none;
   will-change: opacity, transform;
@@ -226,9 +226,10 @@
 
 .pollHint {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.96rem;
+  font-weight: 600;
   color: var(--navy, #0a3a57);
   text-align: center;
-  margin: 10px 0 0;
+  margin: 0;
+  padding-top: 14px;
 }

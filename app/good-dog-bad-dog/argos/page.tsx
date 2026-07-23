@@ -651,9 +651,11 @@ export default function ArgosPage() {
                 />
               </div>
 
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
+
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
 
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
+
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
 
@@ -725,10 +727,6 @@ export default function ArgosPage() {
                     </>
                   }
                 />
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <LikelyOriginsCard />
               </div>
 
               <div className={`${styles.sceneMobile} ${styles.overlapNext}`} id="wwk-scene">
@@ -946,6 +944,10 @@ export default function ArgosPage() {
               <p>Once he has seen Odysseus, once he has known him, once he has confirmed that the man beneath the disguise is still the man who left, Argos can go. In a story full of monsters, storms, gods, violence and tricks, the dog&apos;s gift is simple.</p>
 
               <p>He knows who has come home. That is not a broken heart. That is a completed one.</p>
+
+              <div className={styles.sceneMobile}>
+                <LikelyOriginsCard />
+              </div>
 
               <h2 className={styles.subhead}>Why Argos still matters</h2>
 
