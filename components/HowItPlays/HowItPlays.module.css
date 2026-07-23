@@ -9,20 +9,17 @@
   position: relative;
 }
 
-/* Pinned viewport. A flexible spacer at the top pushes the heading, progress bar
-   and cards to the BOTTOM, so the cards hug the bento that follows. */
+/* Pinned viewport. Top-anchored (its own content height) so the cards sit near
+   the top of the screen as the row scrolls, and the horizontal scroll engages
+   as the cards reach the top. */
 .pin {
   position: sticky;
   top: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: clamp(64px, 9vw, 88px) 0 clamp(8px, 1.4vw, 18px);
+  padding: clamp(20px, 3vw, 40px) 0 clamp(10px, 1.4vw, 18px);
   box-sizing: border-box;
-}
-.spacer {
-  flex: 1 1 auto;
-  min-height: 0;
 }
 
 .heading {
@@ -71,8 +68,10 @@
   align-items: flex-start;
   width: max-content;
   gap: clamp(24px, 3vw, 48px);
-  /* Left padding matches the bento below so card 1 lines up with it. */
-  padding: 0 clamp(20px, 6vw, 80px);
+  /* Left padding matches the bento below so card 1 lines up with it. Top
+     padding gives the number badges room to sit above the frame without being
+     clipped by the stage's overflow. */
+  padding: clamp(40px, 4.5vw, 58px) clamp(20px, 6vw, 80px) 0;
   will-change: transform;
 }
 
@@ -89,10 +88,12 @@
   box-shadow: 0 12px 36px rgba(10, 58, 87, 0.24);
 }
 
-/* Square media (matches the square source videos), ~25% smaller than before. */
+/* Square media (matches the square source videos), ~25% smaller than before.
+   Capped against the viewport height so the top-anchored pin never runs off a
+   short screen. */
 .media {
   position: relative;
-  width: clamp(240px, 30vw, 440px);
+  width: clamp(220px, min(30vw, calc(100svh - 420px)), 440px);
   aspect-ratio: 1 / 1;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
@@ -151,7 +152,7 @@
     font-size: clamp(28px, 8vw, 44px);
   }
   .media {
-    width: clamp(200px, 66vw, 300px);
+    width: clamp(190px, min(66vw, calc(100svh - 360px)), 300px);
   }
   .badge {
     width: clamp(84px, 22vw, 120px);

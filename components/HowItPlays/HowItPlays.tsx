@@ -84,12 +84,13 @@ export default function HowItPlays() {
 
     const layout = () => {
       distance = Math.max(0, rail.offsetWidth - stage.clientWidth);
-      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // Pin keeps its natural (content) height and is top-anchored, so the
+      // cards sit near the top of the viewport while the row scrolls, and the
+      // bento follows right after the pin rather than a full screen later.
+      const pinH = pin.offsetHeight;
       if (distance > 0) {
-        pin.style.height = `${vh}px`;
-        section.style.height = `${vh + distance}px`;
+        section.style.height = `${pinH + distance}px`;
       } else {
-        pin.style.height = "";
         section.style.height = "";
       }
       update();
@@ -123,8 +124,6 @@ export default function HowItPlays() {
     <div className={styles.root}>
       <section ref={sectionRef} className={styles.section}>
         <div ref={pinRef} className={styles.pin}>
-          <div className={styles.spacer} aria-hidden="true" />
-
           <h2 className={styles.heading}>
             How it <span className={styles.headingYellow}>plays</span>
           </h2>
