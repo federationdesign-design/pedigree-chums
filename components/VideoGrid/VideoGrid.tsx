@@ -38,40 +38,98 @@ const VIDEOS: LightboxVideo[] = ORDER.map((src) => ({
 export default function VideoGrid() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  // Horizontal-scroll rail (mobile). Reuses CardRail's approach: vertical /
-  // trackpad wheel drives the rail sideways, and only once it reaches the end
-  // does the page carry on scrolling down. On desktop the grid isn't
-  // scrollable, so every bit of this is inert. Yellow thumb mirrors progress.
   const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
 
+  // Desktop: convert a vertical wheel into horizontal scroll, holding the page
+  // until every video has passed, then release. (Ported from BreedStrip.)
   useEffect(() => {
     const wrap = wrapRef.current;
     const el = railRef.current;
     if (!wrap || !el) return;
 
-    const onWheel = (e: WheelEvent) => {
-      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    const driveRail = (delta: number, preventDefault: () => void) => {
       if (delta === 0) return;
       const max = el.scrollWidth - el.clientWidth;
-      if (max <= 0) return; // not scrollable (desktop grid) -> let the page scroll
+      if (max <= 0) return; // not scrollable (desktop grid) -> let the page move
       if (delta > 0) {
-        if (el.scrollLeft >= max) return; // fully scrolled -> page continues down
-        e.preventDefault();
+        if (el.scrollLeft >= max) return; // all videos passed -> page continues
+        preventDefault();
         el.scrollLeft = Math.min(el.scrollLeft + delta, max);
       } else {
-        if (el.scrollLeft <= 0) return; // at the start -> page scrolls up
-        e.preventDefault();
+        if (el.scrollLeft <= 0) return; // back at the start -> page scrolls up
+        preventDefault();
         el.scrollLeft = Math.max(el.scrollLeft + delta, 0);
       }
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      driveRail(delta, () => e.preventDefault());
     };
 
     wrap.addEventListener("wheel", onWheel, { passive: false });
     return () => wrap.removeEventListener("wheel", onWheel);
   }, []);
 
+  // Touch: no wheel events, so drive the rail from the page-scroll position via
+  // a rAF lerp (eases in with inertia). Engages as the row rises through the
+  // screen and runs through all six before releasing. (Ported from BreedStrip.)
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const el = railRef.current;
+    if (!wrap || !el) return;
+    if (!window.matchMedia("(pointer: coarse)").matches) return;
+
+    const EASE = 0.08;
+    let target = 0;
+    let current = 0;
+    let released = false;
+    let raf = 0;
+
+    const measure = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 0) return 0;
+      const rect = wrap.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const centre = rect.top + rect.height / 2;
+      const start = vh * 0.85; // begins as the row nears the lower half
+      const end = vh * 0.15; //   finishes as it nears the top
+      const p = (start - centre) / (start - end);
+      const clamped = Math.max(0, Math.min(1, p));
+      if (clamped >= 1) released = true; // all passed -> hand control back
+      return clamped * max; // drive through every video
+    };
+
+    const tick = () => {
+      target = measure();
+      current += (target - current) * EASE;
+      if (Math.abs(target - current) < 0.5) current = target;
+      el.scrollLeft = current;
+      if (current === target) {
+        raf = 0;
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    const onScroll = () => {
+      if (released) return; // reader owns it now
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Yellow draggable scrollbar thumb synced to the rail's scroll position.
   useEffect(() => {
     const el = railRef.current;
     const track = trackRef.current;
@@ -85,10 +143,8 @@ export default function VideoGrid() {
         return;
       }
       track.style.opacity = "1";
-      const widthPct = (el.clientWidth / el.scrollWidth) * 100;
-      const leftPct = (el.scrollLeft / el.scrollWidth) * 100;
-      thumb.style.width = `${widthPct}%`;
-      thumb.style.left = `${leftPct}%`;
+      thumb.style.width = `${(el.clientWidth / el.scrollWidth) * 100}%`;
+      thumb.style.left = `${(el.scrollLeft / el.scrollWidth) * 100}%`;
     };
 
     let dragging = false;
@@ -146,7 +202,7 @@ export default function VideoGrid() {
               aria-label="Play video"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={v.poster} alt="" className={styles.poster} loading="lazy" />
+              <img src={v.poster} alt="" className={styles.poster} />
               <span className={styles.play} aria-hidden />
             </button>
           ))}
