@@ -229,22 +229,35 @@ export function StatueBulletsChoreo({
   const { sceneRef, p } = useSceneProgress();
   const trackRef = useRef<HTMLDivElement | null>(null);
   const swiped = useRef(false);
+  const [trackFrac, setTrackFrac] = useState(0);
 
+  /* Single source of truth for "which image is current": the track's own
+     scrollLeft, read via a real scroll listener. This fires identically
+     whether the position was set programmatically (auto-pan below) or by
+     the reader's own finger on the gallery -- so bullets react correctly
+     either way, which a value derived only from vertical scroll never could. */
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
+    const onScroll = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      setTrackFrac(max > 0 ? track.scrollLeft / max : 0);
+    };
     const onTouch = () => {
       swiped.current = true;
     };
+    track.addEventListener("scroll", onScroll, { passive: true });
     track.addEventListener("touchstart", onTouch, { passive: true });
-    return () => track.removeEventListener("touchstart", onTouch);
+    onScroll();
+    return () => {
+      track.removeEventListener("scroll", onScroll);
+      track.removeEventListener("touchstart", onTouch);
+    };
   }, []);
 
-  /* The gallery pans continuously with vertical scroll progress (across
-     the first 55% of the scene) rather than firing a single autoplay
-     animation -- this lets each bullet be tied directly to a specific
-     image becoming current, per image N+1 arriving -> bullet N appears.
-     A manual swipe hands control to the browser for the rest of the scene. */
+  /* Auto-pan continuously with vertical scroll progress (first 55% of the
+     scene) until the reader swipes manually, at which point native touch
+     takes over completely and this effect stops writing to scrollLeft. */
   const galleryP = clamp01(p / 0.55);
   useEffect(() => {
     const track = trackRef.current;
@@ -279,25 +292,15 @@ export function StatueBulletsChoreo({
         {bullets && (
           <ul className={styles.choreoBullets}>
             {bullets.map((b, i) => {
-              const isFirst = i === 0;
               const isLast = i === bullets.length - 1;
-              let o: number;
-              if (isFirst) {
-                // first bullet is already visible on arrival -- only the
-                // others are scroll-triggered
-                o = 1;
-              } else if (isLast) {
-                // final bullet: reveals after the gallery finishes, as the
-                // reader resumes ordinary scrolling
-                o = clamp01((p - 0.65) / 0.15);
-              } else {
-                // bullet i reveals when image (i+1) becomes current, i.e.
-                // gallery progress crosses i/(n-1). (Bullet 0 is now always
-                // shown from arrival, so the chain shifts down by one: the
-                // second bullet ties to the second image, not the third.)
-                const threshold = i / (n - 1);
-                o = clamp01((galleryP - threshold + 0.06) / 0.1);
-              }
+              // Uniform 1:1 mapping, driven by the REAL track position:
+              // bullet i shows once image (i+1) is current -- image 1 ->
+              // bullet 1 (visible immediately, threshold 0), image 2 ->
+              // bullet 2, image 3 -> bullet 3, image 4 -> bullet 4.
+              const threshold = i / (n - 1);
+              // offset equals the window width so threshold=0 (bullet 1)
+              // resolves to o=1 immediately at rest, not partway there
+              const o = clamp01((trackFrac - threshold + 0.1) / 0.1);
               return (
                 <li
                   key={b}

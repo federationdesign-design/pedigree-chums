@@ -2,11 +2,32 @@
   /* Full-width / liquid, matching the buy area: just the page side padding. */
   padding: clamp(24px, 4vw, 48px) clamp(20px, 6vw, 80px);
 }
+.wrap {
+  width: 100%;
+}
 .inner {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(12px, 1.5vw, 20px);
 }
+
+/* Yellow progress scrollbar (only shown when the rail is scrollable = mobile) */
+.scrollbar {
+  display: none;
+}
+.thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  cursor: grab;
+  touch-action: none;
+}
+.thumb:active { cursor: grabbing; }
 
 .cell {
   position: relative;
@@ -64,10 +85,31 @@
 }
 .cell:hover .play::after { border-left-color: var(--navy, #0a3a57); }
 
-/* Responsive: 2-up then 1-up on smaller screens (refined in the mobile pass) */
-@media (max-width: 900px) {
-  .inner { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 560px) {
-  .inner { grid-template-columns: 1fr; }
+/* Mobile: swap the 3x2 grid for a single horizontal-scroll rail. */
+@media (max-width: 768px) {
+  .inner {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .inner::-webkit-scrollbar { display: none; }
+  .cell {
+    /* ~78% of the viewport, so the next video peeks in to invite scrolling */
+    flex: 0 0 78%;
+  }
+
+  .scrollbar {
+    display: block;
+    position: relative;
+    height: 10px;
+    margin: 16px 0 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    transition: opacity 0.2s ease;
+  }
 }

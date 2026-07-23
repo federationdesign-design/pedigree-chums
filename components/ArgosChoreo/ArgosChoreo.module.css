@@ -223,8 +223,8 @@
 
 /* ── Quote + poll composite scene ── */
 .quotePollScene {
-  height: 250vh;
-  height: 250svh;
+  height: 150vh;
+  height: 150svh;
 }
 
 .pollWrap {
