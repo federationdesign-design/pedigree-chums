@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import CardDock from "../CardDock/CardDock";
@@ -35,6 +35,14 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [captionOpen, setCaptionOpen] = useState(false); // closed from the start
+  const [score, setScore] = useState(0);
+  const [scorePulse, setScorePulse] = useState(false);
+  const shakeFnRef = useRef<(() => void) | null>(null);
+  const addScore = (v: number) => {
+    setScore((s) => s + v);
+    setScorePulse(true);
+    window.setTimeout(() => setScorePulse(false), 400);
+  };
 
   useEffect(() => setMounted(true), []);
 
@@ -62,6 +70,9 @@ export default function LineageModal({ name, image, character, lineage, onClose 
             <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
           </svg>
         </button>
+        <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
+          {score.toLocaleString("en-GB")}
+        </div>
       </div>
       <h3 className={css.title}>
         {titleLines(shownName).map((line, i, arr) => (
@@ -87,12 +98,29 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           onShownChange={setShownName}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
+          onScore={addScore}
+          registerShake={(fn) => { shakeFnRef.current = fn; }}
           rootNote={character}
           onClose={onClose}
         />
         {/* Pit floor, same graphic as the main pit */}
         <img src="/floor-shortened-svg.svg" alt="" aria-hidden="true" className={css.floor} />
       </div>
+
+      {/* Shake button, straight from the pit: jelly icon, bottom right */}
+      <button
+        type="button"
+        className={css.shake}
+        onClick={(e) => {
+          shakeFnRef.current?.();
+          const el = e.currentTarget;
+          el.classList.add(css.shakeFlash);
+          window.setTimeout(() => el.classList.remove(css.shakeFlash), 300);
+        }}
+        aria-label="Shake the pit"
+      >
+        <span className={css.shakeIcon} aria-hidden="true" />
+      </button>
 
       {/* Reopen icon for the description box, chum-page style */}
       {!captionOpen && (

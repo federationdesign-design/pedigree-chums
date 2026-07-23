@@ -149,6 +149,8 @@ export default function BreedTree({
   onShownChange,
   hideCaption = false,
   onCaptionClose,
+  onScore,
+  registerShake,
   rootNote,
 }: {
   root: LineageNode;
@@ -168,6 +170,8 @@ export default function BreedTree({
   onShownChange?: (name: string) => void;
   hideCaption?: boolean;
   onCaptionClose?: () => void;
+  onScore?: (v: number) => void;
+  registerShake?: (fn: () => void) => void;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -210,6 +214,9 @@ export default function BreedTree({
   const [entered, setEntered] = useState(false);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
+  const [badgePcts, setBadgePcts] = useState<number[]>([]);
+  const runFallRef = useRef<(() => void) | null>(null);
+  const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
   type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number };
@@ -498,7 +505,8 @@ export default function BreedTree({
     if (!gravity || !entered || fellRef.current) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
-    const timer = window.setTimeout(() => {
+    const doFall = () => {
+      if (fellRef.current) return;
       if (focusRef.current !== nodes[0]) return; // user already exploring
       fellRef.current = true;
       setFalling(true);
@@ -530,6 +538,7 @@ export default function BreedTree({
         r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(),
       }));
       badgeBodiesRef.current = badges;
+      setBadgePcts(d1.map((n) => pctOf(n)));
       // The name pill enters the pit as a sticky capsule at the bottom centre.
       if (namePill && !pillBodyRef.current) {
         pillBodyRef.current = {
@@ -567,6 +576,20 @@ export default function BreedTree({
           for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.add(other);
           owned.add(ch);
           all.push(nb);
+          // the child's yellow % badge pops out with it
+          const bl = badgeBodiesRef.current;
+          if (bl) {
+            const bb: Body = {
+              n: null, x: ch.x + ch.r * 0.6, y: ch.y + ch.r * 0.6,
+              vx: nb.vx * 0.8 + (Math.random() - 0.5) * worldH * 0.3,
+              vy: nb.vy * 0.8,
+              r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0,
+              popped: true, ghosts: new Set<Body>(nb.ghosts),
+            };
+            bl.push(bb);
+            all.push(bb);
+            setBadgePcts((l) => [...l, bb.pct]);
+          }
         }
       };
       const G = worldH * 2.4; // per s^2
@@ -575,7 +598,11 @@ export default function BreedTree({
       const WALL_REST = 0.35;
       // little white numbers that flash up on a hit, copied from PackPit:
       // 650ms life, alpha 1-t, rising 22 + t*34, weight 400, --font-pct
-      const fxScale = vbHf / stageH; // svg units per screen px, so sizes match the pit
+      // svg units per screen px via the real screen transform, so the flash
+      // numbers render at exactly the pit's 15px regardless of viewBox fit
+      const svgEl = st ? st.querySelector("svg") : null;
+      const ctm = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
+      const fxScale = ctm && ctm.a ? 1 / ctm.a : vbHf / stageH;
       const numbers: { el: SVGTextElement; x: number; y: number; born: number }[] = [];
       const pctFont = (getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() || "Montserrat");
       const numAt = (x: number, y: number, val: number, now: number) => {
@@ -591,6 +618,7 @@ export default function BreedTree({
         el.style.pointerEvents = "none";
         fx.appendChild(el);
         numbers.push({ el, x, y, born: now });
+        onScore?.(val);
       };
       const FX_LIFE = 650;
       const drawNumbers = (now: number, view: View) => {
@@ -623,8 +651,8 @@ export default function BreedTree({
             b.y = yF - b.r; b.vy = -b.vy * (b.n ? BOUNCE : REST); b.vx *= 0.96;
             if (hitSpeed > FX_MIN * 0.6) popChildren(b);
           }
-          if (b.x - b.r < xL) { b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
-          if (b.x + b.r > xR) { b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
+          if (b.x - b.r < xL) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
+          if (b.x + b.r > xR) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
         }
         for (let i = 0; i < all.length; i++) {
           for (let j = i + 1; j < all.length; j++) {
@@ -654,6 +682,7 @@ export default function BreedTree({
                 const imp = (-(1 + REST) * rel) / (1 / ma + 1 / mc);
                 a.vx -= (imp / ma) * nx; a.vy -= (imp / ma) * ny;
                 c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
+                if (-rel > FX_MIN * 0.6) { popChildren(a); popChildren(c); }
               }
             }
           }
@@ -683,7 +712,7 @@ export default function BreedTree({
                 // first contact knocks it loose; resolve as a static bounce
                 b.x += nx * overlap; b.y += ny * overlap;
                 const rel = b.vx * nx + b.vy * ny;
-                if (rel < 0) { b.vx -= (1 + REST) * rel * nx; b.vy -= (1 + REST) * rel * ny; }
+                if (rel < 0) { b.vx -= (1 + REST) * rel * nx; b.vy -= (1 + REST) * rel * ny; if (-rel > FX_MIN * 0.6) popChildren(b); }
                 if (now - b.lastFx > FX_COOLDOWN) { numAt(cxp, pill.y - prW, b.pct, now); b.lastFx = now; }
                 pill.stuck = false;
               } else {
@@ -734,9 +763,29 @@ export default function BreedTree({
         started = last; // fresh time budget each wake
         fallRafRef.current = requestAnimationFrame(step);
       };
+      // Shake: pit-style jolt of everything in the mini pit.
+      shakeInnerRef.current = () => {
+        for (const b of all) {
+          b.vx = (Math.random() - 0.5) * worldH * 1.1;
+          b.vy = -(0.45 + Math.random() * 0.85) * worldH;
+        }
+        const pl = pillBodyRef.current;
+        if (pl) {
+          pl.stuck = false;
+          pl.vx = (Math.random() - 0.5) * worldH * 0.7;
+          pl.vy = -(0.35 + Math.random() * 0.6) * worldH;
+        }
+        wake();
+      };
       wakeRef.current = wake;
       wake();
-    }, 2000);
+    };
+    runFallRef.current = doFall;
+    registerShake?.(() => {
+      if (!fellRef.current) runFallRef.current?.();
+      shakeInnerRef.current?.();
+    });
+    const timer = window.setTimeout(doFall, 2000);
     return () => { window.clearTimeout(timer); cancelAnimationFrame(fallRafRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gravity, entered, nodes]);
@@ -900,19 +949,19 @@ export default function BreedTree({
           {/* Physics badges: once dropped, the yellow % chips live here and are
               positioned by the sim / zoomTo from their body coordinates. */}
           <g ref={badgesRef} style={{ display: dropped ? "inline" : "none" }} textAnchor="middle">
-            {nodes.filter((n) => n.depth === 1).map((d, i) => {
+            {badgePcts.map((pct, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
               const b = badgeBodiesRef.current?.[i];
-              const bx = b ? b.x : d.x + d.r * 0.6;
-              const by = b ? b.y : d.y + d.r * 0.6;
+              const bx = b ? b.x : v[0];
+              const by = b ? b.y : v[1] - 99999;
               return (
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
                 style={{ cursor: "grab", pointerEvents: "auto" }}
                 onPointerDown={(e) => startDrag(e, badgeBodiesRef.current?.[i])}>
                 <circle cx={0} cy={0} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
                 <text x={0} y={0} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
-                  {`${d.parent ? Math.round(((d.value ?? 0) / (d.parent.value || 1)) * 100) : 0}%`}
+                  {`${pct}%`}
                 </text>
               </g>
               );
