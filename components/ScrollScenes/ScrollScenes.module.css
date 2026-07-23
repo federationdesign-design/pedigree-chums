@@ -1,0 +1,77 @@
+/* ── Shared pin stage ─────────────────────────────────────────────────
+   Every Rule-B scene uses this same tight budget: just enough scroll
+   room to pin, hold through one short fixed reading pause, then release.
+   No scene is stretched to match an animation's own duration -- that
+   coupling was the source of the recurring "big gap" complaints. */
+.stage {
+  position: sticky;
+  top: 130px;
+  min-height: calc(100vh - 130px);
+  min-height: calc(100svh - 130px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pinnedText {
+  margin-bottom: 18px;
+  font-weight: 700;
+}
+
+/* ── Quote scene ── */
+.quoteScene {
+  /* pin (100vh) + a fixed, modest reading pause -- not scroll-distance
+     dependent, so this number never has to chase an animation's timing */
+  height: 145vh;
+  height: 145svh;
+}
+
+.quoteHolder {
+  position: relative;
+}
+
+.quoteLineTrack {
+  position: absolute;
+  left: 0;
+  top: 24px;
+  bottom: 24px;
+  width: 10px;
+}
+
+.quoteLine {
+  width: 10px;
+  height: 0%;
+  background: var(--yellow, #ffd23e);
+  border-radius: 6px;
+  transition: height 0.45s ease-out;
+}
+
+.quoteLineActive {
+  height: 100%;
+}
+
+.quoteMarkFx {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition-delay: 0.45s;
+}
+
+.quoteMarkActive {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.quoteTextFx {
+  opacity: 0;
+  filter: blur(14px);
+  display: inline-block;
+  will-change: opacity, filter;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+  transition-delay: 0.6s;
+}
+
+.quoteTextActive {
+  opacity: 1;
+  filter: blur(0px);
+}
