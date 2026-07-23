@@ -10,7 +10,18 @@ export default function HomeClient() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [placeholder, setPlaceholder] = useState("Labrador, Cockapoo, Pug...");
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Mobile shows a single example breed; wider screens show the full list.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const apply = () =>
+      setPlaceholder(mq.matches ? "Labrador" : "Labrador, Cockapoo, Pug...");
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   const goToTopMatch = () => {
     if (filtered.length > 0) {
@@ -63,7 +74,7 @@ export default function HomeClient() {
           <input
             className={styles.searchInput}
             type="text"
-            placeholder="Labrador, Cockapoo, Pug..."
+            placeholder={placeholder}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
             onFocus={() => setOpen(true)}

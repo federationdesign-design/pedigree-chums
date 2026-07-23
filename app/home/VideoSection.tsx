@@ -26,14 +26,25 @@ export default function VideoSection() {
   }, []);
 
   return (
-    <div className={styles.videoCol}>
-      <iframe
-        ref={iframeRef}
-        src="https://player.vimeo.com/video/1199216471?autoplay=0&loop=1&muted=1&controls=0&title=0&byline=0&portrait=0&background=1"
-        title="Pedigree Chums™"
-        allow="autoplay; fullscreen; picture-in-picture"
-        frameBorder="0"
-        className={styles.videoFrame}
+    <div className={styles.videoStack}>
+      <div className={styles.videoCol}>
+        <iframe
+          ref={iframeRef}
+          src="https://player.vimeo.com/video/1199216471?autoplay=0&loop=1&muted=1&controls=0&title=0&byline=0&portrait=0&background=1"
+          title="Pedigree Chums™"
+          allow="autoplay; fullscreen; picture-in-picture"
+          frameBorder="0"
+          className={styles.videoFrame}
+        />
+      </div>
+      <video
+        className={styles.plinthVideo}
+        src="/plinth.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
       />
     </div>
   );
