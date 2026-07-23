@@ -63,9 +63,17 @@
 
 
 /* ── Statue carousel + bullets ── */
+/* This was still 230svh -- the divider-margin fix in the previous round
+   only closed COLLAPSED MARGIN spacing, it never touched this. All four
+   bullets are typically fully visible by roughly p=0.55-0.65 (the last
+   ties to the gallery reaching trackFrac=1, which the auto-pan reaches
+   around p=0.55), so 230svh was reserving up to ~100svh of pure dead
+   scroll after the content had already finished -- nearly a full extra
+   screen's worth, which is what was still showing as "not right" after
+   only the margin was fixed. */
 .bulletScene {
-  height: 230vh;
-  height: 230svh;
+  height: 140vh;
+  height: 140svh;
 }
 
 /* Galleries with no bullets need far less pin-and-release travel -- this
