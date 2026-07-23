@@ -25,6 +25,21 @@ const ZOOM_PAD = 1.1;
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
+
+// Names over 11 characters split to two lines at the nearest word boundary,
+// same rule as the pop-up title, which lets the labels run twice the size.
+function splitLabel(name: string): string[] {
+  if (name.length <= 11 || !name.includes(" ")) return [name];
+  const words = name.split(" ");
+  let first = words[0];
+  let i = 1;
+  while (i < words.length && (first + " " + words[i]).length <= 11) {
+    first += " " + words[i];
+    i++;
+  }
+  const rest = words.slice(i).join(" ");
+  return rest ? [first, rest] : [first];
+}
 type View = [number, number, number];
 
 // Classic bounce easing for the drop-in entrance: overshoots slightly and
@@ -419,13 +434,12 @@ export default function BreedTree({
   }
 
   function zoom(d: Node) {
-    cancelAnimationFrame(fallRafRef.current);
-    simRunningRef.current = false;
-    setFalling(false);
+    // the pit stays live through a zoom: physics keeps running underneath
+    // while the view flies in, and everything returns as the view pulls back
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? 1.1 : 1)];
+    let target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? 1.21 : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
@@ -468,7 +482,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? 1.1 : 1)]);
+    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? 1.21 : 1)]);
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -556,16 +570,16 @@ export default function BreedTree({
       const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
       const yF0 = yF;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body>; a: number; va: number };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body>; a: number; va: number; ia: number; iva: number };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
-      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Set<Body>(), a: 0, va: 0 }));
+      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Set<Body>(), a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
-      const BADGE_R = 38 / k;
+      const BADGE_R = 46 / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(), a: 0, va: 0,
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(), a: 0, va: 0, ia: 0, iva: 0,
       }));
       badgeBodiesRef.current = badges;
       setBadgePcts(d1.map((n) => pctOf(n)));
@@ -621,7 +635,7 @@ export default function BreedTree({
             vx: b.vx * 0.4 + (Math.random() - 0.5) * worldH * 0.7,
             vy: b.vy * 0.3 - worldH * (0.45 + Math.random() * 0.35),
             r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false,
-            ghosts: new Set<Body>(), a: 0, va: (Math.random() - 0.5) * 2,
+            ghosts: new Set<Body>(), a: 0, va: (Math.random() - 0.5) * 0.8, ia: 0, iva: 0,
           };
           for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.add(other);
           owned.add(ch);
@@ -634,7 +648,7 @@ export default function BreedTree({
               vx: nb.vx * 0.8 + (Math.random() - 0.5) * worldH * 0.3,
               vy: nb.vy * 0.8,
               r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0,
-              popped: true, ghosts: new Set<Body>(nb.ghosts), a: 0, va: 0,
+              popped: true, ghosts: new Set<Body>(nb.ghosts), a: 0, va: 0, ia: 0, iva: 0,
             };
             bl.push(bb);
             all.push(bb);
@@ -666,8 +680,34 @@ export default function BreedTree({
         onScore?.(val);
       };
       const FX_LIFE = 650;
+      // understated three-ball pop, straight from the pit's whackAt: three
+      // white circles drift out and fade where each name vanishes
+      const parts: { el: SVGCircleElement; x: number; y: number; vx: number; vy: number; r: number; born: number; life: number }[] = [];
+      const whackAt = (x: number, y: number, now: number) => {
+        const fx = fxRef.current;
+        if (!fx) return;
+        for (let i = 0; i < 3; i++) {
+          const a = Math.random() * Math.PI * 2, sp = (1 + Math.random() * 1.6) * 60 * fxScale;
+          const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          el.setAttribute("r", String((5 + Math.random() * 4) * fxScale));
+          el.style.fill = "#ffffff";
+          el.style.pointerEvents = "none";
+          fx.appendChild(el);
+          parts.push({ el, x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 36 * fxScale, r: 0, born: now, life: 420 + Math.random() * 220 });
+        }
+      };
       const drawNumbers = (now: number, view: View) => {
         const kk = SIZE / view[2];
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const pp = parts[i];
+          const t = (now - pp.born) / pp.life;
+          if (t >= 1) { pp.el.remove(); parts.splice(i, 1); continue; }
+          pp.x += (pp.vx / 60);
+          pp.y += (pp.vy / 60);
+          pp.el.setAttribute("cx", String((pp.x - view[0]) * kk));
+          pp.el.setAttribute("cy", String((pp.y - view[1]) * kk));
+          pp.el.style.opacity = String(1 - t);
+        }
         for (let i = numbers.length - 1; i >= 0; i--) {
           const n = numbers[i];
           const t = (now - n.born) / FX_LIFE;
@@ -677,6 +717,10 @@ export default function BreedTree({
           n.el.style.opacity = String(1 - t);
         }
       };
+      // the white names pop out of existence: three-ball pop at each label
+      const t0 = performance.now();
+      for (const n of d1) whackAt(n.x, n.y - n.r * 0.55, t0);
+
       const FX_COOLDOWN = 220;
       const FX_MIN = worldH * 0.05; // minimum impact speed to flash
       let last = performance.now();
@@ -690,18 +734,26 @@ export default function BreedTree({
           b.vy += G * dt;
           b.x += b.vx * dt;
           b.y += b.vy * dt;
+          b.va = Math.max(-1.0, Math.min(1.0, b.va)); // never a spinning-top blur
           b.a += b.va * dt;
-          b.va *= 0.995;
+          b.va *= 0.99;
+          // the image inside lags its circle like water in a bowl: an
+          // underdamped spring chases the body angle, overshoots, sloshes,
+          // and settles a beat after the circle itself has stopped
+          const sacc = (b.a - b.ia) * 16 - b.iva * 3.2;
+          b.iva += sacc * dt;
+          b.ia += b.iva * dt;
           if (b.y + b.r > yF) {
             if (b.vy > FX_MIN && now - b.lastFx > FX_COOLDOWN) { numAt(b.x, yF - b.r, b.pct, now); b.lastFx = now; }
             const hitSpeed = b.vy;
             b.y = yF - b.r; b.vy = -b.vy * (b.n ? BOUNCE : REST); b.vx *= 0.96;
-            b.va = b.va * 0.5 + (b.vx / Math.max(b.r, 0.001)) * 0.6;
+            b.va = b.va * 0.5 + (b.vx / Math.max(b.r, 0.001)) * 0.22;
             if (hitSpeed > FX_MIN * 0.6) popChildren(b);
           }
           if (b.x - b.r < xL) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
           if (b.x + b.r > xR) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
         }
+        for (let pass = 0; pass < 3; pass++) {
         for (let i = 0; i < all.length; i++) {
           for (let j = i + 1; j < all.length; j++) {
             const a = all[i], c = all[j];
@@ -721,7 +773,7 @@ export default function BreedTree({
               a.x -= nx * overlap * (mc / mt); a.y -= ny * overlap * (mc / mt);
               c.x += nx * overlap * (ma / mt); c.y += ny * overlap * (ma / mt);
               const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
-              if (rel < 0) {
+              if (rel < 0 && pass === 0) {
                 if (-rel > FX_MIN && now - a.lastFx > FX_COOLDOWN) {
                   const cx = a.x + nx * a.r, cy = a.y + ny * a.r;
                   numAt(cx, cy, a.pct, now);
@@ -732,11 +784,12 @@ export default function BreedTree({
                 c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
                 if (-rel > FX_MIN * 0.6) { popChildren(a); popChildren(c); }
                 const tang = (c.vx - a.vx) * -ny + (c.vy - a.vy) * nx;
-                a.va += (tang / Math.max(a.r, 0.001)) * 0.12;
-                c.va -= (tang / Math.max(c.r, 0.001)) * 0.12;
+                a.va += (tang / Math.max(a.r, 0.001)) * 0.045;
+                c.va -= (tang / Math.max(c.r, 0.001)) * 0.045;
               }
             }
           }
+        }
         }
         // in-pit buttons: fixed ones take knocks (sink + tilt, 5th drops them);
         // loose ones fall, bounce and spin like everything else
@@ -854,7 +907,7 @@ export default function BreedTree({
             if (!b.n || Math.abs(b.a) < 0.001) continue;
             const i = nodes.indexOf(b.n);
             const pat = (svgEl as SVGSVGElement).querySelector(`#bt-img-${i}`);
-            if (pat) pat.setAttribute("patternTransform", `rotate(${b.a * 57.2958} 0.5 0.5) translate(0.5 0.5) scale(1.45) translate(-0.5 -0.5)`);
+            if (pat) pat.setAttribute("patternTransform", `rotate(${b.ia * 57.2958} 0.5 0.5)`);
           }
         }
         zoomTo(viewRef.current);
@@ -1045,15 +1098,17 @@ export default function BreedTree({
                       x={0}
                       y={TITLE_DY}
                       transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
-                      style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: isMobile ? "51px" : "17px", letterSpacing: "0.5px" }}
+                      style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: isMobile ? "102px" : "34px", letterSpacing: "0.5px" }}
                     >
-                      {d.data.name.toUpperCase()}
+                      {splitLabel(d.data.name.toUpperCase()).map((line, li) => (
+                        <tspan key={li} x={0} dy={li === 0 ? 0 : "1.05em"}>{line}</tspan>
+                      ))}
                     </text>
                   )}
                   {pct !== null && !(dropped && d.depth === 1) && (
                     <g>
-                      <circle cx={0} cy={50} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
-                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
+                      <circle cx={0} cy={50} r={46} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
+                      <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "31px" }}>
                         {`${pct}%`}
                       </text>
                     </g>
@@ -1075,9 +1130,10 @@ export default function BreedTree({
               return (
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
                 style={{ cursor: "grab", pointerEvents: "auto" }}
+                onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => startDrag(e, badgeBodiesRef.current?.[i])}>
-                <circle cx={0} cy={0} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
-                <text x={0} y={0} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
+                <circle cx={0} cy={0} r={46} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
+                <text x={0} y={0} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "31px" }}>
                   {`${pct}%`}
                 </text>
               </g>
@@ -1111,6 +1167,7 @@ export default function BreedTree({
             return (
               <g ref={pillRef} transform={`translate(${(wx - v[0]) * kk},${(wy - v[1]) * kk})`}
                 style={{ cursor: pb ? "grab" : "default", pointerEvents: pb ? "auto" : "none" }}
+                onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => startDrag(e, pillBodyRef.current)}>
                 <rect x={-L - pr} y={-pr} width={(L + pr) * 2} height={pr * 2} rx={pr}
                   style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: 2 * upp }} />
@@ -1151,6 +1208,7 @@ export default function BreedTree({
               <g key={d.kind} ref={d.kind === "close" ? uiCloseRef : uiDescRef}
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
                 style={{ cursor: "pointer", pointerEvents: "auto" }}
+                onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
                   const act = d.kind === "close" ? onPitClose : onToggleCaption;

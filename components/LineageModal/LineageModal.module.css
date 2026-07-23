@@ -28,19 +28,19 @@
 .title {
   position: absolute;
   top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92%;
+  left: 20px;
+  width: auto;
+  max-width: 78%;
   z-index: 15;
   pointer-events: none;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.9rem, 7vw, 6.1rem);
+  font-size: clamp(2.65rem, 6.5vw, 5.85rem);
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin: 0;
   line-height: 1.05;
-  text-align: center;
+  text-align: left;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
@@ -70,7 +70,7 @@
 
 @media (max-width: 640px) {
   .title {
-    font-size: clamp(1.95rem, 11vw, 3.35rem);
+    font-size: clamp(1.7rem, 10vw, 3.1rem);
   }
 }
 
