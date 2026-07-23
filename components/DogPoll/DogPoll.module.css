@@ -5,6 +5,17 @@
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.25);
 }
 
+.wrap .kickerBody {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+  margin: 0 0 10px;
+}
+
 .wrap .kicker {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.7rem;

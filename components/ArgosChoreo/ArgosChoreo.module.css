@@ -3,9 +3,9 @@
 
 .stage {
   position: sticky;
-  top: 120px;
-  min-height: calc(100vh - 120px);
-  min-height: calc(100svh - 120px);
+  top: 130px;
+  min-height: calc(100vh - 130px);
+  min-height: calc(100svh - 130px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -183,24 +183,24 @@
 }
 
 /* ── Gated video ── */
-.videoGate,
-.videoGateDone {
-  transition: height 0.3s ease;
-}
-
 @media (max-width: 768px) {
   .videoGate {
-    height: 230vh;
-    height: 230svh;
+    position: relative;
   }
 
-  .videoGate .videoStage,
-  .videoGateDone .videoStage {
+  .videoGate::after {
+    content: "";
+    display: block;
+    height: 45vh;
+    height: 45svh;
+  }
+
+  .videoGate .videoStage {
     position: sticky;
-    top: 100px;
+    top: 130px;
   }
 
-  .videoGateDone .videoStage {
-    position: static;
+  .videoGate figure {
+    margin: 0 !important;
   }
 }

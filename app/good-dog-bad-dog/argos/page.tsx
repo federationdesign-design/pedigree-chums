@@ -133,7 +133,7 @@ function NolanFilmCard() {
                   {([
                     { label: "Runtime", value: <>173 <span style={{ fontSize: "75%" }}>min</span></> },
                     { label: "Released", value: "July 26" },
-                    { label: "US rating", value: "R" },
+                    { label: "UK cert", value: "15" },
                   ] as { label: string; value: React.ReactNode }[]).map(({ label, value }) => (
                     <div key={label} style={{ textAlign: "center" }}>
                       <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 3 }}>{label}</p>
@@ -143,7 +143,7 @@ function NolanFilmCard() {
                 </div>
                 <div style={{ background: "#ef4444", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated R (US) and 15 (UK) for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 (UK) for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Zendaya", "Charlize Theron"].map(name => (
@@ -587,11 +587,22 @@ export default function ArgosPage() {
 
               <p>Psychologists often describe this kind of absorption as narrative transportation: the process by which people become mentally and emotionally drawn into a story world. It is why we wince when a character is hurt, why fictional grief can produce real tears, and why the death of a dog on screen can feel almost personally unfair.</p>
 
+              <div className={styles.desktopOnly}>
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <QuoteBuild
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
+                  pinned={<></>}
+                  quote="They are doing what audiences have always done: asking an old story to speak to the feelings of the present."
+                />
+              </div>
 
               <div className={styles.sceneMobile}>
                 <DogPoll
-                  title="What do you think?"
+                  title="What do you think?" titleFont="body"
                   question="Should he change the story so Argos gets head strokes?"
                   options={[
                     { label: "Yes, I love schmaltz", pct: 96, resultLabel: "Pet the dog", color: "green" },
@@ -612,7 +623,7 @@ export default function ArgosPage() {
 
               <p>The old contract &mdash; I keep you, you serve me &mdash; has been replaced by something closer to mutual love, and that love now feels like a moral obligation. When Odysseus walks past Argos without stopping, modern audiences feel it not as a tactical necessity but as a failure. That is the distance between Homer&apos;s world and ours.</p>
 
-              <h3>Which puts Nolan in an interesting position.</h3>
+              <h3 className={styles.h3Navy}>Which puts Nolan in an interesting position.</h3>
 
               <p>He is adapting an ancient scene built on restraint for a modern audience that craves emotional acknowledgement. If Nolan allows Odysseus to acknowledge Argos more directly than Homer does, that is not simply sentimentality. It is cultural translation. Homer&apos;s Argos belongs to a world of hunting dogs, households, duty and restraint. Nolan&apos;s Argos belongs to an audience that sees an old dog and thinks: he should be comforted.</p>
 
@@ -660,7 +671,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/history/agros-on-coins.png" alt="Argos depicted on ancient coins" loading="lazy" style={{ width: "85%", margin: "0 auto" }} />
-                <p className={styles.imageCaption}>Republican denarius serratus minted in 82 BC by the moneyer Gaius Mamilius Limetanus - a depiction of Odysseus and Argos, www.harneycoins.com</p>
+                <p className={styles.imageCaption} style={{ textAlign: "center" }}>Republican denarius serratus minted in 82 BC by the moneyer Gaius Mamilius Limetanus - a depiction of Odysseus and Argos, www.harneycoins.com</p>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -680,8 +691,8 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <HomerCrossfade
                   title={
-                    <div style={{ padding: "16px 20px 12px" }}>
-                      <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                    <div style={{ padding: "16px 20px 12px", background: "var(--navy)" }}>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "34px", textAlign: "center", letterSpacing: "0.12em", color: "var(--navy)", background: "#fff", borderRadius: 8, padding: "6px 0", textTransform: "uppercase", margin: 0 }}>About Homer</p>
                     </div>
                   }
                   header={
@@ -704,7 +715,8 @@ export default function ArgosPage() {
                   }
                   works={
                     <>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 12 }}>Major Works</p>
+                      <div style={{ borderTop: "1px solid rgba(255,255,255,0.25)", marginBottom: 14 }} />
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--yellow)", marginBottom: 14, textAlign: "center" }}>Major Works</p>
                       {[
                         { title: "The Iliad", detail: "c. 750 BCE · 24 books · 15,693 lines", desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs." },
                         { title: "The Odyssey", detail: "c. 700 BCE · 24 books · 12,109 lines", desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos." },
@@ -814,7 +826,7 @@ export default function ArgosPage() {
               <p>This is not just sentimentality. It is biology.</p>
 
               <div className={styles.desktopOnly}>
-              <p>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+              <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</blockquote>
               </div>
@@ -1019,10 +1031,12 @@ export default function ArgosPage() {
             </div>
 
             {/* Card 11: Research note */}
+            <div className={styles.sidebarOnly}>
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>{RESEARCH_NOTE}</p>
               </div>
+            </div>
             </div>
 
             {/* Card 12: What We Know */}
@@ -1102,7 +1116,7 @@ export default function ArgosPage() {
               var np = (vh - hr.top) / vh;
               if (np < 0) np = 0;
               if (np > 1) np = 1;
-              if (wwk) wwk.style.transform = 'translateY(' + (np * 10) + 'px)';
+              if (wwk) wwk.style.transform = 'translateY(' + (np * 5) + 'px)';
               /* image drift: paced by the PIN window only, so the pan happens
                  while the reader is actually looking at the pinned image */
               var pin = (hr.height > vh) ? (-hr.top) / (hr.height - vh) : 0;
@@ -1110,7 +1124,7 @@ export default function ArgosPage() {
               if (pin > 1) pin = 1;
               /* two-way parallax: image eases DOWN as the card rises */
               var hi = document.getElementById('hound-img');
-              if (hi) hi.style.transform = 'translateY(' + (-(26 - pin * 12)) + '%)';
+              if (hi) hi.style.transform = 'translateY(' + (-(19 - pin * 6)) + '%)';
               /* the descendant card fades out as it climbs past halfway */
               var ld = document.getElementById('ld-card');
               if (ld) {

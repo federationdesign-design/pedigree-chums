@@ -182,19 +182,16 @@ export function HomerCrossfade({
    pin travel collapses and it scrolls past normally. */
 export function GatedVideo({ children }: { children: React.ReactNode }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
-  const [ended, setEnded] = useState(false);
 
+  /* Pure CSS sticky-in-tall-container pin, same pattern as every other
+     choreographed scene: release happens naturally when the scroll spacer
+     is exhausted, so there is no JS-driven snap and no dependency on
+     whether the video has finished playing. Autoplay is the only JS job. */
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
     const video = wrap.querySelector("video");
     if (!video) return;
-    if (video.ended) {
-      setEnded(true);
-      return;
-    }
-    const onEnded = () => setEnded(true);
-    video.addEventListener("ended", onEnded);
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
@@ -204,14 +201,11 @@ export function GatedVideo({ children }: { children: React.ReactNode }) {
       { threshold: 0.5 }
     );
     io.observe(video);
-    return () => {
-      video.removeEventListener("ended", onEnded);
-      io.disconnect();
-    };
+    return () => io.disconnect();
   }, []);
 
   return (
-    <div ref={wrapRef} className={ended ? styles.videoGateDone : styles.videoGate}>
+    <div ref={wrapRef} className={styles.videoGate}>
       <div className={styles.videoStage}>{children}</div>
     </div>
   );

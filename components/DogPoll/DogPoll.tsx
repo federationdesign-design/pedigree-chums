@@ -18,11 +18,13 @@ export type PollOption = {
 */
 export default function DogPoll({
   title = "What do you think?",
+  titleFont = "display",
   question,
   options,
   footnote,
 }: {
   title?: string;
+  titleFont?: "display" | "body";
   question: string;
   options: PollOption[];
   footnote?: string;
@@ -31,7 +33,7 @@ export default function DogPoll({
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.kicker}>{title}</p>
+      <p className={titleFont === "body" ? styles.kickerBody : styles.kicker}>{title}</p>
       <p className={styles.question}>{question}</p>
 
       {picked === null ? (
