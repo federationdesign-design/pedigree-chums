@@ -511,20 +511,24 @@ export default function ArgosPage() {
               <div className={styles.desktopOnly}>
               <p>Argos is lying outside, old, filthy and neglected. He had <span style={{ color: "var(--yellow)" }}>once been a fine hunting dog, raised by Odysseus himself</span>, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
 
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.</blockquote>
               </div>
 
-              <div className={styles.sceneMobile} style={{ marginTop: -200 }}>
+              <div className={styles.sceneMobile}>
                 <QuoteReveal
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
                   pinned={<p className={styles.pinnedQuoteText} style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had <span style={{ color: "var(--yellow)" }}>once been a fine hunting dog, raised by Odysseus himself</span>, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
-                  quote="Humans recognise status. Dogs recognise presence."
+                  quote="Odysseus notices. He wipes away a tear, but he cannot go to Argos openly."
                 />
               </div>
 
               <div className={styles.sceneMobile}>
                 <SizeBuildCard />
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <LikelyOriginsCard />
               </div>
 
               <div className={styles.desktopOnly}>
@@ -536,7 +540,7 @@ export default function ArgosPage() {
               </ul>
               </div>
 
-              <div className={styles.sceneMobile}>
+              <div className={styles.sceneMobile} style={{ marginBottom: 0 }}>
                 <StatueBulletsChoreo
                   slides={[
                     {
@@ -550,14 +554,14 @@ export default function ArgosPage() {
                       caption: "When he fails to get the acknowledgment he needed, and with his colossal old age, he dies",
                     },
                     {
-                      src: "/history/odysseus-dog-argos-in-death.webp",
-                      alt: "The death of Argos",
-                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
-                    },
-                    {
                       src: "/history/odyssusand-argos-painting-remake.jpg",
                       alt: "Odysseus and Argos painting remake",
                       caption: "A tale as old as time; a dog's love for their human. The original story, remade and remade",
+                    },
+                    {
+                      src: "/history/odysseus-dog-argos-in-death.webp",
+                      alt: "The death of Argos",
+                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
                     },
                   ]}
                   bullets={[
@@ -569,7 +573,7 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <div style={{ borderTop: "1px solid #ffffff", opacity: 1, margin: "20px 0" }} />
+              <div style={{ borderTop: "1px solid #ffffff", margin: "25px 0" }} />
 
               <p>
                 Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.{" "}
@@ -968,10 +972,6 @@ export default function ArgosPage() {
               <p>Once he has seen Odysseus, once he has known him, once he has confirmed that the man beneath the disguise is still the man who left, Argos can go. In a story full of monsters, storms, gods, violence and tricks, the dog&apos;s gift is simple.</p>
 
               <p>He knows who has come home. That is not a broken heart. That is a completed one.</p>
-
-              <div className={styles.sceneMobile}>
-                <LikelyOriginsCard />
-              </div>
 
               <h2 className={styles.subhead}>Why Argos still matters</h2>
 

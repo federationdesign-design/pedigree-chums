@@ -1124,12 +1124,17 @@
     display: none;
   }
 
-  /* Menuflash video pin: travel for the scroll-scrub playback */
+  /* Menuflash video pin: travel for the scroll-scrub playback. Shortened
+     from 160svh -- the previous fix used a large negative margin on the
+     NEXT scene to fake this closer, which pulled that scene up over
+     content this one hadn't finished occupying yet, causing a visible
+     overlap flash mid-scroll. Shrinking the source of the space is the
+     non-overlapping way to close the same gap. */
   .parallaxScene.videoPinScene::after {
     content: "";
     display: block;
-    height: 160vh;
-    height: 160svh;
+    height: 60vh;
+    height: 60svh;
   }
 
   .videoCard {
