@@ -445,6 +445,18 @@
   color: var(--yellow, #ffd23e);
 }
 
+/* "How it plays" title above the instructional step cards */
+.stepsHeading {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(32px, 5vw, 64px);
+  line-height: 1.05;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0.02em;
+  margin: clamp(48px, 8vw, 96px) 0 clamp(8px, 2vw, 20px);
+  padding: 0 clamp(20px, 6vw, 80px);
+}
+
 .cardsLead {
   font-family: var(--font-body, "Montserrat", system-ui);
   font-size: clamp(16px, 1.8vw, 20px);
@@ -498,4 +510,12 @@
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/* Mobile: stack the text/bullets above the video instead of side by side.
+   (Placed after the base .videoSection rule so it wins the cascade.) */
+@media (max-width: 768px) {
+  .videoSection {
+    grid-template-columns: 1fr;
+  }
 }

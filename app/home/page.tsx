@@ -42,6 +42,9 @@ export default function HomePage() {
         <VideoSection />
       </section>
 
+      <h2 className={styles.stepsHeading}>
+        How it <span className={styles.cardsHeadingYellow}>plays</span>
+      </h2>
       <StepCards />
 
       <Footer />
