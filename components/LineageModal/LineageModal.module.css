@@ -10,7 +10,7 @@
   flex-direction: column;
   background: linear-gradient(to top right, #00e2ff, #008eff);
   isolation: isolate;
-  padding: 16px 22px 18px;
+  padding: 0;
   animation: lmRise 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 @keyframes lmRise {
@@ -26,13 +26,19 @@
 }
 
 .title {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  z-index: 15;
+  pointer-events: none;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.2rem, 7.5vw, 6.4rem);
+  font-size: clamp(2.9rem, 7vw, 6.1rem);
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin: -8px 0 2px;
+  margin: 0;
   line-height: 1.05;
   text-align: center;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
@@ -58,22 +64,13 @@
 }
 
 .stageArea {
-  flex: 1 1 auto;
-  min-height: 0;
-  position: relative;
-  margin-top: 10px;
+  position: absolute;
+  inset: 0;
 }
 
 @media (max-width: 640px) {
-  .overlay {
-    padding: 12px 14px 14px;
-  }
   .title {
-    font-size: clamp(2.2rem, 12vw, 3.6rem);
-  }
-  .close {
-    width: 44px;
-    height: 44px;
+    font-size: clamp(1.95rem, 11vw, 3.35rem);
   }
 }
 

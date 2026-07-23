@@ -241,26 +241,23 @@
   flex-direction: column;
 }
 .asideDocked {
-  left: auto;
+  position: absolute;
+  left: 10%;
   right: auto;
-  top: 0;
+  top: clamp(112px, 17vh, 190px);
   bottom: auto;
-  width: 100%;
+  width: 80%;
   max-width: none;
-  order: -1;
-  z-index: 2;
+  z-index: 15;
   gap: 12px;
-  padding: 0 2px;
+  padding: 0;
 }
 .stageDocked {
-  position: relative;
-  inset: auto;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   z-index: 0;
-  flex: 1 1 auto;
-  min-height: 0;
-  order: 0;
 }
 
 /* Docked caption: centred, 80% wide, condensed so the pit gets the room.

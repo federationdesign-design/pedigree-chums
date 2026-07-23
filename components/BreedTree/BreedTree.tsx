@@ -151,6 +151,8 @@ export default function BreedTree({
   onCaptionClose,
   onScore,
   registerShake,
+  onToggleCaption,
+  onPitClose,
   rootNote,
 }: {
   root: LineageNode;
@@ -172,6 +174,8 @@ export default function BreedTree({
   onCaptionClose?: () => void;
   onScore?: (v: number) => void;
   registerShake?: (fn: () => void) => void;
+  onToggleCaption?: () => void;
+  onPitClose?: () => void;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -234,6 +238,15 @@ export default function BreedTree({
   // a wake() so a drag can restart physics after everything has settled.
   const wakeRef = useRef<(() => void) | null>(null);
   const simRunningRef = useRef(false);
+  // In-pit UI objects (pit-menu style): the close X and the description
+  // toggle are navy rounded squares that start fixed in the corner, sink and
+  // tilt a notch on every knock, give way on the fifth, then tumble like
+  // anything else. A tap always works, wherever they are.
+  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: "close" | "desc" };
+  const uiBodiesRef = useRef<UiBody[] | null>(null);
+  const uiCloseRef = useRef<SVGGElement>(null);
+  const uiDescRef = useRef<SVGGElement>(null);
+  const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const dragRef = useRef<{
     body: { x: number; y: number; vx: number; vy: number };
     dx: number; dy: number; lx: number; ly: number; lt: number;
@@ -275,9 +288,14 @@ export default function BreedTree({
     return v;
   };
 
-  const startDrag = (e: React.PointerEvent, body: { x: number; y: number; vx: number; vy: number } | null | undefined) => {
-    if (!body) return;
+  const startDrag = (e: React.PointerEvent, body: { x: number; y: number; vx: number; vy: number } | null | undefined, onTap?: () => void) => {
+    if (!body) {
+      // fixed or pre-drop objects: a press is simply a tap
+      if (onTap) { e.stopPropagation(); onTap(); }
+      return;
+    }
     e.stopPropagation();
+    pressRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
     const w = svgPointToWorld(e);
     if (!w) return;
     (e.target as Element).setPointerCapture?.(e.pointerId);
@@ -307,7 +325,12 @@ export default function BreedTree({
       d.lx = wx; d.ly = wy; d.lt = now;
       wakeRef.current?.();
     };
-    const up = () => {
+    const up = (ev?: PointerEvent) => {
+      const p0 = pressRef.current;
+      pressRef.current = null;
+      if (onTap && p0 && ev && performance.now() - p0.t < 350 && Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) < 8) {
+        onTap(); // a quick, still press is a tap, wherever the object lies
+      }
       dragRef.current = null;
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
@@ -348,7 +371,14 @@ export default function BreedTree({
     }
     const pb = pillBodyRef.current;
     if (pb && pillRef.current) {
-      pillRef.current.setAttribute("transform", `translate(${(pb.x - v[0]) * k},${(pb.y - v[1]) * k})`);
+      pillRef.current.setAttribute("transform", `translate(${(pb.x - v[0]) * k},${(pb.y - v[1]) * k}) rotate(${((pb as unknown as { a?: number }).a ?? 0) * 57.2958})`);
+    }
+    const ub = uiBodiesRef.current;
+    if (ub) {
+      for (const u of ub) {
+        const el = (u.kind === "close" ? uiCloseRef : uiDescRef).current;
+        if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
+      }
     }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
@@ -395,7 +425,7 @@ export default function BreedTree({
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD)];
+    let target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? 1.1 : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
@@ -438,7 +468,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)]);
+    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? 1.1 : 1)]);
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -526,19 +556,39 @@ export default function BreedTree({
       const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
       const yF0 = yF;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body> };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body>; a: number; va: number };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
-      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Set<Body>() }));
+      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Set<Body>(), a: 0, va: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = 38 / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(),
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Set<Body>(), a: 0, va: 0,
       }));
       badgeBodiesRef.current = badges;
       setBadgePcts(d1.map((n) => pctOf(n)));
+      // svg units per screen px via the real screen transform: used for pit-
+      // exact number sizing and for screen-sized UI objects
+      const svgEl = st ? st.querySelector("svg") : null;
+      const ctm = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
+      const fxScale = ctm && ctm.a ? 1 / ctm.a : vbHf / stageH;
+
+      // The close X and description toggle join the pit, fixed in the top-right
+      // corner like the pit's menu button, in screen-size terms.
+      const uppW = fxScale;
+      if (!uiBodiesRef.current) {
+        const uSz = 84 * uppW; // 84px on screen, dock-icon territory
+        const m = 16 * uppW;
+        const ux = v[0] + (xMinF + vbWf - m - uSz / 2) / k;
+        uiBodiesRef.current = [
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
+        ];
+      }
+      const uiBodies = uiBodiesRef.current;
+
       // The name pill enters the pit as a sticky capsule at the bottom centre.
       if (namePill && !pillBodyRef.current) {
         pillBodyRef.current = {
@@ -571,7 +621,7 @@ export default function BreedTree({
             vx: b.vx * 0.4 + (Math.random() - 0.5) * worldH * 0.7,
             vy: b.vy * 0.3 - worldH * (0.45 + Math.random() * 0.35),
             r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false,
-            ghosts: new Set<Body>(),
+            ghosts: new Set<Body>(), a: 0, va: (Math.random() - 0.5) * 2,
           };
           for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.add(other);
           owned.add(ch);
@@ -584,7 +634,7 @@ export default function BreedTree({
               vx: nb.vx * 0.8 + (Math.random() - 0.5) * worldH * 0.3,
               vy: nb.vy * 0.8,
               r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0,
-              popped: true, ghosts: new Set<Body>(nb.ghosts),
+              popped: true, ghosts: new Set<Body>(nb.ghosts), a: 0, va: 0,
             };
             bl.push(bb);
             all.push(bb);
@@ -598,11 +648,6 @@ export default function BreedTree({
       const WALL_REST = 0.35;
       // little white numbers that flash up on a hit, copied from PackPit:
       // 650ms life, alpha 1-t, rising 22 + t*34, weight 400, --font-pct
-      // svg units per screen px via the real screen transform, so the flash
-      // numbers render at exactly the pit's 15px regardless of viewBox fit
-      const svgEl = st ? st.querySelector("svg") : null;
-      const ctm = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
-      const fxScale = ctm && ctm.a ? 1 / ctm.a : vbHf / stageH;
       const numbers: { el: SVGTextElement; x: number; y: number; born: number }[] = [];
       const pctFont = (getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() || "Montserrat");
       const numAt = (x: number, y: number, val: number, now: number) => {
@@ -645,10 +690,13 @@ export default function BreedTree({
           b.vy += G * dt;
           b.x += b.vx * dt;
           b.y += b.vy * dt;
+          b.a += b.va * dt;
+          b.va *= 0.995;
           if (b.y + b.r > yF) {
             if (b.vy > FX_MIN && now - b.lastFx > FX_COOLDOWN) { numAt(b.x, yF - b.r, b.pct, now); b.lastFx = now; }
             const hitSpeed = b.vy;
             b.y = yF - b.r; b.vy = -b.vy * (b.n ? BOUNCE : REST); b.vx *= 0.96;
+            b.va = b.va * 0.5 + (b.vx / Math.max(b.r, 0.001)) * 0.6;
             if (hitSpeed > FX_MIN * 0.6) popChildren(b);
           }
           if (b.x - b.r < xL) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
@@ -683,6 +731,58 @@ export default function BreedTree({
                 a.vx -= (imp / ma) * nx; a.vy -= (imp / ma) * ny;
                 c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
                 if (-rel > FX_MIN * 0.6) { popChildren(a); popChildren(c); }
+                const tang = (c.vx - a.vx) * -ny + (c.vy - a.vy) * nx;
+                a.va += (tang / Math.max(a.r, 0.001)) * 0.12;
+                c.va -= (tang / Math.max(c.r, 0.001)) * 0.12;
+              }
+            }
+          }
+        }
+        // in-pit buttons: fixed ones take knocks (sink + tilt, 5th drops them);
+        // loose ones fall, bounce and spin like everything else
+        const uis = uiBodiesRef.current;
+        if (uis) {
+          for (const u of uis) {
+            if (!u.fixed && !isDragged(u)) {
+              u.vy += G * dt;
+              u.x += u.vx * dt;
+              u.y += u.vy * dt;
+              u.a += u.va * dt;
+              u.va *= 0.995;
+              if (u.y + u.r > yF) { u.y = yF - u.r; u.vy = -u.vy * 0.3; u.vx *= 0.9; u.va = u.va * 0.5 + (u.vx / Math.max(u.r, 0.001)) * 0.5; }
+              if (u.x - u.r < xL) { u.x = xL + u.r; u.vx = -u.vx * WALL_REST; }
+              if (u.x + u.r > xR) { u.x = xR - u.r; u.vx = -u.vx * WALL_REST; }
+            }
+            for (const b of all) {
+              const dx = b.x - u.x, dy = b.y - u.y;
+              const dist = Math.hypot(dx, dy) || 0.001;
+              const overlap = b.r + u.r - dist;
+              if (overlap <= 0) continue;
+              const nx = dx / dist, ny = dy / dist;
+              if (u.fixed) {
+                b.x += nx * overlap; b.y += ny * overlap;
+                const rel = b.vx * nx + b.vy * ny;
+                if (rel < 0) {
+                  b.vx -= (1 + REST) * rel * nx; b.vy -= (1 + REST) * rel * ny;
+                  if (-rel > FX_MIN * 0.3) {
+                    u.hits += 1;
+                    if (u.hits >= 5) { u.fixed = false; u.va = (Math.random() - 0.5) * 2; }
+                    else { u.y += (12 * uppW) / 1; u.a += 0.09; } // sink a notch and tip
+                  }
+                }
+              } else {
+                const mb = isDragged(b) ? b.r * b.r * 1e6 : b.r * b.r;
+                const mu = isDragged(u) ? u.r * u.r * 1e6 : u.r * u.r * 1.6;
+                const mt = mb + mu;
+                b.x += nx * overlap * (mu / mt); b.y += ny * overlap * (mu / mt);
+                u.x -= nx * overlap * (mb / mt); u.y -= ny * overlap * (mb / mt);
+                const rel = (b.vx - u.vx) * nx + (b.vy - u.vy) * ny;
+                if (rel < 0) {
+                  const imp = (-(1 + REST) * rel) / (1 / mb + 1 / mu);
+                  b.vx += (imp / mb) * nx; b.vy += (imp / mb) * ny;
+                  u.vx -= (imp / mu) * nx; u.vy -= (imp / mu) * ny;
+                  u.va += ((Math.random() - 0.5) * -rel) / worldH;
+                }
               }
             }
           }
@@ -733,6 +833,7 @@ export default function BreedTree({
         }
         let still = true;
         if (dragRef.current) still = false;
+        if (uis) for (const u of uis) if (!u.fixed && Math.hypot(u.vx, u.vy) > worldH * 0.012) still = false;
         if (pill && !pill.stuck && Math.hypot(pill.vx, pill.vy) > worldH * 0.012) still = false;
         for (const b of all) {
           if (b.n) {
@@ -744,6 +845,17 @@ export default function BreedTree({
           if (sp > cap) { b.vx *= cap / sp; b.vy *= cap / sp; }
           const onFloorish = b.y + b.r > yF - worldH * 0.02;
           if (Math.hypot(b.vx, b.vy) > worldH * 0.012 || !onFloorish) still = false;
+        }
+        // spin the circle images with their bodies (pattern rotation about the
+        // centre, scaled up so corners never show through); badges stay
+        // upright like the pit's % chips
+        if (svgEl) {
+          for (const b of all) {
+            if (!b.n || Math.abs(b.a) < 0.001) continue;
+            const i = nodes.indexOf(b.n);
+            const pat = (svgEl as SVGSVGElement).querySelector(`#bt-img-${i}`);
+            if (pat) pat.setAttribute("patternTransform", `rotate(${b.a * 57.2958} 0.5 0.5) translate(0.5 0.5) scale(1.45) translate(-0.5 -0.5)`);
+          }
         }
         zoomTo(viewRef.current);
         drawNumbers(now, viewRef.current);
@@ -768,6 +880,11 @@ export default function BreedTree({
         for (const b of all) {
           b.vx = (Math.random() - 0.5) * worldH * 1.1;
           b.vy = -(0.45 + Math.random() * 0.85) * worldH;
+        }
+        const uu = uiBodiesRef.current;
+        if (uu) for (const u of uu) if (!u.fixed) {
+          u.vx = (Math.random() - 0.5) * worldH * 0.9;
+          u.vy = -(0.4 + Math.random() * 0.7) * worldH;
         }
         const pl = pillBodyRef.current;
         if (pl) {
@@ -976,10 +1093,14 @@ export default function BreedTree({
           {namePill && (() => {
             const v = viewRef.current;
             const kk = SIZE / v[2];
-            const label = shown.data.name.toUpperCase();
-            const fs = 30;
-            const pr = 27;
-            const L = Math.max(50, (label.length * fs * 0.34) / 2);
+            const st = stageRef.current;
+            const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
+            const label = shown.data.name;
+            const fs = 12 * upp;
+            const ph = 26 * upp;
+            const pr = ph / 2;
+            const w = Math.max(44 * upp, label.length * fs * 0.62 + 20 * upp);
+            const L = Math.max(0, w / 2 - pr);
             const pb = pillBodyRef.current;
             if (pb) { pb.L = L; pb.pr = pr; }
             const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
@@ -992,13 +1113,67 @@ export default function BreedTree({
                 style={{ cursor: pb ? "grab" : "default", pointerEvents: pb ? "auto" : "none" }}
                 onPointerDown={(e) => startDrag(e, pillBodyRef.current)}>
                 <rect x={-L - pr} y={-pr} width={(L + pr) * 2} height={pr * 2} rx={pr}
-                  style={{ fill: "var(--blue-sky, #5cc4ee)", stroke: "var(--navy)", strokeWidth: 3 }} />
-                <text x={0} y={0} textAnchor="middle" dominantBaseline="central"
-                  style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${fs}px`, letterSpacing: "0.5px" }}>
+                  style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: 2 * upp }} />
+                <text x={0} y={1 * upp} textAnchor="middle" dominantBaseline="central"
+                  style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${fs}px` }}>
                   {label}
                 </text>
               </g>
             );
+                    })()}
+
+          {/* In-pit buttons: close X and description toggle. Navy rounded
+              squares with a yellow stroke; fixed top-right until knocked
+              loose, always tappable. */}
+          {dockAside && (() => {
+            const v = viewRef.current;
+            const kk = SIZE / v[2];
+            const st = stageRef.current;
+            const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
+            const uSz = 84 * upp;
+            const m = 16 * upp;
+            const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
+            const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
+            const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
+            const ub = uiBodiesRef.current;
+            const defs: { kind: "close" | "desc"; wx: number; wy: number; a: number }[] = (["close", "desc"] as const).map((kind, idx) => {
+              const b = ub?.find((u) => u.kind === kind);
+              return {
+                kind,
+                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2) / kk,
+                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2 + idx * (uSz + 14 * upp)) / kk,
+                a: b ? b.a : 0,
+              };
+            });
+            const half = uSz / 2;
+            const iconStroke = 6 * upp;
+            return defs.map((d) => (
+              <g key={d.kind} ref={d.kind === "close" ? uiCloseRef : uiDescRef}
+                transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
+                style={{ cursor: "pointer", pointerEvents: "auto" }}
+                onPointerDown={(e) => {
+                  const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
+                  const act = d.kind === "close" ? onPitClose : onToggleCaption;
+                  startDrag(e, b && !b.fixed ? b : null, act);
+                }}>
+                <rect x={-half} y={-half} width={uSz} height={uSz} rx={20 * upp}
+                  style={{ fill: "var(--navy, #0a3a57)", stroke: "var(--yellow, #ffd23e)", strokeWidth: 3 * upp }} />
+                {d.kind === "close" ? (
+                  <g stroke="var(--yellow, #ffd23e)" strokeWidth={iconStroke} strokeLinecap="round">
+                    <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
+                    <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
+                  </g>
+                ) : (
+                  <g stroke="var(--yellow, #ffd23e)" strokeWidth={1.8} fill="none" strokeLinecap="round" strokeLinejoin="round"
+                    transform={`scale(${uSz / 44}) translate(-12,-12)`}>
+                    <rect x="9" y="2" width="6" height="4" rx="1" />
+                    <rect x="2" y="18" width="6" height="4" rx="1" />
+                    <rect x="16" y="18" width="6" height="4" rx="1" />
+                    <path d="M12 6v4M12 10H5v8M12 10h7v8" />
+                  </g>
+                )}
+              </g>
+            ));
           })()}
         </svg>
       </div>

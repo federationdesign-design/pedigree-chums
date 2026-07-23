@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
-import CardDock from "../CardDock/CardDock";
+import CookieBanner from "../CookieBanner/CookieBanner";
 import type { LineageNode } from "../../data/lineage";
 import css from "./LineageModal.module.css";
 
@@ -47,6 +47,16 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
+    let t: number | undefined;
+    try {
+      if (!localStorage.getItem("pc-cookie-consent")) {
+        t = window.setTimeout(() => window.dispatchEvent(new Event("pc:open-cookies")), 1000);
+      }
+    } catch { /* private mode */ }
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -62,18 +72,11 @@ export default function LineageModal({ name, image, character, lineage, onClose 
 
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
-      {/* Header: close top right; centred title follows the hovered circle */}
-      <div className={css.header}>
-        <button type="button" className={css.close} onClick={onClose} aria-label="Close">
-          <svg viewBox="0 0 32 32" aria-hidden="true">
-            <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-            <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-          </svg>
-        </button>
-        <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
-          {score.toLocaleString("en-GB")}
-        </div>
+      {/* Score, fixed top-right beside where the in-pit close object starts */}
+      <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
+        {score.toLocaleString("en-GB")}
       </div>
+      {/* Title floats over the pit and never affects its size */}
       <h3 className={css.title}>
         {titleLines(shownName).map((line, i, arr) => (
           <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
@@ -100,6 +103,8 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
+          onToggleCaption={() => setCaptionOpen((o) => !o)}
+          onPitClose={onClose}
           rootNote={character}
           onClose={onClose}
         />
@@ -122,13 +127,8 @@ export default function LineageModal({ name, image, character, lineage, onClose 
         <span className={css.shakeIcon} aria-hidden="true" />
       </button>
 
-      {/* Reopen icon for the description box, chum-page style */}
-      {!captionOpen && (
-        <CardDock
-          items={[{ id: "ancestry", label: "Description", abbr: "AN" }]}
-          onReopen={() => setCaptionOpen(true)}
-        />
-      )}
+      {/* The cookie notice must be reachable above this overlay */}
+      <CookieBanner />
     </div>,
     document.body,
   );
