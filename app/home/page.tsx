@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import HomeClient from "./HomeClient";
-import StepCards from "../../components/StepCards/StepCards";
 import VideoSection from "./VideoSection";
 import FAQ from "../../components/FAQ/FAQ";
-import BentoBoard from "../../components/Nav/BentoBoard";
+import HowItPlays from "../../components/HowItPlays/HowItPlays";
 import Footer from "../../components/Footer/Footer";
 import styles from "./home.module.css";
 
@@ -43,15 +42,8 @@ export default function HomePage() {
         <VideoSection />
       </section>
 
-      <h2 className={styles.stepsHeading}>
-        How it <span className={styles.cardsHeadingYellow}>plays</span>
-      </h2>
-      <StepCards />
-
-      {/* The full bento launcher, embedded at the foot of the page */}
-      <section className={styles.bentoHome}>
-        <BentoBoard />
-      </section>
+      {/* Video-gated "How it plays" scroll sequence with the bento at its foot */}
+      <HowItPlays />
 
       <Footer />
     </div>

@@ -1,0 +1,157 @@
+/* One container for the whole "How it plays" module (sequence + bento). */
+.root {
+  position: relative;
+}
+
+/* Tall spacer: height (viewport + timeline) is set in HowItPlays.tsx to give
+   the sticky pin scroll room for the video-gated card sequence. */
+.section {
+  position: relative;
+}
+
+/* The pinned viewport: heading on top, the card stage in the middle, the
+   progress bar at the bottom. Height (100vh) is set in JS. */
+.pin {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(12px, 2vw, 24px) 0 clamp(10px, 1.6vw, 18px);
+  box-sizing: border-box;
+}
+
+.heading {
+  flex: none;
+  margin: 0 0 clamp(8px, 1.4vw, 16px);
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(40px, 6vw, 84px);
+  line-height: 1.02;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.headingYellow { color: var(--yellow, #ffd23e); }
+
+/* The middle band that holds the cards; the rail is translated across it. */
+.stage {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.rail {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: max-content;
+  gap: clamp(28px, 5vw, 72px);
+  padding: 0 clamp(20px, 6vw, 80px);
+  will-change: transform;
+}
+
+.card {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #ffed00;
+  border: 6px solid #ffed00;
+  border-radius: 20px;
+  box-shadow: 0 10px 34px rgba(10, 58, 87, 0.22);
+}
+
+/* Square media so the square source videos show in full, sized as large as the
+   viewport allows and capped at native x1.25 (~1200px). */
+.media {
+  position: relative;
+  width: max(220px, min(88vw, calc(100svh - 340px), 1200px));
+  aspect-ratio: 1 / 1;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+  background: #e8f4f8;
+}
+.mediaInner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.caption {
+  flex: none;
+  padding: clamp(10px, 1vw, 16px) 12px clamp(12px, 1.1vw, 18px);
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(16px, 1.8vw, 26px);
+  color: #0a3a57;
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.badge {
+  position: absolute;
+  top: -22px;
+  left: -22px;
+  width: clamp(48px, 5vw, 64px);
+  height: clamp(48px, 5vw, 64px);
+  background: var(--blue, #1497d6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(20px, 2.2vw, 28px);
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(10, 58, 87, 0.3);
+  z-index: 2;
+}
+
+/* Short, centred progress bar (driven in HowItPlays.tsx). */
+.scrollbar {
+  position: relative;
+  flex: none;
+  width: clamp(180px, 30vw, 380px);
+  height: 10px;
+  margin: clamp(10px, 1.4vw, 18px) auto 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: clamp(48px, 22%, 90px);
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+}
+
+/* Bento immediately below, so it rises in as the sequence releases. */
+.bento {
+  padding: clamp(8px, 1.5vw, 20px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
+}
+
+/* Phones: drop the heading clear of the floating nav button, size it down. */
+@media (max-width: 700px) {
+  .pin {
+    padding-top: 76px;
+  }
+  .heading {
+    font-size: clamp(30px, 8vw, 44px);
+  }
+  .media {
+    width: max(200px, min(88vw, calc(100svh - 300px), 1200px));
+  }
+}
