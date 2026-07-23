@@ -197,8 +197,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <div className={styles.cluster}>
                   <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWide} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.clusterRow}>
-                    {coverTile(NAV_TILES.gdbd, styles.clusterCell)}
-                    {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell)}
+                    {coverTile(NAV_TILES.gdbd, styles.clusterCell, false, true)}
+                    {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell, false, true)}
                   </div>
                 </div>
                 {fitTile(NAV_TILES.product)}
@@ -210,8 +210,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <div className={styles.cluster}>
                   <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover}`} loop={false} reverseOnHover onNavigate={closeMenu} />
                   <div className={styles.miniRow}>
-                    {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.metaTop}`)}
-                    {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.metaTop}`, true)}
+                    {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.metaTop}`, false, true)}
+                    {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.metaTop}`, false, true)}
                   </div>
                 </div>
                 {/* Right: Know Your Chums square + Discount / Home side by side */}
@@ -226,7 +226,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                         <span className={styles.tileCta}>Grab your code →</span>
                       </span>
                     </button>
-                    {coverTile(NAV_TILES.home, styles.miniCell, false, true)}
+                    {coverTile(NAV_TILES.home, `${styles.miniCell} ${styles.homeLabel}`, false, true)}
                   </div>
                 </div>
               </div>

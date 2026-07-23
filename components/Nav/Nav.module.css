@@ -456,6 +456,11 @@
 /* Title pinned to the top of the tile instead of the bottom (Smarter, Hot/Dogs) */
 .metaTop { justify-content: flex-start; }
 
+/* Home title -- match the Discount code text: same size + centred (both axes) */
+.homeLabel { justify-content: center; }
+.homeLabel .tileMeta { align-items: center; text-align: center; }
+.homeLabel .tileLabel { font-size: clamp(2.1rem, 4.6vw, 3.6rem); }
+
 /* Very light, blurred drop shadow on the Chum Finder title */
 .chumFinderTitle .tileLabel { text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28); }
 
@@ -465,14 +470,14 @@
 
 /* ── Top bar: Back to page (left) + site links (right) ── */
 .backLink {
-  position: fixed; top: clamp(20px, 2.6vh, 32px); left: clamp(18px, 4vw, 44px); z-index: 200;
+  position: absolute; top: clamp(20px, 2.6vh, 32px); left: clamp(18px, 4vw, 44px); z-index: 200;
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(0.9rem, 1.3vw, 1.05rem); font-weight: 700; letter-spacing: 0.02em;
   color: #fff; background: none; border: 0; cursor: pointer; pointer-events: auto;
 }
 .backLink:hover { color: var(--yellow, #ffd23e); }
 .topNav {
-  position: fixed; top: clamp(20px, 2.6vh, 32px); right: clamp(18px, 4vw, 44px); z-index: 200;
+  position: absolute; top: clamp(20px, 2.6vh, 32px); right: clamp(18px, 4vw, 44px); z-index: 200;
   display: flex; align-items: center; gap: clamp(8px, 1vw, 14px); pointer-events: auto;
 }
 .topNavLink {
