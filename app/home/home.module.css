@@ -454,6 +454,11 @@
   color: var(--yellow, #ffd23e);
 }
 
+/* Bento launcher section embedded at the foot of the page */
+.bentoHome {
+  padding: 0 clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
+}
+
 /* "How it plays" title above the instructional step cards */
 .stepsHeading {
   font-family: var(--font-display, "Luckiest Guy", system-ui);

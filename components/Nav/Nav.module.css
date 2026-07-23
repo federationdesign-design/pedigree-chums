@@ -164,6 +164,8 @@
   justify-content: flex-start;
   align-items: stretch;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   /* Header + hamburger are hidden while open, so content sits near the top.
      Top pad only clears the floating close button. */
   padding: clamp(64px, 8vh, 96px) clamp(12px, 3vw, 32px) 60px;

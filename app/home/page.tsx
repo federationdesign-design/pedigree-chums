@@ -4,6 +4,7 @@ import HomeClient from "./HomeClient";
 import StepCards from "../../components/StepCards/StepCards";
 import VideoSection from "./VideoSection";
 import FAQ from "../../components/FAQ/FAQ";
+import BentoBoard from "../../components/Nav/BentoBoard";
 import Footer from "../../components/Footer/Footer";
 import styles from "./home.module.css";
 
@@ -46,6 +47,14 @@ export default function HomePage() {
         How it <span className={styles.cardsHeadingYellow}>plays</span>
       </h2>
       <StepCards />
+
+      {/* The full bento launcher, embedded at the foot of the page */}
+      <h2 className={styles.stepsHeading}>
+        Explore <span className={styles.cardsHeadingYellow}>Pedigree Chums</span>
+      </h2>
+      <section className={styles.bentoHome}>
+        <BentoBoard />
+      </section>
 
       <Footer />
     </div>

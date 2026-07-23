@@ -3,30 +3,12 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Montserrat } from "next/font/google";
-import ChumDropTile from "./ChumDropTile";
-import VideoTile from "./VideoTile";
-import HeroCarousel from "./HeroCarousel";
+import BentoBoard from "./BentoBoard";
 import styles from "./Nav.module.css";
 
 // Montserrat 900 loaded explicitly -- the global --font-body only ships 400-800,
 // so a plain font-weight:900 would fall back. This guarantees the heavy face.
 const backFont = Montserrat({ subsets: ["latin"], weight: ["900"] });
-
-// ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
-type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
-const NAV_TILES: Record<string, TileData> = {
-  nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", video: "/podium-video-menu.mp4", videoAspect: "650 / 542" },
-  product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
-  chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
-  britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
-  about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
-  gdbd: { href: "/good-dog-bad-dog", labelA: "Good Dog,", labelB: "Bad Dog", cta: "Learn", img: "/bulls-eye-img.jpg" },
-  dogsAtWork: { href: "/dogs-at-work", labelA: "Dogs", labelB: "at Work", cta: "Learn", img: "/never-clocking-off.jpg" },
-  knowYourChums: { href: "/know-your-chums", labelA: "Know Your", labelB: "Chums", cta: "Meet the pack", img: "/know-your-chums.jpg" },
-  home: { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
-  hotDogs: { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "What??", img: "/hot-dog-hearo-img.jpg" },
-  smarter: { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Learn", img: "/inteligent-dogs.jpg" },
-};
 
 // Menu images worth preloading so the launcher opens without pop-in.
 const PRELOAD_IMAGES = [
@@ -67,66 +49,45 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     PRELOAD_IMAGES.forEach((s) => { const im = new window.Image(); im.src = s; });
   }, []);
 
+  // Lock the page body while the menu is open. On iOS a touch drag on a fixed
+  // overlay otherwise scrolls the body behind it instead of the overlay, so the
+  // menu appears "stuck". Fixing the body (and restoring scroll on close) keeps
+  // the gesture on the overlay.
+  useEffect(() => {
+    if (!open) return;
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    return () => {
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.left = prev.left;
+      body.style.right = prev.right;
+      body.style.width = prev.width;
+      body.style.overflow = prev.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
   function openOffer() {
     setOpen(false);
     window.dispatchEvent(new CustomEvent("pc:open-offer"));
   }
 
   const closeMenu = () => setOpen(false);
-
-  // Two-tone title: first word(s) yellow, remainder white.
-  const twoTone = (a: string, b?: string) => (
-    <span className={styles.tileLabel}>
-      <span className={styles.tileLabelAccent}>{a}</span>{b ? ` ${b}` : ""}
-    </span>
-  );
-
-  // Standard tile: image (or emoji) fills as a cropped backdrop, label overlaid.
-  // ctaTop floats the green button over the top-right instead of by the title.
-  const coverTile = (t: TileData, cls: string, ctaTop = false, noCta = false) => (
-    <Link href={t.href} className={`${styles.tile} ${cls}`} onClick={closeMenu}>
-      <span className={styles.tileImg} aria-hidden>
-        {t.img ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={t.img} alt="" className={styles.tileImgTag} loading="lazy" />
-        ) : (
-          <span className={styles.tileEmoji}>{t.emoji}</span>
-        )}
-      </span>
-      {ctaTop && !noCta && <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>}
-      <span className={styles.tileMeta}>
-        {twoTone(t.labelA, t.labelB)}
-        {!ctaTop && !noCta && <span className={styles.ctaBtn}>{t.cta}</span>}
-      </span>
-    </Link>
-  );
-
-  // Image-fit tile: media on top (100% shown), title in a solid navy box below.
-  // Green CTA button floats top-right. revealAccent shows labelA over the image
-  // on hover, keeping only labelB in the caption box.
-  const fitTile = (t: TileData, revealAccent = false) => (
-    <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={closeMenu}>
-      {t.video ? (
-        <span className={styles.fitVideoBox} style={{ aspectRatio: t.videoAspect }} aria-hidden>
-          <video className={styles.tileImgTag} src={t.video} muted autoPlay playsInline preload="auto" />
-          {revealAccent && <span className={`${styles.fitAccent} ${styles.accentReveal}`}>{t.labelA}</span>}
-        </span>
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={t.img} alt="" className={styles.tileFitImg} />
-      )}
-      <span className={`${styles.ctaBtn} ${styles.ctaTopRight}`}>{t.cta}</span>
-      <span className={styles.fitCaption}>
-        <span className={styles.tileLabel}>
-          {revealAccent ? (
-            t.labelB
-          ) : (
-            <><span className={styles.tileLabelAccent}>{t.labelA}</span>{t.labelB ? ` ${t.labelB}` : ""}</>
-          )}
-        </span>
-      </span>
-    </Link>
-  );
 
   return (
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
@@ -184,61 +145,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <Link href="/preorder" className={styles.menuLink} onClick={() => setOpen(false)}>Get pre-order discount code</Link>
             </nav>
           ) : (
-            <div className={`${styles.bentoWrap} ${styles.overlayIn}`}>
-              {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles */}
-              <HeroCarousel onNavigate={closeMenu} />
-
-              {/* Row 1 -- Name Generator (left) beside the Chum Drop / Britain's / About cluster */}
-              <div className={styles.rowBlock}>
-                {fitTile(NAV_TILES.nameGen, true)}
-                <div className={styles.cluster}>
-                  <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={closeMenu} />
-                  <div className={styles.clusterRow}>
-                    {coverTile(NAV_TILES.britains, `${styles.clusterCell} ${styles.zoomHover}`, false, true)}
-                    <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" noCta sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} reverseOnHover onNavigate={closeMenu} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2 -- alternated: cluster (left) beside The Card Game (right) */}
-              <div className={styles.rowBlock}>
-                <div className={styles.cluster}>
-                  <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWide} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={closeMenu} />
-                  <div className={styles.clusterRow}>
-                    {coverTile(NAV_TILES.gdbd, styles.clusterCell, false, true)}
-                    {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell, false, true)}
-                  </div>
-                </div>
-                {fitTile(NAV_TILES.product)}
-              </div>
-
-              {/* Bottom bento -- Competitions (square video) + Know Your Chums (square) */}
-              <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
-                {/* Left: Competitions video + Smarter / Home */}
-                <div className={styles.cluster}>
-                  <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover} ${styles.compTile}`} loop={false} reverseOnHover onNavigate={closeMenu} />
-                  <div className={styles.miniRow}>
-                    {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-                    {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-                  </div>
-                </div>
-                {/* Right: Know Your Chums square + Discount / Home side by side */}
-                <div className={styles.cluster}>
-                  {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
-                  <div className={styles.miniRow}>
-                    <button type="button" className={`${styles.tile} ${styles.tileStrip} ${styles.miniCell}`} onClick={openOffer}>
-                      <span className={styles.tileMeta}>
-                        <span className={styles.tileLabel}>
-                          <span className={styles.tileLabelAccent}>Discount</span> code
-                        </span>
-                        <span className={styles.tileCta}>Grab your code →</span>
-                      </span>
-                    </button>
-                    {coverTile(NAV_TILES.home, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <BentoBoard onNavigate={closeMenu} onOffer={openOffer} animateIn />
           )}
         </div>
       )}
