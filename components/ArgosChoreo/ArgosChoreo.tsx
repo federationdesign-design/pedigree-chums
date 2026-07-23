@@ -114,44 +114,53 @@ export function QuotePollScene({
   const text = clamp01((p - 0.3) / 0.28);
   const pollCard = clamp01((p - 0.5) / 0.2);
   const btns = clamp01((p - 0.68) / 0.12);
-  const fullyStaged = p >= 0.82;
+  /* Lock engages the moment the buttons are fully visible -- not later --
+     so there is never a window where the reader is blocked before they can
+     even see something to click. */
+  const fullyStaged = btns >= 0.98;
 
   const [answered, setAnswered] = useState(false);
-  const [shake, setShake] = useState(0);
-  const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [shakeSignal, setShakeSignal] = useState(0);
+  const attemptsRef = useRef(0);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stateRef = useRef({ fullyStaged, answered });
+  stateRef.current = { fullyStaged, answered };
 
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
 
-    const isPinnedAndDue = () => {
+    const isPinnedNow = () => {
       const r = scene.getBoundingClientRect();
-      return fullyStaged && !answered && r.top <= 140 && r.bottom > window.innerHeight + 40;
+      // "pinned" = the scene still has room below the viewport, i.e. we are
+      // still inside its scroll travel, not past it yet.
+      return r.top <= 160 && r.bottom > window.innerHeight;
     };
 
     const trigger = () => {
-      setShake((n) => Math.min(n + 1, 10));
-      if (shakeTimer.current) clearTimeout(shakeTimer.current);
-      shakeTimer.current = setTimeout(() => setShake(0), 1400);
+      attemptsRef.current = Math.min(attemptsRef.current + 1, 10);
+      setShakeSignal((n) => n + 1);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => {
+        attemptsRef.current = 0;
+      }, 2500);
     };
 
-    const onWheel = (e: WheelEvent) => {
-      if (e.deltaY > 0 && isPinnedAndDue()) {
+    const guard = (e: Event, blocked: boolean) => {
+      if (blocked && stateRef.current.fullyStaged && !stateRef.current.answered && isPinnedNow()) {
         e.preventDefault();
         trigger();
+        return true;
       }
+      return false;
     };
+
+    const onWheel = (e: WheelEvent) => guard(e, e.deltaY > 0);
     let touchY = 0;
     const onTouchStart = (e: TouchEvent) => {
       touchY = e.touches[0].clientY;
     };
-    const onTouchMove = (e: TouchEvent) => {
-      const dy = touchY - e.touches[0].clientY;
-      if (dy > 6 && isPinnedAndDue()) {
-        e.preventDefault();
-        trigger();
-      }
-    };
+    const onTouchMove = (e: TouchEvent) => guard(e, touchY - e.touches[0].clientY > 5);
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -160,9 +169,9 @@ export function QuotePollScene({
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
-      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
     };
-  }, [fullyStaged, answered]);
+  }, []);
 
   return (
     <div ref={sceneRef} className={styles.quotePollScene}>
@@ -188,8 +197,11 @@ export function QuotePollScene({
             footnote={footnote}
             onAnswer={() => setAnswered(true)}
             buttonsProgress={btns}
-            shake={shake}
+            locked={fullyStaged && !answered}
+            shakeSignal={shakeSignal}
+            shakeAttempts={attemptsRef.current}
           />
+          {fullyStaged && !answered && <p className={styles.pollHint}>Pick one to keep reading &darr;</p>}
         </div>
       </div>
     </div>
@@ -201,7 +213,7 @@ export function StatueBulletsChoreo({
   bullets,
 }: {
   slides: { src: string; alt: string; caption: string }[];
-  bullets: string[];
+  bullets?: string[];
 }) {
   const { sceneRef, p } = useSceneProgress();
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -240,17 +252,19 @@ export function StatueBulletsChoreo({
             </figure>
           ))}
         </div>
-        <ul className={styles.choreoBullets}>
-          {bullets.map((b, i) => {
-            const start = 0.3 + i * 0.15;
-            const o = clamp01((p - start) / 0.12);
-            return (
-              <li key={b} style={{ opacity: o, transform: `translateY(${(1 - o) * 14}px)` }}>
-                {b}
-              </li>
-            );
-          })}
-        </ul>
+        {bullets && (
+          <ul className={styles.choreoBullets}>
+            {bullets.map((b, i) => {
+              const start = 0.3 + i * 0.15;
+              const o = clamp01((p - start) / 0.12);
+              return (
+                <li key={b} style={{ opacity: o, transform: `translateY(${(1 - o) * 14}px)` }}>
+                  {b}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );

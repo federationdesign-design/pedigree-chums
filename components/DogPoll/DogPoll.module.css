@@ -151,18 +151,13 @@
   text-align: center;
 }
 
-/* Two independent shake signatures so the buttons never move in unison */
-@keyframes dogPollShake0 {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  20% { transform: translateX(-6px) rotate(-2deg); }
-  40% { transform: translateX(5px) rotate(2deg); }
-  60% { transform: translateX(-4px) rotate(-1.5deg); }
-  80% { transform: translateX(3px) rotate(1deg); }
+/* Idle pulse: visible even before any scroll attempt, so the buttons never
+   sit silently -- this is the persistent "click me" signal. */
+@keyframes dogPollIdlePulse {
+  0%, 100% { box-shadow: 0 4px 0 var(--_shadow, #16a34a); }
+  50% { box-shadow: 0 4px 0 var(--_shadow, #16a34a), 0 0 0 6px rgba(255, 255, 255, 0.35); }
 }
 
-@keyframes dogPollShake1 {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  25% { transform: translateX(5px) rotate(2deg); }
-  50% { transform: translateX(-6px) rotate(-2.5deg); }
-  75% { transform: translateX(4px) rotate(1.5deg); }
+.optionLocked {
+  animation: dogPollIdlePulse 1.6s ease-in-out infinite;
 }

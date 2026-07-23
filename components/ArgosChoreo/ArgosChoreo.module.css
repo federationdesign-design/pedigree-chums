@@ -203,17 +203,26 @@
 
   .videoGate figure,
   .videoGateUnlocked figure {
-    margin: 0 !important;
+    margin: 0 0 10px !important;
   }
 }
 
 /* ── Quote + poll composite scene ── */
 .quotePollScene {
-  height: 320vh;
-  height: 320svh;
+  height: 250vh;
+  height: 250svh;
 }
 
 .pollWrap {
   margin-top: 18px;
   will-change: opacity, transform;
+}
+
+.pollHint {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+  margin: 10px 0 0;
 }

@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import HomeClient from "./HomeClient";
 import StepCards from "../../components/StepCards/StepCards";
 import VideoSection from "./VideoSection";
+import FAQ from "../../components/FAQ/FAQ";
 import Footer from "../../components/Footer/Footer";
 import styles from "./home.module.css";
 
@@ -38,6 +39,8 @@ export default function HomePage() {
       </section>
 
       <StepCards />
+
+      <FAQ />
 
       <Footer />
     </div>

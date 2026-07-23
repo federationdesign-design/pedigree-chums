@@ -517,7 +517,7 @@ export default function ArgosPage() {
                 <QuoteBuild
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<p style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
+                  pinned={<p style={{ margin: 0, fontWeight: 700 }}>Argos is lying outside, old, filthy and neglected. He had once been a fine hunting dog, raised by Odysseus himself, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
                   quote="Humans recognise status. Dogs recognise presence."
                 />
               </div>
@@ -624,8 +624,8 @@ export default function ArgosPage() {
 
               <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.carouselScene}`}>
-                <CaptionedCarousel
+              <div className={styles.sceneMobile}>
+                <StatueBulletsChoreo
                   slides={[
                     {
                       src: "/history/odysseus-dog-argos-in-death.webp",
@@ -829,7 +829,12 @@ export default function ArgosPage() {
                 <QuoteBuild
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<p style={{ margin: 0 }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>}
+                  pinned={
+                    <>
+                      <p style={{ margin: "0 0 10px", fontWeight: 700 }}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
+                      <p style={{ margin: 0, fontWeight: 700 }}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+                    </>
+                  }
                   quote="People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home."
                 />
               </div>
@@ -911,7 +916,7 @@ export default function ArgosPage() {
                 <QuoteBuild
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<p style={{ margin: 0 }}>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>}
+                  pinned={<p style={{ margin: 0, fontWeight: 700 }}>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>}
                   quote="A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond."
                 />
               </div>

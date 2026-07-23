@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./DogPoll.module.css";
 
 export type PollOption = {
@@ -24,7 +24,9 @@ export default function DogPoll({
   footnote,
   onAnswer,
   buttonsProgress = 1,
-  shake = 0,
+  locked = false,
+  shakeSignal = 0,
+  shakeAttempts = 0,
 }: {
   title?: string;
   titleFont?: "display" | "body";
@@ -35,13 +37,42 @@ export default function DogPoll({
      a pinned scroll scene (ArgosChoreo). Standalone usage ignores them. */
   onAnswer?: () => void;
   buttonsProgress?: number;
-  shake?: number;
+  locked?: boolean;
+  shakeSignal?: number;
+  shakeAttempts?: number;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
+  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const handlePick = (i: number) => {
     setPicked(i);
     onAnswer?.();
   };
+
+  /* Web Animations API, not a CSS class/string toggle: guarantees a fresh,
+     visible shake every single attempt regardless of React re-render timing.
+     Each button gets its own amplitude/duration/delay so the two never move
+     in lockstep -- explicitly requested. */
+  useEffect(() => {
+    if (shakeSignal === 0) return;
+    btnRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const amp = 4 + Math.min(shakeAttempts, 8) * 1.8 + i * 1.3;
+      const dur = Math.max(420 - shakeAttempts * 24, 160);
+      const dir = i === 0 ? 1 : -1;
+      el.animate(
+        [
+          { transform: "translateX(0) rotate(0deg)" },
+          { transform: `translateX(${-amp * dir}px) rotate(${-3 * dir}deg)` },
+          { transform: `translateX(${amp * dir}px) rotate(${3 * dir}deg)` },
+          { transform: `translateX(${-amp * 0.7 * dir}px) rotate(${-2 * dir}deg)` },
+          { transform: `translateX(${amp * 0.4 * dir}px) rotate(${1 * dir}deg)` },
+          { transform: "translateX(0) rotate(0deg)" },
+        ],
+        { duration: dur, delay: i * 60, easing: "ease-in-out" }
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shakeSignal]);
 
   return (
     <div className={styles.wrap}>
@@ -53,13 +84,13 @@ export default function DogPoll({
           {options.map((opt, i) => (
             <button
               key={opt.label}
+              ref={(el) => { btnRefs.current[i] = el; }}
               type="button"
-              className={opt.color === "red" ? styles.optionRed : styles.option}
+              className={`${opt.color === "red" ? styles.optionRed : styles.option} ${locked ? styles.optionLocked : ""}`}
               onClick={() => handlePick(i)}
               style={{
                 opacity: buttonsProgress,
                 transform: `translateY(${(1 - buttonsProgress) * 14}px) scale(${0.9 + buttonsProgress * 0.1})`,
-                animation: shake ? `dogPollShake${i % 2} ${Math.max(0.5 - shake * 0.035, 0.14)}s ease-in-out ${i * 0.08}s ${Math.min(2 + shake, 6)}` : undefined,
               }}
             >
               {opt.label}
