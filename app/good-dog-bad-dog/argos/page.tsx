@@ -531,7 +531,7 @@ export default function ArgosPage() {
               <ul className={styles.essayBullets}>
                 <li>But Argos recognises Odysseus.</li>
                 <li style={{ color: "var(--navy)" }}>The humans see a beggar.</li>
-                <li>The dog knows his master.</li>
+                <li style={{ color: "#22c55e" }}>The dog knows his master.</li>
                 <li>That is the whole power of the scene.</li>
               </ul>
               </div>
@@ -545,14 +545,14 @@ export default function ArgosPage() {
                       caption: "Odysseus probably has PTSD, as his core ideology of family, loyalty and legacy has been destroyed",
                     },
                     {
-                      src: "/history/odysseus-dog-argos-in-death.webp",
-                      alt: "The death of Argos",
-                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
-                    },
-                    {
                       src: "/history/nolans-king-odyssus-painting-remake.jpg",
                       alt: "Odysseus painting remake",
                       caption: "When he fails to get the acknowledgment he needed, and with his colossal old age, he dies",
+                    },
+                    {
+                      src: "/history/odysseus-dog-argos-in-death.webp",
+                      alt: "The death of Argos",
+                      caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
                     },
                     {
                       src: "/history/odyssusand-argos-painting-remake.jpg",
@@ -563,7 +563,7 @@ export default function ArgosPage() {
                   bullets={[
                     "But Argos recognises Odysseus.",
                     <span key="beggar" style={{ color: "var(--navy)" }}>The humans see a beggar.</span>,
-                    "The dog knows his master.",
+                    <span key="knows" style={{ color: "#22c55e" }}>The dog knows his master.</span>,
                     <>That is the whole power <br />of the scene.</>,
                   ]}
                 />
