@@ -27,6 +27,20 @@
   gap: 12px;
 }
 
+/* One stacked column on narrow; two side-by-side columns on wide screens. */
+.columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .columns {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+  }
+}
+
 .item {
   background: rgba(255, 255, 255, 0.08);
   /* Solid 3px stroke: white closed, dark blue on hover, yellow when open. */

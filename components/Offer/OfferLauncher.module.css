@@ -3,7 +3,8 @@
    (z-index 120) and clears the nav (top) and cookie banner (bottom). */
 .card {
   position: fixed;
-  bottom: clamp(80px, 12vw, 120px);
+  /* Lifted 80px so it clears the video mini-player that docks bottom-right. */
+  bottom: calc(clamp(80px, 12vw, 120px) + 80px);
   right: 0;
   z-index: 100;
   width: min(258px, 80vw);

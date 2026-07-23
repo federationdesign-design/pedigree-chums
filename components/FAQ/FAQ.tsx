@@ -61,45 +61,55 @@ export default function FAQ() {
   const toggle = (i: number) =>
     setOpen((prev) => (prev.includes(i) ? prev.filter((n) => n !== i) : [...prev, i]));
 
+  const renderItem = (item: QA, i: number) => {
+    const isOpen = open.includes(i);
+    return (
+      <li key={i} className={`${styles.item} ${isOpen ? styles.itemOpen : ""}`}>
+        <button
+          type="button"
+          className={styles.question}
+          aria-expanded={isOpen}
+          aria-controls={`faq-panel-${i}`}
+          id={`faq-btn-${i}`}
+          onClick={() => toggle(i)}
+        >
+          <span className={styles.qText}>{item.q}</span>
+          <span className={styles.icon} aria-hidden>
+            <span className={styles.iconBar} />
+            <span className={`${styles.iconBar} ${styles.iconBarV}`} />
+          </span>
+        </button>
+        <div
+          className={styles.panel}
+          id={`faq-panel-${i}`}
+          role="region"
+          aria-labelledby={`faq-btn-${i}`}
+        >
+          <div className={styles.panelInner}>
+            <p className={styles.answer}>{item.a}</p>
+          </div>
+        </div>
+      </li>
+    );
+  };
+
+  // Split into two columns (side by side on wide screens, stacked on narrow) so
+  // an open item only grows its own column.
+  const mid = Math.ceil(FAQS.length / 2);
   return (
     <section className={styles.faq} aria-labelledby="faq-heading">
       <div className={styles.inner}>
         <h2 id="faq-heading" className={styles.heading}>
           Frequently Asked <span className={styles.headingYellow}>Questions</span>
         </h2>
-        <ul className={styles.list}>
-          {FAQS.map((item, i) => {
-            const isOpen = open.includes(i);
-            return (
-              <li key={i} className={`${styles.item} ${isOpen ? styles.itemOpen : ""}`}>
-                <button
-                  type="button"
-                  className={styles.question}
-                  aria-expanded={isOpen}
-                  aria-controls={`faq-panel-${i}`}
-                  id={`faq-btn-${i}`}
-                  onClick={() => toggle(i)}
-                >
-                  <span className={styles.qText}>{item.q}</span>
-                  <span className={styles.icon} aria-hidden>
-                    <span className={styles.iconBar} />
-                    <span className={`${styles.iconBar} ${styles.iconBarV}`} />
-                  </span>
-                </button>
-                <div
-                  className={styles.panel}
-                  id={`faq-panel-${i}`}
-                  role="region"
-                  aria-labelledby={`faq-btn-${i}`}
-                >
-                  <div className={styles.panelInner}>
-                    <p className={styles.answer}>{item.a}</p>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <div className={styles.columns}>
+          <ul className={styles.list}>
+            {FAQS.slice(0, mid).map((item, idx) => renderItem(item, idx))}
+          </ul>
+          <ul className={styles.list}>
+            {FAQS.slice(mid).map((item, idx) => renderItem(item, mid + idx))}
+          </ul>
+        </div>
       </div>
     </section>
   );
