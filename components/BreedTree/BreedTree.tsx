@@ -197,8 +197,13 @@ export default function BreedTree({
   const [hovered, setHovered] = useState<Node | null>(null);
   const [entered, setEntered] = useState(false);
   const [falling, setFalling] = useState(false);
+  const [dropped, setDropped] = useState(false);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number };
+  const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
+  const badgesRef = useRef<SVGGElement>(null);
+  const fxRef = useRef<SVGGElement>(null);
   const [ready, setReady] = useState(false);
 
   function nodeImg(d: Node): string | undefined {
@@ -219,6 +224,14 @@ export default function BreedTree({
     viewRef.current = v;
     const cg = circlesRef.current;
     const lg = labelsRef.current;
+    const bb = badgeBodiesRef.current;
+    if (bb) {
+      const bg = badgesRef.current;
+      for (const b of bb) {
+        const el = bg?.children[b.idx] as SVGGElement | undefined;
+        if (el) el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k})`);
+      }
+    }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
@@ -354,11 +367,14 @@ export default function BreedTree({
   }, [nodes]);
 
   // Gravity: 2s after the entrance settles, the top-level ancestor circles
-  // disconnect and fall as whole units (their nested circles riding inside),
-  // bounce off the container floor like tennis balls, and come to rest as a
-  // live, still-tappable pile. Hand-rolled sim (2 to 4 bodies), no physics
-  // dependency. Popup-only via the gravity prop; skipped for reduced motion;
-  // cancelled by any zoom. Runs once per open.
+  // AND their yellow % badges disconnect and fall as physics bodies (nested
+  // circles ride inside their parent), bounce off the container floor like
+  // tennis balls, knock into each other, and come to rest as a live pile.
+  // Collisions flash little white numbers (the circle's % share) that drift
+  // up and fade, copied from the PackPit number effect. White breed names
+  // vanish at the moment of the drop. Hand-rolled sim, no dependency.
+  // Popup-only via the gravity prop; skipped for reduced motion; cancelled
+  // by any zoom. Runs once per open.
   useEffect(() => {
     if (!gravity || !entered || fellRef.current) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -367,40 +383,88 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       fellRef.current = true;
       setFalling(true);
+      setDropped(true); // names disappear, physics badges appear
       const v = viewRef.current;
       const k = SIZE / v[2];
-      const asp = isMobileRef.current ? (stageRef.current ? stageRef.current.clientWidth / Math.max(stageRef.current.clientHeight, 1) : 1) : aspect;
+      const st = stageRef.current;
+      const stageH = st ? Math.max(st.clientHeight, 1) : SIZE;
+      const asp = st ? st.clientWidth / stageH : aspect;
       const vbWf = asp >= 1 ? SIZE * asp : SIZE;
       const vbHf = asp >= 1 ? SIZE : SIZE / asp;
       const xMinF = asp >= 1 ? -vbWf * (centred ? 0.5 : SHIFT) : -vbWf / 2;
       const M = 14; // margin inside the frame, svg units
-      // world-space walls and floor for this (frozen) root view
       const xL = v[0] + (xMinF + M) / k;
       const xR = v[0] + (xMinF + vbWf - M) / k;
       const yF = v[1] + (vbHf / 2 - M) / k;
-      type Body = { n: Node; x: number; y: number; vx: number; vy: number; r: number };
-      const bodies: Body[] = nodes.filter((n) => n.depth === 1).map((n) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r }));
-      if (bodies.length === 0) { setFalling(false); return; }
       const worldH = vbHf / k;
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number };
+      const d1 = nodes.filter((n) => n.depth === 1);
+      const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
+      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0 }));
+      if (bodies.length === 0) { setFalling(false); return; }
+      // yellow % badges become small bodies, spawned at each circle's lower-right rim
+      const BADGE_R = 38 / k;
+      const badges: Body[] = d1.map((n, i) => ({
+        n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0,
+      }));
+      badgeBodiesRef.current = badges;
+      const all = bodies.concat(badges);
       const G = worldH * 2.4; // per s^2
       const REST = 0.48;
       const WALL_REST = 0.35;
+      // little white numbers that flash up on a hit, copied from PackPit:
+      // 650ms life, alpha 1-t, rising 22 + t*34, weight 400, --font-pct
+      const fxScale = vbHf / stageH; // svg units per screen px, so sizes match the pit
+      const numbers: { el: SVGTextElement; x: number; y: number; born: number }[] = [];
+      const pctFont = (getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() || "Montserrat");
+      const numAt = (x: number, y: number, val: number, now: number) => {
+        const fx = fxRef.current;
+        if (!fx) return;
+        const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        el.textContent = String(val);
+        el.setAttribute("text-anchor", "middle");
+        el.style.fontFamily = pctFont + ", system-ui, sans-serif";
+        el.style.fontWeight = "400";
+        el.style.fontSize = `${15 * fxScale}px`;
+        el.style.fill = "#ffffff";
+        el.style.pointerEvents = "none";
+        fx.appendChild(el);
+        numbers.push({ el, x, y, born: now });
+      };
+      const FX_LIFE = 650;
+      const drawNumbers = (now: number, view: View) => {
+        const kk = SIZE / view[2];
+        for (let i = numbers.length - 1; i >= 0; i--) {
+          const n = numbers[i];
+          const t = (now - n.born) / FX_LIFE;
+          if (t >= 1) { n.el.remove(); numbers.splice(i, 1); continue; }
+          n.el.setAttribute("x", String((n.x - view[0]) * kk));
+          n.el.setAttribute("y", String((n.y - view[1]) * kk - (22 + t * 34) * fxScale));
+          n.el.style.opacity = String(1 - t);
+        }
+      };
+      const FX_COOLDOWN = 220;
+      const FX_MIN = worldH * 0.05; // minimum impact speed to flash
       let last = performance.now();
       const started = last;
       const step = (now: number) => {
         const dt = Math.min(0.032, (now - last) / 1000);
         last = now;
-        for (const b of bodies) {
+        for (const b of all) {
           b.vy += G * dt;
           b.x += b.vx * dt;
           b.y += b.vy * dt;
-          if (b.y + b.r > yF) { b.y = yF - b.r; b.vy = -b.vy * REST; b.vx *= 0.96; }
+          if (b.y + b.r > yF) {
+            if (b.vy > FX_MIN && now - b.lastFx > FX_COOLDOWN) { numAt(b.x, yF - b.r, b.pct, now); b.lastFx = now; }
+            b.y = yF - b.r; b.vy = -b.vy * REST; b.vx *= 0.96;
+          }
           if (b.x - b.r < xL) { b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
           if (b.x + b.r > xR) { b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
         }
-        for (let i = 0; i < bodies.length; i++) {
-          for (let j = i + 1; j < bodies.length; j++) {
-            const a = bodies[i], c = bodies[j];
+        for (let i = 0; i < all.length; i++) {
+          for (let j = i + 1; j < all.length; j++) {
+            const a = all[i], c = all[j];
             const dx = c.x - a.x, dy = c.y - a.y;
             const dist = Math.hypot(dx, dy) || 0.001;
             const overlap = a.r + c.r - dist;
@@ -411,6 +475,11 @@ export default function BreedTree({
               c.x += nx * overlap * (ma / mt); c.y += ny * overlap * (ma / mt);
               const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
               if (rel < 0) {
+                if (-rel > FX_MIN && now - a.lastFx > FX_COOLDOWN) {
+                  const cx = a.x + nx * a.r, cy = a.y + ny * a.r;
+                  numAt(cx, cy, a.pct, now);
+                  a.lastFx = now; c.lastFx = now;
+                }
                 const imp = (-(1 + REST) * rel) / (1 / ma + 1 / mc);
                 a.vx -= (imp / ma) * nx; a.vy -= (imp / ma) * ny;
                 c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
@@ -419,16 +488,21 @@ export default function BreedTree({
           }
         }
         let still = true;
-        for (const b of bodies) {
-          const dxm = b.x - b.n.x, dym = b.y - b.n.y;
-          if (dxm || dym) b.n.descendants().forEach((d) => { d.x += dxm; d.y += dym; });
+        for (const b of all) {
+          if (b.n) {
+            const dxm = b.x - b.n.x, dym = b.y - b.n.y;
+            if (dxm || dym) b.n.descendants().forEach((d) => { d.x += dxm; d.y += dym; });
+          }
           const onFloorish = b.y + b.r > yF - worldH * 0.02;
           if (Math.hypot(b.vx, b.vy) > worldH * 0.012 || !onFloorish) still = false;
         }
         zoomTo(viewRef.current);
-        if (!still && now - started < 5000) {
+        drawNumbers(now, viewRef.current);
+        if ((!still || numbers.length > 0) && now - started < 6000) {
           fallRafRef.current = requestAnimationFrame(step);
         } else {
+          numbers.forEach((n) => n.el.remove());
+          numbers.length = 0;
           setFalling(false);
         }
       };
@@ -571,7 +645,7 @@ export default function BreedTree({
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               return (
                 <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
-                  {isChild && (
+                  {isChild && !(dropped && d.depth === 1) && (
                     <text
                       x={0}
                       y={TITLE_DY}
@@ -581,7 +655,7 @@ export default function BreedTree({
                       {d.data.name.toUpperCase()}
                     </text>
                   )}
-                  {pct !== null && (
+                  {pct !== null && !(dropped && d.depth === 1) && (
                     <g>
                       <circle cx={0} cy={50} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
                       <text x={0} y={50} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
@@ -593,6 +667,29 @@ export default function BreedTree({
               );
             })}
           </g>
+
+          {/* Physics badges: once dropped, the yellow % chips live here and are
+              positioned by the sim / zoomTo from their body coordinates. */}
+          <g ref={badgesRef} style={{ display: dropped ? "inline" : "none", pointerEvents: "none" }} textAnchor="middle">
+            {nodes.filter((n) => n.depth === 1).map((d, i) => {
+              const v = viewRef.current;
+              const kk = SIZE / v[2];
+              const b = badgeBodiesRef.current?.[i];
+              const bx = b ? b.x : d.x + d.r * 0.6;
+              const by = b ? b.y : d.y + d.r * 0.6;
+              return (
+              <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}>
+                <circle cx={0} cy={0} r={38} style={{ fill: "var(--yellow)", stroke: "var(--navy)", strokeWidth: 3 }} />
+                <text x={0} y={0} dominantBaseline="central" style={{ fill: "var(--navy)", fontFamily: "var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: "26px" }}>
+                  {`${d.parent ? Math.round(((d.value ?? 0) / (d.parent.value || 1)) * 100) : 0}%`}
+                </text>
+              </g>
+              );
+            })}
+          </g>
+
+          {/* Collision number flashes, appended imperatively by the sim. */}
+          <g ref={fxRef} style={{ pointerEvents: "none" }} />
         </svg>
       </div>
 
