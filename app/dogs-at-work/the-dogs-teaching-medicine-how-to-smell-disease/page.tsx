@@ -56,7 +56,7 @@ export default function BioDetectionPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <div className={styles.essayHeroImgFallback} />
+          <img src="/Bumper-and-peatnut.jpg" alt="Bumper and Peanut, the Parkinson's bio-detection dogs" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/dogs-at-work" className={styles.backLink}>← Back to Dogs at Work</Link>

@@ -68,7 +68,7 @@ export default function AlertDogPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <div className={styles.essayHeroImgFallback} />
+          <img src="/never-clocking-off.jpg" alt="A medical alert dog resting beside its owner" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/dogs-at-work" className={styles.backLink}>← Back to Dogs at Work</Link>
