@@ -116,7 +116,7 @@ function NolanFilmCard() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Christopher Nolan · Universal · 2026</p>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", textAlign: "center" }}>Christopher Nolan · Universal · 2026</p>
               </div>
               <div style={{ padding: "12px 20px 4px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
@@ -143,7 +143,7 @@ function NolanFilmCard() {
                 </div>
                 <div style={{ background: "#ef4444", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}>
                   <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Not suitable for children</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 (UK) for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: "0.98rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated 15 (UK) for strong violence. Nearly three hours with intense action, mythological horror and mature themes throughout.</p>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Zendaya", "Charlize Theron"].map(name => (
@@ -651,7 +651,18 @@ export default function ArgosPage() {
                 />
               </div>
 
+              <div className={styles.desktopOnly}>
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <QuoteBuild
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
+                  pinned={<></>}
+                  quote="Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next."
+                />
+              </div>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
 
@@ -811,6 +822,7 @@ export default function ArgosPage() {
                 </figcaption>
               </figure>
               </GatedVideo>
+              <div style={{ height: 30, display: "block" }} />
 
               <p>But for people who grew up with dogs, that same smell does something completely different. It opens a door. Not a metaphorical door, but a specific one, in a specific house, at a specific age. The smell of dog is the smell of Saturday mornings, school holidays, wet paws by the back door, warm fur, old blankets and a particular kind of safety that belongs almost entirely to childhood.</p>
 

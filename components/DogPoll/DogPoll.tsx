@@ -57,7 +57,9 @@ export default function DogPoll({
     if (shakeSignal === 0) return;
     btnRefs.current.forEach((el, i) => {
       if (!el) return;
-      const amp = 4 + Math.min(shakeAttempts, 8) * 1.8 + i * 1.3;
+      // reduced amplitude per round-9 request -- shake still escalates
+      // with repeated attempts, just starts and grows more gently
+      const amp = 2.5 + Math.min(shakeAttempts, 8) * 1.1 + i * 0.8;
       const dur = Math.max(420 - shakeAttempts * 24, 160);
       const dir = i === 0 ? 1 : -1;
       el.animate(

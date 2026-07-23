@@ -112,8 +112,10 @@ export function QuotePollScene({
   const line = clamp01(p / 0.24);
   const mark = p >= 0.25;
   const text = clamp01((p - 0.3) / 0.28);
-  const pollCard = clamp01((p - 0.5) / 0.2);
-  const btns = clamp01((p - 0.68) / 0.12);
+  // poll starts fading in the moment the yellow line finishes extending
+  // (p=0.24), overlapping with the mark/text build rather than waiting
+  const pollCard = clamp01((p - 0.24) / 0.3);
+  const btns = clamp01((p - 0.6) / 0.15);
   /* Lock engages the moment the buttons are fully visible -- not later --
      so there is never a window where the reader is blocked before they can
      even see something to click. */
@@ -218,7 +220,6 @@ export function StatueBulletsChoreo({
   const { sceneRef, p } = useSceneProgress();
   const trackRef = useRef<HTMLDivElement | null>(null);
   const swiped = useRef(false);
-  const autoRun = useRef(false);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -230,15 +231,22 @@ export function StatueBulletsChoreo({
     return () => track.removeEventListener("touchstart", onTouch);
   }, []);
 
+  /* The gallery pans continuously with vertical scroll progress (across
+     the first 55% of the scene) rather than firing a single autoplay
+     animation -- this lets each bullet be tied directly to a specific
+     image becoming current, per image N+1 arriving -> bullet N appears.
+     A manual swipe hands control to the browser for the rest of the scene. */
+  const galleryP = clamp01(p / 0.55);
   useEffect(() => {
-    if (p > 0.015 && !swiped.current && !autoRun.current && trackRef.current) {
-      autoRun.current = true;
-      trackRef.current.scrollTo({ left: trackRef.current.scrollWidth, behavior: "smooth" });
-    }
-  }, [p]);
+    const track = trackRef.current;
+    if (!track || swiped.current) return;
+    track.scrollLeft = galleryP * (track.scrollWidth - track.clientWidth);
+  }, [galleryP]);
+
+  const n = slides.length;
 
   return (
-    <div ref={sceneRef} className={styles.bulletScene}>
+    <div ref={sceneRef} className={bullets ? styles.bulletScene : styles.bulletSceneNoBullets}>
       <div className={styles.stage}>
         <div ref={trackRef} className={styles.statueTrack}>
           {slides.map((sl, i) => (
@@ -255,9 +263,18 @@ export function StatueBulletsChoreo({
         {bullets && (
           <ul className={styles.choreoBullets}>
             {bullets.map((b, i) => {
-              const start = 0.3 + i * 0.15;
-              const o = clamp01((p - start) / 0.12);
               const isLast = i === bullets.length - 1;
+              let o: number;
+              if (isLast) {
+                // final bullet: reveals after the gallery finishes, as the
+                // reader resumes ordinary scrolling
+                o = clamp01((p - 0.65) / 0.15);
+              } else {
+                // bullet i reveals when image (i+2) becomes current, i.e.
+                // gallery progress crosses (i+1)/(n-1)
+                const threshold = (i + 1) / (n - 1);
+                o = clamp01((galleryP - threshold + 0.06) / 0.1);
+              }
               return (
                 <li
                   key={b}

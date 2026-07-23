@@ -155,13 +155,9 @@
   75% { transform: rotate(-2.2deg) translateY(-2px); }
 }
 
+/* Item 9 (round 9): back to attempt-only, not continuous -- and gentler. */
 .optionLocked {
-  animation: dogPollWobbleGreen 1.1s ease-in-out infinite;
-}
-
-.optionLockedRed.optionLocked {
-  animation-name: dogPollWobbleRed;
-  animation-delay: 0.2s;
+  animation: none;
 }
 
 /* Fall away: the button not chosen drops off the page, same motion as the

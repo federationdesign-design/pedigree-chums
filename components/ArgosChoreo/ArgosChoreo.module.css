@@ -68,6 +68,13 @@
   height: 230svh;
 }
 
+/* Galleries with no bullets need far less pin-and-release travel -- this
+   was the source of the dead-air gap before the quote that followed. */
+.bulletSceneNoBullets {
+  height: 130vh;
+  height: 130svh;
+}
+
 .statueTrack {
   display: flex;
   gap: 12px;

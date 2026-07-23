@@ -156,16 +156,22 @@
   font-weight: 700;
 }
 
-/* The bold intro paragraph pinned above a scroll-choreographed quote */
-.pinnedQuoteText {
+/* The bold intro paragraph pinned above a scroll-choreographed quote.
+   Scoped with .essayBody to outrank the base .essayBody p specificity --
+   an unscoped single-class rule here was silently losing every time. */
+.essayBody .pinnedQuoteText {
   font-weight: 700;
 }
 
 @media (max-width: 768px) {
-  .pinnedQuoteText {
+  .essayBody .pinnedQuoteText {
     font-size: 0.98rem;
     line-height: 1.1em;
   }
+}
+
+.essayBody .pinnedQuoteText {
+  line-height: 1.1em;
 }
 
 .essayBody h3 {
@@ -999,7 +1005,7 @@
   }
 
   .heroScene .essayHeroTitle {
-    font-size: clamp(2.3rem, 9.5vw, 3rem);
+    font-size: clamp(2.16rem, 9.2vw, 2.86rem);
   }
 
   .heroScene .heroArrow {
@@ -1032,12 +1038,13 @@
   }
 
   .subhead {
-    font-size: clamp(3.11rem, 12.8vw, 4.11rem);
+    font-size: clamp(3.04rem, 12.5vw, 4.04rem);
+    line-height: 1.2em;
     text-shadow: 0 3px 12px rgba(10, 58, 87, 0.35);
   }
 
   .noteScene {
-    margin-top: -16px;
+    margin-top: -40px;
     margin-bottom: 18px;
   }
 
@@ -1061,7 +1068,7 @@
 
   .essayBody .editorsNoteTitle {
     font-family: var(--font-body, "Montserrat", sans-serif);
-    font-size: 0.72rem;
+    font-size: 0.58rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
