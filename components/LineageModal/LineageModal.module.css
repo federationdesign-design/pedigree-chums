@@ -1,0 +1,81 @@
+/* Full-viewport takeover shell for the lineage pop-up. Three stacked zones:
+   header (breed name + close), then the docked caption inside BreedTree,
+   then the diagram filling every remaining pixel. No nested cards, so the
+   diagram is never constrained by a container it cannot see. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+  isolation: isolate;
+  padding: 16px 22px 18px;
+  animation: lmRise 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@keyframes lmRise {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.title {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.8rem, 4.5vw, 3.4rem);
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+  line-height: 1.05;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+.close svg {
+  width: 30px;
+  height: 30px;
+}
+
+.stageArea {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    padding: 12px 14px 14px;
+  }
+  .title {
+    font-size: clamp(1.5rem, 7vw, 2.2rem);
+  }
+  .close {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay { animation: none; }
+}

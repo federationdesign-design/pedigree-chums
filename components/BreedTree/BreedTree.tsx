@@ -140,6 +140,9 @@ export default function BreedTree({
   size = 760,
   hideLabels = false,
   disableZoom = false,
+  fill = false,
+  dockAside = false,
+  rootNote,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -149,6 +152,9 @@ export default function BreedTree({
   size?: number;
   hideLabels?: boolean;
   disableZoom?: boolean;
+  fill?: boolean;
+  dockAside?: boolean;
+  rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -387,8 +393,8 @@ export default function BreedTree({
   const buriedSet = hovered ? new Set(hovered.descendants()) : null;
 
   return (
-    <div className={styles.tree} ref={wrapRef} style={{ width: size, height: size }}>
-      <div className={styles.stage} ref={stageRef}>
+    <div className={`${styles.tree}${fill ? " " + styles.treeFill : ""}`} ref={wrapRef} style={fill ? undefined : { width: size, height: size }}>
+      <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`} ref={stageRef}>
         <svg
           viewBox={viewBox}
           onClick={disableZoom ? undefined : onBackground}
@@ -498,7 +504,7 @@ export default function BreedTree({
         </svg>
       </div>
 
-      <div className={styles.aside} style={{ position: "relative" }}>
+      <div className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`} style={{ position: "relative" }}>
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
             <span key={i}>
@@ -521,7 +527,7 @@ export default function BreedTree({
             </span>
           )}
           <p className={styles.cNote}>
-            {breedInfo[shown.data.name] || shown.data.note}
+            {breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
             {shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
         </div>
