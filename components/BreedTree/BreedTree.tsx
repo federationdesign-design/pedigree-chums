@@ -147,6 +147,8 @@ export default function BreedTree({
   tinted = true,
   namePill = false,
   onShownChange,
+  hideCaption = false,
+  onCaptionClose,
   rootNote,
 }: {
   root: LineageNode;
@@ -164,6 +166,8 @@ export default function BreedTree({
   tinted?: boolean;
   namePill?: boolean;
   onShownChange?: (name: string) => void;
+  hideCaption?: boolean;
+  onCaptionClose?: () => void;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -239,6 +243,29 @@ export default function BreedTree({
     const v = viewRef.current;
     const k = SIZE / v[2];
     return { x: v[0] + sp.x / k, y: v[1] + sp.y / k };
+  };
+
+  const floorReserveVU = () => {
+    const st = stageRef.current;
+    if (!st || !dockAside) return 0;
+    const stW = st.clientWidth, stH = Math.max(st.clientHeight, 1);
+    const asp = stW / stH;
+    const vbHf = asp >= 1 ? SIZE : SIZE / asp;
+    return stW * (28.9 / 544.3) * (vbHf / stH);
+  };
+
+  const clampRootView = (v: View): View => {
+    if (!dockAside) return v;
+    const st = stageRef.current;
+    if (!st) return v;
+    const asp = st.clientWidth / Math.max(st.clientHeight, 1);
+    const vbHf = asp >= 1 ? SIZE : SIZE / asp;
+    const k = SIZE / v[2];
+    const root = nodes[0];
+    const bottomView = (root.y + root.r - v[1]) * k;
+    const maxBottom = vbHf / 2 - floorReserveVU() - 8;
+    if (bottomView > maxBottom) return [v[0], v[1] + (bottomView - maxBottom) / k, v[2]];
+    return v;
   };
 
   const startDrag = (e: React.PointerEvent, body: { x: number; y: number; vx: number; vy: number } | null | undefined) => {
@@ -361,7 +388,8 @@ export default function BreedTree({
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
-    const target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD)];
+    let target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD)];
+    if (d === nodes[0]) target = clampRootView(target);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
     if (reduce) {
@@ -403,7 +431,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)];
+    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)]);
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -483,10 +511,11 @@ export default function BreedTree({
       const vbWf = asp >= 1 ? SIZE * asp : SIZE;
       const vbHf = asp >= 1 ? SIZE : SIZE / asp;
       const xMinF = asp >= 1 ? -vbWf * (centred ? 0.5 : SHIFT) : -vbWf / 2;
-      const M = 14; // margin inside the frame, svg units
+      const M = 4; // margin above the grass, svg units
+      const floorVU = floorReserveVU();
       const xL = v[0] + (xMinF + M) / k;
       const xR = v[0] + (xMinF + vbWf - M) / k;
-      const yF = v[1] + (vbHf / 2 - M) / k;
+      const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
       const yF0 = yF;
       const worldH = vbHf / k;
       type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Set<Body> };
@@ -541,7 +570,8 @@ export default function BreedTree({
         }
       };
       const G = worldH * 2.4; // per s^2
-      const REST = 0.48;
+      const REST = 0.48;       // badges, pill, body-vs-body
+      const BOUNCE = 0.78;     // circles off the floor: tennis-ball lively
       const WALL_REST = 0.35;
       // little white numbers that flash up on a hit, copied from PackPit:
       // 650ms life, alpha 1-t, rising 22 + t*34, weight 400, --font-pct
@@ -590,7 +620,7 @@ export default function BreedTree({
           if (b.y + b.r > yF) {
             if (b.vy > FX_MIN && now - b.lastFx > FX_COOLDOWN) { numAt(b.x, yF - b.r, b.pct, now); b.lastFx = now; }
             const hitSpeed = b.vy;
-            b.y = yF - b.r; b.vy = -b.vy * REST; b.vx *= 0.96;
+            b.y = yF - b.r; b.vy = -b.vy * (b.n ? BOUNCE : REST); b.vx *= 0.96;
             if (hitSpeed > FX_MIN * 0.6) popChildren(b);
           }
           if (b.x - b.r < xL) { b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
@@ -907,7 +937,7 @@ export default function BreedTree({
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
             const wx = pb ? pb.x : v[0] + (xMinR + vbWr / 2) / kk;
-            const wy = pb ? pb.y : v[1] + (vbHr / 2 - 14) / kk - pr / kk;
+            const wy = pb ? pb.y : v[1] + (vbHr / 2 - floorReserveVU() - 6) / kk - pr / kk;
             return (
               <g ref={pillRef} transform={`translate(${(wx - v[0]) * kk},${(wy - v[1]) * kk})`}
                 style={{ cursor: pb ? "grab" : "default", pointerEvents: pb ? "auto" : "none" }}
@@ -924,7 +954,7 @@ export default function BreedTree({
         </svg>
       </div>
 
-      <div className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`} style={{ position: "relative" }}>
+      <div className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`} style={{ position: "relative", display: hideCaption ? "none" : undefined }}>
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
             <span key={i}>
@@ -939,7 +969,15 @@ export default function BreedTree({
           ))}
         </div>
 
-        <div className={styles.caption}>
+        <div className={styles.caption} style={{ position: "relative" }}>
+          {onCaptionClose && (
+            <button type="button" onClick={onCaptionClose} aria-label="Close description" className={styles.captionClose}>
+              <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 14, height: 14 }}>
+                <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
           <span className={styles.cName}>{shown.data.name}</span>
           {shownShare !== null && shown.parent && (
             <span className={styles.cShare}>

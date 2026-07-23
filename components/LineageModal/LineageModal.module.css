@@ -80,3 +80,17 @@
 @media (prefers-reduced-motion: reduce) {
   .overlay { animation: none; }
 }
+
+/* The pit floor graphic, pinned to the bottom of the stage. Physics treats
+   the top of the grass as the ground, so objects rest on it. */
+.floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  z-index: 2;
+}

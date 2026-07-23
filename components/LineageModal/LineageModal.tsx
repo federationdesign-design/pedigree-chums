@@ -3,8 +3,24 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
+import CardDock from "../CardDock/CardDock";
 import type { LineageNode } from "../../data/lineage";
 import css from "./LineageModal.module.css";
+
+// Breed names longer than 11 characters break onto a second line at the
+// nearest word boundary, so long names never force a tiny single line.
+function titleLines(name: string): string[] {
+  if (name.length <= 11 || !name.includes(" ")) return [name];
+  const words = name.split(" ");
+  let first = words[0];
+  let i = 1;
+  while (i < words.length && (first + " " + words[i]).length <= 11) {
+    first += " " + words[i];
+    i++;
+  }
+  const rest = words.slice(i).join(" ");
+  return rest ? [first, rest] : [first];
+}
 
 type Props = {
   name: string;
@@ -18,6 +34,7 @@ type Props = {
 export default function LineageModal({ name, image, character, lineage, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
+  const [captionOpen, setCaptionOpen] = useState(false); // closed from the start
 
   useEffect(() => setMounted(true), []);
 
@@ -46,7 +63,11 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           </svg>
         </button>
       </div>
-      <h3 className={css.title}>{shownName}</h3>
+      <h3 className={css.title}>
+        {titleLines(shownName).map((line, i, arr) => (
+          <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+        ))}
+      </h3>
 
       {/* The diagram owns everything below the header. BreedTree runs in
           fill + dockAside mode: caption and breadcrumbs docked at the top,
@@ -64,10 +85,22 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           tinted={false}
           namePill
           onShownChange={setShownName}
+          hideCaption={!captionOpen}
+          onCaptionClose={() => setCaptionOpen(false)}
           rootNote={character}
           onClose={onClose}
         />
+        {/* Pit floor, same graphic as the main pit */}
+        <img src="/floor-shortened-svg.svg" alt="" aria-hidden="true" className={css.floor} />
       </div>
+
+      {/* Reopen icon for the description box, chum-page style */}
+      {!captionOpen && (
+        <CardDock
+          items={[{ id: "ancestry", label: "Description", abbr: "AN" }]}
+          onReopen={() => setCaptionOpen(true)}
+        />
+      )}
     </div>,
     document.body,
   );

@@ -284,3 +284,21 @@
 .asideDocked .cName {
   font-size: 0.78rem;
 }
+
+/* Small X in the corner of the docked caption. */
+.captionClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--yellow, #ffd23e);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
