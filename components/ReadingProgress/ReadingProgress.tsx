@@ -3,17 +3,16 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import styles from "./ReadingProgress.module.css";
+import { DOG_WALK_PATHS, DOG_WALK_VIEWBOX } from "./dogWalkPaths";
 
 /*
   Reading progress for article pages.
   A tall yellow bar fills with scroll; solid navy notches mark each h2
-  scene; the dog GIF walks the bar (flipped to face right, recoloured
-  from its black silhouette via CSS filter). No bone at the end.
-  Note: unlike the previous hand-built SVG, a GIF's own frames play
-  continuously once loaded -- there is no "legs only move while scrolling"
-  behaviour available for a raster animation, so the walk now loops on
-  its own timing; only the trot bounce and the on-arrival wobble are still
-  scroll-state-driven via CSS.
+  scene; a real SVG dog (four exported frames: 1 standing, 2-3-4 the walk
+  cycle) walks the bar, flipped to face right via CSS. Frames are inlined
+  as <path> data with a real `fill`, not a raster image behind a CSS
+  filter -- colour is exact, not approximated. Legs cycle only while the
+  reader is actively scrolling; frame 1 (standing) shows at rest.
   Pointer-events are disabled throughout -- purely decorative chrome.
 */
 export default function ReadingProgress({ articleSelector = "article" }: { articleSelector?: string }) {
@@ -70,6 +69,23 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
 
   const done = pct >= 99.5;
 
+  // Walk-cycle: frame 1 (standing) at rest; 2 -> 3 -> 4 -> 2... while
+  // actively scrolling. A fixed-interval timer drives the cycle so its
+  // speed is consistent regardless of scroll speed; it only runs while
+  // `walking` is true.
+  const [frame, setFrame] = useState(1);
+  useEffect(() => {
+    if (!walking) {
+      setFrame(1);
+      return;
+    }
+    setFrame((f) => (f === 1 ? 2 : f));
+    const id = setInterval(() => {
+      setFrame((f) => (f >= 4 ? 2 : f + 1));
+    }, 140);
+    return () => clearInterval(id);
+  }, [walking]);
+
   return (
     <div className={styles.wrap} id="rp-wrap" aria-hidden="true">
       <div className={styles.track}>
@@ -79,10 +95,10 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
         <div className={styles.fill} id="rp-fill" style={{ width: `${pct}%` }} />
       </div>
 
-      {/* The dog, walking. Source GIF faces left -- flipped via CSS
-          (scaleX(-1) in .dog) to face right, matching travel direction.
-          Recoloured from its black silhouette via CSS filter; swap
-          styles.dogWhite for styles.dogYellow below to try the other. */}
+      {/* The dog. Source SVGs face left -- flipped via CSS (scaleX(-1) in
+          .dog) to face right, matching travel direction. Fill is a real
+          CSS custom property (--dog-fill in the module CSS), so colour is
+          exact -- swap it there to try white vs yellow vs anything else. */}
       <div
         id="rp-dog"
         data-walking={walking ? "1" : "0"}
@@ -90,12 +106,9 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
         className={`${styles.dog} ${done ? styles.dogDone : ""}`}
         style={{ left: `${pct}%` }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/scottywalking-animation.gif"
-          alt=""
-          className={`${styles.dogImg} ${styles.dogWhite}`}
-        />
+        <svg viewBox={DOG_WALK_VIEWBOX} className={styles.dogImg}>
+          <path d={DOG_WALK_PATHS[frame]} className={styles.dogFill} />
+        </svg>
       </div>
     </div>
   );

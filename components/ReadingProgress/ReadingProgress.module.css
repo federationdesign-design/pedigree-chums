@@ -57,24 +57,18 @@
     width: 34px;
     height: auto;
     display: block;
+    overflow: visible;
   }
 
-  /* Recolour the black silhouette GIF. Default: white (exact and
-     reliable via invert). Swap to .dogYellow for the approximate yellow
-     recipe -- CSS filters can only approximate a specific hex from a
-     black source, so if exact brand yellow matters, the cleanest fix is
-     exporting the GIF pre-coloured from the same pipeline that made it. */
-  .dogWhite {
-    filter: invert(1) drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
+  /* Real fill, not a filter guess. One value to change to try another
+     colour -- e.g. var(--yellow, #ffd23e) for the brand yellow instead. */
+  .dogFill {
+    fill: #ffffff;
   }
 
-  .dogYellow {
-    filter: invert(85%) sepia(45%) saturate(900%) hue-rotate(358deg) brightness(101%) contrast(101%)
-      drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
-  }
-
-  /* Reaching the end: since a tail can't be targeted inside a raster
-     GIF, the whole dog gives a small celebratory wobble instead */
+  /* Reaching the end: each frame is a single flat path (no separate
+     tail element to target), so the whole dog gives a small celebratory
+     wobble instead */
   .dogDone {
     animation: rpWobble 0.4s ease-in-out infinite;
   }
