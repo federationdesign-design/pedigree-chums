@@ -1,34 +1,41 @@
+/* Tall spacer: its height (viewport + horizontal overflow) is set in
+   StepCards.tsx so the sticky pin has scroll room to translate the cards. */
 .section {
-  padding: 48px 0 56px;
-  overflow: hidden;
-}
-
-.wrap {
   position: relative;
 }
 
+/* The pinned viewport. Sticks to the top and holds the cards centred while the
+   page scrolls; its height (100vh) is set in JS to match the real viewport. */
+.pin {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* The card rail — translated horizontally via transform (no native scroll).
+   width: max-content makes its layout width exactly the content width, so the
+   pin distance measures deterministically. */
 .row {
   display: flex;
   flex-wrap: nowrap;
+  width: max-content;
   gap: 20px;
-  padding: 40px clamp(24px, 6vw, 90px) 24px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  padding: 40px clamp(28px, 6vw, 90px) 24px;
+  will-change: transform;
 }
-.row::-webkit-scrollbar { display: none; }
 
 .card {
   position: relative;
-  /* Fixed gallery width so the six cards overflow and scroll horizontally
-     (wheel-hijacked in StepCards.tsx), like the breed strips elsewhere. */
+  /* Fixed gallery width so the six cards overflow; the overflow distance is how
+     far the pin translates them while the page is frozen. */
   flex: 0 0 clamp(240px, 26vw, 340px);
   background: #ffed00;
   border: 6px solid #ffed00;
   border-radius: 16px;
-  scroll-snap-align: center;
   display: flex;
   flex-direction: column;
   box-shadow: 0 6px 20px rgba(10, 58, 87, 0.18);

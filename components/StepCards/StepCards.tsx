@@ -13,7 +13,8 @@ const STEPS = [
 
 export default function StepCards() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
@@ -41,155 +42,149 @@ export default function StepCards() {
     return () => observer.disconnect();
   }, []);
 
-  // Desktop: convert a vertical wheel into horizontal scroll, holding the page
-  // until EVERY card has passed, then release. (Matches the video rail above.)
+  // Sticky pin: the section freezes centred in the viewport while the page's
+  // vertical scroll is translated into horizontal movement of the card rail,
+  // then releases once every card has passed. Works on desktop and touch alike.
   useEffect(() => {
-    const wrap = wrapRef.current;
-    const el = railRef.current;
-    if (!wrap || !el) return;
-
-    const driveRail = (delta: number, preventDefault: () => void) => {
-      if (delta === 0) return;
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 0) return; // not scrollable (fits) -> let the page move
-      if (delta > 0) {
-        if (el.scrollLeft >= max) return; // all cards passed -> page continues
-        preventDefault();
-        el.scrollLeft = Math.min(el.scrollLeft + delta, max);
-      } else {
-        if (el.scrollLeft <= 0) return; // back at the start -> page scrolls up
-        preventDefault();
-        el.scrollLeft = Math.max(el.scrollLeft + delta, 0);
-      }
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-      driveRail(delta, () => e.preventDefault());
-    };
-
-    wrap.addEventListener("wheel", onWheel, { passive: false });
-    return () => wrap.removeEventListener("wheel", onWheel);
-  }, []);
-
-  // Touch: no wheel events, so drive the rail from the page-scroll position via
-  // a rAF lerp (eases in with inertia). Engages as the row rises through the
-  // screen and runs through ALL cards before releasing. (Matches the video rail.)
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    const el = railRef.current;
-    if (!wrap || !el) return;
-    if (!window.matchMedia("(pointer: coarse)").matches) return;
-
-    const EASE = 0.08;
-    let target = 0;
-    let current = 0;
-    let released = false;
-    let raf = 0;
-
-    const measure = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 0) return 0;
-      const rect = wrap.getBoundingClientRect();
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      const centre = rect.top + rect.height / 2;
-      const start = vh * 0.85; // begins as the row nears the lower half
-      const end = vh * 0.15; //   finishes as it nears the top
-      const p = (start - centre) / (start - end);
-      const clamped = Math.max(0, Math.min(1, p));
-      if (clamped >= 1) released = true; // all cards passed -> hand control back
-      return clamped * max; // drive through every card
-    };
-
-    const tick = () => {
-      target = measure();
-      current += (target - current) * EASE;
-      if (Math.abs(target - current) < 0.5) current = target;
-      el.scrollLeft = current;
-      if (current === target) {
-        raf = 0;
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    const onScroll = () => {
-      if (released) return;
-      if (!raf) raf = requestAnimationFrame(tick);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    onScroll();
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  // Yellow draggable scrollbar thumb synced to the rail's scroll position.
-  useEffect(() => {
-    const el = railRef.current;
+    const section = sectionRef.current;
+    const pin = pinRef.current;
+    const rail = railRef.current;
     const track = trackRef.current;
     const thumb = thumbRef.current;
-    if (!el || !track || !thumb) return;
+    if (!section || !pin || !rail) return;
 
-    const sync = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 1) {
-        track.style.opacity = "0";
+    let distance = 0; // px of horizontal overflow == px of scroll spent pinned
+    let raf = 0;
+
+    // The site sets `overflow-x: hidden` on <html>/<body> to stop sideways
+    // scroll, but that turns the root into a clip/scroll container and breaks
+    // `position: sticky`. `overflow-x: clip` prevents sideways scroll WITHOUT
+    // that side effect. We can't set it in CSS (the build downlevels clip ->
+    // hidden for its browser targets), so apply it at runtime where modern
+    // browsers honour it. Harmless on browsers that don't support clip.
+    const root = document.documentElement;
+    const body = document.body;
+    const prevRootOX = root.style.overflowX;
+    const prevBodyOX = body.style.overflowX;
+    if (CSS?.supports?.("overflow-x", "clip")) {
+      root.style.overflowX = "clip";
+      body.style.overflowX = "clip";
+    }
+
+    const update = () => {
+      if (distance <= 0) {
+        rail.style.transform = "none";
+        if (track) track.style.opacity = "0";
         return;
       }
-      track.style.opacity = "1";
-      thumb.style.width = `${(el.clientWidth / el.scrollWidth) * 100}%`;
-      thumb.style.left = `${(el.scrollLeft / el.scrollWidth) * 100}%`;
+      const rect = section.getBoundingClientRect();
+      const scrolled = Math.min(Math.max(-rect.top, 0), distance);
+      rail.style.transform = `translate3d(${-scrolled}px, 0, 0)`;
+      if (track && thumb) {
+        track.style.opacity = "1";
+        const w = Math.min(1, pin.clientWidth / rail.offsetWidth);
+        thumb.style.width = `${w * 100}%`;
+        thumb.style.left = `${(scrolled / distance) * (1 - w) * 100}%`;
+      }
     };
 
+    // Measure the horizontal overflow and set up the tall spacer that gives the
+    // pin something to scroll through. Reference the section width (always the
+    // full viewport width) so the measurement doesn't depend on the pin's own
+    // box, which can read wide mid-layout. Re-run on resize / when media loads.
+    const layout = () => {
+      const refWidth = section.clientWidth || pin.clientWidth;
+      distance = Math.max(0, rail.offsetWidth - refWidth);
+
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      if (distance > 0) {
+        pin.style.height = `${vh}px`;
+        section.style.height = `${vh + distance}px`;
+      } else {
+        // Everything fits: no pin, natural height, cards simply centred.
+        pin.style.height = "";
+        section.style.height = "";
+      }
+      update();
+    };
+
+    const onScroll = () => {
+      if (!raf)
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          update();
+        });
+    };
+
+    // Run now, again after paint, and once web fonts settle — card widths use vw
+    // basis (font-independent) but this guards against measuring mid-layout.
+    layout();
+    requestAnimationFrame(() => requestAnimationFrame(layout));
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(layout).catch(() => {});
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", layout);
+    const ro = new ResizeObserver(layout);
+    ro.observe(rail);
+    ro.observe(section);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", layout);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      root.style.overflowX = prevRootOX;
+      body.style.overflowX = prevBodyOX;
+    };
+  }, []);
+
+  // Yellow scrollbar: reflects progress, and dragging it scrolls the page so the
+  // pin advances (since the pin is driven by page-scroll position).
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = trackRef.current;
+    const thumb = thumbRef.current;
+    if (!section || !track || !thumb) return;
+
     let dragging = false;
-    let startX = 0;
-    let startScroll = 0;
+    const scrollToProgress = (clientX: number) => {
+      const rect = track.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (clientX - rect.left) / (rect.width || 1)));
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const distance = Math.max(0, section.offsetHeight - vh);
+      const sectionTopAbs = window.scrollY + section.getBoundingClientRect().top;
+      window.scrollTo({ top: sectionTopAbs + p * distance });
+    };
     const onDown = (e: PointerEvent) => {
       dragging = true;
-      startX = e.clientX;
-      startScroll = el.scrollLeft;
       thumb.setPointerCapture(e.pointerId);
       e.preventDefault();
+      scrollToProgress(e.clientX);
     };
     const onMove = (e: PointerEvent) => {
-      if (!dragging) return;
-      const trackW = track.clientWidth || 1;
-      const max = el.scrollWidth - el.clientWidth;
-      const next = startScroll + ((e.clientX - startX) / trackW) * el.scrollWidth;
-      el.scrollLeft = Math.max(0, Math.min(next, max));
+      if (dragging) scrollToProgress(e.clientX);
     };
     const onUp = () => {
       dragging = false;
     };
 
-    sync();
-    el.addEventListener("scroll", sync, { passive: true });
-    window.addEventListener("resize", sync);
     thumb.addEventListener("pointerdown", onDown);
     thumb.addEventListener("pointermove", onMove);
     thumb.addEventListener("pointerup", onUp);
     thumb.addEventListener("pointercancel", onUp);
-    const ro = new ResizeObserver(sync);
-    ro.observe(el);
-
     return () => {
-      el.removeEventListener("scroll", sync);
-      window.removeEventListener("resize", sync);
       thumb.removeEventListener("pointerdown", onDown);
       thumb.removeEventListener("pointermove", onMove);
       thumb.removeEventListener("pointerup", onUp);
       thumb.removeEventListener("pointercancel", onUp);
-      ro.disconnect();
     };
   }, []);
 
   return (
-    <section className={styles.section}>
-      <div ref={wrapRef} className={styles.wrap}>
+    <section ref={sectionRef} className={styles.section}>
+      <div ref={pinRef} className={styles.pin}>
         <div ref={railRef} className={styles.row}>
           {STEPS.map((s, i) => (
             <div key={s.n} data-card className={styles.card}>
@@ -219,10 +214,10 @@ export default function StepCards() {
             </div>
           ))}
         </div>
-      </div>
 
-      <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
-        <div ref={thumbRef} className={styles.thumb} />
+        <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
+          <div ref={thumbRef} className={styles.thumb} />
+        </div>
       </div>
     </section>
   );
