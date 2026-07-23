@@ -71,8 +71,13 @@
 /* Galleries with no bullets need far less pin-and-release travel -- this
    was the source of the dead-air gap before the quote that followed. */
 .bulletSceneNoBullets {
-  height: 140vh;
-  height: 140svh;
+  /* dwell after the Barthes quote finishes (p=0.85) was ~21svh; cut
+     roughly in half. Kept moderate rather than a literal 50% of the
+     WHOLE scene, since this height also has to cover the gallery pan
+     and the quote build, both mapped across the same 0-1 progress --
+     cutting harder risks rushing those, not just the trailing gap. */
+  height: 120vh;
+  height: 120svh;
 }
 
 .statueTrack {
@@ -226,8 +231,10 @@
 
 /* ── Quote + poll composite scene ── */
 .quotePollScene {
-  height: 150vh;
-  height: 150svh;
+  /* dwell after buttons finish (p=0.75) was ~37.5svh; cut roughly in
+     half per request */
+  height: 125vh;
+  height: 125svh;
 }
 
 .pollWrap {

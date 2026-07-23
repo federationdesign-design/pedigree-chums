@@ -514,7 +514,7 @@ export default function ArgosPage() {
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Humans recognise status. Dogs recognise presence.</blockquote>
               </div>
 
-              <div className={styles.sceneMobile}>
+              <div className={styles.sceneMobile} style={{ marginTop: -200 }}>
                 <QuoteReveal
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
@@ -569,7 +569,18 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <p>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly. <span style={{ color: "var(--yellow)" }}>He cannot kneel beside him, call his name, or comfort him without risking his disguise.</span> <span style={{ color: "var(--yellow)" }}>Argos has enough strength left to recognise him, but not enough to reach him. Then, as Odysseus goes inside, Argos dies.</span></p>
+              <div style={{ borderTop: "1px solid #ffffff", opacity: 1, margin: "20px 0" }} />
+
+              <p>
+                Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.{" "}
+                <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>He cannot kneel beside him,</strong>{" "}
+                <strong style={{ fontWeight: 700, color: "#ffffff" }}>call his name, or comfort him</strong>{" "}
+                <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>without risking his disguise.</strong>{" "}
+                <strong style={{ fontWeight: 700, color: "#ffffff" }}>Argos has enough strength left to recognise him,</strong>{" "}
+                <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>but not enough to reach him.</strong>{" "}
+                <strong style={{ fontWeight: 700, color: "#ffffff" }}>Then, as Odysseus goes inside,</strong>{" "}
+                <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>Argos dies.</strong>
+              </p>
 
               <p><span style={{ color: "var(--navy)" }}>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</span></p>
 
