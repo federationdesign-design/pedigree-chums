@@ -280,14 +280,10 @@ export default function BreedTree({
     return { x: v[0] + sp.x / k, y: v[1] + sp.y / k };
   };
 
-  const floorReserveVU = () => {
-    const st = stageRef.current;
-    if (!st || !dockAside) return 0;
-    const stW = st.clientWidth, stH = Math.max(st.clientHeight, 1);
-    const asp = stW / stH;
-    const vbHf = asp >= 1 ? SIZE : SIZE / asp;
-    return stW * (28.9 / 544.3) * (vbHf / stH);
-  };
+  // The main pit keeps its physics floor at the very bottom of the container
+  // with the grass graphic layered behind the objects, so nothing hovers.
+  // Same here: no reserved height, objects rest on the container's bottom edge.
+  const floorReserveVU = () => 0;
 
   const clampRootView = (v: View): View => {
     if (!dockAside) return v;

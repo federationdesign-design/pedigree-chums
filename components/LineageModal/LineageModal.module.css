@@ -89,7 +89,7 @@
   height: auto;
   display: block;
   pointer-events: none;
-  z-index: 2;
+  z-index: 0;
 }
 
 /* Score counter, copied from the pit's .scoreTotal, sitting under the close X. */
