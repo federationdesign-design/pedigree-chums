@@ -7,7 +7,7 @@ import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCa
 import DogPoll from "../../../components/DogPoll/DogPoll";
 import ReadingProgress from "../../../components/ReadingProgress/ReadingProgress";
 import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
-import { QuoteBuild, StatueBulletsChoreo, HomerCrossfade, GatedVideo } from "../../../components/ArgosChoreo/ArgosChoreo";
+import { QuoteBuild, QuotePollScene, StatueBulletsChoreo, HomerCrossfade, GatedVideo } from "../../../components/ArgosChoreo/ArgosChoreo";
 
 export const metadata: Metadata = {
   title: "Argos: Homer's Dog in The Odyssey — Loyalty, Home and the Nolan Film",
@@ -592,17 +592,10 @@ export default function ArgosPage() {
               </div>
 
               <div className={styles.sceneMobile}>
-                <QuoteBuild
+                <QuotePollScene
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  pinned={<></>}
                   quote="They are doing what audiences have always done: asking an old story to speak to the feelings of the present."
-                />
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <DogPoll
-                  title="What do you think?" titleFont="body"
                   question="Should he change the story so Argos gets head strokes?"
                   options={[
                     { label: "Yes, I love schmaltz", pct: 96, resultLabel: "Pet the dog", color: "green" },
@@ -691,8 +684,8 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <HomerCrossfade
                   title={
-                    <div style={{ padding: "16px 20px 12px", background: "var(--navy)" }}>
-                      <p style={{ fontFamily: "var(--font-display)", fontSize: "34px", textAlign: "center", letterSpacing: "0.12em", color: "var(--navy)", background: "#fff", borderRadius: 8, padding: "6px 0", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                    <div style={{ padding: "16px 20px 12px", background: "var(--navy)", borderRadius: "16px 16px 0 0" }}>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "34px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
                     </div>
                   }
                   header={
@@ -826,7 +819,8 @@ export default function ArgosPage() {
               <p>This is not just sentimentality. It is biology.</p>
 
               <div className={styles.desktopOnly}>
-              <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories. Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
+              <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, often called the Proust phenomenon, has shown that smells can trigger unusually vivid and emotional memories.</p>
+              <p className={styles.plainPara}>Scientific reviews also describe the close relationship between olfaction and brain regions involved in memory and emotion, including the amygdala and hippocampus. A smell does not merely remind you of a memory. Sometimes it returns you to one, whole and unannounced, with the feeling already attached before you have had time to prepare.</p>
 
               <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</blockquote>
               </div>
@@ -1116,7 +1110,7 @@ export default function ArgosPage() {
               var np = (vh - hr.top) / vh;
               if (np < 0) np = 0;
               if (np > 1) np = 1;
-              if (wwk) wwk.style.transform = 'translateY(' + (np * 5) + 'px)';
+              if (wwk) wwk.style.transform = 'translateY(' + (np * 1) + 'px)';
               /* image drift: paced by the PIN window only, so the pan happens
                  while the reader is actually looking at the pinned image */
               var pin = (hr.height > vh) ? (-hr.top) / (hr.height - vh) : 0;
@@ -1124,7 +1118,7 @@ export default function ArgosPage() {
               if (pin > 1) pin = 1;
               /* two-way parallax: image eases DOWN as the card rises */
               var hi = document.getElementById('hound-img');
-              if (hi) hi.style.transform = 'translateY(' + (-(19 - pin * 6)) + '%)';
+              if (hi) hi.style.transform = 'translateY(' + (-(15 - pin * 4)) + '%)';
               /* the descendant card fades out as it climbs past halfway */
               var ld = document.getElementById('ld-card');
               if (ld) {

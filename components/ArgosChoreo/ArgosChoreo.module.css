@@ -18,7 +18,7 @@
 }
 
 .pinned {
-  margin-bottom: 26px;
+  margin-bottom: 6px;
 }
 
 .pinned img {
@@ -184,7 +184,8 @@
 
 /* ── Gated video ── */
 @media (max-width: 768px) {
-  .videoGate {
+  .videoGate,
+  .videoGateUnlocked {
     position: relative;
   }
 
@@ -200,7 +201,19 @@
     top: 130px;
   }
 
-  .videoGate figure {
+  .videoGate figure,
+  .videoGateUnlocked figure {
     margin: 0 !important;
   }
+}
+
+/* ── Quote + poll composite scene ── */
+.quotePollScene {
+  height: 320vh;
+  height: 320svh;
+}
+
+.pollWrap {
+  margin-top: 18px;
+  will-change: opacity, transform;
 }

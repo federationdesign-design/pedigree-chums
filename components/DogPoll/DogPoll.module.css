@@ -150,3 +150,19 @@
   margin: 6px 0 0;
   text-align: center;
 }
+
+/* Two independent shake signatures so the buttons never move in unison */
+@keyframes dogPollShake0 {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-6px) rotate(-2deg); }
+  40% { transform: translateX(5px) rotate(2deg); }
+  60% { transform: translateX(-4px) rotate(-1.5deg); }
+  80% { transform: translateX(3px) rotate(1deg); }
+}
+
+@keyframes dogPollShake1 {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(5px) rotate(2deg); }
+  50% { transform: translateX(-6px) rotate(-2.5deg); }
+  75% { transform: translateX(4px) rotate(1.5deg); }
+}

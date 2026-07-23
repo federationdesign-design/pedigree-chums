@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import styles from "./ArgosChoreo.module.css";
+import DogPoll, { PollOption } from "../DogPoll/DogPoll";
 
 /*
   Scroll-choreography scenes for the Argos article (mobile).
@@ -85,6 +86,116 @@ export function QuoteBuild({
    The carousel pins; if the reader has not swiped it themselves, it
    auto-pans across once; the four bullets then fade in one by one as the
    scroll continues. */
+/* ── Quote build + poll, staged in one pinned scene ──────────────────────
+   The quote assembles as usual; once it is fully built, the poll card fades
+   in beneath it and its two buttons pop in a beat after that. Once the
+   scene has fully played out, forward scroll is blocked until the reader
+   answers -- attempting to scroll shakes the two buttons, each with its own
+   independent timing, escalating with each attempt. Answering releases the
+   scene immediately. */
+export function QuotePollScene({
+  quote,
+  blockClass,
+  markClass,
+  question,
+  options,
+  footnote,
+}: {
+  quote: string;
+  blockClass: string;
+  markClass: string;
+  question: string;
+  options: PollOption[];
+  footnote?: string;
+}) {
+  const { sceneRef, p } = useSceneProgress();
+  const line = clamp01(p / 0.24);
+  const mark = p >= 0.25;
+  const text = clamp01((p - 0.3) / 0.28);
+  const pollCard = clamp01((p - 0.5) / 0.2);
+  const btns = clamp01((p - 0.68) / 0.12);
+  const fullyStaged = p >= 0.82;
+
+  const [answered, setAnswered] = useState(false);
+  const [shake, setShake] = useState(0);
+  const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    const isPinnedAndDue = () => {
+      const r = scene.getBoundingClientRect();
+      return fullyStaged && !answered && r.top <= 140 && r.bottom > window.innerHeight + 40;
+    };
+
+    const trigger = () => {
+      setShake((n) => Math.min(n + 1, 10));
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+      shakeTimer.current = setTimeout(() => setShake(0), 1400);
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0 && isPinnedAndDue()) {
+        e.preventDefault();
+        trigger();
+      }
+    };
+    let touchY = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      touchY = e.touches[0].clientY;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const dy = touchY - e.touches[0].clientY;
+      if (dy > 6 && isPinnedAndDue()) {
+        e.preventDefault();
+        trigger();
+      }
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+    };
+  }, [fullyStaged, answered]);
+
+  return (
+    <div ref={sceneRef} className={styles.quotePollScene}>
+      <div className={styles.stage}>
+        <div className={styles.quoteHolder}>
+          <div className={styles.quoteLineTrack}>
+            <div className={styles.quoteLine} style={{ height: `${Math.max(3, line * 100)}%` }} />
+          </div>
+          <blockquote className={blockClass} style={{ borderLeftColor: "transparent", margin: "24px 0 16px" }}>
+            <span className={markClass} style={{ opacity: mark ? 1 : 0, transition: "opacity 0.2s ease" }}>{"\u201c"}</span>
+            <span style={{ opacity: text, filter: `blur(${(1 - text) * 14}px)`, willChange: "opacity, filter" }}>{quote}</span>
+          </blockquote>
+        </div>
+        <div
+          className={styles.pollWrap}
+          style={{ opacity: pollCard, transform: `translateY(${(1 - pollCard) * 16}px)` }}
+        >
+          <DogPoll
+            title="What do you think?"
+            titleFont="body"
+            question={question}
+            options={options}
+            footnote={footnote}
+            onAnswer={() => setAnswered(true)}
+            buttonsProgress={btns}
+            shake={shake}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function StatueBulletsChoreo({
   slides,
   bullets,
@@ -182,16 +293,27 @@ export function HomerCrossfade({
    pin travel collapses and it scrolls past normally. */
 export function GatedVideo({ children }: { children: React.ReactNode }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
 
-  /* Pure CSS sticky-in-tall-container pin, same pattern as every other
-     choreographed scene: release happens naturally when the scroll spacer
-     is exhausted, so there is no JS-driven snap and no dependency on
-     whether the video has finished playing. Autoplay is the only JS job. */
+  /* Pin releases once playback passes 60%, or immediately if the video was
+     already past that point on a previous visit. Pin and spacer are removed
+     together (both gated by the same `unlocked` flag) so there is never a
+     mismatch between how much scroll room is reserved and whether anything
+     is actually pinned -- that mismatch was the earlier "gap" bug. */
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
     const video = wrap.querySelector("video");
     if (!video) return;
+
+    const checkProgress = () => {
+      if (video.duration && video.currentTime / video.duration >= 0.6) {
+        setUnlocked(true);
+      }
+    };
+    if (video.duration && video.currentTime / video.duration >= 0.6) setUnlocked(true);
+    video.addEventListener("timeupdate", checkProgress);
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
@@ -201,11 +323,14 @@ export function GatedVideo({ children }: { children: React.ReactNode }) {
       { threshold: 0.5 }
     );
     io.observe(video);
-    return () => io.disconnect();
+    return () => {
+      video.removeEventListener("timeupdate", checkProgress);
+      io.disconnect();
+    };
   }, []);
 
   return (
-    <div ref={wrapRef} className={styles.videoGate}>
+    <div ref={wrapRef} className={unlocked ? styles.videoGateUnlocked : styles.videoGate}>
       <div className={styles.videoStage}>{children}</div>
     </div>
   );

@@ -145,7 +145,7 @@
   color: var(--yellow, #ffd23e);
 }
 
-.essayBody p:first-child,
+.essayBody > p:first-child,
 .essayBody .introPara {
   font-size: 1.625rem;
   font-weight: 700;
@@ -154,7 +154,7 @@
 
 .essayBody h3 {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1.42rem;
+  font-size: 1.56rem;
   font-weight: 600;
   color: #ffffff;
   text-decoration: underline;
@@ -234,6 +234,7 @@
 .verdict {
   background: #22c55e;
   width: 100%;
+  margin-top: 0;
   padding: 40px clamp(18px,4vw,48px);
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.4rem;
@@ -598,24 +599,23 @@
   color: var(--navy, #0a3a57);
   line-height: 1.35;
   margin: 56px 0;
-  padding: 8px 0 8px 90px;
+  padding: 24px 0 24px 40px;
   border-left: 10px solid var(--yellow, #ffd23e);
   border-radius: 6px;
   max-width: 100%;
   display: block;
-  position: relative;
 }
 
 .pullquoteMark {
   font-family: var(--font-stack-notch, serif);
-  font-size: 4.5rem;
+  font-size: 5em;
   color: var(--navy, #0a3a57);
   font-style: normal;
-  line-height: 1;
-  position: absolute;
-  left: 10px;
-  top: 14px;
-  display: block;
+  line-height: 0;
+  position: relative;
+  top: 45px;
+  display: inline-block;
+  margin: 0 6px;
   overflow: visible;
 }
 
@@ -987,7 +987,7 @@
 
   /* Article scene comfort */
   .essayLayout {
-    padding: 10px 20px 36px;
+    padding: 10px 20px 0;
     gap: 25px;
   }
 
@@ -1019,11 +1019,11 @@
   }
 
   .essayBody h3 {
-    font-size: 1.22rem;
+    font-size: 1.36rem;
   }
 
   .essayBody .plainPara {
-    font-size: 1.05rem;
+    font-size: 0.83rem;
     font-weight: 500;
   }
 
@@ -1214,7 +1214,7 @@
 
   /* Tall image drifts vertically inside the pinned frame */
   .parallaxImgWrap .driftImg {
-    height: 150%;
+    height: 125%;
     will-change: transform;
   }
 

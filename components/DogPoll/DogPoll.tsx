@@ -22,14 +22,26 @@ export default function DogPoll({
   question,
   options,
   footnote,
+  onAnswer,
+  buttonsProgress = 1,
+  shake = 0,
 }: {
   title?: string;
   titleFont?: "display" | "body";
   question: string;
   options: PollOption[];
   footnote?: string;
+  /* Optional choreography hooks -- used only when this poll is embedded in
+     a pinned scroll scene (ArgosChoreo). Standalone usage ignores them. */
+  onAnswer?: () => void;
+  buttonsProgress?: number;
+  shake?: number;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
+  const handlePick = (i: number) => {
+    setPicked(i);
+    onAnswer?.();
+  };
 
   return (
     <div className={styles.wrap}>
@@ -43,7 +55,12 @@ export default function DogPoll({
               key={opt.label}
               type="button"
               className={opt.color === "red" ? styles.optionRed : styles.option}
-              onClick={() => setPicked(i)}
+              onClick={() => handlePick(i)}
+              style={{
+                opacity: buttonsProgress,
+                transform: `translateY(${(1 - buttonsProgress) * 14}px) scale(${0.9 + buttonsProgress * 0.1})`,
+                animation: shake ? `dogPollShake${i % 2} ${Math.max(0.5 - shake * 0.035, 0.14)}s ease-in-out ${i * 0.08}s ${Math.min(2 + shake, 6)}` : undefined,
+              }}
             >
               {opt.label}
             </button>
