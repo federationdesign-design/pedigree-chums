@@ -41,35 +41,24 @@ export default function StepCards() {
     return () => observer.disconnect();
   }, []);
 
-  // Desktop: convert vertical wheel into horizontal scroll for the first few
-  // cards (the "hold"), then release the page to scroll on. Same pattern used
-  // by the breed strips elsewhere on the site.
+  // Desktop: convert a vertical wheel into horizontal scroll, holding the page
+  // until EVERY card has passed, then release. (Matches the video rail above.)
   useEffect(() => {
     const wrap = wrapRef.current;
     const el = railRef.current;
     if (!wrap || !el) return;
 
-    const holdDistance = () => {
-      const items = el.querySelectorAll<HTMLElement>("[data-card]");
-      if (items.length > 3) return items[3].offsetLeft - items[0].offsetLeft;
-      return el.clientWidth;
-    };
-    let hold = holdDistance();
-    const onResize = () => {
-      hold = holdDistance();
-    };
-
     const driveRail = (delta: number, preventDefault: () => void) => {
       if (delta === 0) return;
       const max = el.scrollWidth - el.clientWidth;
-      if (max <= 0) return; // nothing to scroll, let the page move
+      if (max <= 0) return; // not scrollable (fits) -> let the page move
       if (delta > 0) {
-        if (el.scrollLeft >= max) return;
-        if (el.scrollLeft < hold) preventDefault();
+        if (el.scrollLeft >= max) return; // all cards passed -> page continues
+        preventDefault();
         el.scrollLeft = Math.min(el.scrollLeft + delta, max);
       } else {
-        if (el.scrollLeft <= 0) return;
-        if (el.scrollLeft <= hold) preventDefault();
+        if (el.scrollLeft <= 0) return; // back at the start -> page scrolls up
+        preventDefault();
         el.scrollLeft = Math.max(el.scrollLeft + delta, 0);
       }
     };
@@ -80,29 +69,19 @@ export default function StepCards() {
     };
 
     wrap.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("resize", onResize);
-    return () => {
-      wrap.removeEventListener("wheel", onWheel);
-      window.removeEventListener("resize", onResize);
-    };
+    return () => wrap.removeEventListener("wheel", onWheel);
   }, []);
 
-  // Mobile (no wheel): a rAF loop lerps the rail toward a scroll-derived target
-  // so it eases in with inertia as the section reaches mid screen, advances a
-  // couple of cards, then releases so finger swipes still work.
+  // Touch: no wheel events, so drive the rail from the page-scroll position via
+  // a rAF lerp (eases in with inertia). Engages as the row rises through the
+  // screen and runs through ALL cards before releasing. (Matches the video rail.)
   useEffect(() => {
     const wrap = wrapRef.current;
     const el = railRef.current;
     if (!wrap || !el) return;
     if (!window.matchMedia("(pointer: coarse)").matches) return;
 
-    const holdDistance = () => {
-      const items = el.querySelectorAll<HTMLElement>("[data-card]");
-      if (items.length > 2) return items[2].offsetLeft - items[0].offsetLeft;
-      return el.clientWidth;
-    };
-
-    const EASE = 0.06;
+    const EASE = 0.08;
     let target = 0;
     let current = 0;
     let released = false;
@@ -111,16 +90,15 @@ export default function StepCards() {
     const measure = () => {
       const max = el.scrollWidth - el.clientWidth;
       if (max <= 0) return 0;
-      const hold = Math.min(holdDistance(), max);
       const rect = wrap.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const centre = rect.top + rect.height / 2;
-      const start = vh * 0.5;
-      const end = vh * 0.0;
+      const start = vh * 0.85; // begins as the row nears the lower half
+      const end = vh * 0.15; //   finishes as it nears the top
       const p = (start - centre) / (start - end);
       const clamped = Math.max(0, Math.min(1, p));
-      if (clamped >= 1) released = true;
-      return clamped * hold;
+      if (clamped >= 1) released = true; // all cards passed -> hand control back
+      return clamped * max; // drive through every card
     };
 
     const tick = () => {
