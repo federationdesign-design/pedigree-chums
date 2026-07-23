@@ -58,6 +58,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           centred
           fill
           dockAside
+          gravity
           rootNote={character}
           onClose={onClose}
         />

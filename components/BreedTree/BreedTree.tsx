@@ -142,6 +142,7 @@ export default function BreedTree({
   disableZoom = false,
   fill = false,
   dockAside = false,
+  gravity = false,
   rootNote,
 }: {
   root: LineageNode;
@@ -154,6 +155,7 @@ export default function BreedTree({
   disableZoom?: boolean;
   fill?: boolean;
   dockAside?: boolean;
+  gravity?: boolean;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -194,6 +196,9 @@ export default function BreedTree({
   const [focus, setFocus] = useState<Node>(nodes[0]);
   const [hovered, setHovered] = useState<Node | null>(null);
   const [entered, setEntered] = useState(false);
+  const [falling, setFalling] = useState(false);
+  const fellRef = useRef(false);
+  const fallRafRef = useRef(0);
   const [ready, setReady] = useState(false);
 
   function nodeImg(d: Node): string | undefined {
@@ -253,6 +258,8 @@ export default function BreedTree({
   }
 
   function zoom(d: Node) {
+    cancelAnimationFrame(fallRafRef.current);
+    setFalling(false);
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
@@ -345,6 +352,91 @@ export default function BreedTree({
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes]);
+
+  // Gravity: 2s after the entrance settles, the top-level ancestor circles
+  // disconnect and fall as whole units (their nested circles riding inside),
+  // bounce off the container floor like tennis balls, and come to rest as a
+  // live, still-tappable pile. Hand-rolled sim (2 to 4 bodies), no physics
+  // dependency. Popup-only via the gravity prop; skipped for reduced motion;
+  // cancelled by any zoom. Runs once per open.
+  useEffect(() => {
+    if (!gravity || !entered || fellRef.current) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const timer = window.setTimeout(() => {
+      if (focusRef.current !== nodes[0]) return; // user already exploring
+      fellRef.current = true;
+      setFalling(true);
+      const v = viewRef.current;
+      const k = SIZE / v[2];
+      const asp = isMobileRef.current ? (stageRef.current ? stageRef.current.clientWidth / Math.max(stageRef.current.clientHeight, 1) : 1) : aspect;
+      const vbWf = asp >= 1 ? SIZE * asp : SIZE;
+      const vbHf = asp >= 1 ? SIZE : SIZE / asp;
+      const xMinF = asp >= 1 ? -vbWf * (centred ? 0.5 : SHIFT) : -vbWf / 2;
+      const M = 14; // margin inside the frame, svg units
+      // world-space walls and floor for this (frozen) root view
+      const xL = v[0] + (xMinF + M) / k;
+      const xR = v[0] + (xMinF + vbWf - M) / k;
+      const yF = v[1] + (vbHf / 2 - M) / k;
+      type Body = { n: Node; x: number; y: number; vx: number; vy: number; r: number };
+      const bodies: Body[] = nodes.filter((n) => n.depth === 1).map((n) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r }));
+      if (bodies.length === 0) { setFalling(false); return; }
+      const worldH = vbHf / k;
+      const G = worldH * 2.4; // per s^2
+      const REST = 0.48;
+      const WALL_REST = 0.35;
+      let last = performance.now();
+      const started = last;
+      const step = (now: number) => {
+        const dt = Math.min(0.032, (now - last) / 1000);
+        last = now;
+        for (const b of bodies) {
+          b.vy += G * dt;
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          if (b.y + b.r > yF) { b.y = yF - b.r; b.vy = -b.vy * REST; b.vx *= 0.96; }
+          if (b.x - b.r < xL) { b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
+          if (b.x + b.r > xR) { b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
+        }
+        for (let i = 0; i < bodies.length; i++) {
+          for (let j = i + 1; j < bodies.length; j++) {
+            const a = bodies[i], c = bodies[j];
+            const dx = c.x - a.x, dy = c.y - a.y;
+            const dist = Math.hypot(dx, dy) || 0.001;
+            const overlap = a.r + c.r - dist;
+            if (overlap > 0) {
+              const nx = dx / dist, ny = dy / dist;
+              const ma = a.r * a.r, mc = c.r * c.r, mt = ma + mc;
+              a.x -= nx * overlap * (mc / mt); a.y -= ny * overlap * (mc / mt);
+              c.x += nx * overlap * (ma / mt); c.y += ny * overlap * (ma / mt);
+              const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
+              if (rel < 0) {
+                const imp = (-(1 + REST) * rel) / (1 / ma + 1 / mc);
+                a.vx -= (imp / ma) * nx; a.vy -= (imp / ma) * ny;
+                c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
+              }
+            }
+          }
+        }
+        let still = true;
+        for (const b of bodies) {
+          const dxm = b.x - b.n.x, dym = b.y - b.n.y;
+          if (dxm || dym) b.n.descendants().forEach((d) => { d.x += dxm; d.y += dym; });
+          const onFloorish = b.y + b.r > yF - worldH * 0.02;
+          if (Math.hypot(b.vx, b.vy) > worldH * 0.012 || !onFloorish) still = false;
+        }
+        zoomTo(viewRef.current);
+        if (!still && now - started < 5000) {
+          fallRafRef.current = requestAnimationFrame(step);
+        } else {
+          setFalling(false);
+        }
+      };
+      fallRafRef.current = requestAnimationFrame(step);
+    }, 2000);
+    return () => { window.clearTimeout(timer); cancelAnimationFrame(fallRafRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gravity, entered, nodes]);
 
   // Track the stage's real aspect ratio. This also catches the fullscreen
   // toggle (done via a class), so the canvas re-widens when it takes over the
@@ -458,7 +550,7 @@ export default function BreedTree({
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",
-                    pointerEvents: hidden ? "none" : "auto",
+                    pointerEvents: hidden || falling ? "none" : "auto",
                     opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden ? undefined : () => setHovered(d)}
