@@ -640,7 +640,7 @@ export default function LineageMap({
   // positions in client px; the pit gives pills a hit limit once they land.
   const circR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
   const emitCircularScatter = (includeNodes: boolean) => {
-    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y - circR - 26, w: tagW, name: breed.name }];
+    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y - circR - 96, w: tagW, name: breed.name }];
     if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
     const vis = shown.filter((n) => n._parent);
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
@@ -1051,8 +1051,8 @@ export default function LineageMap({
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
-      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry - R - 26 : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
+      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry - R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
+        {!INSTR_NAMES.has(breed.name) && (<g transform={circular ? "translate(0,-96)" : undefined}><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
         {!packed && !collecting && !framesDone ? (() => {
@@ -1075,7 +1075,7 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${circular ? -74 : 62})`}
+            transform={`translate(0,${circular ? -18 : 62})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
@@ -1105,7 +1105,7 @@ export default function LineageMap({
         {circular && framesDone && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,-74)`}
+            transform={`translate(0,-18)`}
             onClick={(e) => { e.stopPropagation(); circularComplete(); }}
             role="button"
             aria-label="Complete"
