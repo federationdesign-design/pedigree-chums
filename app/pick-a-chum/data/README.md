@@ -40,8 +40,10 @@ in-chat mini-games) have no URL by design.
 - `dogs.generated.json` plus `dogs.ts`: the 54 pack dogs, extracted from the
   site's own `data/*.ts` by the build (see below). Reshaped into the
   brief-mvp Appendix A dog-record schema.
-- `moderation-draft.ts`: DRAFT safety wording (brief section 16). Not final;
-  needs client approval. See `agent/NEEDS_STEVE.md`.
+- `moderation.ts`: approved safety wording (brief section 16), including the
+  locked SAFETY_SIGNPOST.
+- `campaign.ts`, `rules.ts`, `discount-popup.ts`: confirmed campaign config,
+  the six-stage rules content record, and the OfferModal open helper.
 - `route-map.json`: described above.
 
 ## The dog records

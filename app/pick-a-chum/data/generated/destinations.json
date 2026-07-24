@@ -20,6 +20,7 @@
     ],
     "workbookUrl": "[Popup action ID to be supplied]",
     "resolvedUrl": null,
+    "embedded": true,
     "routeNote": "Not a route. Opens the pre-order / discount OfferModal via window.dispatchEvent(new CustomEvent('pc:open-offer')). See app/pick-a-chum/data/discount-popup.ts."
   },
   {
@@ -43,6 +44,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": "/",
+    "embedded": false,
     "routeNote": "ChumDrop = the root PackPit physics game (next.config.ts redirects /pack-pit -> /). Footer and BentoBoard label '/' as 'Chum Drop'."
   },
   {
@@ -63,7 +65,8 @@
       "Collie"
     ],
     "workbookUrl": "Embedded",
-    "resolvedUrl": "Embedded",
+    "resolvedUrl": null,
+    "embedded": true,
     "routeNote": "In-chat mini-game (Nine-Square Sheep Management). Built after Checkpoint 2."
   },
   {
@@ -84,7 +87,8 @@
       "Collie"
     ],
     "workbookUrl": "Embedded",
-    "resolvedUrl": "Embedded",
+    "resolvedUrl": null,
+    "embedded": true,
     "routeNote": "In-chat mini-game (Missing Sheep). Built after Checkpoint 2."
   },
   {
@@ -106,7 +110,8 @@
       "Boxer"
     ],
     "workbookUrl": "Embedded",
-    "resolvedUrl": "Embedded",
+    "resolvedUrl": null,
+    "embedded": true,
     "routeNote": "In-chat mini-game (Kennel Sketch Recognition). Built after Checkpoint 2."
   },
   {
@@ -130,6 +135,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": "/know-your-chums",
+    "embedded": false,
     "routeNote": "Know Your Chum(s) index. Individual dog pages live at /chums/<slug>."
   },
   {
@@ -154,6 +160,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": "/britains-dog-history",
+    "embedded": false,
     "routeNote": "Britain's Dog History interactive."
   },
   {
@@ -175,6 +182,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": "/name-generator",
+    "embedded": false,
     "routeNote": "Dog Name Generator."
   },
   {
@@ -195,6 +203,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": "/chum-calculator",
+    "embedded": false,
     "routeNote": "Chum Finder = the Chum Calculator suitability test (bento tile 'Chum Finder' -> /chum-calculator)."
   },
   {
@@ -218,6 +227,7 @@
     ],
     "workbookUrl": "[Article library]",
     "resolvedUrl": null,
+    "embedded": true,
     "routeNote": "Family pointer, not a single URL. Resolved per article via generated/articles.json resolvedUrl."
   },
   {
@@ -239,6 +249,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": null,
+    "embedded": true,
     "routeNote": "Answered in-chat, not by a page (Steve: no rules route exists or is planned). The dogs answer directly from app/pick-a-chum/data/rules.ts."
   },
   {
@@ -261,6 +272,7 @@
     ],
     "workbookUrl": "[URL to be supplied]",
     "resolvedUrl": "/chumspot",
+    "embedded": false,
     "routeNote": "Competition = ChumSpot photo competition."
   },
   {
@@ -282,7 +294,8 @@
       "Any"
     ],
     "workbookUrl": "[URL to be supplied]",
-    "resolvedUrl": null,
-    "routeNote": "PLACEHOLDER (Steve: leave for now). No /contact route exists. The site currently uses the email hello@Pedigree-Chums.co.uk. Pending a decision on the contact action. See PLACEHOLDERS.md."
+    "resolvedUrl": "mailto:hello@Pedigree-Chums.co.uk",
+    "embedded": false,
+    "routeNote": "Contact = email link (confirmed by Steve). No /contact route; the site uses hello@Pedigree-Chums.co.uk."
   }
 ]

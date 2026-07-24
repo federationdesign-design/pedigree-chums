@@ -17,7 +17,8 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Core article. Companion piece is the head-tilt study.",
     "resolvedUrl": "/smarter-than-the-test",
-    "routeNote": "TENTATIVE: closest live page to 'Dog Intelligence Essay' is 'Your Dog Is Smarter Than the Test'. Confirm, or point at a dedicated intelligence essay if one is written."
+    "embedded": false,
+    "routeNote": "Confirmed by Steve: 'Dog Intelligence Essay' points at 'Your Dog Is Smarter Than the Test'."
   },
   {
     "articleId": "ART002",
@@ -36,6 +37,7 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Science-led companion article with future canine-sign-language thought experiment.",
     "resolvedUrl": null,
+    "embedded": false,
     "routeNote": "PLANNED: 'The Secret Language of the Head Tilt' not yet built (workbook status Planned)."
   },
   {
@@ -56,6 +58,7 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Safety content. Use approved, non-comic factual answer first.",
     "resolvedUrl": null,
+    "embedded": false,
     "routeNote": "PLANNED/GAP: no heat-safety article found. /hot-dogs is the game mode 'Hot Dogs', not heat safety."
   },
   {
@@ -75,7 +78,8 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Best Labrador Learn route after smell or sniffing input.",
     "resolvedUrl": "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
-    "routeNote": "TENTATIVE: best scent/detection match in Dogs at Work. Other candidate: /dogs-at-work/the-electronic-nose. Confirm exact article."
+    "embedded": false,
+    "routeNote": "Confirmed by Steve: 'Dogs at Work: Detection and Scent' points at the teaching-medicine article."
   },
   {
     "articleId": "ART005",
@@ -95,7 +99,8 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Strong Collie identity route.",
     "resolvedUrl": "/dogs-at-work",
-    "routeNote": "TENTATIVE: no dedicated herding article found; pointing at the Dogs at Work index. Confirm or add a herding piece."
+    "embedded": false,
+    "routeNote": "Confirmed by Steve: no herding article exists; points at the Dogs at Work index for now."
   },
   {
     "articleId": "ART006",
@@ -115,6 +120,7 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Terrier investigation route.",
     "resolvedUrl": "/good-dog-bad-dog",
+    "embedded": false,
     "routeNote": "Good Dog / Bad Dog essay index (7 articles live)."
   },
   {
@@ -135,6 +141,7 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Interactive, not an article index.",
     "resolvedUrl": "/know-your-chums",
+    "embedded": false,
     "routeNote": "Know Your Chum(s)."
   },
   {
@@ -155,6 +162,7 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Interactive lineage maps and mini-games.",
     "resolvedUrl": "/britains-dog-history",
+    "embedded": false,
     "routeNote": "Britain's Dog History."
   },
   {
@@ -176,6 +184,7 @@
     "workbookUrl": "[URL to be supplied]",
     "notes": "Supports the educational positioning of the card game.",
     "resolvedUrl": null,
+    "embedded": false,
     "routeNote": "PLANNED: 'Learning Through Play' not yet built."
   },
   {
@@ -195,7 +204,8 @@
     "status": "Planned",
     "workbookUrl": "[URL to be supplied]",
     "notes": "Family-friendly science with strong Labrador relevance.",
-    "resolvedUrl": null,
-    "routeNote": "PLANNED/GAP: 'The Power of Smell' not built. Closest live: /dogs-at-work/the-electronic-nose or /dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease."
+    "resolvedUrl": "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
+    "embedded": false,
+    "routeNote": "Interim mapping (Steve): 'The Power of Smell' is not built; points at the teaching-medicine article for now."
   }
 ]

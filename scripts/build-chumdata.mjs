@@ -532,9 +532,15 @@ const resolve = (rec, idKey) => {
   const id = rec[idKey];
   const entry = routeMap[id] || {};
   const workbookUrl = clean(rec.workbookUrl);
-  const resolvedUrl = !isPlaceholderUrl(workbookUrl) ? workbookUrl : entry.resolvedUrl || null;
-  if (!resolvedUrl && !entry.embedded) unresolved.push(`${idKey} ${id} (${rec.name || rec.title})`);
-  return { ...rec, resolvedUrl: resolvedUrl || null, routeNote: entry.note || null };
+  // The workbook uses the literal "Embedded" in the URL column for in-chat
+  // items. Normalise that to the route-map convention: resolvedUrl null + an
+  // embedded flag, so runtime never navigates for them.
+  const workbookEmbedded = workbookUrl.toLowerCase() === 'embedded';
+  const embedded = Boolean(entry.embedded || workbookEmbedded);
+  const hasRealWorkbookUrl = workbookUrl && !isPlaceholderUrl(workbookUrl) && !workbookEmbedded;
+  const resolvedUrl = hasRealWorkbookUrl ? workbookUrl : entry.resolvedUrl || null;
+  if (!resolvedUrl && !embedded) unresolved.push(`${idKey} ${id} (${rec.name || rec.title})`);
+  return { ...rec, resolvedUrl: resolvedUrl || null, embedded, routeNote: entry.note || null };
 };
 data.destinations = data.destinations.map((r) => resolve(r, 'destinationId'));
 data.articles = data.articles.map((r) => resolve(r, 'articleId'));

@@ -1,77 +1,45 @@
 # Pick a Chum: needs Steve
 
-Run 0 gathered everything gatherable from the repo. This is the short list of
-what could not be resolved from code and needs a decision, an asset or approved
-wording. Grouped by urgency. Workbook input IDs (OI##) reference the Open Inputs
-sheet.
+Short list of what still needs a decision, an asset or approved wording.
+Workbook input IDs (OI##) reference the Open Inputs sheet.
 
-## Resolved by Steve during Run 0 (recorded, no longer blocking)
+## Resolved by Steve (recorded, no longer blocking)
 
-- Commercial model (OI04, partial): CONFIRMED. Retail £9.99, pre-release £6.99
-  (the "30% off" = £9.99 to £6.99), free UK mainland delivery, taken via the live
-  Stripe pre-order plus email capture for a launch-day code. Buying intent (B01)
-  opens the existing OfferModal. Captured in `app/pick-a-chum/data/campaign.ts`.
-- Rules destination (OI02, partial): CONFIRMED there is no rules page and none is
-  planned. Rules are stored as a content record the dogs answer with directly:
-  `app/pick-a-chum/data/rules.ts` (six stages). Destination DST011 is in-chat.
+- Commercial model (OI04, partial): retail £9.99, pre-release £6.99 (30% off),
+  free UK mainland delivery, via the live pre-order plus email capture. B01 opens
+  the OfferModal. In `campaign.ts`.
+- Rules (OI02, partial): no rules page; stored as a content record the dogs
+  answer with (`rules.ts`, six stages). DST011 is in-chat.
+- Moderation (OI08): APPROVED as drafted, with the locked safety signpost
+  (Childline 0800 1111). In `moderation.ts`.
+- Contact (OI02): DST013 = `mailto:hello@Pedigree-Chums.co.uk`.
+- Article mappings (OI06): ART001 -> /smarter-than-the-test; ART004 -> the
+  Dogs at Work teaching-medicine article; ART005 -> /dogs-at-work index. ART010
+  interim -> the teaching-medicine article until 'The Power of Smell' is written.
+- Chatbot assets: the square card images `/public/<slug>-square.jpg` are FINAL.
+  The HUD portrait frame and selector fan are built around the square format.
 
 ## Still needs Steve
 
-1. Launch DATE (OI04). Not public yet ("launching very soon"). `campaign.ts`
-   holds `launchDate: null` and `launchDateConfirmed: false`. Needed before any
-   copy states a date.
+1. Launch DATE (OI04). Not public yet. `campaign.ts` holds `launchDate: null`;
+   no copy states a date. Needed before any date is shown.
 
-2. Moderation wording approval (OI08). `app/pick-a-chum/data/moderation-draft.ts`
-   is DRAFT FOR APPROVAL (explicit, abusive, distress, unsafe, no-diagnosis). It
-   also contains a `{{safety_signpost_copy}}` placeholder for the real-world
-   signpost wording (helpline / trusted-adult copy), which must not be invented.
-   Approve or replace before public testing.
+2. Planned articles not yet built (OI06). No URL because the page does not exist.
+   Write them, or repoint:
+   - ART002 The Secret Language of the Head Tilt
+   - ART003 Hot/Dogs Heat Safety (no heat-safety article exists)
+   - ART009 Learning Through Play
+   (ART010 The Power of Smell has an interim mapping, see above.)
 
-3. Contact action (OI02). Left as a placeholder per Steve. There is no `/contact`
-   route; the site currently uses `hello@Pedigree-Chums.co.uk`. Destination DST013
-   has `resolvedUrl: null`. Decide the contact action (mailto, a new page, or a
-   form) when ready.
+3. Workbook FAQ answers (OI01). FAQ003-006 and FAQ011-014 have no answer on the
+   live home FAQ, so those records keep `{{placeholder}}` answers. Steve will
+   paste approved wording into the workbook's Canonical answer column.
 
-4. Planned articles not yet built (OI06). These have no URL because the page does
-   not exist. Point them at a live article, or write them:
-   - ART002 The Secret Language of the Head Tilt (workbook status: Planned)
-   - ART003 Hot/Dogs Heat Safety (no heat-safety article exists; `/hot-dogs` is
-     the game mode, not safety)
-   - ART009 Learning Through Play (Planned)
-   - ART010 The Power of Smell (Planned; closest live: the Dogs at Work scent
-     articles)
+4. Revised B01 buying responses (approval at STOP 1). The workbook's B01 bank
+   was written for a mailing-list-only pre-launch. Revised drafts reflecting the
+   live pre-order model are in `app/pick-a-chum/data/collie-b01-revised-draft.ts`
+   for approval, then to be pasted into the workbook. DRAFT, not final.
 
-5. Tentative article mappings to confirm (OI06). Best-guess routes, flagged in
-   `route-map.json`:
-   - ART001 Dog Intelligence Essay -> `/smarter-than-the-test` (closest live page)
-   - ART004 Dogs at Work: Detection and Scent ->
-     `/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease` (or
-     `/dogs-at-work/the-electronic-nose`)
-   - ART005 Dogs at Work: Herding -> `/dogs-at-work` index (no herding article
-     exists)
-
-6. Workbook FAQ answers not on the live home FAQ (OI01). These workbook questions
-   have no matching approved answer on `/home`, so their records still carry
-   `{{placeholder}}` answers. Paste approved wording into the workbook's Canonical
-   answer column (the intended editing surface):
-   - FAQ003 Do I need to own a dog?
-   - FAQ004 What is in the pack? (partially answerable: "54 illustrated breed cards")
-   - FAQ005 How many people can play? (live copy: "plays best with 2 or more")
-   - FAQ006 Can we play indoors? (live copy: "made for walks... anywhere dogs happen")
-   - FAQ011 How do I enter the competition? (see `/chumspot`)
-   - FAQ012 How do I contact you? (see item 3)
-   - FAQ013 What materials are used?
-   - FAQ014 Do you deliver outside the UK? (live copy only covers UK mainland)
-
-7. Collie B01 response wording (content review). The workbook's B01 (buying)
-   response bank was written for a mailing-list-only pre-launch and says things
-   like "Not yet. Buying comes later" and "you cannot take it home today". Now
-   that pre-order buying is the confirmed model, several B01 templates should be
-   revised in the workbook so the Collie can point at the live pre-order rather
-   than implying you cannot buy yet.
-
-8. Final dog and interface assets (OI09, OI10). The launcher robot head is the
-   approved placeholder (runbook rule 3). Still needed for the styled build:
-   full-quality dog portraits for Collie, Labrador, Border Terrier and Boxer for
-   the dialogue HUD, plus the random-dog dice control visual and wording. (Breed
-   card images exist at `/public/<slug>-square.jpg` but are not portrait crops.)
+5. Interface assets for the styled build (OI09). The launcher robot head is the
+   approved placeholder (runbook rule 3). The random-dog control treatment will
+   be proposed for approval at Checkpoint 2.

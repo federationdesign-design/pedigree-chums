@@ -28,30 +28,30 @@
   },
   "DST012": { "resolvedUrl": "/chumspot", "note": "Competition = ChumSpot photo competition." },
   "DST013": {
-    "resolvedUrl": null,
-    "note": "PLACEHOLDER (Steve: leave for now). No /contact route exists. The site currently uses the email hello@Pedigree-Chums.co.uk. Pending a decision on the contact action. See PLACEHOLDERS.md."
+    "resolvedUrl": "mailto:hello@Pedigree-Chums.co.uk",
+    "note": "Contact = email link (confirmed by Steve). No /contact route; the site uses hello@Pedigree-Chums.co.uk."
   },
 
   "ART001": {
     "resolvedUrl": "/smarter-than-the-test",
-    "note": "TENTATIVE: closest live page to 'Dog Intelligence Essay' is 'Your Dog Is Smarter Than the Test'. Confirm, or point at a dedicated intelligence essay if one is written."
+    "note": "Confirmed by Steve: 'Dog Intelligence Essay' points at 'Your Dog Is Smarter Than the Test'."
   },
   "ART002": { "resolvedUrl": null, "note": "PLANNED: 'The Secret Language of the Head Tilt' not yet built (workbook status Planned)." },
   "ART003": { "resolvedUrl": null, "note": "PLANNED/GAP: no heat-safety article found. /hot-dogs is the game mode 'Hot Dogs', not heat safety." },
   "ART004": {
     "resolvedUrl": "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
-    "note": "TENTATIVE: best scent/detection match in Dogs at Work. Other candidate: /dogs-at-work/the-electronic-nose. Confirm exact article."
+    "note": "Confirmed by Steve: 'Dogs at Work: Detection and Scent' points at the teaching-medicine article."
   },
   "ART005": {
     "resolvedUrl": "/dogs-at-work",
-    "note": "TENTATIVE: no dedicated herding article found; pointing at the Dogs at Work index. Confirm or add a herding piece."
+    "note": "Confirmed by Steve: no herding article exists; points at the Dogs at Work index for now."
   },
   "ART006": { "resolvedUrl": "/good-dog-bad-dog", "note": "Good Dog / Bad Dog essay index (7 articles live)." },
   "ART007": { "resolvedUrl": "/know-your-chums", "note": "Know Your Chum(s)." },
   "ART008": { "resolvedUrl": "/britains-dog-history", "note": "Britain's Dog History." },
   "ART009": { "resolvedUrl": null, "note": "PLANNED: 'Learning Through Play' not yet built." },
   "ART010": {
-    "resolvedUrl": null,
-    "note": "PLANNED/GAP: 'The Power of Smell' not built. Closest live: /dogs-at-work/the-electronic-nose or /dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease."
+    "resolvedUrl": "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
+    "note": "Interim mapping (Steve): 'The Power of Smell' is not built; points at the teaching-medicine article for now."
   }
 }
