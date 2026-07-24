@@ -34,6 +34,9 @@ try {
 
     // 1. Closed launcher over the page.
     await page.goto(URL, { waitUntil: 'networkidle' });
+    // Hide the Next.js dev-tools badge (a bottom-left <nextjs-portal>, dev only)
+    // so it does not overlap the bottom-left launcher during capture.
+    await page.addStyleTag({ content: 'nextjs-portal{display:none !important}' });
     await page.waitForTimeout(400);
     await shoot('01-closed');
 

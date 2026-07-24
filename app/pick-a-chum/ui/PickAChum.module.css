@@ -15,10 +15,13 @@
   --pc-shadow: 4px 4px 0 rgba(17, 34, 66, 0.22);
 }
 
-/* ---- Closed launcher ---- */
+/* ---- Closed launcher (bottom-left, global) ----
+   z-index sits above normal page content but BELOW the cookie banner (55), nav
+   (100) and offer modal (120), so the launcher overlays the page yet never
+   blocks those. */
 .launcher {
   position: fixed;
-  right: 24px;
+  left: 24px;
   bottom: 24px;
   width: 72px;
   height: 72px;
@@ -30,7 +33,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 9998;
+  z-index: 50;
   color: #ffffff;
 }
 .launcher:focus-visible {
@@ -38,11 +41,14 @@
   outline-offset: 3px;
 }
 
-/* ---- Overlay root ---- */
+/* ---- Overlay root ----
+   Same stacking band as the launcher (below cookie 55 / nav 100 / offer 120):
+   the wash dims page content but the cookie banner, nav and the discount modal
+   (opened from a > command) all render above it. */
 .root {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 50;
 }
 .wash {
   position: absolute;
@@ -74,7 +80,7 @@
 /* ---- Radial selector ---- */
 .selectorWrap {
   position: absolute;
-  right: 24px;
+  left: 24px;
   bottom: 24px;
   z-index: 2;
 }
@@ -82,7 +88,7 @@
   position: relative;
   width: 220px;
   height: 250px;
-  transform-origin: bottom right;
+  transform-origin: bottom left;
 }
 .connectors {
   position: absolute;
@@ -117,13 +123,13 @@
   outline: 3px solid var(--pc-ui-yellow);
   outline-offset: 2px;
 }
-.dog0 { left: 52px; top: 162px; }
-.dog1 { left: 12px; top: 102px; }
-.dog2 { left: 32px; top: 32px; }
-.dog3 { left: 112px; top: 7px; }
+.dog0 { left: 104px; top: 162px; }
+.dog1 { left: 144px; top: 102px; }
+.dog2 { left: 124px; top: 32px; }
+.dog3 { left: 44px; top: 7px; }
 .randomBtn {
   position: absolute;
-  left: 148px;
+  left: 0;
   top: 178px;
   width: 72px;
   height: 72px;
@@ -295,13 +301,13 @@
 /* ---- Mobile ---- */
 @media (max-width: 480px) {
   .launcher {
-    right: 16px;
+    left: 16px;
     bottom: 16px;
     width: 60px;
     height: 60px;
   }
   .selectorWrap {
-    right: 16px;
+    left: 16px;
     bottom: 16px;
   }
   .selector {

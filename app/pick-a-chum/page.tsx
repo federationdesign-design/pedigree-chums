@@ -1,9 +1,8 @@
-// Pick a Chum route. Self-contained: the interface mounts here only (the
-// site-wide launcher is not wired into the global layout until Steve approves
-// Checkpoint 2). The host content sits behind the focus wash when the interface
-// opens, matching the client mock-ups.
+// Pick a Chum route. The launcher is now mounted globally in the root layout, so
+// it appears on this page (and every page) via that mount. This route is just a
+// light landing surface; it does not render its own launcher to avoid a
+// duplicate.
 
-import PickAChum from './ui/PickAChum';
 import styles from './page.module.css';
 
 export default function PickAChumPage() {
@@ -11,9 +10,8 @@ export default function PickAChumPage() {
     <main className={styles.host}>
       <h1 className={styles.title}>Pick a Chum</h1>
       <p className={styles.lede}>
-        Meet the chums. Tap the launcher in the lower-right, choose a dog, and see what it makes of you.
+        Meet the chums. Tap the launcher in the lower-left, choose a dog, and see what it makes of you.
       </p>
-      <PickAChum />
     </main>
   );
 }
