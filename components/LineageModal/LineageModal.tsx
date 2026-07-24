@@ -39,7 +39,7 @@ type Props = {
 export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange }: Props) {
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
-  const [captionOpen, setCaptionOpen] = useState(true); // mini pit: opens with each lifted dog; user-close persists until the next dog
+  const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 900px)");
@@ -127,7 +127,18 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
           onPitClose={onClose}
-          onRoundWon={() => setPhase("won")}
+          onRoundWon={() => {
+            setPhase("won");
+            // celebration: confetti over the flash (canvas-confetti, CDN pattern)
+            const fire = () => (window as any).confetti?.({ particleCount: 180, spread: 110, origin: { x: 0.5, y: 0.45 }, colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"], startVelocity: 45 });
+            if ((window as any).confetti) fire();
+            else {
+              const sc = document.createElement("script");
+              sc.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
+              sc.onload = fire;
+              document.body.appendChild(sc);
+            }
+          }}
           onPitFull={() => setPhase("lost")}
           rootNote={character}
           onClose={onClose}
@@ -154,13 +165,13 @@ export default function LineageModal({ name, image, character, lineage, onClose,
       {/* Round won / game over, main-pit flash styling */}
       {phase !== "play" && (
         <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
-          <div className={css.endFlash}>{phase === "won" ? "ROUND WON" : "GAME OVER"}</div>
+          <div className={css.endFlash} style={phase === "won" ? { fontSize: "clamp(6.8rem, 24vw, 16rem)" } : undefined}>{phase === "won" ? "ROUND WON" : "GAME OVER"}</div>
           <div className={css.endBtns}>
             {phase === "lost" && onStartOver && (
               <button type="button" className={css.endBtn} onClick={onStartOver}>Start again</button>
             )}
             {phase === "won" && nextLevelLabel && onNextLevel && (
-              <button type="button" className={css.endBtn} onClick={onNextLevel}>{`Next level: ${nextLevelLabel}`}</button>
+              <button type="button" className={css.endBtn} onClick={onNextLevel} style={{ transform: "scale(0.5)", transformOrigin: "center top", background: "#22c55e", borderColor: "#15803d" }}>{nextLevelLabel}</button>
             )}
             {(phase === "lost" || !nextLevelLabel || !onNextLevel) && (
               <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={onClose}>Close</button>

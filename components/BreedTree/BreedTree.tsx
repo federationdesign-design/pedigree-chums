@@ -303,6 +303,9 @@ export default function BreedTree({
   const wakeRef = useRef<(() => void) | null>(null);
   const simRunningRef = useRef(false);
   const matterCleanupRef = useRef<(() => void) | null>(null);
+  const chainRef = useRef<((ox: number, oy: number) => number) | null>(null);
+  const [deadBadges, setDeadBadges] = useState<Set<number>>(new Set());
+  const [descGone, setDescGone] = useState(false);
   // In-pit UI objects (pit-menu style): the close X and the description
   // toggle are navy rounded squares that start fixed in the corner, sink and
   // tilt a notch on every knock, give way on the fifth, then tumble like
@@ -808,6 +811,24 @@ export default function BreedTree({
         poofAt(pr.x, pr.y, now2);
         if (pr.mb) Composite.remove(world, pr.mb);
         (kind === "rod" ? setDeadRods : setDeadPills)((prev) => new Set(prev).add(pr.idx));
+      };
+      // ROUND WON chain: every remaining prop explodes nearest-first from the
+      // final circle's resting spot, 90ms apart (the bomb's chain, mini-pit cut)
+      chainRef.current = (ox: number, oy: number) => {
+        const targets: { x: number; y: number; go: () => void }[] = [];
+        for (const b of all) {
+          if (b.n || !b.mb || !b.mbIn || b.held) continue;
+          targets.push({ x: b.x, y: b.y, go: () => { poofAt(b.x, b.y, performance.now()); Composite.remove(world, b.mb); b.mbIn = false; setDeadBadges((p) => new Set(p).add(b.idx)); } });
+        }
+        for (const [list, kind] of [[rodBodiesRef.current, "rod"], [pillBodiesRef.current, "pill"]] as any[]) {
+          for (const pr of list) if (!pr.dead && pr.mb) targets.push({ x: pr.x, y: pr.y, go: () => killProp(pr, kind, performance.now()) });
+        }
+        const du = (uiBodiesRef.current as any[] | null)?.find((u) => u.kind === "desc");
+        if (du && du.mb) targets.push({ x: du.x, y: du.y, go: () => { poofAt(du.x, du.y, performance.now()); Composite.remove(world, du.mb); setDescGone(true); } });
+        targets.sort((a, b2) => Math.hypot(a.x - ox, a.y - oy) - Math.hypot(b2.x - ox, b2.y - oy));
+        targets.forEach((t, i) => window.setTimeout(t.go, i * 90));
+        wake();
+        return targets.length * 90;
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
@@ -1357,6 +1378,7 @@ export default function BreedTree({
               const st2 = stageRef.current;
               const upp2 = st2 ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st2.clientHeight, 1) : 1;
               const inert = inertBadges.has(i);
+              if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
               return (
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
@@ -1447,7 +1469,7 @@ export default function BreedTree({
             return defs.map((d) => (
               <g key={d.kind} ref={d.kind === "close" ? uiCloseRef : uiDescRef}
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
-                style={{ cursor: "pointer", pointerEvents: "auto" }}
+                style={{ cursor: "pointer", pointerEvents: d.kind === "desc" && descGone ? "none" : "auto", display: d.kind === "desc" && descGone ? "none" : undefined }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
@@ -1494,7 +1516,11 @@ export default function BreedTree({
               removedNodesRef.current.add(learnNode);
               const owned = pitBodiesRef.current?.owned;
               if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
-                window.setTimeout(() => onRoundWon?.(), 700); // after the poof lands
+                const fb = pitBodiesRef.current?.find(learnNode);
+                window.setTimeout(() => {
+                  const total = chainRef.current ? chainRef.current(fb?.x ?? 0, fb?.y ?? 0) : 0;
+                  window.setTimeout(() => onRoundWon?.(), total + 420); // flash lands after the chain
+                }, 700);
               }
             }
           }}

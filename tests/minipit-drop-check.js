@@ -8,6 +8,7 @@ const { chromium } = require('playwright');
   const errs = [];
   p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
   await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(5000); // cold-compile headroom
   await p.getByRole('button', { name: 'View Old English Bulldog family tree' }).click();
   const pos = () => p.evaluate(() => {
     const svg = document.querySelector('[role="dialog"] svg');
