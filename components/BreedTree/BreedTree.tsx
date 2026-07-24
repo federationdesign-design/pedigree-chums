@@ -162,7 +162,6 @@ export default function BreedTree({
   stroke = "#ffd23e",
   strokeByDepth = false,
   tinted = true,
-  namePill = false,
   onShownChange,
   hideCaption = false,
   onCaptionClose,
@@ -188,7 +187,6 @@ export default function BreedTree({
   stroke?: string;
   strokeByDepth?: boolean;
   tinted?: boolean;
-  namePill?: boolean;
   onShownChange?: (name: string) => void;
   hideCaption?: boolean;
   onCaptionClose?: () => void;
@@ -285,17 +283,12 @@ export default function BreedTree({
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
-  // The name pill: light-blue capsule at the foot of the pit showing the
-  // hovered/focused breed. Sticky (static) until one falling body hits it,
-  // then it drops and joins the pile. L/pr are view units; x/y world units.
-  type PillBody = { x: number; y: number; vx: number; vy: number; L: number; pr: number; stuck: boolean };
-  const pillRef = useRef<SVGGElement>(null);
-  const pillBodyRef = useRef<PillBody | null>(null);
-  // Drag support: badges and the name pill can be picked up and flung, like
+  // Drag support: badges can be picked up and flung, like
   // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
   // a wake() so a drag can restart physics after everything has settled.
   const wakeRef = useRef<(() => void) | null>(null);
   const simRunningRef = useRef(false);
+  const matterCleanupRef = useRef<(() => void) | null>(null);
   // In-pit UI objects (pit-menu style): the close X and the description
   // toggle are navy rounded squares that start fixed in the corner, sink and
   // tilt a notch on every knock, give way on the fifth, then tumble like
@@ -360,9 +353,7 @@ export default function BreedTree({
     (e.target as Element).setPointerCapture?.(e.pointerId);
     dragRef.current = { body, dx: body.x - w.x, dy: body.y - w.y, lx: w.x, ly: w.y, lt: performance.now() };
     body.vx = 0; body.vy = 0;
-    const pb = pillBodyRef.current;
-    if (pb && (body as unknown) === (pb as unknown)) pb.stuck = false; // picking it up knocks it loose
-    wakeRef.current?.();
+    wakeRef.current?.();    wakeRef.current?.();
     const move = (ev: PointerEvent) => {
       const d = dragRef.current;
       if (!d) return;
@@ -425,10 +416,6 @@ export default function BreedTree({
         const el = bg?.children[b.idx] as SVGGElement | undefined;
         if (el) el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k})`);
       }
-    }
-    const pb = pillBodyRef.current;
-    if (pb && pillRef.current) {
-      pillRef.current.setAttribute("transform", `translate(${(pb.x - v[0]) * k},${(pb.y - v[1]) * k}) rotate(${((pb as unknown as { a?: number }).a ?? 0) * 57.2958})`);
     }
     const ub = uiBodiesRef.current;
     if (ub) {
@@ -619,9 +606,12 @@ export default function BreedTree({
     if (!gravity || !entered || fellRef.current) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
-    const doFall = () => {
+    const doFall = async () => {
       if (fellRef.current) return;
       if (focusRef.current !== nodes[0]) return; // user already exploring
+      const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
+      if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
+      const { Engine, Bodies, Body: MBody, Composite, Events } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -638,25 +628,75 @@ export default function BreedTree({
       const xL = v[0] + (xMinF + M) / k;
       const xR = v[0] + (xMinF + vbWf - M) / k;
       const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
-      const yF0 = yF;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Map<Body, number>; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean };
+      // svg units per screen px via the real screen transform: used for pit-
+      // exact number sizing and for screen-sized UI objects
+      const svgEl = st ? st.querySelector("svg") : null;
+      const ctm0 = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
+      const fxScale = ctm0 && ctm0.a ? 1 / ctm0.a : vbHf / stageH;
+      // ---- frozen drop-time transform: Matter bodies live in CLIENT PX ----
+      // (the pit's native space, so every pit constant copies verbatim). World
+      // coords stay the render currency: sync after each Engine.update, so
+      // live zoom during physics keeps working.
+      const CT = ctm0
+        ? { a: ctm0.a, b: ctm0.b, c: ctm0.c, d: ctm0.d, e: ctm0.e, f: ctm0.f }
+        : { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+      const det = CT.a * CT.d - CT.b * CT.c || 1;
+      const vD0 = v[0], vD1 = v[1], kD = k;
+      const pxFromWorld = (wx: number, wy: number) => {
+        const ux = (wx - vD0) * kD, uy = (wy - vD1) * kD;
+        return { x: CT.a * ux + CT.c * uy + CT.e, y: CT.b * ux + CT.d * uy + CT.f };
+      };
+      const worldFromPx = (px: number, py: number) => {
+        const x0 = px - CT.e, y0 = py - CT.f;
+        return { x: vD0 + (CT.d * x0 - CT.c * y0) / det / kD, y: vD1 + (-CT.b * x0 + CT.a * y0) / det / kD };
+      };
+      const pxPerWorld = Math.hypot(CT.a, CT.b) * kD || 1;
+      const stagePxH = worldH * pxPerWorld;
+      // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
+      const vps = (x: number) => (stagePxH * x) / 60;
+
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
-      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0 }));
+      const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = 46 / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
-      // svg units per screen px via the real screen transform: used for pit-
-      // exact number sizing and for screen-sized UI objects
-      const svgEl = st ? st.querySelector("svg") : null;
-      const ctm = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
-      const fxScale = ctm && ctm.a ? 1 / ctm.a : vbHf / stageH;
+
+      // ---- Matter world ----
+      const engine = Engine.create();
+      engine.gravity.y = 1; // pit verbatim
+      const world = engine.world;
+      const CIRCLE_OPTS = { restitution: 0.78, friction: 0.1, frictionAir: 0.01, density: 0.001 }; // tennis-ball lively floor bounce
+      const BADGE_OPTS = { restitution: 0.48, friction: 0.1, frictionAir: 0.01, density: 0.001 };
+      const mkCircle = (b: Body, kind: string, opts: any) => {
+        const p = pxFromWorld(b.x, b.y);
+        const mb = Bodies.circle(p.x, p.y, Math.max(2, b.r * pxPerWorld), opts);
+        mb.plugin = { bridge: b, kind };
+        b.mb = mb; b.mbIn = true;
+        Composite.add(world, mb);
+        return mb;
+      };
+      for (const b of bodies) mkCircle(b, "circle", CIRCLE_OPTS);
+      for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
+      // walls and floor: thick statics, pit-style, in px space
+      const T = 600;
+      const pL = pxFromWorld(xL, yF), pR = pxFromWorld(xR, yF);
+      const pTop = pxFromWorld(xL, v[1] - vbHf / k);
+      const wPx = pR.x - pL.x;
+      const sideH = (pL.y - pTop.y) + T * 4, sideC = pL.y + T * 2 - sideH / 2;
+      const floorB = Bodies.rectangle(pL.x + wPx / 2, pL.y + T / 2, wPx + T * 2, T, { isStatic: true, restitution: 0.4 });
+      floorB.plugin = { kind: "floor" };
+      const wallL = Bodies.rectangle(pL.x - T / 2, sideC, T, sideH, { isStatic: true, restitution: 0.35 });
+      const wallR = Bodies.rectangle(pR.x + T / 2, sideC, T, sideH, { isStatic: true, restitution: 0.35 });
+      wallL.plugin = { kind: "wall" }; wallR.plugin = { kind: "wall" };
+      Composite.add(world, [floorB, wallL, wallR]);
 
       // The close X and description toggle join the pit, fixed in the top-right
       // corner like the pit's menu button, in screen-size terms.
@@ -671,48 +711,20 @@ export default function BreedTree({
         ];
       }
       const uiBodies = uiBodiesRef.current;
-
-      // The name pill enters the pit as a sticky capsule at the bottom centre.
-      if (namePill && !pillBodyRef.current) {
-        pillBodyRef.current = {
-          x: v[0] + (xMinF + vbWf / 2) / k,
-          y: yF0 - 27 / k,
-          vx: 0, vy: 0, L: 120, pr: 27, stuck: true,
-        };
+      for (const u of uiBodies as any[]) {
+        const p = pxFromWorld(u.x, u.y);
+        const um = Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
+        um.plugin = { ui: u };
+        u.mb = um;
+        Composite.add(world, um);
       }
+
       const all = bodies.concat(badges);
       // nodes that have their own body: their subtrees no longer ride a parent
       const owned = new Set<Node>(bodies.map((b) => b.n as Node));
       pitBodiesRef.current = {
         find: (n: Node) => all.find((b) => b.n === n),
         owned,
-      };
-      spawnBadgeRef.current = (sx: number, sy: number, rPx: number, pctVal: number) => {
-        // client px -> world, via the svg's real screen transform
-        const svg2 = stageRef.current?.querySelector("svg") as SVGSVGElement | null;
-        const c2 = svg2?.getScreenCTM();
-        if (!svg2 || !c2) return;
-        const pt = svg2.createSVGPoint();
-        pt.x = sx; pt.y = sy;
-        const sp = pt.matrixTransform(c2.inverse());
-        const vNow = viewRef.current;
-        const kNow = SIZE / vNow[2];
-        const bl = badgeBodiesRef.current;
-        if (!bl) return;
-        const nb: Body = {
-          n: null,
-          x: vNow[0] + sp.x / kNow,
-          y: vNow[1] + sp.y / kNow,
-          vx: (Math.random() - 0.5) * worldH * 0.25,
-          vy: worldH * 0.25,
-          r: 46 / kNow, // matches the badge visual, which is a fixed 46 view units
-          pct: pctVal, idx: bl.length, lastFx: 0, popped: true,
-          ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
-        };
-        bl.push(nb);
-        all.push(nb);
-        setBadgePcts((l) => [...l, pctVal]);
-        wake();
       };
       const moveSubtree = (root: Node, dxm: number, dym: number) => {
         const stack: Node[] = [root];
@@ -722,44 +734,65 @@ export default function BreedTree({
           for (const ch of d.children ?? []) if (!owned.has(ch)) stack.push(ch);
         }
       };
-      // First floor hit pops a circle's direct children out as their own
+
+      // ghost immunity: a fresh pop shares a negative collision group with its
+      // parent so it escapes without an explosion; cleared on a 650ms timer
+      let ghostSeq = 1;
+      const ghostTimers: number[] = [];
+      const ghost = (mbs: any[]) => {
+        const g = -(ghostSeq++);
+        for (const m of mbs) m.collisionFilter.group = g;
+        ghostTimers.push(window.setTimeout(() => {
+          for (const m of mbs) if (m.collisionFilter.group === g) m.collisionFilter.group = 0;
+        }, 650));
+      };
+
+      // First solid hit pops a circle's direct children out as their own
       // bodies (their subtrees riding along), inheriting some momentum plus
-      // an upward-outward burst. Ancestor bodies are ghosts to a fresh child
-      // until it has fully cleared them, so it escapes without an explosion.
+      // an upward-outward burst; each child brings its yellow % badge.
       const popChildren = (b: Body) => {
         if (!b.n || b.popped) return;
         b.popped = true;
+        const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
-          const nb: Body = {
-            n: ch, x: ch.x, y: ch.y,
-            vx: b.vx * 0.4 + (Math.random() - 0.5) * worldH * 0.7,
-            vy: b.vy * 0.3 - worldH * (0.45 + Math.random() * 0.35),
-            r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false,
-            ghosts: new Map<Body, number>(), a: 0, va: (Math.random() - 0.5) * 0.8, ia: 0, iva: 0,
-          };
-          for (const other of all) if (other.n && ch.ancestors().includes(other.n)) nb.ghosts.set(other, performance.now());
+          const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
-          // the child's yellow % badge pops out with it
+          const mb = mkCircle(nb, "circle", CIRCLE_OPTS);
+          MBody.setVelocity(mb, {
+            x: (b.mb ? b.mb.velocity.x * 0.4 : 0) + (Math.random() - 0.5) * vps(0.7),
+            y: (b.mb ? b.mb.velocity.y * 0.3 : 0) - vps(0.45 + Math.random() * 0.35),
+          });
+          MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.8 / 60);
+          newMbs.push(mb);
           const bl = badgeBodiesRef.current;
           if (bl) {
-            const bb: Body = {
-              n: null, x: ch.x + ch.r * 0.6, y: ch.y + ch.r * 0.6,
-              vx: nb.vx * 0.8 + (Math.random() - 0.5) * worldH * 0.3,
-              vy: nb.vy * 0.8,
-              r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0,
-              popped: true, ghosts: new Map<Body, number>(nb.ghosts), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
-            };
+            const bb: Body = { n: null, x: ch.x + ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
             bl.push(bb);
             all.push(bb);
+            const mbb = mkCircle(bb, "badge", BADGE_OPTS);
+            MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
+            newMbs.push(mbb);
             setBadgePcts((l) => [...l, bb.pct]);
           }
         }
+        if (newMbs.length > 1) ghost(newMbs);
       };
-      const G = worldH * 2.4; // per s^2
-      const REST = 0.48;       // badges, pill, body-vs-body
-      const BOUNCE = 0.78;     // circles off the floor: tennis-ball lively
-      const WALL_REST = 0.35;
+
+      spawnBadgeRef.current = (sx: number, sy: number, rPx: number, pctVal: number) => {
+        // client px in, which is the physics space itself now
+        const bl = badgeBodiesRef.current;
+        if (!bl) return;
+        const w = worldFromPx(sx, sy);
+        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: 46 / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
+        bl.push(nb);
+        all.push(nb);
+        const mb = mkCircle(nb, "badge", BADGE_OPTS);
+        MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract, verbatim
+        setBadgePcts((l) => [...l, pctVal]);
+        wake();
+      };
+
       // little white numbers that flash up on a hit, copied from PackPit:
       // 650ms life, alpha 1-t, rising 22 + t*34, weight 400, --font-pct
       const numbers: { el: SVGTextElement; x: number; y: number; born: number }[] = [];
@@ -838,7 +871,7 @@ export default function BreedTree({
       };
       const knockBadge = (b: Body, rv: number, now2: number) => {
         if (b.n || b.inert || b.charges === undefined) return; // badges only
-        if (rv < FX_MIN * 1.2) return; // a real knock, not a nudge
+        if (rv < 5) return; // pit onPctHit verbatim: a real knock, not a nudge
         if (b.lastKnock && now2 - b.lastKnock < 600) return;
         b.lastKnock = now2;
         b.charges -= 1;
@@ -850,199 +883,137 @@ export default function BreedTree({
       };
 
       const FX_COOLDOWN = 220;
-      const FX_MIN = worldH * 0.05; // minimum impact speed to flash
-      let last = performance.now();
-      let started = last;
+      const FX_MIN_PS = vps(0.05); // minimum impact speed to flash, px/step
       const isDragged = (b: unknown) => dragRef.current?.body === b;
+
+      // collisions drive everything the walls-and-passes loop used to:
+      // number flashes, cascade pops, badge knocks, menu-button sink/tilt
+      const onCollide = (ev: any) => {
+        const now = performance.now();
+        for (const pair of ev.pairs) {
+          const A = pair.bodyA, B = pair.bodyB;
+          const pa = A.plugin || {}, pb2 = B.plugin || {};
+          const nrm = pair.collision.normal;
+          const rv = Math.abs((B.velocity.x - A.velocity.x) * nrm.x + (B.velocity.y - A.velocity.y) * nrm.y);
+          let flashed = false;
+          const hitSide = (P: any, otherMb: any) => {
+            const b: Body | undefined = P.bridge;
+            if (!b || b.held) return;
+            if (!flashed && !b.inert && rv > FX_MIN_PS && now - b.lastFx > FX_COOLDOWN) {
+              const c = (pair.collision.supports && pair.collision.supports[0]) || (b.mb ? b.mb.position : null);
+              if (c) {
+                const w = worldFromPx(c.x, c.y);
+                numAt(w.x, w.y, b.pct, now);
+                b.lastFx = now;
+                flashed = true;
+              }
+            }
+            if (rv > FX_MIN_PS * 0.6) popChildren(b);
+            if (!otherMb.isStatic) knockBadge(b, rv, now); // statics do not count, pit rule
+          };
+          hitSide(pa, B);
+          hitSide(pb2, A);
+          for (const [P] of [[pa], [pb2]] as any[]) {
+            if (P.ui && P.ui.fixed && rv > FX_MIN_PS * 0.3) {
+              const u = P.ui;
+              u.hits += 1;
+              if (u.hits >= 5) {
+                u.fixed = false;
+                MBody.setStatic(u.mb, false);
+                MBody.setAngularVelocity(u.mb, (Math.random() - 0.5) * 2 / 60);
+              } else {
+                u.y += 12 * uppW; // sink a notch and tip
+                u.a += 0.09;
+                MBody.setPosition(u.mb, pxFromWorld(u.x, u.y));
+                MBody.setAngle(u.mb, u.a);
+              }
+            }
+          }
+        }
+      };
+      Events.on(engine, "collisionStart", onCollide);
+
+      // ---- fixed-timestep loop (same clock discipline as the main pit):
+      // accumulate real time, step in exact 16.66ms slices, settle-aware ----
+      const STEP = 1000 / 60, MAX_ACC = 100;
+      let acc = 0;
+      let lastT: number | null = null;
+      let started = performance.now();
       let stillFrames = 0;
-      const step = (now: number) => {
-        const dt = Math.min(0.032, Math.max(0.004, (now - last) / 1000));
-        last = now;
+      const SETTLE_PS = vps(0.012);
+      const step = (nowRaf: number) => {
+        const now = performance.now();
+        if (lastT === null) lastT = nowRaf;
+        acc += Math.max(0, nowRaf - lastT);
+        lastT = nowRaf;
+        if (acc > MAX_ACC) acc = MAX_ACC;
+        let stepped = 0;
+        while (acc >= STEP) {
+          // a dragged body is pointer-driven: push bridge -> Matter before each slice
+          const d: any = dragRef.current;
+          const db: any = d && d.body;
+          if (db && db.mb && db.mbIn) {
+            MBody.setPosition(db.mb, pxFromWorld(db.x, db.y));
+            MBody.setVelocity(db.mb, { x: (db.vx * pxPerWorld) / 60, y: (db.vy * pxPerWorld) / 60 });
+          }
+          Engine.update(engine, STEP);
+          acc -= STEP;
+          stepped++;
+        }
+        const dt = Math.max(0.004, Math.min(0.032, (stepped * STEP) / 1000 || 0.0166));
+        // held bodies leave the world; released ones drop back in where lifted
         for (const b of all) {
-          if (b.held) continue; // lifted out onto the learn layer
-          if (isDragged(b)) continue; // position driven by the pointer
-          b.vy += G * dt;
-          b.x += b.vx * dt;
-          b.y += b.vy * dt;
-          b.va = Math.max(-1.0, Math.min(1.0, b.va)); // never a spinning-top blur
-          b.a += b.va * dt;
-          b.va *= 0.99;
+          if (!b.mb) continue;
+          if (b.held && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
+          else if (!b.held && !b.mbIn) {
+            MBody.setPosition(b.mb, pxFromWorld(b.x, b.y));
+            MBody.setVelocity(b.mb, { x: 0, y: 0 });
+            Composite.add(world, b.mb);
+            b.mbIn = true;
+          }
+        }
+        let still = !dragRef.current;
+        for (const b of all) {
+          if (b.held) continue;
+          if (b.mb && b.mbIn && !isDragged(b)) {
+            const w = worldFromPx(b.mb.position.x, b.mb.position.y);
+            b.x = w.x; b.y = w.y;
+            b.a = b.n ? b.mb.angle : 0; // badges stay upright, pit-style
+            b.vx = (b.mb.velocity.x * 60) / pxPerWorld;
+            b.vy = (b.mb.velocity.y * 60) / pxPerWorld;
+          }
           // the image inside lags its circle like water in a bowl: an
           // underdamped spring chases the body angle, overshoots, sloshes,
           // and settles a beat after the circle itself has stopped
           const sacc = (b.a - b.ia) * 16 - b.iva * 3.2;
           b.iva += sacc * dt;
           b.ia += b.iva * dt;
-          if (b.y + b.r > yF) {
-            if (b.vy > FX_MIN && now - b.lastFx > FX_COOLDOWN) { numAt(b.x, yF - b.r, b.pct, now); b.lastFx = now; }
-            const hitSpeed = b.vy;
-            b.y = yF - b.r; b.vy = -b.vy * (b.n ? BOUNCE : REST); b.vx *= 0.96;
-            b.va = b.va * 0.5 + (b.vx / Math.max(b.r, 0.001)) * 0.22;
-            if (hitSpeed > FX_MIN * 0.6) popChildren(b);
-          }
-          if (b.x - b.r < xL) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xL + b.r; b.vx = -b.vx * WALL_REST; }
-          if (b.x + b.r > xR) { if (Math.abs(b.vx) > FX_MIN * 0.6) popChildren(b); b.x = xR - b.r; b.vx = -b.vx * WALL_REST; }
-        }
-        for (let pass = 0; pass < 3; pass++) {
-        for (let i = 0; i < all.length; i++) {
-          for (let j = i + 1; j < all.length; j++) {
-            const a = all[i], c = all[j];
-            if (a.held || c.held) continue;
-            const dx = c.x - a.x, dy = c.y - a.y;
-            const dist = Math.hypot(dx, dy) || 0.001;
-            const gBorn = a.ghosts.get(c) ?? c.ghosts.get(a);
-            if (gBorn !== undefined) {
-              if (dist >= a.r + c.r || now - gBorn > 650) {
-                a.ghosts.delete(c); c.ghosts.delete(a); // immunity over: solid from here
-              } else {
-                continue;
-              }
-            }
-            const overlap = a.r + c.r - dist;
-            if (overlap > 0) {
-              const nx = dx / dist, ny = dy / dist;
-              let ma = a.r * a.r, mc = c.r * c.r;
-              if (isDragged(a)) ma = ma * 1e6;
-              if (isDragged(c)) mc = mc * 1e6;
-              const mt = ma + mc;
-              a.x -= nx * overlap * (mc / mt); a.y -= ny * overlap * (mc / mt);
-              c.x += nx * overlap * (ma / mt); c.y += ny * overlap * (ma / mt);
-              const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
-              if (rel < 0 && pass === 0) {
-                if (-rel > FX_MIN && now - a.lastFx > FX_COOLDOWN) {
-                  const cx = a.x + nx * a.r, cy = a.y + ny * a.r;
-                  numAt(cx, cy, a.pct, now);
-                  a.lastFx = now; c.lastFx = now;
-                }
-                const imp = (-(1 + REST) * rel) / (1 / ma + 1 / mc);
-                a.vx -= (imp / ma) * nx; a.vy -= (imp / ma) * ny;
-                c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
-                knockBadge(a, -rel, now); knockBadge(c, -rel, now);
-                if (-rel > FX_MIN * 0.6) { popChildren(a); popChildren(c); }
-                const tang = (c.vx - a.vx) * -ny + (c.vy - a.vy) * nx;
-                a.va += (tang / Math.max(a.r, 0.001)) * 0.045;
-                c.va -= (tang / Math.max(c.r, 0.001)) * 0.045;
-              }
-            }
-          }
-        }
-        }
-        // in-pit buttons: fixed ones take knocks (sink + tilt, 5th drops them);
-        // loose ones fall, bounce and spin like everything else
-        const uis = uiBodiesRef.current;
-        if (uis) {
-          for (const u of uis) {
-            if (!u.fixed && !isDragged(u)) {
-              u.vy += G * dt;
-              u.x += u.vx * dt;
-              u.y += u.vy * dt;
-              u.a += u.va * dt;
-              u.va *= 0.995;
-              if (u.y + u.r > yF) { u.y = yF - u.r; u.vy = -u.vy * 0.3; u.vx *= 0.9; u.va = u.va * 0.5 + (u.vx / Math.max(u.r, 0.001)) * 0.5; }
-              if (u.x - u.r < xL) { u.x = xL + u.r; u.vx = -u.vx * WALL_REST; }
-              if (u.x + u.r > xR) { u.x = xR - u.r; u.vx = -u.vx * WALL_REST; }
-            }
-            for (const b of all) {
-              if (b.held) continue;
-              const dx = b.x - u.x, dy = b.y - u.y;
-              const dist = Math.hypot(dx, dy) || 0.001;
-              const overlap = b.r + u.r - dist;
-              if (overlap <= 0) continue;
-              const nx = dx / dist, ny = dy / dist;
-              if (u.fixed) {
-                b.x += nx * overlap; b.y += ny * overlap;
-                const rel = b.vx * nx + b.vy * ny;
-                if (rel < 0) {
-                  b.vx -= (1 + REST) * rel * nx; b.vy -= (1 + REST) * rel * ny;
-                  if (-rel > FX_MIN * 0.3) {
-                    u.hits += 1;
-                    if (u.hits >= 5) { u.fixed = false; u.va = (Math.random() - 0.5) * 2; }
-                    else { u.y += (12 * uppW) / 1; u.a += 0.09; } // sink a notch and tip
-                  }
-                }
-              } else {
-                const mb = isDragged(b) ? b.r * b.r * 1e6 : b.r * b.r;
-                const mu = isDragged(u) ? u.r * u.r * 1e6 : u.r * u.r * 1.6;
-                const mt = mb + mu;
-                b.x += nx * overlap * (mu / mt); b.y += ny * overlap * (mu / mt);
-                u.x -= nx * overlap * (mb / mt); u.y -= ny * overlap * (mb / mt);
-                const rel = (b.vx - u.vx) * nx + (b.vy - u.vy) * ny;
-                if (rel < 0) {
-                  const imp = (-(1 + REST) * rel) / (1 / mb + 1 / mu);
-                  b.vx += (imp / mb) * nx; b.vy += (imp / mb) * ny;
-                  u.vx -= (imp / mu) * nx; u.vy -= (imp / mu) * ny;
-                  u.va += ((Math.random() - 0.5) * -rel) / worldH;
-                }
-              }
-            }
-          }
-        }
-        // name pill: capsule vs every ball; static until its first hit
-        const pill = pillBodyRef.current;
-        if (pill) {
-          const prW = pill.pr / k;
-          const LW = pill.L / k;
-          if (!pill.stuck && !isDragged(pill)) {
-            pill.vy += G * dt;
-            pill.x += pill.vx * dt;
-            pill.y += pill.vy * dt;
-            if (pill.y + prW > yF) { pill.y = yF - prW; pill.vy = -pill.vy * REST; pill.vx *= 0.94; }
-            if (pill.x - LW - prW < xL) { pill.x = xL + LW + prW; pill.vx = -pill.vx * WALL_REST; }
-            if (pill.x + LW + prW > xR) { pill.x = xR - LW - prW; pill.vx = -pill.vx * WALL_REST; }
-          }
-          const mp = prW * (LW + prW) * 2.5; // heavier than it looks, so it is not batted about
-          for (const b of all) {
-            if (b.held) continue;
-            const cxp = Math.max(pill.x - LW, Math.min(pill.x + LW, b.x));
-            const dx = b.x - cxp, dy = b.y - pill.y;
-            const dist = Math.hypot(dx, dy) || 0.001;
-            const overlap = b.r + prW - dist;
-            if (overlap > 0) {
-              const nx = dx / dist, ny = dy / dist;
-              if (pill.stuck) {
-                // first contact knocks it loose; resolve as a static bounce
-                b.x += nx * overlap; b.y += ny * overlap;
-                const rel = b.vx * nx + b.vy * ny;
-                if (rel < 0) { b.vx -= (1 + REST) * rel * nx; b.vy -= (1 + REST) * rel * ny; if (-rel > FX_MIN * 0.6) popChildren(b); }
-                if (now - b.lastFx > FX_COOLDOWN) { numAt(cxp, pill.y - prW, b.pct, now); b.lastFx = now; }
-                pill.stuck = false;
-              } else {
-                const mb = isDragged(b) ? b.r * b.r * 1e6 : b.r * b.r;
-                const mpe = isDragged(pill) ? mp * 1e6 : mp;
-                const mt = mb + mpe;
-                b.x += nx * overlap * (mpe / mt); b.y += ny * overlap * (mpe / mt);
-                pill.x -= nx * overlap * (mb / mt); pill.y -= ny * overlap * (mb / mt);
-                const rel = (b.vx - pill.vx) * nx + (b.vy - pill.vy) * ny;
-                if (rel < 0) {
-                  const imp = (-(1 + REST) * rel) / (1 / mb + 1 / mpe);
-                  b.vx += (imp / mb) * nx; b.vy += (imp / mb) * ny;
-                  pill.vx -= (imp / mpe) * nx; pill.vy -= (imp / mpe) * ny;
-                }
-              }
-            }
-          }
-        }
-        let still = true;
-        if (dragRef.current) still = false;
-        if (uis) for (const u of uis) if (!u.fixed && Math.hypot(u.vx, u.vy) > worldH * 0.012) still = false;
-        if (pill && !pill.stuck && Math.hypot(pill.vx, pill.vy) > worldH * 0.012) still = false;
-        for (const b of all) {
-          if (b.held) { continue; }
           if (b.n) {
             const dxm = b.x - b.n.x, dym = b.y - b.n.y;
             if (dxm || dym) moveSubtree(b.n, dxm, dym);
           }
-          const sp = Math.hypot(b.vx, b.vy);
-          const cap = worldH * 2.5;
-          if (sp > cap) { b.vx *= cap / sp; b.vy *= cap / sp; }
-          if (sp > worldH * 0.012) still = false;
+          if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
+        }
+        const uis = uiBodiesRef.current as any[] | null;
+        if (uis) for (const u of uis) {
+          if (!u.fixed && u.mb) {
+            if (!isDragged(u)) {
+              const w = worldFromPx(u.mb.position.x, u.mb.position.y);
+              u.x = w.x; u.y = w.y; u.a = u.mb.angle;
+              u.vx = (u.mb.velocity.x * 60) / pxPerWorld;
+              u.vy = (u.mb.velocity.y * 60) / pxPerWorld;
+            } else {
+              MBody.setPosition(u.mb, pxFromWorld(u.x, u.y));
+              MBody.setVelocity(u.mb, { x: (u.vx * pxPerWorld) / 60, y: (u.vy * pxPerWorld) / 60 });
+            }
+            if (u.mb.speed > SETTLE_PS) still = false;
+          }
         }
         // spin the circle images with their bodies (pattern rotation about the
-        // centre, scaled up so corners never show through); badges stay
-        // upright like the pit's % chips
+        // centre); badges stay upright like the pit's % chips
         if (svgEl) {
           for (const b of all) {
-            if (!b.n || Math.abs(b.a) < 0.001) continue;
+            if (!b.n || Math.abs(b.ia) < 0.001) continue;
             const i = nodes.indexOf(b.n);
             const pat = (svgEl as SVGSVGElement).querySelector(`#bt-img-${i}`);
             if (pat) pat.setAttribute("patternTransform", `rotate(${b.ia * 57.2958} 0.5 0.5)`);
@@ -1077,30 +1048,28 @@ export default function BreedTree({
       const wake = () => {
         if (simRunningRef.current) return;
         simRunningRef.current = true;
-        last = performance.now();
-        started = last; // fresh time budget each wake
+        lastT = null;
+        started = performance.now(); // fresh time budget each wake
         fallRafRef.current = requestAnimationFrame(step);
       };
-      // Shake: pit-style jolt of everything in the mini pit.
+      // Shake: pit-style jolt of everything in the mini pit (pit velocities, verbatim px/step).
       shakeInnerRef.current = () => {
-        for (const b of all) {
-          b.vx = (Math.random() - 0.5) * worldH * 1.1;
-          b.vy = -(0.45 + Math.random() * 0.85) * worldH;
+        for (const b of all) if (b.mb && b.mbIn && !b.held) {
+          MBody.setVelocity(b.mb, { x: (Math.random() - 0.5) * 18, y: -(8 + Math.random() * 14) });
         }
-        const uu = uiBodiesRef.current;
-        if (uu) for (const u of uu) if (!u.fixed) {
-          u.vx = (Math.random() - 0.5) * worldH * 0.9;
-          u.vy = -(0.4 + Math.random() * 0.7) * worldH;
-        }
-        const pl = pillBodyRef.current;
-        if (pl) {
-          pl.stuck = false;
-          pl.vx = (Math.random() - 0.5) * worldH * 0.7;
-          pl.vy = -(0.35 + Math.random() * 0.6) * worldH;
+        const uu = uiBodiesRef.current as any[] | null;
+        if (uu) for (const u of uu) if (!u.fixed && u.mb) {
+          MBody.setVelocity(u.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
         wake();
       };
       wakeRef.current = wake;
+      matterCleanupRef.current = () => {
+        Events.off(engine, "collisionStart", onCollide);
+        for (const t of ghostTimers) window.clearTimeout(t);
+        Composite.clear(engine.world, false);
+        Engine.clear(engine);
+      };
       wake();
     };
     runFallRef.current = doFall;
@@ -1109,7 +1078,7 @@ export default function BreedTree({
       shakeInnerRef.current?.();
     });
     const timer = window.setTimeout(doFall, 2000);
-    return () => { window.clearTimeout(timer); cancelAnimationFrame(fallRafRef.current); };
+    return () => { window.clearTimeout(timer); cancelAnimationFrame(fallRafRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gravity, entered, nodes]);
 
@@ -1303,41 +1272,6 @@ export default function BreedTree({
 
           {/* Collision number flashes, appended imperatively by the sim. */}
           <g ref={fxRef} style={{ pointerEvents: "none" }} />
-
-          {/* The name pill: light-blue capsule at the pit floor, showing the
-              hovered/focused breed. Sticky until first hit, then it falls. */}
-          {namePill && (() => {
-            const v = viewRef.current;
-            const kk = SIZE / v[2];
-            const st = stageRef.current;
-            const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
-            const label = shown.data.name;
-            const fs = 12 * upp;
-            const ph = 26 * upp;
-            const pr = ph / 2;
-            const w = Math.max(44 * upp, label.length * fs * 0.62 + 20 * upp);
-            const L = Math.max(0, w / 2 - pr);
-            const pb = pillBodyRef.current;
-            if (pb) { pb.L = L; pb.pr = pr; }
-            const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
-            const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
-            const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
-            const wx = pb ? pb.x : v[0] + (xMinR + vbWr / 2) / kk;
-            const wy = pb ? pb.y : v[1] + (vbHr / 2 - floorReserveVU() - 6) / kk - pr / kk;
-            return (
-              <g ref={pillRef} transform={`translate(${(wx - v[0]) * kk},${(wy - v[1]) * kk})`}
-                style={{ cursor: pb ? "grab" : "default", pointerEvents: pb ? "auto" : "none" }}
-                onClick={(e) => e.stopPropagation()}
-                onPointerDown={(e) => startDrag(e, pillBodyRef.current)}>
-                <rect x={-L - pr} y={-pr} width={(L + pr) * 2} height={pr * 2} rx={pr}
-                  style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: 2 * upp }} />
-                <text x={0} y={1 * upp} textAnchor="middle" dominantBaseline="central"
-                  style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${fs}px`, pointerEvents: "none", userSelect: "none" }}>
-                  {label}
-                </text>
-              </g>
-            );
-                    })()}
 
           {/* In-pit buttons: close X and description toggle. Navy rounded
               squares with a yellow stroke; fixed top-right until knocked

@@ -117,7 +117,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           gravity
           strokeByDepth
           tinted={false}
-          namePill
           onShownChange={setShownName}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
