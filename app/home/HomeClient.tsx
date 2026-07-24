@@ -131,7 +131,7 @@ export default function HomeClient() {
             Pedigree <span>Chums</span>
           </h2>
           <p className={styles.productDesc}>
-            The on-the-go <span className={styles.productDescHi}>dog spotting game</span> for curious minds and dog lovers. <span className={styles.productDescWhite}>54 illustrated breed cards</span> packed with traits, stats, and tell-tale features. <span className={styles.productDescHi}>Spot a dog. </span><span className={styles.productDescWhite}>Make a friend, </span><span className={styles.productDescHi}>you have a new chum.</span>
+            The on-the-go <span className={styles.productDescHi}>dog spotting game</span> for curious minds and dog lovers. <span className={`${styles.productDescWhite} ${styles.productDescUnderline}`}>54 illustrated breed cards</span> packed with traits, stats, and tell-tale features. <span className={styles.productDescHi}>Spot a dog. </span><span className={styles.productDescWhite}>Make a friend, </span><span className={`${styles.productDescHi} ${styles.productDescUnderline}`}>you have a new chum.</span>
           </p>
           <div className={styles.productMeta}>
             <div className={styles.metaItem}>

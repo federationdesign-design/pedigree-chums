@@ -55,54 +55,53 @@ export default function HeroCarousel({ onNavigate }: { onNavigate: () => void })
   const [index, setIndex] = useState(0);
   const vids = useRef<(HTMLVideoElement | null)[]>([]);
   const rafRef = useRef(0);
-  const reversingRef = useRef(false);
-  const lastTsRef = useRef(0);
+  const dirRef = useRef(1); // +1 forward, -1 backward
+  const lastRef = useRef(0);
+  const holdRef = useRef(0); // hold at a bound until this timestamp
 
   const go = (n: number) => setIndex(((n % SLIDES.length) + SLIDES.length) % SLIDES.length);
 
-  // Play the active slide's clip once (no loop -> freezes on the last frame);
-  // pause every other slide.
+  // Ping-pong the active slide's clip: play forward, then backward, bouncing on
+  // a loop. HTML5 video can't play in reverse, so we drive currentTime each
+  // frame. Every other slide is paused; image slides (no <video>) sit still.
   useEffect(() => {
-    reversingRef.current = false;
     cancelAnimationFrame(rafRef.current);
+    dirRef.current = 1;
+    lastRef.current = 0;
+    holdRef.current = 0;
     vids.current.forEach((v, i) => {
       if (!v) return;
-      if (i === index) {
-        try { v.currentTime = 0; } catch {}
-        v.play().catch(() => {});
-      } else {
-        v.pause();
-      }
+      v.pause();
+      if (i === index) { try { v.currentTime = 0; } catch {} }
     });
+
+    const EPS = 0.04; // stay just inside the ends so a frame is always painted
+    const HOLD_MS = 500; // half-second pause at each end before it turns around
+    const tick = (ts: number) => {
+      const v = vids.current[index];
+      if (v) {
+        const d = v.duration;
+        if (isFinite(d) && d > 0 && lastRef.current && ts >= holdRef.current) {
+          const dt = Math.min(0.05, (ts - lastRef.current) / 1000);
+          let t = v.currentTime + dirRef.current * dt;
+          if (t >= d - EPS) { t = d - EPS; dirRef.current = -1; holdRef.current = ts + HOLD_MS; }
+          else if (t <= EPS) { t = EPS; dirRef.current = 1; holdRef.current = ts + HOLD_MS; }
+          try { v.currentTime = t; } catch {}
+        }
+      }
+      lastRef.current = ts;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, [index]);
 
-  // Rewind (play backwards) the active clip while hovered; forward again on leave.
-  const step = (ts: number) => {
-    const v = vids.current[index];
-    if (!v || !reversingRef.current) return;
-    if (lastTsRef.current) {
-      const dt = (ts - lastTsRef.current) / 1000;
-      v.currentTime = Math.max(0, v.currentTime - dt);
-    }
-    lastTsRef.current = ts;
-    if (v.currentTime <= 0.02) { reversingRef.current = false; return; }
-    rafRef.current = requestAnimationFrame(step);
-  };
+  // Hover reverses the current direction; leaving reverses it back.
   function handleEnter(i: number) {
-    if (i !== index) return;
-    const v = vids.current[i];
-    if (!v) return;
-    v.pause();
-    reversingRef.current = true;
-    lastTsRef.current = 0;
-    rafRef.current = requestAnimationFrame(step);
+    if (i === index) dirRef.current = -dirRef.current;
   }
   function handleLeave(i: number) {
-    if (i !== index) return;
-    reversingRef.current = false;
-    cancelAnimationFrame(rafRef.current);
-    vids.current[i]?.play().catch(() => {});
+    if (i === index) dirRef.current = -dirRef.current;
   }
 
   const stop = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); };

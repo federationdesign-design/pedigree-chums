@@ -157,11 +157,16 @@
 .videoBlock {
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 4vw, 48px);
+  /* No extra gap: the grid's own bottom padding already provides the spacing to
+     the Anubis feature, matching the grid's top padding above it. */
+  gap: 0;
 }
 @media (max-width: 768px) {
   .videoBlock {
     flex-direction: column-reverse;
+    /* Anubis is on top here with no padding of its own; add the same top
+       spacing the grid uses so hero->Anubis and Anubis->grid match. */
+    padding-top: clamp(24px, 4vw, 48px);
   }
 }
 
@@ -323,6 +328,12 @@
 .productDescWhite {
   font-weight: 800;
   color: #ffffff;
+}
+
+/* Underline for specific emphasis phrases. */
+.productDescUnderline {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
 }
 
 .productMeta {
