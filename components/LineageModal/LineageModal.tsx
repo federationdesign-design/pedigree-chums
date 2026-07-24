@@ -30,11 +30,13 @@ type Props = {
   lineage: LineageNode;
   onClose: () => void;
   nextLevelLabel?: string;
+  initialScore?: number;
+  onScoreChange?: (s: number) => void;
   onNextLevel?: () => void;
   onStartOver?: () => void;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange }: Props) {
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [captionOpen, setCaptionOpen] = useState(true); // mini pit: opens with each lifted dog; user-close persists until the next dog
@@ -46,7 +48,8 @@ export default function LineageModal({ name, image, character, lineage, onClose,
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
+  useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   const [phase, setPhase] = useState<"play" | "won" | "lost">("play");
   const [runKey, setRunKey] = useState(0);
   const replay = () => {

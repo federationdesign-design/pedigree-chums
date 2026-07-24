@@ -46,6 +46,7 @@ export default function BreedStrip({ era }: { era: string }) {
     lineage: LineageNode;
   };
   const [active, setActive] = useState<Active | null>(null);
+  const [campaignScore, setCampaignScore] = useState(0); // carries across levels, resets on start over
 
   // The mini pits are levels: every popup-capable breed, in timeline order
   // across all eras. Round Won advances to the next; Game Over restarts at
@@ -362,6 +363,8 @@ export default function BreedStrip({ era }: { era: string }) {
       {active && (
         <LineageModal
           key={active.name}
+          initialScore={campaignScore}
+          onScoreChange={setCampaignScore}
           nextLevelLabel={nextLevelOf(active.name)?.name}
           onNextLevel={() => {
             const nb = nextLevelOf(active.name);
@@ -369,6 +372,7 @@ export default function BreedStrip({ era }: { era: string }) {
             if (na) setActive(na);
           }}
           onStartOver={() => {
+            setCampaignScore(0); // game over: the campaign total resets with level 1
             const fa = levelList[0] ? buildActive(levelList[0]) : null;
             if (fa) setActive(fa);
           }}

@@ -468,7 +468,7 @@ export default function LineageMap({
       if (!kids) return;
       const cnt = kids.length;
       const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
-      let center = circular ? Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
+      let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
       const dist = circular ? (depth === 0 ? Math.max(70, (rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT) * 0.85) : RSTEP * 0.55) : depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
