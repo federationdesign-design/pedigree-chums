@@ -144,7 +144,8 @@
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(26px, 3.2vw, 42px);
   letter-spacing: 0.06em;
-  color: #ffffff;
+  color: #22c55e;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
   padding: 4px 8px;
   transition: opacity 0.15s ease, transform 0.1s ease;
 }
@@ -480,7 +481,7 @@
 /* ── Video + cards section ───────────────────────────────── */
 .videoSection {
   display: grid;
-  grid-template-columns: 3fr 7fr;
+  grid-template-columns: 35fr 65fr;
   gap: clamp(32px, 6vw, 64px);
   align-items: start;
   width: 100%;
@@ -498,7 +499,7 @@
   font-size: clamp(51px, 8vw, 102px);
   letter-spacing: 0.04em;
   color: #ffffff;
-  line-height: 1.05;
+  line-height: 0.9;
   margin: 0 0 16px;
   text-transform: uppercase;
 }
@@ -548,21 +549,29 @@
   font-family: var(--font-body, "Montserrat", system-ui);
   font-size: clamp(28px, 2.8vw, 34px);
   font-weight: 600;
+  line-height: 1.1;
   color: #ffffff;
-  padding-left: 24px;
+  padding-left: clamp(40px, 4vw, 50px);
   position: relative;
 }
 
+/* Tick bullet: yellow circle with a navy checkmark, matching the About page's
+   .point marker (globals.css), scaled up to this section's larger text. */
 .cardsPoint::before {
-  content: "";
+  content: "\2713";
   position: absolute;
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  top: 0.12em;
+  width: clamp(28px, 2.8vw, 34px);
+  height: clamp(28px, 2.8vw, 34px);
+  border-radius: 999px;
   background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  display: grid;
+  place-items: center;
+  font-size: clamp(16px, 1.6vw, 20px);
+  font-weight: 800;
+  line-height: 1;
 }
 
 /* Wider column holds the main video with plinth.mp4 stacked directly beneath. */
