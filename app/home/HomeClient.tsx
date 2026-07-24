@@ -87,14 +87,16 @@ export default function HomeClient() {
             autoComplete="off"
             spellCheck={false}
           />
-          <button
-            type="button"
-            className={styles.searchGo}
-            onClick={goToTopMatch}
-            aria-label="Go"
-          >
-            GO
-          </button>
+          {query.trim().length > 0 && (
+            <button
+              type="button"
+              className={styles.searchGo}
+              onClick={goToTopMatch}
+              aria-label="Go"
+            >
+              GO
+            </button>
+          )}
           {open && query.trim().length > 0 && (
             <div className={styles.dropdown}>
               {filtered.length > 0 ? filtered.map((b) => (
