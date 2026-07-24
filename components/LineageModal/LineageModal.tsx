@@ -44,6 +44,14 @@ export default function LineageModal({ name, image, character, lineage, onClose 
     return () => mq.removeEventListener("change", apply);
   }, []);
   const [score, setScore] = useState(0);
+  const [phase, setPhase] = useState<"play" | "won" | "lost">("play");
+  const [runKey, setRunKey] = useState(0);
+  const replay = () => {
+    setPhase("play");
+    setScore(0);
+    setCaptionOpen(false);
+    setRunKey((k) => k + 1); // remounts the pit fresh
+  };
   const [scorePulse, setScorePulse] = useState(false);
   const shakeFnRef = useRef<(() => void) | null>(null);
   const addScore = (v: number) => {
@@ -97,6 +105,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           shown at root, replacing the old floating blue box. */}
       <div className={css.stageArea}>
         <BreedTree
+          key={runKey}
           root={lineage}
           rootImage={image}
           centred
@@ -113,6 +122,8 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
           onPitClose={onClose}
+          onRoundWon={() => setPhase("won")}
+          onPitFull={() => setPhase("lost")}
           rootNote={character}
           onClose={onClose}
         />
@@ -134,6 +145,22 @@ export default function LineageModal({ name, image, character, lineage, onClose 
       >
         <span className={css.shakeIcon} aria-hidden="true" />
       </button>
+
+      {/* Round won / game over, main-pit flash styling */}
+      {phase !== "play" && (
+        <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
+          <div className={css.endFlash}>{phase === "won" ? "ROUND WON" : "GAME OVER"}</div>
+          <div className={css.endBtns}>
+            {phase === "lost" && (
+              <button type="button" className={css.endBtn} onClick={replay}>Replay</button>
+            )}
+            {phase === "won" && (
+              <button type="button" className={css.endBtn} onClick={replay}>Play again</button>
+            )}
+            <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={onClose}>Close</button>
+          </div>
+        </div>
+      )}
 
       {/* The cookie notice must be reachable above this overlay */}
       <CookieBanner />

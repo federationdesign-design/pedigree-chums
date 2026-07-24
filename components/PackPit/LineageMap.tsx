@@ -122,10 +122,12 @@ export default function LineageMap({
   currentScore = 0,
   tree,
   circular = false,
+  rootRadius,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
   circular?: boolean;
+  rootRadius?: number;
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (data: {
@@ -617,6 +619,26 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal;
+  // Mini pit levels: every frame filled means this circle is fully learnt.
+  // No collect step: poof the card and its nodes out of existence, remove the
+  // circle from the pit, and close, exactly like the instructional finish.
+  const circularDoneRef = useRef(false);
+  useEffect(() => {
+    if (!circular || !framesDone || circularDoneRef.current) return;
+    circularDoneRef.current = true;
+    const t = window.setTimeout(() => {
+      burstAt(breed.x, breed.y, (rootRadius ?? ROOT) * 1.5);
+      for (let i = 0; i < 3; i++) {
+        const pid = puffSeq.current++;
+        const ox = (Math.random() - 0.5) * ROOT * 1.2, oy = (Math.random() - 0.5) * ROOT * 1.2;
+        setPuffs((p) => [...p, { id: pid, sx: breed.x + pan.x + ox, sy: breed.y + pan.y + oy }]);
+        window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+      }
+      window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 500);
+    }, 650);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [circular, framesDone]);
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
@@ -930,6 +952,7 @@ export default function LineageMap({
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => {
+    const R = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
     const rx = cx, ry = cy; // root card stays in SVG content space; pan moves the whole tree including it
     const baseDeg = (cardLean * 180) / Math.PI;
     const rootXf = collecting && collectRef.current
@@ -988,9 +1011,9 @@ export default function LineageMap({
             <text x={0} y={IH/2-FOOTER/2} textAnchor="middle" dominantBaseline="central" style={{fill:"#0a3a57",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:fs,fontWeight:400}}>{caption}</text>
           </>);
         })() : (<>
-          <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={circular ? ROOT : 20} /></clipPath>
-          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={circular ? ROOT + 5 : 24} className={styles.rootCard} />
-          {breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          <clipPath id={clip}><rect x={-R} y={-R} width={R*2} height={R*2} rx={circular ? R : 20} /></clipPath>
+          <rect x={-R-5} y={-R-5} width={R*2+10} height={R*2+10} rx={circular ? R + 5 : 24} className={styles.rootCard} />
+          {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
@@ -1250,7 +1273,7 @@ export default function LineageMap({
                     y={f.sy - pan.y - CW / 2}
                     width={CW}
                     height={CW}
-                    rx={15}
+                    rx={circular ? CW / 2 : 15}
                   />
                   {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame, clipped */
                     <>

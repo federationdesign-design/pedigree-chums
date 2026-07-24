@@ -36,7 +36,7 @@
   z-index: 15;
   pointer-events: none;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.65rem, 6.5vw, 5.85rem);
+  font-size: clamp(1.35rem, 3.25vw, 2.95rem);
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -72,7 +72,7 @@
 
 @media (max-width: 640px) {
   .title {
-    font-size: clamp(1.7rem, 10vw, 3.1rem);
+    font-size: clamp(0.9rem, 5vw, 1.6rem);
   }
 }
 
@@ -97,11 +97,11 @@
 /* Score counter, copied from the pit's .scoreTotal, sitting under the close X. */
 .scoreTotal {
   position: fixed;
-  top: 78px;
-  right: clamp(18px, 4vw, 48px);
+  top: 84px;
+  left: 30px;
   min-width: 84px;
   box-sizing: border-box;
-  text-align: center;
+  text-align: left;
   color: #ffffff;
   font-family: var(--font-score), var(--font-pct), system-ui, sans-serif;
   font-weight: 400;
@@ -154,4 +154,56 @@
   0%   { filter: brightness(1); }
   30%  { filter: brightness(1.5); }
   100% { filter: brightness(1); }
+}
+
+/* Round won / game over, in the main pit's flash style. */
+.endOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  background: rgba(10, 58, 87, 0.45);
+}
+.endFlash {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(3.4rem, 12vw, 8rem);
+  color: #ffffff;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
+  animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+  text-align: center;
+  line-height: 1;
+}
+@keyframes lmEndPop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.endBtns {
+  display: flex;
+  gap: 14px;
+}
+.endBtn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 800;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 14px 30px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.35);
+}
+.endBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.35);
+}
+.endBtnAlt {
+  background: #ffffff;
 }

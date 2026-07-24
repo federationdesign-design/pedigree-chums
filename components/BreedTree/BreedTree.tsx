@@ -170,6 +170,8 @@ export default function BreedTree({
   registerShake,
   onToggleCaption,
   onPitClose,
+  onRoundWon,
+  onPitFull,
   rootNote,
 }: {
   root: LineageNode;
@@ -194,6 +196,8 @@ export default function BreedTree({
   registerShake?: (fn: () => void) => void;
   onToggleCaption?: () => void;
   onPitClose?: () => void;
+  onRoundWon?: () => void;
+  onPitFull?: () => void;
   rootNote?: string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -237,13 +241,43 @@ export default function BreedTree({
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
+  useEffect(() => {
+    if (!dockAside) return;
+    setBadgePcts(
+      nodes.filter((n) => n.depth === 1).map((n) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0)),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, dockAside]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
-  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
+  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number) => void) | null>(null);
   const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
   const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
   const runFallRef = useRef<(() => void) | null>(null);
+  const fullTriggeredRef = useRef(false);
+  // The pit-full countdown, ported from the main pit: huge sequential digits
+  // 10 to 0 over the stage, a pause on 0, then GAME OVER hands to the shell.
+  const runCountdown = () => {
+    const st = stageRef.current;
+    if (!st) { onPitFull?.(); return; }
+    const el = document.createElement("div");
+    el.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+    st.appendChild(el);
+    const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
+    let i = 0;
+    el.textContent = steps[i];
+    const tick = window.setInterval(() => {
+      i++;
+      if (i < steps.length) { el.textContent = steps[i]; return; }
+      window.clearInterval(tick);
+      // hold on 0, then GAME OVER, then hand over
+      window.setTimeout(() => {
+        el.textContent = "GAME OVER";
+        window.setTimeout(() => { el.remove(); onPitFull?.(); }, 1400);
+      }, 1200);
+    }, 1000);
+  };
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
@@ -490,6 +524,7 @@ export default function BreedTree({
           x: cr.left + cr.width / 2,
           y: cr.top + cr.height / 2,
           angle: (body as unknown as { a?: number }).a ?? 0,
+          r: cr.width / 2, // keep the circle's on-screen size on the next layer
         });
         setLearnNode(d);
         return;
@@ -613,11 +648,10 @@ export default function BreedTree({
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = 46 / k;
       const badges: Body[] = d1.map((n, i) => ({
-        n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
+        n: null, x: n.x + n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
         r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
-      setBadgePcts(d1.map((n) => pctOf(n)));
       // svg units per screen px via the real screen transform: used for pit-
       // exact number sizing and for screen-sized UI objects
       const svgEl = st ? st.querySelector("svg") : null;
@@ -1016,6 +1050,20 @@ export default function BreedTree({
         }
         zoomTo(viewRef.current);
         drawNumbers(now, viewRef.current);
+        // pit-full: settled bodies whose tops reach the spawn zone, pit-style
+        if (!fullTriggeredRef.current && now - started > 4000) {
+          const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
+          let inZone = 0;
+          for (const b of all) {
+            if (b.held) continue;
+            if (Math.hypot(b.vx, b.vy) > worldH * 0.03) continue;
+            if (b.y - b.r < zoneY) inZone++;
+          }
+          if (inZone >= 5) {
+            fullTriggeredRef.current = true;
+            runCountdown();
+          }
+        }
         stillFrames = still ? stillFrames + 1 : 0;
         if ((stillFrames < 12 || numbers.length > 0) && now - started < 30000) {
           fallRafRef.current = requestAnimationFrame(step);
@@ -1211,7 +1259,7 @@ export default function BreedTree({
                       ))}
                     </text>
                   )}
-                  {pct !== null && !(dropped && d.depth === 1) && (
+                  {pct !== null && !(dockAside && d.depth === 1) && (
                     <g>
                       <circle cx={0} cy={50} r={46} style={{ fill: "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 }} />
                       <text x={0} y={50} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px` }}>
@@ -1226,13 +1274,14 @@ export default function BreedTree({
 
           {/* Physics badges: once dropped, the yellow % chips live here and are
               positioned by the sim / zoomTo from their body coordinates. */}
-          <g ref={badgesRef} style={{ display: dropped ? "inline" : "none" }} textAnchor="middle">
+          <g ref={badgesRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
             {badgePcts.map((pct, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
               const b = badgeBodiesRef.current?.[i];
-              const bx = b ? b.x : v[0];
-              const by = b ? b.y : v[1] - 99999;
+              const d1n = nodes.filter((n) => n.depth === 1)[i];
+              const bx = b ? b.x : d1n ? d1n.x + d1n.r * 0.707 : v[0];
+              const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
               const st2 = stageRef.current;
               const upp2 = st2 ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st2.clientHeight, 1) : 1;
               const inert = inertBadges.has(i);
@@ -1356,12 +1405,17 @@ export default function BreedTree({
               : { ...learnNode.data, children: [{ ...learnNode.data, children: undefined }] }
           }
           circular
+          rootRadius={learnCard.r}
           currentScore={0}
           onScore={onScore}
           onRemove={(name) => {
-            // collected: the circle leaves the pit for good
+            // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
               removedNodesRef.current.add(learnNode);
+              const owned = pitBodiesRef.current?.owned;
+              if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
+                window.setTimeout(() => onRoundWon?.(), 700); // after the poof lands
+              }
             }
           }}
           onScatter={(data) => {
