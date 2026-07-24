@@ -471,12 +471,20 @@ export default function LineageMap({
       let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
-      const dist = circular ? (depth === 0 ? Math.max(70, (rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT) * 0.85) : RSTEP * 0.55) : depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
+      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
+      // mini pit: the connector is aware of both circles' real sizes - the
+      // child clears the parent's EDGE by 50px whatever size either circle is
+      const rOf = (nd: Node): number => {
+        const p = nd._parent;
+        if (!p) return rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT;
+        return radius(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
+      };
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
-        k._x = n._x + Math.cos(a) * dist;
-        k._y = n._y + Math.sin(a) * dist;
+        const d2 = circular ? rOf(n) + rOf(k) + 50 : dist;
+        k._x = n._x + Math.cos(a) * d2;
+        k._y = n._y + Math.sin(a) * d2;
         k._dir = a;
         list.push(k);
         walk(k, depth + 1);
