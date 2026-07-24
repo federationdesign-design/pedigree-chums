@@ -314,6 +314,10 @@ export default function BreedTree({
     e.stopPropagation();
     e.preventDefault(); // stop the browser starting a text-selection drag on SVG text
     pressRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
+    // capture the svg NOW: React nulls e.currentTarget after this handler
+    // returns, so the move closure must never touch the event again
+    const svgEl = (e.currentTarget as SVGGElement).ownerSVGElement;
+    if (!svgEl) return;
     const w = svgPointToWorld(e);
     if (!w) return;
     (e.target as Element).setPointerCapture?.(e.pointerId);
@@ -325,11 +329,9 @@ export default function BreedTree({
     const move = (ev: PointerEvent) => {
       const d = dragRef.current;
       if (!d) return;
-      const svg = (e.currentTarget as SVGGElement).ownerSVGElement;
-      if (!svg) return;
-      const pt = svg.createSVGPoint();
+      const pt = svgEl.createSVGPoint();
       pt.x = ev.clientX; pt.y = ev.clientY;
-      const ctm = svg.getScreenCTM();
+      const ctm = svgEl.getScreenCTM();
       if (!ctm) return;
       const sp = pt.matrixTransform(ctm.inverse());
       const v = viewRef.current;
