@@ -834,10 +834,10 @@ export default function BreedTree({
           for (let i = 0; i < name.length; i++) if (name[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
           return best === -1 ? [name] : [name.slice(0, best), name.slice(best + 1)];
         })();
-        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 22);
+        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 22 + (lines.length > 1 ? 10 : 0));
         const ph = lines.length > 1 ? 46 : 26;
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 3, mb: null as any };
-        const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: 13 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
+        const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
         mb.plugin = { prop: pr, kind: "pill" };
         pr.mb = mb;
         Composite.add(world, mb);
@@ -1393,7 +1393,7 @@ export default function BreedTree({
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => startDrag(e, pillBodiesRef.current[i2])}>
-                  <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={Math.min(pl.rx, pl.h / 2)}
+                  <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
                     style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.rx * 0.154 }} />
                   {pl.lines.map((ln, li) => (
                     <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.rx * 0.77 : pl.rx * 0.77) : 0} dominantBaseline="central"

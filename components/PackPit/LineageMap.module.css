@@ -644,3 +644,18 @@
 .overlayStrong {
   background: radial-gradient(120% 120% at 50% 40%, rgba(15, 110, 165, 0.62), rgba(8, 62, 100, 0.86));
 }
+
+/* mini pit: overlay close matches the in-pit menu squares (navy, yellow stroke) */
+.closeCircular {
+  width: 84px;
+  height: 84px;
+  border-radius: 22px;
+  background: var(--navy);
+  border: 4px solid var(--yellow);
+  color: var(--yellow);
+  font-size: 2.6rem;
+}
+.closeCircular:hover {
+  background: var(--navy);
+  color: var(--yellow);
+}
