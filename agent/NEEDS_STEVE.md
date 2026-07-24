@@ -18,6 +18,8 @@ Workbook input IDs (OI##) reference the Open Inputs sheet.
   interim -> the teaching-medicine article until 'The Power of Smell' is written.
 - Chatbot assets: the square card images `/public/<slug>-square.jpg` are FINAL.
   The HUD portrait frame and selector fan are built around the square format.
+- Revised B01 buying copy: APPROVED as drafted and written into the workbook's
+  Collie Responses sheet (rows B01-R01..R10), regenerated via build:chumdata.
 
 ## Still needs Steve
 
@@ -35,11 +37,6 @@ Workbook input IDs (OI##) reference the Open Inputs sheet.
    live home FAQ, so those records keep `{{placeholder}}` answers. Steve will
    paste approved wording into the workbook's Canonical answer column.
 
-4. Revised B01 buying responses (approval at STOP 1). The workbook's B01 bank
-   was written for a mailing-list-only pre-launch. Revised drafts reflecting the
-   live pre-order model are in `app/pick-a-chum/data/collie-b01-revised-draft.ts`
-   for approval, then to be pasted into the workbook. DRAFT, not final.
-
-5. Interface assets for the styled build (OI09). The launcher robot head is the
+4. Interface assets for the styled build (OI09). The launcher robot head is the
    approved placeholder (runbook rule 3). The random-dog control treatment will
    be proposed for approval at Checkpoint 2.

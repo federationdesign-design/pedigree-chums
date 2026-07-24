@@ -8,7 +8,7 @@
       "want one",
       "order"
     ],
-    "template": "Aye, you are early. Good planning. Join the pre-release list and we will email your 30% discount code the day before launch.",
+    "template": "Aye, good instinct. You can pre-order now and lock the price at £6.99, a tidy 30% off the £9.99, with free UK mainland delivery. I will open the form.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "EARS_UP",
@@ -22,7 +22,7 @@
       "buy now",
       "available now"
     ],
-    "template": "Not yet. Buying comes later. Preparation comes first. Secure the 30% code and I will consider the job properly organised.",
+    "template": "You can. Pre-order is open: £6.99 instead of £9.99, delivery free on the UK mainland. Buying before launch is the organised move, so let us do the organised thing.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "EARS_UP",
@@ -37,7 +37,7 @@
       "price",
       "cost"
     ],
-    "template": "A sensible commercial enquiry. The current product information is {{price_answer}}. The clever move is still to secure the 30% launch code.",
+    "template": "{{price_answer}} The sensible action is to pre-order at £6.99 now and be done with it. I will open it.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "HEAD_TILT_SMALL",
@@ -52,7 +52,7 @@
       "offer",
       "30%"
     ],
-    "template": "Aye, there is a 30% pre-release code. Add your email and it arrives the day before launch. Efficient, measurable and difficult to argue with.",
+    "template": "{{discount_answer}} No code to hunt for: pre-order and the £6.99 is applied. Measurable, and difficult to argue with.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "EARS_UP",
@@ -66,7 +66,7 @@
       "when launch",
       "release date"
     ],
-    "template": "The approved launch information is {{launch_answer}}. Get on the list and the discount code will arrive one day before it.",
+    "template": "{{launch_answer}} I will not invent a date I do not have. What I can do is secure your £6.99 now.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "HEAD_TILT_SMALL",
@@ -80,7 +80,7 @@
       "pre-order",
       "reserve"
     ],
-    "template": "There is no checkout to wrestle with yet. Put your name on the list and secure the useful part, the 30% code.",
+    "template": "The correct department, finally. Pre-order is open at £6.99, 30% off, free UK mainland delivery. Opening the form.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "PUPPY_EYES",
@@ -94,7 +94,7 @@
       "sign me up",
       "mailing list"
     ],
-    "template": "Finally, an instruction with a measurable outcome. Open the discount sign-up and put your email to work.",
+    "template": "An instruction with an outcome. I will open the pre-order and discount sign-up. Put your email to work.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "PUPPY_EYES",
@@ -109,7 +109,7 @@
       "shipping",
       "postage"
     ],
-    "template": "The approved delivery answer is {{delivery_answer}}. While we are organising details, secure the 30% code as well.",
+    "template": "{{delivery_answer}} While we are being practical, pre-order at £6.99 and the delivery sorts itself.",
     "factSource": "FAQ / campaign",
     "defaultRoute": "Get 30% Off",
     "animationCue": "HEAD_TILT_SMALL",
@@ -123,7 +123,7 @@
       "I want the game",
       "sounds good"
     ],
-    "template": "Excellent judgement. You cannot take it home today, but you can make sure it costs 30% less when the time comes.",
+    "template": "Excellent judgement. Pre-order now and it costs £6.99 rather than £9.99, delivered free on the UK mainland. I will open it.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "POSITIVE_RESPONSE",
@@ -137,7 +137,7 @@
       "where is shop",
       "product page"
     ],
-    "template": "The shop is not open yet, our kid. The pre-launch list is the door that currently works.",
+    "template": "The pre-order is the door that works right now: £6.99, 30% off, free UK mainland delivery. I will take you straight to it.",
     "factSource": "Campaign data",
     "defaultRoute": "Get 30% Off",
     "animationCue": "HEAD_TILT_SMALL",
