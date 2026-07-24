@@ -16,10 +16,12 @@ type Node = HierarchyCircularNode<LineageNode>;
 
 export default function LearnLayer({
   root,
+  rootPos,
   onScore,
   onClose,
 }: {
   root: Node;
+  rootPos?: { x: number; y: number } | null;
   onScore?: (v: number) => void;
   onClose: () => void;
 }) {
@@ -62,22 +64,27 @@ export default function LearnLayer({
   // tree layout: root centre-top, each generation a row beneath it
   const positions = useMemo(() => {
     const pos = new Map<Node, { x: number; y: number }>();
-    pos.set(root, { x: 62, y: 24 }); // % of the layer; left band belongs to frames
+    // The lifted circle stays exactly where it was in the pit; the tree of
+    // children builds around that anchor. Fallback keeps the old stage spot.
+    const rx = rootPos ? Math.max(24, Math.min(92, rootPos.x)) : 62;
+    const ry = rootPos ? Math.max(12, Math.min(60, rootPos.y)) : 24;
+    pos.set(root, { x: rootPos?.x ?? rx, y: rootPos?.y ?? ry });
     const byLevel = new Map<number, Node[]>();
     for (const n of shown) {
       if (placed.has(n)) continue;
       const lvl = n.depth - root.depth;
       byLevel.set(lvl, [...(byLevel.get(lvl) ?? []), n]);
     }
+    const anchor = pos.get(root) as { x: number; y: number };
     for (const [lvl, row] of byLevel) {
-      const y = 24 + lvl * 21;
+      const y = Math.min(60, anchor.y) + lvl * 21;
       row.forEach((n, i) => {
-        const x = 62 + (i - (row.length - 1) / 2) * Math.min(20, 64 / Math.max(row.length, 1));
+        const x = Math.max(24, Math.min(92, anchor.x)) + (i - (row.length - 1) / 2) * Math.min(20, 64 / Math.max(row.length, 1));
         pos.set(n, { x: Math.max(34, Math.min(92, x)), y: Math.min(88, y) });
       });
     }
     return pos;
-  }, [root, shown, placed]);
+  }, [root, shown, placed, rootPos]);
 
   const startNodeDrag = (e: React.PointerEvent, node: Node) => {
     e.stopPropagation();
@@ -171,7 +178,7 @@ export default function LearnLayer({
       })}
 
       {/* Learn button with remaining-press counter, pit style */}
-      <div className={css.controls} onClick={(e) => e.stopPropagation()}>
+      <div className={css.controls} style={{ left: `${Math.max(24, Math.min(92, rootPos?.x ?? 62))}%` }} onClick={(e) => e.stopPropagation()}>
         <button type="button" className={css.learn} onClick={revealStep} disabled={revealables.length === 0}>
           Learn
           {revealables.length > 0 && <span className={css.learnCount}>{revealables.length}</span>}

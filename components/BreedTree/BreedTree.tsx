@@ -238,6 +238,7 @@ export default function BreedTree({
   const [dropped, setDropped] = useState(false);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
+  const [learnPos, setLearnPos] = useState<{ x: number; y: number } | null>(null);
   const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
   const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
   const runFallRef = useRef<(() => void) | null>(null);
@@ -477,6 +478,19 @@ export default function BreedTree({
       const body = pb?.owned.has(d) ? pb.find(d) : undefined;
       if (body) {
         body.held = true;
+        // anchor the learn layer exactly where this circle sits right now
+        const el = e.currentTarget as SVGCircleElement;
+        const st = stageRef.current;
+        if (el && st) {
+          const cr = el.getBoundingClientRect();
+          const sr = st.getBoundingClientRect();
+          setLearnPos({
+            x: ((cr.left + cr.width / 2 - sr.left) / sr.width) * 100,
+            y: ((cr.top + cr.height / 2 - sr.top) / sr.height) * 100,
+          });
+        } else {
+          setLearnPos(null);
+        }
         setLearnNode(d);
         return;
       }
@@ -1309,6 +1323,7 @@ export default function BreedTree({
       {learnNode && (
         <LearnLayer
           root={learnNode}
+          rootPos={learnPos}
           onScore={onScore}
           onClose={() => {
             const pb = pitBodiesRef.current;
