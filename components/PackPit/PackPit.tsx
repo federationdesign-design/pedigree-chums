@@ -8,6 +8,7 @@ import LineageMap from "./LineageMap";
 import HowToPlay from "../HowToPlay/HowToPlay";
 import GameOver from "../GameOver/GameOver";
 import { startCheckout } from "../Offer/startCheckout";
+import { startFixedTimestep } from "./fixedTimestep";
 import styles from "./PackPit.module.css";
 
 // Score milestones: crossing one fires a centre-screen celebration with confetti.
@@ -294,7 +295,7 @@ export default function PackPit() {
       const BALLS = isMobile ? [ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
-      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
+      const { Engine, Render, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       // Pre-build slipper compound body AFTER Body is available - avoids freeze on drop
       const slipperW = BIG * (isMobile ? 6.65 : 8.31), slipperH = slipperW / 2.721;
@@ -339,10 +340,18 @@ export default function PackPit() {
       });
       renderRef.current = render;
       Render.run(render);
-      const runner = Runner.create();
+      const runner = startFixedTimestep(Engine, engine); // fixed 60Hz sim on any display (fixes 2x speed on 120Hz screens)
       runnerRef.current = runner;
       slowmoRef.current = () => { if (engine.timing.timeScale === 1) { engine.timing.timeScale = 0.25; slowmoActiveRef.current = true; } else { engine.timing.timeScale = 1; slowmoActiveRef.current = false; } };
-      Runner.run(runner, engine);
+      let simDebugCleanup: (() => void) | null = null;
+      if (window.location.search.includes("simdebug")) {
+        const el = document.createElement("div");
+        el.style.cssText = "position:fixed;top:8px;left:8px;z-index:9999;background:#0a3a57;color:#ffd23e;font:700 14px Montserrat,sans-serif;padding:6px 10px;border-radius:8px;pointer-events:none;border:2px solid #ffd23e";
+        el.textContent = "sim speed x--";
+        document.body.appendChild(el);
+        const simDebugId = setInterval(() => { el.textContent = "sim speed x" + runner.ratio().toFixed(2); }, 250);
+        simDebugCleanup = () => { clearInterval(simDebugId); el.remove(); };
+      }
 
       let walls: any[] = [];
       function buildWalls(w: number, h: number) {
@@ -3146,7 +3155,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Events.off(engine, "collisionStart", onPctHit);
         Events.off(engine, "collisionStart", onKnockScore);
         Render.stop(render);
-        Runner.stop(runner);
+        runner.stop();
+        if (simDebugCleanup) simDebugCleanup();
         if (dangerTimer) clearTimeout(dangerTimer);
         if (throbIntervalOuter) clearInterval(throbIntervalOuter);
         Composite.clear(engine.world, false);
