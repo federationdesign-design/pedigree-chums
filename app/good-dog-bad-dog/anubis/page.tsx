@@ -76,7 +76,8 @@ export default function AnubisPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <div className={styles.essayHeroImgFallback} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/history/Anubis-hero.jpg" alt="Anubis — The Grave-Robber We Made a God" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>
