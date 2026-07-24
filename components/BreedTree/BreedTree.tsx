@@ -1310,16 +1310,26 @@ export default function BreedTree({
               return (
                 <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
                   {isChild && !(dropped && d.depth === 1) && (
-                    <text
-                      x={0}
-                      y={TITLE_DY}
-                      transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
-                      style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: isMobile ? "102px" : "34px", letterSpacing: "0.5px" }}
-                    >
-                      {splitLabel(d.data.name.toUpperCase()).map((line, li) => (
-                        <tspan key={li} x={0} dy={li === 0 ? 0 : "1.05em"}>{line}</tspan>
-                      ))}
-                    </text>
+                    (() => {
+                      const lines = splitLabel(d.data.name.toUpperCase());
+                      const maxLen = Math.max(...lines.map((l) => l.length));
+                      // contain the label in its own circle: cap by the platform
+                      // size, then shrink until the longest line fits the width
+                      const cap = isMobile ? 102 : 34;
+                      const fs = Math.max(10, Math.min(cap, (d.r * 1.7) / (maxLen * 0.56)));
+                      return (
+                        <text
+                          x={0}
+                          y={TITLE_DY}
+                          transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
+                          style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "0.5px" }}
+                        >
+                          {lines.map((line, li) => (
+                            <tspan key={li} x={0} dy={li === 0 ? 0 : "1.05em"}>{line}</tspan>
+                          ))}
+                        </text>
+                      );
+                    })()
                   )}
                   {pct !== null && !(dockAside && d.depth === 1) && (
                     <g>
@@ -1396,7 +1406,7 @@ export default function BreedTree({
                   <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
                     style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.rx * 0.154 }} />
                   {pl.lines.map((ln, li) => (
-                    <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.rx * 0.77 : pl.rx * 0.77) : 0} dominantBaseline="central"
+                    <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.rx * 0.6 : pl.rx * 0.6) : 0} dominantBaseline="central"
                       style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.rx * 0.92}px`, pointerEvents: "none", userSelect: "none" }}>
                       {ln}
                     </text>

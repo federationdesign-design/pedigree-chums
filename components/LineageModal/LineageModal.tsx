@@ -37,7 +37,7 @@ type Props = {
 export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver }: Props) {
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
-  const [captionOpen, setCaptionOpen] = useState(false); // closed from the start
+  const [captionOpen, setCaptionOpen] = useState(true); // mini pit: opens with each lifted dog; user-close persists until the next dog
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 900px)");

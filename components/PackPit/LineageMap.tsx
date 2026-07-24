@@ -467,11 +467,11 @@ export default function LineageMap({
       const kids = open.has(n._id) && n.children && n.children.length ? (n.children as Node[]) : null;
       if (!kids) return;
       const cnt = kids.length;
-      const spread = depth === 0 ? SPREAD1 : SPREADN;
-      let center = depth === 0 ? -Math.PI / 2 + base : n._dir;
+      const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
+      let center = circular ? Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
-      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
+      const dist = circular ? (depth === 0 ? Math.max(70, (rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT) * 0.85) : RSTEP * 0.55) : depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
@@ -651,7 +651,7 @@ export default function LineageMap({
   // landing with the heavy-book dust poof.
   useEffect(() => {
     if (!circular) return;
-    const BTN_CLEAR = 118; // rim -> button bottom + breathing room
+    const BTN_CLEAR = 58; // button overlaps the rim; just its lower half + margin
     const M = 10;
     const vh = typeof window !== "undefined" ? window.innerHeight : vp.h;
     const cyNow = breed.y + pan.y;
@@ -1116,7 +1116,7 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${circular ? 56 : 62})`}
+            transform={`translate(0,${circular ? 4 : 62})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
@@ -1146,7 +1146,7 @@ export default function LineageMap({
         {circular && framesDone && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,56)`}
+            transform={`translate(0,4)`}
             onClick={(e) => { e.stopPropagation(); circularComplete(); }}
             role="button"
             aria-label="Complete"
@@ -1585,7 +1585,7 @@ export default function LineageMap({
                     const ccx = c.cardX - CW / 2, ccy = c.cardY + CW / 2; // bottom-left corner, on loose cards only (placed cards show the magnifier)
                     return (
                       <g
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: "pointer", display: circular ? "none" : undefined }}
                         onPointerDown={(e) => { e.stopPropagation(); }}
                         onClick={(e) => { e.stopPropagation(); removeCard(c.id); }}
                         role="button"
@@ -1630,7 +1630,7 @@ export default function LineageMap({
                         onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                       >
                         <rect x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
-                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />
+                        {!circular && <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />}
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
                           {(pillMix < 1 ? "<1%" : `${rolledMix(c.id, pillMix)}%`) + (wasAdjusted ? "*" : "")}
                         </text>
@@ -1812,7 +1812,7 @@ export default function LineageMap({
               </div>
             )}
             {/* magnify icon bottom-left */}
-            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
+            {!circular && isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
               <button
                 style={{ position: "absolute", left: 4, bottom: 4, width: 28, height: 28, border: "none", borderRadius: 8, background: "rgba(10,58,87,0.75)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
