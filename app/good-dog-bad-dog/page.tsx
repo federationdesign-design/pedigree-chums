@@ -34,7 +34,7 @@ const ESSAYS = [
     tag: "Bad dog", tagStyle: "tagBad",
     breed: "Egyptian jackal / African golden wolf",
     author: "Egyptian myth",
-    title: "Anubis: The Grave-Robber We Made a God",
+    title: "Anubis: The Scavenger Made Into a God",
     summary: "The Egyptians made a dog the god of death -- and it turns out almost everyone did. From a jackal digging up desert graves to a Suffolk hellhound, an essay on the dog we keep posting at the door of the dark, and why we thanked it by turning its name into an insult.",
     image: "/history/Anubis-hero.jpg",
   },

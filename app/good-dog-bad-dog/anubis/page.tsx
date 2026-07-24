@@ -6,7 +6,7 @@ import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
 
 export const metadata: Metadata = {
-  title: "Anubis: The Grave-Robber We Made a God | Good Dog, Bad Dog",
+  title: "Anubis: The Scavenger Made Into a God | Good Dog, Bad Dog",
   description:
     "The Egyptians made a dog the god of death -- and it turns out almost everyone did. An essay on the jackal we posted at the door of the dark, from a scavenger of desert graves to a Suffolk hellhound, and why we thanked it by turning its name into an insult.",
   robots: "noindex",
@@ -77,11 +77,11 @@ export default function AnubisPage() {
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/history/Anubis-hero.jpg" alt="Anubis — The Grave-Robber We Made a God" className={styles.essayHeroImg} />
+          <img src="/history/Anubis-hero.jpg" alt="Anubis — The Scavenger Made Into a God" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>
-              <span className={styles.essayHeroTitleWhite}>Anubis:</span> The Grave-Robber We Made a God
+              <span className={styles.essayHeroTitleWhite}>Anubis:</span> The Scavenger Made Into a God
             </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagBad}`}>Bad dog</span>

@@ -37,7 +37,7 @@ const SLIDES: Slide[] = [
     tagBad: "Bad dog",
     tags: ["Egypt", "Myth"],
     titleAccent: "Anubis:",
-    titleRest: " The Grave-Robber We Made a God",
+    titleRest: " The Scavenger Made Into a God",
     btn: "About this dog",
   },
   {
