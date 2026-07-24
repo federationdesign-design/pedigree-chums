@@ -319,6 +319,12 @@
   color: var(--yellow, #ffd23e);
 }
 
+/* Emphasis words kept bold but white (not yellow). */
+.productDescWhite {
+  font-weight: 800;
+  color: #ffffff;
+}
+
 .productMeta {
   display: flex;
   gap: 24px;
