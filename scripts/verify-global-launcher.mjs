@@ -14,7 +14,8 @@ const page = await ctx.newPage();
 
 // Home page: the launcher must be present here purely via the global layout mount.
 await page.goto('http://localhost:3737/home', { waitUntil: 'domcontentloaded' });
-await page.waitForTimeout(2500);
+await page.addStyleTag({ content: 'nextjs-portal{display:none !important}' });
+ await page.waitForTimeout(2500);
 const launcher = page.getByRole('button', { name: 'Pick a Chum' });
 console.log('launcher visible on /home:', await launcher.isVisible());
 const box = await launcher.boundingBox();

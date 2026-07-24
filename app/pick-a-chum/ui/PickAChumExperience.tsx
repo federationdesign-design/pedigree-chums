@@ -194,10 +194,6 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="true">
       <div className={styles.wash} onClick={phase === 'selecting' ? onClose : undefined} />
 
-      <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
-        <span aria-hidden="true">×</span>
-      </button>
-
       {phase === 'selecting' ? (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
@@ -235,6 +231,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         </div>
       ) : (
         <div className={styles.stage}>
+          <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+            <span aria-hidden="true">×</span>
+          </button>
           <div
             className={styles.portrait}
             style={{ backgroundImage: `url("${dogImage}")` }}

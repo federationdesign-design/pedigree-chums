@@ -56,10 +56,12 @@
   background: var(--pc-focus-wash);
   z-index: 0;
 }
+/* Close sits on the HUD's own top-right (lower portion of the screen), clear of
+   the site nav in the top corners. The selector closes via click-outside/Escape. */
 .close {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: -54px;
+  right: 2px;
   width: 44px;
   height: 44px;
   border-radius: 50%;
