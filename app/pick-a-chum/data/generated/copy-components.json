@@ -1,0 +1,146 @@
+[
+  {
+    "componentId": "CP001",
+    "type": "Collie pivot",
+    "subgroup": "Standard",
+    "line": "Reet. Enough of that. Are we here to Play, Learn or Discover?",
+    "usageRule": "Use only when a menu-like choice is genuinely helpful.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP002",
+    "type": "Collie pivot",
+    "subgroup": "Standard",
+    "line": "Let us herd this somewhere productive. I have selected {{destination_name}}.",
+    "usageRule": "Strong default after a joke.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP003",
+    "type": "Collie pivot",
+    "subgroup": "Work",
+    "line": "You have my attention. Spend it wisely.",
+    "usageRule": "Follow with one specific route.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP004",
+    "type": "Collie pivot",
+    "subgroup": "Work",
+    "line": "Right. Pick a verb with a purpose.",
+    "usageRule": "Use before Play, Learn or Discover choice.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP005",
+    "type": "Collie pivot",
+    "subgroup": "Geordie",
+    "line": "Howay, our kid. Let us get back to it.",
+    "usageRule": "Best after unrelated questions.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP006",
+    "type": "Collie pivot",
+    "subgroup": "Commercial",
+    "line": "Planning ahead is the intelligent option. Secure the 30% code.",
+    "usageRule": "Pre-launch only.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP007",
+    "type": "Head tilt",
+    "subgroup": "Small",
+    "line": "I know the object. I am reconsidering why you brought it to work.",
+    "usageRule": "Random real word.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP008",
+    "type": "Head tilt",
+    "subgroup": "Medium",
+    "line": "Bear with me. I am checking whether that is a question or an emergency.",
+    "usageRule": "Ambiguous question.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP009",
+    "type": "Head tilt",
+    "subgroup": "Double",
+    "line": "I have considered that from both sides. It remains nonsense.",
+    "usageRule": "Gibberish or contradiction.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP010",
+    "type": "Return line",
+    "subgroup": "From Labrador",
+    "line": "Aye. I see the food department has completed its assessment.",
+    "usageRule": "Use when Collie reappears.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP011",
+    "type": "Return line",
+    "subgroup": "From Terrier",
+    "line": "You again. The investigative department appears to have returned the paperwork.",
+    "usageRule": "Use when Collie reappears.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP012",
+    "type": "Labrador transfer-in",
+    "subgroup": "Food",
+    "line": "Did somebody say {{food_word}}? I arrived before the rest of the sentence.",
+    "usageRule": "No greeting.",
+    "status": "Concept"
+  },
+  {
+    "componentId": "CP013",
+    "type": "Terrier transfer-in",
+    "subgroup": "Investigation",
+    "line": "Right, mate. I have been told there is something suspicious about {{topic}}.",
+    "usageRule": "No greeting.",
+    "status": "Concept"
+  },
+  {
+    "componentId": "CP014",
+    "type": "Boxer transfer-in",
+    "subgroup": "Joke",
+    "line": "I was sent here for a joke. I also brought my face.",
+    "usageRule": "No greeting.",
+    "status": "Concept"
+  },
+  {
+    "componentId": "CP015",
+    "type": "Boxer ending",
+    "subgroup": "Cut-off 1",
+    "line": "I tried to transfer the last person. I pressed the wrong thing and they disappeared.",
+    "usageRule": "Follow with false reassurance.",
+    "status": "Concept"
+  },
+  {
+    "componentId": "CP016",
+    "type": "Boxer ending",
+    "subgroup": "Cut-off 2",
+    "line": "I will be more careful this time. Probably this button.",
+    "usageRule": "Close chat immediately after line.",
+    "status": "Concept"
+  },
+  {
+    "componentId": "CP017",
+    "type": "Boxer ending",
+    "subgroup": "Cut-off 3",
+    "line": "Good news. I found someone more qualified. Bad news. It was you.",
+    "usageRule": "Close or offer reset.",
+    "status": "Concept"
+  },
+  {
+    "componentId": "CP018",
+    "type": "Comic disclaimer",
+    "subgroup": "Science",
+    "line": "*Canine claim independently verified by a very good boy.",
+    "usageRule": "Use on deliberately exaggerated claims, not safety information.",
+    "status": "Active"
+  }
+]

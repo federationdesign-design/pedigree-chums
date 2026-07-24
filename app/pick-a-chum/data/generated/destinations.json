@@ -1,0 +1,301 @@
+[
+  {
+    "destinationId": "DST001",
+    "name": "Get 30% Off",
+    "family": "Commercial",
+    "action": "Open the discount-code pop-up",
+    "description": "Pre-launch mailing list; code emailed the day before launch",
+    "triggerTags": [
+      "purchase",
+      "price",
+      "launch",
+      "discount",
+      "interested",
+      "sign up"
+    ],
+    "campaignState": "PRE_LAUNCH",
+    "weight": "High",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "[Popup action ID to be supplied]",
+    "resolvedUrl": null,
+    "embedded": true,
+    "routeNote": "Not a route. Opens the pre-order / discount OfferModal via window.dispatchEvent(new CustomEvent('pc:open-offer')). See app/pick-a-chum/data/discount-popup.ts."
+  },
+  {
+    "destinationId": "DST002",
+    "name": "ChumDrop",
+    "family": "Play",
+    "action": "Open mini-game page or embedded experience",
+    "description": "Main Pedigree Chums mini-game",
+    "triggerTags": [
+      "play",
+      "game",
+      "bored",
+      "challenge",
+      "reactions"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Labrador",
+      "Collie"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "/",
+    "embedded": false,
+    "routeNote": "ChumDrop = the root PackPit physics game (next.config.ts redirects /pack-pit -> /). Footer and BentoBoard label '/' as 'Chum Drop'."
+  },
+  {
+    "destinationId": "DST003",
+    "name": "Nine-Square Sheep Management",
+    "family": "Play",
+    "action": "Enter embedded game state",
+    "description": "Noughts and crosses reinterpreted by the Collie",
+    "triggerTags": [
+      "play now",
+      "strategy",
+      "quick game",
+      "challenge"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "Embedded",
+    "resolvedUrl": null,
+    "embedded": true,
+    "routeNote": "In-chat mini-game (Nine-Square Sheep Management). Built after Checkpoint 2."
+  },
+  {
+    "destinationId": "DST004",
+    "name": "Missing Sheep",
+    "family": "Play",
+    "action": "Enter embedded game state",
+    "description": "Short word guessing game with 3-5 letter dog words",
+    "triggerTags": [
+      "word game",
+      "guess",
+      "letters",
+      "missing"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "Embedded",
+    "resolvedUrl": null,
+    "embedded": true,
+    "routeNote": "In-chat mini-game (Missing Sheep). Built after Checkpoint 2."
+  },
+  {
+    "destinationId": "DST005",
+    "name": "Kennel Sketch Recognition",
+    "family": "Play",
+    "action": "Enter embedded game state",
+    "description": "Guess one of ten dog-themed ASCII sketches",
+    "triggerTags": [
+      "draw",
+      "picture",
+      "guess",
+      "sketch"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Collie",
+      "Boxer"
+    ],
+    "workbookUrl": "Embedded",
+    "resolvedUrl": null,
+    "embedded": true,
+    "routeNote": "In-chat mini-game (Kennel Sketch Recognition). Built after Checkpoint 2."
+  },
+  {
+    "destinationId": "DST006",
+    "name": "Know Your Chum",
+    "family": "Discover",
+    "action": "Open exact interactive page",
+    "description": "Explore all 54 dogs in the card pack",
+    "triggerTags": [
+      "breed",
+      "dogs in pack",
+      "which dog",
+      "show dogs",
+      "54"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Collie",
+      "Terrier"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "/know-your-chums",
+    "embedded": false,
+    "routeNote": "Know Your Chum(s) index. Individual dog pages live at /chums/<slug>."
+  },
+  {
+    "destinationId": "DST007",
+    "name": "Britain's Dog History",
+    "family": "Discover",
+    "action": "Open exact interactive page",
+    "description": "Explore up to 150 breeds, backstories, lineage maps and mini-games",
+    "triggerTags": [
+      "history",
+      "Britain",
+      "lineage",
+      "family tree",
+      "origin",
+      "150"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Terrier",
+      "Collie"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "/britains-dog-history",
+    "embedded": false,
+    "routeNote": "Britain's Dog History interactive."
+  },
+  {
+    "destinationId": "DST008",
+    "name": "Dog Name Generator",
+    "family": "Play / Utility",
+    "action": "Open exact tool",
+    "description": "Generate dog names",
+    "triggerTags": [
+      "name",
+      "naming",
+      "name generator",
+      "call my dog"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "/name-generator",
+    "embedded": false,
+    "routeNote": "Dog Name Generator."
+  },
+  {
+    "destinationId": "DST009",
+    "name": "Chum Finder",
+    "family": "Discover / Utility",
+    "action": "Open exact tool",
+    "description": "Match the visitor to a Chum",
+    "triggerTags": [
+      "which dog am I",
+      "find my chum",
+      "match me"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "/chum-calculator",
+    "embedded": false,
+    "routeNote": "Chum Finder = the Chum Calculator suitability test (bento tile 'Chum Finder' -> /chum-calculator)."
+  },
+  {
+    "destinationId": "DST010",
+    "name": "Curated dog article",
+    "family": "Learn",
+    "action": "Open one specific article",
+    "description": "Article selected by topic tags, never a generic essay index",
+    "triggerTags": [
+      "article",
+      "learn",
+      "fact",
+      "science",
+      "behaviour",
+      "work"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Active dog"
+    ],
+    "workbookUrl": "[Article library]",
+    "resolvedUrl": null,
+    "embedded": true,
+    "routeNote": "Family pointer, not a single URL. Resolved per article via generated/articles.json resolvedUrl."
+  },
+  {
+    "destinationId": "DST011",
+    "name": "Full game rules",
+    "family": "Utility",
+    "action": "Open rules page",
+    "description": "Approved full rules and variants",
+    "triggerTags": [
+      "rules",
+      "instructions",
+      "how to play",
+      "Hot Dog"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Any"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": null,
+    "embedded": true,
+    "routeNote": "Answered in-chat, not by a page (Steve: no rules route exists or is planned). The dogs answer directly from app/pick-a-chum/data/rules.ts."
+  },
+  {
+    "destinationId": "DST012",
+    "name": "Competition",
+    "family": "Utility / Discover",
+    "action": "Open competition page",
+    "description": "Competition, eligibility and entry details",
+    "triggerTags": [
+      "competition",
+      "enter",
+      "prize",
+      "win",
+      "hashtag"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "/chumspot",
+    "embedded": false,
+    "routeNote": "Competition = ChumSpot photo competition."
+  },
+  {
+    "destinationId": "DST013",
+    "name": "Contact",
+    "family": "Utility",
+    "action": "Open contact page",
+    "description": "Human support route when required",
+    "triggerTags": [
+      "contact",
+      "email",
+      "support",
+      "problem",
+      "human"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Any"
+    ],
+    "workbookUrl": "[URL to be supplied]",
+    "resolvedUrl": "mailto:hello@Pedigree-Chums.co.uk",
+    "embedded": false,
+    "routeNote": "Contact = email link (confirmed by Steve). No /contact route; the site uses hello@Pedigree-Chums.co.uk."
+  }
+]

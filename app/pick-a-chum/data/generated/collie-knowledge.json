@@ -1,0 +1,182 @@
+[
+  {
+    "factId": "CK001",
+    "category": "Identity",
+    "topic": "Breed name",
+    "approvedValue": "Border Collie",
+    "source": "Existing website database",
+    "status": "Approved",
+    "usageNote": "Answer in first person where natural."
+  },
+  {
+    "factId": "CK002",
+    "category": "History",
+    "topic": "Development region",
+    "approvedValue": "Border regions of Britain; exact wording to be source-verified",
+    "source": "External official source needed",
+    "status": "Research",
+    "usageNote": "Do not claim Newcastle as literal breed origin."
+  },
+  {
+    "factId": "CK003",
+    "category": "Work",
+    "topic": "Original purpose",
+    "approvedValue": "Herding and managing livestock, especially sheep",
+    "source": "Existing site + official source",
+    "status": "Approved",
+    "usageNote": "Core character metaphor."
+  },
+  {
+    "factId": "CK004",
+    "category": "Intelligence",
+    "topic": "Exceptional word-learning example",
+    "approvedValue": "Chaser learned and retained 1,022 object names",
+    "source": "Primary study",
+    "status": "Approved",
+    "usageNote": "Public character may joke about knowing 1,000 questions."
+  },
+  {
+    "factId": "CK005",
+    "category": "Behaviour",
+    "topic": "Trainability",
+    "approvedValue": "Existing site score and approved explanation",
+    "source": "Existing website database",
+    "status": "Import",
+    "usageNote": "Use site data as canonical."
+  },
+  {
+    "factId": "CK006",
+    "category": "Care",
+    "topic": "Typical lifespan",
+    "approvedValue": "Existing site value",
+    "source": "Existing website database",
+    "status": "Import",
+    "usageNote": "Centralise one value."
+  },
+  {
+    "factId": "CK007",
+    "category": "Care",
+    "topic": "Annual cost",
+    "approvedValue": "Existing site value",
+    "source": "Existing website database",
+    "status": "Import",
+    "usageNote": "Use configurable currency and review date."
+  },
+  {
+    "factId": "CK008",
+    "category": "Care",
+    "topic": "Lifetime cost",
+    "approvedValue": "Existing site value",
+    "source": "Existing website database",
+    "status": "Import",
+    "usageNote": "Derived or canonical site figure."
+  },
+  {
+    "factId": "CK009",
+    "category": "Health",
+    "topic": "Known conditions",
+    "approvedValue": "Existing site condition list with severity",
+    "source": "Existing website database",
+    "status": "Import",
+    "usageNote": "General education only. No diagnosis."
+  },
+  {
+    "factId": "CK010",
+    "category": "Appearance",
+    "topic": "Coat colours and markings",
+    "approvedValue": "Existing site value plus official breed source",
+    "source": "Existing site + official source",
+    "status": "Research",
+    "usageNote": "Support visual questions."
+  },
+  {
+    "factId": "CK011",
+    "category": "Appearance",
+    "topic": "Typical size and weight",
+    "approvedValue": "Existing site value plus official breed source",
+    "source": "Existing site + official source",
+    "status": "Research",
+    "usageNote": "Use ranges and sex-neutral wording where possible."
+  },
+  {
+    "factId": "CK012",
+    "category": "Personality",
+    "topic": "Energy and stimulation",
+    "approvedValue": "High work drive and need for mental and physical activity",
+    "source": "Official breed source",
+    "status": "Research",
+    "usageNote": "Avoid claiming every individual is identical."
+  },
+  {
+    "factId": "CK013",
+    "category": "Records",
+    "topic": "Guinness and documented achievements",
+    "approvedValue": "Record-by-record source list",
+    "source": "Guinness / primary source",
+    "status": "Research",
+    "usageNote": "Do not use unsourced internet lists."
+  },
+  {
+    "factId": "CK014",
+    "category": "Famous dogs",
+    "topic": "Chaser",
+    "approvedValue": "Word-learning Border Collie",
+    "source": "Primary study",
+    "status": "Approved",
+    "usageNote": "Separate dog from breed-wide claims."
+  },
+  {
+    "factId": "CK015",
+    "category": "Famous dogs",
+    "topic": "Rico",
+    "approvedValue": "Border Collie studied for object-name learning",
+    "source": "Primary research",
+    "status": "Research",
+    "usageNote": "Add approved summary."
+  },
+  {
+    "factId": "CK016",
+    "category": "Famous dogs",
+    "topic": "Shep and cultural examples",
+    "approvedValue": "Candidate famous Collies to verify",
+    "source": "Historical sources",
+    "status": "Research",
+    "usageNote": "Avoid confusing fictional and real dogs."
+  },
+  {
+    "factId": "CK017",
+    "category": "Science",
+    "topic": "Head tilt study",
+    "approvedValue": "Gifted word-learning dogs tilted more often during named-toy trials",
+    "source": "Primary study",
+    "status": "Approved",
+    "usageNote": "Use as inspiration, not a universal translation."
+  },
+  {
+    "factId": "CK018",
+    "category": "Communication",
+    "topic": "Referential gestures",
+    "approvedValue": "Dogs have been studied using gestures to direct humans",
+    "source": "Primary study",
+    "status": "Research",
+    "usageNote": "Supports future companion article."
+  },
+  {
+    "factId": "CK019",
+    "category": "Human bond",
+    "topic": "Mutual gaze and oxytocin",
+    "approvedValue": "Source and wording to be approved",
+    "source": "Primary study",
+    "status": "Research",
+    "usageNote": "Use oxytocin, not endorphin."
+  },
+  {
+    "factId": "CK020",
+    "category": "Pedigree Chums",
+    "topic": "Card-pack profile",
+    "approvedValue": "All Collie fields, lineage and interactive content",
+    "source": "Existing website database",
+    "status": "Import",
+    "usageNote": "Link directly to Know Your Chum record."
+  }
+]

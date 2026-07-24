@@ -1,0 +1,67 @@
+{
+  "_readme": "The live home-page FAQ, extracted verbatim from components/FAQ/FAQ.tsx (rendered on /home). This is the task-4 gather AND the answer overlay: scripts/build-chumdata.mjs reads `entries`, and for any entry with a non-null workbookFaqId it fills that FAQ record's {{approved_..._answer}} placeholder as resolvedAnswer in generated/faq.json. Entries with workbookFaqId null are extra live content with no workbook row yet. Ideally Steve pastes these approved answers into the workbook's 'Canonical answer' column so the workbook stays the single source; until then this overlay keeps answers real. See agent/NEEDS_STEVE.md (OI01).",
+  "sourcePage": "/home (components/FAQ/FAQ.tsx)",
+  "entries": [
+    {
+      "workbookFaqId": null,
+      "question": "What is Pedigree Chums?",
+      "answer": "Pedigree Chums is a dog-spotting card game, The Dog Bingo Game. The pack has 54 illustrated breed cards, each packed with traits, stats and tell-tale features. You take your chums out into the real world, spot actual dogs, and match them to the cards in your hand. Spot a dog, call it out, claim your chum.",
+      "cta": null
+    },
+    {
+      "workbookFaqId": null,
+      "question": "How can I buy a pack of Pedigree Chums?",
+      "answer": "Right now you can pre-order online. Hit any Pre-order button on the site, pop in your email, and you'll be first in line when the packs ship, plus you'll get a discount code to use on launch day.",
+      "cta": null,
+      "note": "Confirmed by Steve as the correct model: an active online pre-order at £6.99 plus email capture for a launch-day code. See campaign.ts."
+    },
+    {
+      "workbookFaqId": null,
+      "question": "Is Pedigree Chums food?",
+      "answer": "No, despite the name (a cheeky nod to a certain dog-food brand), Pedigree Chums is a card game, not dinner. The only thing your dog gets out of it is the joy of being spotted. Please don't feed the cards to anyone."
+    },
+    {
+      "workbookFaqId": "FAQ001",
+      "question": "How do you play Pedigree Chums?",
+      "answer": "Deal 3 to 6 chum cards to each player, then head outside. When you spot a real dog that matches one of your cards, call it out and claim the chum. Keep spotting to collect more, and whoever matches the most chums wins. It's made for walks, car journeys and days at the park, anywhere dogs happen.",
+      "cta": null
+    },
+    {
+      "workbookFaqId": "FAQ002",
+      "question": "I have young children, what age range is this game for?",
+      "answer": "It's designed for ages 7 and up, and plays best with 2 or more people. Younger children can absolutely join in with a grown-up, matching cartoon dogs to real ones is exactly the kind of thing they love.",
+      "cta": null,
+      "note": "Also supplies the player-count answer for FAQ005 (plays best with 2 or more people) and the audience answer for FAQ002."
+    },
+    {
+      "workbookFaqId": null,
+      "question": "Is it like Top Trumps, where the cards' facts compete against each other?",
+      "answer": "Sort of. The heart of the game is spotting and matching real dogs, but every card carries real stats and traits, so you can absolutely play a Top Trumps-style round, comparing size, build or temperament to see whose chum comes out on top."
+    },
+    {
+      "workbookFaqId": "FAQ007",
+      "question": "Are there any other game modes to keep it fresh?",
+      "answer": "Plenty. There's Hot Dogs, a memory twist where everyone shows their hand for a few seconds after the draw, then hides it again. If you remember which dog another player is holding and you spot that breed in real life first, you steal their chum. You can also play bingo-style (first to complete a row of chums), Top Trumps-style stat battles, or make up your own house rules. There's a whole page on Hot Dogs.",
+      "cta": "/hot-dogs"
+    },
+    {
+      "workbookFaqId": null,
+      "question": "What's the advice when approaching a dog for the first time?",
+      "answer": "Always ask the owner's permission first. Let the dog come to you rather than reaching over it, crouch side-on, stay calm, and offer a relaxed hand to sniff before any fuss. Watch the dog's body language, keep it gentle, and never disturb a working, assistance or service dog. If the dog isn't interested, that's okay, give it space.",
+      "note": "Safety-relevant approach advice; useful as an approved answer for dog-approach questions."
+    },
+    {
+      "workbookFaqId": "FAQ008",
+      "question": "How much does the game cost, and when will it be released?",
+      "answer": "The retail price is £9.99, but right now we're running a pre-launch discount that brings it down to £6.99, with free UK mainland delivery included. You can only get the £6.99 price if you pre-order before the game is released; once it's out, it's full price. We're launching very soon, pre-order now to lock in the discount, and we'll email you a code to use on launch day along with the release date the moment it's confirmed.",
+      "cta": null,
+      "note": "Confirmed campaign relationship: retail £9.99, discounted £6.99 (30% off), free UK mainland delivery, code emailed on launch day. See campaign.ts. Launch DATE still not public."
+    },
+    {
+      "workbookFaqId": null,
+      "question": "Is there any postage cost applied?",
+      "answer": "Free UK mainland delivery is included on pre-orders, no extra postage to pay.",
+      "note": "Does NOT answer FAQ014 (delivery outside the UK), which remains unanswered."
+    }
+  ]
+}
