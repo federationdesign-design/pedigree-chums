@@ -525,7 +525,18 @@ export default function LineageMap({
     setInfoHover(null);
   };
 
-  const tagW = breed.name.length * 9.5 + 28;
+  // long names wrap to a second line: the pill grows in depth, the corner
+  // radius stays fixed so the capsule shape never changes
+  const splitName = (nm: string): string[] => {
+    if (nm.length <= 16) return [nm];
+    const mid = Math.floor(nm.length / 2);
+    let best = -1;
+    for (let i = 0; i < nm.length; i++) if (nm[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
+    return best === -1 ? [nm] : [nm.slice(0, best), nm.slice(best + 1)];
+  };
+  const tagLines = circular ? splitName(breed.name) : [breed.name];
+  const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28;
+  const tagH = tagLines.length > 1 ? 60 : 32;
   const clip = "lm-clip-root";
 
   // The empty frames the player drags each collected card into: a row of living up
@@ -1052,7 +1063,7 @@ export default function LineageMap({
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry - R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        {!INSTR_NAMES.has(breed.name) && (<g transform={circular ? "translate(0,-96)" : undefined}><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></g>)}
+        {!INSTR_NAMES.has(breed.name) && (<g transform={circular ? `translate(0,${-(80 + tagH / 2)})` : undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={16} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
         {!packed && !collecting && !framesDone ? (() => {
@@ -1276,7 +1287,7 @@ export default function LineageMap({
                       style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
-                    {(hasKids || !autoExposed.has(n._id)) ? (() => {
+                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
                       const nmY = -r - 13;
                       return (

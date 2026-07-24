@@ -244,7 +244,7 @@ export default function BreedTree({
   // render children stay index-aligned with the bridge lists
   const [rodList, setRodList] = useState<{ len: number; h: number; lit: boolean }[]>([]);
   const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
-  const [pillList, setPillList] = useState<{ name: string; w: number; h: number }[]>([]);
+  const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
   useEffect(() => {
     if (!dockAside) return;
@@ -825,15 +825,25 @@ export default function BreedTree({
       };
       spawnPillRef.current = (sx: number, sy: number, wPx: number, name: string) => {
         const w = worldFromPx(sx, sy);
-        const pw = Math.max(44, wPx);
+        // wrap long names: pill grows in depth, corner radius stays 13px so the
+        // capsule shape never changes; width hugs the longest line at 12px text
+        const lines = (() => {
+          if (name.length <= 16) return [name];
+          const mid = Math.floor(name.length / 2);
+          let best = -1;
+          for (let i = 0; i < name.length; i++) if (name[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
+          return best === -1 ? [name] : [name.slice(0, best), name.slice(best + 1)];
+        })();
+        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 22);
+        const ph = lines.length > 1 ? 46 : 26;
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 3, mb: null as any };
-        const mb = Bodies.rectangle(sx, sy, pw, 26, { chamfer: { radius: 13 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
+        const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: 13 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
         mb.plugin = { prop: pr, kind: "pill" };
         pr.mb = mb;
         Composite.add(world, mb);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
         pillBodiesRef.current.push(pr);
-        setPillList((l) => [...l, { name, w: pw * fxScale, h: 26 * fxScale }]);
+        setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, rx: 13 * fxScale }]);
         wake();
       };
       spawnBadgeRef.current = (sx: number, sy: number, rPx: number, pctVal: number) => {
@@ -1383,12 +1393,14 @@ export default function BreedTree({
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => startDrag(e, pillBodiesRef.current[i2])}>
-                  <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
-                    style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.h * 0.077 }} />
-                  <text x={0} y={0} dominantBaseline="central"
-                    style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.h * 0.46}px`, pointerEvents: "none", userSelect: "none" }}>
-                    {pl.name}
-                  </text>
+                  <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={Math.min(pl.rx, pl.h / 2)}
+                    style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.rx * 0.154 }} />
+                  {pl.lines.map((ln, li) => (
+                    <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.rx * 0.77 : pl.rx * 0.77) : 0} dominantBaseline="central"
+                      style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.rx * 0.92}px`, pointerEvents: "none", userSelect: "none" }}>
+                      {ln}
+                    </text>
+                  ))}
                 </g>
               );
             })}
