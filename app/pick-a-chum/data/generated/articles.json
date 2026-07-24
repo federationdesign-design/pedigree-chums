@@ -1,0 +1,201 @@
+[
+  {
+    "articleId": "ART001",
+    "title": "Dog Intelligence Essay",
+    "triggerTags": [
+      "Intelligence",
+      "memory",
+      "learning",
+      "clever dogs",
+      "Border Collie"
+    ],
+    "preferredDog": [
+      "Collie"
+    ],
+    "family": "Learn",
+    "status": "Existing",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Core article. Companion piece is the head-tilt study.",
+    "resolvedUrl": "/smarter-than-the-test",
+    "routeNote": "TENTATIVE: closest live page to 'Dog Intelligence Essay' is 'Your Dog Is Smarter Than the Test'. Confirm, or point at a dedicated intelligence essay if one is written."
+  },
+  {
+    "articleId": "ART002",
+    "title": "The Secret Language of the Head Tilt",
+    "triggerTags": [
+      "Head tilt",
+      "communication",
+      "gifted word learners",
+      "body language"
+    ],
+    "preferredDog": [
+      "Collie"
+    ],
+    "family": "Learn",
+    "status": "Planned",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Science-led companion article with future canine-sign-language thought experiment.",
+    "resolvedUrl": null,
+    "routeNote": "PLANNED: 'The Secret Language of the Head Tilt' not yet built (workbook status Planned)."
+  },
+  {
+    "articleId": "ART003",
+    "title": "Hot/Dogs Heat Safety",
+    "triggerTags": [
+      "Heat",
+      "summer",
+      "hot cars",
+      "dog safety"
+    ],
+    "preferredDog": [
+      "Labrador",
+      "Collie"
+    ],
+    "family": "Learn",
+    "status": "Existing / planned",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Safety content. Use approved, non-comic factual answer first.",
+    "resolvedUrl": null,
+    "routeNote": "PLANNED/GAP: no heat-safety article found. /hot-dogs is the game mode 'Hot Dogs', not heat safety."
+  },
+  {
+    "articleId": "ART004",
+    "title": "Dogs at Work: Detection and Scent",
+    "triggerTags": [
+      "Sniffer dogs",
+      "smell",
+      "detection",
+      "work"
+    ],
+    "preferredDog": [
+      "Labrador"
+    ],
+    "family": "Learn",
+    "status": "Existing / planned",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Best Labrador Learn route after smell or sniffing input.",
+    "resolvedUrl": "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
+    "routeNote": "TENTATIVE: best scent/detection match in Dogs at Work. Other candidate: /dogs-at-work/the-electronic-nose. Confirm exact article."
+  },
+  {
+    "articleId": "ART005",
+    "title": "Dogs at Work: Herding",
+    "triggerTags": [
+      "Sheep",
+      "cattle",
+      "farming",
+      "working dogs",
+      "Collie"
+    ],
+    "preferredDog": [
+      "Collie"
+    ],
+    "family": "Learn",
+    "status": "Existing / planned",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Strong Collie identity route.",
+    "resolvedUrl": "/dogs-at-work",
+    "routeNote": "TENTATIVE: no dedicated herding article found; pointing at the Dogs at Work index. Confirm or add a herding piece."
+  },
+  {
+    "articleId": "ART006",
+    "title": "Good Dog / Bad Dog",
+    "triggerTags": [
+      "Morality",
+      "famous dogs",
+      "heroes",
+      "villains",
+      "strange stories"
+    ],
+    "preferredDog": [
+      "Border Terrier"
+    ],
+    "family": "Learn",
+    "status": "Existing",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Terrier investigation route.",
+    "resolvedUrl": "/good-dog-bad-dog",
+    "routeNote": "Good Dog / Bad Dog essay index (7 articles live)."
+  },
+  {
+    "articleId": "ART007",
+    "title": "Know Your Chum",
+    "triggerTags": [
+      "54 breeds",
+      "pack dogs",
+      "profiles",
+      "characteristics"
+    ],
+    "preferredDog": [
+      "Collie",
+      "Terrier"
+    ],
+    "family": "Discover",
+    "status": "Existing",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Interactive, not an article index.",
+    "resolvedUrl": "/know-your-chums",
+    "routeNote": "Know Your Chum(s)."
+  },
+  {
+    "articleId": "ART008",
+    "title": "Britain's Dog History",
+    "triggerTags": [
+      "British breeds",
+      "150 breeds",
+      "lineage",
+      "history"
+    ],
+    "preferredDog": [
+      "Border Terrier",
+      "Collie"
+    ],
+    "family": "Discover",
+    "status": "Existing",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Interactive lineage maps and mini-games.",
+    "resolvedUrl": "/britains-dog-history",
+    "routeNote": "Britain's Dog History."
+  },
+  {
+    "articleId": "ART009",
+    "title": "Learning Through Play",
+    "triggerTags": [
+      "Play",
+      "brain",
+      "children",
+      "animals",
+      "learning"
+    ],
+    "preferredDog": [
+      "Collie",
+      "Labrador"
+    ],
+    "family": "Learn",
+    "status": "Planned",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Supports the educational positioning of the card game.",
+    "resolvedUrl": null,
+    "routeNote": "PLANNED: 'Learning Through Play' not yet built."
+  },
+  {
+    "articleId": "ART010",
+    "title": "The Power of Smell",
+    "triggerTags": [
+      "Smell",
+      "brain",
+      "memory",
+      "body",
+      "dogs"
+    ],
+    "preferredDog": [
+      "Labrador"
+    ],
+    "family": "Learn",
+    "status": "Planned",
+    "workbookUrl": "[URL to be supplied]",
+    "notes": "Family-friendly science with strong Labrador relevance.",
+    "resolvedUrl": null,
+    "routeNote": "PLANNED/GAP: 'The Power of Smell' not built. Closest live: /dogs-at-work/the-electronic-nose or /dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease."
+  }
+]

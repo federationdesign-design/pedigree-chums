@@ -1,0 +1,30 @@
+{
+  "status": [
+    "Draft",
+    "In review",
+    "Approved",
+    "Blocked",
+    "Superseded",
+    "Research",
+    "Import"
+  ],
+  "phase": [
+    "MVP",
+    "Content phase",
+    "Future",
+    "Phase two"
+  ],
+  "severity": [
+    "Low",
+    "Medium",
+    "High",
+    "Critical"
+  ],
+  "campaignState": [
+    "PRE_LAUNCH",
+    "LIVE",
+    "SOLD_OUT",
+    "PAUSED",
+    "Any"
+  ]
+}

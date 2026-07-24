@@ -1,0 +1,300 @@
+[
+  {
+    "questionId": "GK0001",
+    "category": "Mathematics",
+    "canonicalQuestion": "What is 7 x 8?",
+    "correctAnswer": "56",
+    "collieObservation": "If seven pens held eight sheep each, you would have 56 sheep and a paperwork problem.",
+    "alternativePhrasings": [
+      "what is 7 times 8",
+      "7x8",
+      "seven eights"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0002",
+    "category": "Mathematics",
+    "canonicalQuestion": "What is half of 18?",
+    "correctAnswer": "9",
+    "collieObservation": "Nine sheep here, nine sheep there, one Collie doing all the organising.",
+    "alternativePhrasings": [
+      "half of 18",
+      "18 divided by 2"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0003",
+    "category": "Mathematics",
+    "canonicalQuestion": "How many sides does a hexagon have?",
+    "correctAnswer": "6",
+    "collieObservation": "Six sides. Useful if your field planning has become unnecessarily ambitious.",
+    "alternativePhrasings": [
+      "hexagon sides",
+      "how many sides on a hexagon"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0004",
+    "category": "Mathematics",
+    "canonicalQuestion": "What is 25% of 40?",
+    "correctAnswer": "10",
+    "collieObservation": "Ten sheep. Percentage complete. Gate status still unknown.",
+    "alternativePhrasings": [
+      "quarter of 40",
+      "25 percent of 40"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0005",
+    "category": "Mathematics",
+    "canonicalQuestion": "What is 100 minus 37?",
+    "correctAnswer": "63",
+    "collieObservation": "Sixty-three remain. I would like to know how thirty-seven escaped.",
+    "alternativePhrasings": [
+      "100-37",
+      "one hundred minus thirty seven"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0101",
+    "category": "Science and nature",
+    "canonicalQuestion": "What is the largest planet?",
+    "correctAnswer": "Jupiter",
+    "collieObservation": "Jupiter. Very large, entirely unsuitable for sheep.",
+    "alternativePhrasings": [
+      "biggest planet",
+      "largest planet in solar system"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0102",
+    "category": "Science and nature",
+    "canonicalQuestion": "Is a dolphin a fish?",
+    "correctAnswer": "No. A dolphin is a mammal.",
+    "collieObservation": "A highly intelligent water dog with no legs and an unacceptable working environment.",
+    "alternativePhrasings": [
+      "dolphin fish",
+      "are dolphins mammals"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0103",
+    "category": "Science and nature",
+    "canonicalQuestion": "Why do plants need sunlight?",
+    "correctAnswer": "They use light energy to make food through photosynthesis.",
+    "collieObservation": "Plants organise their own lunch. Efficient.",
+    "alternativePhrasings": [
+      "plants sunlight",
+      "why sunlight for plants"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0104",
+    "category": "Science and nature",
+    "canonicalQuestion": "How many legs does a spider have?",
+    "correctAnswer": "8",
+    "collieObservation": "Eight legs. Excessive staffing for such a small operation.",
+    "alternativePhrasings": [
+      "spider legs",
+      "how many legs spider"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0105",
+    "category": "Science and nature",
+    "canonicalQuestion": "What does the heart do?",
+    "correctAnswer": "It pumps blood around the body.",
+    "collieObservation": "A reliable pump. No tail, but otherwise respectable engineering.",
+    "alternativePhrasings": [
+      "heart function",
+      "what does heart do"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0201",
+    "category": "Geography",
+    "canonicalQuestion": "What is the capital of France?",
+    "correctAnswer": "Paris",
+    "collieObservation": "Geography completed. Come on, our kid, back to dogs.",
+    "alternativePhrasings": [
+      "capital France",
+      "France capital"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0202",
+    "category": "Geography",
+    "canonicalQuestion": "What is the largest ocean?",
+    "correctAnswer": "The Pacific Ocean",
+    "collieObservation": "A very large water field. Difficult to fence.",
+    "alternativePhrasings": [
+      "biggest ocean",
+      "largest ocean"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0203",
+    "category": "Geography",
+    "canonicalQuestion": "Which country is Cardiff in?",
+    "correctAnswer": "Wales",
+    "collieObservation": "Wales. Strong hills, excellent sheep infrastructure.",
+    "alternativePhrasings": [
+      "Cardiff country",
+      "where is Cardiff"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0204",
+    "category": "Geography",
+    "canonicalQuestion": "Is Scotland north of England?",
+    "correctAnswer": "Yes",
+    "collieObservation": "Aye. Even the map has managed to organise that correctly.",
+    "alternativePhrasings": [
+      "Scotland north England"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0205",
+    "category": "Geography",
+    "canonicalQuestion": "How many continents are there?",
+    "correctAnswer": "7",
+    "collieObservation": "Seven. I have not yet inspected all of them.",
+    "alternativePhrasings": [
+      "number of continents",
+      "how many continents"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0301",
+    "category": "English literature",
+    "canonicalQuestion": "Who wrote The Gruffalo?",
+    "correctAnswer": "Julia Donaldson",
+    "collieObservation": "A sensible story about negotiating with larger animals.",
+    "alternativePhrasings": [
+      "Gruffalo author",
+      "who wrote Gruffalo"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0302",
+    "category": "English literature",
+    "canonicalQuestion": "Who wrote Matilda?",
+    "correctAnswer": "Roald Dahl",
+    "collieObservation": "Matilda is clever, under-estimated and surrounded by management issues. Relatable.",
+    "alternativePhrasings": [
+      "Matilda author",
+      "who wrote Matilda"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0303",
+    "category": "English literature",
+    "canonicalQuestion": "Who is Sherlock Holmes?",
+    "correctAnswer": "A fictional detective created by Arthur Conan Doyle.",
+    "collieObservation": "Excellent nose for evidence. Disappointing lack of actual nose work.",
+    "alternativePhrasings": [
+      "Sherlock Holmes who",
+      "who created Sherlock Holmes"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0304",
+    "category": "English literature",
+    "canonicalQuestion": "Who wrote Macbeth?",
+    "correctAnswer": "William Shakespeare",
+    "collieObservation": "A short route to power followed by severe operational failure.",
+    "alternativePhrasings": [
+      "Macbeth author",
+      "who wrote Macbeth"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0305",
+    "category": "English literature",
+    "canonicalQuestion": "What kind of animal is Aslan?",
+    "correctAnswer": "A lion",
+    "collieObservation": "Large cat. Commanding voice. Herdability untested.",
+    "alternativePhrasings": [
+      "Aslan animal",
+      "what is Aslan"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0401",
+    "category": "British history",
+    "canonicalQuestion": "Who built Hadrian's Wall?",
+    "correctAnswer": "The Romans",
+    "collieObservation": "A very long boundary. Finally, humans appreciating fencing.",
+    "alternativePhrasings": [
+      "Hadrian wall who built"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0402",
+    "category": "British history",
+    "canonicalQuestion": "Who was the first Tudor monarch?",
+    "correctAnswer": "Henry VII",
+    "collieObservation": "Henry VII. He began a family project that became difficult to manage.",
+    "alternativePhrasings": [
+      "first Tudor king",
+      "first Tudor monarch"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0403",
+    "category": "British history",
+    "canonicalQuestion": "What was the Industrial Revolution?",
+    "correctAnswer": "A period of major change in manufacturing, transport and society.",
+    "collieObservation": "Humans replaced muscle with machines and immediately created more work.",
+    "alternativePhrasings": [
+      "Industrial Revolution simple"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0404",
+    "category": "British history",
+    "canonicalQuestion": "Where did the Vikings settle in Britain?",
+    "correctAnswer": "They settled in many areas, especially northern and eastern England, parts of Scotland and the islands.",
+    "collieObservation": "Strong travel programme. Limited respect for appointments.",
+    "alternativePhrasings": [
+      "Vikings in Britain",
+      "where Vikings settled"
+    ],
+    "status": "Seed"
+  },
+  {
+    "questionId": "GK0405",
+    "category": "British history",
+    "canonicalQuestion": "What did drovers do?",
+    "correctAnswer": "They moved livestock over long distances to markets.",
+    "collieObservation": "Professional herding support. Finally, a historical occupation I respect.",
+    "alternativePhrasings": [
+      "drovers job",
+      "what did drovers do"
+    ],
+    "status": "Seed"
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "_readme": "Resolves each workbook Destination (DST###) and Article (ART###) to a real route in app/. Hand-maintained from the repo; merged into generated/destinations.json and generated/articles.json as resolvedUrl by scripts/build-chumdata.mjs. A real URL typed into the workbook wins over this overlay. 'embedded: true' marks destinations that have no route by design (in-chat games, the popup action). Entries with resolvedUrl null and no embedded flag are genuine gaps for Steve, listed in agent/NEEDS_STEVE.md.",
+  "DST001": {
+    "resolvedUrl": null,
+    "embedded": true,
+    "note": "Not a route. Opens the pre-order / discount OfferModal via window.dispatchEvent(new CustomEvent('pc:open-offer')). See app/pick-a-chum/data/discount-popup.ts."
+  },
+  "DST002": {
+    "resolvedUrl": "/",
+    "note": "ChumDrop = the root PackPit physics game (next.config.ts redirects /pack-pit -> /). Footer and BentoBoard label '/' as 'Chum Drop'."
+  },
+  "DST003": { "resolvedUrl": null, "embedded": true, "note": "In-chat mini-game (Nine-Square Sheep Management). Built after Checkpoint 2." },
+  "DST004": { "resolvedUrl": null, "embedded": true, "note": "In-chat mini-game (Missing Sheep). Built after Checkpoint 2." },
+  "DST005": { "resolvedUrl": null, "embedded": true, "note": "In-chat mini-game (Kennel Sketch Recognition). Built after Checkpoint 2." },
+  "DST006": { "resolvedUrl": "/know-your-chums", "note": "Know Your Chum(s) index. Individual dog pages live at /chums/<slug>." },
+  "DST007": { "resolvedUrl": "/britains-dog-history", "note": "Britain's Dog History interactive." },
+  "DST008": { "resolvedUrl": "/name-generator", "note": "Dog Name Generator." },
+  "DST009": { "resolvedUrl": "/chum-calculator", "note": "Chum Finder = the Chum Calculator suitability test (bento tile 'Chum Finder' -> /chum-calculator)." },
+  "DST010": {
+    "resolvedUrl": null,
+    "embedded": true,
+    "note": "Family pointer, not a single URL. Resolved per article via generated/articles.json resolvedUrl."
+  },
+  "DST011": {
+    "resolvedUrl": null,
+    "embedded": true,
+    "note": "Answered in-chat, not by a page (Steve: no rules route exists or is planned). The dogs answer directly from app/pick-a-chum/data/rules.ts."
+  },
+  "DST012": { "resolvedUrl": "/chumspot", "note": "Competition = ChumSpot photo competition." },
+  "DST013": {
+    "resolvedUrl": null,
+    "note": "PLACEHOLDER (Steve: leave for now). No /contact route exists. The site currently uses the email hello@Pedigree-Chums.co.uk. Pending a decision on the contact action. See PLACEHOLDERS.md."
+  },
+
+  "ART001": {
+    "resolvedUrl": "/smarter-than-the-test",
+    "note": "TENTATIVE: closest live page to 'Dog Intelligence Essay' is 'Your Dog Is Smarter Than the Test'. Confirm, or point at a dedicated intelligence essay if one is written."
+  },
+  "ART002": { "resolvedUrl": null, "note": "PLANNED: 'The Secret Language of the Head Tilt' not yet built (workbook status Planned)." },
+  "ART003": { "resolvedUrl": null, "note": "PLANNED/GAP: no heat-safety article found. /hot-dogs is the game mode 'Hot Dogs', not heat safety." },
+  "ART004": {
+    "resolvedUrl": "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
+    "note": "TENTATIVE: best scent/detection match in Dogs at Work. Other candidate: /dogs-at-work/the-electronic-nose. Confirm exact article."
+  },
+  "ART005": {
+    "resolvedUrl": "/dogs-at-work",
+    "note": "TENTATIVE: no dedicated herding article found; pointing at the Dogs at Work index. Confirm or add a herding piece."
+  },
+  "ART006": { "resolvedUrl": "/good-dog-bad-dog", "note": "Good Dog / Bad Dog essay index (7 articles live)." },
+  "ART007": { "resolvedUrl": "/know-your-chums", "note": "Know Your Chum(s)." },
+  "ART008": { "resolvedUrl": "/britains-dog-history", "note": "Britain's Dog History." },
+  "ART009": { "resolvedUrl": null, "note": "PLANNED: 'Learning Through Play' not yet built." },
+  "ART010": {
+    "resolvedUrl": null,
+    "note": "PLANNED/GAP: 'The Power of Smell' not built. Closest live: /dogs-at-work/the-electronic-nose or /dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease."
+  }
+}

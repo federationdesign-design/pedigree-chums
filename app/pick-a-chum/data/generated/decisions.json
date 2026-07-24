@@ -1,0 +1,146 @@
+[
+  {
+    "id": "D001",
+    "decision": "Silent opening",
+    "approvedApproach": "The dog does not send an opening message after selection. Only the avatar and text entry field appear.",
+    "reason": "Dogs wait for a human command. The forced first input creates the reveal and trains the visitor how the experience works.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D002",
+    "decision": "Random dog option",
+    "approvedApproach": "Allow visitors to roll the dice and receive one of the four dogs.",
+    "reason": "Supports discovery and makes all four first interactions necessary even while the Collie is the full MVP.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D003",
+    "decision": "Collie-first build",
+    "approvedApproach": "Build the complete conversational journey for the Collie first.",
+    "reason": "It reduces complexity while proving the central system, data model and transfer mechanics.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D004",
+    "decision": "Other dogs first interaction",
+    "approvedApproach": "Write enough opening behaviour for Labrador, Terrier and Boxer to support random selection and transfers.",
+    "reason": "The first response is the key joke and must work for every dog.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D005",
+    "decision": "Controlled knowledge",
+    "approvedApproach": "Use approved site data, FAQs and curated knowledge records rather than unrestricted live web research.",
+    "reason": "Improves safety, speed, accuracy, maintenance and character consistency.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D006",
+    "decision": "Collie commercial behaviour",
+    "approvedApproach": "During pre-launch, the Collie offers the 30% mailing-list code rather than Buy Now.",
+    "reason": "The Collie is strategic and organised. Direct sales enthusiasm belongs mainly to the Labrador.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D007",
+    "decision": "No transfer cap",
+    "approvedApproach": "Allow repeated transfers as part of the joke.",
+    "reason": "Visitors gradually realise that every operator is another dog.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D008",
+    "decision": "Hidden overall ceiling",
+    "approvedApproach": "Use an approximate hidden ceiling of 20 human submissions.",
+    "reason": "Prevents accidental endless sessions without visibly breaking the joke.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D009",
+    "decision": "Boxer final stop",
+    "approvedApproach": "The Boxer can pretend to transfer the visitor and accidentally close the chat.",
+    "reason": "Provides a deliberate comic circuit breaker and satisfying ending.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D010",
+    "decision": "Games are separate state",
+    "approvedApproach": "Mini-game actions do not consume conversation turns.",
+    "reason": "A game would otherwise use the interaction allowance before it can be completed.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D011",
+    "decision": "Three light MVP games",
+    "approvedApproach": "Start with Nine-Square Sheep Management, Missing Sheep and Kennel Sketch Recognition.",
+    "reason": "They are short, family-safe, inexpensive and can run inside the text area.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D012",
+    "decision": "General knowledge target",
+    "approvedApproach": "Collie target is 500 canonical records: 100 each in mathematics, science and nature, geography, English literature and British history.",
+    "reason": "This creates a surprisingly capable but bounded character. Alternative phrasings multiply coverage.",
+    "status": "Approved",
+    "phase": "Content phase"
+  },
+  {
+    "id": "D013",
+    "decision": "No time/calendar or language curriculum",
+    "approvedApproach": "Exclude dedicated time, calendar and grammar/language question sets.",
+    "reason": "They do not fit the intended canine worldview or current creative focus.",
+    "status": "Approved",
+    "phase": "Content phase"
+  },
+  {
+    "id": "D014",
+    "decision": "English-only interface",
+    "approvedApproach": "The experience is written and operated in English only.",
+    "reason": "Keeps the MVP maintainable and avoids false claims of multilingual canine fluency.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D015",
+    "decision": "Light Geordie voice",
+    "approvedApproach": "Use occasional Geordie phrasing but avoid dense phonetic spelling.",
+    "reason": "The humour depends on intelligence and precision, not a regional caricature.",
+    "status": "Approved",
+    "phase": "MVP"
+  },
+  {
+    "id": "D016",
+    "decision": "Science plus comic interpretation",
+    "approvedApproach": "Store scientific facts accurately, then add clearly comic canine interpretations.",
+    "reason": "Allows educational value without flattening the brand's humour.",
+    "status": "Approved",
+    "phase": "All phases"
+  },
+  {
+    "id": "D017",
+    "decision": "Animation postponed",
+    "approvedApproach": "Build static first. Add canine behaviour animation as a later reusable state library.",
+    "reason": "Prevents animation from delaying the conversational proof of concept.",
+    "status": "Approved",
+    "phase": "Future"
+  },
+  {
+    "id": "D018",
+    "decision": "Head-tilt companion article",
+    "approvedApproach": "Create a science-led article about head tilting and the future possibility of canine communication literacy.",
+    "reason": "Supports the intelligence essay and provides content for future animation and chatbot jokes.",
+    "status": "Approved",
+    "phase": "Content phase"
+  }
+]

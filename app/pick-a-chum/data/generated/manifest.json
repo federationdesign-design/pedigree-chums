@@ -1,0 +1,31 @@
+{
+  "generatedFrom": "agent/data/workbook.xlsx",
+  "workbookVersion": "2.0",
+  "counts": {
+    "priority-stack": 10,
+    "buckets": 14,
+    "character-profiles": 4,
+    "first-interaction-matrix": 14,
+    "collie-responses": 140,
+    "destinations": 13,
+    "gk-plan": 5,
+    "general-knowledge": 25,
+    "collie-knowledge": 20,
+    "transfers": 8,
+    "mini-games": 5,
+    "session-logic": 12,
+    "analytics-events": 16,
+    "copy-components": 18,
+    "faq": 14,
+    "articles": 10,
+    "research-sources": 5,
+    "risks": 12,
+    "decisions": 18,
+    "animation-states": 14,
+    "open-inputs": 10,
+    "change-log": 2,
+    "lists": 4,
+    "dogs": 54
+  },
+  "warnings": 0
+}

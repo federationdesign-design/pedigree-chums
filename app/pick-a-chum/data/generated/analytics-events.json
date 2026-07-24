@@ -1,0 +1,114 @@
+[
+  {
+    "eventId": "EV01",
+    "event": "chat_opened",
+    "whenFired": "Chat panel opened",
+    "suggestedProperties": "source button; page; session id",
+    "purpose": "Measure discovery and engagement"
+  },
+  {
+    "eventId": "EV02",
+    "event": "dog_selected",
+    "whenFired": "Dog selected or randomly assigned",
+    "suggestedProperties": "dog; selection method",
+    "purpose": "Measure character popularity and random use"
+  },
+  {
+    "eventId": "EV03",
+    "event": "first_input_classified",
+    "whenFired": "First message assigned to bucket/layer",
+    "suggestedProperties": "bucket; layer; confidence; input length",
+    "purpose": "Validate router quality"
+  },
+  {
+    "eventId": "EV04",
+    "event": "faq_matched",
+    "whenFired": "FAQ answer used",
+    "suggestedProperties": "FAQ ID; confidence",
+    "purpose": "Identify missing or weak FAQ phrasings"
+  },
+  {
+    "eventId": "EV05",
+    "event": "general_knowledge_matched",
+    "whenFired": "Collie knowledge record used",
+    "suggestedProperties": "GK ID; category",
+    "purpose": "Measure useful curriculum coverage"
+  },
+  {
+    "eventId": "EV06",
+    "event": "fallback_used",
+    "whenFired": "No approved match found",
+    "suggestedProperties": "active dog; anonymised pattern tag",
+    "purpose": "Build new records from real behaviour"
+  },
+  {
+    "eventId": "EV07",
+    "event": "transfer_started",
+    "whenFired": "Dog hands off to another dog",
+    "suggestedProperties": "from; to; reason; session count",
+    "purpose": "Measure the transfer joke and false positives"
+  },
+  {
+    "eventId": "EV08",
+    "event": "returning_dog",
+    "whenFired": "Visitor returns to a previously seen dog",
+    "suggestedProperties": "dog; previous reason",
+    "purpose": "Test continuity lines"
+  },
+  {
+    "eventId": "EV09",
+    "event": "destination_offered",
+    "whenFired": "Link, pop-up or game offered",
+    "suggestedProperties": "destination ID; dog; reason",
+    "purpose": "Measure recommendations"
+  },
+  {
+    "eventId": "EV10",
+    "event": "destination_clicked",
+    "whenFired": "Visitor accepts action",
+    "suggestedProperties": "destination ID; dog",
+    "purpose": "Primary conversion and engagement"
+  },
+  {
+    "eventId": "EV11",
+    "event": "discount_popup_opened",
+    "whenFired": "30% pop-up opened",
+    "suggestedProperties": "dog; trigger bucket",
+    "purpose": "Commercial KPI"
+  },
+  {
+    "eventId": "EV12",
+    "event": "discount_signup_completed",
+    "whenFired": "Mailing list form completed",
+    "suggestedProperties": "campaign; source dog",
+    "purpose": "Primary pre-launch conversion"
+  },
+  {
+    "eventId": "EV13",
+    "event": "game_started",
+    "whenFired": "Embedded mini-game begins",
+    "suggestedProperties": "game ID; dog",
+    "purpose": "Measure play engagement"
+  },
+  {
+    "eventId": "EV14",
+    "event": "game_completed",
+    "whenFired": "Mini-game completed or abandoned",
+    "suggestedProperties": "game ID; result; moves",
+    "purpose": "Improve game length and difficulty"
+  },
+  {
+    "eventId": "EV15",
+    "event": "chat_closed",
+    "whenFired": "Visitor closes chat",
+    "suggestedProperties": "active dog; submission count; last layer",
+    "purpose": "Identify abandonment points"
+  },
+  {
+    "eventId": "EV16",
+    "event": "boxer_cutoff",
+    "whenFired": "Boxer performs final cut-off",
+    "suggestedProperties": "submission count; prior dogs",
+    "purpose": "Measure comic endpoint"
+  }
+]
