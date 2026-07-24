@@ -35,6 +35,14 @@ export default function LineageModal({ name, image, character, lineage, onClose 
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [captionOpen, setCaptionOpen] = useState(false); // closed from the start
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 900px)");
+    const apply = () => setIsNarrow(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
   const [score, setScore] = useState(0);
   const [scorePulse, setScorePulse] = useState(false);
   const shakeFnRef = useRef<(() => void) | null>(null);
@@ -78,7 +86,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
       </div>
       {/* Title floats over the pit and never affects its size */}
       <h3 className={css.title}>
-        {titleLines(shownName).map((line, i, arr) => (
+        {(isNarrow ? titleLines(shownName) : [shownName]).map((line, i, arr) => (
           <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
         ))}
       </h3>
@@ -95,7 +103,7 @@ export default function LineageModal({ name, image, character, lineage, onClose 
           fill
           dockAside
           gravity
-          stroke="var(--navy)"
+          strokeByDepth
           tinted={false}
           namePill
           onShownChange={setShownName}

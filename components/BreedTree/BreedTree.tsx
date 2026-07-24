@@ -160,6 +160,7 @@ export default function BreedTree({
   dockAside = false,
   gravity = false,
   stroke = "#ffd23e",
+  strokeByDepth = false,
   tinted = true,
   namePill = false,
   onShownChange,
@@ -183,6 +184,7 @@ export default function BreedTree({
   dockAside?: boolean;
   gravity?: boolean;
   stroke?: string;
+  strokeByDepth?: boolean;
   tinted?: boolean;
   namePill?: boolean;
   onShownChange?: (name: string) => void;
@@ -236,6 +238,7 @@ export default function BreedTree({
   const [dropped, setDropped] = useState(false);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
+  const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
   const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
   const runFallRef = useRef<(() => void) | null>(null);
   const shakeInnerRef = useRef<(() => void) | null>(null);
@@ -309,6 +312,7 @@ export default function BreedTree({
       return;
     }
     e.stopPropagation();
+    e.preventDefault(); // stop the browser starting a text-selection drag on SVG text
     pressRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
     const w = svgPointToWorld(e);
     if (!w) return;
@@ -579,7 +583,7 @@ export default function BreedTree({
       const yF = v[1] + (vbHf / 2 - floorVU - M) / k;
       const yF0 = yF;
       const worldH = vbHf / k;
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Map<Body, number>; a: number; va: number; ia: number; iva: number; held?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; ghosts: Map<Body, number>; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0 }));
@@ -588,7 +592,7 @@ export default function BreedTree({
       const BADGE_R = 46 / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.6, y: n.y + n.r * 0.6, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0,
+        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
       setBadgePcts(d1.map((n) => pctOf(n)));
@@ -661,7 +665,7 @@ export default function BreedTree({
               vx: nb.vx * 0.8 + (Math.random() - 0.5) * worldH * 0.3,
               vy: nb.vy * 0.8,
               r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0,
-              popped: true, ghosts: new Map<Body, number>(nb.ghosts), a: 0, va: 0, ia: 0, iva: 0,
+              popped: true, ghosts: new Map<Body, number>(nb.ghosts), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
             };
             bl.push(bb);
             all.push(bb);
@@ -734,6 +738,34 @@ export default function BreedTree({
       const t0 = performance.now();
       for (const n of d1) whackAt(n.x, n.y - n.r * 0.55, t0);
 
+      // a solid knock spends one of a badge's 20 charges (600ms cooldown, like
+      // the pit); at zero it goes inert: blue, silent, ungrabbable, with a poof
+      const poofAt = (x: number, y: number, now2: number) => {
+        const fx = fxRef.current;
+        if (!fx) return;
+        for (let i = 0; i < 10; i++) {
+          const a2 = Math.random() * Math.PI * 2, sp2 = (0.4 + Math.random() * 2.2) * 60 * fxScale;
+          const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          el.setAttribute("r", String((3 + Math.random() * 6) * fxScale));
+          el.style.fill = "#ffffff";
+          el.style.pointerEvents = "none";
+          fx.appendChild(el);
+          parts.push({ el, x: x + (Math.random() - 0.5) * 20 * fxScale, y: y + (Math.random() - 0.5) * 20 * fxScale, vx: Math.cos(a2) * sp2, vy: Math.sin(a2) * sp2 - 60 * fxScale, r: 0, born: now2, life: 420 + Math.random() * 340 });
+        }
+      };
+      const knockBadge = (b: Body, rv: number, now2: number) => {
+        if (b.n || b.inert || b.charges === undefined) return; // badges only
+        if (rv < FX_MIN * 1.2) return; // a real knock, not a nudge
+        if (b.lastKnock && now2 - b.lastKnock < 600) return;
+        b.lastKnock = now2;
+        b.charges -= 1;
+        if (b.charges <= 0) {
+          b.inert = true;
+          poofAt(b.x, b.y, now2);
+          setInertBadges((prev) => new Set(prev).add(b.idx));
+        }
+      };
+
       const FX_COOLDOWN = 220;
       const FX_MIN = worldH * 0.05; // minimum impact speed to flash
       let last = performance.now();
@@ -801,6 +833,7 @@ export default function BreedTree({
                 const imp = (-(1 + REST) * rel) / (1 / ma + 1 / mc);
                 a.vx -= (imp / ma) * nx; a.vy -= (imp / ma) * ny;
                 c.vx += (imp / mc) * nx; c.vy += (imp / mc) * ny;
+                knockBadge(a, -rel, now); knockBadge(c, -rel, now);
                 if (-rel > FX_MIN * 0.6) { popChildren(a); popChildren(c); }
                 const tang = (c.vx - a.vx) * -ny + (c.vy - a.vy) * nx;
                 a.va += (tang / Math.max(a.r, 0.001)) * 0.045;
@@ -1091,7 +1124,7 @@ export default function BreedTree({
                   key={i}
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
-                  stroke={hidden ? "none" : stroke}
+                  stroke={hidden ? "none" : strokeByDepth ? ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4] : stroke}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",
@@ -1106,7 +1139,7 @@ export default function BreedTree({
             })}
           </g>
 
-          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: hideLabels ? 0 : entered ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: hideLabels ? "none" : "auto" }}>
+          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: hideLabels ? 0 : entered ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none", userSelect: "none" }}>
             {nodes.map((d, i) => {
               const isChild = d.parent === focus;
               // When zoomed right into a single circle that has nothing inside
@@ -1152,15 +1185,18 @@ export default function BreedTree({
               const by = b ? b.y : v[1] - 99999;
               const st2 = stageRef.current;
               const upp2 = st2 ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st2.clientHeight, 1) : 1;
+              const inert = inertBadges.has(i);
               return (
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
-                style={{ cursor: "grab", pointerEvents: "auto" }}
+                style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
-                onPointerDown={(e) => startDrag(e, badgeBodiesRef.current?.[i])}>
-                <circle cx={0} cy={0} r={46} style={{ fill: "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 * upp2 }} />
-                <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px` }}>
-                  {`${pct}%`}
-                </text>
+                onPointerDown={inert ? undefined : (e) => startDrag(e, badgeBodiesRef.current?.[i])}>
+                <circle cx={0} cy={0} r={46} style={{ fill: inert ? "#0c5b92" : "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 * upp2 }} />
+                {!inert && (
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                    {`${pct}%`}
+                  </text>
+                )}
               </g>
               );
             })}
@@ -1197,7 +1233,7 @@ export default function BreedTree({
                 <rect x={-L - pr} y={-pr} width={(L + pr) * 2} height={pr * 2} rx={pr}
                   style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: 2 * upp }} />
                 <text x={0} y={1 * upp} textAnchor="middle" dominantBaseline="central"
-                  style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${fs}px` }}>
+                  style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${fs}px`, pointerEvents: "none", userSelect: "none" }}>
                   {label}
                 </text>
               </g>
