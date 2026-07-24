@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:chumdata": "node scripts/build-chumdata.mjs"
+    "build:chumdata": "node scripts/build-chumdata.mjs",
+    "test:pickachum": "tsx scripts/test-pickachum.mjs"
   },
   "dependencies": {
     "d3-hierarchy": "^3.1.2",
@@ -29,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5",
     "xlsx": "^0.18.5"
   }
