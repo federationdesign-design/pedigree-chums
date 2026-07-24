@@ -441,6 +441,12 @@ export default function BreedTree({
   function zoom(d: Node) {
     // the pit stays live through a zoom: physics keeps running underneath
     // while the view flies in, and everything returns as the view pulls back
+    // If the visitor explored before the drop ever happened, re-arm the 2s
+    // countdown each time they come back to the full view, so the drop is
+    // delayed by curiosity rather than cancelled by it.
+    if (gravity && !fellRef.current && d === nodes[0]) {
+      window.setTimeout(() => { runFallRef.current?.(); }, 2000);
+    }
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
