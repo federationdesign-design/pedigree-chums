@@ -29,9 +29,12 @@ type Props = {
   fact?: string;
   lineage: LineageNode;
   onClose: () => void;
+  nextLevelLabel?: string;
+  onNextLevel?: () => void;
+  onStartOver?: () => void;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver }: Props) {
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [captionOpen, setCaptionOpen] = useState(false); // closed from the start
@@ -151,13 +154,15 @@ export default function LineageModal({ name, image, character, lineage, onClose 
         <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
           <div className={css.endFlash}>{phase === "won" ? "ROUND WON" : "GAME OVER"}</div>
           <div className={css.endBtns}>
-            {phase === "lost" && (
-              <button type="button" className={css.endBtn} onClick={replay}>Replay</button>
+            {phase === "lost" && onStartOver && (
+              <button type="button" className={css.endBtn} onClick={onStartOver}>Start again</button>
             )}
-            {phase === "won" && (
-              <button type="button" className={css.endBtn} onClick={replay}>Play again</button>
+            {phase === "won" && nextLevelLabel && onNextLevel && (
+              <button type="button" className={css.endBtn} onClick={onNextLevel}>{`Next level: ${nextLevelLabel}`}</button>
             )}
-            <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={onClose}>Close</button>
+            {(phase === "lost" || !nextLevelLabel || !onNextLevel) && (
+              <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={onClose}>Close</button>
+            )}
           </div>
         </div>
       )}

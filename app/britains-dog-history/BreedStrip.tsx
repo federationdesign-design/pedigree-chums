@@ -47,6 +47,29 @@ export default function BreedStrip({ era }: { era: string }) {
   };
   const [active, setActive] = useState<Active | null>(null);
 
+  // The mini pits are levels: every popup-capable breed, in timeline order
+  // across all eras. Round Won advances to the next; Game Over restarts at
+  // the very first.
+  const STRIP_ORDER = ["ancient-medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
+  const buildActive = (b: UKBreed): Active | null => {
+    const pn = resolveLineageName(b.name);
+    const lin = getLineage(pn);
+    if (!lin) return null;
+    const pk = packBreeds.find((x) => x.name === pn);
+    return { name: b.name, image: pk?.image ?? b.image ?? "", character: pk?.character ?? b.note, fact: pk?.fact, lineage: lin };
+  };
+  const levelList = ukBreeds
+    .slice()
+    .sort((a, b) => (STRIP_ORDER.indexOf(a.strip) - STRIP_ORDER.indexOf(b.strip)) || (a.anchor - b.anchor))
+    .filter((b) => {
+      const pn = resolveLineageName(b.name);
+      return !packBreeds.find((x) => x.name === pn)?.slug && !!getLineage(pn);
+    });
+  const nextLevelOf = (name: string): UKBreed | null => {
+    const i = levelList.findIndex((b) => b.name === name);
+    return i >= 0 && i + 1 < levelList.length ? levelList[i + 1] : null;
+  };
+
   const breeds: UKBreed[] = ukBreeds
     .filter((b) => b.strip === era)
     .sort((a, b) => a.anchor - b.anchor);
@@ -338,6 +361,17 @@ export default function BreedStrip({ era }: { era: string }) {
 
       {active && (
         <LineageModal
+          key={active.name}
+          nextLevelLabel={nextLevelOf(active.name)?.name}
+          onNextLevel={() => {
+            const nb = nextLevelOf(active.name);
+            const na = nb ? buildActive(nb) : null;
+            if (na) setActive(na);
+          }}
+          onStartOver={() => {
+            const fa = levelList[0] ? buildActive(levelList[0]) : null;
+            if (fa) setActive(fa);
+          }}
           name={active.name}
           image={active.image}
           character={active.character}

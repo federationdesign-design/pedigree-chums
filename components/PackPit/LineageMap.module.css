@@ -638,3 +638,9 @@
   background: var(--navy);
   color: var(--yellow);
 }
+
+/* Mini pit levels: a much stronger wash so the dotted frames read clearly
+   over the bright popup pit. Intuitive beats instructions. */
+.overlayStrong {
+  background: radial-gradient(120% 120% at 50% 40%, rgba(15, 110, 165, 0.62), rgba(8, 62, 100, 0.86));
+}

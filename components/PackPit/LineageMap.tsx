@@ -139,6 +139,17 @@ export default function LineageMap({
   currentScore?: number;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
+  const [rootGone, setRootGone] = useState(false);
+  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
+  useEffect(() => {
+    if (!circular) return;
+    const w = window as unknown as Record<string, unknown>;
+    if (typeof w["confetti"] === "function") { confettiRef.current = w["confetti"] as (o: Record<string, unknown>) => void; return; }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
+    script.onload = () => { confettiRef.current = w["confetti"] as (o: Record<string, unknown>) => void; };
+    document.head.appendChild(script);
+  }, [circular]);
   // Preload all images for instruction cards so they appear instantly when tapped
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name)) return;
@@ -627,14 +638,17 @@ export default function LineageMap({
     if (!circular || !framesDone || circularDoneRef.current) return;
     circularDoneRef.current = true;
     const t = window.setTimeout(() => {
-      burstAt(breed.x, breed.y, (rootRadius ?? ROOT) * 1.5);
-      for (let i = 0; i < 3; i++) {
-        const pid = puffSeq.current++;
-        const ox = (Math.random() - 0.5) * ROOT * 1.2, oy = (Math.random() - 0.5) * ROOT * 1.2;
-        setPuffs((p) => [...p, { id: pid, sx: breed.x + pan.x + ox, sy: breed.y + pan.y + oy }]);
-        window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
-      }
-      window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 500);
+      // the learnt circle vanishes on the spot and celebrates: confetti
+      // from its centre, the same effect as the name generator's winner
+      setRootGone(true);
+      confettiRef.current?.({
+        particleCount: 150,
+        spread: 100,
+        origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h },
+        colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"],
+        startVelocity: 45,
+      });
+      window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
     }, 650);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -952,6 +966,7 @@ export default function LineageMap({
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => {
+    if (rootGone) return null;
     const R = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
     const rx = cx, ry = cy; // root card stays in SVG content space; pan moves the whole tree including it
     const baseDeg = (cardLean * 180) / Math.PI;
@@ -1094,7 +1109,7 @@ export default function LineageMap({
   return (
     <>
     <div
-      className={styles.overlay}
+      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
