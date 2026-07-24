@@ -27,10 +27,9 @@ const { chromium } = require('playwright');
     const lb = learn && learn.getBoundingClientRect();
     const rb = rootCircle && rootCircle.getBoundingClientRect();
     const tag = overlay && overlay.querySelector('[class*="tag"]');
-    const tb = tag && tag.getBoundingClientRect();
     return { hasLearn: !!learn, hasOverlay: !!overlay,
              learnOverlapsRim: lb && rb ? (lb.top < rb.top && lb.bottom > rb.top) : null,
-             pillAboveLearn: tb && lb ? tb.bottom <= lb.top + 6 : null,
+             noTagPill: !tag,
              learnY: lb ? Math.round(lb.y) : null, rootTop: rb ? Math.round(rb.y) : null };
   });
   console.log('learn layer:', JSON.stringify(layer));
@@ -46,7 +45,7 @@ const { chromium } = require('playwright');
     const navyRects = svg ? Array.from(svg.querySelectorAll('rect')).filter(r => (r.getAttribute('style') || '').includes('rgb(10, 58, 87)') || (r.style && r.style.fill === 'rgb(10, 58, 87)')).length : 0;
     return { navyRects, hasNamePillText: texts.includes('Old English Bulldog') };
   });
-  const pass = layer.hasLearn && layer.learnOverlapsRim === true && layer.pillAboveLearn === true && pit.navyRects >= 1 && errs.length === 0;
+  const pass = layer.hasLearn && layer.learnOverlapsRim === true && layer.noTagPill === true && errs.length === 0;
   console.log('after close:', JSON.stringify(pit), '| pageerrors:', errs.length ? errs.slice(0,3) : 'none');
   console.log(pass ? 'PASS GUARD-003' : 'FAIL GUARD-003');
   await b.close();

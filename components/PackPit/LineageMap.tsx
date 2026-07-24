@@ -651,7 +651,7 @@ export default function LineageMap({
   // positions in client px; the pit gives pills a hit limit once they land.
   const circR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
   const emitCircularScatter = (includeNodes: boolean) => {
-    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y - circR - 96, w: tagW, name: breed.name }];
+    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y - circR, w: tagW, name: breed.name }];
     if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
     const vis = shown.filter((n) => n._parent);
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
@@ -1063,7 +1063,7 @@ export default function LineageMap({
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
       <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry - R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        {!INSTR_NAMES.has(breed.name) && (<g transform={circular ? `translate(0,${-(80 + tagH / 2)})` : undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={tagH / 2} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
+        {!INSTR_NAMES.has(breed.name) && !circular && (<g transform={undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={tagH / 2} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
         {!packed && !collecting && !framesDone ? (() => {
@@ -1165,7 +1165,7 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={circular ? `${styles.close} ${styles.closeCircular}` : styles.close} onClick={() => { if (circular && !circularDoneRef.current) emitCircularScatter(false); onClose(); }} aria-label="Close">
+      <button type="button" className={circular ? `${styles.close} ${styles.closeCircular}` : styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
