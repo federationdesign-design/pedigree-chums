@@ -645,13 +645,43 @@ export default function LineageMap({
   // No collect step: poof the card and its nodes out of existence, remove the
   // circle from the pit, and close, exactly like the instructional finish.
   const circularDoneRef = useRef(false);
+  // The Learn button rides the circle's bottom rim. If circle+button would sit
+  // off-screen (or under the top chrome), the whole assembly hops into view:
+  // the pit's pct-circle hop, verbatim shape (300ms, -sin(t*PI)*A*(1-t)),
+  // landing with the heavy-book dust poof.
+  useEffect(() => {
+    if (!circular) return;
+    const BTN_CLEAR = 118; // rim -> button bottom + breathing room
+    const M = 10;
+    const vh = typeof window !== "undefined" ? window.innerHeight : vp.h;
+    const cyNow = breed.y + pan.y;
+    const bottomOver = cyNow + circR + BTN_CLEAR - (vh - M);
+    const topOver = (M + 96) - (cyNow - circR);
+    const dy = bottomOver > 0 ? bottomOver : topOver > 0 ? -topOver : 0;
+    if (!dy) return;
+    const oy = pan.y;
+    const A = Math.max(14, Math.min(44, Math.abs(dy) * 0.18));
+    const t0 = performance.now();
+    let raf = 0;
+    const stepA = (now: number) => {
+      const t = Math.min(1, (now - t0) / 300);
+      setPan((p) => ({ ...p, y: oy - dy * t - Math.sin(t * Math.PI) * A * (1 - t) }));
+      if (t < 1) { raf = requestAnimationFrame(stepA); return; }
+      const pid = puffSeq.current++;
+      setPuffs((p) => [...p, { id: pid, sx: breed.x + pan.x, sy: breed.y + oy - dy + circR }]);
+      window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+    };
+    raf = requestAnimationFrame(stepA);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [circular]);
   const [scattered, setScattered] = useState(false);
   // Mini pit: the tag pill (and on Complete, every node and rod) tips into the
   // pit as live physics objects, main-pit style. Positions are CURRENT layer
   // positions in client px; the pit gives pills a hit limit once they land.
   const circR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
   const emitCircularScatter = (includeNodes: boolean) => {
-    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y - circR, w: tagW, name: breed.name }];
+    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y + circR, w: tagW, name: breed.name }];
     if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
     const vis = shown.filter((n) => n._parent);
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
@@ -1062,7 +1092,7 @@ export default function LineageMap({
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
-      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry - R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
+      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry + R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         {!INSTR_NAMES.has(breed.name) && !circular && (<g transform={undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={tagH / 2} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
@@ -1086,7 +1116,7 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${circular ? -18 : 62})`}
+            transform={`translate(0,${circular ? 56 : 62})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
@@ -1116,7 +1146,7 @@ export default function LineageMap({
         {circular && framesDone && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,-18)`}
+            transform={`translate(0,56)`}
             onClick={(e) => { e.stopPropagation(); circularComplete(); }}
             role="button"
             aria-label="Complete"

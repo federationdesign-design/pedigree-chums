@@ -19,7 +19,7 @@ const { chromium } = require('playwright');
   });
   if (!c) { console.log('NO CIRCLE'); process.exit(1); }
   await p.mouse.click(c.x, c.y);
-  await p.waitForTimeout(1800);
+  await p.waitForTimeout(2400);
   const layer = await p.evaluate(() => {
     const learn = document.querySelector('[aria-label="Learn"]');
     const overlay = document.querySelector('[class*="overlayStrong"]');
@@ -28,9 +28,10 @@ const { chromium } = require('playwright');
     const rb = rootCircle && rootCircle.getBoundingClientRect();
     const tag = overlay && overlay.querySelector('[class*="tag"]');
     return { hasLearn: !!learn, hasOverlay: !!overlay,
-             learnOverlapsRim: lb && rb ? (lb.top < rb.top && lb.bottom > rb.top) : null,
+             learnBelowCircle: lb && rb ? lb.top >= rb.bottom - 40 : null,
+             learnInViewport: lb ? (lb.bottom <= window.innerHeight - 2 && lb.top >= 0) : null,
              noTagPill: !tag,
-             learnY: lb ? Math.round(lb.y) : null, rootTop: rb ? Math.round(rb.y) : null };
+             learnY: lb ? Math.round(lb.y) : null, rootBottom: rb ? Math.round(rb.bottom) : null };
   });
   console.log('learn layer:', JSON.stringify(layer));
   await p.evaluate(() => {
@@ -45,7 +46,7 @@ const { chromium } = require('playwright');
     const navyRects = svg ? Array.from(svg.querySelectorAll('rect')).filter(r => (r.getAttribute('style') || '').includes('rgb(10, 58, 87)') || (r.style && r.style.fill === 'rgb(10, 58, 87)')).length : 0;
     return { navyRects, hasNamePillText: texts.includes('Old English Bulldog') };
   });
-  const pass = layer.hasLearn && layer.learnOverlapsRim === true && layer.noTagPill === true && errs.length === 0;
+  const pass = layer.hasLearn && layer.learnBelowCircle === true && layer.learnInViewport === true && layer.noTagPill === true && errs.length === 0;
   console.log('after close:', JSON.stringify(pit), '| pageerrors:', errs.length ? errs.slice(0,3) : 'none');
   console.log(pass ? 'PASS GUARD-003' : 'FAIL GUARD-003');
   await b.close();
