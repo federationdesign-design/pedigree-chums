@@ -599,6 +599,15 @@
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
 }
 
+/* On very wide / full-screen viewports the plinth clip makes the video column
+   much taller than the text column, so hide it past this width. Adjust the
+   2000px value to taste. */
+@media (min-width: 2000px) {
+  .plinthVideo {
+    display: none;
+  }
+}
+
 .videoFrame {
   position: absolute;
   inset: 0;
