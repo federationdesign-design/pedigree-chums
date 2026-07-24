@@ -1,0 +1,354 @@
+/* Pick a Chum visual layer. Built to the client mock-ups: blue focus wash,
+   rounded white command bar and response panel, blue dialogue, green GO and a
+   circular blue-ringed portrait medallion. Hard (unblurred) shadows, restrained
+   radii on the panel. Tokens are scoped here, not global. */
+
+.launcher,
+.root {
+  --pc-ui-blue: #00a9ef;
+  --pc-ui-navy: #112242;
+  --pc-ui-yellow: #ffe868;
+  --pc-ui-green: #0a7d2f;
+  --pc-ui-cream: #faf9f4;
+  --pc-focus-wash: rgba(0, 169, 239, 0.7);
+  --pc-dialogue: #0a5b8f;
+  --pc-shadow: 4px 4px 0 rgba(17, 34, 66, 0.22);
+}
+
+/* ---- Closed launcher ---- */
+.launcher {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--pc-ui-blue);
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 0 4px var(--pc-ui-blue), var(--pc-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9998;
+  color: #ffffff;
+}
+.launcher:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 3px;
+}
+
+/* ---- Overlay root ---- */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+.wash {
+  position: absolute;
+  inset: 0;
+  background: var(--pc-focus-wash);
+  z-index: 0;
+}
+.close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  color: var(--pc-ui-navy);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: var(--pc-shadow);
+}
+.close:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+
+/* ---- Radial selector ---- */
+.selectorWrap {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2;
+}
+.selector {
+  position: relative;
+  width: 220px;
+  height: 250px;
+  transform-origin: bottom right;
+}
+.connectors {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.connectors line {
+  stroke: #ffffff;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.dogBtn {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  background-color: var(--pc-ui-blue);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  box-shadow: var(--pc-shadow);
+  z-index: 2;
+  transition: transform 180ms ease;
+}
+.dogBtn:hover,
+.dogBtn:focus-visible {
+  transform: scale(1.08);
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+.dog0 { left: 52px; top: 162px; }
+.dog1 { left: 12px; top: 102px; }
+.dog2 { left: 32px; top: 32px; }
+.dog3 { left: 112px; top: 7px; }
+.randomBtn {
+  position: absolute;
+  left: 148px;
+  top: 178px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--pc-ui-blue);
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 0 4px var(--pc-ui-blue), var(--pc-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  z-index: 3;
+}
+.randomBtn:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 3px;
+}
+
+/* ---- Lower-screen dialogue HUD ---- */
+.stage {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(880px, calc(100vw - 48px));
+  display: flex;
+  align-items: flex-end;
+  z-index: 2;
+}
+.portrait {
+  flex: none;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 6px solid var(--pc-ui-blue);
+  background-color: var(--pc-ui-blue);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 0 4px #ffffff, var(--pc-shadow);
+  margin-right: -22px;
+  margin-bottom: -8px;
+  z-index: 2;
+}
+.panelCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.commandBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 58px;
+  padding: 0 10px 0 26px;
+  background: #ffffff;
+  border-radius: 30px;
+  box-shadow: var(--pc-shadow);
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body, sans-serif);
+  font-size: 18px;
+  color: var(--pc-ui-navy);
+}
+.input::placeholder {
+  color: #7a8aa0;
+}
+.go {
+  border: none;
+  background: transparent;
+  color: var(--pc-ui-green);
+  font-family: var(--font-display, sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0 16px;
+  cursor: pointer;
+}
+.go:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.userLine {
+  font-family: var(--font-body, sans-serif);
+  font-size: 18px;
+  color: var(--pc-ui-navy);
+  padding-left: 0;
+}
+.responsePanel {
+  position: relative;
+  min-height: 112px;
+  padding: 16px 24px 18px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+}
+.nameplate {
+  font-family: var(--font-display, sans-serif);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--pc-ui-blue);
+  margin-bottom: 6px;
+}
+.dialogue {
+  margin: 0;
+  font-family: var(--font-body, sans-serif);
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--pc-dialogue);
+}
+.continueMarker {
+  position: absolute;
+  right: 18px;
+  bottom: 12px;
+  color: var(--pc-ui-blue);
+  font-size: 16px;
+  animation: pcBlink 900ms steps(2, start) infinite;
+}
+.commands {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.command {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  border: none;
+  background: none;
+  font-family: var(--font-body, sans-serif);
+  font-size: 18px;
+  color: var(--pc-ui-blue);
+  text-decoration: none;
+  text-align: left;
+  padding: 3px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.command:hover,
+.command:focus-visible {
+  background: var(--pc-ui-yellow);
+  color: var(--pc-ui-navy);
+  outline: none;
+}
+.pointer {
+  color: var(--pc-ui-navy);
+  font-weight: 800;
+}
+
+@keyframes pcBlink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 480px) {
+  .launcher {
+    right: 16px;
+    bottom: 16px;
+    width: 60px;
+    height: 60px;
+  }
+  .selectorWrap {
+    right: 16px;
+    bottom: 16px;
+  }
+  .selector {
+    transform: scale(0.8);
+  }
+  .stage {
+    bottom: 14px;
+    width: calc(100vw - 24px);
+    align-items: flex-end;
+  }
+  .portrait {
+    width: 88px;
+    height: 88px;
+    border-width: 5px;
+    margin-right: -16px;
+  }
+  .commandBar {
+    height: 50px;
+    padding-left: 18px;
+  }
+  .input,
+  .userLine {
+    font-size: 16px;
+  }
+  .dialogue {
+    font-size: 16px;
+  }
+  .responsePanel {
+    min-height: 96px;
+    padding: 14px 18px;
+  }
+}
+
+/* ---- Short-height screens ---- */
+@media (max-height: 620px) {
+  .portrait {
+    width: 104px;
+    height: 104px;
+  }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .dogBtn {
+    transition: none;
+  }
+  .continueMarker {
+    animation: none;
+  }
+}

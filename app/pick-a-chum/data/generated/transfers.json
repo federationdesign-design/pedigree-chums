@@ -3,88 +3,125 @@
     "transferId": "TR001",
     "from": "Collie",
     "to": "Labrador",
+    "strongTriggersProse": "Food, snacks and casual eating talk",
     "strongTriggers": [
-      "Food, snacks and casual eating talk"
+      "food",
+      "snack",
+      "biscuit",
+      "sausage",
+      "bacon",
+      "cheese",
+      "hungry",
+      "pizza"
     ],
-    "exclusions": "food|snack|biscuit|sausage|bacon|cheese|hungry|pizza",
-    "exampleLine": "Dog-health or toxicity questions; delivery cost; Collie-specific diet question",
-    "contextCarried": "Food detected. I could continue, but professional integrity requires a Labrador."
+    "exclusions": "Dog-health or toxicity questions; delivery cost; Collie-specific diet question",
+    "exampleLine": "Food detected. I could continue, but professional integrity requires a Labrador.",
+    "contextCarried": "Carry original food term and any product interest."
   },
   {
     "transferId": "TR002",
     "from": "Collie",
     "to": "Boxer",
+    "strongTriggersProse": "Explicit request for a joke or deliberately silly entertainment",
     "strongTriggers": [
-      "Explicit request for a joke or deliberately silly entertainment"
+      "joke",
+      "make me laugh",
+      "knock knock",
+      "silly"
     ],
-    "exclusions": "joke|make me laugh|knock knock|silly",
-    "exampleLine": "Serious safety or factual questions containing the word funny",
-    "contextCarried": "This requires the comedy operator. Standards may fall during transfer."
+    "exclusions": "Serious safety or factual questions containing the word funny",
+    "exampleLine": "This requires the comedy operator. Standards may fall during transfer.",
+    "contextCarried": "Boxer opens on the requested joke type."
   },
   {
     "transferId": "TR003",
     "from": "Collie",
     "to": "Border Terrier",
+    "strongTriggersProse": "Investigation, odd history or suspicious detail",
     "strongTriggers": [
-      "Investigation, odd history or suspicious detail"
+      "dig",
+      "investigate",
+      "strange history",
+      "Good Dog Bad Dog",
+      "ratting",
+      "mystery"
     ],
-    "exclusions": "dig|investigate|strange history|Good Dog Bad Dog|ratting|mystery",
-    "exampleLine": "General British history that Collie can answer",
-    "contextCarried": "You need the investigative department. Try not to encourage him."
+    "exclusions": "General British history that Collie can answer",
+    "exampleLine": "You need the investigative department. Try not to encourage him.",
+    "contextCarried": "Carry the topic and desired page."
   },
   {
     "transferId": "TR004",
     "from": "Labrador",
     "to": "Collie",
+    "strongTriggersProse": "Mathematics, structured general knowledge or planning",
     "strongTriggers": [
-      "Mathematics, structured general knowledge or planning"
+      "maths",
+      "calculate",
+      "capital",
+      "science question",
+      "organise"
     ],
-    "exclusions": "maths|calculate|capital|science question|organise",
-    "exampleLine": "Food arithmetic or simple product price question",
-    "contextCarried": "This sounds clever again. I’m sending you back to the clever one."
+    "exclusions": "Food arithmetic or simple product price question",
+    "exampleLine": "This sounds clever again. I’m sending you back to the clever one.",
+    "contextCarried": "Returning Collie acknowledges Labrador's referral."
   },
   {
     "transferId": "TR005",
     "from": "Labrador",
     "to": "Border Terrier",
+    "strongTriggersProse": "Deep history, suspicious objects or investigation",
     "strongTriggers": [
-      "Deep history, suspicious objects or investigation"
+      "history",
+      "mystery",
+      "dig",
+      "weird fact"
     ],
-    "exclusions": "history|mystery|dig|weird fact",
-    "exampleLine": "Labrador work and detection stories",
-    "contextCarried": "I’ve got a friend who loves digging into things. Sometimes literally."
+    "exclusions": "Labrador work and detection stories",
+    "exampleLine": "I’ve got a friend who loves digging into things. Sometimes literally.",
+    "contextCarried": "Carry exact subject."
   },
   {
     "transferId": "TR006",
     "from": "Border Terrier",
     "to": "Collie",
+    "strongTriggersProse": "Formal general knowledge, rules or structured navigation",
     "strongTriggers": [
-      "Formal general knowledge, rules or structured navigation"
+      "rules",
+      "calculate",
+      "where is",
+      "how do I"
     ],
-    "exclusions": "rules|calculate|where is|how do I",
-    "exampleLine": "Terrier's own history routes",
-    "contextCarried": "That needs the organised one, mate. Don’t tell him I said that."
+    "exclusions": "Terrier's own history routes",
+    "exampleLine": "That needs the organised one, mate. Don’t tell him I said that.",
+    "contextCarried": "Collie may say 'You again.'"
   },
   {
     "transferId": "TR007",
     "from": "Border Terrier",
     "to": "Boxer",
+    "strongTriggersProse": "Jokes or escalating nonsense",
     "strongTriggers": [
-      "Jokes or escalating nonsense"
+      "joke",
+      "silly",
+      "nonsense",
+      "cat joke"
     ],
-    "exclusions": "joke|silly|nonsense|cat joke",
-    "exampleLine": "Mild insults that Terrier can handle",
-    "contextCarried": "I know a dog with absolutely no standards. Perfect for this."
+    "exclusions": "Mild insults that Terrier can handle",
+    "exampleLine": "I know a dog with absolutely no standards. Perfect for this.",
+    "contextCarried": "Boxer continues without greeting."
   },
   {
     "transferId": "TR008",
     "from": "Any",
     "to": "Boxer",
+    "strongTriggersProse": "Hidden session ceiling or deliberate comic ending",
     "strongTriggers": [
-      "Hidden session ceiling or deliberate comic ending"
+      "session_count >= 20",
+      "ending flag"
     ],
-    "exclusions": "session_count >= 20|ending flag",
-    "exampleLine": "Safety response in progress",
-    "contextCarried": "I’ll transfer you to our final operator."
+    "exclusions": "Safety response in progress",
+    "exampleLine": "I’ll transfer you to our final operator.",
+    "contextCarried": "Boxer performs cut-off routine."
   }
 ]

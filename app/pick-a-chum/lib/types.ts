@@ -80,6 +80,7 @@ export interface DogRecord {
   name: string;
   slug: string;
   detailUrl: string;
+  image: string;
   character: string;
   temperament: string[];
   lifespanYears: number | null;

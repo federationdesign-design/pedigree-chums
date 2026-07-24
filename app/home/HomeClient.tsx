@@ -131,7 +131,7 @@ export default function HomeClient() {
             Pedigree <span>Chums</span>
           </h2>
           <p className={styles.productDesc}>
-            The on-the-go dog spotting game for curious minds and dog lovers. 54 illustrated breed cards packed with traits, stats, and tell-tale features. Spot a dog. Call it out. Claim your chum.
+            The on-the-go <span className={styles.productDescHi}>dog spotting game</span> for curious minds and dog lovers. <span className={styles.productDescHi}>54 illustrated breed cards</span> packed with traits, stats, and tell-tale features. <span className={styles.productDescHi}>Spot a dog. Make a friend, you have a new chum.</span>
           </p>
           <div className={styles.productMeta}>
             <div className={styles.metaItem}>

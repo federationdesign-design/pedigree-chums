@@ -75,13 +75,64 @@ const isPlaceholderUrl = (v) => /^\[.*\]$/.test(clean(v)) || clean(v) === '';
 // the header is located by content (best overlap with the configured column
 // names) rather than a fixed index, which survives blank-row trimming and small
 // layout edits. `headerRow` may be pinned explicitly (e.g. Lists at row 0).
-function readSheet(wb, sheetName, { headerRow, columns, arrays = {}, required = [], idKey } = {}) {
+function readSheet(wb, sheetName, { headerRow, columns, arrays = {}, required = [], idKey, byPosition, anchor } = {}) {
   const ws = wb.Sheets[sheetName];
   if (!ws) {
     warn(`sheet "${sheetName}" not found in workbook`);
     return [];
   }
   const grid = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+  // Positional read: some sheets have a data column with no header label (the
+  // Transfers sheet has an unlabelled trigger-patterns column), which shifts
+  // header-based mapping. For those, map by column index instead, anchoring the
+  // header row on a few known labels.
+  if (byPosition) {
+    const want = anchor || [];
+    let best = -1;
+    let bestScore = 0;
+    for (let r = 0; r < Math.min(grid.length, 10); r++) {
+      const cells = (grid[r] || []).map(clean);
+      const score = want.filter((w) => cells.includes(w)).length;
+      if (score > bestScore) {
+        bestScore = score;
+        best = r;
+      }
+    }
+    if (best < 0) {
+      warn(`sheet "${sheetName}" has no locatable header row`);
+      return [];
+    }
+    const out = [];
+    for (let r = best + 1; r < grid.length; r++) {
+      const row = grid[r] || [];
+      const rec = {};
+      let anyValue = false;
+      for (const spec of byPosition) {
+        const raw = clean(row[spec.i]);
+        if (raw) anyValue = true;
+        rec[spec.key] = spec.split ? splitList(row[spec.i], spec.split) : raw;
+      }
+      if (!anyValue) continue;
+      const missing = required.filter((k) => {
+        const val = rec[k];
+        return Array.isArray(val) ? val.length === 0 : !val;
+      });
+      if (missing.length) {
+        warn(`sheet "${sheetName}" row ${r + 1}: missing required [${missing.join(', ')}] -> row skipped`);
+        continue;
+      }
+      out.push(rec);
+    }
+    if (idKey) {
+      const seen = new Set();
+      for (const rec of out) {
+        if (seen.has(rec[idKey])) warn(`sheet "${sheetName}" duplicate ${idKey} "${rec[idKey]}"`);
+        seen.add(rec[idKey]);
+      }
+    }
+    return out;
+  }
 
   if (headerRow == null) {
     const wanted = columns ? Object.keys(columns) : [];
@@ -303,19 +354,23 @@ const SHEETS = {
     },
   },
   transfers: {
+    // The Transfers sheet has an unlabelled trigger-patterns column (E), so read
+    // it positionally: A id, B from, C to, D prose triggers, E pattern triggers,
+    // F exclusions, G example line, H context carried.
     sheet: 'Transfers',
     idKey: 'transferId',
     required: ['transferId', 'from', 'to'],
-    arrays: { strongTriggers: /\|/ },
-    columns: {
-      'Transfer ID': 'transferId',
-      From: 'from',
-      To: 'to',
-      'Strong triggers': 'strongTriggers',
-      'Exclusions / higher-priority checks': 'exclusions',
-      'Example transfer line': 'exampleLine',
-      'Context carried': 'contextCarried',
-    },
+    anchor: ['Transfer ID', 'From', 'To', 'Example transfer line'],
+    byPosition: [
+      { key: 'transferId', i: 0 },
+      { key: 'from', i: 1 },
+      { key: 'to', i: 2 },
+      { key: 'strongTriggersProse', i: 3 },
+      { key: 'strongTriggers', i: 4, split: /\|/ },
+      { key: 'exclusions', i: 5 },
+      { key: 'exampleLine', i: 6 },
+      { key: 'contextCarried', i: 7 },
+    ],
   },
   'mini-games': {
     sheet: 'Mini Games',
