@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import VideoGrid from "../../components/VideoGrid/VideoGrid";
+import AnubisFeature from "../../components/AnubisFeature/AnubisFeature";
 import styles from "./home.module.css";
 import { breeds } from "../../data/breeds";
 
@@ -58,8 +59,12 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* 3 x 2 grid of breed videos */}
-      <VideoGrid />
+      {/* 3 x 2 grid of breed videos, with the Anubis feature below it on desktop
+          and above it on mobile. */}
+      <div className={styles.videoBlock}>
+        <VideoGrid />
+        <AnubisFeature />
+      </div>
 
       {/* Search hero */}
       <section className={styles.searchHero}>
@@ -82,6 +87,14 @@ export default function HomeClient() {
             autoComplete="off"
             spellCheck={false}
           />
+          <button
+            type="button"
+            className={styles.searchGo}
+            onClick={goToTopMatch}
+            aria-label="Go"
+          >
+            GO
+          </button>
           {open && query.trim().length > 0 && (
             <div className={styles.dropdown}>
               {filtered.length > 0 ? filtered.map((b) => (
@@ -105,14 +118,6 @@ export default function HomeClient() {
             </div>
           )}
         </div>
-        <button
-          type="button"
-          className={styles.searchBtn}
-          onClick={goToTopMatch}
-          disabled={filtered.length === 0}
-        >
-          Search
-        </button>
       </section>
 
 

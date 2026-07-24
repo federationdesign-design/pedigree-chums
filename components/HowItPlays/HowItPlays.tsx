@@ -15,9 +15,7 @@ const STEPS: Step[] = [
 ];
 
 export default function HowItPlays() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
@@ -41,129 +39,134 @@ export default function HowItPlays() {
     return () => io.disconnect();
   }, []);
 
-  // Sticky pin: freeze the section and translate the card row horizontally with
-  // vertical scroll (left-aligned, several cards visible), then release.
+  // Desktop: convert a vertical wheel into horizontal scroll of the card rail,
+  // holding the page until every card has passed, then release. Mobile scrolls
+  // the rail natively (touch swipe). No pinned/reserved space, so the bento
+  // below stays tight to the cards.
   useEffect(() => {
-    const section = sectionRef.current;
-    const pin = pinRef.current;
-    const stage = stageRef.current;
-    const rail = railRef.current;
+    const wrap = wrapRef.current;
+    const el = railRef.current;
+    if (!wrap || !el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (delta === 0) return;
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 0) return;
+      if (delta > 0) {
+        if (el.scrollLeft >= max) return; // all cards passed -> page continues
+        e.preventDefault();
+        el.scrollLeft = Math.min(el.scrollLeft + delta, max);
+      } else {
+        if (el.scrollLeft <= 0) return; // back at the start -> page scrolls up
+        e.preventDefault();
+        el.scrollLeft = Math.max(el.scrollLeft + delta, 0);
+      }
+    };
+
+    wrap.addEventListener("wheel", onWheel, { passive: false });
+    return () => wrap.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // Yellow progress bar (above the cards): reflects scroll position and is
+  // draggable to scrub the row.
+  useEffect(() => {
+    const el = railRef.current;
     const track = trackRef.current;
     const thumb = thumbRef.current;
-    if (!section || !pin || !stage || !rail) return;
+    if (!el || !track || !thumb) return;
 
-    // overflow-x: hidden on <html>/<body> breaks position: sticky; clip does
-    // not. The build downlevels CSS clip -> hidden, so set it at runtime.
-    const root = document.documentElement;
-    const body = document.body;
-    const prevRootOX = root.style.overflowX;
-    const prevBodyOX = body.style.overflowX;
-    if (typeof CSS !== "undefined" && CSS.supports?.("overflow-x", "clip")) {
-      root.style.overflowX = "clip";
-      body.style.overflowX = "clip";
-    }
-
-    let distance = 0;
-    let raf = 0;
-
-    const update = () => {
-      if (distance <= 0) {
-        rail.style.transform = "none";
-        if (track) track.style.opacity = "0";
-        return;
-      }
-      const rect = section.getBoundingClientRect();
-      const scrolled = Math.min(Math.max(-rect.top, 0), distance);
-      rail.style.transform = `translate3d(${-scrolled}px, 0, 0)`;
-      if (track && thumb) {
-        track.style.opacity = "1";
-        const maxLeft = Math.max(0, track.clientWidth - thumb.offsetWidth);
-        thumb.style.left = `${(scrolled / distance) * maxLeft}px`;
-      }
+    const sync = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 1) { track.style.opacity = "0"; return; }
+      track.style.opacity = "1";
+      const w = Math.min(1, el.clientWidth / el.scrollWidth);
+      thumb.style.width = `${w * 100}%`;
+      thumb.style.left = `${(el.scrollLeft / el.scrollWidth) * 100}%`;
     };
 
-    const layout = () => {
-      distance = Math.max(0, rail.offsetWidth - stage.clientWidth);
-      // Pin keeps its natural (content) height and is top-anchored, so the
-      // cards sit near the top of the viewport while the row scrolls, and the
-      // bento follows right after the pin rather than a full screen later.
-      const pinH = pin.offsetHeight;
-      if (distance > 0) {
-        section.style.height = `${pinH + distance}px`;
-      } else {
-        section.style.height = "";
-      }
-      update();
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+    const onDown = (e: PointerEvent) => {
+      dragging = true;
+      startX = e.clientX;
+      startScroll = el.scrollLeft;
+      thumb.setPointerCapture(e.pointerId);
+      e.preventDefault();
     };
-
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(() => { raf = 0; update(); });
+    const onMove = (e: PointerEvent) => {
+      if (!dragging) return;
+      const trackW = track.clientWidth || 1;
+      const max = el.scrollWidth - el.clientWidth;
+      const next = startScroll + ((e.clientX - startX) / trackW) * el.scrollWidth;
+      el.scrollLeft = Math.max(0, Math.min(next, max));
     };
+    const onUp = () => { dragging = false; };
 
-    layout();
-    requestAnimationFrame(() => requestAnimationFrame(layout));
-    if (document.fonts?.ready) document.fonts.ready.then(layout).catch(() => {});
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", layout);
-    const ro = new ResizeObserver(layout);
-    ro.observe(rail);
-    ro.observe(section);
+    sync();
+    el.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    thumb.addEventListener("pointerdown", onDown);
+    thumb.addEventListener("pointermove", onMove);
+    thumb.addEventListener("pointerup", onUp);
+    thumb.addEventListener("pointercancel", onUp);
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", layout);
+      el.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+      thumb.removeEventListener("pointerdown", onDown);
+      thumb.removeEventListener("pointermove", onMove);
+      thumb.removeEventListener("pointerup", onUp);
+      thumb.removeEventListener("pointercancel", onUp);
       ro.disconnect();
-      if (raf) cancelAnimationFrame(raf);
-      root.style.overflowX = prevRootOX;
-      body.style.overflowX = prevBodyOX;
     };
   }, []);
 
   return (
     <div className={styles.root}>
-      <section ref={sectionRef} className={styles.section}>
-        <div ref={pinRef} className={styles.pin}>
-          <h2 className={styles.heading}>
-            How it <span className={styles.headingYellow}>plays</span>
-          </h2>
+      <div className={styles.module}>
+        <h2 className={styles.heading}>
+          How it <span className={styles.headingYellow}>plays</span>
+        </h2>
 
-          {/* Progress bar sits above the cards so they hug the bento below. */}
-          <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
-            <div ref={thumbRef} className={styles.thumb} />
-          </div>
+        {/* Progress bar sits above the cards. */}
+        <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
+          <div ref={thumbRef} className={styles.thumb} />
+        </div>
 
-          <div ref={stageRef} className={styles.stage}>
-            <div ref={railRef} className={styles.rail}>
-              {STEPS.map((s, i) => (
-                <figure key={s.n} data-card className={styles.card}>
-                  <div className={styles.badge}>{s.n}</div>
-                  <div className={styles.media}>
-                    {s.video ? (
-                      <video
-                        ref={(el) => { videoRefs.current[i] = el; }}
-                        src={s.video}
-                        poster={s.img}
-                        muted
-                        loop
-                        playsInline
-                        preload="auto"
-                        className={styles.mediaInner}
-                      />
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.img} alt={`Step ${s.n}`} className={styles.mediaInner} />
-                    )}
-                  </div>
-                  <figcaption className={styles.caption}>{s.caption}</figcaption>
-                </figure>
-              ))}
-            </div>
+        <div ref={wrapRef} className={styles.wrap}>
+          <div ref={railRef} className={styles.rail}>
+            {STEPS.map((s, i) => (
+              <figure key={s.n} data-card className={styles.card}>
+                <div className={styles.badge}>{s.n}</div>
+                <div className={styles.media}>
+                  {s.video ? (
+                    <video
+                      ref={(el) => { videoRefs.current[i] = el; }}
+                      src={s.video}
+                      poster={s.img}
+                      muted
+                      loop
+                      playsInline
+                      preload="auto"
+                      className={styles.mediaInner}
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={s.img} alt={`Step ${s.n}`} className={styles.mediaInner} />
+                  )}
+                </div>
+                <figcaption className={styles.caption}>{s.caption}</figcaption>
+              </figure>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Bento sits directly beneath, so it rises in as the sequence releases. */}
+      {/* Bento sits directly beneath the cards, tight (no reserved gap). */}
       <div className={styles.bento}>
         <BentoBoard />
       </div>

@@ -1,32 +1,17 @@
-/* One container for the whole "How it plays" module (sequence + bento). */
+/* One container for the whole "How it plays" module (cards + bento). Normal
+   flow — no pinned/reserved space — so the bento stays tight under the cards. */
 .root {
   position: relative;
 }
 
-/* Tall spacer: height (viewport + horizontal overflow) is set in HowItPlays.tsx
-   so the sticky pin has scroll room to translate the card row. */
-.section {
-  position: relative;
-}
-
-/* Pinned viewport. Top-anchored (its own content height) so the cards sit near
-   the top of the screen as the row scrolls, and the horizontal scroll engages
-   as the cards reach the top. */
-.pin {
-  position: sticky;
-  top: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(20px, 3vw, 40px) 0 clamp(10px, 1.4vw, 18px);
-  box-sizing: border-box;
+.module {
+  padding: clamp(28px, 5vw, 64px) 0 clamp(10px, 1.4vw, 20px);
 }
 
 .heading {
-  flex: none;
   margin: 0 0 clamp(10px, 1.4vw, 18px);
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(36px, 5.4vw, 76px);
+  font-size: clamp(40px, 6vw, 84px);
   line-height: 1.02;
   color: #ffffff;
   text-align: center;
@@ -37,10 +22,9 @@
 /* Progress bar — short, centred, ABOVE the cards. */
 .scrollbar {
   position: relative;
-  flex: none;
   width: clamp(180px, 28vw, 360px);
   height: 10px;
-  margin: 0 auto clamp(16px, 2vw, 28px);
+  margin: 0 auto clamp(20px, 2.4vw, 32px);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.22);
   opacity: 0;
@@ -51,29 +35,35 @@
   top: 0;
   bottom: 0;
   left: 0;
-  width: clamp(48px, 22%, 90px);
+  width: 30%;
+  min-width: 48px;
   border-radius: 999px;
   background: var(--yellow, #ffd23e);
+  cursor: grab;
+  touch-action: none;
+}
+.thumb:active { cursor: grabbing; }
+
+.wrap {
+  position: relative;
 }
 
-/* The row band; the rail is translated across it, several cards visible. */
-.stage {
-  flex: none;
-  width: 100%;
-  overflow: hidden;
-}
+/* The horizontally-scrolling card rail (native scroll; wheel-hijacked on
+   desktop). Top padding gives the number badges room to sit above the frames
+   without being clipped; left/right padding matches the bento so card 1 lines
+   up with it. */
 .rail {
   display: flex;
   flex-wrap: nowrap;
   align-items: flex-start;
-  width: max-content;
   gap: clamp(24px, 3vw, 48px);
-  /* Left padding matches the bento below so card 1 lines up with it. Top
-     padding gives the number badges room to sit above the frame without being
-     clipped by the stage's overflow. */
-  padding: clamp(40px, 4.5vw, 58px) clamp(20px, 6vw, 80px) 0;
-  will-change: transform;
+  padding: clamp(40px, 4.5vw, 58px) clamp(20px, 6vw, 80px) clamp(8px, 1.2vw, 16px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.rail::-webkit-scrollbar { display: none; }
 
 .card {
   position: relative;
@@ -82,18 +72,16 @@
   display: flex;
   flex-direction: column;
   background: #ffed00;
-  /* Chunky yellow frame (was 6px). */
+  /* Chunky yellow frame. */
   border: 14px solid #ffed00;
   border-radius: 22px;
   box-shadow: 0 12px 36px rgba(10, 58, 87, 0.24);
 }
 
-/* Square media (matches the square source videos), ~25% smaller than before.
-   Capped against the viewport height so the top-anchored pin never runs off a
-   short screen. */
+/* Square media (matches the square source videos). */
 .media {
   position: relative;
-  width: clamp(220px, min(30vw, calc(100svh - 420px)), 440px);
+  width: clamp(240px, 30vw, 440px);
   aspect-ratio: 1 / 1;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
@@ -108,7 +96,7 @@
   display: block;
 }
 
-/* Taller yellow caption band with much bigger text. */
+/* Yellow caption band with big text. */
 .caption {
   flex: none;
   padding: clamp(16px, 1.8vw, 30px) 14px clamp(18px, 2vw, 32px);
@@ -120,7 +108,7 @@
   letter-spacing: 0.02em;
 }
 
-/* Big blue number sticker, ~3x the old size. */
+/* Big blue number sticker, on top of and outside the frame. */
 .badge {
   position: absolute;
   top: -30px;
@@ -139,20 +127,17 @@
   z-index: 2;
 }
 
-/* Bento immediately below, so it rises in tight as the sequence releases. */
+/* Bento immediately below the cards — tight. */
 .bento {
   padding: clamp(6px, 1.2vw, 16px) clamp(20px, 6vw, 80px) clamp(48px, 8vw, 96px);
 }
 
 @media (max-width: 700px) {
-  .pin {
-    padding-top: 72px;
-  }
   .heading {
-    font-size: clamp(28px, 8vw, 44px);
+    font-size: clamp(30px, 8vw, 44px);
   }
   .media {
-    width: clamp(190px, min(66vw, calc(100svh - 360px)), 300px);
+    width: clamp(200px, 66vw, 300px);
   }
   .badge {
     width: clamp(84px, 22vw, 120px);
@@ -163,5 +148,8 @@
   }
   .caption {
     font-size: clamp(18px, 5vw, 26px);
+  }
+  .rail {
+    padding-top: clamp(30px, 8vw, 44px);
   }
 }
