@@ -1,0 +1,215 @@
+[
+  {
+    "bucketId": "B01",
+    "bucket": "Buying, launch, price and discount",
+    "relatedLayer": "2",
+    "exampleInputs": [
+      "Where do I buy?",
+      "How much is it?",
+      "I want one",
+      "Is it out yet?",
+      "Sign me up"
+    ],
+    "detectionGuidance": "buy|order|price|cost|launch|available|pre-order|discount|30%|mailing list",
+    "responseBehaviour": "Answer from campaign data. Open discount pop-up during pre-launch.",
+    "defaultOutcome": "Get 30% Off",
+    "notes": "Do not send to a random article or mini-game."
+  },
+  {
+    "bucketId": "B02",
+    "bucket": "Rules and physical gameplay",
+    "relatedLayer": "3",
+    "exampleInputs": [
+      "How do I play?",
+      "What are the rules?",
+      "How many cards?",
+      "Who wins?"
+    ],
+    "detectionGuidance": "how to play|rules|instructions|cards|deal|win|players|age|Hot Dog mode",
+    "responseBehaviour": "Answer from approved rules. Link directly to full rules or relevant game explanation.",
+    "defaultOutcome": "Rules / product",
+    "notes": "FAQ may supply the approved factual answer."
+  },
+  {
+    "bucketId": "B03",
+    "bucket": "Website navigation and feature finding",
+    "relatedLayer": "3",
+    "exampleInputs": [
+      "Where is the Name Generator?",
+      "Show me ChumDrop",
+      "Find Know Your Chum"
+    ],
+    "detectionGuidance": "where is|find|show me|open|take me to|name generator|ChumDrop|Know Your Chum",
+    "responseBehaviour": "Identify the exact destination and provide a text link or interface action.",
+    "defaultOutcome": "Direct page or feature",
+    "notes": "Navigation outranks greeting and comedy."
+  },
+  {
+    "bucketId": "B04",
+    "bucket": "FAQ and product information",
+    "relatedLayer": "4",
+    "exampleInputs": [
+      "Do I need a dog?",
+      "Is it for children?",
+      "What is in the pack?"
+    ],
+    "detectionGuidance": "Semantic match against approved FAQ questions and alternatives",
+    "responseBehaviour": "Return canonical answer, active-dog wrapper and relevant CTA.",
+    "defaultOutcome": "FAQ destination",
+    "notes": "FAQ is a source layer as well as a user-intent family."
+  },
+  {
+    "bucketId": "B05",
+    "bucket": "Dog, breed and article questions",
+    "relatedLayer": "5",
+    "exampleInputs": [
+      "Tell me about Labradors",
+      "Which breed is cleverest?",
+      "Show me working dogs"
+    ],
+    "detectionGuidance": "dog|breed|puppy|history|working dog|lineage|article|essay",
+    "responseBehaviour": "Answer from dog database or link to a specific article, Know Your Chum or Britain's Dog History.",
+    "defaultOutcome": "Learn / Discover",
+    "notes": "Prefer a precise article over an essay index."
+  },
+  {
+    "bucketId": "B06",
+    "bucket": "General knowledge",
+    "relatedLayer": "6",
+    "exampleInputs": [
+      "Capital of France?",
+      "Largest planet?",
+      "What is 8 x 7?"
+    ],
+    "detectionGuidance": "Question match against controlled knowledge records",
+    "responseBehaviour": "Answer only when the canonical record exists. Add a dog joke and redirect.",
+    "defaultOutcome": "Play / Learn / Discover",
+    "notes": "Collie has the broadest bank. Other dogs may transfer."
+  },
+  {
+    "bucketId": "B07",
+    "bucket": "Facts about the active dog or breed",
+    "relatedLayer": "7",
+    "exampleInputs": [
+      "Are you clever?",
+      "How long do Collies live?",
+      "Are Collies easy to train?"
+    ],
+    "detectionGuidance": "active breed name|you|your breed|lifespan|training|health|history|records",
+    "responseBehaviour": "Answer from active breed library in character.",
+    "defaultOutcome": "Breed profile / lineage",
+    "notes": "Health answers remain general and never diagnose."
+  },
+  {
+    "bucketId": "B08",
+    "bucket": "Specialist transfer trigger",
+    "relatedLayer": "8",
+    "exampleInputs": [
+      "Sausages",
+      "Tell me a joke",
+      "Who were the ratting dogs?"
+    ],
+    "detectionGuidance": "food/sniffing -> Labrador; jokes -> Boxer; investigations/history -> Terrier",
+    "responseBehaviour": "Current dog acknowledges its limit and transfers with original context.",
+    "defaultOutcome": "Another dog",
+    "notes": "Higher layers must check safety and FAQ before a transfer."
+  },
+  {
+    "bucketId": "B09",
+    "bucket": "Greeting and social opening",
+    "relatedLayer": "9",
+    "exampleInputs": [
+      "Hi",
+      "Hello",
+      "Morning",
+      "Anyone there?",
+      "How are you?"
+    ],
+    "detectionGuidance": "hi|hello|hey|morning|evening|anyone there|how are you",
+    "responseBehaviour": "Acknowledge contact, reveal personality and assign a useful direction.",
+    "defaultOutcome": "Weighted destination",
+    "notes": "The dog never speaks before the first user message."
+  },
+  {
+    "bucketId": "B10",
+    "bucket": "Testing and interface questions",
+    "relatedLayer": "9",
+    "exampleInputs": [
+      "Test",
+      "Does this work?",
+      "Are you a bot?",
+      "Can you hear me?"
+    ],
+    "detectionGuidance": "test|testing|is this working|bot|AI|real|hear me|what are you",
+    "responseBehaviour": "Make the test itself the joke, then offer a useful route.",
+    "defaultOutcome": "Weighted destination",
+    "notes": "Do not claim to be live support or a human."
+  },
+  {
+    "bucketId": "B11",
+    "bucket": "Commands and vague requests",
+    "relatedLayer": "9",
+    "exampleInputs": [
+      "Sit",
+      "Stay",
+      "Fetch",
+      "Help",
+      "Surprise me",
+      "Tell me something"
+    ],
+    "detectionGuidance": "sit|stay|fetch|help|do something|surprise me|show me|tell me|take me",
+    "responseBehaviour": "Interpret the command literally, improve the brief and choose an action.",
+    "defaultOutcome": "Play / Learn / Discover",
+    "notes": "Surprise Me can select any unused destination."
+  },
+  {
+    "bucketId": "B12",
+    "bucket": "Personal statement or emotional reaction",
+    "relatedLayer": "9",
+    "exampleInputs": [
+      "I have a Labrador",
+      "I am bored",
+      "Good dog",
+      "You are annoying",
+      "Thank you"
+    ],
+    "detectionGuidance": "I have|my dog|I like|I love|bored|sad|angry|good dog|clever|stupid|thanks",
+    "responseBehaviour": "Acknowledge the relevant emotion or statement, then choose a related route.",
+    "defaultOutcome": "Contextual",
+    "notes": "Distress receives a gentle response, not sarcasm."
+  },
+  {
+    "bucketId": "B13",
+    "bucket": "Random real word or object",
+    "relatedLayer": "9",
+    "exampleInputs": [
+      "Kettle",
+      "Banana",
+      "Steve",
+      "Purple",
+      "Tuesday",
+      "Tractor"
+    ],
+    "detectionGuidance": "Recognised word with no usable intent",
+    "responseBehaviour": "Treat the input as an unexplained object or noun and ask for purpose through a redirect.",
+    "defaultOutcome": "Weighted destination",
+    "notes": "Insert the original word using {{input}}."
+  },
+  {
+    "bucketId": "B14",
+    "bucket": "Gibberish, minimal or punctuation",
+    "relatedLayer": "10",
+    "exampleInputs": [
+      "qwerty",
+      "asdfgh",
+      "nnnnnn",
+      "?????",
+      "X",
+      "emoji only"
+    ],
+    "detectionGuidance": "keyboard sequence|repeated characters|punctuation only|single letter|unknown string",
+    "responseBehaviour": "Use keyboard-accident or head-tilt response, then recommend something useful.",
+    "defaultOutcome": "Weighted destination",
+    "notes": "Final fallback if no higher layer matches."
+  }
+]

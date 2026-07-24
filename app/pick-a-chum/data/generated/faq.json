@@ -1,0 +1,253 @@
+[
+  {
+    "faqId": "FAQ001",
+    "canonicalQuestion": "How do I play?",
+    "alternativePhrasings": [
+      "how to play",
+      "rules",
+      "instructions",
+      "what do you do"
+    ],
+    "canonicalAnswer": "{{approved_rule_summary}}",
+    "sourcePage": "Rules page",
+    "cta": "Full game rules",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Rules must remain canonical.",
+    "resolvedAnswer": "Deal 3 to 6 chum cards to each player, then head outside. When you spot a real dog that matches one of your cards, call it out and claim the chum. Keep spotting to collect more, and whoever matches the most chums wins. It's made for walks, car journeys and days at the park, anywhere dogs happen.",
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ002",
+    "canonicalQuestion": "Who is the game for?",
+    "alternativePhrasings": [
+      "age",
+      "family",
+      "children",
+      "kids",
+      "who can play"
+    ],
+    "canonicalAnswer": "{{approved_age_and_audience_answer}}",
+    "sourcePage": "Product / FAQ",
+    "cta": "Full game rules",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Separate product age from competition eligibility.",
+    "resolvedAnswer": "It's designed for ages 7 and up, and plays best with 2 or more people. Younger children can absolutely join in with a grown-up, matching cartoon dogs to real ones is exactly the kind of thing they love.",
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ003",
+    "canonicalQuestion": "Do I need to own a dog?",
+    "alternativePhrasings": [
+      "need a dog",
+      "own a dog",
+      "without a dog"
+    ],
+    "canonicalAnswer": "{{approved_no_dog_required_answer}}",
+    "sourcePage": "FAQ",
+    "cta": "How to play",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Useful early objection answer.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ004",
+    "canonicalQuestion": "What is in the pack?",
+    "alternativePhrasings": [
+      "pack contents",
+      "in the box",
+      "how many cards",
+      "54 cards"
+    ],
+    "canonicalAnswer": "{{approved_pack_contents_answer}}",
+    "sourcePage": "Product data",
+    "cta": "Product information",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Use exact current contents.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ005",
+    "canonicalQuestion": "How many people can play?",
+    "alternativePhrasings": [
+      "players",
+      "people",
+      "group size"
+    ],
+    "canonicalAnswer": "{{approved_player_count_answer}}",
+    "sourcePage": "Rules",
+    "cta": "Full game rules",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Do not guess ranges.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ006",
+    "canonicalQuestion": "Can we play indoors?",
+    "alternativePhrasings": [
+      "indoors",
+      "outside",
+      "outdoors",
+      "where play"
+    ],
+    "canonicalAnswer": "{{approved_play_location_answer}}",
+    "sourcePage": "Rules",
+    "cta": "Full game rules",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Explain intended outdoor discovery.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ007",
+    "canonicalQuestion": "What is Hot Dog mode?",
+    "alternativePhrasings": [
+      "Hot Dog",
+      "variant",
+      "other way to play"
+    ],
+    "canonicalAnswer": "{{approved_hot_dog_mode_answer}}",
+    "sourcePage": "Rules",
+    "cta": "Full game rules",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Memory restriction and revealed hands.",
+    "resolvedAnswer": "Plenty. There's Hot Dogs, a memory twist where everyone shows their hand for a few seconds after the draw, then hides it again. If you remember which dog another player is holding and you spot that breed in real life first, you steal their chum. You can also play bingo-style (first to complete a row of chums), Top Trumps-style stat battles, or make up your own house rules. There's a whole page on Hot Dogs.",
+    "resolvedCta": "/hot-dogs"
+  },
+  {
+    "faqId": "FAQ008",
+    "canonicalQuestion": "How much is it?",
+    "alternativePhrasings": [
+      "price",
+      "cost",
+      "how much",
+      "£6.99"
+    ],
+    "canonicalAnswer": "{{approved_price_answer}}",
+    "sourcePage": "Campaign / product",
+    "cta": "Get 30% Off",
+    "campaignState": "PRE_LAUNCH",
+    "contentStatus": "Confirm before launch",
+    "notes": "Clarify full price versus discounted price.",
+    "resolvedAnswer": "The retail price is £9.99, but right now we're running a pre-launch discount that brings it down to £6.99, with free UK mainland delivery included. You can only get the £6.99 price if you pre-order before the game is released; once it's out, it's full price. We're launching very soon, pre-order now to lock in the discount, and we'll email you a code to use on launch day along with the release date the moment it's confirmed.",
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ009",
+    "canonicalQuestion": "How do I get 30% off?",
+    "alternativePhrasings": [
+      "discount",
+      "30%",
+      "code",
+      "pre-release"
+    ],
+    "canonicalAnswer": "Join the pre-release list and the code will be emailed the day before launch.",
+    "sourcePage": "Campaign",
+    "cta": "Get 30% Off",
+    "campaignState": "PRE_LAUNCH",
+    "contentStatus": "Approved concept",
+    "notes": "Pop-up action required.",
+    "resolvedAnswer": "Join the pre-release list and the code will be emailed the day before launch.",
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ010",
+    "canonicalQuestion": "When will the code arrive?",
+    "alternativePhrasings": [
+      "when code",
+      "email code",
+      "day before"
+    ],
+    "canonicalAnswer": "The 30% code is emailed to list members the day before launch.",
+    "sourcePage": "Campaign",
+    "cta": "Get 30% Off",
+    "campaignState": "PRE_LAUNCH",
+    "contentStatus": "Approved concept",
+    "notes": "Campaign wording must match email flow.",
+    "resolvedAnswer": "The 30% code is emailed to list members the day before launch.",
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ011",
+    "canonicalQuestion": "How do I enter the competition?",
+    "alternativePhrasings": [
+      "competition",
+      "enter",
+      "prize",
+      "win"
+    ],
+    "canonicalAnswer": "{{approved_competition_answer}}",
+    "sourcePage": "Competition page",
+    "cta": "Competition",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Eligibility and guardian wording must remain exact.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ012",
+    "canonicalQuestion": "How do I contact you?",
+    "alternativePhrasings": [
+      "contact",
+      "support",
+      "email",
+      "problem",
+      "human"
+    ],
+    "canonicalAnswer": "{{approved_contact_answer}}",
+    "sourcePage": "Contact page",
+    "cta": "Contact",
+    "campaignState": "Any",
+    "contentStatus": "Import from live site",
+    "notes": "Utility answer should remain polite and clean.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ013",
+    "canonicalQuestion": "What materials are used?",
+    "alternativePhrasings": [
+      "paper",
+      "card",
+      "FSC",
+      "materials",
+      "laminated"
+    ],
+    "canonicalAnswer": "{{approved_materials_answer}}",
+    "sourcePage": "Product / compliance data",
+    "cta": "Product information",
+    "campaignState": "Any",
+    "contentStatus": "Import from technical file",
+    "notes": "Only include approved manufacturing details.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ014",
+    "canonicalQuestion": "Do you deliver outside the UK?",
+    "alternativePhrasings": [
+      "delivery",
+      "shipping",
+      "postage",
+      "outside UK"
+    ],
+    "canonicalAnswer": "{{approved_delivery_answer}}",
+    "sourcePage": "Campaign / product",
+    "cta": "Product information",
+    "campaignState": "Any",
+    "contentStatus": "Open",
+    "notes": "Do not infer coverage.",
+    "resolvedAnswer": null,
+    "resolvedCta": null
+  }
+]

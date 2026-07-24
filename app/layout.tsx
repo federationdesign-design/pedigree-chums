@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
+import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
 
 const display = Luckiest_Guy({
@@ -94,6 +95,7 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable}`}>
       <body>
         {children}
+        <PickAChumLauncher />
         <OfferLauncher />
         <CookieBanner />
         <Analytics />
