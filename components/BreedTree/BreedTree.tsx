@@ -1350,7 +1350,11 @@ export default function BreedTree({
       {learnNode && learnCard && (
         <LineageMap
           breed={learnCard}
-          tree={learnNode.data}
+          tree={
+            learnNode.data.children && learnNode.data.children.length > 0
+              ? learnNode.data
+              : { ...learnNode.data, children: [{ ...learnNode.data, children: undefined }] }
+          }
           circular
           currentScore={0}
           onScore={onScore}

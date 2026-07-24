@@ -1045,7 +1045,7 @@ export default function LineageMap({
           );
         })() : null}
         {/* Green button - Complete/skip for instructional, Pack chum for dog cards */}
-        {(canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
+        {!circular && (canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (!packed && !collecting && !framesDone ? 138 : 62)})`}
@@ -1104,7 +1104,7 @@ export default function LineageMap({
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      {showPack && !INSTR_NAMES.has(breed.name) && (
+      {showPack && !circular && !INSTR_NAMES.has(breed.name) && (
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
@@ -1825,10 +1825,10 @@ export default function LineageMap({
         );
       })()}
     </div>
-    {boxPop && (
+    {boxPop && !circular && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
-    {showAuto && (
+    {showAuto && !circular && (
       <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />
