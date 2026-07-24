@@ -953,8 +953,7 @@ export default function BreedTree({
           const sp = Math.hypot(b.vx, b.vy);
           const cap = worldH * 2.5;
           if (sp > cap) { b.vx *= cap / sp; b.vy *= cap / sp; }
-          const onFloorish = b.y + b.r > yF - worldH * 0.02;
-          if (Math.hypot(b.vx, b.vy) > worldH * 0.012 || !onFloorish) still = false;
+          if (sp > worldH * 0.012) still = false;
         }
         // spin the circle images with their bodies (pattern rotation about the
         // centre, scaled up so corners never show through); badges stay
@@ -1130,7 +1129,7 @@ export default function BreedTree({
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",
-                    pointerEvents: hidden || falling ? "none" : "auto",
+                    pointerEvents: hidden ? "none" : "auto",
                     opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden ? undefined : () => setHovered(d)}
