@@ -239,6 +239,13 @@ export default function BreedTree({
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
+  // rods and name pills scattered in from the learn layer, pit-style props:
+  // sizes are view units frozen at the drop; dead ones keep their slot so the
+  // render children stay index-aligned with the bridge lists
+  const [rodList, setRodList] = useState<{ len: number; h: number; lit: boolean }[]>([]);
+  const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
+  const [pillList, setPillList] = useState<{ name: string; w: number; h: number }[]>([]);
+  const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
   useEffect(() => {
     if (!dockAside) return;
     setBadgePcts(
@@ -250,6 +257,13 @@ export default function BreedTree({
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number) => void) | null>(null);
+  const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
+  const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
+  type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any };
+  const rodBodiesRef = useRef<PropBody[]>([]);
+  const pillBodiesRef = useRef<PropBody[]>([]);
+  const rodsGRef = useRef<SVGGElement>(null);
+  const pillsGRef = useRef<SVGGElement>(null);
   const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
   const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
   const runFallRef = useRef<(() => void) | null>(null);
@@ -422,6 +436,14 @@ export default function BreedTree({
       for (const u of ub) {
         const el = (u.kind === "close" ? uiCloseRef : uiDescRef).current;
         if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
+      }
+    }
+    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef]] as const) {
+      const list = (listRef as typeof rodBodiesRef).current;
+      const gg = (gRef as typeof rodsGRef).current;
+      if (list && gg) for (const pr of list) {
+        const el = gg.children[pr.idx] as SVGGElement | undefined;
+        if (el) el.setAttribute("transform", `translate(${(pr.x - v[0]) * k},${(pr.y - v[1]) * k}) rotate(${pr.a * 57.2958})`);
       }
     }
     nodes.forEach((d, i) => {
@@ -779,6 +801,41 @@ export default function BreedTree({
         if (newMbs.length > 1) ghost(newMbs);
       };
 
+      // rods (thin chamfered bars, lit yellow / unlit white, 2 knocks) and the
+      // name pill (navy capsule, 3 knocks then gone) - pit props, verbatim specs
+      const killProp = (pr: any, kind: string, now2: number) => {
+        pr.dead = true;
+        poofAt(pr.x, pr.y, now2);
+        if (pr.mb) Composite.remove(world, pr.mb);
+        (kind === "rod" ? setDeadRods : setDeadPills)((prev) => new Set(prev).add(pr.idx));
+      };
+      spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
+        const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
+        const ang = Math.atan2(y2 - y1, x2 - x1);
+        const w = worldFromPx((x1 + x2) / 2, (y1 + y2) / 2);
+        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: ang, idx: rodBodiesRef.current.length, hits: 0, maxHits: 2, mb: null as any };
+        const mb = Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, lenPx, 8, { chamfer: { radius: 4 }, restitution: 0.4, friction: 0.1, frictionAir: 0.01, density: 0.001, angle: ang });
+        mb.plugin = { prop: pr, kind: "rod" };
+        pr.mb = mb;
+        Composite.add(world, mb);
+        MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract
+        rodBodiesRef.current.push(pr);
+        setRodList((l) => [...l, { len: lenPx * fxScale, h: 8 * fxScale, lit }]);
+        wake();
+      };
+      spawnPillRef.current = (sx: number, sy: number, wPx: number, name: string) => {
+        const w = worldFromPx(sx, sy);
+        const pw = Math.max(44, wPx);
+        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 3, mb: null as any };
+        const mb = Bodies.rectangle(sx, sy, pw, 26, { chamfer: { radius: 13 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
+        mb.plugin = { prop: pr, kind: "pill" };
+        pr.mb = mb;
+        Composite.add(world, mb);
+        MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
+        pillBodiesRef.current.push(pr);
+        setPillList((l) => [...l, { name, w: pw * fxScale, h: 26 * fxScale }]);
+        wake();
+      };
       spawnBadgeRef.current = (sx: number, sy: number, rPx: number, pctVal: number) => {
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
@@ -913,6 +970,14 @@ export default function BreedTree({
           };
           hitSide(pa, B);
           hitSide(pb2, A);
+          for (const [P, other] of [[pa, B], [pb2, A]] as any[]) {
+            const pr = P.prop;
+            if (!pr || pr.dead || other.isStatic || rv < 5) continue;
+            if (pr.lastKnock && now - pr.lastKnock < 600) continue;
+            pr.lastKnock = now;
+            pr.hits += 1;
+            if (pr.hits >= pr.maxHits) killProp(pr, P.kind, now);
+          }
           for (const [P] of [[pa], [pb2]] as any[]) {
             if (P.ui && P.ui.fixed && rv > FX_MIN_PS * 0.3) {
               const u = P.ui;
@@ -994,6 +1059,21 @@ export default function BreedTree({
           }
           if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
         }
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current]) {
+          for (const pr of list) {
+            if (pr.dead || !pr.mb) continue;
+            if (!isDragged(pr)) {
+              const w = worldFromPx(pr.mb.position.x, pr.mb.position.y);
+              pr.x = w.x; pr.y = w.y; pr.a = pr.mb.angle;
+              pr.vx = (pr.mb.velocity.x * 60) / pxPerWorld;
+              pr.vy = (pr.mb.velocity.y * 60) / pxPerWorld;
+            } else {
+              MBody.setPosition(pr.mb, pxFromWorld(pr.x, pr.y));
+              MBody.setVelocity(pr.mb, { x: (pr.vx * pxPerWorld) / 60, y: (pr.vy * pxPerWorld) / 60 });
+            }
+            if (pr.mb.speed > SETTLE_PS) still = false;
+          }
+        }
         const uis = uiBodiesRef.current as any[] | null;
         if (uis) for (const u of uis) {
           if (!u.fixed && u.mb) {
@@ -1060,6 +1140,9 @@ export default function BreedTree({
         const uu = uiBodiesRef.current as any[] | null;
         if (uu) for (const u of uu) if (!u.fixed && u.mb) {
           MBody.setVelocity(u.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
+        }
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current]) {
+          for (const pr of list) if (!pr.dead && pr.mb) MBody.setVelocity(pr.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
         wake();
       };
@@ -1270,6 +1353,47 @@ export default function BreedTree({
             })}
           </g>
 
+          {/* Rods and name pills scattered in from the learn layer: true pit
+              props with hit limits; dead ones keep their slot, hidden. */}
+          <g ref={rodsGRef} style={{ display: dockAside ? "inline" : "none" }}>
+            {rodList.map((rd, i2) => {
+              const pr = rodBodiesRef.current[i2];
+              const v2 = viewRef.current;
+              const kk2 = SIZE / v2[2];
+              const dead = deadRods.has(i2);
+              return (
+                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
+                  style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => startDrag(e, rodBodiesRef.current[i2])}>
+                  <rect x={-rd.len / 2} y={-rd.h / 2} width={rd.len} height={rd.h} rx={rd.h / 2}
+                    style={{ fill: rd.lit ? "#ffd23e" : "#ffffff", stroke: "#0a3a57", strokeWidth: rd.h * 0.22 }} />
+                </g>
+              );
+            })}
+          </g>
+          <g ref={pillsGRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
+            {pillList.map((pl, i2) => {
+              const pr = pillBodiesRef.current[i2];
+              const v2 = viewRef.current;
+              const kk2 = SIZE / v2[2];
+              const dead = deadPills.has(i2);
+              return (
+                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
+                  style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => startDrag(e, pillBodiesRef.current[i2])}>
+                  <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
+                    style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.h * 0.077 }} />
+                  <text x={0} y={0} dominantBaseline="central"
+                    style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.h * 0.46}px`, pointerEvents: "none", userSelect: "none" }}>
+                    {pl.name}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+
           {/* Collision number flashes, appended imperatively by the sim. */}
           <g ref={fxRef} style={{ pointerEvents: "none" }} />
 
@@ -1353,10 +1477,18 @@ export default function BreedTree({
             }
           }}
           onScatter={(data) => {
-            // the learnt % circles tip into the pit as live objects
+            // the learnt % circles, their rods and the name pill tip into the
+            // pit as live objects at the very instant the layer drops them
             for (const c of data.circles ?? []) {
               spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share));
             }
+            for (const rd of data.rods ?? []) {
+              spawnRodRef.current?.(rd.x1, rd.y1, rd.x2, rd.y2, !!rd.lit);
+            }
+            for (const pl of data.pills ?? []) {
+              spawnPillRef.current?.(pl.x, pl.y, pl.w, pl.name);
+            }
+            wakeRef.current?.();
           }}
           onClose={() => {
             const pb = pitBodiesRef.current;

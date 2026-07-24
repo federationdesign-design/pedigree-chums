@@ -532,10 +532,10 @@ export default function LineageMap({
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
   // sx - pan.x so they stay put while the tree pans behind them.
   const F_LEFT = isMobile ? 52 : 96;
-  const F_COL = isMobile ? 92 : 112, F_ROW = isMobile ? 92 : 112; // tighter pitch on phones to match the 15% smaller cards
+  const F_COL = circular ? CW + 3 : isMobile ? 92 : 112, F_ROW = circular ? CW + 3 : isMobile ? 92 : 112; // mini pit: 3px gutter; else tighter pitch on phones to match the 15% smaller cards
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
   const MCOLS = 4; // phones: one continuous grid, four frames wide before it wraps
-  const chumTop = isMobile ? 170 : 240; // rows sit clear of the top-left chrome (and the section headers on desktop); mobile lifted 20px so the deepest breeds fit before Collect
+  const chumTop = circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // mini pit: rows ride high under the title; else clear of the top-left chrome (and desktop section headers)
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
@@ -634,25 +634,44 @@ export default function LineageMap({
   // No collect step: poof the card and its nodes out of existence, remove the
   // circle from the pit, and close, exactly like the instructional finish.
   const circularDoneRef = useRef(false);
-  useEffect(() => {
-    if (!circular || !framesDone || circularDoneRef.current) return;
+  const [scattered, setScattered] = useState(false);
+  // Mini pit: the tag pill (and on Complete, every node and rod) tips into the
+  // pit as live physics objects, main-pit style. Positions are CURRENT layer
+  // positions in client px; the pit gives pills a hit limit once they land.
+  const circR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+  const emitCircularScatter = (includeNodes: boolean) => {
+    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y - circR - 26, w: tagW, name: breed.name }];
+    if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
+    const vis = shown.filter((n) => n._parent);
+    const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+    const circles = vis.slice(0, 60).map((n) => {
+      const share = shareOf(n);
+      return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
+    });
+    const rods = vis.slice(0, 70).map((n) => {
+      const p = n._parent as Node;
+      return { x1: p._x + pan.x, y1: p._y + pan.y, x2: n._x + pan.x, y2: n._y + pan.y, lit: open.has(n._id) };
+    });
+    onScatter?.({ circles, rods, pills });
+  };
+  // Green Complete pressed: at the very same instant the layer stops drawing
+  // the tree and everything drops into the pit - zero-lag handover.
+  const circularComplete = () => {
+    if (circularDoneRef.current) return;
     circularDoneRef.current = true;
-    const t = window.setTimeout(() => {
-      // the learnt circle vanishes on the spot and celebrates: confetti
-      // from its centre, the same effect as the name generator's winner
-      setRootGone(true);
-      confettiRef.current?.({
-        particleCount: 150,
-        spread: 100,
-        origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h },
-        colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"],
-        startVelocity: 45,
-      });
-      window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
-    }, 650);
-    return () => window.clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [circular, framesDone]);
+    emitCircularScatter(true);
+    setScattered(true);
+    burstAt(breed.x, breed.y, circR * 1.33);
+    setRootGone(true);
+    confettiRef.current?.({
+      particleCount: 150,
+      spread: 100,
+      origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h },
+      colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"],
+      startVelocity: 45,
+    });
+    window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
+  };
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
@@ -1032,7 +1051,7 @@ export default function LineageMap({
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
-      <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
+      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry - R - 26 : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
         {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
@@ -1056,7 +1075,7 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,62)`}
+            transform={`translate(0,${circular ? -74 : 62})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
@@ -1082,6 +1101,25 @@ export default function LineageMap({
           </g>
           );
         })() : null}
+        {/* Mini pit: green Complete replaces Learn once every frame is filled */}
+        {circular && framesDone && !rootGone && !scattered ? (
+          <g
+            className={styles.removeBtn}
+            transform={`translate(0,-74)`}
+            onClick={(e) => { e.stopPropagation(); circularComplete(); }}
+            role="button"
+            aria-label="Complete"
+          >
+            <g className={styles.chumPop}>
+              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
+              <g className={styles.chumTop}>
+                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
+                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>Complete</text>
+              </g>
+            </g>
+          </g>
+        ) : null}
         {/* Green button - Complete/skip for instructional, Pack chum for dog cards */}
         {!circular && (canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
@@ -1116,7 +1154,7 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
+      <button type="button" className={styles.close} onClick={() => { if (circular && !circularDoneRef.current) emitCircularScatter(false); onClose(); }} aria-label="Close">
         &times;
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
@@ -1168,7 +1206,7 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
+            <g style={{ opacity: removing || scattered ? 0 : 1, display: scattered ? "none" : undefined, transition: "opacity 0.12s ease-out" }}>
             {shown
               .filter((n) => n._parent)
               .map((n) => {
