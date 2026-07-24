@@ -779,8 +779,9 @@ export default function BreedTree({
       let last = performance.now();
       let started = last;
       const isDragged = (b: unknown) => dragRef.current?.body === b;
+      let stillFrames = 0;
       const step = (now: number) => {
-        const dt = Math.min(0.032, (now - last) / 1000);
+        const dt = Math.min(0.032, Math.max(0.004, (now - last) / 1000));
         last = now;
         for (const b of all) {
           if (b.held) continue; // lifted out onto the learn layer
@@ -974,7 +975,8 @@ export default function BreedTree({
         }
         zoomTo(viewRef.current);
         drawNumbers(now, viewRef.current);
-        if ((!still || numbers.length > 0) && now - started < 30000) {
+        stillFrames = still ? stillFrames + 1 : 0;
+        if ((stillFrames < 12 || numbers.length > 0) && now - started < 30000) {
           fallRafRef.current = requestAnimationFrame(step);
         } else {
           simRunningRef.current = false;
