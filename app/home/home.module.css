@@ -238,7 +238,9 @@
   /* Image column takes precedence -- larger than the text column at all widths. */
   grid-template-columns: 3fr 2fr;
   gap: clamp(32px, 6vw, 80px);
-  align-items: center;
+  /* Top-align so the "Pedigree Chums" title lines up with the top of the
+     product image (rather than being vertically centred against it). */
+  align-items: start;
   /* Full-width / liquid: no max-width cap, just the page side padding. */
   padding: 16px clamp(20px, 6vw, 80px) clamp(60px, 10vw, 120px);
 }
@@ -331,6 +333,11 @@
   color: #ffffff;
 }
 
+/* Yellow emphasis without the bold weight (inherits the body 600). */
+.productDescYellow {
+  color: var(--yellow, #ffd23e);
+}
+
 /* Underline for specific emphasis phrases. */
 .productDescUnderline {
   text-decoration: underline;
@@ -350,7 +357,7 @@
 }
 
 .metaLabel {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.12em;
   color: #ffffff;
   text-transform: uppercase;
@@ -359,7 +366,7 @@
 
 .metaValue {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(16px, 2vw, 22px);
+  font-size: clamp(18px, 2vw, 24px);
   color: #fff;
   letter-spacing: 0.04em;
 }
