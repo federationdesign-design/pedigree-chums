@@ -7,7 +7,7 @@ import type { LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
-import LearnLayer from "./LearnLayer";
+import LineageMap from "../PackPit/LineageMap";
 
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
@@ -238,7 +238,9 @@ export default function BreedTree({
   const [dropped, setDropped] = useState(false);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
-  const [learnPos, setLearnPos] = useState<{ x: number; y: number } | null>(null);
+  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
+  const removedNodesRef = useRef<Set<Node>>(new Set());
+  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number) => void) | null>(null);
   const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
   const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
   const runFallRef = useRef<(() => void) | null>(null);
@@ -478,19 +480,17 @@ export default function BreedTree({
       const body = pb?.owned.has(d) ? pb.find(d) : undefined;
       if (body) {
         body.held = true;
-        // anchor the learn layer exactly where this circle sits right now
+        // the pulled-out card appears exactly where the circle sits, at its
+        // current tumble angle, exactly like a dog card leaving the main pit
         const el = e.currentTarget as SVGCircleElement;
-        const st = stageRef.current;
-        if (el && st) {
-          const cr = el.getBoundingClientRect();
-          const sr = st.getBoundingClientRect();
-          setLearnPos({
-            x: ((cr.left + cr.width / 2 - sr.left) / sr.width) * 100,
-            y: ((cr.top + cr.height / 2 - sr.top) / sr.height) * 100,
-          });
-        } else {
-          setLearnPos(null);
-        }
+        const cr = el.getBoundingClientRect();
+        setLearnCard({
+          name: d.data.name,
+          image: d.data.img ?? rootImage ?? "",
+          x: cr.left + cr.width / 2,
+          y: cr.top + cr.height / 2,
+          angle: (body as unknown as { a?: number }).a ?? 0,
+        });
         setLearnNode(d);
         return;
       }
@@ -652,6 +652,33 @@ export default function BreedTree({
       pitBodiesRef.current = {
         find: (n: Node) => all.find((b) => b.n === n),
         owned,
+      };
+      spawnBadgeRef.current = (sx: number, sy: number, rPx: number, pctVal: number) => {
+        // client px -> world, via the svg's real screen transform
+        const svg2 = stageRef.current?.querySelector("svg") as SVGSVGElement | null;
+        const c2 = svg2?.getScreenCTM();
+        if (!svg2 || !c2) return;
+        const pt = svg2.createSVGPoint();
+        pt.x = sx; pt.y = sy;
+        const sp = pt.matrixTransform(c2.inverse());
+        const vNow = viewRef.current;
+        const kNow = SIZE / vNow[2];
+        const bl = badgeBodiesRef.current;
+        if (!bl) return;
+        const nb: Body = {
+          n: null,
+          x: vNow[0] + sp.x / kNow,
+          y: vNow[1] + sp.y / kNow,
+          vx: (Math.random() - 0.5) * worldH * 0.25,
+          vy: worldH * 0.25,
+          r: 46 / kNow, // matches the badge visual, which is a fixed 46 view units
+          pct: pctVal, idx: bl.length, lastFx: 0, popped: true,
+          ghosts: new Map<Body, number>(), a: 0, va: 0, ia: 0, iva: 0, charges: 20,
+        };
+        bl.push(nb);
+        all.push(nb);
+        setBadgePcts((l) => [...l, pctVal]);
+        wake();
       };
       const moveSubtree = (root: Node, dxm: number, dym: number) => {
         const stack: Node[] = [root];
@@ -1140,7 +1167,7 @@ export default function BreedTree({
                   : styles.tintB
                 : "";
               const cls = hasImg && tinted ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
-              const heldHidden = !!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)));
+              const heldHidden = (!!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)))) || removedNodesRef.current.has(d);
               const buried = (!!buriedSet && d !== hovered && buriedSet.has(d)) || heldHidden;
               return (
                 <circle
@@ -1320,26 +1347,33 @@ export default function BreedTree({
         </svg>
       </div>
 
-      {learnNode && (
-        <LearnLayer
-          root={learnNode}
-          rootPos={learnPos}
+      {learnNode && learnCard && (
+        <LineageMap
+          breed={learnCard}
+          tree={learnNode.data}
+          circular
+          currentScore={0}
           onScore={onScore}
+          onRemove={(name) => {
+            // collected: the circle leaves the pit for good
+            if (learnNode && name === learnNode.data.name) {
+              removedNodesRef.current.add(learnNode);
+            }
+          }}
+          onScatter={(data) => {
+            // the learnt % circles tip into the pit as live objects
+            for (const c of data.circles ?? []) {
+              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share));
+            }
+          }}
           onClose={() => {
             const pb = pitBodiesRef.current;
             const body = learnNode ? pb?.find(learnNode) : undefined;
-            if (body) {
-              const v = viewRef.current;
-              const k = SIZE / v[2];
-              const st = stageRef.current;
-              const asp = st ? st.clientWidth / Math.max(st.clientHeight, 1) : 1;
-              const vbHf = asp >= 1 ? SIZE : SIZE / asp;
-              body.x = v[0];
-              body.y = v[1] + (-vbHf * 0.3) / k;
-              body.vx = 0; body.vy = 0;
-              body.held = false;
+            if (body && learnNode && !removedNodesRef.current.has(learnNode)) {
+              body.held = false; // falls back in from where it was lifted
             }
             setLearnNode(null);
+            setLearnCard(null);
             wakeRef.current?.();
           }}
         />

@@ -120,8 +120,12 @@ export default function LineageMap({
   onScatter,
   onScore,
   currentScore = 0,
+  tree,
+  circular = false,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
+  tree?: LineageNode;
+  circular?: boolean;
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (data: {
@@ -151,7 +155,7 @@ export default function LineageMap({
   }, []);
 
   const root = useMemo(() => {
-    const t = getLineage(breed.name);
+    const t = tree ?? getLineage(breed.name);
     if (!t) return null;
     const r = JSON.parse(JSON.stringify(t)) as Node;
     const assign = (n: Node, id: string, parent: Node | null) => {
@@ -162,7 +166,8 @@ export default function LineageMap({
     };
     assign(r, "0", null);
     return r;
-  }, [breed.name]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [breed.name, tree]);
 
   const hasTree = !!(root && root.children && root.children.length);
 
@@ -983,8 +988,8 @@ export default function LineageMap({
             <text x={0} y={IH/2-FOOTER/2} textAnchor="middle" dominantBaseline="central" style={{fill:"#0a3a57",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:fs,fontWeight:400}}>{caption}</text>
           </>);
         })() : (<>
-          <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={20} /></clipPath>
-          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />
+          <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={circular ? ROOT : 20} /></clipPath>
+          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={circular ? ROOT + 5 : 24} className={styles.rootCard} />
           {breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
@@ -1447,8 +1452,8 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
-                  {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
+                  {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
+                  {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
                   {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:12,fontWeight:400,pointerEvents:"none" as const}; const by1=c.cardY+CW/2+48; const by2=c.cardY+CW/2+40; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by2}>{l1}</tspan><tspan x={c.cardX} dy={20}>{l2}</tspan></text>):(<text x={c.cardX} y={by1} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
                   {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
