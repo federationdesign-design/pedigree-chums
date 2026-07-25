@@ -112,12 +112,17 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const threadRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef(0);
   const timersRef = useRef<number[]>([]);
+  const rafRef = useRef<number | null>(null);
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
     timersRef.current = [];
+    if (rafRef.current !== null) {
+      window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
   }, []);
   const after = useCallback((ms: number, fn: () => void) => {
     timersRef.current.push(window.setTimeout(fn, ms));
@@ -159,23 +164,43 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       playbackRef.current = { id, plan, closed, done: false };
       setMsg(id, { typing: true, display: '' });
       setPhase('transferring'); // lock the composer while the dog performs
-      const play = (i: number) => {
-        if (playbackRef.current?.done || playbackRef.current?.id !== id) return;
-        if (i >= plan.steps.length) {
+
+      // Clock-driven playback: each step's delay is turned into a wall-clock
+      // deadline, and every animation frame we jump the shown text to whichever
+      // step the elapsed time has reached. Because the whole thing is paced by
+      // performance.now, not by counting setTimeouts, the performance always ends
+      // at plan.totalMs (<= 8s) regardless of per-frame render or timer overhead,
+      // so the eight-second cap holds as real wall-clock, not just on paper.
+      const deadlines = new Array<number>(plan.steps.length);
+      let acc = plan.think;
+      for (let i = 0; i < plan.steps.length; i++) {
+        acc += plan.steps[i].delay;
+        deadlines[i] = acc;
+      }
+      const total = plan.totalMs;
+      const start = performance.now();
+      let shownIdx = -1;
+      const frame = () => {
+        const pb = playbackRef.current;
+        if (!pb || pb.done || pb.id !== id) return;
+        const elapsed = performance.now() - start;
+        if (elapsed >= total) {
           finishTheatre(id, plan.final, closed);
           return;
         }
-        setMsg(id, { display: plan.steps[i].display, typing: false });
-        after(plan.steps[i].delay, () => play(i + 1));
-      };
-      after(plan.think, () => {
-        if (playbackRef.current?.id === id && !playbackRef.current?.done) {
-          setMsg(id, { typing: false, display: '' });
-          play(0);
+        if (elapsed >= plan.think) {
+          let i = shownIdx;
+          while (i + 1 < plan.steps.length && deadlines[i + 1] <= elapsed) i++;
+          if (i >= 0 && i !== shownIdx) {
+            shownIdx = i;
+            setMsg(id, { typing: false, display: plan.steps[i].display });
+          }
         }
-      });
+        rafRef.current = window.requestAnimationFrame(frame);
+      };
+      rafRef.current = window.requestAnimationFrame(frame);
     },
-    [reducedMotion, finishTheatre, setMsg, after]
+    [reducedMotion, finishTheatre, setMsg]
   );
 
   // Tap the message or press Enter to complete the current performance instantly.
