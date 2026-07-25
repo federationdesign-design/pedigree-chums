@@ -7,7 +7,7 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog } from './types';
-import { Normalised, isGibberish, isSingleWord, hasAny } from './normalise';
+import { Normalised, isGibberish, isSingleWord, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion } from './safety';
 
 const HIDDEN_CEILING = 20;
@@ -160,7 +160,11 @@ export interface RouterState {
   submissionCount: number; // count AFTER this submission (1-based)
 }
 
-export function resolve(n: Normalised, data: ChumData, state: RouterState): Resolution {
+export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
+  // Apply curated misspelling aliases first, so both the safety gate and every
+  // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
+  // covers the unpredictable slips on top of these predictable ones.
+  const n = applyAliases(n0, buildAliasMap(data.misspellings));
   const c = n.compact;
   const N = n; // for hasAny
 

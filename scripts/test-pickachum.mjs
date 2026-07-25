@@ -27,6 +27,7 @@ const data = {
   transfers: read('transfers.json'),
   copyComponents: read('copy-components.json'),
   dogs: read('dogs.json'),
+  misspellings: read('misspellings.json'),
 };
 
 const { submit } = await import(pathToFileURL(join(LIB, 'engine.ts')).href);
@@ -119,6 +120,36 @@ const ORIENTATION_CORPUS = [
   'Can you point me in the right direction?', 'Can you tell me what comes next?', 'So, what do I do with you?',
 ];
 for (const q of ORIENTATION_CORPUS) check(q, { layer: 11, bucket: 'B15', action: 'orientation' });
+
+// ---- Typo tolerance: typo'd inputs route like their clean versions ----
+// Tolerance covers words of 6+ letters (where a single edit rarely reaches
+// another real word); short high-value words (buy, shop, play) rely on the
+// curated alias map, demonstrated by discont -> discount.
+check('I want to purchace one', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // purchace->purchase
+check('wheres the discont code', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // alias discont->discount
+check('I love sausges', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' }); // sausges->sausages
+check('how do i get statred?', { layer: 11, bucket: 'B15', action: 'orientation' }); // statred->started
+check('any instrcutions?', { layer: 11, bucket: 'B15', action: 'orientation' }); // instrcutions->instructions
+check('what kind of thigns can you answer?', { layer: 11, bucket: 'B15', action: 'orientation' }); // thigns->things
+
+// ---- Safety keeps priority AND tolerance under typos (never fall through to comedy) ----
+check('sucide', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('Childline') ? null : 'expected signpost') }); // sucide->suicide
+check('I want to kill myslef', { layer: 1, action: 'safety_signpost' }); // myslef->myself
+check('you are stuipd', { layer: 1, action: 'safety_boundary' }); // stuipd->stupid
+
+// ---- Negative: fuzziness must NOT drag benign near-neighbours into safety or buying ----
+const FORBID = ['safety_signpost', 'safety_boundary', 'open_discount_popup', 'health_answer'];
+function checkClean(input) {
+  const { resolution: r } = submit(data, newSession(), input);
+  const ok = !FORBID.includes(r.action);
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: input.slice(0, 34), layer: r.layer, bucket: r.bucket ?? '-', action: r.action, note: ok ? '' : `LEAKED into ${r.action}` });
+}
+// lunch!=launch(buy), books!=boobs, baked!=naked, cast!=cost(buy), shot/shut!=shit, boxer(name) benign
+[
+  'I had my lunch', 'I love reading books', 'we baked a cake today', 'the cast was great',
+  'he took a shot on goal', 'can you shut the door', 'my favourite is a boxer', 'I read lots of books',
+].forEach(checkClean);
 
 // ---- No exact response repetition within a session when alternatives exist ----
 (() => {
