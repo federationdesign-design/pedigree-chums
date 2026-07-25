@@ -74,8 +74,9 @@ type Node = LineageNode & {
 // and which way it leans (1 right, -1 left). Two numbers, nothing else uses them.
 const SOLO_DEG = 33;
 const SOLO_SIDE = 1;
-// How far inside the screen edge the walls sit, in px. 0 puts them on the glass.
-const WALL_PAD = 16;
+// How far inside the screen edge the walls sit, in px. 0 puts them on the glass,
+// so the node may sit flush against the very edge and still be fully visible.
+const WALL_PAD = 0;
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);

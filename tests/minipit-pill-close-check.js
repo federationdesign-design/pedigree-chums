@@ -42,7 +42,7 @@ const { chromium } = require('playwright');
   console.log('learn layer:', JSON.stringify(layer));
   // GUARD-003b: a lone child on the first ring leans out on the diagonal at 33
   // degrees above horizontal instead of sitting dead vertical, AND it never
-  // crosses the walls 16px inside each screen edge. Where the diagonal would
+  // crosses the walls, which sit on the glass at each screen edge. Where the diagonal would
   // put it off screen the arm swings up toward vertical, so the angle is 33 when
   // there is room and somewhere between 33 and 90 when there is not. It must
   // never go below 33 (too shallow) or past 90 (over the top).
@@ -65,7 +65,7 @@ const { chromium } = require('playwright');
   });
   const soloAngleOk = edge.edges === 1 && edge.deg !== null
     && edge.deg >= 32.5 && edge.deg <= 90.5
-    && edge.nodeLeft >= 15 && edge.nodeRight <= edge.vw - 15;
+    && edge.nodeLeft >= -1 && edge.nodeRight <= edge.vw + 1;
   console.log('solo connector:', JSON.stringify(edge), '| in range and inside walls:', soloAngleOk);
   // GUARD-003c: a card placed in a circular frame must be a CIRCLE. This one bit
   // twice before, because the placed card is not SVG at all - it is a fixed HTML
