@@ -11,7 +11,7 @@ final copy.
 | ART002 / ART003 / ART009 `resolvedUrl: null` | `route-map.json` | Planned articles not yet built | NEEDS_STEVE item 4 (OI06) |
 | ART010 interim mapping | `route-map.json` | 'The Power of Smell' unbuilt; points at the teaching-medicine article for now | NEEDS_STEVE item 4 |
 | Random-dog control treatment | (styled build, Checkpoint 2) | To be proposed for approval | NEEDS_STEVE item 5 |
-| B19 / B20 bark-game lines | `generated/collie-responses.json` (B19-R01/02, B20-R01/02) + fallbacks in `assembler.ts` | The English break line and the post-break bark-acknowledgement family; routing and mirroring are live, copy is not | Steve writes the bark-break and bark-ack copy into the workbook Collie Responses sheet (B19 / B20), then regenerates |
+| Labrador / Terrier / Boxer bark presentations + B19/B20 lines | `assembler.ts` (`BARK_PRESENTATION` wires the Collie only) + parked deck rows | The non-Collie bark words and English break/ack lines are PARKED with the Phase 3 voice package; the per-dog state machine runs but their responses render a parked marker | Phase 3 per-dog build wires the presentations and merges the LAB/TER/BOX B19/B20 lines |
 
 ## Resolved (no longer placeholders)
 
@@ -28,6 +28,9 @@ final copy.
 - B15 orientation copy: WRITTEN (copy deck v2), 12 lines across 4 families in the
   workbook Collie Responses sheet, regenerated. `ORIENTATION_PLACEHOLDER` in
   `assembler.ts` is now only a defensive fallback.
+- Collie bark-game copy: WRITTEN (completed bark-game deck). Three COL-B19 break
+  lines and three COL-B20 post-break lines wired into the workbook (B19 / B20),
+  replacing the interim placeholders.
 - FAQ003-006 and FAQ011-014 answers: WRITTEN (copy deck v2) into the workbook
   Canonical answer column. FAQ011 uses the render-time `{{competition_close_date}}`
   token, filled by the assembler to the last day of the current month, mirroring

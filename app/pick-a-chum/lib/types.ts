@@ -151,7 +151,6 @@ export interface Resolution {
   gkId?: string;
   moderationId?: string;
   responseFamily?: string; // e.g. identity family 'F01'..'F10' for family-specific copy
-  barkWord?: string; // the bark to mirror (woof / yap / ...)
-  barkCount?: number; // how many barks the visitor sent (reply is count + 1)
+  barkCount?: number; // dog bark units to render this round (visitor count + 1, capped)
   note?: string;
 }

@@ -19,6 +19,7 @@ export interface Assembled {
   openPopup?: boolean;
   transferTo?: Dog;
   closed?: boolean;
+  followUp?: string; // a second message sent after a short pause (bark-game break)
 }
 
 const DOG_LABEL: Record<Dog, string> = {
@@ -33,8 +34,30 @@ const DOG_LABEL: Record<Dog, string> = {
 const ORIENTATION_PLACEHOLDER = '[B15 orientation line, copy pending: Steve to write in the Collie voice]';
 // Bark-game break and post-break acknowledgement: copy pending (logged in
 // PLACEHOLDERS.md). Steve writes these families into the workbook (B19 / B20).
-const BARK_BREAK_PLACEHOLDER = '[B19 bark-break line, copy pending: Steve to write the moment the Collie drops the game]';
-const BARK_ACK_PLACEHOLDER = '[B20 bark-acknowledgement line, copy pending: Steve to write the post-break barks]';
+const BARK_BREAK_PLACEHOLDER = '[B19 bark-break line, copy pending]';
+const BARK_ACK_PLACEHOLDER = '[B20 bark-acknowledgement line, copy pending]';
+
+// Bark presentation: only the Collie is wired live. Labrador/Terrier/Boxer bark
+// words and their B19/B20 English lines are PARKED with the Phase 3 voice
+// package; the per-dog state machine still runs for them, but their responses
+// render a parked marker until Phase 3.
+const BARK_PRESENTATION: Partial<Record<Dog, { word: string; end: string }>> = {
+  collie: { word: 'Woof', end: '.' },
+};
+const DOG_PREFIX: Record<Dog, string> = { collie: 'COL', labrador: 'LAB', terrier: 'TER', boxer: 'BOX' };
+
+// The generated bark volley: the dog's own word, count units, e.g. "Woof. Woof.".
+function barkVolley(dog: Dog, count: number): string {
+  const p = BARK_PRESENTATION[dog];
+  if (!p) return `[${DOG_LABEL[dog]} bark presentation parked for Phase 3]`;
+  return Array.from({ length: Math.max(1, count) }, () => `${p.word}${p.end}`).join(' ');
+}
+
+// A dog-specific B19/B20 line (COL-/LAB-/TER-/BOX- prefixed), unused first.
+function pickBark(data: ChumData, bucket: string, dog: Dog, used: string[]): CollieResponse | null {
+  const pool = data.collieResponses.filter((r) => r.bucketId === bucket && r.responseId.startsWith(DOG_PREFIX[dog]));
+  return pool.find((r) => !used.includes(r.responseId)) ?? pool[0] ?? null;
+}
 
 // Fill {{token}} placeholders from a context map. Unknown tokens are dropped and
 // stray double spaces collapsed, so a partial context never leaks braces.
@@ -204,22 +227,20 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
     }
 
     case 'bark': {
-      // Mirror the visitor's bark at their count + 1 (generated, not from copy).
-      const word = res.barkWord ?? 'woof';
-      const total = (res.barkCount ?? 1) + 1;
-      const cap = word.charAt(0).toUpperCase() + word.slice(1);
-      const barks = [cap, ...Array(Math.max(0, total - 1)).fill(word)].join(' ');
-      return { responseId: 'BARK', text: `${barks}!`, dog };
+      // The dog's own bark word, count units (generated, not from copy).
+      return { responseId: 'BARK', text: barkVolley(dog, res.barkCount ?? 2), dog };
     }
 
     case 'bark_break': {
-      const r = pickResponse(data, 'B19', session.usedResponseIds);
-      const text = r ? fill(r.template, baseContext(n)) : BARK_BREAK_PLACEHOLDER;
-      return { responseId: r?.responseId ?? 'B19', text, dog };
+      // Round five: the final bark volley, then (after a pause, in the UI) the
+      // English break line as a second message.
+      const r = pickBark(data, 'B19', dog, session.usedResponseIds);
+      const followUp = r ? fill(r.template, baseContext(n)) : BARK_BREAK_PLACEHOLDER;
+      return { responseId: r?.responseId ?? 'B19', text: barkVolley(dog, res.barkCount ?? 2), dog, followUp };
     }
 
     case 'bark_ack': {
-      const r = pickResponse(data, 'B20', session.usedResponseIds);
+      const r = pickBark(data, 'B20', dog, session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n)) : BARK_ACK_PLACEHOLDER;
       return { responseId: r?.responseId ?? 'B20', text, dog };
     }

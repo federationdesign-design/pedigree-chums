@@ -7,7 +7,7 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog } from './types';
-import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, parseBark, hasAny, buildAliasMap, applyAliases } from './normalise';
+import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion } from './safety';
 
 const HIDDEN_CEILING = 20;
@@ -190,7 +190,9 @@ function isActiveBreedQuestion(compact: string): boolean {
 
 export interface RouterState {
   submissionCount: number; // count AFTER this submission (1-based)
-  barkStreak?: number; // consecutive bark-only exchanges BEFORE this message
+  activeDog?: Dog; // whose bark game this is
+  barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
+  barkCompleted?: boolean; // the active dog has already completed its bark game
 }
 
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
@@ -228,16 +230,23 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'boxer_cutoff', transferTo: 'boxer' };
   }
 
-  // The bark game (after safety and the ceiling, before everything else): a
-  // bark-only message keeps the exchange in barks, mirroring at count + 1, until
-  // the streak hits the break, then English. Any real words route normally and
-  // reset the streak (handled in the engine).
+  // The bark game (after safety and the ceiling, before everything else). A
+  // bark-only message keeps the exchange in barks: the active dog answers with
+  // its OWN bark word at the visitor's unit count + 1, capped at eight. On the
+  // fifth exchange it barks then breaks into English (two messages). Once a dog
+  // has completed, later barks route to its post-break line. Any real words
+  // route normally and reset the streak (handled in the engine); safety, checked
+  // above, always wins.
   if (isBarkOnly(n)) {
+    if (state.barkCompleted) {
+      return { layer: 15, layerName: 'The bark game', bucket: 'B20', action: 'bark_ack' };
+    }
     const streak = (state.barkStreak ?? 0) + 1;
-    if (streak === BARK_BREAK) return { layer: 15, layerName: 'The bark game', bucket: 'B19', action: 'bark_break' };
-    if (streak > BARK_BREAK) return { layer: 15, layerName: 'The bark game', bucket: 'B20', action: 'bark_ack' };
-    const { word, count } = parseBark(n);
-    return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark', barkWord: word, barkCount: count };
+    const dogCount = Math.min(barkUnitCount(n) + 1, 8);
+    if (streak === BARK_BREAK) {
+      return { layer: 15, layerName: 'The bark game', bucket: 'B19', action: 'bark_break', barkCount: dogCount };
+    }
+    return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark', barkCount: dogCount };
   }
 
   // Layer 2: buying, launch and 30% discount.

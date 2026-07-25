@@ -2379,47 +2379,69 @@
     "status": "Approved copy v2"
   },
   {
-    "responseId": "B19-R01",
+    "responseId": "COL-B19-v1",
     "bucketId": "B19",
-    "subtag": "Bark break (drops the game)",
+    "subtag": "Break into English",
     "triggers": [],
-    "template": "[B19 bark-break placeholder 1, Steve to write]",
+    "template": "Right. Form acceptable, commitment excessive, vocabulary unchanged. What did you actually want?",
     "factSource": "Bark game",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
-    "status": "PLACEHOLDER - copy to be written by Steve"
+    "status": "Approved copy (bark game)"
   },
   {
-    "responseId": "B19-R02",
+    "responseId": "COL-B19-v2",
     "bucketId": "B19",
-    "subtag": "Bark break (drops the game)",
+    "subtag": "Break into English",
     "triggers": [],
-    "template": "[B19 bark-break placeholder 2, Steve to write]",
+    "template": "Five rounds. Consistent delivery, limited range. We can return to the real question now.",
     "factSource": "Bark game",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
-    "status": "PLACEHOLDER - copy to be written by Steve"
+    "status": "Approved copy (bark game)"
   },
   {
-    "responseId": "B20-R01",
-    "bucketId": "B20",
-    "subtag": "Post-break bark acknowledgement",
+    "responseId": "COL-B19-v3",
+    "bucketId": "B19",
+    "subtag": "Break into English",
     "triggers": [],
-    "template": "[B20 bark-ack placeholder 1, Steve to write]",
+    "template": "That concludes the barking assessment. You demonstrated persistence. I demonstrated restraint. What are we working on?",
     "factSource": "Bark game",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
-    "status": "PLACEHOLDER - copy to be written by Steve"
+    "status": "Approved copy (bark game)"
   },
   {
-    "responseId": "B20-R02",
+    "responseId": "COL-B20-v1",
     "bucketId": "B20",
-    "subtag": "Post-break bark acknowledgement",
+    "subtag": "Post-break bark",
     "triggers": [],
-    "template": "[B20 bark-ack placeholder 2, Steve to write]",
+    "template": "Already assessed. Use words.",
     "factSource": "Bark game",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
-    "status": "PLACEHOLDER - copy to be written by Steve"
+    "status": "Approved copy (bark game)"
+  },
+  {
+    "responseId": "COL-B20-v2",
+    "bucketId": "B20",
+    "subtag": "Post-break bark",
+    "triggers": [],
+    "template": "The barking portion is complete, our kid.",
+    "factSource": "Bark game",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy (bark game)"
+  },
+  {
+    "responseId": "COL-B20-v3",
+    "bucketId": "B20",
+    "subtag": "Post-break bark",
+    "triggers": [],
+    "template": "Same result as before. Your form remains adequate. Move on.",
+    "factSource": "Bark game",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy (bark game)"
   }
 ]

@@ -64,20 +64,41 @@ export function isEmojiOnly(n: Normalised): boolean {
 }
 
 // ---- The bark game ----
-const BARK_ATOM = 'woof|bark|yap|arf|ruff|yip|howl|grr+|aroo+|awoo+|boof';
-const BARK_WORD = new RegExp(`^(?:${BARK_ATOM})+s?$`);
-const BARK_GLOBAL = new RegExp(BARK_ATOM, 'g');
+// Recognised bark units (growls are deliberately excluded: they carry a
+// different emotional/safety context). "bow wow" counts as a single unit.
+const BARK_ATOMS = ['woof', 'bark', 'ruff', 'arf', 'yap'];
+const BARK_WORD = new RegExp(`^(?:${BARK_ATOMS.join('|')})+$`); // one word = one or more atoms
+const BARK_ATOM_GLOBAL = new RegExp(BARK_ATOMS.join('|'), 'g');
 
-// The whole message is barks (one or more bark words, nothing else).
-export function isBarkOnly(n: Normalised): boolean {
-  return n.words.length >= 1 && n.words.every((w) => BARK_WORD.test(w));
+// Lowercase, drop punctuation, collapse whitespace, and fold "bow wow" into a
+// single token so it is treated as one bark unit.
+function barkClean(n: Normalised): string {
+  return n.lower
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\bbow\s+wow\b/g, ' bowwow ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-// The bark to mirror and how many the visitor sent (counting repeats within a
-// word too, so "woofwoof" is two). Reply count is this + 1.
-export function parseBark(n: Normalised): { word: string; count: number } {
-  const atoms = n.compact.toLowerCase().match(BARK_GLOBAL) ?? [];
-  return { word: atoms[0] ?? 'woof', count: Math.max(1, atoms.length) };
+// The whole meaningful message is bark units and nothing else. Mixed language
+// ("woof how are you"), semantic questions ("why do dogs bark") and growls do
+// not qualify.
+export function isBarkOnly(n: Normalised): boolean {
+  const s = barkClean(n);
+  if (!s) return false;
+  return s.split(' ').every((w) => w === 'bowwow' || BARK_WORD.test(w));
+}
+
+// Count recognised bark units (repeats within a word count; "bow wow" is one).
+export function barkUnitCount(n: Normalised): number {
+  const s = barkClean(n);
+  if (!s) return 0;
+  let count = 0;
+  for (const w of s.split(' ')) {
+    if (w === 'bowwow') count += 1;
+    else count += w.match(BARK_ATOM_GLOBAL)?.length ?? 0;
+  }
+  return count;
 }
 
 // ---- Typo tolerance (deterministic fuzzy matching) ----
