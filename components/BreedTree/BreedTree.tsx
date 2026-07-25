@@ -24,8 +24,18 @@ const ZOOM_PAD = 1.1;
 // Breed-title placement on each circle, relative to its label anchor. TITLE_DY
 // moves it up (more negative) or down toward the circle; TITLE_ANGLE tilts it
 // (negative leans the text up to the right). Tweak these two to taste.
-// Mini pit only: the dog circles run 15% smaller than the space allows.
-const MINI_FILL = 0.85;
+// Mini pit only: the difficulty slider sets how much of the stage the dog
+// circles fill before the round starts. Bigger circles means less room in the
+// pit and a faster game over, so fill IS the difficulty. Level 5 lands on 0.85,
+// which is the fixed MINI_FILL this replaced, so the default is unchanged.
+// Mobile only for now: above 640px the layout does not run relayoutMobile, so
+// the fill has nowhere to land and the slider stays hidden.
+const DIFF_DEFAULT = 5;
+const DIFF_FILL_MIN = 0.7; // level 0, roughly half the area of maximum
+const DIFF_FILL_RANGE = 0.3; // level 10 lands on 1.00, the full packing
+function fillForLevel(level: number): number {
+  return DIFF_FILL_MIN + (Math.min(Math.max(level, 0), 10) / 10) * DIFF_FILL_RANGE;
+}
 // START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
 const START_SCALE = 2;
 // Toys ported from the main pit. Sizes come off the same unit the main pit uses,
@@ -332,15 +342,41 @@ export default function BreedTree({
   // entrance on every click. Capturing it once keeps the circles steady.
   const [layoutAspect, setLayoutAspect] = useState<number | null>(null);
   const aspectKey = isMobile ? layoutAspect ?? 0.55 : 1;
+  // Difficulty: 10 hardest at the top of the slider, 0 easiest at the bottom.
+  // Start-screen control only, and it resets to the default every time the pit
+  // is opened (LineageModal remounts this component on its runKey).
+  const [level, setLevel] = useState(DIFF_DEFAULT);
+  const miniFill = fillForLevel(level);
+  // Set the instant before a difficulty change, and consumed by the entrance
+  // effect so that re-pack resizes in place rather than replaying the drop-in.
+  const resizeOnlyRef = useRef(false);
+  const levelRef = useRef(DIFF_DEFAULT);
+  const diffRef = useRef<HTMLDivElement>(null);
+  const diffDragRef = useRef(false);
+  function applyLevel(next: number) {
+    const l = Math.min(Math.max(Math.round(next), 0), 10);
+    if (l === levelRef.current) return;
+    levelRef.current = l;
+    resizeOnlyRef.current = true;
+    setLevel(l);
+  }
+  // The track runs 0 at the bottom to 10 at the top, so invert the pointer's
+  // offset within it. Snaps to whole levels.
+  function setLevelFromY(clientY: number) {
+    const el = diffRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    applyLevel((1 - (clientY - r.top) / Math.max(r.height, 1)) * 10);
+  }
   const nodes = useMemo<Node[]>(() => {
     const h = hierarchy<LineageNode>(root)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
     normalizeTop(ns);
-    if (isMobile) relayoutMobile(ns, aspectKey, dockAside ? MINI_FILL : 1);
+    if (isMobile) relayoutMobile(ns, aspectKey, dockAside ? miniFill : 1);
     return ns;
-  }, [root, isMobile, aspectKey, dockAside]);
+  }, [root, isMobile, aspectKey, dockAside, miniFill]);
 
   // capture the stage aspect for the layout exactly once, on the first valid read.
   // "Valid" has to mean actually measured: aspect starts at 1, and freezing that
@@ -780,7 +816,13 @@ export default function BreedTree({
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (reduce) {
+    // A difficulty change re-packs the circles, which lands here as a fresh
+    // nodes array. Replaying the 700ms staggered entrance on every step of the
+    // slider would be unusable, and START is gated on `entered` so it would
+    // blink out each time. Resize in place instead: the pack is real, so the
+    // physics still reads the true radii when START is pressed.
+    if (reduce || resizeOnlyRef.current) {
+      resizeOnlyRef.current = false;
       zoomTo(v);
       setEntered(true);
       return () => cancelAnimationFrame(rafRef.current);
@@ -1848,7 +1890,7 @@ export default function BreedTree({
           {/* START: the pit hangs still until this is pressed. Screen-space
               sized like the other in-pit UI objects, centred over the stage,
               and hidden while the visitor is zoomed into a circle. */}
-          {dockAside && gravity && entered && !started && !learning && focus === nodes[0] && (() => {
+          {dockAside && gravity && entered && !started && !learning && focus.depth === 0 && (() => {
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
             // same size ramp as the GAME OVER / ROUND WON flash: clamp(3.4rem, 12vw, 8rem)
@@ -1909,6 +1951,57 @@ export default function BreedTree({
           })()}
         </svg>
       </div>
+
+      {/* Difficulty: start-screen only, down the left, 10 hardest at the top.
+          The root-view gate is `focus.depth === 0`, not `focus === nodes[0]`:
+          a re-pack hands back a new node array, so identity is briefly stale
+          and the control would unmount mid-drag and drop the pointer capture.
+          Hand-rolled rather than an <input type="range"> so the vertical
+          orientation does not depend on writing-mode support, which only landed
+          in Safari 17.4, and so the thumb can carry the pit's own yellow square
+          look. Mobile only: the fill has no effect on the desktop layout. */}
+      {dockAside && gravity && isMobile && entered && !started && !learning && focus.depth === 0 && (
+        <div className={styles.diff}>
+          <span className={styles.diffEnd} aria-hidden="true">10</span>
+          <div
+            ref={diffRef}
+            className={styles.diffTrack}
+            role="slider"
+            tabIndex={0}
+            aria-label="Difficulty"
+            aria-valuemin={0}
+            aria-valuemax={10}
+            aria-valuenow={level}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+              diffDragRef.current = true;
+              setLevelFromY(e.clientY);
+            }}
+            onPointerMove={(e) => {
+              if (!diffDragRef.current) return;
+              setLevelFromY(e.clientY);
+            }}
+            onPointerUp={(e) => {
+              diffDragRef.current = false;
+              try { (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId); } catch { /* already gone */ }
+            }}
+            onPointerCancel={() => { diffDragRef.current = false; }}
+            onKeyDown={(e) => {
+              const step = e.key === "ArrowUp" || e.key === "ArrowRight" ? 1 : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -1 : 0;
+              if (!step) return;
+              e.preventDefault();
+              applyLevel(levelRef.current + step);
+            }}
+          >
+            <div className={styles.diffTrail} style={{ height: `${level * 10}%` }} />
+            <div className={styles.diffThumb} style={{ bottom: `${level * 10}%` }}>
+              <span>{level}</span>
+            </div>
+          </div>
+          <span className={styles.diffEnd} aria-hidden="true">0</span>
+        </div>
+      )}
 
       {dockAside && gravity && (
         <div

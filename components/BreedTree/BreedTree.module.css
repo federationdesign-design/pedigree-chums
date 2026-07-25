@@ -367,3 +367,77 @@
   pointer-events: none;
   user-select: none;
 }
+
+/* Difficulty slider: start screen only, mounted down the left of the stage.
+   10 hardest at the top, 0 easiest at the bottom, default 5. It sits above the
+   circles but clear of START, which rides at 80% of the stage height. */
+.diff {
+  position: absolute;
+  left: 14px;
+  top: 15%;
+  height: 52%;
+  z-index: 16;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.diffEnd {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  color: #ffffff;
+  letter-spacing: 1px;
+  filter: drop-shadow(0 4px 40px rgba(0, 0, 0, 0.6));
+}
+.diffTrack {
+  position: relative;
+  flex: 1;
+  width: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid var(--navy, #0a3a57);
+  box-shadow: 0 3px 10px rgba(10, 58, 87, 0.3);
+  /* the pointer owns the gesture: a phone must not read a drag as a scroll */
+  touch-action: none;
+  cursor: pointer;
+}
+.diffTrack:focus-visible {
+  outline: 3px solid var(--yellow, #ffd23e);
+  outline-offset: 3px;
+}
+/* filled portion below the thumb, so the level reads at a glance */
+.diffTrail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--blue-sky, #5cc4ee);
+}
+/* yellow square with a navy stroke, the same object language as the in-pit
+   shake and slow-motion buttons */
+.diffThumb {
+  position: absolute;
+  left: 50%;
+  width: 38px;
+  height: 38px;
+  margin: 0 0 -19px -19px;
+  border-radius: 11px;
+  background: var(--yellow, #ffd23e);
+  border: 4px solid var(--navy, #0a3a57);
+  box-shadow: 0 3px 10px rgba(10, 58, 87, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.diffThumb span {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--navy, #0a3a57);
+}

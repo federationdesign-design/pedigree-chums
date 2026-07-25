@@ -75,7 +75,9 @@ const centreOf = (re) => {
   // a) retire the flag by reading its message
   // click the element, with retries: the flag rolls, so a coordinate click can
   // land mid-bounce and be read as a drag rather than a tap
-  for (let attempt = 0; attempt < 3; attempt++) {
+  // six attempts, not three: the flag is still lively at this point and three
+  // taps in a row can all land mid-bounce, which read as a false failure
+  for (let attempt = 0; attempt < 6; attempt++) {
     const already = await p.$('[aria-label="Got it"]');
     if (already) break;
     const flagEl = await p.$('image[href*="uk-icon"]');
