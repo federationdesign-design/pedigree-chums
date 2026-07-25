@@ -195,14 +195,34 @@ export default function GoodDogBadDogPage() {
           update();
 
           function goTo(idx) {
-            var count = carousel.children.length;
+            /* Re-queried each time so the handler still works if React has
+               replaced these nodes during hydration. */
+            var c = document.getElementById('mobile-carousel');
+            if (!c) return;
+            var count = c.children.length;
             if (idx < 0) idx = 0;
             if (idx > count - 1) idx = count - 1;
-            carousel.scrollTo({ left: idx * carousel.clientWidth, behavior: 'smooth' });
+            var from = c.scrollLeft;
+            var target = idx * c.clientWidth;
+            /* scroll-snap-type: x mandatory blocks programmatic smooth scrolling
+               on iOS Safari, which is why this button did nothing while native
+               swiping worked. The touchend handler below already relies on the
+               same off/on trick -- that is the only reason it succeeds. */
+            c.style.scrollSnapType = 'none';
+            c.scrollTo({ left: target, behavior: 'smooth' });
+            /* If smooth scrolling was ignored outright, jump there instead. */
+            setTimeout(function(){
+              if (Math.abs(c.scrollLeft - from) < 2) c.scrollLeft = target;
+            }, 400);
+            setTimeout(function(){ c.style.scrollSnapType = ''; }, 700);
           }
 
-          var btn = document.getElementById('intro-next-btn');
-          if (btn) btn.addEventListener('click', function(){ goTo(1); });
+          /* Delegated rather than bound directly, so the button keeps working
+             even if its node is re-created after this script has run. */
+          document.addEventListener('click', function(e){
+            var t = e.target;
+            if (t && t.closest && t.closest('#intro-next-btn')) goTo(1);
+          });
 
           /* Continuous vertical drag -> horizontal movement.
              touch-action: pan-x means the browser has no default action for
