@@ -2045,5 +2045,337 @@
     "defaultRoute": "",
     "animationCue": "EARS_UP",
     "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F01-v1",
+    "bucketId": "B16",
+    "subtag": "How can a dog type",
+    "triggers": [
+      "How can a dog type?",
+      "Is that really your face?",
+      "Do you really know what I typed?"
+    ],
+    "template": "I do not type, our kid. A person wrote every line in advance, and the game matches your message to the right one. I merely provide the judgement and the face.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F01-v2",
+    "bucketId": "B16",
+    "subtag": "How can a dog type",
+    "triggers": [],
+    "template": "No paws on keyboards here. Someone human wrote the words, the system chooses the closest fit, and I deliver them with the level of confidence they deserve.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F02-v1",
+    "bucketId": "B16",
+    "subtag": "Are you real / actually a dog",
+    "triggers": [
+      "Are you real?",
+      "Are you actually a dog?",
+      "Is there a real dog there?",
+      "Are you alive?",
+      "Are you a real animal?"
+    ],
+    "template": "I am a Border Collie character inside a game, not a live animal hiding behind your screen. Real enough to answer you, illustrated enough to avoid the practical complications.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F02-v2",
+    "bucketId": "B16",
+    "subtag": "Are you real / actually a dog",
+    "triggers": [],
+    "template": "Not a flesh-and-blood dog, no. I am the Collie written and drawn for this game, which saves us both from explaining how I reached the keyboard.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F03-v1",
+    "bucketId": "B16",
+    "subtag": "Are you AI / a robot / ChatGPT",
+    "triggers": [
+      "Are you AI?",
+      "Are you a chatbot?",
+      "Are you a robot?",
+      "Is this one of those AI things?",
+      "Is ChatGPT running this?",
+      "Are you a computer program?",
+      "Are you software?"
+    ],
+    "template": "No AI. Every line was written by a person, checked and placed here deliberately. I am organised fiction, our kid, not a machine improvising in a hurry.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F03-v2",
+    "bucketId": "B16",
+    "subtag": "Are you AI / a robot / ChatGPT",
+    "triggers": [],
+    "template": "ChatGPT is not running this. Humans wrote the answers, the system matches your question, and I take the credit. A sound division of labour.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F04-v1",
+    "bucketId": "B16",
+    "subtag": "Is a human writing this / controlled",
+    "triggers": [
+      "Is a human writing these replies?",
+      "Is someone controlling you?",
+      "Is somebody typing for you?",
+      "Are you being operated by somebody?"
+    ],
+    "template": "A human wrote this, but not while you were waiting. These replies were prepared in advance, so nobody is crouched behind the screen trying to keep up.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F04-v2",
+    "bucketId": "B16",
+    "subtag": "Is a human writing this / controlled",
+    "triggers": [],
+    "template": "Nobody is typing live. A person wrote my words beforehand, the game selects the most suitable line, and I remain entirely composed throughout.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F05-v1",
+    "bucketId": "B16",
+    "subtag": "Prewritten / automatic / same for everyone",
+    "triggers": [
+      "Are these replies prewritten?",
+      "Are your answers automatic?",
+      "Do you give everyone the same answer?",
+      "Are you just saying random things?"
+    ],
+    "template": "Aye, prewritten with care. I have several answers for the same sort of question, so visitors do not always hear the identical line. Random would be easier. This is organised.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F05-v2",
+    "bucketId": "B16",
+    "subtag": "Prewritten / automatic / same for everyone",
+    "triggers": [],
+    "template": "The replies are prepared, not improvised. Different phrasings can lead to different lines, which is why this feels less like a vending machine and more like competent planning.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F06-v1",
+    "bucketId": "B16",
+    "subtag": "Can you understand me",
+    "triggers": [
+      "Can you really understand me?",
+      "Can you actually read this?",
+      "Can you hear me?",
+      "Do you understand English?",
+      "Are you really responding to me?"
+    ],
+    "template": "I cannot hear you, but the system reads what you type and matches it against subjects I know. Clear words help. Elbows on keyboards do not.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F06-v2",
+    "bucketId": "B16",
+    "subtag": "Can you understand me",
+    "triggers": [],
+    "template": "I understand within my working brief. Your message is compared with the questions and topics prepared for me, then I answer from there. Speak normally, only in writing.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F07-v1",
+    "bucketId": "B16",
+    "subtag": "Cartoon / picture / not real face",
+    "triggers": [
+      "Are you a cartoon dog?",
+      "Are you just a picture?",
+      "Is this really happening?"
+    ],
+    "template": "Aye, I am illustrated. This is my face, though, and I think the artist has handled the important features with appropriate respect.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F07-v2",
+    "bucketId": "B16",
+    "subtag": "Cartoon / picture / not real face",
+    "triggers": [],
+    "template": "I am a drawn Border Collie character, not a photograph. Frankly, the likeness is strong and the lighting is considerably more reliable.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F08-v1",
+    "bucketId": "B16",
+    "subtag": "Are you an actual [breed]",
+    "triggers": [
+      "Are you an actual Border Collie?",
+      "an actual Labrador?",
+      "Border Terrier?",
+      "Boxer?"
+    ],
+    "template": "I am the Border Collie character in this game, built from the breed's brains, work ethic and entirely justified confidence. Not flesh and fur, but recognisably one of us.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F08-v2",
+    "bucketId": "B16",
+    "subtag": "Are you an actual [breed]",
+    "triggers": [],
+    "template": "Actual animal, no. Actual Border Collie character, absolutely. The appearance, history and attitude come from the breed. Operating a website required outside assistance.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F09-v1",
+    "bucketId": "B16",
+    "subtag": "Can you think / clever / smarter than me",
+    "triggers": [
+      "Can you think for yourself?",
+      "Do you have a brain?",
+      "Are you intelligent?",
+      "Are you smarter than me?"
+    ],
+    "template": "I do not think independently. My answers were written and organised in advance. Fortunately, the person responsible gave me enough intelligence to remain ahead of most opening questions.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F09-v2",
+    "bucketId": "B16",
+    "subtag": "Can you think / clever / smarter than me",
+    "triggers": [],
+    "template": "No private thoughts, no hidden brain. I work from carefully written knowledge and rules. Whether that still makes me cleverer than you is a separate assessment.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F10-v1",
+    "bucketId": "B16",
+    "subtag": "Is this live / connected",
+    "triggers": [
+      "Is this live?",
+      "Are you connected to the internet?",
+      "Is this all programmed?",
+      "Is this a real conversation?"
+    ],
+    "template": "The conversation is happening now, but I am not browsing the internet or inventing replies live. Your message is matched to prepared answers, which is safer and considerably better organised.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "SCP-F10-v2",
+    "bucketId": "B16",
+    "subtag": "Is this live / connected",
+    "triggers": [],
+    "template": "Programmed, yes. Connected to the wider internet, no. You type, the system identifies what you mean, and I answer from material written for this game. That is still a conversation, just one with boundaries.",
+    "factSource": "Identity (scepticism)",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "FUN-TEASE-v1",
+    "bucketId": "B17",
+    "subtag": "Games coming soon (interim)",
+    "triggers": [
+      "Someone asks to play, says they are bored, wants a game: Can we play a game? / Entertain me / Quiz me / Let's play"
+    ],
+    "template": "Games are on the way, but they are not ready to release into the field yet. I would rather make you wait than hand you something unfinished and pretend it is play.",
+    "factSource": "Play (interim tease)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "FUN-TEASE-v2",
+    "bucketId": "B17",
+    "subtag": "Games coming soon (interim)",
+    "triggers": [],
+    "template": "Aye, play is coming. The games are still being tested, organised and prevented from wandering off. For now, the rest of the site is behaving itself.",
+    "factSource": "Play (interim tease)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "FUN-TEASE-v3",
+    "bucketId": "B17",
+    "subtag": "Games coming soon (interim)",
+    "triggers": [],
+    "template": "Not quite yet, our kid. The games are being built properly rather than hurried into public view. When they are ready, you will not need instructions to know what to do.",
+    "factSource": "Play (interim tease)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "EMOJI-ONLY-v1",
+    "bucketId": "B18",
+    "subtag": "Message is only unmapped emoji",
+    "triggers": [
+      "The whole message is emoji the system does not recognise"
+    ],
+    "template": "I can see the symbol, but it is not one I have been taught to interpret. Put it into words for me, our kid, and I will have a proper go.",
+    "factSource": "Emoji fallback",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "EMOJI-ONLY-v2",
+    "bucketId": "B18",
+    "subtag": "Message is only unmapped emoji",
+    "triggers": [],
+    "template": "That may be perfectly clear in human picture-writing. I work better with words. Type what you mean and I will stop tilting my head at it.",
+    "factSource": "Emoji fallback",
+    "defaultRoute": "",
+    "animationCue": "HEAD_TILT",
+    "status": "Approved copy v2"
   }
 ]

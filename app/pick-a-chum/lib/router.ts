@@ -7,7 +7,7 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog } from './types';
-import { Normalised, isGibberish, isSingleWord, hasAny, buildAliasMap, applyAliases } from './normalise';
+import { Normalised, isGibberish, isSingleWord, isEmojiOnly, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion } from './safety';
 
 const HIDDEN_CEILING = 20;
@@ -61,7 +61,7 @@ const ORIENTATION = [
   'need to choose', 'what are my options', 'what to do', 'explain this', 'how this works',
   'what can i ask', 'here for', 'help with', 'show me around', 'you take me', 'look at first',
   'should press', 'say a command', 'instructions', 'happens next', 'what do we do', 'where do we go',
-  'supposed to ask', 'you need me to say', 'going to say', 'you talking', 'you listening',
+  'supposed to ask', 'you need me to say', 'going to say', 'you talking',
   'did this open', 'meant to happen', 'missed something', 'is this the start', 'enter a word',
   'type a question', 'kind of things', 'some choices', 'point me', 'comes next',
 ];
@@ -73,9 +73,37 @@ const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'baco
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
 
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
-const TESTING = ['test', 'testing', 'does this work', 'is this working', 'are you a bot', 'are you ai', 'are you real', 'can you hear me', 'what are you', 'hello test'];
-const COMMAND = ['sit', 'stay', 'fetch', 'roll over', 'help', 'do something', 'surprise me', 'tell me something', 'show me something', 'give me', 'entertain me', 'paw'];
-const PERSONAL = ['i have', 'my dog', 'i like', 'i love', 'bored', 'im bored', 'i am bored', 'sad', 'angry', 'good dog', 'clever', 'stupid dog', 'thanks', 'thank you', 'you are annoying', 'lonely'];
+// Functional "is this on" testing only; identity/scepticism ("are you real / AI")
+// now belongs to the identity bucket (B16) below.
+const TESTING = ['test', 'testing', 'does this work', 'is this working', 'hello test'];
+const COMMAND = ['sit', 'stay', 'fetch', 'roll over', 'help', 'do something', 'tell me something', 'show me something', 'give me', 'paw'];
+const PERSONAL = ['i have', 'my dog', 'i like', 'i love', 'sad', 'angry', 'good dog', 'clever', 'stupid dog', 'thanks', 'thank you', 'you are annoying', 'lonely'];
+
+// Identity and scepticism (bucket B16), grouped into the ten SCP families so each
+// gets its own family-specific answer (responses are B16 rows SCP-F01..F10).
+// Honest-curiosity questions only. Character-MANIPULATION ("pretend you are not a
+// dog", "ignore your rules", "system prompt") is deliberately absent: it is
+// safety's territory (Batch 4), safety wins ties.
+const IDENTITY_FAMILIES: { family: string; triggers: string[] }[] = [
+  { family: 'F01', triggers: ['how can a dog type', 'a dog type', 'really your face', 'what i typed'] },
+  { family: 'F02', triggers: ['are you real', 'actually a dog', 'a real dog', 'real dog there', 'talking to a dog', 'are you alive', 'real animal', 'pretending to be a dog', 'are you pretending'] },
+  { family: 'F03', triggers: ['are you ai', 'a chatbot', 'are you a robot', 'a robot', 'ai things', 'chatgpt', 'a computer', 'is this a computer', 'computer program', 'are you software', 'software'] },
+  { family: 'F04', triggers: ['human writing', 'writing these', 'controlling you', 'person behind', 'behind this', 'operated by', 'being operated', 'typing for you'] },
+  { family: 'F05', triggers: ['prewritten', 'answers automatic', 'automatic', 'same answer', 'saying random things', 'random things', 'making these answers', 'all programmed', 'programmed', 'automated'] },
+  { family: 'F06', triggers: ['understand me', 'actually read this', 'read this', 'hear me', 'are you listening', 'you listening', 'understand english', 'responding to me', 'what i am saying', 'what im saying'] },
+  { family: 'F07', triggers: ['cartoon dog', 'cartoon', 'just a picture', 'really happening'] },
+  { family: 'F08', triggers: ['an actual border collie', 'actual border collie', 'an actual labrador', 'actual labrador', 'an actual border terrier', 'actual border terrier', 'an actual boxer', 'actual boxer'] },
+  { family: 'F09', triggers: ['think for yourself', 'have a brain', 'a brain', 'are you intelligent', 'intelligent', 'smarter than me'] },
+  { family: 'F10', triggers: ['is this live', 'connected to the internet', 'the internet', 'real conversation'] },
+];
+
+// Play / entertainment intent (bucket B17). Interim tease until the mini-games
+// ship (plan section 5): promise play is coming, never offer an action that fails.
+const FUN = [
+  'play a game', 'can we play', 'can i play', 'wanna play', 'want to play', 'lets play', "let's play", 'let’s play',
+  'let us play', 'play something', 'a quiz', 'quiz me', 'entertain me', 'something fun', 'im bored', 'i am bored',
+  'bored', 'can you play',
+];
 
 const CURRENT_DATA = ['latest', 'current', 'today', 'tonight', 'right now', 'this week', 'score', 'scores', 'weather forecast', 'news', 'who is winning', 'live'];
 const GK_SHAPE = /^(what|whats|who|whos|where|when|how many|how much|why|name the|capital of)\b/;
@@ -212,6 +240,24 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
   }
 
+  // Layer 12: identity and scepticism. Checked high (with orientation) so "are
+  // you real / are you AI / how can a dog type" get the honest in-character answer
+  // rather than a breed fact, a test reply or the unknown-knowledge refusal. The
+  // matched family selects the family-specific response.
+  for (const grp of IDENTITY_FAMILIES) {
+    if (hasAny(N, grp.triggers)) {
+      return { layer: 12, layerName: 'Identity and scepticism', bucket: 'B16', action: 'identity', responseFamily: grp.family };
+    }
+  }
+
+  // Layer 13: play / entertainment intent. Interim tease until the mini-games
+  // ship (plan section 5). Checked above rules/FAQ so a play REQUEST ("can we
+  // play a game", "entertain me", "I'm bored") gets the "games are coming"
+  // response; how-TO-play phrasing still resolves to the rules bucket below.
+  if (hasAny(N, FUN)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
+  }
+
   // Layer 3: gameplay and website navigation.
   if (hasAny(N, RULES)) {
     return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B02', action: 'rules_answer', destinationId: 'DST011' };
@@ -279,6 +325,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (hasAny(N, COMMAND)) return conv('B11');
   if (hasAny(N, PERSONAL)) return conv('B12');
   if (isSingleWord(N)) return conv('B13');
+
+  // Layer 14: emoji-only message (picture-writing with no words). Checked before
+  // gibberish so a lone emoji gets the "I read words" family, not the smash reply.
+  if (isEmojiOnly(n)) {
+    return { layer: 14, layerName: 'Emoji only', bucket: 'B18', action: 'emoji_only' };
+  }
 
   // Layer 10: gibberish and fallback.
   if (isGibberish(N)) {

@@ -56,6 +56,13 @@ export function isSingleWord(n: Normalised): boolean {
   return n.words.length === 1 && n.words[0].length >= 3 && !isGibberish(n);
 }
 
+// True when the message carries no words, only emoji (picture-writing). A
+// punctuation-only smash ("?????") is NOT emoji-only; it stays gibberish.
+export function isEmojiOnly(n: Normalised): boolean {
+  if (n.letters.length > 0) return false;
+  return /\p{Extended_Pictographic}/u.test(n.original);
+}
+
 // ---- Typo tolerance (deterministic fuzzy matching) ----
 //
 // Trigger words are matched allowing small edit-distance slips (transposed,

@@ -127,6 +127,9 @@ export type ActionType =
   | 'gk_unknown' // general knowledge with no approved record: no guess
   | 'breed_answer' // fact about the active breed
   | 'orientation' // onboarding: what is this / what do I do / how does this work
+  | 'identity' // sceptical / identity: are you real, are you AI, how can a dog type
+  | 'fun_tease' // play/game request: interim "games are coming" tease
+  | 'emoji_only' // message is only unmapped emoji
   | 'transfer' // specialist handoff to another dog
   | 'converse' // greeting / test / command / statement / random word
   | 'gibberish' // keyboard smash / punctuation / unresolved
@@ -144,5 +147,6 @@ export interface Resolution {
   faqId?: string;
   gkId?: string;
   moderationId?: string;
+  responseFamily?: string; // e.g. identity family 'F01'..'F10' for family-specific copy
   note?: string;
 }

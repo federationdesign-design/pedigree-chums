@@ -176,6 +176,29 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       return { responseId: r?.responseId ?? 'B15', text, dog };
     }
 
+    case 'identity': {
+      // Family-specific: pick from this SCP family's variants (SCP-F0x-*), rotating.
+      const fam = res.responseFamily;
+      const pool = fam
+        ? data.collieResponses.filter((r) => r.bucketId === 'B16' && r.responseId.startsWith(`SCP-${fam}`))
+        : [];
+      const r = pool.find((x) => !session.usedResponseIds.includes(x.responseId)) ?? pool[0] ?? pickResponse(data, 'B16', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : 'I am exactly what I appear to be, and busy with it.';
+      return { responseId: r?.responseId ?? 'B16', text, dog };
+    }
+
+    case 'fun_tease': {
+      const r = pickResponse(data, 'B17', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : 'Play is coming. Not quite yet.';
+      return { responseId: r?.responseId ?? 'B17', text, dog };
+    }
+
+    case 'emoji_only': {
+      const r = pickResponse(data, 'B18', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : 'I work better with words. Type what you mean.';
+      return { responseId: r?.responseId ?? 'B18', text, dog };
+    }
+
     case 'transfer': {
       const to = res.transferTo ?? 'labrador';
       const toLabel = DOG_LABEL[to];
