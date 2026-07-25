@@ -1005,7 +1005,15 @@ export default function BreedTree({
         const px = kind === "ball"
           ? pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40)
           : pL.x + wPx * 0.7;
-        const py = pL.y - Math.max(vbHf / k, dia) * 0.35 - dia;
+        // Spawn ABOVE the visible top so the toy is already falling when it
+        // enters, exactly as the main pit does. Take the top edge from the stage
+        // rectangle, not from the viewBox mapping: the viewBox can reach well
+        // past the visible stage, which was launching the ball ~590px up instead
+        // of the pit's 60 to 120.
+        const stageTopPx = st ? st.getBoundingClientRect().top : 0;
+        const py = kind === "ball"
+          ? stageTopPx - (60 + Math.random() * 60) // pit: y = -60 - rand*60
+          : stageTopPx - r;                        // pit: y = -ujR
         const w2 = worldFromPx(px, py);
         const idx = toyBodiesRef.current.length;
         const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null };
@@ -1016,7 +1024,8 @@ export default function BreedTree({
         mb.plugin = { prop: pr, kind: "toy" };
         pr.mb = mb;
         Composite.add(world, mb);
-        MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit contract
+        // the pit gives the flag a throw and lets the ball simply drop
+        if (kind === "flag") MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
         toyBodiesRef.current.push(pr);
         if (kind === "flag") flagIdxRef.current = idx;
         setToyList((l) => [...l, { kind, size: dia * fxScale, src: kind === "ball" ? TOY_BALL_SRC : TOY_FLAG_SRC }]);

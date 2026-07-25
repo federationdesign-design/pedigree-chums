@@ -42,19 +42,37 @@ const shown = (list, kind) => list.filter((t) => t.kind === kind && t.shown);
   await p.waitForTimeout(2700);
 
   const preStart = await p.evaluate(readToys);
+  const t0 = Date.now();
   await p.locator('[aria-label="Start"]').click({ force: true });
-  await p.waitForTimeout(2500);
-  const atLanding = await p.evaluate(readToys);
-  await p.waitForTimeout(3200);
-  const ballDue = await p.evaluate(readToys);
-  await p.waitForTimeout(3200);
-  const flagDue = await p.evaluate(readToys);
-  await p.waitForTimeout(2500);
+
+  // poll fast so we catch the ball's very first painted frame, and time it
+  let firstPaint = null;
+  let msToBall = null;
+  for (let i = 0; i < 100; i++) {
+    await p.waitForTimeout(90);
+    firstPaint = await p.evaluate(() => {
+      const svg = document.querySelector('[role="dialog"] svg');
+      const i2 = Array.from(svg.querySelectorAll('image')).find((x) => /tennis-ball/.test(x.getAttribute('href') || ''));
+      if (!i2) return null;
+      const r = i2.getBoundingClientRect();
+      return r.width < 1 ? null : { top: Math.round(r.top), bottom: Math.round(r.bottom) };
+    });
+    if (firstPaint) { msToBall = Date.now() - t0; break; }
+  }
+
+  await p.waitForTimeout(1500);
+  const ballDue = await p.evaluate(readToys);   // ball in the pit, flag not yet
+  await p.waitForTimeout(3000);
+  const flagDue = await p.evaluate(readToys);   // flag has arrived
+  await p.waitForTimeout(3500);
   const settledA = await p.evaluate(readToys);
   await p.waitForTimeout(1500);
   const settledB = await p.evaluate(readToys);
 
-  const quietEarly = preStart.length === 0 && shown(atLanding, 'ball').length === 0;
+  // nothing before START, and the ball waits for the dogs to land plus 3s
+  const quietEarly = preStart.length === 0 && msToBall !== null && msToBall > 3000 && msToBall < 9000;
+  // toys must enter from ABOVE the viewport, already falling, not pop into the pit
+  const enteredFromAbove = !!firstPaint && firstPaint.bottom <= 4;
   const ballOnTime = shown(ballDue, 'ball').length === 1 && shown(ballDue, 'flag').length === 0;
   const flagOnTime = shown(flagDue, 'flag').length === 1;
   const fell = shown(flagDue, 'ball')[0] && shown(ballDue, 'ball')[0]
@@ -62,8 +80,9 @@ const shown = (list, kind) => list.filter((t) => t.kind === kind && t.shown);
   const settled = shown(settledA, 'ball')[0] && shown(settledB, 'ball')[0]
     && Math.abs(shown(settledB, 'ball')[0].y - shown(settledA, 'ball')[0].y) < 3;
 
-  console.log('pre-START:', preStart.length, '| at landing:', JSON.stringify(atLanding.map((t) => t.kind + ':' + t.shown)));
+  console.log('pre-START:', preStart.length, '| ms to ball:', msToBall);
   console.log('ball due:', JSON.stringify(shown(ballDue, 'ball')), '| flag due:', JSON.stringify(shown(flagDue, 'flag')));
+  console.log('ball first paint:', JSON.stringify(firstPaint), '| entered from above:', !!enteredFromAbove);
   console.log('quiet early:', quietEarly, '| ball on time:', ballOnTime, '| flag on time:', flagOnTime, '| fell:', !!fell, '| settled:', !!settled);
 
   // flag tap -> shared popup -> tick poofs the flag, ball survives
@@ -92,7 +111,7 @@ const shown = (list, kind) => list.filter((t) => t.kind === kind && t.shown);
   const mainPitOk = await p.evaluate(() => !!document.querySelector('canvas'));
   console.log('main pit renders:', mainPitOk, '| pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
-  const pass = !!(quietEarly && ballOnTime && flagOnTime && fell && settled
+  const pass = !!(quietEarly && enteredFromAbove && ballOnTime && flagOnTime && fell && settled
     && popupOk && flagGone && ballKept && mainPitOk && errs.length === 0);
   console.log(pass ? 'PASS GUARD-006' : 'FAIL GUARD-006');
   await b.close();
