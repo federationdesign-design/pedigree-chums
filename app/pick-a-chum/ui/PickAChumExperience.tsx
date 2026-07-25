@@ -7,9 +7,10 @@
 // the launcher: tapping it ripples four large dog circles into being; picking one
 // grows a chat widget from that spot, with the chosen dog's medallion, a running
 // message thread (dog on the left, visitor on the right) and a command bar that
-// persists below. The retro is the interaction: silent opening, paged type-on
-// reveal for each new dog message, and > action links that ARE the response's
-// action (not a menu). Response-specific links only; no suggestion chips.
+// persists below. Each dog message appears in full at once (no paged reveal).
+// Only response-specific action links that ARE the response's action remain, and
+// navigation links only on the final interaction; the discount pop-up is the one
+// exception kept in buying replies.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -21,7 +22,7 @@ import { newSession, Session } from '../lib/session';
 import { Dog } from '../lib/types';
 import { openDiscountPopup } from '../data/discount-popup';
 
-type Phase = 'selecting' | 'idle' | 'revealing' | 'ending';
+type Phase = 'selecting' | 'idle' | 'ending';
 
 const DOG_SLUGS: Record<Dog, string> = {
   collie: 'border-collie',
@@ -38,23 +39,6 @@ function dogInfo(dog: Dog): { name: string; image: string } {
   return { name: rec?.name ?? dog, image: rec ? encodeURI(rec.image) : '' };
 }
 
-// Split a reply into dialogue pages at sentence boundaries (no internal scroll).
-function paginate(text: string, max = 200): string[] {
-  const sentences = text.match(/[^.!?]+[.!?]*\s*/g) ?? [text];
-  const pages: string[] = [];
-  let cur = '';
-  for (const s of sentences) {
-    if (cur && (cur + s).length > max) {
-      pages.push(cur.trim());
-      cur = s;
-    } else {
-      cur += s;
-    }
-  }
-  if (cur.trim()) pages.push(cur.trim());
-  return pages.length ? pages : [text];
-}
-
 interface Command {
   label: string;
   kind: 'popup' | 'internal' | 'external';
@@ -64,10 +48,9 @@ interface Command {
 interface Message {
   id: number;
   who: 'user' | 'dog';
-  text?: string; // user line
+  text: string;
   dog?: Dog; // dog turn
   name?: string;
-  pages?: string[];
   action?: Command;
   closed?: boolean; // this dog turn is the session cut-off
 }
@@ -95,8 +78,6 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const [dog, setDog] = useState<Dog>('collie'); // active dog (the anchor medallion)
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [shown, setShown] = useState(0); // chars revealed on the current page
   const inputRef = useRef<HTMLInputElement | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef(0);
@@ -105,14 +86,6 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
     []
   );
-
-  // The last dog turn is the one that types on; everything above it is settled.
-  const last = messages[messages.length - 1];
-  const activeMsg = phase === 'revealing' && last?.who === 'dog' ? last : null;
-  const pages = activeMsg?.pages ?? [];
-  const page = pages[pageIndex] ?? '';
-  const revealing = phase === 'revealing' && shown < page.length;
-  const lastPage = pageIndex >= pages.length - 1;
 
   // Lock background scroll for the lifetime of the open experience.
   useEffect(() => {
@@ -123,50 +96,17 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     };
   }, []);
 
-  // Type-on reveal for the current page (instant under reduced motion).
-  useEffect(() => {
-    if (phase !== 'revealing') return;
-    if (reducedMotion) {
-      setShown(page.length);
-      return;
-    }
-    setShown(0);
-    let i = 0;
-    const id = window.setInterval(() => {
-      i += 1;
-      setShown(i);
-      if (i >= page.length) window.clearInterval(id);
-    }, 20);
-    return () => window.clearInterval(id);
-  }, [phase, pageIndex, page, reducedMotion]);
-
-  // When the last page finishes revealing, settle the turn: cut-off ends the
-  // session, otherwise the command bar reopens for the next message.
-  useEffect(() => {
-    if (phase !== 'revealing') return;
-    if (shown >= page.length && lastPage) {
-      if (last?.closed) {
-        setPhase('ending');
-      } else {
-        setPhase('idle');
-        window.setTimeout(() => inputRef.current?.focus(), 0);
-      }
-    }
-  }, [phase, shown, page.length, lastPage, last]);
-
-  // Keep the newest message in view as the thread grows and text types on.
+  // Keep the newest message in view as the thread grows.
   useEffect(() => {
     const el = threadRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, shown, pageIndex, phase]);
+  }, [messages, phase]);
 
   const selectDog = useCallback((d: Dog) => {
     sessionRef.current = newSession(d);
     setDog(d);
     setMessages([]);
     setInput('');
-    setPageIndex(0);
-    setShown(0);
     setPhase('idle');
     window.setTimeout(() => inputRef.current?.focus(), 60);
   }, []);
@@ -174,7 +114,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const send = useCallback(() => {
     const session = sessionRef.current;
     const text = input.trim();
-    if (!session || !text || session.closed || phase === 'revealing') return;
+    if (!session || !text || session.closed) return;
     const result = submit(CHUM_DATA, session, text);
     const r = result.response;
     const activeDog = session.activeDog; // reflect any transfer
@@ -183,29 +123,18 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     const dogMsg: Message = {
       id: idRef.current++,
       who: 'dog',
+      text: r.text,
       dog: activeDog,
       name: info.name,
-      pages: paginate(r.text),
       action: actionFor(r),
       closed: r.closed,
     };
     setDog(activeDog);
     setInput('');
     setMessages((m) => [...m, userMsg, dogMsg]);
-    setPageIndex(0);
-    setShown(0);
-    setPhase('revealing');
-  }, [input, phase]);
-
-  // Click the thread to skip the type-on, then page through, click by click.
-  const advance = useCallback(() => {
-    if (phase !== 'revealing') return;
-    if (shown < page.length) {
-      setShown(page.length);
-    } else if (!lastPage) {
-      setPageIndex((i) => i + 1);
-    }
-  }, [phase, shown, page.length, lastPage]);
+    setPhase(r.closed ? 'ending' : 'idle');
+    if (!r.closed) window.setTimeout(() => inputRef.current?.focus(), 0);
+  }, [input]);
 
   // Escape closes the interface (parent restores focus to the launcher).
   useEffect(() => {
@@ -224,15 +153,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   }, [phase, onClose, reducedMotion]);
 
   const { image: dogImage } = dogInfo(dog);
-  const inputLocked = phase === 'revealing' || phase === 'ending' || !!sessionRef.current?.closed;
-
-  // Text revealed for a dog turn: settled turns show in full; the active turn
-  // shows its completed pages plus the page currently typing on.
-  const revealedText = (msg: Message): string => {
-    const p = msg.pages ?? [];
-    if (msg !== activeMsg) return p.join(' ');
-    return [...p.slice(0, pageIndex), (p[pageIndex] ?? '').slice(0, shown)].join(' ');
-  };
+  const inputLocked = phase === 'ending' || !!sessionRef.current?.closed;
 
   return (
     <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="true">
@@ -275,35 +196,29 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         </div>
       ) : (
         <div className={styles.panel}>
-          <div className={styles.thread} ref={threadRef} onClick={advance}>
-            {messages.map((msg) =>
-              msg.who === 'user' ? (
-                <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
-                  <div className={styles.bubbleUser}>{msg.text}</div>
-                </div>
-              ) : (
-                <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
-                  <div className={styles.bubbleDog}>
-                    <div className={styles.nameplate}>{msg.name}</div>
-                    <p className={styles.dialogue} aria-live={msg === activeMsg ? 'polite' : undefined}>
-                      {revealedText(msg)}
-                    </p>
-
-                    {msg === activeMsg && !revealing && !lastPage && (
-                      <span className={styles.continueMarker} aria-hidden="true">
-                        ▶
-                      </span>
-                    )}
-
-                    {msg !== activeMsg && msg.action && (msg.action.kind === 'popup' || msg.closed) && (
-                      <div className={styles.actionWrap}>
-                        <ActionLink command={msg.action} />
-                      </div>
-                    )}
+          <div className={styles.thread} ref={threadRef} aria-live="polite">
+            <div className={styles.threadInner}>
+              {messages.map((msg) =>
+                msg.who === 'user' ? (
+                  <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
+                    <div className={styles.bubbleUser}>{msg.text}</div>
                   </div>
-                </div>
-              )
-            )}
+                ) : (
+                  <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
+                    <div className={styles.bubbleDog}>
+                      <div className={styles.nameplate}>{msg.name}</div>
+                      <p className={styles.dialogue}>{msg.text}</p>
+
+                      {msg.action && (msg.action.kind === 'popup' || msg.closed) && (
+                        <div className={styles.actionWrap}>
+                          <ActionLink command={msg.action} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
           </div>
 
           <div className={styles.composerRow}>
