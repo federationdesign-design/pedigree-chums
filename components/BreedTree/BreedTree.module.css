@@ -473,15 +473,18 @@
   position: absolute;
   inset: -40%;
 }
-/* the picture keeps its own proportions and is anchored to the bottom, so the
-   horizon stays on the floor and the crop is taken off the top */
+/* The picture is sized to the stage height and centred, so it keeps its own
+   proportions and the overspill is trimmed evenly off the left and right. The
+   min-width floor only bites on a screen wider than the art's 1.56:1, where it
+   fills the width instead rather than leaving bare edges. */
 .levelBg {
   position: absolute;
   left: 50%;
   bottom: 0;
-  min-width: 100%;
-  min-height: 100%;
+  height: 100%;
   width: auto;
+  max-width: none;
+  min-width: 100%;
   transform: translateX(-50%);
   object-fit: cover;
   object-position: bottom center;

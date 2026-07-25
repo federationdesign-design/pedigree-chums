@@ -13,8 +13,11 @@
 // one era at a time without touching anything else.
 
 export type LevelTheme = {
-  // Full-bleed artwork. Anchored bottom centre and cropped, because the art is
-  // landscape and a phone stage is tall: the horizon must stay on the floor.
+  // Full-bleed artwork, as SVG. It is loaded through an <img>, never inlined:
+  // that keeps the file's own blend modes sealed inside the image, where they
+  // cannot reach the pit's SVG and disturb its paint order.
+  // Scaled to the stage height and centred, so the crop comes off the left and
+  // right and the middle of the picture is what you see.
   bg: string;
   // Flat colours behind the artwork, top to bottom, for the strip of stage the
   // cropped picture cannot reach on a very tall screen.
@@ -35,7 +38,7 @@ export type LevelTheme = {
 
 const THEMES: Record<string, LevelTheme> = {
   "ancient-medieval": {
-    bg: "/levels/ancient-bg.jpg",
+    bg: "/levels/ancient-bg.svg",
     sky: ["#20033b", "#255075"],
     floor: "/levels/ancient-floor.svg",
     floorAspect: 567.5 / 57.6,
