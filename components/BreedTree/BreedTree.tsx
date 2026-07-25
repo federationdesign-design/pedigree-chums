@@ -27,19 +27,117 @@ const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
 
-// Names over 11 characters split to two lines at the nearest word boundary,
-// same rule as the pop-up title, which lets the labels run twice the size.
-function splitLabel(name: string): string[] {
-  if (name.length <= 11 || !name.includes(" ")) return [name];
-  const words = name.split(" ");
-  let first = words[0];
-  let i = 1;
-  while (i < words.length && (first + " " + words[i]).length <= 11) {
-    first += " " + words[i];
-    i++;
+// Breed titles are fitted to the circle they belong to. The name is wrapped
+// across 1 to LABEL_MAX_LINES balanced lines and every option is measured; the
+// wrap that allows the largest type while keeping all four corners of the text
+// block inside the circle wins. A very long name therefore takes a third or
+// fourth line instead of spilling over the rim.
+const LABEL_MAX_LINES = 4;
+const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
+const LABEL_LINE_H = 1.05; // line height in ems, matches the tspan dy
+const LABEL_CAP_H = 0.8; // ink above the first baseline, in ems
+const LABEL_DESC = 0.28; // ink below the last baseline, in ems
+const LABEL_SAFE = 0.9; // keep the block inside this fraction of the radius
+
+// Real glyph widths, not a flat per-character average. Luckiest Guy caps run
+// from about 0.57em (BRITISH) to 0.73em (BANDOGS), so an average either
+// overflows the wide names or wastes size on the narrow ones. Canvas measures
+// whatever font is actually painting, at font-size 1em, cached per string.
+let labelCanvas: HTMLCanvasElement | null = null;
+const labelWidths = new Map<string, number>();
+function measureEm(line: string, font: string | null): number {
+  if (!font) return line.length * LABEL_CHAR_W;
+  const key = font + "|" + line;
+  const hit = labelWidths.get(key);
+  if (hit !== undefined) return hit;
+  let w = line.length * LABEL_CHAR_W;
+  try {
+    labelCanvas = labelCanvas ?? document.createElement("canvas");
+    const ctx = labelCanvas.getContext("2d");
+    if (ctx) {
+      const probe = 100;
+      ctx.font = `${probe}px ${font}`;
+      const m = ctx.measureText(line).width / probe;
+      if (m > 0) w = m;
+    }
+  } catch {
+    /* no canvas: the average stands in */
   }
-  const rest = words.slice(i).join(" ");
-  return rest ? [first, rest] : [first];
+  labelWidths.set(key, w);
+  return w;
+}
+// Steve: names two point sizes larger than the fitted size. Single tunable.
+const TITLE_BOOST = 2;
+
+// Split words into exactly n lines as evenly as the word lengths allow.
+// Returns null when n lines are not reachable (a single long word can force
+// fewer lines than asked for).
+function balancedWrap(words: string[], n: number): string[] | null {
+  if (n === 1) return [words.join(" ")];
+  if (words.length < n) return null;
+  const total = words.join(" ").length;
+  for (let target = Math.ceil(total / n); target <= total; target++) {
+    const lines: string[] = [];
+    let cur = "";
+    for (const w of words) {
+      const next = cur ? cur + " " + w : w;
+      if (cur && next.length > target) {
+        lines.push(cur);
+        cur = w;
+      } else cur = next;
+    }
+    if (cur) lines.push(cur);
+    if (lines.length === n) return lines;
+    if (lines.length < n) return null;
+  }
+  return null;
+}
+
+// First baseline for an n-line block: 1 and 2 line labels keep their historic
+// anchor exactly, 3 and 4 line labels lift so the block stays balanced.
+function labelFirstY(n: number, fs: number): number {
+  return TITLE_DY - Math.max(0, (n - 2) / 2) * LABEL_LINE_H * fs;
+}
+
+// Does the rotated text block sit inside a circle of radius r? Corners are
+// rotated about (0, TITLE_DY), exactly as the rendered <text> is.
+function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
+  const halfW = (widthEm * fs) / 2;
+  const y0 = labelFirstY(n, fs);
+  const top = y0 - LABEL_CAP_H * fs;
+  const bot = y0 + (n - 1) * LABEL_LINE_H * fs + LABEL_DESC * fs;
+  const cos = Math.cos((TITLE_ANGLE * Math.PI) / 180);
+  const sin = Math.sin((TITLE_ANGLE * Math.PI) / 180);
+  const lim = r * LABEL_SAFE;
+  for (const x of [-halfW, halfW]) {
+    for (const y of [top, bot]) {
+      const dy = y - TITLE_DY;
+      const rx = x * cos - dy * sin;
+      const ry = x * sin + dy * cos + TITLE_DY;
+      if (Math.hypot(rx, ry) > lim) return false;
+    }
+  }
+  return true;
+}
+
+function fitLabel(name: string, r: number, capFs: number, font: string | null): { lines: string[]; fs: number } {
+  const words = name.split(/\s+/).filter(Boolean);
+  const maxN = Math.min(LABEL_MAX_LINES, Math.max(1, words.length));
+  let best = { lines: [name], fs: 0 };
+  for (let n = 1; n <= maxN; n++) {
+    const lines = balancedWrap(words, n);
+    if (!lines) continue;
+    const widthEm = Math.max(...lines.map((l) => measureEm(l, font)));
+    let lo = 6;
+    let hi = capFs;
+    for (let it = 0; it < 26; it++) {
+      const mid = (lo + hi) / 2;
+      if (labelFits(widthEm, n, mid, r)) lo = mid;
+      else hi = mid;
+    }
+    if (lo > best.fs) best = { lines, fs: lo };
+  }
+  return best;
 }
 type View = [number, number, number];
 
@@ -238,6 +336,19 @@ export default function BreedTree({
   const [entered, setEntered] = useState(false);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
+  // The pit is inert until START is pressed. Nothing falls on a timer.
+  const [started, setStarted] = useState(false);
+  // Held null until the display face is painting, so the first (server-matched)
+  // render uses the flat average and only the measured pass uses canvas.
+  const [labelFont, setLabelFont] = useState<string | null>(null);
+  useEffect(() => {
+    const read = () => {
+      const v = getComputedStyle(document.documentElement).getPropertyValue("--font-display").trim();
+      setLabelFont(`${v || "system-ui"}, system-ui, sans-serif`);
+    };
+    if (document.fonts?.ready) document.fonts.ready.then(read, read);
+    else read();
+  }, []);
   const [badgePcts, setBadgePcts] = useState<number[]>([]);
   // rods and name pills scattered in from the learn layer, pit-style props:
   // sizes are view units frozen at the drop; dead ones keep their slot so the
@@ -489,13 +600,9 @@ export default function BreedTree({
 
   function zoom(d: Node) {
     // the pit stays live through a zoom: physics keeps running underneath
-    // while the view flies in, and everything returns as the view pulls back
-    // If the visitor explored before the drop ever happened, re-arm the 2s
-    // countdown each time they come back to the full view, so the drop is
-    // delayed by curiosity rather than cancelled by it.
-    if (gravity && !fellRef.current && d === nodes[0]) {
-      window.setTimeout(() => { runFallRef.current?.(); }, 2000);
-    }
+    // while the view flies in, and everything returns as the view pulls back.
+    // Nothing auto-drops any more: exploring before the drop simply hides the
+    // START button, and it comes back when the view returns to the full pit.
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
@@ -1188,11 +1295,12 @@ export default function BreedTree({
     };
     runFallRef.current = doFall;
     registerShake?.(() => {
-      if (!fellRef.current) runFallRef.current?.();
+      // a shake also starts the round, so the button never blocks the pit
+      if (!fellRef.current) { setStarted(true); runFallRef.current?.(); }
       shakeInnerRef.current?.();
     });
-    const timer = window.setTimeout(doFall, 2000);
-    return () => { window.clearTimeout(timer); cancelAnimationFrame(fallRafRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
+    // No timer: the circles hang until the visitor presses START.
+    return () => { cancelAnimationFrame(fallRafRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gravity, entered, nodes]);
 
@@ -1332,16 +1440,23 @@ export default function BreedTree({
                 <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
                   {isChild && !(dropped && d.depth === 1) && (
                     (() => {
-                      const lines = splitLabel(d.data.name.toUpperCase());
-                      const maxLen = Math.max(...lines.map((l) => l.length));
-                      // contain the label in its own circle: cap by the platform
-                      // size, then shrink until the longest line fits the width
+                      // Contain the label in its own circle. On mobile zoomTo
+                      // scales the whole label group by ls, so the fit has to be
+                      // done against the radius that scale leaves behind
+                      // (r * k / ls); without that the type came out about a
+                      // third too large and long names ran over the rim.
+                      const vL = viewRef.current;
+                      const kL = SIZE / vL[2];
+                      const ls = isMobile ? Math.max(0.4, Math.min(1.25, (d.r * kL) / 250)) : 1;
+                      const rFit = isMobile ? (d.r * kL) / ls : d.r;
                       const cap = isMobile ? 102 : 34;
-                      const fs = Math.max(10, Math.min(cap, (d.r * 1.7) / (maxLen * 0.56)));
+                      const fit = fitLabel(d.data.name.toUpperCase(), rFit, cap, labelFont);
+                      const lines = fit.lines;
+                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST));
                       return (
                         <text
                           x={0}
-                          y={TITLE_DY}
+                          y={labelFirstY(lines.length, fs)}
                           transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
                           style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "0.5px" }}
                         >
@@ -1367,7 +1482,13 @@ export default function BreedTree({
 
           {/* Physics badges: once dropped, the yellow % chips live here and are
               positioned by the sim / zoomTo from their body coordinates. */}
-          <g ref={badgesRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
+          {/* The badges are laid out from viewRef, which only reaches its final
+              value when the drop-in entrance calls zoomTo at the end. Showing
+              them before that put every chip at the wrong scale and origin (up
+              and to the left), then snapped it to the rim. They now fade in with
+              the labels, already at their resting spot on the lower-right rim,
+              which is exactly where the physics bodies spawn. */}
+          <g ref={badgesRef} style={{ display: dockAside ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
             {badgePcts.map((pct, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
@@ -1494,6 +1615,37 @@ export default function BreedTree({
                 )}
               </g>
             ));
+          })()}
+
+          {/* START: the pit hangs still until this is pressed. Screen-space
+              sized like the other in-pit UI objects, centred over the stage,
+              and hidden while the visitor is zoomed into a circle. */}
+          {dockAside && gravity && entered && !started && focus === nodes[0] && (() => {
+            const st = stageRef.current;
+            const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
+            const bw = 300 * upp;
+            const bh = 104 * upp;
+            return (
+              <g
+                className={styles.startBtn}
+                role="button"
+                aria-label="Start"
+                tabIndex={0}
+                style={{ cursor: "pointer" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStarted(true);
+                  runFallRef.current?.();
+                }}
+              >
+                <rect x={-bw / 2} y={-bh / 2} width={bw} height={bh} rx={26 * upp}
+                  style={{ fill: "var(--navy, #0a3a57)", stroke: "var(--yellow, #ffd23e)", strokeWidth: 4 * upp }} />
+                <text x={0} y={0} textAnchor="middle" dominantBaseline="central"
+                  style={{ fill: "var(--yellow, #ffd23e)", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${52 * upp}px`, letterSpacing: `${2 * upp}px`, pointerEvents: "none", userSelect: "none" }}>
+                  START
+                </text>
+              </g>
+            );
           })()}
         </svg>
       </div>

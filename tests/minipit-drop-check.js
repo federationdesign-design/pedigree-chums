@@ -19,6 +19,8 @@ const { chromium } = require('playwright');
   });
   await p.waitForTimeout(2500); // entrance, pre-drop
   const a = await pos();
+  // the pit is inert until START is pressed (no auto-drop timer any more)
+  await p.locator('[aria-label="Start"]').click({ force: true }); // pulses, so force
   await p.waitForTimeout(5100); // hold + drop + bounces
   const c1 = await pos();
   await p.waitForTimeout(2000);

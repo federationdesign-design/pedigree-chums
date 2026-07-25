@@ -299,3 +299,23 @@
   padding: 0;
   cursor: pointer;
 }
+
+/* START button: the pit stays inert until this is pressed. Drawn inside the
+   SVG so it shares the in-pit UI vocabulary (navy square, yellow rim) and
+   scales with the stage. A slow pulse marks it as the thing to press. */
+.startBtn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: btStartPulse 1.6s ease-in-out infinite;
+}
+.startBtn:active {
+  animation: none;
+  transform: scale(0.96);
+}
+@keyframes btStartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .startBtn { animation: none; }
+}
