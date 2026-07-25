@@ -41,8 +41,20 @@ function fill(template: string, ctx: Record<string, string>): string {
     .trim();
 }
 
+// Last calendar day of the current month, formatted for UK. Mirrors the
+// /chumspot competition page (components: app/chumspot/ChumSpotClient.tsx) EXACTLY
+// so the chatbot and that page can never state different closing dates.
+function competitionCloseDate(): string {
+  return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 function baseContext(n: Normalised, destName = ''): Record<string, string> {
   return {
+    competition_close_date: competitionCloseDate(),
     price_answer: CAMPAIGN.answers.price_answer,
     launch_answer: CAMPAIGN.answers.launch_answer,
     delivery_answer: CAMPAIGN.answers.delivery_answer,
@@ -123,11 +135,18 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
 
     case 'faq_answer': {
       const f = data.faq.find((x) => x.faqId === res.faqId);
-      const answer = f?.resolvedAnswer ?? '';
+      const ctx = baseContext(n);
+      // Fill render-time tokens in the approved answer (e.g. competition_close_date).
+      const answer = fill(f?.resolvedAnswer ?? '', ctx);
       const r = pickResponse(data, 'B04', session.usedResponseIds);
-      const wrapper = r ? fill(r.template, baseContext(n)) : '';
+      const wrapper = r ? fill(r.template, ctx) : '';
       const text = [answer, wrapper].filter(Boolean).join(' ').trim() || 'That is a fair question.';
-      return { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url: f?.cta ?? null };
+      // Contextual link added by structure, not copy: resolve the FAQ's CTA to a
+      // real destination route (e.g. Competition -> /chumspot). No raw URL lives
+      // in the answer text.
+      const dest = data.destinations.find((d) => d.name === f?.cta || d.destinationId === f?.cta);
+      const url = dest?.resolvedUrl ?? (f?.cta && f.cta.startsWith('/') ? f.cta : null);
+      return { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url, destinationId: dest?.destinationId };
     }
 
     case 'gk_answer': {

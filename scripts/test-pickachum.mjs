@@ -72,6 +72,13 @@ check('Where is the Name Generator?', { layer: 3, bucket: 'B03', action: 'link' 
 check('Show me Know Your Chum', { layer: 3, bucket: 'B03', action: 'link' }, { destinationId: 'DST006' });
 check('How do I play?', { layer: 3, bucket: 'B02', action: 'rules_answer' });
 check('Do I need to own a dog?', { layer: 4, bucket: 'B04', action: 'faq_answer' });
+// FAQ011 fills {{competition_close_date}} at render, mirroring the /chumspot page.
+check('How do I enter the competition?', { layer: 4, bucket: 'B04', action: 'faq_answer' }, {
+  assert: (_r, resp) => {
+    if (resp.text.includes('{{')) return 'unfilled template token in answer';
+    return /\b\d{1,2} [A-Z][a-z]+ \d{4}\b/.test(resp.text) ? null : 'expected a resolved close date (e.g. "31 July 2026")';
+  },
+});
 check('Tell me about working dogs.', { layer: 5, bucket: 'B05', action: 'link' });
 
 // ---- Knowledge: known vs unknown (never guess) ----

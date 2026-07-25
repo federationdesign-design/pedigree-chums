@@ -10,9 +10,7 @@ final copy.
 | `campaign.launchDate = null` | `app/pick-a-chum/data/campaign.ts` | Launch date not public yet; no copy may state a date | NEEDS_STEVE item 1 (OI04) |
 | ART002 / ART003 / ART009 `resolvedUrl: null` | `route-map.json` | Planned articles not yet built | NEEDS_STEVE item 4 (OI06) |
 | ART010 interim mapping | `route-map.json` | 'The Power of Smell' unbuilt; points at the teaching-medicine article for now | NEEDS_STEVE item 4 |
-| FAQ003-006, FAQ011-014 `{{...}}` answers | `generated/faq.json` (from workbook) | Workbook FAQ answers Steve will paste into the workbook | NEEDS_STEVE item 4 (OI01) |
 | Random-dog control treatment | (styled build, Checkpoint 2) | To be proposed for approval | NEEDS_STEVE item 5 |
-| B15 orientation lines | `generated/collie-responses.json` (B15-R01..R04) + `ORIENTATION_PLACEHOLDER` in `assembler.ts` | Onboarding replies for the new orientation bucket; routing is live, copy is not | Steve writes the Collie-voice orientation copy into the workbook Collie Responses sheet (bucket B15), then regenerates |
 
 ## Resolved (no longer placeholders)
 
@@ -26,3 +24,10 @@ final copy.
 - Chatbot dog assets: the square card images at `/public/<slug>-square.jpg` are
   FINAL. The HUD and selector are built around the square format.
 - Dog records for all 54 pack dogs: real, from the repo's own `data/*.ts`.
+- B15 orientation copy: WRITTEN (copy deck v2), 12 lines across 4 families in the
+  workbook Collie Responses sheet, regenerated. `ORIENTATION_PLACEHOLDER` in
+  `assembler.ts` is now only a defensive fallback.
+- FAQ003-006 and FAQ011-014 answers: WRITTEN (copy deck v2) into the workbook
+  Canonical answer column. FAQ011 uses the render-time `{{competition_close_date}}`
+  token, filled by the assembler to the last day of the current month, mirroring
+  `app/chumspot/ChumSpotClient.tsx` exactly.

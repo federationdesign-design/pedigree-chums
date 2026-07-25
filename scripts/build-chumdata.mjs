@@ -620,7 +620,11 @@ if (unresolved.length) {
   data.faq = data.faq.map((rec) => {
     const e = byId[rec.faqId];
     const raw = clean(rec.canonicalAnswer);
-    const hasReal = raw && !/\{\{.*\}\}/.test(raw);
+    // Render-time tokens (filled by the assembler at answer time, e.g.
+    // competition_close_date) are real content; only build-time {{approved_*}}
+    // placeholders defer to the faq-source overlay.
+    const withoutRenderTokens = raw.replace(/\{\{\s*competition_close_date\s*\}\}/g, '');
+    const hasReal = raw && !/\{\{.*\}\}/.test(withoutRenderTokens);
     const resolvedAnswer = hasReal ? raw : e ? e.answer : null;
     return { ...rec, resolvedAnswer: resolvedAnswer || null, resolvedCta: e?.cta || null };
   });

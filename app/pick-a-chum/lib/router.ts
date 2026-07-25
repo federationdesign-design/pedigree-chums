@@ -100,7 +100,9 @@ const TOOL_ALIASES: Record<string, string[]> = {
   DST007: ["britain's dog history", 'britains dog history', 'dog history'],
   DST008: ['name generator', 'dog name generator'],
   DST009: ['chum finder', 'chum calculator', 'find my chum', 'which chum'],
-  DST012: ['competition', 'chumspot', 'chum spot'],
+  // 'competition' (the generic word) belongs to FAQ011, which answers in chat
+  // with the close date and a contextual link; 'chumspot' stays direct nav.
+  DST012: ['chumspot', 'chum spot'],
   DST013: ['contact you', 'contact page', 'get in touch', 'contact us'],
 };
 
