@@ -68,6 +68,23 @@
   border-radius: 999px;
   background: var(--navy);
 }
+/* Mobile: match the pit's menu icon, which is drawn on canvas at BIG * 1.2 with
+   PackPit's mobile SCALE of 0.67 (84 * 0.67 * 1.2 = 67.5px). Every internal
+   proportion below mirrors the canvas draw: radius 0.3, bar width 0.5, bar
+   height 0.1, bar pitch 0.22, and a 5px navy edge that is not scaled.
+   Breakpoint is 768px to match PackPit's own isMobile query. */
+@media (max-width: 768px) {
+  .burger {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+    gap: 8.1px;
+  }
+  .burger span {
+    width: 33.75px;
+    height: 6.75px;
+  }
+}
 
 .overlay {
   position: fixed;
