@@ -88,6 +88,13 @@ export interface DogRecord {
   health: { generalNote: string; conditions: { name: string; severity: number }[] } | null;
 }
 
+// Curated misspelling alias: a canonical high-value word and the known slips
+// that should be treated as it (workbook-driven content Steve extends).
+export interface MisspellingAlias {
+  canonical: string;
+  variants: string[];
+}
+
 // The full data bundle the engine consumes. Hand-authored records (campaign,
 // rules, moderation) are imported directly by the engine since they are plain
 // TS; only the generated JSON is injected here.
@@ -100,6 +107,7 @@ export interface ChumData {
   transfers: TransferRule[];
   copyComponents: CopyComponent[];
   dogs: DogRecord[];
+  misspellings?: MisspellingAlias[];
 }
 
 // ---- Routing result ----
@@ -118,6 +126,7 @@ export type ActionType =
   | 'gk_answer' // known general-knowledge answer
   | 'gk_unknown' // general knowledge with no approved record: no guess
   | 'breed_answer' // fact about the active breed
+  | 'orientation' // onboarding: what is this / what do I do / how does this work
   | 'transfer' // specialist handoff to another dog
   | 'converse' // greeting / test / command / statement / random word
   | 'gibberish' // keyboard smash / punctuation / unresolved

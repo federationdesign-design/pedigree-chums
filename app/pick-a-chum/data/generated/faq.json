@@ -44,13 +44,13 @@
       "own a dog",
       "without a dog"
     ],
-    "canonicalAnswer": "{{approved_no_dog_required_answer}}",
+    "canonicalAnswer": "No, you don't need to own a dog. You only need to see a dog.",
     "sourcePage": "FAQ",
     "cta": "How to play",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Useful early objection answer.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "No, you don't need to own a dog. You only need to see a dog.",
     "resolvedCta": null
   },
   {
@@ -62,13 +62,13 @@
       "how many cards",
       "54 cards"
     ],
-    "canonicalAnswer": "{{approved_pack_contents_answer}}",
+    "canonicalAnswer": "54 uniquely illustrated cards, 40 of the most popular UK dog breeds. Plus 12 designer crossbreeds",
     "sourcePage": "Product data",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Use exact current contents.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "54 uniquely illustrated cards, 40 of the most popular UK dog breeds. Plus 12 designer crossbreeds",
     "resolvedCta": null
   },
   {
@@ -79,13 +79,13 @@
       "people",
       "group size"
     ],
-    "canonicalAnswer": "{{approved_player_count_answer}}",
+    "canonicalAnswer": "No limit, you can even play by yourself if you really wanted, better with two, great with 3, hilarious with 4, hazardous with 50",
     "sourcePage": "Rules",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Do not guess ranges.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "No limit, you can even play by yourself if you really wanted, better with two, great with 3, hilarious with 4, hazardous with 50",
     "resolvedCta": null
   },
   {
@@ -97,13 +97,13 @@
       "outdoors",
       "where play"
     ],
-    "canonicalAnswer": "{{approved_play_location_answer}}",
+    "canonicalAnswer": "Yes, if you have enough actual dogs indoors",
     "sourcePage": "Rules",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Explain intended outdoor discovery.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "Yes, if you have enough actual dogs indoors",
     "resolvedCta": null
   },
   {
@@ -185,13 +185,13 @@
       "prize",
       "win"
     ],
-    "canonicalAnswer": "{{approved_competition_answer}}",
+    "canonicalAnswer": "Spot a dog. Match the card. Share your ChumSpot with us on social. The current monthly round closes on {{competition_close_date}}.",
     "sourcePage": "Competition page",
     "cta": "Competition",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Eligibility and guardian wording must remain exact.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "Spot a dog. Match the card. Share your ChumSpot with us on social. The current monthly round closes on {{competition_close_date}}.",
     "resolvedCta": null
   },
   {
@@ -204,13 +204,13 @@
       "problem",
       "human"
     ],
-    "canonicalAnswer": "{{approved_contact_answer}}",
+    "canonicalAnswer": "A human will come when beckoned at hello@Pedigree-Chums.co.uk",
     "sourcePage": "Contact page",
     "cta": "Contact",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Utility answer should remain polite and clean.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "A human will come when beckoned at hello@Pedigree-Chums.co.uk",
     "resolvedCta": null
   },
   {
@@ -223,13 +223,13 @@
       "materials",
       "laminated"
     ],
-    "canonicalAnswer": "{{approved_materials_answer}}",
+    "canonicalAnswer": "Fully biodegradable, no plastic coatings. Compact, pocket-friendly and lightweight. Made in the UK using recycled paper.",
     "sourcePage": "Product / compliance data",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Import from technical file",
     "notes": "Only include approved manufacturing details.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "Fully biodegradable, no plastic coatings. Compact, pocket-friendly and lightweight. Made in the UK using recycled paper.",
     "resolvedCta": null
   },
   {
@@ -241,13 +241,13 @@
       "postage",
       "outside UK"
     ],
-    "canonicalAnswer": "{{approved_delivery_answer}}",
+    "canonicalAnswer": "No, UK mainland only for now.",
     "sourcePage": "Campaign / product",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Open",
     "notes": "Do not infer coverage.",
-    "resolvedAnswer": null,
+    "resolvedAnswer": "No, UK mainland only for now.",
     "resolvedCta": null
   }
 ]

@@ -28,6 +28,10 @@ const DOG_LABEL: Record<Dog, string> = {
   boxer: 'Boxer',
 };
 
+// Shown only until the workbook B15 orientation rows carry real copy (logged in
+// PLACEHOLDERS.md). Deliberately not final copy: Steve writes the Collie voice.
+const ORIENTATION_PLACEHOLDER = '[B15 orientation line, copy pending: Steve to write in the Collie voice]';
+
 // Fill {{token}} placeholders from a context map. Unknown tokens are dropped and
 // stray double spaces collapsed, so a partial context never leaks braces.
 function fill(template: string, ctx: Record<string, string>): string {
@@ -37,8 +41,20 @@ function fill(template: string, ctx: Record<string, string>): string {
     .trim();
 }
 
+// Last calendar day of the current month, formatted for UK. Mirrors the
+// /chumspot competition page (components: app/chumspot/ChumSpotClient.tsx) EXACTLY
+// so the chatbot and that page can never state different closing dates.
+function competitionCloseDate(): string {
+  return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 function baseContext(n: Normalised, destName = ''): Record<string, string> {
   return {
+    competition_close_date: competitionCloseDate(),
     price_answer: CAMPAIGN.answers.price_answer,
     launch_answer: CAMPAIGN.answers.launch_answer,
     delivery_answer: CAMPAIGN.answers.delivery_answer,
@@ -119,11 +135,18 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
 
     case 'faq_answer': {
       const f = data.faq.find((x) => x.faqId === res.faqId);
-      const answer = f?.resolvedAnswer ?? '';
+      const ctx = baseContext(n);
+      // Fill render-time tokens in the approved answer (e.g. competition_close_date).
+      const answer = fill(f?.resolvedAnswer ?? '', ctx);
       const r = pickResponse(data, 'B04', session.usedResponseIds);
-      const wrapper = r ? fill(r.template, baseContext(n)) : '';
+      const wrapper = r ? fill(r.template, ctx) : '';
       const text = [answer, wrapper].filter(Boolean).join(' ').trim() || 'That is a fair question.';
-      return { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url: f?.cta ?? null };
+      // Contextual link added by structure, not copy: resolve the FAQ's CTA to a
+      // real destination route (e.g. Competition -> /chumspot). No raw URL lives
+      // in the answer text.
+      const dest = data.destinations.find((d) => d.name === f?.cta || d.destinationId === f?.cta);
+      const url = dest?.resolvedUrl ?? (f?.cta && f.cta.startsWith('/') ? f.cta : null);
+      return { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url, destinationId: dest?.destinationId };
     }
 
     case 'gk_answer': {
@@ -145,6 +168,12 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
         ? `${collie.character} Typical working life is around ${collie.lifespanYears} years, and on training we are, professionally speaking, ${collie.training?.label.toLowerCase()}.`
         : 'We maintain a strong professional record.';
       return { responseId: 'B07-COLLIE', text: bits.replace(/\s{2,}/g, ' ').trim(), dog };
+    }
+
+    case 'orientation': {
+      const r = pickResponse(data, 'B15', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : ORIENTATION_PLACEHOLDER;
+      return { responseId: r?.responseId ?? 'B15', text, dog };
     }
 
     case 'transfer': {

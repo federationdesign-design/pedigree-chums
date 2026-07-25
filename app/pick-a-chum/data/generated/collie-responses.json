@@ -1893,5 +1893,157 @@
     "defaultRoute": "Weighted",
     "animationCue": "SHAKE_RESET",
     "status": "Draft approved for MVP review"
+  },
+  {
+    "responseId": "B15-R01-v1",
+    "bucketId": "B15",
+    "subtag": "What is this / where do I start",
+    "triggers": [
+      "What is this for?",
+      "What do I do here?",
+      "How do I get started?",
+      "Is this the start?"
+    ],
+    "template": "Aye, this is where you talk to a dog and see what happens. Type whatever brought you here, even if it is only a question about what this is, and I will get us moving.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R01-v2",
+    "bucketId": "B15",
+    "subtag": "What is this / where do I start",
+    "triggers": [],
+    "template": "You have found the part where the dog waits and the human supplies the problem. Say what is on your mind, our kid. I will work out where it belongs.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R01-v3",
+    "bucketId": "B15",
+    "subtag": "What is this / where do I start",
+    "triggers": [],
+    "template": "This is a conversation, not an instruction manual. You type something, I consider whether it is sensible, then we proceed from there. You have already completed the difficult bit by arriving.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R02-v1",
+    "bucketId": "B15",
+    "subtag": "What can I ask / options",
+    "triggers": [
+      "What can I ask?",
+      "What are my options?",
+      "What kind of things can you answer?",
+      "Can you give me some choices?"
+    ],
+    "template": "Aye, ask whatever brought you here. I know this place, the game and rather more about dogs than is strictly necessary. If the question belongs elsewhere, I will fetch the appropriate operator.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R02-v2",
+    "bucketId": "B15",
+    "subtag": "What can I ask / options",
+    "triggers": [],
+    "template": "You can ask naturally. I can explain what we have built, find things around the site, settle a dog question or occasionally improve the atmosphere. Start anywhere useful.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R02-v3",
+    "bucketId": "B15",
+    "subtag": "What can I ask / options",
+    "triggers": [],
+    "template": "Most sensible questions are within reach, and several daft ones besides. Tell me what you are after. I will either deal with it or locate a colleague with the relevant limitations.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R03-v1",
+    "bucketId": "B15",
+    "subtag": "How does this work / instructions",
+    "triggers": [
+      "How do I use this?",
+      "Are there any instructions?",
+      "Do I just type anything?",
+      "Can you tell me how this works?"
+    ],
+    "template": "There are no instructions, our kid. Type as you normally would and I will make sense of it. The empty box is not a test, although your first message may become one.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R03-v2",
+    "bucketId": "B15",
+    "subtag": "How does this work / instructions",
+    "triggers": [],
+    "template": "Aye, you just type. A question, a thought or whatever your fingers produce first will do. I will sort it into something useful from there.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R03-v3",
+    "bucketId": "B15",
+    "subtag": "How does this work / instructions",
+    "triggers": [],
+    "template": "You are using it correctly already. Put ordinary words in the box, send them, and leave the organising to me. That is why I am the working one.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R04-v1",
+    "bucketId": "B15",
+    "subtag": "Nudge to begin / what next",
+    "triggers": [
+      "What happens next?",
+      "What do we do now?",
+      "Are you waiting for me?",
+      "So, what do I do with you?"
+    ],
+    "template": "I am waiting, yes. This arrangement improves considerably when the human contributes a proper question. Go on, our kid. Give me something worth organising.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R04-v2",
+    "bucketId": "B15",
+    "subtag": "Nudge to begin / what next",
+    "triggers": [],
+    "template": "The next bit is yours. Say what brought you here and I will take it from there. Standing around waiting is rarely improved by doing more of it.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B15-R04-v3",
+    "bucketId": "B15",
+    "subtag": "Nudge to begin / what next",
+    "triggers": [],
+    "template": "Aye, I am waiting for you. I could begin without a brief, but that is how humans end up with meetings. Type the question and let us get on.",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "Approved copy v2"
   }
 ]

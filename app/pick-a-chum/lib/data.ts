@@ -10,6 +10,7 @@ import articles from '../data/generated/articles.json';
 import transfers from '../data/generated/transfers.json';
 import copyComponents from '../data/generated/copy-components.json';
 import dogs from '../data/generated/dogs.json';
+import misspellings from '../data/generated/misspellings.json';
 import {
   ChumData,
   CollieResponse,
@@ -20,6 +21,7 @@ import {
   TransferRule,
   CopyComponent,
   DogRecord,
+  MisspellingAlias,
 } from './types';
 
 export const CHUM_DATA: ChumData = {
@@ -31,4 +33,5 @@ export const CHUM_DATA: ChumData = {
   transfers: transfers as unknown as TransferRule[],
   copyComponents: copyComponents as unknown as CopyComponent[],
   dogs: dogs as unknown as DogRecord[],
+  misspellings: misspellings as unknown as MisspellingAlias[],
 };

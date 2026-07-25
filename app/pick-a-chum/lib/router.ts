@@ -7,7 +7,7 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog } from './types';
-import { Normalised, isGibberish, isSingleWord, hasAny } from './normalise';
+import { Normalised, isGibberish, isSingleWord, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion } from './safety';
 
 const HIDDEN_CEILING = 20;
@@ -43,8 +43,27 @@ const COMMERCIAL = [
 ];
 
 const RULES = [
-  'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules', 'instructions',
+  'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
   'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
+];
+
+// Orientation / onboarding (bucket B15). First-time visitors who do not yet know
+// what the chat is or what to do: "what do I do here", "how does this work",
+// "what can I ask". Curated, specific phrases only (never bare "how do i" / "what
+// is" / "show me"), so real navigation, rules, FAQ and commercial queries are not
+// swallowed. The response copy lives in the workbook (B15); these are the
+// detection patterns, matched high in the stack so onboarding questions are met
+// with orientation, not the "no approved answer" refusal or the echo fallback.
+const ORIENTATION = [
+  'meant to do', 'get started', 'what do i do', 'should i begin', 'what am i looking at',
+  'how do i use', 'what is this for', 'happens if i type', 'allowed to ask', 'ask you a question',
+  'should i ask', 'just type', 'doing this right', 'where i type', 'meant to say', 'waiting for me',
+  'need to choose', 'what are my options', 'what to do', 'explain this', 'how this works',
+  'what can i ask', 'here for', 'help with', 'show me around', 'you take me', 'look at first',
+  'should press', 'say a command', 'instructions', 'happens next', 'what do we do', 'where do we go',
+  'supposed to ask', 'you need me to say', 'going to say', 'you talking', 'you listening',
+  'did this open', 'meant to happen', 'missed something', 'is this the start', 'enter a word',
+  'type a question', 'kind of things', 'some choices', 'point me', 'comes next',
 ];
 
 const NAV_FRAME = ['where is', 'wheres', 'where can i', 'find', 'show me', 'open', 'take me to', 'go to', 'how do i get to', 'link to'];
@@ -81,7 +100,9 @@ const TOOL_ALIASES: Record<string, string[]> = {
   DST007: ["britain's dog history", 'britains dog history', 'dog history'],
   DST008: ['name generator', 'dog name generator'],
   DST009: ['chum finder', 'chum calculator', 'find my chum', 'which chum'],
-  DST012: ['competition', 'chumspot', 'chum spot'],
+  // 'competition' (the generic word) belongs to FAQ011, which answers in chat
+  // with the close date and a contextual link; 'chumspot' stays direct nav.
+  DST012: ['chumspot', 'chum spot'],
   DST013: ['contact you', 'contact page', 'get in touch', 'contact us'],
 };
 
@@ -141,7 +162,11 @@ export interface RouterState {
   submissionCount: number; // count AFTER this submission (1-based)
 }
 
-export function resolve(n: Normalised, data: ChumData, state: RouterState): Resolution {
+export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
+  // Apply curated misspelling aliases first, so both the safety gate and every
+  // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
+  // covers the unpredictable slips on top of these predictable ones.
+  const n = applyAliases(n0, buildAliasMap(data.misspellings));
   const c = n.compact;
   const N = n; // for hasAny
 
@@ -175,6 +200,16 @@ export function resolve(n: Normalised, data: ChumData, state: RouterState): Reso
   // Layer 2: buying, launch and 30% discount.
   if (hasAny(N, COMMERCIAL)) {
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
+
+  // Layer 11: orientation and onboarding. Checked high (right after commercial)
+  // so a first-timer's "what do I do here" is oriented, not refused as unknown
+  // knowledge or echoed as a stray word. The number is a category id, not code
+  // order: this stack already runs the ceiling (8) and breed (7) out of numeric
+  // sequence. It sits below safety and commercial but above rules/FAQ/content so
+  // onboarding phrasing is intercepted; the curated patterns keep real queries out.
+  if (hasAny(N, ORIENTATION)) {
+    return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
   }
 
   // Layer 3: gameplay and website navigation.
