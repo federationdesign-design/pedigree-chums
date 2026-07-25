@@ -8,6 +8,7 @@ import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
 import LineageMap from "../PackPit/LineageMap";
+import BritainMessage from "../PackPit/BritainMessage";
 
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
@@ -27,6 +28,14 @@ const ZOOM_PAD = 1.1;
 const MINI_FILL = 0.85;
 // START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
 const START_SCALE = 2;
+// Toys ported from the main pit. Sizes come off the same unit the main pit uses,
+// BIG = 84 * SCALE, so a ball here is the same ball there. The drop beats run
+// from the moment the first dog circle touches the floor.
+const TOY_BALL_SRC = "/tennis-ball.svg";
+const TOY_FLAG_SRC = "/uk-icon.jpg";
+const TOY_BALL_DELAY = 3000; // ball, after the first circle lands
+const TOY_FLAG_GAP = 3000; // flag, after the ball
+const TOY_FLAG_HITS = 8; // main pit maxHits
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
@@ -395,6 +404,11 @@ export default function BreedTree({
   const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
   const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
+  const [toyList, setToyList] = useState<{ kind: "ball" | "flag"; size: number; src: string }[]>([]);
+  const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
+  const [britainOpen, setBritainOpen] = useState(false);
+  const killToyRef = useRef<((idx: number) => void) | null>(null);
+  const flagIdxRef = useRef<number | null>(null);
   useEffect(() => {
     if (!dockAside) return;
     setBadgePcts(
@@ -410,6 +424,8 @@ export default function BreedTree({
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
   type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any };
   const rodBodiesRef = useRef<PropBody[]>([]);
+  const toyBodiesRef = useRef<PropBody[]>([]);
+  const toysGRef = useRef<SVGGElement>(null);
   const pillBodiesRef = useRef<PropBody[]>([]);
   const rodsGRef = useRef<SVGGElement>(null);
   const pillsGRef = useRef<SVGGElement>(null);
@@ -593,7 +609,7 @@ export default function BreedTree({
         if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
       }
     }
-    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef]] as const) {
+    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
       if (list && gg) for (const pr of list) {
@@ -958,7 +974,7 @@ export default function BreedTree({
         pr.dead = true;
         poofAt(pr.x, pr.y, now2);
         if (pr.mb) Composite.remove(world, pr.mb);
-        (kind === "rod" ? setDeadRods : setDeadPills)((prev) => new Set(prev).add(pr.idx));
+        (kind === "rod" ? setDeadRods : kind === "toy" ? setDeadToys : setDeadPills)((prev) => new Set(prev).add(pr.idx));
       };
       // ROUND WON chain: every remaining prop explodes nearest-first from the
       // final circle's resting spot, 90ms apart (the bomb's chain, mini-pit cut)
@@ -968,7 +984,7 @@ export default function BreedTree({
           if (b.n || !b.mb || !b.mbIn || b.held) continue;
           targets.push({ x: b.x, y: b.y, go: () => { poofAt(b.x, b.y, performance.now()); Composite.remove(world, b.mb); b.mbIn = false; setDeadBadges((p) => new Set(p).add(b.idx)); } });
         }
-        for (const [list, kind] of [[rodBodiesRef.current, "rod"], [pillBodiesRef.current, "pill"]] as any[]) {
+        for (const [list, kind] of [[rodBodiesRef.current, "rod"], [pillBodiesRef.current, "pill"], [toyBodiesRef.current, "toy"]] as any[]) {
           for (const pr of list) if (!pr.dead && pr.mb) targets.push({ x: pr.x, y: pr.y, go: () => killProp(pr, kind, performance.now()) });
         }
         const du = (uiBodiesRef.current as any[] | null)?.find((u) => u.kind === "desc");
@@ -977,6 +993,43 @@ export default function BreedTree({
         targets.forEach((t, i) => window.setTimeout(t.go, i * 90));
         wake();
         return targets.length * 90;
+      };
+      // ---- toys: tennis ball and Union Jack, main pit physics verbatim ----
+      const BIGT = 84 * (window.matchMedia("(max-width: 768px)").matches ? 0.67 : 1);
+      const toyTimers: number[] = [];
+      const spawnToy = (kind: "ball" | "flag") => {
+        const isNarrow = window.matchMedia("(max-width: 768px)").matches;
+        const dia = kind === "ball" ? BIGT * 2.25 * (isNarrow ? 0.9 : 1) : BIGT * 0.6 * 2;
+        const r = dia / 2;
+        // ball drops anywhere across the pit, flag comes in at 70% like the pit
+        const px = kind === "ball"
+          ? pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40)
+          : pL.x + wPx * 0.7;
+        const py = pL.y - Math.max(vbHf / k, dia) * 0.35 - dia;
+        const w2 = worldFromPx(px, py);
+        const idx = toyBodiesRef.current.length;
+        const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null };
+        const opts = kind === "ball"
+          ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
+          : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
+        const mb = Bodies.circle(px, py, r, opts);
+        mb.plugin = { prop: pr, kind: "toy" };
+        pr.mb = mb;
+        Composite.add(world, mb);
+        MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit contract
+        toyBodiesRef.current.push(pr);
+        if (kind === "flag") flagIdxRef.current = idx;
+        setToyList((l) => [...l, { kind, size: dia * fxScale, src: kind === "ball" ? TOY_BALL_SRC : TOY_FLAG_SRC }]);
+        wake();
+      };
+      killToyRef.current = (idx: number) => {
+        const pr = toyBodiesRef.current[idx];
+        if (pr && !pr.dead) killProp(pr, "toy", performance.now());
+      };
+      const armToys = () => {
+        if (toyTimers.length) return; // first landing only
+        toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
+        toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
@@ -1129,6 +1182,9 @@ export default function BreedTree({
         for (const pair of ev.pairs) {
           const A = pair.bodyA, B = pair.bodyB;
           const pa = A.plugin || {}, pb2 = B.plugin || {};
+          // the first thing to reach the floor is always a dog circle, because
+          // nothing else is in the pit yet: that is the beat the toys run from
+          if (pa.kind === "floor" || pb2.kind === "floor") armToys();
           const nrm = pair.collision.normal;
           const rv = Math.abs((B.velocity.x - A.velocity.x) * nrm.x + (B.velocity.y - A.velocity.y) * nrm.y);
           let flashed = false;
@@ -1238,7 +1294,7 @@ export default function BreedTree({
           }
           if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
         }
-        for (const list of [rodBodiesRef.current, pillBodiesRef.current]) {
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current]) {
           for (const pr of list) {
             if (pr.dead || !pr.mb) continue;
             if (!isDragged(pr)) {
@@ -1320,7 +1376,7 @@ export default function BreedTree({
         if (uu) for (const u of uu) if (!u.fixed && u.mb) {
           MBody.setVelocity(u.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
-        for (const list of [rodBodiesRef.current, pillBodiesRef.current]) {
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current]) {
           for (const pr of list) if (!pr.dead && pr.mb) MBody.setVelocity(pr.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
         wake();
@@ -1332,6 +1388,7 @@ export default function BreedTree({
       };
       matterCleanupRef.current = () => {
         Events.off(engine, "collisionStart", onCollide);
+        for (const t of toyTimers) window.clearTimeout(t);
         for (const t of ghostTimers) window.clearTimeout(t);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
@@ -1581,6 +1638,35 @@ export default function BreedTree({
               );
             })}
           </g>
+          {/* Toys: tennis ball and Union Jack. Same bodies as the main pit,
+              drawn as SVG here because the mini pit has no canvas. A tap on the
+              flag opens the Britain popup, the same one the main pit uses. */}
+          <g ref={toysGRef} style={{ display: dockAside ? "inline" : "none" }}>
+            {toyList.map((ty, i2) => {
+              const pr = toyBodiesRef.current[i2];
+              const v2 = viewRef.current;
+              const kk2 = SIZE / v2[2];
+              const dead = deadToys.has(i2);
+              const half = ty.size / 2;
+              return (
+                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
+                  style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => startDrag(e, toyBodiesRef.current[i2], ty.kind === "flag" ? () => setBritainOpen(true) : undefined)}>
+                  {ty.kind === "flag" ? (
+                    <>
+                      <clipPath id={`bt-toy-${i2}`}><circle cx={0} cy={0} r={half} /></clipPath>
+                      <image href={ty.src} x={-half} y={-half} width={ty.size} height={ty.size}
+                        clipPath={`url(#bt-toy-${i2})`} preserveAspectRatio="xMidYMid slice" />
+                      <circle cx={0} cy={0} r={half} style={{ fill: "none", stroke: "#ffffff", strokeWidth: ty.size * 0.06 }} />
+                    </>
+                  ) : (
+                    <image href={ty.src} x={-half} y={-half} width={ty.size} height={ty.size} />
+                  )}
+                </g>
+              );
+            })}
+          </g>
           <g ref={pillsGRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
             {pillList.map((pl, i2) => {
               const pr = pillBodiesRef.current[i2];
@@ -1702,6 +1788,15 @@ export default function BreedTree({
         </svg>
       </div>
 
+      {britainOpen && (
+        <BritainMessage
+          onDismiss={() => {
+            setBritainOpen(false);
+            // the tick poofs the flag, exactly as it does in the main pit
+            if (flagIdxRef.current !== null) killToyRef.current?.(flagIdxRef.current);
+          }}
+        />
+      )}
       {learnNode && learnCard && (
         <LineageMap
           breed={learnCard}

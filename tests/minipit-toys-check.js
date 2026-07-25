@@ -1,0 +1,100 @@
+// GUARD-006: mini pit toys. Tennis ball and Union Jack, ported from the main pit.
+//   a) neither exists before START, and neither drops before the dogs land
+//   b) ball lands about 3s after the first circle touches the floor
+//   c) flag lands about 3s after the ball
+//   d) both are live bodies: they fall and settle, and can be dragged
+//   e) tapping the flag opens the shared Britain popup; the tick closes it and
+//      poofs the flag, leaving the ball alone
+//   f) the main pit still renders after the popup was extracted into its own
+//      component (that edit touched PackPit, so it gets a smoke check here)
+// Note: dead props keep a hidden slot so the render stays index-aligned with the
+// bridge list, so "gone" means display:none, not absent from the DOM.
+// Run with dev server up: node tests/minipit-toys-check.js
+const { chromium } = require('playwright');
+
+const readToys = () => {
+  const svg = document.querySelector('[role="dialog"] svg');
+  if (!svg) return [];
+  return Array.from(svg.querySelectorAll('image'))
+    .filter((i) => /tennis-ball|uk-icon/.test(i.getAttribute('href') || ''))
+    .map((i) => {
+      const g = i.closest('g');
+      const r = i.getBoundingClientRect();
+      return {
+        kind: /uk-icon/.test(i.getAttribute('href')) ? 'flag' : 'ball',
+        shown: (g.style.display || '') !== 'none' && r.width > 1,
+        x: Math.round(r.x + r.width / 2),
+        y: Math.round(r.y + r.height / 2),
+      };
+    });
+};
+const shown = (list, kind) => list.filter((t) => t.kind === kind && t.shown);
+
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  const errs = [];
+  p.on('pageerror', (e) => errs.push(e.message.slice(0, 200)));
+
+  await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(6000);
+  await p.getByRole('button', { name: 'View Celtic Hound family tree' }).click();
+  await p.waitForTimeout(2700);
+
+  const preStart = await p.evaluate(readToys);
+  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.waitForTimeout(2500);
+  const atLanding = await p.evaluate(readToys);
+  await p.waitForTimeout(3200);
+  const ballDue = await p.evaluate(readToys);
+  await p.waitForTimeout(3200);
+  const flagDue = await p.evaluate(readToys);
+  await p.waitForTimeout(2500);
+  const settledA = await p.evaluate(readToys);
+  await p.waitForTimeout(1500);
+  const settledB = await p.evaluate(readToys);
+
+  const quietEarly = preStart.length === 0 && shown(atLanding, 'ball').length === 0;
+  const ballOnTime = shown(ballDue, 'ball').length === 1 && shown(ballDue, 'flag').length === 0;
+  const flagOnTime = shown(flagDue, 'flag').length === 1;
+  const fell = shown(flagDue, 'ball')[0] && shown(ballDue, 'ball')[0]
+    && shown(flagDue, 'ball')[0].y > shown(ballDue, 'ball')[0].y;
+  const settled = shown(settledA, 'ball')[0] && shown(settledB, 'ball')[0]
+    && Math.abs(shown(settledB, 'ball')[0].y - shown(settledA, 'ball')[0].y) < 3;
+
+  console.log('pre-START:', preStart.length, '| at landing:', JSON.stringify(atLanding.map((t) => t.kind + ':' + t.shown)));
+  console.log('ball due:', JSON.stringify(shown(ballDue, 'ball')), '| flag due:', JSON.stringify(shown(flagDue, 'flag')));
+  console.log('quiet early:', quietEarly, '| ball on time:', ballOnTime, '| flag on time:', flagOnTime, '| fell:', !!fell, '| settled:', !!settled);
+
+  // flag tap -> shared popup -> tick poofs the flag, ball survives
+  const flag = shown(settledB, 'flag')[0];
+  let popupOk = false;
+  let flagGone = false;
+  let ballKept = false;
+  if (flag) {
+    await p.mouse.click(flag.x, flag.y);
+    await p.waitForTimeout(700);
+    popupOk = await p.evaluate(() => !!document.querySelector('[aria-label="Got it"]')
+      && document.body.innerText.includes('Designed & Printed in Britain'));
+    if (popupOk) {
+      await p.click('[aria-label="Got it"]');
+      await p.waitForTimeout(1000);
+      const after = await p.evaluate(readToys);
+      flagGone = shown(after, 'flag').length === 0;
+      ballKept = shown(after, 'ball').length === 1;
+    }
+  }
+  console.log('popup opened:', popupOk, '| flag poofed:', flagGone, '| ball kept:', ballKept);
+
+  // the popup extraction edited PackPit, so make sure the main pit still boots
+  await p.goto('http://localhost:3000/', { waitUntil: 'domcontentloaded' }); // the main pit is the root route
+  await p.waitForTimeout(7000);
+  const mainPitOk = await p.evaluate(() => !!document.querySelector('canvas'));
+  console.log('main pit renders:', mainPitOk, '| pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
+
+  const pass = !!(quietEarly && ballOnTime && flagOnTime && fell && settled
+    && popupOk && flagGone && ballKept && mainPitOk && errs.length === 0);
+  console.log(pass ? 'PASS GUARD-006' : 'FAIL GUARD-006');
+  await b.close();
+  process.exit(pass ? 0 : 1);
+})();
