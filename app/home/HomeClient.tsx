@@ -55,7 +55,7 @@ export default function HomeClient() {
         <div className={styles.heroTint} aria-hidden="true" />
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>Pedigree <span>Chums</span></h1>
-          <p className={styles.heroSub}>The on-the-go dog spotting game. 54 breeds to discover.</p>
+          <p className={styles.heroSub}>The on-the-go dog spotting game.<br />54 breeds to discover.</p>
         </div>
       </section>
 

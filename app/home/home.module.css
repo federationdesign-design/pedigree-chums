@@ -477,6 +477,14 @@
     display: none;
   }
 
+  /* Hero title: the 2.8rem floor left it the smallest display heading on the
+     page (44.8px on a 390px phone) while the product title and "How it plays"
+     both floor at 64px and the search title at 76.8px. Matched to 64px so the
+     hero no longer reads smaller than the sections beneath it. */
+  .heroTitle {
+    font-size: clamp(4rem, 8vw, 6rem);
+  }
+
   /* Hero text: 3px bigger subtitle. */
   .heroSub {
     font-size: 17px;
