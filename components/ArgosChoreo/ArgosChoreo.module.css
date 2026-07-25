@@ -118,7 +118,8 @@
   overflow: hidden;
 }
 
-.statueImgBox img {
+.statueImgBox img,
+.statueImgBox video {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;

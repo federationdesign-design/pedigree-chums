@@ -281,8 +281,23 @@ export function StatueBulletsChoreo({
           {slides.map((sl, i) => (
             <figure key={sl.src} className={styles.statueSlide}>
               <div className={styles.statueImgBox}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={sl.src} alt={sl.alt} loading="lazy" />
+                {/* A slide is a video purely by file extension, so callers keep
+                    passing the same {src, alt, caption} shape. Muted + playsInline
+                    are what make autoplay permitted on iOS. */}
+                {/\.(mp4|webm)$/i.test(sl.src) ? (
+                  <video
+                    src={sl.src}
+                    aria-label={sl.alt}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                  />
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={sl.src} alt={sl.alt} loading="lazy" />
+                )}
                 <span className={styles.statueCount}>{i + 1} / {slides.length}</span>
               </div>
               <figcaption className={styles.statueCaption}>{sl.caption}</figcaption>

@@ -881,9 +881,34 @@ export default function ArgosPage() {
 
               <p>Argos is not just a dog at the house. In a way, Argos is the house.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/dogsinthehome.jpg" alt="Dogs in the home" loading="lazy" />
+              {/* "The dog as home" gallery. Video first and autoplaying, then the
+                  four stills. Captions are PLACEHOLDER copy for Steve to rewrite. */}
+              <div className={styles.desktopOnly}>
+                <StatueBulletsChoreo
+                  slides={[
+                    { src: "/home/puppy-walk.mp4", alt: "A puppy walking through the house", caption: "PLACEHOLDER: The first one through the door, every single day." },
+                    { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "PLACEHOLDER: Every home with a dog keeps a record of it by the door." },
+                    { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "PLACEHOLDER: Dogs know exactly which room the food happens in." },
+                    { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "PLACEHOLDER: The one who is still there when everyone else has left the room." },
+                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "PLACEHOLDER: A house with a dog in it is inhabited, not merely occupied." },
+                  ]}
+                />
+                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Dogs alter the atmosphere of a home in a physical, audible, smellable way</blockquote>
+              </div>
+
+              <div className={styles.sceneMobile}>
+                <StatueBulletsChoreo
+                  slides={[
+                    { src: "/home/puppy-walk.mp4", alt: "A puppy walking through the house", caption: "PLACEHOLDER: The first one through the door, every single day." },
+                    { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "PLACEHOLDER: Every home with a dog keeps a record of it by the door." },
+                    { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "PLACEHOLDER: Dogs know exactly which room the food happens in." },
+                    { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "PLACEHOLDER: The one who is still there when everyone else has left the room." },
+                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "PLACEHOLDER: A house with a dog in it is inhabited, not merely occupied." },
+                  ]}
+                  quote="Dogs alter the atmosphere of a home in a physical, audible, smellable way"
+                  blockClass={styles.pullquote}
+                  markClass={styles.pullquoteMark}
+                />
               </div>
 
               <p>For people who grow up with dogs, home is not only a place. It is a set of sounds and sensations. Paws in the hallway. A bowl on the kitchen floor. The soft weight of a dog settling beside you. Wet paws by the back door. A dog bed tucked into a corner.</p>
