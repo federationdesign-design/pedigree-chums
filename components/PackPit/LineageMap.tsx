@@ -563,6 +563,9 @@ export default function LineageMap({
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
   // sx - pan.x so they stay put while the tree pans behind them.
   const F_LEFT = isMobile ? 52 : 96;
+  // On a circle the rim at 45 degrees sits this far in from the bounding box, so
+  // corner adornments tuck against the edge instead of floating outside it.
+  const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
   const F_COL = circular ? CW + 3 : isMobile ? 92 : 112, F_ROW = circular ? CW + 3 : isMobile ? 92 : 112; // mini pit: 3px gutter; else tighter pitch on phones to match the 15% smaller cards
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
   const MCOLS = 4; // phones: one continuous grid, four frames wide before it wraps
@@ -1772,7 +1775,7 @@ export default function LineageMap({
               key={`stk-html-${sid}`}
               style={{
                 position: "fixed", left, top, width: CW, height: CW,
-                borderRadius: 15, overflow: "hidden",
+                borderRadius: circular ? "50%" : 15, overflow: "hidden",
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
                 pointerEvents: "none",
@@ -1783,7 +1786,7 @@ export default function LineageMap({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={encodeURI(bust(f.img))} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              <div style={{ position: "absolute", inset: 0, borderRadius: 15, border: "3px solid rgba(255,255,255,0.3)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", inset: 0, borderRadius: circular ? "50%" : 15, border: "3px solid rgba(255,255,255,0.3)", pointerEvents: "none" }} />
             </div>
           );
         });
@@ -1799,16 +1802,20 @@ export default function LineageMap({
             draggable={false}
             style={{
               position: "fixed", left, top, width: CW, height: CW,
-              borderRadius: 15, overflow: "visible",
+              borderRadius: circular ? "50%" : 15, overflow: "visible",
               transform: `rotate(${cardDeg}deg)`,
               transformOrigin: "center",
               pointerEvents: "all",
               cursor: !PACK_BREEDS.has(c.name) ? "zoom-in" : "default",
               zIndex: 62,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              // circular: the yellow ring rides as a box-shadow spread rather than
+              // an outline, because box-shadow always follows border-radius
+              boxShadow: circular
+                ? "0 0 0 3px var(--yellow, #ffd23e), 0 2px 8px rgba(0,0,0,0.25)"
+                : "0 2px 8px rgba(0,0,0,0.25)",
               userSelect: "none",
               touchAction: "none",
-              outline: "3px solid var(--yellow, #ffd23e)",
+              outline: circular ? "none" : "3px solid var(--yellow, #ffd23e)",
               outlineOffset: "-1px",
             }}
             onClick={(e) => { e.stopPropagation(); }}
@@ -1817,7 +1824,7 @@ export default function LineageMap({
             onPointerUp={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
             onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
-            <div style={{ width: "100%", height: "100%", borderRadius: 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
+            <div style={{ width: "100%", height: "100%", borderRadius: circular ? "50%" : 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={encodeURI(bust(c.img))}
@@ -1845,13 +1852,13 @@ export default function LineageMap({
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
               const ts = TAG_STYLE[c.status ?? "extinct"];
               return (
-                <div title={ts.label} style={{ position: "absolute", left: -4, top: -4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
+                <div title={ts.label} style={{ position: "absolute", left: circular ? RIM_IN - 6 : -4, top: circular ? RIM_IN - 6 : -4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
               );
             })()}
             {/* info icon top-right */}
             {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
-                style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                style={{ position: "absolute", right: circular ? RIM_IN - 14 : -14, top: circular ? RIM_IN - 14 : -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
@@ -1864,7 +1871,7 @@ export default function LineageMap({
                 <div
                   onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  style={{ position: "absolute", right: -2, bottom: -14, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 65 }}
+                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: -2, bottom: -14 }), background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 65 }}
                 >
                   {pillTxt}
                 </div>

@@ -30,7 +30,11 @@ const { chromium } = require('playwright');
     const rb = rootCircle && rootCircle.getBoundingClientRect();
     const tag = overlay && overlay.querySelector('[class*="tag"]');
     return { hasLearn: !!learn, hasOverlay: !!overlay,
-             learnBelowCircle: lb && rb ? lb.top >= rb.bottom - 40 : null,
+             // The spec is "anchored at the circle bottom, centre 4px below the rim,
+             // roughly half overlapping". Assert that directly. The old check was a
+             // pixel proxy on the button's TOP edge, which drifts with circle size.
+             learnBelowCircle: lb && rb ? Math.abs((lb.top + lb.height / 2) - rb.bottom) <= 12 : null,
+             centreOffRim: lb && rb ? +((lb.top + lb.height / 2) - rb.bottom).toFixed(1) : null,
              learnInViewport: lb ? (lb.bottom <= window.innerHeight - 2 && lb.top >= 0) : null,
              noTagPill: !tag,
              learnY: lb ? Math.round(lb.y) : null, rootBottom: rb ? Math.round(rb.bottom) : null };
@@ -49,6 +53,31 @@ const { chromium } = require('playwright');
   });
   const soloAngleOk = edge.edges === 1 && edge.deg !== null && Math.abs(edge.deg - 33) <= 2;
   console.log('solo connector:', JSON.stringify(edge), '| 33 deg:', soloAngleOk);
+  // GUARD-003c: a card placed in a circular frame must be a CIRCLE. This one bit
+  // twice before, because the placed card is not SVG at all - it is a fixed HTML
+  // div that was hard-coded to borderRadius 15 with a square yellow outline,
+  // while the SVG frame and clip underneath were correctly circular all along.
+  for (let i = 0; i < 3; i++) {
+    const l = await p.$('[aria-label="Learn"]');
+    if (!l) break;
+    await l.click({ force: true });
+    await p.waitForTimeout(1700);
+  }
+  const placed = await p.evaluate(() => {
+    const hits = [];
+    document.querySelectorAll('div').forEach((el) => {
+      const cs = getComputedStyle(el);
+      if (cs.position !== 'fixed' || !el.querySelector('img')) return;
+      const r = el.getBoundingClientRect();
+      if (r.width < 30 || r.width > 200 || Math.abs(r.width - r.height) > 3) return;
+      hits.push({ w: Math.round(r.width), radius: cs.borderRadius, outline: cs.outlineStyle,
+                  ringFollowsCurve: cs.boxShadow.includes('rgb(255, 210, 62)') });
+    });
+    return hits;
+  });
+  const roundCards = placed.length === 0 || placed.every((c) => c.radius === '50%' && c.outline === 'none' && c.ringFollowsCurve);
+  console.log('placed cards:', JSON.stringify(placed), '| circular:', roundCards);
+
   await p.evaluate(() => {
     const overlay = document.querySelector('[class*="overlayStrong"]');
     const x = overlay && overlay.querySelector('button[class*="close"]');
@@ -61,7 +90,7 @@ const { chromium } = require('playwright');
     const navyRects = svg ? Array.from(svg.querySelectorAll('rect')).filter(r => (r.getAttribute('style') || '').includes('rgb(10, 58, 87)') || (r.style && r.style.fill === 'rgb(10, 58, 87)')).length : 0;
     return { navyRects, hasNamePillText: texts.includes('Old English Bulldog') };
   });
-  const pass = layer.hasLearn && layer.learnBelowCircle === true && layer.learnInViewport === true && layer.noTagPill === true && soloAngleOk && errs.length === 0;
+  const pass = layer.hasLearn && layer.learnBelowCircle === true && layer.learnInViewport === true && layer.noTagPill === true && soloAngleOk && roundCards && errs.length === 0;
   console.log('after close:', JSON.stringify(pit), '| pageerrors:', errs.length ? errs.slice(0,3) : 'none');
   console.log(pass ? 'PASS GUARD-003' : 'FAIL GUARD-003');
   await b.close();

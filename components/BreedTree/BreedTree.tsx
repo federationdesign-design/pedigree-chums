@@ -23,6 +23,8 @@ const ZOOM_PAD = 1.1;
 // Breed-title placement on each circle, relative to its label anchor. TITLE_DY
 // moves it up (more negative) or down toward the circle; TITLE_ANGLE tilts it
 // (negative leans the text up to the right). Tweak these two to taste.
+// Mini pit only: the dog circles run 15% smaller than the space allows.
+const MINI_FILL = 0.85;
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
@@ -202,7 +204,9 @@ function normalizeTop(nodes: Node[]) {
   root.r = target;
 }
 
-function relayoutMobile(nodes: Node[], aspect: number) {
+// How much of the available stage the mobile masonry fills. The mini pit runs at
+// 0.85 so the circles sit 15% smaller; the breed page keeps the full fill.
+function relayoutMobile(nodes: Node[], aspect: number, fill = 1) {
   const root = nodes[0];
   const kids = root.children ?? [];
   const n = kids.length;
@@ -212,7 +216,7 @@ function relayoutMobile(nodes: Node[], aspect: number) {
   const ox = root.x, oy = root.y;
   const pts = nodes.map((d) => ({ d, x: d.x - ox, y: d.y - oy }));
   if (n === 1) {
-    const s = Math.min(FW * 0.5, FH * 0.46) / kids[0].r;
+    const s = (Math.min(FW * 0.5, FH * 0.46) / kids[0].r) * fill;
     pts.forEach((p) => {
       p.d.x = p.x * s;
       p.d.y = p.y * s;
@@ -234,7 +238,7 @@ function relayoutMobile(nodes: Node[], aspect: number) {
   const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
   const M = 20;
   // fill the height, but cap how far circles may spill past the side edges
-  const scale = Math.min((FH - M) / bh, (FW * 1.12) / bw);
+  const scale = Math.min((FH - M) / bh, (FW * 1.12) / bw) * fill;
   pts.forEach((p) => {
     p.d.x = (p.x - cx) * scale;
     p.d.y = (p.y - cy) * scale;
@@ -310,9 +314,9 @@ export default function BreedTree({
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
     normalizeTop(ns);
-    if (isMobile) relayoutMobile(ns, aspectKey);
+    if (isMobile) relayoutMobile(ns, aspectKey, dockAside ? MINI_FILL : 1);
     return ns;
-  }, [root, isMobile, aspectKey]);
+  }, [root, isMobile, aspectKey, dockAside]);
 
   // capture the stage aspect for the layout exactly once, on the first valid read.
   // "Valid" has to mean actually measured: aspect starts at 1, and freezing that
@@ -1653,8 +1657,11 @@ export default function BreedTree({
           {dockAside && gravity && entered && !started && focus === nodes[0] && (() => {
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
-            const bw = 300 * upp;
-            const bh = 104 * upp;
+            // same size ramp as the GAME OVER / ROUND WON flash: clamp(3.4rem, 12vw, 8rem)
+            const stW = st ? st.clientWidth : 390;
+            const startFs = Math.min(Math.max(54.4, stW * 0.12), 128);
+            const bw = startFs * 5.2 * upp; // hit area, roughly the width of the word
+            const bh = startFs * 1.6 * upp;
             return (
               <g
                 className={styles.startBtn}
@@ -1668,10 +1675,10 @@ export default function BreedTree({
                   runFallRef.current?.();
                 }}
               >
-                <rect x={-bw / 2} y={-bh / 2} width={bw} height={bh} rx={26 * upp}
-                  style={{ fill: "var(--navy, #0a3a57)", stroke: "var(--yellow, #ffd23e)", strokeWidth: 4 * upp }} />
+                {/* invisible hit area, so the tap target is not just the glyphs */}
+                <rect x={-bw / 2} y={-bh / 2} width={bw} height={bh} fill="transparent" />
                 <text x={0} y={0} textAnchor="middle" dominantBaseline="central"
-                  style={{ fill: "var(--yellow, #ffd23e)", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${52 * upp}px`, letterSpacing: `${2 * upp}px`, pointerEvents: "none", userSelect: "none" }}>
+                  style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${startFs * upp}px`, letterSpacing: `${2 * upp}px`, filter: "drop-shadow(0 4px 40px rgba(0,0,0,0.6))", pointerEvents: "none", userSelect: "none" }}>
                   START
                 </text>
               </g>
