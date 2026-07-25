@@ -158,6 +158,32 @@ function checkClean(input) {
   'he took a shot on goal', 'can you shut the door', 'my favourite is a boxer', 'I read lots of books',
 ].forEach(checkClean);
 
+// ---- Character canon (workbook: Character Canon sheet) ----
+// Guardrails on any response to name / age / owner questions, whatever the route.
+// Name: everyone calls him Collie; a response may never CONFIRM or DENY a private
+// name. Age and owner: never fabricated. These hold now and lock future copy.
+function canonCheck(kind) {
+  return (_r, resp) => {
+    const s = resp.text.toLowerCase();
+    if (kind === 'name') {
+      if (/\bnameless\b/.test(s)) return 'denies a private name';
+      if (/\b(no|not have|do not have|don'?t have|have no|haven'?t got|without)\s+(a\s+|another\s+|a\s+private\s+|any\s+|real\s+|other\s+)?name\b/.test(s)) return 'denies a private name';
+      if (/\bmy\s+(real|private|actual|other|secret)\s+name\b/.test(s)) return 'confirms a private name';
+      if (/\bmy name is\s+(?!collie\b)/.test(s)) return 'confirms a private name other than Collie';
+    }
+    if (kind === 'age') {
+      if (/\b(i am|i'?m|aged|age is)\s+\d+\b/.test(s) || /\b\d+\s*(years?|yrs?)\b/.test(s)) return 'states a specific age';
+    }
+    if (kind === 'owner') {
+      if (/\bmy\s+(owner|human|master|handler|mum|dad|family)\s+(is|'?s|are)\b/.test(s) || /\bowned by\b/.test(s) || /\bbelongs? to\b/.test(s)) return 'names an owner';
+    }
+    return null;
+  };
+}
+for (const q of ['What is your name?', 'Do you have a name?', "What's your real name?", 'Do you have a secret name?']) check(q, {}, { assert: canonCheck('name') });
+for (const q of ['How old are you?', 'What is your age?']) check(q, {}, { assert: canonCheck('age') });
+for (const q of ['Who is your owner?', 'Do you have an owner?', 'Who owns you?']) check(q, {}, { assert: canonCheck('owner') });
+
 // ---- No exact response repetition within a session when alternatives exist ----
 (() => {
   const s = newSession();
