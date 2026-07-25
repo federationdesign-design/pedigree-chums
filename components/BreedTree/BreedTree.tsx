@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
@@ -314,15 +314,33 @@ export default function BreedTree({
     return ns;
   }, [root, isMobile, aspectKey]);
 
-  // capture the stage aspect for the layout exactly once, on the first valid read
+  // capture the stage aspect for the layout exactly once, on the first valid read.
+  // "Valid" has to mean actually measured: aspect starts at 1, and freezing that
+  // placeholder clamped the layout to 0.85 instead of the real ~0.45, packing the
+  // circles roughly half size. Which one you got was a race between the
+  // ResizeObserver's first callback and the isMobile flip, so a cold first open
+  // looked right and every reopen came back shrunk.
+  const measuredRef = useRef(false);
   useEffect(() => {
-    if (isMobile && layoutAspect === null && aspect > 0.2 && aspect < 3) {
+    if (isMobile && layoutAspect === null && measuredRef.current && aspect > 0.2 && aspect < 3) {
       setLayoutAspect(Math.min(Math.max(Math.round(aspect * 20) / 20, 0.42), 0.85));
     }
   }, [isMobile, aspect, layoutAspect]);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  // Measure the stage synchronously on mount, before any passive effect runs, so
+  // the frozen layout aspect is always a real reading.
+  useLayoutEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    if (w > 0 && h > 0) {
+      measuredRef.current = true;
+      setAspect(w / h);
+    }
+  }, []);
   const circlesRef = useRef<SVGGElement>(null);
   const labelsRef = useRef<SVGGElement>(null);
   const isMobileRef = useRef(false);
@@ -336,6 +354,18 @@ export default function BreedTree({
   const [entered, setEntered] = useState(false);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
+  // The main pit sizes every toy off BIG = 84 * SCALE, and its menu square off
+  // BIG * 1.2, where SCALE drops to 0.67 below 768px. The mini pit used a flat
+  // 84px, so its squares came out 24% too big on mobile and 17% too small on
+  // desktop. Mirror the main pit's own rule so the two can never drift.
+  const [pitScale, setPitScale] = useState(1);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const apply = () => setPitScale(mq.matches ? 0.67 : 1);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
   // The pit is inert until START is pressed. Nothing falls on a timer.
   const [started, setStarted] = useState(false);
   // Held null until the display face is painting, so the first (server-matched)
@@ -1313,7 +1343,7 @@ export default function BreedTree({
     const ro = new ResizeObserver(() => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (w > 0 && h > 0) setAspect(w / h);
+      if (w > 0 && h > 0) { measuredRef.current = true; setAspect(w / h); }
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -1570,7 +1600,7 @@ export default function BreedTree({
             const kk = SIZE / v[2];
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
-            const uSz = 84 * upp;
+            const uSz = 84 * pitScale * 1.2 * upp; // main pit: BIG * 1.2
             const m = 16 * upp;
             const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
@@ -1586,7 +1616,7 @@ export default function BreedTree({
               };
             });
             const half = uSz / 2;
-            const iconStroke = 6 * upp;
+            const iconStroke = Math.max(4 * upp, uSz * 0.1); // main pit icon weight
             return defs.map((d) => (
               <g key={d.kind} ref={d.kind === "close" ? uiCloseRef : uiDescRef}
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
@@ -1597,15 +1627,15 @@ export default function BreedTree({
                   const act = d.kind === "close" ? onPitClose : onToggleCaption;
                   startDrag(e, b && !b.fixed ? b : null, act);
                 }}>
-                <rect x={-half} y={-half} width={uSz} height={uSz} rx={20 * upp}
-                  style={{ fill: "var(--navy, #0a3a57)", stroke: "var(--yellow, #ffd23e)", strokeWidth: 3 * upp }} />
+                <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
+                  style={{ fill: "var(--yellow, #ffd23e)", stroke: "var(--navy, #0a3a57)", strokeWidth: 5 * upp }} />
                 {d.kind === "close" ? (
-                  <g stroke="var(--yellow, #ffd23e)" strokeWidth={iconStroke} strokeLinecap="round">
+                  <g stroke="var(--navy, #0a3a57)" strokeWidth={iconStroke} strokeLinecap="round">
                     <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
                     <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
                   </g>
                 ) : (
-                  <g stroke="var(--yellow, #ffd23e)" strokeWidth={1.8} fill="none" strokeLinecap="round" strokeLinejoin="round"
+                  <g stroke="var(--navy, #0a3a57)" strokeWidth={1.8} fill="none" strokeLinecap="round" strokeLinejoin="round"
                     transform={`scale(${uSz / 44}) translate(-12,-12)`}>
                     <rect x="9" y="2" width="6" height="4" rx="1" />
                     <rect x="2" y="18" width="6" height="4" rx="1" />

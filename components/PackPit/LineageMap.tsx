@@ -70,6 +70,10 @@ type Node = LineageNode & {
   _dir: number; // outward direction this node sits at, so its own children fan away
 };
 
+// Single child on the first ring of the circular layer: angle from horizontal,
+// and which way it leans (1 right, -1 left). Two numbers, nothing else uses them.
+const SOLO_DEG = 33;
+const SOLO_SIDE = 1;
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
@@ -469,6 +473,14 @@ export default function LineageMap({
       const cnt = kids.length;
       const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
       let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
+      // A lone child on the first ring has no fan spread to offset it, so it used
+      // to sit dead vertical above the dog. Lean it out on the diagonal instead.
+      // SOLO_DEG is measured from horizontal, the way the connector reads on
+      // screen: 90 is the old vertical, 33 is the diagonal.
+      if (circular && depth === 0 && cnt === 1) {
+        const rad = (SOLO_DEG * Math.PI) / 180;
+        center = SOLO_SIDE > 0 ? -rad : -(Math.PI - rad);
+      }
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
       const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);

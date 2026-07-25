@@ -646,16 +646,27 @@
 }
 
 /* mini pit: overlay close matches the in-pit menu squares (navy, yellow stroke) */
+/* Matches the main pit's menu square exactly: BIG * 1.2 (84 * 0.67 * 1.2 on
+   mobile, 84 * 1.2 on desktop), radius 0.3 of the size, 5px border, yellow
+   with a navy icon. Do not deviate from the main pit here. */
 .closeCircular {
-  width: 84px;
-  height: 84px;
-  border-radius: 22px;
-  background: var(--navy);
-  border: 4px solid var(--yellow);
-  color: var(--yellow);
-  font-size: 2.6rem;
+  width: 100.8px;
+  height: 100.8px;
+  border-radius: 30.24px;
+  background: var(--yellow);
+  border: 5px solid var(--navy);
+  color: var(--navy);
+  font-size: 3.1rem;
 }
 .closeCircular:hover {
-  background: var(--navy);
-  color: var(--yellow);
+  background: var(--yellow);
+  color: var(--navy);
+}
+@media (max-width: 768px) {
+  .closeCircular {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+    font-size: 2.1rem;
+  }
 }
