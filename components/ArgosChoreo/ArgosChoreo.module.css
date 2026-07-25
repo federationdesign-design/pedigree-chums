@@ -260,3 +260,57 @@
   margin: 0;
   padding-top: 14px;
 }
+
+/* ── Wipe sequence ───────────────────────────────────────────
+   Scene height sets how long the whole build takes. With 8 frames there are 7
+   wipes, so 420vh minus the sticky stage leaves roughly 45vh of scroll per
+   wipe. Raise this number to slow the build down. */
+.wipeScene {
+  height: 420vh;
+  height: 420svh;
+}
+
+.wipeStage {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+}
+
+.wipeLayers {
+  position: relative;
+  line-height: 0;
+}
+
+.wipeBase {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.wipeLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: clip-path;
+}
+
+/* min-height reserves room for the longest caption so the block does not jump
+   in height as the text swaps between groups. */
+.wipeCaption {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--navy, #0a3a57);
+  margin: 12px 0 0;
+  padding: 0 20px;
+  min-height: 7.2em;
+  animation: wipeCaptionIn 260ms ease-out both;
+}
+
+@keyframes wipeCaptionIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}

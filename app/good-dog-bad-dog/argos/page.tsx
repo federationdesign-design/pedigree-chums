@@ -7,7 +7,7 @@ import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCa
 import DogPoll from "../../../components/DogPoll/DogPoll";
 import ReadingProgress from "../../../components/ReadingProgress/ReadingProgress";
 import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
-import { QuoteBuild, QuotePollScene, StatueBulletsChoreo, HomerCrossfade, GatedVideo } from "../../../components/ArgosChoreo/ArgosChoreo";
+import { QuoteBuild, QuotePollScene, StatueBulletsChoreo, HomerCrossfade, GatedVideo, WipeSequence } from "../../../components/ArgosChoreo/ArgosChoreo";
 import { QuoteReveal } from "../../../components/ScrollScenes/QuoteReveal";
 
 export const metadata: Metadata = {
@@ -918,6 +918,32 @@ export default function ArgosPage() {
               <p>A house with a dog in it has a quality of aliveness that a house without one lacks. Not noise exactly, though there is noise. Not mess exactly, though there is mess. Something more like the sense that the house is inhabited rather than merely occupied. Something in it is paying attention.</p>
 
               <p>Argos is all of that, compressed into a single moment. He is the physical proof that this was once a real home, with a man who raised a dog, knew his name and expected to return to him. That home has been hollowed out by twenty years of absence and occupation. The suitors have filled the palace, but they have not made it home. Argos, neglected and nearly gone, is still part of the old household. He is what remains of what Odysseus left behind.</p>
+
+              {/* Olfactory build: eight frames wiping in from the right as the
+                  reader scrolls, with grouped captions. Mobile only, matching
+                  every other scroll scene on this page. */}
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                <WipeSequence
+                  alt="A dog and a woman nose to nose, with the path of smell traced into the brain"
+                  images={[
+                    "/smell/smell-img1.jpg",
+                    "/smell/smell-img2.jpg",
+                    "/smell/smell-img3.jpg",
+                    "/smell/smell-img4.jpg",
+                    "/smell/smell-img5.jpg",
+                    "/smell/smell-img6.jpg",
+                    "/smell/smell-hippocampus.jpg",
+                    "/smell/smell-amygdala.jpg",
+                  ]}
+                  captions={[
+                    { fromFrame: 0, text: "Direct path. Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus. Other senses like sight or sound must go through a relay station, the thalamus, first." },
+                    { fromFrame: 3, text: "Olfactory bulb. A neural structure in the forebrain that processes the sense of smell. It receives odour signals directly from sensory neurons in the nasal cavity and relays them to brain regions for interpretation." },
+                    { fromFrame: 4, text: "Two more structures sit at the end of that path. Smell reaches both of them before you have consciously registered the smell at all." },
+                    { fromFrame: 6, text: "Hippocampus. This part builds and brings back long-term memories, helping you connect a specific scent to a past event or place." },
+                    { fromFrame: 7, text: "Amygdala. This part handles your feelings and gives an immediate emotional reaction, like joy or fear, to a smell." },
+                  ]}
+                />
+              </div>
 
               <h2 className={styles.subhead}>A good household, and what it owes</h2>
 

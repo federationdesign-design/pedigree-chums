@@ -373,6 +373,59 @@ export function HomerCrossfade({
   );
 }
 
+/* ── Wipe sequence ──
+   Frames stack and build as the reader scrolls. Frame 0 is the resting state and
+   is always fully drawn; every later frame is revealed by a clip-path inset that
+   retreats from the right edge leftwards, so it wipes in from the right rather
+   than fading. Captions are grouped: each entry names the frame index at which
+   it takes over, so text holds still while the artwork draws itself in. */
+export function WipeSequence({
+  images,
+  alt,
+  captions,
+}: {
+  images: string[];
+  alt: string;
+  captions: { fromFrame: number; text: string }[];
+}) {
+  const { sceneRef, p } = useSceneProgress();
+  const steps = Math.max(1, images.length - 1);
+  const topFrame = Math.min(steps, Math.ceil(p * steps));
+  let capIdx = 0;
+  for (let i = 0; i < captions.length; i++) {
+    if (captions[i].fromFrame <= topFrame) capIdx = i;
+  }
+  return (
+    <div ref={sceneRef} className={styles.wipeScene}>
+      <div className={styles.wipeStage}>
+        <div className={styles.wipeLayers}>
+          {images.map((src, i) => {
+            if (i === 0) {
+              /* eslint-disable-next-line @next/next/no-img-element */
+              return <img key={src} src={src} alt={alt} className={styles.wipeBase} />;
+            }
+            const reveal = clamp01(p * steps - (i - 1));
+            return (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                key={src}
+                src={src}
+                alt=""
+                aria-hidden="true"
+                className={styles.wipeLayer}
+                style={{ clipPath: `inset(0 0 0 ${(1 - reveal) * 100}%)` }}
+              />
+            );
+          })}
+        </div>
+        {/* key forces a remount so each new caption fades in */}
+        <p key={capIdx} className={styles.wipeCaption}>{captions[capIdx].text}</p>
+      </div>
+    </div>
+  );
+}
+
+
 /* ── Gated video ─────────────────────────────────────────────────────────
    Wraps the smell-of-home figure. On mobile the video pins at the top of
    the viewport until it finishes playing (autoplaying at 50% visibility as
