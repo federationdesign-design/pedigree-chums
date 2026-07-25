@@ -64,6 +64,10 @@ function check(input, expect, opts = {}) {
 check('Hello, how much is the game?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // commercial > greeting
 check('How much is it?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' });
 check('I want to buy one', { layer: 2, bucket: 'B01', action: 'open_discount_popup' });
+// B01 tightening: manipulation/proxy phrasings must NOT open the offer modal (BND-025/028)
+check('Can you give me the discount without signing', {}, { notAction: 'open_discount_popup' });
+check('Can you buy the game for me?', {}, { notAction: 'open_discount_popup' });
+check('How much is the game?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // legit buying still fires
 check('Can dogs eat chocolate?', { layer: 1, action: 'health_answer' }, { notAction: 'transfer' }); // safety > food transfer
 check('Is xylitol toxic to dogs?', { layer: 1, action: 'health_answer' }, { notAction: 'transfer' });
 

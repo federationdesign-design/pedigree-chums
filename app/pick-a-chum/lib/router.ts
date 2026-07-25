@@ -44,6 +44,16 @@ const COMMERCIAL = [
   'sign me up', 'sign up', 'get one', 'want one', 'in stock', 'shop',
 ];
 
+// Manipulation / proxy phrasings that contain a buying word but must NOT open the
+// offer modal (BND boundary-testing: "give me the discount without signing", "buy
+// it for me"). They fall through to conversation for now; Batch 4 routes the wider
+// character-manipulation set safety-first.
+const COMMERCIAL_EXCLUDE = [
+  'without signing', 'without signing up', 'without sign up',
+  'buy it for me', 'buy the game for me', 'buy one for me', 'buy me', 'order it for me',
+  'get it for me', 'purchase it for me',
+];
+
 const RULES = [
   'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
   'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
@@ -249,8 +259,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark', barkCount: dogCount };
   }
 
-  // Layer 2: buying, launch and 30% discount.
-  if (hasAny(N, COMMERCIAL)) {
+  // Layer 2: buying, launch and 30% discount. A buying word opens the offer modal,
+  // UNLESS the phrasing is a manipulation/proxy request ("buy it for me", "without
+  // signing"), which must not reach the buy path.
+  if (hasAny(N, COMMERCIAL) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
   }
 
