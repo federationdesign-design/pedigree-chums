@@ -1893,5 +1893,83 @@
     "defaultRoute": "Weighted",
     "animationCue": "SHAKE_RESET",
     "status": "Draft approved for MVP review"
+  },
+  {
+    "responseId": "B15-R01",
+    "bucketId": "B15",
+    "subtag": "What is this / where do I begin",
+    "triggers": [
+      "what is this for",
+      "what do i do",
+      "get started",
+      "should i begin",
+      "what am i looking at",
+      "is this the start"
+    ],
+    "template": "[B15 orientation placeholder 1, Steve to write: what this is / where to begin]",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - orientation copy to be written by Steve"
+  },
+  {
+    "responseId": "B15-R02",
+    "bucketId": "B15",
+    "subtag": "What can I ask / options",
+    "triggers": [
+      "what can i ask",
+      "allowed to ask",
+      "should i ask",
+      "what are my options",
+      "kind of things",
+      "some choices",
+      "here for",
+      "help with"
+    ],
+    "template": "[B15 orientation placeholder 2, Steve to write: what you can ask about]",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - orientation copy to be written by Steve"
+  },
+  {
+    "responseId": "B15-R03",
+    "bucketId": "B15",
+    "subtag": "How does this work / just type",
+    "triggers": [
+      "how do i use",
+      "how this works",
+      "just type",
+      "where i type",
+      "type a question",
+      "enter a word",
+      "instructions",
+      "just type anything"
+    ],
+    "template": "[B15 orientation placeholder 3, Steve to write: how it works, just type]",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - orientation copy to be written by Steve"
+  },
+  {
+    "responseId": "B15-R04",
+    "bucketId": "B15",
+    "subtag": "Nudge to begin / what next",
+    "triggers": [
+      "what to do",
+      "happens next",
+      "comes next",
+      "what do we do",
+      "where do we go",
+      "point me",
+      "show me around",
+      "waiting for me"
+    ],
+    "template": "[B15 orientation placeholder 4, Steve to write: gentle nudge to try something]",
+    "factSource": "Orientation (onboarding)",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - orientation copy to be written by Steve"
   }
 ]

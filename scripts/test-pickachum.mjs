@@ -99,6 +99,27 @@ check('nnnnnn', { layer: 10, bucket: 'B14', action: 'gibberish' });
 check('I want to die', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('Childline') ? null : 'expected approved signpost') });
 check('you are stupid', { layer: 1, action: 'safety_boundary' });
 
+// ---- Orientation / onboarding cold-start corpus (bucket B15, layer 11) ----
+// First-time visitors who do not yet know what the chat is or what to do. All
+// must land in the dedicated orientation bucket, never the gk_unknown refusal or
+// the converse echo. Copy is written by Steve in the workbook; routing is asserted here.
+const ORIENTATION_CORPUS = [
+  'What am I meant to do here?', 'How do I get started?', 'What do I do first?', 'Where should I begin?',
+  'What am I looking at?', 'How do I use this?', 'What is this for?', 'What happens if I type something?',
+  'What am I allowed to ask?', 'Can I ask you a question?', 'What should I ask you?', 'Do I just type anything?',
+  'Am I doing this right?', 'Is this where I type?', 'What am I meant to say?', 'Are you waiting for me?',
+  'Do I need to choose something?', 'What are my options?', 'Can you show me what to do?', 'Can you explain this?',
+  'Can you tell me how this works?', 'What can I ask about?', 'What are you here for?', 'What do you help with?',
+  'Can you show me around?', 'Where can you take me?', 'What should I look at first?', 'Is there something I should press?',
+  'Do I need to say a command?', 'Are there any instructions?', 'Where are the instructions?', 'What happens next?',
+  'What do we do now?', 'Where do we go from here?', 'What am I supposed to ask?', 'Do you need me to say something?',
+  'Are you going to say anything?', 'Why aren’t you talking?', 'Are you listening?', 'Did this open properly?',
+  'Is something meant to happen?', 'Have I missed something?', 'Is this the start?', 'Do I need to enter a word?',
+  'Can I type a question here?', 'What kind of things can you answer?', 'Can you give me some choices?',
+  'Can you point me in the right direction?', 'Can you tell me what comes next?', 'So, what do I do with you?',
+];
+for (const q of ORIENTATION_CORPUS) check(q, { layer: 11, bucket: 'B15', action: 'orientation' });
+
 // ---- No exact response repetition within a session when alternatives exist ----
 (() => {
   const s = newSession();

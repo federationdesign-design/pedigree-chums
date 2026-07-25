@@ -118,6 +118,7 @@ export type ActionType =
   | 'gk_answer' // known general-knowledge answer
   | 'gk_unknown' // general knowledge with no approved record: no guess
   | 'breed_answer' // fact about the active breed
+  | 'orientation' // onboarding: what is this / what do I do / how does this work
   | 'transfer' // specialist handoff to another dog
   | 'converse' // greeting / test / command / statement / random word
   | 'gibberish' // keyboard smash / punctuation / unresolved

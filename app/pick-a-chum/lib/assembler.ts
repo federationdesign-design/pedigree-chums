@@ -28,6 +28,10 @@ const DOG_LABEL: Record<Dog, string> = {
   boxer: 'Boxer',
 };
 
+// Shown only until the workbook B15 orientation rows carry real copy (logged in
+// PLACEHOLDERS.md). Deliberately not final copy: Steve writes the Collie voice.
+const ORIENTATION_PLACEHOLDER = '[B15 orientation line, copy pending: Steve to write in the Collie voice]';
+
 // Fill {{token}} placeholders from a context map. Unknown tokens are dropped and
 // stray double spaces collapsed, so a partial context never leaks braces.
 function fill(template: string, ctx: Record<string, string>): string {
@@ -145,6 +149,12 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
         ? `${collie.character} Typical working life is around ${collie.lifespanYears} years, and on training we are, professionally speaking, ${collie.training?.label.toLowerCase()}.`
         : 'We maintain a strong professional record.';
       return { responseId: 'B07-COLLIE', text: bits.replace(/\s{2,}/g, ' ').trim(), dog };
+    }
+
+    case 'orientation': {
+      const r = pickResponse(data, 'B15', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : ORIENTATION_PLACEHOLDER;
+      return { responseId: r?.responseId ?? 'B15', text, dog };
     }
 
     case 'transfer': {

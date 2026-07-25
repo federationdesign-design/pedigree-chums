@@ -12,6 +12,7 @@ final copy.
 | ART010 interim mapping | `route-map.json` | 'The Power of Smell' unbuilt; points at the teaching-medicine article for now | NEEDS_STEVE item 4 |
 | FAQ003-006, FAQ011-014 `{{...}}` answers | `generated/faq.json` (from workbook) | Workbook FAQ answers Steve will paste into the workbook | NEEDS_STEVE item 4 (OI01) |
 | Random-dog control treatment | (styled build, Checkpoint 2) | To be proposed for approval | NEEDS_STEVE item 5 |
+| B15 orientation lines | `generated/collie-responses.json` (B15-R01..R04) + `ORIENTATION_PLACEHOLDER` in `assembler.ts` | Onboarding replies for the new orientation bucket; routing is live, copy is not | Steve writes the Collie-voice orientation copy into the workbook Collie Responses sheet (bucket B15), then regenerates |
 
 ## Resolved (no longer placeholders)
 
