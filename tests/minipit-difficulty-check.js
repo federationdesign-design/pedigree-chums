@@ -1,8 +1,9 @@
 // GUARD-009: the mini pit difficulty slider.
 //   a) it is on the start screen, down the left, default 5, and it goes when
 //      START is pressed; it is absent on desktop, where the fill has no effect
-//   b) the mapping is the spec: fill = 0.70 + level/10 * 0.30, so level 10 is
-//      1.176x the default radius and level 0 is 0.824x
+//   b) the three pinned points: level 5 is the approved default, level 0 is
+//      0.618x of it (a quarter under the old easiest), and at level 10 the
+//      widest circle spans the pit, which is the stage less its 4-unit walls
 //   c) changing it must NOT replay the entrance: START stays on screen and the
 //      labels stay visible throughout (both are gated on `entered`)
 //   d) after a change, START still drops the circles, so the physics is reading
@@ -12,13 +13,16 @@ const { chromium } = require('playwright');
 
 const probe = () => {
   const svg = document.querySelector('[role="dialog"] svg');
-  const c = svg && svg.querySelectorAll('circle')[1];
-  const box = c && c.getBoundingClientRect();
+  const cs = svg ? Array.from(svg.querySelectorAll('circle')).slice(1) : [];
+  const box = cs.length
+    ? cs.map((c) => c.getBoundingClientRect()).reduce((a, r) => (r.width > a.width ? r : a))
+    : null;
   const sl = document.querySelector('[role="slider"][aria-label="Difficulty"]');
   const labels = svg && Array.from(svg.querySelectorAll('g')).find((g) => g.querySelector(':scope > g > text tspan'));
   return {
     r: box ? +(box.width / 2).toFixed(2) : null,
     y: box ? Math.round(box.y) : null,
+    stageW: svg ? +svg.parentElement.getBoundingClientRect().width.toFixed(1) : null,
     level: sl ? +sl.getAttribute('aria-valuenow') : null,
     hasSlider: !!sl,
     hasStart: !!document.querySelector('[aria-label="Start"]'),
@@ -69,15 +73,28 @@ const openPit = async (p) => {
   const easy = await p.evaluate(probe);
   const dragTracked = new Set(mid).size >= 4; // it followed, it did not stick
 
-  // b) mapping, measured against the level-5 default
-  const ratioHard = hard.r / base.r;
+  // b) the pinned points. Level 10 fills the pit: the stage less the 4 svg-unit
+  // wall inset each side, so 96% to 100% of the stage width is on spec and
+  // anything wider would wedge the body between the walls.
   const ratioEasy = easy.r / base.r;
+  const spanTop = (hard.r * 2) / hard.stageW;
   const mapping =
     base.level === 5 &&
     hard.level === 10 &&
     easy.level === 0 &&
-    Math.abs(ratioHard - 1.0 / 0.85) < 0.02 &&
-    Math.abs(ratioEasy - 0.7 / 0.85) < 0.02;
+    spanTop > 0.96 && spanTop <= 1.0 &&
+    Math.abs(ratioEasy - 0.525 / 0.85) < 0.02;
+
+  // and it must climb the whole way, never flatten off or step backwards
+  const sweep = [];
+  await track.focus();
+  for (let i = 0; i < 10; i++) await p.keyboard.press('ArrowDown');
+  for (let i = 0; i <= 10; i++) {
+    sweep.push((await p.evaluate(probe)).r);
+    if (i < 10) await p.keyboard.press('ArrowUp');
+    await p.waitForTimeout(60);
+  }
+  const monotonic = sweep.every((v, i) => i === 0 || v > sweep[i - 1]);
 
   // c) no entrance replay at any point
   const noReplay =
@@ -104,12 +121,13 @@ const openPit = async (p) => {
   const deskClean = desk.hasStart && !desk.hasSlider;
 
   console.log('default:', base.level, 'r', base.r, '| 10:', hard.level, 'r', hard.r, '| 0:', easy.level, 'r', easy.r);
-  console.log('mapping:', mapping, '| ratios', ratioHard.toFixed(3), ratioEasy.toFixed(3), '(want 1.176 / 0.824)');
+  console.log('mapping:', mapping, '| level 10 spans', (spanTop * 100).toFixed(1) + '% of the stage | level 0 ratio', ratioEasy.toFixed(3), '(want 0.618)');
+  console.log('monotonic:', monotonic, JSON.stringify(sweep));
   console.log('drag tracked:', dragTracked, JSON.stringify(mid));
   console.log('no entrance replay:', noReplay, '| fell after START:', fell, '| slider cleared:', clearedOnStart);
   console.log('desktop hides slider:', deskClean, '| pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
-  const pass = !!(mapping && dragTracked && noReplay && fell && clearedOnStart && deskClean && errs.length === 0);
+  const pass = !!(mapping && monotonic && dragTracked && noReplay && fell && clearedOnStart && deskClean && errs.length === 0);
   console.log(pass ? 'PASS GUARD-009' : 'FAIL GUARD-009');
   await b.close();
   process.exit(pass ? 0 : 1);

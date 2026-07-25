@@ -24,17 +24,32 @@ const ZOOM_PAD = 1.1;
 // Breed-title placement on each circle, relative to its label anchor. TITLE_DY
 // moves it up (more negative) or down toward the circle; TITLE_ANGLE tilts it
 // (negative leans the text up to the right). Tweak these two to taste.
-// Mini pit only: the difficulty slider sets how much of the stage the dog
-// circles fill before the round starts. Bigger circles means less room in the
-// pit and a faster game over, so fill IS the difficulty. Level 5 lands on 0.85,
-// which is the fixed MINI_FILL this replaced, so the default is unchanged.
-// Mobile only for now: above 640px the layout does not run relayoutMobile, so
-// the fill has nowhere to land and the slider stays hidden.
+// Mini pit only: the difficulty slider sets how big the dog circles are before
+// the round starts. Bigger circles means less room in the pit and a faster game
+// over, so size IS the difficulty. Three points are pinned:
+//   level 5  the packing signed off as MINI_FILL 0.85, unchanged
+//   level 0  a quarter smaller again than the old easiest setting
+//   level 10 the widest circle spans the full width of the pit
+// The top end is measured off the widest top-level circle rather than the
+// cluster's bounding box, because that is the thing the eye reads as "as big as
+// it goes", and it is the body that has to fit between the pit walls.
+// Mobile only: above 640px the layout does not run relayoutMobile, so the size
+// has nowhere to land and the slider stays hidden.
 const DIFF_DEFAULT = 5;
-const DIFF_FILL_MIN = 0.7; // level 0, roughly half the area of maximum
-const DIFF_FILL_RANGE = 0.3; // level 10 lands on 1.00, the full packing
-function fillForLevel(level: number): number {
-  return DIFF_FILL_MIN + (Math.min(Math.max(level, 0), 10) / 10) * DIFF_FILL_RANGE;
+const DIFF_EASY = 0.525; // level 0, against the base packing
+const DIFF_MID = 0.85; // level 5, the approved default
+// The docked view zooms out to 1.21x the frame, so the visible pit is this much
+// wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
+// walls, which sit 4 svg units inside the stage edges.
+const DIFF_SPAN = 1.21;
+const DIFF_INSET = 16;
+// level: null outside the mini pit, where the packing is used untouched.
+function diffScale(base: number, wide: number, level: number | null): number {
+  if (level === null) return base;
+  const l = Math.min(Math.max(level, 0), 10);
+  const mid = base * DIFF_MID;
+  if (l <= 5) return base * (DIFF_EASY + (l / 5) * (DIFF_MID - DIFF_EASY));
+  return mid + ((l - 5) / 5) * (Math.max(wide, mid) - mid);
 }
 // START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
 const START_SCALE = 2;
@@ -238,7 +253,7 @@ function normalizeTop(nodes: Node[]) {
 
 // How much of the available stage the mobile masonry fills. The mini pit runs at
 // 0.85 so the circles sit 15% smaller; the breed page keeps the full fill.
-function relayoutMobile(nodes: Node[], aspect: number, fill = 1) {
+function relayoutMobile(nodes: Node[], aspect: number, level: number | null = null) {
   const root = nodes[0];
   const kids = root.children ?? [];
   const n = kids.length;
@@ -248,7 +263,11 @@ function relayoutMobile(nodes: Node[], aspect: number, fill = 1) {
   const ox = root.x, oy = root.y;
   const pts = nodes.map((d) => ({ d, x: d.x - ox, y: d.y - oy }));
   if (n === 1) {
-    const s = (Math.min(FW * 0.5, FH * 0.46) / kids[0].r) * fill;
+    const s = diffScale(
+      Math.min(FW * 0.5, FH * 0.46) / kids[0].r,
+      (FW * DIFF_SPAN - DIFF_INSET) / (2 * kids[0].r),
+      level
+    );
     pts.forEach((p) => {
       p.d.x = p.x * s;
       p.d.y = p.y * s;
@@ -270,7 +289,12 @@ function relayoutMobile(nodes: Node[], aspect: number, fill = 1) {
   const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
   const M = 20;
   // fill the height, but cap how far circles may spill past the side edges
-  const scale = Math.min((FH - M) / bh, (FW * 1.12) / bw) * fill;
+  const rMax = Math.max(...d1.map((p) => p.d.r));
+  const scale = diffScale(
+    Math.min((FH - M) / bh, (FW * 1.12) / bw),
+    (FW * DIFF_SPAN - DIFF_INSET) / (2 * rMax),
+    level
+  );
   pts.forEach((p) => {
     p.d.x = (p.x - cx) * scale;
     p.d.y = (p.y - cy) * scale;
@@ -346,7 +370,6 @@ export default function BreedTree({
   // Start-screen control only, and it resets to the default every time the pit
   // is opened (LineageModal remounts this component on its runKey).
   const [level, setLevel] = useState(DIFF_DEFAULT);
-  const miniFill = fillForLevel(level);
   // Set the instant before a difficulty change, and consumed by the entrance
   // effect so that re-pack resizes in place rather than replaying the drop-in.
   const resizeOnlyRef = useRef(false);
@@ -374,9 +397,9 @@ export default function BreedTree({
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
     normalizeTop(ns);
-    if (isMobile) relayoutMobile(ns, aspectKey, dockAside ? miniFill : 1);
+    if (isMobile) relayoutMobile(ns, aspectKey, dockAside ? level : null);
     return ns;
-  }, [root, isMobile, aspectKey, dockAside, miniFill]);
+  }, [root, isMobile, aspectKey, dockAside, level]);
 
   // capture the stage aspect for the layout exactly once, on the first valid read.
   // "Valid" has to mean actually measured: aspect starts at 1, and freezing that

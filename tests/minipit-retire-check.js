@@ -73,14 +73,25 @@ const centreOf = (re) => {
   const pairOk = beforeOpen === true && whileOpen === false && boxOpen === true;
 
   // a) retire the flag by reading its message
-  // click the element, with retries: the flag rolls, so a coordinate click can
-  // land mid-bounce and be read as a drag rather than a tap
-  // six attempts, not three: the flag is still lively at this point and three
-  // taps in a row can all land mid-bounce, which read as a false failure
+  // The flag rolls, and a tap that lands mid-bounce is read as a drag rather
+  // than a tap. Retrying alone was not enough: wait for the flag to come to
+  // rest first, then click the element, and only then retry.
+  const flagStill = async () => {
+    let last = null;
+    for (let i = 0; i < 24; i++) { // up to ~6s
+      const el = await p.$('image[href*="uk-icon"]');
+      if (!el) return null;
+      const b = await el.boundingBox();
+      if (b && last && Math.hypot(b.x - last.x, b.y - last.y) < 1.5) return el;
+      last = b;
+      await p.waitForTimeout(250);
+    }
+    return await p.$('image[href*="uk-icon"]');
+  };
   for (let attempt = 0; attempt < 6; attempt++) {
     const already = await p.$('[aria-label="Got it"]');
     if (already) break;
-    const flagEl = await p.$('image[href*="uk-icon"]');
+    const flagEl = await flagStill();
     if (!flagEl) break;
     await flagEl.click({ force: true });
     await p.waitForTimeout(700);
