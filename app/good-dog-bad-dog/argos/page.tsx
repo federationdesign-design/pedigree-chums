@@ -661,8 +661,8 @@ export default function ArgosPage() {
               <div className={styles.desktopOnly}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
-                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
                 />
                 <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
@@ -671,8 +671,8 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is the only one to reimagine this moment" },
-                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Odysseus and Argos: the reunion in stone." },
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
                   quote="Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next."
                   blockClass={styles.pullquote}
