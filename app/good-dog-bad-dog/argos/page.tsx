@@ -936,11 +936,11 @@ export default function ArgosPage() {
                     "/smell/smell-amygdala.jpg",
                   ]}
                   captions={[
-                    { fromFrame: 0, text: <>Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus.<br />Other senses like sight or sound must go through a relay station, the thalamus, first.</> },
-                    { fromFrame: 3, text: <><strong>The Olfactory bulb</strong><br />A neural structure in the brain that processes the sense of smell. It receives odour signals (smells) directly from sensory neurons in the nasal cavity (nose) and relays them to brain regions for interpretation...</> },
-                    { fromFrame: 4, text: <>Two of these structures sit at the end of that path. The things you smell reach both of these before you have even thought about the thing you are smelling, in fact way before you have consciously registered the smell at all.</> },
-                    { fromFrame: 6, text: <><strong>The Hippocampus</strong><br />This part of your brain builds memories and brings back long-term memories, helping you connect a specific scent to a past event or place.</> },
-                    { fromFrame: 7, text: <><strong>The Amygdala</strong><br />This part of the brain handles the feelings you feel and gives an immediate emotional reaction, like joy/fear, or satisfaction/disgust to a smell.</> },
+                    { fromFrame: 0, tone: "yellow", text: <>Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus.<br />Other senses like sight or sound must go through a relay station, the thalamus, first.</> },
+                    { fromFrame: 3, title: "The Olfactory bulb", titleTone: "yellow", tone: "white", text: <>A neural structure in the brain that processes the sense of smell. It receives odour signals (smells) directly from sensory neurons in the nasal cavity (nose) and relays them to brain regions for interpretation...</> },
+                    { fromFrame: 4, title: "The unconscious highway", titleTone: "white", tone: "yellow", text: <>Two of these structures sit at the end of that path. The things you smell reach both of these before you have even thought about the thing you are smelling, in fact way before you have consciously registered the smell at all.</> },
+                    { fromFrame: 6, title: "The Hippocampus", titleTone: "white", tone: "white", text: <>This part of your brain builds memories and brings back long-term memories, helping you connect a specific scent to a past event or place.</> },
+                    { fromFrame: 7, title: "The Amygdala", titleTone: "yellow", tone: "white", text: <>This part of the brain handles the feelings you feel and gives an immediate emotional reaction, like joy/fear, or satisfaction/disgust to a smell.</> },
                   ]}
                 />
               </div>

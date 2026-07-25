@@ -309,8 +309,9 @@
   font-weight: 500;
   line-height: 1.3;
   text-align: center;
-  margin: 32px 0 0; /* clear gap between the image and the caption */
-  padding: 0 20px;
+  margin: 32px auto 0; /* clear gap between the image and the caption */
+  width: 75%;
+  padding: 0;
   animation: wipeCaptionIn 260ms ease-out both;
 }
 
@@ -319,6 +320,11 @@
    specificity reason as above. */
 .wipeStage .wipeCaptionYellow { color: var(--yellow, #ffd23e); font-weight: 700; }
 .wipeStage .wipeCaptionWhite { color: #ffffff; }
+
+/* Title colour is set per caption, independent of the body colour. <strong> is
+   already bold, so yellow titles satisfy "yellow is always bold". */
+.wipeStage .wipeTitleYellow { color: var(--yellow, #ffd23e); }
+.wipeStage .wipeTitleWhite { color: #ffffff; }
 
 @keyframes wipeCaptionIn {
   from { opacity: 0; transform: translateY(4px); }

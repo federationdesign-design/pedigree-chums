@@ -386,7 +386,13 @@ export function WipeSequence({
 }: {
   images: string[];
   alt: string;
-  captions: { fromFrame: number; text: React.ReactNode }[];
+  captions: {
+    fromFrame: number;
+    title?: string;
+    titleTone?: "yellow" | "white";
+    text: React.ReactNode;
+    tone?: "yellow" | "white";
+  }[];
 }) {
   const { sceneRef, p } = useSceneProgress();
   const steps = Math.max(1, images.length - 1);
@@ -421,8 +427,22 @@ export function WipeSequence({
         {/* key forces a remount so each new caption fades in */}
         <p
           key={capIdx}
-          className={`${styles.wipeCaption} ${capIdx % 2 === 0 ? styles.wipeCaptionYellow : styles.wipeCaptionWhite}`}
+          className={`${styles.wipeCaption} ${
+            captions[capIdx].tone === "yellow" ? styles.wipeCaptionYellow : styles.wipeCaptionWhite
+          }`}
         >
+          {captions[capIdx].title && (
+            <>
+              <strong
+                className={
+                  captions[capIdx].titleTone === "white" ? styles.wipeTitleWhite : styles.wipeTitleYellow
+                }
+              >
+                {captions[capIdx].title}
+              </strong>
+              <br />
+            </>
+          )}
           {captions[capIdx].text}
         </p>
       </div>
