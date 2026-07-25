@@ -386,7 +386,7 @@ export function WipeSequence({
 }: {
   images: string[];
   alt: string;
-  captions: { fromFrame: number; text: string }[];
+  captions: { fromFrame: number; text: React.ReactNode }[];
 }) {
   const { sceneRef, p } = useSceneProgress();
   const steps = Math.max(1, images.length - 1);
