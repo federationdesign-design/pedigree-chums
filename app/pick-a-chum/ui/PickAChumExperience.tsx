@@ -21,6 +21,7 @@ import { submit, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
 import { Dog } from '../lib/types';
 import { openDiscountPopup } from '../data/discount-popup';
+import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 
 type Phase = 'selecting' | 'idle' | 'transferring' | 'ending';
 
@@ -77,6 +78,9 @@ interface Message {
   name?: string;
   action?: Command;
   closed?: boolean; // this dog turn is the session cut-off
+  typing?: boolean; // thinking dots are showing
+  display?: string; // text revealed so far (typing theatre)
+  done?: boolean; // performance finished (show the action link, allow the next)
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -103,14 +107,22 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const [swap, setSwap] = useState<Swap>('none');
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [announce, setAnnounce] = useState(''); // aria-live: whole messages, once
   const inputRef = useRef<HTMLInputElement | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef(0);
   const timersRef = useRef<number[]>([]);
+  const rafRef = useRef<number | null>(null);
+  // The active typing performance, so a tap or Enter can complete it instantly.
+  const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
     timersRef.current = [];
+    if (rafRef.current !== null) {
+      window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
   }, []);
   const after = useCallback((ms: number, fn: () => void) => {
     timersRef.current.push(window.setTimeout(fn, ms));
@@ -121,6 +133,84 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     []
   );
 
+  const setMsg = useCallback((id: number, patch: Partial<Message>) => {
+    setMessages((m) => m.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  }, []);
+
+  // Finish a performance: show the whole message, announce it once, hand back.
+  const finishTheatre = useCallback(
+    (id: number, finalText: string, closed?: boolean) => {
+      if (playbackRef.current?.id === id) playbackRef.current = { ...playbackRef.current, done: true };
+      setMsg(id, { display: finalText, typing: false, done: true });
+      setAnnounce(finalText);
+      if (closed) setPhase('ending');
+      else {
+        setPhase('idle');
+        window.setTimeout(() => inputRef.current?.focus(), 0);
+      }
+    },
+    [setMsg]
+  );
+
+  // Perform a dog message: safety and barks render instantly and whole (no dots,
+  // no typing, no typos); otherwise thinking dots, then the per-dog typed reveal.
+  const performTheatre = useCallback(
+    (id: number, text: string, dog: Dog, action: string, closed?: boolean) => {
+      if (skipTheatre(action as never) || reducedMotion) {
+        finishTheatre(id, text, closed);
+        return;
+      }
+      const plan = buildTypingPlan(text, TYPING_PROFILES[dog]);
+      playbackRef.current = { id, plan, closed, done: false };
+      setMsg(id, { typing: true, display: '' });
+      setPhase('transferring'); // lock the composer while the dog performs
+
+      // Clock-driven playback: each step's delay is turned into a wall-clock
+      // deadline, and every animation frame we jump the shown text to whichever
+      // step the elapsed time has reached. Because the whole thing is paced by
+      // performance.now, not by counting setTimeouts, the performance always ends
+      // at plan.totalMs (<= 8s) regardless of per-frame render or timer overhead,
+      // so the eight-second cap holds as real wall-clock, not just on paper.
+      const deadlines = new Array<number>(plan.steps.length);
+      let acc = plan.think;
+      for (let i = 0; i < plan.steps.length; i++) {
+        acc += plan.steps[i].delay;
+        deadlines[i] = acc;
+      }
+      const total = plan.totalMs;
+      const start = performance.now();
+      let shownIdx = -1;
+      const frame = () => {
+        const pb = playbackRef.current;
+        if (!pb || pb.done || pb.id !== id) return;
+        const elapsed = performance.now() - start;
+        if (elapsed >= total) {
+          finishTheatre(id, plan.final, closed);
+          return;
+        }
+        if (elapsed >= plan.think) {
+          let i = shownIdx;
+          while (i + 1 < plan.steps.length && deadlines[i + 1] <= elapsed) i++;
+          if (i >= 0 && i !== shownIdx) {
+            shownIdx = i;
+            setMsg(id, { typing: false, display: plan.steps[i].display });
+          }
+        }
+        rafRef.current = window.requestAnimationFrame(frame);
+      };
+      rafRef.current = window.requestAnimationFrame(frame);
+    },
+    [reducedMotion, finishTheatre, setMsg]
+  );
+
+  // Tap the message or press Enter to complete the current performance instantly.
+  const completeTheatre = useCallback(() => {
+    const p = playbackRef.current;
+    if (!p || p.done) return;
+    clearTimers();
+    finishTheatre(p.id, p.plan.final, p.closed);
+  }, [clearTimers, finishTheatre]);
+
   // Drive a handover: post the user line (and any handover line), pause, pop the
   // old dog out and the new dog in, then land the new dog's reply.
   const runSwap = useCallback(
@@ -130,11 +220,19 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       handoverMsg: Message | null;
       toDog: Dog;
       afterMsg: Message;
+      action: string;
       closed?: boolean;
     }) => {
       clearTimers();
       const popOut = reducedMotion ? 0 : POP_OUT;
       const settle = reducedMotion ? 120 : POP_IN_SETTLE;
+      // The handover line (the old dog) lands whole; the new dog's reply is then
+      // performed with the NEW dog's typing profile, so the change is felt.
+      if (opts.handoverMsg) {
+        opts.handoverMsg.display = opts.handoverMsg.text;
+        opts.handoverMsg.done = true;
+        setAnnounce(opts.handoverMsg.text);
+      }
       setMessages((m) => (opts.handoverMsg ? [...m, opts.userMsg, opts.handoverMsg] : [...m, opts.userMsg]));
       setPhase('transferring');
       setSwap('none');
@@ -145,15 +243,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       });
       after(opts.lead + popOut + settle, () => {
         setMessages((m) => [...m, opts.afterMsg]);
-        if (opts.closed) {
-          setPhase('ending');
-        } else {
-          setPhase('idle');
-          inputRef.current?.focus();
-        }
+        performTheatre(opts.afterMsg.id, opts.afterMsg.text, opts.toDog, opts.action, opts.closed);
       });
     },
-    [reducedMotion, clearTimers, after]
+    [reducedMotion, clearTimers, after, performTheatre]
   );
 
   // Lock background scroll for the lifetime of the open experience.
@@ -224,7 +317,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         action: actionFor(r),
         closed: r.closed,
       };
-      runSwap({ lead: BEAT, userMsg, handoverMsg, toDog, afterMsg: incomingMsg, closed: r.closed });
+      runSwap({ lead: BEAT, userMsg, handoverMsg, toDog, afterMsg: incomingMsg, action: result.resolution.action, closed: r.closed });
       return;
     }
 
@@ -240,11 +333,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         action: actionFor(r),
         closed: r.closed,
       };
-      runSwap({ lead: 240, userMsg, handoverMsg: null, toDog, afterMsg: swapMsg, closed: r.closed });
+      runSwap({ lead: 240, userMsg, handoverMsg: null, toDog, afterMsg: swapMsg, action: result.resolution.action, closed: r.closed });
       return;
     }
 
-    // No swap: the active dog answers directly.
+    // No swap: the active dog answers directly, performed with typing theatre.
     const dogMsg: Message = {
       id: idRef.current++,
       who: 'dog',
@@ -257,32 +350,39 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
 
-    // Bark-game break: the English line follows the final bark volley as a
-    // separate message after a short pause.
+    // Bark-game break: the volley is instant (a bark action skips theatre); the
+    // English line follows as a separate message after a short pause.
     if (r.followUp) {
-      const followUpMsg: Message = { id: idRef.current++, who: 'dog', text: r.followUp, dog: toDog, name: dogInfo(toDog).name };
+      const followUp = r.followUp;
+      setMsg(dogMsg.id, { display: r.text, typing: false, done: true });
+      setAnnounce(r.text);
+      const followUpMsg: Message = { id: idRef.current++, who: 'dog', text: followUp, display: followUp, done: true, dog: toDog, name: dogInfo(toDog).name };
       setPhase('transferring');
       clearTimers();
       after(reducedMotion ? 0 : 500, () => {
         setMessages((m) => [...m, followUpMsg]);
+        setAnnounce(followUp);
         setPhase('idle');
         inputRef.current?.focus();
       });
       return;
     }
 
-    setPhase(r.closed ? 'ending' : 'idle');
-    if (!r.closed) window.setTimeout(() => inputRef.current?.focus(), 0);
-  }, [input, phase, runSwap, after, clearTimers, reducedMotion]);
+    performTheatre(dogMsg.id, r.text, toDog, result.resolution.action, r.closed);
+  }, [input, phase, runSwap, after, clearTimers, reducedMotion, performTheatre, setMsg]);
 
-  // Escape closes the interface (parent restores focus to the launcher).
+  // Escape closes the interface; Enter while a message is typing completes it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      else if (e.key === 'Enter' && playbackRef.current && !playbackRef.current.done) {
+        e.preventDefault();
+        completeTheatre();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, completeTheatre]);
 
   // Ending: the Boxer cut-off closes the HUD abruptly after the line is read.
   useEffect(() => {
@@ -336,7 +436,8 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         </div>
       ) : (
         <div className={styles.panel}>
-          <div className={styles.thread} ref={threadRef} aria-live="polite">
+          {/* Tap anywhere in the thread to complete an in-progress performance. */}
+          <div className={styles.thread} ref={threadRef} onClick={completeTheatre}>
             <div className={styles.threadInner}>
               {messages.map((msg) =>
                 msg.who === 'user' ? (
@@ -347,9 +448,22 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                   <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
                     <div className={styles.bubbleDog}>
                       <div className={styles.nameplate}>{msg.name}</div>
-                      <p className={styles.dialogue}>{msg.text}</p>
+                      {msg.typing ? (
+                        <div className={styles.typingDots} aria-hidden="true">
+                          <span />
+                          <span />
+                          <span />
+                        </div>
+                      ) : (
+                        // aria-hidden while still typing so the character stream is
+                        // never announced; the completed text is announced once via
+                        // the live region below.
+                        <p className={styles.dialogue} aria-hidden={!msg.done}>
+                          {msg.display ?? msg.text}
+                        </p>
+                      )}
 
-                      {msg.action && (msg.action.kind === 'popup' || msg.closed) && (
+                      {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed) && (
                         <div className={styles.actionWrap}>
                           <ActionLink command={msg.action} />
                         </div>
@@ -359,6 +473,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                 )
               )}
             </div>
+          </div>
+          {/* Screen-reader announcements: each dog message once, whole, when done. */}
+          <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
+            {announce}
           </div>
 
           <div className={styles.composerRow}>

@@ -243,6 +243,43 @@
 .actionWrap {
   margin-top: 10px;
 }
+/* Typing theatre: the thinking indicator (three dots) and its bounce. */
+.typingDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 3px 2px;
+}
+.typingDots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pc-ui-blue);
+  animation: pcTypingDots 1.2s infinite ease-in-out both;
+}
+.typingDots span:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.typingDots span:nth-child(3) {
+  animation-delay: 0.36s;
+}
+@keyframes pcTypingDots {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+/* Screen-reader-only live region for whole-message announcements. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 .command {
   display: inline-flex;
   align-items: baseline;
@@ -467,5 +504,8 @@
   }
   .launcher:hover {
     transform: none;
+  }
+  .typingDots span {
+    animation: none;
   }
 }
