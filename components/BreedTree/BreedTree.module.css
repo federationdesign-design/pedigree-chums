@@ -443,48 +443,39 @@
 }
 
 /* Level background: a themed picture and ground strip that replace the pit's
-   flat blue. Off-state waits below and left of the stage, tilted, and slides
-   home on START. z-index 0 keeps the whole thing under the stage (z-index 1),
-   so it can never intercept a tap or sit over a dog circle. */
+   flat blue. It never moves. A clip cuts it along the LEARN wash's own leading
+   edge, so the two are halves of one split screen, and START carries that cut
+   past the seam until the level covers everything. z-index 0 keeps the whole
+   thing under the stage (z-index 1), so it can never intercept a tap or sit
+   over a dog circle. */
 .level {
   position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  /* parked fully clear of the stage: 75% still showed a corner at the bottom
-     left, and the -14deg tilt adds about 35px of vertical bounding box */
-  transform: rotate(-14deg) translate3d(-45%, 115%, 0);
-  transition: transform 560ms cubic-bezier(0.22, 0.9, 0.3, 1);
-  /* deliberately no will-change: this layer is a full-screen photograph, and
+  transition: clip-path 560ms cubic-bezier(0.22, 0.9, 0.3, 1);
+  /* deliberately no will-change: this layer is a full-screen illustration, and
      holding it on the compositor for the whole round made the pit measurably
-     less responsive. The transition is a one-off 560ms slide and is smooth
+     less responsive. The transition is a one-off 560ms wipe and is smooth
      without it. */
-}
-.levelOn {
-  transform: rotate(0deg) translate3d(0, 0, 0);
 }
 @media (prefers-reduced-motion: reduce) {
   .level { transition: none; }
 }
-/* flat colour behind the picture, for the band a landscape crop cannot reach
-   on a tall phone. Oversized so the tilted off-state has no bare corners. */
 .levelSky {
   position: absolute;
   inset: -40%;
 }
-/* The picture is sized to the stage height and centred, so it keeps its own
-   proportions and the overspill is trimmed evenly off the left and right. The
-   min-width floor only bites on a screen wider than the art's 1.56:1, where it
-   fills the width instead rather than leaving bare edges. */
+/* the picture keeps its own proportions and is anchored to the bottom, so the
+   horizon stays on the floor and the crop is taken off the top */
 .levelBg {
   position: absolute;
   left: 50%;
   bottom: 0;
-  height: 100%;
-  width: auto;
-  max-width: none;
   min-width: 100%;
+  min-height: 100%;
+  width: auto;
   transform: translateX(-50%);
   object-fit: cover;
   object-position: bottom center;

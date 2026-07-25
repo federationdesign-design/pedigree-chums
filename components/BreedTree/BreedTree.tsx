@@ -73,11 +73,19 @@ function toyRetired(key: string): boolean {
 function retireToy(key: string) {
   try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
-// Level themes: how much of the ground strip shows above the bottom of the
-// stage, in css px. Every pixel here is a pixel of pit height given up, so it
-// stays small: enough to read the era at a glance, not enough to need the
-// game-over thresholds retuned.
-const LEVEL_FLOOR_LIFT = 10;
+// Level themes: how much of the ground strip shows, as a fraction of the strip's
+// own height. 1 shows the art exactly as drawn, its bottom edge on the bottom of
+// the stage. Every pixel of visible ground is a pixel of pit height given up, so
+// this is the dial to turn if the pit starts filling too fast.
+const LEVEL_FLOOR_SHOW = 1;
+// The level background and the LEARN wash are two halves of one split screen.
+// The wash is a slab tilted by this much, pushed off toward the top right; the
+// level fills everything on the other side of that slab's leading edge. Both
+// numbers are the wash's own, so the two edges are the same line by
+// construction rather than by eye.
+const WASH_DEG = 18;
+const WASH_PEEK_X = 0.46; // .learnWashPeek translate3d(46%, ...)
+const WASH_INSET = 2.2; // .learnWash inset: -60% -> 2.2 viewports wide
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
@@ -646,10 +654,48 @@ export default function BreedTree({
     const st = stageRef.current;
     if (!levelTheme || !st) return 0;
     const bandPx = st.clientWidth / levelTheme.floorAspect;
-    const deepest = Math.max(...levelTheme.floorProfile);
-    return LEVEL_FLOOR_LIFT - bandPx * (1 - deepest);
+    return -bandPx * (1 - LEVEL_FLOOR_SHOW);
   };
-  const floorReserveVU = () => (levelTheme ? LEVEL_FLOOR_LIFT * pxVU() : 0);
+  // the deepest point of the drawn surface, in css px above the stage bottom
+  const floorLiftPx = () => {
+    const st = stageRef.current;
+    if (!levelTheme || !st) return 0;
+    const bandPx = st.clientWidth / levelTheme.floorAspect;
+    return bandPx * (LEVEL_FLOOR_SHOW - Math.max(...levelTheme.floorProfile));
+  };
+  const floorReserveVU = () => (levelTheme ? floorLiftPx() * pxVU() : 0);
+
+  // The split. The wash is a slab 2.2 viewports wide, centred, pushed right by
+  // WASH_PEEK_X of its own width and then rotated. Its leading edge is therefore
+  // a known line, and the level background is simply everything on the far side
+  // of it. Rather than slide a second slab in and hope the two meet, the level
+  // sits still and a clip cuts it along that same line, so the seam is exact at
+  // any screen size and the artwork is correctly framed the whole way through.
+  //
+  // shift slides the cut along its own normal: positive clears the level off the
+  // bottom left, 0 is the seam, negative carries it past the seam to full cover.
+  const seamClip = (shift: number) => {
+    const vw = typeof window === "undefined" ? 390 : window.innerWidth;
+    const vh = typeof window === "undefined" ? 844 : window.innerHeight;
+    const rad = (-WASH_DEG * Math.PI) / 180;
+    const cos = Math.cos(rad), sin = Math.sin(rad);
+    const W = WASH_INSET * vw;
+    // the slab's leading edge, taken through the same rotation the wash uses
+    const ex = (0.5 - WASH_PEEK_X) * -W;
+    const px0 = vw / 2 + cos * ex;
+    const py0 = vh / 2 + sin * ex;
+    // along the edge, and the normal pointing into the level's half
+    const ax = -sin, ay = cos;
+    const nx = -cos, ny = -sin;
+    const far = 2 * (vw + vh);
+    const ox = px0 + nx * shift, oy = py0 + ny * shift;
+    // px, not %: percentages in a polygon resolve against each axis separately,
+    // which shears the line the moment the viewport is not square
+    const pt = (t: number, u: number) =>
+      `${Math.round(ox + ax * t + nx * u)}px ${Math.round(oy + ay * t + ny * u)}px`;
+    return `polygon(${pt(-far, 0)}, ${pt(far, 0)}, ${pt(far, far)}, ${pt(-far, far)})`;
+  };
+  const SEAM_OFF = () => (typeof window === "undefined" ? 900 : window.innerWidth + window.innerHeight);
 
   const clampRootView = (v: View): View => {
     if (!dockAside) return v;
@@ -2116,7 +2162,8 @@ export default function BreedTree({
       {dockAside && gravity && levelTheme && (
         <div
           aria-hidden="true"
-          className={`${styles.level}${started || startPeek ? " " + styles.levelOn : ""}`}
+          className={styles.level}
+          style={{ clipPath: seamClip(started ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
         >
           <div
             className={styles.levelSky}
