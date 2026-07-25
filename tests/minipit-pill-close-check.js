@@ -40,8 +40,12 @@ const { chromium } = require('playwright');
              learnY: lb ? Math.round(lb.y) : null, rootBottom: rb ? Math.round(rb.bottom) : null };
   });
   console.log('learn layer:', JSON.stringify(layer));
-  // GUARD-003b: a lone child on the first ring leans out on the diagonal
-  // (33 degrees above horizontal) instead of sitting dead vertical above the dog.
+  // GUARD-003b: a lone child on the first ring leans out on the diagonal at 33
+  // degrees above horizontal instead of sitting dead vertical, AND it never
+  // crosses the walls 16px inside each screen edge. Where the diagonal would
+  // put it off screen the arm swings up toward vertical, so the angle is 33 when
+  // there is room and somewhere between 33 and 90 when there is not. It must
+  // never go below 33 (too shallow) or past 90 (over the top).
   const edge = await p.evaluate(() => {
     const ov = document.querySelector('[class*="overlayStrong"]');
     const ls = ov ? Array.from(ov.querySelectorAll('line[class*="edge"]')) : [];
@@ -49,10 +53,20 @@ const { chromium } = require('playwright');
     const l = ls[0];
     const dx = +l.getAttribute('x2') - +l.getAttribute('x1');
     const dy = +l.getAttribute('y2') - +l.getAttribute('y1');
-    return { edges: 1, deg: +(Math.atan2(-dy, Math.abs(dx)) * 180 / Math.PI).toFixed(1) };
+    let minL = 1e9, maxR = -1e9;
+    ov.querySelectorAll('[class*="disc"], [class*="nmPill"]').forEach((el) => {
+      const b = el.getBoundingClientRect();
+      if (b.width < 4) return;
+      minL = Math.min(minL, b.left);
+      maxR = Math.max(maxR, b.right);
+    });
+    return { edges: 1, deg: +(Math.atan2(-dy, Math.abs(dx)) * 180 / Math.PI).toFixed(1),
+             nodeLeft: Math.round(minL), nodeRight: Math.round(maxR), vw: window.innerWidth };
   });
-  const soloAngleOk = edge.edges === 1 && edge.deg !== null && Math.abs(edge.deg - 33) <= 2;
-  console.log('solo connector:', JSON.stringify(edge), '| 33 deg:', soloAngleOk);
+  const soloAngleOk = edge.edges === 1 && edge.deg !== null
+    && edge.deg >= 32.5 && edge.deg <= 90.5
+    && edge.nodeLeft >= 15 && edge.nodeRight <= edge.vw - 15;
+  console.log('solo connector:', JSON.stringify(edge), '| in range and inside walls:', soloAngleOk);
   // GUARD-003c: a card placed in a circular frame must be a CIRCLE. This one bit
   // twice before, because the placed card is not SVG at all - it is a fixed HTML
   // div that was hard-coded to borderRadius 15 with a square yellow outline,

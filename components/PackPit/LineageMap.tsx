@@ -74,6 +74,8 @@ type Node = LineageNode & {
 // and which way it leans (1 right, -1 left). Two numbers, nothing else uses them.
 const SOLO_DEG = 33;
 const SOLO_SIDE = 1;
+// How far inside the screen edge the walls sit, in px. 0 puts them on the glass.
+const WALL_PAD = 16;
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
@@ -472,17 +474,6 @@ export default function LineageMap({
       if (!kids) return;
       const cnt = kids.length;
       const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
-      let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
-      // A lone child on the first ring has no fan spread to offset it, so it used
-      // to sit dead vertical above the dog. Lean it out on the diagonal instead.
-      // SOLO_DEG is measured from horizontal, the way the connector reads on
-      // screen: 90 is the old vertical, 33 is the diagonal.
-      if (circular && depth === 0 && cnt === 1) {
-        const rad = (SOLO_DEG * Math.PI) / 180;
-        center = SOLO_SIDE > 0 ? -rad : -(Math.PI - rad);
-      }
-      if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
-      else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
       const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
       // mini pit: the connector is aware of both circles' real sizes - the
       // child clears the parent's EDGE by 50px whatever size either circle is
@@ -491,6 +482,38 @@ export default function LineageMap({
         if (!p) return rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT;
         return radius(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
       };
+      let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
+      // A lone child on the first ring has no fan spread to offset it, so it used
+      // to sit dead vertical above the dog. Lean it out on the diagonal instead.
+      // SOLO_DEG is measured from horizontal, the way the connector reads on
+      // screen: 90 is the old vertical, 33 is the diagonal.
+      if (circular && depth === 0 && cnt === 1) {
+        const rad = (SOLO_DEG * Math.PI) / 180;
+        center = SOLO_SIDE > 0 ? -rad : -(Math.PI - rad);
+        // Walls down both sides of the layer. The node cannot pass them, so when
+        // the diagonal would push it off the edge the arm swings up toward
+        // vertical until the whole node, name pill included, clears the wall.
+        const kid = kids[0];
+        const reach = rOf(n) + rOf(kid) + 50;
+        const half = Math.max(rOf(kid), (kid.name.length * 7.4 + 22) / 2);
+        const vw = typeof window !== "undefined" ? window.innerWidth : 0;
+        if (vw > 0) {
+          const clears = (ang: number) => {
+            const cx = n._x + Math.cos(ang) * reach;
+            return cx - half >= WALL_PAD && cx + half <= vw - WALL_PAD;
+          };
+          const upright = -Math.PI / 2; // straight up
+          const stepR = (2 * Math.PI) / 180;
+          let a = center;
+          for (let i = 0; i < 60 && !clears(a); i++) {
+            if (Math.abs(a - upright) <= stepR) { a = upright; break; }
+            a += a > upright ? -stepR : stepR; // swing toward vertical, never past it
+          }
+          center = a;
+        }
+      }
+      if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
+      else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
       const step = spread / Math.max(cnt, 2);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
