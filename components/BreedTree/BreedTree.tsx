@@ -2011,6 +2011,16 @@ export default function BreedTree({
               </svg>
             </button>
           )}
+          {/* Mini pit only: the dog whose tree is open, as a round portrait at the
+              head of the box. The chum page keeps its text-only caption. */}
+          {dockAside && (rootImage ?? nodes[0].data.img) && (
+            <img
+              className={styles.cPortrait}
+              src={bust((rootImage ?? nodes[0].data.img) as string)}
+              alt={nodes[0].data.name}
+              draggable={false}
+            />
+          )}
           <span className={styles.cName}>{shown.data.name}</span>
           {shownShare !== null && shown.parent && (
             <span className={styles.cShare}>
@@ -2019,7 +2029,9 @@ export default function BreedTree({
           )}
           <p className={styles.cNote}>
             {breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
-            {shown.children ? " Tap a circle inside to keep digging." : ""}
+            {/* the mini pit drops the "keep digging" prompt: in LEARN mode the
+                circles are the whole point, so the nudge is noise */}
+            {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
         </div>
       </div>

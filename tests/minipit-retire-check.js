@@ -73,13 +73,18 @@ const centreOf = (re) => {
   const pairOk = beforeOpen === true && whileOpen === false && boxOpen === true;
 
   // a) retire the flag by reading its message
-  const f = await p.evaluate(centreOf, /uk-icon/);
-  if (f) {
-    await p.mouse.click(f.x, f.y);
+  // click the element, with retries: the flag rolls, so a coordinate click can
+  // land mid-bounce and be read as a drag rather than a tap
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const already = await p.$('[aria-label="Got it"]');
+    if (already) break;
+    const flagEl = await p.$('image[href*="uk-icon"]');
+    if (!flagEl) break;
+    await flagEl.click({ force: true });
     await p.waitForTimeout(700);
-    const tick = await p.$('[aria-label="Got it"]');
-    if (tick) { await tick.click(); await p.waitForTimeout(700); }
   }
+  const tick = await p.$('[aria-label="Got it"]');
+  if (tick) { await tick.click(); await p.waitForTimeout(700); }
   const flagKey = await p.evaluate(() => sessionStorage.getItem('pc-minipit-flag-seen'));
   await close();
 
@@ -89,8 +94,12 @@ const centreOf = (re) => {
 
   // b) retire the ball by throwing it out of the top
   await round('Celtic Hound');
-  const ball = await p.evaluate(centreOf, /tennis-ball/);
-  if (ball) {
+  // the ball is bouncy, so re-read its centre immediately before each attempt
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const done = await p.evaluate(() => sessionStorage.getItem('pc-minipit-ball-gone') === '1');
+    if (done) break;
+    const ball = await p.evaluate(centreOf, /tennis-ball/);
+    if (!ball) break;
     await p.mouse.move(ball.x, ball.y);
     await p.mouse.down();
     for (let i = 1; i <= 8; i++) { await p.mouse.move(ball.x, ball.y - i * 55); await p.waitForTimeout(16); }

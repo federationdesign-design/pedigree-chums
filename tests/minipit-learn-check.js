@@ -61,6 +61,22 @@ const readScreen = () => {
   const entered = !!(s2.wash && s2.wash.on && s2.boxOpen && !s2.START && !s2.LEARN);
   const blendOk = !!(s2.wash && s2.wash.blend === 'overlay' && s2.wash.hits === 'none');
 
+  // g) mini pit only: the box leads with a round portrait of the dog whose tree
+  //    is open, and drops the "keep digging" prompt. The chum page keeps both
+  //    as they were, which is checked at the end.
+  const boxContent = await p.evaluate(() => {
+    const a = document.querySelector('[class*="asideDocked"]');
+    const img = a && a.querySelector('img[class*="cPortrait"]');
+    return {
+      hasPortrait: !!img,
+      round: img ? getComputedStyle(img).borderRadius : null,
+      alt: img ? img.alt : null,
+      digging: (a ? a.innerText : '').includes('keep digging'),
+    };
+  });
+  const boxOk = boxContent.hasPortrait && boxContent.round === '50%' && !boxContent.digging;
+  console.log('box content:', JSON.stringify(boxContent), '| ok:', boxOk);
+
   // f) the blue box can be picked up and moved, like a chum-page card, and it
   //    snaps back to its docked spot the next time it opens
   const boxAt = () => p.evaluate(() => {
@@ -103,12 +119,22 @@ const readScreen = () => {
   const snapped = !!(bHome && bBefore && bHome.x === bBefore.x && bHome.y === bBefore.y);
   console.log('reopened at:', JSON.stringify(bHome), '| snapped home:', snapped);
 
+  // the chum page must be untouched by any of this
+  await p.goto('http://localhost:3000/chums/boxer', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(8000);
+  const chum = await p.evaluate(() => ({
+    portraits: document.querySelectorAll('img[class*="cPortrait"]').length,
+    digging: document.body.innerText.includes('keep digging'),
+  }));
+  const chumUntouched = chum.portraits === 0 && chum.digging === true;
+  console.log('chum page:', JSON.stringify(chum), '| untouched:', chumUntouched);
+
   console.log('placement:', JSON.stringify({ LEARN: s0.LEARN, START: s0.START }), '| ok:', placed);
   console.log('hover peek:', peeked, '| entered learn:', entered, '| blend:', blendOk);
   console.log('pit inert:', inert, JSON.stringify({ toys: s3.toys, circleY: s3.circleY }), '| returned:', returned);
 
   const pass = !!(placed && peeked && entered && blendOk && inert && returned
-    && dragged && snapped && errs.length === 0);
+    && dragged && snapped && boxOk && chumUntouched && errs.length === 0);
   if (errs.length) console.log('pageerrors:', errs.slice(0, 3));
   console.log(pass ? 'PASS GUARD-008' : 'FAIL GUARD-008');
   await b.close();
