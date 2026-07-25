@@ -20,10 +20,15 @@
    z-index sits above normal page content but BELOW the cookie banner (55), nav
    (100) and offer modal (120), so the launcher overlays the page yet never
    blocks those. */
+/* Quarter-peek: the circle's CENTRE is pinned to the viewport's bottom-left
+   corner (left/bottom = -half the size), so exactly one quarter peeks round the
+   corner. transform-origin is the centre, so hover/pop scale about the pinned
+   corner and the visible fraction stays a quarter at every size. The icon is
+   pushed into the visible (top-right) quarter. */
 .launcher {
   position: fixed;
-  left: 24px;
-  bottom: 24px;
+  left: -36px;
+  bottom: -36px;
   width: 72px;
   height: 72px;
   border-radius: 50%;
@@ -31,11 +36,27 @@
   border: 4px solid #ffffff;
   box-shadow: 0 0 0 4px var(--pc-ui-blue), var(--pc-shadow);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 12px 12px 0 0;
   cursor: pointer;
   z-index: 50;
   color: #ffffff;
+  transform-origin: 50% 50%;
+  transition: transform 160ms ease;
+}
+.launcher:hover {
+  transform: scale(1.15);
+}
+/* Invisible >=44x44 hit area anchored to the visible quarter (top-right of the
+   circle), so the small peeking quarter is still comfortably tappable. */
+.launcher::before {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 44px;
+  height: 44px;
 }
 .launcher:focus-visible {
   outline: 3px solid var(--pc-ui-yellow);
@@ -133,6 +154,10 @@
   color: #ffffff;
   cursor: pointer;
   z-index: 3;
+  transform-origin: center;
+  /* Click pop: as the launcher opens, the anchor gives the same quick ~10%
+     overshoot as the selector circles while the dogs begin their fan-out. */
+  animation: pcClickPop 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .randomBtn:focus-visible {
   outline: 3px solid var(--pc-ui-yellow);
@@ -360,6 +385,11 @@
   0% { transform: scale(1) rotate(0); opacity: 1; }
   100% { transform: scale(0) rotate(-120deg); opacity: 0; }
 }
+@keyframes pcClickPop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
 @keyframes pcFade {
   to {
     opacity: 1;
@@ -426,8 +456,16 @@
   .bubbleUser,
   .composerRow,
   .anchorOut,
-  .anchorIn {
+  .anchorIn,
+  .randomBtn {
     animation: none;
     opacity: 1;
+  }
+  /* No hover grow or click pop under reduced motion. */
+  .launcher {
+    transition: none;
+  }
+  .launcher:hover {
+    transform: none;
   }
 }
