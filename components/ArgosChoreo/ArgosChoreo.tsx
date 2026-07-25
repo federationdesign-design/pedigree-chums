@@ -290,7 +290,6 @@ export function StatueBulletsChoreo({
                     aria-label={sl.alt}
                     autoPlay
                     muted
-                    loop
                     playsInline
                     preload="metadata"
                   />
