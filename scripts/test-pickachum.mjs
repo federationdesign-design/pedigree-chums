@@ -32,6 +32,9 @@ const data = {
 
 const { submit } = await import(pathToFileURL(join(LIB, 'engine.ts')).href);
 const { newSession } = await import(pathToFileURL(join(LIB, 'session.ts')).href);
+const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEligible } = await import(
+  pathToFileURL(join(LIB, 'theatre.ts')).href
+);
 
 let pass = 0;
 let fail = 0;
@@ -366,6 +369,51 @@ const isBarkAct = (a) => a === 'bark' || a === 'bark_break' || a === 'bark_ack';
   barkCase('BARK-T19', ok, JSON.stringify(s.barkCompletedByDog));
 })();
 // BARK-T20 (keyboard / screen-reader) is a manual test; not automated here.
+
+// ---- Typing theatre ----
+// GATE: safety-layer responses must render instantly and completely (no dots, no
+// typing, no typos). This is the permanent guarantee.
+(() => {
+  const cases = [
+    ['I want to die', 'safety_signpost'],
+    ['you are stupid', 'safety_boundary'],
+    ['Can dogs eat chocolate?', 'health_answer'],
+  ];
+  let ok = true;
+  let note = '';
+  for (const [input, act] of cases) {
+    const { resolution: r } = submit(data, newSession(), input);
+    if (r.action !== act || !skipTheatre(r.action)) { ok = false; note += `${input}: ${r.action} skip=${skipTheatre(r.action)}; `; }
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'safety renders instantly (no theatre)', layer: 1, bucket: '-', action: 'theatre skip', note: ok ? '' : note });
+})();
+// A normal reply DOES get the theatre.
+(() => {
+  const { resolution: r } = submit(data, newSession(), 'Hello there');
+  const ok = r.action === 'converse' && !skipTheatre(r.action);
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'normal reply gets theatre', layer: 9, bucket: r.bucket ?? '-', action: 'theatre on', note: ok ? '' : `skip=${skipTheatre(r.action)}` });
+})();
+// Deterministic RNG for plan tests.
+const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+// 8-second cap holds for a long message on the slowest (Boxer) profile.
+(() => {
+  const long = 'The Border Collie is widely regarded as the most intelligent working dog, with remarkable stamina, precise instincts and a professional temperament that suits the operation perfectly.';
+  const plan = buildTypingPlan(long, TYPING_PROFILES.boxer, lcg(7));
+  const capOk = plan.totalMs <= THEATRE_MAX_MS + 1;
+  const endsWhole = plan.steps[plan.steps.length - 1].display === plan.final;
+  const lenOk = plan.final.length === long.length; // typos never change the final length
+  const ok = capOk && endsWhole && lenOk;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'typing plan: 8s cap, ends whole', layer: '-', bucket: '-', action: 'theatre plan', note: ok ? '' : `total=${Math.round(plan.totalMs)} whole=${endsWhole} len=${lenOk}` });
+})();
+// Typo eligibility excludes numbers, capitals and short words.
+(() => {
+  const ok = isTypoEligible('remarkable') && !isTypoEligible('Collie') && !isTypoEligible('6.99') && !isTypoEligible('the');
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'typo eligibility excludes names/prices', layer: '-', bucket: '-', action: 'theatre eligibility', note: ok ? '' : 'eligibility wrong' });
+})();
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
