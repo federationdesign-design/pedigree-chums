@@ -72,8 +72,13 @@ interface Message {
   closed?: boolean; // this dog turn is the session cut-off
 }
 
-// The response-specific action link (if any). This IS the response's action, not
-// a menu item: the discount pop-up, or a curated destination / article link.
+// The response-specific action link (if any). Navigation links (a destination or
+// article page) only ever render on the final interaction: visitors arrive not
+// knowing what any of these names are, so an obscure clickable link mid-chat
+// confuses more than it helps. The journey is text; the dog names places in
+// words, not links, until the very end. The one exception is the discount
+// pop-up (kind 'popup'): it opens the offer in place and is the purchase path,
+// not navigation away, so it stays in buying replies. Gating lives at render.
 function actionFor(r: Turn['response']): Command | undefined {
   if (r.openPopup) return { label: 'Get the 30% discount code', kind: 'popup' };
   if (r.url) {
@@ -236,12 +241,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       {phase === 'selecting' ? (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
-            <svg className={styles.connectors} viewBox="0 0 320 440" aria-hidden="true" focusable="false">
-              {/* Random control centre is (36,404); lines run out to each dog. */}
-              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="36" y1="404" x2="124" y2="300" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="36" y1="404" x2="176" y2="214" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="36" y1="404" x2="150" y2="120" />
-              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="36" y1="404" x2="78" y2="70" />
+            <svg className={styles.connectors} viewBox="0 0 450 540" aria-hidden="true" focusable="false">
+              {/* Random control centre is (40,510); lines run out to each dog. */}
+              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="40" y1="510" x2="135" y2="425" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="40" y1="510" x2="250" y2="330" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="40" y1="510" x2="345" y2="210" />
+              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="40" y1="510" x2="375" y2="65" />
             </svg>
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);
@@ -290,7 +295,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                       </span>
                     )}
 
-                    {msg !== activeMsg && msg.action && (
+                    {msg !== activeMsg && msg.action && (msg.action.kind === 'popup' || msg.closed) && (
                       <div className={styles.actionWrap}>
                         <ActionLink command={msg.action} />
                       </div>
