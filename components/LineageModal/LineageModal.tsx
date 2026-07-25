@@ -55,11 +55,14 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const replay = () => {
     setPhase("play");
     setScore(0);
+    setSlowmo(false); // a fresh pit always starts at full speed
     setCaptionOpen(false);
     setRunKey((k) => k + 1); // remounts the pit fresh
   };
   const [scorePulse, setScorePulse] = useState(false);
   const shakeFnRef = useRef<(() => void) | null>(null);
+  const slowmoFnRef = useRef<(() => void) | null>(null);
+  const [slowmo, setSlowmo] = useState(false);
   const addScore = (v: number) => {
     setScore((s) => s + v);
     setScorePulse(true);
@@ -125,6 +128,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
+          registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
           onPitClose={onClose}
           onRoundWon={() => {
@@ -146,6 +150,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         {/* Pit floor, same graphic as the main pit */}
         <img src="/floor-shortened-svg.svg" alt="" aria-hidden="true" className={css.floor} />
       </div>
+
+      {/* Slow motion, straight from the main pit: snail icon, sits above shake.
+          Quarter speed while active, navy while on. */}
+      <button
+        type="button"
+        className={`${css.slowmo}${slowmo ? " " + css.slowmoActive : ""}`}
+        onClick={() => { slowmoFnRef.current?.(); setSlowmo((s2) => !s2); }}
+        aria-label={slowmo ? "Normal speed" : "Slow motion"}
+      >
+        <img src="/svg-snail-icon.svg" alt="" aria-hidden="true" className={css.slowmoIcon} />
+      </button>
 
       {/* Shake button, straight from the pit: jelly icon, bottom right */}
       <button

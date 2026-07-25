@@ -25,6 +25,8 @@ const ZOOM_PAD = 1.1;
 // (negative leans the text up to the right). Tweak these two to taste.
 // Mini pit only: the dog circles run 15% smaller than the space allows.
 const MINI_FILL = 0.85;
+// START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
+const START_SCALE = 2;
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
@@ -269,6 +271,7 @@ export default function BreedTree({
   onCaptionClose,
   onScore,
   registerShake,
+  registerSlowmo,
   onToggleCaption,
   onPitClose,
   onRoundWon,
@@ -294,6 +297,7 @@ export default function BreedTree({
   onCaptionClose?: () => void;
   onScore?: (v: number) => void;
   registerShake?: (fn: () => void) => void;
+  registerSlowmo?: (fn: () => void) => void;
   onToggleCaption?: () => void;
   onPitClose?: () => void;
   onRoundWon?: () => void;
@@ -446,6 +450,9 @@ export default function BreedTree({
   // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
   // a wake() so a drag can restart physics after everything has settled.
   const wakeRef = useRef<(() => void) | null>(null);
+  // Slow motion. The fixed-timestep driver feeds Engine.update, which applies
+  // engine.timing.timeScale itself, so a quarter speed toggle is all it takes.
+  const slowmoRef = useRef<(() => void) | null>(null);
   const simRunningRef = useRef(false);
   const matterCleanupRef = useRef<(() => void) | null>(null);
   const chainRef = useRef<((ox: number, oy: number) => number) | null>(null);
@@ -1319,6 +1326,10 @@ export default function BreedTree({
         wake();
       };
       wakeRef.current = wake;
+      slowmoRef.current = () => {
+        engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1;
+        wake(); // a settled pit still needs to be woken to show the change
+      };
       matterCleanupRef.current = () => {
         Events.off(engine, "collisionStart", onCollide);
         for (const t of ghostTimers) window.clearTimeout(t);
@@ -1328,6 +1339,7 @@ export default function BreedTree({
       wake();
     };
     runFallRef.current = doFall;
+    registerSlowmo?.(() => slowmoRef.current?.());
     registerShake?.(() => {
       // a shake also starts the round, so the button never blocks the pit
       if (!fellRef.current) { setStarted(true); runFallRef.current?.(); }
@@ -1659,7 +1671,10 @@ export default function BreedTree({
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
             // same size ramp as the GAME OVER / ROUND WON flash: clamp(3.4rem, 12vw, 8rem)
             const stW = st ? st.clientWidth : 390;
-            const startFs = Math.min(Math.max(54.4, stW * 0.12), 128);
+            // "START" measures about 3.17x its font size across, so cap the size to
+            // keep it inside the stage. Without this the doubled word runs off a
+            // 320px phone.
+            const startFs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
             const bw = startFs * 5.2 * upp; // hit area, roughly the width of the word
             const bh = startFs * 1.6 * upp;
             return (
