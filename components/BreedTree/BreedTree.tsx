@@ -36,6 +36,17 @@ const TOY_FLAG_SRC = "/uk-icon.jpg";
 const TOY_BALL_DELAY = 3000; // ball, after the first circle lands
 const TOY_FLAG_GAP = 3000; // flag, after the ball
 const TOY_FLAG_HITS = 8; // main pit maxHits
+// Used-up toys stay gone for the rest of the session: the flag once its message
+// has been read, the ball once the player has thrown it out of the pit. Session
+// scope, so a fresh visit starts clean. Swap to localStorage to make it forever.
+const TOY_FLAG_SEEN_KEY = "pc-minipit-flag-seen";
+const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
+function toyRetired(key: string): boolean {
+  try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
+}
+function retireToy(key: string) {
+  try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
+}
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
@@ -408,6 +419,8 @@ export default function BreedTree({
   const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
   const [britainOpen, setBritainOpen] = useState(false);
   const killToyRef = useRef<((idx: number) => void) | null>(null);
+  const throwWatchRef = useRef<((pr: any) => void) | null>(null);
+  const checkEscapeRef = useRef<(() => void) | null>(null);
   const flagIdxRef = useRef<number | null>(null);
   useEffect(() => {
     if (!dockAside) return;
@@ -559,6 +572,7 @@ export default function BreedTree({
       wakeRef.current?.();
     };
     const up = (ev?: PointerEvent) => {
+      if ((body as any)?.mb?.circleRadius) throwWatchRef.current?.(body); // toy released
       const p0 = pressRef.current;
       pressRef.current = null;
       if (onTap && p0 && ev && performance.now() - p0.t < 350 && Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) < 8) {
@@ -998,6 +1012,9 @@ export default function BreedTree({
       const BIGT = 84 * (window.matchMedia("(max-width: 768px)").matches ? 0.67 : 1);
       const toyTimers: number[] = [];
       const spawnToy = (kind: "ball" | "flag") => {
+        // the flag never returns once its message has been read; the ball never
+        // returns once the player has thrown it clear of the pit
+        if (toyRetired(kind === "flag" ? TOY_FLAG_SEEN_KEY : TOY_BALL_GONE_KEY)) return;
         const isNarrow = window.matchMedia("(max-width: 768px)").matches;
         const dia = kind === "ball" ? BIGT * 2.25 * (isNarrow ? 0.9 : 1) : BIGT * 0.6 * 2;
         const r = dia / 2;
@@ -1016,7 +1033,7 @@ export default function BreedTree({
           : stageTopPx - r;                        // pit: y = -ujR
         const w2 = worldFromPx(px, py);
         const idx = toyBodiesRef.current.length;
-        const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null };
+        const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null, toyKind: kind };
         const opts = kind === "ball"
           ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
@@ -1030,6 +1047,25 @@ export default function BreedTree({
         if (kind === "flag") flagIdxRef.current = idx;
         setToyList((l) => [...l, { kind, size: dia * fxScale, src: kind === "ball" ? TOY_BALL_SRC : TOY_FLAG_SRC }]);
         wake();
+      };
+      // Tennis ball escape, ported from the main pit: a ball RELEASED with real
+      // upward speed and then leaving the top of the stage is gone for good.
+      // A ball merely bounced upward by physics comes back down as normal.
+      let thrownBall: any = null;
+      throwWatchRef.current = (pr: any) => {
+        if (pr?.toyKind !== "ball") return; // badges and the flag are not in scope
+        if (pr.mb && pr.mb.velocity.y < -4) thrownBall = pr; // pit threshold
+        else if (thrownBall === pr) thrownBall = null;
+      };
+      checkEscapeRef.current = () => {
+        const pr: any = thrownBall;
+        if (!pr || pr.dead || !pr.mb) { thrownBall = null; return; }
+        const stageTop = st ? st.getBoundingClientRect().top : 0;
+        if (pr.mb.position.y < stageTop - pr.mb.circleRadius) {
+          thrownBall = null;
+          retireToy(TOY_BALL_GONE_KEY);
+          killProp(pr, "toy", performance.now());
+        }
       };
       killToyRef.current = (idx: number) => {
         const pr = toyBodiesRef.current[idx];
@@ -1217,6 +1253,11 @@ export default function BreedTree({
           for (const [P, other] of [[pa, B], [pb2, A]] as any[]) {
             const pr = P.prop;
             if (!pr || pr.dead || other.isStatic || rv < 5) continue;
+            // Toys never take collision damage. Rods and pills wear out from
+            // knocks, but in the main pit the flag only ever counts TAPS, and
+            // the ball never expires at all. Left as it was, a well-knocked
+            // Union Jack poofed at random before anyone could read it.
+            if (P.kind === "toy") continue;
             if (pr.lastKnock && now - pr.lastKnock < 600) continue;
             pr.lastKnock = now;
             pr.hits += 1;
@@ -1303,6 +1344,7 @@ export default function BreedTree({
           }
           if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
         }
+        checkEscapeRef.current?.();
         for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current]) {
           for (const pr of list) {
             if (pr.dead || !pr.mb) continue;
@@ -1661,7 +1703,7 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => startDrag(e, toyBodiesRef.current[i2], ty.kind === "flag" ? () => setBritainOpen(true) : undefined)}>
+                  onPointerDown={(e) => startDrag(e, toyBodiesRef.current[i2], ty.kind === "flag" ? () => { retireToy(TOY_FLAG_SEEN_KEY); setBritainOpen(true); } : undefined)}>
                   {ty.kind === "flag" ? (
                     <>
                       <clipPath id={`bt-toy-${i2}`}><circle cx={0} cy={0} r={half} /></clipPath>
@@ -1731,7 +1773,14 @@ export default function BreedTree({
             return defs.map((d) => (
               <g key={d.kind} ref={d.kind === "close" ? uiCloseRef : uiDescRef}
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
-                style={{ cursor: "pointer", pointerEvents: d.kind === "desc" && descGone ? "none" : "auto", display: d.kind === "desc" && descGone ? "none" : undefined }}
+                style={{
+                  cursor: "pointer",
+                  // the info square and the blue box are one on/off pair: while
+                  // the box is open the square leaves the pit, and it drops back
+                  // in the moment the box is closed
+                  pointerEvents: d.kind === "desc" && (descGone || !hideCaption) ? "none" : "auto",
+                  display: d.kind === "desc" && (descGone || !hideCaption) ? "none" : undefined,
+                }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
@@ -1801,7 +1850,9 @@ export default function BreedTree({
         <BritainMessage
           onDismiss={() => {
             setBritainOpen(false);
-            // the tick poofs the flag, exactly as it does in the main pit
+            // the tick poofs the flag, exactly as it does in the main pit, and
+            // a flag whose message has been read does not come back next round
+            retireToy(TOY_FLAG_SEEN_KEY);
             if (flagIdxRef.current !== null) killToyRef.current?.(flagIdxRef.current);
           }}
         />
