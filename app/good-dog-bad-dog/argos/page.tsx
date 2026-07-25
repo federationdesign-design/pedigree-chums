@@ -886,11 +886,11 @@ export default function ArgosPage() {
               <div className={styles.desktopOnly}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/home/puppy-walk.mp4", alt: "A puppy walking through the house", caption: "PLACEHOLDER: The first one through the door, every single day." },
-                    { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "PLACEHOLDER: Every home with a dog keeps a record of it by the door." },
-                    { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "PLACEHOLDER: Dogs know exactly which room the food happens in." },
-                    { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "PLACEHOLDER: The one who is still there when everyone else has left the room." },
-                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "PLACEHOLDER: A house with a dog in it is inhabited, not merely occupied." },
+                    { src: "/home/puppy-walk.mp4", alt: "A puppy walking through the house", caption: "Before anyone is properly awake, the dog is already padding through the house, checking that everything is where it was left." },
+                    { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "Every family with a dog keeps an honest record of its walks, printed on the doormat in mud." },
+                    { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "There is no room in the house a dog would rather be than the one where the family is cooking." },
+                    { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "A dog will sit through an entire chapter without once asking how the story ends." },
+                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
                   ]}
                 />
                 <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Dogs alter the atmosphere of a home in a physical, audible, smellable way</blockquote>
@@ -899,11 +899,11 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/home/puppy-walk.mp4", alt: "A puppy walking through the house", caption: "PLACEHOLDER: The first one through the door, every single day." },
-                    { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "PLACEHOLDER: Every home with a dog keeps a record of it by the door." },
-                    { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "PLACEHOLDER: Dogs know exactly which room the food happens in." },
-                    { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "PLACEHOLDER: The one who is still there when everyone else has left the room." },
-                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "PLACEHOLDER: A house with a dog in it is inhabited, not merely occupied." },
+                    { src: "/home/puppy-walk.mp4", alt: "A puppy walking through the house", caption: "Before anyone is properly awake, the dog is already padding through the house, checking that everything is where it was left." },
+                    { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "Every family with a dog keeps an honest record of its walks, printed on the doormat in mud." },
+                    { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "There is no room in the house a dog would rather be than the one where the family is cooking." },
+                    { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "A dog will sit through an entire chapter without once asking how the story ends." },
+                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
                   ]}
                   quote="Dogs alter the atmosphere of a home in a physical, audible, smellable way"
                   blockClass={styles.pullquote}
@@ -936,7 +936,7 @@ export default function ArgosPage() {
                     "/smell/smell-amygdala.jpg",
                   ]}
                   captions={[
-                    { fromFrame: 0, tone: "yellow", text: <>Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus.<br />Other senses like sight or sound must go through a relay station, the thalamus, first.</> },
+                    { fromFrame: 0, tone: "white", text: <>Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus.<br />Other senses like sight or sound must go through a relay station, the thalamus, first.</> },
                     { fromFrame: 3, title: "The Olfactory bulb", titleTone: "yellow", tone: "white", text: <>A neural structure in the brain that processes the sense of smell. It receives odour signals (smells) directly from sensory neurons in the nasal cavity (nose) and relays them to brain regions for interpretation...</> },
                     { fromFrame: 4, title: "The unconscious highway", titleTone: "white", tone: "yellow", text: <>Two of these structures sit at the end of that path. The things you smell reach both of these before you have even thought about the thing you are smelling, in fact way before you have consciously registered the smell at all.</> },
                     { fromFrame: 6, title: "The Hippocampus", titleTone: "white", tone: "white", text: <>This part of your brain builds memories and brings back long-term memories, helping you connect a specific scent to a past event or place.</> },

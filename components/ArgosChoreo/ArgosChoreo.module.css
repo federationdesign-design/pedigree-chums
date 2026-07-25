@@ -276,15 +276,23 @@
   overflow: hidden;
 }
 
+/* aspect-ratio is the frame's own ratio with 10% taken off the height
+   (1115 x 1400 becomes 1115 x 1260). Combined with object-fit: cover and
+   centre positioning below, that trims 5% off the top and 5% off the
+   bottom of every frame. Change 1260 to re-cut. */
 .wipeLayers {
   position: relative;
   line-height: 0;
+  aspect-ratio: 1115 / 1260;
+  overflow: hidden;
 }
 
 .wipeBase {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .wipeLayer {
