@@ -287,12 +287,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       {phase === 'selecting' ? (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
-            <svg className={styles.connectors} viewBox="0 0 450 540" aria-hidden="true" focusable="false">
-              {/* Random control centre is (40,510); lines run out to each dog. */}
-              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="40" y1="510" x2="135" y2="425" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="40" y1="510" x2="250" y2="330" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="40" y1="510" x2="345" y2="210" />
-              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="40" y1="510" x2="375" y2="65" />
+            <svg className={styles.connectors} viewBox="0 0 440 420" aria-hidden="true" focusable="false">
+              {/* Launcher centre is (64,376); clean radials out to each clock position. */}
+              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="64" y1="376" x2="364" y2="376" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="64" y1="376" x2="324" y2="226" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="64" y1="376" x2="214" y2="116" />
+              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="64" y1="376" x2="64" y2="76" />
             </svg>
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);

@@ -69,8 +69,8 @@
 }
 .selector {
   position: relative;
-  width: 450px;
-  height: 540px;
+  width: 440px;
+  height: 420px;
   transform-origin: bottom left;
 }
 .connectors {
@@ -109,18 +109,18 @@
   outline-offset: 3px;
   z-index: 4;
 }
-/* Centre-to-centre distance between neighbours is >=148px against a 128px
-   circle, so every pair keeps a clear >=20px gap and none can overlap at any
-   scale. The arc opens up and to the right, the top dog leaning out near 45deg
-   rather than stacking near-vertical. */
-.dog0 { left: 71px; top: 361px; }
-.dog1 { left: 186px; top: 266px; }
-.dog2 { left: 281px; top: 146px; }
-.dog3 { left: 311px; top: 1px; }
+/* Clock face centred on the launcher (centre 64,376), all four dogs at radius
+   300 and 30deg apart: Collie 3 o'clock, Labrador 2, Terrier 1, Boxer 12. Equal
+   radius + equal angle means the four connectors are clean radials that never
+   cross, and the 155px chord clears the 128px circles by ~27px. */
+.dog0 { left: 300px; top: 312px; } /* Collie, 3 o'clock */
+.dog1 { left: 260px; top: 162px; } /* Labrador, 2 o'clock */
+.dog2 { left: 150px; top: 52px; }  /* Border Terrier, 1 o'clock */
+.dog3 { left: 0; top: 12px; }      /* Boxer, 12 o'clock */
 .randomBtn {
   position: absolute;
-  left: 4px;
-  top: 474px;
+  left: 28px;
+  top: 340px;
   width: 72px;
   height: 72px;
   border-radius: 50%;
