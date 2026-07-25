@@ -256,9 +256,24 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
+
+    // Bark-game break: the English line follows the final bark volley as a
+    // separate message after a short pause.
+    if (r.followUp) {
+      const followUpMsg: Message = { id: idRef.current++, who: 'dog', text: r.followUp, dog: toDog, name: dogInfo(toDog).name };
+      setPhase('transferring');
+      clearTimers();
+      after(reducedMotion ? 0 : 500, () => {
+        setMessages((m) => [...m, followUpMsg]);
+        setPhase('idle');
+        inputRef.current?.focus();
+      });
+      return;
+    }
+
     setPhase(r.closed ? 'ending' : 'idle');
     if (!r.closed) window.setTimeout(() => inputRef.current?.focus(), 0);
-  }, [input, phase, runSwap]);
+  }, [input, phase, runSwap, after, clearTimers, reducedMotion]);
 
   // Escape closes the interface (parent restores focus to the launcher).
   useEffect(() => {
