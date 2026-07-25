@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Montserrat } from "next/font/google";
@@ -27,6 +27,10 @@ const tradeNavLinks = [
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // Set only when the menu is closing because the visitor picked a link. The
+  // scroll restore in the body-lock cleanup is then skipped, so the page they
+  // are travelling to always opens at the top.
+  const navigatingRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -78,7 +82,16 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       body.style.right = prev.right;
       body.style.width = prev.width;
       body.style.overflow = prev.overflow;
-      window.scrollTo(0, scrollY);
+      if (navigatingRef.current) {
+        // Leaving for another page. Fixing the body already collapsed the scroll
+        // to 0, so doing nothing here is what lands the new page at the top.
+        navigatingRef.current = false;
+      } else {
+        // Closing back onto the same page: return to the exact spot. Instant,
+        // because the global `scroll-behavior: smooth` would otherwise animate
+        // this and the animation can outlive a later navigation.
+        window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
+      }
     };
   }, [open]);
 
@@ -87,7 +100,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     window.dispatchEvent(new CustomEvent("pc:open-offer"));
   }
 
-  const closeMenu = () => setOpen(false);
+  // Closing because the visitor is going somewhere else: no scroll restore.
+  const closeForNav = () => { navigatingRef.current = true; setOpen(false); };
 
   return (
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
@@ -116,11 +130,11 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <span className={styles.backText}>Back to page</span>
               </button>
               <nav className={styles.topNav} aria-label="Site links">
-                <Link href="/home" className={styles.topNavLink} onClick={closeMenu}>Home</Link>
+                <Link href="/home" className={styles.topNavLink} onClick={closeForNav}>Home</Link>
                 <span className={styles.topNavSep}>|</span>
-                <Link href="/about" className={styles.topNavLink} onClick={closeMenu}>About</Link>
+                <Link href="/about" className={styles.topNavLink} onClick={closeForNav}>About</Link>
                 <span className={styles.topNavSep}>|</span>
-                <Link href="/preorder" className={styles.topNavLink} onClick={closeMenu}>Pre-order</Link>
+                <Link href="/preorder" className={styles.topNavLink} onClick={closeForNav}>Pre-order</Link>
                 <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Instagram">
                   <svg viewBox="440 0 261 341" fill="currentColor" aria-hidden="true">
                     <path d="M476.4,15.5v15.2h146.5c9.2,0,17.9,1.9,25.9,5.2,11.9,5,22.1,13.5,29.2,24.1,7.2,10.6,11.3,23.3,11.3,37.1v146.5c0,9.2-1.8,17.9-5.2,25.9-5,11.9-13.5,22.1-24.1,29.2-10.6,7.2-23.3,11.3-37.1,11.4h-146.5c-9.2,0-17.9-1.9-25.9-5.2-11.9-5-22.1-13.5-29.2-24.1-7.2-10.6-11.4-23.3-11.4-37.1V97.2c0-9.2,1.9-17.9,5.2-25.9,5-11.9,13.5-22.1,24.1-29.2,10.6-7.2,23.3-11.3,37.1-11.4V.4c-13.3,0-26.1,2.7-37.7,7.6-17.4,7.4-32.1,19.6-42.6,35.1-10.4,15.4-16.6,34.1-16.6,54.1v146.5c0,13.3,2.7,26.1,7.6,37.7,7.4,17.4,19.6,32.1,35.1,42.6,15.4,10.4,34.1,16.6,54.1,16.5h146.5c13.3,0,26.1-2.7,37.7-7.6,17.4-7.4,32.2-19.6,42.6-35,10.4-15.4,16.5-34.1,16.5-54.1V97.2c0-13.3-2.7-26.1-7.6-37.7-7.4-17.4-19.6-32.1-35-42.6-15.4-10.4-34.1-16.6-54.1-16.5h-146.5v15.2Z"/>
@@ -140,12 +154,12 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           {tradeLinks ? (
             <nav className={styles.menu}>
               {tradeNavLinks.map((l) => (
-                <Link key={l.href} href={l.href} className={styles.menuLink} onClick={() => setOpen(false)}>{l.label}</Link>
+                <Link key={l.href} href={l.href} className={styles.menuLink} onClick={closeForNav}>{l.label}</Link>
               ))}
-              <Link href="/preorder" className={styles.menuLink} onClick={() => setOpen(false)}>Get pre-order discount code</Link>
+              <Link href="/preorder" className={styles.menuLink} onClick={closeForNav}>Get pre-order discount code</Link>
             </nav>
           ) : (
-            <BentoBoard onNavigate={closeMenu} onOffer={openOffer} animateIn />
+            <BentoBoard onNavigate={closeForNav} onOffer={openOffer} animateIn />
           )}
         </div>
       )}
