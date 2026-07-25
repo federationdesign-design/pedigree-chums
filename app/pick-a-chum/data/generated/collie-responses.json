@@ -2377,5 +2377,49 @@
     "defaultRoute": "",
     "animationCue": "HEAD_TILT",
     "status": "Approved copy v2"
+  },
+  {
+    "responseId": "B19-R01",
+    "bucketId": "B19",
+    "subtag": "Bark break (drops the game)",
+    "triggers": [],
+    "template": "[B19 bark-break placeholder 1, Steve to write]",
+    "factSource": "Bark game",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - copy to be written by Steve"
+  },
+  {
+    "responseId": "B19-R02",
+    "bucketId": "B19",
+    "subtag": "Bark break (drops the game)",
+    "triggers": [],
+    "template": "[B19 bark-break placeholder 2, Steve to write]",
+    "factSource": "Bark game",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - copy to be written by Steve"
+  },
+  {
+    "responseId": "B20-R01",
+    "bucketId": "B20",
+    "subtag": "Post-break bark acknowledgement",
+    "triggers": [],
+    "template": "[B20 bark-ack placeholder 1, Steve to write]",
+    "factSource": "Bark game",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - copy to be written by Steve"
+  },
+  {
+    "responseId": "B20-R02",
+    "bucketId": "B20",
+    "subtag": "Post-break bark acknowledgement",
+    "triggers": [],
+    "template": "[B20 bark-ack placeholder 2, Steve to write]",
+    "factSource": "Bark game",
+    "defaultRoute": "",
+    "animationCue": "EARS_UP",
+    "status": "PLACEHOLDER - copy to be written by Steve"
   }
 ]

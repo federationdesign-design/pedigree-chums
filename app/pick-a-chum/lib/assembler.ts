@@ -31,6 +31,10 @@ const DOG_LABEL: Record<Dog, string> = {
 // Shown only until the workbook B15 orientation rows carry real copy (logged in
 // PLACEHOLDERS.md). Deliberately not final copy: Steve writes the Collie voice.
 const ORIENTATION_PLACEHOLDER = '[B15 orientation line, copy pending: Steve to write in the Collie voice]';
+// Bark-game break and post-break acknowledgement: copy pending (logged in
+// PLACEHOLDERS.md). Steve writes these families into the workbook (B19 / B20).
+const BARK_BREAK_PLACEHOLDER = '[B19 bark-break line, copy pending: Steve to write the moment the Collie drops the game]';
+const BARK_ACK_PLACEHOLDER = '[B20 bark-acknowledgement line, copy pending: Steve to write the post-break barks]';
 
 // Fill {{token}} placeholders from a context map. Unknown tokens are dropped and
 // stray double spaces collapsed, so a partial context never leaks braces.
@@ -197,6 +201,27 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       const r = pickResponse(data, 'B18', session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n)) : 'I work better with words. Type what you mean.';
       return { responseId: r?.responseId ?? 'B18', text, dog };
+    }
+
+    case 'bark': {
+      // Mirror the visitor's bark at their count + 1 (generated, not from copy).
+      const word = res.barkWord ?? 'woof';
+      const total = (res.barkCount ?? 1) + 1;
+      const cap = word.charAt(0).toUpperCase() + word.slice(1);
+      const barks = [cap, ...Array(Math.max(0, total - 1)).fill(word)].join(' ');
+      return { responseId: 'BARK', text: `${barks}!`, dog };
+    }
+
+    case 'bark_break': {
+      const r = pickResponse(data, 'B19', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : BARK_BREAK_PLACEHOLDER;
+      return { responseId: r?.responseId ?? 'B19', text, dog };
+    }
+
+    case 'bark_ack': {
+      const r = pickResponse(data, 'B20', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n)) : BARK_ACK_PLACEHOLDER;
+      return { responseId: r?.responseId ?? 'B20', text, dog };
     }
 
     case 'transfer': {

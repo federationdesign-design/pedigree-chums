@@ -7,10 +7,12 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog } from './types';
-import { Normalised, isGibberish, isSingleWord, isEmojiOnly, hasAny, buildAliasMap, applyAliases } from './normalise';
+import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, parseBark, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion } from './safety';
 
 const HIDDEN_CEILING = 20;
+// The bark game breaks into English on the fifth consecutive bark exchange.
+const BARK_BREAK = 5;
 
 const STOP = new Set([
   'what', 'is', 'the', 'a', 'an', 'of', 'are', 'how', 'many', 'do', 'does', 'you', 'your', 'to',
@@ -188,6 +190,7 @@ function isActiveBreedQuestion(compact: string): boolean {
 
 export interface RouterState {
   submissionCount: number; // count AFTER this submission (1-based)
+  barkStreak?: number; // consecutive bark-only exchanges BEFORE this message
 }
 
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
@@ -223,6 +226,18 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Hidden ceiling: after safety, a session at the ceiling ends via the Boxer.
   if (state.submissionCount >= HIDDEN_CEILING) {
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'boxer_cutoff', transferTo: 'boxer' };
+  }
+
+  // The bark game (after safety and the ceiling, before everything else): a
+  // bark-only message keeps the exchange in barks, mirroring at count + 1, until
+  // the streak hits the break, then English. Any real words route normally and
+  // reset the streak (handled in the engine).
+  if (isBarkOnly(n)) {
+    const streak = (state.barkStreak ?? 0) + 1;
+    if (streak === BARK_BREAK) return { layer: 15, layerName: 'The bark game', bucket: 'B19', action: 'bark_break' };
+    if (streak > BARK_BREAK) return { layer: 15, layerName: 'The bark game', bucket: 'B20', action: 'bark_ack' };
+    const { word, count } = parseBark(n);
+    return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark', barkWord: word, barkCount: count };
   }
 
   // Layer 2: buying, launch and 30% discount.

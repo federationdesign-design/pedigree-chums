@@ -11,6 +11,7 @@ final copy.
 | ART002 / ART003 / ART009 `resolvedUrl: null` | `route-map.json` | Planned articles not yet built | NEEDS_STEVE item 4 (OI06) |
 | ART010 interim mapping | `route-map.json` | 'The Power of Smell' unbuilt; points at the teaching-medicine article for now | NEEDS_STEVE item 4 |
 | Random-dog control treatment | (styled build, Checkpoint 2) | To be proposed for approval | NEEDS_STEVE item 5 |
+| B19 / B20 bark-game lines | `generated/collie-responses.json` (B19-R01/02, B20-R01/02) + fallbacks in `assembler.ts` | The English break line and the post-break bark-acknowledgement family; routing and mirroring are live, copy is not | Steve writes the bark-break and bark-ack copy into the workbook Collie Responses sheet (B19 / B20), then regenerates |
 
 ## Resolved (no longer placeholders)
 

@@ -10,6 +10,7 @@ export interface Session {
   previousDogs: Dog[]; // for returning-dog lines
   safetyState: string | null; // last moderation id, if any
   closed: boolean; // Boxer cut-off performed
+  barkStreak: number; // consecutive bark-only exchanges (the bark game)
 }
 
 export function newSession(activeDog: Dog = 'collie'): Session {
@@ -21,5 +22,6 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     previousDogs: [activeDog],
     safetyState: null,
     closed: false,
+    barkStreak: 0,
   };
 }

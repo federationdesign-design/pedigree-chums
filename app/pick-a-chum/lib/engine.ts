@@ -17,8 +17,12 @@ export interface Turn {
 export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
   const n = normalise(input);
-  const resolution = resolve(n, data, { submissionCount: session.submissionCount });
+  const resolution = resolve(n, data, { submissionCount: session.submissionCount, barkStreak: session.barkStreak });
   const response = assemble(resolution, data, n, session);
+
+  // The bark game: a bark exchange extends the streak, anything else resets it.
+  const isBarkTurn = resolution.action === 'bark' || resolution.action === 'bark_break' || resolution.action === 'bark_ack';
+  session.barkStreak = isBarkTurn ? session.barkStreak + 1 : 0;
 
   // Session updates for rotation and continuity.
   session.usedResponseIds.push(response.responseId);

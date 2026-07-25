@@ -63,6 +63,23 @@ export function isEmojiOnly(n: Normalised): boolean {
   return /\p{Extended_Pictographic}/u.test(n.original);
 }
 
+// ---- The bark game ----
+const BARK_ATOM = 'woof|bark|yap|arf|ruff|yip|howl|grr+|aroo+|awoo+|boof';
+const BARK_WORD = new RegExp(`^(?:${BARK_ATOM})+s?$`);
+const BARK_GLOBAL = new RegExp(BARK_ATOM, 'g');
+
+// The whole message is barks (one or more bark words, nothing else).
+export function isBarkOnly(n: Normalised): boolean {
+  return n.words.length >= 1 && n.words.every((w) => BARK_WORD.test(w));
+}
+
+// The bark to mirror and how many the visitor sent (counting repeats within a
+// word too, so "woofwoof" is two). Reply count is this + 1.
+export function parseBark(n: Normalised): { word: string; count: number } {
+  const atoms = n.compact.toLowerCase().match(BARK_GLOBAL) ?? [];
+  return { word: atoms[0] ?? 'woof', count: Math.max(1, atoms.length) };
+}
+
 // ---- Typo tolerance (deterministic fuzzy matching) ----
 //
 // Trigger words are matched allowing small edit-distance slips (transposed,

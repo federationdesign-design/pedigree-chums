@@ -130,6 +130,9 @@ export type ActionType =
   | 'identity' // sceptical / identity: are you real, are you AI, how can a dog type
   | 'fun_tease' // play/game request: interim "games are coming" tease
   | 'emoji_only' // message is only unmapped emoji
+  | 'bark' // bark-only message: mirror the bark at count + 1
+  | 'bark_break' // the dog breaks the bark game into English (configured streak)
+  | 'bark_ack' // post-break bark acknowledgement (rotation)
   | 'transfer' // specialist handoff to another dog
   | 'converse' // greeting / test / command / statement / random word
   | 'gibberish' // keyboard smash / punctuation / unresolved
@@ -148,5 +151,7 @@ export interface Resolution {
   gkId?: string;
   moderationId?: string;
   responseFamily?: string; // e.g. identity family 'F01'..'F10' for family-specific copy
+  barkWord?: string; // the bark to mirror (woof / yap / ...)
+  barkCount?: number; // how many barks the visitor sent (reply is count + 1)
   note?: string;
 }

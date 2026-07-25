@@ -255,6 +255,48 @@ for (const q of ['Who is your owner?', 'Do you have an owner?', 'Who owns you?']
   rows.push({ ok, input: '20 submissions', layer: last.resolution.layer, bucket: last.resolution.bucket ?? '-', action: last.resolution.action, note: ok ? '' : 'no Boxer cut-off at ceiling' });
 })();
 
+// ---- The bark game ----
+(() => {
+  const s = newSession();
+  const steps = [
+    { in: 'woof', act: 'bark', text: 'Woof woof!' },
+    { in: 'woof woof', act: 'bark', text: 'Woof woof woof!' },
+    { in: 'yap yap', act: 'bark', text: 'Yap yap yap!' }, // mirrors the visitor's bark word
+    { in: 'woof', act: 'bark' },
+    { in: 'bark', act: 'bark_break' }, // fifth consecutive bark exchange breaks into English
+    { in: 'woof', act: 'bark_ack' }, // post-break acknowledgement
+    { in: 'woof', act: 'bark_ack' },
+  ];
+  let ok = true;
+  let note = '';
+  steps.forEach((st, i) => {
+    const { resolution: r, response } = submit(data, s, st.in);
+    if (r.action !== st.act) { ok = false; note += `step${i + 1} act=${r.action} want ${st.act}; `; }
+    if (st.text && response.text !== st.text) { ok = false; note += `step${i + 1} text="${response.text}" want "${st.text}"; `; }
+  });
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'bark streak escalates + break@5', layer: 15, bucket: '-', action: 'bark game', note: ok ? '' : note });
+})();
+(() => {
+  const s = newSession();
+  submit(data, s, 'woof');
+  submit(data, s, 'woof woof');
+  const before = s.barkStreak;
+  const { resolution: r } = submit(data, s, 'How much is it?');
+  const ok = before === 2 && r.action === 'open_discount_popup' && s.barkStreak === 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'real words interrupt the streak', layer: 2, bucket: 'B01', action: r.action, note: ok ? '' : `streak ${before}->${s.barkStreak}, ${r.action}` });
+})();
+(() => {
+  const s = newSession();
+  submit(data, s, 'woof');
+  submit(data, s, 'woof woof');
+  const { resolution: r } = submit(data, s, 'I want to die');
+  const ok = r.action === 'safety_signpost' && s.barkStreak === 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'distress mid bark-streak -> safety', layer: 1, bucket: '-', action: r.action, note: ok ? '' : `${r.action}, streak ${s.barkStreak}` });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
