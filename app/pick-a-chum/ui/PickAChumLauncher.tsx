@@ -10,6 +10,9 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styles from './PickAChum.module.css';
 import PickAChumIcon from './PickAChumIcon';
+// DEV-RECORDER (strip for production): preview-only conversation recorder. It is
+// inert on production hosts anyway (see lib/turn-tap.ts recorderEnabled).
+import DevRecorder from '../dev/DevRecorder';
 
 const PickAChumExperience = dynamic(() => import('./PickAChumExperience'), { ssr: false });
 
@@ -24,19 +27,23 @@ export default function PickAChumLauncher() {
     wasOpen.current = open;
   }, [open]);
 
-  if (open) {
-    return <PickAChumExperience onClose={() => setOpen(false)} />;
-  }
-
   return (
-    <button
-      ref={buttonRef}
-      type="button"
-      className={styles.launcher}
-      aria-label="Pick a Chum"
-      onClick={() => setOpen(true)}
-    >
-      <PickAChumIcon />
-    </button>
+    <>
+      {open ? (
+        <PickAChumExperience onClose={() => setOpen(false)} />
+      ) : (
+        <button
+          ref={buttonRef}
+          type="button"
+          className={styles.launcher}
+          aria-label="Pick a Chum"
+          onClick={() => setOpen(true)}
+        >
+          <PickAChumIcon />
+        </button>
+      )}
+      {/* DEV-RECORDER (strip for production): renders null on production hosts. */}
+      <DevRecorder />
+    </>
   );
 }

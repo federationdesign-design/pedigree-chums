@@ -22,6 +22,7 @@ import { newSession, Session } from '../lib/session';
 import { Dog } from '../lib/types';
 import { openDiscountPopup } from '../data/discount-popup';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
+import { emitTurn } from '../lib/turn-tap';
 
 type Phase = 'selecting' | 'idle' | 'transferring' | 'ending';
 
@@ -113,6 +114,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const idRef = useRef(0);
   const timersRef = useRef<number[]>([]);
   const rafRef = useRef<number | null>(null);
+  // Recorder session id: one per engine session (a dog pick / page load reset).
+  // Inert in production (the turn tap has no sink there); see lib/turn-tap.ts.
+  const recSessionRef = useRef('');
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
 
@@ -270,6 +274,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const selectDog = useCallback((d: Dog) => {
     clearTimers();
     sessionRef.current = newSession(d);
+    // A fresh engine session starts a fresh recorded conversation. Time-prefixed
+    // so exported rows sort into conversation order.
+    recSessionRef.current = `s${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
     setDog(d);
     setSwap('none');
     setMessages([]);
@@ -288,6 +295,17 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     const r = result.response;
     const toDog = session.activeDog; // submit applied any transfer in place
     const swapped = toDog !== fromDog; // the active dog actually changed
+    // Record this turn (no-op in production; the dev recorder is the only sink).
+    // submissionCount was just incremented by submit, so it is this turn's number.
+    emitTurn({
+      sessionId: recSessionRef.current,
+      turn: session.submissionCount,
+      activeDog: fromDog,
+      input: text,
+      resolution: result.resolution,
+      response: r,
+      transferTo: swapped ? toDog : undefined,
+    });
     const userMsg: Message = { id: idRef.current++, who: 'user', text };
     setInput('');
 
