@@ -396,6 +396,10 @@ export default function BreedTree({
   }, []);
   // The pit is inert until START is pressed. Nothing falls on a timer.
   const [started, setStarted] = useState(false);
+  // LEARN mode: the pit stays inert, the blue box is open, and a pink wash lies
+  // over everything. learnPeek is the desktop hover preview of that wash.
+  const [learning, setLearning] = useState(false);
+  const [learnPeek, setLearnPeek] = useState(false);
   // Held null until the display face is painting, so the first (server-matched)
   // render uses the flat average and only the measured pass uses canvas.
   const [labelFont, setLabelFont] = useState<string | null>(null);
@@ -789,6 +793,11 @@ export default function BreedTree({
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes]);
+
+  // Closing the blue box is the way out of LEARN, back to the start screen.
+  useEffect(() => {
+    if (learning && hideCaption) setLearning(false);
+  }, [learning, hideCaption]);
 
   // Let the shell mirror the hovered/focused breed (title + pill text).
   useEffect(() => {
@@ -1810,42 +1819,74 @@ export default function BreedTree({
           {/* START: the pit hangs still until this is pressed. Screen-space
               sized like the other in-pit UI objects, centred over the stage,
               and hidden while the visitor is zoomed into a circle. */}
-          {dockAside && gravity && entered && !started && focus === nodes[0] && (() => {
+          {dockAside && gravity && entered && !started && !learning && focus === nodes[0] && (() => {
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
             // same size ramp as the GAME OVER / ROUND WON flash: clamp(3.4rem, 12vw, 8rem)
             const stW = st ? st.clientWidth : 390;
-            // "START" measures about 3.17x its font size across, so cap the size to
-            // keep it inside the stage. Without this the doubled word runs off a
-            // 320px phone.
-            const startFs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
-            const bw = startFs * 5.2 * upp; // hit area, roughly the width of the word
-            const bh = startFs * 1.6 * upp;
-            return (
+            // the words measure about 3.17x their font size across, so cap the
+            // size to keep them inside the stage on a narrow phone
+            const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
+            const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
+            const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
+            const xMinC = aspect >= 1 ? -vbWc * shift : -vbWc / 2;
+            const m = 18 * upp; // side margin
+            const hitW = fs * 5.2 * upp;
+            const hitH = fs * 1.6 * upp;
+            // LEARN sits right and high, START sits left and low
+            const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
+              { key: "learn", label: "LEARN", x: xMinC + vbWc - m, y: -vbHc * 0.30, anchor: "end" },
+              { key: "start", label: "START", x: xMinC + m, y: vbHc * 0.30, anchor: "start" },
+            ];
+            return words.map((w) => (
               <g
+                key={w.key}
                 className={styles.startBtn}
                 role="button"
-                aria-label="Start"
+                aria-label={w.key === "start" ? "Start" : "Learn about these breeds"}
                 tabIndex={0}
                 style={{ cursor: "pointer" }}
+                onMouseEnter={w.key === "learn" ? () => setLearnPeek(true) : undefined}
+                onMouseLeave={w.key === "learn" ? () => setLearnPeek(false) : undefined}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setStarted(true);
-                  runFallRef.current?.();
+                  if (w.key === "start") {
+                    setStarted(true);
+                    runFallRef.current?.();
+                    return;
+                  }
+                  // LEARN never arms the pit. The wash slides in and the blue box
+                  // opens; on touch this doubles as the reveal, since there is no
+                  // hover to preview it with.
+                  setLearnPeek(false);
+                  setLearning(true);
+                  if (hideCaption) onToggleCaption?.();
                 }}
               >
                 {/* invisible hit area, so the tap target is not just the glyphs */}
-                <rect x={-bw / 2} y={-bh / 2} width={bw} height={bh} fill="transparent" />
-                <text x={0} y={0} textAnchor="middle" dominantBaseline="central"
-                  style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${startFs * upp}px`, letterSpacing: `${2 * upp}px`, filter: "drop-shadow(0 4px 40px rgba(0,0,0,0.6))", pointerEvents: "none", userSelect: "none" }}>
-                  START
+                <rect
+                  x={w.anchor === "end" ? w.x - hitW : w.x}
+                  y={w.y - hitH / 2}
+                  width={hitW}
+                  height={hitH}
+                  fill="transparent"
+                />
+                <text x={w.x} y={w.y} textAnchor={w.anchor} dominantBaseline="central"
+                  style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs * upp}px`, letterSpacing: `${2 * upp}px`, filter: "drop-shadow(0 4px 40px rgba(0,0,0,0.6))", pointerEvents: "none", userSelect: "none" }}>
+                  {w.label}
                 </text>
               </g>
-            );
+            ));
           })()}
         </svg>
       </div>
 
+      {dockAside && gravity && (
+        <div
+          aria-hidden="true"
+          className={`${styles.learnWash}${learning ? " " + styles.learnWashOn : learnPeek ? " " + styles.learnWashPeek : ""}`}
+        />
+      )}
       {britainOpen && (
         <BritainMessage
           onDismiss={() => {

@@ -319,3 +319,29 @@
 @media (prefers-reduced-motion: reduce) {
   .startBtn { animation: none; }
 }
+
+/* LEARN wash: the pink layer from the design, blending in 'overlay' so the dogs
+   and the blue behind it tint rather than being covered. It waits off the
+   top-right corner, tilted; hovering LEARN slides it partway in for a preview,
+   and choosing LEARN brings it all the way in and levels it out. Touch has no
+   hover, so on a phone the tap plays the same slide as the reveal. */
+.learnWash {
+  position: fixed;
+  inset: -60%;
+  background: #ec0376;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 40;
+  transform: rotate(-18deg) translate3d(115%, -60%, 0);
+  transition: transform 560ms cubic-bezier(0.22, 0.9, 0.3, 1);
+  will-change: transform;
+}
+.learnWashPeek {
+  transform: rotate(-18deg) translate3d(46%, -22%, 0);
+}
+.learnWashOn {
+  transform: rotate(0deg) translate3d(0, 0, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .learnWash { transition: none; }
+}
