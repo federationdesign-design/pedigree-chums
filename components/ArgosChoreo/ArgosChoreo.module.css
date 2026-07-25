@@ -298,22 +298,27 @@
 
 /* min-height reserves room for the longest caption so the block does not jump
    in height as the text swaps between groups. */
-.wipeCaption {
+/* Scoped under .wipeStage on purpose. This caption is a <p> inside .essayBody,
+   and `.essayBody p` (class + element) outranks a bare `.wipeCaption` class, so
+   an unscoped rule here loses silently on font-size, margin and colour. Two
+   classes beat one class plus one element, so this wins. Same trap the essay
+   stylesheet already documents for .pinnedQuoteText. */
+.wipeStage .wipeCaption {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.94rem; /* was 0.82rem, +2px */
+  font-size: 1.175rem; /* .essayBody p is 1.05rem on mobile, so this is +2px */
   font-weight: 500;
   line-height: 1.45;
   text-align: center;
-  margin: 28px 0 0; /* was 12px: gap between the image and the caption */
+  margin: 32px 0 0; /* clear gap between the image and the caption */
   padding: 0 20px;
-  min-height: 8.5em;
   animation: wipeCaptionIn 260ms ease-out both;
 }
 
-/* Captions alternate yellow, white, yellow, white down the sequence. Both
-   read against the blue page gradient, which is what the essay body sits on. */
-.wipeCaptionYellow { color: var(--yellow, #ffd23e); }
-.wipeCaptionWhite { color: #ffffff; }
+/* Captions alternate yellow, white, yellow, white down the sequence. Both read
+   against the blue page gradient the essay body sits on. Scoped for the same
+   specificity reason as above. */
+.wipeStage .wipeCaptionYellow { color: var(--yellow, #ffd23e); }
+.wipeStage .wipeCaptionWhite { color: #ffffff; }
 
 @keyframes wipeCaptionIn {
   from { opacity: 0; transform: translateY(4px); }
