@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import CookieBanner from "../CookieBanner/CookieBanner";
 import type { LineageNode } from "../../data/lineage";
+import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
 
 // Breed names longer than 11 characters break onto a second line at the
@@ -34,9 +35,13 @@ type Props = {
   onScoreChange?: (s: number) => void;
   onNextLevel?: () => void;
   onStartOver?: () => void;
+  // history-page era strip, e.g. "ancient-medieval". Picks the pit's themed
+  // background; an era with no artwork keeps the plain blue gradient.
+  era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era }: Props) {
+  const theme = levelThemeFor(era);
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
@@ -124,6 +129,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           strokeByDepth
           tinted={false}
           onShownChange={setShownName}
+          levelTheme={theme}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
@@ -147,8 +153,10 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           rootNote={character}
           onClose={onClose}
         />
-        {/* Pit floor, same graphic as the main pit */}
-        <img src="/floor-shortened-svg.svg" alt="" aria-hidden="true" className={css.floor} />
+        {/* Pit floor, same graphic as the main pit. A themed level brings its
+            own ground art, so the default strip stands down rather than
+            doubling up underneath it. */}
+        {!theme && <img src="/floor-shortened-svg.svg" alt="" aria-hidden="true" className={css.floor} />}
       </div>
 
       {/* Slow motion, straight from the main pit: snail icon, sits above shake.

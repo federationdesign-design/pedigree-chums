@@ -8,6 +8,7 @@ import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
 import LineageMap from "../PackPit/LineageMap";
+import type { LevelTheme } from "../../data/levelThemes";
 import BritainMessage from "../PackPit/BritainMessage";
 
 const SIZE = 760;
@@ -72,6 +73,11 @@ function toyRetired(key: string): boolean {
 function retireToy(key: string) {
   try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
+// Level themes: how much of the ground strip shows above the bottom of the
+// stage, in css px. Every pixel here is a pixel of pit height given up, so it
+// stays small: enough to read the era at a glance, not enough to need the
+// game-over thresholds retuned.
+const LEVEL_FLOOR_LIFT = 10;
 const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
@@ -331,6 +337,7 @@ export default function BreedTree({
   onRoundWon,
   onPitFull,
   rootNote,
+  levelTheme = null,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -357,6 +364,7 @@ export default function BreedTree({
   onRoundWon?: () => void;
   onPitFull?: () => void;
   rootNote?: string;
+  levelTheme?: LevelTheme | null;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -459,6 +467,8 @@ export default function BreedTree({
   // over everything. learnPeek is the desktop hover preview of that wash.
   const [learning, setLearning] = useState(false);
   const [learnPeek, setLearnPeek] = useState(false);
+  // Desktop hover preview of the level background, the same courtesy LEARN gets.
+  const [startPeek, setStartPeek] = useState(false);
   // The blue box can be picked up and moved, the same as the cards on a chum
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
@@ -609,7 +619,37 @@ export default function BreedTree({
   // The main pit keeps its physics floor at the very bottom of the container
   // with the grass graphic layered behind the objects, so nothing hovers.
   // Same here: no reserved height, objects rest on the container's bottom edge.
-  const floorReserveVU = () => 0;
+  // Without a theme the pit keeps the main pit's rule: floor at the very bottom
+  // of the container, nothing hovers. With a theme the ground strip is real art
+  // with a real surface, so the floor is reserved up to the LOWEST point of that
+  // surface and the stepped slabs take it from there.
+  //
+  // Everything is derived from the stage width, so the art and the physics scale
+  // together and cannot drift apart. bandVU is the strip's on-screen height in
+  // svg units; pxVU converts a css pixel into svg units at the current size.
+  const pxVU = () => {
+    const st = stageRef.current;
+    const w = st ? st.clientWidth : 0;
+    if (!w) return 1;
+    const asp = w / Math.max(st!.clientHeight, 1);
+    return (asp >= 1 ? SIZE * asp : SIZE) / w;
+  };
+  const floorBandVU = () => {
+    const st = stageRef.current;
+    if (!levelTheme || !st) return 0;
+    return st.clientWidth * pxVU() / levelTheme.floorAspect;
+  };
+  // How far the strip's bottom edge sits below the stage bottom, in css px. The
+  // deepest point of the drawn surface lands exactly LEVEL_FLOOR_LIFT above the
+  // stage bottom, and the rest of the art hangs off the screen below it.
+  const floorArtBottomPx = () => {
+    const st = stageRef.current;
+    if (!levelTheme || !st) return 0;
+    const bandPx = st.clientWidth / levelTheme.floorAspect;
+    const deepest = Math.max(...levelTheme.floorProfile);
+    return LEVEL_FLOOR_LIFT - bandPx * (1 - deepest);
+  };
+  const floorReserveVU = () => (levelTheme ? LEVEL_FLOOR_LIFT * pxVU() : 0);
 
   const clampRootView = (v: View): View => {
     if (!dockAside) return v;
@@ -997,12 +1037,55 @@ export default function BreedTree({
       const pTop = pxFromWorld(xL, v[1] - vbHf / k);
       const wPx = pR.x - pL.x;
       const sideH = (pL.y - pTop.y) + T * 4, sideC = pL.y + T * 2 - sideH / 2;
-      const floorB = Bodies.rectangle(pL.x + wPx / 2, pL.y + T / 2, wPx + T * 2, T, { isStatic: true, restitution: 0.4 });
-      floorB.plugin = { kind: "floor" };
+      // Flat pit: one slab. Themed pit: the drawn ground is uneven, so the floor
+      // is a run of stepped slabs following its surface. Stepped rectangles, not
+      // a vertex body: the main pit tried fromVertices for its jagged floor and
+      // it came out ragged (commit 770173e), and statics cost nothing anyway.
+      // Every slab carries kind "floor" so the toy beats, which run from the
+      // first floor contact, behave exactly as before.
+      const floorParts: any[] = [];
+      const floorSlabs: any[] = [];
+      if (levelTheme) {
+        const prof = levelTheme.floorProfile;
+        const deepest = Math.max(...prof);
+        const bandVU = floorBandVU();
+        const stepPx = wPx / prof.length;
+        for (let i = 0; i < prof.length; i++) {
+          // how far this sample sits above the deepest point of the surface
+          const riseVU = bandVU * (deepest - prof[i]);
+          const py = pxFromWorld(xL, yF - riseVU / k).y;
+          const slab = Bodies.rectangle(
+            pL.x + stepPx * (i + 0.5),
+            py + T / 2,
+            stepPx + 2, // overlap so a body cannot catch between two slabs
+            T,
+            { isStatic: true, restitution: 0.4 }
+          );
+          slab.plugin = { kind: "floor" };
+          floorSlabs.push(slab);
+        }
+        // One compound static, not 24 loose ones. Separate overlapping statics
+        // each resolve their own contact, so a ball straddling a seam gets two
+        // corrective impulses and an upward throw can be cancelled outright.
+        // As parts of one body the seams stop existing.
+        const ground = MBody.create({ parts: floorSlabs, isStatic: true, restitution: 0.4 });
+        ground.plugin = { kind: "floor" };
+        floorParts.push(ground);
+        // aprons past the walls, so nothing squeezes out at the corners
+        for (const sx of [pL.x - T / 2, pR.x + T / 2]) {
+          const apron = Bodies.rectangle(sx, pL.y + T / 2, T, T, { isStatic: true, restitution: 0.4 });
+          apron.plugin = { kind: "floor" };
+          floorParts.push(apron);
+        }
+      } else {
+        const flat = Bodies.rectangle(pL.x + wPx / 2, pL.y + T / 2, wPx + T * 2, T, { isStatic: true, restitution: 0.4 });
+        flat.plugin = { kind: "floor" };
+        floorParts.push(flat);
+      }
       const wallL = Bodies.rectangle(pL.x - T / 2, sideC, T, sideH, { isStatic: true, restitution: 0.35 });
       const wallR = Bodies.rectangle(pR.x + T / 2, sideC, T, sideH, { isStatic: true, restitution: 0.35 });
       wallL.plugin = { kind: "wall" }; wallR.plugin = { kind: "wall" };
-      Composite.add(world, [floorB, wallL, wallR]);
+      Composite.add(world, [...floorParts, wallL, wallR]);
 
       // The close X and description toggle join the pit, fixed in the top-right
       // corner like the pit's menu button, in screen-size terms.
@@ -1940,8 +2023,8 @@ export default function BreedTree({
                 aria-label={w.key === "start" ? "Start" : "Learn about these breeds"}
                 tabIndex={0}
                 style={{ cursor: "pointer" }}
-                onMouseEnter={w.key === "learn" ? () => setLearnPeek(true) : undefined}
-                onMouseLeave={w.key === "learn" ? () => setLearnPeek(false) : undefined}
+                onMouseEnter={w.key === "learn" ? () => setLearnPeek(true) : () => setStartPeek(true)}
+                onMouseLeave={w.key === "learn" ? () => setLearnPeek(false) : () => setStartPeek(false)}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (w.key === "start") {
@@ -2023,6 +2106,30 @@ export default function BreedTree({
             </div>
           </div>
           <span className={styles.diffEnd} aria-hidden="true">0</span>
+        </div>
+      )}
+
+      {/* The level background. It waits off the bottom-left, tilted, and slides
+          up into place on START, borrowing the wash's motion. It sits at
+          z-index 0, below the stage at 1, so the circles, labels and in-pit
+          buttons stay on top of it and nothing is tinted or blended. */}
+      {dockAside && gravity && levelTheme && (
+        <div
+          aria-hidden="true"
+          className={`${styles.level}${started || startPeek ? " " + styles.levelOn : ""}`}
+        >
+          <div
+            className={styles.levelSky}
+            style={{ background: `linear-gradient(${levelTheme.sky[0]}, ${levelTheme.sky[1]})` }}
+          />
+          <img className={styles.levelBg} src={levelTheme.bg} alt="" draggable={false} />
+          <img
+            className={styles.levelFloor}
+            src={levelTheme.floor}
+            alt=""
+            draggable={false}
+            style={{ bottom: `${floorArtBottomPx()}px` }}
+          />
         </div>
       )}
 

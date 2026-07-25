@@ -363,6 +363,7 @@ export default function BreedStrip({ era }: { era: string }) {
       {active && (
         <LineageModal
           key={active.name}
+          era={era}
           initialScore={campaignScore}
           onScoreChange={setCampaignScore}
           nextLevelLabel={nextLevelOf(active.name)?.name}
