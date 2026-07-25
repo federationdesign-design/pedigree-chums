@@ -400,6 +400,35 @@ export default function BreedTree({
   // over everything. learnPeek is the desktop hover preview of that wash.
   const [learning, setLearning] = useState(false);
   const [learnPeek, setLearnPeek] = useState(false);
+  // The blue box can be picked up and moved, the same as the cards on a chum
+  // page. It rides on a transform offset rather than left/top, so it cannot
+  // disturb the docked layout underneath, and it snaps home each time it opens.
+  const asideRef = useRef<HTMLDivElement>(null);
+  const asideOff = useRef({ x: 0, y: 0 });
+  const asideDrag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  useEffect(() => {
+    if (!hideCaption) return; // closed: forget where it was left
+    asideOff.current = { x: 0, y: 0 };
+    if (asideRef.current) asideRef.current.style.transform = "";
+  }, [hideCaption]);
+  const asideDown = (e: React.PointerEvent) => {
+    if (!dockAside) return;
+    const t = e.target as HTMLElement;
+    if (t.closest("button, a, input, select, textarea")) return; // let the close X work
+    const el = asideRef.current;
+    if (!el) return;
+    e.preventDefault();
+    asideDrag.current = { sx: e.clientX, sy: e.clientY, ox: asideOff.current.x, oy: asideOff.current.y };
+    try { el.setPointerCapture(e.pointerId); } catch { /* no capture available */ }
+  };
+  const asideMove = (e: React.PointerEvent) => {
+    const d = asideDrag.current;
+    const el = asideRef.current;
+    if (!d || !el) return;
+    asideOff.current = { x: d.ox + (e.clientX - d.sx), y: d.oy + (e.clientY - d.sy) };
+    el.style.transform = `translate(${asideOff.current.x}px, ${asideOff.current.y}px)`;
+  };
+  const asideUp = () => { asideDrag.current = null; };
   // Held null until the display face is painting, so the first (server-matched)
   // render uses the flat average and only the measured pass uses canvas.
   const [labelFont, setLabelFont] = useState<string | null>(null);
@@ -1950,7 +1979,15 @@ export default function BreedTree({
           }}
         />
       )}
-      <div className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`} style={{ position: "relative", display: hideCaption ? "none" : undefined }}>
+      <div
+        ref={asideRef}
+        className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`}
+        style={{ position: "relative", display: hideCaption ? "none" : undefined }}
+        onPointerDown={dockAside ? asideDown : undefined}
+        onPointerMove={dockAside ? asideMove : undefined}
+        onPointerUp={dockAside ? asideUp : undefined}
+        onPointerCancel={dockAside ? asideUp : undefined}
+      >
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
             <span key={i}>

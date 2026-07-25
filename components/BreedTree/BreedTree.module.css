@@ -241,6 +241,10 @@
   flex-direction: column;
 }
 .asideDocked {
+  /* picked up and moved like a chum-page card: the pointer owns it, so the
+     browser must not claim the gesture for scrolling */
+  touch-action: none;
+  cursor: grab;
   position: absolute;
   left: 10%;
   right: auto;
@@ -251,6 +255,9 @@
   z-index: 15;
   gap: 12px;
   padding: 0;
+}
+.asideDocked:active {
+  cursor: grabbing;
 }
 .stageDocked {
   position: absolute;
