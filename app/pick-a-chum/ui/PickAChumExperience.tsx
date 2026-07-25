@@ -1,14 +1,15 @@
 'use client';
 
-// Pick a Chum: the conversation experience (Checkpoint 2 visual layer). This is
-// the heavy half, code-split behind next/dynamic in PickAChumLauncher: it pulls
+// Pick a Chum: the conversation experience (Checkpoint 2 visual layer, revised).
+// The heavy half, code-split behind next/dynamic in PickAChumLauncher: it pulls
 // in the engine and every data record, so it only loads once the visitor opens
-// the launcher. Built to the client mock-ups: full-viewport blue focus wash,
-// rounded white command bar and response panel, blue dialogue, green GO and a
-// circular blue-ringed portrait medallion. The retro is the interaction: silent
-// opening, one active panel (no transcript), paged type-on reveal with a
-// continue marker, and > command links. Launcher lives bottom-left, so the
-// selector fans up and to the right.
+// the launcher. The whole thing is anchored to the bottom-left and grows out of
+// the launcher: tapping it ripples four large dog circles into being; picking one
+// grows a chat widget from that spot, with the chosen dog's medallion, a running
+// message thread (dog on the left, visitor on the right) and a command bar that
+// persists below. The retro is the interaction: silent opening, paged type-on
+// reveal for each new dog message, and > action links that ARE the response's
+// action (not a menu). Response-specific links only; no suggestion chips.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -20,7 +21,7 @@ import { newSession, Session } from '../lib/session';
 import { Dog } from '../lib/types';
 import { openDiscountPopup } from '../data/discount-popup';
 
-type Phase = 'selecting' | 'waiting' | 'revealing' | 'continue' | 'ending';
+type Phase = 'selecting' | 'idle' | 'revealing' | 'ending';
 
 const DOG_SLUGS: Record<Dog, string> = {
   collie: 'border-collie',
@@ -56,27 +57,54 @@ function paginate(text: string, max = 200): string[] {
 
 interface Command {
   label: string;
-  kind: 'popup' | 'internal' | 'external' | 'ask' | 'close';
+  kind: 'popup' | 'internal' | 'external';
   href?: string;
+}
+
+interface Message {
+  id: number;
+  who: 'user' | 'dog';
+  text?: string; // user line
+  dog?: Dog; // dog turn
+  name?: string;
+  pages?: string[];
+  action?: Command;
+  closed?: boolean; // this dog turn is the session cut-off
+}
+
+// The response-specific action link (if any). This IS the response's action, not
+// a menu item: the discount pop-up, or a curated destination / article link.
+function actionFor(r: Turn['response']): Command | undefined {
+  if (r.openPopup) return { label: 'Get the 30% discount code', kind: 'popup' };
+  if (r.url) {
+    const external = /^https?:/.test(r.url) || r.url.startsWith('mailto:');
+    const name = destinationName(r.destinationId) || 'Open it';
+    return { label: name, kind: external ? 'external' : 'internal', href: r.url };
+  }
+  return undefined;
 }
 
 export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
   const sessionRef = useRef<Session | null>(null);
   const [phase, setPhase] = useState<Phase>('selecting');
-  const [dog, setDog] = useState<Dog>('collie');
+  const [dog, setDog] = useState<Dog>('collie'); // active dog (the anchor medallion)
   const [input, setInput] = useState('');
-  const [userLine, setUserLine] = useState('');
-  const [turn, setTurn] = useState<Turn | null>(null);
-  const [pages, setPages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [shown, setShown] = useState(0); // chars revealed on the current page
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const threadRef = useRef<HTMLDivElement | null>(null);
+  const idRef = useRef(0);
 
   const reducedMotion = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
     []
   );
 
+  // The last dog turn is the one that types on; everything above it is settled.
+  const last = messages[messages.length - 1];
+  const activeMsg = phase === 'revealing' && last?.who === 'dog' ? last : null;
+  const pages = activeMsg?.pages ?? [];
   const page = pages[pageIndex] ?? '';
   const revealing = phase === 'revealing' && shown < page.length;
   const lastPage = pageIndex >= pages.length - 1;
@@ -107,38 +135,64 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     return () => window.clearInterval(id);
   }, [phase, pageIndex, page, reducedMotion]);
 
-  // When the last page finishes revealing, move to the continue/command state.
+  // When the last page finishes revealing, settle the turn: cut-off ends the
+  // session, otherwise the command bar reopens for the next message.
   useEffect(() => {
-    if (phase === 'revealing' && shown >= page.length && lastPage) setPhase('continue');
-  }, [phase, shown, page.length, lastPage]);
+    if (phase !== 'revealing') return;
+    if (shown >= page.length && lastPage) {
+      if (last?.closed) {
+        setPhase('ending');
+      } else {
+        setPhase('idle');
+        window.setTimeout(() => inputRef.current?.focus(), 0);
+      }
+    }
+  }, [phase, shown, page.length, lastPage, last]);
+
+  // Keep the newest message in view as the thread grows and text types on.
+  useEffect(() => {
+    const el = threadRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, shown, pageIndex, phase]);
 
   const selectDog = useCallback((d: Dog) => {
     sessionRef.current = newSession(d);
     setDog(d);
-    setTurn(null);
-    setPages([]);
-    setUserLine('');
+    setMessages([]);
     setInput('');
-    setPhase('waiting');
+    setPageIndex(0);
+    setShown(0);
+    setPhase('idle');
     window.setTimeout(() => inputRef.current?.focus(), 60);
   }, []);
 
   const send = useCallback(() => {
     const session = sessionRef.current;
     const text = input.trim();
-    if (!session || !text || session.closed) return;
+    if (!session || !text || session.closed || phase === 'revealing') return;
     const result = submit(CHUM_DATA, session, text);
-    setUserLine(text);
+    const r = result.response;
+    const activeDog = session.activeDog; // reflect any transfer
+    const info = dogInfo(activeDog);
+    const userMsg: Message = { id: idRef.current++, who: 'user', text };
+    const dogMsg: Message = {
+      id: idRef.current++,
+      who: 'dog',
+      dog: activeDog,
+      name: info.name,
+      pages: paginate(r.text),
+      action: actionFor(r),
+      closed: r.closed,
+    };
+    setDog(activeDog);
     setInput('');
-    setTurn(result);
-    setDog(session.activeDog); // reflect any transfer in the portrait
-    setPages(paginate(result.response.text));
+    setMessages((m) => [...m, userMsg, dogMsg]);
     setPageIndex(0);
     setShown(0);
-    setPhase(result.response.closed ? 'ending' : 'revealing');
-  }, [input]);
+    setPhase('revealing');
+  }, [input, phase]);
 
-  // Advance: skip the type-on, then page through, click by click.
+  // Click the thread to skip the type-on, then page through, click by click.
   const advance = useCallback(() => {
     if (phase !== 'revealing') return;
     if (shown < page.length) {
@@ -147,14 +201,6 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       setPageIndex((i) => i + 1);
     }
   }, [phase, shown, page.length, lastPage]);
-
-  const askAgain = useCallback(() => {
-    setTurn(null);
-    setPages([]);
-    setUserLine('');
-    setPhase('waiting');
-    window.setTimeout(() => inputRef.current?.focus(), 0);
-  }, []);
 
   // Escape closes the interface (parent restores focus to the launcher).
   useEffect(() => {
@@ -172,23 +218,16 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     return () => window.clearTimeout(id);
   }, [phase, onClose, reducedMotion]);
 
-  const commands: Command[] = useMemo(() => {
-    if (phase !== 'continue' || !turn) return [];
-    const r = turn.response;
-    const list: Command[] = [];
-    if (r.openPopup) {
-      list.push({ label: 'Get the 30% discount code', kind: 'popup' });
-    } else if (r.url) {
-      const external = /^https?:/.test(r.url) || r.url.startsWith('mailto:');
-      const name = destinationName(r.destinationId) || 'Open it';
-      list.push({ label: name, kind: external ? 'external' : 'internal', href: r.url });
-    }
-    list.push({ label: 'Ask something else', kind: 'ask' });
-    list.push({ label: 'Close', kind: 'close' });
-    return list;
-  }, [phase, turn]);
+  const { image: dogImage } = dogInfo(dog);
+  const inputLocked = phase === 'revealing' || phase === 'ending' || !!sessionRef.current?.closed;
 
-  const { name: dogName, image: dogImage } = dogInfo(dog);
+  // Text revealed for a dog turn: settled turns show in full; the active turn
+  // shows its completed pages plus the page currently typing on.
+  const revealedText = (msg: Message): string => {
+    const p = msg.pages ?? [];
+    if (msg !== activeMsg) return p.join(' ');
+    return [...p.slice(0, pageIndex), (p[pageIndex] ?? '').slice(0, shown)].join(' ');
+  };
 
   return (
     <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="true">
@@ -197,12 +236,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       {phase === 'selecting' ? (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
-            <svg className={styles.connectors} viewBox="0 0 220 250" aria-hidden="true" focusable="false">
-              {/* Random control centre is (36,214); lines run out to each dog. */}
-              <line x1="36" y1="214" x2="136" y2="194" />
-              <line x1="36" y1="214" x2="176" y2="134" />
-              <line x1="36" y1="214" x2="156" y2="64" />
-              <line x1="36" y1="214" x2="76" y2="39" />
+            <svg className={styles.connectors} viewBox="0 0 320 440" aria-hidden="true" focusable="false">
+              {/* Random control centre is (36,404); lines run out to each dog. */}
+              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="36" y1="404" x2="124" y2="300" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="36" y1="404" x2="176" y2="214" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="36" y1="404" x2="150" y2="120" />
+              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="36" y1="404" x2="78" y2="70" />
             </svg>
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);
@@ -214,7 +253,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                   onClick={() => selectDog(d)}
                   title={info.name}
                   aria-label={info.name}
-                  style={{ backgroundImage: `url("${info.image}")` }}
+                  style={{ backgroundImage: `url("${info.image}")`, animationDelay: `${0.15 + i * 0.3}s` }}
                 />
               );
             })}
@@ -230,70 +269,69 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
           </div>
         </div>
       ) : (
-        <div className={styles.stage}>
-          <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
-            <span aria-hidden="true">×</span>
-          </button>
-          <div
-            className={styles.portrait}
-            style={{ backgroundImage: `url("${dogImage}")` }}
-            role="img"
-            aria-label={dogName}
-          />
+        <div className={styles.panel}>
+          <div className={styles.thread} ref={threadRef} onClick={advance}>
+            {messages.map((msg) =>
+              msg.who === 'user' ? (
+                <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
+                  <div className={styles.bubbleUser}>{msg.text}</div>
+                </div>
+              ) : (
+                <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
+                  <div className={styles.bubbleDog}>
+                    <div className={styles.nameplate}>{msg.name}</div>
+                    <p className={styles.dialogue} aria-live={msg === activeMsg ? 'polite' : undefined}>
+                      {revealedText(msg)}
+                    </p>
 
-          <div className={styles.panelCol}>
-            {/* Command bar: the current user line while a reply is showing, or the editable input. */}
-            {phase === 'waiting' ? (
-              <form
-                className={styles.commandBar}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  send();
-                }}
-              >
-                <input
-                  ref={inputRef}
-                  className={styles.input}
-                  aria-label="Type something here"
-                  placeholder="Type something here"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                />
-                <button type="submit" className={styles.go} aria-label="Send">
-                  GO
-                </button>
-              </form>
-            ) : (
-              <div className={styles.commandBar}>
-                <span className={styles.userLine}>{userLine}</span>
-              </div>
+                    {msg === activeMsg && !revealing && !lastPage && (
+                      <span className={styles.continueMarker} aria-hidden="true">
+                        ▶
+                      </span>
+                    )}
+
+                    {msg !== activeMsg && msg.action && (
+                      <div className={styles.actionWrap}>
+                        <ActionLink command={msg.action} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
             )}
+          </div>
 
-            {/* Response panel: nameplate, paged dialogue, continue marker, commands. */}
-            {phase !== 'waiting' && (
-              <div className={styles.responsePanel} onClick={advance}>
-                <div className={styles.nameplate}>{dogName}</div>
-                <p className={styles.dialogue} aria-live="polite">
-                  {reducedMotion || !revealing ? page : page.slice(0, shown)}
-                </p>
-
-                {phase === 'revealing' && !revealing && !lastPage && (
-                  <span className={styles.continueMarker} aria-hidden="true">
-                    ▶
-                  </span>
-                )}
-
-                {phase === 'continue' && commands.length > 0 && (
-                  <ul className={styles.commands}>
-                    {commands.map((c) => (
-                      <li key={c.label}>
-                        <CommandRow command={c} onAsk={askAgain} onClose={onClose} />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
+          <div className={styles.composerRow}>
+            <div
+              className={styles.dogAnchor}
+              style={{ backgroundImage: `url("${dogImage}")` }}
+              role="img"
+              aria-label={dogInfo(dog).name}
+            >
+              <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <form
+              className={styles.composer}
+              onSubmit={(e) => {
+                e.preventDefault();
+                send();
+              }}
+            >
+              <input
+                ref={inputRef}
+                className={styles.input}
+                aria-label="Type something here"
+                placeholder="Type something here"
+                value={input}
+                disabled={inputLocked}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <button type="submit" className={styles.go} aria-label="Send" disabled={inputLocked}>
+                GO
+              </button>
+            </form>
           </div>
         </div>
       )}
@@ -309,7 +347,7 @@ function destinationName(id?: string): string {
   return a ? a.title : '';
 }
 
-function CommandRow({ command, onAsk, onClose }: { command: Command; onAsk: () => void; onClose: () => void }) {
+function ActionLink({ command }: { command: Command }) {
   const label = (
     <>
       <span className={styles.pointer} aria-hidden="true">
@@ -333,15 +371,8 @@ function CommandRow({ command, onAsk, onClose }: { command: Command; onAsk: () =
       </a>
     );
   }
-  if (command.kind === 'popup') {
-    return (
-      <button type="button" className={cls} onClick={openDiscountPopup}>
-        {label}
-      </button>
-    );
-  }
   return (
-    <button type="button" className={cls} onClick={command.kind === 'ask' ? onAsk : onClose}>
+    <button type="button" className={cls} onClick={openDiscountPopup}>
       {label}
     </button>
   );
