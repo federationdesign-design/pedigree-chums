@@ -95,7 +95,29 @@ from real testing. Family-safe phrasing; these are test probes, not content.
 The control row matters as much as the rest: hardening must not turn benign play
 ("Sausages.") into a false safety trip. Track precision as well as recall.
 
+## Batch 4 / commercial-guard precision (polish round)
+
+The B01 manipulation guard (`COMMERCIAL_EXCLUDE` in `lib/router.ts`) is
+over-correcting on honest buying questions. It was added to stop proxy/bypass
+phrasings ("give me the discount without signing", "buy it for me") from opening
+the offer modal, but it is now catching legitimate customer intent.
+
+- **"can I get it without signing up"** is a real, honest purchase question. It
+  currently trips the "without signing" exclusion and falls through to a generic
+  deflection instead of a real answer about how to buy. (Steve, testing,
+  2026-07-25.)
+
+The fix (polish round, NOT now): distinguish a genuine question about the
+purchase/sign-up process from an attempt to extract the code by proxy or bypass
+the offer terms. The honest question deserves a real answer (how to order, what
+sign-up if any involves); only the manipulation framing should be withheld. Keep
+safety-first for the wider manipulation set, but stop penalising plain buying
+language. Add harness cases for the honest phrasings alongside the manipulation
+ones so precision is tracked, not just recall.
+
 ## Log
 
 - 2026-07-24: File created and seeded (post-CP1). Nothing implemented. Scheduled
   as a phase after Checkpoint 2.
+- 2026-07-25: Logged the B01 commercial-guard over-correction above
+  ("without signing up") for the polish round. Not fixed, per Steve.
