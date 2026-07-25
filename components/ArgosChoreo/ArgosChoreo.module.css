@@ -300,15 +300,20 @@
    in height as the text swaps between groups. */
 .wipeCaption {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.82rem;
+  font-size: 0.94rem; /* was 0.82rem, +2px */
   font-weight: 500;
   line-height: 1.45;
-  color: var(--navy, #0a3a57);
-  margin: 12px 0 0;
+  text-align: center;
+  margin: 28px 0 0; /* was 12px: gap between the image and the caption */
   padding: 0 20px;
-  min-height: 7.2em;
+  min-height: 8.5em;
   animation: wipeCaptionIn 260ms ease-out both;
 }
+
+/* Captions alternate yellow, white, yellow, white down the sequence. Both
+   read against the blue page gradient, which is what the essay body sits on. */
+.wipeCaptionYellow { color: var(--yellow, #ffd23e); }
+.wipeCaptionWhite { color: #ffffff; }
 
 @keyframes wipeCaptionIn {
   from { opacity: 0; transform: translateY(4px); }

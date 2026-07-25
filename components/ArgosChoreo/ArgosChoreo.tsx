@@ -419,7 +419,12 @@ export function WipeSequence({
           })}
         </div>
         {/* key forces a remount so each new caption fades in */}
-        <p key={capIdx} className={styles.wipeCaption}>{captions[capIdx].text}</p>
+        <p
+          key={capIdx}
+          className={`${styles.wipeCaption} ${capIdx % 2 === 0 ? styles.wipeCaptionYellow : styles.wipeCaptionWhite}`}
+        >
+          {captions[capIdx].text}
+        </p>
       </div>
     </div>
   );
