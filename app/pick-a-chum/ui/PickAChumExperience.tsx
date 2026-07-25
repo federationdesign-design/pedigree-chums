@@ -22,7 +22,11 @@ import { newSession, Session } from '../lib/session';
 import { Dog } from '../lib/types';
 import { openDiscountPopup } from '../data/discount-popup';
 
-type Phase = 'selecting' | 'idle' | 'ending';
+type Phase = 'selecting' | 'idle' | 'transferring' | 'ending';
+
+// Anchor medallion animation during a handover: 'out' pops the current dog away,
+// 'in' pops the new dog in (the same overshoot the selector circles use).
+type Swap = 'none' | 'out' | 'in';
 
 const DOG_SLUGS: Record<Dog, string> = {
   collie: 'border-collie',
@@ -31,12 +35,32 @@ const DOG_SLUGS: Record<Dog, string> = {
   boxer: 'boxer',
 };
 
+// Workbook Transfers-sheet labels, mirroring the engine assembler so the handover
+// line we display is the exact string the response text was built from.
+const DOG_LABEL: Record<Dog, string> = {
+  collie: 'Collie',
+  labrador: 'Labrador',
+  terrier: 'Border Terrier',
+  boxer: 'Boxer',
+};
+
+// Handover pacing (ms). The current dog announces the handover, then a beat, then
+// the medallion pops out and the new dog pops in, then the new dog's reply lands.
+const BEAT = 1000;
+const POP_OUT = 260;
+const POP_IN_SETTLE = 380;
+
 // Fixed selector order so returning visitors learn where each dog lives.
 const SELECT_ORDER: Dog[] = ['collie', 'labrador', 'terrier', 'boxer'];
 
 function dogInfo(dog: Dog): { name: string; image: string } {
   const rec = CHUM_DATA.dogs.find((d) => d.slug === DOG_SLUGS[dog]);
   return { name: rec?.name ?? dog, image: rec ? encodeURI(rec.image) : '' };
+}
+
+// Match the assembler's whitespace collapse so a handover prefix strips cleanly.
+function collapse(s: string): string {
+  return s.replace(/\s{2,}/g, ' ').trim();
 }
 
 interface Command {
@@ -76,15 +100,60 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const sessionRef = useRef<Session | null>(null);
   const [phase, setPhase] = useState<Phase>('selecting');
   const [dog, setDog] = useState<Dog>('collie'); // active dog (the anchor medallion)
+  const [swap, setSwap] = useState<Swap>('none');
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef(0);
+  const timersRef = useRef<number[]>([]);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((id) => window.clearTimeout(id));
+    timersRef.current = [];
+  }, []);
+  const after = useCallback((ms: number, fn: () => void) => {
+    timersRef.current.push(window.setTimeout(fn, ms));
+  }, []);
 
   const reducedMotion = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
     []
+  );
+
+  // Drive a handover: post the user line (and any handover line), pause, pop the
+  // old dog out and the new dog in, then land the new dog's reply.
+  const runSwap = useCallback(
+    (opts: {
+      lead: number;
+      userMsg: Message;
+      handoverMsg: Message | null;
+      toDog: Dog;
+      afterMsg: Message;
+      closed?: boolean;
+    }) => {
+      clearTimers();
+      const popOut = reducedMotion ? 0 : POP_OUT;
+      const settle = reducedMotion ? 120 : POP_IN_SETTLE;
+      setMessages((m) => (opts.handoverMsg ? [...m, opts.userMsg, opts.handoverMsg] : [...m, opts.userMsg]));
+      setPhase('transferring');
+      setSwap('none');
+      after(opts.lead, () => setSwap('out'));
+      after(opts.lead + popOut, () => {
+        setDog(opts.toDog);
+        setSwap('in');
+      });
+      after(opts.lead + popOut + settle, () => {
+        setMessages((m) => [...m, opts.afterMsg]);
+        if (opts.closed) {
+          setPhase('ending');
+        } else {
+          setPhase('idle');
+          inputRef.current?.focus();
+        }
+      });
+    },
+    [reducedMotion, clearTimers, after]
   );
 
   // Lock background scroll for the lifetime of the open experience.
@@ -96,6 +165,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     };
   }, []);
 
+  // Cancel any in-flight handover timers when the experience unmounts.
+  useEffect(() => clearTimers, [clearTimers]);
+
   // Keep the newest message in view as the thread grows.
   useEffect(() => {
     const el = threadRef.current;
@@ -103,38 +175,90 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   }, [messages, phase]);
 
   const selectDog = useCallback((d: Dog) => {
+    clearTimers();
     sessionRef.current = newSession(d);
     setDog(d);
+    setSwap('none');
     setMessages([]);
     setInput('');
     setPhase('idle');
     window.setTimeout(() => inputRef.current?.focus(), 60);
-  }, []);
+  }, [clearTimers]);
 
   const send = useCallback(() => {
     const session = sessionRef.current;
     const text = input.trim();
-    if (!session || !text || session.closed) return;
+    if (!session || !text || session.closed || phase === 'transferring') return;
+
+    const fromDog = session.activeDog;
     const result = submit(CHUM_DATA, session, text);
     const r = result.response;
-    const activeDog = session.activeDog; // reflect any transfer
-    const info = dogInfo(activeDog);
+    const toDog = session.activeDog; // submit applied any transfer in place
+    const swapped = toDog !== fromDog; // the active dog actually changed
     const userMsg: Message = { id: idRef.current++, who: 'user', text };
+    setInput('');
+
+    // A specialist handoff: the current dog announces it (using the workbook
+    // handover line), a beat passes, the medallion pops the old dog out and the
+    // new dog in, then the new dog's reply lands. No cold, silent image swap.
+    if (swapped && result.resolution.action === 'transfer') {
+      const toLabel = DOG_LABEL[toDog];
+      const handover = collapse(
+        CHUM_DATA.transfers.find((t) => t.from === 'Collie' && t.to === toLabel)?.exampleLine ??
+          `This needs the ${toLabel}.`
+      );
+      const incoming = r.text.startsWith(handover) ? r.text.slice(handover.length).trim() : r.text;
+      const handoverMsg: Message = {
+        id: idRef.current++,
+        who: 'dog',
+        text: handover,
+        dog: fromDog,
+        name: dogInfo(fromDog).name,
+      };
+      const incomingMsg: Message = {
+        id: idRef.current++,
+        who: 'dog',
+        text: incoming,
+        dog: toDog,
+        name: dogInfo(toDog).name,
+        action: actionFor(r),
+        closed: r.closed,
+      };
+      runSwap({ lead: BEAT, userMsg, handoverMsg, toDog, afterMsg: incomingMsg, closed: r.closed });
+      return;
+    }
+
+    // A dog change with no handover line (the Boxer cut-off): pop-swap so the
+    // change is still legible, then the message lands.
+    if (swapped) {
+      const swapMsg: Message = {
+        id: idRef.current++,
+        who: 'dog',
+        text: r.text,
+        dog: toDog,
+        name: dogInfo(toDog).name,
+        action: actionFor(r),
+        closed: r.closed,
+      };
+      runSwap({ lead: 240, userMsg, handoverMsg: null, toDog, afterMsg: swapMsg, closed: r.closed });
+      return;
+    }
+
+    // No swap: the active dog answers directly.
     const dogMsg: Message = {
       id: idRef.current++,
       who: 'dog',
       text: r.text,
-      dog: activeDog,
-      name: info.name,
+      dog: toDog,
+      name: dogInfo(toDog).name,
       action: actionFor(r),
       closed: r.closed,
     };
-    setDog(activeDog);
-    setInput('');
+    setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
     setPhase(r.closed ? 'ending' : 'idle');
     if (!r.closed) window.setTimeout(() => inputRef.current?.focus(), 0);
-  }, [input]);
+  }, [input, phase, runSwap]);
 
   // Escape closes the interface (parent restores focus to the launcher).
   useEffect(() => {
@@ -153,7 +277,8 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   }, [phase, onClose, reducedMotion]);
 
   const { image: dogImage } = dogInfo(dog);
-  const inputLocked = phase === 'ending' || !!sessionRef.current?.closed;
+  const inputLocked = phase === 'ending' || phase === 'transferring' || !!sessionRef.current?.closed;
+  const anchorSwap = swap === 'out' ? styles.anchorOut : swap === 'in' ? styles.anchorIn : '';
 
   return (
     <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="true">
@@ -223,7 +348,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
 
           <div className={styles.composerRow}>
             <div
-              className={styles.dogAnchor}
+              className={`${styles.dogAnchor} ${anchorSwap}`}
               style={{ backgroundImage: `url("${dogImage}")` }}
               role="img"
               aria-label={dogInfo(dog).name}
