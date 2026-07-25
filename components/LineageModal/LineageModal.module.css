@@ -132,7 +132,7 @@
   width: 100.8px;
   height: 100.8px;
   padding: 0;
-  border: 5px solid var(--navy);
+  border: 0;
   border-radius: 30.24px;
   display: grid;
   place-items: center;
@@ -154,7 +154,6 @@
 }
 .slowmoActive {
   background: var(--navy);
-  border-color: var(--yellow);
 }
 .slowmoActive .slowmoIcon {
   filter: brightness(0) saturate(100%) invert(91%) sepia(44%) saturate(800%) hue-rotate(5deg) brightness(105%);
