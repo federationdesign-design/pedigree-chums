@@ -9,7 +9,8 @@
     "lint": "eslint",
     "build:chumdata": "node scripts/build-chumdata.mjs",
     "test:pickachum": "tsx scripts/test-pickachum.mjs",
-    "replay:pickachum": "tsx scripts/replay-pickachum.mjs"
+    "replay:pickachum": "tsx scripts/replay-pickachum.mjs",
+    "sim": "tsx scripts/sim-multi-turn.mjs"
   },
   "dependencies": {
     "d3-hierarchy": "^3.1.2",
