@@ -29,13 +29,16 @@ export function QuoteReveal({
   markClass: string;
   /* By default the stage is a near-full-screen box that centres its content,
      so a short quote floats with a large void above and below it. `tight`
-     makes the stage hug its content instead, removing that void. */
+     makes the stage hug its content instead, removing that void, and drops
+     the pin so the scene sits in normal flow: the reveal then plays as the
+     reader scrolls past, and whatever follows moves up behind it instead of
+     waiting out a stretch of pinned dead scroll. */
   tight?: boolean;
 }) {
   const { sceneRef, active } = usePinnedTrigger();
 
   return (
-    <div ref={sceneRef} className={styles.quoteScene}>
+    <div ref={sceneRef} className={`${styles.quoteScene} ${tight ? styles.quoteSceneFlow : ""}`}>
       <div className={`${styles.stage} ${tight ? styles.stageTight : ""}`}>
         {pinned && <div className={styles.pinnedText}>{pinned}</div>}
         <div className={styles.quoteHolder}>

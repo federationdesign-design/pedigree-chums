@@ -18,6 +18,11 @@
 .stageTight {
   min-height: 0;
   justify-content: flex-start;
+  /* No pin. The reveal is triggered on arrival and runs on a fixed timer, so
+     it does not need scroll distance to play out. Leaving it in normal flow
+     means the content below rises as the quote clarifies, rather than the
+     reader scrolling through an empty pinned stretch first. */
+  position: static;
 }
 
 .pinnedText {
@@ -34,6 +39,12 @@
      starts), so the pause itself only needs to be short. */
   height: 118vh;
   height: 118svh;
+}
+
+/* The scene no longer needs to reserve scroll travel for a pin, so it
+   collapses to exactly the height of its content. */
+.quoteSceneFlow {
+  height: auto;
 }
 
 .quoteHolder {
