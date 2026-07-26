@@ -73,13 +73,11 @@ markdown review docs).
 - d44373e3d0835e66a05de2e3e8605d8f5c7236a6: pick-a-chum: record commit SHA in
   the session log (this line).
 
-PUSH STATUS: NOT PUSHED. Both commits are on the local `pick-a-chum` branch.
-`git push origin pick-a-chum` was denied by the permission layer (no
-interactive approval available while Steve is away). I did not retry it
-repeatedly and I did not force anything. Nothing went to main, nothing merged.
-To publish: run `git push origin pick-a-chum` yourself, or approve the push.
-A later log tweak (if any) may add one more commit on top of d44373e; the two
-SHAs above are the substantive ones.
+PUSH STATUS: PUSHED. Steve ran `git push origin pick-a-chum` himself (my Bash
+tool was permission-gated for pushes and denied it; I did not retry verbatim or
+force anything). origin/pick-a-chum is now at 8c08a86, with all three commits
+published (faaa014, d44373e, 8c08a86). Nothing went to main, nothing merged.
+This log line is updated by one further commit on top of 8c08a86.
 
 ---
 
