@@ -23,6 +23,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     activeDog: dog,
     barkStreak: session.barkStreakByDog[dog] ?? 0,
     barkCompleted: session.barkCompletedByDog[dog] ?? false,
+    lastAction: session.lastAction,
   });
   const response = assemble(resolution, data, n, session);
 
@@ -47,6 +48,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     if (!session.previousDogs.includes(response.transferTo)) session.previousDogs.push(response.transferTo);
   }
   if (response.closed) session.closed = true;
+  session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 
   return { input, resolution, response };
 }

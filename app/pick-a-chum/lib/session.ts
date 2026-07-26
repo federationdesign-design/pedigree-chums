@@ -1,6 +1,6 @@
 // Shared session state (brief section 13). Browser-session lifetime; no account.
 
-import { Dog } from './types';
+import { Dog, ActionType } from './types';
 
 export interface Session {
   activeDog: Dog;
@@ -10,6 +10,7 @@ export interface Session {
   previousDogs: Dog[]; // for returning-dog lines
   safetyState: string | null; // last moderation id, if any
   closed: boolean; // Boxer cut-off performed
+  lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
   // stable Dog id (a visitor can discover a version for each of the four dogs).
   barkStreakByDog: Partial<Record<Dog, number>>;
@@ -25,6 +26,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     previousDogs: [activeDog],
     safetyState: null,
     closed: false,
+    lastAction: null,
     barkStreakByDog: {},
     barkCompletedByDog: {},
   };

@@ -169,6 +169,16 @@ check('I found something deeply offensive on the cards', { bucket: 'B04', action
 check('can I speak to a real person', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
 check('I have a complaint', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
 
+// ---- Task 3: clarifier answer-capture, and never fire the clarifier twice ----
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('the website', { action: 'orientation' }, { session: s }); })();
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('game', { action: 'rules_answer' }, { session: s }); })();
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('dogs', { action: 'link' }, { session: s, assert: (r) => (r.destinationId === 'DST006' ? null : `not DST006, got ${r.destinationId}`) }); })();
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('worried', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `not general distress, got ${r.moderationId}`) }); })();
+// Second consecutive clarifier is capped to the repair line:
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('need help', { action: 'fallback' }, { session: s }); })();
+// A single clarifier still works on a fresh session (no follow-up state):
+check('help me', { action: 'clarifier' });
+
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
 check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('full question') ? null : 'expected approved gk-unknown line') });
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });

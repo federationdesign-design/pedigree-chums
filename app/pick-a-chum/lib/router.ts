@@ -6,7 +6,7 @@
 // (layer 9); "Can dogs eat chocolate?" is safety (layer 1), not a food transfer
 // (layer 8). All matching is deterministic local code.
 
-import { ChumData, Resolution, Dog } from './types';
+import { ChumData, Resolution, Dog, ActionType } from './types';
 import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion } from './safety';
 
@@ -226,6 +226,29 @@ export interface RouterState {
   activeDog?: Dog; // whose bark game this is
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
   barkCompleted?: boolean; // the active dog has already completed its bark game
+  lastAction?: ActionType | null; // previous turn's action (for the clarifier follow-up)
+}
+
+// After the bare-help clarifier fires, the visitor's next turn is an answer to
+// "site, or something worrying you?". Map it to an existing route (no new copy).
+function captureClarifierAnswer(n: Normalised, data: ChumData): Resolution | null {
+  if (hasAny(n, ['worried', 'worrying', 'something is wrong'])) {
+    return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_GENERAL_DISTRESS' };
+  }
+  if (hasAny(n, ['website', 'the site', 'its the website', 'to do with the website', 'site'])) {
+    return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
+  }
+  if (hasAny(n, ['dogs', 'breeds', 'breed'])) {
+    const d = data.destinations.find((x) => x.destinationId === 'DST006');
+    return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST006', url: d?.resolvedUrl ?? null };
+  }
+  if (hasAny(n, ['game', 'games'])) {
+    return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B02', action: 'rules_answer', destinationId: 'DST011' };
+  }
+  if (hasAny(n, ['buying', 'buy'])) {
+    return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
+  return null;
 }
 
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
@@ -236,9 +259,24 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   const c = n.compact;
   const N = n; // for hasAny
 
+  // Clarifier follow-up: if the previous turn was the bare-help clarifier, try to
+  // map this turn's answer to an existing route. Checked before safety so an
+  // answer containing "help" is not read as a fresh help request. A distress
+  // answer ("worried") maps to general distress; a genuine disclosure that is not
+  // one of these answer words falls through to the safety gate below.
+  if (state.lastAction === 'clarifier') {
+    const mapped = captureClarifierAnswer(N, data);
+    if (mapped) return mapped;
+  }
+
   // Layer 1: safety and unsuitable content. Always first.
   const safety = detectSafety(N);
   if (safety) {
+    // Never fire the clarifier twice in a row: the second consecutive one goes to
+    // the repair line (approved fallback copy) instead.
+    if (safety.action === 'clarifier' && state.lastAction === 'clarifier') {
+      return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+    }
     return {
       layer: 1,
       layerName: 'Safety and unsuitable content',
