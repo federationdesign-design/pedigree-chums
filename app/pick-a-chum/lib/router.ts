@@ -85,7 +85,16 @@ const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'baco
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
 // Visitor explicitly asks to switch to a different dog. Tight phrases so card /
 // content queries ("another dog card") are not swallowed. Approved repair copy.
-const TRANSFER_REQUEST = ['talk to another dog', 'speak to another dog', 'a different dog', 'different dog', 'another dog', 'change the dog', 'swap the dog', 'switch dog', 'switch the dog'];
+const TRANSFER_REQUEST = [
+  'talk to another dog', 'speak to another dog', 'a different dog', 'different dog', 'another dog',
+  'change the dog', 'swap the dog', 'switch dog', 'switch the dog',
+  // Steve's test inputs and additions, narrowed: bare "transfer" and bare
+  // "someone else" dropped (the latter collides with disclosures like "someone
+  // else hurt me"); phrased forms used instead. Safety is checked first, so a
+  // disclosure never reaches here.
+  'transfer me', 'transfer me to', 'can you transfer me', 'new dog', 'new dog please',
+  'different agent', 'another agent', 'talk to someone else', 'speak to someone else', 'swap dog', 'change dog',
+];
 
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
