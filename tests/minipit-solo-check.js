@@ -36,7 +36,20 @@ const pit = () => {
     .filter((t) => getComputedStyle(t).fontFamily.toLowerCase().includes('luckiest'))
     .map((t) => (t.textContent || '').trim())
     .filter(Boolean);
+  // the solo circle is the one carrying a breed name; capture where it landed
+  // and how heavy its stroke is so both can be asserted
+  const namedCircles = Array.from(svg.querySelectorAll('circle'))
+    .filter((c) => Number(getComputedStyle(c).strokeWidth.replace('px', '')) > 4.5)
+    .map((c) => {
+      const r = c.getBoundingClientRect();
+      return {
+        r: Math.round(r.width / 2),
+        cy: Math.round(r.y + r.height / 2),
+        stroke: +Number(getComputedStyle(c).strokeWidth.replace('px', '')).toFixed(1),
+      };
+    });
   return {
+    namedCircles,
     radii: Array.from(svg.querySelectorAll('circle'))
       .map((c) => Math.round(c.getBoundingClientRect().width / 2))
       .filter((r) => r > 10),
@@ -117,12 +130,19 @@ const liftACircle = async (p) => {
   console.log('Celtic Hound: lifted circle', idx, '| layer at open', JSON.stringify(l0));
   console.log('  no connector drawn:', noEdges, '| first press popped a card:', poppedFirstPress, l0.cards, '->', l1.cards);
   console.log('  finished on its own:', closedItself, '| Complete never shown:', !sawComplete);
+  // it must arrive where the dog was, in the lower half of the stage, not up at
+  // the old node centre, and it must carry the doubled stroke
+  const solo = (after && after.namedCircles) || [];
+  const landedLow = solo.some((c) => c.cy > 844 * 0.35);
+  const thickStroke = solo.some((c) => c.stroke >= 5);
   console.log('  named circle landed:', gotNamedCircle, JSON.stringify(after && after.named), '| full size:', gotFullSize);
+  console.log('  came from the dog, not the node centre:', landedLow, '| doubled stroke:', thickStroke, JSON.stringify(solo));
   console.log('Manchester Terrier keeps its nodes and connectors:', ancestorsKeepNodes, 'edges', q1.edges);
   console.log('pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
   const pass = !!(noEdges && poppedFirstPress && closedItself && !sawComplete
-    && gotNamedCircle && gotFullSize && ancestorsKeepNodes && errs.length === 0);
+    && gotNamedCircle && gotFullSize && landedLow && thickStroke
+    && ancestorsKeepNodes && errs.length === 0);
   console.log(pass ? 'PASS GUARD-013' : 'FAIL GUARD-013');
   await b.close();
   process.exit(pass ? 0 : 1);

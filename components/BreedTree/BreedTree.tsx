@@ -1973,7 +1973,7 @@ export default function BreedTree({
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={inert ? undefined : (e) => startDrag(e, badgeBodiesRef.current?.[i])}>
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 * upp2 }} />
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: (item.label ? 6 : 3) * upp2 }} />
                 {!inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
                   // started, measured by the same fitter the pit circles use
@@ -2340,18 +2340,6 @@ export default function BreedTree({
             // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
               removedNodesRef.current.add(learnNode);
-              // A solo dog leaves a full-size blank circle behind, wearing the
-              // name it had before the round started. Twelve hits rather than a
-              // badge's twenty, because a circle that size is struck far more.
-              if (!(learnNode.data.children && learnNode.data.children.length > 0) && learnCard) {
-                // learnCard carries the circle's own client position, the same
-                // space the layer scatters its badges into
-                spawnBadgeRef.current?.(learnCard.x, learnCard.y, 0, 0, {
-                  r: learnCard.r,
-                  label: learnNode.data.name,
-                  charges: 12,
-                });
-              }
               const owned = pitBodiesRef.current?.owned;
               if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
                 const fb = pitBodiesRef.current?.find(learnNode);
@@ -2373,6 +2361,18 @@ export default function BreedTree({
             }
             for (const pl of data.pills ?? []) {
               spawnPillRef.current?.(pl.x, pl.y, pl.w, pl.name);
+            }
+            // A solo dog leaves a full-size blank circle wearing its breed name.
+            // The layer sends the position because only the layer knows its pan,
+            // and without that it lands where the old node centre used to be
+            // rather than where the dog actually was. Twelve hits rather than a
+            // badge's twenty, since a circle that size is struck far more often.
+            if (data.big) {
+              spawnBadgeRef.current?.(data.big.x, data.big.y, 0, 0, {
+                r: data.big.r,
+                label: data.big.name,
+                charges: 12,
+              });
             }
             wakeRef.current?.();
           }}

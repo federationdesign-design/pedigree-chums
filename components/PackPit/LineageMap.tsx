@@ -148,6 +148,7 @@ export default function LineageMap({
     circles: { x: number; y: number; r: number; share: number; name: string }[];
     rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[];
     pills: { x: number; y: number; w: number; name: string }[];
+    big?: { x: number; y: number; r: number; name: string };
   }) => void;
   onScore?: (v: number) => void;
   currentScore?: number;
@@ -747,7 +748,14 @@ export default function LineageMap({
       const p = n._parent as Node;
       return { x1: p._x + pan.x, y1: p._y + pan.y, x2: n._x + pan.x, y2: n._y + pan.y, lit: open.has(n._id) };
     });
-    onScatter?.({ circles, rods, pills });
+    // A solo dog leaves a full-size circle behind. It has to come from where the
+    // big circle actually sits, which is breed.x plus the pan, the same point
+    // burstAt uses. Spawning from the unpanned figure puts it up where the node
+    // centre used to be, which is not where the dog was.
+    const big = soloLeaf
+      ? { x: breed.x + pan.x, y: breed.y + pan.y, r: circR, name: breed.name }
+      : undefined;
+    onScatter?.({ circles: soloLeaf ? [] : circles, rods: soloLeaf ? [] : rods, pills, big });
   };
   // Green Complete pressed: at the very same instant the layer stops drawing
   // the tree and everything drops into the pit - zero-lag handover.
