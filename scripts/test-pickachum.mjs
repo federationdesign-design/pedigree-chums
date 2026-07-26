@@ -99,6 +99,7 @@ check('Tell me a joke.', { layer: 8, bucket: 'B08', action: 'transfer' }, { tran
 
 // ---- Recognised conversation ----
 check('Hello.', { layer: 9, bucket: 'B09', action: 'converse' });
+check('heyyyy', { layer: 9, bucket: 'B09', action: 'converse' }); // elongation: heyyyy -> hey
 check('Test', { layer: 9, bucket: 'B10', action: 'converse' });
 check('Sit', { layer: 9, bucket: 'B11', action: 'converse' });
 check('I have three cats', { layer: 9, bucket: 'B12', action: 'converse' }); // personal statement (bored moved to FUN)

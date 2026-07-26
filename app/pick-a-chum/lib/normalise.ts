@@ -10,7 +10,12 @@ export interface Normalised {
 
 export function normalise(input: string): Normalised {
   const original = (input ?? '').trim();
-  const lower = original.toLowerCase();
+  // Collapse any run of 3+ identical characters to one before matching, so
+  // stretched words ("pleeeassssee" -> "pleasee", "helppppp" -> "help") match
+  // their base form. Children stretch words constantly. Runs of 2 (real double
+  // letters like "hello", "good") are left alone. `original` is untouched; it is
+  // what any echo renders.
+  const lower = original.toLowerCase().replace(/(.)\1{2,}/gu, '$1');
   const compact = lower.replace(/\s+/g, ' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim();
   const words = lower.match(/[a-z]+/g) ?? [];
   const letters = (lower.match(/[a-z]/g) ?? []).join('');
