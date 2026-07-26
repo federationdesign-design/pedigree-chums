@@ -600,7 +600,7 @@ export default function ArgosPage() {
               <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>An ancient audience may have been more prepared to admire that restraint:</strong> Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
 
               <div className={styles.desktopOnly}>
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new.</blockquote>
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Audiences want the dog&apos;s loyalty to be answered with something visible and heartwarming.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -615,7 +615,7 @@ export default function ArgosPage() {
                       <figcaption className={styles.choreoCaption}>Jurassic Bark: every good show or story will use this as a trope, some more successfully than others</figcaption>
                     </figure>
                   }
-                  quote="The people demanding that Argos be petted are not doing something new."
+                  quote="Audiences want the dog's loyalty to be answered with something visible and heartwarming."
                 />
               </div>
 
