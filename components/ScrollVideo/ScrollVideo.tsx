@@ -50,42 +50,13 @@ export default function ScrollVideo({ src, className }: { src: string; className
 
     window.addEventListener("scroll", onScroll, { passive: true });
     update();
-
-    /* The element ships with preload="metadata", so only a few KB of headers
-       are fetched on page load instead of the whole clip. The scrub encode is
-       all-intra and therefore large, and this scene sits well down the article,
-       so eagerly downloading it was costing the initial page load dearly.
-       Once the scene comes within two screens, switch to full buffering: that
-       is far enough ahead that the footage is ready before it is scrubbed. */
-    let io: IntersectionObserver | null = null;
-    if (scene && typeof IntersectionObserver !== "undefined") {
-      io = new IntersectionObserver(
-        (entries) => {
-          if (!entries.some((e) => e.isIntersecting)) return;
-          if (video.preload !== "auto") {
-            video.preload = "auto";
-            video.load();
-          }
-          io?.disconnect();
-          io = null;
-        },
-        { rootMargin: "200% 0px" },
-      );
-      io.observe(scene as HTMLElement);
-    } else {
-      /* No observer available: fall back to the old eager behaviour. */
-      video.preload = "auto";
-      video.load();
-    }
-
     return () => {
       window.removeEventListener("scroll", onScroll);
       video.removeEventListener("loadedmetadata", onMeta);
-      io?.disconnect();
     };
   }, []);
 
   return (
-    <video ref={videoRef} src={src} className={className} muted playsInline preload="metadata" />
+    <video ref={videoRef} src={src} className={className} muted playsInline preload="auto" />
   );
 }
