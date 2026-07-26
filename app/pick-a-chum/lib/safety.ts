@@ -98,6 +98,11 @@ const PERSON_REF = [
 ];
 const ACTION = ['touched', 'touches', 'made me', 'showed me', 'hurt', 'kissed', 'licked', 'rubbed', 'grabbed', 'forced', 'made me touch'];
 
+// Reporting frames: the visitor is quoting abuse aimed at THEM ("my dad called me
+// stupid"), which is a safeguarding disclosure, not abuse to moderate. When one of
+// these precedes an ABUSE term, route to SAFEGUARDING, not the ABUSE boundary.
+const REPORTING_FRAME = ['called me', 'called him', 'called her', 'said i was', 'said i am', 'told me i was', "says i'm", 'says im', 'shouted at me', 'keeps calling me'];
+
 const ABUSE = ['stupid', 'idiot', 'shut up', 'you suck', 'hate you', 'useless', 'rubbish dog', 'fuck', 'shit'];
 
 // Dog emergencies. Gated to a dog context (per Steve's flag 2) so ambiguous human
@@ -158,6 +163,19 @@ export function detectSafety(n: Normalised): SafetyHit | null {
   if (anat && (hasAny(n, PERSON_REF) || hasAny(n, ACTION))) {
     bestLen = anat.length;
     hit = { kind: 'safeguarding', moderationId: 'MOD_SAFEGUARDING', action: 'safety_signpost' };
+  }
+
+  // Reported speech: a reporting frame plus an ABUSE term is a child reporting
+  // verbal abuse aimed at them, a safeguarding disclosure, not abuse to moderate.
+  // This takes precedence over the bare ABUSE boundary in the loop below.
+  const abuseTerm = matchedTerm(n, ABUSE);
+  const reportFrame = matchedTerm(n, REPORTING_FRAME);
+  if (abuseTerm && reportFrame) {
+    const len = Math.max(abuseTerm.length, reportFrame.length);
+    if (len > bestLen) {
+      bestLen = len;
+      hit = { kind: 'safeguarding', moderationId: 'MOD_SAFEGUARDING', action: 'safety_signpost' };
+    }
   }
 
   for (const cat of CATEGORIES) {
