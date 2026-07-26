@@ -9,9 +9,10 @@ SYNCED 2026-07-26 to the SETTLED and AMENDED decisions in
 sync, so this file no longer contradicts the other four:
 
 - Confusion **decays by one** on a meaningful turn (was: reset to zero).
-- There is **no `confusionRung3PlusTotal`** anywhere (the tally is deleted; the
-  hidden ceiling at 20 submissions is the sole session terminator). This draft
-  never contained the tally, but the note is here so the absence is deliberate.
+- There is **no `confusionRung3PlusTotal`** anywhere. The tally WAS present in
+  the first-pass DECISIONS.md and runbook Phases 0 and 2; Amendment 1 DELETED
+  it (the hidden ceiling at 20 submissions is the sole session terminator). This
+  draft is synced to that deletion and now guards the field's absence.
 - Rudeness decay is driven by **`cleanStreak` reaching 5** (was: 3 clean turns).
 - Precedence reworded: **at most one counter ESCALATES per turn; decay is
   bookkeeping and may co-occur** (was: exactly one counter moves per turn).

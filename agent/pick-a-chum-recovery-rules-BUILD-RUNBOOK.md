@@ -193,11 +193,13 @@ Scope:
   `confusion` by one (floor at zero). Reset-to-zero would drop a visitor three
   confusions deep all the way back to rephrase after one good message; decay
   holds the ladder's position while rewarding progress.
-- **No rung-3+ tally.** The session terminator is the hidden ceiling
-  (`HIDDEN_CEILING = 20` in `router.ts`, the Boxer cut-off, `closedReason =
-  'ceiling'`). Every session ends at 20 submissions, so stuck-unstuck cycles
-  cannot run forever and no second terminator is built. Name the ceiling in the
-  spec as the terminator so this reads as intentional, not an omission.
+- **No rung-3+ tally.** The first-pass `confusionRung3PlusTotal` (present in the
+  first-pass DECISIONS.md and this phase) was DELETED by Amendment 1. The
+  session terminator is instead the hidden ceiling (`HIDDEN_CEILING = 20` in
+  `router.ts`, the Boxer cut-off, `closedReason = 'ceiling'`). Every session
+  ends at 20 submissions, so stuck-unstuck cycles cannot run forever and no
+  second terminator is needed. Name the ceiling in the spec as the terminator so
+  this reads as intentional, not an omission.
 - **Rephrase rung (rung 1)** uses the `[X]` slot, which restates the prior DOG
   line, never the visitor's words (spec amendment).
 - **Stage 4 soft end (DECISION B, Amendment 4):** set `closed = true`,
