@@ -474,7 +474,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.noteScene}`}>
                 <p className={styles.editorsNoteTitle}>Editor&apos;s Note</p>
                 <p className={styles.editorsNoteText}>This piece was written before the release of Christopher Nolan&apos;s <em style={{ fontWeight: 600 }}>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
-                <div className={styles.noteDivider} />
+                <div className={styles.rule} />
               </div>
 
               <p className={styles.introPara}>Before Lassie ran for help, before <a href="/good-dog-bad-dog/greyfriars-bobby" style={{ color: "inherit", textDecoration: "underline" }}>Greyfriars Bobby</a> waited by a grave, before the internet discovered videos of dogs greeting soldiers home from war, there was Argos.</p>
