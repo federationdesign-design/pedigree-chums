@@ -952,8 +952,6 @@ export default function ArgosPage() {
 
               <h2 className={styles.subhead}>The dog as home</h2>
 
-              <p>Argos is not just a dog at the house. In a way, Argos is the house.</p>
-
               {/* "The dog as home" gallery. Video first and autoplaying, then the
                   four stills. Captions are PLACEHOLDER copy for Steve to rewrite. */}
               <div className={styles.desktopOnly}>
@@ -966,7 +964,7 @@ export default function ArgosPage() {
                     { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
                   ]}
                 />
-                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Dogs alter the atmosphere of a home in a physical, audible, smellable way</blockquote>
+                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Argos is not just a dog at the house. In a way, Argos is the house.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -978,7 +976,7 @@ export default function ArgosPage() {
                     { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "A dog will sit through an entire chapter without once asking how the story ends." },
                     { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
                   ]}
-                  quote="Dogs alter the atmosphere of a home in a physical, audible, smellable way"
+                  quote="Argos is not just a dog at the house. In a way, Argos is the house."
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
                 />
@@ -1051,7 +1049,7 @@ export default function ArgosPage() {
 
               <p>Yet real dogs do not need impossible longevity to be good.</p>
 
-              <p>A dog does not have to live twenty years to prove loyalty. It does not even have to live ten. A dog can be good for three years, five years, seven years, one afternoon. The goodness is not in the length of the life. It is in the bond.</p>
+              <p>It does not even have to live ten. A dog can be good for three years, five years, seven years, one afternoon.</p>
 
               <p>Argos&apos;s twenty years belong to myth. Real dogs prove themselves in smaller, daily ways: waiting at the door, learning our routines, forgiving our absences, greeting us as though we have returned from war when we have only been to Tesco.</p>
 
