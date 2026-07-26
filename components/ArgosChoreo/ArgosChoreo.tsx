@@ -392,7 +392,11 @@ export function WipeSequence({
   images: string[];
   alt: string;
   captions?: {
-    fromFrame: number;
+    /* Reveal keyed to a frame index... */
+    fromFrame?: number;
+    /* ...or to raw scroll progress, 0 to 1, when you want more caption steps
+       than there are images. Takes precedence over fromFrame. */
+    fromProgress?: number;
     title?: string;
     titleTone?: "yellow" | "white";
     text: React.ReactNode;
@@ -418,9 +422,11 @@ export function WipeSequence({
   const steps = Math.max(1, images.length - 1);
   const topFrame = Math.min(steps, Math.ceil(p * steps));
   const caps = captions ?? [];
+  const shown = (c: { fromFrame?: number; fromProgress?: number }) =>
+    c.fromProgress !== undefined ? p >= c.fromProgress : (c.fromFrame ?? 0) <= topFrame;
   let capIdx = 0;
   for (let i = 0; i < caps.length; i++) {
-    if (caps[i].fromFrame <= topFrame) capIdx = i;
+    if (shown(caps[i])) capIdx = i;
   }
   const height = sceneVh ?? 100 + steps * 45;
   return (
@@ -465,7 +471,7 @@ export function WipeSequence({
         {caps.length > 0 && captionMode === "stack" && (
           <div className={styles.wipeCaptionStack}>
             {caps.map((c, i) =>
-              c.fromFrame <= topFrame ? (
+              shown(c) ? (
                 /* keyed by index so lines already on screen stay mounted and
                    only the newly revealed one plays its fade-in */
                 <p

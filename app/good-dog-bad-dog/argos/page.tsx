@@ -897,17 +897,27 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 <WipeSequence
                   mode="fade"
+                  captionMode="stack"
+                  sceneVh={320}
                   alt="Argos in the world of scent"
                   images={[
                     "/smell/smell-scene-a.jpg",
                     "/smell/smell-scene-b.jpg",
                   ]}
+                  captions={[
+                    { fromProgress: 0.00, tone: "white", text: "That matters here because dogs live in scent" },
+                    { fromProgress: 0.12, tone: "white", text: "in a way humans barely do." },
+                    { fromProgress: 0.25, tone: "white", text: "Dogs experience paths, people and homes" },
+                    { fromProgress: 0.37, tone: "white", text: "through layers of smell: identity, time, stress," },
+                    { fromProgress: 0.50, tone: "white", text: "illness, direction, absence and presence." },
+                    { fromProgress: 0.62, tone: "white", text: "A path is not just a path." },
+                    { fromProgress: 0.75, tone: "white", text: "It is a recent history of who has passed, when," },
+                    { fromProgress: 0.87, tone: "white", text: "in what condition and in what direction." },
+                  ]}
                 />
               </div>
 
-              <p>That matters here because dogs live in scent in a way humans barely do. Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence. A path is not just a path. It is a recent history of who has passed, when, in what condition and in what direction.</p>
-
-              <p>Argos belongs to that world.</p>
+              <p><strong>Argos belongs to that world.</strong></p>
 
               {/* Olfactory build: eight frames wiping in from the right as the
                   reader scrolls, with grouped captions. Mobile only, matching
