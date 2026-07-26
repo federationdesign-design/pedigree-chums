@@ -110,8 +110,6 @@ Needs COPY from Steve (nothing was invented; these are blocked on his lines):
   ("...choose dogs, games or the website"). A DISTINCT two-choice line needs copy.
 - OOD (task 7): one new line for "valid-but-unsupported" ("Is there a God?");
   near-domain and malformed can reuse existing lines if approved.
-- Older outstanding: the anatomy-alone "curious child" line (a bare body-part word
-  with no person/action) is still unwritten; today it falls through to fallback.
 - Recorder scored columns (topScore/runnerUp/runnerUpScore/matchedSignals) are
   blank until the scoring/NLU layer exists (not copy, but a dependency).
 
@@ -121,8 +119,9 @@ Needs COPY from Steve (nothing was invented; these are blocked on his lines):
 
 Production (`main`), the only main change:
 - `f76f8b8` D1: launcher hidden on production (commented mount in
-  `app/layout.tsx`). Reverse with `git revert`, or it returns when the tested
-  branch merges. The `/pick-a-chum` route itself is unchanged.
+  `app/layout.tsx`). This commit lives ONLY on `main`. Reverse with `git revert`.
+  It does NOT get undone by merging `pick-a-chum` into `main` (see the Sequencing
+  note). The `/pick-a-chum` route itself is unchanged.
 
 Preview (`pick-a-chum`), in order:
 - `6e2e625` remove "and confidential" from the safety signpost
@@ -155,20 +154,13 @@ plus the false-positive guards: "stroke the dog" -> fallback, "what is a penis"
   round. The launcher is hidden on production, so no real visitor can generate a
   disclosure meanwhile. D6 goes in AFTER the test round.
 
-## Three open items
+## Two open items
 
 1. Step 5 / D6 recorder redaction + replay skip (held, above). Touchpoint:
    `app/pick-a-chum/dev/recorder-store.ts` stores raw `input`/`normalised` and
    exports them; redact those for any safety-category turn at capture.
    `scripts/replay-pickachum.mjs` then skips rows with empty input.
-2. Reported-speech ABUSE collision. ABUSE terms (stupid, idiot, shut up, fuck,
-   ...) fire the boundary even when the visitor is REPORTING someone else's
-   abuse aimed at them ("my brother called me stupid", "they keep saying shut up
-   to me"). That is a safeguarding/distress signal, not abuse to moderate.
-   Needs to distinguish reported speech (a person reference + a saying verb
-   before the abuse word) and route it to SAFEGUARDING, not the ABUSE boundary.
-   Not started.
-3. Card lookup. "find me a labrador card", "do you have a pug card" etc. have no
+2. Card lookup. "find me a labrador card", "do you have a pug card" etc. have no
    dedicated route; they land on the fallback or the bare-help clarifier. This
    is a content-coverage gap, not a safety issue. Logged for the breeds round.
 
@@ -183,7 +175,12 @@ with before/after shown.
 
 ## Sequencing note
 
-The safety net lives only on `pick-a-chum`. Merging it to `main` will BOTH ship
-the safety net AND re-expose the launcher (the D1 hide is main-only). Do that
-deliberately, after the test round and after D6 (step 5) is in, so a real
-visitor never meets the launcher without redaction in place.
+The safety net lives only on `pick-a-chum`. Merging it to `main` ships the safety
+net. It does NOT re-expose the launcher: the D1 hide (`f76f8b8`) is a commit on
+`main`, and merging does not revert commits already on `main`. Verified
+(2026-07-26): `pick-a-chum` has NOT separately modified `app/layout.tsx`
+(`git log main..pick-a-chum -- app/layout.tsx` is empty; the file is identical to
+the merge base `c546d87`). Only `main` changed that file, so a 3-way merge keeps
+`main`'s hidden version with no conflict. To bring the launcher back, revert
+`f76f8b8` deliberately, after the test round and after D6 (step 5) is in, so a
+real visitor never meets the launcher without redaction in place.
