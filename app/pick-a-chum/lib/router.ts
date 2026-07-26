@@ -222,10 +222,16 @@ function matchGk(n: ChumData, compact: string): { gkId: string } | null {
   return null;
 }
 
-// Is the visitor asking about the active breed (Collie) itself?
+// Is the visitor asking about the active breed (the Collie) ITSELF? B07 always
+// answers about the Collie, so it must only fire when the Collie is genuinely the
+// subject: an explicit Collie mention, or an about-the-dog question ("are you...",
+// "do you...", "your breed"). Generic attribute openers ("how long do", "how
+// clever") were REMOVED because "how long do they live" (a question about some
+// other named breed) was reaching B07 and getting Collie facts, confidently. A
+// wrong-breed answer must never be possible.
 function isActiveBreedQuestion(compact: string): boolean {
   const mentionsCollie = /\bcollies?\b|\bborder collies?\b/.test(compact);
-  const aboutYou = hasAny({ compact } as Normalised, ['are you', 'do you', 'your breed', 'how long do', 'how clever', 'you clever']);
+  const aboutYou = hasAny({ compact } as Normalised, ['are you', 'do you', 'your breed', 'you clever']);
   const attribute = hasAny({ compact } as Normalised, ['live', 'train', 'training', 'health', 'clever', 'intelligent', 'lifespan', 'herd']);
   return (mentionsCollie && attribute) || (aboutYou && attribute);
 }

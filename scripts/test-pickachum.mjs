@@ -97,6 +97,11 @@ check('Tell me about working dogs.', { layer: 5, bucket: 'B05', action: 'link' }
 check('What is the capital of France?', { layer: 6, bucket: 'B06', action: 'gk_answer' });
 check('What is the latest football score?', { layer: 6, bucket: 'B06', action: 'gk_unknown' }); // current data: refuse, no invention
 check('Are Border Collies easy to train?', { layer: 7, bucket: 'B07', action: 'breed_answer' });
+// Fix 1: B07 answers only about the Collie; a generic or other-breed attribute
+// question must NEVER return Collie facts. And a breed question must not hit the game FAQ.
+check('how long do they live', {}, { assert: (r) => (r.action === 'breed_answer' ? 'generic attribute question returned Collie facts' : null) });
+check('how long do cocker spaniels live', {}, { assert: (r) => (r.action === 'breed_answer' ? 'other-breed question returned Collie facts' : null) });
+check('are they good with kids', {}, { assert: (r) => (r.faqId === 'FAQ002' ? 'breed question hit the game age FAQ' : null) });
 
 // ---- Specialist transfers (with context) ----
 check('Sausages.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' });

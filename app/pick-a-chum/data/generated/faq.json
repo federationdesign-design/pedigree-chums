@@ -19,10 +19,6 @@
     "faqId": "FAQ002",
     "canonicalQuestion": "Who is the game for?",
     "alternativePhrasings": [
-      "age",
-      "family",
-      "children",
-      "kids",
       "who can play"
     ],
     "canonicalAnswer": "{{approved_age_and_audience_answer}}",
