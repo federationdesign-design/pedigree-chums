@@ -464,7 +464,6 @@ export default function ArgosPage() {
           </div>
         </div>
 
-
         {/* ── Two-column layout ── */}
         <div className={styles.essayLayout} id="article-start">
           <Link href="/good-dog-bad-dog" className={styles.backLinkArticle}><span className={styles.backArrow}>←</span> Back to Good Dog, Bad Dog</Link>
@@ -508,21 +507,7 @@ export default function ArgosPage() {
                 </div>
               </div>
 
-              <div className={styles.desktopOnly}>
               <p>Argos is lying outside, old, filthy and neglected. He had <span style={{ color: "var(--yellow)" }}>once been a fine hunting dog, raised by Odysseus himself</span>, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
-
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.</blockquote>
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <QuoteReveal
-                  tight
-                  blockClass={styles.pullquote}
-                  markClass={styles.pullquoteMark}
-                  pinned={<p className={styles.pinnedQuoteText} style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had <span style={{ color: "var(--yellow)" }}>once been a fine hunting dog, raised by Odysseus himself</span>, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
-                  quote="Odysseus notices. He wipes away a tear, but he cannot go to Argos openly."
-                />
-              </div>
 
               <div className={styles.sceneMobile}>
                 <SizeBuildCard />
@@ -599,39 +584,17 @@ export default function ArgosPage() {
 
               <p>In Homer, Odysseus&apos;s restraint makes sense. He is in disguise, in danger, inside a plan that cannot unravel. The scene is painful precisely because he loves Argos and cannot act on it. <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>An ancient audience may have been more prepared to admire that restraint:</strong> Odysseus endures the pain, keeps his disguise and remains faithful to the larger task.</p>
 
-              <div className={styles.desktopOnly}>
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>The people demanding that Argos be petted are not doing something new.</blockquote>
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <QuoteReveal
-                  tight
-                  blockClass={styles.pullquote}
-                  markClass={styles.pullquoteMark}
-                  pinned={
-                    <figure style={{ margin: 0 }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/history/jurrisicbark-shialebuff.jpg" alt="Jurassic Bark" loading="lazy" />
-                      <figcaption className={styles.choreoCaption}>Jurassic Bark: every good show or story will use this as a trope, some more successfully than others</figcaption>
-                    </figure>
-                  }
-                  quote="The people demanding that Argos be petted are not doing something new."
-                />
-              </div>
-
               <p>Modern audiences do something different. <span style={{ color: "var(--yellow)" }}>We do not only watch Odysseus.</span> <strong style={{ fontWeight: 700 }}>We become him.</strong> We enter the scene emotionally, and once we have done that, walking past the dog feels almost impossible.</p>
 
               <p><strong style={{ fontWeight: 700 }}>Psychologists often describe this kind of absorption as narrative transportation:</strong> the process by which people become <span style={{ color: "var(--yellow)" }}>mentally and emotionally drawn into a story world</span>. It is why we wince when a character is hurt, why fictional grief can produce real tears, and why the death of a dog on screen can feel almost personally unfair.</p>
 
               <div className={styles.desktopOnly}>
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
                 <QuotePollScene
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  quote="They are doing what audiences have always done: asking an old story to speak to the feelings of the present."
                   question="Should he change the story so Argos gets head strokes?"
                   options={[
                     { label: "Yes, I love schmaltz", pct: 96, resultLabel: "Pet the dog", color: "green" },
@@ -646,7 +609,6 @@ export default function ArgosPage() {
               </div>
 
               <p>That instinct has become <span style={{ color: "var(--yellow)" }}>much more visible in the age of social media.</span> Audiences no longer wait silently for a story to happen to them. <strong style={{ fontWeight: 700 }}>They talk back.</strong> They speculate, demand, dread and rewrite in real time. The Reddit users asking Nolan to pet the dog are doing what audiences have always done, only louder: asking an old story to answer a modern emotional need.</p>
-
 
               <p>Part of why that need is so strong is that the dog&apos;s position in our lives has changed so completely. <span style={{ color: "var(--yellow)" }}>Over the last century, and dramatically over the last few decades, the dog has moved from the yard to the house, from the house to the sofa, from the sofa to the bedroom.</span> Dogs now have beds chosen for their joint health, food chosen for their digestion, coats chosen for cold mornings. We arrange our holidays around them. We grieve them publicly, with the same language we use for people, because the loss genuinely feels like the same kind of thing.</p>
 
@@ -667,7 +629,6 @@ export default function ArgosPage() {
                     { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
                 />
-                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -676,15 +637,12 @@ export default function ArgosPage() {
                     { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
                     { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
-                  quote="Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next."
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
                 />
               </div>
 
               <p>There is an old literary argument, often associated with Roland Barthes, that once a work is released, it no longer belongs entirely to its author. Meaning is made and remade by readers. Homer has been dead for nearly three thousand years, and <em style={{ fontWeight: 600 }}>The Odyssey</em> has belonged to singers, translators, teachers, readers, filmmakers and audiences ever since. The people demanding that Argos be petted are not doing something entirely new. They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</p>
-
-
 
               <h2 className={styles.subhead}>How Homer wrote the most realistic dog in ancient literature</h2>
 
@@ -829,7 +787,6 @@ export default function ArgosPage() {
                 </div>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", opacity: 0.85, margin: "20px 0 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.2)" }}>{RESEARCH_NOTE}</p>
               </div>
-
 
               <h2 className={styles.subhead}>The smell of home</h2>
 
@@ -1037,21 +994,7 @@ export default function ArgosPage() {
 
               <p>For a small terrier or toy breed, reaching eighteen or nineteen is rare but not impossible. For a large hunting dog, especially in the ancient world without modern veterinary care, pain relief, parasite control or senior diets, twenty years is almost certainly mythic. Argos would not have been a pampered senior dog carefully managed through his final years. He was a neglected working hound lying outside.</p>
 
-              <div className={styles.desktopOnly}>
               <p>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>
-
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond.</blockquote>
-              </div>
-
-              <div className={styles.sceneMobile}>
-                <QuoteReveal
-                  tight
-                  blockClass={styles.pullquote}
-                  markClass={styles.pullquoteMark}
-                  pinned={<p className={styles.pinnedQuoteText} style={{ margin: 0 }}>Homer gives Argos twenty years because myth often measures goodness in impossible numbers. The longer the dog waits, the greater the loyalty appears. Argos becomes a good dog not only because he recognises Odysseus, but because he has survived impossibly long in order to do it.</p>}
-                  quote="A dog does not have to live twenty years to prove loyalty. The goodness is not in the length of the life. It is in the bond."
-                />
-              </div>
 
               <p>Yet real dogs do not need impossible longevity to be good.</p>
 
@@ -1090,7 +1033,6 @@ export default function ArgosPage() {
               <p>Homer may have written an epic about war, gods, monsters and kings. But in Argos, he also wrote one of the oldest truths about dogs.</p>
 
               <p>A dog does not need you to look like yourself. A dog does not need your status restored. A dog does not need the world to know who you are.</p>
-
 
             </div>
           </article>
@@ -1192,8 +1134,6 @@ export default function ArgosPage() {
               </div>
             </div>
             </div>
-
-
 
           </aside>
         </div>
