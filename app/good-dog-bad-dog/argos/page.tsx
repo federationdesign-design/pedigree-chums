@@ -716,6 +716,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 <WipeSequence
                   mode="fade"
+                  captionSize="large"
                   alt="A soldier coming home to their dog"
                   images={[
                     "/homecoming/soldier-homecoming1.jpg",
@@ -723,10 +724,14 @@ export default function ArgosPage() {
                     "/homecoming/soldier-homecoming3.jpg",
                     "/homecoming/soldier-homecoming4.jpg",
                   ]}
+                  captions={[
+                    { fromFrame: 0, tone: "white", text: "Argos does that in ancient form." },
+                    { fromFrame: 1, tone: "navy", text: "He does not need Odysseus to explain." },
+                    { fromFrame: 2, tone: "white", text: "He does not need proof." },
+                    { fromFrame: 3, tone: "yellow", text: "He knows." },
+                  ]}
                 />
               </div>
-
-              <p><strong style={{ fontWeight: 700, color: "var(--yellow)" }}>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</strong></p>
 
               <div className={styles.sceneMobile}>
                 <HomerCrossfade

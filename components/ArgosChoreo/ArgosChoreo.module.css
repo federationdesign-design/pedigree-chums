@@ -336,6 +336,16 @@
    specificity reason as above. */
 .wipeStage .wipeCaptionYellow { color: var(--yellow, #ffd23e); font-weight: 700; }
 .wipeStage .wipeCaptionWhite { color: #ffffff; }
+.wipeStage .wipeCaptionNavy { color: var(--navy, #0a3a57); }
+
+/* Matches .choreoBullets on the statue gallery: one short line per slide,
+   set larger and centred rather than as a paragraph of explanation. */
+.wipeStage .wipeCaptionLarge {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.2;
+  width: 88%;
+}
 
 /* Title colour is set per caption, independent of the body colour. <strong> is
    already bold, so yellow titles satisfy "yellow is always bold". */

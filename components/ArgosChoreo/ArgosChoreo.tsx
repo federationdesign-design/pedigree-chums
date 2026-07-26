@@ -386,6 +386,7 @@ export function WipeSequence({
   mode = "wipe",
   frameRatio,
   sceneVh,
+  captionSize = "small",
 }: {
   images: string[];
   alt: string;
@@ -394,7 +395,7 @@ export function WipeSequence({
     title?: string;
     titleTone?: "yellow" | "white";
     text: React.ReactNode;
-    tone?: "yellow" | "white";
+    tone?: "yellow" | "white" | "navy";
   }[];
   /* "wipe" reveals each frame from the right edge; "fade" cross-dissolves. */
   mode?: "wipe" | "fade";
@@ -404,6 +405,10 @@ export function WipeSequence({
   /* Scene height in vh. Defaults to 45vh of scroll per transition plus a
      screen for the sticky stage. */
   sceneVh?: number;
+  /* "large" matches the statue gallery's bullet treatment: 1.3rem, weight 600,
+     centred. Use it when each slide gets one short line rather than a
+     paragraph of explanatory text. */
+  captionSize?: "small" | "large";
 }) {
   const { sceneRef, p } = useSceneProgress();
   const steps = Math.max(1, images.length - 1);
@@ -457,7 +462,13 @@ export function WipeSequence({
           <p
             key={capIdx}
             className={`${styles.wipeCaption} ${
-              caps[capIdx].tone === "yellow" ? styles.wipeCaptionYellow : styles.wipeCaptionWhite
+              captionSize === "large" ? styles.wipeCaptionLarge : ""
+            } ${
+              caps[capIdx].tone === "yellow"
+                ? styles.wipeCaptionYellow
+                : caps[capIdx].tone === "navy"
+                  ? styles.wipeCaptionNavy
+                  : styles.wipeCaptionWhite
             }`}
           >
             {caps[capIdx].title && (
