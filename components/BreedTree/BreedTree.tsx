@@ -176,7 +176,6 @@ const TITLE_BOOST = 2;
 // tree often holds only two or three circles. Two bodies is the floor, so one
 // wide circle resting high cannot end a round on its own.
 const PIT_FULL_COVER = 0.72;
-const PIT_FULL_MIN_BODIES = 2;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -1844,7 +1843,7 @@ export default function BreedTree({
           // the real distance between the walls, not the viewBox, which reaches
           // well past the visible stage
           const pitW = (xR - xL) || 1;
-          const blocked = covered / pitW >= PIT_FULL_COVER && spans.length >= PIT_FULL_MIN_BODIES;
+          const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
           if (blocked || inZone >= 5) {
             fullTriggeredRef.current = true;
             runCountdown();
