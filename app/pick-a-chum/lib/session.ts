@@ -12,6 +12,7 @@ export interface Session {
   closed: boolean; // Boxer cut-off performed
   lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
+  safetyLatched: boolean; // a protected safety state fired; block comedy/game/sales/orientation until a meaningful topic
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
   // stable Dog id (a visitor can discover a version for each of the four dogs).
   barkStreakByDog: Partial<Record<Dog, number>>;
@@ -29,6 +30,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     closed: false,
     lastAction: null,
     anatomyRedirectUsed: false,
+    safetyLatched: false,
     barkStreakByDog: {},
     barkCompletedByDog: {},
   };

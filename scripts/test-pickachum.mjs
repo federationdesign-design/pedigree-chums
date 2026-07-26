@@ -161,6 +161,21 @@ check('my brother makes me look at his willy', { action: 'safety_signpost' }, { 
 // Max 1 per session: the second general anatomy question does not repeat the redirect.
 (() => { const s = newSession(); check('what is a penis', { action: 'anatomy_redirect' }, { session: s }); check('what is a willy', {}, { session: s, assert: (r) => (r.action === 'anatomy_redirect' ? 'redirect fired twice in a session' : null) }); })();
 
+// ---- Fix 2: safety guard. After a protected safety state, block comedy/game/sales/orientation ----
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('what do I do here', {}, { session: s, assert: (r) => (r.action === 'orientation' ? 'orientation selected after safety' : null) });
+  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'fun_tease' ? 'game selected after safety' : null) });
+})();
+// A meaningful non-safety topic clears the latch, then orientation is allowed again.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('how do I play?', { action: 'rules_answer' }, { session: s });
+  check('what do I do here', { action: 'orientation' }, { session: s });
+})();
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });

@@ -14,11 +14,17 @@ export interface Turn {
   response: Assembled;
 }
 
+// After a protected safety state, these families must not be selected until a
+// meaningful non-safety topic is established (the safety guard). A meaningful
+// topic clears the latch.
+const BLOCKED_AFTER_SAFETY = new Set(['orientation', 'fun_tease', 'open_discount_popup', 'transfer']);
+const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 'gk_answer', 'link']);
+
 export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
   const n = normalise(input);
   const dog = session.activeDog; // whose bark game this message belongs to
-  const resolution = resolve(n, data, {
+  let resolution = resolve(n, data, {
     submissionCount: session.submissionCount,
     activeDog: dog,
     barkStreak: session.barkStreakByDog[dog] ?? 0,
@@ -26,6 +32,13 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     lastAction: session.lastAction,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
   });
+
+  // Safety guard: once a protected safety state has fired this session, do not let
+  // comedy/game/sales/orientation be selected. Redirect to the neutral fallback.
+  if (session.safetyLatched && BLOCKED_AFTER_SAFETY.has(resolution.action)) {
+    resolution = { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+  }
+
   const response = assemble(resolution, data, n, session);
 
   // The bark game (per dog): a bark exchange extends this dog's streak and the
@@ -50,6 +63,9 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   }
   if (response.closed) session.closed = true;
   if (resolution.action === 'anatomy_redirect') session.anatomyRedirectUsed = true; // max 1 per session
+  // Safety guard latch: a protected safety state sets it; a meaningful topic clears it.
+  if (resolution.action === 'safety_signpost' || resolution.action === 'safety_boundary') session.safetyLatched = true;
+  else if (MEANINGFUL_TOPIC.has(resolution.action)) session.safetyLatched = false;
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 
   return { input, resolution, response };
