@@ -187,6 +187,10 @@
 .essayBody h3.h3Navy {
   color: var(--navy, #0a3a57);
   text-align: center;
+  font-weight: 700;
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .subhead {
@@ -635,7 +639,7 @@
   font-weight: 500;
   font-style: italic;
   color: var(--navy, #0a3a57);
-  line-height: 1.35;
+  line-height: 1.1em;
   margin: 56px 0;
   /* right padding shortens the measure so quotes do not run the full width */
   padding: 24px 12% 24px 20px;
