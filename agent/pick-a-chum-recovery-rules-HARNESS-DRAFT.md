@@ -67,6 +67,15 @@ session via `opts.session`.
 // This ADDS a guard; it does not edit or remove any existing assertion.
 ```
 
+## Phase 0B. Glossary content (no engine assertions; copy review)
+
+```js
+// 0B is Steve's copy review (the critical path, runs at t0 in parallel with
+// Phase 0; relocated here, formerly Phase 6A). It has no engine assertions. The
+// data-integrity gate below is DEFINED here but only ENFORCED in Phase 6B, once
+// the glossary store exists.
+```
+
 ## Phase 1. AAN and no dead ends (workbook review gate, NOT a harness assertion)
 
 ```js
@@ -248,14 +257,6 @@ check('<a single rude word Steve supplies>', {}, { assert: (r, resp) =>
 })();
 ```
 
-## Phase 6A. Glossary content (no engine assertions; copy review)
-
-```js
-// 6A is Steve's copy review (the critical path, runs from t0). It has no engine
-// assertions. The data-integrity gate below is DEFINED here but only ENFORCED
-// in 6B, once the glossary store exists.
-```
-
 ## Phase 6B. Contextual definition route (section 12 rows 4 and 5)
 
 ```js
@@ -276,7 +277,7 @@ check('what is a verb?', { action: 'definition' }, { assert: (_r, resp) =>
 })();
 
 // Build-time integrity: every complex term tagged in copy has glossary coverage
-// (runs over the data, not the engine). This is the enforced gate from 6A.
+// (runs over the data, not the engine). This is the enforced gate from Phase 0B.
 (() => {
   const tagged = collectTaggedComplexTerms(data);       // from copy records
   const covered = new Set(Object.keys(data.glossary));   // glossary keys

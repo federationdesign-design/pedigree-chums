@@ -109,22 +109,25 @@ Full text and an amendments log in
   standing exemption to REWRITE (not remove) the one Kettle harness assertion,
   in its own commit with before/after; (3) split `closed` into two reasons
   (ceiling vs recovery), distinct copy.
-- Schedule change: Phase 6A (glossary content) starts at t0 in parallel with
+- Schedule change: the glossary content phase starts at t0 in parallel with
   Phase 0. It is the critical path (Steve's copy review), must not wait in
-  sixth position; 6B stays gated behind it.
+  sixth position; 6B stays gated behind it. In the runbook it is physically
+  relocated to sit right after Phase 0 and renumbered from 6A to Phase 0B, so
+  its number and position agree.
 - Notes: (1) Phase 1 AAN is a workbook review gate on column 1, not a fragile
   harness text assertion; (2) Phase 0 adds a floor RATCHET to test-pickachum.mjs
   so a dropped assertion fails instead of silently passing.
 - Spec amendment: the `[X]` restatement slot restates the prior DOG line, never
   the visitor's words.
 
-The BUILD-RUNBOOK has been revised twice against all of the above (second pass:
-Phases 0, 1, 2, 3 changed, 6A rescheduled to t0, Phase 7 tally reference
-removed). The HARNESS-DRAFT is now SYNCED to the amended decisions (decay not
-reset, no tally, cleanStreak decay at 5, escalation-only precedence, P1 as a
-review gate, Phase 0 floor ratchet), so all five documents agree. Still open and
-Steve's to provide: the actual COPY at each
-phase STOP, and glossary approval at STOP 6A (the critical path). Glossary
+The BUILD-RUNBOOK has been revised against all of the above (second pass:
+Phases 0, 1, 2, 3 changed, glossary phase relocated and renumbered 6A -> 0B to
+sit right after Phase 0, Phase 7 tally reference removed). The HARNESS-DRAFT is
+SYNCED to the amended decisions (decay not reset, no tally, cleanStreak decay at
+5, escalation-only precedence, P1 as a review gate, Phase 0 floor ratchet) and
+its glossary block was moved to match, so all five documents agree. Still open
+and Steve's to provide: the actual COPY at each
+phase STOP, and glossary approval at STOP 0B (the critical path). Glossary
 judgement calls still flagged at the foot
 of the glossary (Hot Dog Mode's real answer, the "Herdability" joke entry, the
 Childline row staying in lockstep with approved safety wording).

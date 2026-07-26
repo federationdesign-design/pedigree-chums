@@ -36,9 +36,11 @@ the rulings. Phases changed by the second pass:
   1) and the DECISION E copy constraint unchanged.
 - **Phase 4**: unchanged from the first pass (DECISION F, the Kettle exemption,
   the `[X]` invariant).
-- **Phase 6A rescheduled** (schedule change): the glossary content phase now
-  starts at t0 IN PARALLEL with Phase 0. It is the critical path and does not
-  wait in sixth position. 6B stays gated behind 6A. See the Scheduling overview.
+- **Phase 6A relocated and renumbered to Phase 0B** (schedule change): the
+  glossary content phase is physically moved to sit immediately after Phase 0
+  and renumbered 0B, so its number and its position both say "runs at t0, in
+  parallel with Phase 0". Phase 6B keeps its number and place and now depends on
+  Phase 0B. See the Scheduling overview.
 - **Phase 7**: the safety-mid-confusion assertion no longer references the
   deleted rung-3+ tally.
 - **HARNESS-DRAFT now SYNCED**: `pick-a-chum-recovery-rules-HARNESS-DRAFT.md`
@@ -92,18 +94,21 @@ the rulings. Phases changed by the second pass:
 
 ## Scheduling overview
 
-The build spine is linear (Phases 0 to 7). One phase runs OFF the spine:
+The build spine is linear (Phase 0, then 1 to 7). One phase runs OFF the spine,
+in parallel:
 
-- **Phase 6A (glossary content) starts at t0, in parallel with Phase 0.** It
-  depends on nothing (pure copy, the draft already exists) and it is the
-  programme's critical path (Steve's copy review, not the build). It must not
-  wait in sixth position.
-- **Phase 6B (the definition route) stays gated behind 6A**, because
-  `last_complex_terms` has no source until the glossary exists. In practice 6A
+- **Phase 0B (glossary content) runs in parallel with Phase 0, from t0.** It is
+  positioned and numbered to say so: it sits immediately after Phase 0, off the
+  spine, and is named 0B rather than 6-something so its number and its position
+  agree. It depends on nothing (pure copy, the draft already exists) and it is
+  the programme's critical path (Steve's copy review, not the build). (It was
+  earlier drafted as Phase 6A; it has been physically relocated here.)
+- **Phase 6B (the definition route) stays gated behind Phase 0B**, because
+  `last_complex_terms` has no source until the glossary exists. In practice 0B
   will have cleared long before the spine reaches 6B.
 
-So the numbering is spine order; 6A is the one item to start immediately
-regardless of where the spine is.
+So Phase 0B is the one item to start immediately, alongside Phase 0, regardless
+of where the linear spine has reached.
 
 ---
 
@@ -147,6 +152,37 @@ falls; the existing 194 all still pass unchanged.
 
 STOP 0: Steve confirms the state shape and field names, and the starting stored
 floor value. Nothing user-visible has changed; this is a code-shape review only.
+
+---
+
+## Phase 0B. Glossary content (PARALLEL with Phase 0, CRITICAL PATH)
+
+Numbered 0B, and positioned here, so its number and its position agree: it sits
+at t0, off the linear spine, running in parallel with Phase 0. (Relocated from
+its earlier position as Phase 6A.) It does NOT wait for Phases 1 to 5. It
+depends on nothing (pure copy, the draft already exists) and it is the
+programme's critical path (Steve's copy review, not the build). It BLOCKS only
+Phase 6B.
+
+Goal: an approved controlled glossary. This is copy, it is Steve's. The critical
+path of the whole recovery programme is this review, not the build: the build
+cannot populate `last_complex_terms` with anything until the glossary exists,
+so leaving it late would idle the critical path behind five unrelated phases.
+
+Scope:
+- Steve reviews and approves the glossary delivered this session
+  (`pick-a-chum-recovery-rules-GLOSSARY.md`): plain def, child-friendly def,
+  example, optional in-character wording per term.
+- Approved content moves into the workbook as the section-8 store.
+- Steve confirms which complex terms are tagged in which copy lines.
+
+Assertions added (0B): none in the engine (this is copy). A build-time data
+integrity check is defined here but only ENFORCED in Phase 6B once the store
+exists.
+
+STOP 0B (BLOCKING): glossary content approved and in the workbook. Nothing in
+Phase 6B may start until this clears. This STOP is the programme's critical
+path.
 
 ---
 
@@ -320,42 +356,15 @@ STOP 5: Steve writes the three fallback stages; build wires the staging.
 
 ---
 
-## Phase 6A. Glossary content (STARTS AT t0, PARALLEL WITH PHASE 0, CRITICAL PATH)
-
-SCHEDULING (schedule change): this phase does NOT wait for Phases 1 to 5. It
-starts immediately, in parallel with Phase 0, because it depends on nothing (it
-is pure copy and the draft already exists). It is the programme's critical
-path. It BLOCKS only 6B.
-
-Goal: an approved controlled glossary. This is copy, it is Steve's. The critical
-path of the whole recovery programme is this review, not the build: the build
-cannot populate `last_complex_terms` with anything until the glossary exists,
-so starting it late would idle the critical path behind five unrelated phases.
-
-Scope:
-- Steve reviews and approves the glossary delivered this session
-  (`pick-a-chum-recovery-rules-GLOSSARY.md`): plain def, child-friendly def,
-  example, optional in-character wording per term.
-- Approved content moves into the workbook as the section-8 store.
-- Steve confirms which complex terms are tagged in which copy lines.
-
-Assertions added (6A): none in the engine (this is copy). A build-time data
-integrity check is defined here but only ENFORCED in 6B once the store exists.
-
-STOP 6A (BLOCKING): glossary content approved and in the workbook. Nothing in
-6B may start until this clears. This STOP is the programme's critical path.
-
----
-
-## Phase 6B. Contextual definition route (depends on 6A)
+## Phase 6B. Contextual definition route (depends on Phase 0B)
 
 Goal: dogs can explain their own words, using `last_complex_terms` and
 `last_response_id`.
 
 Scope:
 - On each turn, store the complex terms used (tagged per response) into
-  `last_complex_terms`. This has NO source until 6A ships the glossary, which
-  is why 6A blocks it.
+  `last_complex_terms`. This has NO source until Phase 0B ships the glossary,
+  which is why 0B blocks it.
 - A definition route: "what is a verb?" answers directly; "what does that
   mean?" answers a term from the previous response via `last_complex_terms`.
 - A build-chumdata integrity gate: fail the build if any copy line tags a
@@ -368,7 +377,7 @@ previous response; every complex term tagged in copy has glossary coverage
 (data-integrity assertion).
 
 STOP 6B: Steve confirms the tagging and the definition copy. Cannot begin
-before STOP 6A clears.
+before STOP 0B clears.
 
 ---
 
@@ -426,7 +435,7 @@ the schedule change and the spec amendment, are all settled in
 `pick-a-chum-recovery-rules-DECISIONS.md` (see its amendments log). This runbook
 is written against them. Nothing in the build is waiting on a Steve decision; it
 is waiting on Steve's COPY (each phase STOP) and, for the whole definition
-track, on the glossary approval at STOP 6A, which is the critical path and runs
+track, on the glossary approval at STOP 0B, which is the critical path and runs
 from t0.
 
 ---

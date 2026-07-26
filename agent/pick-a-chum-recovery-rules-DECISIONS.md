@@ -29,8 +29,11 @@ changed and why so the history is visible.
   field to make DECISION C's "decays after 5 clean turns" testable.
 - **Amendment 4 (soft end):** with the tally gone, the soft end is simply soft;
   DECISION B stands unchanged.
-- **Schedule change:** Phase 6A (glossary content) starts at t0 in parallel
-  with Phase 0. It is the critical path and must not wait in sixth position.
+- **Schedule change:** the glossary content phase starts at t0 in parallel
+  with Phase 0. It is the critical path and must not wait in sixth position. In
+  the runbook it is physically relocated to sit immediately after Phase 0 and
+  renumbered from Phase 6A to **Phase 0B**, so its number and its position
+  agree.
 - **Note 1:** Phase 1 AAN compliance is enforced as a workbook review gate
   (column 1, Next Step Required), not a fragile harness text assertion.
 - **Note 2:** add a Phase 0 item that makes `test-pickachum.mjs` fail when the
@@ -148,11 +151,13 @@ and is the backstop that makes the deleted rung-3+ tally unnecessary.
 is a dependency of the contextual-definition phase (6B), not parallel to it.
 6B stays gated behind glossary approval.
 
-But the glossary CONTENT phase (6A) depends on nothing: it is pure copy and the
-draft already exists (`pick-a-chum-recovery-rules-GLOSSARY.md`). So 6A **starts
-at t0, in parallel with Phase 0**, and must not sit idle in sixth position. It
-is the programme's **critical path**, and the critical path is Steve's copy
-review, not the build.
+But the glossary CONTENT phase (Phase 0B, formerly 6A) depends on nothing: it
+is pure copy and the draft already exists
+(`pick-a-chum-recovery-rules-GLOSSARY.md`). So it **starts at t0, in parallel
+with Phase 0**, and must not sit idle in sixth position. In the runbook it is
+relocated to sit immediately after Phase 0 and renumbered 0B. It is the
+programme's **critical path**, and the critical path is Steve's copy review, not
+the build.
 
 ---
 
@@ -170,7 +175,7 @@ and aligns it with the no-echo invariant (DECISION F).
 DECISIONS A to F are CLOSED (A and D amended, second pass). The runbook's
 "Decisions this runbook needs from Steve" section is replaced by a pointer to
 this document. Nothing in the build is waiting on a Steve decision; it waits on
-Steve's COPY at each phase STOP, and on glossary approval at STOP 6A (the
+Steve's COPY at each phase STOP, and on glossary approval at STOP 0B (the
 critical path, now running from t0).
 
 The HARNESS-DRAFT still shows the first-pass assertions (reset-to-zero, the
