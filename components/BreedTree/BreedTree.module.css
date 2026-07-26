@@ -384,17 +384,32 @@
 
 /* Round portrait of the dog whose tree is open, at the head of the docked box.
    Mini pit only: the chum page caption stays text-only. */
+/* The head of the box is a row: portrait on the left, name beside it. It used to
+   be a centred stack with a yellow ring, which read as a second card sitting on
+   the box rather than as its heading. A third smaller, no ring, left aligned. */
+.cHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
 .cPortrait {
   display: block;
-  width: clamp(64px, 18vw, 104px);
-  height: clamp(64px, 18vw, 104px);
+  width: clamp(43px, 12vw, 70px);
+  height: clamp(43px, 12vw, 70px);
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--yellow, #ffd23e);
-  box-shadow: 0 3px 10px rgba(10, 58, 87, 0.3);
-  margin: 0 auto 8px;
+  flex: none;
   pointer-events: none;
   user-select: none;
+}
+/* the level's own name, beside the portrait */
+.cHeadName {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  color: #ffffff;
+  font-size: clamp(1.1rem, 5vw, 1.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
 }
 
 /* Difficulty slider: start screen only, mounted down the left of the stage.

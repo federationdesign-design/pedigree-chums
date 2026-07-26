@@ -1093,10 +1093,10 @@ export default function BreedTree({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes]);
 
-  // Closing the blue box is the way out of LEARN, back to the start screen.
-  useEffect(() => {
-    if (learning && hideCaption) setLearning(false);
-  }, [learning, hideCaption]);
+  // Closing the blue box used to be the way out of LEARN. It is not any more:
+  // the corner X is the single exit everywhere, on the start screen, in play and
+  // in learn alike. Shutting the box now leaves you in learn with the box down,
+  // a state that did not previously exist, and the info square lives in it.
 
   // Let the shell mirror the hovered/focused breed (title + pill text).
   useEffect(() => {
@@ -2301,12 +2301,13 @@ export default function BreedTree({
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
             const ub = uiBodiesRef.current;
-            // Only the close X, so there is always a way out. The info square is
-            // gone from the pit altogether: it was already hidden on the start
-            // screen, and it opens the blue box, which is reading rather than
-            // playing, so it has no place during a round either. The blue box is
-            // still reachable through the LEARN word on the start screen.
-            const kinds = ["close"] as const;
+            // The close X is always there, the single way out. The info square
+            // belongs to learn and nowhere else: it is how you get the blue box
+            // back once you have closed it. It stays out of the start screen and
+            // out of play, where reading is not what you are doing.
+            const kinds = (learning && hideCaption
+              ? ["close", "desc"]
+              : ["close"]) as readonly ("close" | "desc")[];
             const defs: { kind: "close" | "desc"; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
               const b = ub?.find((u) => u.kind === kind);
               return {
@@ -2672,14 +2673,18 @@ export default function BreedTree({
             </button>
           )}
           {/* Mini pit only: the dog whose tree is open, as a round portrait at the
-              head of the box. The chum page keeps its text-only caption. */}
+              head of the box, with its name beside it. The chum page keeps its
+              text-only caption. */}
           {dockAside && (rootImage ?? nodes[0].data.img) && (
-            <img
-              className={styles.cPortrait}
-              src={bust((rootImage ?? nodes[0].data.img) as string)}
-              alt={nodes[0].data.name}
-              draggable={false}
-            />
+            <div className={styles.cHead}>
+              <img
+                className={styles.cPortrait}
+                src={bust((rootImage ?? nodes[0].data.img) as string)}
+                alt={nodes[0].data.name}
+                draggable={false}
+              />
+              <span className={styles.cHeadName}>{nodes[0].data.name}</span>
+            </div>
           )}
           <span className={styles.cName}>{shown.data.name}</span>
           {shownShare !== null && shown.parent && (

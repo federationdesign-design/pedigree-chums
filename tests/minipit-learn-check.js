@@ -108,7 +108,10 @@ const readScreen = () => {
   const s3 = await p.evaluate(readScreen);
   const inert = s3.toys === 0 && s2.circleY !== null && Math.abs(s3.circleY - s2.circleY) < 3;
 
-  // e) closing the box returns to the start screen
+  // e) closing the box no longer leaves LEARN. The corner X is the single exit
+  // everywhere now, so shutting the box drops you into learn-with-the-box-down,
+  // a state that did not previously exist, and the info square appears to bring
+  // the box back.
   await p.evaluate(() => {
     const btns = Array.from(document.querySelectorAll('[class*="asideDocked"] button'));
     const x = btns.find((b2) => /close/i.test(b2.getAttribute('aria-label') || '') || /^[×✕x]$/i.test((b2.textContent || '').trim()));
@@ -116,10 +119,12 @@ const readScreen = () => {
   });
   await p.waitForTimeout(900);
   const s4 = await p.evaluate(readScreen);
-  const returned = !!(s4.PLAY && s4.LEARN && !s4.boxOpen);
+  // still in learn: the words are gone, the box is down, and the square is there
+  const squareBack = await p.evaluate(() => !!document.querySelector('[aria-label="Breed information"]'));
+  const returned = !s4.boxOpen && squareBack;
 
   // reopening puts the box back where it belongs, not where it was dropped
-  await p.locator('[aria-label="Learn about these breeds"]').click({ force: true });
+  await p.locator('[aria-label="Breed information"]').click({ force: true });
   await p.waitForTimeout(1000);
   const bHome = await boxAt();
   const snapped = !!(bHome && bBefore && bHome.x === bBefore.x && bHome.y === bBefore.y);
