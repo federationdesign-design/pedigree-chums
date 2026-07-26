@@ -129,11 +129,18 @@ export default function LineageMap({
   currentScore = 0,
   tree,
   circular = false,
+  soloLeaf = false,
   rootRadius,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
   circular?: boolean;
+  // A dog with no ancestors is handed a synthetic child by BreedTree: itself,
+  // drawn again, so this layer has something to reveal. Rendering that as a node
+  // on a connector claims the dog descends from itself, so when this is set the
+  // node and its rod are skipped and the reveal comes straight out of the big
+  // circle. Placement then finishes the round on its own, with no green button.
+  soloLeaf?: boolean;
   rootRadius?: number;
   onClose: () => void;
   onRemove?: (name: string) => void;
@@ -760,6 +767,24 @@ export default function LineageMap({
     });
     window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
   };
+  // Solo dog: there is no node to turn green and no Complete button to press,
+  // so landing the image in its frame IS the completion. circularComplete does
+  // the rest, which is what the green button has always called: scatter into the
+  // pit, burst the big circle, confetti, remove and close.
+  useEffect(() => {
+    if (!soloLeaf || !circular || !framesDone) return;
+    const t = window.setTimeout(() => circularComplete(), 420); // let the frame settle first
+    return () => window.clearTimeout(t);
+  }, [soloLeaf, circular, framesDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A solo dog's synthetic child is opened on arrival, so the first double-click
+  // pops the card straight out of the big circle rather than spending a step
+  // revealing a node that is never drawn.
+  useEffect(() => {
+    if (!soloLeaf || !circular || !root) return;
+    setOpen((prev) => { const s = new Set(prev); s.add(root._id); return s; });
+  }, [soloLeaf, circular, root]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
@@ -1296,7 +1321,7 @@ export default function LineageMap({
           <>
             <g style={{ opacity: removing || scattered ? 0 : 1, display: scattered ? "none" : undefined, transition: "opacity 0.12s ease-out" }}>
             {shown
-              .filter((n) => n._parent)
+              .filter((n) => n._parent && !soloLeaf)
               .map((n) => {
                 const p = n._parent as Node;
                 return (
@@ -1311,7 +1336,7 @@ export default function LineageMap({
                 );
               })}
             {shown
-              .filter((n) => n._parent)
+              .filter((n) => n._parent && !soloLeaf)
               .map((n) => {
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;

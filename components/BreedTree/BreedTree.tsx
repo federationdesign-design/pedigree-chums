@@ -548,7 +548,12 @@ export default function BreedTree({
     if (document.fonts?.ready) document.fonts.ready.then(read, read);
     else read();
   }, []);
-  const [badgePcts, setBadgePcts] = useState<number[]>([]);
+  // Scattered pit props. A badge is the small yellow percentage disc; a solo
+  // dog leaves behind a full-size blank circle wearing its breed name instead.
+  // Both ride the same bodies, hit counting and inert state: only the radius,
+  // the face and the charge count differ.
+  type BadgeItem = { pct: number; r: number; label?: string };
+  const [badgePcts, setBadgePcts] = useState<BadgeItem[]>([]);
   // rods and name pills scattered in from the learn layer, pit-style props:
   // sizes are view units frozen at the drop; dead ones keep their slot so the
   // render children stay index-aligned with the bridge lists
@@ -566,14 +571,16 @@ export default function BreedTree({
   useEffect(() => {
     if (!dockAside) return;
     setBadgePcts(
-      nodes.filter((n) => n.depth === 1).map((n) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0)),
+      nodes
+        .filter((n) => n.depth === 1)
+        .map((n) => ({ pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0, r: 46 })),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, dockAside]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
-  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number) => void) | null>(null);
+  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
   type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any };
@@ -1239,7 +1246,7 @@ export default function BreedTree({
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, bb.pct]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: 46 }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -1404,17 +1411,27 @@ export default function BreedTree({
         setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, rx: 13 * fxScale }]);
         wake();
       };
-      spawnBadgeRef.current = (sx: number, sy: number, rPx: number, pctVal: number) => {
+      // opts is how the solo-dog circle arrives: its own radius, its breed name
+      // in place of a percentage, and a lower charge count because a circle that
+      // size gets struck far more often than a badge does.
+      spawnBadgeRef.current = (
+        sx: number,
+        sy: number,
+        rPx: number,
+        pctVal: number,
+        opts?: { r?: number; label?: string; charges?: number }
+      ) => {
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
         if (!bl) return;
         const w = worldFromPx(sx, sy);
-        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: 46 / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
+        const rDraw = opts?.r ?? 46; // badges keep their fixed 46, unchanged
+        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20 };
         bl.push(nb);
         all.push(nb);
         const mb = mkCircle(nb, "badge", BADGE_OPTS);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract, verbatim
-        setBadgePcts((l) => [...l, pctVal]);
+        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label }]);
         wake();
       };
 
@@ -1940,7 +1957,7 @@ export default function BreedTree({
               the labels, already at their resting spot on the lower-right rim,
               which is exactly where the physics bodies spawn. */}
           <g ref={badgesRef} style={{ display: dockAside ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
-            {badgePcts.map((pct, i) => {
+            {badgePcts.map((item, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
               const b = badgeBodiesRef.current?.[i];
@@ -1956,12 +1973,26 @@ export default function BreedTree({
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={inert ? undefined : (e) => startDrag(e, badgeBodiesRef.current?.[i])}>
-                <circle cx={0} cy={0} r={46} style={{ fill: inert ? "#0c5b92" : "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 * upp2 }} />
-                {!inert && (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
-                    {`${pct}%`}
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 * upp2 }} />
+                {!inert && (item.label ? (
+                  // solo dog circle: the breed name it wore before the round
+                  // started, measured by the same fitter the pit circles use
+                  (() => {
+                    const lab = fitLabel(item.label, item.r, item.r * 0.34, labelFont);
+                    const top = -((lab.lines.length - 1) * lab.fs * 1.02) / 2;
+                    return (
+                      <text x={0} y={0} dominantBaseline="central" style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
+                        {lab.lines.map((ln, li) => (
+                          <tspan key={li} x={0} y={top + li * lab.fs * 1.02}>{ln}</tspan>
+                        ))}
+                      </text>
+                    );
+                  })()
+                ) : (
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                    {`${item.pct}%`}
                   </text>
-                )}
+                ))}
               </g>
               );
             })}
@@ -2285,6 +2316,11 @@ export default function BreedTree({
           }}
         />
       )}
+      {/* A dog with no ancestors of its own gets the synthetic child seen in the
+          tree prop below: the same dog drawn a second time, purely so the layer
+          has something to reveal. Drawing that as a node with a connector says
+          the dog descends from itself. soloLeaf tells the layer to skip the node
+          entirely and reveal straight out of the big circle instead. */}
       {learnNode && learnCard && (
         <LineageMap
           breed={learnCard}
@@ -2294,6 +2330,7 @@ export default function BreedTree({
               : { ...learnNode.data, children: [{ ...learnNode.data, children: undefined }] }
           }
           circular
+          soloLeaf={!(learnNode.data.children && learnNode.data.children.length > 0)}
           rootRadius={learnCard.r}
           currentScore={0}
           onScore={onScore}
@@ -2301,6 +2338,18 @@ export default function BreedTree({
             // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
               removedNodesRef.current.add(learnNode);
+              // A solo dog leaves a full-size blank circle behind, wearing the
+              // name it had before the round started. Twelve hits rather than a
+              // badge's twenty, because a circle that size is struck far more.
+              if (!(learnNode.data.children && learnNode.data.children.length > 0) && learnCard) {
+                // learnCard carries the circle's own client position, the same
+                // space the layer scatters its badges into
+                spawnBadgeRef.current?.(learnCard.x, learnCard.y, 0, 0, {
+                  r: learnCard.r,
+                  label: learnNode.data.name,
+                  charges: 12,
+                });
+              }
               const owned = pitBodiesRef.current?.owned;
               if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
                 const fb = pitBodiesRef.current?.find(learnNode);

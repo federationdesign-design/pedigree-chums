@@ -63,10 +63,15 @@ const { chromium } = require('playwright');
     return { edges: 1, deg: +(Math.atan2(-dy, Math.abs(dx)) * 180 / Math.PI).toFixed(1),
              nodeLeft: Math.round(minL), nodeRight: Math.round(maxR), vw: window.innerWidth };
   });
-  const soloAngleOk = edge.edges === 1 && edge.deg !== null
-    && edge.deg >= 32.5 && edge.deg <= 90.5
-    && edge.nodeLeft >= -1 && edge.nodeRight <= edge.vw + 1;
-  console.log('solo connector:', JSON.stringify(edge), '| in range and inside walls:', soloAngleOk);
+  // This used to assert the lone node leaned out at SOLO_DEG, between 32.5 and
+  // 90.5 degrees, and stayed inside the pit walls. That node no longer exists.
+  // A dog with no ancestors was being handed a synthetic child, itself drawn a
+  // second time, and hanging it off a connector claimed the dog descended from
+  // itself. Both the node and its rod are now suppressed for those dogs, so the
+  // correct assertion is the opposite one: there is no connector to angle.
+  // The geometry itself is checked in full by GUARD-013.
+  const soloAngleOk = edge.edges === 0;
+  console.log('solo connector absent, as intended:', JSON.stringify(edge), '->', soloAngleOk);
   // GUARD-003c: a card placed in a circular frame must be a CIRCLE. This one bit
   // twice before, because the placed card is not SVG at all - it is a fixed HTML
   // div that was hard-coded to borderRadius 15 with a square yellow outline,
