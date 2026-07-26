@@ -55,6 +55,14 @@ const BREED_FACTS: Record<string, string> = {
     'The Border Terrier needed legs long enough to keep up with horses all day and a body narrow enough to follow a fox underground. That is a remarkable amount of dog packed into a small one.',
 };
 
+// Shared lines (Steve's approved copy, no character variation) for a breed question
+// with no breed named. BREED_HUB attaches the /chums index page as its [LINK];
+// BREED_BEST has no destination.
+const BREED_HUB_LINE =
+  'There are 54 Chums, so it is easier if you name one. Tell me a breed you like, or I can show you the whole pack.';
+const BREED_BEST_LINE =
+  'I am not going to pick a best one, and neither should anyone else. Tell me a breed you are curious about and I will tell you what it was bred for.';
+
 // Bark presentation: only the Collie is wired live. Labrador/Terrier/Boxer bark
 // words and their B19/B20 English lines are PARKED with the Phase 3 voice
 // package; the per-dog state machine still runs for them, but their responses
@@ -139,6 +147,16 @@ function pickDestination(data: ChumData, offered: string[]): { id: string; name:
   );
   const choice = pool.find((d) => !offered.includes(d.destinationId)) ?? pool[0];
   return choice ? { id: choice.destinationId, name: choice.name, url: choice.resolvedUrl } : null;
+}
+
+// The active dog's mid-conversation handoff line (NAV_BREED_HANDOFF family),
+// deterministically rotated by turn count (never Math.random), with the trailing
+// [LINK] token stripped (the page link is attached as the action button). Empty if
+// the dog has no handoff lines.
+function navHandoff(data: ChumData, dog: Dog, session: Session): string {
+  const pool = data.linkHandoffs.filter((h) => h.family === 'NAV_BREED_HANDOFF' && h.dog === DOG_LABEL[dog]);
+  if (!pool.length) return '';
+  return pool[session.submissionCount % pool.length].line.replace(/\s*\[LINK\]\s*$/i, '').trim();
 }
 
 export function assemble(res: Resolution, data: ChumData, n: Normalised, session: Session): Assembled {
@@ -325,16 +343,26 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       // button. The link (url) is real.
       const fact = BREED_FACTS[res.breedSlug ?? ''];
       const factText = fact ?? `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`;
-      const handoffs = data.linkHandoffs.filter(
-        (h) => h.family === 'NAV_BREED_HANDOFF' && h.dog === DOG_LABEL[dog],
-      );
-      let text = factText;
-      if (handoffs.length) {
-        // Deterministic rotation (never Math.random): index by the turn count.
-        const line = handoffs[session.submissionCount % handoffs.length].line.replace(/\s*\[LINK\]\s*$/i, '').trim();
-        text = `${factText} ${line}`;
-      }
+      const handoff = navHandoff(data, dog, session);
+      const text = handoff ? `${factText} ${handoff}` : factText;
       return { responseId: `BREED-${res.breedSlug}`, text, dog, destinationId: res.breedSlug, url: res.url ?? null };
+    }
+
+    case 'breed_hub': {
+      // Shared hub line + the active dog's handoff, with the breed index page
+      // (/chums) attached as the contextual [LINK]. Note: /chums currently renders a
+      // placeholder stub, but it is a real route, so this is not an invented target.
+      const handoff = navHandoff(data, dog, session);
+      const text = handoff ? `${BREED_HUB_LINE} ${handoff}` : BREED_HUB_LINE;
+      return { responseId: 'BREED-HUB', text, dog, destinationId: 'chums-index', url: '/chums' };
+    }
+
+    case 'breed_best': {
+      // Shared refuse-to-pick line. No destination exists for "best dog", so there
+      // is no link. The NAV_BREED_HANDOFF lines are all link pointers ("...here:"),
+      // so appending one with no link would dangle; the line stands alone (it already
+      // ends with its own invitation).
+      return { responseId: 'BREED-BEST', text: BREED_BEST_LINE, dog };
     }
 
     case 'breed_choice': {

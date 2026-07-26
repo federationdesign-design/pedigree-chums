@@ -300,7 +300,20 @@ const AMBIGUOUS_FAMILY: Record<string, string[]> = {
   shepherd: ['german-shepherd'],
 };
 
-const BREED_HUB = ['dog breeds', 'breeds', 'best dog breed', 'best breed', 'which breed', 'what breed', 'best dog'];
+// Two shared-line families, both for a breed question with NO breed named. Checked
+// AFTER matchBreed so a named breed always wins ("tell me about labradors" stays a
+// breed_page). BREED_BEST (superlative) is checked before BREED_HUB so "whats the
+// best dog breed" is BREED_BEST, not the hub.
+const BREED_BEST = ['best dog breed', 'best breed', 'best dog', 'which dog is best', 'what is the best dog', 'cleverest dog', 'nicest dog'];
+const BREED_HUB_PHRASES = ['dog breeds', 'dog breed', 'tell me about dog breeds', 'tell me about dogs', 'what dogs are there', 'what breeds are there', 'show me the breeds', 'list the breeds', 'all the breeds'];
+// Bare hub words only count as the WHOLE message (the one content word), so "dogs"
+// is the hub but "another dog" (a transfer) and "working dogs" (content) are not.
+const BREED_HUB_WORDS = new Set(['dog', 'dogs', 'breeds']);
+function matchesBreedHub(c: string): boolean {
+  if (BREED_HUB_PHRASES.some((p) => c.includes(p))) return true;
+  const content = (c.match(/[a-z]+/g) ?? []).filter((w) => !STOP.has(w));
+  return content.length === 1 && BREED_HUB_WORDS.has(content[0]);
+}
 const BREED_FOLLOWUP = ['they', 'them', 'how long', 'live', 'lifespan', 'train', 'training', 'health', 'cost', 'temperament', 'good with', 'size', 'weight', 'shed', 'exercise'];
 
 // Plural/singular tolerant whole-word match (mechanical, not authored copy).
@@ -552,10 +565,14 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (!state.lastWasComplaint) {
     const breed = matchBreed(c, N, state);
     if (breed) return breed;
-    // Breed hub ("tell me about dog breeds", "best dog breed"): no specific breed, so
-    // route to the approved fallback for now. A proper narrowing line is Steve's copy.
-    if (hasAny(N, BREED_HUB)) {
-      return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+    // Superlative "best dog" question: the shared refuse-to-pick line. Checked before
+    // the hub so "whats the best dog breed" is BREED_BEST, not BREED_HUB.
+    if (hasAny(N, BREED_BEST)) {
+      return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_best' };
+    }
+    // Breed question with no breed named: the shared hub line.
+    if (matchesBreedHub(c)) {
+      return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
     }
   }
 

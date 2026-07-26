@@ -367,10 +367,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       name: dogInfo(toDog).name,
       action: actionFor(r),
       closed: r.closed,
-      // A breed page link is a CONTEXTUAL link (it ends a breed answer), so it may
-      // show mid-chat. This is the ONLY exception to "nav links at the very end";
-      // every other action's link stays gated below. Not a general loosening.
-      contextualLink: result.resolution.action === 'breed_page',
+      // A breed page link and the breed-hub index link are CONTEXTUAL links (they
+      // end a breed answer), so they may show mid-chat. These are the only
+      // exceptions to "nav links at the very end"; every other action's link stays
+      // gated below. Not a general loosening.
+      contextualLink: result.resolution.action === 'breed_page' || result.resolution.action === 'breed_hub',
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);

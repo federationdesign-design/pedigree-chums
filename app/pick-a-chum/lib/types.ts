@@ -156,6 +156,8 @@ export type ActionType =
   | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a trusted adult
   | 'breed_page' // confident named-breed match: link to that breed's page
   | 'breed_choice' // two breeds within the confidence gap: offer both
+  | 'breed_hub' // a breed question with no breed named: the shared hub line
+  | 'breed_best' // a superlative "best dog" question: the shared refuse-to-pick line
   | 'boxer_cutoff'; // hidden ceiling reached
 
 export interface Resolution {

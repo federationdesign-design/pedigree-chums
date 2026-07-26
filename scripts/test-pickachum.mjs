@@ -130,6 +130,14 @@ check('alsatian', { action: 'breed_page' }, { url: '/chums/german-shepherd' });
 check('staffie', { action: 'breed_page' }, { url: '/chums/staffordshire-bull-terrier' });
 check('lab', { action: 'breed_page' }, { url: '/chums/labrador' });
 
+// Breed hub (no breed named) and breed best (superlative): the two shared lines.
+// Must NOT outrank a named breed.
+check('dog breeds', { action: 'breed_hub' });
+check('dogs', { action: 'breed_hub' });
+check('whats the best dog breed', { action: 'breed_best' });
+check('tell me about labradors', { action: 'breed_page' }, { url: '/chums/labrador' });
+check('tell me about border collies', { action: 'breed_page' }, { url: '/chums/border-collie' });
+
 // Breed page renders three parts: the factual answer, a mid-conversation
 // NAV_BREED_HANDOFF line in the ACTIVE dog's voice (Collie by default), and the
 // real page link (url). The [LINK] token is stripped from the spoken text.
