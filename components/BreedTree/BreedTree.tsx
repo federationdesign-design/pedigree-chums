@@ -62,11 +62,32 @@ const TOY_FLAG_SRC = "/uk-icon.jpg";
 const TOY_BALL_DELAY = 3000; // ball, after the first circle lands
 const TOY_FLAG_GAP = 3000; // flag, after the ball
 const TOY_FLAG_HITS = 8; // main pit maxHits
+// Medieval props, dropped together one second after the flag. Neither does
+// anything when tapped; they are there to be picked up and shoved about. The
+// rock is the heavy one: dense, dead on the bounce and high friction, so it
+// lands with a thump and stays. The stick is light and skitters.
+const TOY_STICK_SRC = "/stick.svg";
+const TOY_ROCK_SRC = "/rock.svg";
+const TOY_PROP_GAP = 1000; // stick and rock, after the flag
+// artwork proportions, so the bodies match what is drawn
+const STICK_ASPECT = 1368 / 299.7;
+const ROCK_ASPECT = 756.3 / 659.2;
 // Used-up toys stay gone for the rest of the session: the flag once its message
 // has been read, the ball once the player has thrown it out of the pit. Session
 // scope, so a fresh visit starts clean. Swap to localStorage to make it forever.
 const TOY_FLAG_SEEN_KEY = "pc-minipit-flag-seen";
 const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
+const TOY_STICK_GONE_KEY = "pc-minipit-stick-gone";
+const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
+type ToyKind = "ball" | "flag" | "stick" | "rock";
+const TOY_SRC: Record<ToyKind, string> = {
+  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC, rock: TOY_ROCK_SRC,
+};
+// every prop except the flag leaves for good once it is thrown clear of the pit
+const TOY_GONE_KEY: Record<ToyKind, string> = {
+  ball: TOY_BALL_GONE_KEY, flag: TOY_FLAG_SEEN_KEY,
+  stick: TOY_STICK_GONE_KEY, rock: TOY_ROCK_GONE_KEY,
+};
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
 }
@@ -535,7 +556,7 @@ export default function BreedTree({
   const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
   const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
-  const [toyList, setToyList] = useState<{ kind: "ball" | "flag"; size: number; src: string }[]>([]);
+  const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string }[]>([]);
   const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
   const [britainOpen, setBritainOpen] = useState(false);
   const killToyRef = useRef<((idx: number) => void) | null>(null);
@@ -1253,41 +1274,62 @@ export default function BreedTree({
       // ---- toys: tennis ball and Union Jack, main pit physics verbatim ----
       const BIGT = 84 * (window.matchMedia("(max-width: 768px)").matches ? 0.67 : 1);
       const toyTimers: number[] = [];
-      const spawnToy = (kind: "ball" | "flag") => {
+      const spawnToy = (kind: ToyKind) => {
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
-        if (toyRetired(kind === "flag" ? TOY_FLAG_SEEN_KEY : TOY_BALL_GONE_KEY)) return;
+        if (toyRetired(TOY_GONE_KEY[kind])) return;
         const isNarrow = window.matchMedia("(max-width: 768px)").matches;
-        const dia = kind === "ball" ? BIGT * 2.25 * (isNarrow ? 0.9 : 1) : BIGT * 0.6 * 2;
+        const ballDia = BIGT * 2.25 * (isNarrow ? 0.9 : 1);
+        // rock reads at the ball's size, stick a little longer than the ball is
+        // wide so it looks throwable rather than like a twig
+        const dia =
+          kind === "ball" ? ballDia
+          : kind === "rock" ? ballDia
+          : kind === "stick" ? ballDia * 1.6
+          : BIGT * 0.6 * 2;
+        const hgt = kind === "stick" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
-        const px = kind === "ball"
-          ? pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40)
-          : pL.x + wPx * 0.7;
+        const px = kind === "flag"
+          ? pL.x + wPx * 0.7
+          : pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40);
         // Spawn ABOVE the visible top so the toy is already falling when it
         // enters, exactly as the main pit does. Take the top edge from the stage
         // rectangle, not from the viewBox mapping: the viewBox can reach well
         // past the visible stage, which was launching the ball ~590px up instead
         // of the pit's 60 to 120.
         const stageTopPx = st ? st.getBoundingClientRect().top : 0;
-        const py = kind === "ball"
-          ? stageTopPx - (60 + Math.random() * 60) // pit: y = -60 - rand*60
-          : stageTopPx - r;                        // pit: y = -ujR
+        const py = kind === "flag"
+          ? stageTopPx - r                             // pit: y = -ujR
+          : stageTopPx - (60 + Math.random() * 60);    // pit: y = -60 - rand*60
         const w2 = worldFromPx(px, py);
         const idx = toyBodiesRef.current.length;
         const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null, toyKind: kind };
-        const opts = kind === "ball"
-          ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
+        const opts =
+          kind === "ball" ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
+          : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
+          : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
-        const mb = Bodies.circle(px, py, r, opts);
+        // A long thin body needs a real rectangle or it spins like a propeller.
+        // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
+        // The rock is a seven-sided polygon rather than a circle: a circle would
+        // roll away down the sloped ground, and a rock should sit where it lands.
+        const startAngle = kind === "stick" ? (Math.random() - 0.5) * 0.8 : 0;
+        const mb =
+          kind === "stick"
+            ? Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: hgt / 2 }, angle: startAngle })
+            : kind === "rock"
+              ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
+              : Bodies.circle(px, py, r, opts);
         mb.plugin = { prop: pr, kind: "toy" };
         pr.mb = mb;
         Composite.add(world, mb);
         // the pit gives the flag a throw and lets the ball simply drop
         if (kind === "flag") MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
+        if (kind === "stick") pr.a = startAngle;
         toyBodiesRef.current.push(pr);
         if (kind === "flag") flagIdxRef.current = idx;
-        setToyList((l) => [...l, { kind, size: dia * fxScale, src: kind === "ball" ? TOY_BALL_SRC : TOY_FLAG_SRC }]);
+        setToyList((l) => [...l, { kind, size: dia * fxScale, h: hgt * fxScale, src: TOY_SRC[kind] }]);
         wake();
       };
       // Tennis ball escape, ported from the main pit: a ball RELEASED with real
@@ -1295,7 +1337,8 @@ export default function BreedTree({
       // A ball merely bounced upward by physics comes back down as normal.
       let thrownBall: any = null;
       throwWatchRef.current = (pr: any) => {
-        if (pr?.toyKind !== "ball") return; // badges and the flag are not in scope
+        // the flag leaves by having its message read, badges are not in scope
+        if (pr?.toyKind !== "ball" && pr?.toyKind !== "stick" && pr?.toyKind !== "rock") return;
         if (pr.mb && pr.mb.velocity.y < -4) thrownBall = pr; // pit threshold
         else if (thrownBall === pr) thrownBall = null;
       };
@@ -1303,9 +1346,12 @@ export default function BreedTree({
         const pr: any = thrownBall;
         if (!pr || pr.dead || !pr.mb) { thrownBall = null; return; }
         const stageTop = st ? st.getBoundingClientRect().top : 0;
-        if (pr.mb.position.y < stageTop - pr.mb.circleRadius) {
+        // circleRadius is undefined on the stick and the rock, so fall back to
+        // the body's own half-height
+        const reach = pr.mb.circleRadius ?? (pr.mb.bounds.max.y - pr.mb.bounds.min.y) / 2;
+        if (pr.mb.position.y < stageTop - reach) {
           thrownBall = null;
-          retireToy(TOY_BALL_GONE_KEY);
+          retireToy(TOY_GONE_KEY[pr.toyKind as ToyKind]);
           killProp(pr, "toy", performance.now());
         }
       };
@@ -1317,6 +1363,9 @@ export default function BreedTree({
         if (toyTimers.length) return; // first landing only
         toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
+        const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
+        toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
+        toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
@@ -1960,7 +2009,7 @@ export default function BreedTree({
                       <circle cx={0} cy={0} r={half} style={{ fill: "none", stroke: "#ffffff", strokeWidth: ty.size * 0.06 }} />
                     </>
                   ) : (
-                    <image href={ty.src} x={-half} y={-half} width={ty.size} height={ty.size} />
+                    <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h} />
                   )}
                 </g>
               );
