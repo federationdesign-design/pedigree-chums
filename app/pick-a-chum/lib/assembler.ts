@@ -187,8 +187,8 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
     }
 
     case 'gk_unknown': {
-      const tilt = copy(data, 'Head tilt', 'Double');
-      const text = `I do not have an approved answer for that, and I will not invent one. ${tilt}`.trim();
+      // Approved repair line (Steve).
+      const text = 'I am not sure what you mean yet. Try asking me as a full question, or choose dogs, games or finding something on the site.';
       return { responseId: 'GK-UNKNOWN', text, dog };
     }
 
@@ -262,6 +262,10 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
 
     case 'converse': {
       const bucket = res.bucket ?? 'B09';
+      if (bucket === 'B12') {
+        // Approved B12 repair line (replaces the old personal-statement pool).
+        return { responseId: 'B12-REPAIR', text: 'All right. What would you like to do next: talk about dogs, play something or find a page?', dog };
+      }
       const r = pickResponse(data, bucket, session.usedResponseIds);
       const dest = pickDestination(data, session.offeredDestinationIds);
       const text = r ? fill(r.template, baseContext(n, dest?.name ?? '')) : 'Noted.';
@@ -284,6 +288,10 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       const cat = MODERATION.find((m) => m.id === res.moderationId) ?? MODERATION[0];
       return { responseId: cat.id, text: cat.responses[0], dog };
     }
+
+    case 'transfer_request':
+      // Visitor asked to switch dogs. Approved repair line.
+      return { responseId: 'TRANSFER-REQUEST', text: 'All right. Choose another dog from the pack and I will hand you over.', dog };
 
     case 'boxer_cutoff': {
       const l1 = copy(data, 'Boxer ending', 'Cut-off 1');

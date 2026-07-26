@@ -83,6 +83,9 @@ const NAV_FRAME = ['where is', 'wheres', 'where can i', 'find', 'show me', 'open
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
 const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
+// Visitor explicitly asks to switch to a different dog. Tight phrases so card /
+// content queries ("another dog card") are not swallowed. Approved repair copy.
+const TRANSFER_REQUEST = ['talk to another dog', 'speak to another dog', 'a different dog', 'different dog', 'another dog', 'change the dog', 'swap the dog', 'switch dog', 'switch the dog'];
 
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
@@ -352,6 +355,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   }
   if (hasAny(N, INVESTIGATE)) {
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: 'terrier' };
+  }
+
+  // Visitor asks to switch dogs (a transfer they request). Approved repair line.
+  if (hasAny(N, TRANSFER_REQUEST)) {
+    return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer_request' };
   }
 
   // Layer 9: recognised conversation.

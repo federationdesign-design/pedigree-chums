@@ -158,6 +158,11 @@ check('can I stroke the dog', {}, { assert: (r) => (r.action === 'safety_signpos
 // Anatomy alone still no boundary; with person + action it is safeguarding (unchanged from D8):
 check('my brother touched my willy', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('Childline') ? null : 'expected safeguarding Childline') });
 
+// ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
+check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('full question') ? null : 'expected approved gk-unknown line') });
+check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
+check('can I talk to another dog', { action: 'transfer_request' }, { assert: (_r, resp) => (resp.text.includes('hand you over') ? null : 'expected transfer-request line') });
+
 // ---- Orientation / onboarding cold-start corpus (bucket B15, layer 11) ----
 // First-time visitors who do not yet know what the chat is or what to do. All
 // must land in the dedicated orientation bucket, never the gk_unknown refusal or
