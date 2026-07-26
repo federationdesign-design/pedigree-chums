@@ -161,6 +161,12 @@
 /* the Spacer component's element -- it supplies its own height */
 .spacer { flex: none; }
 
+/* Seam opt-out: blocks that must butt against the one above. The rhythm
+   rules score three classes, so a seam rule needs to match that and come
+   later to win. Without this, .timelineScene.tightTop's deliberate -25px
+   was being replaced by the rhythm's gap and the join opened up. */
+.essayBody.essayBody > .tightTop { margin-top: -25px; }
+
 .essayBody.essayBody > .spacer,
 .essayBody.essayBody > .spacer + * { margin-top: 0; }
 

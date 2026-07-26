@@ -272,7 +272,10 @@ export function StatueBulletsChoreo({
   // before release into the next paragraph
   const qLine = clamp01(p / 0.45);
   const qMark = p >= 0.46;
-  const qText = clamp01((p - 0.5) / 0.35);
+  /* Ends at p = 0.97 rather than 0.85. The scene length is unchanged, so
+     nothing speeds up -- the build simply uses the tail of the scroll that
+     was previously dead dwell with the quote just sitting there. */
+  const qText = clamp01((p - 0.5) / 0.47);
 
   return (
     <div ref={sceneRef} className={bullets ? styles.bulletScene : quote ? styles.bulletSceneNoBullets : styles.bulletSceneNoBullets}>
