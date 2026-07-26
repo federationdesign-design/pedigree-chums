@@ -583,6 +583,14 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   rows.push({ ok, input: 'task5: clusterKey groups paraphrases, blank on safety', layer: '-', bucket: '-', action: 'recorder columns', note: ok ? '' : `a=${a.clusterKey} b=${b.clusterKey} safety="${safetyRow.clusterKey}"` });
 })();
 
+// ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----
+(() => {
+  const bad = data.collieResponses.some((r) => r.bucketId === 'B05' && /located the correct chum/i.test(r.template || ''));
+  const ok = !bad;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'fix5: B05 correct-Chum line removed', layer: 5, bucket: 'B05', action: 'data', note: ok ? '' : 'still present' });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

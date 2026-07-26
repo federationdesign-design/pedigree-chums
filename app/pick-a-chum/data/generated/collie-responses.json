@@ -564,19 +564,6 @@
     "status": "Draft approved for MVP review"
   },
   {
-    "responseId": "B05-R01",
-    "bucketId": "B05",
-    "subtag": "Breed fact",
-    "triggers": [
-      "tell me about breed"
-    ],
-    "template": "{{dog_fact}} If you want the full profile, I have already located the correct Chum.",
-    "factSource": "Dog database",
-    "defaultRoute": "Know Your Chum",
-    "animationCue": "EARS_UP",
-    "status": "Draft approved for MVP review"
-  },
-  {
     "responseId": "B05-R02",
     "bucketId": "B05",
     "subtag": "Breed origin",
