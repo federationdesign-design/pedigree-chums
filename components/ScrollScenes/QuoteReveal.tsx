@@ -21,17 +21,22 @@ export function QuoteReveal({
   pinned,
   blockClass,
   markClass,
+  tight = false,
 }: {
   quote: string;
   pinned?: React.ReactNode;
   blockClass: string;
   markClass: string;
+  /* By default the stage is a near-full-screen box that centres its content,
+     so a short quote floats with a large void above and below it. `tight`
+     makes the stage hug its content instead, removing that void. */
+  tight?: boolean;
 }) {
   const { sceneRef, active } = usePinnedTrigger();
 
   return (
     <div ref={sceneRef} className={styles.quoteScene}>
-      <div className={styles.stage}>
+      <div className={`${styles.stage} ${tight ? styles.stageTight : ""}`}>
         {pinned && <div className={styles.pinnedText}>{pinned}</div>}
         <div className={styles.quoteHolder}>
           <div className={styles.quoteLineTrack}>

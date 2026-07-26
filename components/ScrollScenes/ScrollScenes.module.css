@@ -13,6 +13,13 @@
   justify-content: center;
 }
 
+/* Opt out of the full-screen centred box: the stage becomes exactly as tall
+   as its content, so there is no empty half-screen above and below it. */
+.stageTight {
+  min-height: 0;
+  justify-content: flex-start;
+}
+
 .pinnedText {
   margin-bottom: 18px;
   font-weight: 700;

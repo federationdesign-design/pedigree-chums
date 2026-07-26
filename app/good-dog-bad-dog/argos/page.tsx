@@ -881,6 +881,7 @@ export default function ArgosPage() {
 
               <div className={styles.sceneMobile}>
                 <QuoteReveal
+                  tight
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
                   pinned={
