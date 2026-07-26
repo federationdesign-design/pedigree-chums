@@ -171,6 +171,12 @@ function measureEm(line: string, font: string | null): number {
 }
 // Steve: names two point sizes larger than the fitted size. Single tunable.
 const TITLE_BOOST = 2;
+// How much of the pit's width settled bodies must block, at the top zone, for
+// the round to be over. A fraction rather than a head count, because a mini pit
+// tree often holds only two or three circles. Two bodies is the floor, so one
+// wide circle resting high cannot end a round on its own.
+const PIT_FULL_COVER = 0.72;
+const PIT_FULL_MIN_BODIES = 2;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -1806,13 +1812,40 @@ export default function BreedTree({
         // pit-full: settled bodies whose tops reach the spawn zone, pit-style
         if (!fullTriggeredRef.current && now - started > 4000) {
           const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
+          // "Full" used to mean five settled bodies reaching the top zone, a
+          // count borrowed from the main pit, which always holds dozens of
+          // cards. Half the mini pit trees have two or three circles, so the pit
+          // could be visibly stuffed while the count sat at 2 and the round
+          // never ended: the top of the difficulty slider did nothing on those
+          // trees, because the game could not see it had run out of room.
+          //
+          // Occupancy is what full actually means. Take every settled body whose
+          // top reaches the zone, merge their horizontal spans so two circles
+          // side by side are not counted twice, and compare against the width
+          // between the pit walls. Tree size stops mattering.
+          const spans: [number, number][] = [];
           let inZone = 0;
           for (const b of all) {
             if (b.held) continue;
             if (Math.hypot(b.vx, b.vy) > worldH * 0.03) continue;
-            if (b.y - b.r < zoneY) inZone++;
+            if (b.y - b.r < zoneY) { inZone++; spans.push([b.x - b.r, b.x + b.r]); }
           }
-          if (inZone >= 5) {
+          let covered = 0;
+          if (spans.length) {
+            spans.sort((p1, p2) => p1[0] - p2[0]);
+            let cs = spans[0][0], ce = spans[0][1];
+            for (let si = 1; si < spans.length; si++) {
+              const [s2, e2] = spans[si];
+              if (s2 > ce) { covered += ce - cs; cs = s2; ce = e2; }
+              else if (e2 > ce) ce = e2;
+            }
+            covered += ce - cs;
+          }
+          // the real distance between the walls, not the viewBox, which reaches
+          // well past the visible stage
+          const pitW = (xR - xL) || 1;
+          const blocked = covered / pitW >= PIT_FULL_COVER && spans.length >= PIT_FULL_MIN_BODIES;
+          if (blocked || inZone >= 5) {
             fullTriggeredRef.current = true;
             runCountdown();
           }
