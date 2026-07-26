@@ -387,6 +387,7 @@ export function WipeSequence({
   frameRatio,
   sceneVh,
   captionSize = "small",
+  captionMode = "swap",
 }: {
   images: string[];
   alt: string;
@@ -409,6 +410,9 @@ export function WipeSequence({
      centred. Use it when each slide gets one short line rather than a
      paragraph of explanatory text. */
   captionSize?: "small" | "large";
+  /* "swap" replaces the caption at each step. "stack" keeps every caption on
+     screen and adds the next one beneath it, so the lines build up. */
+  captionMode?: "swap" | "stack";
 }) {
   const { sceneRef, p } = useSceneProgress();
   const steps = Math.max(1, images.length - 1);
@@ -458,7 +462,31 @@ export function WipeSequence({
           })}
         </div>
         {/* key forces a remount so each new caption fades in */}
-        {caps.length > 0 && (
+        {caps.length > 0 && captionMode === "stack" && (
+          <div className={styles.wipeCaptionStack}>
+            {caps.map((c, i) =>
+              c.fromFrame <= topFrame ? (
+                /* keyed by index so lines already on screen stay mounted and
+                   only the newly revealed one plays its fade-in */
+                <p
+                  key={i}
+                  className={`${styles.wipeCaption} ${
+                    captionSize === "large" ? styles.wipeCaptionLarge : ""
+                  } ${
+                    c.tone === "yellow"
+                      ? styles.wipeCaptionYellow
+                      : c.tone === "navy"
+                        ? styles.wipeCaptionNavy
+                        : styles.wipeCaptionWhite
+                  }`}
+                >
+                  {c.text}
+                </p>
+              ) : null,
+            )}
+          </div>
+        )}
+        {caps.length > 0 && captionMode === "swap" && (
           <p
             key={capIdx}
             className={`${styles.wipeCaption} ${

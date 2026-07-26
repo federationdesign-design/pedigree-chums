@@ -717,6 +717,7 @@ export default function ArgosPage() {
                 <WipeSequence
                   mode="fade"
                   captionSize="large"
+                  captionMode="stack"
                   alt="A soldier coming home to their dog"
                   images={[
                     "/homecoming/soldier-homecoming1.jpg",

@@ -340,6 +340,12 @@
 
 /* Matches .choreoBullets on the statue gallery: one short line per slide,
    set larger and centred rather than as a paragraph of explanation. */
+/* Stacked captions: the first keeps the gap under the image, the rest sit
+   tight beneath the line above, matching the statue gallery's bullet rhythm. */
+.wipeCaptionStack .wipeCaption { margin-top: 0; }
+.wipeCaptionStack .wipeCaption:first-child { margin-top: 32px; }
+.wipeCaptionStack .wipeCaption + .wipeCaption { margin-top: 18px; }
+
 .wipeStage .wipeCaptionLarge {
   font-size: 1.3rem;
   font-weight: 600;
