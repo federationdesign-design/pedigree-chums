@@ -11,6 +11,71 @@ a test round; do not start anything new until he returns with findings.
 
 ---
 
+## RUN 3 (2026-07-26, simulation fixes + breed retrieval). Read this first.
+
+All on `pick-a-chum` preview. Tip is now `c507d81`. Harness is **280 passing,
+0 failing** (started this run at ~257, floor was 224). Nothing merged to `main`.
+
+Shipped this run, one commit each (newest last):
+- `e0acf6b` audit fix 2: TRANSFER_REQUEST requires a verb (no bare "another dog").
+- `7850b65` audit fix 3: delete NAV_FRAME dead code.
+- `2c24cdf` + `69c3052` FAQ audit fix: remove bare single-word phrasings, in the
+  router AND at source (workbook) so a rebuild cannot reintroduce them.
+- `8382f9c` ANATOMY_GENERAL_REDIRECT: approved trusted-adult redirect line, fires
+  at most once per session (`session.anatomyRedirectUsed`).
+- Five simulation fixes (12-scenario multi-turn sim, ran to 0/12 then fixed):
+  - `2af3cc9` fix 1: B07 never returns wrong-breed facts (assembler no longer
+    hardcodes border-collie; `isActiveBreedQuestion` tightened); FAQ002 audience
+    words removed so "good with kids" stops hitting the game-age FAQ.
+  - `a09b5db` fix 2: safety guard. `session.safetyLatched` blocks
+    comedy/game/sales/orientation after a protected safety state until a
+    meaningful topic clears it.
+  - `66a5ac0` fix 3: answer-capture for transfer offers ("the boxer" performs the
+    transfer) and complaint follow-ups (stay in FAQ012).
+  - `677d83f` fix 4: delete the single-word echo (bye/ok/no/why no longer echoed).
+  - `2ee4a11` fix 5: remove the meaningless B05 "correct Chum" line; voice-leak
+    reported only.
+- `c507d81` BREED PAGE RETRIEVAL (10 proof breeds). The main deliverable:
+  - `router.ts` `BREED_PAGES` (labrador, border collie, boxer, border terrier,
+    cocker spaniel, beagle, french bulldog, pug, german shepherd, staffordshire
+    bull terrier) + `matchBreed`. Signal-STRENGTH scoring: an exact whole-word
+    breed name/alias is confident alone; a lone weak/partial match is not; two
+    weak signals are. Placed AFTER the active-breed (Collie) B07 route so
+    "Are Border Collies easy to train?" keeps the Collie answer. Ambiguous term
+    in the confidence gap ("terrier" -> Border Terrier or Staffie) returns
+    `breed_choice`. Breed hub ("dog breeds") -> approved fallback, NOT a
+    placeholder. Deferred while a complaint is open (so "the labrador one" during
+    a complaint stays FAQ012).
+  - Alias table is intentionally EMPTY; only the two real misspelling entries
+    (labrador, terrier) resolve via `misspellings.json`. Plurals/singulars are
+    mechanical in `matchBreed`, not aliases.
+  - `session.ts`/`engine.ts`: `lastBreedSlug` carries the breed across turns so a
+    follow-up ("how long do they live") re-resolves to the same page.
+  - `types.ts`: `breed_page` / `breed_choice` actions + Resolution breed fields.
+  - `assembler.ts`: PLACEHOLDER lines for per-breed and choice copy.
+  - 5 assertions added: labradors -> /chums/labrador; labradror misspelling ->
+    same; terrier -> choice(border-terrier, staffordshire-bull-terrier);
+    "dog breeds" -> NOT a confident page; cocker spaniel carried across two turns.
+
+PAUSED, approved but NOT built (survives to next session):
+- PERSONAL_SADNESS_GENTLE_REDIRECT. Fully specced and approved (L1 shared line,
+  trigger = first-person + present + sadness; DO-NOT-trigger list; remove
+  sad/lonely from PERSONAL; L2 -> general distress; L3 -> protected distress;
+  6 assertions; recorder field `sadness_self_disclosure_count`). L2-variant copy
+  is owed by Steve. Build floor was quoted as 249 at spec time.
+
+Needs COPY from Steve (nothing invented; all logged in PLACEHOLDERS.md):
+- Per-breed page lines `BREED-<slug>`, one per breed, all 10.
+- Breed choice framing `BREED-CHOICE` (the "A or B?" sentence).
+- Breed hub line (currently routed to the approved fallback as a stand-in).
+- Per-breed alias list (empty table). The requested shape was handed to Steve:
+  informal names / nicknames / short forms per breed (lab, frenchie, staffie,
+  gsd/alsatian, cocker, etc.), flagging any cross-breed alias (bare "spaniel",
+  "shepherd") to wire to the confidence gap -> choice, not a guess.
+- Carried: L2-variant distress copy for the sadness redirect (above).
+
+---
+
 ## RUN 2 (2026-07-26, nine-task run). Read this first.
 
 All on `pick-a-chum` preview, floor now **247** (started this run at 224).
@@ -109,9 +174,9 @@ plus the false-positive guards: "stroke the dog" -> fallback, "what is a penis"
 
 ## Harness floor
 
-`scripts/test-pickachum.mjs` is at **224 passing, 0 failing**. The floor to hold
-going forward is **224**: do not remove or weaken existing assertions; new work
-only adds. (There is no coded ratchet yet; the floor is a convention. A ratchet
+`scripts/test-pickachum.mjs` is at **280 passing, 0 failing** (RUN 3). The floor
+to hold going forward is **280**: do not remove or weaken existing assertions;
+new work only adds. (There is no coded ratchet yet; the floor is a convention. A ratchet
 is a Phase-0 item in the Recovery Rules runbook, unbuilt.) The one permitted
 edit so far was BARK-T16 (chocolate -> dog emergency), done in its own commit
 with before/after shown.
