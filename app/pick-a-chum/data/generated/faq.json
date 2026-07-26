@@ -4,8 +4,6 @@
     "canonicalQuestion": "How do I play?",
     "alternativePhrasings": [
       "how to play",
-      "rules",
-      "instructions",
       "what do you do"
     ],
     "canonicalAnswer": "{{approved_rule_summary}}",
@@ -75,8 +73,6 @@
     "faqId": "FAQ005",
     "canonicalQuestion": "How many people can play?",
     "alternativePhrasings": [
-      "players",
-      "people",
       "group size"
     ],
     "canonicalAnswer": "No limit, you can even play by yourself if you really wanted, better with two, great with 3, hilarious with 4, hazardous with 50",
@@ -92,9 +88,6 @@
     "faqId": "FAQ006",
     "canonicalQuestion": "Can we play indoors?",
     "alternativePhrasings": [
-      "indoors",
-      "outside",
-      "outdoors",
       "where play"
     ],
     "canonicalAnswer": "Yes, if you have enough actual dogs indoors",
@@ -111,7 +104,6 @@
     "canonicalQuestion": "What is Hot Dog mode?",
     "alternativePhrasings": [
       "Hot Dog",
-      "variant",
       "other way to play"
     ],
     "canonicalAnswer": "{{approved_hot_dog_mode_answer}}",
@@ -147,7 +139,6 @@
     "alternativePhrasings": [
       "discount",
       "30%",
-      "code",
       "pre-release"
     ],
     "canonicalAnswer": "Join the pre-release list and the code will be emailed the day before launch.",
@@ -181,9 +172,7 @@
     "canonicalQuestion": "How do I enter the competition?",
     "alternativePhrasings": [
       "competition",
-      "enter",
-      "prize",
-      "win"
+      "prize"
     ],
     "canonicalAnswer": "Spot a dog. Match the card. Share your ChumSpot with us on social. The current monthly round closes on {{competition_close_date}}.",
     "sourcePage": "Competition page",
@@ -197,13 +186,7 @@
   {
     "faqId": "FAQ012",
     "canonicalQuestion": "How do I contact you?",
-    "alternativePhrasings": [
-      "contact",
-      "support",
-      "email",
-      "problem",
-      "human"
-    ],
+    "alternativePhrasings": [],
     "canonicalAnswer": "A human will come when beckoned at hello@Pedigree-Chums.co.uk",
     "sourcePage": "Contact page",
     "cta": "Contact",
@@ -217,10 +200,7 @@
     "faqId": "FAQ013",
     "canonicalQuestion": "What materials are used?",
     "alternativePhrasings": [
-      "paper",
-      "card",
       "FSC",
-      "materials",
       "laminated"
     ],
     "canonicalAnswer": "Fully biodegradable, no plastic coatings. Compact, pocket-friendly and lightweight. Made in the UK using recycled paper.",
