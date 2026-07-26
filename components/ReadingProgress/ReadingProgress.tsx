@@ -19,6 +19,7 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
   const [pct, setPct] = useState(0);
   const [notches, setNotches] = useState<number[]>([]);
   const [walking, setWalking] = useState(false);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
   const walkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const raf = useRef(false);
 
@@ -41,6 +42,19 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
       raf.current = false;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setPct(max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0);
+
+      /* Dock to the footer. The bar is a fixed overlay pinned to the bottom of
+         the viewport, so once the footer rises past that line the bar would
+         simply sit on top of it. Offsetting by the overlap parks the bar on
+         the footer's yellow top border -- the same yellow the fill uses -- so
+         the progress reads as completing into the footer rather than floating
+         over it. Above the footer the offset is 0 and nothing changes. */
+      const wrap = wrapRef.current;
+      const footer = document.querySelector("footer");
+      if (wrap && footer) {
+        const overlap = window.innerHeight - footer.getBoundingClientRect().top;
+        wrap.style.transform = overlap > 0 ? `translateY(${-overlap}px)` : "";
+      }
     };
 
     const onScroll = () => {
@@ -87,7 +101,7 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
   }, [walking]);
 
   return (
-    <div className={styles.wrap} id="rp-wrap" aria-hidden="true">
+    <div ref={wrapRef} className={styles.wrap} id="rp-wrap" aria-hidden="true">
       <div className={styles.track}>
         {notches.map((n) => (
           <span key={n} className={styles.notch} style={{ left: `${n}%` }} />
