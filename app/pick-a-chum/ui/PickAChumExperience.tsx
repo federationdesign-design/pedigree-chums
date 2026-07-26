@@ -165,7 +165,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         finishTheatre(id, text, closed);
         return;
       }
-      const plan = buildTypingPlan(text, TYPING_PROFILES[dog]);
+      // Pass the action so factual/safety copy types clean and only character copy
+      // gets the self-correcting typo (see theatre.ts NO_TYPO).
+      const plan = buildTypingPlan(text, TYPING_PROFILES[dog], undefined, action);
       playbackRef.current = { id, plan, closed, done: false };
       setMsg(id, { typing: true, display: '' });
       setPhase('transferring'); // lock the composer while the dog performs

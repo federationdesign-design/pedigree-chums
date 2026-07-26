@@ -600,6 +600,19 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'typo eligibility excludes names/prices', layer: '-', bucket: '-', action: 'theatre eligibility', note: ok ? '' : 'eligibility wrong' });
 })();
+// Self-correcting typo on CHARACTER copy, clean on FACTUAL/safety copy; never a
+// standing typo (final always equals the input). Same text and seed, two actions.
+(() => {
+  const text = 'the clever brown terrier happily wandered around the peaceful meadow chasing several excited rabbits through tall summer grasses today here';
+  const allPrefix = (plan) => plan.steps.every((s) => plan.final.startsWith(s.display));
+  const charPlan = buildTypingPlan(text, TYPING_PROFILES.boxer, lcg(3), 'converse'); // greeting/character
+  const factPlan = buildTypingPlan(text, TYPING_PROFILES.boxer, lcg(3), 'faq_answer'); // factual
+  const charOk = charPlan.final === text && !allPrefix(charPlan); // a wrong letter appeared then was fixed
+  const factOk = factPlan.final === text && allPrefix(factPlan); // clean throughout, no wrong letter
+  const ok = charOk && factOk;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'typos on character copy, clean on facts', layer: '-', bucket: '-', action: 'theatre typo scope', note: ok ? '' : `charOk=${charOk} factOk=${factOk}` });
+})();
 
 // ---- Task 4: D6 recorder redaction (safety input never stored; non-safety kept) ----
 (() => {
