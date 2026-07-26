@@ -113,16 +113,20 @@ export function QuotePollScene({
      something to read. The line used to take the first 24% of the scene on
      its own, which was a screen and a half of empty page before any words
      arrived. It now draws quickly and the quote follows straight behind it. */
-  const line = clamp01(p / 0.10);
-  const mark = p >= 0.08;
-  const text = clamp01((p - 0.08) / 0.30);
+  const line = clamp01(p / 0.06);
+  const mark = p >= 0.04;
+  const text = clamp01((p - 0.04) / 0.26);
   // poll starts fading in the moment the yellow line finishes extending
   // (p=0.24), overlapping with the mark/text build rather than waiting
-  const pollCard = clamp01((p - 0.30) / 0.30);
+  /* The card holds its full height from the first frame, so while it is
+     transparent the reader is looking at a screen of nothing. It now fades in
+     from the very start and lands ahead of the quote, so the poll is already
+     on screen as the quote comes into focus rather than arriving after it. */
+  const pollCard = clamp01(p / 0.22);
   /* Same idea: the buttons used to land at p = 0.75 and the last quarter of
      the scene was dead. They now fade in over twice the scroll, finishing at
      0.9, which also holds the reader a little longer before the lock. */
-  const btns = clamp01((p - 0.6) / 0.3);
+  const btns = clamp01((p - 0.30) / 0.55);
   /* Lock engages the moment the buttons are fully visible -- not later --
      so there is never a window where the reader is blocked before they can
      even see something to click. */
