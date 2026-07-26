@@ -20,7 +20,7 @@
 
 /** Approved safety signpost. Locked wording: do not vary. */
 export const SAFETY_SIGNPOST =
-  'If something is worrying or upsetting you, talk to a trusted adult. If you are a young person in the UK and need someone to talk to, Childline is free and confidential on 0800 1111.';
+  'If something is worrying or upsetting you, talk to a trusted adult. If you are a young person in the UK and need someone to talk to, Childline is free on 0800 1111.';
 
 export type ModerationAction =
   | 'redirect' // deliver the line, then steer to a safe neutral destination
