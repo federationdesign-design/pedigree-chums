@@ -2545,7 +2545,10 @@ export default function BreedTree({
       {dockAside && gravity && (
         <div
           aria-hidden="true"
-          className={`${styles.learnPattern}${learning || learnPeek ? " " + styles.learnPatternOn : ""}`}
+          // learn only, never the hover preview: on the start screen the peek is a
+          // glimpse of the pink, and the artwork underneath it made the two
+          // overlays read as one busy thing
+          className={`${styles.learnPattern}${learning ? " " + styles.learnPatternOn : ""}`}
         />
       )}
 

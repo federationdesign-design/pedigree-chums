@@ -122,10 +122,15 @@ export default function LineageModal({ name, image, character, lineage, onClose,
 
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
-      {/* Score, fixed top-right beside where the in-pit close object starts */}
-      <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
-        {score.toLocaleString("en-GB")}
-      </div>
+      {/* Score, fixed top-right beside where the in-pit close object starts.
+          Hidden once the round is running: the number belongs to the menu and
+          the end screens, and during play it competes with the lives indicator
+          that now sits along the same edge. */}
+      {!running && (
+        <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
+          {score.toLocaleString("en-GB")}
+        </div>
+      )}
       {/* Title floats over the pit and never affects its size */}
       <h3 className={css.title}>
         {(isNarrow ? titleLines(shownName) : [shownName]).map((line, i, arr) => (
