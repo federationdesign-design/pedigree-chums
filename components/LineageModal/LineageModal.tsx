@@ -56,6 +56,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   const [phase, setPhase] = useState<"play" | "won" | "lost">("play");
+  // The start screen is bare: no shake, no slow motion. They arrive with the
+  // round, so nothing is offered that cannot do anything yet.
+  const [running, setRunning] = useState(false);
   const [runKey, setRunKey] = useState(0);
   const replay = () => {
     setPhase("play");
@@ -130,6 +133,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           tinted={false}
           onShownChange={setShownName}
           levelTheme={theme}
+          onStartedChange={setRunning}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
@@ -161,29 +165,33 @@ export default function LineageModal({ name, image, character, lineage, onClose,
 
       {/* Slow motion, straight from the main pit: snail icon, sits above shake.
           Quarter speed while active, navy while on. */}
-      <button
-        type="button"
-        className={`${css.slowmo}${slowmo ? " " + css.slowmoActive : ""}`}
-        onClick={() => { slowmoFnRef.current?.(); setSlowmo((s2) => !s2); }}
-        aria-label={slowmo ? "Normal speed" : "Slow motion"}
-      >
-        <img src="/svg-snail-icon.svg" alt="" aria-hidden="true" className={css.slowmoIcon} />
-      </button>
+      {running && (
+        <>
+        <button
+          type="button"
+          className={`${css.slowmo}${slowmo ? " " + css.slowmoActive : ""}`}
+          onClick={() => { slowmoFnRef.current?.(); setSlowmo((s2) => !s2); }}
+          aria-label={slowmo ? "Normal speed" : "Slow motion"}
+        >
+          <img src="/svg-snail-icon.svg" alt="" aria-hidden="true" className={css.slowmoIcon} />
+        </button>
 
-      {/* Shake button, straight from the pit: jelly icon, bottom right */}
-      <button
-        type="button"
-        className={css.shake}
-        onClick={(e) => {
-          shakeFnRef.current?.();
-          const el = e.currentTarget;
-          el.classList.add(css.shakeFlash);
-          window.setTimeout(() => el.classList.remove(css.shakeFlash), 300);
-        }}
-        aria-label="Shake the pit"
-      >
-        <span className={css.shakeIcon} aria-hidden="true" />
-      </button>
+        {/* Shake button, straight from the pit: jelly icon, bottom right */}
+        <button
+          type="button"
+          className={css.shake}
+          onClick={(e) => {
+            shakeFnRef.current?.();
+            const el = e.currentTarget;
+            el.classList.add(css.shakeFlash);
+            window.setTimeout(() => el.classList.remove(css.shakeFlash), 300);
+          }}
+          aria-label="Shake the pit"
+        >
+          <span className={css.shakeIcon} aria-hidden="true" />
+        </button>
+        </>
+      )}
 
       {/* Round won / game over, main-pit flash styling */}
       {phase !== "play" && (

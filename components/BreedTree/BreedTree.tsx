@@ -346,6 +346,7 @@ export default function BreedTree({
   onPitFull,
   rootNote,
   levelTheme = null,
+  onStartedChange,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -373,6 +374,7 @@ export default function BreedTree({
   onPitFull?: () => void;
   rootNote?: string;
   levelTheme?: LevelTheme | null;
+  onStartedChange?: (started: boolean) => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -471,10 +473,18 @@ export default function BreedTree({
   }, []);
   // The pit is inert until START is pressed. Nothing falls on a timer.
   const [started, setStarted] = useState(false);
+  // Inert means inert: on the start screen the circles do not take clicks, do
+  // not highlight on hover and cannot be drilled into. Only START, LEARN and
+  // the close X answer. LEARN counts as having chosen, so the layer behind it
+  // behaves normally.
+  useEffect(() => { onStartedChange?.(started); }, [started, onStartedChange]);
+  // which of the two words the pointer is over, for their hover state
+  const [wordHover, setWordHover] = useState<"start" | "learn" | null>(null);
   // LEARN mode: the pit stays inert, the blue box is open, and a pink wash lies
   // over everything. learnPeek is the desktop hover preview of that wash.
   const [learning, setLearning] = useState(false);
   const [learnPeek, setLearnPeek] = useState(false);
+  const frozen = dockAside && gravity && !started && !learning;
   // Desktop hover preview of the level background, the same courtesy LEARN gets.
   const [startPeek, setStartPeek] = useState(false);
   // The blue box can be picked up and moved, the same as the cards on a chum
@@ -1806,9 +1816,15 @@ export default function BreedTree({
                     pointerEvents: hidden ? "none" : "auto",
                     opacity: buried ? 0 : undefined,
                   }}
-                  onMouseEnter={hidden ? undefined : () => setHovered(d)}
-                  onMouseLeave={hidden ? undefined : () => setHovered((h) => (h === d ? null : h))}
-                  onClick={disableZoom ? undefined : (e) => onCircle(e, d)}
+                  onMouseEnter={hidden || frozen ? undefined : () => setHovered(d)}
+                  onMouseLeave={hidden || frozen ? undefined : () => setHovered((h) => (h === d ? null : h))}
+                  onClick={
+                    frozen
+                      ? (e) => e.stopPropagation() // swallow it: falling through would close the pit
+                      : disableZoom
+                        ? undefined
+                        : (e) => onCircle(e, d)
+                  }
                 />
               );
             })}
@@ -1991,7 +2007,10 @@ export default function BreedTree({
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
             const ub = uiBodiesRef.current;
-            const defs: { kind: "close" | "desc"; wx: number; wy: number; a: number }[] = (["close", "desc"] as const).map((kind, idx) => {
+            // Start screen: only the close X, so there is still a way out. The
+            // info square joins once the round is running.
+            const kinds = frozen ? (["close"] as const) : (["close", "desc"] as const);
+            const defs: { kind: "close" | "desc"; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
               const b = ub?.find((u) => u.kind === kind);
               return {
                 kind,
@@ -2069,8 +2088,16 @@ export default function BreedTree({
                 aria-label={w.key === "start" ? "Start" : "Learn about these breeds"}
                 tabIndex={0}
                 style={{ cursor: "pointer" }}
-                onMouseEnter={w.key === "learn" ? () => setLearnPeek(true) : () => setStartPeek(true)}
-                onMouseLeave={w.key === "learn" ? () => setLearnPeek(false) : () => setStartPeek(false)}
+                onMouseEnter={() => {
+                  setWordHover(w.key);
+                  if (w.key === "learn") setLearnPeek(true);
+                  else setStartPeek(true);
+                }}
+                onMouseLeave={() => {
+                  setWordHover((h) => (h === w.key ? null : h));
+                  if (w.key === "learn") setLearnPeek(false);
+                  else setStartPeek(false);
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (w.key === "start") {
@@ -2095,7 +2122,19 @@ export default function BreedTree({
                   fill="transparent"
                 />
                 <text x={w.x} y={w.y} textAnchor={w.anchor} dominantBaseline="central"
-                  style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs * upp}px`, letterSpacing: `${2 * upp}px`, filter: "drop-shadow(0 4px 40px rgba(0,0,0,0.6))", pointerEvents: "none", userSelect: "none" }}>
+                  style={{
+                    fill: "#ffffff",
+                    fontFamily: "var(--font-display), system-ui, sans-serif",
+                    fontSize: `${fs * upp * (wordHover === w.key ? 1.08 : 1)}px`,
+                    letterSpacing: `${2 * upp}px`,
+                    filter:
+                      wordHover === w.key
+                        ? "drop-shadow(0 6px 26px rgba(0,0,0,0.85))"
+                        : "drop-shadow(0 4px 40px rgba(0,0,0,0.6))",
+                    transition: "font-size 160ms ease, filter 160ms ease",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                  }}>
                   {w.label}
                 </text>
               </g>

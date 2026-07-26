@@ -131,9 +131,25 @@ const seamLines = () => {
   for (const size of [{ width: 390, height: 844 }, { width: 1280, height: 900 }]) {
     await p.setViewportSize(size);
     await p.waitForTimeout(700);
-    await p.locator('[aria-label="Start"]').hover({ force: true }); // a resize drops the hover
-    await p.waitForTimeout(700);
-    seams.push({ size: size.width + 'x' + size.height, ...(await p.evaluate(seamLines)) });
+    // A resize drops the hover, and the clip is a 560ms transition, so a naive
+    // read catches either the parked state or a tween. Hover, wait for the clip
+    // to stop moving, and only accept a reading that is actually at the seam;
+    // retry the hover if it did not take.
+    let reading = null;
+    for (let attempt = 0; attempt < 4 && !reading; attempt++) {
+      await p.locator('[aria-label="Start"]').hover({ force: true });
+      let last = null;
+      for (let i = 0; i < 20; i++) {
+        const now = await p.evaluate(() => getComputedStyle(document.querySelector('[class*="level"][aria-hidden="true"]')).clipPath);
+        if (last === now) break;
+        last = now;
+        await p.waitForTimeout(150);
+      }
+      const r = await p.evaluate(seamLines);
+      if (r && r.gap < 50) reading = r; // anything larger means it never peeked
+      else await p.mouse.move(2, 2);
+    }
+    seams.push({ size: size.width + 'x' + size.height, ...(reading || { gap: null }) });
   }
   await p.setViewportSize({ width: 390, height: 844 });
   await p.waitForTimeout(700);
