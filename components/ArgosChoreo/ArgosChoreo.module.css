@@ -342,9 +342,17 @@
    set larger and centred rather than as a paragraph of explanation. */
 /* Stacked captions: the first keeps the gap under the image, the rest sit
    tight beneath the line above, matching the statue gallery's bullet rhythm. */
-.wipeCaptionStack .wipeCaption { margin-top: 0; }
-.wipeCaptionStack .wipeCaption:first-child { margin-top: 32px; }
-.wipeCaptionStack .wipeCaption + .wipeCaption { margin-top: 18px; }
+.wipeCaptionStack .wipeCaption {
+  margin-top: 0;
+  /* Smaller and wider than a swap caption: a stack has several blocks on
+     screen at once, so it has to earn its height. .wipeCaptionLarge is
+     declared after this and still wins where it is applied. */
+  font-size: 1rem;
+  line-height: 1.35;
+  width: 86%;
+}
+.wipeCaptionStack .wipeCaption:first-child { margin-top: 28px; }
+.wipeCaptionStack .wipeCaption + .wipeCaption { margin-top: 14px; }
 
 .wipeStage .wipeCaptionLarge {
   font-size: 1.3rem;

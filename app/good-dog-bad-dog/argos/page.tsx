@@ -905,14 +905,10 @@ export default function ArgosPage() {
                     "/smell/smell-scene-b.jpg",
                   ]}
                   captions={[
-                    { fromProgress: 0.00, tone: "white", text: "That matters here because dogs live in scent" },
-                    { fromProgress: 0.12, tone: "white", text: "in a way humans barely do." },
-                    { fromProgress: 0.25, tone: "white", text: "Dogs experience paths, people and homes" },
-                    { fromProgress: 0.37, tone: "white", text: "through layers of smell: identity, time, stress," },
-                    { fromProgress: 0.50, tone: "white", text: "illness, direction, absence and presence." },
-                    { fromProgress: 0.62, tone: "white", text: "A path is not just a path." },
-                    { fromProgress: 0.75, tone: "white", text: "It is a recent history of who has passed, when," },
-                    { fromProgress: 0.87, tone: "white", text: "in what condition and in what direction." },
+                    { fromProgress: 0.00, tone: "white", text: "That matters here because dogs live in scent in a way humans barely do." },
+                    { fromProgress: 0.22, tone: "white", text: "Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence." },
+                    { fromProgress: 0.46, tone: "white", text: "A path is not just a path." },
+                    { fromProgress: 0.68, tone: "white", text: "It is a recent history of who has passed, when, in what condition and in what direction." },
                   ]}
                 />
               </div>
