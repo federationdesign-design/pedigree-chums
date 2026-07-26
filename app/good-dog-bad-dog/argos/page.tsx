@@ -658,8 +658,6 @@ export default function ArgosPage() {
 
               <p>And early discussion of the film suggests that Argos has not been treated as a disposable detail. Coverage of Nolan&apos;s adaptation notes that Argos appears in the film, and <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>viewers have already singled out the dog scene as one of the moments that affected them most</strong>.</p>
 
-              <p>Both versions can be true. But they tell us different things about dogs, and about ourselves.</p>
-
               <div className={styles.desktopOnly}>
                 <StatueBulletsChoreo
                   slides={[
@@ -667,7 +665,7 @@ export default function ArgosPage() {
                     { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
                 />
-                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next.</blockquote>
+                <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Both versions can be true. But they tell us different things about dogs, and about ourselves.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -676,7 +674,7 @@ export default function ArgosPage() {
                     { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
                     { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
-                  quote="Barthes called this the death of the author: once a story leaves its writer, it belongs to everyone who reads it next."
+                  quote="Both versions can be true. But they tell us different things about dogs, and about ourselves."
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
                 />
