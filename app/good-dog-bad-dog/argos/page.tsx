@@ -174,8 +174,8 @@ function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
               </div>
               )}
               <div style={{ padding: "9px 50px 16px 50px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
               </div>
             </div>
   );
@@ -199,7 +199,7 @@ function ArgosIdentityCard() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
               </div>
               <div style={{ padding: "9px 50px 16px 50px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
@@ -226,7 +226,7 @@ function BookFactsCard() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
               </div>
               <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
                 {([
@@ -339,8 +339,8 @@ function LikelyOriginsCard() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
               </div>
               <div style={{ padding: "9px 50px 16px 50px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Larger, strong-boned, with short coats and great endurance.</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Larger, strong-boned, with short coats and great endurance.</p>
               </div>
             </div>
   );
@@ -913,7 +913,7 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <p><strong>Argos belongs to that world.</strong></p>
+              <p style={{ textAlign: "center" }}><strong>Argos belongs to that world.</strong></p>
 
               {/* Olfactory build: eight frames wiping in from the right as the
                   reader scrolls, with grouped captions. Mobile only, matching
