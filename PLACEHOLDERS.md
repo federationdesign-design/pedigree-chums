@@ -12,13 +12,21 @@ final copy.
 | ART010 interim mapping | `route-map.json` | 'The Power of Smell' unbuilt; points at the teaching-medicine article for now | NEEDS_STEVE item 4 |
 | Random-dog control treatment | (styled build, Checkpoint 2) | To be proposed for approval | NEEDS_STEVE item 5 |
 | Labrador / Terrier / Boxer bark presentations + B19/B20 lines | `assembler.ts` (`BARK_PRESENTATION` wires the Collie only) + parked deck rows | The non-Collie bark words and English break/ack lines are PARKED with the Phase 3 voice package; the per-dog state machine runs but their responses render a parked marker | Phase 3 per-dog build wires the presentations and merges the LAB/TER/BOX B19/B20 lines |
-| `BREED-<slug>` per-breed page lines | `assembler.ts` (`case 'breed_page'`) | One-line intro shown when a named breed resolves to its page (all 10 proof breeds). Currently `[PLACEHOLDER breed line for <Breed>, Steve to supply]` | Steve supplies one line per breed (labrador, border collie, boxer, border terrier, cocker spaniel, beagle, french bulldog, pug, german shepherd, staffordshire bull terrier) |
+| `BREED-<slug>` per-breed page lines | `assembler.ts` (`BREED_FACTS`, `case 'breed_page'`) | Shared factual one-liner (no dog voice) shown when a named breed resolves to its page. FOUR filled but DRAFT-UNVERIFIED, NOT approved (labrador, border collie, boxer, border terrier): the historical claims still need checking against the breed pages and a Kennel Club source before this branch merges. SIX still outstanding (cocker spaniel, beagle, french bulldog, pug, german shepherd, staffordshire bull terrier), rendering `[PLACEHOLDER breed line for <Breed>, Steve to supply]` | Steve verifies the four, supplies the six, and writes the per-breed character-handoff line that follows each factual answer |
 | `BREED-CHOICE` framing | `assembler.ts` (`case 'breed_choice'`) | The line that offers two breeds when an ambiguous word (e.g. "terrier") is within the confidence gap. Currently `[PLACEHOLDER breed choice framing] A or B?` | Steve supplies the choice framing sentence |
 | Breed hub answer | `router.ts` (`BREED_HUB` -> `fallback`) | "tell me about dog breeds" / "best dog breed" has no specific breed; routed to the approved fallback for now, NOT a placeholder line | Steve supplies a proper narrowing/hub line, then wire a dedicated action |
-| Per-breed aliases | `router.ts` (`BREED_PAGES[].aliases`, currently all `[]`) | The alias table is intentionally EMPTY; only the two real misspelling entries (labrador, terrier) resolve via `misspellings.json`. Plurals/singulars are handled mechanically in `matchBreed`, not aliases | Steve fills the per-breed alias list (see the alias request below / session note) |
 
 ## Resolved (no longer placeholders)
 
+- Per-breed aliases: WIRED from Steve's list into `router.ts`
+  `BREED_PAGES[].aliases` (labrador: lab/labs/lab retriever/labrador retriever;
+  border collie: collie/collies; cocker spaniel: cocker/cockers; french bulldog:
+  frenchie/frenchies/frenchy/french bull dog/french bulldogs; german shepherd:
+  gsd/alsatian/alsation/german shepard/german shepperd; staffie:
+  staffie/staffy/staffies/staffordshire/staffie bull terrier/sbt). Boxer, beagle,
+  pug and border terrier carry no aliases. Excluded per Steve: `staff` (employees),
+  `sheepdog` (a separate breed), and bare `shepherd` / `spaniel`, which route to
+  the confidence gap as a choice (`AMBIGUOUS_FAMILY`), never a guess.
 - Moderation wording and the safety signpost: APPROVED (`moderation.ts`).
 - Revised B01 buying copy: APPROVED and written into the workbook's Collie
   Responses sheet, regenerated into `generated/collie-responses.json`.

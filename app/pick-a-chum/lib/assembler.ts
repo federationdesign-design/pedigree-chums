@@ -40,6 +40,21 @@ const FALLBACK_LINE = 'I am not sure what you want me to do with that. Try a ful
 const BARK_BREAK_PLACEHOLDER = '[B19 bark-break line, copy pending]';
 const BARK_ACK_PLACEHOLDER = '[B20 bark-acknowledgement line, copy pending]';
 
+// Per-breed SHARED factual answer (no dog voice). Four of the ten proof breeds are
+// filled from Steve's list; the rest render the marked placeholder. These four are
+// DRAFT-UNVERIFIED, not approved: the historical claims must be checked against the
+// breed pages and a Kennel Club source before this branch merges (PLACEHOLDERS.md).
+const BREED_FACTS: Record<string, string> = {
+  labrador:
+    'Labrador ancestors worked alongside Newfoundland fishermen, hauling nets and lines through cold water. That urge to get into every pond did not appear by accident.',
+  'border-collie':
+    "Border Collies were bred to move sheep with a hard stare that shepherds call 'the eye'. If yours watches everyone as though they need organising, the old job is still showing.",
+  boxer:
+    'Boxers came from dogs bred to take hold of large animals and keep hold until a person arrived. That is a lot of determination to fit into a face that looks permanently surprised.',
+  'border-terrier':
+    'The Border Terrier needed legs long enough to keep up with horses all day and a body narrow enough to follow a fox underground. That is a remarkable amount of dog packed into a small one.',
+};
+
 // Bark presentation: only the Collie is wired live. Labrador/Terrier/Boxer bark
 // words and their B19/B20 English lines are PARKED with the Phase 3 voice
 // package; the per-dog state machine still runs for them, but their responses
@@ -299,10 +314,16 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       return { responseId: cat.id, text: cat.responses[0], dog };
     }
 
-    case 'breed_page':
-      // PLACEHOLDER: Steve supplies the one-line breed descriptions. Marked so it
-      // cannot ship. The link to the breed page is real.
-      return { responseId: `BREED-${res.breedSlug}`, text: `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`, dog, destinationId: res.breedSlug, url: res.url ?? null };
+    case 'breed_page': {
+      // The SHARED factual answer per breed (no dog voice). The character handoff
+      // line and the breed-page link (url below) follow as specced. Four breeds are
+      // filled but DRAFT-UNVERIFIED (not approved): the historical claims still need
+      // checking against the breed pages and a Kennel Club source before this branch
+      // merges (see PLACEHOLDERS.md). The other six remain a marked placeholder.
+      const fact = BREED_FACTS[res.breedSlug ?? ''];
+      const text = fact ?? `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`;
+      return { responseId: `BREED-${res.breedSlug}`, text, dog, destinationId: res.breedSlug, url: res.url ?? null };
+    }
 
     case 'breed_choice': {
       // PLACEHOLDER framing; the breed titles are real data. One option means a
