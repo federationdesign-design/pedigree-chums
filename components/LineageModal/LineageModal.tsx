@@ -210,7 +210,10 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         </>
       )}
 
-      {typeof lives === "number" && (
+      {/* Lives belong to the round, not the menu. On the start screen there is
+          nothing at stake yet, and the indicator sat over the title. It arrives
+          with PLAY, alongside the shake and slow-motion controls. */}
+      {running && typeof lives === "number" && (
         <div className={css.lives} aria-label={`${lives} of ${livesMax} lives left`}>
           <div className={css.livesHeart} aria-hidden="true">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
