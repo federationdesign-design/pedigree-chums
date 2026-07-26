@@ -765,6 +765,22 @@ export default function BreedTree({
       `${Math.round(ox + ax * t + nx * u)}px ${Math.round(oy + ay * t + ny * u)}px`;
     return `polygon(${pt(-far, 0)}, ${pt(far, 0)}, ${pt(far, far)}, ${pt(-far, far)})`;
   };
+  // Which side of the seam a screen point falls on. Positive is the lower-left
+  // half, which belongs to PLAY; negative is the upper-right half, LEARN's.
+  const seamSide = (cx: number, cy: number): number => {
+    const vw = typeof window === "undefined" ? 390 : window.innerWidth;
+    const vh = typeof window === "undefined" ? 844 : window.innerHeight;
+    const rad = (-WASH_DEG * Math.PI) / 180;
+    const cos = Math.cos(rad), sin = Math.sin(rad);
+    const W = WASH_INSET * vw;
+    const ex = (0.5 - WASH_PEEK_X) * -W;
+    const px0 = vw / 2 + cos * ex;
+    const py0 = vh / 2 + sin * ex;
+    const ax = -sin, ay = cos; // along the seam
+    // cross product of the seam direction with the point, so the sign tells us
+    // which side it lies on
+    return ax * (cy - py0) - ay * (cx - px0);
+  };
   const SEAM_OFF = () => (typeof window === "undefined" ? 900 : window.innerWidth + window.innerHeight);
 
   const clampRootView = (v: View): View => {
@@ -944,6 +960,28 @@ export default function BreedTree({
     rafRef.current = requestAnimationFrame(step);
   }
 
+  // The lift is split out so a tap that arrives from the drag handler can use it
+  // too. That tap fires after React has recycled its event, so currentTarget is
+  // already null by then: the element has to be captured up front and passed in.
+  function liftToLearn(el: Element | null, d: Node): boolean {
+    if (!fellRef.current || !el) return false;
+    const pb = pitBodiesRef.current;
+    const body = pb?.owned.has(d) ? pb.find(d) : undefined;
+    if (!body) return false;
+    body.held = true;
+    const cr = el.getBoundingClientRect();
+    setLearnCard({
+      name: d.data.name,
+      image: d.data.img ?? rootImage ?? "",
+      x: cr.left + cr.width / 2,
+      y: cr.top + cr.height / 2,
+      angle: (body as unknown as { a?: number }).a ?? 0,
+      r: cr.width / 2, // keep the circle's on-screen size on the next layer
+    });
+    setLearnNode(d);
+    return true;
+  }
+
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
     // once dropped, a circle that owns a body lifts out to the learn layer
@@ -981,8 +1019,12 @@ export default function BreedTree({
     else if (d.parent) zoom(d.parent);
   }
   function onBackground() {
-    if (focusRef.current !== nodes[0]) zoom(nodes[0]);
-    else onClose?.();
+    if (focusRef.current !== nodes[0]) { zoom(nodes[0]); return; }
+    // Once the round is running a stray tap on the background must not throw the
+    // player out. A missed grab at a circle lands here, and losing a round that
+    // way is miserable. Route it through the same confirmation the close X uses.
+    if (started && onPitClose) { onPitClose(); return; }
+    onClose?.();
   }
 
   useEffect(() => {
@@ -1879,7 +1921,30 @@ export default function BreedTree({
   const buriedSet = hovered && !dropped ? new Set(hovered.descendants()) : null;
 
   return (
-    <div className={`${styles.tree}${fill ? " " + styles.treeFill : ""}`} ref={wrapRef} style={fill ? undefined : { width: size, height: size }}>
+    <div
+      className={`${styles.tree}${fill ? " " + styles.treeFill : ""}`}
+      ref={wrapRef}
+      style={fill ? undefined : { width: size, height: size }}
+      // The whole half of the screen is the hover target, not just the word.
+      // Move the pointer anywhere in the upper-right half and LEARN previews;
+      // anywhere in the lower-left half and PLAY does. The split is the same
+      // seam the two overlays share, so what you hover is exactly what you get.
+      onPointerMove={
+        dockAside && gravity && !started && !learning
+          ? (e) => {
+              if (e.pointerType === "touch") return; // a tap is not a hover
+              const play = seamSide(e.clientX, e.clientY) > 0;
+              setStartPeek(play);
+              setLearnPeek(!play);
+            }
+          : undefined
+      }
+      onPointerLeave={
+        dockAside && gravity && !started && !learning
+          ? () => { setStartPeek(false); setLearnPeek(false); }
+          : undefined
+      }
+    >
       <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`} ref={stageRef}>
         <svg
           viewBox={viewBox}
@@ -1955,7 +2020,47 @@ export default function BreedTree({
                       ? (e) => e.stopPropagation() // swallow it: falling through would close the pit
                       : disableZoom
                         ? undefined
-                        : (e) => onCircle(e, d)
+                        : (e) => { if (!fellRef.current) onCircle(e, d); else e.stopPropagation(); }
+                  }
+                  // Once they have dropped, the dogs are physics bodies like
+                  // everything else in the pit, so they can be picked up and
+                  // shoved about. A press that does not travel is still a tap
+                  // and still lifts the dog to the learn layer.
+                  onPointerDown={
+                    frozen || hidden || disableZoom
+                      ? undefined
+                      : (e) => {
+                          // fellRef is a ref, so it cannot be read at render
+                          // time: the component does not re-render when the
+                          // drop finishes, and the handler would be frozen as
+                          // undefined for ever. Check it here instead.
+                          if (!fellRef.current) return;
+                          const body = pitBodiesRef.current?.owned.has(d)
+                            ? pitBodiesRef.current.find(d)
+                            : undefined;
+                          // held lifts the body out of the physics world, so the
+                          // drag can place it directly. Without this the sim
+                          // writes the old position back every frame and the dog
+                          // does not move at all. Released on pointer up, which
+                          // drops it back in wherever it was let go.
+                          if (body) body.held = true;
+                          const release = () => {
+                            if (body) body.held = false;
+                            wakeRef.current?.();
+                            window.removeEventListener("pointerup", release);
+                            window.removeEventListener("pointercancel", release);
+                          };
+                          window.addEventListener("pointerup", release);
+                          window.addEventListener("pointercancel", release);
+                          // captured now: by the time the tap callback runs,
+                          // React has recycled the event and currentTarget is
+                          // null, which threw and left the layer unopened
+                          const el = e.currentTarget as SVGCircleElement;
+                          startDrag(e, body as never, () => {
+                            if (body) body.held = false;
+                            liftToLearn(el, d);
+                          });
+                        }
                   }
                 />
               );

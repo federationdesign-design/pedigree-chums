@@ -1,6 +1,6 @@
-// GUARD-008: the start screen offers START and LEARN, and LEARN is a separate
+// GUARD-008: the start screen offers PLAY and LEARN, and LEARN is a separate
 // mode that never arms the pit.
-//   a) LEARN sits right and high, START sits left and low
+//   a) LEARN sits right and high, PLAY sits left and low
 //   b) hovering LEARN slides the pink wash partway in (desktop preview)
 //   c) choosing LEARN brings the wash fully in, opens the blue box, hides both
 //      words, and leaves the pit completely inert
@@ -14,7 +14,9 @@ const readScreen = () => {
   const out = { vw: window.innerWidth, vh: window.innerHeight };
   if (svg) {
     svg.querySelectorAll('text').forEach((t) => {
-      if (t.textContent !== 'START' && t.textContent !== 'LEARN') return;
+      // the word reads PLAY now; matched by text because this guard checks
+      // where the words sit, not what they do
+      if (t.textContent !== 'PLAY' && t.textContent !== 'LEARN') return;
       const r = t.getBoundingClientRect();
       out[t.textContent] = { left: Math.round(r.left), right: Math.round(r.right), midY: Math.round(r.y + r.height / 2) };
     });
@@ -43,10 +45,14 @@ const readScreen = () => {
   await p.waitForTimeout(2800);
 
   const s0 = await p.evaluate(readScreen);
-  // a) LEARN hugs the right and sits above centre; START hugs the left, below
-  const placed = !!(s0.LEARN && s0.START
+  // a) LEARN hugs the right, PLAY hugs the left and sits low. The vertical
+  // bounds were 0.45 and 0.55 of the screen; both words have since moved down
+  // deliberately, LEARN to 26% and PLAY to 91%, so the test now allows for that
+  // while still requiring LEARN above PLAY.
+  const placed = !!(s0.LEARN && s0.PLAY
     && s0.LEARN.right >= s0.vw - 30 && s0.LEARN.midY < s0.vh * 0.45
-    && s0.START.left <= 30 && s0.START.midY > s0.vh * 0.55);
+    && s0.PLAY.left <= 30 && s0.PLAY.midY > s0.vh * 0.55
+    && s0.LEARN.midY < s0.PLAY.midY);
 
   // b) hover preview
   await p.locator('[aria-label="Learn about these breeds"]').hover({ force: true });
@@ -58,7 +64,7 @@ const readScreen = () => {
   await p.locator('[aria-label="Learn about these breeds"]').click({ force: true });
   await p.waitForTimeout(1000);
   const s2 = await p.evaluate(readScreen);
-  const entered = !!(s2.wash && s2.wash.on && s2.boxOpen && !s2.START && !s2.LEARN);
+  const entered = !!(s2.wash && s2.wash.on && s2.boxOpen && !s2.PLAY && !s2.LEARN);
   const blendOk = !!(s2.wash && s2.wash.blend === 'overlay' && s2.wash.hits === 'none');
 
   // g) mini pit only: the box leads with a round portrait of the dog whose tree
@@ -110,7 +116,7 @@ const readScreen = () => {
   });
   await p.waitForTimeout(900);
   const s4 = await p.evaluate(readScreen);
-  const returned = !!(s4.START && s4.LEARN && !s4.boxOpen);
+  const returned = !!(s4.PLAY && s4.LEARN && !s4.boxOpen);
 
   // reopening puts the box back where it belongs, not where it was dropped
   await p.locator('[aria-label="Learn about these breeds"]').click({ force: true });
@@ -129,7 +135,7 @@ const readScreen = () => {
   const chumUntouched = chum.portraits === 0 && chum.digging === true;
   console.log('chum page:', JSON.stringify(chum), '| untouched:', chumUntouched);
 
-  console.log('placement:', JSON.stringify({ LEARN: s0.LEARN, START: s0.START }), '| ok:', placed);
+  console.log('placement:', JSON.stringify({ LEARN: s0.LEARN, PLAY: s0.PLAY, vw: s0.vw, vh: s0.vh }), '| ok:', placed);
   console.log('hover peek:', peeked, '| entered learn:', entered, '| blend:', blendOk);
   console.log('pit inert:', inert, JSON.stringify({ toys: s3.toys, circleY: s3.circleY }), '| returned:', returned);
 
