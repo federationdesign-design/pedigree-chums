@@ -105,17 +105,17 @@ const NAV_FRAME = ['where is', 'wheres', 'where can i', 'find', 'show me', 'open
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
 const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
-// Visitor explicitly asks to switch to a different dog. Tight phrases so card /
-// content queries ("another dog card") are not swallowed. Approved repair copy.
+// Visitor explicitly asks to switch to a different dog. A transfer REQUEST needs
+// a verb: bare noun phrases ("new dog", "different dog", "another dog") were
+// removed because "I just got a new dog" is common pet talk and was transferring.
+// Safety is checked first, so a disclosure never reaches here.
 const TRANSFER_REQUEST = [
-  'talk to another dog', 'speak to another dog', 'a different dog', 'different dog', 'another dog',
-  'change the dog', 'swap the dog', 'switch dog', 'switch the dog',
-  // Steve's test inputs and additions, narrowed: bare "transfer" and bare
-  // "someone else" dropped (the latter collides with disclosures like "someone
-  // else hurt me"); phrased forms used instead. Safety is checked first, so a
-  // disclosure never reaches here.
-  'transfer me', 'transfer me to', 'can you transfer me', 'new dog', 'new dog please',
-  'different agent', 'another agent', 'talk to someone else', 'speak to someone else', 'swap dog', 'change dog',
+  'talk to another dog', 'speak to another dog', 'talk to a different dog', 'speak to a different dog',
+  'can i have a different dog', 'can i have another dog', 'get me another dog', 'get me a different dog',
+  'give me another dog', 'give me a different dog',
+  'change the dog', 'swap the dog', 'switch dog', 'switch the dog', 'swap dog', 'change dog',
+  'transfer me', 'transfer me to', 'can you transfer me',
+  'different agent', 'another agent', 'talk to someone else', 'speak to someone else',
 ];
 
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];

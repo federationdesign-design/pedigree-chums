@@ -189,7 +189,12 @@ check('What is the latest football score?', { action: 'gk_unknown' }, { assert: 
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
 check('can I talk to another dog', { action: 'transfer_request' }, { assert: (_r, resp) => (resp.text.includes('hand you over') ? null : 'expected transfer-request line') });
 check('transfer me', { action: 'transfer_request' });
-check('new dog please', { action: 'transfer_request' });
+// Audit fix 2: TRANSFER_REQUEST now requires a verb.
+//   before: check('new dog please', { action: 'transfer_request' });
+//   after:  bare "new dog" no longer transfers (common pet talk); verb forms still do.
+check('new dog please', {}, { assert: (r) => (r.action === 'transfer_request' ? 'bare new dog still transfers' : null) });
+check('I just got a new dog', {}, { assert: (r) => (r.action === 'transfer_request' ? 'pet talk wrongly transferred' : null) });
+check('get me another dog', { action: 'transfer_request' });
 check('I want a different agent', { action: 'transfer_request' });
 
 // ---- Step 4 dog emergency (checked before the dog-health boundary) ----
