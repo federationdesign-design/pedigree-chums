@@ -67,9 +67,11 @@ markdown review docs).
 
 ## Commits this session (SHAs filled after commit)
 
-- SHA_PENDING: pick-a-chum: Recovery Rules review docs (reading, runbook,
-  harness draft, glossary, session log). Docs only, no code.
-  (SHA recorded below once committed.)
+- faaa01410ba97efe62907d9e33480ede40efbba0: pick-a-chum: Recovery Rules review
+  docs (reading, runbook, harness draft, glossary, log). Docs only, no code.
+  5 files, 1198 insertions, 0 deletions.
+- (a second small commit updates this log line with the SHA above; its own SHA
+  is noted when I push.)
 
 ---
 
