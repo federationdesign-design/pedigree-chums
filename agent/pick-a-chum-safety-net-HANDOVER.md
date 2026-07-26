@@ -11,7 +11,62 @@ a test round; do not start anything new until he returns with findings.
 
 ---
 
-## RUN 4 (2026-07-26, breed aliases + two guards + four breed one-liners). Read this first.
+## RUN 5 (2026-07-26, choice fix + theatre + breed handoff/hub/best + sim). Read this first.
+
+All on `pick-a-chum` preview. Harness is **294 passing, 0 failing** (RUN 4 ended at
+285). Nothing merged to `main`. Commits this session, newest last:
+
+- `5ef1fa9` fix one-option breed_choice: a bare cross-family word ("spaniel",
+  "shepherd") that matches exactly ONE proof breed now routes to that breed's page,
+  not a single-option "choice"; a choice needs two or more matches (287).
+- `61f9db6` typing theatre types clean copy: removed the deliberate misspellings
+  (standing AND corrected) that were corrupting breed facts (287).
+- `3f3d60d` breed page handoff + contextual link gate: new "Link Handoffs" workbook
+  sheet (Family / Response ID / Dog / Line / Status); 12 NAV_BREED_HANDOFF lines
+  seeded (3 per dog). breed_page renders factual + active-dog handoff + [LINK]. UI
+  `contextualLink` flag lets the breed link show mid-chat (288).
+- `1d3ba05` reinstate the self-correcting typo on CHARACTER copy only (`NO_TYPO`
+  set): never on breed facts / FAQ / rules / GK / safety, and never a standing typo
+  (289).
+- `8867922` breed hub + breed best shared lines: BREED_HUB (breed question, no breed
+  named) and BREED_BEST (superlative). Both after matchBreed so a named breed always
+  wins. BREED_HUB links the /chums index; BREED_BEST has no link (294).
+- `83e3e76` multi-turn sim as permanent tooling: `scripts/sim-multi-turn.mjs` +
+  `scripts/sim-scenarios.txt` (12 scenarios seeded from pass2), `npm run sim`.
+
+Produced this session (files, not in repo): `~/Downloads/` pass3 sim
+(`pick-a-chum-sim-results-pass3.csv`), `breed-hub-sweep.csv`,
+`b15-orientation-report.md`, `breed-handoff-trace.md`,
+`close-with-link-home-and-gate.md`.
+
+Copy owed by Steve (nothing invented):
+- Six per-breed factual lines (cocker spaniel, beagle, french bulldog, pug, german
+  shepherd, staffordshire bull terrier); plus verification of the four
+  DRAFT-UNVERIFIED one-liners (breed pages + a Kennel Club source) before merge.
+- The rest of the "Link Handoffs" sheet: NAV_BREED_HANDOFF beyond the 12 seeded
+  (Steve intends 20 per dog) and the CLOSE_WITH_LINK family (end-of-conversation,
+  20 per dog). Format is fixed; paste into the workbook sheet.
+- Breed choice framing `BREED-CHOICE`; L2-variant distress copy (sadness redirect).
+
+Paused (approved, NOT built, survives): PERSONAL_SADNESS_GENTLE_REDIRECT (L2
+variant copy owed).
+
+Two OPEN items from this session:
+1. The /chums index page renders a placeholder STUB ("Chums index - hello").
+   BREED_HUB attaches /chums as its [LINK] because the route is real (not
+   invented), but it is unfinished. Decide: build the index page, or drop the link
+   until it exists.
+2. The breed page link may not render in the browser. At HEAD the engine returns
+   the handoff inside `response.text` and sets `url`, and the UI logic reaches the
+   ActionLink branch (full trace in `~/Downloads/breed-handoff-trace.md`); the
+   preview showing only the factual line points to a stale bundle / browser cache.
+   Needs re-verification on a confirmed-fresh `1d3ba05`+ deploy. (Design note:
+   BREED_BEST intentionally has no handoff/link, as every handoff line is a link
+   pointer and "best" has no destination.)
+
+---
+
+## RUN 4 (2026-07-26, breed aliases + two guards + four breed one-liners).
 
 All on `pick-a-chum` preview. Harness is **285 passing, 0 failing** (started this
 run at 280). Nothing merged to `main`. Two commits this run:
@@ -213,8 +268,8 @@ plus the false-positive guards: "stroke the dog" -> fallback, "what is a penis"
 
 ## Harness floor
 
-`scripts/test-pickachum.mjs` is at **285 passing, 0 failing** (RUN 4). The floor
-to hold going forward is **285**: do not remove or weaken existing assertions;
+`scripts/test-pickachum.mjs` is at **294 passing, 0 failing** (RUN 5). The floor
+to hold going forward is **294**: do not remove or weaken existing assertions;
 new work only adds. (There is no coded ratchet yet; the floor is a convention. A ratchet
 is a Phase-0 item in the Recovery Rules runbook, unbuilt.) The one permitted
 edit so far was BARK-T16 (chocolate -> dog emergency), done in its own commit
