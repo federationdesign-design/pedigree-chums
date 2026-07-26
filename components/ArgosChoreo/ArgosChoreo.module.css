@@ -1,11 +1,13 @@
 /* All choreography is mobile-only; on desktop these render nothing special
    because the scenes themselves are gated behind .sceneMobile in the page. */
 
+/* No min-height. The content is top-aligned, so a full-screen box just left a
+   tall empty tail below the last element -- which is what the gap under the
+   gallery quotes was. Hugging the content removes it, and because the stage is
+   now shorter it also stays pinned for longer, which is the inertia we want. */
 .stage {
   position: sticky;
   top: 130px;
-  min-height: calc(100vh - 130px);
-  min-height: calc(100svh - 130px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
