@@ -265,9 +265,11 @@
    Scene height sets how long the whole build takes. With 8 frames there are 7
    wipes, so 420vh minus the sticky stage leaves roughly 45vh of scroll per
    wipe. Raise this number to slow the build down. */
+/* --scene-vh is set inline by the component, so each scene sizes itself to the
+   number of transitions it has. The two declarations keep the vh fallback. */
 .wipeScene {
-  height: 420vh;
-  height: 420svh;
+  height: calc(var(--scene-vh, 420) * 1vh);
+  height: calc(var(--scene-vh, 420) * 1svh);
 }
 
 .wipeStage {
@@ -276,18 +278,24 @@
   overflow: hidden;
 }
 
-/* aspect-ratio is the frame's own ratio with 10% taken off the height
-   (1115 x 1400 becomes 1115 x 1260). Combined with object-fit: cover and
-   centre positioning below, that trims 5% off the top and 5% off the
-   bottom of every frame. Change 1260 to re-cut. */
+/* The frame shape comes from the component: pass frameRatio to crop to a fixed
+   ratio, or omit it to keep the artwork's own proportions with no cropping. */
 .wipeLayers {
   position: relative;
   line-height: 0;
-  aspect-ratio: 1115 / 1260;
   overflow: hidden;
 }
 
+/* No crop: the base image sets the height, so nothing is trimmed. */
 .wipeBase {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Cropped: the container's aspect-ratio governs, and cover trims evenly from
+   the top and bottom (or the sides, if the ratio is wider than the artwork). */
+.wipeBaseCrop {
   display: block;
   width: 100%;
   height: 100%;

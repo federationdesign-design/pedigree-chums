@@ -873,6 +873,20 @@ export default function ArgosPage() {
 
               <p>Argos belongs to that world.</p>
 
+              {/* Two landscape scenes cross-dissolving on scroll. No frameRatio,
+                  so the artwork keeps its own proportions and nothing is cropped
+                  off the left or right. Mobile only, like the other scenes. */}
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                <WipeSequence
+                  mode="fade"
+                  alt="Argos in the world of scent"
+                  images={[
+                    "/smell/smell-scene-a.jpg",
+                    "/smell/smell-scene-b.jpg",
+                  ]}
+                />
+              </div>
+
               <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
 
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
@@ -924,6 +938,8 @@ export default function ArgosPage() {
                   every other scroll scene on this page. */}
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 <WipeSequence
+                  frameRatio="1115 / 1260"
+                  sceneVh={420}
                   alt="A dog and a woman nose to nose, with the path of smell traced into the brain"
                   images={[
                     "/smell/smell-img1.jpg",

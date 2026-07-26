@@ -383,32 +383,56 @@ export function WipeSequence({
   images,
   alt,
   captions,
+  mode = "wipe",
+  frameRatio,
+  sceneVh,
 }: {
   images: string[];
   alt: string;
-  captions: {
+  captions?: {
     fromFrame: number;
     title?: string;
     titleTone?: "yellow" | "white";
     text: React.ReactNode;
     tone?: "yellow" | "white";
   }[];
+  /* "wipe" reveals each frame from the right edge; "fade" cross-dissolves. */
+  mode?: "wipe" | "fade";
+  /* e.g. "1115 / 1260" to crop the frames to a fixed shape. Omit to keep the
+     artwork's own proportions with no cropping at all. */
+  frameRatio?: string;
+  /* Scene height in vh. Defaults to 45vh of scroll per transition plus a
+     screen for the sticky stage. */
+  sceneVh?: number;
 }) {
   const { sceneRef, p } = useSceneProgress();
   const steps = Math.max(1, images.length - 1);
   const topFrame = Math.min(steps, Math.ceil(p * steps));
+  const caps = captions ?? [];
   let capIdx = 0;
-  for (let i = 0; i < captions.length; i++) {
-    if (captions[i].fromFrame <= topFrame) capIdx = i;
+  for (let i = 0; i < caps.length; i++) {
+    if (caps[i].fromFrame <= topFrame) capIdx = i;
   }
+  const height = sceneVh ?? 100 + steps * 45;
   return (
-    <div ref={sceneRef} className={styles.wipeScene}>
+    <div
+      ref={sceneRef}
+      className={styles.wipeScene}
+      style={{ "--scene-vh": height } as React.CSSProperties}
+    >
       <div className={styles.wipeStage}>
-        <div className={styles.wipeLayers}>
+        <div className={styles.wipeLayers} style={frameRatio ? { aspectRatio: frameRatio } : undefined}>
           {images.map((src, i) => {
             if (i === 0) {
               /* eslint-disable-next-line @next/next/no-img-element */
-              return <img key={src} src={src} alt={alt} className={styles.wipeBase} />;
+              return (
+                <img
+                  key={src}
+                  src={src}
+                  alt={alt}
+                  className={frameRatio ? styles.wipeBaseCrop : styles.wipeBase}
+                />
+              );
             }
             const reveal = clamp01(p * steps - (i - 1));
             return (
@@ -419,32 +443,38 @@ export function WipeSequence({
                 alt=""
                 aria-hidden="true"
                 className={styles.wipeLayer}
-                style={{ clipPath: `inset(0 0 0 ${(1 - reveal) * 100}%)` }}
+                style={
+                  mode === "fade"
+                    ? { opacity: reveal }
+                    : { clipPath: `inset(0 0 0 ${(1 - reveal) * 100}%)` }
+                }
               />
             );
           })}
         </div>
         {/* key forces a remount so each new caption fades in */}
-        <p
-          key={capIdx}
-          className={`${styles.wipeCaption} ${
-            captions[capIdx].tone === "yellow" ? styles.wipeCaptionYellow : styles.wipeCaptionWhite
-          }`}
-        >
-          {captions[capIdx].title && (
-            <>
-              <strong
-                className={
-                  captions[capIdx].titleTone === "white" ? styles.wipeTitleWhite : styles.wipeTitleYellow
-                }
-              >
-                {captions[capIdx].title}
-              </strong>
-              <br />
-            </>
-          )}
-          {captions[capIdx].text}
-        </p>
+        {caps.length > 0 && (
+          <p
+            key={capIdx}
+            className={`${styles.wipeCaption} ${
+              caps[capIdx].tone === "yellow" ? styles.wipeCaptionYellow : styles.wipeCaptionWhite
+            }`}
+          >
+            {caps[capIdx].title && (
+              <>
+                <strong
+                  className={
+                    caps[capIdx].titleTone === "white" ? styles.wipeTitleWhite : styles.wipeTitleYellow
+                  }
+                >
+                  {caps[capIdx].title}
+                </strong>
+                <br />
+              </>
+            )}
+            {caps[capIdx].text}
+          </p>
+        )}
       </div>
     </div>
   );
