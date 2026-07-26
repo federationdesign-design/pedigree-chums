@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
   await p.waitForTimeout(6000); // cold compile headroom
   await p.getByRole('button', { name: 'View Old English Bulldog family tree' }).click();
   await p.waitForTimeout(2500); // entrance
-  await p.locator('[aria-label="Start"]').click({ force: true }); // START gates the drop now (pulsing, so force)
+  await p.locator('[aria-label="Play"]').click({ force: true }); // START gates the drop now (pulsing, so force)
   await p.waitForTimeout(9000); // drop + settle
   const c = await p.evaluate(() => {
     const svg = document.querySelector('[role="dialog"] svg');

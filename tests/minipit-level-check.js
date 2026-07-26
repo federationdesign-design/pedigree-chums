@@ -119,7 +119,7 @@ const seamLines = () => {
   await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
   await p.waitForTimeout(7000); // hydration: a click before this is a no-op
   await p.getByRole('button', { name: 'View Celtic Hound family tree' }).click({ timeout: 60000 });
-  await p.locator('[aria-label="Start"]').waitFor({ timeout: 15000 });
+  await p.locator('[aria-label="Play"]').waitFor({ timeout: 15000 });
 
   // a) present but parked off screen before START
   const before = await p.evaluate(readLevel);
@@ -137,7 +137,7 @@ const seamLines = () => {
     // retry the hover if it did not take.
     let reading = null;
     for (let attempt = 0; attempt < 4 && !reading; attempt++) {
-      await p.locator('[aria-label="Start"]').hover({ force: true });
+      await p.locator('[aria-label="Play"]').hover({ force: true });
       let last = null;
       for (let i = 0; i < 20; i++) {
         const now = await p.evaluate(() => getComputedStyle(document.querySelector('[class*="level"][aria-hidden="true"]')).clipPath);
@@ -157,7 +157,7 @@ const seamLines = () => {
     (s) => s && s.gap < 2 && Math.abs(s.washAngle - s.levelAngle) < 0.1
   );
 
-  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.locator('[aria-label="Play"]').click({ force: true });
   await p.waitForTimeout(1200);
   const after = await p.evaluate(readLevel);
   const home = after.clipArea === 4;
@@ -189,7 +189,7 @@ const seamLines = () => {
   await p2.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
   await p2.waitForTimeout(7000);
   await p2.getByRole('button', { name: 'View Old English Bulldog family tree' }).click({ timeout: 60000 });
-  await p2.locator('[aria-label="Start"]').waitFor({ timeout: 15000 });
+  await p2.locator('[aria-label="Play"]').waitFor({ timeout: 15000 });
   const other = await p2.evaluate(readLevel);
   const untouched = !other.present;
 

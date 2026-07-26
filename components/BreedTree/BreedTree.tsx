@@ -137,7 +137,10 @@ const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
 const LABEL_LINE_H = 1.05; // line height in ems, matches the tspan dy
 const LABEL_CAP_H = 0.8; // ink above the first baseline, in ems
 const LABEL_DESC = 0.28; // ink below the last baseline, in ems
-const LABEL_SAFE = 0.9; // keep the block inside this fraction of the radius
+// Keep the block inside this fraction of the radius. Raised from 0.9: names are
+// meant to fill the circle and touching the rim is fine, so only a thin margin
+// is held back to stop ink crossing the stroke itself.
+const LABEL_SAFE = 0.95;
 
 // Real glyph widths, not a flat per-character average. Luckiest Guy caps run
 // from about 0.57em (BRITISH) to 0.73em (BANDOGS), so an average either
@@ -168,6 +171,10 @@ function measureEm(line: string, font: string | null): number {
 }
 // Steve: names two point sizes larger than the fitted size. Single tunable.
 const TITLE_BOOST = 2;
+// The yellow percentage badge, drawn and collided at this radius. Doubled from
+// 46: they were easy to lose against the circles, on the start screen and in
+// the pit alike.
+const BADGE_DRAW_R = 92;
 
 // Split words into exactly n lines as evenly as the word lengths allow.
 // Returns null when n lines are not reachable (a single long word can force
@@ -598,7 +605,7 @@ export default function BreedTree({
     setBadgePcts(
       nodes
         .filter((n) => n.depth === 1)
-        .map((n) => ({ pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0, r: 46 })),
+        .map((n) => ({ pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0, r: BADGE_DRAW_R })),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, dockAside]);
@@ -1117,7 +1124,7 @@ export default function BreedTree({
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
-      const BADGE_R = 46 / k;
+      const BADGE_R = BADGE_DRAW_R / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
         r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
@@ -1271,7 +1278,7 @@ export default function BreedTree({
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: 46 }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: BADGE_DRAW_R }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -1484,7 +1491,7 @@ export default function BreedTree({
         const bl = badgeBodiesRef.current;
         if (!bl) return;
         const w = worldFromPx(sx, sy);
-        const rDraw = opts?.r ?? 46; // badges keep their fixed 46, unchanged
+        const rDraw = opts?.r ?? BADGE_DRAW_R;
         const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20 };
         bl.push(nb);
         all.push(nb);
@@ -1976,7 +1983,10 @@ export default function BreedTree({
                       const kL = SIZE / vL[2];
                       const ls = isMobile ? Math.max(0.4, Math.min(1.25, (d.r * kL) / 250)) : 1;
                       const rFit = isMobile ? (d.r * kL) / ls : d.r;
-                      const cap = isMobile ? 102 : 34;
+                      // the ceiling the fitter may grow to. Raised with
+                      // LABEL_SAFE so short names are not capped before they
+                      // reach the rim.
+                      const cap = isMobile ? 132 : 44;
                       const fit = fitLabel(d.data.name.toUpperCase(), rFit, cap, labelFont);
                       const lines = fit.lines;
                       const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST));
@@ -2225,14 +2235,14 @@ export default function BreedTree({
             // near the foot of the pit, LEARN a little above centre.
             const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
               { key: "learn", label: "LEARN", x: xMinC + vbWc - m, y: -vbHc * WORD_LEARN_Y, anchor: "end" },
-              { key: "start", label: "START", x: xMinC + m, y: vbHc * WORD_START_Y, anchor: "start" },
+              { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y, anchor: "start" },
             ];
             return words.map((w) => (
               <g
                 key={w.key}
                 className={styles.startBtn}
                 role="button"
-                aria-label={w.key === "start" ? "Start" : "Learn about these breeds"}
+                aria-label={w.key === "start" ? "Play" : "Learn about these breeds"}
                 tabIndex={0}
                 style={{ cursor: "pointer" }}
                 onMouseEnter={() => {
@@ -2310,12 +2320,17 @@ export default function BreedTree({
             const stW = st ? st.clientWidth : 390;
             const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
-            const topFrac = 0.045;
+            const topFrac = 0.045; // plus a 20px nudge below, applied in css units
             // 1.24 is the glyph half-height as a multiple of fs/vbHc, measured
             // off the rendered word rather than assumed: Luckiest Guy at this
             // scale sits taller in its box than a nominal 0.62 would suggest.
             const startTopFrac = 0.5 + WORD_START_Y - (fs / vbHc) * 1.24;
-            return { top: `${topFrac * 100}%`, height: `${Math.max(18, (startTopFrac - topFrac) * 100)}%` };
+            // nudged 20px down, and the track shortens by the same so its foot
+            // stays on the cap of the P
+            return {
+              top: `calc(${topFrac * 100}% + 20px)`,
+              height: `calc(${Math.max(18, (startTopFrac - topFrac) * 100)}% - 20px)`,
+            };
           })()}
         >
           <div

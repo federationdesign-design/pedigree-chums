@@ -25,7 +25,7 @@ const probe = () => {
     stageW: svg ? +svg.parentElement.getBoundingClientRect().width.toFixed(1) : null,
     level: sl ? +sl.getAttribute('aria-valuenow') : null,
     hasSlider: !!sl,
-    hasStart: !!document.querySelector('[aria-label="Start"]'),
+    hasStart: !!document.querySelector('[aria-label="Play"]'),
     labelsOn: labels ? labels.style.opacity !== '0' : false,
   };
 };
@@ -53,7 +53,7 @@ const openPit = async (p) => {
   const reach = await p.evaluate(() => {
     const st = document.querySelector('[role="dialog"] svg').parentElement.getBoundingClientRect();
     const sl = document.querySelector('[role="slider"][aria-label="Difficulty"]');
-    const tx = document.querySelector('[aria-label="Start"] text');
+    const tx = document.querySelector('[aria-label="Play"] text');
     if (!sl || !tx) return null;
     const s2 = sl.getBoundingClientRect(), t2 = tx.getBoundingClientRect();
     return {
@@ -123,11 +123,14 @@ const openPit = async (p) => {
   for (let i = 0; i < 7; i++) await p.keyboard.press('ArrowUp');
   await p.waitForTimeout(120);
   const seven = await p.evaluate(probe);
-  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.locator('[aria-label="Play"]').click({ force: true });
   await p.waitForTimeout(3000);
   const played = await p.evaluate(probe);
 
-  const fell = played.y - seven.y > 50;
+  // The cluster now starts lower on the screen, so there is less room to fall
+  // through. What matters is that it moved down and came to rest, not that it
+  // travelled an arbitrary distance.
+  const fell = played.y - seven.y > 20;
   const clearedOnStart = !played.hasSlider && !played.hasStart;
 
   // ---- desktop: no slider, because the fill never reaches the layout ----

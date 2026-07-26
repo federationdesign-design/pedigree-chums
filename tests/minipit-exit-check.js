@@ -32,8 +32,8 @@ const openPit = async (p) => {
   await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
   await p.waitForTimeout(7000); // hydration
   await p.getByRole('button', { name: 'View Celtic Hound family tree' }).click({ timeout: 60000 });
-  await p.locator('[aria-label="Start"]').waitFor({ timeout: 30000 });
-  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.locator('[aria-label="Play"]').waitFor({ timeout: 30000 });
+  await p.locator('[aria-label="Play"]').click({ force: true });
   await p.waitForTimeout(5000); // the X is a physics object, let it settle
 };
 

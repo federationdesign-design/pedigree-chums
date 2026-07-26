@@ -83,8 +83,8 @@ const openPit = async (p, breed) => {
   await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
   await p.waitForTimeout(7000); // hydration: a click before this is a no-op
   await p.getByRole('button', { name: `View ${breed} family tree` }).click({ timeout: 60000 });
-  await p.locator('[aria-label="Start"]').waitFor({ timeout: 30000 });
-  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.locator('[aria-label="Play"]').waitFor({ timeout: 30000 });
+  await p.locator('[aria-label="Play"]').click({ force: true });
   await p.waitForTimeout(6500); // the drop has to settle before a circle owns a body
 };
 

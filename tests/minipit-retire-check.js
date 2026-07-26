@@ -39,7 +39,7 @@ const centreOf = (re) => {
   const round = async (breed) => {
     await p.getByRole('button', { name: 'View ' + breed + ' family tree' }).click();
     await p.waitForTimeout(2700);
-    const s = await p.$('[aria-label="Start"]');
+    const s = await p.$('[aria-label="Play"]');
     if (s) await s.click({ force: true });
     await p.waitForTimeout(12000);
     return p.evaluate(toys);

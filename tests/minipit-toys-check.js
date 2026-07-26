@@ -43,7 +43,7 @@ const shown = (list, kind) => list.filter((t) => t.kind === kind && t.shown);
 
   const preStart = await p.evaluate(readToys);
   const t0 = Date.now();
-  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.locator('[aria-label="Play"]').click({ force: true });
 
   // poll fast so we catch the ball's very first painted frame, and time it
   let firstPaint = null;

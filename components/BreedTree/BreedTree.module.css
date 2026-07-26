@@ -373,7 +373,7 @@
    circles but clear of START, which rides at 80% of the stage height. */
 .diff {
   position: absolute;
-  left: 14px;
+  left: 24px; /* nudged 10px right */
   /* top and height are set inline: the track runs to the cap of the S in START,
      which is computed from the same numbers the word uses */
   z-index: 16;

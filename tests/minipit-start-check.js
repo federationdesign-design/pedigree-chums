@@ -27,7 +27,7 @@ const probe = () => ({
       return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) };
     });
   })(),
-  hasStart: !!document.querySelector('[aria-label="Start"]'),
+  hasStart: !!document.querySelector('[aria-label="Play"]'),
 });
 
 (async () => {
@@ -98,7 +98,7 @@ const probe = () => ({
   const contained = !!labels && labels.length > 0 && labels.every((l) => l.fill <= 1);
 
   // START actually starts it
-  await p.locator('[aria-label="Start"]').click({ force: true }); // pulses, so force
+  await p.locator('[aria-label="Play"]').click({ force: true }); // pulses, so force
   await p.waitForTimeout(3000);
   const s3 = await p.evaluate(probe);
   const fell = s2.circle && s3.circle && s3.circle.y - s2.circle.y > 50;

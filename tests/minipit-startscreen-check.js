@@ -28,12 +28,12 @@ const probe = () => {
   };
   return {
     dialogOpen: true,
-    start: !!document.querySelector('[aria-label="Start"]'),
+    start: !!document.querySelector('[aria-label="Play"]'),
     shake: !!document.querySelector('[aria-label="Shake the pit"]'),
     slowmo: !!document.querySelector('[aria-label="Slow motion"], [aria-label="Normal speed"]'),
     close: !!dlg.querySelector('g[style*="cursor: pointer"] line'),
     info: !!dlg.querySelector('path[d*="M12 6v4"]'),
-    startSize: word('Start'),
+    startSize: word('Play'), // the word reads PLAY now, not START
     learnSize: word('Learn about these breeds'),
     circle: first
       ? {
@@ -54,7 +54,7 @@ const probe = () => {
   await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
   await p.waitForTimeout(7000); // hydration: a click before this is a no-op
   await p.getByRole('button', { name: 'View Celtic Hound family tree' }).click({ timeout: 60000 });
-  await p.locator('[aria-label="Start"]').waitFor({ timeout: 30000 });
+  await p.locator('[aria-label="Play"]').waitFor({ timeout: 30000 });
   await p.waitForTimeout(400);
 
   const before = await p.evaluate(probe);
@@ -72,14 +72,14 @@ const probe = () => {
     Math.abs(tapped.circle.y - before.circle.y) < 2;
 
   // e) the word answers to the pointer
-  await p.locator('[aria-label="Start"]').hover({ force: true });
+  await p.locator('[aria-label="Play"]').hover({ force: true });
   await p.waitForTimeout(400);
   const hovered = await p.evaluate(probe);
   const wordAnswers =
     hovered.startSize > before.startSize && hovered.learnSize === before.learnSize;
 
   // d) everything arrives with the round
-  await p.locator('[aria-label="Start"]').click({ force: true });
+  await p.locator('[aria-label="Play"]').click({ force: true });
   await p.waitForTimeout(2500);
   const running = await p.evaluate(probe);
   // shake and slow motion arrive with the round; the info square never does
