@@ -70,8 +70,16 @@ markdown review docs).
 - faaa01410ba97efe62907d9e33480ede40efbba0: pick-a-chum: Recovery Rules review
   docs (reading, runbook, harness draft, glossary, log). Docs only, no code.
   5 files, 1198 insertions, 0 deletions.
-- (a second small commit updates this log line with the SHA above; its own SHA
-  is noted when I push.)
+- d44373e3d0835e66a05de2e3e8605d8f5c7236a6: pick-a-chum: record commit SHA in
+  the session log (this line).
+
+PUSH STATUS: NOT PUSHED. Both commits are on the local `pick-a-chum` branch.
+`git push origin pick-a-chum` was denied by the permission layer (no
+interactive approval available while Steve is away). I did not retry it
+repeatedly and I did not force anything. Nothing went to main, nothing merged.
+To publish: run `git push origin pick-a-chum` yourself, or approve the push.
+A later log tweak (if any) may add one more commit on top of d44373e; the two
+SHAs above are the substantive ones.
 
 ---
 
