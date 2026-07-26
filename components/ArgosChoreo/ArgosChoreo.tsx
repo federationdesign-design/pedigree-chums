@@ -101,7 +101,7 @@ export function QuotePollScene({
   options,
   footnote,
 }: {
-  quote?: string;
+  quote: string;
   blockClass: string;
   markClass: string;
   question: string;
@@ -178,7 +178,7 @@ export function QuotePollScene({
   return (
     <div ref={sceneRef} className={styles.quotePollScene}>
       <div className={styles.stage}>
-        {quote && <div className={styles.quoteHolder}>
+        <div className={styles.quoteHolder}>
           <div className={styles.quoteLineTrack}>
             <div className={styles.quoteLine} style={{ height: `${Math.max(3, line * 100)}%` }} />
           </div>
@@ -186,7 +186,7 @@ export function QuotePollScene({
             <span className={markClass} style={{ opacity: mark ? 1 : 0, transition: "opacity 0.2s ease" }}>{"\u201c"}</span>
             <span style={{ opacity: text, filter: `blur(${(1 - text) * 14}px)`, willChange: "opacity, filter" }}>{quote}</span>
           </blockquote>
-        </div>}
+        </div>
         <div
           className={styles.pollWrap}
           style={{ opacity: pollCard, transform: `translateY(${(1 - pollCard) * 16}px)` }}
