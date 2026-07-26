@@ -663,8 +663,15 @@ export default function LineageMap({
       // and is no longer drawn. Popping from its coordinates throws the card out
       // to wherever that invisible node sat, which is a long way from the dog.
       // For these dogs the card comes out of the big circle itself.
-      const baseX = soloLeaf ? breed.x : live ? live._x + Math.cos(live._dir) * d : 0;
-      const baseY = soloLeaf ? breed.y : live ? live._y + Math.sin(live._dir) * d : 0;
+      // A solo dog has no node to pop from. The card springs out of the big
+      // circle's top-right shoulder, offset by that circle's own radius so it
+      // sits clear whatever size the dog is, rather than hiding dead centre.
+      // circR is declared further down, so use the same expression it does:
+      // the dog's own radius, clamped, falling back to ROOT off the mini pit
+      const bigR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+      const soloOff = bigR * 0.72;
+      const baseX = soloLeaf ? breed.x + soloOff : live ? live._x + Math.cos(live._dir) * d : 0;
+      const baseY = soloLeaf ? breed.y - soloOff : live ? live._y + Math.sin(live._dir) * d : 0;
       const pos = dragPos.get(id);
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
@@ -1332,6 +1339,10 @@ export default function LineageMap({
         {hasTree ? (
           <>
             <g style={{ opacity: removing || scattered ? 0 : 1, display: scattered ? "none" : undefined, transition: "opacity 0.12s ease-out" }}>
+            {/* A solo dog's card pops out of the big circle, so the circle has
+                to be painted first or it covers the card. Every other dog keeps
+                the original order, with the root drawn last. */}
+            {soloLeaf && rootCard(breed.x, breed.y)}
             {shown
               .filter((n) => n._parent && !soloLeaf)
               .map((n) => {
@@ -1753,7 +1764,7 @@ export default function LineageMap({
               );
             })}
 {/* stacked duplicate cards rendered as fixed HTML below */}
-            {rootCard(breed.x, breed.y)}
+            {!soloLeaf && rootCard(breed.x, breed.y)}
           </>
         ) : (
           <>

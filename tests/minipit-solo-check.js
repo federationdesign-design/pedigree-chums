@@ -21,6 +21,27 @@ const { chromium } = require('playwright');
 
 const layer = () => ({
   open: !!document.querySelector('[aria-label="Learn"]'),
+  // the popped card must sit above the big circle in paint order and off its
+  // top-right shoulder, not hidden dead centre behind it
+  pop: (() => {
+    // the layer is not the first svg on the page, so look across all of them
+    const imgs = Array.from(document.querySelectorAll('svg image'));
+    if (imgs.length < 2) return null;
+    const boxes = imgs.map((el) => {
+      const r = el.getBoundingClientRect();
+      return { el, cx: r.x + r.width / 2, cy: r.y + r.height / 2, w: r.width };
+    }).filter((b) => b.w > 20);
+    if (boxes.length < 2) return null;
+    const big = boxes.reduce((a, b2) => (b2.w > a.w ? b2 : a));
+    const small = boxes.filter((b2) => b2 !== big).reduce((a, b2) => (b2.w < a.w ? b2 : a));
+    // paint order: later in document order wins in SVG
+    const after = !!(big.el.compareDocumentPosition(small.el) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return {
+      right: +(small.cx - big.cx).toFixed(0),
+      up: +(big.cy - small.cy).toFixed(0),
+      paintedAfterBig: after,
+    };
+  })(),
   edges: document.querySelectorAll('[class*="edge"]').length,
   // popped ancestor cards render as <g> with a pick- key; CSS Module class
   // names are hashed, so match on the image the card carries instead
@@ -97,6 +118,8 @@ const liftACircle = async (p) => {
   await p.waitForTimeout(1400);
   const l1 = await p.evaluate(layer);
   const poppedFirstPress = l1.cards > l0.cards;
+  // it must clear the big circle: up and to the right, and painted on top
+  const popsClear = !!(l1.pop && l1.pop.right > 20 && l1.pop.up > 20 && l1.pop.paintedAfterBig);
   const noEdges = l0.edges === 0 && l1.edges === 0;
 
   // keep pressing until the layer finishes by itself. If a Complete button ever
@@ -128,6 +151,7 @@ const liftACircle = async (p) => {
   if (qIdx === -1) console.log('  NOTE: Manchester Terrier pit never opened, control inconclusive');
 
   console.log('Celtic Hound: lifted circle', idx, '| layer at open', JSON.stringify(l0));
+  console.log('  pops clear of the big circle:', popsClear, JSON.stringify(l1.pop));
   console.log('  no connector drawn:', noEdges, '| first press popped a card:', poppedFirstPress, l0.cards, '->', l1.cards);
   console.log('  finished on its own:', closedItself, '| Complete never shown:', !sawComplete);
   // it must arrive where the dog was, in the lower half of the stage, not up at
@@ -140,7 +164,7 @@ const liftACircle = async (p) => {
   console.log('Manchester Terrier keeps its nodes and connectors:', ancestorsKeepNodes, 'edges', q1.edges);
   console.log('pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
-  const pass = !!(noEdges && poppedFirstPress && closedItself && !sawComplete
+  const pass = !!(noEdges && poppedFirstPress && popsClear && closedItself && !sawComplete
     && gotNamedCircle && gotFullSize && landedLow && thickStroke
     && ancestorsKeepNodes && errs.length === 0);
   console.log(pass ? 'PASS GUARD-013' : 'FAIL GUARD-013');
