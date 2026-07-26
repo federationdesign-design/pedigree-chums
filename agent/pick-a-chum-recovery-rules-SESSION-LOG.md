@@ -53,10 +53,11 @@ CI check, or an editor integration, none of which live in this tree.)
 ## Deliverables produced (all review documents, no code, no execution)
 
 1. agent/pick-a-chum-recovery-rules-READING.md   (items 1 and 2)
-2. agent/pick-a-chum-recovery-rules-BUILD-RUNBOOK.md   (item 3)
+2. agent/pick-a-chum-recovery-rules-BUILD-RUNBOOK.md   (item 3; REVISED against DECISIONS)
 3. agent/pick-a-chum-recovery-rules-HARNESS-DRAFT.md   (item 4)
 4. agent/pick-a-chum-recovery-rules-GLOSSARY.md   (item 5)
 5. agent/pick-a-chum-recovery-rules-SESSION-LOG.md   (this hand-back)
+6. agent/pick-a-chum-recovery-rules-DECISIONS.md   (Steve's settled rulings A-F + additions)
 
 Verification note: I ran `npm run test:pickachum` ONCE, read-only, to confirm
 the 194/0 baseline. I did not edit the harness or any code. `tsc` was not run
@@ -81,31 +82,37 @@ This log line is updated by one further commit on top of 8c08a86.
 
 ---
 
-## Decisions deferred to Steve (all restated in the READING and RUNBOOK)
+## Decisions: NOW SETTLED (2026-07-26, see the DECISIONS doc)
 
-These are product/policy calls I did not guess. Each blocks a build phase.
+DECISIONS A to F are closed. Steve ruled on all six, plus three additions, a
+sequencing change and a spec amendment. Full text in
+`agent/pick-a-chum-recovery-rules-DECISIONS.md`. Summary:
 
-- DECISION A (gap 2 / Phase 2): precise definition of a "meaningful message"
-  that resets confusion. My recommendation: routed to a substantive family,
-  not any recovery-sensitive family.
-- DECISION B (gap 4 / Phase 2): soft end or hard end after stage 4. My
-  recommendation: soft (re-engage on a genuinely meaningful message).
-- DECISION C (gap 1 / Phase 3): rudeness reset policy: never, decay
-  (recommended), or reset-like-confusion.
-- DECISION D (gap 3 / Phase 3): confirm one-counter-per-turn precedence
-  (safety, then rudeness, then confusion; a turn touches one counter, resets
-  none of the others).
-- DECISION E (gap 6 / Phases 3 and 7): the character-manipulation set's home
-  (route into safety, or declare out of scope for this release). Until decided,
-  no copy may claim "safety wins during recovery" in the general sense. NOTE: I
-  did not open or work the parked safety workstream this session; this decision
-  is yours and touches files I was told to leave alone.
-- DECISION F (gap 5 / Phase 4): approve the transfer-context sanitisation rule
-  (carry classified intent plus sanitised summary, never the raw string).
-- Glossary content (item 5) is copy, so it is yours to approve/edit before it
-  moves into the workbook. Specific judgement calls flagged at the foot of the
-  glossary (Hot Dog Mode's real answer, whether to keep the "Herdability" joke
-  entry, the Childline row staying in lockstep with approved safety wording).
+- A: "meaningful" = substantive family, not recovery-sensitive; plus a
+  never-resetting rung-3+ tally to terminate stuck-unstuck cycles.
+- B: soft end (re-engage on a meaningful message).
+- C: rudeness DECAYS one level per 5 clean meaningful turns (five, for the
+  nine-year-old audience).
+- D: one counter per turn; order safety, rudeness, confusion; resets none.
+- E: manipulation set OUT OF SCOPE; copy may not claim "safety wins during
+  recovery" generally; on the section-14 release checklist.
+- F: approved; never render input from refusal/rude/unsafe/fallback families;
+  transfer carries classified intent plus sanitised summary, never raw string.
+- Additions: (1) section 7 level-3 "stops" gets the soft-end mechanism; (2)
+  standing exemption to REWRITE (not remove) the one Kettle harness assertion,
+  in its own commit with before/after; (3) split `closed` into two reasons
+  (ceiling vs recovery), distinct copy.
+- Sequencing: glossary approval BLOCKS the definition phase; the critical path
+  is Steve's copy review, not the build.
+- Spec amendment: the `[X]` restatement slot restates the prior DOG line, never
+  the visitor's words.
+
+The BUILD-RUNBOOK has been revised against all of the above (Phases 0, 2, 3, 4
+changed; 6/7 reordered so glossary blocks the definition phase). Still open and
+Steve's to provide: the actual COPY at each phase STOP, and glossary approval at
+STOP 6A (the critical path). Glossary judgement calls still flagged at the foot
+of the glossary (Hot Dog Mode's real answer, the "Herdability" joke entry, the
+Childline row staying in lockstep with approved safety wording).
 
 ---
 
