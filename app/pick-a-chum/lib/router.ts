@@ -236,6 +236,7 @@ export interface RouterState {
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
   barkCompleted?: boolean; // the active dog has already completed its bark game
   lastAction?: ActionType | null; // previous turn's action (for the clarifier follow-up)
+  anatomyRedirectUsed?: boolean; // ANATOMY_GENERAL_REDIRECT already fired this session
 }
 
 // After the bare-help clarifier fires, the visitor's next turn is an answer to
@@ -286,13 +287,17 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (safety.action === 'clarifier' && state.lastAction === 'clarifier') {
       return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
     }
-    return {
-      layer: 1,
-      layerName: 'Safety and unsuitable content',
-      bucket: null,
-      action: safety.action,
-      moderationId: safety.moderationId,
-    };
+    // ANATOMY_GENERAL_REDIRECT fires at most once per session. After the first,
+    // do not repeat it: fall through to normal routing (gk_unknown / fallback).
+    if (!(safety.action === 'anatomy_redirect' && state.anatomyRedirectUsed)) {
+      return {
+        layer: 1,
+        layerName: 'Safety and unsuitable content',
+        bucket: null,
+        action: safety.action,
+        moderationId: safety.moderationId,
+      };
+    }
   }
   if (isDogHealthQuestion(N)) {
     return {

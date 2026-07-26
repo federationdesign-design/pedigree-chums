@@ -22,7 +22,8 @@ export type SafetyKind =
   | 'dog_emergency'
   | 'explicit'
   | 'abuse'
-  | 'bare_help';
+  | 'bare_help'
+  | 'anatomy_redirect';
 
 export interface SafetyHit {
   kind: SafetyKind;
@@ -103,6 +104,19 @@ const ACTION = ['touched', 'touches', 'made me', 'showed me', 'hurt', 'kissed', 
 // these precedes an ABUSE term, route to SAFEGUARDING, not the ABUSE boundary.
 const REPORTING_FRAME = ['called me', 'called him', 'called her', 'said i was', 'said i am', 'told me i was', "says i'm", 'says im', 'shouted at me', 'keeps calling me'];
 
+// Person-reference classes for anatomy routing. FIRST_PERSON is the hard override:
+// its presence NEVER takes the neutral redirect (a first-person anatomy message is
+// treated as a possible disclosure). SPECIFIC (first-person plus he/she/they/you
+// and the named PERSON_REF) routes anatomy to safeguarding. GENERIC person words
+// (boys, girls, people, ...) are neutral: they are NOT in SPECIFIC, so an anatomy
+// question that only mentions them (and no first-person, no action) takes the
+// general redirect. GENERIC is listed for reference; the code only needs to test
+// FIRST_PERSON, SPECIFIC and ACTION.
+const FIRST_PERSON = ['me', 'my', 'mine', 'i', 'us'];
+const SPECIFIC_PERSON = [...FIRST_PERSON, 'you', 'your', 'he', 'him', 'his', 'she', 'her', 'they', 'them', ...PERSON_REF];
+// GENERIC (neutral, not tested directly): boys, girls, men, women, babies, people,
+// humans, boy, girl, man, woman, baby, child, children, kids.
+
 const ABUSE = ['stupid', 'idiot', 'shut up', 'you suck', 'hate you', 'useless', 'rubbish dog', 'fuck', 'shit'];
 
 // Dog emergencies. Gated to a dog context (per Steve's flag 2) so ambiguous human
@@ -160,9 +174,18 @@ export function detectSafety(n: Normalised): SafetyHit | null {
   // Safeguarding via an anatomy word plus a person reference or an action. A
   // body-part word ALONE is NOT a hit (no inappropriate-content boundary).
   const anat = matchedTerm(n, ANATOMY);
-  if (anat && (hasAny(n, PERSON_REF) || hasAny(n, ACTION))) {
+  if (anat) {
+    // An anatomy term routes by context. An action verb, a SPECIFIC person
+    // reference, or (subsumed within SPECIFIC) any first-person marker makes it a
+    // safeguarding disclosure. Otherwise (only generic person words like "boys",
+    // or no person at all) it is a general anatomy question and takes the approved
+    // trusted-adult redirect. The first-person override is absolute: a message
+    // with me/my/mine/i/us never takes the neutral route, whatever else is present.
+    const safeguard = hasAny(n, ACTION) || hasAny(n, SPECIFIC_PERSON);
     bestLen = anat.length;
-    hit = { kind: 'safeguarding', moderationId: 'MOD_SAFEGUARDING', action: 'safety_signpost' };
+    hit = safeguard
+      ? { kind: 'safeguarding', moderationId: 'MOD_SAFEGUARDING', action: 'safety_signpost' }
+      : { kind: 'anatomy_redirect', moderationId: 'MOD_ANATOMY_REDIRECT', action: 'anatomy_redirect' };
   }
 
   // Reported speech: a reporting frame plus an ABUSE term is a child reporting

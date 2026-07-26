@@ -293,6 +293,12 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       // Visitor asked to switch dogs. Approved repair line.
       return { responseId: 'TRANSFER-REQUEST', text: 'All right. Choose another dog from the pack and I will hand you over.', dog };
 
+    case 'anatomy_redirect': {
+      // General anatomy question: approved trusted-adult redirect. No links.
+      const cat = MODERATION.find((m) => m.id === res.moderationId) ?? MODERATION[0];
+      return { responseId: cat.id, text: cat.responses[0], dog };
+    }
+
     case 'boxer_cutoff': {
       const l1 = copy(data, 'Boxer ending', 'Cut-off 1');
       const l2 = copy(data, 'Boxer ending', 'Cut-off 2');

@@ -139,6 +139,7 @@ export type ActionType =
   | 'fallback' // terminal catch-all: unresolved free text, approved line, never echoes raw input
   | 'clarifier' // bare help-seeking: ask whether it is a site question or a worry
   | 'transfer_request' // visitor asks to switch to a different dog
+  | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a trusted adult
   | 'boxer_cutoff'; // hidden ceiling reached
 
 export interface Resolution {

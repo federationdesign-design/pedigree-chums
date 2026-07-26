@@ -164,6 +164,17 @@ export const MODERATION: ModerationCategory[] = [
     responses: ['Tell an adult and call your vet now. If the vet is closed, use the out-of-hours number on its answerphone. This needs a real vet, not this chat.'],
     status: 'APPROVED',
   },
+  {
+    // ANATOMY_GENERAL_REDIRECT (SAFETY_ADJACENT). One shared line, all four dogs,
+    // no character variation. No comedy, no sales, no games, no links. Max 1 use
+    // per session (enforced in the router via session state).
+    id: 'MOD_ANATOMY_REDIRECT',
+    scenario: 'General anatomy question (no disclosure): redirect to a trusted adult',
+    action: 'redirect',
+    escalateOnRepeat: false,
+    responses: ['That is a fair question, but a cartoon dog is not the right one to answer it. Ask a grown-up you trust or a teacher, and they can explain it properly.'],
+    status: 'APPROVED',
+  },
 ];
 
 /**
