@@ -11,7 +11,61 @@ a test round; do not start anything new until he returns with findings.
 
 ---
 
-## RUN 5 (2026-07-26, choice fix + theatre + breed handoff/hub/best + sim). Read this first.
+## RUN 6 (2026-07-26, two regressions + all ten breed lines + games roster). Read this first.
+
+All on `pick-a-chum` preview. Harness **300 passing, 0 failing** (RUN 5 ended at
+294). Nothing merged to `main`. Commits this session (after RUN 5's `ac5c3ac`):
+
+- `d9cc581` identity outranks the breed hub: "are you a dog" now reaches B16
+  identity. The hub's stopword strip collapsed it to "dog"; F02 gained the
+  trigger. (Pass3 regression.)
+- `9fa1cf7` widen `TRANSFER_VERBS` (take me back to / get me / bring me / put me
+  back to / go back to / swap to / i want the / can i have the): a switch-back
+  phrasing plus a dog name is a handoff, not the breed page ("take me back to the
+  collie"). (Pass3 regression.)
+- `7ffde2b` six breed one-liners (cocker spaniel, beagle, french bulldog, pug,
+  german shepherd, staffordshire bull terrier). ALL TEN breeds now have a factual
+  line, every one DRAFT-UNVERIFIED.
+- Docs (this section): `agent/pick-a-chum-games-roster.md` (parked six-game roster
+  + game-surface faults) and this handover update.
+
+Reports produced this session (files, not in repo, under `~/Downloads/`):
+`pick-a-chum-sim-results-pass3.csv`, `breed-hub-sweep.csv`, `game-sweep.csv`,
+`breed-hub-stopword-check.md`, `b15-orientation-report.md`,
+`breed-handoff-trace.md`, `close-with-link-home-and-gate.md`.
+
+Built: the two regression fixes; all ten breed factual one-liners (DRAFT); the
+games roster doc.
+
+Paused (approved, NOT built): PERSONAL_SADNESS_GENTLE_REDIRECT (L2 variant copy
+owed).
+
+Needs COPY / decisions from Steve:
+- Verification of all ten DRAFT-UNVERIFIED breed one-liners (breed pages + a
+  Kennel Club source) before merge.
+- Breed choice framing line `BREED-CHOICE` (still outstanding).
+- The rest of the "Link Handoffs" library beyond the 12 seeded NAV_BREED_HANDOFF
+  (Steve intends 20 per dog) plus the CLOSE_WITH_LINK family (20 per dog).
+- L2-variant distress copy (sadness redirect).
+
+OPEN items to carry:
+1. The /chums index page renders a placeholder STUB ("Chums index - hello");
+   BREED_HUB links to it (real route, unfinished).
+2. The breed page link may not render in the browser (engine correct at HEAD;
+   likely a stale bundle, see `~/Downloads/breed-handoff-trace.md`).
+3. The breed choice framing line is still outstanding.
+4. All ten breed one-liners are DRAFT-UNVERIFIED, not approved.
+5. The game surface has routing faults, recorded in
+   `agent/pick-a-chum-games-roster.md` (play-not-ready, the age FAQ over- and
+   under-matching, one B02 rules blurb for every rules question, "what is pedigree
+   chums" -> gk_unknown, and several missing routes).
+6. Orientation is unfixed: the B15 report (`~/Downloads/b15-orientation-report.md`)
+   is written but NOT acted on ("whats this?", "what can you do" etc. reach
+   gk_unknown, not B15).
+
+---
+
+## RUN 5 (2026-07-26, choice fix + theatre + breed handoff/hub/best + sim).
 
 All on `pick-a-chum` preview. Harness is **294 passing, 0 failing** (RUN 4 ended at
 285). Nothing merged to `main`. Commits this session, newest last:
@@ -268,8 +322,8 @@ plus the false-positive guards: "stroke the dog" -> fallback, "what is a penis"
 
 ## Harness floor
 
-`scripts/test-pickachum.mjs` is at **294 passing, 0 failing** (RUN 5). The floor
-to hold going forward is **294**: do not remove or weaken existing assertions;
+`scripts/test-pickachum.mjs` is at **300 passing, 0 failing** (RUN 6). The floor
+to hold going forward is **300**: do not remove or weaken existing assertions;
 new work only adds. (There is no coded ratchet yet; the floor is a convention. A ratchet
 is a Phase-0 item in the Recovery Rules runbook, unbuilt.) The one permitted
 edit so far was BARK-T16 (chocolate -> dog emergency), done in its own commit
