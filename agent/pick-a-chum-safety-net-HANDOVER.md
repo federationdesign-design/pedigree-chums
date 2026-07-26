@@ -11,6 +11,53 @@ a test round; do not start anything new until he returns with findings.
 
 ---
 
+## RUN 4 (2026-07-26, breed aliases + two guards + four breed one-liners). Read this first.
+
+All on `pick-a-chum` preview. Harness is **285 passing, 0 failing** (started this
+run at 280). Nothing merged to `main`. Two commits this run:
+
+- `84b6cdb` breed aliases + two guards.
+  - Steve's alias lists wired into `router.ts` `BREED_PAGES[].aliases`: labrador
+    (lab, labs, lab retriever, labrador retriever), border collie (collie,
+    collies), cocker spaniel (cocker, cockers), french bulldog (frenchie,
+    frenchies, frenchy, french bull dog, french bulldogs), german shepherd (gsd,
+    alsatian, alsation, german shepard, german shepperd), staffie (staffie,
+    staffy, staffies, staffordshire, staffie bull terrier, sbt). Boxer, beagle,
+    pug, border terrier: no aliases. Excluded per Steve: `staff` (means
+    employees), `sheepdog` (Old English Sheepdog is a separate breed), and bare
+    `shepherd` / `spaniel` (both routed to the gap, below).
+  - GUARD 1 (named-dog handoff): a transfer verb (`talk to` / `speak to` /
+    `chat to` ...) naming one of the four chatbot dogs (boxer, labrador, terrier,
+    collie) is a handoff, checked BEFORE breed retrieval, so "can I talk to the
+    boxer" reaches the Boxer, not the Boxer breed page. NOTE: this was NOT winning
+    before the fix (boxer is a breed page and matched first); now fixed.
+  - GUARD 2 (bare cross-family word): bare `spaniel` / `shepherd` go to the
+    confidence gap as a `breed_choice`, never a confident single-page guess
+    (`AMBIGUOUS_FAMILY` in `router.ts`). Qualified forms ("cocker spaniel",
+    "german shepherd") still match their page. `assembler.ts` `breed_choice` now
+    joins a variable-length option list (one option for a bare family word).
+  - 5 assertions added (280 -> 285): "can I talk to the boxer" -> transfer;
+    "spaniel" -> breed_choice; alsatian -> /chums/german-shepherd; staffie ->
+    /chums/staffordshire-bull-terrier; lab -> /chums/labrador.
+- `84b6cdb`+1 four breed one-liners (this run). The SHARED factual answer (no dog
+  voice) for labrador, border collie, boxer, border terrier wired into
+  `assembler.ts` `case 'breed_page'`. The character handoff line and the [LINK]
+  (the real breed-page url) follow as specced; the handoff copy is still owed.
+  These four are **DRAFT-UNVERIFIED, not approved**: the historical claims need
+  checking against the breed pages and a Kennel Club source before this branch
+  merges (logged in PLACEHOLDERS.md). Six per-breed lines still owed.
+
+Still owed by Steve after this run (logged in PLACEHOLDERS.md):
+- Six per-breed page lines: cocker spaniel, beagle, french bulldog, pug, german
+  shepherd, staffordshire bull terrier.
+- Verification of the four DRAFT-UNVERIFIED one-liners (breed pages + Kennel Club).
+- The per-breed character-handoff line that follows each factual answer.
+- Breed choice framing `BREED-CHOICE` (the "A or B?" sentence).
+- Breed hub line (still the approved fallback stand-in).
+- Carried: L2-variant distress copy for the sadness redirect (below).
+
+---
+
 ## RUN 3 (2026-07-26, simulation fixes + breed retrieval). Read this first.
 
 All on `pick-a-chum` preview. Tip is now `c507d81`. Harness is **280 passing,
@@ -166,8 +213,8 @@ plus the false-positive guards: "stroke the dog" -> fallback, "what is a penis"
 
 ## Harness floor
 
-`scripts/test-pickachum.mjs` is at **280 passing, 0 failing** (RUN 3). The floor
-to hold going forward is **280**: do not remove or weaken existing assertions;
+`scripts/test-pickachum.mjs` is at **285 passing, 0 failing** (RUN 4). The floor
+to hold going forward is **285**: do not remove or weaken existing assertions;
 new work only adds. (There is no coded ratchet yet; the floor is a convention. A ratchet
 is a Phase-0 item in the Recovery Rules runbook, unbuilt.) The one permitted
 edit so far was BARK-T16 (chocolate -> dog emergency), done in its own commit
