@@ -113,7 +113,10 @@ check('heyyyy', { layer: 9, bucket: 'B09', action: 'converse' }); // elongation:
 check('Test', { layer: 9, bucket: 'B10', action: 'converse' });
 check('Sit', { layer: 9, bucket: 'B11', action: 'converse' });
 check('I have three cats', { layer: 9, bucket: 'B12', action: 'converse' }); // personal statement (bored moved to FUN)
-check('Kettle', { layer: 9, bucket: 'B13', action: 'converse' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('kettle') ? null : 'expected original word inserted') });
+// Fix 4: the single-word bucket no longer echoes the input (standing exemption).
+//   before: check('Kettle', { layer: 9, bucket: 'B13', action: 'converse' }, { assert: includes('kettle') ? null : 'expected original word inserted' });
+//   after:  a single word gets the non-echoing fallback line and must NOT contain the input.
+check('Kettle', { bucket: 'B13', action: 'fallback' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('kettle') ? 'single-word still echoes the input' : null) });
 
 // Q1: 'help' removed from the B11 COMMAND pool, so help-seeking is no longer
 // answered with a dog command ("Sit? I am running the session."). Real safety

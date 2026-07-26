@@ -466,7 +466,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (hasAny(N, TESTING)) return conv('B10');
   if (hasAny(N, COMMAND)) return conv('B11');
   if (hasAny(N, PERSONAL)) return conv('B12');
-  if (isSingleWord(N)) return conv('B13');
+  // Single word: NO echo. "bye", "ok", "no", "please", "why", "help" are the
+  // commonest single words anyone types, and echoing them ("bye. A noun.
+  // Excellent...") reads as broken. Use the non-echoing fallback line.
+  if (isSingleWord(N)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
 
   // Layer 14: emoji-only message (picture-writing with no words). Checked before
   // gibberish so a lone emoji gets the "I read words" family, not the smash reply.
