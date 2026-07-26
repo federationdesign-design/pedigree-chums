@@ -22,9 +22,17 @@ function useSceneProgress() {
       const el = sceneRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const travel = r.height - window.innerHeight;
+      const vh = window.innerHeight;
+      /* Progress used to be -r.top / travel, which stays at 0 for the whole
+         time the scene is travelling up the screen. Every element was
+         therefore invisible while reserving its full height -- a screen of
+         blank rectangle before anything began. Progress now starts the moment
+         the scene's top enters the lower third of the viewport, so the build
+         is already under way as the scene arrives. */
+      const LEAD = vh * 0.66;
+      const travel = r.height - vh + LEAD;
       if (travel <= 0) return setP(1);
-      setP(Math.min(1, Math.max(0, -r.top / travel)));
+      setP(Math.min(1, Math.max(0, (LEAD - r.top) / travel)));
     };
     const onScroll = () => {
       if (!raf) {
