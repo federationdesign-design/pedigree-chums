@@ -116,6 +116,17 @@ const TRANSFER_REQUEST = [
   'different agent', 'another agent', 'talk to someone else', 'speak to someone else',
 ];
 
+// Transfer VERBS that, when paired with one of the four chatbot dog NAMES (boxer,
+// labrador, terrier, collie), mean a handoff to that dog. Three of those names
+// (boxer, labrador, terrier) and the active Collie are ALSO breed pages, so this
+// pairing is checked before breed retrieval: "can I talk to the boxer" must reach
+// the Boxer, never the Boxer breed page. A verb with no dog name (or a dog name
+// with no verb) is left to the existing transfer / breed / follow-up routes.
+const TRANSFER_VERBS = [
+  'talk to', 'speak to', 'chat to', 'chat with', 'talk with', 'speak with',
+  'put me through', 'connect me to', 'switch to',
+];
+
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
 // now belongs to the identity bucket (B16) below.
@@ -248,10 +259,14 @@ export interface RouterState {
 }
 
 // ---- Breed page retrieval (10 proof breeds) ----
-// Aliases are Steve's copy: the arrays are EMPTY for now. Mechanical plurals /
-// singulars are handled in the matcher, not authored. The two real breed
-// misspellings (labrador, terrier) live in misspellings.json and are applied
-// upstream, so the matcher already sees the canonical word. Signal STRENGTH, not
+// Aliases are Steve's copy (informal names, nicknames, short forms and the two
+// predictable GSD misspellings). Mechanical plurals / singulars are handled in the
+// matcher, not authored. The labrador/terrier misspellings live in
+// misspellings.json and are applied upstream, so the matcher already sees the
+// canonical word. Deliberately EXCLUDED per Steve: bare "shepherd" and bare
+// "spaniel" (both cross-family, routed to the confidence gap as a choice, see
+// AMBIGUOUS_FAMILY), "staff" (means employees far more often than a dog) and
+// "sheepdog" (Old English Sheepdog is a separate breed). Signal STRENGTH, not
 // count, decides confidence:
 //   - exact full title, or an exact alias, whole word = strong = confident alone
 //   - a partial title token, or a fuzzy match = weak = never confident alone
@@ -259,11 +274,29 @@ export interface RouterState {
 //   - two pages within one point = the confidence gap: offer both, never guess
 interface BreedPage { slug: string; title: string; url: string; aliases: string[]; tokens: string[]; }
 const BREED_PAGES: BreedPage[] = ([
-  ['labrador', 'Labrador'], ['border-collie', 'Border Collie'], ['boxer', 'Boxer'],
-  ['border-terrier', 'Border Terrier'], ['cocker-spaniel', 'Cocker Spaniel'], ['beagle', 'Beagle'],
-  ['french-bulldog', 'French Bulldog'], ['pug', 'Pug'], ['german-shepherd', 'German Shepherd'],
-  ['staffordshire-bull-terrier', 'Staffordshire Bull Terrier'],
-] as [string, string][]).map(([slug, title]) => ({ slug, title, url: `/chums/${slug}`, aliases: [], tokens: title.toLowerCase().split(/\s+/) }));
+  ['labrador', 'Labrador', ['lab', 'labs', 'lab retriever', 'labrador retriever']],
+  ['border-collie', 'Border Collie', ['collie', 'collies']],
+  ['boxer', 'Boxer', []],
+  ['border-terrier', 'Border Terrier', []],
+  ['cocker-spaniel', 'Cocker Spaniel', ['cocker', 'cockers']],
+  ['beagle', 'Beagle', []],
+  ['french-bulldog', 'French Bulldog', ['frenchie', 'frenchies', 'frenchy', 'french bull dog', 'french bulldogs']],
+  ['pug', 'Pug', []],
+  ['german-shepherd', 'German Shepherd', ['gsd', 'alsatian', 'alsation', 'german shepard', 'german shepperd']],
+  ['staffordshire-bull-terrier', 'Staffordshire Bull Terrier', ['staffie', 'staffy', 'staffies', 'staffordshire', 'staffie bull terrier', 'sbt']],
+] as [string, string, string[]][]).map(([slug, title, aliases]) => ({ slug, title, url: `/chums/${slug}`, aliases, tokens: title.toLowerCase().split(/\s+/) }));
+
+// Bare cross-family words: each hits one proof page today but names MANY breeds at
+// full catalogue ("spaniel" -> springer / cocker / king charles ...; "shepherd" ->
+// german / anatolian / australian / belgian ...). A bare family word must never
+// resolve to a confident single page: it goes to the confidence gap as a choice.
+// Qualified forms ("cocker spaniel", "german shepherd") match their page normally,
+// above this rule. ("terrier" already yields a choice via two shared proof-breed
+// tokens, so it needs no entry here.)
+const AMBIGUOUS_FAMILY: Record<string, string[]> = {
+  spaniel: ['cocker-spaniel'],
+  shepherd: ['german-shepherd'],
+};
 
 const BREED_HUB = ['dog breeds', 'breeds', 'best dog breed', 'best breed', 'which breed', 'what breed', 'best dog'];
 const BREED_FOLLOWUP = ['they', 'them', 'how long', 'live', 'lifespan', 'train', 'training', 'health', 'cost', 'temperament', 'good with', 'size', 'weight', 'shed', 'exercise'];
@@ -276,8 +309,8 @@ function hasBreedWord(words: Set<string>, token: string): boolean {
 function breedPageRes(p: BreedPage): Resolution {
   return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_page', breedSlug: p.slug, breedTitle: p.title, url: p.url, destinationId: p.slug };
 }
-function breedChoiceRes(a: BreedPage, b: BreedPage): Resolution {
-  return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_choice', breedOptions: [{ title: a.title, slug: a.slug, url: a.url }, { title: b.title, slug: b.slug, url: b.url }] };
+function breedChoiceRes(opts: BreedPage[]): Resolution {
+  return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_choice', breedOptions: opts.map((p) => ({ title: p.title, slug: p.slug, url: p.url })) };
 }
 
 function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | null {
@@ -293,9 +326,16 @@ function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | 
 
   if (scored.length) {
     const [top, second] = scored;
-    if (second && top.score - second.score <= 1) return breedChoiceRes(top.p, second.p); // confidence gap
+    if (second && top.score - second.score <= 1) return breedChoiceRes([top.p, second.p]); // confidence gap
     if (top.strong >= 1 || top.weak >= 2) return breedPageRes(top.p); // confident
-    // a single weak signal is never confident: fall through
+    // A lone weak signal. If it is a bare cross-family word ("spaniel",
+    // "shepherd"), it names many breeds at full catalogue even though it hits one
+    // proof page today: offer a choice, never a confident guess.
+    const bareFamily = Object.keys(AMBIGUOUS_FAMILY).some(
+      (w) => hasBreedWord(words, w) && AMBIGUOUS_FAMILY[w].includes(top.p.slug),
+    );
+    if (bareFamily) return breedChoiceRes([top.p]);
+    // otherwise a single weak signal is not confident: fall through
   }
   // Breed follow-up: no new breed named, but one is established and this reads as a
   // question about it ("how long do they live").
@@ -454,6 +494,17 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Above rules/nav/FAQ so a complaint is not answered as product copy.
   if (hasAny(N, COMPLAINT_CONTACT)) {
     return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ012' };
+  }
+
+  // Named-dog handoff: a transfer verb plus one of the four chatbot dog names is a
+  // handoff, not a breed lookup. Checked before breed retrieval (and the rules /
+  // FAQ layers) so "can I talk to the boxer" transfers to the Boxer instead of
+  // opening the Boxer breed page. matchDogName is whole-word, so only an actual
+  // dog name (not a generic "another dog") satisfies the pairing here; those still
+  // fall through to the TRANSFER_REQUEST offer below.
+  if (hasAny(N, TRANSFER_VERBS)) {
+    const named = matchDogName(c);
+    if (named) return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: named };
   }
 
   // Layer 3: gameplay and website navigation.

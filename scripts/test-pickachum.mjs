@@ -111,6 +111,18 @@ check('tell me about dog breeds', {}, { assert: (r) => (r.action === 'breed_page
 // S04: the breed is carried in session state across turns.
 (() => { const s = newSession(); check('I have a cocker spaniel', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' }); check('how long do they live', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' }); })();
 
+// ---- Breed aliases (Steve's list) + two guards ----
+// Guard 1: "boxer" is one of the four chatbot dogs AND a breed page. A transfer
+// verb naming it is a handoff, and that must beat the breed page.
+check('can I talk to the boxer', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'boxer' });
+// Guard 2: bare "spaniel" (and "shepherd") name many breeds at full catalogue;
+// they go to the confidence gap as a choice, never a confident single-page guess.
+check('spaniel', { action: 'breed_choice' }, { assert: (r) => (r.action === 'breed_page' ? 'bare spaniel guessed a page' : null) });
+// Aliases resolve to their page.
+check('alsatian', { action: 'breed_page' }, { url: '/chums/german-shepherd' });
+check('staffie', { action: 'breed_page' }, { url: '/chums/staffordshire-bull-terrier' });
+check('lab', { action: 'breed_page' }, { url: '/chums/labrador' });
+
 // ---- Specialist transfers (with context) ----
 check('Sausages.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' });
 check('Tell me a joke.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'boxer' });
