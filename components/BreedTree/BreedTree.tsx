@@ -59,8 +59,8 @@ const START_SCALE = 2;
 // bottom edge. START at 0.38 puts it 88% down, using most of the dead space that
 // was sitting under it, while leaving room for the ground band and the shake and
 // slow-motion buttons. LEARN comes down from 20% to 38%.
-const WORD_START_Y = 0.38;
-const WORD_LEARN_Y = 0.12;
+const WORD_START_Y = 0.41; // 91% down
+const WORD_LEARN_Y = 0.24; // 26% down
 // How far the circle cluster drops from centre, as a fraction of the frame
 // height. Clamped at runtime by whatever slack the packing leaves.
 const CLUSTER_DROP = 0.05;
@@ -2311,11 +2311,13 @@ export default function BreedTree({
             const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const topFrac = 0.045;
-            const startTopFrac = 0.5 + WORD_START_Y - (fs / vbHc) * 0.62;
+            // 1.24 is the glyph half-height as a multiple of fs/vbHc, measured
+            // off the rendered word rather than assumed: Luckiest Guy at this
+            // scale sits taller in its box than a nominal 0.62 would suggest.
+            const startTopFrac = 0.5 + WORD_START_Y - (fs / vbHc) * 1.24;
             return { top: `${topFrac * 100}%`, height: `${Math.max(18, (startTopFrac - topFrac) * 100)}%` };
           })()}
         >
-          <span className={styles.diffEnd} aria-hidden="true">10</span>
           <div
             ref={diffRef}
             className={styles.diffTrack}
@@ -2347,12 +2349,8 @@ export default function BreedTree({
               applyLevel(levelRef.current + step);
             }}
           >
-            <div className={styles.diffTrail} style={{ height: `${level * 10}%` }} />
-            <div className={styles.diffThumb} style={{ bottom: `${level * 10}%` }}>
-              <span>{level}</span>
-            </div>
+            <div className={styles.diffThumb} style={{ bottom: `${level * 10}%` }} />
           </div>
-          <span className={styles.diffEnd} aria-hidden="true">0</span>
         </div>
       )}
 
