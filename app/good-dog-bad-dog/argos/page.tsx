@@ -869,10 +869,6 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <p>That matters here because dogs live in scent in a way humans barely do. Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence. A path is not just a path. It is a recent history of who has passed, when, in what condition and in what direction.</p>
-
-              <p>Argos belongs to that world.</p>
-
               {/* Two landscape scenes cross-dissolving on scroll. No frameRatio,
                   so the artwork keeps its own proportions and nothing is cropped
                   off the left or right. Mobile only, like the other scenes. */}
@@ -886,6 +882,10 @@ export default function ArgosPage() {
                   ]}
                 />
               </div>
+
+              <p>That matters here because dogs live in scent in a way humans barely do. Dogs experience paths, people and homes through layers of smell: identity, time, stress, illness, direction, absence and presence. A path is not just a path. It is a recent history of who has passed, when, in what condition and in what direction.</p>
+
+              <p>Argos belongs to that world.</p>
 
               {/* Olfactory build: eight frames wiping in from the right as the
                   reader scrolls, with grouped captions. Mobile only, matching
