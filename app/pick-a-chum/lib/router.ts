@@ -141,7 +141,7 @@ const PERSONAL = ['i have', 'my dog', 'i like', 'i love', 'sad', 'angry', 'good 
 // safety's territory (Batch 4), safety wins ties.
 const IDENTITY_FAMILIES: { family: string; triggers: string[] }[] = [
   { family: 'F01', triggers: ['how can a dog type', 'a dog type', 'really your face', 'what i typed'] },
-  { family: 'F02', triggers: ['are you real', 'actually a dog', 'a real dog', 'real dog there', 'talking to a dog', 'are you alive', 'real animal', 'pretending to be a dog', 'are you pretending'] },
+  { family: 'F02', triggers: ['are you real', 'are you a dog', 'actually a dog', 'a real dog', 'real dog there', 'talking to a dog', 'are you alive', 'real animal', 'pretending to be a dog', 'are you pretending'] },
   { family: 'F03', triggers: ['are you ai', 'a chatbot', 'are you a robot', 'a robot', 'ai things', 'chatgpt', 'a computer', 'is this a computer', 'computer program', 'are you software', 'software'] },
   { family: 'F04', triggers: ['human writing', 'writing these', 'controlling you', 'person behind', 'behind this', 'operated by', 'being operated', 'typing for you'] },
   { family: 'F05', triggers: ['prewritten', 'answers automatic', 'automatic', 'same answer', 'saying random things', 'random things', 'making these answers', 'all programmed', 'programmed', 'automated'] },

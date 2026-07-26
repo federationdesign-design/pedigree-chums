@@ -137,6 +137,12 @@ check('dogs', { action: 'breed_hub' });
 check('whats the best dog breed', { action: 'breed_best' });
 check('tell me about labradors', { action: 'breed_page' }, { url: '/chums/labrador' });
 check('tell me about border collies', { action: 'breed_page' }, { url: '/chums/border-collie' });
+// Regression (pass3): an identity question must reach B16 identity, never the breed
+// hub. The hub's bare-word rule collapses "are you a dog" to "dog"; identity is
+// checked first and now carries the trigger.
+check('are you a dog', { bucket: 'B16', action: 'identity' });
+check('are you a real dog', { bucket: 'B16', action: 'identity' });
+check('are you actually a dog', { bucket: 'B16', action: 'identity' });
 
 // Breed page renders three parts: the factual answer, a mid-conversation
 // NAV_BREED_HANDOFF line in the ACTIVE dog's voice (Collie by default), and the
