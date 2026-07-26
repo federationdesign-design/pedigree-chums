@@ -4,7 +4,8 @@ import localFont from "next/font/local";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
-import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
+// D1 (2026-07-26): launcher hidden on production until the safety net ships and is tested on preview.
+// import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
 
 const display = Luckiest_Guy({
@@ -95,7 +96,7 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable}`}>
       <body>
         {children}
-        <PickAChumLauncher />
+        {/* D1 (2026-07-26): PickAChumLauncher hidden on production until the safety net ships and is tested on preview. */}
         <OfferLauncher />
         <CookieBanner />
         <Analytics />
