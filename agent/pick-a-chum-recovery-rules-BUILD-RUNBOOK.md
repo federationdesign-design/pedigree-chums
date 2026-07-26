@@ -41,10 +41,11 @@ the rulings. Phases changed by the second pass:
   wait in sixth position. 6B stays gated behind 6A. See the Scheduling overview.
 - **Phase 7**: the safety-mid-confusion assertion no longer references the
   deleted rung-3+ tally.
-- **HARNESS-DRAFT sync PENDING**: `pick-a-chum-recovery-rules-HARNESS-DRAFT.md`
-  still shows first-pass assertions (reset-to-zero, the rung-3+ tally, the
-  fragile P1 marker, one-counter-per-turn). This revision was scoped to
-  DECISIONS.md and this runbook only; the harness draft needs a follow-up sync.
+- **HARNESS-DRAFT now SYNCED**: `pick-a-chum-recovery-rules-HARNESS-DRAFT.md`
+  is updated to match this pass (decay not reset-to-zero, no rung-3+ tally,
+  `cleanStreak`-driven rudeness decay at 5, escalation-only precedence, Phase 1
+  as a workbook review gate not a text assertion, and a Phase 0 floor ratchet).
+  All five documents now agree.
 
 ---
 

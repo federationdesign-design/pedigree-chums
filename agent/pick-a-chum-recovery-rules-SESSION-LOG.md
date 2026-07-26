@@ -120,9 +120,10 @@ Full text and an amendments log in
 
 The BUILD-RUNBOOK has been revised twice against all of the above (second pass:
 Phases 0, 1, 2, 3 changed, 6A rescheduled to t0, Phase 7 tally reference
-removed). PENDING: the HARNESS-DRAFT still shows first-pass assertions and needs
-a follow-up sync (out of scope for this revision, which covered DECISIONS.md and
-the runbook only). Still open and Steve's to provide: the actual COPY at each
+removed). The HARNESS-DRAFT is now SYNCED to the amended decisions (decay not
+reset, no tally, cleanStreak decay at 5, escalation-only precedence, P1 as a
+review gate, Phase 0 floor ratchet), so all five documents agree. Still open and
+Steve's to provide: the actual COPY at each
 phase STOP, and glossary approval at STOP 6A (the critical path). Glossary
 judgement calls still flagged at the foot
 of the glossary (Hot Dog Mode's real answer, the "Herdability" joke entry, the
