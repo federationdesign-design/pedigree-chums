@@ -710,6 +710,22 @@ export default function ArgosPage() {
 
               <p>That is why the returning soldier videos hit so hard online. A person comes home from deployment, changed by distance and time and experience. The dog does not understand war or politics. But it understands return, sometimes before the person is fully through the door.</p>
 
+              {/* Four homecoming scenes cross-dissolving on scroll. No frameRatio,
+                  so the artwork keeps its own proportions and nothing is cropped.
+                  Mobile only, like the other scenes on this page. */}
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                <WipeSequence
+                  mode="fade"
+                  alt="A soldier coming home to their dog"
+                  images={[
+                    "/homecoming/soldier-homecoming1.jpg",
+                    "/homecoming/soldier-homecoming2.jpg",
+                    "/homecoming/soldier-homecoming3.jpg",
+                    "/homecoming/soldier-homecoming4.jpg",
+                  ]}
+                />
+              </div>
+
               <p><strong style={{ fontWeight: 700, color: "var(--yellow)" }}>Argos does that in ancient form. He does not need Odysseus to explain. He does not need proof. He knows.</strong></p>
 
               <div className={styles.sceneMobile}>
