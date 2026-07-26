@@ -624,14 +624,14 @@ export default function ArgosPage() {
               <p><strong style={{ fontWeight: 700 }}>Psychologists often describe this kind of absorption as narrative transportation:</strong> the process by which people become <span style={{ color: "var(--yellow)" }}>mentally and emotionally drawn into a story world</span>. It is why we wince when a character is hurt, why fictional grief can produce real tears, and why the death of a dog on screen can feel almost personally unfair.</p>
 
               <div className={styles.desktopOnly}>
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>They are doing what audiences have always done: asking an old story to speak to the feelings of the present.</blockquote>
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Asking an old story to speak to the feelings of the present.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
                 <QuotePollScene
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
-                  quote="They are doing what audiences have always done: asking an old story to speak to the feelings of the present."
+                  quote="Asking an old story to speak to the feelings of the present."
                   question="Should he change the story so Argos gets head strokes?"
                   options={[
                     { label: "Yes, I love schmaltz", pct: 96, resultLabel: "Pet the dog", color: "green" },
