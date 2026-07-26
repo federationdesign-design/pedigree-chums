@@ -143,6 +143,11 @@ check('tell me about border collies', { action: 'breed_page' }, { url: '/chums/b
 check('are you a dog', { bucket: 'B16', action: 'identity' });
 check('are you a real dog', { bucket: 'B16', action: 'identity' });
 check('are you actually a dog', { bucket: 'B16', action: 'identity' });
+// Regression (pass3): a transfer verb + a chatbot dog name is a handoff, not a
+// breed page. A named breed with no verb is unchanged.
+check('take me back to the collie', { action: 'transfer' }, { transferTo: 'collie' });
+check('get me the labrador', { action: 'transfer' }, { transferTo: 'labrador' });
+check('border collie', { action: 'breed_page' }, { url: '/chums/border-collie' });
 
 // Breed page renders three parts: the factual answer, a mid-conversation
 // NAV_BREED_HANDOFF line in the ACTIVE dog's voice (Collie by default), and the

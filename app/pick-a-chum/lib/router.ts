@@ -125,6 +125,11 @@ const TRANSFER_REQUEST = [
 const TRANSFER_VERBS = [
   'talk to', 'speak to', 'chat to', 'chat with', 'talk with', 'speak with',
   'put me through', 'connect me to', 'switch to',
+  // Switch-back / fetch-me phrasings ("take me back to the collie", "get me the
+  // labrador"): with a dog name these are handoffs. Without a dog name they fall
+  // through to TRANSFER_REQUEST ("get me another dog") or FOOD ("bring me a treat").
+  'take me back to', 'get me', 'bring me', 'put me back to', 'go back to', 'swap to',
+  'i want the', 'can i have the',
 ];
 
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
