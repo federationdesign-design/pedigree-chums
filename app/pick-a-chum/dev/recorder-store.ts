@@ -40,10 +40,20 @@ export const COLUMNS: (keyof TurnRow)[] = [
 
 const MIN_MESSAGES = 3; // a conversation counts only at three turns or more
 
-function outcomeOf(action: string): string {
+// Catch-all / fallback buckets: the router lands here when it could not map the
+// message to anything meaningful, so a hit is a miss (a generic deflection), not
+// an answer. B13 = single-word + unresolved conversational catch; B14 = gibberish.
+// Add any future fallback bucket here so the miss rate stays honest.
+const FALLBACK_BUCKETS = new Set(['B13', 'B14']);
+
+// Outcome is a function of the action AND the bucket (some misses, like the B13
+// catch-all, share the benign 'converse' action with real greetings, so action
+// alone would call them answers).
+function outcomeOf(action: string, bucket: string): string {
   if (action === 'transfer') return 'transfer';
   if (action === 'safety_signpost' || action === 'safety_boundary') return 'refusal';
   if (action === 'gibberish' || action === 'gk_unknown' || action === 'emoji_only') return 'unmatched';
+  if (FALLBACK_BUCKETS.has(bucket)) return 'unmatched';
   if (action === 'boxer_cutoff') return 'cutoff';
   return 'answered';
 }
@@ -83,7 +93,7 @@ export function buildRow(e: TurnEvent, now: string): TurnRow {
   const r = e.resolution;
   const resp = e.response;
   const conf = (r as unknown as { confidence?: number | string }).confidence;
-  const outcome = outcomeOf(r.action);
+  const outcome = outcomeOf(r.action, r.bucket ?? '');
   const text = resp.followUp ? `${resp.text}\n${resp.followUp}` : resp.text;
   return {
     sessionId: e.sessionId,
@@ -111,9 +121,14 @@ export async function record(e: TurnEvent, now: string): Promise<void> {
 
 export async function getAllRows(): Promise<TurnRow[]> {
   const rows = (await tx<TurnRow[]>('readonly', (s) => s.getAll())) ?? [];
+  // Recompute the outcome on read from the stored action + bucket, so a
+  // classification change (like B13 becoming a miss) applies retroactively to
+  // rows already recorded, and the badge and the export always agree.
   // Session order (first-seen) then turn order, so a conversation reads top to
   // bottom. sessionId is time-prefixed, so lexical sort is chronological.
-  return rows.sort((a, b) => (a.sessionId === b.sessionId ? a.turn - b.turn : a.sessionId < b.sessionId ? -1 : 1));
+  return rows
+    .map((r) => ({ ...r, outcome: outcomeOf(r.action, r.bucket) }))
+    .sort((a, b) => (a.sessionId === b.sessionId ? a.turn - b.turn : a.sessionId < b.sessionId ? -1 : 1));
 }
 
 export async function getAggregate(): Promise<Aggregate> {
