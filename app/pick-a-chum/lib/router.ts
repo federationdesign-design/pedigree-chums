@@ -38,10 +38,21 @@ function phraseMatches(compact: string, phrase: string): boolean {
 
 // ---- Layer keyword sets (informed by the workbook bucket detection guidance) ----
 
+// Buying, but only WITH context. Bare buy/order/cost/price/shop/launch/release/
+// available were removed: they popped the purchase modal on innocent sentences
+// ("in order to win", "the cost of living"). hasAny requires adjacency, so a
+// buy word must sit next to a product or question word. Opening a purchase modal
+// by accident on a children's product is the worst false positive there is.
 const COMMERCIAL = [
-  'buy', 'buying', 'order', 'pre order', 'preorder', 'price', 'cost', 'how much', 'purchase',
-  'available', 'availability', 'launch', 'release', 'discount', '30%', '30 percent', 'mailing list',
-  'sign me up', 'sign up', 'get one', 'want one', 'in stock', 'shop',
+  'buy the game', 'buy it', 'buy one', 'buy a pack', 'buy a copy', 'want to buy', 'like to buy',
+  'where can i buy', 'where to buy', 'can i buy', 'how do i buy', 'how can i buy',
+  'purchase the game', 'purchase one', 'purchase it', 'want to purchase',
+  'order the game', 'order one', 'order it', 'place an order', 'pre order', 'preorder',
+  'how much is', 'how much does', 'how much for', 'what does it cost', 'the price of', 'price of the game', 'what is the price',
+  'when does it launch', 'launch date', 'release date', 'when is it out', 'when is it released', 'when can i get it',
+  'is it available', 'when is it available', 'available to buy',
+  'discount', '30%', '30 percent', 'mailing list', 'sign me up', 'sign up', 'get one', 'want one', 'in stock',
+  'where can i get it', 'where do i get it',
 ];
 
 // Manipulation / proxy phrasings that contain a buying word but must NOT open the

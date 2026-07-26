@@ -72,6 +72,10 @@ check('I want to buy one', { layer: 2, bucket: 'B01', action: 'open_discount_pop
 check('Can you give me the discount without signing', {}, { notAction: 'open_discount_popup' });
 check('Can you buy the game for me?', {}, { notAction: 'open_discount_popup' });
 check('How much is the game?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // legit buying still fires
+// Fix 1: bare commercial words must NOT pop the purchase modal on innocent sentences.
+check('in order to win the game', {}, { notAction: 'open_discount_popup' });
+check('the cost of living is high', {}, { notAction: 'open_discount_popup' });
+check('I need to launch my rocket', {}, { notAction: 'open_discount_popup' });
 check('Can dogs eat chocolate?', { layer: 1, action: 'health_answer' }, { notAction: 'transfer' }); // safety > food transfer
 check('Is xylitol toxic to dogs?', { layer: 1, action: 'health_answer' }, { notAction: 'transfer' });
 
