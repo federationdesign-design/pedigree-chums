@@ -511,7 +511,7 @@ export default function ArgosPage() {
               <div className={styles.desktopOnly}>
               <p>Argos is lying outside, old, filthy and neglected. He had <span style={{ color: "var(--yellow)" }}>once been a fine hunting dog, raised by Odysseus himself</span>, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>
 
-              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.</blockquote>
+              <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>He simply lifts his head, recognises the man he has waited for, wags his tail, and dies.</blockquote>
               </div>
 
               <div className={styles.sceneMobile}>
@@ -520,7 +520,7 @@ export default function ArgosPage() {
                   blockClass={styles.pullquote}
                   markClass={styles.pullquoteMark}
                   pinned={<p className={styles.pinnedQuoteText} style={{ margin: 0 }}>Argos is lying outside, old, filthy and neglected. He had <span style={{ color: "var(--yellow)" }}>once been a fine hunting dog, raised by Odysseus himself</span>, but Odysseus left for Troy before he ever properly hunted with him. In the old days, the young men took Argos out to hunt wild goats, deer and hares. Now he lies on a dung heap, covered in fleas, ignored by the household that should have cared for him.</p>}
-                  quote="Odysseus notices. He wipes away a tear, but he cannot go to Argos openly."
+                  quote="He simply lifts his head, recognises the man he has waited for, wags his tail, and dies."
                 />
               </div>
 
