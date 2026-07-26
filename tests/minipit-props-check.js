@@ -96,6 +96,44 @@ const play = async (p) => {
   const rest3 = await p.evaluate(shot);
   await p.waitForTimeout(3000);
   const rest4 = await p.evaluate(shot);
+
+  // and nothing floats. The bug this catches: the big stick fell through to a
+  // circular body of half its own LENGTH, so it could never come within a couple
+  // of hundred pixels of anything below it. Props rest on the dog circles rather
+  // than the floor, so measure each one against the nearest surface beneath it,
+  // circles included.
+  const floats = await p.evaluate(() => {
+    const svg = document.querySelector('[role="dialog"] svg');
+    if (!svg) return null;
+    const rects = [];
+    svg.querySelectorAll('image').forEach((i) => {
+      const href = i.getAttribute('href') || '';
+      const r = i.getBoundingClientRect();
+      if (r.width > 10) rects.push({ what: href.replace(/^\//, ''), prop: /stick|rock|tennis/.test(href), l: r.left, r: r.right, t: r.top, b: r.bottom });
+    });
+    svg.querySelectorAll('circle').forEach((c) => {
+      const r = c.getBoundingClientRect();
+      if (r.width > 40) rects.push({ what: 'circle', prop: false, l: r.left, r: r.right, t: r.top, b: r.bottom });
+    });
+    const out = [];
+    for (const a of rects.filter((x) => x.prop)) {
+      let best = null;
+      for (const c of rects) {
+        if (c === a || c.t < a.b - 4) continue;           // must be below it
+        if (c.r < a.l + 10 || c.l > a.r - 10) continue;   // and overlapping horizontally
+        const g = c.t - a.b;
+        if (best === null || g < best) best = g;
+      }
+      if (best !== null) out.push({ what: a.what, gap: Math.round(best) });
+    }
+    return out.sort((x, y) => x.gap - y.gap);
+  });
+  // at least one prop must be genuinely resting on something. A body twice the
+  // size of its picture can never manage that.
+  const restingGap = floats && floats.length ? floats[0].gap : null;
+  const noFloat = restingGap !== null && restingGap < 60;
+
+  console.log('prop gaps to whatever is beneath:', JSON.stringify(floats), '-> closest', restingGap, 'no float:', noFloat);
   // What this is really asserting is that the rock reads as heavy: it holds its
   // place while lighter things around it are still shifting. An absolute pixel
   // threshold was fine with three props but the second, larger stick now lands
@@ -123,7 +161,8 @@ const play = async (p) => {
   console.log('rock drift', rockDrift.toFixed(1), 'px vs ball', ballDrift === null ? 'n/a' : ballDrift.toFixed(1), '->', rockSettled, '| retired props stay gone:', retired, '| ball still comes:', !!after.ball);
   console.log('pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
-  const pass = !!(beat && fromAbove && heavier && rockSettled && retired && errs.length === 0);
+
+  const pass = !!(beat && fromAbove && heavier && rockSettled && retired && noFloat && errs.length === 0);
   console.log(pass ? 'PASS GUARD-012' : 'FAIL GUARD-012');
   await b.close();
   process.exit(pass ? 0 : 1);

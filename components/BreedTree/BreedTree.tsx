@@ -1328,13 +1328,22 @@ export default function BreedTree({
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
         // The rock is a seven-sided polygon rather than a circle: a circle would
         // roll away down the sloped ground, and a rock should sit where it lands.
-        const startAngle = kind === "stick" ? (Math.random() - 0.5) * 0.8 : 0;
+        const isStick = kind === "stick" || kind === "stickBig";
+        const startAngle = isStick ? (Math.random() - 0.5) * 0.8 : 0;
+        // The rock's shell follows the artwork's own proportions. Building it
+        // from r, which comes off the width, made a body as tall as the rock is
+        // wide, and the drawing is 13% shorter than that. It floated.
+        const rockRx = dia / 2, rockRy = hgt / 2;
         const mb =
-          kind === "stick"
+          isStick
             ? Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: hgt / 2 }, angle: startAngle })
             : kind === "rock"
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : Bodies.circle(px, py, r, opts);
+        // fromVertices is avoided deliberately: it produced a ragged body when
+        // it was tried on the pit floor. A plain polygon squashed to the
+        // artwork's own proportions is predictable and does the same job.
+        if (kind === "rock" && rockRy > 0 && rockRx > 0) MBody.scale(mb, 1, rockRy / rockRx);
         mb.plugin = { prop: pr, kind: "toy" };
         pr.mb = mb;
         Composite.add(world, mb);
