@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
@@ -200,7 +201,7 @@ function ArgosIdentityCard() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
               </div>
-              <div style={{ padding: "10px 20px 16px" }}>
+              <div style={{ padding: "9px 50px 16px 50px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>In Homer&apos;s <em>Odyssey</em>, Argos is Odysseus&apos; old hunting dog who recognises his master after 20 years away. The details below are a realistic interpretation of how Argos may have looked, based on archaeological evidence and ancient art.</p>
               </div>
             </div>
@@ -213,7 +214,7 @@ function InContextCard() {
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
               </div>
-              <div style={{ padding: "10px 20px 16px" }}>
+              <div style={{ padding: "9px 50px 16px 50px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", textAlign: "center" }}>&ldquo;Argos in <em style={{ fontWeight: 600 }}>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
               </div>
             </div>
@@ -337,7 +338,7 @@ function LikelyOriginsCard() {
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
               </div>
-              <div style={{ padding: "10px 20px 16px" }}>
+              <div style={{ padding: "9px 50px 16px 50px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Larger, strong-boned, with short coats and great endurance.</p>
               </div>
@@ -351,7 +352,7 @@ function BuildAppearanceCard() {
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build & Appearance</p>
               </div>
-              <div style={{ padding: "10px 20px 16px" }}>
+              <div style={{ padding: "9px 50px 16px 50px" }}>
                 {[
                   "Broad head, powerful jaw, drop ears, thick neck",
                   "Powerful, muscular and deep-chested",
@@ -498,18 +499,9 @@ export default function ArgosPage() {
 
               <p className={styles.heavyLine}>Then he sees the dog.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.videoPinScene}`} id="menuflash-scene">
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.videoPinScene}`} data-scrub-scene id="menuflash-scene">
                 <div className={styles.parallaxImgWrap}>
-                  {/* Was a 5.5MB scroll-scrubbed clip that preloaded in full on
-                      every page load. Replaced with a still frame from the same
-                      footage. The clip itself stays in public/ because the home
-                      page hero carousel still uses it. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/history/argos-menuflash-still.jpg"
-                    alt="Odysseus, disguised, catches sight of Argos"
-                    className={styles.parallaxStill}
-                  />
+                  <ScrollVideo src="/menuflash-argos-opt.mp4" className={styles.parallaxVideo} />
                   <div className={styles.videoCard} id="menu-card">
                     <ArgosIdentityCard />
                   </div>
@@ -1103,7 +1095,7 @@ export default function ArgosPage() {
               <div style={{ padding: "16px 20px 4px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Ancestral Lineage</p>
               </div>
-              <div style={{ padding: "10px 20px 16px" }}>
+              <div style={{ padding: "9px 50px 16px 50px" }}>
                 {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }, i) => (
                   <div key={era + name} style={{ display: "flex", gap: 14 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
