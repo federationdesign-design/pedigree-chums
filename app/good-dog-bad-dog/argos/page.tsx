@@ -887,6 +887,34 @@ export default function ArgosPage() {
                 />
               </div>
 
+              {/* Olfactory build: eight frames wiping in from the right as the
+                  reader scrolls, with grouped captions. Mobile only, matching
+                  every other scroll scene on this page. */}
+              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
+                <WipeSequence
+                  frameRatio="1115 / 1134"
+                  sceneVh={420}
+                  alt="A dog and a woman nose to nose, with the path of smell traced into the brain"
+                  images={[
+                    "/smell/smell-img1.jpg",
+                    "/smell/smell-img2.jpg",
+                    "/smell/smell-img3.jpg",
+                    "/smell/smell-img4.jpg",
+                    "/smell/smell-img5.jpg",
+                    "/smell/smell-img6.jpg",
+                    "/smell/smell-hippocampus.jpg",
+                    "/smell/smell-amygdala.jpg",
+                  ]}
+                  captions={[
+                    { fromFrame: 0, tone: "white", text: <>Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus.<br />Other senses like sight or sound must go through a relay station, the thalamus, first.</> },
+                    { fromFrame: 3, title: "The Olfactory bulb", titleTone: "yellow", tone: "white", text: <>A neural structure in the brain that processes the sense of smell. It receives odour signals (smells) directly from sensory neurons in the nasal cavity (nose) and relays them to brain regions for interpretation...</> },
+                    { fromFrame: 4, title: "The unconscious highway", titleTone: "white", tone: "white", text: <>Two of these structures sit at the end of that path. The things you smell reach both of these before you have even thought about the thing you are smelling, in fact way before you have consciously registered the smell at all.</> },
+                    { fromFrame: 6, title: "The Hippocampus", titleTone: "white", tone: "white", text: <>This part of your brain builds memories and brings back long-term memories, helping you connect a specific scent to a past event or place.</> },
+                    { fromFrame: 7, title: "The Amygdala", titleTone: "yellow", tone: "white", text: <>This part of the brain handles the feelings you feel and gives an immediate emotional reaction, like joy/fear, or satisfaction/disgust to a smell.</> },
+                  ]}
+                />
+              </div>
+
               <p>It is tempting to imagine him knowing Odysseus before Odysseus is fully visible. Whether through scent, movement, voice, or some mixture of all three, the dog recognises what the humans miss. The scent of his master, however changed by twenty years of sea, war and foreign places, would have meant something to him that no disguise could fully hide.</p>
 
               <p>That is the smell of home, arriving after twenty years. And for Argos, it is enough.</p>
@@ -932,35 +960,6 @@ export default function ArgosPage() {
               <p>A house with a dog in it has a quality of aliveness that a house without one lacks. Not noise exactly, though there is noise. Not mess exactly, though there is mess. Something more like the sense that the house is inhabited rather than merely occupied. Something in it is paying attention.</p>
 
               <p>Argos is all of that, compressed into a single moment. He is the physical proof that this was once a real home, with a man who raised a dog, knew his name and expected to return to him. That home has been hollowed out by twenty years of absence and occupation. The suitors have filled the palace, but they have not made it home. Argos, neglected and nearly gone, is still part of the old household. He is what remains of what Odysseus left behind.</p>
-
-              {/* Olfactory build: eight frames wiping in from the right as the
-                  reader scrolls, with grouped captions. Mobile only, matching
-                  every other scroll scene on this page. */}
-              <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
-                <WipeSequence
-                  frameRatio="1115 / 1260"
-                  sceneVh={420}
-                  alt="A dog and a woman nose to nose, with the path of smell traced into the brain"
-                  images={[
-                    "/smell/smell-img1.jpg",
-                    "/smell/smell-img2.jpg",
-                    "/smell/smell-img3.jpg",
-                    "/smell/smell-img4.jpg",
-                    "/smell/smell-img5.jpg",
-                    "/smell/smell-img6.jpg",
-                    "/smell/smell-hippocampus.jpg",
-                    "/smell/smell-amygdala.jpg",
-                  ]}
-                  captions={[
-                    { fromFrame: 0, tone: "white", text: <>Smell signals go straight from the nose to the olfactory bulb, and then directly to the amygdala and hippocampus.<br />Other senses like sight or sound must go through a relay station, the thalamus, first.</> },
-                    { fromFrame: 3, title: "The Olfactory bulb", titleTone: "yellow", tone: "white", text: <>A neural structure in the brain that processes the sense of smell. It receives odour signals (smells) directly from sensory neurons in the nasal cavity (nose) and relays them to brain regions for interpretation...</> },
-                    { fromFrame: 4, title: "The unconscious highway", titleTone: "white", tone: "white", text: <>Two of these structures sit at the end of that path. The things you smell reach both of these before you have even thought about the thing you are smelling, in fact way before you have consciously registered the smell at all.</> },
-                    { fromFrame: 6, title: "The Hippocampus", titleTone: "white", tone: "white", text: <>This part of your brain builds memories and brings back long-term memories, helping you connect a specific scent to a past event or place.</> },
-                    { fromFrame: 7, title: "The Amygdala", titleTone: "yellow", tone: "white", text: <>This part of the brain handles the feelings you feel and gives an immediate emotional reaction, like joy/fear, or satisfaction/disgust to a smell.</> },
-                  ]}
-                />
-              </div>
-
               <h2 className={styles.subhead}>A good household, and what it owes</h2>
 
               <p>Argos&apos;s condition when Odysseus finds him is not accidental. The neglect is a moral signal.</p>
