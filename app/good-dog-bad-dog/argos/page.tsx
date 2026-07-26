@@ -866,8 +866,6 @@ export default function ArgosPage() {
 
               <p>But for people who grew up with dogs, that same smell does something completely different. It opens a door. Not a metaphorical door, but a specific one, in a specific house, at a specific age. The smell of dog is the smell of Saturday mornings, school holidays, wet paws by the back door, warm fur, old blankets and a particular kind of safety that belongs almost entirely to childhood.</p>
 
-              <p>People press their face into the fur of an old dog and inhale, not because the dog smells good exactly, but because the dog smells like home.</p>
-
               <p>This is not just sentimentality. It is biology.</p>
 
               <div className={styles.rule} />
