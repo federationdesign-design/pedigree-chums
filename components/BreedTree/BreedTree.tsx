@@ -2686,6 +2686,14 @@ export default function BreedTree({
               <span className={styles.cHeadName}>{nodes[0].data.name}</span>
             </div>
           )}
+          {/* The head names the level's dog; everything below it describes
+              whichever circle you are on. With a circle selected the two are not
+              the same thing, so say what the relationship is rather than leaving
+              two names stacked with nothing between them. Absent when nothing is
+              selected, since then there is no relation to state. */}
+          {dockAside && shown !== nodes[0] && (
+            <span className={styles.cRelated}>is related to:</span>
+          )}
           <span className={styles.cName}>{shown.data.name}</span>
           {shownShare !== null && shown.parent && (
             <span className={styles.cShare}>

@@ -403,6 +403,18 @@
   pointer-events: none;
   user-select: none;
 }
+/* Sits between the level's name and the selected circle's, naming the link
+   between them. Montserrat rather than the display face: it is connective
+   tissue, not a heading, and should not compete with either name. */
+.cRelated {
+  display: block;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-size: 0.72rem;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
 /* the level's own name, beside the portrait */
 .cHeadName {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
