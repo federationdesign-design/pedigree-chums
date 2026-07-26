@@ -279,6 +279,12 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       // Terminal catch-all. Approved line, no {{input}}, so raw text is never echoed.
       return { responseId: 'B13-FALLBACK', text: FALLBACK_LINE, dog };
 
+    case 'clarifier': {
+      // Bare help-seeking: the approved clarifier line, no raw-input echo.
+      const cat = MODERATION.find((m) => m.id === res.moderationId) ?? MODERATION[0];
+      return { responseId: cat.id, text: cat.responses[0], dog };
+    }
+
     case 'boxer_cutoff': {
       const l1 = copy(data, 'Boxer ending', 'Cut-off 1');
       const l2 = copy(data, 'Boxer ending', 'Cut-off 2');

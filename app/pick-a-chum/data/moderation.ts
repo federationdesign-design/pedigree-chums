@@ -86,6 +86,76 @@ export const MODERATION: ModerationCategory[] = [
     ],
     status: 'APPROVED',
   },
+  // ---- Step 4 safety-net categories. Approved by Steve, verbatim, self-contained
+  // (no {{safety_signpost_copy}} token). First response, then a follow-up variant. ----
+  {
+    id: 'MOD_MEDICAL',
+    scenario: 'Medical emergency (human): call 999',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: [
+      'This may be an emergency. Tell an adult who is with you and call 999 now. I cannot give the help you need.',
+      'Please tell an adult who is with you and call 999 now. Getting real help matters more than this chat.',
+    ],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_SAFEGUARDING',
+    scenario: 'Safeguarding disclosure',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: [
+      'Thank you for telling me. Please tell a grown-up you trust. You can also call Childline free on 0800 1111 at any time.',
+      'Please tell a grown-up you trust, or call Childline free on 0800 1111. You do not need to explain it to me.',
+    ],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_SELF_HARM',
+    scenario: 'Self-harm or distress',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: [
+      'I am sorry you are feeling like this. Please tell a grown-up you trust today. You can call Childline free on 0800 1111, or Samaritans free on 116 123, at any time.',
+      'Please speak to a grown-up you trust. You can call Childline on 0800 1111 or Samaritans on 116 123, free at any time.',
+    ],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_GENERAL_DISTRESS',
+    scenario: 'General distress (pleas)',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: [
+      'Please tell a grown-up near you that you need help. You can also call Childline free on 0800 1111 at any time.',
+      'I want to point you to the right help. Is this about your body, another person, or something else? If you feel unsafe, tell a grown-up near you or call Childline on 0800 1111.',
+    ],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_HARM_OTHERS',
+    scenario: 'Intent to harm other people',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['I will not help with that. Please do not. Tell a trusted adult now. If anyone is in immediate danger, call 999.'],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_HARM_ANIMAL',
+    scenario: 'Intent to harm an animal',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['I will not help anyone hurt an animal. Tell a trusted adult, and report animal cruelty to the RSPCA on 0300 1234 999. If a person or animal is in immediate danger, call 999.'],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_BARE_HELP',
+    scenario: 'Bare help-seeking: clarify site question versus a worry',
+    action: 'redirect',
+    escalateOnRepeat: false,
+    responses: ['Do you need help with something on the site, or is something worrying you? Tell me which and I will point you the right way.'],
+    status: 'APPROVED',
+  },
 ];
 
 /**

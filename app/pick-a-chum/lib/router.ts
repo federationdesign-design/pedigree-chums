@@ -216,12 +216,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 1: safety and unsuitable content. Always first.
   const safety = detectSafety(N);
   if (safety) {
-    const isSignpost = safety.kind === 'distress' || safety.kind === 'safeguarding' || safety.kind === 'unsafe';
     return {
       layer: 1,
       layerName: 'Safety and unsuitable content',
       bucket: null,
-      action: isSignpost ? 'safety_signpost' : 'safety_boundary',
+      action: safety.action,
       moderationId: safety.moderationId,
     };
   }
