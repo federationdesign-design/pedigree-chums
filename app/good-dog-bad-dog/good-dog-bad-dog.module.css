@@ -114,18 +114,62 @@
 }
 
 /* ── Essay body ─────────────────────────────────────────────── */
+/* == Vertical rhythm =====================================================
+   Space belongs BETWEEN things, not ON them.
+
+   No element in the essay body carries a vertical margin of its own. The
+   parent places every gap via the `* + *` rules below, which means:
+     - gaps can never collapse against each other (the old divider bug)
+     - a bottom margin can never turn up uninvited, because none exist
+     - deleting or reordering a block cannot orphan a gap
+
+   Every value is a multiple of --gap-s, so changing that one number
+   rescales the whole essay in proportion. It is the only number to touch
+   if the page wants opening up or tightening. */
+.essayBody {
+  --gap-xs: 9px;   /* 0.5x -- a heading and its own first line */
+  --gap-s: 18px;   /* 1x   -- between paragraphs (the base unit) */
+  --gap-m: 36px;   /* 2x   -- before a heading */
+  --gap-l: 54px;   /* 3x   -- around quotes, scenes and rules */
+  --gap-xl: 72px;  /* 4x   -- section breaks */
+}
+
+.essayBody > * + * { margin-top: var(--gap-s); }
+
+.essayBody > * + h2,
+.essayBody > * + h3,
+.essayBody > * + .subhead { margin-top: var(--gap-m); }
+.essayBody > h2 + *,
+.essayBody > h3 + *,
+.essayBody > .subhead + * { margin-top: var(--gap-xs); }
+
+.essayBody > * + .pullquote,
+.essayBody > .pullquote + *,
+.essayBody > * + .rule,
+.essayBody > .rule + *,
+.essayBody > * + .sceneMobile,
+.essayBody > .sceneMobile + *,
+.essayBody > * + .desktopOnly,
+.essayBody > .desktopOnly + * { margin-top: var(--gap-l); }
+
+/* the Spacer component's element -- it supplies its own height */
+.spacer { flex: none; }
+
+.essayBody > .spacer,
+.essayBody > .spacer + * { margin-top: 0; }
+
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1.3;
-  margin: 0 0 18px;
+  margin: 0;
 }
 
 /* First paragraph treatment */
 .essayBullets {
-  margin: 0 0 18px;
+  margin: 0;
   padding-left: 26px;
   list-style: disc; /* globals.css resets list-style: none -- restore markers */
 }
@@ -136,10 +180,12 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.55;
-  margin-bottom: 14px;
+  margin: 0;
   list-style: disc;
   padding-left: 4px;
 }
+
+.essayBullets li + li { margin-top: 14px; }
 
 .essayBullets li::marker {
   color: var(--yellow, #ffd23e);
@@ -181,27 +227,19 @@
   color: #ffffff;
   text-decoration: underline;
   text-underline-offset: 4px;
-  margin: 28px 0 14px;
+  margin: 0;
 }
 
-/* Full-width divider rule.
-   Deliberately has NO margin. Margins between siblings collapse to the larger
-   of the two, so a margin here was being overruled by whatever sat next to it
-   -- 18px from a paragraph, 30px from a scene wrapper -- and the gap was never
-   the same twice. Instead the element is a fixed 71px tall (35 + 1px line + 35)
-   with the line painted dead centre by a background gradient, and the two
-   rules below zero the facing margins of its neighbours so nothing can add to
-   it. Change 71px and the two 35s together if you want a different gap. */
+/* Full-width divider rule. A bare 1px line with no space of its own: the
+   rhythm rules above give it --gap-l on both sides, so it is even by
+   construction rather than by hand-tuning. */
 .rule {
-  height: 71px;
+  height: 1px;
+  background: #ffffff;
   margin: 0;
   padding: 0;
   border: 0;
-  background: linear-gradient(#ffffff, #ffffff) center center / 100% 1px no-repeat;
 }
-
-.essayBody *:has(+ .rule) { margin-bottom: 0; }
-.essayBody .rule + * { margin-top: 0; }
 
 .essayBody h3.h3Navy {
   color: var(--navy, #0a3a57);
@@ -218,7 +256,7 @@
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin: 48px 0 16px;
+  margin: 0;
   line-height: 0.9em;
 }
 
@@ -659,7 +697,7 @@
   font-style: italic;
   color: var(--navy, #0a3a57);
   line-height: 1.1em;
-  margin: 56px 0;
+  margin: 0;
   /* right padding shortens the measure so quotes do not run the full width */
   padding: 24px 12% 24px 20px;
   border-left: 10px solid var(--yellow, #ffd23e);
@@ -1141,7 +1179,7 @@
 
   .sceneMobile {
     display: block;
-    margin: 30px 0;
+    margin: 0;
   }
 
   .desktopOnly {
@@ -1193,12 +1231,12 @@
 
   /* Carousel scene: full-bleed, component handles inner padding */
   .carouselScene {
-    margin: 30px -20px;
+    margin: 0 -20px;
   }
 
   /* Full-bleed inline image scene */
   .imageScene {
-    margin: 30px -20px;
+    margin: 0 -20px;
   }
 
   .imageScene img {
@@ -1208,7 +1246,7 @@
 
   /* Timeline scene: full-bleed navy panel */
   .timelineScene {
-    margin: 34px -20px;
+    margin: 0 -20px;
     padding: 26px 20px 20px;
     background: var(--navy, #0a3a57);
   }
@@ -1296,7 +1334,7 @@
 
   /* Parallax scene: image pins, card scrolls over it */
   .parallaxScene {
-    margin: 34px -20px;
+    margin: 0 -20px;
     position: relative;
   }
 
