@@ -184,6 +184,25 @@
   margin: 28px 0 14px;
 }
 
+/* Full-width divider rule.
+   Deliberately has NO margin. Margins between siblings collapse to the larger
+   of the two, so a margin here was being overruled by whatever sat next to it
+   -- 18px from a paragraph, 30px from a scene wrapper -- and the gap was never
+   the same twice. Instead the element is a fixed 71px tall (35 + 1px line + 35)
+   with the line painted dead centre by a background gradient, and the two
+   rules below zero the facing margins of its neighbours so nothing can add to
+   it. Change 71px and the two 35s together if you want a different gap. */
+.rule {
+  height: 71px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: linear-gradient(#ffffff, #ffffff) center center / 100% 1px no-repeat;
+}
+
+.essayBody *:has(+ .rule) { margin-bottom: 0; }
+.essayBody .rule + * { margin-top: 0; }
+
 .essayBody h3.h3Navy {
   color: var(--navy, #0a3a57);
   text-align: center;

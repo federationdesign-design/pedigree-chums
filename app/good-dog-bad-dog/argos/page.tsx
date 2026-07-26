@@ -573,7 +573,7 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <div style={{ borderTop: "1px solid #ffffff", margin: "25px 0" }} />
+              <div className={styles.rule} />
 
               <p>
                 Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.{" "}
@@ -870,7 +870,7 @@ export default function ArgosPage() {
 
               <p>This is not just sentimentality. It is biology.</p>
 
-              <div style={{ borderTop: "1px solid #fff", margin: "25px 0" }} />
+              <div className={styles.rule} />
 
               <div className={styles.desktopOnly}>
               <p className={styles.plainPara}>Smell has an unusually direct relationship with memory and emotion. Research into odour-evoked autobiographical memory, the Proust phenomenon, shows that smells trigger unusually vivid, emotional memories.</p>
