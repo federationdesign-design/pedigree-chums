@@ -284,12 +284,15 @@ export function StatueBulletsChoreo({
   // quote build progress, starting almost immediately (p ~ 0) and
   // finishing well before the scene ends, so there is minimal dwell
   // before release into the next paragraph
-  const qLine = clamp01(p / 0.45);
-  const qMark = p >= 0.46;
+  const qLine = clamp01(p / 0.14);
+  const qMark = p >= 0.12;
   /* Ends at p = 0.97 rather than 0.85. The scene length is unchanged, so
      nothing speeds up -- the build simply uses the tail of the scroll that
      was previously dead dwell with the quote just sitting there. */
-  const qText = clamp01((p - 0.5) / 0.47);
+  /* Was 0.5 to 0.97, which left the quote holder reserving its height while
+     invisible for the first half of the scene -- a blank rectangle under the
+     images. It now builds alongside the gallery pan instead of after it. */
+  const qText = clamp01((p - 0.12) / 0.78);
 
   return (
     <div ref={sceneRef} className={bullets ? styles.bulletScene : quote ? styles.bulletSceneNoBullets : styles.bulletSceneNoBullets}>
