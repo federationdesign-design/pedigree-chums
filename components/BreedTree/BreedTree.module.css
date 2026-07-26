@@ -332,26 +332,30 @@
    top-right corner, tilted; hovering LEARN slides it partway in for a preview,
    and choosing LEARN brings it all the way in and levels it out. Touch has no
    hover, so on a phone the tap plays the same slide as the reveal. */
-/* Learn background: one icon tiled by the browser, not a pre-stacked artwork.
-   The stacked file was 394KB and 51,740 points, being 222 copies of the same two
-   paths. A single 1.9KB tile repeated costs the browser nothing and carries on
-   for ever, which matters because the wash is 2.2 viewports across and tilted 18
-   degrees, so any fixed composition would crop or tile visibly.
-   It sits UNDER the pink, so the wash stays a flat tint and the pattern is not
-   double-blended. */
+/* Learn background: Steve's own composition, a masonry stack of the same icon at
+   varied placement and scale. It sits UNDER the pink, so the wash stays a flat
+   tint and the artwork is not double-blended.
+   It is a heavy file, 394KB and around 51,740 points, and worth revisiting: the
+   same look can be had from a handful of tiles at a fraction of the weight. Left
+   as drawn for now, deliberately. */
 .learnPattern {
   position: fixed;
-  inset: -60%;
+  /* Anchored to the visible screen, not to the wash's oversized box. The wash is
+     2.2 viewports across and tilted 18 degrees; sizing the artwork to that would
+     push most of the composition off screen. This way what you drew is what is
+     seen, and only the edges are cropped. */
+  inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: url("/learn-icon.svg");
-  background-repeat: repeat;
-  background-size: 120px 120px;
+  background-image: url("/learn-background.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   opacity: 0;
   transition: opacity 420ms ease;
 }
 .learnPatternOn {
-  opacity: 0.16;
+  opacity: 0.28;
 }
 
 .learnWash {
