@@ -12,7 +12,13 @@ import DogPoll, { PollOption } from "../DogPoll/DogPoll";
   naturally. No scroll hijacking anywhere -- the page always scrolls freely.
 */
 
-function useSceneProgress() {
+/* `lead` is how far down the viewport the scene's top must be before progress
+   starts, as a fraction of the screen. 0.66 suits scenes whose content fades
+   in from nothing, so the build is under way as they arrive. Pass 0 for
+   scenes whose first frame is already fully visible -- there is no blank
+   arrival to cover, and starting early just means the first transition
+   happens before the caption below the image has reached the screen. */
+function useSceneProgress(lead = 0.66) {
   const sceneRef = useRef<HTMLDivElement | null>(null);
   const [p, setP] = useState(0);
   useEffect(() => {
@@ -29,7 +35,7 @@ function useSceneProgress() {
          blank rectangle before anything began. Progress now starts the moment
          the scene's top enters the lower third of the viewport, so the build
          is already under way as the scene arrives. */
-      const LEAD = vh * 0.66;
+      const LEAD = vh * lead;
       const travel = r.height - vh + LEAD;
       if (travel <= 0) return setP(1);
       setP(Math.min(1, Math.max(0, (LEAD - r.top) / travel)));
@@ -43,7 +49,7 @@ function useSceneProgress() {
     window.addEventListener("scroll", onScroll, { passive: true });
     update();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [lead]);
   return { sceneRef, p };
 }
 
@@ -452,7 +458,10 @@ export function WipeSequence({
      screen and adds the next one beneath it, so the lines build up. */
   captionMode?: "swap" | "stack";
 }) {
-  const { sceneRef, p } = useSceneProgress();
+  /* No lead: frame 1 is opaque from the start, so nothing needs covering, and
+     transitions must not begin until the caption beneath the image is on
+     screen. */
+  const { sceneRef, p } = useSceneProgress(0);
   const n = images.length;
   const steps = Math.max(1, n - 1);
   /* The scene is divided into units: one per fade, plus `hold` per frame.
