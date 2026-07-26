@@ -54,6 +54,16 @@ function diffScale(base: number, wide: number, level: number | null): number {
 }
 // START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
 const START_SCALE = 2;
+// Where the two words sit, as a fraction of the FULL stage height measured from
+// the centre line, which is the same convention the viewBox uses: 0.5 is the
+// bottom edge. START at 0.38 puts it 88% down, using most of the dead space that
+// was sitting under it, while leaving room for the ground band and the shake and
+// slow-motion buttons. LEARN comes down from 20% to 38%.
+const WORD_START_Y = 0.38;
+const WORD_LEARN_Y = 0.12;
+// How far the circle cluster drops from centre, as a fraction of the frame
+// height. Clamped at runtime by whatever slack the packing leaves.
+const CLUSTER_DROP = 0.05;
 // Toys ported from the main pit. Sizes come off the same unit the main pit uses,
 // BIG = 84 * SCALE, so a ball here is the same ball there. The drop beats run
 // from the moment the first dog circle touches the floor.
@@ -336,9 +346,18 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
     (FW * DIFF_SPAN - DIFF_INSET) / (2 * rMax),
     level
   );
+  // The cluster used to sit dead centre, which left the lower third of the pit
+  // empty. Drop it toward the words, but never further than the slack actually
+  // available: at the hardest difficulty the pack already fills the height, so
+  // the shift has to give way rather than push circles through the floor.
+  const halfH = FH / 2;
+  const wantDrop = FH * CLUSTER_DROP;
+  const bottomAfter = (maxY - cy) * scale;
+  const slack = Math.max(0, halfH - M / 2 - bottomAfter);
+  const drop = Math.min(wantDrop, slack);
   pts.forEach((p) => {
     p.d.x = (p.x - cx) * scale;
-    p.d.y = (p.y - cy) * scale;
+    p.d.y = (p.y - cy) * scale + drop;
     p.d.r = p.d.r * scale;
   });
   root.x = 0;
@@ -2200,10 +2219,13 @@ export default function BreedTree({
             const m = 18 * upp; // side margin
             const hitW = fs * 5.2 * upp;
             const hitH = fs * 1.6 * upp;
-            // LEARN sits right and high, START sits left and low
+            // LEARN sits right and high, START sits left and low. Both were
+            // pulled toward the middle, which left roughly a third of the stage
+            // empty beneath START. They now sit lower and use the room: START
+            // near the foot of the pit, LEARN a little above centre.
             const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
-              { key: "learn", label: "LEARN", x: xMinC + vbWc - m, y: -vbHc * 0.30, anchor: "end" },
-              { key: "start", label: "START", x: xMinC + m, y: vbHc * 0.30, anchor: "start" },
+              { key: "learn", label: "LEARN", x: xMinC + vbWc - m, y: -vbHc * WORD_LEARN_Y, anchor: "end" },
+              { key: "start", label: "START", x: xMinC + m, y: vbHc * WORD_START_Y, anchor: "start" },
             ];
             return words.map((w) => (
               <g
@@ -2277,7 +2299,22 @@ export default function BreedTree({
           in Safari 17.4, and so the thumb can carry the pit's own yellow square
           look. Mobile only: the fill has no effect on the desktop layout. */}
       {dockAside && gravity && isMobile && entered && !started && !learning && focus.depth === 0 && (
-        <div className={styles.diff}>
+        <div
+          className={styles.diff}
+          style={(() => {
+            // The track runs from just under the top edge down to the cap of the
+            // S in START, so it uses the full height rather than a guessed 52%.
+            // START's glyph top is worked out with the same numbers the word
+            // itself uses, so the two stay together if either is retuned.
+            const st = stageRef.current;
+            const stW = st ? st.clientWidth : 390;
+            const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
+            const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
+            const topFrac = 0.045;
+            const startTopFrac = 0.5 + WORD_START_Y - (fs / vbHc) * 0.62;
+            return { top: `${topFrac * 100}%`, height: `${Math.max(18, (startTopFrac - topFrac) * 100)}%` };
+          })()}
+        >
           <span className={styles.diffEnd} aria-hidden="true">10</span>
           <div
             ref={diffRef}

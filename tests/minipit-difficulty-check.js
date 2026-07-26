@@ -48,6 +48,23 @@ const openPit = async (p) => {
 
   const base = await p.evaluate(probe);
 
+  // it must use the room: from near the top edge down to the cap of the S in
+  // START, rather than a guessed fraction that leaves a third of the pit empty
+  const reach = await p.evaluate(() => {
+    const st = document.querySelector('[role="dialog"] svg').parentElement.getBoundingClientRect();
+    const sl = document.querySelector('[role="slider"][aria-label="Difficulty"]');
+    const tx = document.querySelector('[aria-label="Start"] text');
+    if (!sl || !tx) return null;
+    const s2 = sl.getBoundingClientRect(), t2 = tx.getBoundingClientRect();
+    return {
+      topPct: +(((s2.top - st.top) / st.height) * 100).toFixed(0),
+      heightPct: +((s2.height / st.height) * 100).toFixed(0),
+      gapToS: Math.round(t2.top - s2.bottom),
+    };
+  });
+  const fillsHeight = !!(reach && reach.topPct <= 12 && reach.heightPct >= 60 && Math.abs(reach.gapToS) <= 24);
+  console.log('slider reach:', JSON.stringify(reach), '-> fills the height and meets START:', fillsHeight);
+
   // keyboard: five presses up from the default reaches 10 (hardest, biggest)
   const track = p.locator('[role="slider"][aria-label="Difficulty"]');
   await track.focus();
@@ -127,7 +144,7 @@ const openPit = async (p) => {
   console.log('no entrance replay:', noReplay, '| fell after START:', fell, '| slider cleared:', clearedOnStart);
   console.log('desktop hides slider:', deskClean, '| pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
-  const pass = !!(mapping && monotonic && dragTracked && noReplay && fell && clearedOnStart && deskClean && errs.length === 0);
+  const pass = !!(mapping && monotonic && fillsHeight && dragTracked && noReplay && fell && clearedOnStart && deskClean && errs.length === 0);
   console.log(pass ? 'PASS GUARD-009' : 'FAIL GUARD-009');
   await b.close();
   process.exit(pass ? 0 : 1);
