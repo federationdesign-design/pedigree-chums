@@ -6,7 +6,6 @@ import styles from "../good-dog-bad-dog.module.css";
 import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCarousel";
 import DogPoll from "../../../components/DogPoll/DogPoll";
 import ReadingProgress from "../../../components/ReadingProgress/ReadingProgress";
-import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
 import { QuoteBuild, QuotePollScene, StatueBulletsChoreo, HomerCrossfade, GatedVideo, WipeSequence } from "../../../components/ArgosChoreo/ArgosChoreo";
 import { QuoteReveal } from "../../../components/ScrollScenes/QuoteReveal";
 
@@ -499,9 +498,18 @@ export default function ArgosPage() {
 
               <p className={styles.heavyLine}>Then he sees the dog.</p>
 
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.videoPinScene}`} data-scrub-scene id="menuflash-scene">
+              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.videoPinScene}`} id="menuflash-scene">
                 <div className={styles.parallaxImgWrap}>
-                  <ScrollVideo src="/menuflash-argos-opt.mp4" className={styles.parallaxVideo} />
+                  {/* Was a 5.5MB scroll-scrubbed clip that preloaded in full on
+                      every page load. Replaced with a still frame from the same
+                      footage. The clip itself stays in public/ because the home
+                      page hero carousel still uses it. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/history/argos-menuflash-still.jpg"
+                    alt="Odysseus, disguised, catches sight of Argos"
+                    className={styles.parallaxStill}
+                  />
                   <div className={styles.videoCard} id="menu-card">
                     <ArgosIdentityCard />
                   </div>
