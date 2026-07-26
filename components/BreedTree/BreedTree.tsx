@@ -2320,7 +2320,7 @@ export default function BreedTree({
             const stW = st ? st.clientWidth : 390;
             const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
-            const topFrac = 0.045; // plus a 20px nudge below, applied in css units
+            const topFrac = 0.045; // plus a 100px nudge below, applied in css units
             // 1.24 is the glyph half-height as a multiple of fs/vbHc, measured
             // off the rendered word rather than assumed: Luckiest Guy at this
             // scale sits taller in its box than a nominal 0.62 would suggest.
@@ -2328,8 +2328,8 @@ export default function BreedTree({
             // nudged 20px down, and the track shortens by the same so its foot
             // stays on the cap of the P
             return {
-              top: `calc(${topFrac * 100}% + 20px)`,
-              height: `calc(${Math.max(18, (startTopFrac - topFrac) * 100)}% - 20px)`,
+              top: `calc(${topFrac * 100}% + 100px)`,
+              height: `calc(${Math.max(18, (startTopFrac - topFrac) * 100)}% - 100px)`,
             };
           })()}
         >

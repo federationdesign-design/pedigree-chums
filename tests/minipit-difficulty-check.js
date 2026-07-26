@@ -62,7 +62,10 @@ const openPit = async (p) => {
       gapToS: Math.round(t2.top - s2.bottom),
     };
   });
-  const fillsHeight = !!(reach && reach.topPct <= 12 && reach.heightPct >= 60 && Math.abs(reach.gapToS) <= 24);
+  // The track is nudged 100px down from the top edge by design, so it starts
+  // around 16% rather than hard against the top. What still matters is that it
+  // uses most of the height and that its foot lands on the cap of the P.
+  const fillsHeight = !!(reach && reach.topPct <= 20 && reach.heightPct >= 60 && Math.abs(reach.gapToS) <= 24);
   console.log('slider reach:', JSON.stringify(reach), '-> fills the height and meets START:', fillsHeight);
 
   // keyboard: five presses up from the default reaches 10 (hardest, biggest)
