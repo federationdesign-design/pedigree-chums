@@ -10,32 +10,41 @@ Written against the doc AS SPECCED plus Steve's rulings. Where I would still
 build it differently, that is quarantined in the final section and is NOT
 folded into the phases.
 
-## Revision note (what changed in this pass and why)
+## Revision note (what changed and why)
 
-Every DECISION-GATED item from the previous draft is now resolved; the phases
-below bake in the answers rather than pausing on them. Phases that changed:
+REVISED TWICE on 2026-07-26. This note reflects the current (second-pass)
+state. The second pass applied four amendments, a schedule change and two notes
+from Steve; see `pick-a-chum-recovery-rules-DECISIONS.md` (amendments log) for
+the rulings. Phases changed by the second pass:
 
-- **Phase 0** changed: adds the never-resetting rung-3+ escalation counter
-  (DECISION A) and a `closedReason` field to split the two ends (Addition 3).
-- **Phase 2** changed: soft end (DECISION B), the substantive-family definition
-  of "meaningful" (DECISION A), the never-reset rung-3+ tally driving
-  termination (DECISION A), the split closed reason (Addition 3), and the `[X]`
-  restatement rule (spec amendment).
-- **Phase 3** changed: rudeness decays after 5 clean meaningful turns (DECISION
-  C), one-counter-per-turn precedence and its stated consequence (DECISION D),
-  the level-3 "stops" line gets the soft-end mechanism (Addition 1), and the
-  scoped-safety-wording copy constraint (DECISION E).
-- **Phase 4** changed: no-echo rescoped to all four families and transfer
-  context (DECISION F), plus the standing single-assertion exemption for the
-  Kettle case (Addition 2), plus the `[X]` restatement invariant.
-- **Phases 6 and 7 reordered** (Addition/Sequencing): glossary approval now
-  BLOCKS the contextual-definition wiring. The glossary is split into a copy
-  phase (6A, critical path, Steve's review) that gates the build phase (6B).
-  Phase 7 strengthens the DECISION E release-checklist constraint.
-- The old "Decisions this runbook needs from Steve" section is replaced by a
-  pointer to the DECISIONS doc.
-- "What I would do differently" updated: item 3 (reuse Boxer cut-off) is
-  overridden by Addition 3; items 2 and 5 are now partly adopted.
+- **Phase 0**: recovery shape is now `{ sameIntent, confusion, rudeness,
+  cleanStreak }` (Amendment 3). The never-resetting rung-3+ tally is DELETED
+  (Amendment 1). Keeps the `closedReason` split (Addition 3). NEW item: a floor
+  ratchet in `test-pickachum.mjs` so a dropped assertion actually fails
+  (Note 2).
+- **Phase 1**: AAN compliance is enforced as a workbook review gate on column 1
+  (Next Step Required), NOT a harness text assertion, which would be fragile
+  (Note 1). The P1 text-marker assertion is dropped.
+- **Phase 2**: confusion now DECAYS BY ONE on a meaningful turn, not reset to
+  zero (Amendment 1). The rung-3+ tally and its termination logic are removed;
+  the hidden ceiling (20 submissions) is named as the session terminator
+  instead (Amendment 1). Soft end unchanged (DECISION B, Amendment 4). Keeps the
+  split closed reason and the `[X]` rule.
+- **Phase 3**: precedence reworded to "at most one counter ESCALATES per turn;
+  decay is bookkeeping and may co-occur" (Amendment 2). Decay is driven by
+  `cleanStreak` reaching 5 (DECISION C, Amendment 3). Level-3 soft end (Addition
+  1) and the DECISION E copy constraint unchanged.
+- **Phase 4**: unchanged from the first pass (DECISION F, the Kettle exemption,
+  the `[X]` invariant).
+- **Phase 6A rescheduled** (schedule change): the glossary content phase now
+  starts at t0 IN PARALLEL with Phase 0. It is the critical path and does not
+  wait in sixth position. 6B stays gated behind 6A. See the Scheduling overview.
+- **Phase 7**: the safety-mid-confusion assertion no longer references the
+  deleted rung-3+ tally.
+- **HARNESS-DRAFT sync PENDING**: `pick-a-chum-recovery-rules-HARNESS-DRAFT.md`
+  still shows first-pass assertions (reset-to-zero, the rung-3+ tally, the
+  fragile P1 marker, one-counter-per-turn). This revision was scoped to
+  DECISIONS.md and this runbook only; the harness draft needs a follow-up sync.
 
 ---
 
@@ -47,7 +56,11 @@ below bake in the answers rather than pausing on them. Phases that changed:
   assertions are never edited or removed, with ONE standing exemption
   (Addition 2): the "Kettle" B13-echo assertion may be REWRITTEN (not removed),
   in its own commit, before-and-after shown. A rewrite does not lower the
-  count, so 190 still holds. Every other assertion stays untouchable.
+  count, so 190 still holds. Every other assertion stays untouchable. Phase 0
+  adds a ratchet so the floor is ENFORCED, not just documented (Note 2): the
+  harness fails if the passing total drops below a stored value, and the stored
+  value is raised when the total rises. The stored value starts at the current
+  count (194) and never sits below 190.
 - Detection stays a pure function of the current message (item 2). All new
   state lives in a recovery layer that runs after detection.
 - No raw user input rendered from any refusal, rude, unsafe or fallback path
@@ -76,19 +89,39 @@ below bake in the answers rather than pausing on them. Phases that changed:
 
 ---
 
+## Scheduling overview
+
+The build spine is linear (Phases 0 to 7). One phase runs OFF the spine:
+
+- **Phase 6A (glossary content) starts at t0, in parallel with Phase 0.** It
+  depends on nothing (pure copy, the draft already exists) and it is the
+  programme's critical path (Steve's copy review, not the build). It must not
+  wait in sixth position.
+- **Phase 6B (the definition route) stays gated behind 6A**, because
+  `last_complex_terms` has no source until the glossary exists. In practice 6A
+  will have cleared long before the spine reaches 6B.
+
+So the numbering is spine order; 6A is the one item to start immediately
+regardless of where the spine is.
+
+---
+
 ## Phase 0. Recovery state scaffold (no behaviour change)
 
 Goal: add the recovery state as dormant fields so later phases have somewhere
 to write, with zero change to any current response.
 
 Scope:
-- Add `session.recovery = { sameIntent, confusion, rudeness }` plus
-  `lastResponseId`, `lastIntent`, `lastComplexTerms`, `lastAction`, all
-  initialised empty/zero in `newSession()`.
-- Add the never-resetting session-level tally
-  `session.recovery.confusionRung3PlusTotal` (DECISION A). It increments when a
-  confusion ladder reaches rung 3 or higher and is never reset for the life of
-  the session.
+- Add `session.recovery = { sameIntent, confusion, rudeness, cleanStreak }`
+  (Amendment 3) plus `lastResponseId`, `lastIntent`, `lastComplexTerms`,
+  `lastAction`, all initialised empty/zero in `newSession()`.
+- `cleanStreak` (Amendment 3) counts consecutive clean meaningful turns. It
+  drives the rudeness decay at 5 (DECISION C) and resets to zero on any
+  non-meaningful turn. Confusion needs no streak field: it decays on every
+  meaningful turn (DECISION A).
+- No rung-3+ tally. The first-pass `confusionRung3PlusTotal` is DELETED
+  (Amendment 1): the hidden ceiling terminates every session at 20 submissions,
+  so no second terminator is needed.
 - Add `session.closedReason` (Addition 3), one of `null | 'ceiling' | 'recovery'`.
   The existing Boxer cut-off will set `'ceiling'`; the recovery end (Phase 2)
   will set `'recovery'`. One closed STATE, two REASONS, distinct copy per
@@ -99,13 +132,20 @@ Scope:
 - Extend the recorder `TurnRow` (`dev/recorder-store.ts`) to capture the
   recovery block and `closedReason`, so replay can see counter evolution and
   distinguish the two ends.
+- **Floor ratchet (Note 2):** add to `test-pickachum.mjs` a stored expected
+  count (start at 194) and make the run FAIL when the passing total drops below
+  it (today a dropped assertion just reports a smaller number and exits zero).
+  When the total rises, raise the stored value in the same commit. This enforces
+  the 190 floor mechanically. This is ADDING a guard, not editing or removing an
+  existing assertion, so it is within the constraints.
 
-Assertions added (harness draft P0): the fields exist and default correctly; a
-fresh session has all counters at zero, `closedReason === null`; the existing
-194 all still pass unchanged.
+Assertions added (harness draft P0): the recovery fields exist and default
+correctly (`cleanStreak === 0`, no tally field); a fresh session has all
+counters at zero, `closedReason === null`; the floor ratchet trips if the total
+falls; the existing 194 all still pass unchanged.
 
-STOP 0: Steve confirms the state shape and field names. Nothing user-visible
-has changed; this is a code-shape review only.
+STOP 0: Steve confirms the state shape and field names, and the starting stored
+floor value. Nothing user-visible has changed; this is a code-shape review only.
 
 ---
 
@@ -122,49 +162,61 @@ Scope:
 - Steve rewrites flagged lines in the workbook. Build rebuilds data
   (`npm run build:chumdata`) and re-runs the harness.
 
-Assertions added (P1): for each recovery-family bucket, a shape assertion that
-the resolved text contains a next-step marker. A copy-shape guard on the
-rendered text, not new routing.
+Enforcement (Note 1): AAN compliance is a WORKBOOK REVIEW GATE, not a harness
+assertion. A harness check for "the resolved text contains a next-step marker"
+is not mechanically definable and would be fragile: a next step can be a
+question, a choice, a transfer, an action or a clear end, in any phrasing, and a
+regex for that will both miss real exits and flag good lines. Instead, gate it
+on workbook column 1 (Next Step Required = Yes for every recovery-family row)
+and Steve's sign-off, which is where the judgement actually lives. The harness
+keeps asserting ROUTING (which bucket fires), which is mechanical; it does not
+try to police prose shape.
 
-STOP 1: Steve approves the audit list and writes the replacement copy. Build
-does not invent lines.
+STOP 1: Steve approves the audit list and writes the replacement copy, with
+column 1 filled for every recovery-family row. Build does not invent lines.
 
 ---
 
-## Phase 2. Confusion ladder with reset and soft end (sections 4 and 5)
+## Phase 2. Confusion ladder with decay and soft end (sections 4 and 5)
 
 Goal: the four-rung confusion ladder, driven by `confusion`, with the DECISION
-A reset, the never-reset rung-3+ tally, and a stage-4 soft end.
+A decay (not reset) and a stage-4 soft end. No second terminator: the hidden
+ceiling ends the session.
 
 Scope:
 - A recovery selector that runs AFTER detection: when the resolved family is a
   confusion/repair family, read `confusion`, pick the rung (1 rephrase, 2
   choices, 3 reset-or-transfer, 4 end), then increment.
-- **Reset (DECISION A):** on a meaningful turn (routed to a substantive family,
-  NOT any recovery-sensitive family), set `confusion = 0`.
-- **Never-reset tally (DECISION A):** when a ladder reaches rung 3 or higher,
-  increment `confusionRung3PlusTotal`, which never resets. When it crosses its
-  threshold, force the graceful end even if the per-ladder counter was reset in
-  between, so stuck-unstuck cycles terminate. Spec must state the never-reset is
-  intentional.
+- **Decay, not reset (DECISION A, Amendment 1):** on a meaningful turn (routed
+  to a substantive family, NOT any recovery-sensitive family), DECREMENT
+  `confusion` by one (floor at zero). Reset-to-zero would drop a visitor three
+  confusions deep all the way back to rephrase after one good message; decay
+  holds the ladder's position while rewarding progress.
+- **No rung-3+ tally.** The session terminator is the hidden ceiling
+  (`HIDDEN_CEILING = 20` in `router.ts`, the Boxer cut-off, `closedReason =
+  'ceiling'`). Every session ends at 20 submissions, so stuck-unstuck cycles
+  cannot run forever and no second terminator is built. Name the ceiling in the
+  spec as the terminator so this reads as intentional, not an omission.
 - **Rephrase rung (rung 1)** uses the `[X]` slot, which restates the prior DOG
   line, never the visitor's words (spec amendment).
-- **Stage 4 soft end (DECISION B):** set `closed = true`, `closedReason =
-  'recovery'`. Re-engage (clear the closed state) only on a clearly meaningful
-  message; stay ended on any further recovery-family input.
+- **Stage 4 soft end (DECISION B, Amendment 4):** set `closed = true`,
+  `closedReason = 'recovery'`. Re-engage (clear the closed state) only on a
+  clearly meaningful message; stay ended on any further recovery-family input.
+  With the tally gone there is no one-turn re-engagement edge case; the soft end
+  is simply soft.
 - Rungs 1 to 4 copy is Steve's (workbook), one pool per rung, plus distinct
   recovery-end copy (separate from the ceiling copy, Addition 3).
 
 Assertions added (P2): `huh? -> huh? -> huh?` yields rephrase then choices then
-reset/transfer; a meaningful (substantive-family) message returns `confusion`
-to zero; a fallback/gibberish message between confusions does NOT reset (it is
-not meaningful); a fourth confusion reaches the soft end with `closedReason ===
+reset/transfer; after reaching rung 2, one meaningful (substantive-family)
+message DECAYS `confusion` from 2 to 1 (it does not drop to zero); a
+fallback/gibberish message between confusions does NOT decay (it is not
+meaningful); a fourth confusion reaches the soft end with `closedReason ===
 'recovery'`; a meaningful message after the soft end re-engages, a
-recovery-family message after it does not; repeated stuck-unstuck cycles reach
-the end via `confusionRung3PlusTotal` despite per-ladder resets.
+recovery-family message after it does not.
 
 STOP 2: rung copy and the recovery-end copy written by Steve. Build wires the
-ladder against the settled DECISION A and B.
+ladder against the settled DECISION A (decay) and B (soft end).
 
 ---
 
@@ -183,12 +235,17 @@ Scope:
   stop a web chat, so level 3 uses the SAME soft-end mechanism as the confusion
   stage-4 end: `closed = true`, `closedReason = 'recovery'`, re-engage on a
   clearly meaningful message.
-- **Decay (DECISION C):** subtract one rudeness level after 5 consecutive clean
-  meaningful turns (five, not three, for the nine-year-old audience).
-- **Precedence (DECISION D):** exactly one recovery counter moves per turn;
-  order safety, then rudeness, then confusion; incrementing one resets none of
-  the others. Consequence baked in: a confusion-stuck visitor never decays
-  rudeness (decay needs meaningful turns). Intended.
+- **Decay (DECISION C, via Amendment 3):** subtract one rudeness level once
+  `cleanStreak` reaches 5 consecutive clean meaningful turns (five, not three,
+  for the nine-year-old audience). `cleanStreak` increments on a meaningful turn
+  and resets to zero on any non-meaningful turn.
+- **Precedence (DECISION D, reworded, Amendment 2):** at MOST one counter
+  ESCALATES per turn; order for routing and escalation is safety, then rudeness,
+  then confusion. Decay is bookkeeping, not escalation, and MAY occur on the
+  same turn as another counter's movement (a meaningful turn decays confusion
+  and advances `cleanStreak` together, which is fine). Consequence baked in and
+  intended: a confusion-stuck visitor never decays rudeness, because decay needs
+  meaningful turns and a confusion turn is not meaningful.
 - **No raw echo (DECISION F):** boundary copy never renders the input.
 - **DECISION E copy constraint:** boundary and warning copy must not claim
   "safety wins during recovery" in the general sense.
@@ -196,10 +253,12 @@ Scope:
 Assertions added (P3): `shut up` routes to the boundary and the response does
 NOT contain the input; repeated rudeness climbs light, refusal, warning;
 level 3 sets the soft end with `closedReason === 'recovery'`; a
-severe/unsafe message routes to safety not the boundary; rudeness decays to a
-lower level only after 5 clean meaningful turns (4 do not); the one-counter rule
-holds (a rude turn leaves `confusion` untouched, a confusion turn leaves
-`rudeness` untouched).
+severe/unsafe message routes to safety not the boundary; rudeness decays one
+level once `cleanStreak` hits 5 (at 4 it does not, which is why the field is
+needed); the escalation-precedence rule holds (a meaningful turn may decay
+confusion AND advance `cleanStreak` in the same turn, but no two counters
+ESCALATE in one turn; a rude turn escalates only rudeness, a confusion turn
+escalates only confusion).
 
 STOP 3: boundary, warning and level-3 soft-end copy written by Steve. NOTE:
 this phase is adjacent to the parked safety workstream. Per DECISION E, the
@@ -258,12 +317,17 @@ STOP 5: Steve writes the three fallback stages; build wires the staging.
 
 ---
 
-## Phase 6A. Glossary content (CRITICAL PATH, Steve's copy review, BLOCKS 6B)
+## Phase 6A. Glossary content (STARTS AT t0, PARALLEL WITH PHASE 0, CRITICAL PATH)
 
-Goal: an approved controlled glossary. This is copy, it is Steve's, and per the
-sequencing ruling it BLOCKS the contextual-definition build. The critical path
-of the whole recovery programme is this review, not the build: the build cannot
-populate `last_complex_terms` with anything until the glossary exists.
+SCHEDULING (schedule change): this phase does NOT wait for Phases 1 to 5. It
+starts immediately, in parallel with Phase 0, because it depends on nothing (it
+is pure copy and the draft already exists). It is the programme's critical
+path. It BLOCKS only 6B.
+
+Goal: an approved controlled glossary. This is copy, it is Steve's. The critical
+path of the whole recovery programme is this review, not the build: the build
+cannot populate `last_complex_terms` with anything until the glossary exists,
+so starting it late would idle the critical path behind five unrelated phases.
 
 Scope:
 - Steve reviews and approves the glossary delivered this session
@@ -322,7 +386,7 @@ Scope:
 
 Assertions added (P7): the eight section-12 tests as permanent cases; a
 safety-mid-confusion case (distress at confusion rung 3 still fires safety and
-does not advance the ladder or the rung-3+ tally); a safety-mid-rudeness case.
+does not advance the ladder); a safety-mid-rudeness case.
 
 STOP 7: Steve confirms scope: safety wins for the CURRENT safety set only; no
 claim of coverage for the parked manipulation set (DECISION E). Ship note and
@@ -354,12 +418,13 @@ discipline.
 
 ## Decisions (now SETTLED, see the DECISIONS doc)
 
-DECISIONS A to F, plus the three additions, the sequencing change and the spec
-amendment, are all settled in
-`pick-a-chum-recovery-rules-DECISIONS.md`. This runbook is written against
-them. Nothing in the build is waiting on a Steve decision; it is waiting on
-Steve's COPY (each phase STOP) and, for the whole definition track, on the
-glossary approval at STOP 6A, which is the critical path.
+DECISIONS A to F (A and D amended in the second pass), plus the three additions,
+the schedule change and the spec amendment, are all settled in
+`pick-a-chum-recovery-rules-DECISIONS.md` (see its amendments log). This runbook
+is written against them. Nothing in the build is waiting on a Steve decision; it
+is waiting on Steve's COPY (each phase STOP) and, for the whole definition
+track, on the glossary approval at STOP 6A, which is the critical path and runs
+from t0.
 
 ---
 

@@ -84,16 +84,23 @@ This log line is updated by one further commit on top of 8c08a86.
 
 ## Decisions: NOW SETTLED (2026-07-26, see the DECISIONS doc)
 
-DECISIONS A to F are closed. Steve ruled on all six, plus three additions, a
-sequencing change and a spec amendment. Full text in
-`agent/pick-a-chum-recovery-rules-DECISIONS.md`. Summary:
+DECISIONS A to F are closed (A and D AMENDED in a second pass, same day). Steve
+ruled on all six, plus three additions, a schedule change and a spec amendment.
+Full text and an amendments log in
+`agent/pick-a-chum-recovery-rules-DECISIONS.md`. Summary (post-amendment):
 
-- A: "meaningful" = substantive family, not recovery-sensitive; plus a
-  never-resetting rung-3+ tally to terminate stuck-unstuck cycles.
-- B: soft end (re-engage on a meaningful message).
+- A [amended]: "meaningful" = substantive family, not recovery-sensitive.
+  Confusion DECAYS BY ONE on a meaningful turn (not reset to zero). The
+  never-reset rung-3+ tally is DELETED; the hidden ceiling (20 submissions) is
+  the session terminator, so no second terminator is needed.
+- B: soft end (re-engage on a meaningful message). Simplified by the tally
+  deletion; unchanged in substance.
 - C: rudeness DECAYS one level per 5 clean meaningful turns (five, for the
-  nine-year-old audience).
-- D: one counter per turn; order safety, rudeness, confusion; resets none.
+  nine-year-old audience), tracked by a `cleanStreak` field.
+- D [reworded]: at MOST one counter ESCALATES per turn; order safety, rudeness,
+  confusion. Decay is bookkeeping and MAY co-occur (fixes the old contradiction
+  with C, where a meaningful turn must decay confusion and advance cleanStreak
+  at once). Consequence kept: confusion-stuck never decays rudeness.
 - E: manipulation set OUT OF SCOPE; copy may not claim "safety wins during
   recovery" generally; on the section-14 release checklist.
 - F: approved; never render input from refusal/rude/unsafe/fallback families;
@@ -102,15 +109,22 @@ sequencing change and a spec amendment. Full text in
   standing exemption to REWRITE (not remove) the one Kettle harness assertion,
   in its own commit with before/after; (3) split `closed` into two reasons
   (ceiling vs recovery), distinct copy.
-- Sequencing: glossary approval BLOCKS the definition phase; the critical path
-  is Steve's copy review, not the build.
+- Schedule change: Phase 6A (glossary content) starts at t0 in parallel with
+  Phase 0. It is the critical path (Steve's copy review), must not wait in
+  sixth position; 6B stays gated behind it.
+- Notes: (1) Phase 1 AAN is a workbook review gate on column 1, not a fragile
+  harness text assertion; (2) Phase 0 adds a floor RATCHET to test-pickachum.mjs
+  so a dropped assertion fails instead of silently passing.
 - Spec amendment: the `[X]` restatement slot restates the prior DOG line, never
   the visitor's words.
 
-The BUILD-RUNBOOK has been revised against all of the above (Phases 0, 2, 3, 4
-changed; 6/7 reordered so glossary blocks the definition phase). Still open and
-Steve's to provide: the actual COPY at each phase STOP, and glossary approval at
-STOP 6A (the critical path). Glossary judgement calls still flagged at the foot
+The BUILD-RUNBOOK has been revised twice against all of the above (second pass:
+Phases 0, 1, 2, 3 changed, 6A rescheduled to t0, Phase 7 tally reference
+removed). PENDING: the HARNESS-DRAFT still shows first-pass assertions and needs
+a follow-up sync (out of scope for this revision, which covered DECISIONS.md and
+the runbook only). Still open and Steve's to provide: the actual COPY at each
+phase STOP, and glossary approval at STOP 6A (the critical path). Glossary
+judgement calls still flagged at the foot
 of the glossary (Hot Dog Mode's real answer, the "Herdability" joke entry, the
 Childline row staying in lockstep with approved safety wording).
 
