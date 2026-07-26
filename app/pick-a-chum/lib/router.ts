@@ -100,8 +100,6 @@ const ORIENTATION = [
   'type a question', 'kind of things', 'some choices', 'point me', 'comes next',
 ];
 
-const NAV_FRAME = ['where is', 'wheres', 'where can i', 'find', 'show me', 'open', 'take me to', 'go to', 'how do i get to', 'link to'];
-
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
 const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
