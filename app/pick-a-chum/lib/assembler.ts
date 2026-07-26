@@ -53,6 +53,18 @@ const BREED_FACTS: Record<string, string> = {
     'Boxers came from dogs bred to take hold of large animals and keep hold until a person arrived. That is a lot of determination to fit into a face that looks permanently surprised.',
   'border-terrier':
     'The Border Terrier needed legs long enough to keep up with horses all day and a body narrow enough to follow a fox underground. That is a remarkable amount of dog packed into a small one.',
+  'cocker-spaniel':
+    'Cocker Spaniels were named after the woodcock they were bred to find and flush from thick cover. That urge to disappear into every hedge is part of the original job.',
+  beagle:
+    'Beagles were bred so people could follow the hunt on foot, listening to the pack as it worked. That loud voice was never designed to be kept quiet.',
+  'french-bulldog':
+    'Nottingham lace workers took their little Bulldogs to France, and American breeders later backed the upright bat ears. This French-looking dog was shaped by Britain, France and America.',
+  pug:
+    'Pugs were treasured companions in the courts of Chinese emperors, sometimes with guards of their own. They have been expecting important treatment for a very long time.',
+  'german-shepherd':
+    'The German Shepherd was deliberately created by one man, Max von Stephanitz, from 1899, and built to keep moving for hours. That purposeful trot is part of the original plan, not just a stylish walk.',
+  'staffordshire-bull-terrier':
+    'Staffordshire Bull Terriers had to be handled at very close range, so steadiness around people mattered from the beginning. That people-focused side is part of the history.',
 };
 
 // Shared lines (Steve's approved copy, no character variation) for a breed question
