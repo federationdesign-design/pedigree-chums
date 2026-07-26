@@ -1330,13 +1330,34 @@ export default function BreedTree({
         // roll away down the sloped ground, and a rock should sit where it lands.
         const isStick = kind === "stick" || kind === "stickBig";
         const startAngle = isStick ? (Math.random() - 0.5) * 0.8 : 0;
+        // The stick is a tapered, kinked branch, not a sausage: traced from the
+        // artwork it is thin at the left tip, fat through the middle where the
+        // side branch juts down, and slimmer along the right arm. A single
+        // capsule the size of the bounding box left 10 to 24px of air depending
+        // where it landed. Three chamfered sections follow the real shape.
+        // Each entry is [start, end, thickness] as fractions of the sprite.
+        const STICK_PARTS: [number, number, number][] = [
+          [0.00, 0.06, 0.26], // the thin left tip
+          [0.04, 0.50, 0.70], // left and middle, thickest, carries the branch
+          [0.46, 1.00, 0.50], // the right arm
+        ];
         // The rock's shell follows the artwork's own proportions. Building it
         // from r, which comes off the width, made a body as tall as the rock is
         // wide, and the drawing is 13% shorter than that. It floated.
         const rockRx = dia / 2, rockRy = hgt / 2;
         const mb =
           isStick
-            ? Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: hgt / 2 }, angle: startAngle })
+            ? (() => {
+                const parts = STICK_PARTS.map(([a, b2, th]) => {
+                  const w = (b2 - a) * dia;
+                  const cx = px + (a + b2) / 2 * dia - dia / 2;
+                  const h2 = Math.max(4, th * hgt);
+                  return Bodies.rectangle(cx, py, w, h2, { ...opts, chamfer: { radius: Math.min(h2, w) / 2 } });
+                });
+                const body = MBody.create({ parts, ...opts });
+                MBody.setAngle(body, startAngle);
+                return body;
+              })()
             : kind === "rock"
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : Bodies.circle(px, py, r, opts);
