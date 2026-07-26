@@ -538,6 +538,8 @@ export default function BreedTree({
   useEffect(() => { onStartedChange?.(started); }, [started, onStartedChange]);
   // which of the two words the pointer is over, for their hover state
   const [wordHover, setWordHover] = useState<"start" | "learn" | null>(null);
+  // mirrored into a ref for the pointer handler, which is bound once
+  const wordHoverRef = useRef(false);
   // LEARN mode: the pit stays inert, the blue box is open, and a pink wash lies
   // over everything. learnPeek is the desktop hover preview of that wash.
   const [learning, setLearning] = useState(false);
@@ -1965,6 +1967,12 @@ export default function BreedTree({
         dockAside && gravity && !started && !learning
           ? (e) => {
               if (e.pointerType === "touch") return; // a tap is not a hover
+              // A word beats the half it sits in. The words are enormous: at
+              // desktop PLAY is wider than the screen, so its centre lands on the
+              // far side of the seam and hovering the middle of PLAY previewed
+              // LEARN. A ref rather than the wordHover state, because this
+              // handler is bound once and would read a stale value.
+              if (wordHoverRef.current) return;
               const play = seamSide(e.clientX, e.clientY) > 0;
               setStartPeek(play);
               setLearnPeek(!play);
@@ -2383,11 +2391,13 @@ export default function BreedTree({
                 tabIndex={0}
                 style={{ cursor: "pointer" }}
                 onMouseEnter={() => {
+                  wordHoverRef.current = true;
                   setWordHover(w.key);
                   if (w.key === "learn") setLearnPeek(true);
                   else setStartPeek(true);
                 }}
                 onMouseLeave={() => {
+                  wordHoverRef.current = false;
                   setWordHover((h) => (h === w.key ? null : h));
                   if (w.key === "learn") setLearnPeek(false);
                   else setStartPeek(false);

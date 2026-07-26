@@ -147,7 +147,12 @@ const seamLines = () => {
       }
       const r = await p.evaluate(seamLines);
       if (r && r.gap < 50) reading = r; // anything larger means it never peeked
-      else await p.mouse.move(2, 2);
+      // Nudging to (2,2) used to be a harmless way to reset a stuck hover. It is
+      // not any more: which half of the screen the pointer sits in now decides
+      // which overlay peeks, and the top-left corner is on the wrong side of the
+      // seam, so the nudge cancelled the very peek being measured. Move to a
+      // point that is unambiguously in the level's half instead: low and left.
+      else await p.mouse.move(20, await p.evaluate(() => window.innerHeight - 20));
     }
     seams.push({ size: size.width + 'x' + size.height, ...(reading || { gap: null }) });
   }
