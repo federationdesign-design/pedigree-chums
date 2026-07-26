@@ -2103,6 +2103,8 @@ export default function BreedTree({
             const iconStroke = Math.max(4 * upp, uSz * 0.1); // main pit icon weight
             return defs.map((d) => (
               <g key={d.kind} ref={d.kind === "close" ? uiCloseRef : uiDescRef}
+                role="button"
+                aria-label={d.kind === "close" ? "Close the pit" : "Breed information"}
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
                 style={{
                   cursor: "pointer",

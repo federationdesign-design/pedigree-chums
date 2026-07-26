@@ -42,10 +42,16 @@ type Props = {
 
 export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era }: Props) {
   const theme = levelThemeFor(era);
+  // The close X asks before it closes. A round can take a couple of minutes to
+  // build up, and losing it to a mis-tap in the corner is a rotten exit.
+  const [exitAsk, setExitAsk] = useState(false);
+  // read inside the key handler, which is bound once
+  const exitAskRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
   const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 900px)");
     const apply = () => setIsNarrow(mq.matches);
@@ -90,7 +96,13 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   }, []);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    // Escape closes the pit as before, but while the exit panel is up it answers
+    // "no" instead. A stray key should never be the thing that ends a round.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (exitAskRef.current) { setExitAsk(false); return; }
+      onClose();
+    };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     document.body.classList.add("pc-modal-open");
@@ -140,7 +152,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
-          onPitClose={onClose}
+          onPitClose={() => setExitAsk(true)}
           onRoundWon={() => {
             setPhase("won");
             // celebration: confetti over the flash (canvas-confetti, CDN pattern)
@@ -191,6 +203,38 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           <span className={css.shakeIcon} aria-hidden="true" />
         </button>
         </>
+      )}
+
+      {/* Exit confirmation, raised by the close X rather than closing outright.
+          Sits above the pit at z-index 320 and takes every pointer, so the pit
+          is unreachable while it is up. Escape answers no, which is the safe
+          direction for a stray key. */}
+      {exitAsk && (
+        <div
+          className={css.exitOverlay}
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="Leave the game?"
+          onClick={() => setExitAsk(false)}
+        >
+          <div className={css.exitPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={css.exitTitle}>EXIT</div>
+            <div className={css.exitBtns}>
+              <button type="button" className={css.endBtn} onClick={onClose} aria-label="Yes, leave the game">
+                Yes
+              </button>
+              <button
+                type="button"
+                className={`${css.endBtn} ${css.endBtnAlt}`}
+                onClick={() => setExitAsk(false)}
+                aria-label="No, keep playing"
+                autoFocus
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Round won / game over, main-pit flash styling */}

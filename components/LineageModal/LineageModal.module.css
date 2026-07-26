@@ -248,3 +248,50 @@
 .endBtnAlt {
   background: #ffffff;
 }
+
+/* Exit confirmation. The close X no longer closes the pit on its own: it asks
+   first, because losing a round to a stray tap is a miserable way to leave.
+   Built from the same parts as the end overlay so it reads as one family. */
+.exitOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 58, 87, 0.55);
+  animation: lmExitFade 0.18s ease-out;
+}
+@keyframes lmExitFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.exitPanel {
+  background: var(--blue-deep, #0b78bd);
+  border: 6px solid var(--navy, #0a3a57);
+  border-radius: 28px;
+  padding: 26px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 12px 0 rgba(10, 58, 87, 0.35);
+  animation: lmExitPop 0.34s cubic-bezier(0.2, 1.4, 0.4, 1);
+  max-width: min(86vw, 420px);
+}
+@keyframes lmExitPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.exitTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2.4rem, 9vw, 3.6rem);
+  color: #ffffff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.exitBtns {
+  display: flex;
+  gap: 16px;
+}
