@@ -89,19 +89,27 @@ function tx<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => IDBReque
 
 // Build a row from a raw turn event (recompute the normalised form the same way
 // the engine does, so the log shows exactly what routing saw).
+// D6: never store or export the visitor's raw safety disclosure. A logged
+// disclosure is a child's crisis sitting in a CSV. For a safety turn we keep the
+// category, route and timestamp and REDACT the raw input at capture, so it never
+// reaches IndexedDB. Non-safety turns keep raw input (replay still works for them).
+export const REDACTED_INPUT = '[redacted: safety]';
+const isSafetyTurn = (action: string) => action === 'safety_signpost' || action === 'safety_boundary';
+
 export function buildRow(e: TurnEvent, now: string): TurnRow {
   const r = e.resolution;
   const resp = e.response;
   const conf = (r as unknown as { confidence?: number | string }).confidence;
   const outcome = outcomeOf(r.action, r.bucket ?? '');
   const text = resp.followUp ? `${resp.text}\n${resp.followUp}` : resp.text;
+  const safety = isSafetyTurn(r.action);
   return {
     sessionId: e.sessionId,
     turn: e.turn,
     timestamp: now,
     activeDog: e.activeDog,
-    input: e.input,
-    normalised: normalise(e.input).compact,
+    input: safety ? REDACTED_INPUT : e.input,
+    normalised: safety ? '' : normalise(e.input).compact,
     layer: r.layer,
     layerName: r.layerName,
     bucket: r.bucket ?? '',

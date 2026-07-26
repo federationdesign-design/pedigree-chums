@@ -35,6 +35,7 @@ const { newSession } = await import(pathToFileURL(join(LIB, 'session.ts')).href)
 const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEligible } = await import(
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
+const { buildRow } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 
 let pass = 0;
 let fail = 0;
@@ -500,6 +501,22 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   const ok = isTypoEligible('remarkable') && !isTypoEligible('Collie') && !isTypoEligible('6.99') && !isTypoEligible('the');
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'typo eligibility excludes names/prices', layer: '-', bucket: '-', action: 'theatre eligibility', note: ok ? '' : 'eligibility wrong' });
+})();
+
+// ---- Task 4: D6 recorder redaction (safety input never stored; non-safety kept) ----
+(() => {
+  const { resolution, response } = submit(data, newSession(), 'I want to die');
+  const row = buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input: 'I want to die', resolution, response, transferTo: response.transferTo ?? '' }, '2026-01-01T00:00:00.000Z');
+  const ok = row.action === 'safety_signpost' && row.input === '[redacted: safety]' && row.normalised === '';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'D6: safety input redacted at capture', layer: 1, bucket: '-', action: 'recorder redact', note: ok ? '' : `input="${row.input}" norm="${row.normalised}"` });
+})();
+(() => {
+  const { resolution, response } = submit(data, newSession(), 'Hello there');
+  const row = buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input: 'Hello there', resolution, response, transferTo: '' }, '2026-01-01T00:00:00.000Z');
+  const ok = row.input === 'Hello there' && row.normalised.length > 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'D6: non-safety input kept', layer: 9, bucket: '-', action: 'recorder keep', note: ok ? '' : `input="${row.input}"` });
 })();
 
 // ---- Report ----

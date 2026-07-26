@@ -81,6 +81,13 @@ for (const s of order) {
   sessions++;
   console.log(`\n=== session ${s}  (start: ${startDog}, ${seq.length} turns) ===`);
   for (const row of seq) {
+    // D6: safety turns are redacted at capture (no raw input stored). Skip them
+    // rather than feeding the engine an empty or placeholder string.
+    if (!row.input || row.input.startsWith('[redacted')) {
+      console.log(`  turn ${row.turn}  [skipped: redacted safety turn]`);
+      turns++;
+      continue;
+    }
     const t = submit(CHUM_DATA, session, row.input);
     const resp = t.response;
     const newText = resp.followUp ? `${resp.text}\n${resp.followUp}` : resp.text;
