@@ -2097,9 +2097,12 @@ export default function BreedTree({
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinR = aspect >= 1 ? -vbWr * shift : -vbWr / 2;
             const ub = uiBodiesRef.current;
-            // Start screen: only the close X, so there is still a way out. The
-            // info square joins once the round is running.
-            const kinds = frozen ? (["close"] as const) : (["close", "desc"] as const);
+            // Only the close X, so there is always a way out. The info square is
+            // gone from the pit altogether: it was already hidden on the start
+            // screen, and it opens the blue box, which is reading rather than
+            // playing, so it has no place during a round either. The blue box is
+            // still reachable through the LEARN word on the start screen.
+            const kinds = ["close"] as const;
             const defs: { kind: "close" | "desc"; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
               const b = ub?.find((u) => u.kind === kind);
               return {

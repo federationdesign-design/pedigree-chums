@@ -1,5 +1,9 @@
 // GUARD-011: the start screen is a start screen, not a half-live pit.
-//   a) shake, slow motion and the info square are not offered before START,
+//   a) shake, slow motion and the info square are not offered before START.
+//      The info square is now gone from the pit altogether: it opens the blue
+//      box, which is reading rather than playing, and the blue box is reached
+//      through the LEARN word on the start screen instead. So it must be absent
+//      during a round too, not only before one.
 //      because none of them can do anything yet
 //   b) the close X stays, so there is always a way out
 //   c) the circles are frozen: a tap does not drill in, does not highlight, and
@@ -78,12 +82,13 @@ const probe = () => {
   await p.locator('[aria-label="Start"]').click({ force: true });
   await p.waitForTimeout(2500);
   const running = await p.evaluate(probe);
-  const armed = !running.start && running.shake && running.slowmo && running.info && running.close;
+  // shake and slow motion arrive with the round; the info square never does
+  const armed = !running.start && running.shake && running.slowmo && !running.info && running.close;
 
   console.log('start screen bare:', bareStart, JSON.stringify({ shake: before.shake, slowmo: before.slowmo, info: before.info }));
   console.log('way out kept:', wayOut, '| circles inert:', inert);
   console.log('word answers to hover:', wordAnswers, before.startSize, '->', hovered.startSize, '(learn unchanged at', hovered.learnSize + ')');
-  console.log('armed once running:', armed, JSON.stringify({ shake: running.shake, slowmo: running.slowmo, info: running.info, close: running.close }));
+  console.log('armed once running (info stays out):', armed, JSON.stringify({ shake: running.shake, slowmo: running.slowmo, info: running.info, close: running.close }));
   console.log('pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
   const pass = !!(bareStart && wayOut && inert && wordAnswers && armed && errs.length === 0);
