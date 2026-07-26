@@ -115,9 +115,30 @@ safety-first for the wider manipulation set, but stop penalising plain buying
 language. Add harness cases for the honest phrasings alongside the manipulation
 ones so precision is tracked, not just recall.
 
+## Recorder findings (polish round)
+
+From reviewing the first recorder export (Steve, 2026-07-26). Logged, NOT fixed.
+
+- **B13 echoes the visitor's raw input back into the response.** The catch-all
+  deflection fills its template with the raw input, e.g. "ok what can you do?"
+  produced "ok what can you do?. A noun. Excellent." Two problems: it reads as
+  broken, AND it is a safety risk, if a child types something distressing or
+  personal, the dog repeats it back on screen. Fix: the B13 / conversational
+  catch-all must not echo raw input verbatim; use a generic deflection that never
+  reflects the visitor's words. Treat the safety angle (no repeating of personal
+  or distressing input) as the priority. Relates to the Volunteered PII row in
+  the red-team table (do not echo/store).
+- **B12 has an unfilled placeholder.** "ok thanks" returned "A . Useful
+  information." A template slot is empty, leaving a stray "A ." and a filler
+  tail. Fix: fill the B12 (personal) response templates with real copy so the
+  slot is never blank.
+
 ## Log
 
 - 2026-07-24: File created and seeded (post-CP1). Nothing implemented. Scheduled
   as a phase after Checkpoint 2.
 - 2026-07-25: Logged the B01 commercial-guard over-correction above
   ("without signing up") for the polish round. Not fixed, per Steve.
+- 2026-07-26: Logged two recorder findings (B13 raw-input echo with its safety
+  angle; B12 unfilled placeholder) for the polish round. Not fixed, per Steve.
+  Recorder outcome classification fixed separately (B13/B14 now count as misses).
