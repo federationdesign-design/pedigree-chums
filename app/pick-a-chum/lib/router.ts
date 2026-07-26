@@ -88,7 +88,7 @@ const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'even
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
 // now belongs to the identity bucket (B16) below.
 const TESTING = ['test', 'testing', 'does this work', 'is this working', 'hello test'];
-const COMMAND = ['sit', 'stay', 'fetch', 'roll over', 'help', 'do something', 'tell me something', 'show me something', 'give me', 'paw'];
+const COMMAND = ['sit', 'stay', 'fetch', 'roll over', 'do something', 'tell me something', 'show me something', 'give me', 'paw'];
 const PERSONAL = ['i have', 'my dog', 'i like', 'i love', 'sad', 'angry', 'good dog', 'clever', 'stupid dog', 'thanks', 'thank you', 'you are annoying', 'lonely'];
 
 // Identity and scepticism (bucket B16), grouped into the ten SCP families so each

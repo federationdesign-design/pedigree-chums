@@ -104,6 +104,13 @@ check('Sit', { layer: 9, bucket: 'B11', action: 'converse' });
 check('I have three cats', { layer: 9, bucket: 'B12', action: 'converse' }); // personal statement (bored moved to FUN)
 check('Kettle', { layer: 9, bucket: 'B13', action: 'converse' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('kettle') ? null : 'expected original word inserted') });
 
+// Q1: 'help' removed from the B11 COMMAND pool, so help-seeking is no longer
+// answered with a dog command ("Sit? I am running the session."). Real safety
+// routing of these inputs is a later phase; here we assert only that they no
+// longer reach B11. 'Sit' etc. still reach B11 (asserted above).
+check('I need help', {}, { assert: (r) => (r.bucket === 'B11' ? 'help-seeking reached the B11 command pool' : null) });
+check('pleeeassssee help me', {}, { assert: (r) => (r.bucket === 'B11' ? 'help-seeking reached the B11 command pool' : null) });
+
 // ---- Gibberish and fallback ----
 check('qwerty', { layer: 10, bucket: 'B14', action: 'gibberish' });
 check('asdfgh', { layer: 10, bucket: 'B14', action: 'gibberish' });
