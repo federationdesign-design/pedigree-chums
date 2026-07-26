@@ -519,6 +519,17 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   rows.push({ ok, input: 'D6: non-safety input kept', layer: 9, bucket: '-', action: 'recorder keep', note: ok ? '' : `input="${row.input}"` });
 })();
 
+// ---- Task 5: recorder analysis columns (clusterKey groups paraphrases; blank on safety) ----
+(() => {
+  const mk = (input) => { const { resolution, response } = submit(data, newSession(), input); return buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input, resolution, response, transferTo: '' }, '2026-01-01T00:00:00.000Z'); };
+  const a = mk('How do I play the game?');
+  const b = mk('play the game how');
+  const safetyRow = mk('I want to die');
+  const ok = a.clusterKey === b.clusterKey && a.clusterKey.length > 0 && safetyRow.clusterKey === '' && a.topIntent.length > 0 && typeof a.gapType === 'string';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'task5: clusterKey groups paraphrases, blank on safety', layer: '-', bucket: '-', action: 'recorder columns', note: ok ? '' : `a=${a.clusterKey} b=${b.clusterKey} safety="${safetyRow.clusterKey}"` });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

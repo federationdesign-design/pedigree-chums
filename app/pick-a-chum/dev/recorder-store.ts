@@ -23,6 +23,18 @@ export interface TurnRow {
   transferTo: string;
   outcome: string; // transfer | refusal | unmatched | cutoff | answered
   verdict: string; // always empty; Steve tags rows after export
+  // Analysis columns (for ranking real questions later). topIntent and clusterKey
+  // are computable now; the scored fields (topScore, runnerUp, runnerUpScore,
+  // matchedSignals) and the near_miss/ambiguous gapTypes await the scoring/NLU
+  // layer and are left blank until then. clusterKey is blanked on safety turns
+  // (it derives from the raw input, which D6 forbids storing).
+  topIntent: string; // the winning intent (bucket, or action if bucketless)
+  topScore: string; // blank until the scoring layer exists
+  runnerUp: string; // blank until the scoring layer exists
+  runnerUpScore: string; // blank until the scoring layer exists
+  matchedSignals: string; // blank until the router exposes matched triggers
+  gapType: string; // near_miss | no_match | ambiguous (only no_match derivable now)
+  clusterKey: string; // input normalised, stopwords stripped, tokens deduped + sorted
 }
 
 export interface Aggregate {
@@ -36,7 +48,21 @@ export const COLUMNS: (keyof TurnRow)[] = [
   'sessionId', 'turn', 'timestamp', 'activeDog', 'input', 'normalised',
   'layer', 'layerName', 'bucket', 'action', 'confidence', 'responseId',
   'responseText', 'transferTo', 'outcome', 'verdict',
+  'topIntent', 'topScore', 'runnerUp', 'runnerUpScore', 'matchedSignals', 'gapType', 'clusterKey',
 ];
+
+// Cluster key: normalise the input, drop very common words, dedupe and sort the
+// tokens, so paraphrases of the same question share a key ("how do i play" and
+// "how to play the game" collapse together). Blank for safety turns (D6).
+const CLUSTER_STOP = new Set([
+  'the', 'a', 'an', 'of', 'is', 'are', 'do', 'does', 'you', 'your', 'to', 'in', 'it', 'this', 'that',
+  'can', 'on', 'and', 'for', 'with', 'me', 'my', 'i', 'what', 'how', 'where', 'when', 'who', 'why', 'which',
+]);
+function clusterKeyOf(input: string): string {
+  const words = normalise(input).words.filter((w) => w.length >= 2 && !CLUSTER_STOP.has(w));
+  return [...new Set(words)].sort().join(' ');
+}
+const gapTypeOf = (outcome: string) => (outcome === 'unmatched' ? 'no_match' : '');
 
 const MIN_MESSAGES = 3; // a conversation counts only at three turns or more
 
@@ -120,6 +146,13 @@ export function buildRow(e: TurnEvent, now: string): TurnRow {
     transferTo: e.transferTo ?? '',
     outcome,
     verdict: '',
+    topIntent: r.bucket ?? r.action,
+    topScore: '',
+    runnerUp: '',
+    runnerUpScore: '',
+    matchedSignals: '',
+    gapType: gapTypeOf(outcome),
+    clusterKey: safety ? '' : clusterKeyOf(e.input),
   };
 }
 
