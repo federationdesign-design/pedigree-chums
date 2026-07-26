@@ -214,6 +214,17 @@ check('I have a complaint', { bucket: 'B04', action: 'faq_answer' }, { assert: (
 // A single clarifier still works on a fresh session (no follow-up state):
 check('help me', { action: 'clarifier' });
 
+// ---- Fix 3: transfer answer-capture (dog name performs the transfer) ----
+(() => { const s = newSession(); check('can I talk to a different dog', { action: 'transfer_request' }, { session: s }); check('the boxer', { action: 'transfer' }, { session: s, transferTo: 'boxer' }); })();
+(() => { const s = newSession(); check('can I talk to another dog', { action: 'transfer_request' }, { session: s }); check('labrador', { action: 'transfer' }, { session: s, transferTo: 'labrador' }); })();
+// ---- Fix 3: complaint follow-ups stay in the complaint context ----
+(() => {
+  const s = newSession();
+  check('I have a complaint', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId}`) });
+  check('the labrador one', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ012' ? null : `complaint follow-up lost: ${r.faqId}`) });
+  check('is there an email', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ012' ? null : `email follow-up lost: ${r.faqId}`) });
+})();
+
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
 check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('full question') ? null : 'expected approved gk-unknown line') });
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });

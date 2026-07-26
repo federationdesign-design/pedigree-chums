@@ -19,6 +19,8 @@ export interface Turn {
 // topic clears the latch.
 const BLOCKED_AFTER_SAFETY = new Set(['orientation', 'fun_tease', 'open_discount_popup', 'transfer']);
 const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 'gk_answer', 'link']);
+// Weak routes that, after a complaint answer, should stay in the complaint context.
+const WEAK_AFTER_COMPLAINT = new Set(['fallback', 'gk_unknown', 'gibberish', 'clarifier']);
 
 export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
@@ -37,6 +39,12 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // comedy/game/sales/orientation be selected. Redirect to the neutral fallback.
   if (session.safetyLatched && BLOCKED_AFTER_SAFETY.has(resolution.action)) {
     resolution = { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+  }
+
+  // Complaint context: a weak follow-up after a complaint answer stays in the
+  // complaint (the human-contact FAQ), rather than falling to the catch-all.
+  if (session.lastWasComplaint && !session.safetyLatched && WEAK_AFTER_COMPLAINT.has(resolution.action)) {
+    resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ012' };
   }
 
   const response = assemble(resolution, data, n, session);
@@ -66,6 +74,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // Safety guard latch: a protected safety state sets it; a meaningful topic clears it.
   if (resolution.action === 'safety_signpost' || resolution.action === 'safety_boundary') session.safetyLatched = true;
   else if (MEANINGFUL_TOPIC.has(resolution.action)) session.safetyLatched = false;
+  session.lastWasComplaint = resolution.faqId === 'FAQ012'; // complaint follow-up context
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 
   return { input, resolution, response };

@@ -267,6 +267,15 @@ function captureClarifierAnswer(n: Normalised, data: ChumData): Resolution | nul
   return null;
 }
 
+// A dog name in a transfer follow-up ("the boxer", "labrador"). Returns the Dog id.
+function matchDogName(c: string): Dog | null {
+  if (/\bboxer\b/.test(c)) return 'boxer';
+  if (/\blab(rador)?s?\b/.test(c)) return 'labrador';
+  if (/\bterriers?\b/.test(c)) return 'terrier';
+  if (/\bcollies?\b/.test(c)) return 'collie';
+  return null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
@@ -283,6 +292,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.lastAction === 'clarifier') {
     const mapped = captureClarifierAnswer(N, data);
     if (mapped) return mapped;
+  }
+
+  // Transfer follow-up: after a transfer OFFER, a dog name performs the transfer.
+  if (state.lastAction === 'transfer_request') {
+    const to = matchDogName(c);
+    if (to) return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: to };
   }
 
   // Layer 1: safety and unsuitable content. Always first.
