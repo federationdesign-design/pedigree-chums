@@ -115,7 +115,10 @@ export function QuotePollScene({
   // poll starts fading in the moment the yellow line finishes extending
   // (p=0.24), overlapping with the mark/text build rather than waiting
   const pollCard = clamp01((p - 0.24) / 0.3);
-  const btns = clamp01((p - 0.6) / 0.15);
+  /* Same idea: the buttons used to land at p = 0.75 and the last quarter of
+     the scene was dead. They now fade in over twice the scroll, finishing at
+     0.9, which also holds the reader a little longer before the lock. */
+  const btns = clamp01((p - 0.6) / 0.3);
   /* Lock engages the moment the buttons are fully visible -- not later --
      so there is never a window where the reader is blocked before they can
      even see something to click. */
@@ -258,7 +261,10 @@ export function StatueBulletsChoreo({
   /* Auto-pan continuously with vertical scroll progress (first 55% of the
      scene) until the reader swipes manually, at which point native touch
      takes over completely and this effect stops writing to scrollLeft. */
-  const galleryP = clamp01(p / 0.55);
+  /* The pan used to finish at p = 0.55, leaving 45% of the scene as dead
+     scroll with nothing moving. Spreading it to 0.9 uses that tail instead.
+     The scene is unchanged, so the pan is slower, not faster. */
+  const galleryP = clamp01(p / 0.9);
   useEffect(() => {
     const track = trackRef.current;
     if (!track || swiped.current) return;
