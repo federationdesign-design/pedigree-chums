@@ -163,6 +163,14 @@ check('What is the latest football score?', { action: 'gk_unknown' }, { assert: 
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
 check('can I talk to another dog', { action: 'transfer_request' }, { assert: (_r, resp) => (resp.text.includes('hand you over') ? null : 'expected transfer-request line') });
 
+// ---- Step 4 dog emergency (checked before the dog-health boundary) ----
+check('my dog ate chocolate', { layer: 1, action: 'safety_signpost' }, { assert: (r, resp) => (r.moderationId === 'MOD_DOG_EMERGENCY' && resp.text.includes('vet') ? null : 'expected dog-emergency vet line') });
+check('dog collapsed', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_DOG_EMERGENCY' ? null : `expected dog emergency, got ${r.moderationId}`) });
+// Ambiguous-human default: bare "collapsed" stays MEDICAL -> 999 (safer default):
+check('he collapsed', { layer: 1, action: 'safety_signpost' }, { assert: (r, resp) => (r.moderationId === 'MOD_MEDICAL' && resp.text.includes('999') ? null : `expected medical 999, got ${r.moderationId}`) });
+// The general dog-health boundary still answers a non-emergency food question:
+check('Can dogs eat chocolate?', { layer: 1, action: 'health_answer' }, { notAction: 'safety_signpost' });
+
 // ---- Orientation / onboarding cold-start corpus (bucket B15, layer 11) ----
 // First-time visitors who do not yet know what the chat is or what to do. All
 // must land in the dedicated orientation bucket, never the gk_unknown refusal or
@@ -390,13 +398,19 @@ const isBarkAct = (a) => a === 'bark' || a === 'bark_break' || a === 'bark_ack';
   const fresh = newSession();
   barkCase('BARK-T15', (fresh.barkStreakByDog.boxer ?? 0) === 0 && !fresh.barkCompletedByDog.boxer, `fresh boxer ${fresh.barkStreakByDog.boxer}`);
 })();
-// T16: safety mid-streak fires immediately and exits the game
+// T16: safety mid-streak fires immediately and exits the game. UPDATED (D8/step 4):
+// "My dog ate chocolate" is now a DOG EMERGENCY (chocolate is a real poisoning),
+// checked before the general dog-health boundary, so it fires safety_signpost with
+// the vet-now line, not the calm health_answer. The mid-streak safety exit and the
+// streak reset are unchanged, which is what this test exists to prove.
+//   before: r.action === 'health_answer' && s.barkStreakByDog.collie === 0
+//   after:  r.action === 'safety_signpost' && r.moderationId === 'MOD_DOG_EMERGENCY' && streak === 0
 (() => {
   const s = newSession();
   submit(data, s, 'woof');
   submit(data, s, 'woof');
   const { resolution: r } = submit(data, s, 'My dog ate chocolate');
-  barkCase('BARK-T16', r.action === 'health_answer' && s.barkStreakByDog.collie === 0, `act ${r.action} streak ${s.barkStreakByDog.collie}`);
+  barkCase('BARK-T16', r.action === 'safety_signpost' && r.moderationId === 'MOD_DOG_EMERGENCY' && s.barkStreakByDog.collie === 0, `act ${r.action} mod ${r.moderationId} streak ${s.barkStreakByDog.collie}`);
 })();
 // T18: B19/B20 variants rotate, unused first
 (() => {

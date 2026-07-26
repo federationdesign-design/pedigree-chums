@@ -19,6 +19,7 @@ export type SafetyKind =
   | 'self_harm'
   | 'safeguarding'
   | 'general_distress'
+  | 'dog_emergency'
   | 'explicit'
   | 'abuse'
   | 'bare_help';
@@ -99,6 +100,20 @@ const ACTION = ['touched', 'touches', 'made me', 'showed me', 'hurt', 'kissed', 
 
 const ABUSE = ['stupid', 'idiot', 'shut up', 'you suck', 'hate you', 'useless', 'rubbish dog', 'fuck', 'shit'];
 
+// Dog emergencies. Gated to a dog context (per Steve's flag 2) so ambiguous human
+// words are not swallowed; bare "collapsed"/"seizure"/"not breathing" stay in
+// MEDICAL and go to 999 (the safer default when it is genuinely ambiguous). This
+// is checked inside detectSafety, so it fires BEFORE the general dog-health
+// boundary (isDogHealthQuestion), giving the urgent "call your vet now" line.
+const DOG_EMERGENCY = [
+  'ate chocolate', 'ate grapes', 'ate raisins', 'ate xylitol', 'dog ate sweets', 'dog ate chewing gum',
+  'dog ate medicine', 'dog ate pills', 'dog ate onions', 'dog ate garlic', 'dog ate a battery',
+  'dog ate something poisonous', 'dog seizure', 'dog is having a seizure', 'dog collapsed',
+  'dog is not breathing', 'dog cannot stand', 'dog is bloated', 'dog hit by car', 'dog got hit by a car',
+  "dog can't breathe", 'dog cant breathe', "dog won't wake up", 'dog wont wake up', 'dog keeps being sick',
+  'dog is shaking', 'dog is choking', 'dog got run over', 'dog fell from a height', 'dog has a swollen tummy',
+];
+
 // Categories in safety-first priority order (used only to break ties when two
 // matched triggers are the same length). Longest matched trigger wins overall.
 interface SafetyCategory {
@@ -114,6 +129,7 @@ const CATEGORIES: SafetyCategory[] = [
   { kind: 'self_harm', moderationId: 'MOD_SELF_HARM', action: 'safety_signpost', terms: SELF_HARM },
   { kind: 'safeguarding', moderationId: 'MOD_SAFEGUARDING', action: 'safety_signpost', terms: SAFEGUARDING },
   { kind: 'general_distress', moderationId: 'MOD_GENERAL_DISTRESS', action: 'safety_signpost', terms: GENERAL_DISTRESS },
+  { kind: 'dog_emergency', moderationId: 'MOD_DOG_EMERGENCY', action: 'safety_signpost', terms: DOG_EMERGENCY },
   { kind: 'explicit', moderationId: 'MOD_EXPLICIT', action: 'safety_boundary', terms: CONTENT_SEEKING },
   { kind: 'abuse', moderationId: 'MOD_ABUSE', action: 'safety_boundary', terms: ABUSE },
   { kind: 'bare_help', moderationId: 'MOD_BARE_HELP', action: 'clarifier', terms: BARE_HELP },

@@ -156,6 +156,14 @@ export const MODERATION: ModerationCategory[] = [
     responses: ['Do you need help with something on the site, or is something worrying you? Tell me which and I will point you the right way.'],
     status: 'APPROVED',
   },
+  {
+    id: 'MOD_DOG_EMERGENCY',
+    scenario: 'Dog emergency: vet now',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['Tell an adult and call your vet now. If the vet is closed, use the out-of-hours number on its answerphone. This needs a real vet, not this chat.'],
+    status: 'APPROVED',
+  },
 ];
 
 /**
