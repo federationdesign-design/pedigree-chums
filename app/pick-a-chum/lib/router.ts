@@ -373,8 +373,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 10, layerName: 'Gibberish and fallback', bucket: 'B14', action: 'gibberish' };
   }
 
-  // Unresolved free text falls back to the conversational catch (B13-style).
-  return conv('B13');
+  // Unresolved free text: the terminal catch-all. A distinct action so the
+  // assembler renders the approved fallback line and NEVER echoes the raw input
+  // (the old conv('B13') here rendered {{input}} verbatim). The single-word
+  // bucket above (B13 via conv) keeps its echo for now.
+  return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
 }
 
 function conv(bucket: string): Resolution {

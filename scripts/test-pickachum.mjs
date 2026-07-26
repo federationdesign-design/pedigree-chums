@@ -111,6 +111,15 @@ check('Kettle', { layer: 9, bucket: 'B13', action: 'converse' }, { assert: (_r, 
 check('I need help', {}, { assert: (r) => (r.bucket === 'B11' ? 'help-seeking reached the B11 command pool' : null) });
 check('pleeeassssee help me', {}, { assert: (r) => (r.bucket === 'B11' ? 'help-seeking reached the B11 command pool' : null) });
 
+// Q2: the terminal catch-all uses the approved fallback line and NEVER renders
+// the visitor's raw input. (The single-word bucket still echoes: 'Kettle' above.)
+check('the wardrobe negotiated with marmalade', { action: 'fallback' }, {
+  assert: (_r, resp) => {
+    const t = resp.text.toLowerCase();
+    return t.includes('wardrobe') || t.includes('negotiated') || t.includes('marmalade') ? 'catch-all echoed raw input' : null;
+  },
+});
+
 // ---- Gibberish and fallback ----
 check('qwerty', { layer: 10, bucket: 'B14', action: 'gibberish' });
 check('asdfgh', { layer: 10, bucket: 'B14', action: 'gibberish' });

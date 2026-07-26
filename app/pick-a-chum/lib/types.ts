@@ -136,6 +136,7 @@ export type ActionType =
   | 'transfer' // specialist handoff to another dog
   | 'converse' // greeting / test / command / statement / random word
   | 'gibberish' // keyboard smash / punctuation / unresolved
+  | 'fallback' // terminal catch-all: unresolved free text, approved line, never echoes raw input
   | 'boxer_cutoff'; // hidden ceiling reached
 
 export interface Resolution {

@@ -32,6 +32,9 @@ const DOG_LABEL: Record<Dog, string> = {
 // Shown only until the workbook B15 orientation rows carry real copy (logged in
 // PLACEHOLDERS.md). Deliberately not final copy: Steve writes the Collie voice.
 const ORIENTATION_PLACEHOLDER = '[B15 orientation line, copy pending: Steve to write in the Collie voice]';
+// Terminal catch-all line. Approved by Steve. MUST NOT contain {{input}}: the
+// catch-all never echoes the visitor's raw words.
+const FALLBACK_LINE = 'I am not sure what you want me to do with that. Try a full question, or choose dogs, games or the website.';
 // Bark-game break and post-break acknowledgement: copy pending (logged in
 // PLACEHOLDERS.md). Steve writes these families into the workbook (B19 / B20).
 const BARK_BREAK_PLACEHOLDER = '[B19 bark-break line, copy pending]';
@@ -271,6 +274,10 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       const text = r ? fill(r.template, baseContext(n, dest?.name ?? '')) : 'Did you lean on your keyboard?';
       return { responseId: r?.responseId ?? 'B14', text, dog, destinationId: dest?.id, url: dest?.url ?? null };
     }
+
+    case 'fallback':
+      // Terminal catch-all. Approved line, no {{input}}, so raw text is never echoed.
+      return { responseId: 'B13-FALLBACK', text: FALLBACK_LINE, dog };
 
     case 'boxer_cutoff': {
       const l1 = copy(data, 'Boxer ending', 'Cut-off 1');
