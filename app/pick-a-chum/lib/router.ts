@@ -59,6 +59,17 @@ const RULES = [
   'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
 ];
 
+// Complaint / human-contact intent. Routes to the approved FAQ012 human-contact
+// answer (nothing reached it before). Checked above the rules/nav/FAQ layers so a
+// complaint ("something offensive on the cards") is not answered as a product
+// description or swallowed by navigation.
+const COMPLAINT_CONTACT = [
+  'complaint', 'make a complaint', 'i have a complaint', 'speak to a real person', 'real person',
+  'speak to somebody', 'talk to a human', 'is there a human', 'report something', 'offensive',
+  'wrong information', 'correct information', 'who runs this', 'write to you', 'po box',
+  'email address', 'contact you', 'parent contact',
+];
+
 // Orientation / onboarding (bucket B15). First-time visitors who do not yet know
 // what the chat is or what to do: "what do I do here", "how does this work",
 // "what can I ask". Curated, specific phrases only (never bare "how do i" / "what
@@ -303,6 +314,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // response; how-TO-play phrasing still resolves to the rules bucket below.
   if (hasAny(N, FUN)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
+  }
+
+  // Complaint / human-contact: route to the approved FAQ012 human-contact answer.
+  // Above rules/nav/FAQ so a complaint is not answered as product copy.
+  if (hasAny(N, COMPLAINT_CONTACT)) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ012' };
   }
 
   // Layer 3: gameplay and website navigation.

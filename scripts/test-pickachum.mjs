@@ -164,6 +164,11 @@ check('he keeps calling me an idiot', { layer: 1, action: 'safety_signpost' }, {
 // Direct abuse (no reporting frame) is still the boundary, unchanged:
 check('you are stupid and I hate this', { layer: 1, action: 'safety_boundary' }, { assert: (r) => (r.moderationId === 'MOD_ABUSE' ? null : `direct abuse misrouted to ${r.moderationId}`) });
 
+// ---- Task 2: complaint / human-contact intent -> approved FAQ012 answer ----
+check('I found something deeply offensive on the cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `complaint not routed to FAQ012, got ${r.faqId}`) });
+check('can I speak to a real person', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
+check('I have a complaint', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
+
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
 check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('full question') ? null : 'expected approved gk-unknown line') });
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
