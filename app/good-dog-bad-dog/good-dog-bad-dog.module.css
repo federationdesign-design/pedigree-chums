@@ -167,6 +167,12 @@
    was being replaced by the rhythm's gap and the join opened up. */
 .essayBody.essayBody > .tightTop { margin-top: -25px; }
 
+/* The rhythm rules above only reach DIRECT children of .essayBody, so a rule
+   nested inside a scene wrapper gets no gap at all. This gives the line its
+   spacing wherever it sits. Direct children still match the rules above,
+   which score higher, so nothing here overrides them. */
+.essayBody .rule { margin-top: var(--gap-l); }
+
 .essayBody.essayBody > .spacer,
 .essayBody.essayBody > .spacer + * { margin-top: 0; }
 
