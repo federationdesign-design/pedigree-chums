@@ -716,6 +716,8 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 <WipeSequence
                   mode="fade"
+                  hold={1}
+                  sceneVh={380}
                   captionSize="large"
                   captionMode="stack"
                   alt="A soldier coming home to their dog"
@@ -897,6 +899,7 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 <WipeSequence
                   mode="fade"
+                  hold={1}
                   captionMode="stack"
                   sceneVh={320}
                   alt="Argos in the world of scent"
@@ -921,7 +924,8 @@ export default function ArgosPage() {
               <div className={`${styles.sceneMobile} ${styles.imageScene}`}>
                 <WipeSequence
                   frameRatio="1115 / 1134"
-                  sceneVh={420}
+                  hold={1}
+                  sceneVh={600}
                   alt="A dog and a woman nose to nose, with the path of smell traced into the brain"
                   images={[
                     "/smell/smell-img1.jpg",

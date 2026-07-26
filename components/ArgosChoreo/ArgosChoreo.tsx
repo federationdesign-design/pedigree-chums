@@ -386,6 +386,7 @@ export function WipeSequence({
   mode = "wipe",
   frameRatio,
   sceneVh,
+  hold = 0,
   captionSize = "small",
   captionMode = "swap",
 }: {
@@ -407,9 +408,14 @@ export function WipeSequence({
   /* e.g. "1115 / 1260" to crop the frames to a fixed shape. Omit to keep the
      artwork's own proportions with no cropping at all. */
   frameRatio?: string;
-  /* Scene height in vh. Defaults to 45vh of scroll per transition plus a
-     screen for the sticky stage. */
+  /* Scene height in vh. Defaults to 40vh of scroll per unit plus a screen for
+     the sticky stage, where a unit is one fade or one hold. */
   sceneVh?: number;
+  /* Scroll spent holding each frame fully visible, measured in fade-lengths.
+     0 means each frame starts being replaced the instant it lands, which is
+     the old behaviour. 1 means every frame gets a still moment exactly as
+     long as the fade that brought it in. */
+  hold?: number;
   /* "large" matches the statue gallery's bullet treatment: 1.3rem, weight 600,
      centred. Use it when each slide gets one short line rather than a
      paragraph of explanatory text. */
@@ -419,8 +425,15 @@ export function WipeSequence({
   captionMode?: "swap" | "stack";
 }) {
   const { sceneRef, p } = useSceneProgress();
-  const steps = Math.max(1, images.length - 1);
-  const topFrame = Math.min(steps, Math.ceil(p * steps));
+  const n = images.length;
+  const steps = Math.max(1, n - 1);
+  /* The scene is divided into units: one per fade, plus `hold` per frame.
+     Frame i fades in over the single unit that starts once every earlier fade
+     and every hold up to and including its own has been scrolled through. */
+  const units = n * hold + steps;
+  const revealFor = (i: number) => clamp01(p * units - (i * hold + (i - 1)));
+  let topFrame = 0;
+  for (let i = 1; i < n; i++) if (revealFor(i) > 0) topFrame = i;
   const caps = captions ?? [];
   const shown = (c: { fromFrame?: number; fromProgress?: number }) =>
     c.fromProgress !== undefined ? p >= c.fromProgress : (c.fromFrame ?? 0) <= topFrame;
@@ -428,7 +441,7 @@ export function WipeSequence({
   for (let i = 0; i < caps.length; i++) {
     if (shown(caps[i])) capIdx = i;
   }
-  const height = sceneVh ?? 100 + steps * 45;
+  const height = sceneVh ?? 100 + units * 40;
   return (
     <div
       ref={sceneRef}
@@ -449,7 +462,7 @@ export function WipeSequence({
                 />
               );
             }
-            const reveal = clamp01(p * steps - (i - 1));
+            const reveal = revealFor(i);
             return (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
