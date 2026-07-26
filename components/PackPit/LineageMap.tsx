@@ -1886,8 +1886,10 @@ export default function LineageMap({
               zIndex: 62,
               // circular: the yellow ring rides as a box-shadow spread rather than
               // an outline, because box-shadow always follows border-radius
+              // white in the learn layer: yellow is the pit's colour and it read as
+              // pit furniture sitting on top of the learning view
               boxShadow: circular
-                ? "0 0 0 3px var(--yellow, #ffd23e), 0 2px 8px rgba(0,0,0,0.25)"
+                ? "0 0 0 3px #ffffff, 0 2px 8px rgba(0,0,0,0.25)"
                 : "0 2px 8px rgba(0,0,0,0.25)",
               userSelect: "none",
               touchAction: "none",

@@ -90,7 +90,11 @@ const { chromium } = require('playwright');
       const r = el.getBoundingClientRect();
       if (r.width < 30 || r.width > 200 || Math.abs(r.width - r.height) > 3) return;
       hits.push({ w: Math.round(r.width), radius: cs.borderRadius, outline: cs.outlineStyle,
-                  ringFollowsCurve: cs.boxShadow.includes('rgb(255, 210, 62)') });
+                  // the ring is white in the learn layer now, not the pit's
+                  // yellow. What matters is that it rides as a box-shadow, so it
+                  // follows the card's curve instead of squaring off, which is
+                  // what an outline would do.
+                  ringFollowsCurve: cs.boxShadow.includes('rgb(255, 255, 255)') });
     });
     return hits;
   });

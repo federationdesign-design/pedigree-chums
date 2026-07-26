@@ -109,7 +109,9 @@
   stroke-linejoin: round;
 }
 .pickCardStack {
-  stroke: var(--yellow);
+  /* white in the learn layer, matching the ring on a zoomed card. Yellow is the
+     pit's colour and read as pit furniture laid over the learning view. */
+  stroke: #ffffff;
 }
 .pickCaption {
   fill: rgba(10, 58, 87, 0.88);
