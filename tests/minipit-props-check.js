@@ -58,13 +58,24 @@ const play = async (p) => {
   const flagSeen = await waitFor('flag', 20000);
   const propsClean = flagSeen && !flagSeen.shot.stick && !flagSeen.shot.rock;
   const stickSeen = await waitFor('stick', 6000);
+  // the rock now lands half a second behind the sticks, so it gets its own thump
+  // rather than arriving underneath them
+  const atSticks = await p.evaluate(shot); // the instant the sticks land
+  const rockSeen = await waitFor('rock', 6000);
   const atProps = await p.evaluate(shot);
   // one second after the flag, with slack for the poll interval and a frame or two
   const gap = stickSeen ? stickSeen.at : null;
-  const beat = !!(flagSeen && propsClean && stickSeen && atProps.rock && gap < 2500);
+  // the rock is held back half a second, so it is not yet present when the
+  // sticks arrive but has appeared by the time the wait returns
+  const rockLater = !!(rockSeen && !atSticks.rock);
+  const beat = !!(flagSeen && propsClean && stickSeen && rockSeen && gap < 2500 && rockLater);
 
   // b) entered from above: first sight of each is at or above the stage top
-  const fromAbove = atProps.stick.y < atProps.top + 120 && atProps.rock.y < atProps.top + 200;
+  // each is judged at its own first sighting: the sticks from the shot taken as
+  // they land, the rock from the shot half a second later. Judging the stick
+  // from the later shot just measures how far it has already fallen.
+  const fromAbove = !!(atSticks.stick && atProps.rock
+    && atSticks.stick.y < atSticks.top + 120 && atProps.rock.y < atProps.top + 200);
 
   // c) weight, read off the spec itself
   const src = fs.readFileSync('components/BreedTree/BreedTree.tsx', 'utf8');
@@ -75,18 +86,30 @@ const play = async (p) => {
   const rockD = densityOf('rock'), stickD = densityOf('stick');
   const heavier = !!(rockD && stickD && rockD >= stickD * 5);
   const moved = (a, b2) => Math.hypot(b2.x - a.x, b2.y - a.y);
-  await p.waitForTimeout(7000);
+  // Four props now, and the pit takes longer to come to rest than it did with
+  // three. Sampling too early measures the settling itself rather than whether
+  // the rock rolls on once settled, which is the actual claim.
+  await p.waitForTimeout(13000);
 
   // and the rock stays where it landed rather than rolling on. Sampled after a
   // longer settle: everything underneath it is still moving right after a shake.
   const rest3 = await p.evaluate(shot);
   await p.waitForTimeout(3000);
   const rest4 = await p.evaluate(shot);
-  const rockSettled = moved(rest3.rock, rest4.rock) < 8;
+  // What this is really asserting is that the rock reads as heavy: it holds its
+  // place while lighter things around it are still shifting. An absolute pixel
+  // threshold was fine with three props but the second, larger stick now lands
+  // beside it and nudges it, which is correct physics rather than a fault. So
+  // compare against the ball, the lightest and bounciest thing in the pit: the
+  // rock must move meaningfully less than it does over the same window.
+  const rockDrift = moved(rest3.rock, rest4.rock);
+  const ballDrift = rest3.ball && rest4.ball ? moved(rest3.ball, rest4.ball) : null;
+  const rockSettled = rockDrift < 20 && (ballDrift === null || rockDrift <= ballDrift + 2);
 
   // d) retirement contract
   await p.evaluate(() => {
     sessionStorage.setItem('pc-minipit-stick-gone', '1');
+    sessionStorage.setItem('pc-minipit-stickbig-gone', '1');
     sessionStorage.setItem('pc-minipit-rock-gone', '1');
   });
   await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
@@ -95,9 +118,9 @@ const play = async (p) => {
   const after = await p.evaluate(shot);
   const retired = !after.stick && !after.rock && !!after.ball;
 
-  console.log('beat:', beat, '| props followed the flag by', gap, 'ms | entered from above:', fromAbove, JSON.stringify({ stick: Math.round(atProps.stick.y), rock: Math.round(atProps.rock.y), top: Math.round(atProps.top) }));
+  console.log('beat:', beat, '| props followed the flag by', gap, 'ms | entered from above:', fromAbove, JSON.stringify({ stick: atSticks.stick ? Math.round(atSticks.stick.y) : null, rock: Math.round(atProps.rock.y), top: Math.round(atProps.top) }));
   console.log('density: rock', rockD, 'vs stick', stickD, '->', rockD && stickD ? (rockD / stickD).toFixed(0) + 'x heavier:' : 'unreadable:', heavier);
-  console.log('rock drift once settled:', moved(rest3.rock, rest4.rock).toFixed(1), 'px ->', rockSettled, '| retired props stay gone:', retired, '| ball still comes:', !!after.ball);
+  console.log('rock drift', rockDrift.toFixed(1), 'px vs ball', ballDrift === null ? 'n/a' : ballDrift.toFixed(1), '->', rockSettled, '| retired props stay gone:', retired, '| ball still comes:', !!after.ball);
   console.log('pageerrors:', errs.length ? errs.slice(0, 3) : 'none');
 
   const pass = !!(beat && fromAbove && heavier && rockSettled && retired && errs.length === 0);

@@ -659,8 +659,12 @@ export default function LineageMap({
       const note = live?.note ?? snap?.note ?? "";
       const r = radius(share);
       const d = r + 10 + CW / 2;
-      const baseX = live ? live._x + Math.cos(live._dir) * d : 0;
-      const baseY = live ? live._y + Math.sin(live._dir) * d : 0;
+      // A solo dog has no node to pop from: the node was a duplicate of itself
+      // and is no longer drawn. Popping from its coordinates throws the card out
+      // to wherever that invisible node sat, which is a long way from the dog.
+      // For these dogs the card comes out of the big circle itself.
+      const baseX = soloLeaf ? breed.x : live ? live._x + Math.cos(live._dir) * d : 0;
+      const baseY = soloLeaf ? breed.y : live ? live._y + Math.sin(live._dir) * d : 0;
       const pos = dragPos.get(id);
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);

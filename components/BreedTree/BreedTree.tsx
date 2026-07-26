@@ -68,7 +68,8 @@ const TOY_FLAG_HITS = 8; // main pit maxHits
 // lands with a thump and stays. The stick is light and skitters.
 const TOY_STICK_SRC = "/stick.svg";
 const TOY_ROCK_SRC = "/rock.svg";
-const TOY_PROP_GAP = 1000; // stick and rock, after the flag
+const TOY_PROP_GAP = 1000; // the two sticks, after the flag
+const TOY_ROCK_GAP = 500; // rock, after the sticks, so it lands on its own beat
 // artwork proportions, so the bodies match what is drawn
 const STICK_ASPECT = 1368 / 299.7;
 const ROCK_ASPECT = 756.3 / 659.2;
@@ -78,15 +79,20 @@ const ROCK_ASPECT = 756.3 / 659.2;
 const TOY_FLAG_SEEN_KEY = "pc-minipit-flag-seen";
 const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
 const TOY_STICK_GONE_KEY = "pc-minipit-stick-gone";
+const TOY_STICK_BIG_GONE_KEY = "pc-minipit-stickbig-gone";
 const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
-type ToyKind = "ball" | "flag" | "stick" | "rock";
+// stickBig is the same artwork half again as large, so the pair reads as two
+// sticks of different sizes rather than one drawn twice
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock";
 const TOY_SRC: Record<ToyKind, string> = {
-  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC, rock: TOY_ROCK_SRC,
+  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
+  stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
   ball: TOY_BALL_GONE_KEY, flag: TOY_FLAG_SEEN_KEY,
-  stick: TOY_STICK_GONE_KEY, rock: TOY_ROCK_GONE_KEY,
+  stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
+  rock: TOY_ROCK_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -1293,8 +1299,9 @@ export default function BreedTree({
           kind === "ball" ? ballDia
           : kind === "rock" ? ballDia
           : kind === "stick" ? ballDia * 1.6
+          : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : dia;
+        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
         const px = kind === "flag"
@@ -1371,8 +1378,11 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
         const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
+        // both sticks together, then the rock half a second later so it gets
+        // its own thump rather than landing under them
         toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
-        toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt));
+        toyTimers.push(window.setTimeout(() => spawnToy("stickBig"), propsAt));
+        toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt + TOY_ROCK_GAP));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
