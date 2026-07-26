@@ -2541,6 +2541,14 @@ export default function BreedTree({
         </div>
       )}
 
+      {/* the tiled icon rides under the pink, appearing with it */}
+      {dockAside && gravity && (
+        <div
+          aria-hidden="true"
+          className={`${styles.learnPattern}${learning || learnPeek ? " " + styles.learnPatternOn : ""}`}
+        />
+      )}
+
       {dockAside && gravity && (
         <div
           aria-hidden="true"
