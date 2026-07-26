@@ -119,7 +119,7 @@ function NolanFilmCard() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", textAlign: "center" }}>Christopher Nolan · Universal · 2026</p>
               </div>
-              <div style={{ padding: "12px 20px 4px" }}>
+              <div style={{ padding: "12px 30px 4px 30px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                   <div style={{ display: "flex", gap: 4 }}>
                     {[1,2,3,4,5].map(i => (
@@ -173,7 +173,7 @@ function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
                 />
               </div>
               )}
-              <div style={{ padding: "14px 20px 16px" }}>
+              <div style={{ padding: "9px 50px 16px 50px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginBottom: 6 }}>Greek Harehound</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>(<em>Hellenikos Ichnilatis</em>) — the only FCI-recognised Greek breed today, believed to descend directly from the ancient Laconian hunting dogs of the classical period. Its genetics have remained largely unchanged for thousands of years due to isolation in the Greek mountains.</p>
               </div>
@@ -402,7 +402,7 @@ function SizeBuildCard() {
               <div style={{ padding: "16px 20px 12px" }}>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "27px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Size & Build</p>
               </div>
-              <div style={{ padding: "0 20px 16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+              <div style={{ padding: "0 30px 16px 30px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 {[
                   { label: "Height", value: "90 cm" },
                   { label: "Length", value: "130 cm" },
