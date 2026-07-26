@@ -295,3 +295,48 @@
   display: flex;
   gap: 16px;
 }
+
+/* Lives. A heart badge and a run of segments, drawn in the pit's own language
+   rather than shipped as artwork: navy stroke, yellow fill, red pips. Spent
+   segments stay in place as empty sockets so the ceiling is always readable. */
+.lives {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.livesHeart {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--blue-deep, #0b78bd);
+  border: 3px solid var(--navy, #0a3a57);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.35);
+}
+.livesBar {
+  display: flex;
+  gap: 4px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: var(--blue-deep, #0b78bd);
+  border: 3px solid var(--navy, #0a3a57);
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.35);
+}
+.lifePip {
+  width: 13px;
+  height: 20px;
+  border-radius: 4px;
+  background: #e23b3b;
+  border: 2px solid var(--navy, #0a3a57);
+}
+.lifePipSpent {
+  background: rgba(10, 58, 87, 0.45);
+}

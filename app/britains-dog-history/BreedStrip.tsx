@@ -19,6 +19,12 @@ function DogIcon() {
   );
 }
 
+// Lives: three to begin, a ceiling of six, one back for every three levels
+// completed without a loss in between.
+const LIVES_START = 3;
+const LIVES_MAX = 6;
+const LIVES_STREAK = 3;
+
 const ERA_LABELS: Record<string, string> = {
   "ancient-medieval": "Ancient to medieval",
   c1500: "Tudor times",
@@ -47,6 +53,12 @@ export default function BreedStrip({ era }: { era: string }) {
   };
   const [active, setActive] = useState<Active | null>(null);
   const [campaignScore, setCampaignScore] = useState(0); // carries across levels, resets on start over
+  // Lives run alongside the score and last for one run at the pit, not for ever:
+  // opening a level from the page starts you at three again. A retry spends one.
+  // Three levels completed in a row earns one back, up to a ceiling of six, and
+  // a loss breaks the streak, which is what "in a row" has to mean.
+  const [lives, setLives] = useState(LIVES_START);
+  const [streak, setStreak] = useState(0);
 
   // The mini pits are levels: every popup-capable breed, in timeline order
   // across all eras. Round Won advances to the next; Game Over restarts at
@@ -284,14 +296,18 @@ export default function BreedStrip({ era }: { era: string }) {
             const open = pack?.slug
               ? () => router.push(`/chums/${pack.slug}`)
               : lineage
-              ? () =>
+              ? () => {
+                  // opening a level from the page is a fresh run
+                  setLives(LIVES_START);
+                  setStreak(0);
                   setActive({
                     name: b.name,
                     image: pack?.image ?? b.image ?? "",
                     character: pack?.character ?? b.note,
                     fact: pack?.fact,
                     lineage,
-                  })
+                  });
+                }
               : undefined;
             return (
               <div key={b.name} data-node className={styles.node} role="listitem">
@@ -367,12 +383,24 @@ export default function BreedStrip({ era }: { era: string }) {
           initialScore={campaignScore}
           onScoreChange={setCampaignScore}
           nextLevelLabel={nextLevelOf(active.name)?.name}
+          lives={lives}
+          livesMax={LIVES_MAX}
           onNextLevel={() => {
+            // a level completed: three in a row earns a life back
+            setStreak((st) => {
+              const next = st + 1;
+              if (next % LIVES_STREAK === 0) setLives((l) => Math.min(LIVES_MAX, l + 1));
+              return next;
+            });
             const nb = nextLevelOf(active.name);
             const na = nb ? buildActive(nb) : null;
             if (na) setActive(na);
           }}
+          onLost={() => setStreak(0)} // a loss breaks the run toward the next life
           onStartOver={() => {
+            // a retry costs a life; at zero the modal never offers this
+            setLives((l) => Math.max(0, l - 1));
+            setStreak(0);
             setCampaignScore(0); // game over: the campaign total resets with level 1
             const fa = levelList[0] ? buildActive(levelList[0]) : null;
             if (fa) setActive(fa);

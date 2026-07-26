@@ -35,12 +35,17 @@ type Props = {
   onScoreChange?: (s: number) => void;
   onNextLevel?: () => void;
   onStartOver?: () => void;
+  // Lives are owned by the page, since they have to survive between levels.
+  // The modal only displays them and decides whether a retry may be offered.
+  lives?: number;
+  livesMax?: number;
+  onLost?: () => void;
   // history-page era strip, e.g. "ancient-medieval". Picks the pit's themed
   // background; an era with no artwork keeps the plain blue gradient.
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -165,7 +170,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
               document.body.appendChild(sc);
             }
           }}
-          onPitFull={() => setPhase("lost")}
+          onPitFull={() => { setPhase("lost"); onLost?.(); }}
           rootNote={character}
           onClose={onClose}
         />
@@ -205,6 +210,27 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         </>
       )}
 
+      {typeof lives === "number" && (
+        <div className={css.lives} aria-label={`${lives} of ${livesMax} lives left`}>
+          <div className={css.livesHeart} aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 21s-7.5-4.7-9.3-9.2C1.3 8.1 3.4 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.6 0 5.7 3.6 4.3 7.3C19.5 16.3 12 21 12 21z"
+                fill="#e23b3b"
+                stroke="#ffffff"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div className={css.livesBar} aria-hidden="true">
+            {Array.from({ length: livesMax }, (_, i) => (
+              <span key={i} className={`${css.lifePip}${i < lives ? "" : " " + css.lifePipSpent}`} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Exit confirmation, raised by the close X rather than closing outright.
           Sits above the pit at z-index 320 and takes every pointer, so the pit
           is unreachable while it is up. Escape answers no, which is the safe
@@ -242,7 +268,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
           <div className={css.endFlash} style={phase === "won" ? { fontSize: "clamp(6.8rem, 24vw, 16rem)" } : undefined}>{phase === "won" ? "ROUND WON" : "GAME OVER"}</div>
           <div className={css.endBtns}>
-            {phase === "lost" && onStartOver && (
+            {phase === "lost" && onStartOver && (lives === undefined || lives > 0) && (
               <button type="button" className={css.endBtn} onClick={onStartOver}>Start again</button>
             )}
             {phase === "won" && nextLevelLabel && onNextLevel && (
