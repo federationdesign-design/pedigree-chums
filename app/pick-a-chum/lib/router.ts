@@ -286,13 +286,15 @@ const BREED_PAGES: BreedPage[] = ([
   ['staffordshire-bull-terrier', 'Staffordshire Bull Terrier', ['staffie', 'staffy', 'staffies', 'staffordshire', 'staffie bull terrier', 'sbt']],
 ] as [string, string, string[]][]).map(([slug, title, aliases]) => ({ slug, title, url: `/chums/${slug}`, aliases, tokens: title.toLowerCase().split(/\s+/) }));
 
-// Bare cross-family words: each hits one proof page today but names MANY breeds at
+// Bare cross-family words: each hits ONE proof page today but names MANY breeds at
 // full catalogue ("spaniel" -> springer / cocker / king charles ...; "shepherd" ->
-// german / anatolian / australian / belgian ...). A bare family word must never
-// resolve to a confident single page: it goes to the confidence gap as a choice.
-// Qualified forms ("cocker spaniel", "german shepherd") match their page normally,
-// above this rule. ("terrier" already yields a choice via two shared proof-breed
-// tokens, so it needs no entry here.)
+// german / anatolian / australian / belgian ...). Marking them here lets a lone
+// weak match on a family word resolve to that single proof page (rather than fall
+// through to the fallback). It does NOT force a choice: a choice is only offered
+// when TWO OR MORE breeds share the word (the confidence-gap branch in matchBreed),
+// which is what happens for "terrier" today and will happen for these two as the
+// proof set grows. Qualified forms ("cocker spaniel", "german shepherd") match
+// their page as a strong signal, above this rule.
 const AMBIGUOUS_FAMILY: Record<string, string[]> = {
   spaniel: ['cocker-spaniel'],
   shepherd: ['german-shepherd'],
@@ -326,15 +328,22 @@ function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | 
 
   if (scored.length) {
     const [top, second] = scored;
-    if (second && top.score - second.score <= 1) return breedChoiceRes([top.p, second.p]); // confidence gap
+    // Confidence gap: two or more breeds within a point of each other. A choice is
+    // only ever offered with TWO OR MORE options; a one-option "choice" reads as
+    // broken, so it is never produced here.
+    if (second && top.score - second.score <= 1) return breedChoiceRes([top.p, second.p]);
     if (top.strong >= 1 || top.weak >= 2) return breedPageRes(top.p); // confident
-    // A lone weak signal. If it is a bare cross-family word ("spaniel",
-    // "shepherd"), it names many breeds at full catalogue even though it hits one
-    // proof page today: offer a choice, never a confident guess.
+    // A lone weak signal from a bare cross-family word ("spaniel", "shepherd").
+    // Inside the 10 proof breeds each matches EXACTLY ONE page today, so route to
+    // that page rather than a single-option choice. When the proof set grows and
+    // two or more breeds share the family word ("spaniel" -> cocker + springer,
+    // "shepherd" -> german + anatolian), the confidence-gap branch above turns it
+    // into a real two-option choice automatically. Same mechanism as "terrier",
+    // which already has two proof breeds and so is a choice today.
     const bareFamily = Object.keys(AMBIGUOUS_FAMILY).some(
       (w) => hasBreedWord(words, w) && AMBIGUOUS_FAMILY[w].includes(top.p.slug),
     );
-    if (bareFamily) return breedChoiceRes([top.p]);
+    if (bareFamily) return breedPageRes(top.p);
     // otherwise a single weak signal is not confident: fall through
   }
   // Breed follow-up: no new breed named, but one is established and this reads as a

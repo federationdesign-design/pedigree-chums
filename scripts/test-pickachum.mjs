@@ -115,9 +115,15 @@ check('tell me about dog breeds', {}, { assert: (r) => (r.action === 'breed_page
 // Guard 1: "boxer" is one of the four chatbot dogs AND a breed page. A transfer
 // verb naming it is a handoff, and that must beat the breed page.
 check('can I talk to the boxer', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'boxer' });
-// Guard 2: bare "spaniel" (and "shepherd") name many breeds at full catalogue;
-// they go to the confidence gap as a choice, never a confident single-page guess.
-check('spaniel', { action: 'breed_choice' }, { assert: (r) => (r.action === 'breed_page' ? 'bare spaniel guessed a page' : null) });
+// Guard 2: bare cross-family words ("spaniel", "shepherd"). A choice is only ever
+// offered with TWO OR MORE matches; a one-option choice is broken. Inside the 10
+// proof breeds each of these matches exactly ONE page, so it routes to that page.
+//   before: check('spaniel', { action: 'breed_choice' }, ...);  // one-option choice, broken
+//   after:  a single family-word match routes to the breed page; 2+ -> choice.
+check('spaniel', { action: 'breed_page' }, { url: '/chums/cocker-spaniel' });
+check('shepherd', { action: 'breed_page' }, { url: '/chums/german-shepherd' });
+// A breed_choice must always carry two or more options (the "terrier" gap case).
+check('terrier', { action: 'breed_choice' }, { assert: (r) => ((r.breedOptions || []).length >= 2 ? null : `breed_choice offered ${(r.breedOptions || []).length} option(s)`) });
 // Aliases resolve to their page.
 check('alsatian', { action: 'breed_page' }, { url: '/chums/german-shepherd' });
 check('staffie', { action: 'breed_page' }, { url: '/chums/staffordshire-bull-terrier' });
