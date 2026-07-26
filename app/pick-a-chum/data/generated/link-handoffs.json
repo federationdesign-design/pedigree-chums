@@ -1,0 +1,86 @@
+[
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-COL-01",
+    "dog": "Collie",
+    "line": "You now have the essential information. The supporting evidence is arranged neatly here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-COL-02",
+    "dog": "Collie",
+    "line": "I could keep explaining, but the page has already been organised for precisely this purpose. Read it here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-COL-03",
+    "dog": "Collie",
+    "line": "That should give you enough to work with for now. The organised next step is waiting here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-LAB-01",
+    "dog": "Labrador",
+    "line": "I have given you the short version. The bigger and better version is here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-LAB-02",
+    "dog": "Labrador",
+    "line": "I think we have found the right place for you! Go and have a look here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-LAB-03",
+    "dog": "Labrador",
+    "line": "That should give you a good start. There is plenty more waiting here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-TER-01",
+    "dog": "Border Terrier",
+    "line": "That is as much as I can usefully add. The full details are here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-TER-02",
+    "dog": "Border Terrier",
+    "line": "That should answer the main question. Check the rest for yourself here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-TER-03",
+    "dog": "Border Terrier",
+    "line": "You have your next lead. Follow it here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-BOX-01",
+    "dog": "Boxer",
+    "line": "We did the talking. Now comes the looking. Look here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-BOX-02",
+    "dog": "Boxer",
+    "line": "That is everything I know, plus several things I confidently guessed. For the proper version, go here: [LINK]",
+    "status": "draft"
+  },
+  {
+    "family": "NAV_BREED_HANDOFF",
+    "responseId": "NBH-BOX-03",
+    "dog": "Boxer",
+    "line": "I have run out of things to add without making them up. This page has actual information: [LINK]",
+    "status": "draft"
+  }
+]

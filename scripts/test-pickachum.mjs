@@ -27,6 +27,7 @@ const data = {
   transfers: read('transfers.json'),
   copyComponents: read('copy-components.json'),
   dogs: read('dogs.json'),
+  linkHandoffs: read('link-handoffs.json'),
   misspellings: read('misspellings.json'),
 };
 
@@ -128,6 +129,24 @@ check('terrier', { action: 'breed_choice' }, { assert: (r) => ((r.breedOptions |
 check('alsatian', { action: 'breed_page' }, { url: '/chums/german-shepherd' });
 check('staffie', { action: 'breed_page' }, { url: '/chums/staffordshire-bull-terrier' });
 check('lab', { action: 'breed_page' }, { url: '/chums/labrador' });
+
+// Breed page renders three parts: the factual answer, a mid-conversation
+// NAV_BREED_HANDOFF line in the ACTIVE dog's voice (Collie by default), and the
+// real page link (url). The [LINK] token is stripped from the spoken text.
+(() => {
+  const collieHandoffs = data.linkHandoffs
+    .filter((h) => h.family === 'NAV_BREED_HANDOFF' && h.dog === 'Collie')
+    .map((h) => h.line.replace(/\s*\[LINK\]\s*$/i, '').trim());
+  check('tell me about labradors', { action: 'breed_page' }, {
+    url: '/chums/labrador',
+    assert: (_r, resp) => {
+      if (!resp.text.includes('Newfoundland')) return 'breed factual line missing';
+      if (!collieHandoffs.some((l) => resp.text.includes(l))) return 'active-dog NAV_BREED_HANDOFF line missing';
+      if (/\[LINK\]/.test(resp.text)) return '[LINK] token not stripped from spoken text';
+      return null;
+    },
+  });
+})();
 
 // ---- Specialist transfers (with context) ----
 check('Sausages.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' });

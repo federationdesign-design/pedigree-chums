@@ -372,6 +372,23 @@ const SHEETS = {
       { key: 'contextCarried', i: 7 },
     ],
   },
+  'link-handoffs': {
+    // Per-dog page-handoff lines, two families in one sheet: NAV_BREED_HANDOFF
+    // (mid-conversation, hands over a page without ending the chat) and
+    // CLOSE_WITH_LINK (genuine end of conversation, page as the parting gift).
+    // Each line ends with the literal [LINK] token, which the assembler replaces
+    // with the real page link. Twenty per dog per family when fully supplied.
+    sheet: 'Link Handoffs',
+    idKey: 'responseId',
+    required: ['responseId', 'family', 'dog', 'line'],
+    columns: {
+      Family: 'family',
+      'Response ID': 'responseId',
+      Dog: 'dog',
+      Line: 'line',
+      Status: 'status',
+    },
+  },
   'mini-games': {
     sheet: 'Mini Games',
     idKey: 'gameId',

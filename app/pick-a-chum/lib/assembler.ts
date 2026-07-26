@@ -315,13 +315,25 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
     }
 
     case 'breed_page': {
-      // The SHARED factual answer per breed (no dog voice). The character handoff
-      // line and the breed-page link (url below) follow as specced. Four breeds are
-      // filled but DRAFT-UNVERIFIED (not approved): the historical claims still need
-      // checking against the breed pages and a Kennel Club source before this branch
-      // merges (see PLACEHOLDERS.md). The other six remain a marked placeholder.
+      // Three parts, as specced: the SHARED factual answer (no dog voice), then a
+      // mid-conversation handoff line in the ACTIVE dog's voice (NAV_BREED_HANDOFF
+      // family), then the page link. Four breeds' facts are filled but
+      // DRAFT-UNVERIFIED (not approved: claims still need checking against the breed
+      // pages and a Kennel Club source before merge, see PLACEHOLDERS.md); the other
+      // six show a marked placeholder. The handoff line ends with the literal [LINK]
+      // token: strip it here, since the UI renders the page link as the action
+      // button. The link (url) is real.
       const fact = BREED_FACTS[res.breedSlug ?? ''];
-      const text = fact ?? `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`;
+      const factText = fact ?? `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`;
+      const handoffs = data.linkHandoffs.filter(
+        (h) => h.family === 'NAV_BREED_HANDOFF' && h.dog === DOG_LABEL[dog],
+      );
+      let text = factText;
+      if (handoffs.length) {
+        // Deterministic rotation (never Math.random): index by the turn count.
+        const line = handoffs[session.submissionCount % handoffs.length].line.replace(/\s*\[LINK\]\s*$/i, '').trim();
+        text = `${factText} ${line}`;
+      }
       return { responseId: `BREED-${res.breedSlug}`, text, dog, destinationId: res.breedSlug, url: res.url ?? null };
     }
 

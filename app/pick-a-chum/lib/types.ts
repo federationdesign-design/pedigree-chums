@@ -98,6 +98,19 @@ export interface MisspellingAlias {
 // The full data bundle the engine consumes. Hand-authored records (campaign,
 // rules, moderation) are imported directly by the engine since they are plain
 // TS; only the generated JSON is injected here.
+// A per-dog page-handoff line. Two families share the sheet: NAV_BREED_HANDOFF
+// (mid-conversation, hands over a page without ending the chat) and CLOSE_WITH_LINK
+// (end of conversation, page as the parting gift). `line` ends with the literal
+// [LINK] token; the assembler strips it and attaches the real page link. `dog` is
+// the workbook display name (Collie / Labrador / Border Terrier / Boxer).
+export interface LinkHandoff {
+  family: string;
+  responseId: string;
+  dog: string;
+  line: string;
+  status: string;
+}
+
 export interface ChumData {
   collieResponses: CollieResponse[];
   destinations: Destination[];
@@ -107,6 +120,7 @@ export interface ChumData {
   transfers: TransferRule[];
   copyComponents: CopyComponent[];
   dogs: DogRecord[];
+  linkHandoffs: LinkHandoff[];
   misspellings?: MisspellingAlias[];
 }
 

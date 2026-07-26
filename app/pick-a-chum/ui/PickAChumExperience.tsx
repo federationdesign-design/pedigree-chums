@@ -82,6 +82,7 @@ interface Message {
   typing?: boolean; // thinking dots are showing
   display?: string; // text revealed so far (typing theatre)
   done?: boolean; // performance finished (show the action link, allow the next)
+  contextualLink?: boolean; // a contextual link allowed mid-chat (breed_page only)
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -364,6 +365,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       name: dogInfo(toDog).name,
       action: actionFor(r),
       closed: r.closed,
+      // A breed page link is a CONTEXTUAL link (it ends a breed answer), so it may
+      // show mid-chat. This is the ONLY exception to "nav links at the very end";
+      // every other action's link stays gated below. Not a general loosening.
+      contextualLink: result.resolution.action === 'breed_page',
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
@@ -481,7 +486,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                         </p>
                       )}
 
-                      {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed) && (
+                      {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed || msg.contextualLink) && (
                         <div className={styles.actionWrap}>
                           <ActionLink command={msg.action} />
                         </div>
