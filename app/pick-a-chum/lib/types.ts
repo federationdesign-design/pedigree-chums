@@ -140,6 +140,8 @@ export type ActionType =
   | 'clarifier' // bare help-seeking: ask whether it is a site question or a worry
   | 'transfer_request' // visitor asks to switch to a different dog
   | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a trusted adult
+  | 'breed_page' // confident named-breed match: link to that breed's page
+  | 'breed_choice' // two breeds within the confidence gap: offer both
   | 'boxer_cutoff'; // hidden ceiling reached
 
 export interface Resolution {
@@ -157,4 +159,7 @@ export interface Resolution {
   responseFamily?: string; // e.g. identity family 'F01'..'F10' for family-specific copy
   barkCount?: number; // dog bark units to render this round (visitor count + 1, capped)
   note?: string;
+  breedSlug?: string; // breed_page: the matched breed's slug
+  breedTitle?: string; // breed_page: the matched breed's display title (for placeholder copy)
+  breedOptions?: { title: string; slug: string; url: string }[]; // breed_choice: the two options
 }

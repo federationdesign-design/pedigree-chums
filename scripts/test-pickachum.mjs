@@ -103,6 +103,14 @@ check('how long do they live', {}, { assert: (r) => (r.action === 'breed_answer'
 check('how long do cocker spaniels live', {}, { assert: (r) => (r.action === 'breed_answer' ? 'other-breed question returned Collie facts' : null) });
 check('are they good with kids', {}, { assert: (r) => (r.faqId === 'FAQ002' ? 'breed question hit the game age FAQ' : null) });
 
+// ---- Breed page retrieval (10 proof breeds) ----
+check('tell me about labradors', { action: 'breed_page' }, { url: '/chums/labrador' }); // plural, strong
+check('labradror', { action: 'breed_page' }, { url: '/chums/labrador' }); // misspelling (applied upstream)
+check('terrier', { action: 'breed_choice' }, { assert: (r) => { const s = (r.breedOptions || []).map((o) => o.slug); return s.includes('border-terrier') && s.includes('staffordshire-bull-terrier') ? null : `terrier choice wrong: ${s.join(',')}`; } });
+check('tell me about dog breeds', {}, { assert: (r) => (r.action === 'breed_page' || r.action === 'breed_choice' ? 'hub made a confident page match' : null) }); // NOT confident
+// S04: the breed is carried in session state across turns.
+(() => { const s = newSession(); check('I have a cocker spaniel', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' }); check('how long do they live', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' }); })();
+
 // ---- Specialist transfers (with context) ----
 check('Sausages.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' });
 check('Tell me a joke.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'boxer' });

@@ -243,6 +243,67 @@ export interface RouterState {
   barkCompleted?: boolean; // the active dog has already completed its bark game
   lastAction?: ActionType | null; // previous turn's action (for the clarifier follow-up)
   anatomyRedirectUsed?: boolean; // ANATOMY_GENERAL_REDIRECT already fired this session
+  lastBreedSlug?: string | null; // the breed established earlier, for follow-up questions
+  lastWasComplaint?: boolean; // an open complaint context: defer breed retrieval until it clears
+}
+
+// ---- Breed page retrieval (10 proof breeds) ----
+// Aliases are Steve's copy: the arrays are EMPTY for now. Mechanical plurals /
+// singulars are handled in the matcher, not authored. The two real breed
+// misspellings (labrador, terrier) live in misspellings.json and are applied
+// upstream, so the matcher already sees the canonical word. Signal STRENGTH, not
+// count, decides confidence:
+//   - exact full title, or an exact alias, whole word = strong = confident alone
+//   - a partial title token, or a fuzzy match = weak = never confident alone
+//   - two or more weak signals on one page = confident
+//   - two pages within one point = the confidence gap: offer both, never guess
+interface BreedPage { slug: string; title: string; url: string; aliases: string[]; tokens: string[]; }
+const BREED_PAGES: BreedPage[] = ([
+  ['labrador', 'Labrador'], ['border-collie', 'Border Collie'], ['boxer', 'Boxer'],
+  ['border-terrier', 'Border Terrier'], ['cocker-spaniel', 'Cocker Spaniel'], ['beagle', 'Beagle'],
+  ['french-bulldog', 'French Bulldog'], ['pug', 'Pug'], ['german-shepherd', 'German Shepherd'],
+  ['staffordshire-bull-terrier', 'Staffordshire Bull Terrier'],
+] as [string, string][]).map(([slug, title]) => ({ slug, title, url: `/chums/${slug}`, aliases: [], tokens: title.toLowerCase().split(/\s+/) }));
+
+const BREED_HUB = ['dog breeds', 'breeds', 'best dog breed', 'best breed', 'which breed', 'what breed', 'best dog'];
+const BREED_FOLLOWUP = ['they', 'them', 'how long', 'live', 'lifespan', 'train', 'training', 'health', 'cost', 'temperament', 'good with', 'size', 'weight', 'shed', 'exercise'];
+
+// Plural/singular tolerant whole-word match (mechanical, not authored copy).
+function hasBreedWord(words: Set<string>, token: string): boolean {
+  return words.has(token) || words.has(token + 's') || (token.endsWith('s') && words.has(token.slice(0, -1)));
+}
+
+function breedPageRes(p: BreedPage): Resolution {
+  return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_page', breedSlug: p.slug, breedTitle: p.title, url: p.url, destinationId: p.slug };
+}
+function breedChoiceRes(a: BreedPage, b: BreedPage): Resolution {
+  return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_choice', breedOptions: [{ title: a.title, slug: a.slug, url: a.url }, { title: b.title, slug: b.slug, url: b.url }] };
+}
+
+function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | null {
+  const words = new Set(c.match(/[a-z]+/g) ?? []);
+  const scored = BREED_PAGES.map((p) => {
+    const aliasHit = p.aliases.some((a) => (a.includes(' ') ? c.includes(a) : words.has(a)));
+    const matched = p.tokens.filter((t) => hasBreedWord(words, t));
+    const fullTitle = matched.length === p.tokens.length && p.tokens.length > 0;
+    const strong = aliasHit || fullTitle ? 1 : 0;
+    const weak = strong ? 0 : matched.length;
+    return { p, strong, weak, score: strong * 10 + weak };
+  }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score);
+
+  if (scored.length) {
+    const [top, second] = scored;
+    if (second && top.score - second.score <= 1) return breedChoiceRes(top.p, second.p); // confidence gap
+    if (top.strong >= 1 || top.weak >= 2) return breedPageRes(top.p); // confident
+    // a single weak signal is never confident: fall through
+  }
+  // Breed follow-up: no new breed named, but one is established and this reads as a
+  // question about it ("how long do they live").
+  if (state.lastBreedSlug && hasAny(n, BREED_FOLLOWUP)) {
+    const p = BREED_PAGES.find((x) => x.slug === state.lastBreedSlug);
+    if (p) return breedPageRes(p);
+  }
+  return null;
 }
 
 // After the bare-help clarifier fires, the visitor's next turn is an answer to
@@ -420,6 +481,22 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // acceptance example "Are Border Collies easy to train?" resolves here.)
   if (isActiveBreedQuestion(c)) {
     return { layer: 7, layerName: 'Facts about the active breed', bucket: 'B07', action: 'breed_answer' };
+  }
+
+  // Breed page retrieval (10 proof breeds), after the active-breed (Collie) route
+  // so "Are Border Collies easy to train?" still gets the Collie answer. A confident
+  // named breed links to its page; two breeds within the gap offer a choice; a
+  // breed follow-up ("how long do they live") reuses the established breed. Deferred
+  // while a complaint is open, so "the labrador one" names the complaint's product
+  // rather than jumping to the breed page.
+  if (!state.lastWasComplaint) {
+    const breed = matchBreed(c, N, state);
+    if (breed) return breed;
+    // Breed hub ("tell me about dog breeds", "best dog breed"): no specific breed, so
+    // route to the approved fallback for now. A proper narrowing line is Steve's copy.
+    if (hasAny(N, BREED_HUB)) {
+      return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+    }
   }
 
   // Layer 5: dog, breed and website content.

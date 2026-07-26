@@ -33,6 +33,8 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     barkCompleted: session.barkCompletedByDog[dog] ?? false,
     lastAction: session.lastAction,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
+    lastBreedSlug: session.lastBreedSlug,
+    lastWasComplaint: session.lastWasComplaint,
   });
 
   // Safety guard: once a protected safety state has fired this session, do not let
@@ -75,6 +77,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   if (resolution.action === 'safety_signpost' || resolution.action === 'safety_boundary') session.safetyLatched = true;
   else if (MEANINGFUL_TOPIC.has(resolution.action)) session.safetyLatched = false;
   session.lastWasComplaint = resolution.faqId === 'FAQ012'; // complaint follow-up context
+  if (resolution.breedSlug) session.lastBreedSlug = resolution.breedSlug; // carry breed for follow-ups
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 
   return { input, resolution, response };

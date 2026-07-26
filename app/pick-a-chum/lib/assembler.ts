@@ -299,6 +299,18 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       return { responseId: cat.id, text: cat.responses[0], dog };
     }
 
+    case 'breed_page':
+      // PLACEHOLDER: Steve supplies the one-line breed descriptions. Marked so it
+      // cannot ship. The link to the breed page is real.
+      return { responseId: `BREED-${res.breedSlug}`, text: `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`, dog, destinationId: res.breedSlug, url: res.url ?? null };
+
+    case 'breed_choice': {
+      // PLACEHOLDER framing; the two breed titles are real data.
+      const [a, b] = res.breedOptions ?? [];
+      const text = `[PLACEHOLDER breed choice framing] ${a?.title ?? ''} or ${b?.title ?? ''}?`;
+      return { responseId: 'BREED-CHOICE', text, dog };
+    }
+
     case 'boxer_cutoff': {
       const l1 = copy(data, 'Boxer ending', 'Cut-off 1');
       const l2 = copy(data, 'Boxer ending', 'Cut-off 2');
