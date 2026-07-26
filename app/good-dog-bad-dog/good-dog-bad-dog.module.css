@@ -129,34 +129,40 @@
 .essayBody {
   --gap-xs: 9px;   /* 0.5x -- a heading and its own first line */
   --gap-s: 18px;   /* 1x   -- between paragraphs (the base unit) */
-  --gap-m: 36px;   /* 2x   -- before a heading */
-  --gap-l: 54px;   /* 3x   -- around quotes, scenes and rules */
-  --gap-xl: 72px;  /* 4x   -- section breaks */
+  --gap-m: 27px;   /* 1.5x -- before a heading */
+  --gap-l: 36px;   /* 2x   -- around quotes, scenes and rules */
+  --gap-xl: 54px;  /* 3x   -- section breaks */
 }
 
-.essayBody > * + * { margin-top: var(--gap-s); }
+/* The class is doubled on purpose. `.essayBody p { margin: 0 }` scores one
+   class plus one element, which outranks a single class, so an undoubled
+   rhythm rule loses to it and every paragraph gap collapses to nothing.
+   Doubling scores two classes and wins, without resorting to !important. */
+.essayBody.essayBody > * + * { margin-top: var(--gap-s); }
 
-.essayBody > * + h2,
-.essayBody > * + h3,
-.essayBody > * + .subhead { margin-top: var(--gap-m); }
-.essayBody > h2 + *,
-.essayBody > h3 + *,
-.essayBody > .subhead + * { margin-top: var(--gap-xs); }
+.essayBody.essayBody > * + h2,
+.essayBody.essayBody > * + h3,
+.essayBody.essayBody > * + .subhead { margin-top: var(--gap-m); }
+.essayBody.essayBody > h2 + *,
+.essayBody.essayBody > h3 + *,
+.essayBody.essayBody > .subhead + * { margin-top: var(--gap-xs); }
 
-.essayBody > * + .pullquote,
-.essayBody > .pullquote + *,
-.essayBody > * + .rule,
-.essayBody > .rule + *,
-.essayBody > * + .sceneMobile,
-.essayBody > .sceneMobile + *,
-.essayBody > * + .desktopOnly,
-.essayBody > .desktopOnly + * { margin-top: var(--gap-l); }
+.essayBody.essayBody > * + .pullquote,
+.essayBody.essayBody > .pullquote + *,
+.essayBody.essayBody > * + .rule,
+.essayBody.essayBody > .rule + *,
+.essayBody.essayBody > * + .sceneMobile,
+.essayBody.essayBody > .sceneMobile + *,
+.essayBody.essayBody > * + .desktopOnly,
+.essayBody.essayBody > .desktopOnly + *,
+.essayBody.essayBody > * + .videoGate,
+.essayBody.essayBody > .videoGate + * { margin-top: var(--gap-l); }
 
 /* the Spacer component's element -- it supplies its own height */
 .spacer { flex: none; }
 
-.essayBody > .spacer,
-.essayBody > .spacer + * { margin-top: 0; }
+.essayBody.essayBody > .spacer,
+.essayBody.essayBody > .spacer + * { margin-top: 0; }
 
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
