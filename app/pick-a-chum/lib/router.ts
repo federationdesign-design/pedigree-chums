@@ -21,6 +21,16 @@ const BARK_BREAK = 5;
 const BARK_GAME_NAMES = ['bark game', 'barking game'];
 const BARK_ENTER_AFFIRM = ['lets do it', "let's do it", 'let us do it', 'lets go', 'go on', 'do it', 'go for it'];
 
+// Task 28a: bark-game explanation. NAMED question forms reach the explanation ALWAYS
+// (outranking the bark mechanic). CONTEXTUAL generic questions reach it only when the bark
+// game is the active topic (state.topic.kind === 'game'); cold-start they keep their own
+// route (card-game rules / orientation).
+const BARK_EXPLAIN_NAMED = ['how do i play the bark game', 'whats the bark game', 'what is the bark game', 'how does the bark game work', 'how do you play the bark game'];
+const BARK_EXPLAIN_CONTEXTUAL = ['how do you play', 'how does this game work', 'what do i do'];
+// Task 28b: exit the bark game. Only while a game is running (bark streak active). "ok stop"
+// and "okay stop" are covered by the whole-word 'stop'.
+const BARK_EXIT_TRIGGERS = ['stop', 'enough', 'finished', 'finish', 'done'];
+
 // Task 14: games/rules meta-route. Each group maps to an EXISTING approved answer
 // (no new copy). RULES -> the card-game rules answer (B02), which opens by describing
 // the product; AGE -> the approved age answer (FAQ002); AVAILABILITY -> the approved
@@ -144,6 +154,9 @@ const ORIENTATION = [
   'whats this', 'what can you do', 'where do i start', 'how does this work', 'how does it work',
   // Task 22: apostrophe form of the bare-only 'whats this' trigger (Task 21 gap).
   "what's this",
+  // Task 28 (S06 turn 8): "what else is there" is a "what can I do here" question; B15's
+  // existing line answers it. Specific phrase, so it does not catch breed or buying words.
+  'what else is there',
 ];
 
 // Orientation phrasings matched on the WHOLE normalised input only (Task 11a).
@@ -485,7 +498,7 @@ function topicReturnResolution(topic: Topic): Resolution | null {
     case 'commercial':
       return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
     case 'game':
-      return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
+      return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     case 'article':
       return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'link', destinationId: topic.subject };
   }
@@ -660,9 +673,25 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // the games meta-route below, so "how do I play the bark game" is the bark game, not
   // the card-game rules or the age FAQ. Kept below commercial. NOTE: no approved line
   // EXPLAINS the bark game, so a named query is answered by a bark, not an explanation.
+  // Task 28b: EXIT. While a game is running (bark streak active), an exit phrase ends it
+  // with the approved exit line, rather than falling to the B13 catch-all.
+  if ((state.barkStreak ?? 0) > 0 && hasAny(N, BARK_EXIT_TRIGGERS)) {
+    return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark_exit' };
+  }
+  // The bark game is the ACTIVE topic when the previous turn was a bark-game action:
+  // it was just offered, explained, or barked. This is narrower than topic.kind === 'game'
+  // (which the CARD-game rules also set), so "what do I do" after the card rules stays
+  // orientation, not the bark explanation.
+  const barkTopicActive = ['offer_bark_game', 'bark_explain', 'bark', 'bark_break', 'bark_ack'].includes(state.lastAction ?? '');
+  // Task 28a: EXPLANATION. A question about the bark game reaches the explanation, outranking
+  // the bark mechanic. Named forms always; generic forms only when the bark game is active
+  // (so "what do I do" / "how do you play" stay orientation / card-rules cold-start).
+  if (hasAny(N, BARK_EXPLAIN_NAMED) || (barkTopicActive && hasAny(N, BARK_EXPLAIN_CONTEXTUAL))) {
+    return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark_explain' };
+  }
   {
-    const lastWasBark = state.lastAction === 'bark' || state.lastAction === 'bark_break' || state.lastAction === 'bark_ack';
-    const enterBark = hasAny(N, BARK_GAME_NAMES) || (lastWasBark && BARK_ENTER_AFFIRM.some((a) => c === a));
+    // A short affirmation enters the game while the bark game is the active topic.
+    const enterBark = hasAny(N, BARK_GAME_NAMES) || (barkTopicActive && BARK_ENTER_AFFIRM.some((a) => c === a));
     if (enterBark) {
       if (state.barkCompleted) return { layer: 15, layerName: 'The bark game', bucket: 'B20', action: 'bark_ack' };
       const streak = (state.barkStreak ?? 0) + 1;
@@ -696,7 +725,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // play a game", "entertain me", "I'm bored") gets the "games are coming"
   // response; how-TO-play phrasing still resolves to the rules bucket below.
   if (hasAny(N, FUN)) {
-    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
   }
 
   // Task 18: complaint / report / escalation -> the approved FAQ015 complaint answer.
@@ -735,7 +764,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ002', faqMatchStrength: 2 };
   }
   if (hasAny(N, META_AVAILABILITY_TRIGGERS)) {
-    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
   }
 
   // Layer 3: gameplay and website navigation.

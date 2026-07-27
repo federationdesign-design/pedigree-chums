@@ -142,7 +142,9 @@ export type ActionType =
   | 'breed_answer' // fact about the active breed
   | 'orientation' // onboarding: what is this / what do I do / how does this work
   | 'identity' // sceptical / identity: are you real, are you AI, how can a dog type
-  | 'fun_tease' // play/game request: interim "games are coming" tease
+  | 'offer_bark_game' // Task 28: play/game request -> offer the ready bark game (was fun_tease)
+  | 'bark_explain' // Task 28: a question about the bark game -> the explanation (outranks the bark volley)
+  | 'bark_exit' // Task 28: stop/enough/done while a game is running -> the exit line
   | 'emoji_only' // message is only unmapped emoji
   | 'bark' // bark-only message: mirror the bark at count + 1
   | 'bark_break' // the dog breaks the bark game into English (configured streak)

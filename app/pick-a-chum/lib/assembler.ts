@@ -266,11 +266,15 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       return { responseId: r?.responseId ?? 'B16', text, dog };
     }
 
-    case 'fun_tease': {
-      const r = pickResponse(data, 'B17', session.usedResponseIds);
-      const text = r ? fill(r.template, baseContext(n)) : 'Play is coming. Not quite yet.';
-      return { responseId: r?.responseId ?? 'B17', text, dog };
-    }
+    // Task 28: the bark-game offer, explanation and exit. Three approved lines, wired as
+    // constants (provided by Steve directly; NOT yet in the generated Collie Responses, so
+    // move them into the workbook later). No character variation.
+    case 'offer_bark_game':
+      return { responseId: 'OFFER_BARK_GAME', text: 'One game is ready to play here: the bark game. Type woof and I will start it. The other games are still in training until they are properly finished.', dog };
+    case 'bark_explain':
+      return { responseId: 'BARK_GAME_EXPLAIN', text: 'Type one or more woofs and I will always bark once more than you do. Type stop when you have finished.', dog };
+    case 'bark_exit':
+      return { responseId: 'BARK_GAME_EXIT', text: 'Good barking. That is enough for now. You can ask me about a dog breed or how the card game works.', dog };
 
     case 'emoji_only': {
       const r = pickResponse(data, 'B18', session.usedResponseIds);

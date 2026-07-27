@@ -18,7 +18,7 @@ function topicOf(r: Resolution): Topic | null {
       return r.breedSlug ? { kind: 'breed', subject: r.breedSlug } : null;
     case 'open_discount_popup':
       return { kind: 'commercial', subject: 'the game' };
-    case 'fun_tease':
+    case 'offer_bark_game':
     case 'rules_answer':
       return { kind: 'game', subject: 'the game' };
     case 'link':
@@ -44,7 +44,7 @@ const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 
 // is held as the safeguarding continuation, so this set only gates aftercare. The
 // bark game (bark / bark_break / bark_ack) and a comic transfer (joke -> Boxer) are
 // the comedy; open_discount_popup is sales; fun_tease is the games tease.
-const AFTERCARE_BLOCKED = new Set(['fun_tease', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack']);
+const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack']);
 // Weak routes that, after a complaint answer, should stay in the complaint context.
 const WEAK_AFTER_COMPLAINT = new Set(['fallback', 'gk_unknown', 'gibberish', 'clarifier']);
 

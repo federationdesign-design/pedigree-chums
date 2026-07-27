@@ -234,7 +234,7 @@ check('my brother makes me look at his willy', { action: 'safety_signpost' }, { 
   const s = newSession();
   check('im in trouble', { action: 'safety_signpost' }, { session: s });
   check('what do I do here', {}, { session: s, assert: (r) => (r.action === 'orientation' ? 'orientation selected after safety' : null) });
-  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'fun_tease' ? 'game selected after safety' : null) });
+  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'offer_bark_game' ? 'game selected after safety' : null) });
 })();
 // A meaningful non-safety topic clears the latch, then orientation is allowed again.
 (() => {
@@ -311,24 +311,25 @@ check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { assert: (r) 
 check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('worrying you') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
 check('help me find a labrador', { action: 'clarifier' }, { assert: (r) => (r.moderationId === 'MOD_BARE_HELP' ? null : `changed from bare-help clarifier: ${r.moderationId}`) });
 
-// ---- Task 13: the bark game is reachable by name (blocks S06 turns 3 and 4) ----
-check('whats the bark game', { action: 'bark', layer: 15 });
-check('how do I play the bark game', { action: 'bark', layer: 15 });
-// "lets do it" enters the game when the bark game is the topic under discussion.
-(() => { const s = newSession(); check('whats the bark game', { action: 'bark' }, { session: s }); check('lets do it', { action: 'bark' }, { session: s }); })();
+// ---- Task 13/28: a QUESTION naming the bark game now reaches the explanation (Task 28a),
+// which outranks the bark volley. "lets do it" after the explanation enters the game. ----
+check('whats the bark game', { action: 'bark_explain', layer: 15 });
+check('how do I play the bark game', { action: 'bark_explain', layer: 15 });
+// the explanation is the topic, so "lets do it" then enters the game.
+(() => { const s = newSession(); check('whats the bark game', { action: 'bark_explain' }, { session: s }); check('lets do it', { action: 'bark' }, { session: s }); })();
 // but a bare "lets do it" with no bark-game context must NOT bark.
 check('lets do it', {}, { assert: (r) => (r.action === 'bark' ? 'lets do it barked with no bark-game context' : null) });
 
-// ---- Task 14: games/rules meta-route (bark-by-name beats it) ----
-// bark-by-name still wins over the meta-route:
-check('whats the bark game', { action: 'bark' }, { assert: (r) => (r.action === 'bark' ? null : `meta-route stole the bark game: ${r.action}`) });
+// ---- Task 14/28: games/rules meta-route (the bark-game explanation beats it) ----
+// the explanation still wins over the meta-route:
+check('whats the bark game', { action: 'bark_explain' }, { assert: (r) => (r.action === 'bark_explain' ? null : `meta-route stole the explanation: ${r.action}`) });
 // recovered to existing approved answers:
 check('rules', { bucket: 'B02', action: 'rules_answer' });
 check('what is pedigree chums', { bucket: 'B02', action: 'rules_answer' });
 check('how many players', { bucket: 'B02', action: 'rules_answer' });
 check('what age is it for', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ002' ? null : `not FAQ002: ${r.faqId}`) });
 check('is it for kids', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ002' ? null : `not FAQ002: ${r.faqId}`) });
-check('do you have any games', { bucket: 'B17', action: 'fun_tease' });
+check('do you have any games', { bucket: 'B17', action: 'offer_bark_game' });
 check('how does it work', { bucket: 'B15', action: 'orientation' }); // already recovered by Task 9 orientation
 // no games-catalogue answer exists, so this stays honestly unmatched:
 check('what games are there', { bucket: 'B06', action: 'gk_unknown' });
@@ -339,7 +340,7 @@ check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { ass
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
 check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
 check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
-check('can I play something', { bucket: 'B17', action: 'fun_tease' });
+check('can I play something', { bucket: 'B17', action: 'offer_bark_game' });
 
 // ---- Task 15: S12 protected-state machine ----
 // The full S12 sequence as one session, each turn asserted.
@@ -370,7 +371,7 @@ check('can I play something', { bucket: 'B17', action: 'fun_tease' });
 (() => {
   const s = newSession();
   check('im in trouble', { action: 'safety_signpost' }, { session: s });
-  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'fun_tease' ? 'game served in PROTECTED_ACTIVE' : null) });
+  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'offer_bark_game' ? 'game served in PROTECTED_ACTIVE' : null) });
 })();
 // A game request in PROTECTED_AFTERCARE is blocked (games stay blocked for the session).
 (() => {
@@ -378,7 +379,7 @@ check('can I play something', { bucket: 'B17', action: 'fun_tease' });
   check('im in trouble', { action: 'safety_signpost' }, { session: s });
   check('how do I play?', { action: 'rules_answer' }, { session: s }); // clear ordinary topic -> aftercare
   check('can we play a game', {}, { session: s, assert: (r, _resp, sess) =>
-    sess.protectedState !== 'aftercare' ? `not aftercare: ${sess.protectedState}` : r.action === 'fun_tease' ? 'game served in PROTECTED_AFTERCARE' : null });
+    sess.protectedState !== 'aftercare' ? `not aftercare: ${sess.protectedState}` : r.action === 'offer_bark_game' ? 'game served in PROTECTED_AFTERCARE' : null });
 })();
 // A new safety signal in PROTECTED_AFTERCARE returns to PROTECTED_ACTIVE.
 (() => {
@@ -426,7 +427,7 @@ check('can I play something', { bucket: 'B17', action: 'fun_tease' });
 (() => {
   const s = newSession();
   check('im in trouble', { action: 'safety_signpost' }, { session: s });
-  check('can we play a game', {}, { session: s, notAction: 'fun_tease', assert: (r) => (r.action === 'safety_signpost' ? null : `game not held in the safety flow: ${r.action}`) });
+  check('can we play a game', {}, { session: s, notAction: 'offer_bark_game', assert: (r) => (r.action === 'safety_signpost' ? null : `game not held in the safety flow: ${r.action}`) });
 })();
 (() => {
   const s = newSession();
@@ -560,13 +561,13 @@ check("I'm sad and I want to hurt myself", { layer: 1, action: 'safety_signpost'
 // L1 does not latch: a game after L1 is still available.
 (() => { const s = newSession();
   check("I'm sad", {}, { session: s, assert: (r) => (isL1(r) ? null : 'not L1') });
-  check('can we play a game', { action: 'fun_tease' }, { session: s });
+  check('can we play a game', { action: 'offer_bark_game' }, { session: s });
 })();
 // L2 latches (PROTECTED_ACTIVE): a game after L2 is blocked.
 (() => { const s = newSession();
   check("I'm sad", {}, { session: s });
   check('I still feel lonely', {}, { session: s, assert: (r) => (isL2(r) ? null : 'not L2') });
-  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'fun_tease' ? 'game served after L2' : null) });
+  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'offer_bark_game' ? 'game served after L2' : null) });
 })();
 // Regression guard: personal sadness sits below the safety routes and does not disturb these.
 check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `not safeguarding: ${r.moderationId}`) });
@@ -707,7 +708,7 @@ for (const q of IDENTITY_CORPUS) check(q, { layer: 12, bucket: 'B16', action: 'i
 
 // ---- Play / entertainment intent -> interim FUN tease (bucket B17) ----
 for (const q of ['Can we play a game?', 'Entertain me', 'Quiz me', 'I am bored.', "Let's play", 'Can I play?'])
-  check(q, { layer: 13, bucket: 'B17', action: 'fun_tease' });
+  check(q, { layer: 13, bucket: 'B17', action: 'offer_bark_game' });
 
 // ---- Emoji-only -> emoji fallback (B18); punctuation-only stays gibberish ----
 check('🐶', { layer: 14, bucket: 'B18', action: 'emoji_only' });
@@ -1048,7 +1049,7 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   // Turn 2: commercial, does not leak beagle into the answer.
   check('actually how much is the game', { bucket: 'B01', action: 'open_discount_popup' }, { session: s, assert: (_r, resp) => (resp.text.toLowerCase().includes('beagle') ? 'beagle leaked into the commercial answer' : null) });
   // Turn 3: games tease, leaks neither of the previous two.
-  check('no wait, can I play something', { bucket: 'B17', action: 'fun_tease' }, { session: s, assert: (_r, resp) => { const t = resp.text.toLowerCase(); return t.includes('beagle') || t.includes('pre-order') || t.includes('discount') ? 'leaked a previous topic' : null; } });
+  check('no wait, can I play something', { bucket: 'B17', action: 'offer_bark_game' }, { session: s, assert: (_r, resp) => { const t = resp.text.toLowerCase(); return t.includes('beagle') || t.includes('pre-order') || t.includes('discount') ? 'leaked a previous topic' : null; } });
   // Turn 4: restores beagles as the active topic.
   check('sorry, back to beagles', { bucket: 'B05', action: 'breed_page' }, { session: s, assert: (r) => (r.breedSlug === 'beagle' ? null : `did not restore beagle: ${r.breedSlug}`) });
   // Turn 5: "them" answers about beagles, not games or buying.
@@ -1226,6 +1227,41 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'repair ladder: no rung repeats in a row', layer: '-', bucket: '-', action: 'repair', note: ok ? '' : `ids=${ids.join(',')}` });
 })();
+
+// ---- Task 28: bark game wired (offer / explain / exit), fun_tease renamed offer_bark_game.
+// The full S06 script as one session. ----
+(() => {
+  const s = newSession();
+  const turns = [
+    ['can I play something', 'offer_bark_game', 'OFFER_BARK_GAME'],
+    ['how do you play', 'bark_explain', 'BARK_GAME_EXPLAIN'], // contextual: bark game is active after the offer
+    ['whats the bark game', 'bark_explain', 'BARK_GAME_EXPLAIN'], // named
+    ['lets do it', 'bark', null], // enter the game
+    ['woof', 'bark', null],
+    ['woof woof', 'bark', null],
+    ['ok stop', 'bark_exit', 'BARK_GAME_EXIT'], // exit while running
+    ['what else is there', 'orientation', null], // B15
+  ];
+  let ok = true, note = '';
+  for (const [inp, act, rid] of turns) {
+    const { resolution: r, response } = submit(data, s, inp);
+    if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
+    if (rid && response.responseId !== rid) { ok = false; note += `"${inp}" respId ${response.responseId} want ${rid}; `; }
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'S06: bark game, one session', layer: 15, bucket: '-', action: 'bark game', note: ok ? '' : note });
+})();
+// A game offer is still blocked in PROTECTED_ACTIVE, under the NEW name (the atomic rename).
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('can we play a game', {}, { session: s, notAction: 'offer_bark_game', assert: (r) => (r.action === 'safety_signpost' ? null : `offer not held in the safety flow: ${r.action}`) });
+})();
+// Bare woof and woof woof still play; "ok"/"stop" outside a game do not reach the exit line.
+check('woof', { action: 'bark', layer: 15 });
+check('woof woof', { action: 'bark', layer: 15 });
+check('ok', {}, { assert: (r) => (r.action === 'bark_exit' ? 'ok exited with no game running' : null) });
+check('stop', {}, { assert: (r) => (r.action === 'bark_exit' ? 'stop reached the exit line with no game running' : null) });
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
