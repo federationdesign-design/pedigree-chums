@@ -686,7 +686,7 @@ export default function BreedTree({
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
-  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number };
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; held?: boolean };
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
@@ -2253,7 +2253,22 @@ export default function BreedTree({
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
-                onPointerDown={inert ? undefined : (e) => startDrag(e, badgeBodiesRef.current?.[i])}>
+                onPointerDown={inert ? undefined : (e) => {
+                  // Lift the badge out of the sim while dragging, like the dog
+                  // circles: without this it keeps falling in the physics world
+                  // behind your finger and snaps to that spot when you let go.
+                  const body = badgeBodiesRef.current?.[i];
+                  if (body) body.held = true;
+                  const release = () => {
+                    if (body) body.held = false;
+                    wakeRef.current?.();
+                    window.removeEventListener("pointerup", release);
+                    window.removeEventListener("pointercancel", release);
+                  };
+                  window.addEventListener("pointerup", release);
+                  window.addEventListener("pointercancel", release);
+                  startDrag(e, body);
+                }}>
                 <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: (item.label ? 6 : 3) * upp2 }} />
                 {!inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
