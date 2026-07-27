@@ -406,7 +406,7 @@ function LearnDragCard({
   style?: React.CSSProperties;
   ariaLabel: string;
   icon?: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
   titleWhite?: boolean;
   subtitle?: string;
   onClose: () => void;
@@ -643,7 +643,7 @@ export default function BreedTree({
   // Hovering the learn PLAY button previews the play scene behind the pit.
   const [playPeek, setPlayPeek] = useState(false);
   // Learn rail: the pack dog whose Ancestry card is open below the box.
-  const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string } | null>(null);
+  const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string; image?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
   const [trainHidden, setTrainHidden] = useState(false);
   const [ancPos, setAncPos] = useState<{ left: number; top: number; width: number } | null>(null);
@@ -2085,6 +2085,7 @@ export default function BreedTree({
       : null;
   // The level dog's living/extinct status, for the marker on its portrait.
   const rootTag = nodeStatus(nodes[0].data.name, rootNote ?? nodes[0].data.note ?? "");
+  const headTag = ancestryFor ? nodeStatus(ancestryFor.name, ancestryFor.note ?? "") : rootTag;
   // The related-dogs rail follows the shown circle: each ancestor has its own
   // set of pack descendants (an uneven split), so it changes as you hover.
   const railDogs = useMemo(() => {
@@ -2767,14 +2768,14 @@ export default function BreedTree({
           // learn only, never the hover preview: on the start screen the peek is a
           // glimpse of the pink, and the artwork underneath it made the two
           // overlays read as one busy thing
-          className={`${styles.learnPattern}${!started && learning && !playPeek ? " " + styles.learnPatternOn : ""}`}
+          className={`${styles.learnPattern}${!started && learning ? " " + styles.learnPatternOn : ""}`}
         />
       )}
 
       {dockAside && gravity && (
         <div
           aria-hidden="true"
-          className={`${styles.learnWash}${!started && learning && !playPeek ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
+          className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
         />
       )}
       {/* Big PLAY in the bottom-left of the learn area: jump straight from
@@ -2919,31 +2920,31 @@ export default function BreedTree({
               <span className={styles.cPortraitWrap}>
                 <img
                   className={styles.cPortrait}
-                  src={bust((rootImage ?? nodes[0].data.img) as string)}
+                  src={bust((ancestryFor?.image ?? rootImage ?? nodes[0].data.img) as string)}
                   alt={nodes[0].data.name}
                   draggable={false}
                 />
-                {rootTag && (
+                {headTag && (
                   <span
                     className={styles.cStatus}
-                    style={{ background: TAG_STYLE[rootTag].bg }}
-                    title={STATUS_LABEL[rootTag]}
-                    aria-label={STATUS_LABEL[rootTag]}
+                    style={{ background: TAG_STYLE[headTag].bg }}
+                    title={STATUS_LABEL[headTag]}
+                    aria-label={STATUS_LABEL[headTag]}
                   />
                 )}
               </span>
               <span className={styles.cHeadText}>
-                <span className={styles.cHeadName}>{nodes[0].data.name}</span>
+                <span className={styles.cHeadName}>{ancestryFor ? ancestryFor.name : nodes[0].data.name}</span>
                 {/* The relation line sits directly under the level dog's name (the
                     card title), naming the link to the selected circle. Absent at
                     root, since then there is nothing selected to relate to. */}
-                {(ancestryFor || shown !== nodes[0]) && (
+                {!ancestryFor && shown !== nodes[0] && (
                   <span className={styles.cRelated}>is related to:</span>
                 )}
               </span>
             </div>
           )}
-          <span className={styles.cName}>{ancestryFor ? ancestryFor.name : shown.data.name}</span>
+          {!ancestryFor && <span className={styles.cName}>{shown.data.name}</span>}
           {!ancestryFor && shownShare !== null && shown.parent && !learning && (
             <span className={styles.cShare}>
               {shownShare}% of {shown.parent.data.name}
@@ -2983,7 +2984,7 @@ export default function BreedTree({
                   className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
-                  onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note }); }}
+                  onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note, image: r.image }); }}
                   title={r.name}
                   aria-label={`View ${r.name}`}
                 >
@@ -3019,10 +3020,10 @@ export default function BreedTree({
       {dockAside && ancestryFor && !trainHidden && trainingDifficulty[ancestryFor.slug] && (
         <LearnDragCard
           className={styles.trainCard}
-          style={trainPos ? { left: trainPos.left, top: trainPos.top, width: trainPos.width, right: "auto", bottom: "auto" } : undefined}
+          style={trainPos ? { left: trainPos.left, top: trainPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Training for ${ancestryFor.name}`}
           icon={ICONS.training}
-          title="Training"
+          title={<>Training <span className={styles.cardTitleName}>{ancestryFor.name}</span></>}
           onClose={() => setTrainHidden(true)}
           closeLabel="Close training"
         >
