@@ -340,6 +340,85 @@ check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
 check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
 check('can I play something', { bucket: 'B17', action: 'fun_tease' });
 
+// ---- Task 15: S12 protected-state machine ----
+// The full S12 sequence as one session, each turn asserted.
+(() => {
+  const s = newSession();
+  // Turn 1: entry -> PROTECTED_ACTIVE, a safeguarding signpost under the support surface.
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (_r, resp, sess) =>
+    sess.protectedState !== 'active' ? `did not enter PROTECTED_ACTIVE: ${sess.protectedState}`
+      : resp.hideDogIdentity !== true || resp.header !== 'HELP AND SUPPORT' ? 'entry response showed a dog identity' : null });
+  // Turn 2: "I dont know what to do" -> the general safeguarding continuation, not B13.
+  check('I dont know what to do', { action: 'safety_signpost', bucket: null }, { session: s, assert: (r, resp) =>
+    r.moderationId !== 'MOD_SAFEGUARDING_CONTINUATION' ? `not the continuation: ${r.moderationId}`
+      : resp.text.includes('work out what to do on your own') ? null : 'continuation line not rendered' });
+  // Turn 3: naming an adult with a disclosure -> safeguarding, not B13.
+  check('my uncle is very hands on', { action: 'safety_signpost', bucket: null }, { session: s, assert: (r) =>
+    (r.moderationId || '').startsWith('MOD_') ? null : `not safeguarding: ${r.moderationId}` });
+  // Turn 4: naming a parent they will not tell -> the adult barrier, not B13.
+  check('I dont want to tell my mum', { action: 'safety_signpost', bucket: null }, { session: s, assert: (r, resp) =>
+    r.moderationId !== 'MOD_ADULT_BARRIER' ? `not the adult barrier: ${r.moderationId}`
+      : resp.text.includes('tell someone at home') ? null : 'adult-barrier line not rendered' });
+  // Turn 5: a clean acknowledgement -> the close line, and PROTECTED_AFTERCARE.
+  check('ok', { action: 'safety_signpost' }, { session: s, assert: (r, resp, sess) =>
+    r.moderationId !== 'MOD_SAFEGUARDING_ACK_CLOSE' ? `not the ack close: ${r.moderationId}`
+      : sess.protectedState !== 'aftercare' ? `did not move to aftercare: ${sess.protectedState}`
+        : resp.text.includes('support information is still there') ? null : 'ack-close line not rendered' });
+})();
+// A game request in PROTECTED_ACTIVE is blocked.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'fun_tease' ? 'game served in PROTECTED_ACTIVE' : null) });
+})();
+// A game request in PROTECTED_AFTERCARE is blocked (games stay blocked for the session).
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('how do I play?', { action: 'rules_answer' }, { session: s }); // clear ordinary topic -> aftercare
+  check('can we play a game', {}, { session: s, assert: (r, _resp, sess) =>
+    sess.protectedState !== 'aftercare' ? `not aftercare: ${sess.protectedState}` : r.action === 'fun_tease' ? 'game served in PROTECTED_AFTERCARE' : null });
+})();
+// A new safety signal in PROTECTED_AFTERCARE returns to PROTECTED_ACTIVE.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('how do I play?', { action: 'rules_answer' }, { session: s }); // -> aftercare
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (_r, _resp, sess) =>
+    sess.protectedState === 'active' ? null : `did not return to PROTECTED_ACTIVE: ${sess.protectedState}` });
+})();
+// Barrier scope: "at home" routes to the adult barrier even with a global word present.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check("I can't tell anyone at home", { action: 'safety_signpost' }, { session: s, assert: (r) =>
+    r.moderationId === 'MOD_ADULT_BARRIER' ? null : `not the adult barrier: ${r.moderationId}` });
+})();
+// Global no-one with no scope routes to the no-one route.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check("I can't tell anyone", { action: 'safety_signpost' }, { session: s, assert: (r) =>
+    r.moderationId === 'MOD_NO_ONE_ROUTE' ? null : `not the no-one route: ${r.moderationId}` });
+})();
+// A qualified acknowledgement does NOT close, and stays PROTECTED_ACTIVE.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check("ok but I can't", {}, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId === 'MOD_SAFEGUARDING_ACK_CLOSE' ? 'qualified ack wrongly closed'
+      : sess.protectedState !== 'active' ? `did not stay PROTECTED_ACTIVE: ${sess.protectedState}` : null });
+})();
+// No dog name (identity hidden, shared header) on any PROTECTED_ACTIVE response.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  for (const inp of ['I dont know what to do', 'my uncle is very hands on', 'I dont want to tell my mum']) {
+    check(inp, {}, { session: s, assert: (_r, resp) =>
+      resp.hideDogIdentity === true && resp.header === 'HELP AND SUPPORT' ? null : 'a dog identity appeared on a PROTECTED_ACTIVE response' });
+  }
+})();
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
@@ -744,6 +823,25 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   const ok = row.input === 'Hello there' && row.normalised.length > 0;
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'D6: non-safety input kept', layer: 9, bucket: '-', action: 'recorder keep', note: ok ? '' : `input="${row.input}"` });
+})();
+// Task 15: S12-line redaction is locked the SAME way as "I want to die". A disclosure
+// routed through the adult barrier must redact the raw input, drop the normalised form
+// AND the cluster key, and still keep the route (responseId) and the approved response
+// text (our copy, never the child's words).
+(() => {
+  const s = newSession();
+  submit(data, s, 'im in trouble'); // enter PROTECTED_ACTIVE
+  const { resolution, response } = submit(data, s, 'I dont want to tell my mum'); // adult barrier disclosure
+  const row = buildRow({ sessionId: 's', turn: s.submissionCount, activeDog: s.activeDog, input: 'I dont want to tell my mum', resolution, response, transferTo: '' }, '2026-01-01T00:00:00.000Z');
+  const ok =
+    resolution.moderationId === 'MOD_ADULT_BARRIER' &&
+    row.input === '[redacted: safety]' &&
+    row.normalised === '' &&
+    row.clusterKey === '' &&
+    row.responseId.length > 0 &&
+    row.responseText.length > 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task15: S12 adult-barrier redacted', layer: 1, bucket: '-', action: 'recorder redact', note: ok ? '' : `mod=${resolution.moderationId} input="${row.input}" norm="${row.normalised}" cluster="${row.clusterKey}" rid="${row.responseId}" text.len=${row.responseText.length}` });
 })();
 
 // ---- Task 5: recorder analysis columns (clusterKey groups paraphrases; blank on safety) ----
