@@ -858,3 +858,6 @@
   color: var(--yellow, #ffd23e);
 }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
+.cardTitleWhite {
+  color: #ffffff;
+}

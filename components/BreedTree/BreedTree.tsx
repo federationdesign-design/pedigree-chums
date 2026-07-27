@@ -395,6 +395,7 @@ function LearnDragCard({
   ariaLabel,
   icon,
   title,
+  titleWhite,
   subtitle,
   onClose,
   closeLabel,
@@ -404,6 +405,7 @@ function LearnDragCard({
   ariaLabel: string;
   icon?: React.ReactNode;
   title: string;
+  titleWhite?: boolean;
   subtitle?: string;
   onClose: () => void;
   closeLabel: string;
@@ -441,7 +443,7 @@ function LearnDragCard({
       <div className={styles.cardHead}>
         {icon ? <span className={styles.cardIcon}>{icon}</span> : null}
         <span className={styles.cardHeadText}>
-          <span className={styles.cardTitle}>{title}</span>
+          <span className={`${styles.cardTitle}${titleWhite ? " " + styles.cardTitleWhite : ""}`}>{title}</span>
           {subtitle ? <span className={styles.cardSub}>{subtitle}</span> : null}
         </span>
         <button type="button" className={styles.ancClose} onClick={(e) => { e.stopPropagation(); onClose(); }} aria-label={closeLabel}>
@@ -2945,8 +2947,8 @@ export default function BreedTree({
           className={styles.ancCard}
           ariaLabel={`Ancestry of ${ancestryFor.name}`}
           icon={ICONS.ancestry}
-          title="Ancestry"
-          subtitle={ancestryFor.name}
+          title={ancestryFor.name}
+          titleWhite
           onClose={() => setAncHidden(true)}
           closeLabel="Close ancestry"
         >
@@ -2959,12 +2961,6 @@ export default function BreedTree({
               <span className={styles.ancPct}>{a.pct}%</span>
             </div>
           ))}
-          <p className={styles.ancDisclaimer}>
-            Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
-          </p>
-          <button type="button" className={styles.ancLink} onClick={() => onRelativeTap?.(ancestryFor.slug, ancestryFor.name)}>
-            See {ancestryFor.name}&rsquo;s full page
-          </button>
         </LearnDragCard>
       )}
       {dockAside && ancestryFor && !trainHidden && trainingDifficulty[ancestryFor.slug] && (
