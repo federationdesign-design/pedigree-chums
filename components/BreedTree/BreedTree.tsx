@@ -1127,12 +1127,17 @@ export default function BreedTree({
     return stroke;
   }
   function strokeWidthFor(d: Node): number {
-    const widths = [5, 4, 3, 2.6, 2.4];
-    const base = widths[d.depth - 1] ?? 2.4;
+    // A ring is a FRACTION OF ITS OWN RADIUS, not a fixed number. Two things
+    // resize a circle: the view zoom, and the difficulty slider, which rescales
+    // the radii directly. A flat width tracked neither, so a circle could halve
+    // while its ring stayed put and the border fell out of ratio with the
+    // picture. Tied to d.r it follows both, exactly as the badges do.
+    // Fractions keep the old 5 / 4 / 3 / 2.6 / 2.4 relationship between depths.
+    const frac = [0.09, 0.072, 0.054, 0.047, 0.043];
+    const base = frac[d.depth - 1] ?? 0.043;
     // The mini pit draws its rings four times heavier than the chum page, so a
-    // small, simple lineage reads boldly. (These circles are leaves, not
-    // single-child, which is why the earlier per-child rule never showed.)
-    return dockAside ? base * 4 : base;
+    // small, simple lineage reads boldly.
+    return d.r * (dockAside ? base : base / 4);
   }
 
   function zoomTo(v: View) {

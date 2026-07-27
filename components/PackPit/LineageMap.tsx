@@ -1397,10 +1397,6 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                // An only child is by definition all of its parent, so "100%"
-                // states nothing and reads as a bug. Blank the number but keep
-                // the disc: it is the tap target that opens the node.
-                const onlyChild = (((n._parent as Node)?.children?.length) ?? 0) === 1;
                 const r = radius(share);
                 return (
                   <g
@@ -1447,7 +1443,7 @@ export default function LineageMap({
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                       fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
                       style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
-                      {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : circular && onlyChild ? "" : `${share}%`}
+                      {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
