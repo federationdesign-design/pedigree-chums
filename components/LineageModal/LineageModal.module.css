@@ -280,6 +280,122 @@
 .endBtnAlt {
   background: #ffffff;
 }
+
+/* ── Round Won ──────────────────────────────────────────────────────────
+   Its own screen rather than a flash with a button under it: what you just
+   finished, what it was worth, and what is coming next, stacked down the
+   page. The next level's photo fills the lower half and bleeds off the
+   bottom, so the screen ends on the dog you are about to meet. */
+.winWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(14px, 3vw, 26px);
+  overflow: hidden;
+  text-align: center;
+}
+.winTop {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 2;
+}
+.winDone {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+.winDone img {
+  width: clamp(38px, 8vw, 54px);
+  height: clamp(38px, 8vw, 54px);
+  flex: none;
+}
+.winDoneName {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.1rem, 3.4vw, 1.7rem);
+  line-height: 1.02;
+  color: #ffffff;
+  text-transform: uppercase;
+  max-width: 6em;
+}
+.winBanner {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1rem, 3.4vw, 1.7rem);
+  line-height: 1;
+  color: #22c55e;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: right;
+}
+.winScore {
+  margin-top: clamp(18px, 6vw, 46px);
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 800;
+  font-size: clamp(1.2rem, 5vw, 2.4rem);
+  color: var(--yellow, #ffd23e);
+  z-index: 2;
+}
+/* Tilted, like the mock. Sits above the photo. */
+.winFlash {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(3.6rem, 17vw, 9rem);
+  line-height: 0.9;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.55);
+  transform: rotate(-4deg);
+  margin: clamp(2px, 1vw, 10px) 0 clamp(10px, 3vw, 22px);
+  z-index: 2;
+  animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.winNextLead {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 3.2vw, 1.3rem);
+  color: #ffffff;
+  z-index: 2;
+}
+.winNextName {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2rem, 9vw, 4.4rem);
+  line-height: 1;
+  color: #ff2d95;
+  text-transform: uppercase;
+  margin-top: 2px;
+  z-index: 2;
+}
+/* Bleeds off the bottom behind the button. */
+.winNextImg {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(100%, 620px);
+  max-height: 52%;
+  object-fit: contain;
+  object-position: bottom;
+  z-index: 1;
+  pointer-events: none;
+}
+.winGo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(18px, 5vw, 40px);
+  z-index: 3;
+  min-width: min(72vw, 420px);
+}
+.winGo:active {
+  transform: translateX(-50%) translateY(2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .winFlash { animation: none; }
+}
 /* Next level: the house CTA, matching the chum calculator's start button and
    the home page primary. It used to be a yellow pill shrunk to half size by an
    inline transform, which read as a mistake rather than a button. */

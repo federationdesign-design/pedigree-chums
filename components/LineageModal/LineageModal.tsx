@@ -45,6 +45,8 @@ type Props = {
   initialScore?: number;
   onScoreChange?: (s: number) => void;
   onNextLevel?: () => void;
+  // Photo of the level the player is about to unlock, for the Round Won screen.
+  nextLevelImage?: string;
   onStartOver?: () => void;
   // Lives are owned by the page, since they have to survive between levels.
   // The modal only displays them and decides whether a retry may be offered.
@@ -61,7 +63,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -357,35 +359,56 @@ export default function LineageModal({ name, image, character, lineage, onClose,
       {/* Round won / game over, main-pit flash styling */}
       {phase !== "play" && (
         <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
-          {/* The way out is the X in the corner now, same as everywhere else,
-              so the buttons underneath are only ever about carrying on. */}
-          <button type="button" className={css.endClose} onClick={onClose} aria-label="Close the pit">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <line x1="7" y1="7" x2="17" y2="17" />
-              <line x1="17" y1="7" x2="7" y2="17" />
-            </svg>
-          </button>
-          {/* GAME OVER now matches ROUND WON's size and takes a line per word,
-              so two long words do not have to share one. */}
-          <div className={css.endFlash} style={{ fontSize: "clamp(6.8rem, 24vw, 16rem)" }}>
-            {phase === "won" ? "ROUND WON" : (
-              <>
+          {/* Round Won is its own screen: what you just finished, what it was
+              worth, and what is coming next. Next Level is the whole point of
+              it, so there is no X competing with the button. Game Over keeps the
+              older layout, since it is a different moment. */}
+          {phase === "won" ? (
+            <div className={css.winWrap}>
+              <div className={css.winTop}>
+                <span className={css.winDone}>
+                  <img src="/greentock-icon.svg" alt="" aria-hidden="true" />
+                  <span className={css.winDoneName}>{name}</span>
+                </span>
+                <span className={css.winBanner}>Ancestor discovered</span>
+              </div>
+              <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
+              <div className={css.winFlash}>Round Won</div>
+              {nextLevelLabel && onNextLevel ? (
+                <>
+                  <div className={css.winNextLead}>Next Level Up...</div>
+                  <div className={css.winNextName}>{nextLevelLabel}</div>
+                  {nextLevelImage ? (
+                    <img className={css.winNextImg} src={nextLevelImage} alt="" aria-hidden="true" />
+                  ) : null}
+                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
+                </>
+              ) : (
+                // Last level, so there is nothing to go on to. The way out has
+                // to come back, or the player is stuck on this screen.
+                <button type="button" className={`${css.endBtn} ${css.endBtnAlt} ${css.winGo}`} onClick={onClose}>Close</button>
+              )}
+            </div>
+          ) : (
+            <>
+              <button type="button" className={css.endClose} onClick={onClose} aria-label="Close the pit">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <line x1="7" y1="7" x2="17" y2="17" />
+                  <line x1="17" y1="7" x2="7" y2="17" />
+                </svg>
+              </button>
+              <div className={css.endFlash} style={{ fontSize: "clamp(6.8rem, 24vw, 16rem)" }}>
                 <span className={css.endFlashWord}>GAME</span>
                 <span className={css.endFlashWord}>OVER</span>
-              </>
-            )}
-          </div>
-          <div className={css.endBtns}>
-            {phase === "lost" && onStartOver && (lives === undefined || lives > 0) && (
-              <button type="button" className={css.endBtn} onClick={onStartOver}>Restart</button>
-            )}
-            {phase === "lost" && (
-              <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={() => goLearn(false)}>Learn</button>
-            )}
-            {phase === "won" && nextLevelLabel && onNextLevel && (
-              <button type="button" className={css.endBtnGo} onClick={onNextLevel}>{nextLevelLabel}</button>
-            )}
-          </div>
+              </div>
+              <div className={css.endBtns}>
+                {onStartOver && (lives === undefined || lives > 0) && (
+                  <button type="button" className={css.endBtn} onClick={onStartOver}>Restart</button>
+                )}
+                <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={() => goLearn(false)}>Learn</button>
+              </div>
+            </>
+          )}
         </div>
       )}
 

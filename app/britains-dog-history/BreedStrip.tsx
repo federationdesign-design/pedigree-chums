@@ -383,6 +383,7 @@ export default function BreedStrip({ era }: { era: string }) {
           initialScore={campaignScore}
           onScoreChange={setCampaignScore}
           nextLevelLabel={nextLevelOf(active.name)?.name}
+          nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
           lives={lives}
           livesMax={LIVES_MAX}
           onNextLevel={() => {
