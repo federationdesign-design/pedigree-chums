@@ -3097,7 +3097,7 @@ export default function BreedTree({
       {dockAside && ancestryFor && !tempHidden && chumTraits && (
         <LearnDragCard
           className={styles.tempCard}
-          style={tempPos ? { left: tempPos.left, top: tempPos.top, width: tempPos.width, right: "auto", bottom: "auto" } : undefined}
+          style={tempPos ? { left: tempPos.left, top: tempPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Temperament of ${ancestryFor.name}`}
           icon={ICONS.infoBox}
           title={<>Temperament <span className={styles.cardTitleName}>{ancestryFor.name}</span></>}

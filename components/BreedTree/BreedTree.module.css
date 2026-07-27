@@ -855,7 +855,7 @@
 .tempTabs {
   display: flex;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 2px 14px 10px;
 }
 /* The same pill as the training card's difficulty label: compact Montserrat,
