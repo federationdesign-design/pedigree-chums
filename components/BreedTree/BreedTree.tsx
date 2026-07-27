@@ -692,6 +692,7 @@ export default function BreedTree({
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
   const asideRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
   const asideOff = useRef({ x: 0, y: 0 });
   const asideDrag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
   useEffect(() => {
@@ -2128,6 +2129,10 @@ export default function BreedTree({
   // The level dog's living/extinct status, for the marker on its portrait.
   const rootTag = nodeStatus(nodes[0].data.name, rootNote ?? nodes[0].data.note ?? "");
   const headTag = ancestryFor ? nodeStatus(ancestryFor.name, ancestryFor.note ?? "") : rootTag;
+  // The box header now follows the shown circle, mirroring the page-top title:
+  // its image and its living/extinct status, updated as you hover.
+  const shownHeadImg = shown === nodes[0] ? (rootImage ?? nodes[0].data.img) : shown.data.img;
+  const shownTag = nodeStatus(shown.data.name, shown === nodes[0] ? (rootNote ?? nodes[0].data.note ?? "") : (shown.data.note ?? ""));
   // The related-dogs rail follows the shown circle: each ancestor has its own
   // set of pack descendants (an uneven split), so it changes as you hover.
   const railDogs = useMemo(() => {
@@ -2178,19 +2183,34 @@ export default function BreedTree({
     const r = asideRef.current?.getBoundingClientRect();
     const vw = typeof window === "undefined" ? 390 : window.innerWidth;
     const vh = typeof window === "undefined" ? 844 : window.innerHeight;
-    // Same width as the main blue box (the docked caption is 80% of the aside).
-    const boxW = r ? r.width * 0.8 : Math.min(vw * 0.6, 300);
-    const boxLeft = r ? r.left + r.width * 0.1 : vw * 0.2;
-    const boxRight = boxLeft + boxW;
-    const boxTop = r ? r.top : 60;
-    const cardW = boxW;
-    const gap = 12;
-    let left = boxRight + gap + index * 22;
-    if (left + cardW > vw - 8) left = boxLeft - cardW - gap - index * 22;
-    if (left < 8) left = Math.max(8, vw - cardW - 8);
-    // Always below the 25% mark of the page; free to bleed off the bottom.
-    const top = Math.max(Math.round(vh * 0.25), Math.round(boxTop + index * 44));
-    return { left: Math.round(left), top, width: Math.round(cardW) };
+    const GAP = 10;
+    // Each card's natural max width, so placement matches what actually renders.
+    const widths = [Math.min(vw * 0.88, 330), Math.min(vw * 0.92, 218), Math.min(vw * 0.92, 218)];
+    let cardW = Math.round(widths[index] ?? 218);
+    if (!r) return { left: 8, top: Math.round(vh * 0.28), width: cardW };
+    // Cards open BELOW the main box so they never cover it, and stay clear of
+    // the pack rail so they never cover that either, with GAP px of breathing
+    // room from both. Each card cascades down a little from the last.
+    const rail = railRef.current?.getBoundingClientRect();
+    let left = Math.round(r.left);
+    if (rail && rail.width > 0) {
+      if (rail.left >= r.right - 1) {
+        // Rail on the right: keep the card's right edge left of it.
+        const maxRight = rail.left - GAP;
+        cardW = Math.min(cardW, Math.round(maxRight - 8));
+        if (left + cardW > maxRight) left = Math.round(maxRight - cardW);
+      } else if (rail.right <= r.left + 1) {
+        // Rail on the left: start the card to the right of it.
+        left = Math.max(left, Math.round(rail.right + GAP));
+      }
+    }
+    if (left + cardW > vw - 8) {
+      cardW = Math.min(cardW, vw - 16);
+      left = Math.max(8, vw - 8 - cardW);
+    }
+    if (left < 8) left = 8;
+    const top = Math.round(r.bottom + GAP + index * 40);
+    return { left, top, width: cardW };
   };
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
@@ -2967,36 +2987,35 @@ export default function BreedTree({
           {/* Mini pit only: the dog whose tree is open, as a round portrait at the
               head of the box, with its name beside it. The chum page keeps its
               text-only caption. */}
-          {dockAside && (rootImage ?? nodes[0].data.img) && (
+          {dockAside && shownHeadImg && (
             <div className={styles.cHead}>
               <span className={styles.cPortraitWrap}>
                 <img
                   className={styles.cPortrait}
-                  src={bust((rootImage ?? nodes[0].data.img) as string)}
-                  alt={nodes[0].data.name}
+                  src={bust(shownHeadImg as string)}
+                  alt={shown.data.name}
                   draggable={false}
                 />
-                {rootTag && (
+                {shownTag && (
                   <span
                     className={styles.cStatus}
-                    style={{ background: TAG_STYLE[rootTag].bg }}
-                    title={STATUS_LABEL[rootTag]}
-                    aria-label={STATUS_LABEL[rootTag]}
+                    style={{ background: TAG_STYLE[shownTag].bg }}
+                    title={STATUS_LABEL[shownTag]}
+                    aria-label={STATUS_LABEL[shownTag]}
                   />
                 )}
               </span>
               <span className={styles.cHeadText}>
-                <span className={styles.cHeadName}>{nodes[0].data.name}</span>
-                {/* The relation line sits directly under the level dog's name (the
-                    card title), naming the link to the selected circle. Absent at
-                    root, since then there is nothing selected to relate to. */}
-                {(ancestryFor || shown !== nodes[0]) && (
+                <span className={styles.cHeadName}>{shown.data.name}</span>
+                {/* With a chum picked, the header names the hovered circle and this
+                    line links it to the chum shown in yellow just below. */}
+                {ancestryFor && (
                   <span className={styles.cRelated}>is related to:</span>
                 )}
               </span>
             </div>
           )}
-          <span className={styles.cName}>{ancestryFor ? ancestryFor.name : shown.data.name}</span>
+          {ancestryFor && <span className={styles.cName}>{ancestryFor.name}</span>}
           {!ancestryFor && shownShare !== null && shown.parent && !learning && (
             <span className={styles.cShare}>
               {shownShare}% of {shown.parent.data.name}
@@ -3037,6 +3056,7 @@ export default function BreedTree({
               from this level's ancestors, as square cards down one side. */}
           {dockAside && !hideCaption && renderRail.length > 0 && (
             <div
+              ref={railRef}
               className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
               style={{ gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)` }}
               aria-label="Pack dogs from this lineage"
@@ -3045,7 +3065,7 @@ export default function BreedTree({
                 <button
                   key={r.slug}
                   type="button"
-                  className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}`}
+                  className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
                   onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); setTempHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note, image: r.image }); }}
