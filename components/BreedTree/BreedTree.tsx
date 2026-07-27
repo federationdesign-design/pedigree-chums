@@ -414,6 +414,7 @@ export default function BreedTree({
   rootNote,
   levelTheme = null,
   onStartedChange,
+  onLearningChange,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -442,6 +443,7 @@ export default function BreedTree({
   rootNote?: string;
   levelTheme?: LevelTheme | null;
   onStartedChange?: (started: boolean) => void;
+  onLearningChange?: (learning: boolean) => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -552,6 +554,7 @@ export default function BreedTree({
   // LEARN mode: the pit stays inert, the blue box is open, and a pink wash lies
   // over everything. learnPeek is the desktop hover preview of that wash.
   const [learning, setLearning] = useState(false);
+  useEffect(() => { onLearningChange?.(learning); }, [learning, onLearningChange]);
   const [learnPeek, setLearnPeek] = useState(false);
   const frozen = dockAside && gravity && !started && !learning;
   // Desktop hover preview of the level background, the same courtesy LEARN gets.
@@ -2183,7 +2186,7 @@ export default function BreedTree({
                       );
                     })()
                   )}
-                  {pct !== null && !(dockAside && d.depth === 1) && (
+                  {pct !== null && !(dockAside && d.depth === 1) && !learning && (
                     <g>
                       <circle cx={0} cy={50} r={46} style={{ fill: "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 }} />
                       <text x={0} y={50} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px` }}>
@@ -2462,7 +2465,7 @@ export default function BreedTree({
                 />
                 <text x={w.x} y={w.y} textAnchor={w.anchor} dominantBaseline="central"
                   style={{
-                    fill: "#ffffff",
+                    fill: w.key === "learn" ? "var(--yellow, #ffd23e)" : "#003cff",
                     fontFamily: "var(--font-display), system-ui, sans-serif",
                     fontSize: `${fs * upp * (wordHover === w.key ? 1.08 : 1)}px`,
                     letterSpacing: `${2 * upp}px`,

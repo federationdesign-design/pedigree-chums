@@ -70,6 +70,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   // The start screen is bare: no shake, no slow motion. They arrive with the
   // round, so nothing is offered that cannot do anything yet.
   const [running, setRunning] = useState(false);
+  const [learningActive, setLearningActive] = useState(false);
   const [runKey, setRunKey] = useState(0);
   const replay = () => {
     setPhase("play");
@@ -126,7 +127,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           Hidden once the round is running: the number belongs to the menu and
           the end screens, and during play it competes with the lives indicator
           that now sits along the same edge. */}
-      {!running && (
+      {!running && !learningActive && (
         <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
           {score.toLocaleString("en-GB")}
         </div>
@@ -156,6 +157,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onShownChange={setShownName}
           levelTheme={theme}
           onStartedChange={setRunning}
+          onLearningChange={setLearningActive}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
