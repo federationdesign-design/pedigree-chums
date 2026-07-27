@@ -2001,8 +2001,12 @@ export default function BreedTree({
         }
         let still = !dragRef.current;
         for (const b of all) {
-          if (b.held) continue;
-          if (b.mb && b.mbIn && !isDragged(b)) {
+          // A held body is out of the physics world, so there is nothing to read
+          // back from Matter. Everything BELOW still has to run: skipping the
+          // whole body here meant the node was never moved to the dragged
+          // position, so the circle you can see stayed put and only jumped to
+          // your finger when you let go. The drag was invisible.
+          if (b.mb && b.mbIn && !isDragged(b) && !b.held) {
             const w = worldFromPx(b.mb.position.x, b.mb.position.y);
             b.x = w.x; b.y = w.y;
             b.a = b.mb.angle; // badges tumble with the physics, like the dogs
