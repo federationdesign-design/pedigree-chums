@@ -23,6 +23,7 @@ export interface Session {
   lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
   protectedState: ProtectedState; // S12 protected-state machine (Task 15)
+  personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
   lastBreedSlug: string | null; // the breed most recently established, for follow-up questions
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
@@ -43,6 +44,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     lastAction: null,
     anatomyRedirectUsed: false,
     protectedState: null,
+    personalSadnessCount: 0,
     lastWasComplaint: false,
     lastBreedSlug: null,
     barkStreakByDog: {},

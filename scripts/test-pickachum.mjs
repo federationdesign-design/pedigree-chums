@@ -505,6 +505,64 @@ check('what are the cards made of', { bucket: 'B04', action: 'faq_answer' }, { a
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallback' });
 
+// ---- Task 20: personal-sadness pair. L1 gentle redirect (no latch); L2 enters PROTECTED_ACTIVE ----
+const isL1 = (r) => r.moderationId === 'MOD_PERSONAL_SADNESS_L1';
+const isL2 = (r) => r.moderationId === 'MOD_PERSONAL_SADNESS_L2';
+const notSadness = (r) => (isL1(r) || isL2(r) ? `reached ${r.moderationId}` : null);
+// First qualifying statement -> L1, count 1, not protected. Approved line rendered.
+check("I'm sad", { action: 'safety_signpost', bucket: null }, { assert: (r, resp, s) =>
+  !isL1(r) ? `not L1: ${r.moderationId}`
+    : s.personalSadnessCount !== 1 ? `count ${s.personalSadnessCount}`
+      : s.protectedState !== null ? `entered protected: ${s.protectedState}`
+        : resp.text.includes('tell a teacher or another safe grown-up') ? null : 'L1 line not rendered' });
+check('I feel lonely', {}, { assert: (r, _resp, s) => (isL1(r) && s.personalSadnessCount === 1 && s.protectedState === null ? null : `not L1/count1/unprotected: ${r.moderationId} c${s.personalSadnessCount} p${s.protectedState}`) });
+check('nobody likes me', {}, { assert: (r, _resp, s) => (isL1(r) && s.personalSadnessCount === 1 ? null : `not L1 count1: ${r.moderationId} c${s.personalSadnessCount}`) });
+// Non-qualifying: not L1.
+check("that's sad", {}, { assert: notSadness });
+check('my friend is lonely', {}, { assert: notSadness });
+check('why do people feel sad', {}, { assert: notSadness });
+// The two undefined acceptance cases: assert only that they do NOT reach L1/L2.
+// (Destinations, reported separately: "my dog died" -> B12 converse; "this film is scary" -> B13 fallback.)
+check('my dog died', {}, { assert: notSadness });
+check('this film is scary', {}, { assert: notSadness });
+// A second message that only CONTAINS a sad word (attributive, no self-state) does not qualify -> no L2.
+(() => { const s = newSession();
+  check("I'm sad", {}, { session: s, assert: (r) => (isL1(r) ? null : `t1 not L1: ${r.moderationId}`) });
+  check('I just watched a sad film', {}, { session: s, assert: (r, _resp, sess) => (isL2(r) ? 'wrongly L2' : sess.personalSadnessCount !== 1 ? `count moved to ${sess.personalSadnessCount}` : null) });
+})();
+// A second INDEPENDENT qualifying statement -> L2 and PROTECTED_ACTIVE, with the approved L2 line.
+(() => { const s = newSession();
+  check("I'm sad", {}, { session: s });
+  check('I still feel lonely', {}, { session: s, assert: (r, resp, sess) =>
+    !isL2(r) ? `not L2: ${r.moderationId}`
+      : sess.protectedState !== 'active' ? `not protected: ${sess.protectedState}`
+        : resp.text.includes('still feeling like this') && resp.text.includes('Childline free on 0800 1111') ? null : 'L2 line not rendered' });
+})();
+// An explicit clear -> no L2, counter cleared.
+(() => { const s = newSession();
+  check("I'm sad", {}, { session: s });
+  check("thanks I'm okay now", {}, { session: s, assert: (r, _resp, sess) => (isL2(r) ? 'wrongly L2' : sess.personalSadnessCount !== 0 ? `counter not cleared: ${sess.personalSadnessCount}` : null) });
+})();
+// Safety-first: a self-harm phrase in the same message bypasses L1 entirely.
+check("I'm sad and I want to hurt myself", { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SELF_HARM' ? null : `not self-harm: ${r.moderationId}`) });
+// L1 does not latch: a game after L1 is still available.
+(() => { const s = newSession();
+  check("I'm sad", {}, { session: s, assert: (r) => (isL1(r) ? null : 'not L1') });
+  check('can we play a game', { action: 'fun_tease' }, { session: s });
+})();
+// L2 latches (PROTECTED_ACTIVE): a game after L2 is blocked.
+(() => { const s = newSession();
+  check("I'm sad", {}, { session: s });
+  check('I still feel lonely', {}, { session: s, assert: (r) => (isL2(r) ? null : 'not L2') });
+  check('can we play a game', {}, { session: s, assert: (r) => (r.action === 'fun_tease' ? 'game served after L2' : null) });
+})();
+// Regression guard: personal sadness sits below the safety routes and does not disturb these.
+check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `not safeguarding: ${r.moderationId}`) });
+check('I want to die', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SELF_HARM' ? null : `not self-harm: ${r.moderationId}`) });
+check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('tell me about beagles', { bucket: 'B05', action: 'breed_page' });
+check('woof', { action: 'bark' });
+
 // ---- Task 3: clarifier answer-capture, and never fire the clarifier twice ----
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('the website', { action: 'orientation' }, { session: s }); })();
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('game', { action: 'rules_answer' }, { session: s }); })();

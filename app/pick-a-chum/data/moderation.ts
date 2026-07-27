@@ -214,6 +214,30 @@ export const MODERATION: ModerationCategory[] = [
     responses: ['Okay. The support information is still there if you need it, and you can ask another question when you are ready.'],
     status: 'APPROVED',
   },
+  // ---- Task 20 personal-sadness pair. Approved by Steve, verbatim. Shared across
+  // all four dogs, no character variation. L1 (PERSONAL_SADNESS_GENTLE_REDIRECT_01)
+  // is a gentle redirect on the FIRST qualifying statement: it does NOT enter
+  // PROTECTED_ACTIVE, so games, sales and ordinary character behaviour stay
+  // available. L2 (PERSONAL_SADNESS_L2) fires on a SECOND independent qualifying
+  // statement in the same session and DOES enter PROTECTED_ACTIVE. Both sit below
+  // danger, self-harm, safeguarding and medical. Detection and the counter live in
+  // lib/safety.ts and lib/engine.ts; this file only supplies the approved text. ----
+  {
+    id: 'MOD_PERSONAL_SADNESS_L1',
+    scenario: 'Personal sadness L1: gentle redirect, first qualifying statement, not latched',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ["I'm sorry you're feeling like this. Please tell a teacher or another safe grown-up. They can help you properly."],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_PERSONAL_SADNESS_L2',
+    scenario: 'Personal sadness L2: second qualifying statement, enters PROTECTED_ACTIVE',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ["I'm sorry you're still feeling like this. Please tell a safe grown-up, such as a teacher, or call Childline free on 0800 1111."],
+    status: 'APPROVED',
+  },
 ];
 
 /**

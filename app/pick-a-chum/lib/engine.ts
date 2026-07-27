@@ -7,6 +7,7 @@ import { normalise } from './normalise';
 import { resolve } from './router';
 import { assemble, Assembled } from './assembler';
 import { Session } from './session';
+import { detectSadnessClear } from './safety';
 
 export interface Turn {
   input: string;
@@ -51,6 +52,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     lastBreedSlug: session.lastBreedSlug,
     lastWasComplaint: session.lastWasComplaint,
     protectedState: wasProtected,
+    personalSadnessCount: session.personalSadnessCount,
   });
 
   // Task 15 (S12) protected-state machine. When a protected state is already live, a
@@ -110,13 +112,25 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // PROTECTED_AFTERCARE. A clear ordinary topic while active also clears to
   // aftercare (served plainly). Every safety response is rendered under the shared
   // support surface: the HELP AND SUPPORT header, no dog name or avatar.
+  // Task 20: the personal-sadness L1 gentle redirect renders through the safety path
+  // but MUST NOT enter PROTECTED_ACTIVE (games, sales and character stay available).
+  // L2 and every other safety response enter/hold the protected state as usual.
   const isSafetyResponse = resolution.action === 'safety_signpost' || resolution.action === 'safety_boundary';
-  if (isSafetyResponse) {
+  const isSadnessL1 = resolution.moderationId === 'MOD_PERSONAL_SADNESS_L1';
+  if (isSafetyResponse && !isSadnessL1) {
     session.protectedState = resolution.moderationId === 'MOD_SAFEGUARDING_ACK_CLOSE' ? 'aftercare' : 'active';
     response.header = 'HELP AND SUPPORT';
     response.hideDogIdentity = true;
   } else if (wasProtected === 'active' && MEANINGFUL_TOPIC.has(resolution.action)) {
     session.protectedState = 'aftercare'; // a clear ordinary topic clears the active state
+  }
+
+  // Task 20 personal-sadness counter: a qualifying statement (L1 or L2) increments it;
+  // an explicit clearing statement ("I'm fine", "I mean the film was sad") resets it.
+  if (resolution.moderationId === 'MOD_PERSONAL_SADNESS_L1' || resolution.moderationId === 'MOD_PERSONAL_SADNESS_L2') {
+    session.personalSadnessCount += 1;
+  } else if (detectSadnessClear(n)) {
+    session.personalSadnessCount = 0;
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ012'; // complaint follow-up context

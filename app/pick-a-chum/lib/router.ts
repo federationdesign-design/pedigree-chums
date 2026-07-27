@@ -8,7 +8,7 @@
 
 import { ChumData, Resolution, Dog, ActionType } from './types';
 import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
-import { detectSafety, isDogHealthQuestion, detectProtectedContinuation } from './safety';
+import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness } from './safety';
 
 const HIDDEN_CEILING = 20;
 // The bark game breaks into English on the fifth consecutive bark exchange.
@@ -337,6 +337,7 @@ export interface RouterState {
   lastBreedSlug?: string | null; // the breed established earlier, for follow-up questions
   lastWasComplaint?: boolean; // an open complaint context: defer breed retrieval until it clears
   protectedState?: 'active' | 'aftercare' | null; // S12 protected-state machine (Task 15)
+  personalSadnessCount?: number; // Task 20: qualifying personal-sadness statements so far this session
 }
 
 // ---- Breed page retrieval (10 proof breeds) ----
@@ -544,6 +545,24 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       bucket: null,
       action: 'health_answer',
       note: 'Dog health / food toxicity outranks the Labrador food transfer.',
+    };
+  }
+
+  // Personal sadness (Task 20). Below every safety route above (a danger, self-harm,
+  // safeguarding, medical or distress message is caught by detectSafety and returns
+  // before this point). Not fired inside a protected state: the S12 machine owns
+  // those turns. The session counter decides L1 (gentle redirect, no latch) vs L2
+  // (second qualifying statement, enters PROTECTED_ACTIVE). Both render through the
+  // shared safety path (moderationId), so they inherit instant render and recorder
+  // redaction; the engine special-cases L1 so it does NOT enter the protected state.
+  if (!state.protectedState && detectPersonalSadness(N)) {
+    const l2 = (state.personalSadnessCount ?? 0) >= 1;
+    return {
+      layer: 1,
+      layerName: 'Safety and unsuitable content',
+      bucket: null,
+      action: 'safety_signpost',
+      moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1',
     };
   }
 

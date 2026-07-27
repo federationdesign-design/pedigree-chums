@@ -314,3 +314,72 @@ export function detectProtectedContinuation(n: Normalised): ProtectedHit | null 
   if (safety && safety.kind === 'general_distress') return { moderationId: safety.moderationId, action: safety.action };
   return null;
 }
+
+// ---- Task 20 personal-sadness detection ----
+//
+// A present, first-person statement directly describing the visitor's OWN sadness,
+// loneliness, isolation or perceived rejection. The phrases below all encode a
+// first-person self-state predicate ("I'm sad", "I feel lonely", "nobody likes
+// me"), so an attributive use ("a sad film", "that dog looks lonely") and a
+// third-person report ("my friend is sad") do not match. External causes are NOT
+// detected: "I'm upset because my team lost" still qualifies, and that is accepted,
+// because L1 does not latch. The strictness lives on the counter (engine): a second
+// qualifying statement must qualify on its OWN terms, which is why "I just watched a
+// sad film" (attributive, no self-state predicate) does not qualify.
+const SADNESS_PREDICATES = [
+  'im sad', 'i am sad', 'i feel sad', 'im so sad', 'im really sad', 'im very sad', 'i feel so sad',
+  'im feeling sad', 'i still feel sad', 'still feel sad', 'i just feel sad', 'i feel really sad',
+  'im lonely', 'i am lonely', 'i feel lonely', 'im so lonely', 'i feel so lonely', 'im really lonely',
+  'i still feel lonely', 'still feel lonely', 'im feeling lonely', 'i feel really lonely',
+  'i feel alone', 'im alone', 'i am alone', 'i feel so alone', 'im all alone', 'i feel all alone',
+  'i still feel alone', 'still feel alone', 'im so alone',
+  'im upset', 'i am upset', 'i feel upset', 'im really upset', 'im so upset', 'im very upset',
+  'i feel so upset', 'im feeling upset', 'i still feel upset', 'still feel upset',
+  'i feel left out', 'im left out', 'i am left out', 'i feel so left out', 'i always feel left out',
+  'im unhappy', 'i am unhappy', 'i feel unhappy', 'im so unhappy',
+  'im miserable', 'i feel miserable', 'im so miserable',
+  'nobody likes me', 'no one likes me', 'noone likes me', 'no body likes me', 'nobody like me',
+  'no one cares about me', 'nobody cares about me', 'no one cares', 'nobody cares', 'no one cares about',
+  'i have no friends', 'i dont have any friends', 'i have no mates', 'i have no one', 'i have nobody',
+  'i dont have friends', 'i dont have any mates', 'ive got no friends', 'i have got no friends',
+  'nobody wants me', 'no one wants me', 'nobody wants me around', 'no one wants me around', 'nobody wants me here',
+];
+
+// Surface markers that disqualify even when a predicate phrase is present: quoted or
+// reported speech ("someone said I'm sad"), a general/hypothetical question about
+// people in general, and the dismissive "leave me alone".
+const SADNESS_EXCLUDE = [
+  'said', 'says', 'told me', 'told him', 'told her',
+  'why do people', 'do people feel', 'what does', 'what makes people', 'how do people', 'why are people', 'people feel',
+  'leave me alone',
+];
+
+// Fold internal apostrophes so "I'm" reads as "im" for phrase matching (the compact
+// form keeps the apostrophe, so "im sad" would otherwise miss "i'm sad").
+function apostropheFold(n: Normalised): Normalised {
+  const strip = (s: string) => s.replace(/['’]/g, '');
+  const lower = strip(n.lower);
+  const compact = strip(n.compact);
+  const words = compact.match(/[a-z]+/g) ?? [];
+  return { ...n, lower, compact, words, letters: words.join('') };
+}
+
+export function detectPersonalSadness(n: Normalised): boolean {
+  if (n.original.includes('"') || n.original.includes('“')) return false; // quoted speech
+  const f = apostropheFold(n);
+  if (hasAny(f, SADNESS_EXCLUDE)) return false;
+  return hasAny(f, SADNESS_PREDICATES);
+}
+
+// The counter clears when the visitor explicitly establishes that the feeling was a
+// reaction to content or a passing event ("I mean the film was sad, I'm fine",
+// "thanks, I'm okay now"). Detected separately from a fresh qualifying statement.
+const SADNESS_CLEAR = [
+  'im okay', 'im ok', 'im fine', 'im alright', 'im better', 'i feel better', 'im good now',
+  'im okay now', 'im ok now', 'im fine now', 'feeling better', 'im alright now', 'im all good',
+  'i mean the film', 'i mean it was', 'it was just the', 'i mean the story', 'im okay thanks',
+];
+
+export function detectSadnessClear(n: Normalised): boolean {
+  return hasAny(apostropheFold(n), SADNESS_CLEAR);
+}
