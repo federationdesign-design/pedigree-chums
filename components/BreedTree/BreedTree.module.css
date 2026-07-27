@@ -340,22 +340,19 @@
    as drawn for now, deliberately. */
 .learnPattern {
   position: fixed;
-  /* Anchored to the visible screen, not to the wash's oversized box. The wash is
-     2.2 viewports across and tilted 18 degrees; sizing the artwork to that would
-     push most of the composition off screen. This way what you drew is what is
-     seen, and only the edges are cropped. */
+  /* The same paw pattern as the homepage and the main pit (paw-pattern2.svg),
+     tiled at 144px, so the learn area shares the site background. */
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: url("/learn-background.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
   opacity: 0;
   transition: opacity 420ms ease;
 }
 .learnPatternOn {
-  opacity: 0.28;
+  opacity: 0.5;
 }
 
 .learnWash {
