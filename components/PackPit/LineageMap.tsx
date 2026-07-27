@@ -131,6 +131,7 @@ export default function LineageMap({
   circular = false,
   soloLeaf = false,
   rootRadius,
+  ringColor,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
@@ -142,6 +143,10 @@ export default function LineageMap({
   // circle. Placement then finishes the round on its own, with no green button.
   soloLeaf?: boolean;
   rootRadius?: number;
+  // Mini pit only: the ring the lifted dog wore in the pit, carried through so
+  // the circle looks like the one just picked up. Without it the card keeps its
+  // own yellow stroke over a blue fill, which reads as two thin rings.
+  ringColor?: string;
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (data: {
@@ -1119,6 +1124,9 @@ export default function LineageMap({
   const rootCard = (cx: number, cy: number) => {
     if (rootGone) return null;
     const R = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+    // One band, not a stroke over a contrasting fill. Heavier in the mini pit so
+    // it carries the weight the pit's own rings have.
+    const rootRingW = circular && ringColor ? 11 : 5;
     const rx = cx, ry = cy; // root card stays in SVG content space; pan moves the whole tree including it
     const baseDeg = (cardLean * 180) / Math.PI;
     const rootXf = collecting && collectRef.current
@@ -1178,7 +1186,12 @@ export default function LineageMap({
           </>);
         })() : (<>
           <clipPath id={clip}><rect x={-R} y={-R} width={R*2} height={R*2} rx={circular ? R : 20} /></clipPath>
-          <rect x={-R-5} y={-R-5} width={R*2+10} height={R*2+10} rx={circular ? R + 5 : 24} className={styles.rootCard} />
+          <rect
+            x={-R-rootRingW} y={-R-rootRingW}
+            width={R*2+rootRingW*2} height={R*2+rootRingW*2}
+            rx={circular ? R + rootRingW : 24}
+            className={styles.rootCard}
+            style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}

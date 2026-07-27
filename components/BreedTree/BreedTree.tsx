@@ -818,7 +818,7 @@ export default function BreedTree({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, dockAside]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
-  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number } | null>(null);
+  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
@@ -1081,6 +1081,14 @@ export default function BreedTree({
   }
   // Thinner stroke the deeper (smaller) the circle, so the ring never
   // overpowers a tiny image several levels down: 5, 4, 3, then finer still.
+  // The ring colour a circle wears in the pit. Pulled out of the render so the
+  // learn layer can carry the very same colour through when a dog is lifted,
+  // rather than inventing its own.
+  function strokeColorFor(d: Node): string {
+    if (dockAside && d !== nodes[0] && d === shown) return "#ffffff";
+    if (strokeByDepth) return ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4];
+    return stroke;
+  }
   function strokeWidthFor(d: Node): number {
     const widths = [5, 4, 3, 2.6, 2.4];
     const base = widths[d.depth - 1] ?? 2.4;
@@ -1200,6 +1208,7 @@ export default function BreedTree({
       y: cr.top + cr.height / 2,
       angle: (body as unknown as { a?: number }).a ?? 0,
       r: cr.width / 2, // keep the circle's on-screen size on the next layer
+      ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
     });
     setLearnNode(d);
     return true;
@@ -1224,6 +1233,7 @@ export default function BreedTree({
           y: cr.top + cr.height / 2,
           angle: (body as unknown as { a?: number }).a ?? 0,
           r: cr.width / 2, // keep the circle's on-screen size on the next layer
+          ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
         });
         setLearnNode(d);
         return;
@@ -2445,7 +2455,7 @@ export default function BreedTree({
                   key={i}
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
-                  stroke={hidden ? "none" : dockAside && d !== nodes[0] && d === shown ? "#ffffff" : strokeByDepth ? ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4] : stroke}
+                  stroke={hidden ? "none" : strokeColorFor(d)}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",
@@ -3115,6 +3125,7 @@ export default function BreedTree({
               : { ...learnNode.data, children: [{ ...learnNode.data, children: undefined }] }
           }
           circular
+          ringColor={learnCard.ring}
           soloLeaf={!(learnNode.data.children && learnNode.data.children.length > 0)}
           rootRadius={learnCard.r}
           currentScore={0}
