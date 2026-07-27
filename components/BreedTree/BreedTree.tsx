@@ -105,6 +105,22 @@ const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
 const TOY_STICK_GONE_KEY = "pc-minipit-stick-gone";
 const TOY_STICK_BIG_GONE_KEY = "pc-minipit-stickbig-gone";
 const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
+// The pink ball. The yellow one is gone the first time it leaves the pit; this
+// one takes three throws to lose, and loses its colour on the way out. The
+// count rides in sessionStorage beside the other toy state, so it survives
+// between levels but resets on a fresh visit.
+const TOY_BALL_PINK_GONE_KEY = "pc-minipit-ballpink-gone";
+const TOY_BALL_PINK_THROWS_KEY = "pc-minipit-ballpink-throws";
+const BALL_PINK_LIVES = 3;
+const BALL_PINK_GAP = 1400;   // after the yellow ball, so they arrive separately
+const BALL_PINK_BACK = 900;   // pause before it is tipped back in
+// Pink first, then the pink drains out of it: same hue, less and less of it,
+// until the third throw leaves it almost grey.
+const BALL_PINK_FILTER = [
+  "hue-rotate(252deg) saturate(1.55)",
+  "hue-rotate(252deg) saturate(0.6)",
+  "hue-rotate(252deg) saturate(0.2)",
+];
 // The level's chums pour in after the rock. They are scenery, not toys: they
 // cannot be grabbed, opened or scored, and they are props rather than pit
 // bodies, so they never count toward the pit-full loss. Size mirrors the learn
@@ -116,22 +132,28 @@ const CHUM_MAX = 56;
 const CHUM_VW = 0.075;
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock";
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink";
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
-  stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC,
+  stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
   ball: TOY_BALL_GONE_KEY, flag: TOY_FLAG_SEEN_KEY,
   stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
-  rock: TOY_ROCK_GONE_KEY,
+  rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
 }
 function retireToy(key: string) {
   try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
+}
+function pinkThrows(): number {
+  try { return Number(sessionStorage.getItem(TOY_BALL_PINK_THROWS_KEY) || "0") || 0; } catch { return 0; }
+}
+function setPinkThrows(n: number) {
+  try { sessionStorage.setItem(TOY_BALL_PINK_THROWS_KEY, String(n)); } catch { /* private mode */ }
 }
 // Level themes: how much of the ground strip shows, as a fraction of the strip's
 // own height. 1 shows the art exactly as drawn, its bottom edge on the bottom of
@@ -778,7 +800,7 @@ export default function BreedTree({
   const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
   const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
-  const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string }[]>([]);
+  const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string; filter?: string }[]>([]);
   const [chumList, setChumList] = useState<{ image: string; size: number }[]>([]);
   const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
   const [britainOpen, setBritainOpen] = useState(false);
@@ -1617,7 +1639,7 @@ export default function BreedTree({
         // rock reads at the ball's size, stick a little longer than the ball is
         // wide so it looks throwable rather than like a twig
         const dia =
-          kind === "ball" ? ballDia
+          kind === "ball" || kind === "ballPink" ? ballDia
           : kind === "rock" ? ballDia
           : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
@@ -1641,7 +1663,7 @@ export default function BreedTree({
         const idx = toyBodiesRef.current.length;
         const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null, toyKind: kind };
         const opts =
-          kind === "ball" ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
+          kind === "ball" || kind === "ballPink" ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
@@ -1694,7 +1716,12 @@ export default function BreedTree({
         if (kind === "stick") pr.a = startAngle;
         toyBodiesRef.current.push(pr);
         if (kind === "flag") flagIdxRef.current = idx;
-        setToyList((l) => [...l, { kind, size: dia * fxScale, h: hgt * fxScale, src: TOY_SRC[kind] }]);
+        setToyList((l) => [...l, {
+          kind, size: dia * fxScale, h: hgt * fxScale, src: TOY_SRC[kind],
+          filter: kind === "ballPink"
+            ? BALL_PINK_FILTER[Math.min(pinkThrows(), BALL_PINK_FILTER.length - 1)]
+            : undefined,
+        }]);
         wake();
       };
       // Tennis ball escape, ported from the main pit: a ball RELEASED with real
@@ -1703,7 +1730,7 @@ export default function BreedTree({
       let thrownBall: any = null;
       throwWatchRef.current = (pr: any) => {
         // the flag leaves by having its message read, badges are not in scope
-        if (pr?.toyKind !== "ball" && pr?.toyKind !== "stick" && pr?.toyKind !== "rock") return;
+        if (pr?.toyKind !== "ball" && pr?.toyKind !== "stick" && pr?.toyKind !== "rock" && pr?.toyKind !== "ballPink") return;
         if (pr.mb && pr.mb.velocity.y < -4) thrownBall = pr; // pit threshold
         else if (thrownBall === pr) thrownBall = null;
       };
@@ -1716,6 +1743,16 @@ export default function BreedTree({
         const reach = pr.mb.circleRadius ?? (pr.mb.bounds.max.y - pr.mb.bounds.min.y) / 2;
         if (pr.mb.position.y < stageTop - reach) {
           thrownBall = null;
+          if (pr.toyKind === "ballPink") {
+            // Three lives, not one. Each throw drains more colour out of it, and
+            // it is tipped back in a beat later until the last one.
+            const spent = pinkThrows() + 1;
+            setPinkThrows(spent);
+            killProp(pr, "toy", performance.now());
+            if (spent >= BALL_PINK_LIVES) retireToy(TOY_BALL_PINK_GONE_KEY);
+            else toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), BALL_PINK_BACK));
+            return;
+          }
           retireToy(TOY_GONE_KEY[pr.toyKind as ToyKind]);
           killProp(pr, "toy", performance.now());
         }
@@ -1727,6 +1764,7 @@ export default function BreedTree({
       const armToys = () => {
         if (toyTimers.length) return; // first landing only
         toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
+        toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
         const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
         // both sticks together, then the rock half a second later so it gets
@@ -2660,7 +2698,8 @@ export default function BreedTree({
                       <circle cx={0} cy={0} r={half} style={{ fill: "none", stroke: "#ffffff", strokeWidth: ty.size * 0.06 }} />
                     </>
                   ) : (
-                    <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h} />
+                    <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
+                      style={ty.filter ? { filter: ty.filter } : undefined} />
                   )}
                 </g>
               );
