@@ -63,7 +63,7 @@ const DIFF_SPAN = 1.21;
 // same on-screen pit. One dial, used everywhere the pit resets to its default
 // view, so the start screen, the round and the PLAY reset can never disagree.
 // 1 leaves things exactly as they were. Raise it to shrink the circles.
-const PIT_SHRINK = 1.45;
+const PIT_SHRINK = 2.1;
 const PIT_SPAN = DIFF_SPAN * PIT_SHRINK;
 const DIFF_INSET = 16;
 // level: null outside the mini pit, where the packing is used untouched.
