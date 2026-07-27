@@ -432,7 +432,7 @@
     "triggers": [
       "FAQ semantic match"
     ],
-    "template": "{{approved_faq_answer}} I have retained the useful part and removed the committee language.",
+    "template": "{{approved_faq_answer}}",
     "factSource": "FAQ library",
     "defaultRoute": "{{faq_cta}}",
     "animationCue": "HEAD_TILT_SMALL",
