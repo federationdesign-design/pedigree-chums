@@ -318,6 +318,28 @@ check('how do I play the bark game', { action: 'bark', layer: 15 });
 // but a bare "lets do it" with no bark-game context must NOT bark.
 check('lets do it', {}, { assert: (r) => (r.action === 'bark' ? 'lets do it barked with no bark-game context' : null) });
 
+// ---- Task 14: games/rules meta-route (bark-by-name beats it) ----
+// bark-by-name still wins over the meta-route:
+check('whats the bark game', { action: 'bark' }, { assert: (r) => (r.action === 'bark' ? null : `meta-route stole the bark game: ${r.action}`) });
+// recovered to existing approved answers:
+check('rules', { bucket: 'B02', action: 'rules_answer' });
+check('what is pedigree chums', { bucket: 'B02', action: 'rules_answer' });
+check('how many players', { bucket: 'B02', action: 'rules_answer' });
+check('what age is it for', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ002' ? null : `not FAQ002: ${r.faqId}`) });
+check('is it for kids', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ002' ? null : `not FAQ002: ${r.faqId}`) });
+check('do you have any games', { bucket: 'B17', action: 'fun_tease' });
+check('how does it work', { bucket: 'B15', action: 'orientation' }); // already recovered by Task 9 orientation
+// no games-catalogue answer exists, so this stays honestly unmatched:
+check('what games are there', { bucket: 'B06', action: 'gk_unknown' });
+// Regression guard: the meta-route sits above FAQ/GK, so these must NOT change bucket.
+check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}`) });
+check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
+check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
+check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
+check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
+check('can I play something', { bucket: 'B17', action: 'fun_tease' });
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });

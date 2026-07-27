@@ -20,6 +20,15 @@ const BARK_BREAK = 5;
 const BARK_GAME_NAMES = ['bark game', 'barking game'];
 const BARK_ENTER_AFFIRM = ['lets do it', "let's do it", 'let us do it', 'lets go', 'go on', 'do it', 'go for it'];
 
+// Task 14: games/rules meta-route. Each group maps to an EXISTING approved answer
+// (no new copy). RULES -> the card-game rules answer (B02), which opens by describing
+// the product; AGE -> the approved age answer (FAQ002); AVAILABILITY -> the approved
+// play-availability tease (B17). "what games are there" has no games-catalogue answer
+// to reach, so it is deliberately left unmatched, not added here.
+const META_RULES_TRIGGERS = ['rules', 'how many players', 'pedigree chums'];
+const META_AGE_TRIGGERS = ['what age', 'is it for kids'];
+const META_AVAILABILITY_TRIGGERS = ['do you have any games', 'any games'];
+
 const STOP = new Set([
   'what', 'is', 'the', 'a', 'an', 'of', 'are', 'how', 'many', 'do', 'does', 'you', 'your', 'to',
   'in', 'which', 'who', 'where', 'when', 'me', 'my', 'i', 'it', 'this', 'that', 'can', 'on', 'and',
@@ -608,6 +617,22 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (hasAny(N, TRANSFER_VERBS)) {
     const named = matchDogName(c);
     if (named) return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: named };
+  }
+
+  // Games and rules meta-route (Task 14). Recovers game-surface questions that
+  // otherwise fall to gk_unknown or the fallback, each pointed at an EXISTING approved
+  // answer (no new copy). Sits above RULES/FAQ/GK so it catches them; below the
+  // bark-by-name check (so "whats the bark game" is the bark game, not this) and below
+  // FUN/orientation/identity/complaint (so those keep their inputs). "what games are
+  // there" has no games-catalogue answer, so it is not routed here and stays unmatched.
+  if (hasAny(N, META_RULES_TRIGGERS)) {
+    return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B02', action: 'rules_answer', destinationId: 'DST011' };
+  }
+  if (hasAny(N, META_AGE_TRIGGERS)) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ002', faqMatchStrength: 2 };
+  }
+  if (hasAny(N, META_AVAILABILITY_TRIGGERS)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
   }
 
   // Layer 3: gameplay and website navigation.
