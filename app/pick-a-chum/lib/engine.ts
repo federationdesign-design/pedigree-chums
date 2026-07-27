@@ -56,6 +56,19 @@ const SAFEGUARDING_CONTINUATION_RES: Resolution = {
 };
 const PLAIN_FALLBACK_RES: Resolution = { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
 
+// Task 31a: within PROTECTED_ACTIVE, an input that matches no safety continuation, barrier,
+// emergency, acknowledgement or clear ordinary topic, AND did not resolve to any conversational
+// action either (it fell through to the router's terminal catch-all: unresolved free text, a
+// keyboard smash, or an unmapped emoji), gets this approved "unclear" continuation line rather
+// than the general safeguarding continuation. It reuses the router's existing verdict, so there
+// is no new gibberish or emoji detection here; a thumbs-up or tick is caught upstream as the
+// acknowledgement close and never reaches this branch. Coherent continuations (e.g. "I dont know
+// what to do" -> orientation) resolve to a named action and so keep MOD_SAFEGUARDING_CONTINUATION.
+const SAFE_UNCLEAR_CONTINUATION_RES: Resolution = {
+  layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_SAFE_UNCLEAR_CONTINUATION',
+};
+const UNRESOLVED_ACTIONS = new Set(['fallback', 'gibberish', 'emoji_only']);
+
 // Task 25b: the FAQ015 complaint answer is served in full ONCE per complaint context;
 // subsequent complaint-context turns get this approved short repeat instead of the same
 // line five times. Approved by Steve, verbatim.
@@ -108,7 +121,12 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     const isSafety = resolution.action === 'safety_signpost' || resolution.action === 'safety_boundary';
     if (!isSafety) {
       if (wasProtected === 'active') {
-        if (!MEANINGFUL_TOPIC.has(resolution.action)) resolution = SAFEGUARDING_CONTINUATION_RES;
+        // A clear ordinary topic is served plainly (below). Anything else is held: an input that
+        // resolved to nothing (Task 31a: the router's terminal catch-all) gets the unclear line;
+        // any other non-ordinary turn keeps the general safeguarding continuation.
+        if (!MEANINGFUL_TOPIC.has(resolution.action)) {
+          resolution = UNRESOLVED_ACTIONS.has(resolution.action) ? SAFE_UNCLEAR_CONTINUATION_RES : SAFEGUARDING_CONTINUATION_RES;
+        }
       } else if (AFTERCARE_BLOCKED.has(resolution.action)) {
         resolution = PLAIN_FALLBACK_RES;
       }

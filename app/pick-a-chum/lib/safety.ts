@@ -295,6 +295,16 @@ export function isAcknowledgeClose(n: Normalised): boolean {
   return words.some((w) => ACK_CORE.has(w)); // and a bare "you"/"it"/"i" alone is not a close
 }
 
+// Task 31a: a bare thumbs-up or tick is an acknowledgement, the same as "ok". Every OTHER
+// emoji is deliberately left to fall through as unclear (the engine serves the unclear
+// continuation line). Matched on the original text because the compact form strips every
+// non-alphanumeric, so an emoji never survives there; the letter/number guard keeps a mixed
+// message ("👍 but I can't") out, since that carries real words to classify instead.
+const ACK_EMOJI = /[\u{1F44D}\u{2714}\u{2705}\u{2713}]/u; // 👍 thumbs-up, ✔ ✅ ✓ ticks
+export function isAckEmoji(n: Normalised): boolean {
+  return ACK_EMOJI.test(n.original) && !/[\p{L}\p{N}]/u.test(n.original);
+}
+
 export interface ProtectedHit {
   moderationId: string;
   action: ActionType;
@@ -317,8 +327,9 @@ export function detectProtectedContinuation(n: Normalised): ProtectedHit | null 
   if (hasAny(n, ADULT_SCOPE)) return { moderationId: 'MOD_ADULT_BARRIER', action: 'safety_signpost' };
   // Precedence 2: a global no-one term with no scope routes to the no-one route.
   if (hasAny(n, GLOBAL_NO_ONE)) return { moderationId: 'MOD_NO_ONE_ROUTE', action: 'safety_signpost' };
-  // Acknowledgement close (meaningful in active; a harmless echo if already aftercare).
-  if (isAcknowledgeClose(n)) return { moderationId: 'MOD_SAFEGUARDING_ACK_CLOSE', action: 'safety_signpost' };
+  // Acknowledgement close (meaningful in active; a harmless echo if already aftercare). A
+  // bare thumbs-up or tick counts as an acknowledgement too (Task 31a).
+  if (isAcknowledgeClose(n) || isAckEmoji(n)) return { moderationId: 'MOD_SAFEGUARDING_ACK_CLOSE', action: 'safety_signpost' };
   // A general-distress plea with no barrier keeps the general-distress signpost.
   if (safety && safety.kind === 'general_distress') return { moderationId: safety.moderationId, action: safety.action };
   return null;

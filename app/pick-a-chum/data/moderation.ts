@@ -216,6 +216,18 @@ export const MODERATION: ModerationCategory[] = [
     responses: ['Okay. The support information is still there if you need it, and you can ask another question when you are ready.'],
     status: 'APPROVED',
   },
+  {
+    // Task 31a: in PROTECTED_ACTIVE, an input that matches no safety continuation, barrier,
+    // emergency, acknowledgement or clear ordinary topic (it did not resolve to anything the
+    // router could name) gets this line instead of the general safeguarding continuation.
+    // Approved by Steve, verbatim.
+    id: 'MOD_SAFE_UNCLEAR_CONTINUATION',
+    scenario: 'S12 unclear continuation (active safety state, input resolves to nothing)',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['I may not have understood that, but you do not need to explain it again. A teacher can help, or you can call Childline free on 0800 1111.'],
+    status: 'APPROVED',
+  },
   // ---- Task 20 personal-sadness pair. Approved by Steve, verbatim. Shared across
   // all four dogs, no character variation. L1 (PERSONAL_SADNESS_GENTLE_REDIRECT_01)
   // is a gentle redirect on the FIRST qualifying statement: it does NOT enter

@@ -421,6 +421,47 @@ check('can I play something', { bucket: 'B17', action: 'offer_bark_game' });
   }
 })();
 
+// ---- Task 31a: SAFE_UNCLEAR_CONTINUATION. In PROTECTED_ACTIVE, an input that matches no
+// safety continuation, barrier, emergency, acknowledgement or clear ordinary topic and
+// resolves to nothing (gibberish, a non-ack emoji, a bare question mark, a one-word
+// non-answer) gets the approved unclear-continuation line: not the B13 catch-all, and not
+// the general safeguarding continuation. The state stays active (nothing was resolved). ----
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  for (const inp of ['asdfghjkl', '🎈', '?', 'banana']) {
+    check(inp, { action: 'safety_signpost', bucket: null }, { session: s, assert: (r, resp, sess) =>
+      r.moderationId !== 'MOD_SAFE_UNCLEAR_CONTINUATION' ? `not the unclear line: ${r.moderationId}`
+        : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}`
+          : resp.text.includes('do not need to explain it again') ? null : 'unclear line not rendered' });
+  }
+})();
+// A bare thumbs-up or tick is the acknowledgement close (to aftercare), NOT the unclear line.
+(() => {
+  for (const inp of ['👍', '✔']) {
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check(inp, { action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+      r.moderationId !== 'MOD_SAFEGUARDING_ACK_CLOSE' ? `not the ack close: ${r.moderationId}`
+        : sess.protectedState !== 'aftercare' ? `did not move to aftercare: ${sess.protectedState}` : null });
+  }
+})();
+// A coherent continuation still gets the general safeguarding continuation, not the unclear
+// line (it resolves to a named action, so it is not "unresolved").
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('I dont know what to do', { action: 'safety_signpost', bucket: null }, { session: s, assert: (r) =>
+    r.moderationId === 'MOD_SAFEGUARDING_CONTINUATION' ? null : `unclear line stole the continuation: ${r.moderationId}` });
+})();
+// Ordinary state unchanged: the same unresolved inputs outside a protected state keep their
+// normal buckets (no unclear-continuation, no protected state introduced).
+(() => {
+  check('asdfghjkl', { action: 'gibberish', bucket: 'B14' }, { assert: (_r, _resp, s) => (s.protectedState === null ? null : `introduced a protected state: ${s.protectedState}`) });
+  check('banana', { action: 'fallback', bucket: 'B13' }, { assert: (_r, _resp, s) => (s.protectedState === null ? null : `introduced a protected state: ${s.protectedState}`) });
+  check('🎈', { action: 'emoji_only', bucket: 'B18' }, {});
+})();
+
 // ---- Task 16(a): in PROTECTED_ACTIVE a game, a buying and a joke request are ALL
 // blocked (the browser round covered these in AFTERCARE only). Each is held inside the
 // safety flow as the safeguarding continuation, never served. ----
