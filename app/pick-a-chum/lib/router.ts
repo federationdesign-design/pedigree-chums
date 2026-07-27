@@ -14,6 +14,12 @@ const HIDDEN_CEILING = 20;
 // The bark game breaks into English on the fifth consecutive bark exchange.
 const BARK_BREAK = 5;
 
+// Task 13: the bark game is reachable by name, not only by barking. Naming it, or a
+// short affirmation while it is the topic under discussion, enters the game (the dog
+// barks, using the existing mechanic; no new copy exists to explain it).
+const BARK_GAME_NAMES = ['bark game', 'barking game'];
+const BARK_ENTER_AFFIRM = ['lets do it', "let's do it", 'let us do it', 'lets go', 'go on', 'do it', 'go for it'];
+
 const STOP = new Set([
   'what', 'is', 'the', 'a', 'an', 'of', 'are', 'how', 'many', 'do', 'does', 'you', 'your', 'to',
   'in', 'which', 'who', 'where', 'when', 'me', 'my', 'i', 'it', 'this', 'that', 'can', 'on', 'and',
@@ -540,6 +546,23 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // signing"), which must not reach the buy path.
   if (hasAny(N, COMMERCIAL) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
+
+  // Bark game by name (Task 13). Naming the bark game, or a short affirmation while
+  // the bark game is the topic under discussion, enters the game: the dog barks (the
+  // existing mechanic, count 1). Checked before orientation/identity/fun/rules/FAQ and
+  // the games meta-route below, so "how do I play the bark game" is the bark game, not
+  // the card-game rules or the age FAQ. Kept below commercial. NOTE: no approved line
+  // EXPLAINS the bark game, so a named query is answered by a bark, not an explanation.
+  {
+    const lastWasBark = state.lastAction === 'bark' || state.lastAction === 'bark_break' || state.lastAction === 'bark_ack';
+    const enterBark = hasAny(N, BARK_GAME_NAMES) || (lastWasBark && BARK_ENTER_AFFIRM.some((a) => c === a));
+    if (enterBark) {
+      if (state.barkCompleted) return { layer: 15, layerName: 'The bark game', bucket: 'B20', action: 'bark_ack' };
+      const streak = (state.barkStreak ?? 0) + 1;
+      if (streak === BARK_BREAK) return { layer: 15, layerName: 'The bark game', bucket: 'B19', action: 'bark_break', barkCount: 1 };
+      return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark', barkCount: 1 };
+    }
   }
 
   // Layer 11: orientation and onboarding. Checked high (right after commercial)

@@ -283,7 +283,11 @@ check('whats in the pack', { bucket: 'B04', action: 'faq_answer' });
 const t10outcome = (input, r, resp) => buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input, resolution: r, response: resp, transferTo: '' }, '2026-01-01T00:00:00.000Z').outcome;
 // Part A: the five inputs FAQ002 answered on the lone token "game" no longer reach
 // FAQ002, and now report unmatched rather than a false 'answered'.
-['whats the game', 'tell me about the game', 'how long does a game take', 'whats the bark game', 'is there a game on the website'].forEach((inp) => {
+// NB: 'whats the bark game' was here at Task 10 (unmatched), but Task 13 gives it a
+// real home (the bark game), so it is no longer unmatched. It is asserted in the
+// Task 13 block instead (action 'bark', which is not a FAQ answer, so the FAQ002
+// catch-all guarantee still holds for it).
+['whats the game', 'tell me about the game', 'how long does a game take', 'is there a game on the website'].forEach((inp) => {
   check(inp, {}, { assert: (r, resp) => {
     if (r.faqId === 'FAQ002') return 'still answered by FAQ002';
     const oc = t10outcome(inp, r, resp);
@@ -305,6 +309,14 @@ check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { assert: (r) 
 // gets); "help me find a labrador" is unchanged (already that clarifier).
 check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('worrying you') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
 check('help me find a labrador', { action: 'clarifier' }, { assert: (r) => (r.moderationId === 'MOD_BARE_HELP' ? null : `changed from bare-help clarifier: ${r.moderationId}`) });
+
+// ---- Task 13: the bark game is reachable by name (blocks S06 turns 3 and 4) ----
+check('whats the bark game', { action: 'bark', layer: 15 });
+check('how do I play the bark game', { action: 'bark', layer: 15 });
+// "lets do it" enters the game when the bark game is the topic under discussion.
+(() => { const s = newSession(); check('whats the bark game', { action: 'bark' }, { session: s }); check('lets do it', { action: 'bark' }, { session: s }); })();
+// but a bare "lets do it" with no bark-game context must NOT bark.
+check('lets do it', {}, { assert: (r) => (r.action === 'bark' ? 'lets do it barked with no bark-game context' : null) });
 
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
