@@ -131,6 +131,8 @@ const ORIENTATION = [
   // orientation (layer 11) beats the TESTING converse route (layer 9): the two
   // overlap on the substring "does this work", and the earlier layer wins.
   'whats this', 'what can you do', 'where do i start', 'how does this work', 'how does it work',
+  // Task 22: apostrophe form of the bare-only 'whats this' trigger (Task 21 gap).
+  "what's this",
 ];
 
 // Orientation phrasings matched on the WHOLE normalised input only (Task 11a).
@@ -190,7 +192,7 @@ const IDENTITY_FAMILIES: { family: string; triggers: string[] }[] = [
   { family: 'F03', triggers: ['are you ai', 'a chatbot', 'are you a robot', 'a robot', 'ai things', 'chatgpt', 'a computer', 'is this a computer', 'computer program', 'are you software', 'software'] },
   { family: 'F04', triggers: ['human writing', 'writing these', 'controlling you', 'person behind', 'behind this', 'operated by', 'being operated', 'typing for you'] },
   { family: 'F05', triggers: ['prewritten', 'answers automatic', 'automatic', 'same answer', 'saying random things', 'random things', 'making these answers', 'all programmed', 'programmed', 'automated'] },
-  { family: 'F06', triggers: ['understand me', 'actually read this', 'read this', 'hear me', 'are you listening', 'you listening', 'understand english', 'responding to me', 'what i am saying', 'what im saying'] },
+  { family: 'F06', triggers: ['understand me', 'actually read this', 'read this', 'hear me', 'are you listening', 'you listening', 'understand english', 'responding to me', 'what i am saying', 'what im saying', "what i'm saying"] },
   { family: 'F07', triggers: ['cartoon dog', 'cartoon', 'just a picture', 'really happening'] },
   { family: 'F08', triggers: ['an actual border collie', 'actual border collie', 'an actual labrador', 'actual labrador', 'an actual border terrier', 'actual border terrier', 'an actual boxer', 'actual boxer'] },
   { family: 'F09', triggers: ['think for yourself', 'have a brain', 'a brain', 'are you intelligent', 'intelligent', 'smarter than me'] },

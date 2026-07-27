@@ -10,12 +10,14 @@ export interface Normalised {
 
 export function normalise(input: string): Normalised {
   const original = (input ?? '').trim();
-  // Collapse any run of 3+ identical characters to one before matching, so
-  // stretched words ("pleeeassssee" -> "pleasee", "helppppp" -> "help") match
-  // their base form. Children stretch words constantly. Runs of 2 (real double
-  // letters like "hello", "good") are left alone. `original` is untouched; it is
-  // what any echo renders.
-  const lower = original.toLowerCase().replace(/(.)\1{2,}/gu, '$1');
+  // Unify the curly apostrophe U+2019 (what iOS/macOS autocorrect produces for
+  // "I'm", "can't") to the straight U+0027 the trigger lists are written with, so
+  // phone input matches. This is character UNIFICATION, not stripping: the
+  // apostrophe stays, so "I'll" -> "i'll" (never "ill") and the dog-illness trap
+  // cannot appear. `original` is untouched; only the matched forms are folded.
+  // Then collapse any run of 3+ identical characters ("pleeeassssee" -> "pleasee")
+  // so stretched words match their base form (runs of 2 like "hello" are kept).
+  const lower = original.toLowerCase().replace(/’/g, "'").replace(/(.)\1{2,}/gu, '$1');
   const compact = lower.replace(/\s+/g, ' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim();
   const words = lower.match(/[a-z]+/g) ?? [];
   const letters = (lower.match(/[a-z]/g) ?? []).join('');

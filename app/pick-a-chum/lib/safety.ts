@@ -66,6 +66,8 @@ const SELF_HARM = [
   'i want it all to stop', "i can't do this anymore", 'cant do this anymore', 'mental issue',
   'mental health', 'mental health problem', 'depressed', 'depression', 'anxiety', 'panic attacks',
   'counselling', 'therapist', 'need to see someone',
+  // Task 22: apostrophe forms of triggers that only had the bare spelling (Task 21 gap).
+  "what's the point of anything", "what's the point in anything", "don't want to wake up", "can't do this anymore",
 ];
 
 const SAFEGUARDING = [
@@ -76,6 +78,8 @@ const SAFEGUARDING = [
   'smacks me', 'grabs me', 'makes me uncomfortable', 'touches my private parts', 'touched my private parts',
   'makes me take my clothes off', 'comes into my room', 'says i will get in trouble', 'says it is our secret',
   "i don't feel safe at home", 'dont feel safe at home',
+  // Task 22: apostrophe form of the bare-only trigger (Task 21 gap).
+  "don't feel safe at home",
 ];
 
 const GENERAL_DISTRESS = [
@@ -83,6 +87,11 @@ const GENERAL_DISTRESS = [
   'im scared', 'im really scared', 'something bad happened', 'i am not safe', 'im not safe',
   "i can't tell anyone", 'cant tell anyone', 'please answer me', 'im worried', 'please help me',
   'pls help me', 'plz help me',
+  // Task 22: apostrophe forms of triggers that only had the bare spelling (Task 21 gap).
+  // "i'm not safe" is added so both forms share ONE moderation id, which the Task 22
+  // meta-assertion enforces (bare "im not safe" is general distress; without this the
+  // apostrophe form fell through to the safeguarding "not safe" trigger).
+  "i'm scared", "i'm really scared", "i'm worried", "can't tell anyone", "i'm not safe",
 ];
 
 const BARE_HELP = ['help me', 'need help', 'i need help'];
@@ -383,3 +392,12 @@ const SADNESS_CLEAR = [
 export function detectSadnessClear(n: Normalised): boolean {
   return hasAny(apostropheFold(n), SADNESS_CLEAR);
 }
+
+// Task 22: every hand-authored trigger phrase that feeds a safety moderation id.
+// Exposed so the harness meta-assertion can prove both the bare and the apostrophe
+// form of each contractible trigger resolve to the SAME moderation id, failing if a
+// future trigger is ever added in only one spelling (the Task 21 apostrophe gap).
+export const SAFETY_TRIGGER_PHRASES: string[] = [
+  ...MEDICAL, ...HARM_OTHERS, ...HARM_ANIMAL, ...SELF_HARM, ...SAFEGUARDING, ...GENERAL_DISTRESS,
+  ...CONTENT_SEEKING, ...ANATOMY, ...ABUSE, ...BARE_HELP, ...REPORTING_FRAME, ...SADNESS_PREDICATES,
+];

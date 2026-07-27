@@ -37,6 +37,7 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
 const { buildRow } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
+const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
 let pass = 0;
 let fail = 0;
@@ -562,6 +563,52 @@ check('I want to die', { layer: 1, action: 'safety_signpost' }, { assert: (r) =>
 check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
 check('tell me about beagles', { bucket: 'B05', action: 'breed_page' });
 check('woof', { action: 'bark' });
+
+// ---- Task 22: apostrophe gap closed. Both forms of all eleven phrases reach safety,
+// in three spellings each: bare, straight U+0027 and curly U+2019 (iOS autocorrect). ----
+const curly22 = (s) => s.replace(/'/g, '’');
+const T22_SAFETY = [
+  ["what's the point of anything", 'MOD_SELF_HARM'], ["what's the point in anything", 'MOD_SELF_HARM'],
+  ["i'm scared", 'MOD_GENERAL_DISTRESS'], ["i'm really scared", 'MOD_GENERAL_DISTRESS'], ["i'm worried", 'MOD_GENERAL_DISTRESS'],
+  ["don't want to wake up", 'MOD_SELF_HARM'], ["can't do this anymore", 'MOD_SELF_HARM'],
+  ["don't feel safe at home", 'MOD_SAFEGUARDING'], ["can't tell anyone", 'MOD_GENERAL_DISTRESS'],
+];
+const T22_ROUTER = [["what's this", 'B15', 'orientation'], ["what i'm saying", 'B16', 'identity']];
+for (const [p, mod] of T22_SAFETY)
+  for (const form of [p.replace(/'/g, ''), p, curly22(p)])
+    check(form, { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === mod ? null : `want ${mod}, got ${r.moderationId}`) });
+for (const [p, bucket, action] of T22_ROUTER)
+  for (const form of [p.replace(/'/g, ''), p, curly22(p)]) check(form, { bucket, action });
+// The i'll trap must NOT reappear: folding curly->straight keeps the apostrophe, so
+// "I'll" never becomes "ill", and the dog-illness answer stays for the real thing.
+const notHealth22 = (r) => (r.action === 'health_answer' ? 'reached the dog-health route' : null);
+check("I'll tell someone", {}, { assert: notHealth22 });
+check(curly22("I'll tell someone"), {}, { assert: notHealth22 });
+check("I'll tell my teacher", {}, { assert: notHealth22 });
+check('dog is ill', { action: 'health_answer' });
+check('my dog is ill', { action: 'health_answer' });
+// Meta-assertion: every safety-list phrase with a contractible word must resolve BOTH
+// its bare and apostrophe form to the same moderation id. Fails if a future trigger is
+// ever added in only one spelling (guards the Task 21 gap from reopening).
+(() => {
+  const PAIRS = [['im', "i'm"], ['dont', "don't"], ['cant', "can't"], ['wont', "won't"], ['didnt', "didn't"], ['doesnt', "doesn't"], ['isnt', "isn't"], ['thats', "that's"], ['whats', "what's"], ['youre', "you're"], ['ive', "i've"], ['ill', "i'll"], ['theres', "there's"], ['wouldnt', "wouldn't"], ['couldnt', "couldn't"], ['shouldnt', "shouldn't"]];
+  const bareRe = new RegExp('\\b(' + PAIRS.map((p) => p[0]).join('|') + ')\\b');
+  const aposForms = PAIRS.map((p) => p[1]);
+  const hasC = (s) => bareRe.test(s) || aposForms.some((a) => s.includes(a));
+  const toBare = (s) => s.replace(/[’']/g, '');
+  const toApos = (s) => { let r = s; for (const [b, a] of PAIRS) r = r.replace(new RegExp('\\b' + b + '\\b', 'g'), a); return r; };
+  const modOf = (inp) => submit(data, newSession(), inp).resolution.moderationId ?? '-';
+  const bad = [];
+  for (const phrase of SAFETY_TRIGGER_PHRASES) {
+    if (!hasC(phrase)) continue;
+    const b = toBare(phrase), a = toApos(b);
+    if (b === a) continue;
+    if (modOf(b) !== modOf(a)) bad.push(`"${phrase}" ${modOf(b)}/${modOf(a)}`);
+  }
+  const ok = bad.length === 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'META: safety contractibles both forms same mod', layer: 1, bucket: '-', action: 'meta', note: ok ? '' : bad.join(' | ') });
+})();
 
 // ---- Task 3: clarifier answer-capture, and never fire the clarifier twice ----
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('the website', { action: 'orientation' }, { session: s }); })();
