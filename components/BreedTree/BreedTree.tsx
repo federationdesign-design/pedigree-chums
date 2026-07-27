@@ -2237,7 +2237,7 @@ export default function BreedTree({
               and to the left), then snapped it to the rim. They now fade in with
               the labels, already at their resting spot on the lower-right rim,
               which is exactly where the physics bodies spawn. */}
-          <g ref={badgesRef} style={{ display: dockAside ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
+          <g ref={badgesRef} style={{ display: dockAside && !learning ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
             {badgePcts.map((item, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
@@ -2625,6 +2625,23 @@ export default function BreedTree({
           aria-hidden="true"
           className={`${styles.learnWash}${learning ? " " + styles.learnWashOn : learnPeek ? " " + styles.learnWashPeek : ""}`}
         />
+      )}
+      {/* Big PLAY in the bottom-left of the learn area: jump straight from
+          reading into the round. */}
+      {dockAside && gravity && learning && (
+        <button
+          type="button"
+          className={styles.learnPlay}
+          onClick={() => {
+            setLearnPeek(false);
+            setLearning(false);
+            setStarted(true);
+            runFallRef.current?.();
+          }}
+          aria-label="Play"
+        >
+          PLAY
+        </button>
       )}
       {britainOpen && (
         <BritainMessage

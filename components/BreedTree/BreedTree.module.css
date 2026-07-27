@@ -610,3 +610,23 @@
   0% { opacity: 0; transform: scale(0.4); }
   100% { opacity: 1; transform: scale(1); }
 }
+
+/* Big white PLAY, bottom-left of the learn area, to jump into the round. */
+.learnPlay {
+  position: absolute;
+  left: 4%;
+  bottom: 3%;
+  z-index: 16;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: #ffffff;
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2.6rem, 20vw, 11rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  pointer-events: auto;
+  text-shadow: 0 4px 26px rgba(0, 0, 0, 0.55);
+}
