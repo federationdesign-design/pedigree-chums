@@ -2850,6 +2850,19 @@ export default function BreedTree({
           className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
         />
       )}
+      {/* PLAY sweeps white to yellow on the very same diagonal and at the same
+          rate as the level slides in: a yellow copy of the word clipped by the
+          identical seam, revealed together with the pit scene. Replaces the old
+          separate hover colour. */}
+      {dockAside && gravity && learning && (
+        <div
+          aria-hidden="true"
+          className={styles.learnPlaySweep}
+          style={{ clipPath: seamClip(started || (learning && playPeek) ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
+        >
+          <span className={styles.learnPlaySweepWord}>PLAY</span>
+        </div>
+      )}
       {/* Big PLAY in the bottom-left of the learn area: jump straight from
           reading into the round. */}
       {dockAside && gravity && learning && (
@@ -2858,6 +2871,8 @@ export default function BreedTree({
           className={styles.learnPlay}
           onMouseEnter={() => setPlayPeek(true)}
           onMouseLeave={() => setPlayPeek(false)}
+          onFocus={() => setPlayPeek(true)}
+          onBlur={() => setPlayPeek(false)}
           onClick={() => {
             setLearnPeek(false);
             setStartPeek(false);
