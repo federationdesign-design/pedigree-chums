@@ -2920,31 +2920,31 @@ export default function BreedTree({
               <span className={styles.cPortraitWrap}>
                 <img
                   className={styles.cPortrait}
-                  src={bust((ancestryFor?.image ?? rootImage ?? nodes[0].data.img) as string)}
+                  src={bust((rootImage ?? nodes[0].data.img) as string)}
                   alt={nodes[0].data.name}
                   draggable={false}
                 />
-                {headTag && (
+                {rootTag && (
                   <span
                     className={styles.cStatus}
-                    style={{ background: TAG_STYLE[headTag].bg }}
-                    title={STATUS_LABEL[headTag]}
-                    aria-label={STATUS_LABEL[headTag]}
+                    style={{ background: TAG_STYLE[rootTag].bg }}
+                    title={STATUS_LABEL[rootTag]}
+                    aria-label={STATUS_LABEL[rootTag]}
                   />
                 )}
               </span>
               <span className={styles.cHeadText}>
-                <span className={styles.cHeadName}>{ancestryFor ? ancestryFor.name : nodes[0].data.name}</span>
+                <span className={styles.cHeadName}>{nodes[0].data.name}</span>
                 {/* The relation line sits directly under the level dog's name (the
                     card title), naming the link to the selected circle. Absent at
                     root, since then there is nothing selected to relate to. */}
-                {!ancestryFor && shown !== nodes[0] && (
+                {(ancestryFor || shown !== nodes[0]) && (
                   <span className={styles.cRelated}>is related to:</span>
                 )}
               </span>
             </div>
           )}
-          {!ancestryFor && <span className={styles.cName}>{shown.data.name}</span>}
+          <span className={styles.cName}>{ancestryFor ? ancestryFor.name : shown.data.name}</span>
           {!ancestryFor && shownShare !== null && shown.parent && !learning && (
             <span className={styles.cShare}>
               {shownShare}% of {shown.parent.data.name}
@@ -2968,6 +2968,18 @@ export default function BreedTree({
               <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
             </div>
           )}
+          {/* Chum picked: how much of that pack dog traces to the level circle
+              currently shown, from its own ancestry breakdown. */}
+          {ancestryFor && dockAside && shown !== nodes[0] && (() => {
+            const share = ancestryRows.find((a) => a.name === shown.data.name);
+            return share ? (
+              <div className={styles.cBreak}>
+                <div className={styles.cBreakBig}>{ancestryFor.name} is {share.pct}% {shown.data.name}</div>
+                <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
+                <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
+              </div>
+            ) : null;
+          })()}
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
