@@ -646,8 +646,8 @@ export default function BreedTree({
   const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
   const [trainHidden, setTrainHidden] = useState(false);
-  const [ancPos, setAncPos] = useState<{ left: number; top: number } | null>(null);
-  const [trainPos, setTrainPos] = useState<{ left: number; top: number } | null>(null);
+  const [ancPos, setAncPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [trainPos, setTrainPos] = useState<{ left: number; top: number; width: number } | null>(null);
   // The blue box can be picked up and moved, the same as the cards on a chum
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
@@ -2119,16 +2119,19 @@ export default function BreedTree({
     const r = asideRef.current?.getBoundingClientRect();
     const vw = typeof window === "undefined" ? 390 : window.innerWidth;
     const vh = typeof window === "undefined" ? 844 : window.innerHeight;
-    const cardW = Math.min(vw * 0.88, 330);
-    const gap = 12;
+    // Same width as the main blue box (the docked caption is 80% of the aside).
+    const boxW = r ? r.width * 0.8 : Math.min(vw * 0.6, 300);
+    const boxLeft = r ? r.left + r.width * 0.1 : vw * 0.2;
+    const boxRight = boxLeft + boxW;
     const boxTop = r ? r.top : 60;
-    const boxRight = r ? r.right : vw * 0.5;
-    const boxLeft = r ? r.left : vw * 0.5;
+    const cardW = boxW;
+    const gap = 12;
     let left = boxRight + gap + index * 22;
     if (left + cardW > vw - 8) left = boxLeft - cardW - gap - index * 22;
     if (left < 8) left = Math.max(8, vw - cardW - 8);
-    const top = Math.max(8, Math.min(vh - 240, boxTop + index * 44));
-    return { left: Math.round(left), top: Math.round(top) };
+    // Always below the 25% mark of the page; free to bleed off the bottom.
+    const top = Math.max(Math.round(vh * 0.25), Math.round(boxTop + index * 44));
+    return { left: Math.round(left), top, width: Math.round(cardW) };
   };
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
@@ -2988,7 +2991,7 @@ export default function BreedTree({
       {dockAside && ancestryFor && !ancHidden && ancestryRows.length > 0 && (
         <LearnDragCard
           className={styles.ancCard}
-          style={ancPos ? { left: ancPos.left, top: ancPos.top, right: "auto", bottom: "auto" } : undefined}
+          style={ancPos ? { left: ancPos.left, top: ancPos.top, width: ancPos.width, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Ancestry of ${ancestryFor.name}`}
           icon={ICONS.ancestry}
           title={ancestryFor.name}
@@ -3010,7 +3013,7 @@ export default function BreedTree({
       {dockAside && ancestryFor && !trainHidden && trainingDifficulty[ancestryFor.slug] && (
         <LearnDragCard
           className={styles.trainCard}
-          style={trainPos ? { left: trainPos.left, top: trainPos.top, right: "auto", bottom: "auto" } : undefined}
+          style={trainPos ? { left: trainPos.left, top: trainPos.top, width: trainPos.width, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Training for ${ancestryFor.name}`}
           icon={ICONS.training}
           title="Training"

@@ -43,7 +43,7 @@ export default function TrainingCard({ data, compact = false }: Props) {
 
       {/* Arc gauge */}
       <div className={styles.gaugeWrap}>
-        <svg viewBox="0 0 260 110" width={compact ? 208 : 260} height={compact ? 88 : 110} aria-label={`Training difficulty gauge: ${score} out of 5`}>
+        <svg viewBox="0 0 260 110" width={compact ? 208 : 260} height={compact ? 88 : 110} style={compact ? { maxWidth: "100%", height: "auto" } : undefined} aria-label={`Training difficulty gauge: ${score} out of 5`}>
           {/* Track arc */}
           <path
             d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 180, 360)}

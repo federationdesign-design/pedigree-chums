@@ -22,10 +22,13 @@
   gap: 8px;
 }
 
-.labelPillCompact {
-  font-size: 0.45rem;
-  padding: 2px 9px;
-  letter-spacing: 0.05em;
+.labelPill.labelPillCompact {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-weight: 700;
+  font-size: 0.5rem;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .labelPill {
   display: inline-block;
