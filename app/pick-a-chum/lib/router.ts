@@ -85,22 +85,30 @@ const RULES = [
   'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
 ];
 
-// Complaint / human-contact intent. Routes to the approved FAQ012 human-contact
-// answer (nothing reached it before). Checked above the rules/nav/FAQ layers so a
-// complaint ("something offensive on the cards") is not answered as a product
-// description or swallowed by navigation.
+// Task 18: complaint / report / human-escalation intent. Routes to the approved
+// FAQ015 complaint answer. Checked above the rules/nav/FAQ layers so a complaint
+// ("something offensive on the cards") is not answered as a product description or
+// swallowed by navigation. General contact enquiries are a SEPARATE list below and
+// keep FAQ012 (the general enquiry answer).
 const COMPLAINT_CONTACT = [
   'complaint', 'make a complaint', 'i have a complaint', 'speak to a real person', 'real person',
   'speak to somebody', 'talk to a human', 'is there a human', 'report something', 'offensive',
-  'wrong information', 'correct information', 'who runs this', 'write to you', 'po box',
-  'email address', 'contact you', 'parent contact',
+  'wrong information', 'correct information',
   // Task 17 (S11): a visitor escalating to a human, or making a formal report, must reach
-  // the human-contact answer, not the pack-contents FAQ or the fallback. Specific
-  // multiword phrases only, so the six product/pack questions in the regression guard
-  // (pack contents, card count, child-safety, materials, buying, packaging plastic) are
-  // never pulled in.
+  // the complaint answer, not the pack-contents FAQ or the fallback. Specific multiword
+  // phrases only, so the six product/pack questions in the regression guard are never
+  // pulled in.
   'serious statement', 'make a statement', 'statement to you', 'tell a person', 'tell a real person',
   'speak to a person', 'talk to a person', 'speak to a human', 'report it to someone', 'want to report',
+];
+
+// General contact enquiry (not a complaint): keeps the approved FAQ012 answer. Checked
+// after COMPLAINT_CONTACT (so a complaint that also names contact still routes to FAQ015)
+// and ABOVE navigation, so "how do I contact you" reaches FAQ012 rather than the DST013
+// contact-page nav link (which shares the 'contact you' alias). These are the general
+// contact terms that used to live in COMPLAINT_CONTACT when it pointed at FAQ012.
+const CONTACT_ENQUIRY = [
+  'contact you', 'email address', 'write to you', 'po box', 'parent contact', 'who runs this',
 ];
 
 // Orientation / onboarding (bucket B15). First-time visitors who do not yet know
@@ -644,9 +652,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
   }
 
-  // Complaint / human-contact: route to the approved FAQ012 human-contact answer.
+  // Task 18: complaint / report / escalation -> the approved FAQ015 complaint answer.
   // Above rules/nav/FAQ so a complaint is not answered as product copy.
   if (hasAny(N, COMPLAINT_CONTACT)) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ015' };
+  }
+  // General contact enquiry -> the approved FAQ012 general enquiry answer. Checked after
+  // COMPLAINT_CONTACT and above navigation, so "how do I contact you" stays FAQ012 and
+  // does not become the DST013 contact-page nav link.
+  if (hasAny(N, CONTACT_ENQUIRY)) {
     return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ012' };
   }
 

@@ -462,12 +462,12 @@ check('he keeps calling me an idiot', { layer: 1, action: 'safety_signpost' }, {
 // Direct abuse (no reporting frame) is still the boundary, unchanged:
 check('you are stupid and I hate this', { layer: 1, action: 'safety_boundary' }, { assert: (r) => (r.moderationId === 'MOD_ABUSE' ? null : `direct abuse misrouted to ${r.moderationId}`) });
 
-// ---- Task 2: complaint / human-contact intent -> approved FAQ012 answer ----
-check('I found something deeply offensive on the cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `complaint not routed to FAQ012, got ${r.faqId}`) });
-check('can I speak to a real person', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
-check('I have a complaint', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
+// ---- Task 2 / Task 18: complaint / report / escalation -> approved FAQ015 answer ----
+check('I found something deeply offensive on the cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ015' ? null : `complaint not routed to FAQ015, got ${r.faqId}`) });
+check('can I speak to a real person', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ015' ? null : `not FAQ015, got ${r.faqId}`) });
+check('I have a complaint', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ015' ? null : `not FAQ015, got ${r.faqId}`) });
 
-// ---- Task 17: complaints reach a human (FAQ012), above the FAQ layer (S11) ----
+// ---- Task 17 / Task 18: complaints reach FAQ015, above the FAQ layer (S11) ----
 // The four browser-failure inputs must ALL reach the human-contact answer, never the
 // generic repair, the pack-contents FAQ, or the fallback.
 for (const inp of [
@@ -477,7 +477,7 @@ for (const inp of [
   'Is there not a real person I can speak to?',
 ]) {
   check(inp, { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) =>
-    r.faqId !== 'FAQ012' ? `did not reach the human-contact answer: ${r.faqId ?? r.action}`
+    r.faqId !== 'FAQ015' ? `did not reach the complaint answer: ${r.faqId ?? r.action}`
       : resp.text.toLowerCase().includes('try a full question') ? 'told the visitor to try a full question' : null });
 }
 // The S11 script as one session: a real human contact route within two turns, every turn
@@ -489,8 +489,8 @@ for (const inp of [
   script.forEach((inp, i) => {
     check(inp, { bucket: 'B04', action: 'faq_answer' }, { session: s, assert: (r, resp) => {
       if (resp.text.toLowerCase().includes('try a full question')) return `turn ${i + 1} told the visitor to try a full question`;
-      if (r.faqId === 'FAQ012' && humanBy === 0) humanBy = i + 1;
-      return r.faqId === 'FAQ012' ? null : `turn ${i + 1} left the complaint: ${r.faqId ?? r.action}`;
+      if (r.faqId === 'FAQ015' && humanBy === 0) humanBy = i + 1;
+      return r.faqId === 'FAQ015' ? null : `turn ${i + 1} left the complaint: ${r.faqId ?? r.action}`;
     } });
   });
   const ok = humanBy > 0 && humanBy <= 2;
@@ -505,6 +505,17 @@ check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, {
 check('what are the cards made of', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `materials moved: ${r.faqId ?? r.action}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallback' });
+
+// ---- Task 18: complaint route repointed to FAQ015; FAQ012 stays the general enquiry
+// answer. These six must reach exactly what they reached before the repoint. The one to
+// watch is "how do I contact you": it stays FAQ012 (via the CONTACT_ENQUIRY route), not
+// FAQ015 and not the DST013 contact nav link. ----
+check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact enquiry moved off FAQ012: ${r.faqId ?? r.action}`) });
+check('whats your email', { bucket: 'B06', action: 'gk_unknown' });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
+check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
+check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
 // ---- Task 20: personal-sadness pair. L1 gentle redirect (no latch); L2 enters PROTECTED_ACTIVE ----
 const isL1 = (r) => r.moderationId === 'MOD_PERSONAL_SADNESS_L1';
@@ -626,9 +637,9 @@ check('help me', { action: 'clarifier' });
 // ---- Fix 3: complaint follow-ups stay in the complaint context ----
 (() => {
   const s = newSession();
-  check('I have a complaint', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId}`) });
-  check('the labrador one', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ012' ? null : `complaint follow-up lost: ${r.faqId}`) });
-  check('is there an email', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ012' ? null : `email follow-up lost: ${r.faqId}`) });
+  check('I have a complaint', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ015' ? null : `not FAQ015: ${r.faqId}`) });
+  check('the labrador one', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ015' ? null : `complaint follow-up lost: ${r.faqId}`) });
+  check('is there an email', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ015' ? null : `email follow-up lost: ${r.faqId}`) });
 })();
 
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----

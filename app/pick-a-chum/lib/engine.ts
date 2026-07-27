@@ -76,10 +76,10 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   }
 
   // Complaint context: a weak follow-up after a complaint answer stays in the
-  // complaint (the human-contact FAQ), rather than falling to the catch-all. Not
+  // complaint (the FAQ015 answer, Task 18), rather than falling to the catch-all. Not
   // applied inside a protected state (the S12 machine owns those turns).
   if (session.lastWasComplaint && !wasProtected && WEAK_AFTER_COMPLAINT.has(resolution.action)) {
-    resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ012' };
+    resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ015' };
   }
 
   const response = assemble(resolution, data, n, session);
@@ -133,7 +133,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.personalSadnessCount = 0;
   }
 
-  session.lastWasComplaint = resolution.faqId === 'FAQ012'; // complaint follow-up context
+  session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
   if (resolution.breedSlug) session.lastBreedSlug = resolution.breedSlug; // carry breed for follow-ups
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 
