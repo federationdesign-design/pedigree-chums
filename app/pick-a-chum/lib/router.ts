@@ -94,6 +94,13 @@ const COMPLAINT_CONTACT = [
   'speak to somebody', 'talk to a human', 'is there a human', 'report something', 'offensive',
   'wrong information', 'correct information', 'who runs this', 'write to you', 'po box',
   'email address', 'contact you', 'parent contact',
+  // Task 17 (S11): a visitor escalating to a human, or making a formal report, must reach
+  // the human-contact answer, not the pack-contents FAQ or the fallback. Specific
+  // multiword phrases only, so the six product/pack questions in the regression guard
+  // (pack contents, card count, child-safety, materials, buying, packaging plastic) are
+  // never pulled in.
+  'serious statement', 'make a statement', 'statement to you', 'tell a person', 'tell a real person',
+  'speak to a person', 'talk to a person', 'speak to a human', 'report it to someone', 'want to report',
 ];
 
 // Orientation / onboarding (bucket B15). First-time visitors who do not yet know

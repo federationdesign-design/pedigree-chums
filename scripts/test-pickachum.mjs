@@ -419,6 +419,25 @@ check('can I play something', { bucket: 'B17', action: 'fun_tease' });
   }
 })();
 
+// ---- Task 16(a): in PROTECTED_ACTIVE a game, a buying and a joke request are ALL
+// blocked (the browser round covered these in AFTERCARE only). Each is held inside the
+// safety flow as the safeguarding continuation, never served. ----
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('can we play a game', {}, { session: s, notAction: 'fun_tease', assert: (r) => (r.action === 'safety_signpost' ? null : `game not held in the safety flow: ${r.action}`) });
+})();
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('how much is the game', {}, { session: s, notAction: 'open_discount_popup', assert: (r) => (r.action === 'safety_signpost' ? null : `buying not held in the safety flow: ${r.action}`) });
+})();
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('tell me a joke', {}, { session: s, notAction: 'transfer', assert: (r) => (r.action === 'safety_signpost' ? null : `joke not held in the safety flow: ${r.action}`) });
+})();
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
@@ -446,6 +465,45 @@ check('you are stupid and I hate this', { layer: 1, action: 'safety_boundary' },
 check('I found something deeply offensive on the cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `complaint not routed to FAQ012, got ${r.faqId}`) });
 check('can I speak to a real person', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
 check('I have a complaint', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012, got ${r.faqId}`) });
+
+// ---- Task 17: complaints reach a human (FAQ012), above the FAQ layer (S11) ----
+// The four browser-failure inputs must ALL reach the human-contact answer, never the
+// generic repair, the pack-contents FAQ, or the fallback.
+for (const inp of [
+  'I have a complaint',
+  'I want to make a serious statement to you',
+  'I found something deeply offensive on the cards and I think it should be removed',
+  'Is there not a real person I can speak to?',
+]) {
+  check(inp, { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) =>
+    r.faqId !== 'FAQ012' ? `did not reach the human-contact answer: ${r.faqId ?? r.action}`
+      : resp.text.toLowerCase().includes('try a full question') ? 'told the visitor to try a full question' : null });
+}
+// The S11 script as one session: a real human contact route within two turns, every turn
+// on the human-contact answer, and the visitor never told to try a full question.
+(() => {
+  const s = newSession();
+  const script = ['I have a complaint', 'there is wrong information on one of your cards', 'the labrador one', 'I want to tell a person about it', 'is there an email'];
+  let humanBy = 0;
+  script.forEach((inp, i) => {
+    check(inp, { bucket: 'B04', action: 'faq_answer' }, { session: s, assert: (r, resp) => {
+      if (resp.text.toLowerCase().includes('try a full question')) return `turn ${i + 1} told the visitor to try a full question`;
+      if (r.faqId === 'FAQ012' && humanBy === 0) humanBy = i + 1;
+      return r.faqId === 'FAQ012' ? null : `turn ${i + 1} left the complaint: ${r.faqId ?? r.action}`;
+    } });
+  });
+  const ok = humanBy > 0 && humanBy <= 2;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'S11: human contact within two turns', layer: 4, bucket: 'B04', action: 'faq_answer', note: ok ? '' : `human contact first reached at turn ${humanBy}` });
+})();
+// Regression guard: the complaint route sits above FAQ, so it is greedy. These six
+// product / pack questions must NOT move bucket into the complaint route.
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack contents moved: ${r.faqId ?? r.action}`) });
+check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId ?? r.action}`) });
+check('what are the cards made of', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `materials moved: ${r.faqId ?? r.action}`) });
+check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallback' });
 
 // ---- Task 3: clarifier answer-capture, and never fire the clarifier twice ----
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('the website', { action: 'orientation' }, { session: s }); })();
