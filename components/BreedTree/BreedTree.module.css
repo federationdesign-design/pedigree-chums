@@ -646,12 +646,16 @@
   outline-offset: 2px;
 }
 .ancCard {
-  position: relative;
-  margin-top: 12px;
+  position: fixed;
+  top: 6%;
+  right: 4%;
+  width: min(88vw, 330px);
+  z-index: 21;
+  touch-action: none;
   background: #0a2a3f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 12px 0;
+  padding: 0 0 10px;
   animation: ancIn 260ms cubic-bezier(0.22, 0.9, 0.3, 1);
 }
 @keyframes ancIn {
@@ -695,30 +699,40 @@
   opacity: 0.85;
 }
 .ancRow {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px 34px;
   align-items: center;
-  padding: 7px 16px 3px;
+  gap: 8px;
+  padding: 3px 14px;
 }
 .ancName {
   font-family: var(--font-body, "Montserrat", system-ui);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #ffffff;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ancBarWrap {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ancBar {
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  border-radius: 999px;
+  transition: width 0.4s ease;
 }
 .ancPct {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: var(--yellow, #ffd23e);
-  letter-spacing: 0.03em;
-}
-.ancBar {
-  height: 4px;
-  background: var(--yellow, #ffd23e);
-  border-radius: 2px;
-  margin: 0 16px 4px;
-  min-width: 6px;
-  transition: width 0.4s ease;
+  letter-spacing: 0.02em;
+  text-align: right;
 }
 .ancDisclaimer {
   font-family: var(--font-body, "Montserrat", system-ui);
@@ -761,10 +775,55 @@
 }
 .learnCards .ancCard { margin-top: 0; }
 .trainCard {
-  position: relative;
+  position: fixed;
+  bottom: 6%;
+  right: 4%;
+  width: min(88vw, 330px);
+  z-index: 21;
+  touch-action: none;
   background: #0a2a3f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 6px 10px 10px;
+  padding: 0 6px 8px;
   animation: ancIn 260ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.cardHead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 34px 6px 14px;
+  cursor: grab;
+}
+.cardIcon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--yellow, #ffd23e);
+  display: inline-flex;
+}
+.cardIcon svg { width: 100%; height: 100%; }
+.cardHeadText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.cardTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+.cardSub {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: #ffffff;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -8,6 +8,7 @@ import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeM
 import { descendantPackBreeds, ancestryBreakdown } from "../../data/lineageArchive";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import trainingDifficulty from "../../data/trainingDifficulty";
+import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
@@ -387,6 +388,72 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   root.x = 0;
   root.y = 0;
   root.r = FW / (2 * PAD);
+}
+
+function LearnDragCard({
+  className,
+  ariaLabel,
+  icon,
+  title,
+  subtitle,
+  onClose,
+  closeLabel,
+  children,
+}: {
+  className: string;
+  ariaLabel: string;
+  icon?: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  onClose: () => void;
+  closeLabel: string;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ sx: number; sy: number; bx: number; by: number } | null>(null);
+  const off = useRef({ x: 0, y: 0 });
+  const down = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest("button, a")) return;
+    drag.current = { sx: e.clientX, sy: e.clientY, bx: off.current.x, by: off.current.y };
+    ref.current?.setPointerCapture(e.pointerId);
+  };
+  const move = (e: React.PointerEvent) => {
+    if (!drag.current) return;
+    off.current = {
+      x: drag.current.bx + (e.clientX - drag.current.sx),
+      y: drag.current.by + (e.clientY - drag.current.sy),
+    };
+    if (ref.current) ref.current.style.transform = `translate3d(${off.current.x}px, ${off.current.y}px, 0)`;
+  };
+  const up = () => {
+    drag.current = null;
+  };
+  return (
+    <div
+      ref={ref}
+      className={className}
+      role="group"
+      aria-label={ariaLabel}
+      onPointerDown={down}
+      onPointerMove={move}
+      onPointerUp={up}
+    >
+      <div className={styles.cardHead}>
+        {icon ? <span className={styles.cardIcon}>{icon}</span> : null}
+        <span className={styles.cardHeadText}>
+          <span className={styles.cardTitle}>{title}</span>
+          {subtitle ? <span className={styles.cardSub}>{subtitle}</span> : null}
+        </span>
+        <button type="button" className={styles.ancClose} onClick={(e) => { e.stopPropagation(); onClose(); }} aria-label={closeLabel}>
+          <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 12, height: 12 }}>
+            <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+            <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+      {children}
+    </div>
+  );
 }
 
 export default function BreedTree({
@@ -2873,47 +2940,44 @@ export default function BreedTree({
           )}
         </div>
       </div>
-      {dockAside && ancestryFor && (
-        <div className={styles.learnCards}>
-          {!ancHidden && ancestryRows.length > 0 && (
-            <div className={styles.ancCard} role="group" aria-label={`Ancestry of ${ancestryFor.name}`}>
-              <button type="button" className={styles.ancClose} onClick={() => setAncHidden(true)} aria-label="Close ancestry">
-                <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 12, height: 12 }}>
-                  <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                  <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                </svg>
-              </button>
-              <div className={styles.ancTitle}>Ancestry</div>
-              <div className={styles.ancDog}>{ancestryFor.name}</div>
-              {ancestryRows.map((a) => (
-                <div key={a.name}>
-                  <div className={styles.ancRow}>
-                    <span className={styles.ancName}>{a.name}</span>
-                    <span className={styles.ancPct}>{a.pct}%</span>
-                  </div>
-                  <div className={styles.ancBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
-                </div>
-              ))}
-              <p className={styles.ancDisclaimer}>
-                Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
-              </p>
-              <button type="button" className={styles.ancLink} onClick={() => onRelativeTap?.(ancestryFor.slug, ancestryFor.name)}>
-                See {ancestryFor.name}&rsquo;s full page
-              </button>
+      {dockAside && ancestryFor && !ancHidden && ancestryRows.length > 0 && (
+        <LearnDragCard
+          className={styles.ancCard}
+          ariaLabel={`Ancestry of ${ancestryFor.name}`}
+          icon={ICONS.ancestry}
+          title="Ancestry"
+          subtitle={ancestryFor.name}
+          onClose={() => setAncHidden(true)}
+          closeLabel="Close ancestry"
+        >
+          {ancestryRows.map((a) => (
+            <div key={a.name} className={styles.ancRow} title={a.name}>
+              <span className={styles.ancName}>{a.name}</span>
+              <span className={styles.ancBarWrap}>
+                <span className={styles.ancBar} style={{ width: `${a.pct}%` }} />
+              </span>
+              <span className={styles.ancPct}>{a.pct}%</span>
             </div>
-          )}
-          {!trainHidden && trainingDifficulty[ancestryFor.slug] && (
-            <div className={styles.trainCard} role="group" aria-label={`Training for ${ancestryFor.name}`}>
-              <button type="button" className={styles.ancClose} onClick={() => setTrainHidden(true)} aria-label="Close training">
-                <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 12, height: 12 }}>
-                  <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                  <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                </svg>
-              </button>
-              <TrainingCard data={trainingDifficulty[ancestryFor.slug]} />
-            </div>
-          )}
-        </div>
+          ))}
+          <p className={styles.ancDisclaimer}>
+            Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
+          </p>
+          <button type="button" className={styles.ancLink} onClick={() => onRelativeTap?.(ancestryFor.slug, ancestryFor.name)}>
+            See {ancestryFor.name}&rsquo;s full page
+          </button>
+        </LearnDragCard>
+      )}
+      {dockAside && ancestryFor && !trainHidden && trainingDifficulty[ancestryFor.slug] && (
+        <LearnDragCard
+          className={styles.trainCard}
+          ariaLabel={`Training for ${ancestryFor.name}`}
+          icon={ICONS.training}
+          title="Training"
+          onClose={() => setTrainHidden(true)}
+          closeLabel="Close training"
+        >
+          <TrainingCard data={trainingDifficulty[ancestryFor.slug]} compact />
+        </LearnDragCard>
       )}
     </div>
   );
