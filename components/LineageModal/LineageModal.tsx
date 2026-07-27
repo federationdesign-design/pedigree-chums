@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import CookieBanner from "../CookieBanner/CookieBanner";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
+import { useRouter } from "next/navigation";
+import { relativesForLevel } from "../../data/lineageArchive";
 
 // Breed names longer than 11 characters break onto a second line at the
 // nearest word boundary, so long names never force a tiny single line.
@@ -55,6 +57,12 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [shownImg, setShownImg] = useState<string | null>(image);
+  const router = useRouter();
+  const [leavePage, setLeavePage] = useState<{ slug: string; name: string } | null>(null);
+  const relatives = useMemo(
+    () => relativesForLevel(name).map((b) => ({ name: b.name, slug: b.slug, image: b.image })),
+    [name],
+  );
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
@@ -163,6 +171,8 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           levelTheme={theme}
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}
+          relatives={relatives}
+          onRelativeTap={(slug, nm) => setLeavePage({ slug, name: nm })}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
@@ -246,6 +256,33 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         </div>
       )}
 
+      {/* Tapping a related dog offers its page, gated by the same leave-game
+          confirm so a stray tap never drops the player out mid-round. */}
+      {leavePage && (
+        <div
+          className={css.exitOverlay}
+          role="alertdialog"
+          aria-modal="true"
+          aria-label={`View ${leavePage.name}`}
+          onClick={() => setLeavePage(null)}
+        >
+          <div className={css.exitPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={css.exitTitle}>LEAVE GAME</div>
+            <div style={{ color: "#ffffff", fontWeight: 600, fontSize: 13, lineHeight: 1.4, margin: "2px 0 10px", textAlign: "center", maxWidth: 260 }}>
+              Leave to view {leavePage.name}?
+            </div>
+            <div className={css.exitBtns}>
+              <button type="button" className={css.endBtn} onClick={() => router.push(`/chums/${leavePage.slug}`)} aria-label={`View ${leavePage.name}`}>
+                View
+              </button>
+              <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={() => setLeavePage(null)} aria-label="Stay in the game" autoFocus>
+                Stay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Exit confirmation, raised by the close X rather than closing outright.
           Sits above the pit at z-index 320 and takes every pointer, so the pit
           is unreachable while it is up. Escape answers no, which is the safe
@@ -259,7 +296,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onClick={() => setExitAsk(false)}
         >
           <div className={css.exitPanel} onClick={(e) => e.stopPropagation()}>
-            <div className={css.exitTitle}>EXIT</div>
+            <div className={css.exitTitle}>LEAVE GAME</div>
             <div className={css.exitBtns}>
               <button type="button" className={css.endBtn} onClick={onClose} aria-label="Yes, leave the game">
                 Yes

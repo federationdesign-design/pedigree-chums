@@ -577,3 +577,36 @@
   flex-direction: column;
   min-width: 0;
 }
+
+/* Related pack dogs rail: square cards down one side of the learn box. */
+.relRail {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 12;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 8px;
+  pointer-events: auto;
+}
+.relRailRight { right: 12px; }
+.relRailLeft { left: 12px; }
+.relCard {
+  width: clamp(38px, 7.5vw, 56px);
+  height: clamp(38px, 7.5vw, 56px);
+  padding: 0;
+  border: 2px solid #0a3a57;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(10, 58, 87, 0.35);
+  opacity: 0;
+  transform: scale(0.4);
+  animation: relPop 360ms cubic-bezier(0.2, 0.8, 0.3, 1.2) forwards;
+}
+.relCard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes relPop {
+  0% { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
+}

@@ -416,6 +416,8 @@ export default function BreedTree({
   levelTheme = null,
   onStartedChange,
   onLearningChange,
+  relatives,
+  onRelativeTap,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -446,6 +448,8 @@ export default function BreedTree({
   levelTheme?: LevelTheme | null;
   onStartedChange?: (started: boolean) => void;
   onLearningChange?: (learning: boolean) => void;
+  relatives?: { name: string; slug: string; image: string }[];
+  onRelativeTap?: (slug: string, name: string) => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -528,6 +532,7 @@ export default function BreedTree({
   const [focus, setFocus] = useState<Node>(nodes[0]);
   const [hovered, setHovered] = useState<Node | null>(null);
   const [boxAlt, setBoxAlt] = useState(false); // flips each time the shown circle changes, for the alternating box colour
+  const [railSide, setRailSide] = useState<"left" | "right">("right"); // side the related-dogs rail sits, flipped when the box is dragged across
   const [entered, setEntered] = useState(false);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
@@ -590,7 +595,16 @@ export default function BreedTree({
     asideOff.current = { x: d.ox + (e.clientX - d.sx), y: d.oy + (e.clientY - d.sy) };
     el.style.transform = `translate(${asideOff.current.x}px, ${asideOff.current.y}px)`;
   };
-  const asideUp = () => { asideDrag.current = null; };
+  const asideUp = () => {
+    asideDrag.current = null;
+    const el = asideRef.current;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      // Put the rail on the side with more room: box in the right half of
+      // the screen sends the cards left, and the other way round.
+      setRailSide(r.left + r.width / 2 > window.innerWidth / 2 ? "left" : "right");
+    }
+  };
   // Held null until the display face is painting, so the first (server-matched)
   // render uses the flat average and only the measured pass uses canvas.
   const [labelFont, setLabelFont] = useState<string | null>(null);
@@ -2777,6 +2791,30 @@ export default function BreedTree({
           )}
         </div>
       </div>
+      {/* Related pack dogs: the 54-pack breeds that descend from this level's
+          ancestors, as square cards down one side of the box. Two columns once
+          past nine, popping in one by one. */}
+      {dockAside && learning && relatives && relatives.length > 0 && (
+        <div
+          className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
+          style={{ gridTemplateRows: `repeat(${relatives.length > 9 ? Math.ceil(relatives.length / 2) : relatives.length}, auto)` }}
+          aria-label="Pack dogs from this lineage"
+        >
+          {relatives.map((r, i) => (
+            <button
+              key={r.slug}
+              type="button"
+              className={styles.relCard}
+              style={{ animationDelay: `${i * 55}ms` }}
+              onClick={() => onRelativeTap?.(r.slug, r.name)}
+              title={r.name}
+              aria-label={`View ${r.name}`}
+            >
+              <img src={bust(r.image)} alt="" draggable={false} />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
