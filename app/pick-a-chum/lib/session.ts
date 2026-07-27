@@ -25,6 +25,7 @@ export interface Session {
   protectedState: ProtectedState; // S12 protected-state machine (Task 15)
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
+  complaintOpened: boolean; // Task 25b: the full FAQ015 complaint answer was already served this context (subsequent turns get the short repeat)
   lastBreedSlug: string | null; // the breed most recently established, for follow-up questions
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
   // stable Dog id (a visitor can discover a version for each of the four dogs).
@@ -46,6 +47,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     protectedState: null,
     personalSadnessCount: 0,
     lastWasComplaint: false,
+    complaintOpened: false,
     lastBreedSlug: null,
     barkStreakByDog: {},
     barkCompletedByDog: {},

@@ -37,6 +37,11 @@ const SAFEGUARDING_CONTINUATION_RES: Resolution = {
 };
 const PLAIN_FALLBACK_RES: Resolution = { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
 
+// Task 25b: the FAQ015 complaint answer is served in full ONCE per complaint context;
+// subsequent complaint-context turns get this approved short repeat instead of the same
+// line five times. Approved by Steve, verbatim.
+const COMPLAINT_REPEAT_LINE = 'Noted. Put that in the email too and someone will look at it.';
+
 export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
   const n = normalise(input);
@@ -83,6 +88,18 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   }
 
   const response = assemble(resolution, data, n, session);
+
+  // Task 25b: complaint short-repeat. The first FAQ015 turn serves the full answer; while
+  // the complaint context holds, subsequent FAQ015 turns get the short repeat line. The
+  // reset when the context ends (a clear topic change) is handled with lastWasComplaint below.
+  if (resolution.faqId === 'FAQ015') {
+    if (session.complaintOpened) {
+      response.text = COMPLAINT_REPEAT_LINE;
+      response.responseId = 'B04-FAQ015-REPEAT';
+    } else {
+      session.complaintOpened = true;
+    }
+  }
 
   // The bark game (per dog): a bark exchange extends this dog's streak and the
   // fifth completes it; a post-completion bark leaves state untouched; anything
@@ -134,6 +151,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
+  if (!session.lastWasComplaint) session.complaintOpened = false; // Task 25b: a clear topic change ends the complaint context, so the next complaint gets the full answer again
   if (resolution.breedSlug) session.lastBreedSlug = resolution.breedSlug; // carry breed for follow-ups
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 

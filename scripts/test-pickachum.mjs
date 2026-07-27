@@ -511,7 +511,7 @@ check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallbac
 // watch is "how do I contact you": it stays FAQ012 (via the CONTACT_ENQUIRY route), not
 // FAQ015 and not the DST013 contact nav link. ----
 check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact enquiry moved off FAQ012: ${r.faqId ?? r.action}`) });
-check('whats your email', { bucket: 'B06', action: 'gk_unknown' });
+check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId}`) }); // Task 25a: moved from gk_unknown to the FAQ012 general enquiry answer
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
 check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
 check('how many cards', { bucket: 'B02', action: 'rules_answer' });
@@ -1087,6 +1087,42 @@ check("I'm scared", { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r
   check('what were you saying', {}, { session: s, assert: (r, resp) =>
     r.action === 'breed_page' || r.breedSlug === 'beagle' || resp.text.toLowerCase().includes('beagle') ? 'beagle leaked out of the safety exchange' : null });
 })();
+
+// ---- Task 25: email enquiries reach FAQ012 (25a); complaint answer full once then a
+// short repeat while the context holds (25b). ----
+// 25a: the three email phrasings reach FAQ012, never the FAQ015 complaint answer.
+for (const q of ['your email', 'whats your email', 'what is your email'])
+  check(q, { bucket: 'B04', action: 'faq_answer' }, { assert: (r) =>
+    r.faqId === 'FAQ015' ? 'reached the complaint answer FAQ015'
+      : r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId ?? r.action}` });
+// 25b: the S11 script serves the full complaint answer once, then the short repeat.
+(() => {
+  const s = newSession();
+  const script = ['I have a complaint', 'there is wrong information on one of your cards', 'the labrador one', 'I want to tell a person about it', 'is there an email'];
+  script.forEach((inp, i) => {
+    check(inp, {}, { session: s, assert: (r, resp) => {
+      if (r.faqId !== 'FAQ015') return `turn ${i + 1} left the complaint: ${r.faqId ?? r.action}`;
+      const full = resp.text.includes('That needs a person, not a dog');
+      const short = resp.text.includes('Put that in the email too and someone will look at it');
+      if (i === 0) return full ? null : 'turn 1 was not the full answer';
+      return short ? null : `turn ${i + 1} was not the short repeat: "${resp.text.slice(0, 40)}"`;
+    } });
+  });
+})();
+// 25b: a clear topic change ends the complaint context, so the next complaint is full again.
+(() => {
+  const s = newSession();
+  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a person, not a dog') ? null : 'first complaint not the full answer') });
+  check('how do I play?', { action: 'rules_answer' }, { session: s }); // clear topic change
+  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a person, not a dog') ? null : 'complaint context did not reset to the full answer') });
+})();
+// The six existing complaint-route guards still hold (email now FAQ012 per 25a).
+check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact moved: ${r.faqId}`) });
+check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `email moved: ${r.faqId}`) });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
+check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
+check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);

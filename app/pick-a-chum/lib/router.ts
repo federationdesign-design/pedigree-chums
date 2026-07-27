@@ -109,6 +109,8 @@ const COMPLAINT_CONTACT = [
 // contact terms that used to live in COMPLAINT_CONTACT when it pointed at FAQ012.
 const CONTACT_ENQUIRY = [
   'contact you', 'email address', 'write to you', 'po box', 'parent contact', 'who runs this',
+  // Task 25a: asking for the email is a general enquiry (FAQ012), not a complaint (FAQ015).
+  'your email', 'whats your email', 'what is your email',
 ];
 
 // Orientation / onboarding (bucket B15). First-time visitors who do not yet know
