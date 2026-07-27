@@ -153,7 +153,7 @@ export type ActionType =
   | 'fallback' // terminal catch-all: unresolved free text, approved line, never echoes raw input
   | 'clarifier' // bare help-seeking: ask whether it is a site question or a worry
   | 'transfer_request' // visitor asks to switch to a different dog
-  | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a trusted adult
+  | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a safe grown-up
   | 'breed_page' // confident named-breed match: link to that breed's page
   | 'breed_choice' // two breeds within the confidence gap: offer both
   | 'breed_hub' // a breed question with no breed named: the shared hub line

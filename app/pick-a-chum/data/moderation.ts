@@ -20,7 +20,7 @@
 
 /** Approved safety signpost. Locked wording: do not vary. */
 export const SAFETY_SIGNPOST =
-  'If something is worrying or upsetting you, talk to a trusted adult. If you are a young person in the UK and need someone to talk to, Childline is free on 0800 1111.';
+  'If something is worrying or upsetting you, talk to a safe grown-up. If you are a young person in the UK and need someone to talk to, Childline is free on 0800 1111.';
 
 export type ModerationAction =
   | 'redirect' // deliver the line, then steer to a safe neutral destination
@@ -105,8 +105,8 @@ export const MODERATION: ModerationCategory[] = [
     action: 'signpost',
     escalateOnRepeat: false,
     responses: [
-      'Thank you for telling me. Please tell a grown-up you trust. You can also call Childline free on 0800 1111 at any time.',
-      'Please tell a grown-up you trust, or call Childline free on 0800 1111. You do not need to explain it to me.',
+      'Thank you for telling me. Please tell a safe grown-up. You can also call Childline free on 0800 1111 at any time.',
+      'Please tell a safe grown-up, or call Childline free on 0800 1111. You do not need to explain it to me.',
     ],
     status: 'APPROVED',
   },
@@ -116,8 +116,8 @@ export const MODERATION: ModerationCategory[] = [
     action: 'signpost',
     escalateOnRepeat: false,
     responses: [
-      'I am sorry you are feeling like this. Please tell a grown-up you trust today. You can call Childline free on 0800 1111, or Samaritans free on 116 123, at any time.',
-      'Please speak to a grown-up you trust. You can call Childline on 0800 1111 or Samaritans on 116 123, free at any time.',
+      'I am sorry you are feeling like this. Please tell a safe grown-up today. You can call Childline free on 0800 1111, or Samaritans free on 116 123, at any time.',
+      'Please speak to a safe grown-up. You can call Childline on 0800 1111 or Samaritans on 116 123, free at any time.',
     ],
     status: 'APPROVED',
   },
@@ -137,7 +137,7 @@ export const MODERATION: ModerationCategory[] = [
     scenario: 'Intent to harm other people',
     action: 'signpost',
     escalateOnRepeat: false,
-    responses: ['I will not help with that. Please do not. Tell a trusted adult now. If anyone is in immediate danger, call 999.'],
+    responses: ['I will not help with that. Please do not. Tell a safe grown-up now. If anyone is in immediate danger, call 999.'],
     status: 'APPROVED',
   },
   {
@@ -145,7 +145,7 @@ export const MODERATION: ModerationCategory[] = [
     scenario: 'Intent to harm an animal',
     action: 'signpost',
     escalateOnRepeat: false,
-    responses: ['I will not help anyone hurt an animal. Tell a trusted adult, and report animal cruelty to the RSPCA on 0300 1234 999. If a person or animal is in immediate danger, call 999.'],
+    responses: ['I will not help anyone hurt an animal. Tell a safe grown-up, and report animal cruelty to the RSPCA on 0300 1234 999. If a person or animal is in immediate danger, call 999.'],
     status: 'APPROVED',
   },
   {
@@ -172,7 +172,7 @@ export const MODERATION: ModerationCategory[] = [
     scenario: 'General anatomy question (no disclosure): redirect to a trusted adult',
     action: 'redirect',
     escalateOnRepeat: false,
-    responses: ['That is a fair question, but a cartoon dog is not the right one to answer it. Ask a grown-up you trust or a teacher, and they can explain it properly.'],
+    responses: ['That is a fair question, but a cartoon dog is not the right one to answer it. Ask a safe grown-up or a teacher, and they can explain it properly.'],
     status: 'APPROVED',
   },
 ];
