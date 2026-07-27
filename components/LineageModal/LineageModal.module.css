@@ -364,6 +364,7 @@
 .winFlash {
   position: relative;
   z-index: 2;
+  padding-top: 10px;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(5.2rem, 26vw, 14rem);
   line-height: 0.82;
@@ -376,9 +377,8 @@
   animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
 .winNextLead {
-  /* pushed to the bottom of the column, so it and the pink name sit over the
-     photo rather than above its edge */
-  margin-top: auto;
+  /* Directly under ROUND WON, which lands it on the top of the photo. It was
+     pushed to the foot of the column, which put it down by the dog's feet. */
   font-family: var(--font-body, Montserrat, system-ui);
   font-weight: 600;
   font-size: clamp(0.95rem, 3.2vw, 1.3rem);
@@ -387,7 +387,7 @@
 }
 .winNextName {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2rem, 9vw, 4.4rem);
+  font-size: clamp(2.6rem, 13vw, 6.2rem);
   line-height: 1;
   color: #ff2d95;
   text-transform: uppercase;
@@ -419,11 +419,12 @@
   transform: translateX(-50%);
   bottom: clamp(18px, 5vw, 40px);
   z-index: 3;
-  min-width: min(78vw, 460px);
-  /* The label carries the button, so it is big and the sides are tight. */
-  font-size: clamp(1.7rem, 7.4vw, 2.9rem);
-  padding-left: clamp(10px, 2.5vw, 18px);
-  padding-right: clamp(10px, 2.5vw, 18px);
+  /* Narrower than it was, with the label doing the work: roughly twice the
+     type and only just enough room either side of it. */
+  min-width: min(66vw, 380px);
+  font-size: clamp(2.3rem, 11vw, 3.7rem);
+  padding-left: clamp(8px, 2vw, 14px);
+  padding-right: clamp(8px, 2vw, 14px);
 }
 .winGo:active {
   transform: translateX(-50%) translateY(2px);
