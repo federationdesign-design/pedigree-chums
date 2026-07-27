@@ -581,16 +581,16 @@
 /* Related pack dogs rail: square cards down one side of the learn box. */
 .relRail {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
   z-index: 12;
   display: grid;
   grid-auto-flow: column;
   gap: 8px;
   pointer-events: auto;
 }
-.relRailRight { right: 12px; }
-.relRailLeft { left: 12px; }
+/* Beside the box, on whichever side has room. */
+.relRailRight { left: calc(100% + 10px); }
+.relRailLeft { right: calc(100% + 10px); }
 .relCard {
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);

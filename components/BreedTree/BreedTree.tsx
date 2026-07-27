@@ -2766,7 +2766,7 @@ export default function BreedTree({
             </div>
           )}
           <span className={styles.cName}>{shown.data.name}</span>
-          {shownShare !== null && shown.parent && (
+          {shownShare !== null && shown.parent && !learning && (
             <span className={styles.cShare}>
               {shownShare}% of {shown.parent.data.name}
             </span>
@@ -2789,32 +2789,32 @@ export default function BreedTree({
               <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
             </div>
           )}
+          {/* Related pack dogs, part of the box: they open and close with it
+              and ride along when it is dragged. The 54-pack breeds that descend
+              from this level's ancestors, as square cards down one side. */}
+          {dockAside && !hideCaption && relatives && relatives.length > 0 && (
+            <div
+              className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
+              style={{ gridTemplateRows: `repeat(${relatives.length > 9 ? Math.ceil(relatives.length / 2) : relatives.length}, auto)` }}
+              aria-label="Pack dogs from this lineage"
+            >
+              {relatives.map((r, i) => (
+                <button
+                  key={r.slug}
+                  type="button"
+                  className={styles.relCard}
+                  style={{ animationDelay: `${i * 55}ms` }}
+                  onClick={() => onRelativeTap?.(r.slug, r.name)}
+                  title={r.name}
+                  aria-label={`View ${r.name}`}
+                >
+                  <img src={bust(r.image)} alt="" draggable={false} />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {/* Related pack dogs: the 54-pack breeds that descend from this level's
-          ancestors, as square cards down one side of the box. Two columns once
-          past nine, popping in one by one. */}
-      {dockAside && learning && relatives && relatives.length > 0 && (
-        <div
-          className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
-          style={{ gridTemplateRows: `repeat(${relatives.length > 9 ? Math.ceil(relatives.length / 2) : relatives.length}, auto)` }}
-          aria-label="Pack dogs from this lineage"
-        >
-          {relatives.map((r, i) => (
-            <button
-              key={r.slug}
-              type="button"
-              className={styles.relCard}
-              style={{ animationDelay: `${i * 55}ms` }}
-              onClick={() => onRelativeTap?.(r.slug, r.name)}
-              title={r.name}
-              aria-label={`View ${r.name}`}
-            >
-              <img src={bust(r.image)} alt="" draggable={false} />
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
