@@ -8,7 +8,6 @@ import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
 import { TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
-import { ICONS } from "../CardDock/CardDock";
 import { useRouter } from "next/navigation";
 
 // Plain-language label for the status dot on the title portrait.
@@ -69,10 +68,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [exitAsk, setExitAsk] = useState(false);
   // read inside the key handler, which is bound once
   const exitAskRef = useRef(false);
-  // Back-to-learn question, declared here so its ref effect can see it.
-  const [learnAsk, setLearnAsk] = useState(false);
-  // read inside the same bound-once key handler
-  const learnAskRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [shownImg, setShownImg] = useState<string | null>(image);
@@ -82,7 +77,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
-  useEffect(() => { learnAskRef.current = learnAsk; }, [learnAsk]);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 900px)");
     const apply = () => setIsNarrow(mq.matches);
@@ -105,8 +99,8 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   // is really a restart screen wearing something more useful.
   const [resumeInLearn, setResumeInLearn] = useState(false);
   const outOfLives = typeof lives === "number" && lives <= 0;
+  // Straight there, no question asked. The switch is meant to feel abrupt.
   const backToLearn = () => {
-    setLearnAsk(false);
     onSpendLife?.();
     setResumeInLearn(true);
     setPhase("play");
@@ -150,7 +144,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (exitAskRef.current) { setExitAsk(false); return; }
-      if (learnAskRef.current) { setLearnAsk(false); return; }
       onClose();
     };
     document.addEventListener("keydown", onKey);
@@ -217,6 +210,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onShownImageChange={setShownImg}
           onShownStatusChange={setShownStatus}
           levelTheme={theme}
+          onBackToLearn={backToLearn}
           startInLearn={resumeInLearn}
           playLabel={outOfLives ? "PLAY AGAIN" : "PLAY"}
           onPlayPressed={() => {
@@ -266,18 +260,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           aria-label={slowmo ? "Normal speed" : "Slow motion"}
         >
           <img src="/svg-snail-icon.svg" alt="" aria-hidden="true" className={css.slowmoIcon} />
-        </button>
-
-        {/* Back to learn. A live round can be left to go and read, but it
-            costs a life and the round restarts, so it asks first: the same
-            courtesy the close X gets. */}
-        <button
-          type="button"
-          className={css.learnBtn}
-          onClick={() => setLearnAsk(true)}
-          aria-label="Back to the learn area"
-        >
-          <span className={css.learnBtnIcon} aria-hidden="true">{ICONS.infoBox}</span>
         </button>
 
         {/* Shake button, straight from the pit: jelly icon, bottom right */}
@@ -370,41 +352,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 type="button"
                 className={`${css.endBtn} ${css.endBtnAlt}`}
                 onClick={() => setExitAsk(false)}
-                aria-label="No, keep playing"
-                autoFocus
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Leaving for learn costs a life and restarts the round, so it is
-          worth a question. Escape answers no, like the exit panel. */}
-      {learnAsk && (
-        <div
-          className={css.exitOverlay}
-          role="alertdialog"
-          aria-modal="true"
-          aria-label="Go back to the learn area?"
-          onClick={() => setLearnAsk(false)}
-        >
-          <div className={css.exitPanel} onClick={(e) => e.stopPropagation()}>
-            <div className={css.exitTitle}>BACK TO LEARN</div>
-            <div className={css.learnAskNote}>
-              {outOfLives
-                ? "This round will start again. Your score stays."
-                : "This costs a life and starts the round again. Your score stays."}
-            </div>
-            <div className={css.exitBtns}>
-              <button type="button" className={css.endBtn} onClick={backToLearn} aria-label="Yes, go back to learn">
-                Yes
-              </button>
-              <button
-                type="button"
-                className={`${css.endBtn} ${css.endBtnAlt}`}
-                onClick={() => setLearnAsk(false)}
                 aria-label="No, keep playing"
                 autoFocus
               >

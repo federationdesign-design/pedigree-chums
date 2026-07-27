@@ -217,64 +217,6 @@
     height: 41px;
   }
 }
-/* Back to learn: the third pit square, stacked above slow motion. Same body
-   as shake and slow motion, but wearing the blue outline the close X has, so
-   it reads as a way out of the round rather than another toy. */
-.learnBtn {
-  position: fixed;
-  right: clamp(18px, 4vw, 48px);
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + (100.8px + 12px) * 2);
-  z-index: 30;
-  width: 100.8px;
-  height: 100.8px;
-  padding: 0;
-  box-sizing: border-box;
-  border: 5px solid var(--navy, #0a3a57);
-  border-radius: 30.24px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  background: var(--yellow, #ffd23e);
-  color: var(--blue-deep, #0b78bd);
-  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
-}
-.learnBtn:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
-}
-.learnBtnIcon {
-  display: block;
-  width: 58px;
-  height: 58px;
-}
-.learnBtnIcon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-@media (max-width: 768px) {
-  .learnBtn {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20.25px;
-    border-width: 4px;
-    bottom: calc(18px + env(safe-area-inset-bottom, 0px) + (67.5px + 10px) * 2);
-  }
-  .learnBtnIcon {
-    width: 38px;
-    height: 38px;
-  }
-}
-/* The note under the title in the back-to-learn question. */
-.learnAskNote {
-  font-family: var(--font-body, Montserrat, system-ui);
-  font-size: clamp(0.95rem, 3.4vw, 1.05rem);
-  font-weight: 600;
-  color: #ffffff;
-  text-align: center;
-  line-height: 1.35;
-  margin-top: -8px;
-}
 .shakeFlash {
   animation: lmShakeFlash 0.3s ease-out forwards;
 }
