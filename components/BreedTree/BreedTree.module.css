@@ -582,6 +582,9 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  /* Keep the title clear of the close X in the top-right: it wraps to another
+     line rather than running under the button, however long the name is. */
+  padding-right: 28px;
 }
 
 /* Related pack dogs rail: square cards down one side of the learn box. */
