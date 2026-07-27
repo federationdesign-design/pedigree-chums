@@ -22,6 +22,11 @@
   gap: 8px;
 }
 
+.labelPillCompact {
+  font-size: 0.67rem;
+  padding: 3px 12px;
+  letter-spacing: 0.05em;
+}
 .labelPill {
   display: inline-block;
   border: 1.5px solid;

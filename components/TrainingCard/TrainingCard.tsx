@@ -43,7 +43,7 @@ export default function TrainingCard({ data, compact = false }: Props) {
 
       {/* Arc gauge */}
       <div className={styles.gaugeWrap}>
-        <svg viewBox="0 0 260 110" width={260} height={110} aria-label={`Training difficulty gauge: ${score} out of 5`}>
+        <svg viewBox="0 0 260 110" width={compact ? 208 : 260} height={compact ? 88 : 110} aria-label={`Training difficulty gauge: ${score} out of 5`}>
           {/* Track arc */}
           <path
             d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 180, 360)}
@@ -95,20 +95,22 @@ export default function TrainingCard({ data, compact = false }: Props) {
         </svg>
 
         {/* Label pill */}
-        <div className={styles.labelPill} style={{ background: bgColour, color: colour, borderColor: colour }}>
+        <div className={`${styles.labelPill}${compact ? " " + styles.labelPillCompact : ""}`} style={{ background: bgColour, color: colour, borderColor: colour }}>
           {label}
         </div>
       </div>
 
       {/* Traits */}
-      <ul className={styles.traitsList}>
-        {traits.map((t) => (
-          <li key={t} className={styles.trait}>
-            <span className={styles.traitDot} style={{ background: colour }} />
-            {t}
-          </li>
-        ))}
-      </ul>
+      {!compact && (
+        <ul className={styles.traitsList}>
+          {traits.map((t) => (
+            <li key={t} className={styles.trait}>
+              <span className={styles.traitDot} style={{ background: colour }} />
+              {t}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!compact && (
         <>

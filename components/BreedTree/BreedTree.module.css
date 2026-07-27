@@ -598,7 +598,7 @@
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);
   padding: 0;
-  border: 2px solid #0a3a57;
+  border: 2px solid var(--yellow, #ffd23e);
   border-radius: 12px;
   background: #ffffff;
   overflow: hidden;
@@ -641,10 +641,6 @@
 }
 /* Ancestry card: opens below the box when a rail dog is tapped, same breakdown
    as that breed's own page. Rides with the box like the rail does. */
-.relCardOn {
-  outline: 3px solid var(--yellow, #ffd23e);
-  outline-offset: 2px;
-}
 .ancCard {
   position: fixed;
   top: 6%;

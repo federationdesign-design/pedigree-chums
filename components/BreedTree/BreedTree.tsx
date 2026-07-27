@@ -2951,7 +2951,7 @@ export default function BreedTree({
                 <button
                   key={r.slug}
                   type="button"
-                  className={`${styles.relCard}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}`}
+                  className={styles.relCard}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
                   onClick={() => { setAncHidden(true); setTrainHidden(true); setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug, note: r.note })); }}
