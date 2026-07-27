@@ -23,8 +23,8 @@
 }
 
 .labelPillCompact {
-  font-size: 0.67rem;
-  padding: 3px 12px;
+  font-size: 0.45rem;
+  padding: 2px 9px;
   letter-spacing: 0.05em;
 }
 .labelPill {
@@ -119,4 +119,8 @@
   color: #ffffff;
   line-height: 1.45;
   margin: 0;
+}
+.innerCompact {
+  padding: 0 14px 12px;
+  gap: 8px;
 }

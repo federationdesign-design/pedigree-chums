@@ -2089,6 +2089,21 @@ export default function BreedTree({
     () => descendantPackBreeds([shown.data.name]).map((b) => ({ name: b.name, slug: b.slug, image: b.image, note: b.character })),
     [shown],
   );
+  // Rail with enter/exit animation: dogs that drop out of the list stay mounted
+  // for one beat with a "leaving" flag so they can play the pop in reverse.
+  const [renderRail, setRenderRail] = useState<Array<{ name: string; slug: string; image: string; note: string; leaving?: boolean }>>(() => railDogs);
+  useEffect(() => {
+    setRenderRail((prev) => {
+      const next = new Set(railDogs.map((d) => d.slug));
+      const leaving = prev.filter((p) => !p.leaving && !next.has(p.slug)).map((p) => ({ ...p, leaving: true }));
+      return [...railDogs.map((d) => ({ ...d })), ...leaving];
+    });
+  }, [railDogs]);
+  useEffect(() => {
+    if (!renderRail.some((p) => p.leaving)) return;
+    const t = window.setTimeout(() => setRenderRail((prev) => prev.filter((p) => !p.leaving)), 340);
+    return () => window.clearTimeout(t);
+  }, [renderRail]);
   // That dog's ancestry breakdown, the same figures as its own page.
   const ancestryRows = useMemo(
     () => (ancestryFor ? ancestryBreakdown(ancestryFor.name) : []),
@@ -2941,20 +2956,20 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
-          {dockAside && !hideCaption && railDogs.length > 0 && (
+          {dockAside && !hideCaption && renderRail.length > 0 && (
             <div
               className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
-              style={{ gridTemplateRows: `repeat(${railDogs.length > 9 ? Math.ceil(railDogs.length / 2) : railDogs.length}, auto)` }}
+              style={{ gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)` }}
               aria-label="Pack dogs from this lineage"
             >
-              {railDogs.map((r, i) => (
+              {renderRail.map((r, i) => (
                 <button
                   key={r.slug}
                   type="button"
-                  className={styles.relCard}
+                  className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
-                  onClick={() => { setAncHidden(true); setTrainHidden(true); setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug, note: r.note })); }}
+                  onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note }); }}
                   title={r.name}
                   aria-label={`View ${r.name}`}
                 >

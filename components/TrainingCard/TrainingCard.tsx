@@ -38,7 +38,7 @@ export default function TrainingCard({ data, compact = false }: Props) {
   const endDeg = 180 + fillDeg;
 
   return (
-    <div className={styles.inner}>
+    <div className={`${styles.inner}${compact ? " " + styles.innerCompact : ""}`}>
       {!compact && <p className={styles.heading}>Training</p>}
 
       {/* Arc gauge */}
