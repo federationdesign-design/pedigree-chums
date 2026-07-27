@@ -392,6 +392,7 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
 
 function LearnDragCard({
   className,
+  style,
   ariaLabel,
   icon,
   title,
@@ -402,6 +403,7 @@ function LearnDragCard({
   children,
 }: {
   className: string;
+  style?: React.CSSProperties;
   ariaLabel: string;
   icon?: React.ReactNode;
   title: string;
@@ -434,6 +436,7 @@ function LearnDragCard({
     <div
       ref={ref}
       className={className}
+      style={style}
       role="group"
       aria-label={ariaLabel}
       onPointerDown={down}
@@ -641,6 +644,8 @@ export default function BreedTree({
   const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
   const [trainHidden, setTrainHidden] = useState(false);
+  const [ancPos, setAncPos] = useState<{ left: number; top: number } | null>(null);
+  const [trainPos, setTrainPos] = useState<{ left: number; top: number } | null>(null);
   // The blue box can be picked up and moved, the same as the cards on a chum
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
@@ -1129,6 +1134,7 @@ export default function BreedTree({
       void st.offsetWidth; // force reflow so the animation can retrigger
       st.classList.add(styles.shake);
     }
+    if (dockAside) { setAncestryFor(null); setAncHidden(true); setTrainHidden(true); }
     if (focusRef.current !== d) {
       zoom(d);
       // Clicking a circle to zoom in also opens the info box if it was closed.
@@ -2089,7 +2095,24 @@ export default function BreedTree({
     [ancestryFor],
   );
   // Close the card when the hovered circle changes or the round begins.
-  useEffect(() => { setAncestryFor(null); }, [shown, learning]);
+  useEffect(() => { setAncestryFor(null); }, [learning]);
+  // A card opens next to the main box: to its right if there is room, else its
+  // left, cascaded a little per card so two do not land dead on top of each other.
+  const cardSpot = (index: number) => {
+    const r = asideRef.current?.getBoundingClientRect();
+    const vw = typeof window === "undefined" ? 390 : window.innerWidth;
+    const vh = typeof window === "undefined" ? 844 : window.innerHeight;
+    const cardW = Math.min(vw * 0.88, 330);
+    const gap = 12;
+    const boxTop = r ? r.top : 60;
+    const boxRight = r ? r.right : vw * 0.5;
+    const boxLeft = r ? r.left : vw * 0.5;
+    let left = boxRight + gap + index * 22;
+    if (left + cardW > vw - 8) left = boxLeft - cardW - gap - index * 22;
+    if (left < 8) left = Math.max(8, vw - cardW - 8);
+    const top = Math.max(8, Math.min(vh - 240, boxTop + index * 44));
+    return { left: Math.round(left), top: Math.round(top) };
+  };
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
   // Moving onto one of those inner circles re-hovers it and brings it back.
@@ -2945,6 +2968,7 @@ export default function BreedTree({
       {dockAside && ancestryFor && !ancHidden && ancestryRows.length > 0 && (
         <LearnDragCard
           className={styles.ancCard}
+          style={ancPos ? { left: ancPos.left, top: ancPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Ancestry of ${ancestryFor.name}`}
           icon={ICONS.ancestry}
           title={ancestryFor.name}
@@ -2966,6 +2990,7 @@ export default function BreedTree({
       {dockAside && ancestryFor && !trainHidden && trainingDifficulty[ancestryFor.slug] && (
         <LearnDragCard
           className={styles.trainCard}
+          style={trainPos ? { left: trainPos.left, top: trainPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Training for ${ancestryFor.name}`}
           icon={ICONS.training}
           title="Training"
@@ -2978,12 +3003,12 @@ export default function BreedTree({
       {dockAside && ancestryFor && (ancHidden || trainHidden) && (
         <div className={styles.learnDock}>
           {ancHidden && ancestryRows.length > 0 && (
-            <button type="button" className={styles.learnDockBtn} onClick={() => setAncHidden(false)} aria-label="Reopen ancestry" title="Ancestry">
+            <button type="button" className={styles.learnDockBtn} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
               <span className={styles.learnDockIcon}>{ICONS.ancestry}</span>
             </button>
           )}
           {trainHidden && trainingDifficulty[ancestryFor.slug] && (
-            <button type="button" className={styles.learnDockBtn} onClick={() => setTrainHidden(false)} aria-label="Reopen training" title="Training">
+            <button type="button" className={styles.learnDockBtn} onClick={() => { setTrainPos(cardSpot(1)); setTrainHidden(false); }} aria-label="Reopen training" title="Training">
               <span className={styles.learnDockIcon}>{ICONS.training}</span>
             </button>
           )}
