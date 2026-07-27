@@ -855,30 +855,38 @@
 .tempTabs {
   display: flex;
   gap: 8px;
-  padding: 2px 14px 8px;
+  justify-content: center;
+  padding: 2px 14px 10px;
 }
+/* The same pill as the training card's difficulty label: compact Montserrat,
+   1.5px border, 20px radius, a solid colour for text and border with that same
+   colour at 15% as a faint fill. Pros green, Cons red; the inactive tab is
+   muted so only the chosen one carries colour. */
 .tempTab {
-  flex: 1;
   appearance: none;
   cursor: pointer;
+  display: inline-block;
   background: transparent;
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
-  padding: 5px 0;
-  font-family: var(--font-body, "Montserrat", system-ui);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 3px 14px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.5rem;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.55);
-  transition: color 0.15s ease, border-color 0.15s ease;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 .tempTabPro.tempTabOn {
-  color: #4ade80;
-  border-color: #4ade80;
+  color: #22c55e;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
 }
 .tempTabCon.tempTabOn {
-  color: #ff6b6b;
-  border-color: #ff6b6b;
+  color: #ef4444;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
 }
 .tempList {
   list-style: none;
