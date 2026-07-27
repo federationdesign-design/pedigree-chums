@@ -827,7 +827,7 @@ export default function BreedTree({
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
-  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; held?: boolean };
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean };
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
@@ -1062,7 +1062,7 @@ export default function BreedTree({
       const bg = badgesRef.current;
       for (const b of bb) {
         const el = bg?.children[b.idx] as SVGGElement | undefined;
-        if (el) el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k})`);
+        if (el) el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k}) rotate(${b.a * 57.2958})`);
       }
     }
     const ub = uiBodiesRef.current;
@@ -1946,7 +1946,7 @@ export default function BreedTree({
           if (b.mb && b.mbIn && !isDragged(b)) {
             const w = worldFromPx(b.mb.position.x, b.mb.position.y);
             b.x = w.x; b.y = w.y;
-            b.a = b.n ? b.mb.angle : 0; // badges stay upright, pit-style
+            b.a = b.mb.angle; // badges tumble with the physics, like the dogs
             b.vx = (b.mb.velocity.x * 60) / pxPerWorld;
             b.vy = (b.mb.velocity.y * 60) / pxPerWorld;
           }
@@ -2481,7 +2481,7 @@ export default function BreedTree({
               const inert = inertBadges.has(i);
               if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
               return (
-              <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk})`}
+              <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk}) rotate(${(b ? b.a : 0) * 57.2958})`}
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={inert ? undefined : (e) => {
@@ -2500,7 +2500,7 @@ export default function BreedTree({
                   window.addEventListener("pointercancel", release);
                   startDrag(e, body);
                 }}>
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: (item.label ? 6 : 3) * upp2 }} />
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: (item.label ? 6 : 5) * upp2 }} />
                 {!inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
                   // started, measured by the same fitter the pit circles use
