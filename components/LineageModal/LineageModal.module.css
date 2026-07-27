@@ -247,6 +247,9 @@
   text-align: center;
   line-height: 1;
 }
+.endFlashWord {
+  display: block;
+}
 @keyframes lmEndPop {
   from { transform: scale(0.6); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
@@ -276,6 +279,56 @@
 }
 .endBtnAlt {
   background: #ffffff;
+}
+/* Next level: the house CTA, matching the chum calculator's start button and
+   the home page primary. It used to be a yellow pill shrunk to half size by an
+   inline transform, which read as a mistake rather than a button. */
+.endBtnGo {
+  appearance: none;
+  border: none;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.3rem, 4.2vw, 1.9rem);
+  letter-spacing: 0.04em;
+  background: #22c55e;
+  color: #ffffff;
+  border-radius: 14px;
+  padding: clamp(16px, 3.4vw, 26px) clamp(26px, 5vw, 40px);
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+.endBtnGo:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.4);
+}
+/* The end screen's way out: the same yellow square with a navy X that the pit
+   and every other surface uses, parked in the top right. */
+.endClose {
+  position: absolute;
+  top: clamp(14px, 3vw, 24px);
+  right: clamp(14px, 3vw, 24px);
+  width: clamp(54px, 11vw, 74px);
+  height: clamp(54px, 11vw, 74px);
+  padding: 0;
+  box-sizing: border-box;
+  border: 5px solid var(--navy, #0a3a57);
+  border-radius: 22%;
+  background: var(--yellow, #ffd23e);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
+}
+.endClose svg {
+  width: 62%;
+  height: 62%;
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+.endClose:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
 }
 
 /* Exit confirmation. The close X no longer closes the pit on its own: it asks
@@ -328,27 +381,17 @@
 /* Lives. A heart badge and a run of segments, drawn in the pit's own language
    rather than shipped as artwork: navy stroke, yellow fill, red pips. Spent
    segments stay in place as empty sockets so the ceiling is always readable. */
+/* Lives sit under the title portrait, on the left, so they read as part of
+   the dog's own block. The offset is the portrait's own clamp plus the
+   titleWrap top, which keeps them tucked under it at every width. */
 .lives {
   position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: calc(24px + clamp(40px, 8vw, 54px) + 10px);
+  left: 30px;
   z-index: 40;
   display: flex;
   align-items: center;
-  gap: 8px;
   pointer-events: none;
-}
-.livesHeart {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--blue-deep, #0b78bd);
-  border: 3px solid var(--navy, #0a3a57);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.35);
 }
 .livesBar {
   display: flex;

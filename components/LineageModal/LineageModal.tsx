@@ -100,14 +100,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [resumeInLearn, setResumeInLearn] = useState(false);
   const outOfLives = typeof lives === "number" && lives <= 0;
   // Straight there, no question asked. The switch is meant to feel abrupt.
-  const backToLearn = () => {
-    onSpendLife?.();
+  // Leaving a LIVE round costs a life. Leaving the game over screen does not:
+  // the round is already spent, so charging again would be charging twice.
+  const goLearn = (spend: boolean) => {
+    if (spend) onSpendLife?.();
     setResumeInLearn(true);
     setPhase("play");
     setSlowmo(false);
     setCaptionOpen(false);
     setRunKey((k) => k + 1); // remounts the pit fresh, in learn
   };
+  const backToLearn = () => goLearn(true);
   const replay = () => {
     setPhase("play");
     setResumeInLearn(false);
@@ -284,17 +287,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           with PLAY, alongside the shake and slow-motion controls. */}
       {running && typeof lives === "number" && (
         <div className={css.lives} aria-label={`${lives} of ${livesMax} lives left`}>
-          <div className={css.livesHeart} aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 21s-7.5-4.7-9.3-9.2C1.3 8.1 3.4 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.6 0 5.7 3.6 4.3 7.3C19.5 16.3 12 21 12 21z"
-                fill="#e23b3b"
-                stroke="#ffffff"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
           <div className={css.livesBar} aria-hidden="true">
             {Array.from({ length: livesMax }, (_, i) => (
               <span key={i} className={`${css.lifePip}${i < lives ? "" : " " + css.lifePipSpent}`} />
@@ -365,16 +357,33 @@ export default function LineageModal({ name, image, character, lineage, onClose,
       {/* Round won / game over, main-pit flash styling */}
       {phase !== "play" && (
         <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
-          <div className={css.endFlash} style={phase === "won" ? { fontSize: "clamp(6.8rem, 24vw, 16rem)" } : undefined}>{phase === "won" ? "ROUND WON" : "GAME OVER"}</div>
+          {/* The way out is the X in the corner now, same as everywhere else,
+              so the buttons underneath are only ever about carrying on. */}
+          <button type="button" className={css.endClose} onClick={onClose} aria-label="Close the pit">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <line x1="7" y1="7" x2="17" y2="17" />
+              <line x1="17" y1="7" x2="7" y2="17" />
+            </svg>
+          </button>
+          {/* GAME OVER now matches ROUND WON's size and takes a line per word,
+              so two long words do not have to share one. */}
+          <div className={css.endFlash} style={{ fontSize: "clamp(6.8rem, 24vw, 16rem)" }}>
+            {phase === "won" ? "ROUND WON" : (
+              <>
+                <span className={css.endFlashWord}>GAME</span>
+                <span className={css.endFlashWord}>OVER</span>
+              </>
+            )}
+          </div>
           <div className={css.endBtns}>
             {phase === "lost" && onStartOver && (lives === undefined || lives > 0) && (
-              <button type="button" className={css.endBtn} onClick={onStartOver}>Start again</button>
+              <button type="button" className={css.endBtn} onClick={onStartOver}>Restart</button>
+            )}
+            {phase === "lost" && (
+              <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={() => goLearn(false)}>Learn</button>
             )}
             {phase === "won" && nextLevelLabel && onNextLevel && (
-              <button type="button" className={css.endBtn} onClick={onNextLevel} style={{ transform: "scale(0.5)", transformOrigin: "center top", background: "#22c55e", borderColor: "#15803d" }}>{nextLevelLabel}</button>
-            )}
-            {(phase === "lost" || !nextLevelLabel || !onNextLevel) && (
-              <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={onClose}>Close</button>
+              <button type="button" className={css.endBtnGo} onClick={onNextLevel}>{nextLevelLabel}</button>
             )}
           </div>
         </div>

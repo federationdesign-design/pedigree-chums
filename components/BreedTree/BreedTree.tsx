@@ -1821,12 +1821,15 @@ export default function BreedTree({
           parts.push({ el, x: x + (Math.random() - 0.5) * 20 * fxScale, y: y + (Math.random() - 0.5) * 20 * fxScale, vx: Math.cos(a2) * sp2, vy: Math.sin(a2) * sp2 - 60 * fxScale, r: 0, born: now2, life: 420 + Math.random() * 340 });
         }
       };
-      const knockBadge = (b: Body, rv: number, now2: number) => {
+      // spend is how many of the 20 charges one knock costs. The rock is the
+      // heavy one, so it counts for ten ordinary knocks.
+      const ROCK_KNOCK = 10;
+      const knockBadge = (b: Body, rv: number, now2: number, spend = 1) => {
         if (b.n || b.inert || b.charges === undefined) return; // badges only
         if (rv < 5) return; // pit onPctHit verbatim: a real knock, not a nudge
         if (b.lastKnock && now2 - b.lastKnock < 600) return;
         b.lastKnock = now2;
-        b.charges -= 1;
+        b.charges -= spend;
         if (b.charges <= 0) {
           b.inert = true;
           poofAt(b.x, b.y, now2);
@@ -1864,7 +1867,11 @@ export default function BreedTree({
               }
             }
             if (rv > FX_MIN_PS * 0.6) popChildren(b);
-            if (!otherMb.isStatic) knockBadge(b, rv, now); // statics do not count, pit rule
+            // statics do not count, pit rule
+            if (!otherMb.isStatic) {
+              const rock = otherMb.plugin?.prop?.toyKind === "rock";
+              knockBadge(b, rv, now, rock ? ROCK_KNOCK : 1);
+            }
           };
           hitSide(pa, B);
           hitSide(pb2, A);
