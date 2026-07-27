@@ -2430,6 +2430,10 @@ export default function BreedTree({
               // LEARN. A ref rather than the wordHover state, because this
               // handler is bound once and would read a stale value.
               if (wordHoverRef.current) return;
+              // Dragging the difficulty slider is not hovering the pit. The
+              // slider sits low on the left, which is PLAY's half, so every
+              // drag was sliding the level background in behind it.
+              if (diffDragRef.current) return;
               const play = seamSide(e.clientX, e.clientY) > 0;
               setStartPeek(play);
               setLearnPeek(!play);
@@ -3036,6 +3040,9 @@ export default function BreedTree({
               (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
               diffDragRef.current = true;
               setDiffDragging(true);
+              // Clear any preview the pointer raised on its way to the slider.
+              setStartPeek(false);
+              setLearnPeek(false);
               setLevelFromY(e.clientY);
             }}
             onPointerMove={(e) => {
