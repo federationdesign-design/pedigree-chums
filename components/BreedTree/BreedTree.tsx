@@ -2344,7 +2344,11 @@ export default function BreedTree({
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",
-                    pointerEvents: hidden ? "none" : "auto",
+                    // An invisible circle must not take the press. Collected
+                    // dogs stay in the DOM at opacity 0, and since J2 they stay
+                    // for the rest of the level, so they were littering the pit
+                    // with grabbers you could not see.
+                    pointerEvents: hidden || buried ? "none" : "auto",
                     opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden || frozen ? undefined : () => setHovered(d)}
@@ -2380,9 +2384,19 @@ export default function BreedTree({
                           // drop finishes, and the handler would be frozen as
                           // undefined for ever. Check it here instead.
                           if (!fellRef.current) return;
-                          const body = pitBodiesRef.current?.owned.has(d)
-                            ? pitBodiesRef.current.find(d)
-                            : undefined;
+                          // The pit draws nested circles, so the middle of a dog
+                          // is covered by its own children. Those children have
+                          // no body until the dog pops open, so a press there
+                          // used to find nothing and do nothing: no drag, and no
+                          // lift either, because liftToLearn also needs a body.
+                          // Walk up to the nearest circle that IS one. That makes
+                          // the whole visible dog grabbable, the way a main-pit
+                          // card is grabbable anywhere on it.
+                          const pb = pitBodiesRef.current;
+                          let target: Node | null = d;
+                          while (target && !pb?.owned.has(target)) target = target.parent;
+                          const body = target ? pb?.find(target) : undefined;
+                          const liftNode = target ?? d;
                           // held lifts the body out of the physics world, so the
                           // drag can place it directly. Without this the sim
                           // writes the old position back every frame and the dog
@@ -2400,10 +2414,15 @@ export default function BreedTree({
                           // captured now: by the time the tap callback runs,
                           // React has recycled the event and currentTarget is
                           // null, which threw and left the layer unopened
-                          const el = e.currentTarget as SVGCircleElement;
+                          // The lift is placed from the circle's own rect, so it
+                          // has to be the ancestor's element, not the child that
+                          // happened to catch the press.
+                          const li = nodes.indexOf(liftNode);
+                          const el = (circlesRef.current?.children[li] as SVGCircleElement | undefined)
+                            ?? (e.currentTarget as SVGCircleElement);
                           startDrag(e, body as never, () => {
                             if (body) body.held = false;
-                            liftToLearn(el, d);
+                            liftToLearn(el, liftNode);
                           });
                         }
                   }
