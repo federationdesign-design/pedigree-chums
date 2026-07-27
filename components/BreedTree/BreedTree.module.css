@@ -80,6 +80,7 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  color: var(--yellow, #ffd23e);
 }
 .cShare {
   display: inline-block;

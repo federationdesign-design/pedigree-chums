@@ -27,14 +27,27 @@
   justify-content: flex-end;
 }
 
-.title {
+.titleWrap {
   position: absolute;
   top: 24px;
   left: 30px;
-  width: auto;
-  max-width: 78%;
+  max-width: 82%;
   z-index: 15;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.titlePortrait {
+  width: clamp(40px, 8vw, 54px);
+  height: clamp(40px, 8vw, 54px);
+  border-radius: 12px;
+  object-fit: cover;
+  flex: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.title {
+  width: auto;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(1.35rem, 3.25vw, 2.95rem);
   color: #ffffff;

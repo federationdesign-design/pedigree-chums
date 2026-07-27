@@ -54,6 +54,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const exitAskRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
+  const [shownImg, setShownImg] = useState<string | null>(image);
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
@@ -133,11 +134,14 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         </div>
       )}
       {/* Title floats over the pit and never affects its size */}
-      <h3 className={css.title}>
-        {(isNarrow ? titleLines(shownName) : [shownName]).map((line, i, arr) => (
-          <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-        ))}
-      </h3>
+      <div className={css.titleWrap}>
+        {shownImg && <img className={css.titlePortrait} src={shownImg} alt="" draggable={false} />}
+        <h3 className={css.title}>
+          {(isNarrow ? titleLines(shownName) : [shownName]).map((line, i, arr) => (
+            <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+          ))}
+        </h3>
+      </div>
 
       {/* The diagram owns everything below the header. BreedTree runs in
           fill + dockAside mode: caption and breadcrumbs docked at the top,
@@ -155,6 +159,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           strokeByDepth
           tinted={false}
           onShownChange={setShownName}
+          onShownImageChange={setShownImg}
           levelTheme={theme}
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}

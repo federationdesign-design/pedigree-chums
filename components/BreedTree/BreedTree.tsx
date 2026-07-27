@@ -402,6 +402,7 @@ export default function BreedTree({
   strokeByDepth = false,
   tinted = true,
   onShownChange,
+  onShownImageChange,
   hideCaption = false,
   onCaptionClose,
   onScore,
@@ -431,6 +432,7 @@ export default function BreedTree({
   strokeByDepth?: boolean;
   tinted?: boolean;
   onShownChange?: (name: string) => void;
+  onShownImageChange?: (img: string | null) => void;
   hideCaption?: boolean;
   onCaptionClose?: () => void;
   onScore?: (v: number) => void;
@@ -525,6 +527,7 @@ export default function BreedTree({
 
   const [focus, setFocus] = useState<Node>(nodes[0]);
   const [hovered, setHovered] = useState<Node | null>(null);
+  const [boxAlt, setBoxAlt] = useState(false); // flips each time the shown circle changes, for the alternating box colour
   const [entered, setEntered] = useState(false);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
@@ -883,7 +886,10 @@ export default function BreedTree({
   // overpowers a tiny image several levels down: 5, 4, 3, then finer still.
   function strokeWidthFor(d: Node): number {
     const widths = [5, 4, 3, 2.6, 2.4];
-    return widths[d.depth - 1] ?? 2.4;
+    const base = widths[d.depth - 1] ?? 2.4;
+    // A circle with a single child gets a ring four times heavier, so a lone
+    // lineage step (as on this first level) reads as a deliberate emphasis.
+    return d.children && d.children.length === 1 ? base * 4 : base;
   }
 
   function zoomTo(v: View) {
@@ -1118,7 +1124,11 @@ export default function BreedTree({
 
   // Let the shell mirror the hovered/focused breed (title + pill text).
   useEffect(() => {
-    onShownChange?.(((hovered ?? focus) as Node).data.name);
+    const sh = (hovered ?? focus) as Node;
+    onShownChange?.(sh.data.name);
+    const shImg = sh === nodes[0] ? (rootImage ?? sh.data.img) : sh.data.img;
+    onShownImageChange?.(shImg ? bust(shImg) : null);
+    setBoxAlt((v) => !v);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hovered, focus]);
 
@@ -2177,7 +2187,7 @@ export default function BreedTree({
                           x={0}
                           y={labelFirstY(lines.length, fs)}
                           transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
-                          style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "0.5px" }}
+                          style={{ fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "0.5px" }}
                         >
                           {lines.map((line, li) => (
                             <tspan key={li} x={0} dy={li === 0 ? 0 : "1.05em"}>{line}</tspan>
@@ -2700,7 +2710,7 @@ export default function BreedTree({
           ))}
         </div>
 
-        <div className={styles.caption} style={{ position: "relative" }}>
+        <div className={styles.caption} style={{ position: "relative", background: boxAlt ? "#09344e" : "#093049" }}>
           {onCaptionClose && (
             <button type="button" onClick={onCaptionClose} aria-label="Close description" className={styles.captionClose}>
               <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 14, height: 14 }}>
