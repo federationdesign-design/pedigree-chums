@@ -990,18 +990,22 @@ const LINEAGE: Record<string, LineageNode> = {
         name: "Early badger hunting dogs",
         note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
         img: "/history/breeds/Teckel---Dachshund-family.jpg",
-        value: 55,
+        // No value of its own. A parent's share is the sum of its children, and
+        // d3 adds an owned value ON TOP of them, so carrying both counted this
+        // line twice and pushed the children down to 32%. The two 55s below are
+        // the 55 that used to sit here, split evenly.
         children: [
-          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 60 },
+          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
+          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
         ],
       },
       {
         name: "Welsh herding dogs",
         note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.",
         img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
-        value: 45,
         children: [
-          { name: "Old hunting dogs of the Celts", note: "The broad Celtic hunting and pastoral dog stock brought across Europe. Now extinct.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 50 },
+          { name: "Old hunting dogs of the Celts", note: "The broad Celtic hunting and pastoral dog stock brought across Europe. Now extinct.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 45 },
+          { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 },
         ],
       },
     ],
