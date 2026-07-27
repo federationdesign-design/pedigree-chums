@@ -127,7 +127,9 @@ export const MODERATION: ModerationCategory[] = [
     action: 'signpost',
     escalateOnRepeat: false,
     responses: [
-      'Please tell a grown-up near you that you need help. You can also call Childline free on 0800 1111 at any time.',
+      // Task 26: "near you" is wrong for distress (a frightened child may fear someone
+      // nearby), replaced with the approved safe-grown-up line, verbatim.
+      'I am sorry you are feeling like this. Please tell a safe grown-up. You can also call Childline free on 0800 1111 at any time.',
       'I want to point you to the right help. Is this about your body, another person, or something else? If you feel unsafe, tell a grown-up near you or call Childline on 0800 1111.',
     ],
     status: 'APPROVED',

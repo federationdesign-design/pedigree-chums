@@ -1124,6 +1124,14 @@ check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, {
 check('how many cards', { bucket: 'B02', action: 'rules_answer' });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
+// ---- Task 26: the general-distress signpost (first variant) uses "safe grown-up", not
+// "near you". No existing assertion keyed off the old wording (all key off the moderation
+// id); this adds a lock so the corrected wording cannot regress. ----
+check('can someone help me', { action: 'safety_signpost' }, { assert: (r, resp) =>
+  r.moderationId !== 'MOD_GENERAL_DISTRESS' ? `not general distress: ${r.moderationId}`
+    : resp.text.includes('safe grown-up') && !resp.text.includes('near you') ? null
+      : `distress line still not corrected: "${resp.text.slice(0, 50)}"` });
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
