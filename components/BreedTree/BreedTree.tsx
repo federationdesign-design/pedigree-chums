@@ -105,6 +105,15 @@ const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
 const TOY_STICK_GONE_KEY = "pc-minipit-stick-gone";
 const TOY_STICK_BIG_GONE_KEY = "pc-minipit-stickbig-gone";
 const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
+// The level's chums pour in after the rock. They are scenery, not toys: they
+// cannot be grabbed, opened or scored, and they are props rather than pit
+// bodies, so they never count toward the pit-full loss. Size mirrors the learn
+// rail thumbnail, clamp(38px, 7.5vw, 56px), so they read as the same objects.
+const CHUM_GAP = 600;       // after the rock, so the rock keeps its own beat
+const CHUM_STAGGER = 85;    // ms between each, so they cascade rather than clump
+const CHUM_MIN = 38;
+const CHUM_MAX = 56;
+const CHUM_VW = 0.075;
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock";
@@ -770,6 +779,7 @@ export default function BreedTree({
   const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
   const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string }[]>([]);
+  const [chumList, setChumList] = useState<{ image: string; size: number }[]>([]);
   const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
   const [britainOpen, setBritainOpen] = useState(false);
   const killToyRef = useRef<((idx: number) => void) | null>(null);
@@ -795,6 +805,12 @@ export default function BreedTree({
   const rodBodiesRef = useRef<PropBody[]>([]);
   const toyBodiesRef = useRef<PropBody[]>([]);
   const toysGRef = useRef<SVGGElement>(null);
+  const chumsGRef = useRef<SVGGElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chumBodiesRef = useRef<any[]>([]);
+  // Filled by an effect below. The spawn runs several seconds after the drop,
+  // so it is always populated by the time it is read.
+  const chumImagesRef = useRef<string[]>([]);
   const pillBodiesRef = useRef<PropBody[]>([]);
   const rodsGRef = useRef<SVGGElement>(null);
   const pillsGRef = useRef<SVGGElement>(null);
@@ -1072,7 +1088,7 @@ export default function BreedTree({
         if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
       }
     }
-    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef]] as const) {
+    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
       if (list && gg) for (const pr of list) {
@@ -1557,6 +1573,41 @@ export default function BreedTree({
       // ---- toys: tennis ball and Union Jack, main pit physics verbatim ----
       const BIGT = 84 * (window.matchMedia("(max-width: 768px)").matches ? 0.67 : 1);
       const toyTimers: number[] = [];
+      // The chum flood. Every pack dog this level's circles produce, tipped in
+      // from well above the stage at scattered positions, angles and spins so
+      // they arrive as a shower rather than a column. Inert throughout.
+      const spawnChums = () => {
+        const imgs = chumImagesRef.current;
+        if (!imgs.length) return;
+        const vw = typeof window !== "undefined" ? window.innerWidth : 390;
+        const dia = Math.max(CHUM_MIN, Math.min(CHUM_MAX, vw * CHUM_VW));
+        const r = dia / 2;
+        const stageTopPx = st ? st.getBoundingClientRect().top : 0;
+        imgs.forEach((image, i) => {
+          toyTimers.push(window.setTimeout(() => {
+            const px = pL.x + r + 8 + Math.random() * Math.max(1, wPx - dia - 16);
+            // far higher than the toys' 60 to 120, so they are already moving
+            // fast when they enter and the pit floods rather than fills
+            const py = stageTopPx - (260 + Math.random() * 560);
+            const w2 = worldFromPx(px, py);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx: chumBodiesRef.current.length, hits: 0, maxHits: 9999, mb: null, chum: true };
+            const mb = Bodies.rectangle(px, py, dia, dia, {
+              chamfer: { radius: dia * 0.22 },
+              restitution: 0.4, friction: 0.3, frictionAir: 0.006, density: 0.0012,
+              angle: (Math.random() - 0.5) * 1.4,
+            });
+            MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 7, y: 2 + Math.random() * 3 });
+            MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.3);
+            mb.plugin = { prop: pr, kind: "chum" };
+            pr.mb = mb;
+            Composite.add(world, mb);
+            chumBodiesRef.current.push(pr);
+            setChumList((l) => [...l, { image, size: dia * fxScale }]);
+            wake();
+          }, i * CHUM_STAGGER));
+        });
+      };
       const spawnToy = (kind: ToyKind) => {
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
@@ -1683,6 +1734,7 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
         toyTimers.push(window.setTimeout(() => spawnToy("stickBig"), propsAt));
         toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt + TOY_ROCK_GAP));
+        toyTimers.push(window.setTimeout(spawnChums, propsAt + TOY_ROCK_GAP + CHUM_GAP));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
@@ -1882,7 +1934,7 @@ export default function BreedTree({
             // knocks, but in the main pit the flag only ever counts TAPS, and
             // the ball never expires at all. Left as it was, a well-knocked
             // Union Jack poofed at random before anyone could read it.
-            if (P.kind === "toy") continue;
+            if (P.kind === "toy" || P.kind === "chum") continue;
             if (pr.lastKnock && now - pr.lastKnock < 600) continue;
             pr.lastKnock = now;
             pr.hits += 1;
@@ -1970,7 +2022,7 @@ export default function BreedTree({
           if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
         }
         checkEscapeRef.current?.();
-        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current]) {
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
           for (const pr of list) {
             if (pr.dead || !pr.mb) continue;
             if (!isDragged(pr)) {
@@ -2079,7 +2131,7 @@ export default function BreedTree({
         if (uu) for (const u of uu) if (!u.fixed && u.mb) {
           MBody.setVelocity(u.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
-        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current]) {
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
           for (const pr of list) if (!pr.dead && pr.mb) MBody.setVelocity(pr.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
         wake();
@@ -2093,6 +2145,8 @@ export default function BreedTree({
         Events.off(engine, "collisionStart", onCollide);
         for (const t of toyTimers) window.clearTimeout(t);
         for (const t of ghostTimers) window.clearTimeout(t);
+        chumBodiesRef.current = [];
+        setChumList([]);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
       };
@@ -2191,6 +2245,15 @@ export default function BreedTree({
     const t = window.setTimeout(() => setRenderRail((prev) => prev.filter((p) => !p.leaving)), 340);
     return () => window.clearTimeout(t);
   }, [renderRail]);
+  // Every pack dog this level produces, across all its big circles, not just
+  // the hovered one. This is the flood's cast: the union of the rail lists, so
+  // it is a subset of the 54, never all of them.
+  const levelChums = useMemo(() => {
+    const names = nodes.filter((n) => n.depth === 1).map((n) => n.data.name);
+    if (!names.length) return [] as string[];
+    return descendantPackBreeds(names).map((b) => b.image).filter(Boolean);
+  }, [nodes]);
+  useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
   // That dog's ancestry breakdown, the same figures as its own page.
   const ancestryRows = useMemo(
     () => (ancestryFor ? ancestryBreakdown(ancestryFor.name) : []),
@@ -2595,6 +2658,29 @@ export default function BreedTree({
                   ) : (
                     <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h} />
                   )}
+                </g>
+              );
+            })}
+          </g>
+          {/* The chum flood. pointerEvents none on the whole group, so none of
+              them can be grabbed, tapped or opened: they are scenery. */}
+          <g ref={chumsGRef} style={{ display: dockAside ? "inline" : "none", pointerEvents: "none" }}>
+            {chumList.map((cm, i2) => {
+              const pr = chumBodiesRef.current[i2];
+              const v2 = viewRef.current;
+              const kk2 = SIZE / v2[2];
+              const half = cm.size / 2;
+              const rx = cm.size * 0.22;
+              return (
+                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}>
+                  <clipPath id={`bt-chum-${i2}`}>
+                    <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} />
+                  </clipPath>
+                  <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} style={{ fill: "#ffffff" }} />
+                  <image href={encodeURI(bust(cm.image))} x={-half} y={-half} width={cm.size} height={cm.size}
+                    preserveAspectRatio="xMidYMid slice" clipPath={`url(#bt-chum-${i2})`} />
+                  <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
+                    style={{ fill: "none", stroke: "var(--yellow, #ffd23e)", strokeWidth: Math.max(2, cm.size * 0.055) }} />
                 </g>
               );
             })}
