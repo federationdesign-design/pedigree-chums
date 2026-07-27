@@ -472,6 +472,26 @@
   border: 4px solid var(--navy, #0a3a57);
   box-shadow: 0 3px 10px rgba(10, 58, 87, 0.35);
   pointer-events: none;
+  transition: transform 0.14s cubic-bezier(0.2, 1.4, 0.4, 1);
+  transform-origin: center;
+}
+/* Held: twice the size, so the thumb stays visible under a fingertip. Scaled
+   rather than resized, so the centre stays exactly on the level it points at. */
+.diffThumbBig {
+  transform: scale(2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .diffThumb { transition: none; }
+}
+/* The travelled part of the track, below the thumb. */
+.diffFill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--navy, #0a3a57);
+  pointer-events: none;
 }
 
 /* Level background: a themed picture and ground strip that replace the pit's

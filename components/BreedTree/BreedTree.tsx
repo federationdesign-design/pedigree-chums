@@ -651,6 +651,9 @@ export default function BreedTree({
   const resizeOnlyRef = useRef(false);
   const levelRef = useRef(DIFF_DEFAULT);
   const diffRef = useRef<HTMLDivElement>(null);
+  // The drag flag is a ref so the pointer handlers can read it, but the thumb
+  // has to re-render to grow, so it needs state as well.
+  const [diffDragging, setDiffDragging] = useState(false);
   const diffDragRef = useRef(false);
   function applyLevel(next: number) {
     const l = Math.min(Math.max(Math.round(next), 0), 10);
@@ -1167,6 +1170,9 @@ export default function BreedTree({
       if (c) {
         c.setAttribute("transform", `translate(${tx},${ty})`);
         c.setAttribute("r", String(d.r * k));
+        // The radius is scaled by the view but the stroke was not, so a circle
+        // drawn small kept a full-size ring and read as heavy. Scale both.
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * k));
       }
       const l = lg?.children[i] as SVGTextElement | undefined;
       if (l) {
@@ -2498,7 +2504,7 @@ export default function BreedTree({
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   stroke={hidden ? "none" : strokeColorFor(d)}
-                  strokeWidth={hidden ? 0 : strokeWidthFor(d)}
+                  strokeWidth={hidden ? 0 : strokeWidthFor(d) * (SIZE / viewRef.current[2])}
                   style={{
                     cursor: hidden ? "default" : "pointer",
                     // An invisible circle must not take the press. Collected
@@ -2683,7 +2689,7 @@ export default function BreedTree({
                   window.addEventListener("pointercancel", release);
                   startDrag(e, body);
                 }}>
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: (item.label ? 6 : 5) * upp2 }} />
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.065 : 0.055) }} />
                 {!inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
                   // started, measured by the same fitter the pit circles use
@@ -3029,6 +3035,7 @@ export default function BreedTree({
               e.stopPropagation();
               (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
               diffDragRef.current = true;
+              setDiffDragging(true);
               setLevelFromY(e.clientY);
             }}
             onPointerMove={(e) => {
@@ -3037,9 +3044,10 @@ export default function BreedTree({
             }}
             onPointerUp={(e) => {
               diffDragRef.current = false;
+              setDiffDragging(false);
               try { (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId); } catch { /* already gone */ }
             }}
-            onPointerCancel={() => { diffDragRef.current = false; }}
+            onPointerCancel={() => { diffDragRef.current = false; setDiffDragging(false); }}
             onKeyDown={(e) => {
               const step = e.key === "ArrowUp" || e.key === "ArrowRight" ? 1 : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -1 : 0;
               if (!step) return;
@@ -3047,7 +3055,13 @@ export default function BreedTree({
               applyLevel(levelRef.current + step);
             }}
           >
-            <div className={styles.diffThumb} style={{ bottom: `${level * 10}%` }} />
+            {/* Everything below the thumb reads as filled, in navy against the
+                track's lighter blue, so the level is legible at a glance. */}
+            <div className={styles.diffFill} style={{ height: `${level * 10}%` }} />
+            <div
+              className={`${styles.diffThumb}${diffDragging ? " " + styles.diffThumbBig : ""}`}
+              style={{ bottom: `${level * 10}%` }}
+            />
           </div>
         </div>
       )}
