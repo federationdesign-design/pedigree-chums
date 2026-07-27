@@ -111,6 +111,13 @@ const ORIENTATION = [
   'whats this', 'what can you do', 'where do i start', 'how does this work', 'how does it work',
 ];
 
+// Orientation phrasings matched on the WHOLE normalised input only (Task 11a).
+// "what is this" spelled out is orientation, but it is too generic to keep as a
+// substring trigger: as a substring it would swallow breed queries like "what is
+// this dog". An exact full-input match has no such collision, because a longer
+// input ("what is this dog") is a different string and never equals it.
+const ORIENTATION_EXACT = new Set(['what is this']);
+
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
 const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
@@ -541,7 +548,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // order: this stack already runs the ceiling (8) and breed (7) out of numeric
   // sequence. It sits below safety and commercial but above rules/FAQ/content so
   // onboarding phrasing is intercepted; the curated patterns keep real queries out.
-  if (hasAny(N, ORIENTATION)) {
+  if (ORIENTATION_EXACT.has(c) || hasAny(N, ORIENTATION)) {
     return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
   }
 
@@ -671,10 +678,18 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (hasAny(N, TESTING)) return conv('B10');
   if (hasAny(N, COMMAND)) return conv('B11');
   if (hasAny(N, PERSONAL)) return conv('B12');
-  // Single word: NO echo. "bye", "ok", "no", "please", "why", "help" are the
-  // commonest single words anyone types, and echoing them ("bye. A noun.
-  // Excellent...") reads as broken. Use the non-echoing fallback line.
-  if (isSingleWord(N)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+  // Single word: NO echo. "bye", "ok", "no", "please", "why" are the commonest
+  // single words anyone types, and echoing them ("bye. A noun. Excellent...")
+  // reads as broken. Use the non-echoing fallback line. EXCEPT bare "help": it is
+  // a help plea, so it takes the approved BARE_HELP clarifier, the same line
+  // "can you help me" already gets (Task 11b). A second consecutive clarifier is
+  // capped to the fallback (mirrors the safety block's twice-guard).
+  if (isSingleWord(N)) {
+    if (c === 'help' && state.lastAction !== 'clarifier') {
+      return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'clarifier', moderationId: 'MOD_BARE_HELP' };
+    }
+    return { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+  }
 
   // Layer 14: emoji-only message (picture-writing with no words). Checked before
   // gibberish so a lone emoji gets the "I read words" family, not the smash reply.

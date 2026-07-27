@@ -296,6 +296,16 @@ check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { ass
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ004' ? `not FAQ004: ${r.faqId}` : t10outcome('whats in the pack', r, resp) === 'answered' ? null : 'not answered') });
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('what do you do when a dog barks', r, resp) === 'answered' ? null : 'not answered') });
 
+// ---- Task 11: exact-match orientation + bare-help clarifier ----
+// (a) whole-input "what is this" -> B15; the longer "what is this dog" is unchanged
+// (breed hub), proving the exact match does not leak to a superstring.
+check('what is this', { action: 'orientation', bucket: 'B15' });
+check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { assert: (r) => (r.action === 'orientation' ? 'exact orientation match leaked to a longer input' : null) });
+// (b) bare "help" -> the approved BARE_HELP clarifier (same line "can you help me"
+// gets); "help me find a labrador" is unchanged (already that clarifier).
+check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('worrying you') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
+check('help me find a labrador', { action: 'clarifier' }, { assert: (r) => (r.moderationId === 'MOD_BARE_HELP' ? null : `changed from bare-help clarifier: ${r.moderationId}`) });
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
