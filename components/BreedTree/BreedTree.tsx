@@ -57,6 +57,14 @@ const DIFF_MID = 0.85; // level 5, the approved default
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
 const DIFF_SPAN = 1.21;
+// How far the default pit view is pulled back beyond DIFF_SPAN. The pit walls
+// are derived from the view, so widening the view widens the pit in world terms
+// while the packed circles keep their radii: the circles get smaller inside the
+// same on-screen pit. One dial, used everywhere the pit resets to its default
+// view, so the start screen, the round and the PLAY reset can never disagree.
+// 1 leaves things exactly as they were. Raise it to shrink the circles.
+const PIT_SHRINK = 1.45;
+const PIT_SPAN = DIFF_SPAN * PIT_SHRINK;
 const DIFF_INSET = 16;
 // level: null outside the mini pit, where the packing is used untouched.
 function diffScale(base: number, wide: number, level: number | null): number {
@@ -220,7 +228,11 @@ const TITLE_BOOST = 2;
 // the round to be over. A fraction rather than a head count, because a mini pit
 // tree often holds only two or three circles. Two bodies is the floor, so one
 // wide circle resting high cannot end a round on its own.
-const PIT_FULL_COVER = 0.72;
+// Fraction of the pit's width that settled circles must cover to count as full.
+// Divided by PIT_SHRINK because widening the view widens the pit in world terms
+// while the circles keep their radii: without this, the same physical heap
+// covers proportionally less and a level would become much harder to lose.
+const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -1172,7 +1184,7 @@ export default function BreedTree({
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? 1.21 : 1)];
+    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
@@ -1267,6 +1279,12 @@ export default function BreedTree({
     // out of the whole game. In LEARN the close X is the deliberate way out,
     // so a background tap does nothing.
     if (learning) return;
+    // Start screen: the X is the only way out. A tap on the blue background
+    // used to close the pit outright, which is a harsh exit for a mis-tap and
+    // inconsistent with the round and LEARN, both of which already ignore it.
+    // Other uses of BreedTree, such as the chum page dialog, keep the old
+    // behaviour: this only applies to the pit.
+    if (dockAside && gravity) return;
     onClose?.();
   }
 
@@ -1275,7 +1293,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? 1.21 : 1)]);
+    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3085,7 +3103,7 @@ export default function BreedTree({
             cancelAnimationFrame(rafRef.current);
             focusRef.current = nodes[0];
             setFocus(nodes[0]);
-            zoomTo(clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? 1.21 : 1)]));
+            zoomTo(clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]));
             // Hide the open info box as the round begins.
             if (!hideCaption) onToggleCaption?.();
             // A spent run is reset by the host before anything drops, so the
