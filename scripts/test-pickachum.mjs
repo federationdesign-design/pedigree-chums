@@ -263,6 +263,22 @@ check('my brother makes me look at his willy', { action: 'safety_signpost' }, { 
   check('tell me a joke', {}, { session: s, assert: (r) => (r.action === 'transfer' ? 'comedy served after a protected state' : null) });
 })();
 
+// ---- Task 9: orientation routing widened so onboarding questions reach B15 ----
+check('whats this?', { action: 'orientation', bucket: 'B15' });
+check('what can you do', { action: 'orientation', bucket: 'B15' });
+check('where do I start', { action: 'orientation', bucket: 'B15' });
+// 'how does this work?' overlaps the TESTING list on "does this work"; orientation
+// (layer 11) is evaluated before the conversation layer (9), so orientation wins.
+check('how does this work?', { action: 'orientation', bucket: 'B15' });
+// Regression guard: orientation sits above GK, so a too-greedy list would steal
+// ordinary questions. These must keep the exact bucket they route to today.
+check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
+check('what can you tell me about beagles', { bucket: 'B05', action: 'breed_page' });
+check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' });
+check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' });
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });

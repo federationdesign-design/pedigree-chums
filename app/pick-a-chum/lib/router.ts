@@ -98,6 +98,17 @@ const ORIENTATION = [
   'supposed to ask', 'you need me to say', 'going to say', 'you talking',
   'did this open', 'meant to happen', 'missed something', 'is this the start', 'enter a word',
   'type a question', 'kind of things', 'some choices', 'point me', 'comes next',
+  // Task 9: grounded orientation phrasings the curated list omitted. Sources: the
+  // first-input phrase library ORI category ("What is this?", "What can you do?",
+  // "Where do I start?", "How does this work?") plus one observed miss from the
+  // game sweep ("how does it work"). Specific multiword phrases only, so orientation
+  // stays above GK without stealing breed/FAQ/commercial traffic. Deliberately NOT
+  // added: bare "what is this" (would swallow breed queries like "what is this dog",
+  // per the B15 report) and "what do you do" (owned by FAQ001, and present in
+  // "what do you do when a dog barks"). 'how does this/it work' lives here so
+  // orientation (layer 11) beats the TESTING converse route (layer 9): the two
+  // overlap on the substring "does this work", and the earlier layer wins.
+  'whats this', 'what can you do', 'where do i start', 'how does this work', 'how does it work',
 ];
 
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
