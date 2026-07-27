@@ -373,7 +373,11 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     <circle cx="24" cy="24" r="22" fill="#22c55e" />
                     <path d="M14 24.5l7 7 13-14" fill="none" stroke="#ffffff" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <span className={css.winDoneName}>{name}</span>
+                  <span className={css.winDoneName}>
+                    {titleLines(name).map((ln, i) => (
+                      <span key={i} className={css.winDoneLine}>{ln}</span>
+                    ))}
+                  </span>
                 </span>
                 <span className={css.winBanner}>Ancestor discovered</span>
               </div>

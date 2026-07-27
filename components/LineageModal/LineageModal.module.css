@@ -298,14 +298,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(14px, 3vw, 26px);
+  padding: clamp(96px, 24vw, 150px) clamp(14px, 3vw, 26px) clamp(14px, 3vw, 26px);
   overflow: hidden;
   text-align: center;
 }
+/* Pinned to the same coordinates as .titleWrap, so the tick lands exactly
+   where the dog portrait sat and the name keeps the title's size. It reads as
+   the level title with the portrait swapped for a tick, not a second title. */
 .winTop {
-  width: 100%;
+  position: absolute;
+  top: 24px;
+  left: 30px;
+  right: clamp(14px, 3vw, 26px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   z-index: 2;
@@ -313,22 +319,29 @@
 .winDone {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-align: left;
 }
 .winDone svg,
 .winDone img {
-  width: clamp(38px, 8vw, 54px);
-  height: clamp(38px, 8vw, 54px);
+  /* the portrait's exact size */
+  width: clamp(40px, 8vw, 54px);
+  height: clamp(40px, 8vw, 54px);
   flex: none;
 }
+/* the title's exact type */
 .winDoneName {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.1rem, 3.4vw, 1.7rem);
-  line-height: 1.02;
+  font-size: clamp(1.35rem, 3.25vw, 2.95rem);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
   color: #ffffff;
   text-transform: uppercase;
-  max-width: 6em;
+  text-align: left;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.winDoneLine {
+  display: block;
 }
 .winBanner {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
@@ -340,7 +353,6 @@
   text-align: right;
 }
 .winScore {
-  margin-top: clamp(18px, 6vw, 46px);
   transform: rotate(-7deg);
   font-family: var(--font-body, Montserrat, system-ui);
   font-weight: 800;
