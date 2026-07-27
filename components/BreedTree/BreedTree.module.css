@@ -835,6 +835,78 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Temperament card: same slim width as the training card. A Pros/Cons toggle
+   over white bullet text. Only the active toggle carries colour, as an outline
+   (green for pros, red for cons), never a filled block. */
+.tempCard {
+  position: fixed;
+  bottom: 6%;
+  right: 4%;
+  width: min(92vw, 218px);
+  z-index: 21;
+  touch-action: none;
+  background: #0a2a3f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0 0 10px;
+  animation: ancIn 260ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.tempTabs {
+  display: flex;
+  gap: 8px;
+  padding: 2px 14px 8px;
+}
+.tempTab {
+  flex: 1;
+  appearance: none;
+  cursor: pointer;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 5px 0;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tempTabPro.tempTabOn {
+  color: #4ade80;
+  border-color: #4ade80;
+}
+.tempTabCon.tempTabOn {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+.tempList {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tempItem {
+  position: relative;
+  padding-left: 14px;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 600;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #ffffff;
+}
+.tempItem::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+}
 /* Reopen dock: a closed learn card drops to an icon on the right, tap to reopen. */
 .learnDock {
   position: fixed;
