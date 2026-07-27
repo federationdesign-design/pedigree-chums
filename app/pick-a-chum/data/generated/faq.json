@@ -225,5 +225,21 @@
     "notes": "Do not infer coverage.",
     "resolvedAnswer": "No, UK mainland only for now.",
     "resolvedCta": null
+  },
+  {
+    "faqId": "FAQ015",
+    "canonicalQuestion": "How do I report a problem or complaint?",
+    "alternativePhrasings": [
+      "make a complaint",
+      "report a problem"
+    ],
+    "canonicalAnswer": "Thank you for telling me. That needs a person, not a dog. Email hello@Pedigree-Chums.co.uk and someone will look at it.",
+    "sourcePage": "Contact page",
+    "cta": "",
+    "campaignState": "Any",
+    "contentStatus": "Open",
+    "notes": "Destination for the COMPLAINT_CONTACT route. FAQ012 stays the general enquiry answer.",
+    "resolvedAnswer": "Thank you for telling me. That needs a person, not a dog. Email hello@Pedigree-Chums.co.uk and someone will look at it.",
+    "resolvedCta": null
   }
 ]
