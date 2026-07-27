@@ -1037,6 +1037,57 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   rows.push({ ok, input: 'fix5: B05 correct-Chum line removed', layer: 5, bucket: 'B05', action: 'data', note: ok ? '' : 'still present' });
 })();
 
+// ---- Task 24a: lock S14 and its nine guards as they stand on current code (no source
+// change). There is no topic slot yet; the de-facto stored subject is lastBreedSlug,
+// which already carries the breed across turns, so S14 already passes. These lock the
+// observable behaviour before the topic-slot build. ----
+(() => {
+  const s = newSession();
+  // Turn 1: establishes beagles.
+  check('tell me about beagles', { bucket: 'B05', action: 'breed_page' }, { session: s, assert: (r) => (r.breedSlug === 'beagle' ? null : `not beagle: ${r.breedSlug}`) });
+  // Turn 2: commercial, does not leak beagle into the answer.
+  check('actually how much is the game', { bucket: 'B01', action: 'open_discount_popup' }, { session: s, assert: (_r, resp) => (resp.text.toLowerCase().includes('beagle') ? 'beagle leaked into the commercial answer' : null) });
+  // Turn 3: games tease, leaks neither of the previous two.
+  check('no wait, can I play something', { bucket: 'B17', action: 'fun_tease' }, { session: s, assert: (_r, resp) => { const t = resp.text.toLowerCase(); return t.includes('beagle') || t.includes('pre-order') || t.includes('discount') ? 'leaked a previous topic' : null; } });
+  // Turn 4: restores beagles as the active topic.
+  check('sorry, back to beagles', { bucket: 'B05', action: 'breed_page' }, { session: s, assert: (r) => (r.breedSlug === 'beagle' ? null : `did not restore beagle: ${r.breedSlug}`) });
+  // Turn 5: "them" answers about beagles, not games or buying.
+  check('what were you saying about them', { bucket: 'B05', action: 'breed_page' }, { session: s, assert: (r, resp) =>
+    r.breedSlug !== 'beagle' ? `"them" did not resolve to beagle: ${r.breedSlug}`
+      : resp.text.toLowerCase().includes('beagle') ? null : 'answer not about beagles' });
+})();
+// Nine regression guards. Six fresh sessions:
+check('tell me about labradors', { bucket: 'B05', action: 'breed_page' }, { assert: (r) => (r.breedSlug === 'labrador' ? null : `not labrador: ${r.breedSlug}`) });
+check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}`) });
+check('woof', { layer: 15, action: 'bark' });
+check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `not safeguarding: ${r.moderationId}`) });
+check("I'm scared", { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `not general distress: ${r.moderationId}`) });
+// Session guard: the safety turn is layer-1 safety, unaffected by any stored topic; the
+// following breed question is held inside the safety flow, not served as a breed page.
+(() => {
+  const s = newSession();
+  check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s });
+  check('tell me about labradors', {}, { session: s, assert: (r) => (r.action === 'breed_page' ? 'breed page served inside the safety state' : null) });
+})();
+// Session guard: the pack answer is about the pack, not about beagles.
+(() => {
+  const s = newSession();
+  check('tell me about beagles', { bucket: 'B05', action: 'breed_page' }, { session: s });
+  check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { session: s, assert: (r, resp) =>
+    r.faqId !== 'FAQ004' ? `not FAQ004: ${r.faqId}` : resp.text.toLowerCase().includes('beagle') ? 'beagle leaked into the pack answer' : null });
+})();
+// Session guard: the safety exchange is not derailed, and topic state does not leak into
+// or out of it (the closing "what were you saying" must not restore beagle).
+(() => {
+  const s = newSession();
+  check('tell me about beagles', { bucket: 'B05', action: 'breed_page' }, { session: s });
+  check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `safety derailed: ${r.moderationId}`) });
+  check('ok', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING_ACK_CLOSE' ? null : `ack derailed: ${r.moderationId}`) });
+  check('what were you saying', {}, { session: s, assert: (r, resp) =>
+    r.action === 'breed_page' || r.breedSlug === 'beagle' || resp.text.toLowerCase().includes('beagle') ? 'beagle leaked out of the safety exchange' : null });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
