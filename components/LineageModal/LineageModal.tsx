@@ -367,7 +367,12 @@ export default function LineageModal({ name, image, character, lineage, onClose,
             <div className={css.winWrap}>
               <div className={css.winTop}>
                 <span className={css.winDone}>
-                  <img src="/greentock-icon.svg" alt="" aria-hidden="true" />
+                  {/* Drawn rather than loaded: one less asset to ship, and it
+                      cannot 404. Swap for artwork later if you want to. */}
+                  <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                    <circle cx="24" cy="24" r="22" fill="#22c55e" />
+                    <path d="M14 24.5l7 7 13-14" fill="none" stroke="#ffffff" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                   <span className={css.winDoneName}>{name}</span>
                 </span>
                 <span className={css.winBanner}>Ancestor discovered</span>

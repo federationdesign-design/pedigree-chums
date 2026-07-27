@@ -310,6 +310,7 @@
   gap: 10px;
   text-align: left;
 }
+.winDone svg,
 .winDone img {
   width: clamp(38px, 8vw, 54px);
   height: clamp(38px, 8vw, 54px);
