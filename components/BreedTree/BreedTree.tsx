@@ -1040,6 +1040,12 @@ export default function BreedTree({
     // player out. A missed grab at a circle lands here, and losing a round that
     // way is miserable. Route it through the same confirmation the close X uses.
     if (started && onPitClose) { onPitClose(); return; }
+    // LEARN never sets started, so without this a stray tap on the pit
+    // background (exposed around the floating blue box, e.g. a near-miss on
+    // the box's close X) would fall through to onClose and drop the player
+    // out of the whole game. In LEARN the close X is the deliberate way out,
+    // so a background tap does nothing.
+    if (learning) return;
     onClose?.();
   }
 
