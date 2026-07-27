@@ -1942,7 +1942,7 @@ export default function BreedTree({
     registerSlowmo?.(() => slowmoRef.current?.());
     registerShake?.(() => {
       // a shake also starts the round, so the button never blocks the pit
-      if (!fellRef.current) { setStarted(true); runFallRef.current?.(); }
+      if (!fellRef.current) { setLearnPeek(false); setStartPeek(false); setStarted(true); runFallRef.current?.(); }
       shakeInnerRef.current?.();
     });
     // No timer: the circles hang until the visitor presses START.
@@ -2488,6 +2488,8 @@ export default function BreedTree({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (w.key === "start") {
+                    setLearnPeek(false);
+                    setStartPeek(false);
                     setStarted(true);
                     runFallRef.current?.();
                     return;
@@ -2631,14 +2633,14 @@ export default function BreedTree({
           // learn only, never the hover preview: on the start screen the peek is a
           // glimpse of the pink, and the artwork underneath it made the two
           // overlays read as one busy thing
-          className={`${styles.learnPattern}${learning ? " " + styles.learnPatternOn : ""}`}
+          className={`${styles.learnPattern}${!started && learning ? " " + styles.learnPatternOn : ""}`}
         />
       )}
 
       {dockAside && gravity && (
         <div
           aria-hidden="true"
-          className={`${styles.learnWash}${learning ? " " + styles.learnWashOn : learnPeek ? " " + styles.learnWashPeek : ""}`}
+          className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
         />
       )}
       {/* Big PLAY in the bottom-left of the learn area: jump straight from
@@ -2649,6 +2651,7 @@ export default function BreedTree({
           className={styles.learnPlay}
           onClick={() => {
             setLearnPeek(false);
+            setStartPeek(false);
             setLearning(false);
             setStarted(true);
             runFallRef.current?.();
