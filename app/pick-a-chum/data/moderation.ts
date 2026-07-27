@@ -175,6 +175,45 @@ export const MODERATION: ModerationCategory[] = [
     responses: ['That is a fair question, but a cartoon dog is not the right one to answer it. Ask a safe grown-up or a teacher, and they can explain it properly.'],
     status: 'APPROVED',
   },
+  // ---- Task 15 (S12) protected-state continuation lines. Approved by Steve,
+  // verbatim, self-contained (no {{safety_signpost_copy}} token). These are the four
+  // lines the S12 protected-state machine serves inside an active safety state:
+  // a general safeguarding continuation, the two barrier routes (someone at home
+  // vs no-one the visitor knows), and the acknowledgement close that moves the
+  // session to aftercare. Detection lives in lib/safety.ts and the state machine in
+  // lib/engine.ts; this file only supplies the approved response text. ----
+  {
+    id: 'MOD_SAFEGUARDING_CONTINUATION',
+    scenario: 'S12 general safeguarding continuation (active safety state)',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['You do not have to work out what to do on your own. Tell a safe grown-up, such as a teacher, or call Childline free on 0800 1111.'],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_ADULT_BARRIER',
+    scenario: 'S12 specific adult, parent, family or household barrier',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['You do not have to tell someone at home. A teacher can help, or you can call Childline free on 0800 1111.'],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_NO_ONE_ROUTE',
+    scenario: 'S12 global no-one barrier',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['You may not feel able to tell someone you know. You can call Childline free on 0800 1111 and speak to a counsellor who can help.'],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_SAFEGUARDING_ACK_CLOSE',
+    scenario: 'S12 acknowledgement close (active safety state to aftercare)',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ['Okay. The support information is still there if you need it, and you can ask another question when you are ready.'],
+    status: 'APPROVED',
+  },
 ];
 
 /**

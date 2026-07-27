@@ -79,6 +79,7 @@ interface Message {
   name?: string;
   action?: Command;
   closed?: boolean; // this dog turn is the session cut-off
+  support?: boolean; // S12: rendered under the shared support surface (no dog identity)
   typing?: boolean; // thinking dots are showing
   display?: string; // text revealed so far (typing theatre)
   done?: boolean; // performance finished (show the action link, allow the next)
@@ -359,12 +360,15 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     }
 
     // No swap: the active dog answers directly, performed with typing theatre.
+    // S12: a protected safety response is served under the shared support surface,
+    // so its nameplate reads HELP AND SUPPORT and the dog identity is hidden.
     const dogMsg: Message = {
       id: idRef.current++,
       who: 'dog',
       text: r.text,
       dog: toDog,
-      name: dogInfo(toDog).name,
+      name: r.hideDogIdentity ? (r.header ?? 'HELP AND SUPPORT') : dogInfo(toDog).name,
+      support: r.hideDogIdentity,
       action: actionFor(r),
       closed: r.closed,
       // A breed page link and the breed-hub index link are CONTEXTUAL links (they
@@ -473,7 +477,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                 ) : (
                   <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
                     <div className={styles.bubbleDog}>
-                      <div className={styles.nameplate}>{msg.name}</div>
+                      <div className={`${styles.nameplate}${msg.support ? ` ${styles.nameplateSupport}` : ''}`}>{msg.name}</div>
                       {msg.typing ? (
                         <div className={styles.typingDots} aria-hidden="true">
                           <span />

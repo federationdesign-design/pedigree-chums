@@ -8,7 +8,7 @@
 
 import { ChumData, Resolution, Dog, ActionType } from './types';
 import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
-import { detectSafety, isDogHealthQuestion } from './safety';
+import { detectSafety, isDogHealthQuestion, detectProtectedContinuation } from './safety';
 
 const HIDDEN_CEILING = 20;
 // The bark game breaks into English on the fifth consecutive bark exchange.
@@ -329,6 +329,7 @@ export interface RouterState {
   anatomyRedirectUsed?: boolean; // ANATOMY_GENERAL_REDIRECT already fired this session
   lastBreedSlug?: string | null; // the breed established earlier, for follow-up questions
   lastWasComplaint?: boolean; // an open complaint context: defer breed retrieval until it clears
+  protectedState?: 'active' | 'aftercare' | null; // S12 protected-state machine (Task 15)
 }
 
 // ---- Breed page retrieval (10 proof breeds) ----
@@ -479,6 +480,19 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   const n = applyAliases(n0, buildAliasMap(data.misspellings));
   const c = n.compact;
   const N = n; // for hasAny
+
+  // Task 15 (S12): while a protected safety state is live, the safety continuation
+  // classifier runs first, so only safety routes in PROTECTED_ACTIVE. A safety hit
+  // (a fresh disclosure, a barrier, the no-one route or an acknowledgement close)
+  // is returned here; anything else returns null and falls through to normal
+  // routing, where the engine decides between a clear ordinary topic (which clears
+  // to aftercare) and the general safeguarding continuation.
+  if (state.protectedState) {
+    const p = detectProtectedContinuation(N);
+    if (p) {
+      return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: p.action, moderationId: p.moderationId };
+    }
+  }
 
   // Clarifier follow-up: if the previous turn was the bare-help clarifier, try to
   // map this turn's answer to an existing route. Checked before safety so an

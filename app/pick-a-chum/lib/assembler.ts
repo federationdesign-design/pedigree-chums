@@ -20,6 +20,10 @@ export interface Assembled {
   transferTo?: Dog;
   closed?: boolean;
   followUp?: string; // a second message sent after a short pause (bark-game break)
+  // Task 15 (S12) presentation: a safety message served under the protected support
+  // surface carries a shared header and hides the dog name/avatar/character label.
+  header?: string; // e.g. 'HELP AND SUPPORT' above a protected safety response
+  hideDogIdentity?: boolean; // true: no dog name, avatar or character label above the response
 }
 
 const DOG_LABEL: Record<Dog, string> = {

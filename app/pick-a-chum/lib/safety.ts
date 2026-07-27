@@ -237,3 +237,80 @@ const HEALTH_FRAMES = [
 export function isDogHealthQuestion(n: Normalised): boolean {
   return hasAny(n, HEALTH_FRAMES);
 }
+
+// ---- Task 15 (S12) protected-state continuation classifier ----
+//
+// These run ONLY while a protected safety state is already live (the router gates
+// them on session.protectedState). They classify a follow-up turn into the S12
+// precedence, and reuse the four approved lines in data/moderation.ts:
+//   1  immediate danger or medical emergency  -> the existing detectSafety hit
+//   2  global no-one barrier                  -> MOD_NO_ONE_ROUTE
+//   3  specific adult/family/household barrier -> MOD_ADULT_BARRIER
+//   4  general safeguarding continuation       -> MOD_SAFEGUARDING_CONTINUATION
+//      (applied by the engine to any other non-ordinary turn)
+// plus the acknowledgement close               -> MOD_SAFEGUARDING_ACK_CLOSE.
+
+// Scope-restricting references: a parent, carer, family member or household adult.
+// Their presence names the barrier as "someone at home" and routes to the ADULT
+// barrier, even when a global word is also present ("anyone at home"). No "I can't
+// tell" phrasing is required.
+const ADULT_SCOPE = [
+  'at home', 'at my house', 'in my house', 'in the house', 'people at home', 'someone at home',
+  'anyone at home', 'no one at home', 'grown ups at home', 'grownups at home', 'household',
+  'my mum', 'my mom', 'my mummy', 'my mama', 'my dad', 'my daddy', 'my papa',
+  'my mum and dad', 'my parents', 'my parent', 'my carer', 'my carers', 'my guardian',
+  'my step dad', 'my stepdad', 'my step mum', 'my stepmum', 'my stepmother', 'my stepfather',
+  'my nan', 'my nana', 'my nanny', 'my gran', 'my granny', 'my grandad', 'my grandma', 'my grandmother', 'my grandfather',
+  'my uncle', 'my aunt', 'my auntie', 'my brother', 'my sister', 'my cousin', 'my family', 'my foster',
+];
+
+// Global no-one references: the visitor names no-one at all, not a specific adult.
+// With no scope term present these route to the NO_ONE route.
+const GLOBAL_NO_ONE = ['anyone', 'anybody', 'no one', 'noone', 'nobody', 'no-one', 'not anyone', 'not anybody'];
+
+// Acknowledgement-close vocabulary. A message closes the active safety state only
+// when every word is an acknowledgement word AND at least one is a "core" ack. A
+// qualifier ("ok but I can't", "fine I won't tell", "okay what if he comes back")
+// introduces a non-ack word, so the all-words rule already rejects it; a trailing
+// question mark ("ok?") is rejected explicitly. "no", "I don't know", "whatever"
+// and any new safety information are rejected the same way (their words are not in
+// the set).
+const ACK_WORDS = new Set(['ok', 'okay', 'k', 'kk', 'alright', 'fine', 'yeah', 'yep', 'sure', 'thanks', 'thank', 'you', 'i', 'understand', 'got', 'it', 'will']);
+const ACK_CORE = new Set(['ok', 'okay', 'k', 'kk', 'alright', 'fine', 'yeah', 'yep', 'sure', 'thanks', 'thank', 'understand', 'got', 'will']);
+
+export function isAcknowledgeClose(n: Normalised): boolean {
+  if (n.original.includes('?')) return false; // a question is not a close
+  const words = n.words;
+  if (!words.length) return false;
+  if (!words.every((w) => ACK_WORDS.has(w))) return false; // any non-ack word (a qualifier) rejects it
+  return words.some((w) => ACK_CORE.has(w)); // and a bare "you"/"it"/"i" alone is not a close
+}
+
+export interface ProtectedHit {
+  moderationId: string;
+  action: ActionType;
+}
+
+// Classify a follow-up turn WHILE a protected safety state is live. Returns a
+// safety continuation hit, or null to let normal routing decide (the engine then
+// serves a clear ordinary topic plainly, or holds any other turn as the general
+// safeguarding continuation).
+export function detectProtectedContinuation(n: Normalised): ProtectedHit | null {
+  const safety = detectSafety(n);
+  // Precedence 1: a fresh danger / medical / safeguarding disclosure keeps its own
+  // response. The general-distress "can't tell" family is deliberately excluded so
+  // the barrier logic below can refine it by scope.
+  if (safety && safety.kind !== 'general_distress' && safety.kind !== 'bare_help') {
+    return { moderationId: safety.moderationId, action: safety.action };
+  }
+  // Precedence 3 before 2: a scope-restricting term routes to the adult barrier even
+  // when a global word is also present ("I can't tell anyone at home").
+  if (hasAny(n, ADULT_SCOPE)) return { moderationId: 'MOD_ADULT_BARRIER', action: 'safety_signpost' };
+  // Precedence 2: a global no-one term with no scope routes to the no-one route.
+  if (hasAny(n, GLOBAL_NO_ONE)) return { moderationId: 'MOD_NO_ONE_ROUTE', action: 'safety_signpost' };
+  // Acknowledgement close (meaningful in active; a harmless echo if already aftercare).
+  if (isAcknowledgeClose(n)) return { moderationId: 'MOD_SAFEGUARDING_ACK_CLOSE', action: 'safety_signpost' };
+  // A general-distress plea with no barrier keeps the general-distress signpost.
+  if (safety && safety.kind === 'general_distress') return { moderationId: safety.moderationId, action: safety.action };
+  return null;
+}

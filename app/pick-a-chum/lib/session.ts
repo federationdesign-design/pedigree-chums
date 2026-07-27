@@ -2,6 +2,16 @@
 
 import { Dog, ActionType } from './types';
 
+// S12 protected-state machine (Task 15). Two states only:
+//   'active'    a safety state is live: only safety responses route (games, sales,
+//               comedy, orientation and ordinary variation are all held back).
+//   'aftercare' the visitor acknowledged or moved to a clear ordinary topic:
+//               ordinary factual answers, rules and navigation are served plainly,
+//               but games, sales, teasing and comic variants stay blocked for the
+//               rest of the session. A new safety signal returns to 'active'.
+//   null        no protected state has fired.
+export type ProtectedState = 'active' | 'aftercare' | null;
+
 export interface Session {
   activeDog: Dog;
   submissionCount: number; // human submissions so far
@@ -12,7 +22,7 @@ export interface Session {
   closed: boolean; // Boxer cut-off performed
   lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
-  safetyLatched: boolean; // a protected safety state fired; block comedy/game/sales/orientation until a meaningful topic
+  protectedState: ProtectedState; // S12 protected-state machine (Task 15)
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
   lastBreedSlug: string | null; // the breed most recently established, for follow-up questions
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
@@ -32,7 +42,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     closed: false,
     lastAction: null,
     anatomyRedirectUsed: false,
-    safetyLatched: false,
+    protectedState: null,
     lastWasComplaint: false,
     lastBreedSlug: null,
     barkStreakByDog: {},

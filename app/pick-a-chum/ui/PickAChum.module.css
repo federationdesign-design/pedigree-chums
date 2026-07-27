@@ -232,6 +232,13 @@
   color: var(--pc-ui-blue);
   margin-bottom: 0;
 }
+/* S12 (Task 15): a protected safety response drops the dog name for a calm, shared
+   HELP AND SUPPORT header, in navy rather than the character blue. */
+.nameplateSupport {
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  color: var(--pc-ui-navy);
+}
 .dialogue {
   margin: 0;
   font-family: var(--font-body, sans-serif);
