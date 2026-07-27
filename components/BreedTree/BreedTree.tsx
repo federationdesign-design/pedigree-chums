@@ -2997,18 +2997,11 @@ export default function BreedTree({
             for (const pl of data.pills ?? []) {
               spawnPillRef.current?.(pl.x, pl.y, pl.w, pl.name);
             }
-            // A solo dog leaves a full-size blank circle wearing its breed name.
-            // The layer sends the position because only the layer knows its pan,
-            // and without that it lands where the old node centre used to be
-            // rather than where the dog actually was. Twelve hits rather than a
-            // badge's twenty, since a circle that size is struck far more often.
-            if (data.big) {
-              spawnBadgeRef.current?.(data.big.x, data.big.y, 0, 0, {
-                r: data.big.r,
-                label: data.big.name,
-                charges: 12,
-              });
-            }
+            // A collected dog does NOT come back. It used to return as a
+            // full-size blank circle wearing its breed name, which meant the pit
+            // stayed just as full however much you completed. Now it is simply
+            // gone, so the pit empties as the big circles are worked through and
+            // finishing a level actually clears the floor.
             wakeRef.current?.();
           }}
           onClose={() => {
