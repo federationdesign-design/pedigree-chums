@@ -221,9 +221,15 @@ const PERSONAL = ['i have', 'my dog', 'i like', 'i love', 'sad', 'angry', 'good 
 // safety's territory (Batch 4), safety wins ties.
 const IDENTITY_FAMILIES: { family: string; triggers: string[] }[] = [
   { family: 'F01', triggers: ['how can a dog type', 'a dog type', 'really your face', 'what i typed'] },
-  { family: 'F02', triggers: ['are you real', 'are you a dog', 'actually a dog', 'a real dog', 'real dog there', 'talking to a dog', 'are you alive', 'real animal', 'pretending to be a dog', 'are you pretending'] },
+  // Task 32a: "so you're fake then" is a real-vs-fake probe (F02). "fake" is anchored to "you"
+  // so it stays about the dog and not a stray "fake news"; apostrophe and bare forms both, since
+  // the normaliser keeps an internal apostrophe.
+  { family: 'F02', triggers: ['are you real', 'are you a dog', 'actually a dog', 'a real dog', 'real dog there', 'talking to a dog', 'are you alive', 'real animal', 'pretending to be a dog', 'are you pretending', "you're fake", 'youre fake', 'are you fake', 'you are fake'] },
   { family: 'F03', triggers: ['are you ai', 'a chatbot', 'are you a robot', 'a robot', 'ai things', 'chatgpt', 'a computer', 'is this a computer', 'computer program', 'are you software', 'software'] },
-  { family: 'F04', triggers: ['human writing', 'writing these', 'controlling you', 'person behind', 'behind this', 'operated by', 'being operated', 'typing for you'] },
+  // Task 32a: "who wrote your answers" is an authorship probe (F04). Anchored to "your
+  // answers/replies" (never a bare "who wrote"), so a general-knowledge "who wrote Matilda" is
+  // NOT stolen by this layer-12 route.
+  { family: 'F04', triggers: ['human writing', 'writing these', 'controlling you', 'person behind', 'behind this', 'operated by', 'being operated', 'typing for you', 'who wrote your', 'wrote your answers', 'wrote your replies'] },
   { family: 'F05', triggers: ['prewritten', 'answers automatic', 'automatic', 'same answer', 'saying random things', 'random things', 'making these answers', 'all programmed', 'programmed', 'automated'] },
   { family: 'F06', triggers: ['understand me', 'actually read this', 'read this', 'hear me', 'are you listening', 'you listening', 'understand english', 'responding to me', 'what i am saying', 'what im saying', "what i'm saying"] },
   { family: 'F07', triggers: ['cartoon dog', 'cartoon', 'just a picture', 'really happening'] },

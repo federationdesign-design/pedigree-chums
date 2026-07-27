@@ -744,8 +744,14 @@ const IDENTITY_CORPUS = [
   'Are you pretending to be a dog?', 'Is this a real conversation?', 'Are you just saying random things?',
   'Do you give everyone the same answer?', 'Is this one of those AI things?', 'Is ChatGPT running this?',
   'Are you connected to the internet?', 'Is this live?', 'Are you really responding to me?', 'How can a dog type?',
+  // Task 32a: two acceptance-pack identity probes (S07 turns 3 and 4) that used to miss.
+  "so you're fake then", 'who wrote your answers',
 ];
 for (const q of IDENTITY_CORPUS) check(q, { layer: 12, bucket: 'B16', action: 'identity' });
+// Task 32a regression: the narrow authorship trigger must NOT steal a general-knowledge
+// "who wrote X" question. B16 is layer 12, above GK (layer 6), so a broad "who wrote" would.
+check('who wrote Matilda', { bucket: 'B06', action: 'gk_answer' });
+check('who wrote The Gruffalo', { bucket: 'B06', action: 'gk_answer' });
 
 // ---- Play / entertainment intent -> interim FUN tease (bucket B17) ----
 for (const q of ['Can we play a game?', 'Entertain me', 'Quiz me', 'I am bored.', "Let's play", 'Can I play?'])
