@@ -2877,6 +2877,15 @@ export default function BreedTree({
             setLearnPeek(false);
             setStartPeek(false);
             setPlayPeek(false);
+            // Reset any learn-area zoom back to the full pit before the round
+            // starts. Otherwise the drop routine sees a zoomed-in focus, bails
+            // out, and the round begins stuck inside one circle.
+            cancelAnimationFrame(rafRef.current);
+            focusRef.current = nodes[0];
+            setFocus(nodes[0]);
+            zoomTo(clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? 1.21 : 1)]));
+            // Hide the open info box as the round begins.
+            if (!hideCaption) onToggleCaption?.();
             setLearning(false);
             setStarted(true);
             runFallRef.current?.();
