@@ -34,6 +34,7 @@ export interface Session {
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
   complaintOpened: boolean; // Task 25b: the full FAQ015 complaint answer was already served this context (subsequent turns get the short repeat)
+  repairCount: number; // Task 29: consecutive failed-understanding turns (the repair ladder rung); a valid intent resets it
   topic: Topic | null; // Task 27: the current subject + kind (folds in the old lastBreedSlug)
   previousTopic: Topic | null; // Task 27: the prior subject, so an explicit return has something to restore
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
@@ -57,6 +58,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     personalSadnessCount: 0,
     lastWasComplaint: false,
     complaintOpened: false,
+    repairCount: 0,
     topic: null,
     previousTopic: null,
     barkStreakByDog: {},

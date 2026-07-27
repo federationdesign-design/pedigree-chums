@@ -1166,6 +1166,67 @@ check('can someone help me', { action: 'safety_signpost' }, { assert: (r, resp) 
   check('ok', {}, { session: s, assert: (_r, _resp, sess) => (sess.topic === null ? null : `topic survived the protected exchange: ${JSON.stringify(sess.topic)}`) });
 })();
 
+// ---- Task 29: the repair ladder. Failed understanding climbs the three approved rungs;
+// a valid new intent (including safety) cancels the ladder and resets the count. ----
+const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t);
+// The full S08 script as one session.
+(() => {
+  const s = newSession();
+  const turns = [
+    ['whats the thing with the cards', 'faq_answer', null, 0],
+    ['no not that', 'fallback', 'REPAIR-L1', 1],
+    ['I mean the pictures on them', 'fallback', 'REPAIR-L2', 2],
+    ["you're not understanding me", 'fallback', 'REPAIR-L3', 3],
+    ['forget it', 'fallback', 'B13-FALLBACK', 4],
+    ['actually can you help me find something', 'clarifier', null, 0],
+    ['the name generator', 'link', null, 0],
+  ];
+  let ok = true, note = '', prevRung = null;
+  for (const [inp, act, rid, cnt] of turns) {
+    const { resolution: r, response } = submit(data, s, inp);
+    if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
+    if (rid && response.responseId !== rid) { ok = false; note += `"${inp}" respId ${response.responseId} want ${rid}; `; }
+    if (s.repairCount !== cnt) { ok = false; note += `"${inp}" count ${s.repairCount} want ${cnt}; `; }
+    if (/^REPAIR-/.test(response.responseId)) {
+      if (hasUnresolvedTok(response.text)) { ok = false; note += `"${inp}" unresolved token; `; }
+      if (prevRung === response.responseId) { ok = false; note += `"${inp}" rung repeated in a row; `; }
+      prevRung = response.responseId;
+    } else prevRung = null;
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'S08: repair ladder, one session', layer: '-', bucket: '-', action: 'repair', note: ok ? '' : note });
+})();
+// rung 1 then a valid breed request -> ladder clears, breed answers.
+(() => {
+  const s = newSession();
+  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'REPAIR-L1' ? null : `not rung 1: ${resp.responseId}`) });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, _resp, sess) =>
+    sess.repairCount !== 0 ? `ladder not cleared: ${sess.repairCount}` : r.breedSlug === 'labrador' ? null : `breed wrong: ${r.breedSlug}` });
+})();
+// a safety signal during repair -> safety wins, ladder abandoned.
+(() => {
+  const s = newSession();
+  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'REPAIR-L1' ? null : `not rung 1: ${resp.responseId}`) });
+  check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId !== 'MOD_SAFEGUARDING' ? `safety lost: ${r.moderationId}` : sess.repairCount !== 0 ? `ladder not abandoned: ${sess.repairCount}` : null });
+})();
+// the ladder never repeats the same rung twice in a row (consecutive misses climb L1/L2/L3,
+// then the plain catch-all), and no repair response contains an unresolved token.
+(() => {
+  const s = newSession();
+  const ids = [];
+  for (const inp of ['the wardrobe negotiated with marmalade', 'purple clocks drifting sideways', 'invisible tuesday melting quietly', 'the fifth wheel sang loudly', 'marmalade thoughts wander far']) {
+    const { response } = submit(data, s, inp);
+    ids.push(response.responseId);
+    if (/^REPAIR-/.test(response.responseId) && hasUnresolvedTok(response.text)) { fail++; rows.push({ ok: false, input: 'repair token', layer: '-', bucket: '-', action: 'repair', note: `${response.responseId} has a token` }); }
+  }
+  const order = ids[0] === 'REPAIR-L1' && ids[1] === 'REPAIR-L2' && ids[2] === 'REPAIR-L3';
+  const noRepeat = !ids.some((id, i) => i > 0 && /^REPAIR-/.test(id) && id === ids[i - 1]);
+  const ok = order && noRepeat;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'repair ladder: no rung repeats in a row', layer: '-', bucket: '-', action: 'repair', note: ok ? '' : `ids=${ids.join(',')}` });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

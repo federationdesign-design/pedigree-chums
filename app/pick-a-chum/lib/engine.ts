@@ -61,6 +61,22 @@ const PLAIN_FALLBACK_RES: Resolution = { layer: 9, layerName: 'Recognised conver
 // line five times. Approved by Steve, verbatim.
 const COMPLAINT_REPEAT_LINE = 'Noted. Put that in the email too and someone will look at it.';
 
+// Task 29: the repair ladder. A "failed understanding" is an unresolved catch-all outcome;
+// consecutive ones climb the three approved rungs. A valid new intent (anything that
+// resolves, including safety) cancels the ladder and resets the count. Approved lines,
+// verbatim (provided directly by Steve; not yet in the generated Collie Responses). No
+// dynamic candidates, no slots.
+// A "failed understanding" is the B13 free-text catch-all: the router could not resolve the
+// message at all. gk_unknown (a deliberate refuse-to-guess), gibberish (keyboard smash) and
+// emoji_only each keep their own diagnostic line, so they are NOT ladder rungs; like any
+// non-catch-all turn they cancel the ladder and reset the count.
+const FAILED_UNDERSTANDING = new Set(['fallback']);
+const REPAIR_LADDER: Record<number, { id: string; text: string }> = {
+  1: { id: 'REPAIR-L1', text: 'That one got past me. Say it a different way and I will try again.' },
+  2: { id: 'REPAIR-L2', text: 'That could mean a few things. Do you mean a dog breed, or how the card game works?' },
+  3: { id: 'REPAIR-L3', text: 'I could not sort that out, and I am sorry. Come back another time with a different question. Goodbye.' },
+};
+
 export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
   const n = normalise(input);
@@ -167,6 +183,22 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.personalSadnessCount += 1;
   } else if (detectSadnessClear(n)) {
     session.personalSadnessCount = 0;
+  }
+
+  // Task 29: the repair ladder. Only outside a protected state (the S12 machine owns those
+  // turns). A failed understanding climbs the ladder and its response is replaced by the
+  // rung's approved line; a fourth consecutive miss leaves the plain catch-all (so no rung
+  // ever repeats). Anything that resolves, or a safety signal, is a valid new intent that
+  // cancels the ladder and resets the count.
+  if (session.protectedState === null && FAILED_UNDERSTANDING.has(resolution.action)) {
+    session.repairCount += 1;
+    const rung = REPAIR_LADDER[session.repairCount];
+    if (rung) {
+      response.text = rung.text;
+      response.responseId = rung.id;
+    }
+  } else {
+    session.repairCount = 0;
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
