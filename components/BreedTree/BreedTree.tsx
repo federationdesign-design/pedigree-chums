@@ -640,6 +640,8 @@ export default function BreedTree({
   const frozen = dockAside && gravity && !started && !learning;
   // Desktop hover preview of the level background, the same courtesy LEARN gets.
   const [startPeek, setStartPeek] = useState(false);
+  // Hovering the learn PLAY button previews the play scene behind the pit.
+  const [playPeek, setPlayPeek] = useState(false);
   // Learn rail: the pack dog whose Ancestry card is open below the box.
   const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
@@ -2732,7 +2734,7 @@ export default function BreedTree({
         <div
           aria-hidden="true"
           className={styles.level}
-          style={{ clipPath: seamClip(started ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
+          style={{ clipPath: seamClip(started || (learning && playPeek) ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
         >
           <div
             className={styles.levelSky}
@@ -2756,14 +2758,14 @@ export default function BreedTree({
           // learn only, never the hover preview: on the start screen the peek is a
           // glimpse of the pink, and the artwork underneath it made the two
           // overlays read as one busy thing
-          className={`${styles.learnPattern}${!started && learning ? " " + styles.learnPatternOn : ""}`}
+          className={`${styles.learnPattern}${!started && learning && !playPeek ? " " + styles.learnPatternOn : ""}`}
         />
       )}
 
       {dockAside && gravity && (
         <div
           aria-hidden="true"
-          className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
+          className={`${styles.learnWash}${!started && learning && !playPeek ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
         />
       )}
       {/* Big PLAY in the bottom-left of the learn area: jump straight from
@@ -2772,9 +2774,12 @@ export default function BreedTree({
         <button
           type="button"
           className={styles.learnPlay}
+          onMouseEnter={() => setPlayPeek(true)}
+          onMouseLeave={() => setPlayPeek(false)}
           onClick={() => {
             setLearnPeek(false);
             setStartPeek(false);
+            setPlayPeek(false);
             setLearning(false);
             setStarted(true);
             runFallRef.current?.();
