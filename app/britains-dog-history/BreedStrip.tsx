@@ -397,6 +397,19 @@ export default function BreedStrip({ era }: { era: string }) {
             if (na) setActive(na);
           }}
           onLost={() => setStreak(0)} // a loss breaks the run toward the next life
+          onSpendLife={() => {
+            // Leaving a live round to go and read costs a life, exactly like a
+            // retry does, and breaks the streak for the same reason.
+            setLives((l) => Math.max(0, l - 1));
+            setStreak(0);
+          }}
+          onResetRun={() => {
+            // PLAY AGAIN on a spent run: lives and the campaign total go back
+            // to the start, but the player keeps their place in the level.
+            setLives(LIVES_START);
+            setStreak(0);
+            setCampaignScore(0);
+          }}
           onStartOver={() => {
             // a retry costs a life; at zero the modal never offers this
             setLives((l) => Math.max(0, l - 1));

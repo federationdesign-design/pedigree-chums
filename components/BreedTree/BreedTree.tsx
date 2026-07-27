@@ -529,6 +529,9 @@ export default function BreedTree({
   onStartedChange,
   onLearningChange,
   onRelativeTap,
+  startInLearn = false,
+  playLabel = "PLAY",
+  onPlayPressed,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -561,6 +564,16 @@ export default function BreedTree({
   onStartedChange?: (started: boolean) => void;
   onLearningChange?: (learning: boolean) => void;
   onRelativeTap?: (slug: string, name: string) => void;
+  // Mount straight into the LEARN area instead of the bare start screen. Used
+  // when a round is restarted by the in-pit learn button: the player asked for
+  // learn, so they land in learn rather than back on START / LEARN.
+  startInLearn?: boolean;
+  // The word on the big learn PLAY button. Becomes "PLAY AGAIN" once the run
+  // is out of lives, since that press restarts the whole run.
+  playLabel?: string;
+  // Fires on the learn PLAY button before the drop, so the host can reset a
+  // spent run (lives and score) first.
+  onPlayPressed?: () => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -672,7 +685,7 @@ export default function BreedTree({
   const wordHoverRef = useRef(false);
   // LEARN mode: the pit stays inert, the blue box is open, and a pink wash lies
   // over everything. learnPeek is the desktop hover preview of that wash.
-  const [learning, setLearning] = useState(false);
+  const [learning, setLearning] = useState(startInLearn);
   useEffect(() => { onLearningChange?.(learning); }, [learning, onLearningChange]);
   const [learnPeek, setLearnPeek] = useState(false);
   const frozen = dockAside && gravity && !started && !learning;
@@ -2860,7 +2873,7 @@ export default function BreedTree({
           className={styles.learnPlaySweep}
           style={{ clipPath: seamClip(started || (learning && playPeek) ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
         >
-          <span className={styles.learnPlaySweepWord}>PLAY</span>
+          <span className={styles.learnPlaySweepWord}>{playLabel}</span>
         </div>
       )}
       {/* Big PLAY in the bottom-left of the learn area: jump straight from
@@ -2886,13 +2899,16 @@ export default function BreedTree({
             zoomTo(clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? 1.21 : 1)]));
             // Hide the open info box as the round begins.
             if (!hideCaption) onToggleCaption?.();
+            // A spent run is reset by the host before anything drops, so the
+            // fresh round starts with its lives and score already restored.
+            onPlayPressed?.();
             setLearning(false);
             setStarted(true);
             runFallRef.current?.();
           }}
-          aria-label="Play"
+          aria-label={playLabel}
         >
-          PLAY
+          {playLabel}
         </button>
       )}
       {britainOpen && (
