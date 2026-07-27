@@ -6,6 +6,8 @@ import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { descendantPackBreeds, ancestryBreakdown } from "../../data/lineageArchive";
+import TrainingCard from "../TrainingCard/TrainingCard";
+import trainingDifficulty from "../../data/trainingDifficulty";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
@@ -568,6 +570,8 @@ export default function BreedTree({
   const [startPeek, setStartPeek] = useState(false);
   // Learn rail: the pack dog whose Ancestry card is open below the box.
   const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string } | null>(null);
+  const [ancHidden, setAncHidden] = useState(false);
+  const [trainHidden, setTrainHidden] = useState(false);
   // The blue box can be picked up and moved, the same as the cards on a chum
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
@@ -2858,7 +2862,7 @@ export default function BreedTree({
                   className={`${styles.relCard}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
-                  onClick={() => setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug }))}
+                  onClick={() => { setAncHidden(false); setTrainHidden(false); setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug })); }}
                   title={r.name}
                   aria-label={`View ${r.name}`}
                 >
@@ -2867,9 +2871,13 @@ export default function BreedTree({
               ))}
             </div>
           )}
-          {dockAside && !hideCaption && ancestryFor && ancestryRows.length > 0 && (
+        </div>
+      </div>
+      {dockAside && ancestryFor && (
+        <div className={styles.learnCards}>
+          {!ancHidden && ancestryRows.length > 0 && (
             <div className={styles.ancCard} role="group" aria-label={`Ancestry of ${ancestryFor.name}`}>
-              <button type="button" className={styles.ancClose} onClick={() => setAncestryFor(null)} aria-label="Close ancestry">
+              <button type="button" className={styles.ancClose} onClick={() => setAncHidden(true)} aria-label="Close ancestry">
                 <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 12, height: 12 }}>
                   <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
                   <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
@@ -2894,8 +2902,19 @@ export default function BreedTree({
               </button>
             </div>
           )}
+          {!trainHidden && trainingDifficulty[ancestryFor.slug] && (
+            <div className={styles.trainCard} role="group" aria-label={`Training for ${ancestryFor.name}`}>
+              <button type="button" className={styles.ancClose} onClick={() => setTrainHidden(true)} aria-label="Close training">
+                <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 12, height: 12 }}>
+                  <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                  <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                </svg>
+              </button>
+              <TrainingCard data={trainingDifficulty[ancestryFor.slug]} />
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
