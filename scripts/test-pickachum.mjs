@@ -242,6 +242,26 @@ check('my brother makes me look at his willy', { action: 'safety_signpost' }, { 
   check('how do I play?', { action: 'rules_answer' }, { session: s });
   check('what do I do here', { action: 'orientation' }, { session: s });
 })();
+// ---- Task 7: after a protected state, no game, no sales, no comedy for the rest of the
+// exchange, even when the next message would otherwise route cleanly to one. ----
+// (a) game: a bark that WOULD route cleanly to the bark game (layer 15) is blocked.
+(() => {
+  const s = newSession();
+  check('I want to die', { action: 'safety_signpost' }, { session: s });
+  check('woof', {}, { session: s, assert: (r) => (r.action === 'bark' || r.action === 'bark_break' || r.action === 'bark_ack' ? 'bark game served after a protected state' : null) });
+})();
+// (b) sales: a clean buying phrase that WOULD open the offer modal (layer 2) is blocked.
+(() => {
+  const s = newSession();
+  check('I want to die', { action: 'safety_signpost' }, { session: s });
+  check('how much is the game', {}, { session: s, assert: (r) => (r.action === 'open_discount_popup' ? 'sales served after a protected state' : null) });
+})();
+// (c) comedy: a joke request that WOULD transfer to the Boxer (layer 8) is blocked.
+(() => {
+  const s = newSession();
+  check('I want to die', { action: 'safety_signpost' }, { session: s });
+  check('tell me a joke', {}, { session: s, assert: (r) => (r.action === 'transfer' ? 'comedy served after a protected state' : null) });
+})();
 
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });

@@ -15,9 +15,14 @@ export interface Turn {
 }
 
 // After a protected safety state, these families must not be selected until a
-// meaningful non-safety topic is established (the safety guard). A meaningful
-// topic clears the latch.
-const BLOCKED_AFTER_SAFETY = new Set(['orientation', 'fun_tease', 'open_discount_popup', 'transfer']);
+// meaningful non-safety topic is established (the safety guard). No game, no
+// sales and no comedy may be served for the rest of the exchange: fun_tease and
+// the bark game (bark / bark_break / bark_ack) are the games, open_discount_popup
+// is sales, and a comic transfer (joke -> Boxer) is comedy. orientation is held
+// back too. A meaningful topic clears the latch.
+const BLOCKED_AFTER_SAFETY = new Set([
+  'orientation', 'fun_tease', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack',
+]);
 const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 'gk_answer', 'link']);
 // Weak routes that, after a complaint answer, should stay in the complaint context.
 const WEAK_AFTER_COMPLAINT = new Set(['fallback', 'gk_unknown', 'gibberish', 'clarifier']);
