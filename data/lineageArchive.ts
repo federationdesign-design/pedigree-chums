@@ -3,6 +3,7 @@
 // its "related pack dogs" rail from here, so the lookup lives in one place.
 import { breeds, type Breed } from "./breeds";
 import { getLineage, type LineageNode } from "./lineage";
+import { resolveLineageName } from "./lineageNames";
 
 const index = new Map<string, Set<string>>();
 
@@ -38,4 +39,33 @@ export function relativesForLevel(rootName: string): Breed[] {
   const walk = (n: LineageNode) => { ancestors.push(n.name); n.children?.forEach(walk); };
   tree.children?.forEach(walk); // everything below the root is one of its ancestors
   return descendantPackBreeds(ancestors).filter((b) => b.name !== rootName);
+}
+// Top ancestor breeds for a pack breed as name + rounded %, the same breakdown
+// the breed's own page shows. Reused by the mini pit learn rail.
+function sumLeaves(n: LineageNode): number {
+  if (!n.children?.length) return n.value ?? 1;
+  return n.children.reduce((s, c) => s + sumLeaves(c), 0);
+}
+
+export function ancestryBreakdown(breedName: string): { name: string; pct: number }[] {
+  const lineage = getLineage(resolveLineageName(breedName));
+  if (!lineage) return [];
+  const rootLeaves = sumLeaves(lineage);
+  if (!rootLeaves) return [];
+  const results: { name: string; pct: number }[] = [];
+  const walk = (n: LineageNode) => {
+    if (!n.children?.length) return;
+    n.children.forEach((c) => {
+      const pct = Math.round((sumLeaves(c) / rootLeaves) * 100);
+      if (pct > 0) results.push({ name: c.name, pct });
+      walk(c);
+    });
+  };
+  walk(lineage);
+  const merged = new Map<string, number>();
+  results.forEach(({ name, pct }) => merged.set(name, (merged.get(name) ?? 0) + pct));
+  return [...merged.entries()]
+    .map(([name, pct]) => ({ name, pct }))
+    .sort((a, b) => b.pct - a.pct)
+    .slice(0, 8);
 }

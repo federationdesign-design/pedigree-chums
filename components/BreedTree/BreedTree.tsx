@@ -5,7 +5,7 @@ import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode 
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
-import { descendantPackBreeds } from "../../data/lineageArchive";
+import { descendantPackBreeds, ancestryBreakdown } from "../../data/lineageArchive";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
@@ -566,6 +566,8 @@ export default function BreedTree({
   const frozen = dockAside && gravity && !started && !learning;
   // Desktop hover preview of the level background, the same courtesy LEARN gets.
   const [startPeek, setStartPeek] = useState(false);
+  // Learn rail: the pack dog whose Ancestry card is open below the box.
+  const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string } | null>(null);
   // The blue box can be picked up and moved, the same as the cards on a chum
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
@@ -980,7 +982,7 @@ export default function BreedTree({
     focusRef.current = d;
     setFocus(d);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? 1.21 : 1)];
+    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? 1.21 : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
@@ -1054,8 +1056,11 @@ export default function BreedTree({
       void st.offsetWidth; // force reflow so the animation can retrigger
       st.classList.add(styles.shake);
     }
-    if (focusRef.current !== d) zoom(d);
-    else if (d.parent) zoom(d.parent);
+    if (focusRef.current !== d) {
+      zoom(d);
+      // Clicking a circle to zoom in also opens the info box if it was closed.
+      if (dockAside && hideCaption && d !== nodes[0]) onToggleCaption?.();
+    } else if (d.parent) zoom(d.parent);
   }
   function onBackground() {
     if (focusRef.current !== nodes[0]) { zoom(nodes[0]); return; }
@@ -2005,6 +2010,13 @@ export default function BreedTree({
     () => descendantPackBreeds([shown.data.name]).map((b) => ({ name: b.name, slug: b.slug, image: b.image })),
     [shown],
   );
+  // That dog's ancestry breakdown, the same figures as its own page.
+  const ancestryRows = useMemo(
+    () => (ancestryFor ? ancestryBreakdown(ancestryFor.name) : []),
+    [ancestryFor],
+  );
+  // Close the card when the hovered circle changes or the round begins.
+  useEffect(() => { setAncestryFor(null); }, [shown, learning]);
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
   // Moving onto one of those inner circles re-hovers it and brings it back.
@@ -2102,7 +2114,7 @@ export default function BreedTree({
                   key={i}
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
-                  stroke={hidden ? "none" : strokeByDepth ? ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4] : stroke}
+                  stroke={hidden ? "none" : dockAside && d !== nodes[0] && d === shown ? "#ffffff" : strokeByDepth ? ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4] : stroke}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d)}
                   style={{
                     cursor: hidden ? "default" : "pointer",
@@ -2843,15 +2855,43 @@ export default function BreedTree({
                 <button
                   key={r.slug}
                   type="button"
-                  className={styles.relCard}
+                  className={`${styles.relCard}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
-                  onClick={() => onRelativeTap?.(r.slug, r.name)}
+                  aria-pressed={ancestryFor?.slug === r.slug}
+                  onClick={() => setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug }))}
                   title={r.name}
                   aria-label={`View ${r.name}`}
                 >
                   <img src={bust(r.image)} alt="" draggable={false} />
                 </button>
               ))}
+            </div>
+          )}
+          {dockAside && !hideCaption && ancestryFor && ancestryRows.length > 0 && (
+            <div className={styles.ancCard} role="group" aria-label={`Ancestry of ${ancestryFor.name}`}>
+              <button type="button" className={styles.ancClose} onClick={() => setAncestryFor(null)} aria-label="Close ancestry">
+                <svg viewBox="0 0 32 32" aria-hidden="true" style={{ width: 12, height: 12 }}>
+                  <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                  <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                </svg>
+              </button>
+              <div className={styles.ancTitle}>Ancestry</div>
+              <div className={styles.ancDog}>{ancestryFor.name}</div>
+              {ancestryRows.map((a) => (
+                <div key={a.name}>
+                  <div className={styles.ancRow}>
+                    <span className={styles.ancName}>{a.name}</span>
+                    <span className={styles.ancPct}>{a.pct}%</span>
+                  </div>
+                  <div className={styles.ancBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
+                </div>
+              ))}
+              <p className={styles.ancDisclaimer}>
+                Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
+              </p>
+              <button type="button" className={styles.ancLink} onClick={() => onRelativeTap?.(ancestryFor.slug, ancestryFor.name)}>
+                See {ancestryFor.name}&rsquo;s full page
+              </button>
             </div>
           )}
         </div>
