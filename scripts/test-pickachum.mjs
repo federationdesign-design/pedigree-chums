@@ -1132,6 +1132,40 @@ check('can someone help me', { action: 'safety_signpost' }, { assert: (r, resp) 
     : resp.text.includes('safe grown-up') && !resp.text.includes('near you') ? null
       : `distress line still not corrected: "${resp.text.slice(0, 50)}"` });
 
+// ---- Task 27: dialogue state. The S14 assertions in the Task 24a block above must still
+// pass unchanged (breed carry-over now runs through the topic slot). These add the two new
+// session guards and assert point 4 (a safety requirement) directly on session.topic. ----
+// New guard: a safety exchange mid-conversation is not derailed, and no beagle state leaks.
+(() => {
+  const s = newSession();
+  check('tell me about beagles', { bucket: 'B05', action: 'breed_page' }, { session: s });
+  check("I'm scared", { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId !== 'MOD_GENERAL_DISTRESS' ? `safety derailed: ${r.moderationId}`
+      : sess.topic !== null ? `topic survived into PROTECTED_ACTIVE: ${JSON.stringify(sess.topic)}` : null });
+  check('ok', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING_ACK_CLOSE' ? null : `ack derailed: ${r.moderationId}`) });
+  check('what were you saying', {}, { session: s, assert: (r, resp) =>
+    r.action === 'breed_page' || r.breedSlug === 'beagle' || resp.text.toLowerCase().includes('beagle') ? 'beagle leaked out of the safety exchange' : null });
+})();
+// New guard: the complaint context is not confused by the stored breed topic.
+(() => {
+  const s = newSession();
+  check('tell me about beagles', { bucket: 'B05', action: 'breed_page' }, { session: s });
+  check('I have a complaint', { action: 'faq_answer' }, { session: s, assert: (r) => (r.faqId === 'FAQ015' ? null : `complaint not FAQ015: ${r.faqId ?? r.action}`) });
+  check('the labrador one', { action: 'faq_answer' }, { session: s, assert: (r) =>
+    r.action === 'breed_page' || r.breedSlug === 'labrador' ? 'the stored breed topic hijacked the complaint follow-up'
+      : r.faqId === 'FAQ015' ? null : `complaint context lost: ${r.faqId ?? r.action}` });
+})();
+// Point 4, asserted directly: after a safety signal the topic (and previous topic) is
+// cleared, no stored subject influences any turn, and none survives the protected exchange.
+(() => {
+  const s = newSession();
+  check('tell me about beagles', {}, { session: s, assert: (_r, _resp, sess) => (sess.topic?.subject === 'beagle' ? null : `topic not set: ${JSON.stringify(sess.topic)}`) });
+  check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (_r, _resp, sess) =>
+    sess.topic === null && sess.previousTopic === null ? null : `topic not cleared entering PROTECTED_ACTIVE: t=${JSON.stringify(sess.topic)} p=${JSON.stringify(sess.previousTopic)}` });
+  check('what do I do here', {}, { session: s, assert: (_r, _resp, sess) => (sess.topic === null ? null : `stored topic reappeared during the protected exchange: ${JSON.stringify(sess.topic)}`) });
+  check('ok', {}, { session: s, assert: (_r, _resp, sess) => (sess.topic === null ? null : `topic survived the protected exchange: ${JSON.stringify(sess.topic)}`) });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

@@ -6,8 +6,27 @@ import { ChumData, Resolution } from './types';
 import { normalise } from './normalise';
 import { resolve } from './router';
 import { assemble, Assembled } from './assembler';
-import { Session } from './session';
+import { Session, Topic } from './session';
 import { detectSadnessClear } from './safety';
+
+// Task 27: classify a resolution's subject KIND for the topic slot. This is a subject
+// classifier, not a rival MEANINGFUL_TOPIC set (which stays in its S12 role only). A
+// breed page carries its slug as the subject; the others carry a stable label.
+function topicOf(r: Resolution): Topic | null {
+  switch (r.action) {
+    case 'breed_page':
+      return r.breedSlug ? { kind: 'breed', subject: r.breedSlug } : null;
+    case 'open_discount_popup':
+      return { kind: 'commercial', subject: 'the game' };
+    case 'fun_tease':
+    case 'rules_answer':
+      return { kind: 'game', subject: 'the game' };
+    case 'link':
+      return { kind: 'article', subject: r.destinationId ?? 'that page' };
+    default:
+      return null;
+  }
+}
 
 export interface Turn {
   input: string;
@@ -54,7 +73,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     barkCompleted: session.barkCompletedByDog[dog] ?? false,
     lastAction: session.lastAction,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
-    lastBreedSlug: session.lastBreedSlug,
+    topic: session.topic,
     lastWasComplaint: session.lastWasComplaint,
     protectedState: wasProtected,
     personalSadnessCount: session.personalSadnessCount,
@@ -152,7 +171,20 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
   if (!session.lastWasComplaint) session.complaintOpened = false; // Task 25b: a clear topic change ends the complaint context, so the next complaint gets the full answer again
-  if (resolution.breedSlug) session.lastBreedSlug = resolution.breedSlug; // carry breed for follow-ups
+  // Task 27: dialogue-state update. Point 4 is a safety requirement, not tidiness: the
+  // topic must NOT survive into PROTECTED_ACTIVE, so it (and the previous topic) is cleared
+  // whenever the state is active. Otherwise a topic-bearing turn sets the current topic,
+  // demoting the previous one so an explicit return has something to restore.
+  if (session.protectedState === 'active') {
+    session.topic = null;
+    session.previousTopic = null;
+  } else {
+    const newTopic = topicOf(resolution);
+    if (newTopic) {
+      if (session.topic && session.topic.subject !== newTopic.subject) session.previousTopic = session.topic;
+      session.topic = newTopic;
+    }
+  }
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
 
   return { input, resolution, response };

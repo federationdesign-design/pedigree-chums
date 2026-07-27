@@ -9,6 +9,7 @@
 import { ChumData, Resolution, Dog, ActionType } from './types';
 import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness } from './safety';
+import { Topic } from './session';
 
 const HIDDEN_CEILING = 20;
 // The bark game breaks into English on the fifth consecutive bark exchange.
@@ -346,7 +347,7 @@ export interface RouterState {
   barkCompleted?: boolean; // the active dog has already completed its bark game
   lastAction?: ActionType | null; // previous turn's action (for the clarifier follow-up)
   anatomyRedirectUsed?: boolean; // ANATOMY_GENERAL_REDIRECT already fired this session
-  lastBreedSlug?: string | null; // the breed established earlier, for follow-up questions
+  topic?: Topic | null; // Task 27: the current subject + kind (folds in the old lastBreedSlug)
   lastWasComplaint?: boolean; // an open complaint context: defer breed retrieval until it clears
   protectedState?: 'active' | 'aftercare' | null; // S12 protected-state machine (Task 15)
   personalSadnessCount?: number; // Task 20: qualifying personal-sadness statements so far this session
@@ -453,13 +454,47 @@ function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | 
     if (bareFamily) return breedPageRes(top.p);
     // otherwise a single weak signal is not confident: fall through
   }
-  // Breed follow-up: no new breed named, but one is established and this reads as a
-  // question about it ("how long do they live").
-  if (state.lastBreedSlug && hasAny(n, BREED_FOLLOWUP)) {
-    const p = BREED_PAGES.find((x) => x.slug === state.lastBreedSlug);
+  // Breed follow-up: no new breed named, but a breed topic is established and this reads
+  // as a question about it ("how long do they live"). Reads the topic slot (Task 27).
+  const breedTopic = state.topic?.kind === 'breed' ? state.topic.subject : null;
+  if (breedTopic && hasAny(n, BREED_FOLLOWUP)) {
+    const p = BREED_PAGES.find((x) => x.slug === breedTopic);
     if (p) return breedPageRes(p);
   }
   return null;
+}
+
+// Task 27: generic explicit-return triggers. Named returns ("back to beagles", "the
+// beagle one") carry a subject and go through ordinary breed matching; these carry NO
+// subject, so they restore the stored topic. "them"/"it" resolve only to the stored
+// topic, never the visitor's own words, so nothing is echoed.
+const TOPIC_RETURN_TRIGGERS = [
+  'you were saying', 'what were you saying', 'what was that', 'go back', 'carry on',
+  'as you were', 'back to it', 'back to that', 'about them', 'about it',
+];
+
+// Rebuild the answer for a restored topic. For breed, the page for its slug; for the
+// others, the same route the topic came from. Returns null if a breed slug no longer
+// resolves.
+function topicReturnResolution(topic: Topic): Resolution | null {
+  switch (topic.kind) {
+    case 'breed': {
+      const p = BREED_PAGES.find((x) => x.slug === topic.subject);
+      return p ? breedPageRes(p) : null;
+    }
+    case 'commercial':
+      return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+    case 'game':
+      return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'fun_tease' };
+    case 'article':
+      return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'link', destinationId: topic.subject };
+  }
+}
+
+function detectTopicReturn(n: Normalised, state: RouterState): Resolution | null {
+  if (!state.topic) return null;
+  if (!hasAny(n, TOPIC_RETURN_TRIGGERS)) return null;
+  return topicReturnResolution(state.topic);
 }
 
 // After the bare-help clarifier fires, the visitor's next turn is an answer to
@@ -576,6 +611,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       action: 'safety_signpost',
       moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1',
     };
+  }
+
+  // Task 27: explicit topic return. A generic return ("you were saying", "what were you
+  // saying about them", "go back") with no named subject restores the stored topic. Below
+  // every safety route and only when a topic is stored (cleared on PROTECTED_ACTIVE), so a
+  // safety exchange is never derailed and no topic leaks out of it. Named returns ("back
+  // to beagles") carry a subject and fall through to ordinary breed matching below.
+  {
+    const back = detectTopicReturn(N, state);
+    if (back) return back;
   }
 
   // Hidden ceiling: after safety, a session at the ceiling ends via the Boxer.

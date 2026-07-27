@@ -12,6 +12,14 @@ import { Dog, ActionType } from './types';
 //   null        no protected state has fired.
 export type ProtectedState = 'active' | 'aftercare' | null;
 
+// Task 27: dialogue state (register item 11). The current subject and its kind, carried
+// across turns so an explicit return can restore it. `subject` is the breed slug for a
+// breed topic (folding in the old lastBreedSlug), and a stable label otherwise.
+export interface Topic {
+  kind: 'breed' | 'commercial' | 'game' | 'article';
+  subject: string;
+}
+
 export interface Session {
   activeDog: Dog;
   submissionCount: number; // human submissions so far
@@ -26,7 +34,8 @@ export interface Session {
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
   complaintOpened: boolean; // Task 25b: the full FAQ015 complaint answer was already served this context (subsequent turns get the short repeat)
-  lastBreedSlug: string | null; // the breed most recently established, for follow-up questions
+  topic: Topic | null; // Task 27: the current subject + kind (folds in the old lastBreedSlug)
+  previousTopic: Topic | null; // Task 27: the prior subject, so an explicit return has something to restore
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
   // stable Dog id (a visitor can discover a version for each of the four dogs).
   barkStreakByDog: Partial<Record<Dog, number>>;
@@ -48,7 +57,8 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     personalSadnessCount: 0,
     lastWasComplaint: false,
     complaintOpened: false,
-    lastBreedSlug: null,
+    topic: null,
+    previousTopic: null,
     barkStreakByDog: {},
     barkCompletedByDog: {},
   };
