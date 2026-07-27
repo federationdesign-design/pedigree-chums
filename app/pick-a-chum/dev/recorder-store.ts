@@ -72,13 +72,24 @@ const MIN_MESSAGES = 3; // a conversation counts only at three turns or more
 // Add any future fallback bucket here so the miss rate stays honest.
 const FALLBACK_BUCKETS = new Set(['B13', 'B14']);
 
-// Outcome is a function of the action AND the bucket (some misses, like the B13
-// catch-all, share the benign 'converse' action with real greetings, so action
-// alone would call them answers).
-function outcomeOf(action: string, bucket: string): string {
+// Weak FAQ matches below this strength are misses, not answers (Task 10B). A lone
+// common container token is already blocked at the matcher (strength 0, never
+// routes), so in practice only strength >= 1 faq_answers are ever recorded; this
+// keeps the flag honest by construction if a future phrasing slips through.
+const FAQ_MATCH_THRESHOLD = 1;
+
+// Outcome is a function of the action, the bucket AND (for FAQ) the match strength.
+// Some misses, like the B13 catch-all, share the benign 'converse' action with
+// real greetings, so action alone would call them answers; and a FAQ that matched
+// only weakly is a wrong answer, not a success (Task 10B). faqStrength is optional:
+// undefined means "not a strength-scored FAQ match" (e.g. a deliberate FAQ012
+// complaint route, or a row re-read from storage where it was not persisted), and
+// is treated as answered.
+function outcomeOf(action: string, bucket: string, faqStrength?: number): string {
   if (action === 'transfer') return 'transfer';
   if (action === 'safety_signpost' || action === 'safety_boundary') return 'refusal';
   if (action === 'gibberish' || action === 'gk_unknown' || action === 'emoji_only') return 'unmatched';
+  if (action === 'faq_answer' && faqStrength !== undefined && faqStrength < FAQ_MATCH_THRESHOLD) return 'unmatched';
   if (FALLBACK_BUCKETS.has(bucket)) return 'unmatched';
   if (action === 'boxer_cutoff') return 'cutoff';
   return 'answered';
@@ -126,7 +137,7 @@ export function buildRow(e: TurnEvent, now: string): TurnRow {
   const r = e.resolution;
   const resp = e.response;
   const conf = (r as unknown as { confidence?: number | string }).confidence;
-  const outcome = outcomeOf(r.action, r.bucket ?? '');
+  const outcome = outcomeOf(r.action, r.bucket ?? '', r.faqMatchStrength);
   const text = resp.followUp ? `${resp.text}\n${resp.followUp}` : resp.text;
   const safety = isSafetyTurn(r.action);
   return {

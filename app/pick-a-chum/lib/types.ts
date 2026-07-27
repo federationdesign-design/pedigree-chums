@@ -170,6 +170,7 @@ export interface Resolution {
   url?: string | null;
   transferTo?: Dog;
   faqId?: string;
+  faqMatchStrength?: number; // FAQ match confidence: 0 = lone common token (no match), >=1 = a distinctive signal or full-phrase substring. Consumed by the outcome flag so a weak match reports as unmatched, not answered.
   gkId?: string;
   moderationId?: string;
   responseFamily?: string; // e.g. identity family 'F01'..'F10' for family-specific copy

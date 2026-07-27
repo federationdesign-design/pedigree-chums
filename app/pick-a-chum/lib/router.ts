@@ -229,12 +229,47 @@ function matchArticle(n: ChumData, compact: string): { destinationId: string; ur
   return null;
 }
 
-function matchFaq(n: ChumData, compact: string): { faqId: string } | null {
+// Ubiquitous container tokens: present across unrelated game-surface inputs
+// whatever the intent, so a FAQ phrase that reduces to one of these ALONE is a
+// non-discriminating matcher. FAQ002 "Who is the game for?" collapsed under the
+// stopword filter to ['game'] and matched anything containing "game" (whats the
+// game / how long does a game take / whats the bark game / is there a game online).
+// Scoped to game/games only: the FAQ single-token audit shows every other lone
+// FAQ token is distinctive and is the whole point of its record (discount ->
+// FAQ009, delivery -> FAQ014, competition -> FAQ011, contact -> FAQ012, price ->
+// FAQ008, pack -> FAQ004), so those must keep matching. Task 10A.
+const COMMON_FAQ_TOKENS = new Set(['game', 'games']);
+
+// FAQ match strength for a single phrase against the input:
+//   2 = the whole phrase is a substring of the input (strong, unambiguous)
+//   n = all significant tokens present; score is the count that are NOT common
+//       container words, so a lone common token scores 0 and cannot match alone
+//   0 = no match
+// Recorded on the resolution (Task 10B) so the outcome flag can mark a weak match
+// as unmatched rather than reporting a wrong answer as a success.
+function faqPhraseStrength(compact: string, phrase: string): number {
+  const p = phrase.toLowerCase().trim();
+  if (!p) return 0;
+  if (p.includes(' ') && compact.includes(p)) return 2;
+  const toks = keyTokens(p);
+  if (!toks.length) return 0;
+  const words = new Set(compact.match(/[a-z]+/g) ?? []);
+  if (!toks.every((t) => words.has(t))) return 0;
+  return toks.filter((t) => !COMMON_FAQ_TOKENS.has(t)).length;
+}
+
+// First FAQ (in sheet order) with any confident signal, reporting its best phrase
+// strength. First-match order is preserved from the original matcher; the only
+// change is that a phrase whose sole signal is a lone common token now scores 0
+// and is skipped (Task 10A), so it no longer wins on that token alone.
+function matchFaq(n: ChumData, compact: string): { faqId: string; strength: number } | null {
   for (const f of n.faq) {
-    if (phraseMatches(compact, f.canonicalQuestion)) return { faqId: f.faqId };
+    let s = faqPhraseStrength(compact, f.canonicalQuestion);
     for (const alt of f.alternativePhrasings) {
-      if (phraseMatches(compact, alt)) return { faqId: f.faqId };
+      const a = faqPhraseStrength(compact, alt);
+      if (a > s) s = a;
     }
+    if (s > 0) return { faqId: f.faqId, strength: s };
   }
   return null;
 }
@@ -560,7 +595,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   {
     const faq = matchFaq(data, c);
     if (faq) {
-      return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: faq.faqId };
+      return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: faq.faqId, faqMatchStrength: faq.strength };
     }
   }
 

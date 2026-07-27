@@ -72,11 +72,16 @@ function parseScenarios(text) {
   return scenarios;
 }
 
-// Outcome bucket, matching the earlier passes.
-function outcomeFor(action) {
+// Outcome bucket, matching the earlier passes. Takes the whole resolution so a
+// faq_answer that matched only weakly (a lone common token) reports as unmatched
+// rather than a false 'answered' (Task 10B). Threshold: strength must be >= 1.
+const FAQ_MATCH_THRESHOLD = 1;
+function outcomeFor(r) {
+  const action = r.action;
   if (action === 'safety_signpost' || action === 'safety_boundary') return 'refusal';
   if (action === 'transfer') return 'transfer';
   if (action === 'gk_unknown' || action === 'fallback') return 'unmatched';
+  if (action === 'faq_answer' && r.faqMatchStrength !== undefined && r.faqMatchStrength < FAQ_MATCH_THRESHOLD) return 'unmatched';
   return 'answered';
 }
 
@@ -101,7 +106,7 @@ for (const sc of scenarios) {
       r.bucket ?? '',
       r.action,
       response.responseId ?? '',
-      outcomeFor(r.action),
+      outcomeFor(r),
       response.text ?? '',
     ]);
   });

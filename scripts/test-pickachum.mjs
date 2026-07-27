@@ -279,6 +279,23 @@ check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }
 check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' });
 
+// ---- Task 10: FAQ catch-all fixed (Part A) + honest outcome flag (Part B) ----
+const t10outcome = (input, r, resp) => buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input, resolution: r, response: resp, transferTo: '' }, '2026-01-01T00:00:00.000Z').outcome;
+// Part A: the five inputs FAQ002 answered on the lone token "game" no longer reach
+// FAQ002, and now report unmatched rather than a false 'answered'.
+['whats the game', 'tell me about the game', 'how long does a game take', 'whats the bark game', 'is there a game on the website'].forEach((inp) => {
+  check(inp, {}, { assert: (r, resp) => {
+    if (r.faqId === 'FAQ002') return 'still answered by FAQ002';
+    const oc = t10outcome(inp, r, resp);
+    return oc === 'unmatched' ? null : `expected unmatched, got ${oc}`;
+  } });
+});
+// Part B regression guard: these keep their FAQ and still report 'answered'. If any
+// changes, the threshold is too aggressive: narrow it, do not adjust the assertion.
+check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('how many people can play', r, resp) === 'answered' ? null : 'not answered') });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ004' ? `not FAQ004: ${r.faqId}` : t10outcome('whats in the pack', r, resp) === 'answered' ? null : 'not answered') });
+check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('what do you do when a dog barks', r, resp) === 'answered' ? null : 'not answered') });
+
 // ---- Step 4 safety net: medical, self-harm, safeguarding, general distress, harm, bare help ----
 check('I cannot breathe', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check('im having a stroke', { layer: 1, action: 'safety_signpost' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
