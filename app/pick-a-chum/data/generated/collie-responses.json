@@ -1198,7 +1198,7 @@
     "triggers": [
       "greeting_count > 1"
     ],
-    "template": "Aye, we have met. The next stage normally involves a useful noun or verb.",
+    "template": "Aye. State your case.",
     "factSource": "Session state",
     "defaultRoute": "Weighted",
     "animationCue": "HEAD_TILT_SMALL",
@@ -2392,7 +2392,7 @@
     "bucketId": "B19",
     "subtag": "Break into English",
     "triggers": [],
-    "template": "That concludes the barking assessment. You demonstrated persistence. I demonstrated restraint. What are we working on?",
+    "template": "You have out-barked me. That is not a small thing.",
     "factSource": "Bark game",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
