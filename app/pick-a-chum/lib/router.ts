@@ -157,6 +157,13 @@ const ORIENTATION = [
   // Task 28 (S06 turn 8): "what else is there" is a "what can I do here" question; B15's
   // existing line answers it. Specific phrase, so it does not catch breed or buying words.
   'what else is there',
+  // Task 30: the directionless visitor who has opened the site and does not know what it
+  // is for ("what am I supposed to do", "now what", "what should I type"). B15's existing
+  // lines answer all six. Specific multiword phrases only: every significant word here is
+  // <=5 letters and so matched exactly (fuzzThreshold), and phraseFuzzy keeps them
+  // consecutive, so none reaches the regression guard (a dog barks / beagles / labrador /
+  // how much / whats in the pack).
+  'supposed to do', 'supposed to type', 'what happens now', 'what should i type', 'what do you want',
 ];
 
 // Orientation phrasings matched on the WHOLE normalised input only (Task 11a).
@@ -164,7 +171,9 @@ const ORIENTATION = [
 // substring trigger: as a substring it would swallow breed queries like "what is
 // this dog". An exact full-input match has no such collision, because a longer
 // input ("what is this dog") is a different string and never equals it.
-const ORIENTATION_EXACT = new Set(['what is this']);
+// Task 30: "now what" is orientation as a whole message, but as a substring it sits
+// inside "know what" (an identity phrasing), so it is matched on the whole input only.
+const ORIENTATION_EXACT = new Set(['what is this', 'now what']);
 
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
 const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
