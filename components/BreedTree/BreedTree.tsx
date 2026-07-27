@@ -242,7 +242,10 @@ const BADGE_DRAW_R = 92;
 // slider and PIT_SHRINK, so shrinking the circles left the badges behind and
 // they read as oversized. This is the badge radius as a fraction of the circle
 // radius it sits on, taken from the proportion the pit had before the shrink.
-const BADGE_OF_CIRCLE = 0.55;
+// Halved from 0.55 by request: the badges read as almost the same size as the
+// circle they belong to, which made the pair look like two circles rather than
+// a circle wearing a tag.
+const BADGE_OF_CIRCLE = 0.275;
 const BADGE_MIN_R = 26;
 const BADGE_MAX_R = 140;
 
@@ -1454,7 +1457,9 @@ export default function BreedTree({
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = badgeDrawRRef.current / k;
       const badges: Body[] = d1.map((n, i) => ({
-        n: null, x: n.x + n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
+        // bottom LEFT of the circle: the right side is where the level's own
+        // furniture sits, and a badge there crowded it
+        n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
         r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
@@ -1601,7 +1606,7 @@ export default function BreedTree({
           newMbs.push(mb);
           const bl = badgeBodiesRef.current;
           if (bl) {
-            const bb: Body = { n: null, x: ch.x + ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
@@ -2652,7 +2657,7 @@ export default function BreedTree({
               const kk = SIZE / v[2];
               const b = badgeBodiesRef.current?.[i];
               const d1n = nodes.filter((n) => n.depth === 1)[i];
-              const bx = b ? b.x : d1n ? d1n.x + d1n.r * 0.707 : v[0];
+              const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
               const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
               const st2 = stageRef.current;
               const upp2 = st2 ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st2.clientHeight, 1) : 1;
