@@ -232,7 +232,7 @@ export default function AnubisPage() {
             <div className={styles.sidebarCard}>
               <div style={{ padding: "18px 20px" }}>
                 <p style={cardTitle}>Jackal, and other insults</p>
-                <p style={cardBody}>Half the dog is buried in our language as an insult. To be a <strong>jackal</strong> is to be a sneak who does another&aprs;s dirty work &mdash; from the old idea that the jackal was the lion&aprs;s servant.</p>
+                <p style={cardBody}>Half the dog is buried in our language as an insult. To be a <strong>jackal</strong> is to be a sneak who does another&apos;s dirty work &mdash; from the old idea that the jackal was the lion&apos;s servant.</p>
                 <p style={cardBodyLast}>It has company: <strong>cur</strong>, <strong>mongrel</strong>, <strong>hangdog</strong>, &quot;gone to the dogs,&quot; &quot;in the doghouse.&quot; The animal we call loyal is also the animal we reach for when we want to name a coward.</p>
               </div>
             </div>
