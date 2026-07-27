@@ -69,3 +69,31 @@ export function ancestryBreakdown(breedName: string): { name: string; pct: numbe
     .sort((a, b) => b.pct - a.pct)
     .slice(0, 8);
 }
+
+// A single breed's share of ONE named ancestor, however deep in its tree.
+// Same per-node rounding and merge as ancestryBreakdown, but no top-8 cut, so
+// a distant descendant (e.g. Bull Terrier under a Celtic-level circle) still
+// resolves. Returns null when the ancestor is not in the breed's lineage.
+export function ancestorShareOf(
+  breedName: string,
+  ancestorName: string,
+): number | null {
+  const lineage = getLineage(resolveLineageName(breedName));
+  if (!lineage) return null;
+  const rootLeaves = sumLeaves(lineage);
+  if (!rootLeaves) return null;
+  let pct = 0;
+  let found = false;
+  const walk = (n: LineageNode) => {
+    if (!n.children?.length) return;
+    n.children.forEach((c) => {
+      if (c.name === ancestorName) {
+        pct += Math.round((sumLeaves(c) / rootLeaves) * 100);
+        found = true;
+      }
+      walk(c);
+    });
+  };
+  walk(lineage);
+  return found ? pct : null;
+}

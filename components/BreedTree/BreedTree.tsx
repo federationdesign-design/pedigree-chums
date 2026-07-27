@@ -5,7 +5,7 @@ import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode 
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
-import { descendantPackBreeds, ancestryBreakdown } from "../../data/lineageArchive";
+import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf } from "../../data/lineageArchive";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
@@ -2971,10 +2971,10 @@ export default function BreedTree({
           {/* Chum picked: how much of that pack dog traces to the level circle
               currently shown, from its own ancestry breakdown. */}
           {ancestryFor && dockAside && shown !== nodes[0] && (() => {
-            const share = ancestryRows.find((a) => a.name === shown.data.name);
-            return share ? (
+            const share = ancestorShareOf(ancestryFor.name, shown.data.name);
+            return share !== null ? (
               <div className={styles.cBreak}>
-                <div className={styles.cBreakBig}>{ancestryFor.name} is {share.pct}% {shown.data.name}</div>
+                <div className={styles.cBreakBig}>{ancestryFor.name} is {share < 1 ? "<1%" : `${share}%`} {shown.data.name}</div>
                 <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
                 <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
               </div>
