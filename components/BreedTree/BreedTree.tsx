@@ -638,7 +638,7 @@ export default function BreedTree({
   // Desktop hover preview of the level background, the same courtesy LEARN gets.
   const [startPeek, setStartPeek] = useState(false);
   // Learn rail: the pack dog whose Ancestry card is open below the box.
-  const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string } | null>(null);
+  const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
   const [trainHidden, setTrainHidden] = useState(false);
   // The blue box can be picked up and moved, the same as the cards on a chum
@@ -2080,7 +2080,7 @@ export default function BreedTree({
   // The related-dogs rail follows the shown circle: each ancestor has its own
   // set of pack descendants (an uneven split), so it changes as you hover.
   const railDogs = useMemo(
-    () => descendantPackBreeds([shown.data.name]).map((b) => ({ name: b.name, slug: b.slug, image: b.image })),
+    () => descendantPackBreeds([shown.data.name]).map((b) => ({ name: b.name, slug: b.slug, image: b.image, note: b.character })),
     [shown],
   );
   // That dog's ancestry breakdown, the same figures as its own page.
@@ -2885,20 +2885,20 @@ export default function BreedTree({
                 {/* The relation line sits directly under the level dog's name (the
                     card title), naming the link to the selected circle. Absent at
                     root, since then there is nothing selected to relate to. */}
-                {shown !== nodes[0] && (
+                {(ancestryFor || shown !== nodes[0]) && (
                   <span className={styles.cRelated}>is related to:</span>
                 )}
               </span>
             </div>
           )}
-          <span className={styles.cName}>{shown.data.name}</span>
-          {shownShare !== null && shown.parent && !learning && (
+          <span className={styles.cName}>{ancestryFor ? ancestryFor.name : shown.data.name}</span>
+          {!ancestryFor && shownShare !== null && shown.parent && !learning && (
             <span className={styles.cShare}>
               {shownShare}% of {shown.parent.data.name}
             </span>
           )}
           <p className={styles.cNote}>
-            {breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
+            {ancestryFor ? ancestryFor.note : breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
             {/* the mini pit drops the "keep digging" prompt: in LEARN mode the
                 circles are the whole point, so the nudge is noise */}
             {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}
@@ -2906,7 +2906,7 @@ export default function BreedTree({
           {/* The share pill from the main pit, reproduced below the write-up:
               the breed's share of this whole dog, its share in the role it sits
               in, and the same best-guess caveat. Only when a circle is picked. */}
-          {dockAside && shown.parent && shownNorm !== null && (
+          {!ancestryFor && dockAside && shown.parent && shownNorm !== null && (
             <div className={styles.cBreak}>
               <div className={styles.cBreakBig}>{shownNorm < 1 ? "<1%" : `${shownNorm}%`} of this dog</div>
               <div className={styles.cBreakRow}>As {genLabel(shown.depth)}: {shownShare === null ? "" : shownShare < 1 ? "<1%" : `${shownShare}%`}</div>
@@ -2931,7 +2931,7 @@ export default function BreedTree({
                   className={`${styles.relCard}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
-                  onClick={() => { setAncHidden(false); setTrainHidden(false); setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug })); }}
+                  onClick={() => { setAncHidden(true); setTrainHidden(true); setAncestryFor((cur) => (cur?.slug === r.slug ? null : { name: r.name, slug: r.slug, note: r.note })); }}
                   title={r.name}
                   aria-label={`View ${r.name}`}
                 >
