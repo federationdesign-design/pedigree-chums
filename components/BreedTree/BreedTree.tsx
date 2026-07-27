@@ -2077,7 +2077,18 @@ export default function BreedTree({
                     opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden || frozen ? undefined : () => setHovered(d)}
-                  onMouseLeave={hidden || frozen ? undefined : () => setHovered((h) => (h === d ? null : h))}
+                  onMouseLeave={hidden || frozen ? undefined : (e) => {
+                    // Ignore the mouseleave the blue box triggers when its own
+                    // growth (name, share and note appearing on hover) expands
+                    // down over the very circle being pointed at. Without this the
+                    // box covers the circle, fires leave, collapses back to the
+                    // focused circle, and cannot reopen because the pointer has not
+                    // moved. A real move to another circle or empty space still has
+                    // a relatedTarget outside the aside, so it clears as before.
+                    const rt = e.relatedTarget as Element | null;
+                    if (rt && asideRef.current?.contains(rt)) return;
+                    setHovered((h) => (h === d ? null : h));
+                  }}
                   onClick={
                     frozen
                       ? (e) => e.stopPropagation() // swallow it: falling through would close the pit
