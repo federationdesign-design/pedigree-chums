@@ -4,12 +4,21 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
+import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
 import LineageMap from "../PackPit/LineageMap";
 import type { LevelTheme } from "../../data/levelThemes";
 import BritainMessage from "../PackPit/BritainMessage";
+
+// Reference-info marker on the learn-box portrait: the same red/amber/green
+// status the main pit shows, plus a plain label for the generation line.
+const STATUS_LABEL: Record<BreedTag, string> = {
+  extinct: "Extinct", trending: "Trending", popular: "Popular", endangered: "Endangered", "in-decline": "In decline",
+};
+const genLabel = (d: number) =>
+  d <= 0 ? "the breed itself" : d === 1 ? "parent" : d === 2 ? "grandparent" : `${"great-".repeat(d - 2)}grandparent`;
 
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
@@ -1949,6 +1958,14 @@ export default function BreedTree({
   const shownShare = shown.parent
     ? Math.round(((shown.value ?? 0) / (shown.parent.value || 1)) * 100)
     : null;
+  // Share of the whole chum (root value), the pill's headline figure, as
+  // opposed to shownShare which is the share within the immediate parent.
+  const shownNorm =
+    shown.parent && (nodes[0].value ?? 0) > 0
+      ? Math.round(((shown.value ?? 0) / (nodes[0].value || 1)) * 100)
+      : null;
+  // The level dog's living/extinct status, for the marker on its portrait.
+  const rootTag = nodeStatus(nodes[0].data.name, rootNote ?? nodes[0].data.note ?? "");
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
   // Moving onto one of those inner circles re-hovers it and brings it back.
@@ -2677,12 +2694,22 @@ export default function BreedTree({
               text-only caption. */}
           {dockAside && (rootImage ?? nodes[0].data.img) && (
             <div className={styles.cHead}>
-              <img
-                className={styles.cPortrait}
-                src={bust((rootImage ?? nodes[0].data.img) as string)}
-                alt={nodes[0].data.name}
-                draggable={false}
-              />
+              <span className={styles.cPortraitWrap}>
+                <img
+                  className={styles.cPortrait}
+                  src={bust((rootImage ?? nodes[0].data.img) as string)}
+                  alt={nodes[0].data.name}
+                  draggable={false}
+                />
+                {rootTag && (
+                  <span
+                    className={styles.cStatus}
+                    style={{ background: TAG_STYLE[rootTag].bg }}
+                    title={STATUS_LABEL[rootTag]}
+                    aria-label={STATUS_LABEL[rootTag]}
+                  />
+                )}
+              </span>
               <span className={styles.cHeadName}>{nodes[0].data.name}</span>
             </div>
           )}
@@ -2706,6 +2733,18 @@ export default function BreedTree({
                 circles are the whole point, so the nudge is noise */}
             {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
+          {/* The share pill from the main pit, reproduced below the write-up:
+              the breed's share of the whole chum, its share in the role it sits
+              in, and the same best-guess caveat. Only when a circle is picked. */}
+          {dockAside && shown.parent && shownNorm !== null && (
+            <div className={styles.cBreak}>
+              <div className={styles.cBreakBig}>{shownNorm < 1 ? "<1%" : `${shownNorm}%`} of your chum</div>
+              <div className={styles.cBreakRow}>As {genLabel(shown.depth)}: {shownShare === null ? "" : shownShare < 1 ? "<1%" : `${shownShare}%`}</div>
+              <div className={styles.cBreakRow}>Share of your chum: {shownNorm < 1 ? "<1%" : `${shownNorm}%`}</div>
+              <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
+              <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
+            </div>
+          )}
         </div>
       </div>
     </div>
