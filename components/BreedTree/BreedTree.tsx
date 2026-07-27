@@ -2979,6 +2979,20 @@ export default function BreedTree({
           <TrainingCard data={trainingDifficulty[ancestryFor.slug]} compact />
         </LearnDragCard>
       )}
+      {dockAside && ancestryFor && (ancHidden || trainHidden) && (
+        <div className={styles.learnDock}>
+          {ancHidden && ancestryRows.length > 0 && (
+            <button type="button" className={styles.learnDockBtn} onClick={() => setAncHidden(false)} aria-label="Reopen ancestry" title="Ancestry">
+              <span className={styles.learnDockIcon}>{ICONS.ancestry}</span>
+            </button>
+          )}
+          {trainHidden && trainingDifficulty[ancestryFor.slug] && (
+            <button type="button" className={styles.learnDockBtn} onClick={() => setTrainHidden(false)} aria-label="Reopen training" title="Training">
+              <span className={styles.learnDockIcon}>{ICONS.training}</span>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
