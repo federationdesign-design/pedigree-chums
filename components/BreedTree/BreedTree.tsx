@@ -237,6 +237,14 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
 const BADGE_DRAW_R = 92;
+// A badge belongs to its circle, so it has to scale with it. BADGE_DRAW_R was a
+// flat 92 in SVG units while the circles are sized by the packing, the level
+// slider and PIT_SHRINK, so shrinking the circles left the badges behind and
+// they read as oversized. This is the badge radius as a fraction of the circle
+// radius it sits on, taken from the proportion the pit had before the shrink.
+const BADGE_OF_CIRCLE = 0.55;
+const BADGE_MIN_R = 26;
+const BADGE_MAX_R = 140;
 
 // Split words into exactly n lines as evenly as the word lengths allow.
 // Returns null when n lines are not reachable (a single long word can force
@@ -820,15 +828,26 @@ export default function BreedTree({
   const throwWatchRef = useRef<((pr: any) => void) | null>(null);
   const checkEscapeRef = useRef<(() => void) | null>(null);
   const flagIdxRef = useRef<number | null>(null);
+  // The drawn badge radius for this layout. Mean of the depth-1 circles, so a
+  // level with uneven circles gets one consistent badge size rather than a
+  // different one per dog.
+  const badgeDrawR = useMemo(() => {
+    const d1 = nodes.filter((n) => n.depth === 1);
+    if (!d1.length) return BADGE_DRAW_R;
+    const mean = d1.reduce((acc, n) => acc + n.r, 0) / d1.length;
+    return Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, mean * BADGE_OF_CIRCLE));
+  }, [nodes]);
+  const badgeDrawRRef = useRef(badgeDrawR);
+  useEffect(() => { badgeDrawRRef.current = badgeDrawR; }, [badgeDrawR]);
   useEffect(() => {
     if (!dockAside) return;
     setBadgePcts(
       nodes
         .filter((n) => n.depth === 1)
-        .map((n) => ({ pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0, r: BADGE_DRAW_R })),
+        .map((n) => ({ pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0, r: badgeDrawR })),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, dockAside]);
+  }, [nodes, dockAside, badgeDrawR]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -1433,7 +1452,7 @@ export default function BreedTree({
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
-      const BADGE_R = BADGE_DRAW_R / k;
+      const BADGE_R = badgeDrawRRef.current / k;
       const badges: Body[] = d1.map((n, i) => ({
         n: null, x: n.x + n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
         r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
@@ -1588,7 +1607,7 @@ export default function BreedTree({
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: BADGE_DRAW_R }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawRRef.current }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -1853,7 +1872,7 @@ export default function BreedTree({
         const bl = badgeBodiesRef.current;
         if (!bl) return;
         const w = worldFromPx(sx, sy);
-        const rDraw = opts?.r ?? BADGE_DRAW_R;
+        const rDraw = opts?.r ?? badgeDrawRRef.current;
         const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20 };
         bl.push(nb);
         all.push(nb);
