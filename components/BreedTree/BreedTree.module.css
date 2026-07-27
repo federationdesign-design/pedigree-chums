@@ -19,6 +19,9 @@
   height: 100%;
   display: block;
   transition: opacity 0.3s ease;
+  /* The pit owns the gesture, like the main pit does on its cards: without
+     this a touch drag on a dog or badge is read as a scroll and fights you. */
+  touch-action: none;
 }
 
 .aside {
