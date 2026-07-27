@@ -124,6 +124,17 @@ const CONTACT_ENQUIRY = [
   'your email', 'whats your email', 'what is your email',
 ];
 
+// Task 32b: delivery / shipping questions that name a UK place. FAQ014's approved answer
+// covers the mainland (Scotland, England, Wales -> covered) AND the non-mainland places
+// (Northern Ireland and the islands -> not yet) in a single line, so every UK place name is
+// routed to the same FAQ014 destination. A delivery-intent word is REQUIRED alongside the
+// place, so an ordinary "tell me about Scotland" is not swallowed into the delivery answer.
+const DELIVERY_INTENT = ['ship', 'shipping', 'deliver', 'delivery', 'delivered', 'post', 'postage', 'posted', 'send', 'sent', 'mail', 'mailing'];
+const DELIVERY_PLACES = [
+  'scotland', 'england', 'wales', 'northern ireland',
+  'isle of man', 'channel islands', 'jersey', 'guernsey', 'hebrides', 'orkney', 'shetland', 'isle of wight',
+];
+
 // Orientation / onboarding (bucket B15). First-time visitors who do not yet know
 // what the chat is or what to do: "what do I do here", "how does this work",
 // "what can I ask". Curated, specific phrases only (never bare "how do i" / "what
@@ -791,6 +802,14 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (tool) {
       return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: tool.destinationId, url: tool.url };
     }
+  }
+
+  // Task 32b: a delivery / shipping question naming a UK place -> FAQ014, whose one approved
+  // line covers both the mainland (covered) and the non-mainland places (not yet). Requires a
+  // delivery-intent word AND a place, checked at the FAQ layer so it beats the free-text
+  // fallback that used to swallow "do you ship to Scotland".
+  if (hasAny(N, DELIVERY_INTENT) && hasAny(N, DELIVERY_PLACES)) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ014', faqMatchStrength: 2 };
   }
 
   // Layer 4: FAQ knowledge.

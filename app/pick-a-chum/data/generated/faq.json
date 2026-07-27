@@ -217,13 +217,13 @@
       "postage",
       "outside UK"
     ],
-    "canonicalAnswer": "No, UK mainland only for now.",
+    "canonicalAnswer": "UK mainland only for now, so Scotland, England and Wales are covered. Not Northern Ireland or the islands yet.",
     "sourcePage": "Campaign / product",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Open",
     "notes": "Do not infer coverage.",
-    "resolvedAnswer": "No, UK mainland only for now.",
+    "resolvedAnswer": "UK mainland only for now, so Scotland, England and Wales are covered. Not Northern Ireland or the islands yet.",
     "resolvedCta": null
   },
   {
