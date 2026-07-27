@@ -1215,7 +1215,13 @@ export default function LineageMap({
           const instrIconClicks = INSTR_NAMES.has(breed.name) ? instrFirstUnpicked.length : 0;
           const frontierClicks = frontierNodes.length > 0 ? (INSTR_NAMES.has(breed.name) ? frontierNodes.length : 1) : 0;
           const toPopClick = toPopNodes.length > 0 ? 1 : 0; // always count if images to expose
-          const unplacedClick = unplacedCards.length > 0 ? 1 : 0; // always count if cards to place
+          // Placing follows exposing, always. Counting only the cards that
+          // already exist meant the placement click was invisible until the
+          // images had popped, so two clicks read as "x1" and then "x1" again.
+          // In the mini pit, count the placement step as soon as we know there
+          // is something to expose. Left alone in the main pit, which has not
+          // been asked for and shows longer chains.
+          const unplacedClick = unplacedCards.length > 0 || (circular && toPopNodes.length > 0) ? 1 : 0;
           const stepsLeft = instrIconClicks + frontierClicks + toPopClick + unplacedClick;
           return (
           <g
@@ -1232,9 +1238,23 @@ export default function LineageMap({
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
+                {/* Mini pit: the counter sits INSIDE the pill, bottom right. It
+                    used to hang off the right-hand side at x=108, which ran
+                    clean off the screen whenever the lifted dog sat near the
+                    right edge. Same size, same style, just brought inside, and
+                    inside chumTop so it presses down with the button. */}
+                {circular && stepsLeft > 0 && (
+                  <text
+                    x={88}
+                    y={23}
+                    textAnchor="end"
+                    dominantBaseline="central"
+                    style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 14, fill: "#ffffff", pointerEvents: "none" }}
+                  >{`x${stepsLeft} more`}</text>
+                )}
               </g>
             </g>
-            {stepsLeft > 0 && (
+            {!circular && stepsLeft > 0 && (
               <text
                 x={108}
                 y={5}
