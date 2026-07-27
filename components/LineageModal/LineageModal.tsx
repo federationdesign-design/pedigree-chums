@@ -358,7 +358,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
 
       {/* Round won / game over, main-pit flash styling */}
       {phase !== "play" && (
-        <div className={css.endOverlay} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
+        <div className={`${css.endOverlay}${phase === "won" ? " " + css.winOverlay : ""}`} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
           {/* Round Won is its own screen: what you just finished, what it was
               worth, and what is coming next. Next Level is the whole point of
               it, so there is no X competing with the button. Game Over keeps the
