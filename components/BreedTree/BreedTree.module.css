@@ -492,6 +492,9 @@
      less responsive. The transition is a one-off 560ms wipe and is smooth
      without it. */
 }
+.level.levelSlow {
+  transition-duration: 2800ms;
+}
 @media (prefers-reduced-motion: reduce) {
   .level { transition: none; }
 }
@@ -836,7 +839,7 @@
 .learnDock {
   position: fixed;
   right: 3%;
-  top: 42%;
+  bottom: 4%;
   display: flex;
   flex-direction: column;
   gap: 10px;

@@ -2087,10 +2087,16 @@ export default function BreedTree({
   const rootTag = nodeStatus(nodes[0].data.name, rootNote ?? nodes[0].data.note ?? "");
   // The related-dogs rail follows the shown circle: each ancestor has its own
   // set of pack descendants (an uneven split), so it changes as you hover.
-  const railDogs = useMemo(
-    () => descendantPackBreeds([shown.data.name]).map((b) => ({ name: b.name, slug: b.slug, image: b.image, note: b.character })),
-    [shown],
-  );
+  const railDogs = useMemo(() => {
+    // Dogs shared with the other big circle(s) sit first; dogs unique to this
+    // circle drop to the bottom, so switching circles only churns the tail.
+    const others = nodes.filter((n) => n.depth === 1 && n.data.name !== shown.data.name).map((n) => n.data.name);
+    const sharedSlugs = new Set(others.length ? descendantPackBreeds(others).map((b) => b.slug) : []);
+    const shownDogs = descendantPackBreeds([shown.data.name]);
+    const shared = shownDogs.filter((b) => sharedSlugs.has(b.slug));
+    const unique = shownDogs.filter((b) => !sharedSlugs.has(b.slug));
+    return [...shared, ...unique].map((b) => ({ name: b.name, slug: b.slug, image: b.image, note: b.character }));
+  }, [shown, nodes]);
   // Rail with enter/exit animation: dogs that drop out of the list stay mounted
   // for one beat with a "leaving" flag so they can play the pop in reverse.
   const [renderRail, setRenderRail] = useState<Array<{ name: string; slug: string; image: string; note: string; leaving?: boolean }>>(() => railDogs);
@@ -2736,7 +2742,7 @@ export default function BreedTree({
       {dockAside && gravity && levelTheme && (
         <div
           aria-hidden="true"
-          className={styles.level}
+          className={`${styles.level}${learning && !started ? " " + styles.levelSlow : ""}`}
           style={{ clipPath: seamClip(started || (learning && playPeek) ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
         >
           <div
