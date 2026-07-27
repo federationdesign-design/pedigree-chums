@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import CookieBanner from "../CookieBanner/CookieBanner";
@@ -8,7 +8,6 @@ import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
 import { useRouter } from "next/navigation";
-import { relativesForLevel } from "../../data/lineageArchive";
 
 // Breed names longer than 11 characters break onto a second line at the
 // nearest word boundary, so long names never force a tiny single line.
@@ -59,10 +58,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [shownImg, setShownImg] = useState<string | null>(image);
   const router = useRouter();
   const [leavePage, setLeavePage] = useState<{ slug: string; name: string } | null>(null);
-  const relatives = useMemo(
-    () => relativesForLevel(name).map((b) => ({ name: b.name, slug: b.slug, image: b.image })),
-    [name],
-  );
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
@@ -171,7 +166,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           levelTheme={theme}
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}
-          relatives={relatives}
           onRelativeTap={(slug, nm) => setLeavePage({ slug, name: nm })}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}

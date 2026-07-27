@@ -5,6 +5,7 @@ import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode 
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
+import { descendantPackBreeds } from "../../data/lineageArchive";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTree.module.css";
@@ -416,7 +417,6 @@ export default function BreedTree({
   levelTheme = null,
   onStartedChange,
   onLearningChange,
-  relatives,
   onRelativeTap,
 }: {
   root: LineageNode;
@@ -448,7 +448,6 @@ export default function BreedTree({
   levelTheme?: LevelTheme | null;
   onStartedChange?: (started: boolean) => void;
   onLearningChange?: (learning: boolean) => void;
-  relatives?: { name: string; slug: string; image: string }[];
   onRelativeTap?: (slug: string, name: string) => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -901,9 +900,10 @@ export default function BreedTree({
   function strokeWidthFor(d: Node): number {
     const widths = [5, 4, 3, 2.6, 2.4];
     const base = widths[d.depth - 1] ?? 2.4;
-    // A circle with a single child gets a ring four times heavier, so a lone
-    // lineage step (as on this first level) reads as a deliberate emphasis.
-    return d.children && d.children.length === 1 ? base * 4 : base;
+    // The mini pit draws its rings four times heavier than the chum page, so a
+    // small, simple lineage reads boldly. (These circles are leaves, not
+    // single-child, which is why the earlier per-child rule never showed.)
+    return dockAside ? base * 4 : base;
   }
 
   function zoomTo(v: View) {
@@ -1999,6 +1999,12 @@ export default function BreedTree({
       : null;
   // The level dog's living/extinct status, for the marker on its portrait.
   const rootTag = nodeStatus(nodes[0].data.name, rootNote ?? nodes[0].data.note ?? "");
+  // The related-dogs rail follows the shown circle: each ancestor has its own
+  // set of pack descendants (an uneven split), so it changes as you hover.
+  const railDogs = useMemo(
+    () => descendantPackBreeds([shown.data.name]).map((b) => ({ name: b.name, slug: b.slug, image: b.image })),
+    [shown],
+  );
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
   // Moving onto one of those inner circles re-hovers it and brings it back.
@@ -2792,13 +2798,13 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
-          {dockAside && !hideCaption && relatives && relatives.length > 0 && (
+          {dockAside && !hideCaption && railDogs.length > 0 && (
             <div
               className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
-              style={{ gridTemplateRows: `repeat(${relatives.length > 9 ? Math.ceil(relatives.length / 2) : relatives.length}, auto)` }}
+              style={{ gridTemplateRows: `repeat(${railDogs.length > 9 ? Math.ceil(railDogs.length / 2) : railDogs.length}, auto)` }}
               aria-label="Pack dogs from this lineage"
             >
-              {relatives.map((r, i) => (
+              {railDogs.map((r, i) => (
                 <button
                   key={r.slug}
                   type="button"
