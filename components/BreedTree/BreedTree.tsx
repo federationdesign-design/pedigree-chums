@@ -478,6 +478,7 @@ export default function BreedTree({
   tinted = true,
   onShownChange,
   onShownImageChange,
+  onShownStatusChange,
   hideCaption = false,
   onCaptionClose,
   onScore,
@@ -509,6 +510,7 @@ export default function BreedTree({
   tinted?: boolean;
   onShownChange?: (name: string) => void;
   onShownImageChange?: (img: string | null) => void;
+  onShownStatusChange?: (tag: BreedTag | null) => void;
   hideCaption?: boolean;
   onCaptionClose?: () => void;
   onScore?: (v: number) => void;
@@ -1228,6 +1230,8 @@ export default function BreedTree({
     onShownChange?.(sh.data.name);
     const shImg = sh === nodes[0] ? (rootImage ?? sh.data.img) : sh.data.img;
     onShownImageChange?.(shImg ? bust(shImg) : null);
+    const shNote = sh === nodes[0] ? (rootNote ?? sh.data.note ?? "") : (sh.data.note ?? "");
+    onShownStatusChange?.(nodeStatus(sh.data.name, shNote));
     setBoxAlt((v) => !v);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hovered, focus]);

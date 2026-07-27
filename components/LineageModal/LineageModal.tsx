@@ -7,7 +7,17 @@ import CookieBanner from "../CookieBanner/CookieBanner";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
+import { TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
+
+// Plain-language label for the status dot on the title portrait.
+const STATUS_LABEL: Record<BreedTag, string> = {
+  extinct: "Extinct",
+  trending: "Trending",
+  popular: "Popular",
+  endangered: "Endangered",
+  "in-decline": "In decline",
+};
 
 // Breed names longer than 11 characters break onto a second line at the
 // nearest word boundary, so long names never force a tiny single line.
@@ -56,6 +66,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [mounted, setMounted] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [shownImg, setShownImg] = useState<string | null>(image);
+  const [shownStatus, setShownStatus] = useState<BreedTag | null>(null);
   const router = useRouter();
   const [leavePage, setLeavePage] = useState<{ slug: string; name: string } | null>(null);
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
@@ -138,7 +149,19 @@ export default function LineageModal({ name, image, character, lineage, onClose,
       )}
       {/* Title floats over the pit and never affects its size */}
       <div className={css.titleWrap}>
-        {shownImg && <img className={css.titlePortrait} src={shownImg} alt="" draggable={false} />}
+        {shownImg && (
+          <span className={css.titlePortraitWrap}>
+            <img className={css.titlePortrait} src={shownImg} alt="" draggable={false} />
+            {shownStatus && (
+              <span
+                className={css.titleStatus}
+                style={{ background: TAG_STYLE[shownStatus].bg }}
+                title={STATUS_LABEL[shownStatus]}
+                aria-label={STATUS_LABEL[shownStatus]}
+              />
+            )}
+          </span>
+        )}
         <h3 className={css.title}>
           {(isNarrow ? titleLines(shownName) : [shownName]).map((line, i, arr) => (
             <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
@@ -163,6 +186,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           tinted={false}
           onShownChange={setShownName}
           onShownImageChange={setShownImg}
+          onShownStatusChange={setShownStatus}
           levelTheme={theme}
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}

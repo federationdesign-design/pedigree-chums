@@ -38,13 +38,29 @@
   align-items: center;
   gap: 12px;
 }
+.titlePortraitWrap {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
 .titlePortrait {
   width: clamp(40px, 8vw, 54px);
   height: clamp(40px, 8vw, 54px);
-  border-radius: 12px;
+  border-radius: 50%;
   object-fit: cover;
   flex: none;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.titleStatus {
+  position: absolute;
+  right: 1px;
+  bottom: 2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 .title {
   width: auto;
