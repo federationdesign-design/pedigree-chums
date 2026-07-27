@@ -11,6 +11,7 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
+import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 import LineageMap from "../PackPit/LineageMap";
 import type { LevelTheme } from "../../data/levelThemes";
@@ -461,6 +462,41 @@ function LearnDragCard({
   );
 }
 
+// The temperament card body: a Pros/Cons toggle over white bullet text. Only
+// the active toggle is coloured, and as an outline (green pros, red cons), not
+// a filled block. Keyed per chum so it always reopens on Pros.
+function TemperamentBody({ pros, cons }: { pros: string[]; cons: string[] }) {
+  const [tab, setTab] = useState<"pros" | "cons">("pros");
+  const items = tab === "pros" ? pros : cons;
+  return (
+    <>
+      <div className={styles.tempTabs}>
+        <button
+          type="button"
+          className={`${styles.tempTab} ${styles.tempTabPro}${tab === "pros" ? " " + styles.tempTabOn : ""}`}
+          onClick={() => setTab("pros")}
+          aria-pressed={tab === "pros"}
+        >
+          Pros
+        </button>
+        <button
+          type="button"
+          className={`${styles.tempTab} ${styles.tempTabCon}${tab === "cons" ? " " + styles.tempTabOn : ""}`}
+          onClick={() => setTab("cons")}
+          aria-pressed={tab === "cons"}
+        >
+          Cons
+        </button>
+      </div>
+      <ul className={styles.tempList}>
+        {items.map((it) => (
+          <li key={it} className={styles.tempItem}>{it}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 export default function BreedTree({
   root,
   rootImage,
@@ -648,8 +684,10 @@ export default function BreedTree({
   const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string; image?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
   const [trainHidden, setTrainHidden] = useState(false);
+  const [tempHidden, setTempHidden] = useState(false);
   const [ancPos, setAncPos] = useState<{ left: number; top: number; width: number } | null>(null);
   const [trainPos, setTrainPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [tempPos, setTempPos] = useState<{ left: number; top: number; width: number } | null>(null);
   // The blue box can be picked up and moved, the same as the cards on a chum
   // page. It rides on a transform offset rather than left/top, so it cannot
   // disturb the docked layout underneath, and it snaps home each time it opens.
@@ -1138,7 +1176,7 @@ export default function BreedTree({
       void st.offsetWidth; // force reflow so the animation can retrigger
       st.classList.add(styles.shake);
     }
-    if (dockAside) { setAncestryFor(null); setAncHidden(true); setTrainHidden(true); }
+    if (dockAside) { setAncestryFor(null); setAncHidden(true); setTrainHidden(true); setTempHidden(true); }
     if (focusRef.current !== d) {
       zoom(d);
       // Clicking a circle to zoom in also opens the info box if it was closed.
@@ -2122,6 +2160,16 @@ export default function BreedTree({
     () => (ancestryFor ? ancestryBreakdown(ancestryFor.name) : []),
     [ancestryFor],
   );
+  // That dog's pros and cons, for the temperament card. Keyed by breed name.
+  const chumTraits = useMemo(
+    () =>
+      ancestryFor
+        ? (breedTraits as Record<string, { pros: string[]; cons: string[] }>)[
+            ancestryFor.name
+          ] ?? null
+        : null,
+    [ancestryFor],
+  );
   // Close the card when the hovered circle changes or the round begins.
   useEffect(() => { setAncestryFor(null); }, [learning]);
   // A card opens next to the main box: to its right if there is room, else its
@@ -3000,7 +3048,7 @@ export default function BreedTree({
                   className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
-                  onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note, image: r.image }); }}
+                  onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); setTempHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note, image: r.image }); }}
                   title={r.name}
                   aria-label={`View ${r.name}`}
                 >
@@ -3046,7 +3094,20 @@ export default function BreedTree({
           <TrainingCard data={trainingDifficulty[ancestryFor.slug]} compact />
         </LearnDragCard>
       )}
-      {dockAside && ancestryFor && (ancHidden || trainHidden) && (
+      {dockAside && ancestryFor && !tempHidden && chumTraits && (
+        <LearnDragCard
+          className={styles.tempCard}
+          style={tempPos ? { left: tempPos.left, top: tempPos.top, width: tempPos.width, right: "auto", bottom: "auto" } : undefined}
+          ariaLabel={`Temperament of ${ancestryFor.name}`}
+          icon={ICONS.infoBox}
+          title={<>Temperament <span className={styles.cardTitleName}>{ancestryFor.name}</span></>}
+          onClose={() => setTempHidden(true)}
+          closeLabel="Close temperament"
+        >
+          <TemperamentBody key={ancestryFor.slug} pros={chumTraits.pros ?? []} cons={chumTraits.cons ?? []} />
+        </LearnDragCard>
+      )}
+      {dockAside && ancestryFor && (ancHidden || trainHidden || tempHidden) && (
         <div className={styles.learnDock}>
           {ancHidden && ancestryRows.length > 0 && (
             <button type="button" className={styles.learnDockBtn} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
@@ -3056,6 +3117,11 @@ export default function BreedTree({
           {trainHidden && trainingDifficulty[ancestryFor.slug] && (
             <button type="button" className={styles.learnDockBtn} onClick={() => { setTrainPos(cardSpot(1)); setTrainHidden(false); }} aria-label="Reopen training" title="Training">
               <span className={styles.learnDockIcon}>{ICONS.training}</span>
+            </button>
+          )}
+          {tempHidden && chumTraits && (
+            <button type="button" className={styles.learnDockBtn} onClick={() => { setTempPos(cardSpot(2)); setTempHidden(false); }} aria-label="Reopen temperament" title="Temperament">
+              <span className={styles.learnDockIcon}>{ICONS.infoBox}</span>
             </button>
           )}
         </div>
