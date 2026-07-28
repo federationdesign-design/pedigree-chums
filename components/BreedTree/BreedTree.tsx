@@ -2016,6 +2016,12 @@ export default function BreedTree({
       // heavy one, so it counts for ten ordinary knocks.
       const ROCK_KNOCK = 10;
       const knockBadge = (b: Body, rv: number, now2: number, spend = 1) => {
+        // J17: a bomb is outside the charge system, exactly as in the main pit,
+        // where onPctHit skips any body with plugin.bomb. Without this a bomb
+        // spends its twenty charges, goes inert and the badge group is given
+        // pointerEvents none, so it keeps the sprite but stops responding.
+        // Object knocks feed the fuse instead, from stage 4.
+        if (b.bomb) return;
         if (b.n || b.inert || b.charges === undefined) return; // badges only
         if (rv < 5) return; // pit onPctHit verbatim: a real knock, not a nudge
         if (b.lastKnock && now2 - b.lastKnock < 600) return;
@@ -2832,7 +2838,7 @@ export default function BreedTree({
                     replaces the charge counting with the fuse. */}
                 {item.bomb ? (
                   <>
-                    <circle cx={0} cy={0} r={item.r} style={{ fill: "transparent" }} />
+                    <circle cx={0} cy={0} r={item.r} style={{ fill: "transparent", pointerEvents: "all" }} />
                     <image
                       href="/bomb.svg"
                       x={-item.r * 1.2}
