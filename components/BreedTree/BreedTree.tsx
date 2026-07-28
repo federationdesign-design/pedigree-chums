@@ -3285,7 +3285,14 @@ export default function BreedTree({
   // pointer could never reach a nested circle once its parent was hovered, and
   // every click landed on the parent instead. On an already-focused parent that
   // reads as a zoom out, which is what a nest of children looked like.
-  const buriedSet = hovered && !dropped ? new Set(hovered.descendants()) : null;
+  // Not for a first-ring circle in the mini pit. Hovering one of those is about
+  // to mean "come loose and move", so hiding what is inside it is the opposite
+  // of what we want. Deeper circles keep the old behaviour: hover one and the
+  // circles nested in it get out of the way of its own image.
+  // Keyed on parent === focus rather than depth === 1, so it still means "the
+  // big circles you are looking at" after you have zoomed into one.
+  const firstRingHover = !!hovered && dockAside && hovered.parent === focus;
+  const buriedSet = hovered && !dropped && !firstRingHover ? new Set(hovered.descendants()) : null;
   // Mini pit LEARN only: every circle nested inside the focused one carries its
   // name, not just the first ring. The chum pages keep the single ring they
   // have always had, and PLAY is untouched.
