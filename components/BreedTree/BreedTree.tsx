@@ -3666,15 +3666,19 @@ export default function BreedTree({
               // frozen is the start screen. onClick already swallows the press
               // there, so a magnifier would be promising a zoom that cannot
               // happen. Same reason dropped and disableZoom are excluded.
-              // Colour is the second signal, on top of the plus and minus:
-              // white at the top level, yellow once you are inside a dog. The
-              // minus is only reachable while zoomed in, so it carries yellow
-              // in its own class and needs no test here.
+              // Colour is the second signal, on top of the plus and minus, and
+              // it is about DEPTH, not about whether you happen to be zoomed:
+              //   white   the big circles, the first ring you are looking at
+              //   yellow  a circle nested inside one of those
+              // so the pointer tells you whether you are about to go one level
+              // down or two. The minus only ever appears on the circle you are
+              // already inside, or on the background while zoomed in, so it is
+              // yellow in its own class and needs no test here.
               const curCls = hidden || disableZoom || dropped || frozen
                 ? ""
                 : d === focus && d.parent
                   ? styles.curZoomOut
-                  : focus === nodes[0]
+                  : d.parent === focus
                     ? styles.curZoomIn
                     : styles.curZoomInOn;
               const cls = `${tintCls} ${curCls}`.trim() || undefined;
