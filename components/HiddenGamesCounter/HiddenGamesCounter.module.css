@@ -1,0 +1,74 @@
+/* Hidden Games Stage 1 counter. Fixed to the bottom-left corner, the corner
+   OfferLauncher (right edge) does not hold (BRIEF 6.1). Sits below the nav
+   (z 300) and the mini-pit overlay (z 900), above ordinary page content. A
+   small navy chip in the existing launcher style; this is a chip, not a page
+   background, so the no-dark-page-background rule is not in play. */
+.counter {
+  position: fixed;
+  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
+  left: clamp(12px, 3vw, 22px);
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px 9px 14px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--navy);
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3),
+    inset 0 0 0 2px var(--yellow);
+}
+
+.label {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1.1;
+  color: var(--cream);
+  white-space: nowrap;
+}
+
+.minimise {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Minimised state: a compact yellow pill showing just the numbers, so the
+   visitor keeps their progress in view without the full chip. Progress lives in
+   the engine, so minimising loses nothing (BRIEF 6.1). */
+.reveal {
+  position: fixed;
+  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
+  left: clamp(12px, 3vw, 22px);
+  z-index: 90;
+  padding: 7px 12px;
+  border: 2px solid var(--navy);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* On small screens keep clear of navigation, cookie controls and form actions
+   by hugging the very corner with a slightly smaller footprint. */
+@media (max-width: 480px) {
+  .label {
+    font-size: 0.82rem;
+  }
+}
