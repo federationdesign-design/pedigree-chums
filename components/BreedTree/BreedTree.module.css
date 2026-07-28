@@ -318,8 +318,10 @@
    box's X, parked above the first thumbnail. */
 .railClose {
   position: absolute;
-  top: -30px;
-  right: 0;
+  /* measured off the frame's padding box, so both figures carry the 10px
+     padding: this keeps the X exactly where it sat against the cards */
+  top: -20px;
+  right: 10px;
   appearance: none;
   border: 0;
   padding: 0;
@@ -696,10 +698,14 @@
   padding-right: 28px;
 }
 
-/* Related pack dogs rail: square cards down one side of the learn box. */
+/* Related pack dogs rail: square cards down one side of the learn box.
+   The 10px of padding and the 2px border are the drag handle. A press on a card
+   opens that chum instead of dragging, so the frame is the part you grab. Its
+   top and side offsets are pulled back by the 12px the frame adds, which keeps
+   the cards themselves exactly where they were. */
 .relRail {
   position: absolute;
-  top: 0;
+  top: -12px;
   z-index: 12;
   display: grid;
   grid-auto-flow: column;
@@ -707,11 +713,22 @@
      widening the column, so the two columns never shift sideways. */
   grid-auto-columns: clamp(38px, 7.5vw, 56px);
   gap: 8px;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background: none;
+  cursor: grab;
+  transition: border-color 0.15s ease;
   pointer-events: auto;
 }
+.relRail:active { cursor: grabbing; }
+/* Shown only while the pointer is near the rail but not on a card: it is a
+   grab handle, so it appears where grabbing actually works. */
+.relRail:hover { border-color: rgba(255, 255, 255, 0.45); }
+.relRail:has(.relCard:hover) { border-color: transparent; cursor: default; }
 /* Beside the box, on whichever side has room. */
-.relRailRight { left: calc(100% + 10px); }
-.relRailLeft { right: calc(100% + 10px); }
+.relRailRight { left: calc(100% - 2px); }
+.relRailLeft { right: calc(100% - 2px); }
 .relCard {
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);

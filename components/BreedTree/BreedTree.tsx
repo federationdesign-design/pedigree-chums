@@ -1046,11 +1046,6 @@ export default function BreedTree({
   const railRef = useRef<HTMLDivElement>(null);
   const asideOff = useRef({ x: 0, y: 0 });
   const asideDrag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
-  useEffect(() => {
-    if (!hideCaption) return; // closed: forget where it was left
-    asideOff.current = { x: 0, y: 0 };
-    if (asideRef.current) asideRef.current.style.transform = "";
-  }, [hideCaption]);
   const asideDown = (e: React.PointerEvent) => {
     if (!dockAside) return;
     const t = e.target as HTMLElement;
@@ -1074,8 +1069,12 @@ export default function BreedTree({
     if (el) {
       const r = el.getBoundingClientRect();
       // Put the rail on the side with more room: box in the right half of
-      // the screen sends the cards left, and the other way round.
-      setRailSide(r.left + r.width / 2 > window.innerWidth / 2 ? "left" : "right");
+      // the screen sends the cards left, and the other way round. "Left" is
+      // only allowed if the gap to the screen edge can actually hold the rail,
+      // otherwise the cards hang off the page.
+      const railW = railRef.current?.getBoundingClientRect().width ?? 0;
+      const roomLeft = r.left > railW + 20;
+      setRailSide(roomLeft && r.left + r.width / 2 > window.innerWidth / 2 ? "left" : "right");
     }
   };
   // Held null until the display face is painting, so the first (server-matched)
@@ -1146,11 +1145,31 @@ export default function BreedTree({
   // exactly where the user last saw it.
   const [railPin, setRailPin] = useState<{ top: number; left: number } | null>(null);
   useEffect(() => {
-    if (!hideCaption) { setRailHidden(false); setRailPin(null); return; }
+    if (!hideCaption) {
+      setRailHidden(false);
+      setRailPin(null);
+      // Back on show: the box is home again, so pick the side afresh. Without
+      // this a rail sent left during a drag stays left and reopens off-page.
+      const b = asideRef.current?.getBoundingClientRect();
+      const rw = railRef.current?.getBoundingClientRect().width ?? 0;
+      if (b && !(b.left > rw + 20)) setRailSide("right");
+      return;
+    }
+    // Measure the rail BEFORE clearing the box's drag offset. These were two
+    // separate effects and the reset was declared first, so it ran first: the
+    // rail was pinned to wherever the box's HOME position put it, not where the
+    // user last saw it. With the rail on the left, home sits close to the screen
+    // edge, which is how closing the box threw the cards off the page.
     const el = railRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    setRailPin({ top: r.top, left: r.left });
+    const r = el ? el.getBoundingClientRect() : null;
+    asideOff.current = { x: 0, y: 0 }; // closed: forget where it was left
+    if (asideRef.current) asideRef.current.style.transform = "";
+    if (!r) return;
+    // Last guard. Whatever the measurement says, the rail stays on screen.
+    const pad = 8;
+    const left = Math.max(pad, Math.min(r.left, window.innerWidth - r.width - pad));
+    const top = Math.max(pad, Math.min(r.top, window.innerHeight - r.height - pad));
+    setRailPin({ top, left });
   }, [hideCaption]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
