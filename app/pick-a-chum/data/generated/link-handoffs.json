@@ -3,21 +3,21 @@
     "family": "NAV_BREED_HANDOFF",
     "responseId": "NBH-COL-01",
     "dog": "Collie",
-    "line": "You now have the essential information. The supporting evidence is arranged neatly here: [LINK]",
+    "line": "Properly written up here: [LINK]",
     "status": "draft"
   },
   {
     "family": "NAV_BREED_HANDOFF",
     "responseId": "NBH-COL-02",
     "dog": "Collie",
-    "line": "I could keep explaining, but the page has already been organised for precisely this purpose. Read it here: [LINK]",
+    "line": "Filed here: [LINK]",
     "status": "draft"
   },
   {
     "family": "NAV_BREED_HANDOFF",
     "responseId": "NBH-COL-03",
     "dog": "Collie",
-    "line": "That should give you enough to work with for now. The organised next step is waiting here: [LINK]",
+    "line": "The rest is here: [LINK]",
     "status": "draft"
   },
   {
