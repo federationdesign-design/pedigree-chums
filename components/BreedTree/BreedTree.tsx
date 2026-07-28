@@ -236,6 +236,10 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
+// J17: a scattered percentage badge has this chance of arriving as a bomb.
+// The main pit's own figure, PackPit.tsx scatterRef, where a comment records it
+// was raised from 1 in 35 for better chain reactions.
+const BOMB_ODDS = 20;
 const BADGE_DRAW_R = 92;
 // A badge belongs to its circle, so it has to scale with it. BADGE_DRAW_R was a
 // flat 92 in SVG units while the circles are sized by the packing, the level
@@ -817,7 +821,7 @@ export default function BreedTree({
   // dog leaves behind a full-size blank circle wearing its breed name instead.
   // Both ride the same bodies, hit counting and inert state: only the radius,
   // the face and the charge count differ.
-  type BadgeItem = { pct: number; r: number; label?: string };
+  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean };
   const [badgePcts, setBadgePcts] = useState<BadgeItem[]>([]);
   // rods and name pills scattered in from the learn layer, pit-style props:
   // sizes are view units frozen at the drop; dead ones keep their slot so the
@@ -1485,7 +1489,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -1914,12 +1918,21 @@ export default function BreedTree({
         if (!bl) return;
         const w = worldFromPx(sx, sy);
         const rDraw = opts?.r ?? badgeDrawRRef.current;
-        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20 };
+        // J17 stage 2: the bomb roll, per scattered percentage circle, exactly
+        // where the main pit rolls it. A solo dog circle arrives through the
+        // same call carrying a label, and that one is never a bomb: it is a
+        // whole breed, not a percentage chip.
+        // ?bombs=all forces every scattered chip to be a bomb, so a stage can be
+        // tested in one scatter instead of waiting out the odds. Test hook only,
+        // removed with the fxtest rig at stage 5.
+        const forceBomb = typeof window !== "undefined" && window.location.search.indexOf("bombs=all") >= 0;
+        const isBomb = !opts?.label && (forceBomb || Math.random() < 1 / BOMB_ODDS);
+        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
         const mb = mkCircle(nb, "badge", BADGE_OPTS);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract, verbatim
-        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label }]);
+        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label, bomb: isBomb }]);
         wake();
       };
 
@@ -2809,8 +2822,31 @@ export default function BreedTree({
                   window.addEventListener("pointercancel", release);
                   startDrag(e, body);
                 }}>
+                {/* J17 stage 2: a bomb wears the main pit's sprite in place of
+                    the yellow disc, sized the same way the pit sizes it: a box
+                    of 2.4 radii with the aspect ratio preserved inside it. The
+                    transparent circle underneath keeps the grab area identical
+                    to a badge's, so drag, tap and hit-testing are unchanged.
+                    It keeps the sprite when the badge goes inert, because a
+                    bomb turning into a blue disc reads as broken. Stage 3
+                    replaces the charge counting with the fuse. */}
+                {item.bomb ? (
+                  <>
+                    <circle cx={0} cy={0} r={item.r} style={{ fill: "transparent" }} />
+                    <image
+                      href="/bomb.svg"
+                      x={-item.r * 1.2}
+                      y={-item.r * 1.2}
+                      width={item.r * 2.4}
+                      height={item.r * 2.4}
+                      preserveAspectRatio="xMidYMid meet"
+                      style={{ pointerEvents: "none" }}
+                    />
+                  </>
+                ) : (
                 <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.065 : 0.055) }} />
-                {!inert && (item.label ? (
+                )}
+                {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
                   // started, measured by the same fitter the pit circles use
                   (() => {
