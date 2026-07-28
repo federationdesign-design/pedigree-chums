@@ -373,6 +373,26 @@ const TITLE_DY = -42;
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
 
+// A circle whose name repeats its parent's is not a second animal. It is the
+// same dog carrying on: this line, crossed with the one other dog beside it.
+// The parent circle already stands for that dog, so drawing its name again
+// inside itself says the same thing twice, which is what made the Celtic Heeler
+// level read wrong.
+//
+// It stays in the tree rather than being deleted from the data. That matters:
+// the pack sizes every parent from its children, so removing one would make its
+// only sibling swell from half the parent's radius to 0.95 of it, and it would
+// also drop out of the chum rail index. Left in and merely not drawn, the sizes,
+// the badge percentages and the rail are all untouched, and what you see is one
+// half-size circle inside its parent, which reads as "this dog, plus the one
+// other dog". The empty half IS the parent.
+//
+// It is skipped in three places and only three: the drawing, the pop that turns
+// children into physics bodies, and the hover unlock.
+function isEcho(d: Node): boolean {
+  return !!d.parent && d.data.name === d.parent.data.name;
+}
+
 // Breed titles are fitted to the circle they belong to. The name is wrapped
 // across 1 to LABEL_MAX_LINES balanced lines and every option is measured; the
 // wrap that allows the largest type while keeping all four corners of the text
@@ -1215,9 +1235,10 @@ export default function BreedTree({
     unlockStop();
     const P = hovered as Node;
     // Ranked by height, so the fan below knows which one is on top.
-    const byHeight = [...(P.children ?? [])].sort((a, b) => a.y - b.y);
+    const shownKids = (P.children ?? []).filter((n) => !isEcho(n));
+    const byHeight = [...shownKids].sort((a, b) => a.y - b.y);
     const mid = (byHeight.length - 1) / 2;
-    const kids = (P.children ?? []).map((n) => {
+    const kids = shownKids.map((n) => {
       // Two shoves. Outward, along the line from the parent centre through this
       // circle's own centre. And sideways, the fan: the highest circle goes one
       // way and the lowest the other, scaled by how far off the middle it is,
@@ -2342,6 +2363,7 @@ export default function BreedTree({
         b.popped = true;
         const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
+          if (isEcho(ch)) continue;
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
@@ -3701,7 +3723,7 @@ export default function BreedTree({
               // The outer breed circle (root) is hidden so only the ancestor
               // circles inside it show. It stays in the DOM (rendered invisible
               // and non-interactive) so the index alignment used by zoomTo holds.
-              const hidden = d.depth === 0;
+              const hidden = d.depth === 0 || isEcho(d);
               const hasImg = !hidden && !!nodeImg(d);
               // The larger "bottom" image in each circle stays full colour and
               // the images nested on top of it are tinted, alternating inward.
