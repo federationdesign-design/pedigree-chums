@@ -75,6 +75,15 @@ const DIFF_FLOOR_VU = (SIZE / (567.5 / 57.6)) * (1 - 0.1043);
 // the view height. Without it a pit-full cluster rests ON the floor and pressing
 // PLAY is a settle rather than a drop. This is the dial for how far things fall.
 const DIFF_DROP = 0.04;
+// Half the depth-1 ring, as a fraction of the circle's radius. An SVG stroke is
+// drawn CENTRED on the path, so half of it lives outside the radius. At level 10
+// the ring is 0.09 of a very large radius, and that overhang is what was putting
+// the widest circle a hair past the wall. The fit now allows for it.
+const DIFF_RING = 0.045;
+// Level 10 wears a slightly finer ring. At that size the stroke is the thing
+// that reads as heavy. Tapers in from level 5, so nothing at or below the
+// default changes. 0.1 is a tenth thinner at the top of the slider.
+const DIFF_STROKE_TRIM = 0.1;
 // How far the default pit view is pulled back beyond DIFF_SPAN. The pit walls
 // are derived from the view, so widening the view widens the pit in world terms
 // while the packed circles keep their radii: the circles get smaller inside the
@@ -507,7 +516,7 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
     const pit = pitBox(FW, FH);
     const s = diffScale(
       Math.min(FW * 0.5, FH * 0.46) / kids[0].r,
-      pit.w / (2 * kids[0].r),
+      pit.w / (2 * kids[0].r * (1 + DIFF_RING)),
       level
     );
     // sat on the floor gap, free to run off the top
@@ -539,7 +548,9 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   const pit = pitBox(FW, FH);
   const scale = diffScale(
     Math.min((FH - M) / bh, (FW * 1.12) / bw),
-    pit.w / bw, // width only: the pit has no ceiling to run out of
+    // width only, since the pit has no ceiling, and the widest circle's ring
+    // has to fit between the walls as well as the circle itself
+    pit.w / (bw * (1 + DIFF_RING)),
     level
   );
   // The cluster used to sit dead centre, which left the lower third of the pit
@@ -1332,7 +1343,11 @@ export default function BreedTree({
     // picture. Tied to d.r it follows both, exactly as the badges do.
     // Fractions keep the old 5 / 4 / 3 / 2.6 / 2.4 relationship between depths.
     const frac = [0.09, 0.072, 0.054, 0.047, 0.043];
-    const base = frac[d.depth - 1] ?? 0.043;
+    let base = frac[d.depth - 1] ?? 0.043;
+    // The ring still grows and shrinks with the circle, which is the part that
+    // works. This only shaves the top of the slider, where the circles are so
+    // large that the same fraction reads as a much heavier line.
+    if (dockAside && level > 5) base *= 1 - ((Math.min(level, 10) - 5) / 5) * DIFF_STROKE_TRIM;
     // The mini pit draws its rings four times heavier than the chum page, so a
     // small, simple lineage reads boldly.
     return d.r * (dockAside ? base : base / 4);
