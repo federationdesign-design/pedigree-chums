@@ -254,6 +254,17 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // The main pit's own figure, PackPit.tsx scatterRef, where a comment records it
 // was raised from 1 in 35 for better chain reactions.
 const BOMB_ODDS = 20;
+// The fuse is 2.5 seconds, half the main pit's five. Five is not a magic number
+// there, it is a divisor in four places, and all four are halved together here
+// or the sparks peak after the blast, or fizz at full doing nothing:
+//   1. the intensity ramp, held * 5 over 5000ms becomes held * 10 over the same
+//      window, so it still reaches full exactly as the fuse runs out
+//   2. one hit per whole second becomes one hit per half second
+//   3. the vibration step doubles, so it reaches the same peak in half the time
+//   4. clicks step by whole hits, so a click is now worth twice as much
+const BOMB_HITS = 5;          // hits to detonate
+const BOMB_FUSE_MS = 2500;    // the whole fuse
+const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
 // pctRadius is the very function the main pit uses, imported rather than
 // copied, so the two can never drift apart.
@@ -956,7 +967,10 @@ export default function BreedTree({
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
-  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean };
+  // The render-side view of a badge body. J17 adds the fuse fields, which the
+  // rattle in zoomTo reads: rDraw is the chip's own drawn radius, so the shake
+  // is always a fraction of the chip rather than a flat pixel count.
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; popped?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
@@ -970,6 +984,8 @@ export default function BreedTree({
   // held, so Matter is never left pulling a body that the sim has just taken
   // out of the world.
   const mcReleaseRef = useRef<(() => void) | null>(null);
+  // The bomb currently under the pointer, so the fuse burns while it is held.
+  const pressedBombRef = useRef<unknown>(null);
   // Drop-time pixels per world unit, published by the sim below. Effects are
   // authored in pit pixels, so dividing a pixel constant by this turns it into
   // world units: a blast keeps its intended size at the default view and grows
@@ -1209,7 +1225,11 @@ export default function BreedTree({
     return d.r * (dockAside ? base : base / 4);
   }
 
-  function zoomTo(v: View) {
+  // `now` is the sim's frame time, passed in rather than read here: calling
+  // performance.now() inside this function is flagged as impure render work.
+  // Zero means no animation this call, which is right for every caller that is
+  // not the physics loop.
+  function zoomTo(v: View, now = 0) {
     const k = SIZE / v[2];
     viewRef.current = v;
     const cg = circlesRef.current;
@@ -1219,7 +1239,24 @@ export default function BreedTree({
       const bg = badgesRef.current;
       for (const b of bb) {
         const el = bg?.children[b.idx] as SVGGElement | undefined;
-        if (el) el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k}) rotate(${b.a * 57.2958})`);
+        if (!el) continue;
+        let rot = b.a * 57.2958, ox = 0;
+        // A lit bomb rattles harder the longer it is held, furious by the last
+        // half second. Straight from the main pit, with the two fives halved.
+        // The shake offset is a fraction of the chip's OWN drawn radius, never a
+        // flat pixel count, or a small chip would judder further than a big one.
+        if (b.bomb && !b.popped && now) {
+          const now2 = now;
+          const hh = b.hits || 0;
+          const heldF = b.heldSince ? Math.min(1, (now2 - b.heldSince) / BOMB_FUSE_MS) : 0;
+          const inten = Math.max(hh, heldF * BOMB_HITS * 2);
+          if (inten > 0) {
+            const amp = 0.06 * inten, sp = Math.max(6, 28 - inten * 5);
+            rot += Math.sin(now2 / sp) * amp * 57.2958;
+            ox = Math.sin(now2 / (sp * 0.6)) * inten * 0.045 * (b.rDraw ?? 0);
+          }
+        }
+        el.setAttribute("transform", `translate(${(b.x - v[0]) * k + ox},${(b.y - v[1]) * k}) rotate(${rot})`);
       }
     }
     const ub = uiBodiesRef.current;
@@ -1530,7 +1567,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -1541,7 +1578,7 @@ export default function BreedTree({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: badgeRFor(pctOf(n), BADGE_R), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
+        r: badgeRFor(pctOf(n), BADGE_R), rDraw: badgeRFor(pctOf(n), badgeDrawRRef.current), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
 
@@ -1691,7 +1728,7 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeRFor(pctOf(ch), BADGE_R), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: popBomb };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeRFor(pctOf(ch), BADGE_R), rDraw: badgeRFor(pctOf(ch), badgeDrawRRef.current), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
@@ -1969,7 +2006,7 @@ export default function BreedTree({
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
-        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20, bomb: isBomb };
+        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, rDraw, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
         const mb = mkCircle(nb, "badge", BADGE_OPTS);
@@ -2076,6 +2113,35 @@ export default function BreedTree({
         }
       };
 
+      // A hit is a click, or one half second of holding. The last one detonates.
+      // Stage 3 ends in a placeholder poof; stage 4 replaces it with the real
+      // blast, the shockwave and the chain.
+      const hitBomb = (b: Body) => {
+        if (!b.bomb || b.popped) return;
+        b.hits = (b.hits || 0) + 1;
+        wake();
+        if ((b.hits || 0) < BOMB_HITS) return;
+        b.popped = true;
+        poofAt(b.x, b.y, performance.now());
+        if (b.mb && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
+        setDeadBadges((p) => new Set(p).add(b.idx));
+        if (pressedBombRef.current === b) pressedBombRef.current = null;
+      };
+      // Burns the fuse of whichever bomb is being held: one hit per half second,
+      // and a rattle in the hand that grows on the same halved step.
+      const burnFuse = (now2: number) => {
+        const b = pressedBombRef.current as Body | null;
+        if (!b || !b.bomb || b.popped || !b.heldSince) return;
+        const due = Math.floor((now2 - b.heldSince) / BOMB_TICK_MS);
+        while ((b.heldHits || 0) < due && pressedBombRef.current === b && !b.popped) {
+          b.clickPending = false; // a sustained hold, not a quick click
+          b.heldHits = (b.heldHits || 0) + 1;
+          hitBomb(b);
+          if (!b.popped && typeof navigator !== "undefined" && navigator.vibrate) {
+            navigator.vibrate(14 + (b.heldHits || 0) * 24);
+          }
+        }
+      };
       const FX_COOLDOWN = 220;
       const FX_MIN_PS = vps(0.05); // minimum impact speed to flash, px/step
       const isDragged = (b: unknown) => dragRef.current?.body === b;
@@ -2212,6 +2278,7 @@ export default function BreedTree({
           }
           if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
         }
+        burnFuse(now);
         checkEscapeRef.current?.();
         for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
           for (const pr of list) {
@@ -2253,7 +2320,7 @@ export default function BreedTree({
             if (pat) pat.setAttribute("patternTransform", `rotate(${b.ia * 57.2958} 0.5 0.5)`);
           }
         }
-        zoomTo(viewRef.current);
+        zoomTo(viewRef.current, now);
         drawNumbers(now, viewRef.current);
         // pit-full: settled bodies whose tops reach the spawn zone, pit-style
         if (!fullTriggeredRef.current && now - started > 4000) {
@@ -2374,6 +2441,27 @@ export default function BreedTree({
         };
         Events.on(mc, "enddrag", onEndDrag);
         mcReleaseRef.current = () => { mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
+        // ---- J17 stage 3: the fuse ------------------------------------------
+        // Pressing a bomb lights it. The constraint already hit-tests in physics
+        // space, so this hangs off its own drag events rather than a second set
+        // of pointer handlers that could disagree about what was pressed.
+        type DragEv = { body?: { plugin?: { bridge?: Body } } };
+        Events.on(mc, "startdrag", (ev: DragEv) => {
+          const br = ev?.body?.plugin?.bridge;
+          if (!br?.bomb || br.popped) return;
+          br.heldSince = performance.now();
+          br.heldHits = 0;
+          br.clickPending = true; // a quick release still counts as one hit
+          pressedBombRef.current = br;
+          wake();
+        });
+        Events.on(mc, "enddrag", (ev: DragEv) => {
+          const br = ev?.body?.plugin?.bridge;
+          if (!br?.bomb) return;
+          if (br.clickPending && !br.popped) hitBomb(br);
+          br.heldSince = 0; br.heldHits = 0; br.clickPending = false;
+          if (pressedBombRef.current === br) pressedBombRef.current = null;
+        });
         Events.on(mc, "startdrag", onStartDrag);
         const setPos = (cx: number, cy: number) => {
           const sv = svgEl as SVGSVGElement | null;
