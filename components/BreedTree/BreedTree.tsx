@@ -240,10 +240,6 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // J17: a scattered percentage badge has this chance of arriving as a bomb.
 // The main pit's own figure, PackPit.tsx scatterRef, where a comment records it
 // was raised from 1 in 35 for better chain reactions.
-// J10b stage 1: ?drag=mc hands the badges to Matter's MouseConstraint. Read
-// from the URL on demand rather than held in state, so there is nothing for the
-// server and the first client render to disagree about.
-const mcDragOn = () => typeof window !== "undefined" && window.location.search.indexOf("drag=mc") >= 0;
 const BOMB_ODDS = 20;
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
 // pctRadius is the very function the main pit uses, imported rather than
@@ -2334,10 +2330,8 @@ export default function BreedTree({
       //   world     -> phys px   via the FROZEN drop-time CT
       // Either transform on its own breaks the moment the pit is zoomed.
       //
-      // Behind ?drag=mc so the old path is untouched until this is signed off.
-      const mcOn = mcDragOn();
       let mcTeardown: (() => void) | null = null;
-      if (mcOn && Mouse && MouseConstraint && st) {
+      if (Mouse && MouseConstraint && st) {
         // A detached element, so Matter's own listeners can never fire. The
         // position is driven by hand below, in physics pixels.
         const mouse = Mouse.create(document.createElement("div"));
@@ -2807,60 +2801,33 @@ export default function BreedTree({
                           const pb = pitBodiesRef.current;
                           let target: Node | null = d;
                           while (target && !pb?.owned.has(target)) target = target.parent;
-                          const body = target ? pb?.find(target) : undefined;
                           const liftNode = target ?? d;
-                          // Released on pointer up, which drops the dog back in
-                          // wherever it was let go. Harmless under the new path,
-                          // where held is never set in the first place.
-                          const release = () => {
-                            if (body) body.held = false;
-                            wakeRef.current?.();
-                            window.removeEventListener("pointerup", release);
-                            window.removeEventListener("pointercancel", release);
-                          };
-                          window.addEventListener("pointerup", release);
-                          window.addEventListener("pointercancel", release);
                           // captured now: by the time the tap callback runs,
                           // React has recycled the event and currentTarget is
-                          // null, which threw and left the layer unopened
+                          // null, which threw and left the layer unopened.
                           // The lift is placed from the circle's own rect, so it
                           // has to be the ancestor's element, not the child that
                           // happened to catch the press.
                           const li = nodes.indexOf(liftNode);
                           const el = (circlesRef.current?.children[li] as SVGCircleElement | undefined)
                             ?? (e.currentTarget as SVGCircleElement);
-                          if (mcDragOn()) {
-                            // Matter owns the drag now. Two things must NOT
-                            // happen here: held, which would pull the body out
-                            // of the world and leave the constraint with
-                            // nothing to hold, and stopPropagation, because the
-                            // press has to reach the stage listener that feeds
-                            // the mouse. All that is left is the tap.
-                            // the old path's release hook is dead weight here,
-                            // and leaving it armed means two listeners racing to
-                            // set held on the same pointer up
-                            window.removeEventListener("pointerup", release);
-                            window.removeEventListener("pointercancel", release);
-                            const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
-                            const tapUp = (ev: PointerEvent) => {
-                              window.removeEventListener("pointerup", tapUp);
-                              window.removeEventListener("pointercancel", tapUp);
-                              if (performance.now() - p0.t >= 350) return;
-                              if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
-                              mcReleaseRef.current?.(); // let go before the lift freezes the body
-                              liftToLearn(el, liftNode);
-                            };
-                            window.addEventListener("pointerup", tapUp);
-                            window.addEventListener("pointercancel", tapUp);
-                            return;
-                          }
-                          // held lifts the body out of the physics world so the
-                          // old drag can place it directly.
-                          if (body) body.held = true;
-                          startDrag(e, body as never, () => {
-                            if (body) body.held = false;
+                          // Matter owns the drag. Two things must NOT happen
+                          // here: held, which would pull the body out of the
+                          // world and leave the constraint with nothing to hold,
+                          // and stopPropagation, because the press has to reach
+                          // the stage listener that feeds the mouse. All that is
+                          // left is the tap.
+                          const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
+                          const tapUp = (ev: PointerEvent) => {
+                            window.removeEventListener("pointerup", tapUp);
+                            window.removeEventListener("pointercancel", tapUp);
+                            if (performance.now() - p0.t >= 350) return;
+                            if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
+                            mcReleaseRef.current?.(); // let go before the lift freezes the body
                             liftToLearn(el, liftNode);
-                          });
+                          };
+                          window.addEventListener("pointerup", tapUp);
+                          window.addEventListener("pointercancel", tapUp);
                         }
                   }
                 />
@@ -2947,27 +2914,7 @@ export default function BreedTree({
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk}) rotate(${(b ? b.a : 0) * 57.2958})`}
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
-                onPointerDown={inert ? undefined : (e) => {
-                  // J10b stage 1: with the MouseConstraint on, Matter owns the
-                  // badge. The old path must not run as well, because it sets
-                  // held, which removes the body from the world and leaves the
-                  // constraint with nothing to pull.
-                  if (mcDragOn()) return;
-                  // Lift the badge out of the sim while dragging, like the dog
-                  // circles: without this it keeps falling in the physics world
-                  // behind your finger and snaps to that spot when you let go.
-                  const body = badgeBodiesRef.current?.[i];
-                  if (body) body.held = true;
-                  const release = () => {
-                    if (body) body.held = false;
-                    wakeRef.current?.();
-                    window.removeEventListener("pointerup", release);
-                    window.removeEventListener("pointercancel", release);
-                  };
-                  window.addEventListener("pointerup", release);
-                  window.addEventListener("pointercancel", release);
-                  startDrag(e, body);
-                }}>
+>
                 {/* J17 stage 2: a bomb wears the main pit's sprite in place of
                     the yellow disc, sized the same way the pit sizes it: a box
                     of 2.4 radii with the aspect ratio preserved inside it. The
@@ -3033,7 +2980,7 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => { if (mcDragOn()) return; startDrag(e, rodBodiesRef.current[i2]); }}>
+                  >
                   <rect x={-rd.len / 2} y={-rd.h / 2} width={rd.len} height={rd.h} rx={rd.h / 2}
                     style={{ fill: rd.lit ? "#ffd23e" : "#ffffff", stroke: "#0a3a57", strokeWidth: rd.h * 0.22 }} />
                 </g>
@@ -3054,27 +3001,22 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => {
-                    const flagTap = ty.kind === "flag" ? () => { retireToy(TOY_FLAG_SEEN_KEY); setBritainOpen(true); } : undefined;
-                    if (mcDragOn()) {
-                      // Matter owns the drag. Only the flag's tap is left, and
-                      // it uses the same threshold the old path used: under
-                      // 350ms and under 8px of travel.
-                      if (!flagTap) return;
-                      const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
-                      const tapUp = (ev: PointerEvent) => {
-                        window.removeEventListener("pointerup", tapUp);
-                        window.removeEventListener("pointercancel", tapUp);
-                        if (performance.now() - p0.t >= 350) return;
-                        if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
-                        mcReleaseRef.current?.();
-                        flagTap();
-                      };
-                      window.addEventListener("pointerup", tapUp);
-                      window.addEventListener("pointercancel", tapUp);
-                      return;
-                    }
-                    startDrag(e, toyBodiesRef.current[i2], flagTap);
+                  onPointerDown={ty.kind !== "flag" ? undefined : (e) => {
+                    // Matter owns the drag. Only the flag's tap is left, on the
+                    // same thresholds the old path used: under 350ms and under
+                    // 8px of travel.
+                    const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
+                    const tapUp = (ev: PointerEvent) => {
+                      window.removeEventListener("pointerup", tapUp);
+                      window.removeEventListener("pointercancel", tapUp);
+                      if (performance.now() - p0.t >= 350) return;
+                      if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
+                      mcReleaseRef.current?.();
+                      retireToy(TOY_FLAG_SEEN_KEY);
+                      setBritainOpen(true);
+                    };
+                    window.addEventListener("pointerup", tapUp);
+                    window.addEventListener("pointercancel", tapUp);
                   }}>
                   {ty.kind === "flag" ? (
                     <>
@@ -3124,7 +3066,7 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => { if (mcDragOn()) return; startDrag(e, pillBodiesRef.current[i2]); }}>
+                  >
                   <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
                     style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.rx * 0.154 }} />
                   {pl.lines.map((ln, li) => (
