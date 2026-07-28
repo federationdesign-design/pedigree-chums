@@ -312,6 +312,13 @@ const CHUM_STAGGER = 85;    // ms between each, so they cascade rather than clum
 const CHUM_MIN = 38;
 const CHUM_MAX = 56;
 const CHUM_VW = 0.075;
+// The main pit sizes every card off its breed's size band, PackPit.tsx line 22:
+// small 57.5, medium 62.5, large 72.5, giant 82.5, used as a half-width. Those
+// are the ratios, reproduced here against medium so the figure above stays the
+// size a medium dog drops at and only the other three bands move around it.
+// Giant lands at 1.32 times medium and 1.44 times small, which is the main pit's
+// real spread, not a new one invented for the mini pit.
+const CHUM_BAND: Record<string, number> = { small: 57.5 / 62.5, medium: 1, large: 72.5 / 62.5, giant: 82.5 / 62.5 };
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies";
@@ -1473,7 +1480,7 @@ export default function BreedTree({
   const chumBodiesRef = useRef<any[]>([]);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
-  const chumImagesRef = useRef<string[]>([]);
+  const chumImagesRef = useRef<{ image: string; band: string }[]>([]);
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
@@ -2436,10 +2443,15 @@ export default function BreedTree({
         const imgs = chumImagesRef.current;
         if (!imgs.length) return;
         const vw = typeof window !== "undefined" ? window.innerWidth : 390;
-        const dia = Math.max(CHUM_MIN, Math.min(CHUM_MAX, vw * CHUM_VW));
-        const r = dia / 2;
+        // The medium dog's size. Every other band is a multiple of it, so a
+        // giant drops in noticeably bigger than a terrier, exactly as in the
+        // main pit. Clamped before the band is applied, so the bands keep
+        // their ratios instead of being flattened by the ceiling.
+        const diaMed = Math.max(CHUM_MIN, Math.min(CHUM_MAX, vw * CHUM_VW));
         const stageTopPx = st ? st.getBoundingClientRect().top : 0;
-        imgs.forEach((image, i) => {
+        imgs.forEach(({ image, band }, i) => {
+          const dia = diaMed * (CHUM_BAND[band] ?? 1);
+          const r = dia / 2;
           toyTimers.push(window.setTimeout(() => {
             const px = pL.x + r + 8 + Math.random() * Math.max(1, wPx - dia - 16);
             // far higher than the toys' 60 to 120, so they are already moving
@@ -3567,8 +3579,10 @@ export default function BreedTree({
   // lists; the rail follows nested circles, so now it actually is.
   const levelChums = useMemo(() => {
     const names = [...new Set(nodes.filter((n) => n.depth > 0).map((n) => n.data.name))];
-    if (!names.length) return [] as string[];
-    return descendantPackBreeds(names).map((b) => b.image).filter(Boolean);
+    if (!names.length) return [] as { image: string; band: string }[];
+    return descendantPackBreeds(names)
+      .filter((b) => !!b.image)
+      .map((b) => ({ image: b.image, band: b.sizeBand as string }));
   }, [nodes]);
   useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
   // That dog's ancestry breakdown, the same figures as its own page.
