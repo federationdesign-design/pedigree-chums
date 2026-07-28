@@ -135,6 +135,8 @@ export function createPitEffects(scale = 1) {
     burstAt,
     /** three starbursts at once, red then orange then yellow: a detonation */
     explodeAt,
+    /** a starburst with every field chosen by the caller, for the odd one-off */
+    pushBurst: (b: Burst) => { bursts.push(b); },
     /** the pop-art comic blast. S is the blast size in pit pixels */
     pushBoom,
     /** fuse fizz. intensity climbs 0..1 as the fuse burns down */
