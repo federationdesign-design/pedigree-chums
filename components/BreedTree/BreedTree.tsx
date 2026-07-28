@@ -84,6 +84,16 @@ const DIFF_RING = 0.045;
 // that reads as heavy. Tapers in from level 5, so nothing at or below the
 // default changes. 0.1 is a tenth thinner at the top of the slider.
 const DIFF_STROKE_TRIM = 0.1;
+// Two circles stack dead vertically, which reads as a snowman. A small tilt
+// breaks that up. The PAIR only: three and four circle packs are already
+// irregular, and tilting them would cost size for nothing.
+//
+// It is close to free up to about 3 degrees, because the smaller circle stays
+// inside the bigger one's shadow. Past that the cluster gets wider and, since
+// the fit is width-only, everything shrinks to compensate: 5 degrees costs 3%,
+// 10 costs 11%. This is purely how the start and learn screens look, because
+// pressing PLAY scatters them anyway.
+const DIFF_TILT_DEG = 5;
 // How far the default pit view is pulled back beyond DIFF_SPAN. The pit walls
 // are derived from the view, so widening the view widens the pit in world terms
 // while the packed circles keep their radii: the circles get smaller inside the
@@ -534,6 +544,17 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   const h0 = Math.max(...d1.map((p) => p.y)) - Math.min(...d1.map((p) => p.y));
   // turn a wide cluster on its side so the long axis runs down the portrait
   if (w0 > h0) pts.forEach((p) => { const t = p.x; p.x = p.y; p.y = -t; });
+  // and then lean the pair off vertical. A rigid rotation of the whole cloud,
+  // so every nested circle keeps its place inside its parent. The bounding box
+  // below is measured after this, so the fit already allows for it.
+  if (level !== null && n === 2 && DIFF_TILT_DEG) {
+    const t = (DIFF_TILT_DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
+    pts.forEach((p) => {
+      const nx = p.x * cs - p.y * sn;
+      p.y = p.x * sn + p.y * cs;
+      p.x = nx;
+    });
+  }
   const minX = Math.min(...d1.map((p) => p.x - p.d.r));
   const maxX = Math.max(...d1.map((p) => p.x + p.d.r));
   const minY = Math.min(...d1.map((p) => p.y - p.d.r));
