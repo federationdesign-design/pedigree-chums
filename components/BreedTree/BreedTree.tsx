@@ -53,12 +53,21 @@ const ZOOM_PAD = 1.1;
 // Mobile only: above 640px the layout does not run relayoutMobile, so the size
 // has nowhere to land and the slider stays hidden.
 const DIFF_DEFAULT = 5;
-const DIFF_EASY = 0.525; // level 0, against the base packing
-const DIFF_MID = 0.85; // level 5, the approved default
+// The three stops, as a fraction of a PIT-FULL cluster. 10 fills the pit, 5 is
+// half of it, 0 a quarter. Two straight segments, so 5 lands exactly on its own
+// number rather than somewhere between the ends.
+const DIFF_STOP_0 = 0.25;
+const DIFF_STOP_5 = 0.50;
+const DIFF_STOP_10 = 1.0;
 // The docked view zooms out to 1.21x the frame, so the visible pit is this much
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
 const DIFF_SPAN = 1.21;
+// Rough allowance for the themed ground strip eating into the bottom of the
+// pit. relayoutMobile cannot see the level theme, and on every tree shape we
+// have the WIDTH is what binds, so this is a safety net rather than the active
+// constraint. Raise it if a tall cluster ever pokes through the floor.
+const DIFF_FLOOR = 0.9;
 // How far the default pit view is pulled back beyond DIFF_SPAN. The pit walls
 // are derived from the view, so widening the view widens the pit in world terms
 // while the packed circles keep their radii: the circles get smaller inside the
@@ -68,14 +77,31 @@ const DIFF_SPAN = 1.21;
 const PIT_SHRINK = 2.1;
 const PIT_SPAN = DIFF_SPAN * PIT_SHRINK;
 const DIFF_INSET = 16;
+// `fit` is the largest scale at which the whole cluster still fits the pit, both
+// axes, whatever the circle count. Level 10 IS that, so the hardest setting
+// means the same thing on a two-circle tree and a four-circle one.
+//
+// This used to measure the pit as DIFF_SPAN, 1.21, when the view actually pulls
+// back to PIT_SPAN, 2.541. It was never updated when PIT_SHRINK landed, so
+// level 10 was measuring against a pit 2.1 times narrower than the real one and
+// came out 2.1x too small on the two-circle levels, which are 64% of them.
+//
 // level: null outside the mini pit, where the packing is used untouched.
-function diffScale(base: number, wide: number, level: number | null): number {
+function diffScale(base: number, fit: number, level: number | null): number {
   if (level === null) return base;
   const l = Math.min(Math.max(level, 0), 10);
-  const mid = base * DIFF_MID;
-  if (l <= 5) return base * (DIFF_EASY + (l / 5) * (DIFF_MID - DIFF_EASY));
-  return mid + ((l - 5) / 5) * (Math.max(wide, mid) - mid);
+  const f = l <= 5
+    ? DIFF_STOP_0 + (l / 5) * (DIFF_STOP_5 - DIFF_STOP_0)
+    : DIFF_STOP_5 + ((l - 5) / 5) * (DIFF_STOP_10 - DIFF_STOP_5);
+  return fit * f;
 }
+// The pit itself, in the packed units relayoutMobile works in. After the
+// relayout the root radius is FW / (2 * PAD), so the view width is exactly
+// FW * PIT_SPAN and the walls sit DIFF_INSET inside that.
+const pitBox = (FW: number, FH: number) => ({
+  w: (FW - DIFF_INSET) * PIT_SPAN,
+  h: (FH - DIFF_INSET) * PIT_SPAN * DIFF_FLOOR,
+});
 // START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
 const START_SCALE = 2;
 // Where the two words sit, as a fraction of the FULL stage height measured from
@@ -465,9 +491,10 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   const ox = root.x, oy = root.y;
   const pts = nodes.map((d) => ({ d, x: d.x - ox, y: d.y - oy }));
   if (n === 1) {
+    const pit = pitBox(FW, FH);
     const s = diffScale(
       Math.min(FW * 0.5, FH * 0.46) / kids[0].r,
-      (FW * DIFF_SPAN - DIFF_INSET) / (2 * kids[0].r),
+      Math.min(pit.w, pit.h) / (2 * kids[0].r),
       level
     );
     pts.forEach((p) => {
@@ -491,10 +518,13 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
   const M = 20;
   // fill the height, but cap how far circles may spill past the side edges
-  const rMax = Math.max(...d1.map((p) => p.d.r));
+  // The whole cluster against the whole pit, not the widest circle against the
+  // width. The old rule ignored the vertical, which is why the same slider
+  // position filled 80% of the pit on a two-circle level and 43% on a four.
+  const pit = pitBox(FW, FH);
   const scale = diffScale(
     Math.min((FH - M) / bh, (FW * 1.12) / bw),
-    (FW * DIFF_SPAN - DIFF_INSET) / (2 * rMax),
+    Math.min(pit.w / bw, pit.h / bh),
     level
   );
   // The cluster used to sit dead centre, which left the lower third of the pit
