@@ -963,7 +963,7 @@ export default function BreedTree({
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
   const btnsGRef = useRef<SVGGElement>(null);
-  const [btnList, setBtnList] = useState<{ label: string; w: number; h: number; tone: string }[]>([]);
+  const [btnList, setBtnList] = useState<{ label: string; w: number; h: number; tone: string; sw: number }[]>([]);
   const [deadBtns, setDeadBtns] = useState<Set<number>>(new Set());
   const cookieBtnsRef = useRef<((px: number, py: number) => void) | null>(null);
   const cookieAnswerRef = useRef<((i: number, accept: boolean) => void) | null>(null);
@@ -2050,7 +2050,9 @@ export default function BreedTree({
           MBody.setVelocity(mb, { x: vx, y: -9 }); // pops up and apart
           MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.4);
           btnBodiesRef.current.push(pr);
-          setBtnList((l) => [...l, { label, tone, w: rw * fxScale, h: rh * fxScale }]);
+          // The main pit's keyline is a flat 5 canvas px, not a fraction of the
+          // button, so it converts through the same px-to-svg scale the sizes do.
+          setBtnList((l) => [...l, { label, tone, w: rw * fxScale, h: rh * fxScale, sw: 5 * fxScale }]);
         };
         mk("Reject", "#d64545", 1, 2 + Math.random() * 4);
         mk("Accept", "#4ade80", 1.33, -2 - Math.random() * 4); // the main pit makes Accept 33% larger
@@ -3485,10 +3487,16 @@ export default function BreedTree({
                     window.addEventListener("pointerup", tapUp);
                     window.addEventListener("pointercancel", tapUp);
                   }}>
+                  {/* Matched line for line to the main pit's own drawing of
+                      these two, PackPit drawBall, the cookieaccept branch:
+                      corner radius 0.34 of the height, a flat 5px navy keyline,
+                      Luckiest Guy at half the height, white on the red Reject
+                      and navy on the green Accept, and the label nudged down by
+                      0.05 of the height so it sits optically centred. */}
                   <rect x={-bt.w / 2} y={-bt.h / 2} width={bt.w} height={bt.h} rx={bt.h * 0.34}
-                    style={{ fill: bt.tone, stroke: "#0a3a57", strokeWidth: bt.h * 0.09 }} />
-                  <text x={0} y={0} dominantBaseline="central"
-                    style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${bt.h * 0.42}px`, pointerEvents: "none", userSelect: "none" }}>
+                    style={{ fill: bt.tone, stroke: "#0a3a57", strokeWidth: bt.sw }} />
+                  <text x={0} y={bt.h * 0.05} dominantBaseline="central"
+                    style={{ fill: accept ? "#0a3a57" : "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${bt.h * 0.5}px`, pointerEvents: "none", userSelect: "none" }}>
                     {bt.label}
                   </text>
                 </g>
