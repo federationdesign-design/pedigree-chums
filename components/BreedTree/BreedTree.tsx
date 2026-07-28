@@ -256,6 +256,11 @@ const BOMB_ODDS = 20;
 // below and multiplied by the pit's own badge size. BADGE_SHARE_REF is the
 // share that keeps exactly the size the mini pit draws for everything today,
 // so the middle of the range does not move and only the ends do.
+// ?bombs=all forces every chip to be a bomb, so a stage can be tested in one
+// go instead of waiting out the odds. Test hook only, removed at J17 stage 5.
+const rollBomb = () =>
+  (typeof window !== "undefined" && window.location.search.indexOf("bombs=all") >= 0) ||
+  Math.random() < 1 / BOMB_ODDS;
 const BADGE_SHARE_REF = 25;
 const badgeRFor = (pct: number, base: number) => base * (pctRadius(pct || 0) / pctRadius(BADGE_SHARE_REF));
 const BADGE_DRAW_R = 92;
@@ -1671,13 +1676,17 @@ export default function BreedTree({
           newMbs.push(mb);
           const bl = badgeBodiesRef.current;
           if (bl) {
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeRFor(pctOf(ch), BADGE_R), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
+            // Opening a dog circle is the mini pit's commonest chip source, so
+            // the roll belongs here as much as in the scatter. Without it a bomb
+            // only ever arrives from the lineage layer and stays rare.
+            const popBomb = rollBomb();
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeRFor(pctOf(ch), BADGE_R), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeRFor(bb.pct, badgeDrawRRef.current) }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeRFor(bb.pct, badgeDrawRRef.current), bomb: popBomb }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -1946,15 +1955,9 @@ export default function BreedTree({
         // percentage chip and is sized by its figure, bombs included: in the
         // main pit a bomb IS a percentage circle and only its sprite differs.
         const rDraw = opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current);
-        // J17 stage 2: the bomb roll, per scattered percentage circle, exactly
-        // where the main pit rolls it. A solo dog circle arrives through the
-        // same call carrying a label, and that one is never a bomb: it is a
-        // whole breed, not a percentage chip.
-        // ?bombs=all forces every scattered chip to be a bomb, so a stage can be
-        // tested in one scatter instead of waiting out the odds. Test hook only,
-        // removed with the fxtest rig at stage 5.
-        const forceBomb = typeof window !== "undefined" && window.location.search.indexOf("bombs=all") >= 0;
-        const isBomb = !opts?.label && (forceBomb || Math.random() < 1 / BOMB_ODDS);
+        // A solo dog circle arrives through this same call carrying a label,
+        // and that one is never a bomb: it is a whole breed, not a chip.
+        const isBomb = !opts?.label && rollBomb();
         const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
@@ -2975,7 +2978,12 @@ export default function BreedTree({
                     replaces the charge counting with the fuse. */}
                 {item.bomb ? (
                   <>
-                    <circle cx={0} cy={0} r={item.r} style={{ fill: "transparent", pointerEvents: "all" }} />
+                    {/* The sprite is drawn 2.4 radii wide, so the ball you aim
+                        at is bigger than the body under it. The grab area
+                        matches what you can see rather than the physics radius,
+                        which matters most for the press and hold that burns the
+                        fuse. */}
+                    <circle cx={0} cy={0} r={item.r * 1.13} style={{ fill: "transparent", pointerEvents: "all" }} />
                     <image
                       href="/bomb.svg"
                       x={-item.r * 1.2}
