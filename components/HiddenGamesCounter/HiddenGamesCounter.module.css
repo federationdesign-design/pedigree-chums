@@ -65,10 +65,72 @@
   cursor: pointer;
 }
 
+/* Lifecycle messages (SUSPENDED, CLOSED). A wrapping card in the same
+   bottom-left corner as the counter, sized to read on a phone without covering
+   navigation or form actions (BRIEF 6.1). */
+.notice {
+  position: fixed;
+  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
+  left: clamp(12px, 3vw, 22px);
+  z-index: 90;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--navy);
+  color: var(--cream);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3), inset 0 0 0 2px var(--yellow);
+}
+
+/* Storage-blocked notice. Sits just above the counter chip, same corner, so it
+   reads as attached to it (BRIEF 4.2). Cream on navy border to stand apart from
+   the navy chip below. */
+.blocked {
+  position: fixed;
+  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px) + 50px);
+  left: clamp(12px, 3vw, 22px);
+  z-index: 90;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--cream);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3), inset 0 0 0 2px var(--navy);
+}
+
+.blockedDismiss {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 /* On small screens keep clear of navigation, cookie controls and form actions
    by hugging the very corner with a slightly smaller footprint. */
 @media (max-width: 480px) {
   .label {
     font-size: 0.82rem;
+  }
+  .notice,
+  .blocked {
+    font-size: 0.76rem;
+    max-width: min(280px, calc(100vw - 24px));
   }
 }

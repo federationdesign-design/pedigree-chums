@@ -1,15 +1,15 @@
 // Hidden Games Stage 1: the progress engine.
 //
-// createEngine wires the pure record logic (record.ts) to injected side
-// effects: storage get/set, a clock, and a warning sink. Injecting them keeps
-// the engine fully testable under node:test with in-memory stubs, and lets the
-// browser build (browserEngine.ts) supply real localStorage, Date.now and
-// console.warn.
+// createEngine wires the pure record logic (record.ts) and the lifecycle rules
+// (lifecycle.ts) to injected side effects: storage get/set, a clock, and a
+// warning sink. Injecting them keeps the engine fully testable under node:test
+// with in-memory stubs, and lets the browser build (browserEngine.ts) supply
+// real localStorage, Date.now and console.warn plus the build-time status.
 //
 // The engine owns: restore before render, deduplication, unknown-id handling
-// with a warning, the version-keyed schema-3 record, and fail-soft reads and
-// writes (BRIEF section 3, "Rules the engine owns"). It does NOT know about any
-// game: no G01 or G02 wiring lives here.
+// with a warning, the version-keyed schema-3 record, fail-soft reads and writes
+// with storage-blocked detection, and lifecycle gating of finds (BRIEF sections
+// 3, 4.2, 5). It does NOT know about any game.
 
 import { STORAGE_KEY, REGISTRY } from "./registry";
 import {
@@ -20,35 +20,55 @@ import {
   readRecord,
   serializeRecord,
 } from "./record";
+import {
+  type LifecycleStatus,
+  type CounterView,
+  lifecycleView,
+} from "./lifecycle";
 
 export interface EngineDeps {
   // Read the raw string for a key, or null. May throw; the engine treats a
   // throw as "nothing stored" (fail-soft read, BRIEF 4.3).
   getItem: (key: string) => string | null;
-  // Persist a raw string. May throw or refuse; the engine swallows the failure
-  // so nothing throws. The visitor-facing storage-blocked message is Batch 2,
-  // out of scope here; only "never throws" is in scope.
+  // Persist a raw string. May throw or refuse; the engine records that as
+  // storage-blocked and never re-throws (BRIEF 4.2).
   setItem: (key: string, value: string) => void;
   now: () => number;
   warn: (message: string) => void;
+  // Operational status from build config (BRIEF 5). Optional: defaults to OPEN,
+  // the live experience, so existing callers are unaffected.
+  status?: LifecycleStatus;
 }
 
+// A report that reached the engine but did not register because the campaign is
+// not accepting finds (SUSPENDED, CLOSED or ARCHIVED).
+export type EngineOutcome = ReportOutcome | "frozen";
+
 // The public snapshot the counter renders. Kept as a cached, stable reference
-// so useSyncExternalStore does not loop: a new object is created only when the
-// count actually changes.
+// so useSyncExternalStore does not loop: a new object is created only when
+// something the counter shows actually changes.
 export interface CounterState {
   count: number;
   total: number;
   label: string;
+  status: LifecycleStatus;
+  view: CounterView;
+  render: boolean;
+  // True once a write has been refused by the browser (BRIEF 4.2). The visitor
+  // is told once; the site stays playable and nothing throws.
+  storageBlocked: boolean;
 }
 
 export interface HiddenGamesEngine {
-  reportHiddenGame: (id: string) => ReportOutcome;
+  reportHiddenGame: (id: string) => EngineOutcome;
   getState: () => CounterState;
   subscribe: (listener: () => void) => () => void;
 }
 
 export function createEngine(deps: EngineDeps): HiddenGamesEngine {
+  const status: LifecycleStatus = deps.status ?? "OPEN";
+  const view = lifecycleView(status);
+
   function safeGet(): string | null {
     try {
       return deps.getItem(STORAGE_KEY);
@@ -57,23 +77,36 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     }
   }
 
-  function safeSet(value: string): void {
+  // True on a successful write, false if the browser refused it. A refusal
+  // never throws (BRIEF 4.2); the caller records it as storage-blocked.
+  function safeSet(value: string): boolean {
     try {
       deps.setItem(STORAGE_KEY, value);
+      return true;
     } catch {
-      // Fail-soft write: a blocked write must not throw. Detection and the
-      // visitor message are Batch 2.
+      return false;
     }
   }
+
+  let storageBlocked = false;
 
   function toState(record: HiddenGamesRecord): CounterState {
     const count = record.count;
     const total = REGISTRY.games.length;
-    return { count, total, label: counterLabel(count, total) };
+    return {
+      count,
+      total,
+      label: counterLabel(count, total),
+      status,
+      view: view.view,
+      render: view.render,
+      storageBlocked,
+    };
   }
 
   // Restore before render: the first snapshot already reflects storage, so the
   // counter never paints a stale 0 before real progress appears (BRIEF 9).
+  // Detection is lazy, so restore performs no write.
   let record = readRecord(safeGet(), deps.now()).record;
   let snapshot: CounterState = toState(record);
 
@@ -82,7 +115,12 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     for (const listener of listeners) listener();
   }
 
-  function reportHiddenGame(id: string): ReportOutcome {
+  function reportHiddenGame(id: string): EngineOutcome {
+    if (!view.acceptsFinds) {
+      // Frozen: SUSPENDED, CLOSED or ARCHIVED. Nothing registers, nothing is
+      // written, and the stored record is left exactly as it was (BRIEF 5).
+      return "frozen";
+    }
     const { record: next, outcome } = applyReport(record, id, deps.now());
     if (outcome === "unknown") {
       // Ignored, logged as a QA warning, never counted (BRIEF 3).
@@ -94,7 +132,11 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       return outcome;
     }
     record = next;
-    safeSet(serializeRecord(record));
+    if (!safeSet(serializeRecord(record))) {
+      // The find is kept in memory so play is unaffected, but it could not be
+      // saved: tell the visitor once (BRIEF 4.2).
+      storageBlocked = true;
+    }
     snapshot = toState(record);
     emit();
     return outcome;

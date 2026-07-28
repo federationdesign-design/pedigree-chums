@@ -11,6 +11,7 @@
 
 import type { GameId } from "./registry";
 import { createEngine, type HiddenGamesEngine } from "./engine";
+import { STATUS } from "./lifecycle";
 
 let singleton: HiddenGamesEngine | null = null;
 
@@ -26,6 +27,7 @@ export function getHiddenGamesEngine(): HiddenGamesEngine {
     warn: (message) => {
       if (typeof console !== "undefined") console.warn(message);
     },
+    status: STATUS,
   });
   return singleton;
 }
