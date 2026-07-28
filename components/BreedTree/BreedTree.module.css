@@ -250,7 +250,9 @@
   touch-action: none;
   cursor: grab;
   position: absolute;
-  left: 10%;
+  /* 10px left of centre, so the rail hanging off the right-hand edge has room
+     and its second column stops running off the screen. */
+  left: calc(10% - 10px);
   right: auto;
   top: clamp(112px, 17vh, 190px);
   bottom: auto;
