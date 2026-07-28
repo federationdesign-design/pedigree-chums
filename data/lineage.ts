@@ -986,14 +986,34 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
     img: "/history/breeds/medieval-corgi.jpg",
     children: [
-      // Flattened to the shape every other level uses: the level's dog and two
-      // ancestors, no middle layer. The middle layer here had each dog listed
-      // as its own ancestor, which was the only place in the file that happened
-      // and is what made this level read wrong. The two 55s and two 45s under
-      // it collapse back to the 55 / 45 split that Cardigan Welsh Corgi already
-      // states, so the badges are unchanged at 55% and 45%.
-      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 },
+      {
+        name: "Early badger hunting dogs",
+        note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+        img: "/history/breeds/Teckel---Dachshund-family.jpg",
+        // No value of its own. A parent's share is the sum of its children, and
+        // d3 adds an owned value ON TOP of them, so carrying both counted this
+        // line twice and pushed the children down to 32%. The two 55s below are
+        // the 55 that used to sit here, split evenly.
+        children: [
+          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
+          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
+        ],
+      },
+      {
+        name: "Welsh herding dogs",
+        note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.",
+        img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
+        children: [
+          // Same dog as the one in the Celtic Hound level, so it carries the
+          // same picture and the same words. It used to have its own image and
+          // its own write-up, typed separately, which is why the two levels
+          // disagreed about what it looked like. Nothing copies img or note
+          // between entries, so a duplicate has to be kept in step by hand:
+          // change this one and change "Celtic Hound" below to match.
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 },
+          { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 },
+        ],
+      },
     ],
   },
 
