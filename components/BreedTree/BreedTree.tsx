@@ -3556,11 +3556,17 @@ export default function BreedTree({
     const t = window.setTimeout(() => setRenderRail((prev) => prev.filter((p) => !p.leaving)), 340);
     return () => window.clearTimeout(t);
   }, [renderRail]);
-  // Every pack dog this level produces, across all its big circles, not just
-  // the hovered one. This is the flood's cast: the union of the rail lists, so
-  // it is a subset of the 54, never all of them.
+  // Every pack dog this level produces, across EVERY circle in it, not just the
+  // hovered one and not just the big ones. This is the flood's cast: the true
+  // union of the rail lists, so it is a subset of the 54, never all of them.
+  //
+  // It used to filter depth === 1, which quietly cut the flood to the two outer
+  // circles. On Celtic Heeler that meant 3 dogs fell instead of 17, because
+  // "Old hunting dogs of the Celts" carries 14 of them on its own and sits at
+  // depth 2. The comment here already claimed this was the union of the rail
+  // lists; the rail follows nested circles, so now it actually is.
   const levelChums = useMemo(() => {
-    const names = nodes.filter((n) => n.depth === 1).map((n) => n.data.name);
+    const names = [...new Set(nodes.filter((n) => n.depth > 0).map((n) => n.data.name))];
     if (!names.length) return [] as string[];
     return descendantPackBreeds(names).map((b) => b.image).filter(Boolean);
   }, [nodes]);
