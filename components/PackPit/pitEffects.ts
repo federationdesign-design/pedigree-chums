@@ -13,7 +13,14 @@
 type Spark = { x: number; y: number; vx: number; vy: number; r: number; born: number; life: number; col: string };
 type Burst = { x: number; y: number; s: number; born: number; life: number; colour?: string; rot?: number };
 
-export function createPitEffects() {
+/**
+ * `scale` shrinks the constants that are flat pixel counts rather than fractions
+ * of a size the caller passes in: spark spread, speed, radius and gravity, and
+ * the starburst's stroke and tips. 1 is the main pit, untouched. The mini pit
+ * runs smaller because its furniture is smaller, so a main-pit-sized blast
+ * swamps it.
+ */
+export function createPitEffects(scale = 1) {
   const bursts: Burst[] = [];
   const burstAt = (x: number, y: number, s: number) =>
     bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
@@ -59,14 +66,14 @@ export function createPitEffects() {
       if (Math.random() > 0.18 + intensity * 0.78) continue; // sparse and faint at low intensity, near-constant at full
       const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.7 + intensity * 1.7); // tighter spit when low, wider spray when high
       const sp = 0.7 + Math.random() * (1.0 + intensity * 2.8); // slower drips low, faster shower high
-      fuseSparks.push({ x: x + (Math.random() - 0.5) * (4 + intensity * 7), y: y + (Math.random() - 0.5) * (4 + intensity * 7), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: 1 + Math.random() * (0.8 + intensity * 2.6), born: performance.now(), life: 220 + Math.random() * 280, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
+      fuseSparks.push({ x: x + (Math.random() - 0.5) * (4 + intensity * 7) * scale, y: y + (Math.random() - 0.5) * (4 + intensity * 7) * scale, vx: Math.cos(a) * sp * scale, vy: Math.sin(a) * sp * scale, r: (1 + Math.random() * (0.8 + intensity * 2.6)) * scale, born: performance.now(), life: 220 + Math.random() * 280, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
     }
   };
   const drawFuseSparks = (ctx: any, now: number) => {
     for (let i = fuseSparks.length - 1; i >= 0; i--) {
       const s = fuseSparks[i], t = (now - s.born) / s.life;
       if (t >= 1) { fuseSparks.splice(i, 1); continue; }
-      s.x += s.vx; s.y += s.vy; s.vy += 0.05; s.vx *= 0.97;
+      s.x += s.vx; s.y += s.vy; s.vy += 0.05 * scale; s.vx *= 0.97;
       ctx.save(); ctx.globalAlpha = 1 - t; ctx.fillStyle = s.col;
       ctx.beginPath(); ctx.arc(s.x, s.y, s.r * (1 - t * 0.5), 0, Math.PI * 2); ctx.fill();
       ctx.restore();
@@ -99,7 +106,7 @@ export function createPitEffects() {
       const reach = bu.s * (0.35 + t * 0.85), inner = bu.s * (0.12 + t * 0.4);
       ctx.save(); ctx.globalAlpha = (1 - t); ctx.translate(bu.x, bu.y);
       ctx.rotate((t * 5 + (bu.rot || 0)) * Math.PI / 180); // rotate over the pop, plus this layer's fixed offset
-      ctx.strokeStyle = bu.colour || "#ff2d78"; ctx.lineWidth = 2.4; ctx.lineCap = "round";
+      ctx.strokeStyle = bu.colour || "#ff2d78"; ctx.lineWidth = 2.4 * scale; ctx.lineCap = "round";
       for (let k = 0; k < 12; k++) {
         const a = (k / 12) * Math.PI * 2;
         ctx.beginPath();
@@ -109,7 +116,7 @@ export function createPitEffects() {
       }
       ctx.fillStyle = bu.colour || "#ff2d78";
       for (let k = 0; k < 5; k++) {
-        const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 3 * (1 - t) + 1.5;
+        const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = (3 * (1 - t) + 1.5) * scale;
         ctx.beginPath();
         for (let p = 0; p < 5; p++) {
           const aa = a + (p / 5) * Math.PI * 2;

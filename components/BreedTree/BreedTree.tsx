@@ -266,6 +266,11 @@ const BOMB_ODDS = 20;
 const BOMB_HITS = 5;          // hits to detonate
 const BOMB_FUSE_MS = 2500;    // the whole fuse
 const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
+// The blast is tuned for the main pit, whose cards are far bigger than a mini
+// pit chip, so a straight copy reads as an overreaction. ONE dial: it scales
+// every size handed to the shared effects, and the flat constants inside them.
+// 1 is main pit size. Lower is smaller.
+const FX_SCALE = 0.7;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
@@ -1584,7 +1589,7 @@ export default function BreedTree({
       const pxPerWorld = Math.hypot(CT.a, CT.b) * kD || 1;
       fxPxPerWorldRef.current = pxPerWorld; // J17: the effects layer's pixel-to-world scale
       fxFromPxRef.current = worldFromPx;
-      const fx = createPitEffects();
+      const fx = createPitEffects(FX_SCALE);
       fxKitRef.current = fx;
       const stagePxH = worldH * pxPerWorld;
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
@@ -2142,7 +2147,7 @@ export default function BreedTree({
       const hitBomb = (b: Body) => {
         if (!b.bomb || b.blown) return;
         b.hits = (b.hits || 0) + 1;
-        if (b.mb) fx.burstAt(b.mb.position.x, b.mb.position.y, radOf(b.mb) * 1.1);
+        if (b.mb) fx.burstAt(b.mb.position.x, b.mb.position.y, radOf(b.mb) * 1.1 * FX_SCALE);
         fxKickRef.current?.();
         wake();
         if ((b.hits || 0) < BOMB_HITS) return;
@@ -2198,7 +2203,7 @@ export default function BreedTree({
         wake();
         toyTimers.push(window.setTimeout(() => {
           const now2 = performance.now();
-          fx.pushBoom(bx, by, bsz * 2.2); // the pop-art comic blast
+          fx.pushBoom(bx, by, bsz * 2.2 * FX_SCALE); // the pop-art comic blast
           fxKickRef.current?.();
           numAt(b.x, b.y, 250, now2);
           if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(wasHeld ? [25, 20, 200] : [20, 15, 120]);
@@ -2225,7 +2230,7 @@ export default function BreedTree({
           chain.forEach((o, i) => {
             toyTimers.push(window.setTimeout(() => {
               const t2 = performance.now();
-              fx.explodeAt(o.position.x, o.position.y, radOf(o) * (1 + (o.plugin?.bridge?.pct || 0) / 25));
+              fx.explodeAt(o.position.x, o.position.y, radOf(o) * (1 + (o.plugin?.bridge?.pct || 0) / 25) * FX_SCALE);
               fxKickRef.current?.();
               const val = killChained(o, t2);
               if (val) {
