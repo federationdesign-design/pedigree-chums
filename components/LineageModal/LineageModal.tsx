@@ -9,6 +9,7 @@ import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
 import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
+import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 
 // Plain-language label for the status dot on the title portrait.
 const STATUS_LABEL: Record<BreedTag, string> = {
@@ -163,6 +164,13 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   };
 
   useEffect(() => setMounted(true), []);
+
+  // G02 "The Lineage Game": the round has started. One effect on the running
+  // state, per BRIEF 2.2. onStartedChange is wired to the stable setRunning
+  // setter (line ~226), never an inline arrow, so effect 743 in BreedTree does
+  // not re-fire per render. No dedup wrapper: a new round is a fresh key mount,
+  // so running legitimately transitions again, and the engine dedupes by ID.
+  useEffect(() => { if (running) reportHiddenGame("G02"); }, [running]);
 
   useEffect(() => {
     let t: number | undefined;
