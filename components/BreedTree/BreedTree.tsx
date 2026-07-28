@@ -970,7 +970,7 @@ export default function BreedTree({
   // The render-side view of a badge body. J17 adds the fuse fields, which the
   // rattle in zoomTo reads: rDraw is the chip's own drawn radius, so the shake
   // is always a fraction of the chip rather than a flat pixel count.
-  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; popped?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; blown?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
@@ -1245,7 +1245,7 @@ export default function BreedTree({
         // half second. Straight from the main pit, with the two fives halved.
         // The shake offset is a fraction of the chip's OWN drawn radius, never a
         // flat pixel count, or a small chip would judder further than a big one.
-        if (b.bomb && !b.popped && now) {
+        if (b.bomb && !b.blown && now) {
           const now2 = now;
           const hh = b.hits || 0;
           const heldF = b.heldSince ? Math.min(1, (now2 - b.heldSince) / BOMB_FUSE_MS) : 0;
@@ -1567,7 +1567,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -2117,11 +2117,11 @@ export default function BreedTree({
       // Stage 3 ends in a placeholder poof; stage 4 replaces it with the real
       // blast, the shockwave and the chain.
       const hitBomb = (b: Body) => {
-        if (!b.bomb || b.popped) return;
+        if (!b.bomb || b.blown) return;
         b.hits = (b.hits || 0) + 1;
         wake();
         if ((b.hits || 0) < BOMB_HITS) return;
-        b.popped = true;
+        b.blown = true;
         poofAt(b.x, b.y, performance.now());
         if (b.mb && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
         setDeadBadges((p) => new Set(p).add(b.idx));
@@ -2131,13 +2131,13 @@ export default function BreedTree({
       // and a rattle in the hand that grows on the same halved step.
       const burnFuse = (now2: number) => {
         const b = pressedBombRef.current as Body | null;
-        if (!b || !b.bomb || b.popped || !b.heldSince) return;
+        if (!b || !b.bomb || b.blown || !b.heldSince) return;
         const due = Math.floor((now2 - b.heldSince) / BOMB_TICK_MS);
-        while ((b.heldHits || 0) < due && pressedBombRef.current === b && !b.popped) {
+        while ((b.heldHits || 0) < due && pressedBombRef.current === b && !b.blown) {
           b.clickPending = false; // a sustained hold, not a quick click
           b.heldHits = (b.heldHits || 0) + 1;
           hitBomb(b);
-          if (!b.popped && typeof navigator !== "undefined" && navigator.vibrate) {
+          if (!b.blown && typeof navigator !== "undefined" && navigator.vibrate) {
             navigator.vibrate(14 + (b.heldHits || 0) * 24);
           }
         }
@@ -2448,7 +2448,7 @@ export default function BreedTree({
         type DragEv = { body?: { plugin?: { bridge?: Body } } };
         Events.on(mc, "startdrag", (ev: DragEv) => {
           const br = ev?.body?.plugin?.bridge;
-          if (!br?.bomb || br.popped) return;
+          if (!br?.bomb || br.blown) return;
           br.heldSince = performance.now();
           br.heldHits = 0;
           br.clickPending = true; // a quick release still counts as one hit
@@ -2458,7 +2458,7 @@ export default function BreedTree({
         Events.on(mc, "enddrag", (ev: DragEv) => {
           const br = ev?.body?.plugin?.bridge;
           if (!br?.bomb) return;
-          if (br.clickPending && !br.popped) hitBomb(br);
+          if (br.clickPending && !br.blown) hitBomb(br);
           br.heldSince = 0; br.heldHits = 0; br.clickPending = false;
           if (pressedBombRef.current === br) pressedBombRef.current = null;
         });
