@@ -1797,6 +1797,30 @@ export default function BreedTree({
     return dockAside ? SIZE / Math.max(homeWRef.current, 1) : SIZE / v[2];
   }
 
+  // Rings on NESTED circles are drawn inside their own radius rather than
+  // straddling it. SVG has no stroke alignment, so the only way to inset one is
+  // to shrink the drawn radius by half the ring.
+  //
+  // Measured by running the real pack for the Celtic Heeler level, not guessed:
+  // a depth-2 circle's rim sits 7.31 units inside its parent's rim, while its
+  // centred ring hung 7.83 units past that rim. So it painted over 8.4 of the
+  // parent's 15.8 unit ring, a little over half of it, which is why the yellow
+  // measured 9px beside a nested circle and 19px everywhere else. Inset, the
+  // ring stops 7.31 short of the parent and the overlap falls to 0.6 units.
+  //
+  // Opening up pack().padding() was the other half of the plan and turned out
+  // to be unnecessary: it would have had to roughly double to 17 to clear a
+  // centred ring, which would have pushed the nested circles a long way apart.
+  // Depth 1 keeps its centred ring. It is the outer silhouette, nothing sits
+  // outside it to be spoiled, and leaving it alone keeps the level's shape
+  // exactly as signed off.
+  function ringInset(d: Node, v: View): number {
+    return d.depth >= 2 ? (strokeWidthFor(d) * strokeK(v)) / 2 : 0;
+  }
+  function drawR(d: Node, v: View, k: number): number {
+    return Math.max(0.5, d.r * k - ringInset(d, v));
+  }
+
   // `now` is the sim's frame time, passed in rather than read here: calling
   // performance.now() inside this function is flagged as impure render work.
   // Zero means no animation this call, which is right for every caller that is
@@ -1860,7 +1884,7 @@ export default function BreedTree({
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       if (c) {
         c.setAttribute("transform", `translate(${tx},${ty})`);
-        c.setAttribute("r", String(d.r * k));
+        c.setAttribute("r", String(drawR(d, v, k)));
         // The radius is scaled by the view but the stroke was not, so a circle
         // drawn small kept a full-size ring and read as heavy. Scale both.
         c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v)));
@@ -2067,7 +2091,7 @@ export default function BreedTree({
         const lt = Math.max(0, Math.min(1, (elapsed - i * stagger) / dur));
         const drop = (1 - easeOutBounce(lt)) * dropFrom;
         c.setAttribute("transform", `translate(${tx},${ty - drop})`);
-        c.setAttribute("r", String(d.r * k));
+        c.setAttribute("r", String(drawR(d, v, k)));
         // The ring has to be scaled by the SAME k as the radius. The entrance
         // set the radius and left the stroke to whatever React had rendered,
         // and React sizes it from viewRef, which at mount still holds the
