@@ -967,6 +967,11 @@ export default function BreedTree({
   const [deadBtns, setDeadBtns] = useState<Set<number>>(new Set());
   const cookieBtnsRef = useRef<((px: number, py: number) => void) | null>(null);
   const cookieAnswerRef = useRef<((i: number, accept: boolean) => void) | null>(null);
+  // Which toy slot the cookie panel took, so answering can clear it away.
+  const cookiesIdxRef = useRef<number | null>(null);
+  // Removes the panel and both buttons. Held as a ref because the sim owns the
+  // bodies and the listener below lives out here.
+  const cookieClearRef = useRef<(() => void) | null>(null);
   const pillBodiesRef = useRef<PropBody[]>([]);
   const rodsGRef = useRef<SVGGElement>(null);
   const pillsGRef = useRef<SVGGElement>(null);
@@ -1012,6 +1017,17 @@ export default function BreedTree({
   const fxCanvasRef = useRef<HTMLCanvasElement>(null);
   // Runs before the toy timers, which do not start until a circle lands.
   useEffect(() => { resetToysIfAsked(); }, []);
+  // Consent arrives as an event whichever way it was given, so the pit clears
+  // its cookie objects from one place rather than from each button.
+  useEffect(() => {
+    const done = () => cookieClearRef.current?.();
+    window.addEventListener("pc:cookies-accepted", done);
+    window.addEventListener("pc:cookies-rejected", done);
+    return () => {
+      window.removeEventListener("pc:cookies-accepted", done);
+      window.removeEventListener("pc:cookies-rejected", done);
+    };
+  }, []);
   // J10b stage 2: lets a tap drop the mouse constraint before liftToLearn sets
   // held, so Matter is never left pulling a body that the sim has just taken
   // out of the world.
@@ -1961,6 +1977,7 @@ export default function BreedTree({
         if (kind === "stick") pr.a = startAngle;
         toyBodiesRef.current.push(pr);
         if (kind === "flag") flagIdxRef.current = idx;
+        if (kind === "cookies") cookiesIdxRef.current = idx;
         setToyList((l) => [...l, {
           kind, size: dia * fxScale, h: hgt * fxScale, src: TOY_SRC[kind],
           filter: kind === "ballPink"
@@ -2070,14 +2087,23 @@ export default function BreedTree({
         if (accept) numAt(pr.x, pr.y, 2000, now2); // the main pit's reward for saying yes
         try { localStorage.setItem(COOKIE_CONSENT_KEY, accept ? "accepted" : "declined"); } catch { /* private mode */ }
         window.dispatchEvent(new Event(accept ? "pc:cookies-accepted" : "pc:cookies-rejected"));
-        // both answers leave together: the question has been answered
+        cookieClearRef.current?.();
+      };
+      // The question has been answered, so everything asking it leaves: both
+      // buttons AND the panel they came out of. The panel used to stay sitting
+      // in the pit, because retiring a toy only stops it coming back next time.
+      // Routed through a ref so it fires whichever way consent arrived, the pit
+      // buttons or the notice itself.
+      cookieClearRef.current = () => {
         const gone = new Set<number>();
         btnBodiesRef.current.forEach((b, j) => {
           if (!b?.mb) return;
           Composite.remove(world, b.mb);
           gone.add(j);
         });
-        setDeadBtns((p) => new Set([...p, ...gone]));
+        if (gone.size) setDeadBtns((p) => new Set([...p, ...gone]));
+        const ci = cookiesIdxRef.current;
+        if (ci !== null) { cookiesIdxRef.current = null; killToyRef.current?.(ci); }
         wake();
       };
       spawnPillRef.current = (sx: number, sy: number, wPx: number, name: string) => {
