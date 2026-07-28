@@ -57,7 +57,11 @@ const DIFF_DEFAULT = 5;
 // half of it, 0 a quarter. Two straight segments, so 5 lands exactly on its own
 // number rather than somewhere between the ends.
 const DIFF_STOP_0 = 0.25;
-const DIFF_STOP_5 = 0.50;
+// 0.575, raised 15% from 0.50 by eye. The chips follow on their own: a badge
+// radius is a fraction of the mean circle radius, so growing the circles grows
+// them too. That only holds up to about 0.61, where BADGE_MAX_R takes over and
+// the chips stop tracking.
+const DIFF_STOP_5 = 0.575;
 // 0.92, not 1: a cluster at the literal full width sat too tight against the
 // walls once the ring and the tilt were in. This is the top-end dial.
 const DIFF_STOP_10 = 0.92;
