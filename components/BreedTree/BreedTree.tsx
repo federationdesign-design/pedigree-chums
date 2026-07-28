@@ -933,6 +933,10 @@ export default function BreedTree({
   // and is re-registered with the live view every frame, so anything drawn in
   // world coordinates stays locked to its circle through pan and zoom.
   const fxCanvasRef = useRef<HTMLCanvasElement>(null);
+  // J10b stage 2: lets a tap drop the mouse constraint before liftToLearn sets
+  // held, so Matter is never left pulling a body that the sim has just taken
+  // out of the world.
+  const mcReleaseRef = useRef<(() => void) | null>(null);
   // Drop-time pixels per world unit, published by the sim below. Effects are
   // authored in pit pixels, so dividing a pixel constant by this turns it into
   // world units: a blast keeps its intended size at the default view and grows
@@ -2318,9 +2322,14 @@ export default function BreedTree({
         Composite.add(world, mc);
         // Stage 1 grabs badges only. Everything else keeps the old path, so the
         // two systems can never fight over the same body.
+        // Stage 1 was badges only. Stage 2 adds the dog circles, which is the
+        // object this whole job exists for. Rods, pills, toys and the UI
+        // squares still run the old path, so the two never share a body.
+        const MC_KINDS = new Set(["badge", "circle"]);
         const onStartDrag = (ev: { body?: { plugin?: { kind?: string } } }) => {
-          if (ev?.body?.plugin?.kind !== "badge") { mc.constraint.bodyB = null; mc.body = null; }
+          if (!MC_KINDS.has(ev?.body?.plugin?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; }
         };
+        mcReleaseRef.current = () => { mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
         Events.on(mc, "startdrag", onStartDrag);
         const setPos = (cx: number, cy: number) => {
           const sv = svgEl as SVGSVGElement | null;
@@ -2346,6 +2355,7 @@ export default function BreedTree({
         window.addEventListener("pointerup", onUp);
         window.addEventListener("pointercancel", onUp);
         mcTeardown = () => {
+          mcReleaseRef.current = null;
           Events.off(mc, "startdrag", onStartDrag);
           st.removeEventListener("pointerdown", onDown);
           window.removeEventListener("pointermove", onMove);
@@ -2763,12 +2773,9 @@ export default function BreedTree({
                           while (target && !pb?.owned.has(target)) target = target.parent;
                           const body = target ? pb?.find(target) : undefined;
                           const liftNode = target ?? d;
-                          // held lifts the body out of the physics world, so the
-                          // drag can place it directly. Without this the sim
-                          // writes the old position back every frame and the dog
-                          // does not move at all. Released on pointer up, which
-                          // drops it back in wherever it was let go.
-                          if (body) body.held = true;
+                          // Released on pointer up, which drops the dog back in
+                          // wherever it was let go. Harmless under the new path,
+                          // where held is never set in the first place.
                           const release = () => {
                             if (body) body.held = false;
                             wakeRef.current?.();
@@ -2786,6 +2793,34 @@ export default function BreedTree({
                           const li = nodes.indexOf(liftNode);
                           const el = (circlesRef.current?.children[li] as SVGCircleElement | undefined)
                             ?? (e.currentTarget as SVGCircleElement);
+                          if (mcDragOn()) {
+                            // Matter owns the drag now. Two things must NOT
+                            // happen here: held, which would pull the body out
+                            // of the world and leave the constraint with
+                            // nothing to hold, and stopPropagation, because the
+                            // press has to reach the stage listener that feeds
+                            // the mouse. All that is left is the tap.
+                            // the old path's release hook is dead weight here,
+                            // and leaving it armed means two listeners racing to
+                            // set held on the same pointer up
+                            window.removeEventListener("pointerup", release);
+                            window.removeEventListener("pointercancel", release);
+                            const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
+                            const tapUp = (ev: PointerEvent) => {
+                              window.removeEventListener("pointerup", tapUp);
+                              window.removeEventListener("pointercancel", tapUp);
+                              if (performance.now() - p0.t >= 350) return;
+                              if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
+                              mcReleaseRef.current?.(); // let go before the lift freezes the body
+                              liftToLearn(el, liftNode);
+                            };
+                            window.addEventListener("pointerup", tapUp);
+                            window.addEventListener("pointercancel", tapUp);
+                            return;
+                          }
+                          // held lifts the body out of the physics world so the
+                          // old drag can place it directly.
+                          if (body) body.held = true;
                           startDrag(e, body as never, () => {
                             if (body) body.held = false;
                             liftToLearn(el, liftNode);
