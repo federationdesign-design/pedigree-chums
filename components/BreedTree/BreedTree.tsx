@@ -121,6 +121,16 @@ const DIFF_INSET = 16;
 // Tuning hook: ?d0= ?d5= ?d10= override the three stops for one page load, so a
 // value can be judged live instead of costing a patch and a deploy each time.
 // Read once and cached. TEMPORARY, remove once the numbers are settled.
+// ?bc= overrides the chip fraction for one page load, same idea as the stops.
+// TEMPORARY, out with them.
+let bcCache: number | null = null;
+function badgeFrac() {
+  if (bcCache !== null) return bcCache;
+  const q = typeof window === "undefined" ? null : new URLSearchParams(window.location.search);
+  const v = Number(q?.get("bc"));
+  bcCache = Number.isFinite(v) && v > 0 && v <= 2 ? v : BADGE_OF_CIRCLE;
+  return bcCache;
+}
 let stopsCache: { a: number; b: number; c: number } | null = null;
 function stops() {
   if (stopsCache) return stopsCache;
@@ -393,7 +403,16 @@ const BADGE_DRAW_R = 92;
 // Halved from 0.55 by request: the badges read as almost the same size as the
 // circle they belong to, which made the pair look like two circles rather than
 // a circle wearing a tag.
-const BADGE_OF_CIRCLE = 0.275;
+// The chip radius as a fraction of the DRAWN circle radius, which is what the
+// eye actually compares. It has to be against the drawn one: a circle is drawn
+// at d.r * k while a chip is drawn at its raw radius with no k, so a fraction
+// taken against the unconverted mean came out PIT_SPAN times too big, 0.7 of
+// the circle instead of the 0.275 it claimed. BADGE_MAX_R then clamped it at
+// the top of the slider and hid the fault, which is why maximum looked right
+// and the default did not.
+//
+// 0.44 lands maximum on the 0.33 signed off, once BADGE_TRIM is applied.
+const BADGE_OF_CIRCLE = 0.44;
 // The chips are trimmed at the top of the slider, like the rings. Tapers in
 // from level 5, so nothing at or below the default changes. 0.25 is a quarter
 // smaller at 10.
@@ -1023,7 +1042,9 @@ export default function BreedTree({
     const d1 = nodes.filter((n) => n.depth === 1);
     if (!d1.length) return BADGE_DRAW_R;
     const mean = d1.reduce((acc, n) => acc + n.r, 0) / d1.length;
-    const r = Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, mean * BADGE_OF_CIRCLE));
+    // into the space the chip is drawn in, before the fraction means anything
+    const drawn = (dockAside ? mean / PIT_SPAN : mean) * badgeFrac();
+    const r = Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, drawn));
     if (!dockAside || level <= 5) return r;
     return r * (1 - ((Math.min(level, 10) - 5) / 5) * BADGE_TRIM);
   }, [nodes, dockAside, level]);
