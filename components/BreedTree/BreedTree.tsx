@@ -3882,7 +3882,13 @@ export default function BreedTree({
                       );
                     })()
                   )}
-                  {pct !== null && !(dockAside && d.depth === 1) && !learning && (
+                  {/* The drawn share disc. The mini pit does not use it at all
+                      now: the first ring never did, and the circles nested
+                      inside were still showing one on the start screen. In the
+                      pit the share is carried by the physics chips that scatter
+                      on the drop, so a second static copy on the start screen
+                      was saying the same thing twice. The chum pages keep it. */}
+                  {pct !== null && !dockAside && !learning && (
                     <g>
                       <circle cx={0} cy={50} r={46} style={{ fill: "#ffd23e", stroke: "#0a3a57", strokeWidth: 3 }} />
                       <text x={0} y={50} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${46 * 0.7}px` }}>
