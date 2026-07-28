@@ -57,10 +57,19 @@ export interface CounterState {
   // True once a write has been refused by the browser (BRIEF 4.2). The visitor
   // is told once; the site stays playable and nothing throws.
   storageBlocked: boolean;
+  // Whether the visitor has seen the one-time introduction (D10).
+  introSeen: boolean;
+  // Derived completion: count equals the total (BRIEF 4.3, "Completion is
+  // derived, not stored").
+  completed: boolean;
+  // Whether the visitor has seen the one-time completion celebration (D11).
+  completionSeen: boolean;
 }
 
 export interface HiddenGamesEngine {
   reportHiddenGame: (id: string) => EngineOutcome;
+  markIntroSeen: () => void;
+  markCompletionSeen: () => void;
   getState: () => CounterState;
   subscribe: (listener: () => void) => () => void;
 }
@@ -101,6 +110,9 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       view: view.view,
       render: view.render,
       storageBlocked,
+      introSeen: record.intro_seen,
+      completed: total > 0 && count === total,
+      completionSeen: record.completion_seen,
     };
   }
 
@@ -142,8 +154,34 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     return outcome;
   }
 
+  // Mark the one-time introduction as seen and persist it in the record (D10),
+  // so it never expands again for this browser. Best-effort: a refused write
+  // just re-shows the intro on the next visit and is not the storage-blocked
+  // (finds cannot be saved) condition, so it does not set that flag.
+  function markIntroSeen(): void {
+    if (record.intro_seen) return;
+    record = { ...record, intro_seen: true };
+    safeSet(serializeRecord(record));
+    snapshot = toState(record);
+    emit();
+  }
+
+  // Mark the one-time completion celebration as seen and persist it alongside
+  // the progress (D11), so the completion card collapses to a persistent
+  // completed chip and does not reappear on the next page. Same best-effort
+  // persistence as markIntroSeen.
+  function markCompletionSeen(): void {
+    if (record.completion_seen) return;
+    record = { ...record, completion_seen: true };
+    safeSet(serializeRecord(record));
+    snapshot = toState(record);
+    emit();
+  }
+
   return {
     reportHiddenGame,
+    markIntroSeen,
+    markCompletionSeen,
     getState: () => snapshot,
     subscribe: (listener: () => void) => {
       listeners.add(listener);

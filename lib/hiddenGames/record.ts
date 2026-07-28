@@ -20,6 +20,14 @@ export interface HiddenGamesRecord {
   completed_game_ids: GameId[];
   count: number;
   updated_at: string; // ISO 8601
+  // Whether the visitor has seen the one-time campaign introduction (D10). Kept
+  // alongside progress in the same record, not a separate key. An additive,
+  // optional field: a record written before this existed reads as not-seen, so
+  // the schema stays 3 and no earlier record is invalidated.
+  intro_seen: boolean;
+  // Whether the visitor has seen the one-time completion celebration (D11).
+  // Same additive, optional treatment as intro_seen, in the same record.
+  completion_seen: boolean;
 }
 
 // Why a record read differed from a clean restore. Used only for the
@@ -43,6 +51,8 @@ export function freshRecord(nowMs: number): HiddenGamesRecord {
     completed_game_ids: [],
     count: 0,
     updated_at: new Date(nowMs).toISOString(),
+    intro_seen: false,
+    completion_seen: false,
   };
 }
 
@@ -118,6 +128,8 @@ export function readRecord(
       completed_game_ids: completed,
       count: completed.length,
       updated_at: updatedAt,
+      intro_seen: obj.intro_seen === true,
+      completion_seen: obj.completion_seen === true,
     },
     note: "restored",
   };
@@ -146,6 +158,8 @@ export function applyReport(
       completed_game_ids: completed,
       count: completed.length,
       updated_at: new Date(nowMs).toISOString(),
+      intro_seen: record.intro_seen, // a find never resets the intro flag
+      completion_seen: record.completion_seen,
     },
     outcome: "awarded",
   };

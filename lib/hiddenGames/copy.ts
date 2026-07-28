@@ -17,3 +17,14 @@ export const SUSPENDED =
 export function closedMessage(count: number, total: number): string {
   return `This Hidden Games challenge has ended. You found ${count} of ${total} games.`;
 }
+
+// BRIEF 7, "Campaign introduction". Shown once, expanded, on a visitor's first
+// view (D10).
+export const CAMPAIGN_INTRO =
+  "There are hidden games across the Pedigree Chums website. Find them all.";
+
+// BRIEF 7, "Completion heading" and "Completion body". The two lines the
+// completed counter shows at 2/2 (D11).
+export const COMPLETION_HEADING = "You found every hidden game!";
+export const COMPLETION_BODY =
+  "You completed the first Pedigree Chums Hidden Games challenge.";
