@@ -3526,7 +3526,28 @@ export default function BreedTree({
                           x={0}
                           y={labelFirstY(lines.length, fs)}
                           transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
-                          style={{ fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${fs}px`, letterSpacing: "0.5px" }}
+                          style={{
+                            fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff",
+                            fontFamily: "var(--font-display), system-ui, sans-serif",
+                            fontSize: `${fs}px`,
+                            letterSpacing: "0.5px",
+                            // Paint order already puts a nested name in front of
+                            // the name of the circle it sits in: d3 hands the
+                            // nodes back shallowest first, so the deeper label is
+                            // drawn last. White on white just does not read as
+                            // in front. A navy halo on the nested names cuts them
+                            // cleanly out of whatever is behind. The first ring
+                            // keeps its plain face, so nothing already signed off
+                            // changes.
+                            ...(isInside && !isChild
+                              ? {
+                                  stroke: "var(--navy, #0a3a57)",
+                                  strokeWidth: Math.max(2, fs * 0.16),
+                                  strokeLinejoin: "round" as const,
+                                  paintOrder: "stroke" as const,
+                                }
+                              : null),
+                          }}
                         >
                           {lines.map((line, li) => (
                             <tspan key={li} x={0} dy={li === 0 ? 0 : "1.05em"}>{line}</tspan>
