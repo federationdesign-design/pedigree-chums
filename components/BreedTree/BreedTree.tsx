@@ -99,7 +99,7 @@ const DIFF_STROKE_TRIM = 0.1;
 // the fit is width-only, everything shrinks to compensate: 5 degrees costs 3%,
 // 10 costs 11%. This is purely how the start and learn screens look, because
 // pressing PLAY scatters them anyway.
-const DIFF_TILT_DEG = 5;
+const DIFF_TILT_DEG = 12.5;
 // How far the default pit view is pulled back beyond DIFF_SPAN. The pit walls
 // are derived from the view, so widening the view widens the pit in world terms
 // while the packed circles keep their radii: the circles get smaller inside the
@@ -121,6 +121,15 @@ const DIFF_INSET = 16;
 // Tuning hook: ?d0= ?d5= ?d10= override the three stops for one page load, so a
 // value can be judged live instead of costing a patch and a deploy each time.
 // Read once and cached. TEMPORARY, remove once the numbers are settled.
+// ?tilt= overrides the lean, in degrees. TEMPORARY, out with the rest.
+let tiltCache: number | null = null;
+function tiltDeg() {
+  if (tiltCache !== null) return tiltCache;
+  const q = typeof window === "undefined" ? null : new URLSearchParams(window.location.search);
+  const v = Number(q?.get("tilt"));
+  tiltCache = Number.isFinite(v) && v >= 0 && v <= 45 ? v : DIFF_TILT_DEG;
+  return tiltCache;
+}
 // ?bc= overrides the chip fraction for one page load, same idea as the stops.
 // TEMPORARY, out with them.
 let bcCache: number | null = null;
@@ -411,8 +420,8 @@ const BADGE_DRAW_R = 92;
 // the top of the slider and hid the fault, which is why maximum looked right
 // and the default did not.
 //
-// 0.44 lands maximum on the 0.33 signed off, once BADGE_TRIM is applied.
-const BADGE_OF_CIRCLE = 0.44;
+// 0.36, down from 0.44 by eye. ?bc= overrides it live.
+const BADGE_OF_CIRCLE = 0.36;
 // The chips are trimmed at the top of the slider, like the rings. Tapers in
 // from level 5, so nothing at or below the default changes. 0.25 is a quarter
 // smaller at 10.
@@ -593,8 +602,8 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   // and then lean the pair off vertical. A rigid rotation of the whole cloud,
   // so every nested circle keeps its place inside its parent. The bounding box
   // below is measured after this, so the fit already allows for it.
-  if (level !== null && n === 2 && DIFF_TILT_DEG) {
-    const t = (DIFF_TILT_DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
+  if (level !== null && n === 2 && tiltDeg()) {
+    const t = (tiltDeg() * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
     pts.forEach((p) => {
       const nx = p.x * cs - p.y * sn;
       p.y = p.x * sn + p.y * cs;
@@ -634,7 +643,11 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
     const slack = Math.max(0, halfH - M / 2 - bottomAfter);
     drop = Math.min(FH * CLUSTER_DROP, slack);
   } else {
-    drop = pit.restY - bottomAfter;
+    // The pair reads as ONE object, and that object is centred on the screen.
+    // It only moves at all when centring would drop it through the floor gap,
+    // and then only far enough to sit on it: hence min(0, ...), never positive.
+    // So the easy settings sit dead centre and only the hardest is pushed up.
+    drop = Math.min(0, pit.restY - bottomAfter);
   }
   pts.forEach((p) => {
     p.d.x = (p.x - cx) * scale;
