@@ -3959,7 +3959,12 @@ export default function BreedTree({
                     />
                   </>
                 ) : (
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.065 : 0.055) }} />
+                /* The outline is a fixed 5 CSS pixels, the same 5 * upp the in-pit UI
+                   squares use, so a chip reads with the same weight as the menu
+                   button whatever its radius. It used to be a fraction of the
+                   radius, which left the smallest chips on a sub-pixel hairline
+                   and the biggest on about 4.6px. */
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: 5 * upp2 }} />
                 )}
                 {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
