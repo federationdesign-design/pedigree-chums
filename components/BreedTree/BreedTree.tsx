@@ -3923,8 +3923,6 @@ export default function BreedTree({
               const d1n = nodes.filter((n) => n.depth === 1)[i];
               const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
               const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
-              const st2 = stageRef.current;
-              const upp2 = st2 ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st2.clientHeight, 1) : 1;
               const inert = inertBadges.has(i);
               if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
               return (
@@ -3959,12 +3957,15 @@ export default function BreedTree({
                     />
                   </>
                 ) : (
-                /* The outline is a fixed 5 CSS pixels, the same 5 * upp the in-pit UI
-                   squares use, so a chip reads with the same weight as the menu
-                   button whatever its radius. It used to be a fraction of the
-                   radius, which left the smallest chips on a sub-pixel hairline
-                   and the biggest on about 4.6px. */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: 5 * upp2 }} />
+                /* The outline is a fraction of the radius, so a chip keeps the same
+                   ring-to-disc proportion at every difficulty stop. A fixed
+                   pixel width was tried and rejected: it reads correctly on the
+                   small level-0 chips and thins out badly as they grow. The
+                   fractions are calibrated so a level-0 chip is unchanged, by
+                   measuring the ring off the level-0 screen: 5 * upp against a
+                   radius of about 41 to 46 units, which is 0.19. The label
+                   variant keeps the same 18% extra it always had. */
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
                 )}
                 {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
