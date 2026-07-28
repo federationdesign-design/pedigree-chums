@@ -114,13 +114,26 @@ const DIFF_INSET = 16;
 // level 10 was measuring against a pit 2.1 times narrower than the real one and
 // came out 2.1x too small on the two-circle levels, which are 64% of them.
 //
+// Tuning hook: ?d0= ?d5= ?d10= override the three stops for one page load, so a
+// value can be judged live instead of costing a patch and a deploy each time.
+// Read once and cached. TEMPORARY, remove once the numbers are settled.
+let stopsCache: { a: number; b: number; c: number } | null = null;
+function stops() {
+  if (stopsCache) return stopsCache;
+  const q = typeof window === "undefined" ? null : new URLSearchParams(window.location.search);
+  const num = (k: string, d: number) => {
+    const v = Number(q?.get(k));
+    return Number.isFinite(v) && v > 0 && v <= 2 ? v : d;
+  };
+  stopsCache = { a: num("d0", DIFF_STOP_0), b: num("d5", DIFF_STOP_5), c: num("d10", DIFF_STOP_10) };
+  return stopsCache;
+}
 // level: null outside the mini pit, where the packing is used untouched.
 function diffScale(base: number, fit: number, level: number | null): number {
   if (level === null) return base;
   const l = Math.min(Math.max(level, 0), 10);
-  const f = l <= 5
-    ? DIFF_STOP_0 + (l / 5) * (DIFF_STOP_5 - DIFF_STOP_0)
-    : DIFF_STOP_5 + ((l - 5) / 5) * (DIFF_STOP_10 - DIFF_STOP_5);
+  const { a, b, c } = stops();
+  const f = l <= 5 ? a + (l / 5) * (b - a) : b + ((l - 5) / 5) * (c - b);
   return fit * f;
 }
 // The pit itself, in the packed units relayoutMobile works in. After the
@@ -377,6 +390,14 @@ const BADGE_DRAW_R = 92;
 // circle they belong to, which made the pair look like two circles rather than
 // a circle wearing a tag.
 const BADGE_OF_CIRCLE = 0.275;
+// The chips are trimmed at the top of the slider, like the rings. Tapers in
+// from level 5, so nothing at or below the default changes. 0.25 is a quarter
+// smaller at 10.
+//
+// NOTE this is applied AFTER the clamp below, not before. By level 10 the raw
+// figure is around 211 and BADGE_MAX_R has already pulled it back to 140, so a
+// trim applied first would be swallowed by the clamp and do nothing at all.
+const BADGE_TRIM = 0.25;
 const BADGE_MIN_R = 26;
 const BADGE_MAX_R = 140;
 
@@ -998,8 +1019,10 @@ export default function BreedTree({
     const d1 = nodes.filter((n) => n.depth === 1);
     if (!d1.length) return BADGE_DRAW_R;
     const mean = d1.reduce((acc, n) => acc + n.r, 0) / d1.length;
-    return Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, mean * BADGE_OF_CIRCLE));
-  }, [nodes]);
+    const r = Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, mean * BADGE_OF_CIRCLE));
+    if (!dockAside || level <= 5) return r;
+    return r * (1 - ((Math.min(level, 10) - 5) / 5) * BADGE_TRIM);
+  }, [nodes, dockAside, level]);
   const badgeDrawRRef = useRef(badgeDrawR);
   useEffect(() => { badgeDrawRRef.current = badgeDrawR; }, [badgeDrawR]);
   useEffect(() => {
