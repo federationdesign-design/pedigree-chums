@@ -63,11 +63,18 @@ const DIFF_STOP_10 = 1.0;
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
 const DIFF_SPAN = 1.21;
-// Rough allowance for the themed ground strip eating into the bottom of the
-// pit. relayoutMobile cannot see the level theme, and on every tree shape we
-// have the WIDTH is what binds, so this is a safety net rather than the active
-// constraint. Raise it if a tall cluster ever pokes through the floor.
-const DIFF_FLOOR = 0.9;
+// Where the drawn ground surface sits, in view units above the bottom of the
+// stage. Measured off the ancient-medieval strip: floorAspect 567.5/57.6 gives
+// a band 1/9.852 of the stage width tall, and its deepest sample is 0.1043 down
+// that band, so the surface lands 9.1% of the stage width up from the bottom.
+// Every level shares one floor, so this is a constant rather than something
+// relayoutMobile has to read from a theme it cannot see. If the floor moves
+// when the backgrounds change, this is the one line to update.
+const DIFF_FLOOR_VU = (SIZE / (567.5 / 57.6)) * (1 - 0.1043);
+// Clear air under the cluster on the start and learn screens, as a fraction of
+// the view height. Without it a pit-full cluster rests ON the floor and pressing
+// PLAY is a settle rather than a drop. This is the dial for how far things fall.
+const DIFF_DROP = 0.04;
 // How far the default pit view is pulled back beyond DIFF_SPAN. The pit walls
 // are derived from the view, so widening the view widens the pit in world terms
 // while the packed circles keep their radii: the circles get smaller inside the
@@ -98,9 +105,15 @@ function diffScale(base: number, fit: number, level: number | null): number {
 // The pit itself, in the packed units relayoutMobile works in. After the
 // relayout the root radius is FW / (2 * PAD), so the view width is exactly
 // FW * PIT_SPAN and the walls sit DIFF_INSET inside that.
+// The pit has THREE sides. There is no ceiling, so height never limits how big
+// the circles may be: a cluster too tall for the view simply runs off the top,
+// and on a two-circle level that is the only way the circles reach the full pit
+// width. Height decides one thing only, where the cluster rests.
 const pitBox = (FW: number, FH: number) => ({
   w: (FW - DIFF_INSET) * PIT_SPAN,
-  h: (FH - DIFF_INSET) * PIT_SPAN * DIFF_FLOOR,
+  // where the BOTTOM of the cluster sits: the floor, less the air it falls
+  // through, measured from the middle of the view downward
+  restY: (FH / 2 - DIFF_FLOOR_VU - FH * DIFF_DROP) * PIT_SPAN,
 });
 // START runs at this multiple of the GAME OVER flash ramp. 1 matches it exactly.
 const START_SCALE = 2;
@@ -494,12 +507,14 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
     const pit = pitBox(FW, FH);
     const s = diffScale(
       Math.min(FW * 0.5, FH * 0.46) / kids[0].r,
-      Math.min(pit.w, pit.h) / (2 * kids[0].r),
+      pit.w / (2 * kids[0].r),
       level
     );
+    // sat on the floor gap, free to run off the top
+    const shift1 = level === null ? 0 : pit.restY - kids[0].r * s;
     pts.forEach((p) => {
       p.d.x = p.x * s;
-      p.d.y = p.y * s;
+      p.d.y = p.y * s + shift1;
       p.d.r = p.d.r * s;
     });
     root.x = 0; root.y = 0; root.r = FW / (2 * PAD);
@@ -524,18 +539,25 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   const pit = pitBox(FW, FH);
   const scale = diffScale(
     Math.min((FH - M) / bh, (FW * 1.12) / bw),
-    Math.min(pit.w / bw, pit.h / bh),
+    pit.w / bw, // width only: the pit has no ceiling to run out of
     level
   );
   // The cluster used to sit dead centre, which left the lower third of the pit
   // empty. Drop it toward the words, but never further than the slack actually
   // available: at the hardest difficulty the pack already fills the height, so
   // the shift has to give way rather than push circles through the floor.
-  const halfH = FH / 2;
-  const wantDrop = FH * CLUSTER_DROP;
   const bottomAfter = (maxY - cy) * scale;
-  const slack = Math.max(0, halfH - M / 2 - bottomAfter);
-  const drop = Math.min(wantDrop, slack);
+  // In the pit the cluster hangs off the FLOOR, not the centre: its bottom sits
+  // on the drop gap and whatever will not fit runs off the top, which is free.
+  // Off the pit, on a chum page, the old centred-and-nudged-down rule stands.
+  let drop: number;
+  if (level === null) {
+    const halfH = FH / 2;
+    const slack = Math.max(0, halfH - M / 2 - bottomAfter);
+    drop = Math.min(FH * CLUSTER_DROP, slack);
+  } else {
+    drop = pit.restY - bottomAfter;
+  }
   pts.forEach((p) => {
     p.d.x = (p.x - cx) * scale;
     p.d.y = (p.y - cy) * scale + drop;
