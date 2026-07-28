@@ -265,6 +265,8 @@ const BOMB_ODDS = 20;
 const BOMB_HITS = 5;          // hits to detonate
 const BOMB_FUSE_MS = 2500;    // the whole fuse
 const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
+const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
+const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
 // pctRadius is the very function the main pit uses, imported rather than
 // copied, so the two can never drift apart.
@@ -970,7 +972,7 @@ export default function BreedTree({
   // The render-side view of a badge body. J17 adds the fuse fields, which the
   // rattle in zoomTo reads: rDraw is the chip's own drawn radius, so the shake
   // is always a fraction of the chip rather than a flat pixel count.
-  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; blown?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
@@ -1245,7 +1247,14 @@ export default function BreedTree({
         // half second. Straight from the main pit, with the two fives halved.
         // The shake offset is a fraction of the chip's OWN drawn radius, never a
         // flat pixel count, or a small chip would judder further than a big one.
-        if (b.bomb && !b.blown && now) {
+        let sc = 1;
+        // Anticipation: before it goes, the bomb squashes a touch then snaps
+        // about 20% bigger, so it reads as a burst rather than blinking out.
+        if (b.bursting && now) {
+          const bt = (now - b.bursting) / BOMB_BURST_MS;
+          sc = bt < 0.35 ? 1 - 0.1 * (bt / 0.35) : 0.9 + 0.3 * Math.min(1, (bt - 0.35) / 0.65);
+        }
+        if (b.bomb && !b.blown && !b.bursting && now) {
           const now2 = now;
           const hh = b.hits || 0;
           const heldF = b.heldSince ? Math.min(1, (now2 - b.heldSince) / BOMB_FUSE_MS) : 0;
@@ -1256,7 +1265,7 @@ export default function BreedTree({
             ox = Math.sin(now2 / (sp * 0.6)) * inten * 0.045 * (b.rDraw ?? 0);
           }
         }
-        el.setAttribute("transform", `translate(${(b.x - v[0]) * k + ox},${(b.y - v[1]) * k}) rotate(${rot})`);
+        el.setAttribute("transform", `translate(${(b.x - v[0]) * k + ox},${(b.y - v[1]) * k}) rotate(${rot})${sc !== 1 ? ` scale(${sc})` : ""}`);
       }
     }
     const ub = uiBodiesRef.current;
@@ -1567,7 +1576,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -2121,11 +2130,121 @@ export default function BreedTree({
         b.hits = (b.hits || 0) + 1;
         wake();
         if ((b.hits || 0) < BOMB_HITS) return;
+        detonate(b, pressedBombRef.current === b);
+      };
+      // Matter itself is untyped here (the pit convention), so this is the shape
+      // the blast actually touches. Typed rather than any, to keep the lint
+      // baseline where it is.
+      type MB = {
+        position: { x: number; y: number };
+        velocity: { x: number; y: number };
+        bounds: { min: { x: number; y: number }; max: { x: number; y: number } };
+        circleRadius?: number;
+        mass?: number;
+        isStatic?: boolean;
+        plugin?: { kind?: string; bridge?: Body; prop?: { dead?: boolean } };
+      };
+      // The px radius of any body, circle or not. Rods and pills are rectangles
+      // and have no circleRadius, so fall back to the larger half-extent.
+      const radOf = (mb: MB) =>
+        mb?.circleRadius ?? Math.max(mb.bounds.max.x - mb.bounds.min.x, mb.bounds.max.y - mb.bounds.min.y) / 2;
+      const killChained = (mb: MB, now2: number) => {
+        const p = mb.plugin || {};
+        if (p.kind === "badge") {
+          const br = p.bridge;
+          if (!br || br.blown) return 0;
+          br.blown = true;
+          poofAt(br.x, br.y, now2);
+          if (br.mb && br.mbIn) { Composite.remove(world, br.mb); br.mbIn = false; }
+          setDeadBadges((q) => new Set(q).add(br.idx));
+          return 12; // flat score per chip, the main pit's figure
+        }
+        if (p.kind === "rod" || p.kind === "pill") {
+          const pr = p.prop;
+          if (!pr || pr.dead) return 0;
+          killProp(pr, p.kind, now2);
+        }
+        return 0;
+      };
+      // Detonation, ported from the main pit. A contact chain takes out only what
+      // is actually touching the bomb, then what touches that, and so on, so
+      // anything cut off by a gap is spared. Everything else in range is shoved.
+      // The pop-art blast itself is stage 5, on the canvas.
+      const detonate = (b: Body, wasHeld: boolean) => {
+        if (b.blown) return;
         b.blown = true;
-        poofAt(b.x, b.y, performance.now());
-        if (b.mb && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
-        setDeadBadges((p) => new Set(p).add(b.idx));
+        b.bursting = performance.now();
         if (pressedBombRef.current === b) pressedBombRef.current = null;
+        const bombMb = b.mb as MB;
+        if (!bombMb) return;
+        const bx = bombMb.position.x, by = bombMb.position.y;
+        const bsz = radOf(bombMb) * (1 + (b.pct || 0) / 25); // a bigger figure, a bigger boom
+        wake();
+        toyTimers.push(window.setTimeout(() => {
+          const now2 = performance.now();
+          numAt(b.x, b.y, 250, now2);
+          if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(wasHeld ? [25, 20, 200] : [20, 15, 120]);
+          if (b.mbIn) { Composite.remove(world, bombMb); b.mbIn = false; }
+          setDeadBadges((q) => new Set(q).add(b.idx));
+          const live = (Composite.allBodies(world) as MB[]).filter((o) => !o.isStatic && o !== bombMb);
+          const touch = (m1: MB, m2: MB) =>
+            Math.hypot(m1.position.x - m2.position.x, m1.position.y - m2.position.y) <= radOf(m1) + radOf(m2) + 10;
+          const pool = live.filter((o) => {
+            const k2 = o.plugin?.kind;
+            if (k2 === "badge") return !o.plugin?.bridge?.bomb && !o.plugin?.bridge?.blown;
+            return k2 === "rod" || k2 === "pill";
+          });
+          const claimed = new Set<MB>();
+          let frontier = pool.filter((o) => touch(o, bombMb));
+          frontier.forEach((o) => claimed.add(o));
+          const chain: MB[] = [];
+          while (frontier.length) {
+            chain.push(...frontier);
+            const prev = frontier;
+            frontier = pool.filter((o) => !claimed.has(o) && prev.some((f) => touch(f, o)));
+            frontier.forEach((o) => claimed.add(o));
+          }
+          chain.forEach((o, i) => {
+            toyTimers.push(window.setTimeout(() => {
+              const t2 = performance.now();
+              const val = killChained(o, t2);
+              if (val) {
+                const w2 = worldFromPx(o.position.x, o.position.y);
+                numAt(w2.x, w2.y, val, t2);
+              }
+              wake();
+            }, BOMB_CHAIN_MS * (i + 1)));
+          });
+          // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
+          // once, near takes two hits, far takes one and only if already lit.
+          const SHOVE_R = bsz * 5.5;
+          const SHOVE_F = 0.9 * radOf(bombMb);
+          for (const o of live) {
+            if (claimed.has(o)) continue;
+            const dx = o.position.x - bx, dy = o.position.y - by;
+            const dist = Math.hypot(dx, dy) || 1;
+            const br2 = o.plugin?.bridge;
+            if (br2?.bomb && !br2.blown) {
+              const rr = radOf(o) + radOf(bombMb);
+              if (dist <= rr + 5) toyTimers.push(window.setTimeout(() => { if (!br2.blown) detonate(br2, false); }, 80));
+              else if (dist <= bsz * 2.5) toyTimers.push(window.setTimeout(() => { if (!br2.blown) { hitBomb(br2); if (!br2.blown) hitBomb(br2); } }, 120));
+              else if (dist <= SHOVE_R && (br2.hits || 0) >= 1) toyTimers.push(window.setTimeout(() => { if (!br2.blown) hitBomb(br2); }, 160));
+              continue; // a bomb is never shoved, only triggered
+            }
+            if (o.plugin?.kind === "badge") continue; // chips are chained or spared, never pushed
+            if (dist > SHOVE_R) continue;
+            const fall = 1 - dist / SHOVE_R;
+            const k2 = o.plugin?.kind;
+            const mult = k2 === "rod" || k2 === "pill" ? 0.80 : k2 === "circle" ? 0.10 : 0.15;
+            const mag = SHOVE_F * fall * fall * (o.mass || 1) * mult;
+            MBody.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 });
+            MBody.setAngularVelocity(o, (Math.random() - 0.5) * 0.6 * (fall + 0.2));
+            const spd = Math.hypot(o.velocity.x, o.velocity.y);
+            if (spd > 40) { const sc2 = 40 / spd; MBody.setVelocity(o, { x: o.velocity.x * sc2, y: o.velocity.y * sc2 }); }
+            if (o.velocity.y < -20) MBody.setVelocity(o, { x: o.velocity.x, y: -20 });
+          }
+          wake();
+        }, BOMB_BURST_MS));
       };
       // Burns the fuse of whichever bomb is being held: one hit per half second,
       // and a rattle in the hand that grows on the same halved step.
