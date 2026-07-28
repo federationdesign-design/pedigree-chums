@@ -959,6 +959,14 @@ export default function BreedTree({
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<string[]>([]);
+  // The cookie panel's two answers. They are pit objects, not UI: they squeeze
+  // out of the panel, tumble, can be dragged and barge like anything else.
+  const btnBodiesRef = useRef<PropBody[]>([]);
+  const btnsGRef = useRef<SVGGElement>(null);
+  const [btnList, setBtnList] = useState<{ label: string; w: number; h: number; tone: string }[]>([]);
+  const [deadBtns, setDeadBtns] = useState<Set<number>>(new Set());
+  const cookieBtnsRef = useRef<((px: number, py: number) => void) | null>(null);
+  const cookieAnswerRef = useRef<((i: number, accept: boolean) => void) | null>(null);
   const pillBodiesRef = useRef<PropBody[]>([]);
   const rodsGRef = useRef<SVGGElement>(null);
   const pillsGRef = useRef<SVGGElement>(null);
@@ -1307,7 +1315,7 @@ export default function BreedTree({
         if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
       }
     }
-    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef]] as const) {
+    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
       if (list && gg) for (const pr of list) {
@@ -2013,6 +2021,50 @@ export default function BreedTree({
         setRodList((l) => [...l, { len: lenPx * fxScale, h: 8 * fxScale, lit }]);
         wake();
       };
+      // Tapping the cookie panel squeezes an Accept and a Reject out of it, which
+      // is the main pit's sequence. Reject is added first so Accept, added last,
+      // renders in front of it.
+      cookieBtnsRef.current = (px: number, py: number) => {
+        if (btnBodiesRef.current.length) return; // one pair only
+        const mk = (label: string, tone: string, grow: number, vx: number) => {
+          const rw = BIGT * 2.6 * grow, rh = BIGT * 1.0 * grow;
+          const w = worldFromPx(px, py);
+          const pr: PropBody = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: btnBodiesRef.current.length, hits: 0, maxHits: 9999 };
+          const mb = Bodies.rectangle(px, py, rw, rh, { chamfer: { radius: rh * 0.34 }, restitution: 0.25, friction: 0.4, frictionAir: 0.012, density: 0.004 });
+          mb.plugin = { prop: pr, kind: "btn" };
+          pr.mb = mb;
+          Composite.add(world, mb);
+          MBody.setVelocity(mb, { x: vx, y: -9 }); // pops up and apart
+          MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.4);
+          btnBodiesRef.current.push(pr);
+          setBtnList((l) => [...l, { label, tone, w: rw * fxScale, h: rh * fxScale }]);
+        };
+        mk("Reject", "#d64545", 1, 2 + Math.random() * 4);
+        mk("Accept", "#4ade80", 1.33, -2 - Math.random() * 4); // the main pit makes Accept 33% larger
+        wake();
+      };
+      cookieAnswerRef.current = (i: number, accept: boolean) => {
+        const pr = btnBodiesRef.current[i];
+        if (!pr?.mb) return;
+        const now2 = performance.now();
+        const bx = pr.mb.position.x, by = pr.mb.position.y;
+        const sz = Math.max(pr.mb.bounds.max.y - pr.mb.bounds.min.y, 20) * (accept ? 1.7 : 1.6);
+        fx.pushBurst({ x: bx, y: by, s: sz, born: now2, life: accept ? 480 : 460, colour: accept ? "#ff2d78" : "#0c5b92", rot: 0 });
+        fx.pushBurst({ x: bx, y: by, s: sz * 0.66, born: now2, life: accept ? 480 : 460, colour: accept ? "#ffd23e" : "#9a9a9a", rot: 18 });
+        fxKickRef.current?.();
+        if (accept) numAt(pr.x, pr.y, 2000, now2); // the main pit's reward for saying yes
+        try { localStorage.setItem(COOKIE_CONSENT_KEY, accept ? "accepted" : "declined"); } catch { /* private mode */ }
+        window.dispatchEvent(new Event(accept ? "pc:cookies-accepted" : "pc:cookies-rejected"));
+        // both answers leave together: the question has been answered
+        const gone = new Set<number>();
+        btnBodiesRef.current.forEach((b, j) => {
+          if (!b?.mb) return;
+          Composite.remove(world, b.mb);
+          gone.add(j);
+        });
+        setDeadBtns((p) => new Set([...p, ...gone]));
+        wake();
+      };
       spawnPillRef.current = (sx: number, sy: number, wPx: number, name: string) => {
         const w = worldFromPx(sx, sy);
         // wrap long names: pill grows in depth, corner radius stays 13px so the
@@ -2614,7 +2666,7 @@ export default function BreedTree({
         // brain, are deliberately NOT here: they are controls, and a control
         // that can be dragged into the pack is a worse control. The chum
         // scenery is out too, since it was never draggable.
-        const MC_KINDS = new Set(["badge", "circle", "rod", "pill", "toy"]);
+        const MC_KINDS = new Set(["badge", "circle", "rod", "pill", "toy", "btn"]);
         const onStartDrag = (ev: { body?: { plugin?: { kind?: string } } }) => {
           if (!MC_KINDS.has(ev?.body?.plugin?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; }
         };
@@ -3317,6 +3369,8 @@ export default function BreedTree({
                         retireToy(TOY_COOKIES_SEEN_KEY);
                         // the notice CookieBanner already renders above the pit
                         window.dispatchEvent(new Event("pc:open-cookies"));
+                        const cb = toyBodiesRef.current[i2]?.mb;
+                        if (cb) cookieBtnsRef.current?.(cb.position.x, cb.position.y);
                       } else {
                         retireToy(TOY_FLAG_SEEN_KEY);
                         setBritainOpen(true);
@@ -3382,6 +3436,45 @@ export default function BreedTree({
                       {ln}
                     </text>
                   ))}
+                </g>
+              );
+            })}
+          </g>
+
+          {/* The cookie panel's Accept and Reject. Pit objects: they tumble,
+              can be dragged, and a tap answers the notice. */}
+          <g ref={btnsGRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
+            {btnList.map((bt, i2) => {
+              const pr = btnBodiesRef.current[i2];
+              const v2 = viewRef.current;
+              const kk2 = SIZE / v2[2];
+              const dead = deadBtns.has(i2);
+              const accept = bt.label === "Accept";
+              return (
+                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
+                  style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => {
+                    // Matter owns the drag, so only the tap lives here, on the
+                    // same thresholds as every other tap in the pit.
+                    const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
+                    const tapUp = (ev: PointerEvent) => {
+                      window.removeEventListener("pointerup", tapUp);
+                      window.removeEventListener("pointercancel", tapUp);
+                      if (performance.now() - p0.t >= 350) return;
+                      if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
+                      mcReleaseRef.current?.();
+                      cookieAnswerRef.current?.(i2, accept);
+                    };
+                    window.addEventListener("pointerup", tapUp);
+                    window.addEventListener("pointercancel", tapUp);
+                  }}>
+                  <rect x={-bt.w / 2} y={-bt.h / 2} width={bt.w} height={bt.h} rx={bt.h * 0.34}
+                    style={{ fill: bt.tone, stroke: "#0a3a57", strokeWidth: bt.h * 0.09 }} />
+                  <text x={0} y={0} dominantBaseline="central"
+                    style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${bt.h * 0.42}px`, pointerEvents: "none", userSelect: "none" }}>
+                    {bt.label}
+                  </text>
                 </g>
               );
             })}
