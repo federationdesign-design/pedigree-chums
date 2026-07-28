@@ -118,7 +118,7 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   // Start false if cookies already accepted/rejected in a previous session
-  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookies") ? true : false);
+  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookie-consent") ? true : false);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   // true only when the game-over trigger fired because all 54 were collected
