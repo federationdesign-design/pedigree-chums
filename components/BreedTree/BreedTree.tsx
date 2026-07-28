@@ -239,6 +239,10 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // J17: a scattered percentage badge has this chance of arriving as a bomb.
 // The main pit's own figure, PackPit.tsx scatterRef, where a comment records it
 // was raised from 1 in 35 for better chain reactions.
+// J10b stage 1: ?drag=mc hands the badges to Matter's MouseConstraint. Read
+// from the URL on demand rather than held in state, so there is nothing for the
+// server and the first client render to disagree about.
+const mcDragOn = () => typeof window !== "undefined" && window.location.search.indexOf("drag=mc") >= 0;
 const BOMB_ODDS = 20;
 const BADGE_DRAW_R = 92;
 // A badge belongs to its circle, so it has to scale with it. BADGE_DRAW_R was a
@@ -1443,7 +1447,7 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
       if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
-      const { Engine, Bodies, Body: MBody, Composite, Events } = Matter;
+      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -2290,7 +2294,67 @@ export default function BreedTree({
         engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1;
         wake(); // a settled pit still needs to be woken to show the change
       };
+      // ---- J10b stage 1: Matter's own MouseConstraint, badges only --------
+      // The mini pit lifted a dragged body OUT of the world: startDrag sets
+      // held, and the sim then runs Composite.remove on it. A body outside the
+      // world collides with nothing, which is why a dragged object floats over
+      // everything instead of barging it. The main pit keeps the body in the
+      // world and pulls it with a constraint. This is that, ported.
+      //
+      // The mapping has to be two steps, because the two spaces move
+      // independently:
+      //   client px -> world     via the LIVE screen CTM and the LIVE view
+      //   world     -> phys px   via the FROZEN drop-time CT
+      // Either transform on its own breaks the moment the pit is zoomed.
+      //
+      // Behind ?drag=mc so the old path is untouched until this is signed off.
+      const mcOn = mcDragOn();
+      let mcTeardown: (() => void) | null = null;
+      if (mcOn && Mouse && MouseConstraint && st) {
+        // A detached element, so Matter's own listeners can never fire. The
+        // position is driven by hand below, in physics pixels.
+        const mouse = Mouse.create(document.createElement("div"));
+        const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+        Composite.add(world, mc);
+        // Stage 1 grabs badges only. Everything else keeps the old path, so the
+        // two systems can never fight over the same body.
+        const onStartDrag = (ev: { body?: { plugin?: { kind?: string } } }) => {
+          if (ev?.body?.plugin?.kind !== "badge") { mc.constraint.bodyB = null; mc.body = null; }
+        };
+        Events.on(mc, "startdrag", onStartDrag);
+        const setPos = (cx: number, cy: number) => {
+          const sv = svgEl as SVGSVGElement | null;
+          if (!sv) return;
+          const ctmNow = sv.getScreenCTM();
+          if (!ctmNow) return;
+          const pt = sv.createSVGPoint();
+          pt.x = cx; pt.y = cy;
+          const sp = pt.matrixTransform(ctmNow.inverse());
+          const vNow = viewRef.current;
+          const kNow = SIZE / vNow[2];
+          const p = pxFromWorld(vNow[0] + sp.x / kNow, vNow[1] + sp.y / kNow);
+          // Mutated in place, never replaced: Matter holds this same object as
+          // the constraint's anchor point, so a fresh object would detach it.
+          mouse.position.x = p.x;
+          mouse.position.y = p.y;
+        };
+        const onDown = (e: PointerEvent) => { setPos(e.clientX, e.clientY); mouse.button = 0; wake(); };
+        const onMove = (e: PointerEvent) => { if (mouse.button === 0) { setPos(e.clientX, e.clientY); wake(); } };
+        const onUp = () => { mouse.button = -1; };
+        st.addEventListener("pointerdown", onDown);
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
+        mcTeardown = () => {
+          Events.off(mc, "startdrag", onStartDrag);
+          st.removeEventListener("pointerdown", onDown);
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("pointercancel", onUp);
+        };
+      }
       matterCleanupRef.current = () => {
+        mcTeardown?.();
         Events.off(engine, "collisionStart", onCollide);
         for (const t of toyTimers) window.clearTimeout(t);
         for (const t of ghostTimers) window.clearTimeout(t);
@@ -2813,6 +2877,11 @@ export default function BreedTree({
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={inert ? undefined : (e) => {
+                  // J10b stage 1: with the MouseConstraint on, Matter owns the
+                  // badge. The old path must not run as well, because it sets
+                  // held, which removes the body from the world and leaves the
+                  // constraint with nothing to pull.
+                  if (mcDragOn()) return;
                   // Lift the badge out of the sim while dragging, like the dog
                   // circles: without this it keeps falling in the physics world
                   // behind your finger and snaps to that spot when you let go.
