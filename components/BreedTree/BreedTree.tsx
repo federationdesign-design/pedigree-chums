@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { radius as pctRadius } from "../PackPit/LineageMap";
+import { createPitEffects } from "../PackPit/pitEffects";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
@@ -993,6 +994,16 @@ export default function BreedTree({
   // world units: a blast keeps its intended size at the default view and grows
   // with the circle when you zoom in, instead of being pinned to the screen.
   const fxPxPerWorldRef = useRef<number>(0);
+  // The blast effects, shared with the main pit. Created by the sim, drawn by
+  // the canvas layer, which is why they meet through refs.
+  const fxKitRef = useRef<ReturnType<typeof createPitEffects> | null>(null);
+  // px -> world, using the sim's frozen drop-time transform. The canvas layer
+  // needs it to draw in pit pixels, which is the space every routine is tuned in
+  // and the space Matter bodies already live in.
+  const fxFromPxRef = useRef<((px: number, py: number) => { x: number; y: number }) | null>(null);
+  // Starts the effects loop. It stops itself once nothing is left to draw, so a
+  // settled pit costs nothing.
+  const fxKickRef = useRef<(() => void) | null>(null);
   // Drag support: badges can be picked up and flung, like
   // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
   // a wake() so a drag can restart physics after everything has settled.
@@ -1572,11 +1583,14 @@ export default function BreedTree({
       };
       const pxPerWorld = Math.hypot(CT.a, CT.b) * kD || 1;
       fxPxPerWorldRef.current = pxPerWorld; // J17: the effects layer's pixel-to-world scale
+      fxFromPxRef.current = worldFromPx;
+      const fx = createPitEffects();
+      fxKitRef.current = fx;
       const stagePxH = worldH * pxPerWorld;
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -2128,6 +2142,8 @@ export default function BreedTree({
       const hitBomb = (b: Body) => {
         if (!b.bomb || b.blown) return;
         b.hits = (b.hits || 0) + 1;
+        if (b.mb) fx.burstAt(b.mb.position.x, b.mb.position.y, radOf(b.mb) * 1.1);
+        fxKickRef.current?.();
         wake();
         if ((b.hits || 0) < BOMB_HITS) return;
         detonate(b, pressedBombRef.current === b);
@@ -2182,6 +2198,8 @@ export default function BreedTree({
         wake();
         toyTimers.push(window.setTimeout(() => {
           const now2 = performance.now();
+          fx.pushBoom(bx, by, bsz * 2.2); // the pop-art comic blast
+          fxKickRef.current?.();
           numAt(b.x, b.y, 250, now2);
           if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(wasHeld ? [25, 20, 200] : [20, 15, 120]);
           if (b.mbIn) { Composite.remove(world, bombMb); b.mbIn = false; }
@@ -2207,6 +2225,8 @@ export default function BreedTree({
           chain.forEach((o, i) => {
             toyTimers.push(window.setTimeout(() => {
               const t2 = performance.now();
+              fx.explodeAt(o.position.x, o.position.y, radOf(o) * (1 + (o.plugin?.bridge?.pct || 0) / 25));
+              fxKickRef.current?.();
               const val = killChained(o, t2);
               if (val) {
                 const w2 = worldFromPx(o.position.x, o.position.y);
@@ -2398,6 +2418,25 @@ export default function BreedTree({
           if (b.mb && b.mbIn && b.mb.speed > SETTLE_PS) still = false;
         }
         burnFuse(now);
+        // The fuse fizzes from hit 2, building toward each stage. The ease is
+        // doubled against the main pit's 0.05 because this fuse is half as long,
+        // so it still reaches each stage before the next hit lands.
+        for (const fb of all) {
+          if (!fb.bomb || fb.blown || !fb.mb || !fb.mbIn) continue;
+          const fh = fb.hits || 0;
+          if (fh < fx.FUSE_LIGHT_AT) continue;
+          const fTarget = [0, 0, 0.16, 0.4, 0.68, 1][Math.min(fh, BOMB_HITS)];
+          fb.fuseCur = (fb.fuseCur || 0) + (fTarget - (fb.fuseCur || 0)) * 0.1;
+          if (fb.fuseCur < 0.03) continue;
+          // the wick sits at the top right of the sprite, which is drawn 2.4
+          // radii wide, so the offset is a fraction of the bomb's own radius
+          const fr = radOf(fb.mb);
+          const fRattle = fh >= 3 ? fb.fuseCur * 3 : 0;
+          const fjx = fRattle ? (Math.random() - 0.5) * fRattle : 0;
+          const fjy = fRattle ? (Math.random() - 0.5) * fRattle : 0;
+          fx.emitFuseSparks(fb.mb.position.x + fr * 0.77 + fjx, fb.mb.position.y - fr * 0.96 + fjy, fb.fuseCur);
+        }
+        if (!fx.idle()) fxKickRef.current?.();
         checkEscapeRef.current?.();
         for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
           for (const pr of list) {
@@ -2711,8 +2750,18 @@ export default function BreedTree({
 
     const testing = typeof window !== "undefined" && window.location.search.indexOf("fxtest=1") >= 0;
     let raf = 0;
+    let painted = false;
 
     const frame = () => {
+      const kit = fxKitRef.current;
+      const busy = testing || (kit ? !kit.idle() : false);
+      if (!busy) {
+        // one last clear, then stand down until something is emitted
+        if (painted) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); painted = false; }
+        raf = 0;
+        return;
+      }
+      painted = true;
       raf = requestAnimationFrame(frame);
       if (!box) { remeasure(); return; }
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -2725,6 +2774,19 @@ export default function BreedTree({
       const E = box.a * -v[0] * k + box.c * -v[1] * k + box.e;
       const F = box.b * -v[0] * k + box.d * -v[1] * k + box.f;
       ctx.setTransform(dpr * A, dpr * B, dpr * C, dpr * D, dpr * E, dpr * F);
+      // The blast routines are tuned in pit pixels, so hand them a transform
+      // where one unit is one pit pixel. Derived by mapping three points rather
+      // than assuming the two transforms are pure scale-and-translate.
+      const wfp = fxFromPxRef.current;
+      const kit2 = fxKitRef.current;
+      if (wfp && kit2) {
+        const w2d = (w: { x: number; y: number }) => ({ x: dpr * (A * w.x + C * w.y + E), y: dpr * (B * w.x + D * w.y + F) });
+        const o = w2d(wfp(0, 0)), ex = w2d(wfp(1, 0)), ey = w2d(wfp(0, 1));
+        ctx.save();
+        ctx.setTransform(ex.x - o.x, ex.y - o.y, ey.x - o.x, ey.y - o.y, o.x, o.y);
+        kit2.draw(ctx, performance.now());
+        ctx.restore();
+      }
       // PX converts a pixel-tuned constant into world units. It is the drop-time
       // scale, not the live one, which is what makes an effect hold its size at
       // the default view and grow with a zoom rather than stay screen-sized.
@@ -2733,16 +2795,19 @@ export default function BreedTree({
       // world radius plus a fixed-size dot at its centre. Registered correctly
       // the ring lies on the circle's own stroke at every zoom level, so any
       // drift is unmissable rather than a matter of opinion.
+      if (!testing) return;
       ctx.strokeStyle = "#ff2d78";
       ctx.lineWidth = 3 * PX;
       for (const d of nodes) { ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.stroke(); }
       ctx.fillStyle = "#00ff88";
       for (const d of nodes) { ctx.beginPath(); ctx.arc(d.x, d.y, 4 * PX, 0, Math.PI * 2); ctx.fill(); }
     };
+    fxKickRef.current = () => { if (!raf) raf = requestAnimationFrame(frame); };
     if (testing) raf = requestAnimationFrame(frame);
 
     return () => {
       cancelAnimationFrame(raf);
+      fxKickRef.current = null;
       ro.disconnect();
       window.removeEventListener("scroll", remeasure, true);
       window.removeEventListener("resize", remeasure);
