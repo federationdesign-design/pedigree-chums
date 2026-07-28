@@ -3595,7 +3595,13 @@ export default function BreedTree({
           // still has to see it to feed Matter's mouse.
           onPointerDown={(ev) => { bgPressRef.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp }; }}
           onClick={disableZoom ? undefined : onBackground}
-          style={{ opacity: ready ? 1 : 0 }}
+          // Zoomed in, a click on the background goes back to the top, so say
+          // so. At the top it does nothing in LEARN, so it stays a plain arrow
+          // rather than promising a zoom that will not happen.
+          style={{
+            opacity: ready ? 1 : 0,
+            cursor: !disableZoom && !dropped && focus !== nodes[0] ? "zoom-out" : undefined,
+          }}
         >
           <defs>
             {/* Per-level duotone tints. feColorMatrix flattens the image to
@@ -3664,7 +3670,19 @@ export default function BreedTree({
                   stroke={hidden ? "none" : strokeColorFor(d)}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d) * (SIZE / viewRef.current[2])}
                   style={{
-                    cursor: hidden ? "default" : "pointer",
+                    // The pointer says what the click will do, which is the
+                    // only clue a desktop user gets. onCircle zooms IN unless
+                    // this circle is already the focus, in which case it goes
+                    // back UP to the parent. Once the round has dropped a click
+                    // lifts the dog to the learn card instead, so it stays a
+                    // plain pointer there.
+                    cursor: hidden
+                      ? "default"
+                      : disableZoom || dropped
+                        ? "pointer"
+                        : d === focus && d.parent
+                          ? "zoom-out"
+                          : "zoom-in",
                     // An invisible circle must not take the press. Collected
                     // dogs stay in the DOM at opacity 0, and since J2 they stay
                     // for the rest of the level, so they were littering the pit
