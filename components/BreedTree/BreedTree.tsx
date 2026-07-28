@@ -3596,12 +3596,10 @@ export default function BreedTree({
           onPointerDown={(ev) => { bgPressRef.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp }; }}
           onClick={disableZoom ? undefined : onBackground}
           // Zoomed in, a click on the background goes back to the top, so say
-          // so. At the top it does nothing in LEARN, so it stays a plain arrow
+          // so. At the top it does nothing in LEARN, so it keeps the plain arrow
           // rather than promising a zoom that will not happen.
-          style={{
-            opacity: ready ? 1 : 0,
-            cursor: !disableZoom && !dropped && focus !== nodes[0] ? "zoom-out" : undefined,
-          }}
+          className={!disableZoom && !dropped && focus !== nodes[0] ? styles.curZoomOut : undefined}
+          style={{ opacity: ready ? 1 : 0 }}
         >
           <defs>
             {/* Per-level duotone tints. feColorMatrix flattens the image to
@@ -3659,7 +3657,18 @@ export default function BreedTree({
                   ? styles.tintA
                   : styles.tintB
                 : "";
-              const cls = hasImg && tinted ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
+              const tintCls = hasImg && tinted ? `${styles.imgCircle} ${tintClass}`.trim() : "";
+              // The pointer says what the click will do, which is the only clue
+              // a desktop user gets. onCircle zooms IN unless this circle is
+              // already the focus, in which case it goes back UP. Once the round
+              // has dropped, a click lifts the dog to the learn card instead, so
+              // it stays a plain pointer there.
+              const curCls = hidden || disableZoom || dropped
+                ? ""
+                : d === focus && d.parent
+                  ? styles.curZoomOut
+                  : styles.curZoomIn;
+              const cls = `${tintCls} ${curCls}`.trim() || undefined;
               const heldHidden = (!!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)))) || removedNodesRef.current.has(d);
               const buried = (!!buriedSet && d !== hovered && buriedSet.has(d)) || heldHidden;
               const circleEl = (
@@ -3670,19 +3679,9 @@ export default function BreedTree({
                   stroke={hidden ? "none" : strokeColorFor(d)}
                   strokeWidth={hidden ? 0 : strokeWidthFor(d) * (SIZE / viewRef.current[2])}
                   style={{
-                    // The pointer says what the click will do, which is the
-                    // only clue a desktop user gets. onCircle zooms IN unless
-                    // this circle is already the focus, in which case it goes
-                    // back UP to the parent. Once the round has dropped a click
-                    // lifts the dog to the learn card instead, so it stays a
-                    // plain pointer there.
-                    cursor: hidden
-                      ? "default"
-                      : disableZoom || dropped
-                        ? "pointer"
-                        : d === focus && d.parent
-                          ? "zoom-out"
-                          : "zoom-in",
+                    // Inline would beat the cursor class, so only the two cases
+                    // that have no class of their own are set here.
+                    cursor: hidden ? "default" : curCls ? undefined : "pointer",
                     // An invisible circle must not take the press. Collected
                     // dogs stay in the DOM at opacity 0, and since J2 they stay
                     // for the rest of the level, so they were littering the pit
