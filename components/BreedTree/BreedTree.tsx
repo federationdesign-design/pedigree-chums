@@ -3279,7 +3279,12 @@ export default function BreedTree({
   };
   // While a circle is hovered, hide the circles nested inside it so its own
   // image comes clear to the front instead of being covered by its progenitors.
-  // Moving onto one of those inner circles re-hovers it and brings it back.
+  // Moving onto one of those inner circles re-hovers it and brings it back:
+  // a buried circle goes to opacity 0 but KEEPS its hit area, which is what
+  // makes that return trip possible. It used to lose pointer-events too, so the
+  // pointer could never reach a nested circle once its parent was hovered, and
+  // every click landed on the parent instead. On an already-focused parent that
+  // reads as a zoom out, which is what a nest of children looked like.
   const buriedSet = hovered && !dropped ? new Set(hovered.descendants()) : null;
 
   return (
@@ -3389,7 +3394,10 @@ export default function BreedTree({
                     // dogs stay in the DOM at opacity 0, and since J2 they stay
                     // for the rest of the level, so they were littering the pit
                     // with grabbers you could not see.
-                    pointerEvents: hidden || buried ? "none" : "auto",
+                    // heldHidden, not buried: a collected or lifted dog must
+                    // not take the press, but a circle buried under a hovered
+                    // parent must, or you can never reach it.
+                    pointerEvents: hidden || heldHidden ? "none" : "auto",
                     opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden || frozen ? undefined : () => setHovered(d)}
