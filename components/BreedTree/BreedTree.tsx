@@ -4330,12 +4330,13 @@ export default function BreedTree({
                     runFallRef.current?.();
                     return;
                   }
-                  // LEARN never arms the pit. The wash slides in and the blue box
-                  // opens; on touch this doubles as the reveal, since there is no
-                  // hover to preview it with.
+                  // LEARN never arms the pit. The wash slides in and the pit is
+                  // all there is to look at.
                   setLearnPeek(false);
                   setLearning(true);
-                  if (hideCaption) onToggleCaption?.();
+                  // The blue box no longer opens itself here. Learn now starts
+                  // clean and the box lives behind the info square, which is
+                  // rendered exactly when learning && hideCaption.
                 }}
               >
                 {/* invisible hit area, so the tap target is not just the glyphs */}

@@ -34,6 +34,15 @@
   max-width: 82%;
   z-index: 15;
   pointer-events: none;
+  /* Two rows now, stacked: the level's own dog on top and whatever circle is
+     being looked at underneath it. The row itself keeps the old horizontal
+     layout, so a single-row title is pixel for pixel what it always was. */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.titleRow {
   display: flex;
   align-items: center;
   gap: 12px;

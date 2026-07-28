@@ -7,7 +7,7 @@ import CookieBanner from "../CookieBanner/CookieBanner";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
-import { TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
+import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
 
 // Plain-language label for the status dot on the title portrait.
@@ -32,6 +32,34 @@ function titleLines(name: string): string[] {
   }
   const rest = words.slice(i).join(" ");
   return rest ? [first, rest] : [first];
+}
+
+// One line of the stacked title: round portrait, status dot, name. Pulled out
+// because the level's dog and the circle being looked at are now drawn with the
+// same markup, one above the other.
+function TitleRow({ img, name, status, isNarrow }: { img: string | null; name: string; status: BreedTag | null; isNarrow: boolean }) {
+  return (
+    <div className={css.titleRow}>
+      {img && (
+        <span className={css.titlePortraitWrap}>
+          <img className={css.titlePortrait} src={img} alt="" draggable={false} />
+          {status && (
+            <span
+              className={css.titleStatus}
+              style={{ background: TAG_STYLE[status].bg }}
+              title={STATUS_LABEL[status]}
+              aria-label={STATUS_LABEL[status]}
+            />
+          )}
+        </span>
+      )}
+      <h3 className={css.title}>
+        {(isNarrow ? titleLines(name) : [name]).map((line, i, arr) => (
+          <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+        ))}
+      </h3>
+    </div>
+  );
 }
 
 type Props = {
@@ -74,6 +102,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [shownName, setShownName] = useState(name);
   const [shownImg, setShownImg] = useState<string | null>(image);
   const [shownStatus, setShownStatus] = useState<BreedTag | null>(null);
+  // The top row's dot. The circles get theirs from nodeStatus too, so the two
+  // rows cannot disagree about the same dog.
+  const levelStatus = nodeStatus(name, lineage.note ?? "");
   const router = useRouter();
   const [leavePage, setLeavePage] = useState<{ slug: string; name: string } | null>(null);
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
@@ -174,26 +205,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           {score.toLocaleString("en-GB")}
         </div>
       )}
-      {/* Title floats over the pit and never affects its size */}
+      {/* Title floats over the pit and never affects its size. The level's own
+          dog holds the top row and never moves. Whatever circle is being looked
+          at is added underneath it rather than replacing it, so you can always
+          see where you are as well as what you are on. The second row is only
+          drawn once the two differ, which is why the resting state still reads
+          as a single title. */}
       <div className={css.titleWrap}>
-        {shownImg && (
-          <span className={css.titlePortraitWrap}>
-            <img className={css.titlePortrait} src={shownImg} alt="" draggable={false} />
-            {shownStatus && (
-              <span
-                className={css.titleStatus}
-                style={{ background: TAG_STYLE[shownStatus].bg }}
-                title={STATUS_LABEL[shownStatus]}
-                aria-label={STATUS_LABEL[shownStatus]}
-              />
-            )}
-          </span>
+        <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} />
+        {shownName !== name && (
+          <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
         )}
-        <h3 className={css.title}>
-          {(isNarrow ? titleLines(shownName) : [shownName]).map((line, i, arr) => (
-            <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-          ))}
-        </h3>
       </div>
 
       {/* The diagram owns everything below the header. BreedTree runs in
