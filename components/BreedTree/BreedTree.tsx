@@ -27,6 +27,68 @@ const STATUS_LABEL: Record<BreedTag, string> = {
 const genLabel = (d: number) =>
   d <= 0 ? "the breed itself" : d === 1 ? "parent" : d === 2 ? "grandparent" : `${"great-".repeat(d - 2)}grandparent`;
 
+// The one copy of the small print under the share figures. Folded away by
+// default and opened by the "..." below.
+const FIGURES_NOTE =
+  "These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)";
+
+// The small print, folded behind a "...". It carries its own open state and is
+// mounted with a key that changes whenever the box opens or the circle or chum
+// changes, so it is always folded again on the way in rather than remembering.
+function BreakNote() {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <button
+        type="button"
+        className={styles.cNoteDots}
+        onClick={() => setOpen(true)}
+        aria-expanded={false}
+        aria-label="Show how these figures were worked out"
+      >
+        ...
+      </button>
+    );
+  }
+  return (
+    <div className={styles.cBreakNote}>
+      {FIGURES_NOTE}{" "}
+      <button
+        type="button"
+        className={styles.cNoteDots}
+        onClick={() => setOpen(false)}
+        aria-expanded={true}
+        aria-label="Hide how these figures were worked out"
+      >
+        ...
+      </button>
+    </div>
+  );
+}
+
+// A small pie of one share, drawn at the same diameter as the head portrait.
+// Yellow slice on navy. A share under 1% still gets a visible sliver rather
+// than nothing: the wedge is floored at about two degrees.
+function SharePie({ pct }: { pct: number }) {
+  const p = Math.max(0.56, Math.min(100, pct));
+  const full = p >= 99.9;
+  const a = (p / 100) * Math.PI * 2 - Math.PI / 2;
+  const x = 16 + 16 * Math.cos(a);
+  const y = 16 + 16 * Math.sin(a);
+  const large = p > 50 ? 1 : 0;
+  return (
+    <svg className={styles.cPie} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <circle cx="16" cy="16" r="16" fill="#0a3a57" />
+      {full ? (
+        <circle cx="16" cy="16" r="16" fill="#ffd23e" />
+      ) : (
+        <path d={`M16 16 L16 0 A16 16 0 ${large} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z`} fill="#ffd23e" />
+      )}
+      <circle cx="16" cy="16" r="15" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="2" />
+    </svg>
+  );
+}
+
 const SIZE = 760;
 // A little breathing room around the focused circle so its stroke is not
 // clipped against the square edge, and so siblings stay well out of frame.
@@ -4202,7 +4264,7 @@ export default function BreedTree({
               <div className={styles.cBreakRow}>As {genLabel(shown.depth)}: {shownShare === null ? "" : shownShare < 1 ? "<1%" : `${shownShare}%`}</div>
               <div className={styles.cBreakRow}>Share of this dog: {shownNorm < 1 ? "<1%" : `${shownNorm}%`}</div>
               <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
-              <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
+              <BreakNote key={`${hideCaption ? "shut" : "open"}|${shown.data.name}`} />
             </div>
           )}
           {/* Chum picked: how much of that pack dog traces to the level circle
@@ -4211,9 +4273,14 @@ export default function BreedTree({
             const share = ancestorShareOf(ancestryFor.name, shown.data.name);
             return share !== null ? (
               <div className={styles.cBreak}>
-                <div className={styles.cBreakBig}>{ancestryFor.name} is {share < 1 ? "<1%" : `${share}%`} {shown.data.name}</div>
+                <div className={styles.cBreakBigRow}>
+                  <div className={styles.cBreakBig}>
+                    {ancestryFor.name} is <span className={styles.cPct}>{share < 1 ? "<1%" : `${share}%`}</span> {shown.data.name}
+                  </div>
+                  <SharePie pct={share} />
+                </div>
                 <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
-                <div className={styles.cBreakNote}>These figures come from history and old breeding records, our viewpoint, not proven fact. (Though DNA reading can now trace bloodlines back with real precision, even reviving lost breeds.)</div>
+                <BreakNote key={`${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`} />
               </div>
             ) : null;
           })()}

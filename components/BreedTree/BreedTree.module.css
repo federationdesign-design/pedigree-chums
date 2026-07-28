@@ -263,12 +263,18 @@
   cursor: grab;
   position: absolute;
   /* 10px left of centre, so the rail hanging off the right-hand edge has room
-     and its second column stops running off the screen. */
-  left: calc(10% - 20px);
+     and its second column stops running off the screen. Then 50px further
+     left and 100px further down, which is also where it lands when a circle
+     pops it back open: the start and the reopen share this one rule.
+     max() is the guard: on a narrow phone 10% - 70px goes negative and would
+     take the box off the left edge, so it stops at 8px in. */
+  left: max(8px, calc(10% - 70px));
   right: auto;
-  top: clamp(112px, 17vh, 190px);
+  top: calc(clamp(112px, 17vh, 190px) + 100px);
   bottom: auto;
-  width: 80%;
+  /* a third narrower than the 80% it was: the write-up reflows, no type
+     changes size, and the rail still hangs off the right-hand edge */
+  width: 53.6%;
   max-width: none;
   z-index: 15;
   gap: 12px;
@@ -634,6 +640,49 @@
   line-height: 1.45;
   opacity: 0.85;
   margin-top: 2px;
+}
+/* The small print starts folded behind this. It is a button so the box's own
+   drag handler steps aside for it, the same way it does for the close X. */
+.cNoteDots {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  margin-top: 2px;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 800;
+  font-size: 0.8rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffd23e);
+  cursor: pointer;
+}
+.cNoteDots:focus-visible {
+  outline: 2px solid var(--yellow, #ffd23e);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* The chum share line and its pie sit on one row, text first. */
+.cBreakBigRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cBreakBigRow .cBreakBig {
+  margin-bottom: 0;
+}
+/* Same diameter as the portrait at the head of the box. */
+.cPie {
+  display: block;
+  width: clamp(40px, 8vw, 54px);
+  height: clamp(40px, 8vw, 54px);
+  flex: none;
+  pointer-events: none;
+}
+/* The percentage figure itself, in the box's yellow. */
+.cPct {
+  color: var(--yellow, #ffd23e);
 }
 
 /* Name and relation line stacked in a column beside the portrait, so the

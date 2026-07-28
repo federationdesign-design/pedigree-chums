@@ -44,8 +44,11 @@
   display: inline-flex;
 }
 .titlePortrait {
-  width: clamp(40px, 8vw, 54px);
-  height: clamp(40px, 8vw, 54px);
+  /* Was clamp(40px, 8vw, 54px), the same figure the learn box uses for its own
+     head portrait. Grown so the level's dog reads at title weight rather than
+     as a bullet beside it. Change this one clamp and the two below follow. */
+  width: clamp(56px, 11vw, 78px);
+  height: clamp(56px, 11vw, 78px);
   border-radius: 50%;
   object-fit: cover;
   flex: none;
@@ -53,10 +56,10 @@
 }
 .titleStatus {
   position: absolute;
-  right: 1px;
-  bottom: 2px;
-  width: 13px;
-  height: 13px;
+  right: 2px;
+  bottom: 3px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
   border: 1.5px solid #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -325,8 +328,8 @@
 .winDone svg,
 .winDone img {
   /* the portrait's exact size */
-  width: clamp(40px, 8vw, 54px);
-  height: clamp(40px, 8vw, 54px);
+  width: clamp(56px, 11vw, 78px);
+  height: clamp(56px, 11vw, 78px);
   flex: none;
 }
 /* the title's exact type */
@@ -538,7 +541,7 @@
    titleWrap top, which keeps them tucked under it at every width. */
 .lives {
   position: absolute;
-  top: calc(24px + clamp(40px, 8vw, 54px) + 10px);
+  top: calc(24px + clamp(56px, 11vw, 78px) + 10px);
   left: 30px;
   z-index: 40;
   display: flex;
