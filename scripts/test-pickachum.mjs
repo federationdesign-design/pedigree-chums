@@ -714,7 +714,7 @@ check('help me', { action: 'clarifier' });
 })();
 
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
-check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('full question') ? null : 'expected approved gk-unknown line') });
+check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('Try saying it differently') ? null : 'expected approved gk-unknown line') }); // Task 39: rewording, was 'full question'
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
 check('can I talk to another dog', { action: 'transfer_request' }, { assert: (_r, resp) => (resp.text.includes('hand you over') ? null : 'expected transfer-request line') });
 check('transfer me', { action: 'transfer_request' });

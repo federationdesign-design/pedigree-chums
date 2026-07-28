@@ -44,31 +44,34 @@ const FALLBACK_LINE = 'I am not sure what you want me to do with that. Try a ful
 const BARK_BREAK_PLACEHOLDER = '[B19 bark-break line, copy pending]';
 const BARK_ACK_PLACEHOLDER = '[B20 bark-acknowledgement line, copy pending]';
 
-// Per-breed SHARED factual answer (no dog voice). Four of the ten proof breeds are
-// filled from Steve's list; the rest render the marked placeholder. These four are
-// DRAFT-UNVERIFIED, not approved: the historical claims must be checked against the
-// breed pages and a Kennel Club source before this branch merges (PLACEHOLDERS.md).
+// Per-breed SHARED factual answer (no dog voice). Task 39: the ten v6 "Brief Aligned
+// Pass" first-contact rewrites (curly apostrophes normalised to straight), held as code
+// constants (not workbook rows); migrate into the workbook with the other breed copy later.
+// DRAFT-UNVERIFIED. The v6 copy pass is approved for wording, not for
+// accuracy. The historical claims still need checking against the breed
+// pages and a Kennel Club source before this branch merges. The rewrite
+// moved several facts, so this check restarts rather than carries over.
 const BREED_FACTS: Record<string, string> = {
   labrador:
-    'Labrador ancestors worked alongside Newfoundland fishermen, hauling nets and lines through cold water. That urge to get into every pond did not appear by accident.',
+    'Labrador ancestors hauled nets through Newfoundland waters. The pond obsession has proper historical backing.',
   'border-collie':
-    "Border Collies were bred to move sheep with a hard stare that shepherds call 'the eye'. If yours watches everyone as though they need organising, the old job is still showing.",
+    'Border Collies move sheep with a hard stare called the eye. The old job still shows.',
   boxer:
-    'Boxers came from dogs bred to take hold of large animals and keep hold until a person arrived. That is a lot of determination to fit into a face that looks permanently surprised.',
+    'Boxers were bred to hold large animals until help arrived. Determination, disguised as permanent surprise.',
   'border-terrier':
-    'The Border Terrier needed legs long enough to keep up with horses all day and a body narrow enough to follow a fox underground. That is a remarkable amount of dog packed into a small one.',
+    'Border Terriers kept pace with horses and followed foxes underground. A lot of dog in very little space.',
   'cocker-spaniel':
-    'Cocker Spaniels were named after the woodcock they were bred to find and flush from thick cover. That urge to disappear into every hedge is part of the original job.',
+    'Cocker Spaniels were bred to flush woodcock from thick cover. That explains the hedge inspections.',
   beagle:
-    'Beagles were bred so people could follow the hunt on foot, listening to the pack as it worked. That loud voice was never designed to be kept quiet.',
+    'Beagles were bred so people could follow the hunt on foot. That voice was designed to travel.',
   'french-bulldog':
-    'Nottingham lace workers took their little Bulldogs to France, and American breeders later backed the upright bat ears. This French-looking dog was shaped by Britain, France and America.',
+    'British lace workers took small Bulldogs to France. American breeders later backed the upright bat ears.',
   pug:
-    'Pugs were treasured companions in the courts of Chinese emperors, sometimes with guards of their own. They have been expecting important treatment for a very long time.',
+    'Pugs lived in Chinese imperial courts, sometimes with guards. Important treatment became the working assumption.',
   'german-shepherd':
-    'The German Shepherd was deliberately created by one man, Max von Stephanitz, from 1899, and built to keep moving for hours. That purposeful trot is part of the original plan, not just a stylish walk.',
+    'German Shepherds were created for long, purposeful work. That famous trot was part of the original plan.',
   'staffordshire-bull-terrier':
-    'Staffordshire Bull Terriers had to be handled at very close range, so steadiness around people mattered from the beginning. That people-focused side is part of the history.',
+    'Staffordshire Bull Terriers were handled closely, so steadiness around people mattered from the start.',
 };
 
 // Shared lines (Steve's approved copy, no character variation) for a breed question
@@ -77,7 +80,7 @@ const BREED_FACTS: Record<string, string> = {
 const BREED_HUB_LINE =
   'There are 54 Chums, so it is easier if you name one. Tell me a breed you like, or I can show you the whole pack.';
 const BREED_BEST_LINE =
-  'I am not going to pick a best one, and neither should anyone else. Tell me a breed you are curious about and I will tell you what it was bred for.';
+  "There are 54 Chums. Name a breed and I'll explain its original job.";
 
 // Bark presentation: only the Collie is wired live. Labrador/Terrier/Boxer bark
 // words and their B19/B20 English lines are PARKED with the Phase 3 voice
@@ -237,7 +240,7 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
 
     case 'gk_unknown': {
       // Approved repair line (Steve).
-      const text = 'I am not sure what you mean yet. Try asking me as a full question, or choose dogs, games or finding something on the site.';
+      const text = 'I missed that. Try saying it differently. Or ask about a breed or the card game.';
       return { responseId: 'GK-UNKNOWN', text, dog };
     }
 
@@ -270,7 +273,7 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
     // constants (provided by Steve directly; NOT yet in the generated Collie Responses, so
     // move them into the workbook later). No character variation.
     case 'offer_bark_game':
-      return { responseId: 'OFFER_BARK_GAME', text: 'One game is ready to play here: the bark game. Type woof and I will start it. The other games are still in training until they are properly finished.', dog };
+      return { responseId: 'OFFER_BARK_GAME', text: 'Type woof to start the bark game. The others are still in training.', dog };
     case 'bark_explain':
       return { responseId: 'BARK_GAME_EXPLAIN', text: 'Type one or more woofs and I will always bark once more than you do. Type stop when you have finished.', dog };
     case 'bark_exit':
