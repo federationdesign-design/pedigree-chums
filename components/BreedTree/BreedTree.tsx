@@ -1423,8 +1423,14 @@ export default function BreedTree({
   // jumps. Pinning it to the screen at the coordinates it already had keeps it
   // exactly where the user last saw it.
   const [railPin, setRailPin] = useState<{ top: number; left: number } | null>(null);
+  // The box starts shut now, so the first run of the effect below is the load
+  // state, not the user closing anything. There is no position they have seen
+  // to preserve, so the rail takes its home instead. This flips the moment the
+  // box is opened for the first time, after which closing pins as it always did.
+  const boxEverShownRef = useRef(false);
   useEffect(() => {
     if (!hideCaption) {
+      boxEverShownRef.current = true;
       setRailHidden(false);
       setRailPin(null);
       // Back on show: the box is home again, so pick the side afresh. Without
@@ -1439,6 +1445,8 @@ export default function BreedTree({
     // rail was pinned to wherever the box's HOME position put it, not where the
     // user last saw it. With the rail on the left, home sits close to the screen
     // edge, which is how closing the box threw the cards off the page.
+    // Never opened: leave railPin null and let .relRailHome place it.
+    if (!boxEverShownRef.current) return;
     const el = railRef.current;
     const r = el ? el.getBoundingClientRect() : null;
     asideOff.current = { x: 0, y: 0 }; // closed: forget where it was left
@@ -4555,19 +4563,9 @@ export default function BreedTree({
           className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
         />
       )}
-      {/* PLAY sweeps white to yellow on the very same diagonal and at the same
-          rate as the level slides in: a yellow copy of the word clipped by the
-          identical seam, revealed together with the pit scene. Replaces the old
-          separate hover colour. */}
-      {dockAside && gravity && learning && (
-        <div
-          aria-hidden="true"
-          className={styles.learnPlaySweep}
-          style={{ clipPath: seamClip(started || (learning && playPeek) ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
-        >
-          <span className={styles.learnPlaySweepWord}>{playLabel}</span>
-        </div>
-      )}
+      {/* The white-to-yellow word sweep has gone with the word. The level
+          background behind it still slides in on hover, driven by the same
+          playPeek and the same seamClip a few blocks above. */}
       {/* Big PLAY in the bottom-left of the learn area: jump straight from
           reading into the round. */}
       {dockAside && gravity && learning && (
@@ -4602,7 +4600,31 @@ export default function BreedTree({
           }}
           aria-label={playLabel}
         >
-          {playLabel}
+          {/* Drawn from the in-pit square's own figures rather than eyeballed,
+              so it cannot drift from the close X and the info square: they use
+              uSz = 84 * pitScale * 1.2 in CSS pixels, rx = 0.3 of that, a 5px
+              navy rim and an icon about a third of the square across. The 5px
+              rim is centred on the rect, so the artboard carries 2.5px of
+              padding on every side to hold it. */}
+          {(() => {
+            const S = 84 * pitScale * 1.2;
+            const B = S + 5;
+            const c = B / 2;
+            const g = S * 0.34;
+            const w = S * 0.30;
+            return (
+              <svg width={B} height={B} viewBox={`0 0 ${B} ${B}`} aria-hidden="true" focusable="false">
+                <rect x={2.5} y={2.5} width={S} height={S} rx={S * 0.3} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={5} />
+                <path
+                  d={`M${c - w * 0.3},${c - g / 2} L${c + w * 0.7},${c} L${c - w * 0.3},${c + g / 2} Z`}
+                  fill="var(--navy, #0a3a57)"
+                  stroke="var(--navy, #0a3a57)"
+                  strokeWidth={S * 0.07}
+                  strokeLinejoin="round"
+                />
+              </svg>
+            );
+          })()}
         </button>
       )}
       {britainOpen && (
@@ -4794,7 +4816,13 @@ export default function BreedTree({
           {dockAside && learning && !railHidden && renderRail.length > 0 && (
             <div
               ref={railRef}
-              className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
+              className={`${styles.relRail} ${
+                hideCaption && !railPin
+                  ? styles.relRailHome
+                  : railSide === "left"
+                  ? styles.relRailLeft
+                  : styles.relRailRight
+              }`}
               style={{
                 gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)`,
                 visibility: "visible", // shows through even when the box is hidden

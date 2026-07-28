@@ -742,6 +742,21 @@
 /* Beside the box, on whichever side has room. */
 .relRailRight { left: calc(100% - 2px); }
 .relRailLeft { right: calc(100% - 2px); }
+/* Where the rail starts, before the blue box has ever been opened. Pinned to
+   the screen under the SECOND portrait in the stacked title, on the left.
+   The figures are the title's own: LineageModal puts .titleWrap at top 24px and
+   left 30px, each row is one portrait tall at clamp(56px, 11vw, 78px), and the
+   two rows are 8px apart. Two portraits plus that gap plus 10px of air is where
+   the second dog's picture ends. Change the portrait clamp there and this needs
+   to change with it. The lives bar sits at the same left but only renders while
+   a round is running, and the rail is learn only, so they never meet. */
+.relRailHome {
+  position: fixed;
+  left: 30px;
+  top: calc(42px + 2 * clamp(56px, 11vw, 78px));
+  right: auto;
+  bottom: auto;
+}
 .relCard {
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);
@@ -788,6 +803,10 @@
 }
 
 /* Big white PLAY, bottom-left of the learn area, to jump into the round. */
+/* PLAY is a square now, the same square as the close X and the info icon. All
+   of the type rules have gone with the word; the SVG inside sizes the button,
+   so the only job left here is where it sits. Hovering it still slides the
+   level background in, which is a separate clip in the TSX. */
 .learnPlay {
   position: absolute;
   left: 4%;
@@ -797,43 +816,14 @@
   margin: 0;
   padding: 0;
   background: none;
-  color: #ffffff;
-  font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.6rem, 20vw, 11rem);
-  line-height: 0.9;
-  letter-spacing: 0.02em;
+  line-height: 0;
   cursor: pointer;
   pointer-events: auto;
-  text-shadow: 0 4px 26px rgba(0, 0, 0, 0.55);
 }
-/* The PLAY hover colour is no longer a flat swap: a yellow overlay sweeps in on
-   the same seam as the level (see .learnPlaySweep). The button itself stays
-   white; only keyboard focus keeps a ring for accessibility. */
 .learnPlay:focus-visible {
   outline: 3px solid var(--yellow, #ffd23e);
   outline-offset: 4px;
-}
-.learnPlaySweep {
-  position: fixed;
-  inset: 0;
-  z-index: 17;
-  overflow: hidden;
-  pointer-events: none;
-  /* the level's own slow-learn rate, so the colour and the scene move as one */
-  transition: clip-path 2800ms cubic-bezier(0.22, 0.9, 0.3, 1);
-}
-.learnPlaySweepWord {
-  position: absolute;
-  left: 4%;
-  bottom: 3%;
-  color: var(--yellow, #ffd23e);
-  font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.6rem, 20vw, 11rem);
-  line-height: 0.9;
-  letter-spacing: 0.02em;
-}
-@media (prefers-reduced-motion: reduce) {
-  .learnPlaySweep { transition-duration: 1ms; }
+  border-radius: 12px;
 }
 /* Ancestry card: opens below the box when a rail dog is tapped, same breakdown
    as that breed's own page. Rides with the box like the rail does. */
