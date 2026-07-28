@@ -3891,7 +3891,10 @@ export default function BreedTree({
               // The hovered circle's own name is the one to read, so anything it
               // sits inside stands its name down while the pointer is there.
               const overlaid = !!hovered && d !== hovered && hovered.ancestors().includes(d);
-              const visible = (isInside || isLeafFocus) && !labelBuried && !overlaid;
+              // A name belongs to a circle. If the circle is not drawn, and an
+              // echo circle is not, the name goes with it. Without this the
+              // repeated names stayed floating over the parent they belong to.
+              const visible = (isInside || isLeafFocus) && !labelBuried && !overlaid && !hidden;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               const labelEl = (
                 <g
@@ -3917,7 +3920,16 @@ export default function BreedTree({
                       const vL = viewRef.current;
                       const kL = SIZE / vL[2];
                       const ls = isMobile ? Math.max(0.4, Math.min(1.25, (d.r * kL) / 250)) : 1;
-                      const rFit = isMobile ? (d.r * kL) / ls : d.r;
+                      // Fit to the radius the circle is DRAWN at, not to its
+                      // packed radius. Nested rings are inset by half their
+                      // width, so the picture stops short of d.r and a name
+                      // fitted to d.r could land on the ring. That is why the
+                      // top word of a four-line name crossed the rim. ringInset
+                      // is in screen pixels, so it is divided by the live k to
+                      // come back into the world units the fitter works in.
+                      const insetWorld = ringInset(d, vL) / kL;
+                      const rDrawn = Math.max(1, d.r - insetWorld);
+                      const rFit = isMobile ? (rDrawn * kL) / ls : rDrawn;
                       // the ceiling the fitter may grow to. Raised with
                       // LABEL_SAFE so short names are not capped before they
                       // reach the rim.
@@ -3939,11 +3951,15 @@ export default function BreedTree({
                             // the name of the circle it sits in: d3 hands the
                             // nodes back shallowest first, so the deeper label is
                             // drawn last. White on white just does not read as
-                            // in front. A navy halo on the nested names cuts them
-                            // cleanly out of whatever is behind. The first ring
-                            // keeps its plain face, so nothing already signed off
-                            // changes.
-                            ...(isInside && !isChild
+                            // in front. A navy halo cuts a name cleanly out of
+                            // whatever is behind it. It goes on the first ring
+                            // too now, by request, so the big names and the
+                            // nested ones read as one family. paint-order lays
+                            // the stroke down first and the fill over it, so the
+                            // weight sits outside the letterform rather than
+                            // eating into it. The chum pages pass hideLabels, so
+                            // the first-ring change does not reach them.
+                            ...(isInside
                               ? {
                                   stroke: "var(--navy, #0a3a57)",
                                   strokeWidth: Math.max(2, fs * 0.16),
