@@ -1059,6 +1059,9 @@ export default function BreedTree({
   const uiRefFor = (k: "close" | "desc" | "learn") =>
     k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : uiLearnRef;
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  // Where and when a press on the pit background began, so a drag can be told
+  // apart from a tap. Read by onBackground.
+  const bgPressRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const dragRef = useRef<{
     body: { x: number; y: number; vx: number; vy: number };
     dx: number; dy: number; lx: number; ly: number; lt: number;
@@ -1455,7 +1458,17 @@ export default function BreedTree({
       if (dockAside && hideCaption && d !== nodes[0]) onToggleCaption?.();
     } else if (d.parent) zoom(d.parent);
   }
-  function onBackground() {
+  function onBackground(e?: { clientX: number; clientY: number; timeStamp: number }) {
+    // A drag that STARTED on the background is not a tap on the background.
+    // Since the MouseConstraint landed, a missed grab is common: you press just
+    // outside a chip, haul the pointer across the pit, let go, and the browser
+    // fires a click on the SVG. Every one of those opened the leave-game
+    // confirmation. Same 350ms and 8px rule as every other tap in the pit.
+    const p = bgPressRef.current;
+    bgPressRef.current = null;
+    // timeStamp, not performance.now(): both events share the same clock, and
+    // calling performance.now() here counts as impure render work.
+    if (e && p && (e.timeStamp - p.t >= 350 || Math.hypot(e.clientX - p.x, e.clientY - p.y) >= 8)) return;
     if (focusRef.current !== nodes[0]) { zoom(nodes[0]); return; }
     // Once the round is running a stray tap on the background must not throw the
     // player out. A missed grab at a circle lands here, and losing a round that
@@ -3040,6 +3053,9 @@ export default function BreedTree({
       <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`} ref={stageRef}>
         <svg
           viewBox={viewBox}
+          // Records the press only. No stopPropagation: the stage listener above
+          // still has to see it to feed Matter's mouse.
+          onPointerDown={(ev) => { bgPressRef.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp }; }}
           onClick={disableZoom ? undefined : onBackground}
           style={{ opacity: ready ? 1 : 0 }}
         >
