@@ -110,7 +110,11 @@ function countProgenitors(n: LineageNode): number {
   const c = n.children || [];
   return c.reduce((s, x) => s + 1 + countProgenitors(x), 0);
 }
-function radius(share: number) {
+// The size of a percentage circle, and therefore of the bomb that replaces one,
+// since a main pit bomb IS a percentage circle and differs only in how it is
+// drawn. Exported so the mini pit uses this exact curve rather than a copy that
+// can drift. Nothing about the behaviour changes.
+export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
 function lean(a: number) {

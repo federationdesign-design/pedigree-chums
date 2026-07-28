@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
+import { radius as pctRadius } from "../PackPit/LineageMap";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
@@ -244,6 +245,19 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // server and the first client render to disagree about.
 const mcDragOn = () => typeof window !== "undefined" && window.location.search.indexOf("drag=mc") >= 0;
 const BOMB_ODDS = 20;
+// A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
+// pctRadius is the very function the main pit uses, imported rather than
+// copied, so the two can never drift apart.
+//
+// The main pit floors at 21px, which is why every share up to about 17% comes
+// out the same size there. That flat bottom is deliberate and is kept.
+//
+// The curve is in the main pit's pixels, so it is normalised against the share
+// below and multiplied by the pit's own badge size. BADGE_SHARE_REF is the
+// share that keeps exactly the size the mini pit draws for everything today,
+// so the middle of the range does not move and only the ends do.
+const BADGE_SHARE_REF = 25;
+const badgeRFor = (pct: number, base: number) => base * (pctRadius(pct || 0) / pctRadius(BADGE_SHARE_REF));
 const BADGE_DRAW_R = 92;
 // A badge belongs to its circle, so it has to scale with it. BADGE_DRAW_R was a
 // flat 92 in SVG units while the circles are sized by the packing, the level
@@ -858,7 +872,10 @@ export default function BreedTree({
     setBadgePcts(
       nodes
         .filter((n) => n.depth === 1)
-        .map((n) => ({ pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0, r: badgeDrawR })),
+        .map((n) => {
+          const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
+          return { pct, r: badgeRFor(pct, badgeDrawR) };
+        }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, dockAside, badgeDrawR]);
@@ -1508,7 +1525,7 @@ export default function BreedTree({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: BADGE_R, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
+        r: badgeRFor(pctOf(n), BADGE_R), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
 
@@ -1654,13 +1671,13 @@ export default function BreedTree({
           newMbs.push(mb);
           const bl = badgeBodiesRef.current;
           if (bl) {
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: BADGE_R, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeRFor(pctOf(ch), BADGE_R), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20 };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawRRef.current }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeRFor(bb.pct, badgeDrawRRef.current) }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -1925,7 +1942,10 @@ export default function BreedTree({
         const bl = badgeBodiesRef.current;
         if (!bl) return;
         const w = worldFromPx(sx, sy);
-        const rDraw = opts?.r ?? badgeDrawRRef.current;
+        // A solo dog circle brings its own radius. Everything else is a
+        // percentage chip and is sized by its figure, bombs included: in the
+        // main pit a bomb IS a percentage circle and only its sprite differs.
+        const rDraw = opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current);
         // J17 stage 2: the bomb roll, per scattered percentage circle, exactly
         // where the main pit rolls it. A solo dog circle arrives through the
         // same call carrying a label, and that one is never a bomb: it is a
