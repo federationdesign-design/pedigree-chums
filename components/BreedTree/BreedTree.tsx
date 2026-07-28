@@ -992,6 +992,10 @@ export default function BreedTree({
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
   const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)]);
+  // The width of the full-pit view, kept so a ring can be drawn at the weight it
+  // has when you are zoomed out. Seeded with the same expression as viewRef and
+  // rewritten by every site that returns the view to the root.
+  const homeWRef = useRef<number>(nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD));
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
 
@@ -1784,6 +1788,15 @@ export default function BreedTree({
     return d.r * (dockAside ? base : base / 4);
   }
 
+  // A zoom multiplies every world unit by k, rings included, so flying into a
+  // circle used to thicken its ring on screen in step with the circle. In the
+  // mini pit the ring is now drawn at the k of the FULL-PIT view instead, so it
+  // is the same number of pixels zoomed in as it is zoomed out. The chum page
+  // is deliberately left on the old behaviour: it was not what was asked for.
+  function strokeK(v: View): number {
+    return dockAside ? SIZE / Math.max(homeWRef.current, 1) : SIZE / v[2];
+  }
+
   // `now` is the sim's frame time, passed in rather than read here: calling
   // performance.now() inside this function is flagged as impure render work.
   // Zero means no animation this call, which is right for every caller that is
@@ -1850,7 +1863,7 @@ export default function BreedTree({
         c.setAttribute("r", String(d.r * k));
         // The radius is scaled by the view but the stroke was not, so a circle
         // drawn small kept a full-size ring and read as heavy. Scale both.
-        c.setAttribute("stroke-width", String(strokeWidthFor(d) * k));
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v)));
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
@@ -1892,6 +1905,7 @@ export default function BreedTree({
     onActiveChange?.(d !== nodes[0]);
     let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
     if (d === nodes[0]) target = clampRootView(target);
+    if (d === nodes[0]) homeWRef.current = target[2];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cancelAnimationFrame(rafRef.current);
     if (reduce) {
@@ -2014,6 +2028,7 @@ export default function BreedTree({
     setReady(true);
 
     const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+    homeWRef.current = v[2];
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2059,7 +2074,7 @@ export default function BreedTree({
         // pre-pit view with no PIT_SPAN in it. So the ring came in PIT_SPAN
         // times too heavy, about 2.5x, and only snapped right when the drop
         // finished and zoomTo ran.
-        c.setAttribute("stroke-width", String(strokeWidthFor(d) * k));
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v)));
       });
       if (elapsed < total) {
         rafRef.current = requestAnimationFrame(step);
@@ -3707,7 +3722,7 @@ export default function BreedTree({
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   stroke={hidden ? "none" : strokeColorFor(d)}
-                  strokeWidth={hidden ? 0 : strokeWidthFor(d) * (SIZE / viewRef.current[2])}
+                  strokeWidth={hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current)}
                   style={{
                     // Inline would beat the cursor class, so only the two cases
                     // that have no class of their own are set here.
@@ -4510,7 +4525,9 @@ export default function BreedTree({
             cancelAnimationFrame(rafRef.current);
             focusRef.current = nodes[0];
             setFocus(nodes[0]);
-            zoomTo(clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]));
+            const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+            homeWRef.current = rootV[2];
+            zoomTo(rootV);
             // Hide the open info box as the round begins.
             if (!hideCaption) onToggleCaption?.();
             // A spent run is reset by the host before anything drops, so the
