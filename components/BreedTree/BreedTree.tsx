@@ -3286,6 +3286,11 @@ export default function BreedTree({
   // every click landed on the parent instead. On an already-focused parent that
   // reads as a zoom out, which is what a nest of children looked like.
   const buriedSet = hovered && !dropped ? new Set(hovered.descendants()) : null;
+  // Mini pit LEARN only: every circle nested inside the focused one carries its
+  // name, not just the first ring. The chum pages keep the single ring they
+  // have always had, and PLAY is untouched.
+  const deepLabels = dockAside && !dropped;
+  const labelSet = deepLabels ? new Set(focus.descendants()) : null;
 
   return (
     <div
@@ -3481,14 +3486,24 @@ export default function BreedTree({
           <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: hideLabels ? 0 : entered ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none", userSelect: "none" }}>
             {nodes.map((d, i) => {
               const isChild = d.parent === focus;
+              // Every circle inside the focused one, however deep, not just the
+              // first ring. Falls back to the first ring off the mini pit.
+              const isInside = labelSet ? d !== focus && labelSet.has(d) : isChild;
               // When zoomed right into a single circle that has nothing inside
               // it, show that circle's own share centred within it.
               const isLeafFocus = d === focus && !!d.parent && !d.children;
-              const visible = isChild || isLeafFocus;
+              // A circle hidden under a hovered parent takes its name down with
+              // it. Without this the circles vanish and the words stay floating
+              // over nothing.
+              const labelBuried = !!buriedSet && d !== hovered && buriedSet.has(d);
+              // The hovered circle's own name is the one to read, so anything it
+              // sits inside stands its name down while the pointer is there.
+              const overlaid = !!hovered && d !== hovered && hovered.ancestors().includes(d);
+              const visible = (isInside || isLeafFocus) && !labelBuried && !overlaid;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               return (
                 <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
-                  {isChild && !(dropped && d.depth === 1) && (
+                  {isInside && !(dropped && d.depth === 1) && (
                     (() => {
                       // Contain the label in its own circle. On mobile zoomTo
                       // scales the whole label group by ls, so the fit has to be
