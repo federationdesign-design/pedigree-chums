@@ -380,7 +380,12 @@ type Node = HierarchyCircularNode<LineageNode>;
 // fourth line instead of spilling over the rim.
 const LABEL_MAX_LINES = 4;
 const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
-const LABEL_LINE_H = 1.05; // line height in ems, matches the tspan dy
+// Line height in ems for every label inside a circle, and the single source
+// for it: the fitter reads it and both renderers now interpolate it, so the
+// drawn spacing and the spacing the fitter measured can never drift apart.
+// Tightening this also lets the fitter find a larger type size, because the
+// same words now occupy a shorter block, so multi-line names grow a little.
+const LABEL_LINE_H = 0.9;
 const LABEL_CAP_H = 0.8; // ink above the first baseline, in ems
 const LABEL_DESC = 0.28; // ink below the last baseline, in ems
 // Keep the block inside this fraction of the radius. Raised from 0.9: names are
@@ -3888,7 +3893,7 @@ export default function BreedTree({
                           }}
                         >
                           {lines.map((line, li) => (
-                            <tspan key={li} x={0} dy={li === 0 ? 0 : "1.05em"}>{line}</tspan>
+                            <tspan key={li} x={0} dy={li === 0 ? 0 : `${LABEL_LINE_H}em`}>{line}</tspan>
                           ))}
                         </text>
                       );
@@ -3984,11 +3989,11 @@ export default function BreedTree({
                   // started, measured by the same fitter the pit circles use
                   (() => {
                     const lab = fitLabel(item.label, item.r, item.r * 0.34, labelFont);
-                    const top = -((lab.lines.length - 1) * lab.fs * 1.02) / 2;
+                    const top = -((lab.lines.length - 1) * lab.fs * LABEL_LINE_H) / 2;
                     return (
                       <text x={0} y={0} dominantBaseline="central" style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
                         {lab.lines.map((ln, li) => (
-                          <tspan key={li} x={0} y={top + li * lab.fs * 1.02}>{ln}</tspan>
+                          <tspan key={li} x={0} y={top + li * lab.fs * LABEL_LINE_H}>{ln}</tspan>
                         ))}
                       </text>
                     );
