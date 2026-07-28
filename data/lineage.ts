@@ -1004,7 +1004,13 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.",
         img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
         children: [
-          { name: "Old hunting dogs of the Celts", note: "The broad Celtic hunting and pastoral dog stock brought across Europe. Now extinct.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 45 },
+          // Same dog as the one in the Celtic Hound level, so it carries the
+          // same picture and the same words. It used to have its own image and
+          // its own write-up, typed separately, which is why the two levels
+          // disagreed about what it looked like. Nothing copies img or note
+          // between entries, so a duplicate has to be kept in step by hand:
+          // change this one and change "Celtic Hound" below to match.
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 },
           { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 },
         ],
       },
