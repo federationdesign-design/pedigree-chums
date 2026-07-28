@@ -105,6 +105,20 @@ const TOY_ROCK_SRC = "/rock.svg";
 const TOY_PROP_GAP = 1000; // the two sticks, after the flag
 const TOY_ROCK_GAP = 500; // rock, after the sticks, so it lands on its own beat
 // artwork proportions, so the bodies match what is drawn
+// The cookie policy panel, the main pit's own prop. It falls in, and a tap opens
+// the notice that CookieBanner already renders above the pit, so there is one
+// notice and one consent rather than a second implementation.
+const TOY_COOKIES_SRC = "/cookies-policy.svg";
+const COOKIES_ASPECT = 672.6 / 266; // the artwork's own viewBox, it is wide
+const TOY_COOKIES_DELAY = 2000;     // the main pit drops it at 0:02.0
+const TOY_COOKIES_SEEN_KEY = "pc-minipit-cookies-seen";
+// Consent lives in localStorage and is permanent, so the panel never falls for
+// someone who has already answered. NOTE: the main pit reads a DIFFERENT key,
+// "pc-cookies". That mismatch is a real bug and is logged, not fixed here.
+const COOKIE_CONSENT_KEY = "pc-cookie-consent";
+function cookieConsentGiven(): boolean {
+  try { return !!localStorage.getItem(COOKIE_CONSENT_KEY); } catch { return false; }
+}
 const STICK_ASPECT = 1368 / 299.7;
 const ROCK_ASPECT = 756.3 / 659.2;
 // Used-up toys stay gone for the rest of the session: the flag once its message
@@ -142,16 +156,18 @@ const CHUM_MAX = 56;
 const CHUM_VW = 0.075;
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink";
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies";
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
+  cookies: TOY_COOKIES_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
   ball: TOY_BALL_GONE_KEY, flag: TOY_FLAG_SEEN_KEY,
   stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
+  cookies: TOY_COOKIES_SEEN_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -171,6 +187,9 @@ function resetToysIfAsked() {
   try {
     for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k);
     sessionStorage.removeItem(TOY_BALL_PINK_THROWS_KEY);
+    // the cookie panel is gated on consent, which is localStorage and permanent,
+    // so clearing only the toy key would leave it shut and the reset look broken
+    localStorage.removeItem(COOKIE_CONSENT_KEY);
   } catch { /* private mode */ }
 }
 function pinkThrows(): number {
@@ -1833,6 +1852,8 @@ export default function BreedTree({
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
         if (toyRetired(TOY_GONE_KEY[kind])) return;
+        // answered once, gone for good, so the pit never nags
+        if (kind === "cookies" && cookieConsentGiven()) return;
         const isNarrow = window.matchMedia("(max-width: 768px)").matches;
         const ballDia = BIGT * 2.25 * (isNarrow ? 0.9 : 1);
         // rock reads at the ball's size, stick a little longer than the ball is
@@ -1842,8 +1863,9 @@ export default function BreedTree({
           : kind === "rock" ? ballDia
           : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
+          : kind === "cookies" ? BIGT * 3.2
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : dia;
+        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
         const px = kind === "flag"
@@ -1864,6 +1886,7 @@ export default function BreedTree({
         const opts =
           kind === "ball" || kind === "ballPink" ? { restitution: 0.97, friction: 0.05, frictionAir: 0.003, density: 0.0006 } // pit: super bouncy
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
+          : kind === "cookies" ? { restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.004 } // the main pit's own panel figures
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
@@ -1902,7 +1925,9 @@ export default function BreedTree({
               })()
             : kind === "rock"
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
-              : Bodies.circle(px, py, r, opts);
+              : kind === "cookies"
+                ? Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: hgt * 0.16 } })
+                : Bodies.circle(px, py, r, opts);
         // fromVertices is avoided deliberately: it produced a ragged body when
         // it was tried on the pit floor. A plain polygon squashed to the
         // artwork's own proportions is predictable and does the same job.
@@ -1962,6 +1987,7 @@ export default function BreedTree({
       };
       const armToys = () => {
         if (toyTimers.length) return; // first landing only
+        toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
         toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
         toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
@@ -3275,10 +3301,11 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={ty.kind !== "flag" ? undefined : (e) => {
-                    // Matter owns the drag. Only the flag's tap is left, on the
-                    // same thresholds the old path used: under 350ms and under
-                    // 8px of travel.
+                  onPointerDown={ty.kind !== "flag" && ty.kind !== "cookies" ? undefined : (e) => {
+                    // Matter owns the drag. Only the taps are left, on the same
+                    // thresholds the old path used: under 350ms and under 8px of
+                    // travel. Both props read their message and then retire.
+                    const isCookies = ty.kind === "cookies";
                     const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
                     const tapUp = (ev: PointerEvent) => {
                       window.removeEventListener("pointerup", tapUp);
@@ -3286,8 +3313,14 @@ export default function BreedTree({
                       if (performance.now() - p0.t >= 350) return;
                       if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
                       mcReleaseRef.current?.();
-                      retireToy(TOY_FLAG_SEEN_KEY);
-                      setBritainOpen(true);
+                      if (isCookies) {
+                        retireToy(TOY_COOKIES_SEEN_KEY);
+                        // the notice CookieBanner already renders above the pit
+                        window.dispatchEvent(new Event("pc:open-cookies"));
+                      } else {
+                        retireToy(TOY_FLAG_SEEN_KEY);
+                        setBritainOpen(true);
+                      }
                     };
                     window.addEventListener("pointerup", tapUp);
                     window.addEventListener("pointercancel", tapUp);
