@@ -1007,17 +1007,26 @@ export default function BreedTree({
   // The sim runs in WORLD units, the same currency as d.x, d.y and d.r, and is
   // converted to view units only at the moment of painting. That way a zoom
   // changes nothing about the physics.
-  // Every one of these was tuned against a harness that runs the real packed
-  // radii for 2 even, 2 lopsided, 3 and 4 child levels for fifteen seconds and
-  // measures the worst escape past the ring and the worst sibling overlap.
-  // At these numbers: overlap 0.000 to 0.005 units, escape under 0.36 units on
-  // a 380 unit parent, which is well under a pixel on screen. Do not change one
+  // Tuned against a harness that builds the REAL tree, runs the real pack, then
+  // applies relayoutMobile's 90 degree turn and its tilt, and only then picks a
+  // DEPTH-1 circle as the parent. All three of those matter: the root is hidden
+  // so the circles you hover are depth 1, and gravity is not rotation
+  // invariant, so measuring the unrotated layout gives the wrong answer.
+  // At these numbers: overlap 0.000 to 0.016 units, escape under 0.07 on a
+  // ~190 unit parent, apart in 0.45s, settled by 3.8s. Do not change one
   // without re-running that harness.
   const UNLOCK_G = 5.0;        // gravity, in parent radii per second squared
-  const UNLOCK_BOUNCE = 0.22;  // how much of the closing speed comes back
-  const UNLOCK_DRAG = 2.0;     // air, per second
+  const UNLOCK_BOUNCE = 0.28;  // how much of the closing speed comes back
+  const UNLOCK_DRAG = 1.3;     // air, per second
   const UNLOCK_RIM = 0.85;     // rub along the inside of the ring
-  const UNLOCK_POP = 0.5;      // opening shove, in parent radii per second
+  const UNLOCK_POP = 0.45;     // opening shove outwards, in parent radii/sec
+  // The sideways fan. On most levels the circles are stacked one above the
+  // other, and a purely outward pop is straight up and straight down, so they
+  // land on top of each other and take nearly two seconds to roll apart. The
+  // fan shoves the higher one one way and the lower one the other, which is
+  // what actually slides a stack apart. Measured: two-circle levels come apart
+  // in 0.45s with this, against 1.88s without.
+  const UNLOCK_SIDE = 1.3;     // in parent radii per second, at full lean
   const UNLOCK_ITER = 12;      // constraint passes per frame
   const UNLOCK_HOME_MS = 260;  // the trip back
   const UNLOCK_REST = 0.0006;  // moved less than this fraction of R counts as still
@@ -1196,13 +1205,18 @@ export default function BreedTree({
     }
     unlockStop();
     const P = hovered as Node;
+    // Ranked by height, so the fan below knows which one is on top.
+    const byHeight = [...(P.children ?? [])].sort((a, b) => a.y - b.y);
+    const mid = (byHeight.length - 1) / 2;
     const kids = (P.children ?? []).map((n) => {
-      // The pop. Each one is shoved out along the line from the parent centre
-      // through its own centre, so a pair goes left and right on its own and a
-      // three or four fans out, with no rule per child count.
+      // Two shoves. Outward, along the line from the parent centre through this
+      // circle's own centre. And sideways, the fan: the highest circle goes one
+      // way and the lowest the other, scaled by how far off the middle it is,
+      // so three and four child levels spread rather than needing a rule each.
       const dx = n.x - P.x, dy = n.y - P.y;
       const len = Math.hypot(dx, dy) || 1;
       const sp = UNLOCK_POP * P.r;
+      const lean = byHeight.length < 2 ? 0 : (byHeight.indexOf(n) - mid) / Math.max(mid, 0.5);
       return {
         n,
         i: nodes.indexOf(n),
@@ -1210,7 +1224,7 @@ export default function BreedTree({
         oy: 0,
         px: 0,
         py: 0,
-        vx: (dx / len) * sp,
+        vx: (dx / len) * sp - lean * UNLOCK_SIDE * P.r,
         vy: (dy / len) * sp - sp * 0.35, // a touch of lift, so it reads as a hop
       };
     }).filter((kd) => kd.i >= 0);
