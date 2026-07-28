@@ -1701,6 +1701,13 @@ export default function BreedTree({
         const drop = (1 - easeOutBounce(lt)) * dropFrom;
         c.setAttribute("transform", `translate(${tx},${ty - drop})`);
         c.setAttribute("r", String(d.r * k));
+        // The ring has to be scaled by the SAME k as the radius. The entrance
+        // set the radius and left the stroke to whatever React had rendered,
+        // and React sizes it from viewRef, which at mount still holds the
+        // pre-pit view with no PIT_SPAN in it. So the ring came in PIT_SPAN
+        // times too heavy, about 2.5x, and only snapped right when the drop
+        // finished and zoomTo ran.
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * k));
       });
       if (elapsed < total) {
         rafRef.current = requestAnimationFrame(step);
