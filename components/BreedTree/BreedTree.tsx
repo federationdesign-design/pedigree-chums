@@ -984,7 +984,6 @@ export default function BreedTree({
     }
   }, []);
   const circlesRef = useRef<SVGGElement>(null);
-  const labelsRef = useRef<SVGGElement>(null);
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
   const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)]);
@@ -1526,7 +1525,6 @@ export default function BreedTree({
     const k = SIZE / v[2];
     viewRef.current = v;
     const cg = circlesRef.current;
-    const lg = labelsRef.current;
     const bb = badgeBodiesRef.current;
     if (bb) {
       const bg = badgesRef.current;
@@ -1577,7 +1575,9 @@ export default function BreedTree({
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
-      const c = cg?.children[i] as SVGCircleElement | undefined;
+      // one <g> per node: [0] is the circle, [1] is its label
+      const wrap = cg?.children[i] as SVGGElement | undefined;
+      const c = wrap?.children[0] as SVGCircleElement | undefined;
       if (c) {
         c.setAttribute("transform", `translate(${tx},${ty})`);
         c.setAttribute("r", String(d.r * k));
@@ -1585,7 +1585,7 @@ export default function BreedTree({
         // drawn small kept a full-size ring and read as heavy. Scale both.
         c.setAttribute("stroke-width", String(strokeWidthFor(d) * k));
       }
-      const l = lg?.children[i] as SVGTextElement | undefined;
+      const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
         if (d === focusRef.current) {
           // The focused circle's own label sits at its centre.
@@ -1774,7 +1774,7 @@ export default function BreedTree({
     const step = (now: number) => {
       const elapsed = now - start;
       nodes.forEach((d, i) => {
-        const c = cg?.children[i] as SVGCircleElement | undefined;
+        const c = (cg?.children[i] as SVGGElement | undefined)?.children[0] as SVGCircleElement | undefined;
         if (!c) return;
         const tx = (d.x - v[0]) * k;
         const ty = (d.y - v[1]) * k;
@@ -3366,6 +3366,15 @@ export default function BreedTree({
             )}
           </defs>
 
+          {/* Circles and their names are interleaved, one node at a time:
+              circle, its label, next circle, its label. They used to be two
+              separate groups, all circles then all labels, which put EVERY name
+              in front of EVERY circle, so a nested circle's name floated over
+              the circle drawn on top of it. Paint order is array order, so
+              interleaving makes a name obey exactly the same stacking as the
+              circle it belongs to. zoomTo, the drop-in entrance and
+              liftToLearn all index this group and now read
+              children[i].children[0] for the circle, [1] for the label. */}
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -3386,9 +3395,8 @@ export default function BreedTree({
               const cls = hasImg && tinted ? `${styles.imgCircle} ${tintClass}`.trim() : undefined;
               const heldHidden = (!!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)))) || removedNodesRef.current.has(d);
               const buried = (!!buriedSet && d !== hovered && buriedSet.has(d)) || heldHidden;
-              return (
+              const circleEl = (
                 <circle
-                  key={i}
                   className={cls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   stroke={hidden ? "none" : strokeColorFor(d)}
@@ -3457,7 +3465,8 @@ export default function BreedTree({
                           // has to be the ancestor's element, not the child that
                           // happened to catch the press.
                           const li = nodes.indexOf(liftNode);
-                          const el = (circlesRef.current?.children[li] as SVGCircleElement | undefined)
+                          const el = ((circlesRef.current?.children[li] as SVGGElement | undefined)
+                            ?.children[0] as SVGCircleElement | undefined)
                             ?? (e.currentTarget as SVGCircleElement);
                           // Matter owns the drag. Two things must NOT happen
                           // here: held, which would pull the body out of the
@@ -3480,11 +3489,6 @@ export default function BreedTree({
                   }
                 />
               );
-            })}
-          </g>
-
-          <g ref={labelsRef} textAnchor="middle" style={{ fontFamily: "var(--font-body), system-ui, sans-serif", opacity: hideLabels ? 0 : entered ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none", userSelect: "none" }}>
-            {nodes.map((d, i) => {
               const isChild = d.parent === focus;
               // Every circle inside the focused one, however deep, not just the
               // first ring. Falls back to the first ring off the mini pit.
@@ -3501,8 +3505,20 @@ export default function BreedTree({
               const overlaid = !!hovered && d !== hovered && hovered.ancestors().includes(d);
               const visible = (isInside || isLeafFocus) && !labelBuried && !overlaid;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
-              return (
-                <g key={i} style={{ display: visible ? "inline" : "none", pointerEvents: "none" }}>
+              const labelEl = (
+                <g
+                  textAnchor="middle"
+                  style={{
+                    display: visible ? "inline" : "none",
+                    // These five used to live on the single labels group. That
+                    // group is gone, so each label carries them itself.
+                    fontFamily: "var(--font-body), system-ui, sans-serif",
+                    opacity: hideLabels ? 0 : entered ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                  }}
+                >
                   {isInside && !(dropped && d.depth === 1) && (
                     (() => {
                       // Contain the label in its own circle. On mobile zoomTo
@@ -3564,6 +3580,12 @@ export default function BreedTree({
                       </text>
                     </g>
                   )}
+                </g>
+              );
+              return (
+                <g key={i}>
+                  {circleEl}
+                  {labelEl}
                 </g>
               );
             })}
