@@ -921,6 +921,15 @@ export default function BreedTree({
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
+  // J17 stage 1: the canvas effects layer. The canvas overlays the SVG exactly
+  // and is re-registered with the live view every frame, so anything drawn in
+  // world coordinates stays locked to its circle through pan and zoom.
+  const fxCanvasRef = useRef<HTMLCanvasElement>(null);
+  // Drop-time pixels per world unit, published by the sim below. Effects are
+  // authored in pit pixels, so dividing a pixel constant by this turns it into
+  // world units: a blast keeps its intended size at the default view and grows
+  // with the circle when you zoom in, instead of being pinned to the screen.
+  const fxPxPerWorldRef = useRef<number>(0);
   // Drag support: badges can be picked up and flung, like
   // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
   // a wake() so a drag can restart physics after everything has settled.
@@ -1471,6 +1480,7 @@ export default function BreedTree({
         return { x: vD0 + (CT.d * x0 - CT.c * y0) / det / kD, y: vD1 + (-CT.b * x0 + CT.a * y0) / det / kD };
       };
       const pxPerWorld = Math.hypot(CT.a, CT.b) * kD || 1;
+      fxPxPerWorldRef.current = pxPerWorld; // J17: the effects layer's pixel-to-world scale
       const stagePxH = worldH * pxPerWorld;
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
@@ -2308,6 +2318,92 @@ export default function BreedTree({
     return () => mq.removeEventListener("change", apply);
   }, []);
 
+  // ---- J17 stage 1: the canvas effects layer ------------------------------
+  // The canvas sits on top of the SVG, fills the same box and never takes a
+  // pointer. Registration is the whole job: the SVG has its own viewBox and the
+  // pit pans and zooms inside it, so the canvas has to be told where world
+  // space is on every frame or an effect drifts off the circle it belongs to.
+  //
+  // Two transforms compose:
+  //   world -> svg user units   (x - v[0]) * k, live, changes every frame
+  //   svg   -> client px        getScreenCTM(), only changes on layout
+  //
+  // The CTM is cached and refreshed on resize and scroll rather than read per
+  // frame, because reading it forces a layout and the sim already writes to the
+  // DOM on every tick. The live half is just viewRef, which costs nothing.
+  //
+  // The loop only runs when there is something to draw. Today that means the
+  // test rig behind ?fxtest=1; stages 2 to 5 will start it for live effects.
+  useEffect(() => {
+    const cv = fxCanvasRef.current;
+    const st = stageRef.current;
+    if (!cv || !st) return;
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
+
+    let box: { a: number; b: number; c: number; d: number; e: number; f: number } | null = null;
+    let dpr = 1;
+
+    // The canvas and the SVG are both inset:0 on the stage, so they are the same
+    // rectangle and the SVG's screen transform applies to the canvas unchanged
+    // once the canvas origin is subtracted.
+    const remeasure = () => {
+      const svg = st.querySelector("svg") as SVGSVGElement | null;
+      const r = cv.getBoundingClientRect();
+      const ctm = svg ? svg.getScreenCTM() : null;
+      if (!ctm || !r.width || !r.height) { box = null; return; }
+      box = { a: ctm.a, b: ctm.b, c: ctm.c, d: ctm.d, e: ctm.e - r.left, f: ctm.f - r.top };
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const pw = Math.round(r.width * dpr), ph = Math.round(r.height * dpr);
+      if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+    };
+
+    remeasure();
+    const ro = new ResizeObserver(remeasure);
+    ro.observe(st);
+    window.addEventListener("scroll", remeasure, true);
+    window.addEventListener("resize", remeasure);
+
+    const testing = typeof window !== "undefined" && window.location.search.indexOf("fxtest=1") >= 0;
+    let raf = 0;
+
+    const frame = () => {
+      raf = requestAnimationFrame(frame);
+      if (!box) { remeasure(); return; }
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      const v = viewRef.current;
+      const k = SIZE / v[2];
+      // world -> device px in one matrix, so every draw call below is written in
+      // plain world coordinates and needs no conversion of its own
+      const A = box.a * k, B = box.b * k, C = box.c * k, D = box.d * k;
+      const E = box.a * -v[0] * k + box.c * -v[1] * k + box.e;
+      const F = box.b * -v[0] * k + box.d * -v[1] * k + box.f;
+      ctx.setTransform(dpr * A, dpr * B, dpr * C, dpr * D, dpr * E, dpr * F);
+      // PX converts a pixel-tuned constant into world units. It is the drop-time
+      // scale, not the live one, which is what makes an effect hold its size at
+      // the default view and grow with a zoom rather than stay screen-sized.
+      const PX = 1 / (fxPxPerWorldRef.current || Math.hypot(box.a, box.b) * k || 1);
+      // Test rig only, behind ?fxtest=1. A magenta ring at each circle's exact
+      // world radius plus a fixed-size dot at its centre. Registered correctly
+      // the ring lies on the circle's own stroke at every zoom level, so any
+      // drift is unmissable rather than a matter of opinion.
+      ctx.strokeStyle = "#ff2d78";
+      ctx.lineWidth = 3 * PX;
+      for (const d of nodes) { ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.fillStyle = "#00ff88";
+      for (const d of nodes) { ctx.beginPath(); ctx.arc(d.x, d.y, 4 * PX, 0, Math.PI * 2); ctx.fill(); }
+    };
+    if (testing) raf = requestAnimationFrame(frame);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("scroll", remeasure, true);
+      window.removeEventListener("resize", remeasure);
+    };
+  }, [nodes]);
+
   // Widen (or heighten) the viewBox to the stage's aspect so the focused circle
   // still fits the short side while the long side gains room for siblings. On a
   // wide canvas we also push the origin rightwards so the diagram sits on the
@@ -3011,6 +3107,8 @@ export default function BreedTree({
             ));
           })()}
         </svg>
+        {/* J17: the canvas effects layer, above the SVG, never takes a pointer. */}
+        <canvas ref={fxCanvasRef} className={styles.fxCanvas} aria-hidden="true" />
       </div>
 
       {/* Difficulty: start-screen only, down the left, 10 hardest at the top.
