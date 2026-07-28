@@ -857,7 +857,18 @@ export default function BreedTree({
   // The rail outlives the info box. It is closed only by its own X, and comes
   // back whenever the box is reopened, so the two cycle together.
   const [railHidden, setRailHidden] = useState(false);
-  useEffect(() => { if (!hideCaption) setRailHidden(false); }, [hideCaption]);
+  // Where the rail stood when the box closed. Its normal position is measured
+  // off the box, so once the box is hidden that anchor shifts and the rail
+  // jumps. Pinning it to the screen at the coordinates it already had keeps it
+  // exactly where the user last saw it.
+  const [railPin, setRailPin] = useState<{ top: number; left: number } | null>(null);
+  useEffect(() => {
+    if (!hideCaption) { setRailHidden(false); setRailPin(null); return; }
+    const el = railRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setRailPin({ top: r.top, left: r.left });
+  }, [hideCaption]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -3353,13 +3364,16 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
-          {dockAside && !railHidden && renderRail.length > 0 && (
+          {dockAside && learning && !railHidden && renderRail.length > 0 && (
             <div
               ref={railRef}
               className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
               style={{
                 gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)`,
                 visibility: "visible", // shows through even when the box is hidden
+                ...(railPin
+                  ? { position: "fixed" as const, top: railPin.top, left: railPin.left, right: "auto" }
+                  : null),
               }}
               aria-label="Pack dogs from this lineage"
             >
