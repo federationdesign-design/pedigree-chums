@@ -294,6 +294,32 @@
 }
 
 /* Small X in the corner of the docked caption. */
+/* The rail's own way out, shown only once the box is closed. Same yellow as the
+   box's X, parked above the first thumbnail. */
+.railClose {
+  position: absolute;
+  top: -30px;
+  right: 0;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--yellow, #ffd23e);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+.railClose svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
 .captionClose {
   position: absolute;
   top: 8px;

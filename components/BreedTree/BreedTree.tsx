@@ -854,6 +854,10 @@ export default function BreedTree({
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, dockAside, badgeDrawR]);
+  // The rail outlives the info box. It is closed only by its own X, and comes
+  // back whenever the box is reopened, so the two cycle together.
+  const [railHidden, setRailHidden] = useState(false);
+  useEffect(() => { if (!hideCaption) setRailHidden(false); }, [hideCaption]);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -3246,7 +3250,11 @@ export default function BreedTree({
       <div
         ref={asideRef}
         className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`}
-        style={{ position: "relative", display: hideCaption ? "none" : undefined }}
+        // visibility, not display. The rail is a descendant positioned off this
+        // element's edge, so collapsing it would leave the rail with nothing to
+        // hang off. Hidden this way the box keeps its box, the rail keeps its
+        // anchor, and the rail turns itself visible again below.
+        style={{ position: "relative", visibility: hideCaption ? "hidden" : undefined }}
         onPointerDown={dockAside ? asideDown : undefined}
         onPointerMove={dockAside ? asideMove : undefined}
         onPointerUp={dockAside ? asideUp : undefined}
@@ -3345,13 +3353,32 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
-          {dockAside && !hideCaption && renderRail.length > 0 && (
+          {dockAside && !railHidden && renderRail.length > 0 && (
             <div
               ref={railRef}
               className={`${styles.relRail} ${railSide === "left" ? styles.relRailLeft : styles.relRailRight}`}
-              style={{ gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)` }}
+              style={{
+                gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)`,
+                visibility: "visible", // shows through even when the box is hidden
+              }}
               aria-label="Pack dogs from this lineage"
             >
+              {/* Only once the box is shut: until then the box's own X is the
+                  obvious way out, and two Xs together is noise. */}
+              {hideCaption && (
+                <button
+                  type="button"
+                  className={styles.railClose}
+                  onClick={(e) => { e.stopPropagation(); setRailHidden(true); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  aria-label="Close the dog list"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <line x1="7" y1="7" x2="17" y2="17" />
+                    <line x1="17" y1="7" x2="7" y2="17" />
+                  </svg>
+                </button>
+              )}
               {renderRail.map((r, i) => (
                 <button
                   key={r.slug}
