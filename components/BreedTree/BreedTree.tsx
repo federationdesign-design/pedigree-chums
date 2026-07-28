@@ -2325,10 +2325,22 @@ export default function BreedTree({
         // Stage 1 was badges only. Stage 2 adds the dog circles, which is the
         // object this whole job exists for. Rods, pills, toys and the UI
         // squares still run the old path, so the two never share a body.
-        const MC_KINDS = new Set(["badge", "circle"]);
+        // Stage 3 adds the pit props. The in-pit UI squares, close X and
+        // brain, are deliberately NOT here: they are controls, and a control
+        // that can be dragged into the pack is a worse control. The chum
+        // scenery is out too, since it was never draggable.
+        const MC_KINDS = new Set(["badge", "circle", "rod", "pill", "toy"]);
         const onStartDrag = (ev: { body?: { plugin?: { kind?: string } } }) => {
           if (!MC_KINDS.has(ev?.body?.plugin?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; }
         };
+        // A thrown toy retires itself once it is clear of the pit. The old path
+        // fired this from startDrag's pointer up; the constraint has its own
+        // release event, so it hangs off that instead.
+        const onEndDrag = (ev: { body?: { circleRadius?: number; plugin?: { prop?: unknown } } }) => {
+          const prop = ev?.body?.plugin?.prop;
+          if (prop && ev.body?.circleRadius) throwWatchRef.current?.(prop);
+        };
+        Events.on(mc, "enddrag", onEndDrag);
         mcReleaseRef.current = () => { mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
         Events.on(mc, "startdrag", onStartDrag);
         const setPos = (cx: number, cy: number) => {
@@ -2357,6 +2369,7 @@ export default function BreedTree({
         mcTeardown = () => {
           mcReleaseRef.current = null;
           Events.off(mc, "startdrag", onStartDrag);
+          Events.off(mc, "enddrag", onEndDrag);
           st.removeEventListener("pointerdown", onDown);
           window.removeEventListener("pointermove", onMove);
           window.removeEventListener("pointerup", onUp);
@@ -2992,7 +3005,7 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => startDrag(e, rodBodiesRef.current[i2])}>
+                  onPointerDown={(e) => { if (mcDragOn()) return; startDrag(e, rodBodiesRef.current[i2]); }}>
                   <rect x={-rd.len / 2} y={-rd.h / 2} width={rd.len} height={rd.h} rx={rd.h / 2}
                     style={{ fill: rd.lit ? "#ffd23e" : "#ffffff", stroke: "#0a3a57", strokeWidth: rd.h * 0.22 }} />
                 </g>
@@ -3013,7 +3026,28 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => startDrag(e, toyBodiesRef.current[i2], ty.kind === "flag" ? () => { retireToy(TOY_FLAG_SEEN_KEY); setBritainOpen(true); } : undefined)}>
+                  onPointerDown={(e) => {
+                    const flagTap = ty.kind === "flag" ? () => { retireToy(TOY_FLAG_SEEN_KEY); setBritainOpen(true); } : undefined;
+                    if (mcDragOn()) {
+                      // Matter owns the drag. Only the flag's tap is left, and
+                      // it uses the same threshold the old path used: under
+                      // 350ms and under 8px of travel.
+                      if (!flagTap) return;
+                      const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
+                      const tapUp = (ev: PointerEvent) => {
+                        window.removeEventListener("pointerup", tapUp);
+                        window.removeEventListener("pointercancel", tapUp);
+                        if (performance.now() - p0.t >= 350) return;
+                        if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
+                        mcReleaseRef.current?.();
+                        flagTap();
+                      };
+                      window.addEventListener("pointerup", tapUp);
+                      window.addEventListener("pointercancel", tapUp);
+                      return;
+                    }
+                    startDrag(e, toyBodiesRef.current[i2], flagTap);
+                  }}>
                   {ty.kind === "flag" ? (
                     <>
                       <clipPath id={`bt-toy-${i2}`}><circle cx={0} cy={0} r={half} /></clipPath>
@@ -3062,7 +3096,7 @@ export default function BreedTree({
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => startDrag(e, pillBodiesRef.current[i2])}>
+                  onPointerDown={(e) => { if (mcDragOn()) return; startDrag(e, pillBodiesRef.current[i2]); }}>
                   <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
                     style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.rx * 0.154 }} />
                   {pl.lines.map((ln, li) => (
