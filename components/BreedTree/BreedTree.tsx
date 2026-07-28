@@ -3598,7 +3598,7 @@ export default function BreedTree({
           // Zoomed in, a click on the background goes back to the top, so say
           // so. At the top it does nothing in LEARN, so it keeps the plain arrow
           // rather than promising a zoom that will not happen.
-          className={!disableZoom && !dropped && focus !== nodes[0] ? styles.curZoomOut : undefined}
+          className={!disableZoom && !dropped && !frozen && focus !== nodes[0] ? styles.curZoomOut : undefined}
           style={{ opacity: ready ? 1 : 0 }}
         >
           <defs>
@@ -3663,11 +3663,20 @@ export default function BreedTree({
               // already the focus, in which case it goes back UP. Once the round
               // has dropped, a click lifts the dog to the learn card instead, so
               // it stays a plain pointer there.
-              const curCls = hidden || disableZoom || dropped
+              // frozen is the start screen. onClick already swallows the press
+              // there, so a magnifier would be promising a zoom that cannot
+              // happen. Same reason dropped and disableZoom are excluded.
+              // Colour is the second signal, on top of the plus and minus:
+              // white at the top level, yellow once you are inside a dog. The
+              // minus is only reachable while zoomed in, so it carries yellow
+              // in its own class and needs no test here.
+              const curCls = hidden || disableZoom || dropped || frozen
                 ? ""
                 : d === focus && d.parent
                   ? styles.curZoomOut
-                  : styles.curZoomIn;
+                  : focus === nodes[0]
+                    ? styles.curZoomIn
+                    : styles.curZoomInOn;
               const cls = `${tintCls} ${curCls}`.trim() || undefined;
               const heldHidden = (!!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)))) || removedNodesRef.current.has(d);
               const buried = (!!buriedSet && d !== hovered && buriedSet.has(d)) || heldHidden;
