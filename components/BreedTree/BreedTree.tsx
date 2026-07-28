@@ -163,7 +163,8 @@ function retireToy(key: string) {
 // to reach for the browser console. sessionStorage is per tab and survives a
 // reload, so once you have thrown the ball clear or read the flag's message
 // they are gone for that tab until this clears them.
-// Test hook only, removed with the fxtest and bombs rigs at J17 stage 5.
+// Kept deliberately after the other test rigs were removed: it is harmless and
+// saves a console visit every time the pit is worked on.
 function resetToysIfAsked() {
   if (typeof window === "undefined") return;
   if (window.location.search.indexOf("toys=reset") < 0) return;
@@ -284,11 +285,7 @@ const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
 // below and multiplied by the pit's own badge size. BADGE_SHARE_REF is the
 // share that keeps exactly the size the mini pit draws for everything today,
 // so the middle of the range does not move and only the ends do.
-// ?bombs=all forces every chip to be a bomb, so a stage can be tested in one
-// go instead of waiting out the odds. Test hook only, removed at J17 stage 5.
-const rollBomb = () =>
-  (typeof window !== "undefined" && window.location.search.indexOf("bombs=all") >= 0) ||
-  Math.random() < 1 / BOMB_ODDS;
+const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
 const BADGE_SHARE_REF = 25;
 const badgeRFor = (pct: number, base: number) => base * (pctRadius(pct || 0) / pctRadius(BADGE_SHARE_REF));
 const BADGE_DRAW_R = 92;
@@ -2721,8 +2718,9 @@ export default function BreedTree({
   // frame, because reading it forces a layout and the sim already writes to the
   // DOM on every tick. The live half is just viewRef, which costs nothing.
   //
-  // The loop only runs when there is something to draw. Today that means the
-  // test rig behind ?fxtest=1; stages 2 to 5 will start it for live effects.
+  // The loop only runs when there is something to draw. It stands down as soon
+  // as the last effect dies and is kicked awake by the next emission, so a
+  // settled pit costs nothing.
   useEffect(() => {
     const cv = fxCanvasRef.current;
     const st = stageRef.current;
@@ -2753,13 +2751,12 @@ export default function BreedTree({
     window.addEventListener("scroll", remeasure, true);
     window.addEventListener("resize", remeasure);
 
-    const testing = typeof window !== "undefined" && window.location.search.indexOf("fxtest=1") >= 0;
     let raf = 0;
     let painted = false;
 
     const frame = () => {
       const kit = fxKitRef.current;
-      const busy = testing || (kit ? !kit.idle() : false);
+      const busy = kit ? !kit.idle() : false;
       if (!busy) {
         // one last clear, then stand down until something is emitted
         if (painted) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); painted = false; }
@@ -2792,23 +2789,8 @@ export default function BreedTree({
         kit2.draw(ctx, performance.now());
         ctx.restore();
       }
-      // PX converts a pixel-tuned constant into world units. It is the drop-time
-      // scale, not the live one, which is what makes an effect hold its size at
-      // the default view and grow with a zoom rather than stay screen-sized.
-      const PX = 1 / (fxPxPerWorldRef.current || Math.hypot(box.a, box.b) * k || 1);
-      // Test rig only, behind ?fxtest=1. A magenta ring at each circle's exact
-      // world radius plus a fixed-size dot at its centre. Registered correctly
-      // the ring lies on the circle's own stroke at every zoom level, so any
-      // drift is unmissable rather than a matter of opinion.
-      if (!testing) return;
-      ctx.strokeStyle = "#ff2d78";
-      ctx.lineWidth = 3 * PX;
-      for (const d of nodes) { ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.stroke(); }
-      ctx.fillStyle = "#00ff88";
-      for (const d of nodes) { ctx.beginPath(); ctx.arc(d.x, d.y, 4 * PX, 0, Math.PI * 2); ctx.fill(); }
     };
     fxKickRef.current = () => { if (!raf) raf = requestAnimationFrame(frame); };
-    if (testing) raf = requestAnimationFrame(frame);
 
     return () => {
       cancelAnimationFrame(raf);
