@@ -1757,13 +1757,25 @@ export default function BreedTree({
     // picture. Tied to d.r it follows both, exactly as the badges do.
     // Fractions keep the old 5 / 4 / 3 / 2.6 / 2.4 relationship between depths.
     const frac = [0.09, 0.072, 0.054, 0.047, 0.043];
-    let base = frac[d.depth - 1] ?? 0.043;
+    // The mini pit runs its own table, because a nested circle there sits
+    // right beside a yellow % chip at almost the same size and the chip now
+    // wears 0.19 of its radius. Measured off the Celtic Heeler level: the
+    // depth-1 ring is 19px on a radius of 223, a chip is 22px on a radius of
+    // 108, and a depth-2 circle was only 8px on a radius of 117. So the two
+    // objects a player reads as a pair were nearly three times apart. Depth 1
+    // is deliberately unchanged: it is so much bigger that 0.09 already draws
+    // about the same number of pixels as a chip. Deeper rings still taper, so
+    // a ring never swallows a small picture, but far more gently than before.
+    const fracPit = [0.09, 0.19, 0.17, 0.155, 0.145];
+    let base = (dockAside ? fracPit[d.depth - 1] ?? 0.145 : frac[d.depth - 1] ?? 0.043);
     // The ring still grows and shrinks with the circle, which is the part that
     // works. This only shaves the top of the slider, where the circles are so
     // large that the same fraction reads as a much heavier line.
     if (dockAside && level > 5) base *= 1 - ((Math.min(level, 10) - 5) / 5) * DIFF_STROKE_TRIM;
     // The mini pit draws its rings four times heavier than the chum page, so a
     // small, simple lineage reads boldly.
+    // The chum page is a quarter of the weight; the mini pit table above is
+    // already absolute, so it is used as it stands.
     return d.r * (dockAside ? base : base / 4);
   }
 
