@@ -228,6 +228,20 @@ export const MODERATION: ModerationCategory[] = [
     responses: ['I may not have understood that, but you do not need to explain it again. A teacher can help, or you can call Childline free on 0800 1111.'],
     status: 'APPROVED',
   },
+  {
+    // Task 34: in PROTECTED_AFTERCARE a game, sales or comedy request is declined with
+    // this neutral refusal instead of the B13 menu fallback (whose line advertised
+    // "dogs, games or the website": the very routes the aftercare guard had just
+    // blocked). This is NOT a safety response: no signpost, no support surface, and it
+    // does not re-enter PROTECTED_ACTIVE. It offers help (a breed, the rules), not a
+    // menu of the blocked things. Approved by Steve, verbatim.
+    id: 'MOD_AFTERCARE_REFUSAL',
+    scenario: 'S12 aftercare: decline a blocked game, sales or comedy request',
+    action: 'redirect',
+    escalateOnRepeat: false,
+    responses: ['Not in this conversation. I can still help with a dog breed or the card game rules.'],
+    status: 'APPROVED',
+  },
   // ---- Task 20 personal-sadness pair. Approved by Steve, verbatim. Shared across
   // all four dogs, no character variation. L1 (PERSONAL_SADNESS_GENTLE_REDIRECT_01)
   // is a gentle redirect on the FIRST qualifying statement: it does NOT enter

@@ -381,6 +381,35 @@ check('can I play something', { bucket: 'B17', action: 'offer_bark_game' });
   check('can we play a game', {}, { session: s, assert: (r, _resp, sess) =>
     sess.protectedState !== 'aftercare' ? `not aftercare: ${sess.protectedState}` : r.action === 'offer_bark_game' ? 'game served in PROTECTED_AFTERCARE' : null });
 })();
+// Task 34: in PROTECTED_AFTERCARE a blocked game, sales or comedy request reaches the
+// approved neutral refusal (moderationId MOD_AFTERCARE_REFUSAL), NOT the B13 menu fallback
+// that advertised "dogs, games or the website". The refusal offers help (a breed, the card
+// game rules) but its rendered text must never re-advertise a blocked route: it must contain
+// none of "games", "play" or "website".
+(() => {
+  const refusal = (label) => (r, resp, sess) => {
+    if (sess.protectedState !== 'aftercare') return `not aftercare: ${sess.protectedState}`;
+    if (r.moderationId !== 'MOD_AFTERCARE_REFUSAL') return `${label} not routed to the aftercare refusal: ${r.moderationId}`;
+    const t = resp.text.toLowerCase();
+    const leaked = ['games', 'play', 'website'].filter((w) => t.includes(w));
+    return leaked.length ? `${label} refusal re-advertised a blocked route (${leaked.join(', ')}): ${resp.text}` : null;
+  };
+  // game request
+  const g = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: g });
+  check('how do I play?', { action: 'rules_answer' }, { session: g }); // clear ordinary topic -> aftercare
+  check('can we play a game', { action: 'neutral_refusal' }, { session: g, assert: refusal('game') });
+  // buying request
+  const b = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: b });
+  check('how do I play?', { action: 'rules_answer' }, { session: b });
+  check('how much is the game', { action: 'neutral_refusal' }, { session: b, assert: refusal('buying') });
+  // comedy (joke) request
+  const j = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: j });
+  check('how do I play?', { action: 'rules_answer' }, { session: j });
+  check('tell me a joke', { action: 'neutral_refusal' }, { session: j, assert: refusal('joke') });
+})();
 // A new safety signal in PROTECTED_AFTERCARE returns to PROTECTED_ACTIVE.
 (() => {
   const s = newSession();
@@ -1309,6 +1338,87 @@ check('woof', { action: 'bark', layer: 15 });
 check('woof woof', { action: 'bark', layer: 15 });
 check('ok', {}, { assert: (r) => (r.action === 'bark_exit' ? 'ok exited with no game running' : null) });
 check('stop', {}, { assert: (r) => (r.action === 'bark_exit' ? 'stop reached the exit line with no game running' : null) });
+
+// ---- Task 36: goodbye route (S01 turn 8) ----
+// The full S01 script as one session: every turn answers, and turn 8 is the goodbye.
+(() => {
+  const s = newSession();
+  const turns = [
+    ['hi', 'converse'],
+    ['whats this?', 'orientation'],
+    ['what can you do', 'orientation'],
+    ['tell me about dogs', 'breed_hub'],
+    ['I like labradors', 'breed_page'],
+    ['whats a labrador like', 'breed_page'],
+    ['cool thanks', 'converse'],
+    ['bye', 'goodbye'],
+  ];
+  let ok = true, note = '', last = null;
+  for (const [inp, act] of turns) {
+    const { resolution: r, response } = submit(data, s, inp);
+    if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
+    last = response;
+  }
+  if (last.responseId !== 'GOODBYE') { ok = false; note += `turn 8 respId ${last.responseId} want GOODBYE; `; }
+  if (last.text !== 'Right. Off you go, then. Come back when you need a dog.') { ok = false; note += `turn 8 text wrong: ${last.text}; `; }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'S01: full script, goodbye at t8', layer: '-', bucket: '-', action: 'goodbye', note: ok ? '' : note });
+})();
+// Guard: "bye" as the very first input of a session still reaches the goodbye.
+check('bye', { action: 'goodbye' }, { assert: (_r, resp) => (resp.responseId === 'GOODBYE' ? null : `first-input bye respId ${resp.responseId}`) });
+// Guard: the doubled forms that survive the 3+ collapse are listed explicitly.
+check('byee', { action: 'goodbye' });
+check('cyaa', { action: 'goodbye' });
+// Guard: a farewell word inside a longer question is NOT a goodbye.
+check('what does goodbye mean', {}, { assert: (r) => (r.action === 'goodbye' ? 'definitional question stolen by goodbye' : null) });
+// Guard: a goodbye in PROTECTED_ACTIVE never fires; a safety signal still wins.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('bye', {}, { session: s, assert: (r, _resp, sess) =>
+    r.action === 'goodbye' ? 'goodbye fired in PROTECTED_ACTIVE'
+      : r.action !== 'safety_signpost' ? `safety did not win: ${r.action}`
+        : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}` : null });
+})();
+
+// ---- Task 37: out-of-scope route (S09 turns 1-2) ----
+// The full S09 script as one session, all six turns. Turns 1-2 reach the out-of-scope line
+// (a real question the site does not cover), never the repair ladder; turns 3-4 keep the GK
+// answer and the deliberate refuse-to-guess; turns 5-6 are the Task 35 orientation and hub.
+(() => {
+  const s = newSession();
+  const turns = [
+    ['is there a God', 'out_of_scope'],
+    ['do you have political opinions', 'out_of_scope'],
+    ['whats the capital of France', 'gk_answer'],
+    ['who is the prime minister', 'gk_unknown'],
+    ['ok what CAN you talk about', 'orientation'],
+    ['dogs then', 'breed_hub'],
+  ];
+  let ok = true, note = '';
+  for (const [inp, act] of turns) {
+    const { resolution: r, response } = submit(data, s, inp);
+    if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
+    if (act === 'out_of_scope') {
+      if (response.responseId !== 'OUT-OF-SCOPE') { ok = false; note += `"${inp}" respId ${response.responseId} want OUT-OF-SCOPE; `; }
+      if (response.text !== 'Real question, wrong dog. I cover breeds, the card game and this website.') { ok = false; note += `"${inp}" text wrong; `; }
+      if (/^REPAIR-/.test(response.responseId)) { ok = false; note += `"${inp}" reached the repair ladder; `; }
+    }
+  }
+  // Out-of-scope must not climb the repair ladder (it is a resolved intent, not a miss).
+  if (s.repairCount !== 0) { ok = false; note += `repairCount ${s.repairCount} want 0; `; }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'S09: full script, out-of-scope t1-2', layer: '-', bucket: '-', action: 'out_of_scope', note: ok ? '' : note });
+})();
+// Guard: out-of-scope never fires inside PROTECTED_ACTIVE; a safety signal still wins.
+(() => {
+  const s = newSession();
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('is there a God', {}, { session: s, assert: (r, _resp, sess) =>
+    r.action === 'out_of_scope' ? 'out-of-scope fired in PROTECTED_ACTIVE'
+      : r.action !== 'safety_signpost' ? `safety did not win: ${r.action}`
+        : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}` : null });
+})();
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);

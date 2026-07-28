@@ -44,6 +44,11 @@ const STOP = new Set([
   'what', 'is', 'the', 'a', 'an', 'of', 'are', 'how', 'many', 'do', 'does', 'you', 'your', 'to',
   'in', 'which', 'who', 'where', 'when', 'me', 'my', 'i', 'it', 'this', 'that', 'can', 'on', 'and',
   'for', 'with', 'tell', 'about', 'show', 'find', 'open', 'take', 'was', 'were', 'did',
+  // Task 35 (S09 turn 6): 'then' is a trailing discourse filler ("dogs then"), never a
+  // content word, so the bare-hub rule counts "dogs then" as one content word ("dogs").
+  // Only in matchable FAQ/GK/article ANSWER text, never in a canonical/alt phrase, so
+  // dropping it from keyTokens changes no FAQ, GK or article match.
+  'then',
 ]);
 
 function keyTokens(s: string): string[] {
@@ -135,6 +140,14 @@ const DELIVERY_PLACES = [
   'isle of man', 'channel islands', 'jersey', 'guernsey', 'hebrides', 'orkney', 'shetland', 'isle of wight',
 ];
 
+// Task 35 (S04 turn 5): a question about "the card" (singular) is a pack-contents question,
+// but FAQ004's phrasings all use the plural "cards" or "pack", so the singular slips past
+// matchFaq to gk_unknown. These singular-card phrasings route to FAQ004, the same approved
+// pack answer that "whats in the pack" already reaches. Checked below RULES (so "how many
+// cards" stays the card-game rules) and specific enough that the pack/materials guards, which
+// use the plural, keep reaching FAQ004 through the ordinary matcher.
+const PACK_CONTENTS = ['whats the card like', 'what is the card like', 'the card like', 'whats on the card', 'what are the cards like'];
+
 // Orientation / onboarding (bucket B15). First-time visitors who do not yet know
 // what the chat is or what to do: "what do I do here", "how does this work",
 // "what can I ask". Curated, specific phrases only (never bare "how do i" / "what
@@ -175,6 +188,11 @@ const ORIENTATION = [
   // consecutive, so none reaches the regression guard (a dog barks / beagles / labrador /
   // how much / whats in the pack).
   'supposed to do', 'supposed to type', 'what happens now', 'what should i type', 'what do you want',
+  // Task 35 (S09 turn 5): "what CAN you talk about" is a capability question; B15's existing
+  // lines answer it. Specific "... talk about" phrasings that carry no breed name, so a named
+  // "talk about labradors" still reaches the breed page (these all require the "you/we talk
+  // about" frame, never a bare "talk about").
+  'what can you talk about', 'what do you talk about', 'what can we talk about', 'what else can you talk about',
 ];
 
 // Orientation phrasings matched on the WHOLE normalised input only (Task 11a).
@@ -225,6 +243,19 @@ const TESTING = ['test', 'testing', 'does this work', 'is this working', 'hello 
 const COMMAND = ['sit', 'stay', 'fetch', 'roll over', 'do something', 'tell me something', 'show me something', 'give me', 'paw'];
 const PERSONAL = ['i have', 'my dog', 'i like', 'i love', 'sad', 'angry', 'good dog', 'clever', 'stupid dog', 'thanks', 'thank you', 'you are annoying', 'lonely'];
 
+// Task 36: goodbye. Matched on the WHOLE normalised message only (set membership),
+// never as a word inside a longer sentence, so "what does goodbye mean" is NOT a
+// goodbye. The normaliser collapses runs of 3+ identical letters (byyyeeee -> bye),
+// but runs of 2 survive, so the doubled forms (byee, cyaa) are listed explicitly.
+// Steve's approved trigger list, verbatim: not extended here.
+const GOODBYE_TRIGGERS = new Set([
+  'bye', 'byee', 'goodbye', 'cya', 'cyaa', 'see you', 'seeya', 'seeya later', 'seeya laterz',
+  'laters', 'gtg', 'got to go', 'gotta go', 'im off', "i'm off", 'i am off', 'night', 'nite',
+]);
+function isGoodbye(compact: string): boolean {
+  return GOODBYE_TRIGGERS.has(compact.trim());
+}
+
 // Identity and scepticism (bucket B16), grouped into the ten SCP families so each
 // gets its own family-specific answer (responses are B16 rows SCP-F01..F10).
 // Honest-curiosity questions only. Character-MANIPULATION ("pretend you are not a
@@ -259,6 +290,26 @@ const FUN = [
 
 const CURRENT_DATA = ['latest', 'current', 'today', 'tonight', 'right now', 'this week', 'score', 'scores', 'weather forecast', 'news', 'who is winning', 'live'];
 const GK_SHAPE = /^(what|whats|who|whos|where|when|how many|how much|why|name the|capital of)\b/;
+
+// Task 37: out-of-scope. A coherent, valid question about a topic the site does not cover
+// (religion, politics, personal opinions, philosophy and the like). It reaches the approved
+// out-of-scope line INSTEAD of the repair ladder, which would wrongly imply the visitor typed
+// badly. Curated topic markers (this router classifies deterministically); extend as real
+// out-of-scope questions are observed. Deliberately NARROW: a product/pack question the site
+// simply does not answer ("is there any plastic in the packaging") is in-domain-but-unanswered
+// and stays the fallback, never this route. Checked LAST, just before the terminal fallback, so
+// every real route wins first, including the general-knowledge answer and the deliberate
+// GK-shaped refuse-to-guess (both resolve above this point).
+// NOTE: 'heaven' and 'afterlife' are deliberately EXCLUDED. "Is my dog in heaven" is a
+// bereavement question, not a theology question, and the out-of-scope "wrong dog" line
+// would answer a grieving child cruelly. They are the only words here a grieving child is
+// likely to type, so they stay out of this list.
+const OUT_OF_SCOPE = [
+  'god', 'jesus', 'allah', 'buddha', 'religion', 'religious', 'bible', 'quran',
+  'politics', 'political', 'election', 'brexit', 'president',
+  'your opinion', 'your opinions', 'opinion on', 'opinions on', 'political opinions',
+  'what do you believe', 'meaning of life', 'philosophy',
+];
 
 // Breed / content topic words (layer 5).
 const BREED_CONTENT = ['breed', 'breeds', 'puppy', 'working dog', 'working dogs', 'lineage', 'article', 'essay', 'history of dogs', 'herding', 'sniffer', 'detection', 'famous dog'];
@@ -449,6 +500,11 @@ function matchesBreedHub(c: string): boolean {
   return content.length === 1 && BREED_HUB_WORDS.has(content[0]);
 }
 const BREED_FOLLOWUP = ['they', 'them', 'how long', 'live', 'lifespan', 'train', 'training', 'health', 'cost', 'temperament', 'good with', 'size', 'weight', 'shed', 'exercise'];
+// Task 35 (S04 turn 6): an explicit "show me the page" request, with a breed topic already
+// established, resolves to THAT breed's page via the topic slot. Navigation phrasings only
+// (never a breed attribute), kept distinct from BREED_FOLLOWUP above; each requires "the
+// page", so a bare "show me" command is not swept in.
+const SHOW_PAGE_TRIGGERS = ['show me the page', 'show the page', 'see the page', 'open the page', 'view the page', 'go to the page', 'take me to the page', 'show me that page'];
 
 // Plural/singular tolerant whole-word match (mechanical, not authored copy).
 function hasBreedWord(words: Set<string>, token: string): boolean {
@@ -496,7 +552,9 @@ function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | 
   // Breed follow-up: no new breed named, but a breed topic is established and this reads
   // as a question about it ("how long do they live"). Reads the topic slot (Task 27).
   const breedTopic = state.topic?.kind === 'breed' ? state.topic.subject : null;
-  if (breedTopic && hasAny(n, BREED_FOLLOWUP)) {
+  // A breed follow-up ("how long do they live") OR an explicit "show me the page" request
+  // (Task 35), when a breed topic is established, resolves to that breed's page.
+  if (breedTopic && (hasAny(n, BREED_FOLLOWUP) || hasAny(n, SHOW_PAGE_TRIGGERS))) {
     const p = BREED_PAGES.find((x) => x.slug === breedTopic);
     if (p) return breedPageRes(p);
   }
@@ -812,6 +870,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ014', faqMatchStrength: 2 };
   }
 
+  // Task 35: a singular-card pack-contents question -> the approved FAQ004 pack answer.
+  if (hasAny(N, PACK_CONTENTS)) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ004', faqMatchStrength: 2 };
+  }
+
   // Layer 4: FAQ knowledge.
   {
     const faq = matchFaq(data, c);
@@ -887,6 +950,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer_request' };
   }
 
+  // Task 36 (S01 turn 8): a goodbye, matched on the whole message. Checked at the top of
+  // layer 9 so a bare "bye" reaches it before the single-word fallback below, and as the
+  // whole message so it never steals "what does goodbye mean". In PROTECTED_ACTIVE this
+  // non-safety route is overridden by the S12 machine (a safety signal still wins), so it
+  // can never fire mid-safeguarding. The approved line is held as an assembler constant
+  // (flagged there for later workbook migration), like the bark-game lines.
+  if (isGoodbye(c)) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'goodbye' };
+  }
+
   // Layer 9: recognised conversation.
   if (hasAny(N, GREETING)) return conv('B09');
   if (hasAny(N, TESTING)) return conv('B10');
@@ -914,6 +987,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 10: gibberish and fallback.
   if (isGibberish(N)) {
     return { layer: 10, layerName: 'Gibberish and fallback', bucket: 'B14', action: 'gibberish' };
+  }
+
+  // Task 37: a coherent question on a topic the site does not cover is out-of-scope, not a
+  // failure to understand. It reaches the approved out-of-scope line rather than the repair
+  // ladder (which would wrongly imply the visitor typed badly). Checked here, after every real
+  // route, so an answerable question is never diverted. In PROTECTED_ACTIVE the S12 machine
+  // overrides this non-safety route (a safety signal still wins), so it can never fire
+  // mid-safeguarding.
+  if (hasAny(N, OUT_OF_SCOPE)) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'out_of_scope' };
   }
 
   // Unresolved free text: the terminal catch-all. A distinct action so the

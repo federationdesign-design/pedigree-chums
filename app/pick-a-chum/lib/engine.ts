@@ -40,8 +40,8 @@ export interface Turn {
 const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 'gk_answer', 'link']);
 // Games, sales, teasing and comic variants that stay blocked for the rest of the
 // session once a protected state has begun. In PROTECTED_AFTERCARE these are served
-// as a plain fallback; in PROTECTED_ACTIVE everything non-safety and non-meaningful
-// is held as the safeguarding continuation, so this set only gates aftercare. The
+// as the neutral refusal (Task 34); in PROTECTED_ACTIVE everything non-safety and
+// non-meaningful is held as the safeguarding continuation, so this set only gates aftercare. The
 // bark game (bark / bark_break / bark_ack) and a comic transfer (joke -> Boxer) are
 // the comedy; open_discount_popup is sales; fun_tease is the games tease.
 const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack']);
@@ -54,7 +54,14 @@ const WEAK_AFTER_COMPLAINT = new Set(['fallback', 'gk_unknown', 'gibberish', 'cl
 const SAFEGUARDING_CONTINUATION_RES: Resolution = {
   layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_SAFEGUARDING_CONTINUATION',
 };
-const PLAIN_FALLBACK_RES: Resolution = { layer: 9, layerName: 'Recognised conversation', bucket: 'B13', action: 'fallback' };
+// Task 34: in PROTECTED_AFTERCARE, a blocked game, sales or comedy request is declined
+// with the approved neutral refusal, NOT the B13 plain fallback. The old fallback line
+// advertised "dogs, games or the website", i.e. it offered a menu that re-advertised the
+// very routes the aftercare guard had just blocked. This is a benign decline (its own
+// non-safety action), so it does not re-enter PROTECTED_ACTIVE or render the support surface.
+const AFTERCARE_REFUSAL_RES: Resolution = {
+  layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'neutral_refusal', moderationId: 'MOD_AFTERCARE_REFUSAL',
+};
 
 // Task 31a: within PROTECTED_ACTIVE, an input that matches no safety continuation, barrier,
 // emergency, acknowledgement or clear ordinary topic, AND did not resolve to any conversational
@@ -114,7 +121,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   //                       (and clears to aftercare, below); anything else is held as
   //                       the general safeguarding continuation.
   //   PROTECTED_AFTERCARE ordinary answers are served plainly; games, sales, teasing
-  //                       and comic variants stay blocked (served as a plain fallback).
+  //                       and comic variants stay blocked (served as the neutral refusal, Task 34).
   // Safety resolutions (a fresh disclosure, a barrier, the no-one route, the
   // acknowledgement close) are returned by the router and pass through untouched.
   if (wasProtected) {
@@ -128,7 +135,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
           resolution = UNRESOLVED_ACTIONS.has(resolution.action) ? SAFE_UNCLEAR_CONTINUATION_RES : SAFEGUARDING_CONTINUATION_RES;
         }
       } else if (AFTERCARE_BLOCKED.has(resolution.action)) {
-        resolution = PLAIN_FALLBACK_RES;
+        resolution = AFTERCARE_REFUSAL_RES;
       }
     }
   }

@@ -342,6 +342,24 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       return { responseId: cat.id, text: cat.responses[0], dog };
     }
 
+    case 'goodbye':
+      // Task 36: the approved goodbye line. Held here as a constant, verbatim (NOT yet in the
+      // generated Collie Responses, so migrate into the workbook later), like the bark-game lines.
+      return { responseId: 'GOODBYE', text: 'Right. Off you go, then. Come back when you need a dog.', dog };
+
+    case 'out_of_scope':
+      // Task 37: the approved out-of-scope line. Held here as a constant, verbatim (NOT yet in the
+      // generated Collie Responses, so migrate into the workbook later), like the goodbye line.
+      return { responseId: 'OUT-OF-SCOPE', text: 'Real question, wrong dog. I cover breeds, the card game and this website.', dog };
+
+    case 'neutral_refusal': {
+      // Task 34: PROTECTED_AFTERCARE decline of a blocked game, sales or comedy request.
+      // The approved refusal line (MODERATION), rendered as an ordinary dog line: no
+      // support surface, no signpost, and no menu re-advertising the blocked routes.
+      const cat = MODERATION.find((m) => m.id === res.moderationId) ?? MODERATION[0];
+      return { responseId: cat.id, text: cat.responses[0], dog };
+    }
+
     case 'transfer_request':
       // Visitor asked to switch dogs. Approved repair line.
       return { responseId: 'TRANSFER-REQUEST', text: 'All right. Choose another dog from the pack and I will hand you over.', dog };
