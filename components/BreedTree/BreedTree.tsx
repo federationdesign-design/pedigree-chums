@@ -158,6 +158,19 @@ function toyRetired(key: string): boolean {
 function retireToy(key: string) {
   try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
+// ?toys=reset un-retires every toy on load, so a testing session does not have
+// to reach for the browser console. sessionStorage is per tab and survives a
+// reload, so once you have thrown the ball clear or read the flag's message
+// they are gone for that tab until this clears them.
+// Test hook only, removed with the fxtest and bombs rigs at J17 stage 5.
+function resetToysIfAsked() {
+  if (typeof window === "undefined") return;
+  if (window.location.search.indexOf("toys=reset") < 0) return;
+  try {
+    for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k);
+    sessionStorage.removeItem(TOY_BALL_PINK_THROWS_KEY);
+  } catch { /* private mode */ }
+}
 function pinkThrows(): number {
   try { return Number(sessionStorage.getItem(TOY_BALL_PINK_THROWS_KEY) || "0") || 0; } catch { return 0; }
 }
@@ -951,6 +964,8 @@ export default function BreedTree({
   // and is re-registered with the live view every frame, so anything drawn in
   // world coordinates stays locked to its circle through pan and zoom.
   const fxCanvasRef = useRef<HTMLCanvasElement>(null);
+  // Runs before the toy timers, which do not start until a circle lands.
+  useEffect(() => { resetToysIfAsked(); }, []);
   // J10b stage 2: lets a tap drop the mouse constraint before liftToLearn sets
   // held, so Matter is never left pulling a body that the sim has just taken
   // out of the world.
