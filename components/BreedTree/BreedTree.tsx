@@ -2284,7 +2284,7 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
       if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
-      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint } = Matter;
+      const { Engine, Bodies, Body: MBody, Composite, Constraint, Events, Mouse, MouseConstraint } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -2333,7 +2333,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean; cling?: unknown[] };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -2488,6 +2488,46 @@ export default function BreedTree({
       const all = bodies.concat(badges);
       // nodes that have their own body: their subtrees no longer ride a parent
       const owned = new Set<Node>(bodies.map((b) => b.n as Node));
+
+      // ---- the clinging children ------------------------------------------
+      // A dog's own circles ride on its name from the moment it lands, stuck to
+      // the underside so gravity works with the link rather than against it.
+      // The word is marked popped, which makes popChildren early-return, so the
+      // old rule where a hard enough knock burst a dog open no longer applies to
+      // the level's dogs. Lifting the word is the only release, by decision.
+      //
+      // length 0 with high stiffness is a rigid pin rather than a spring: the
+      // child sits exactly where it is put and turns with the word instead of
+      // swinging off it.
+      for (const b of bodies) {
+        if (!b.n || !b.mb) continue;
+        const kids = (b.n.children ?? []).filter((ch) => !isEcho(ch));
+        if (!kids.length) { b.popped = true; continue; }
+        const f = wordFits[b.idx];
+        const wpx = (f ? f.wv : b.r * 2 * k) / k * pxPerWorld;
+        const hpx = (f ? f.hv : b.r * k) / k * pxPerWorld;
+        b.cling = [];
+        kids.forEach((ch, ci) => {
+          const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
+          owned.add(ch);
+          all.push(nb);
+          const cmb = mkCircle(nb, "circle", CIRCLE_OPTS);
+          const rpx = ch.r * pxPerWorld;
+          // spread along the width, hanging just clear of the lower edge
+          const ax = (-0.5 + (ci + 0.5) / kids.length) * wpx;
+          const ay = hpx / 2 + rpx * 0.75;
+          MBody.setPosition(cmb, { x: b.mb.position.x + ax, y: b.mb.position.y + ay });
+          const link = Constraint.create({
+            bodyA: b.mb, pointA: { x: ax, y: ay },
+            bodyB: cmb, pointB: { x: 0, y: 0 },
+            length: 0, stiffness: 0.9, damping: 0.2, render: { visible: false },
+          });
+          Composite.add(world, link);
+          (b.cling as unknown[]).push(link);
+        });
+        b.popped = true; // its children are already out, so a knock cannot pop it
+      }
+
       pitBodiesRef.current = {
         find: (n: Node) => all.find((b) => b.n === n),
         owned,
@@ -3238,7 +3278,16 @@ export default function BreedTree({
         // held bodies leave the world; released ones drop back in where lifted
         for (const b of all) {
           if (!b.mb) continue;
-          if (b.held && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
+          if (b.held && b.mbIn) {
+            // Lifted: the children stop clinging and are simply pit objects from
+            // here on. They keep whatever the word was doing at the moment it
+            // left, so they fall away rather than dropping dead still.
+            if (b.cling && (b.cling as unknown[]).length) {
+              for (const link of b.cling as unknown[]) Composite.remove(world, link as never);
+              b.cling = [];
+            }
+            Composite.remove(world, b.mb); b.mbIn = false;
+          }
           else if (!b.held && !b.mbIn) {
             MBody.setPosition(b.mb, pxFromWorld(b.x, b.y));
             MBody.setVelocity(b.mb, { x: 0, y: 0 });
