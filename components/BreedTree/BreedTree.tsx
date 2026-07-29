@@ -362,7 +362,22 @@ const LEVEL_FLOOR_SHOW = 1;
 const WASH_DEG = 18;
 const WASH_PEEK_X = 0.46; // .learnWashPeek translate3d(46%, ...)
 const WASH_INSET = 2.2; // .learnWash inset: -60% -> 2.2 viewports wide
+// 42 was a flat number, and that was the bug. The label block anchored 42 units
+// above centre WHATEVER the circle's size, so as the tree goes deeper and the
+// radii shrink the anchor drifts further off centre: 10% of the radius at the
+// root, 33% by depth 2, 60% by depth 3, and past the rim by depth 4. Two
+// symptoms, one cause. The text looked misaligned a little more at every step,
+// and because labelFits measures the rotated corners FROM this anchor, the room
+// it had collapsed, so the fitter shrank the type or gave up.
+//
+// Now capped as a fraction of the radius. 0.18 is the share the depth-1 circles
+// already had, so the level's own circles and the root are untouched to the
+// pixel, and only the smaller ones are pulled back toward their middle.
 const TITLE_DY = -42;
+const TITLE_DY_FRAC = 0.18;
+function titleDy(r: number): number {
+  return -Math.min(-TITLE_DY, Math.max(0, r) * TITLE_DY_FRAC);
+}
 const TITLE_ANGLE = -10;
 type Node = HierarchyCircularNode<LineageNode>;
 
@@ -569,15 +584,16 @@ function balancedWrap(words: string[], n: number): string[] | null {
 
 // First baseline for an n-line block: 1 and 2 line labels keep their historic
 // anchor exactly, 3 and 4 line labels lift so the block stays balanced.
-function labelFirstY(n: number, fs: number): number {
-  return TITLE_DY - Math.max(0, (n - 2) / 2) * LABEL_LINE_H * fs;
+function labelFirstY(n: number, fs: number, r: number): number {
+  return titleDy(r) - Math.max(0, (n - 2) / 2) * LABEL_LINE_H * fs;
 }
 
 // Does the rotated text block sit inside a circle of radius r? Corners are
-// rotated about (0, TITLE_DY), exactly as the rendered <text> is.
+// rotated about (0, titleDy(r)), exactly as the rendered <text> is.
 function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
   const halfW = (widthEm * fs) / 2;
-  const y0 = labelFirstY(n, fs);
+  const dyR = titleDy(r);
+  const y0 = labelFirstY(n, fs, r);
   const top = y0 - LABEL_CAP_H * fs;
   const bot = y0 + (n - 1) * LABEL_LINE_H * fs + LABEL_DESC * fs;
   const cos = Math.cos((TITLE_ANGLE * Math.PI) / 180);
@@ -585,9 +601,9 @@ function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
   const lim = r * LABEL_SAFE;
   for (const x of [-halfW, halfW]) {
     for (const y of [top, bot]) {
-      const dy = y - TITLE_DY;
+      const dy = y - dyR;
       const rx = x * cos - dy * sin;
-      const ry = x * sin + dy * cos + TITLE_DY;
+      const ry = x * sin + dy * cos + dyR;
       if (Math.hypot(rx, ry) > lim) return false;
     }
   }
@@ -1626,7 +1642,7 @@ export default function BreedTree({
   // Each dropped name's real drawn box, measured off the DOM at drop time and
   // converted into world units. Measured rather than derived: the label sits
   // inside a group that zoomTo has already scaled, and its text block is offset
-  // from the group origin by TITLE_DY, so both the size and the centre have to
+  // from the group origin by titleDy(r), so both the size and the centre have to
   // come from getBBox rather than from the constants.
   // The pit words get a group of their own, positioned straight off their
   // bodies, exactly the way the chips and the name pills already work.
@@ -4463,8 +4479,8 @@ export default function BreedTree({
                       return (
                         <text
                           x={0}
-                          y={labelFirstY(lines.length, fs)}
-                          transform={`rotate(${TITLE_ANGLE} 0 ${TITLE_DY})`}
+                          y={labelFirstY(lines.length, fs, rFit)}
+                          transform={`rotate(${TITLE_ANGLE} 0 ${titleDy(rFit)})`}
                           style={{
                             fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff",
                             fontFamily: "var(--font-display), system-ui, sans-serif",
