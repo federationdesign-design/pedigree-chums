@@ -469,6 +469,14 @@ const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
 // every size handed to the shared effects, and the flat constants inside them.
 // 1 is main pit size. Lower is smaller.
 const FX_SCALE = 0.7;
+// How far the chain reaches, in hops. The chain is a flood fill: everything
+// touching the bomb goes, then everything touching those, and so on. Unlimited,
+// which is what it was, that means one bomb takes the entire connected mass of
+// chips, and in a crowded pit they are all in contact. So a single bomb cleared
+// the floor. Two hops is the bomb's neighbours and theirs, which still reads as
+// a chain reaction and still scales with how packed the pit is, without turning
+// every bomb into a full clear.
+const BOMB_CHAIN_HOPS = 2;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
@@ -3189,8 +3197,11 @@ export default function BreedTree({
           let frontier = pool.filter((o) => touch(o, bombMb));
           frontier.forEach((o) => claimed.add(o));
           const chain: MB[] = [];
+          let hops = 0;
           while (frontier.length) {
             chain.push(...frontier);
+            hops += 1;
+            if (hops >= BOMB_CHAIN_HOPS) break;
             const prev = frontier;
             frontier = pool.filter((o) => !claimed.has(o) && prev.some((f) => touch(f, o)));
             frontier.forEach((o) => claimed.add(o));
