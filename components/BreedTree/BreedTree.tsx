@@ -2559,6 +2559,26 @@ export default function BreedTree({
           // off it exactly as they would off the dog.
           cmb.collisionFilter = { ...cmb.collisionFilter, group: clingGroup };
           MBody.setStatic(cmb, true);
+          // The child's own percentage chip, spawned here at the drop. It used
+          // to be made by popChildren, which no longer runs for a level dog now
+          // that its children are out from the start, so the 50% chips had
+          // simply stopped existing. Not clinging: it falls free like the chips
+          // the outer dogs bring, and it is NOT in the cling group, so it can be
+          // knocked about by everything including its own dog.
+          const bl = badgeBodiesRef.current;
+          if (bl) {
+            const kidBomb = rollBomb();
+            const kb: Body = {
+              n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
+              r: badgeRFor(pctOf(ch), BADGE_R), rDraw: badgeRFor(pctOf(ch), badgeDrawRRef.current),
+              pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
+              a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: kidBomb,
+            };
+            bl.push(kb);
+            all.push(kb);
+            mkCircle(kb, "badge", BADGE_OPTS);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeRFor(kb.pct, badgeDrawRRef.current), bomb: kidBomb }]);
+          }
           (b.cling as unknown[]).push({ mb: cmb, nb, ax, ay });
         });
         b.popped = true; // its children are already out, so a knock cannot pop it
