@@ -3255,17 +3255,22 @@ export default function BreedTree({
             if (dist > SHOVE_R) continue;
             const fall = 1 - dist / SHOVE_R;
             const k2 = o.plugin?.kind;
-            // The rock takes a tenth of what everything else does.
+            // WEIGHT NOW COUNTS, and this replaces the rock's hand-written
+            // divisor with something general.
             //
-            // Note what the line below is doing: multiplying the force by the
-            // object's own mass CANCELS the mass, because force is mass times
-            // acceleration. So every object was accelerated the same however
-            // heavy it was, and the rock, which is roughly ten times the
-            // density of anything else in here, flew like a chip. The term is
-            // left in place because the rest of the tuning is built on it, and
-            // the rock is divided out by hand instead.
-            const isRock = o.plugin?.prop?.toyKind === "rock";
-            const mult = (k2 === "rod" || k2 === "pill" ? 0.80 : k2 === "circle" ? 0.10 : 0.15) / (isRock ? 10 : 1);
+            // The line below multiplies the force by the object's own mass,
+            // which CANCELS the mass, since force is mass times acceleration.
+            // Every object was therefore accelerated identically however heavy,
+            // which is why the rock flew like a chip and the logs sailed. The
+            // term stays, because the rest of the tuning is built on it, and the
+            // weight is divided back out here.
+            //
+            // The bomb is its own reference: a bomb and a chip are the same
+            // size, so `mass relative to the bomb` is a fair read of how heavy a
+            // thing is without hard-coding a figure per prop. Capped at 12 so
+            // nothing becomes completely immovable.
+            const heavy = Math.max(1, Math.min(12, (o.mass || 1) / (bombMb.mass || 1)));
+            const mult = (k2 === "rod" || k2 === "pill" ? 0.80 : k2 === "circle" ? 0.10 : 0.15) / heavy;
             const mag = SHOVE_F * fall * fall * (o.mass || 1) * mult;
             MBody.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 });
             MBody.setAngularVelocity(o, (Math.random() - 0.5) * 0.31 * (fall + 0.2));
@@ -3273,9 +3278,14 @@ export default function BreedTree({
             // case, which is what threw things off the top of the screen. 40 and
             // -20 are the main pit's, on bodies several times the mass.
             const spd = Math.hypot(o.velocity.x, o.velocity.y);
-            const cap = isRock ? 4 : 16;
+            // The ceilings carry the weight too, on a square root so a heavy
+            // thing is slowed rather than pinned. These are what actually decide
+            // how far anything travels, so leaving them flat would have undone
+            // most of the work above.
+            const slow = Math.sqrt(heavy);
+            const cap = 16 / slow;
             if (spd > cap) { const sc2 = cap / spd; MBody.setVelocity(o, { x: o.velocity.x * sc2, y: o.velocity.y * sc2 }); }
-            const upCap = isRock ? 2.5 : 9;
+            const upCap = 9 / slow;
             if (o.velocity.y < -upCap) MBody.setVelocity(o, { x: o.velocity.x, y: -upCap });
           }
           wake();

@@ -573,7 +573,13 @@ export default function LineageMap({
       const kidR = Math.max(...kids.map((k) => rOf(k)), 1);
       const SIB_GAP = 8;
       const fitD = cnt < 2 ? 0 : (2 * kidR + SIB_GAP) / (2 * Math.max(0.05, Math.sin(step / 2)));
-      const shoulderD = rOf(n) + kidR * 0.2; // tucked: overlaps by 0.8 of a node
+      // Tucked, but poking clear. The root card is painted AFTER these nodes on
+      // a multi-child dog, so anything sitting too far in is simply covered by
+      // the photograph, which is what was hiding them. The extra 18 is the
+      // daylight that keeps a node readable against the card's own ring, which
+      // is itself 11 wide.
+      const NODE_POKE = 18;
+      const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
       const ringD = Math.max(shoulderD, fitD);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
