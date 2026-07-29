@@ -318,7 +318,12 @@ const CHUM_VW = 0.075;
 // size a medium dog drops at and only the other three bands move around it.
 // Giant lands at 1.32 times medium and 1.44 times small, which is the main pit's
 // real spread, not a new one invented for the mini pit.
-const CHUM_BAND: Record<string, number> = { small: 57.5 / 62.5, medium: 1, large: 72.5 / 62.5, giant: 82.5 / 62.5 };
+// Stretched from the main pit's own spread, which runs 1 : 1.09 : 1.26 : 1.43
+// from small to giant, out to a flat 1 : 1.2 : 1.6 : 2 so a giant is exactly
+// twice a small. Medium stays the anchor at 1, so CHUM_VW above is still the
+// size a medium dog drops at. The mini pit therefore reads BIGGER at the top
+// end than the main pit does, which was the call.
+const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 3, giant: 5 / 3 };
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies";
@@ -515,7 +520,7 @@ const BADGE_DRAW_R = 92;
 // and the default did not.
 //
 // 0.36, down from 0.44 by eye. ?bc= overrides it live.
-const BADGE_OF_CIRCLE = 0.36;
+const BADGE_OF_CIRCLE = 0.27; // was 0.36, pulled back 25% by request
 // The chips are trimmed at the top of the slider, like the rings. Tapers in
 // from level 5, so nothing at or below the default changes. 0.25 is a quarter
 // smaller at 10.
@@ -3978,15 +3983,20 @@ export default function BreedTree({
                       const vL = viewRef.current;
                       const kL = SIZE / vL[2];
                       const ls = isMobile ? Math.max(0.4, Math.min(1.25, (d.r * kL) / 250)) : 1;
-                      // Fit to the radius the circle is DRAWN at, not to its
-                      // packed radius. Nested rings are inset by half their
-                      // width, so the picture stops short of d.r and a name
-                      // fitted to d.r could land on the ring. That is why the
-                      // top word of a four-line name crossed the rim. ringInset
-                      // is in screen pixels, so it is divided by the live k to
-                      // come back into the world units the fitter works in.
-                      const insetWorld = ringInset(d, vL) / kL;
-                      const rDrawn = Math.max(1, d.r - insetWorld);
+                      // Fit inside the ring's INNER EDGE, not to the packed
+                      // radius and not merely to the drawn one. A ring eats into
+                      // the picture from the rim inwards, so anything fitted
+                      // further out can land on it. Two terms, because the two
+                      // depths wear their rings differently: a first-ring circle
+                      // is drawn centred, so its ink starts half a stroke inside
+                      // d.r, while a nested one is already inset by half a
+                      // stroke and its ink starts a full stroke in. Adding the
+                      // inset to half the stroke gives the right answer for
+                      // both. Both are screen pixels, so both are divided by the
+                      // live k to come back into the fitter's world units.
+                      const ringPx = strokeWidthFor(d) * strokeK(vL);
+                      const clearWorld = (ringInset(d, vL) + ringPx / 2) / kL;
+                      const rDrawn = Math.max(1, d.r - clearWorld);
                       const rFit = isMobile ? (rDrawn * kL) / ls : rDrawn;
                       // the ceiling the fitter may grow to. Raised with
                       // LABEL_SAFE so short names are not capped before they
