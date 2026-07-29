@@ -433,7 +433,10 @@ const TITLE_BOOST = 2;
 // no ring or picture around it any more, so at the circle's own size it read as
 // small print rather than as an object. Only in the pit: lift it out and it goes
 // back to the circle it always was, at the circle's size.
-const PIT_WORD_SCALE = 1.3;
+const PIT_WORD_SCALE = 1.95; // 1.3, then half as much again by request
+// The pop as the circles go. Starts at nothing, overshoots to 115%, settles.
+// Timed off the drop rather than off each body, so the names arrive together.
+const WORD_POP_MS = 380;
 // How much of the pit's width settled bodies must block, at the top zone, for
 // the round to be over. A fraction rather than a head count, because a mini pit
 // tree often holds only two or three circles. Two bodies is the floor, so one
@@ -1533,6 +1536,7 @@ export default function BreedTree({
   const wordsGRef = useRef<SVGGElement | null>(null);
   const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
+  const wordPopAtRef = useRef<number>(0);
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
   // The pit-full countdown, ported from the main pit: huge sequential digits
@@ -1913,7 +1917,18 @@ export default function BreedTree({
           const el = wg.children[i2] as SVGGElement | undefined;
           if (!el) continue;
           const b = wb[i2];
-          el.setAttribute("transform", `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k}) rotate(${b.a * 57.2958})`);
+          // The pop. `now` is zero on every caller that is not the physics
+          // loop, and a zero there would freeze the words at nothing, so no
+          // clock means full size.
+          let sc = 1;
+          if (now && wordPopAtRef.current) {
+            const t = (now - wordPopAtRef.current) / WORD_POP_MS;
+            if (t < 1) sc = t < 0.6 ? (t / 0.6) * 1.15 : 1.15 - 0.15 * ((t - 0.6) / 0.4);
+          }
+          el.setAttribute(
+            "transform",
+            `translate(${(b.x - v[0]) * k},${(b.y - v[1]) * k}) rotate(${b.a * 57.2958})${sc !== 1 ? ` scale(${sc})` : ""}`
+          );
         }
       }
     }
@@ -2322,6 +2337,7 @@ export default function BreedTree({
       });
       setWordList(wordFits.map((f) => ({ lines: f.lines, fs: f.fs })));
       wordBodiesRef.current = bodies;
+      wordPopAtRef.current = performance.now();
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = badgeDrawRRef.current / k;
       const badges: Body[] = d1.map((n, i) => ({
