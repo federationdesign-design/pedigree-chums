@@ -1226,9 +1226,16 @@ export default function BreedTree({
   // send them home when it leaves. Refs and rAF only, no state, so this cannot
   // cause a render and cannot fight the zoom.
   useEffect(() => {
-    const live =
-      dockAside && !dropped && !!hovered && hovered.parent === focus && !!hovered.children?.length;
     const u = unlockRef.current;
+    // Pointing at one of the circles that popped out still counts as being in
+    // the parent. Without this, moving onto a nested circle to read it made the
+    // effect think the hover had left, sent everything home under the pointer,
+    // and dropped it back on the parent, which started the whole thing again.
+    const insideCurrent =
+      !!u && u.home === null && !!hovered && hovered !== u.parent && u.inside.has(hovered);
+    const live =
+      dockAside && !dropped && !!hovered &&
+      ((hovered.parent === focus && !!hovered.children?.length) || insideCurrent);
     if (!live) {
       // already home or heading there
       if (u && u.home === null) {
@@ -1239,6 +1246,10 @@ export default function BreedTree({
       }
       return;
     }
+    // Reading one of the circles inside: leave the unlock exactly as it is.
+    // Starting a fresh one on the nested circle would be wrong, and stopping
+    // this one would throw everything home.
+    if (insideCurrent) return;
     if (u && u.parent === hovered) {
       // came back before it finished going home: pick it up where it is
       if (u.home !== null) {
@@ -3830,8 +3841,14 @@ export default function BreedTree({
                     // sliding under a still pointer would end the hover on the
                     // parent, send everything home, put the pointer back over
                     // the parent, and start it again. That is an endless loop.
+                    // The latch only holds WHILE they are moving. u.raf goes
+                    // null once the sim reports rest, and nothing can drift
+                    // under a still pointer after that, so a deliberate move
+                    // onto a nested circle has to be let through. Without the
+                    // raf test the title and the rail stayed stuck on the
+                    // parent no matter which circle inside it you pointed at.
                     const u = unlockRef.current;
-                    if (u && d !== u.parent && u.inside.has(d)) return;
+                    if (u && u.raf !== null && d !== u.parent && u.inside.has(d)) return;
                     setHovered(d);
                   }}
                   onMouseLeave={hidden || frozen ? undefined : (e) => {
