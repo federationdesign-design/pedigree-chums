@@ -646,6 +646,15 @@
 .overlayStrong {
   background: radial-gradient(120% 120% at 50% 40%, rgba(15, 110, 165, 0.62), rgba(8, 62, 100, 0.86));
 }
+/* The reference layer, the chum's own family tree, wears the same wash rotated
+   18 degrees round the wheel, which is 5% of it. Both stops carry the same
+   rotation so the gradient keeps its shape and only its hue moves: 202 to 220
+   degrees, and 205 to 223. Enough to tell at a glance which of the two layers
+   you are on, without reading as a different design.
+   The pit lift, where you actually complete a dog, keeps the original. */
+.overlayAlt {
+  background: radial-gradient(120% 120% at 50% 40%, rgba(15, 65, 165, 0.62), rgba(8, 34, 100, 0.86));
+}
 
 /* mini pit: overlay close matches the in-pit menu squares (navy, yellow stroke) */
 /* Matches the main pit's menu square exactly: BIG * 1.2 (84 * 0.67 * 1.2 on

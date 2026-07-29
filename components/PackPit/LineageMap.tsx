@@ -1322,7 +1322,7 @@ export default function LineageMap({
   return (
     <>
     <div
-      className={`${styles.overlay}${circular || strongBg ? " " + styles.overlayStrong : ""}`}
+      className={`${styles.overlay}${circular || strongBg ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayAlt : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
