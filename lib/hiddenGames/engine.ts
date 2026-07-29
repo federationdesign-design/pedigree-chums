@@ -77,6 +77,10 @@ export interface HiddenGamesEngine {
   markCompletionSeen: () => void;
   getState: () => CounterState;
   subscribe: (listener: () => void) => () => void;
+  // A non-final award (CHANGE-LIST C02): the listener receives the remaining
+  // count (total - count). Not fired on a duplicate, an unknown id, or the final
+  // find (which shows the completion card instead).
+  subscribeDiscovery: (listener: (remaining: number) => void) => () => void;
 }
 
 export function createEngine(deps: EngineDeps): HiddenGamesEngine {
@@ -132,6 +136,11 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     for (const listener of listeners) listener();
   }
 
+  const discoveryListeners = new Set<(remaining: number) => void>();
+  function emitDiscovery(remaining: number): void {
+    for (const listener of discoveryListeners) listener(remaining);
+  }
+
   function reportHiddenGame(id: string): EngineOutcome {
     if (!view.acceptsFinds) {
       // Frozen: SUSPENDED, CLOSED or ARCHIVED. Nothing registers, nothing is
@@ -164,7 +173,12 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     emit();
     deps.track?.({ name: HG_EVENTS.award, params: { game_id: id } });
     if (snapshot.completed) {
+      // The final find shows the completion card; no discovery toast (C02).
       deps.track?.({ name: HG_EVENTS.completion });
+    } else {
+      // A non-final award: notify the discovery toast with the remaining count,
+      // derived from the registry so it stays correct as games are added (C02).
+      emitDiscovery(REGISTRY.games.length - record.count);
     }
     return outcome;
   }
@@ -202,6 +216,12 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
+      };
+    },
+    subscribeDiscovery: (listener: (remaining: number) => void) => {
+      discoveryListeners.add(listener);
+      return () => {
+        discoveryListeners.delete(listener);
       };
     },
   };

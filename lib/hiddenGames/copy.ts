@@ -28,3 +28,10 @@ export const CAMPAIGN_INTRO =
 export const COMPLETION_HEADING = "You found every hidden game!";
 export const COMPLETION_BODY =
   "You completed the first Pedigree Chums Hidden Games challenge.";
+
+// CHANGE-LIST C02 discovery toast, owner-approved verbatim. {remaining} is
+// resolved from the registry (total - count), never written into the copy as a
+// literal, so it stays correct as games are added.
+export function discoveryToast(remaining: number): string {
+  return `Nice one! You found a hidden game. ${remaining} more to find.`;
+}
