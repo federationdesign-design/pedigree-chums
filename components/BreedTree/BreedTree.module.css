@@ -805,7 +805,10 @@
 /* The picked chum: near twice the size so it pushes its neighbours apart, and a
    white outline instead of the yellow the others carry. Capped so it never
    spills off a phone. */
+/* The selected card is the only one wearing the info badge, and that badge
+   overhangs, so this card must stop clipping its own children. */
 .relCardOn {
+  overflow: visible;
   width: clamp(56px, 11vw, 88px);
   height: clamp(56px, 11vw, 88px);
   justify-self: center;
@@ -874,26 +877,32 @@
 @media (hover: hover) {
   .relCardDone:hover .relCardName { opacity: 1; }
 }
+/* Copied FIGURE FOR FIGURE from the main pit's own info badge, which lives
+   inline in LineageMap: 28 square, --blue-deep fill, a 2px white ring, a white
+   italic Georgia i, and overhanging the top-right corner by 14. It was yellow
+   with a navy border and tucked inside the card, which was a second style
+   invented for no reason. Overhanging needs .relCardOn to stop clipping, below. */
 .relCardInfo {
   position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 40%;
-  height: 40%;
-  min-width: 20px;
-  min-height: 20px;
+  top: -14px;
+  right: -14px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: var(--yellow, #ffd23e);
-  border: 2px solid var(--navy, #0a3a57);
-  color: var(--navy, #0a3a57);
-  font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: 0.85rem;
+  background: var(--blue-deep, #0c5b92);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(10, 58, 87, 0.45);
+  padding: 0;
+  z-index: 5;
 }
 @keyframes relPop {
   0% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
