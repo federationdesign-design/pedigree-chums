@@ -5,7 +5,6 @@ import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
 import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
-import RouteWatcher from "../components/RouteWatcher/RouteWatcher";
 // D1 (2026-07-26): launcher hidden on production until the safety net ships and is tested on preview.
 // import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
@@ -103,10 +102,9 @@ export default function RootLayout({
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul
             2026 (BRIEF 6.1, NEEDS_OWNER Q01). */}
         <HiddenGamesCounter />
-        {/* G01 "Off Exploring": awards on the first completed route change of
-            the visit (BRIEF 2.1). Client child of the Server layout, renders
-            nothing. */}
-        <RouteWatcher />
+        {/* G01 now awards on the first pointer interaction with the Main Pit
+            (CHANGE-LIST C01), wired inside PackPit. RouteWatcher is unmounted
+            and pending removal; see NEEDS_OWNER Q06. */}
         <CookieBanner />
         <Analytics />
       </body>

@@ -12,6 +12,7 @@ import { startCheckout } from "../Offer/startCheckout";
 import { startFixedTimestep } from "./fixedTimestep";
 import styles from "./PackPit.module.css";
 import BritainMessage from "./BritainMessage";
+import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 
 // Score milestones: crossing one fires a centre-screen celebration with confetti.
 // Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
@@ -1240,6 +1241,20 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       render.canvas.addEventListener("click", onClick);
       render.canvas.addEventListener("touchstart", onTouchStart, { passive: true });
       render.canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+      // G01 "The Main Pit" (CHANGE-LIST C01): the first deliberate pointer press
+      // on the pit awards the hidden game, mirroring G02 (which awards on
+      // starting the mini pit). A pointerdown is a deliberate act; unlike
+      // devicemotion it cannot fire from the phone merely moving, and unlike
+      // gameOver it cannot fire from inactivity. Finding and starting a game is
+      // enough; the visitor need not play on.
+      let g01Reported = false;
+      const onFirstPitPointer = () => {
+        if (g01Reported) return;
+        g01Reported = true;
+        reportHiddenGame("G01");
+        render.canvas.removeEventListener("pointerdown", onFirstPitPointer);
+      };
+      render.canvas.addEventListener("pointerdown", onFirstPitPointer);
 
       function rrect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
         if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
@@ -3040,6 +3055,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
+        render.canvas.removeEventListener("pointerdown", onFirstPitPointer);
         window.removeEventListener("devicemotion", onMotion);
         window.removeEventListener("deviceorientation", onOrient);
         motionRef.current = () => {};

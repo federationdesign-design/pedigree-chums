@@ -34,9 +34,12 @@ export const REGISTRY: Registry = {
   games: [
     {
       id: "G01",
-      name: "Off Exploring",
+      // Renamed from "Off Exploring" per CHANGE-LIST C01. This is a placeholder
+      // wording describing the pit; the owner confirms the final visitor-facing
+      // name before the found-games list ships (it is not rendered yet, D12).
+      name: "The Main Pit",
       threshold:
-        "First completed route change of the visit, any starting page",
+        "First deliberate pointer interaction with the Main Pit on the home route",
     },
     {
       id: "G02",
