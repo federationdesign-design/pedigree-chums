@@ -2569,6 +2569,18 @@ export default function BreedTree({
           // off it exactly as they would off the dog.
           cmb.collisionFilter = { ...cmb.collisionFilter, group: clingGroup };
           MBody.setStatic(cmb, true);
+          // A sensor while it clings: it reports contact but resolves nothing.
+          //
+          // Static alone was not enough. A static body has infinite mass and
+          // this one is TELEPORTED every frame to follow its word, which makes
+          // it a sweeper: as the name tumbles, its circles plough through
+          // whatever is beside them and win every contact, because nothing can
+          // push a static body back. On a deep level that quietly shovelled the
+          // whole pit up and out through the top over about a minute.
+          //
+          // As a sensor it still rides the word and is still drawn, but it
+          // pushes nothing until it is cut loose.
+          cmb.isSensor = true;
           // The child's own percentage chip, spawned here at the drop. It used
           // to be made by popChildren, which no longer runs for a level dog now
           // that its children are out from the start, so the 50% chips had
@@ -3364,7 +3376,7 @@ export default function BreedTree({
             // Lifted: the children stop clinging and are simply pit objects from
             // here on. They keep whatever the word was doing at the moment it
             // left, so they fall away rather than dropping dead still.
-            const cl = b.cling as { mb: { collisionFilter: Record<string, unknown> }; ax: number; ay: number }[] | undefined;
+            const cl = b.cling as { mb: { collisionFilter: Record<string, unknown>; isSensor: boolean }; ax: number; ay: number }[] | undefined;
             if (cl && cl.length) {
               const wv = b.mb.velocity;
               const wav = b.mb.angularVelocity as number;
@@ -3372,6 +3384,7 @@ export default function BreedTree({
                 MBody.setStatic(c.mb, false);
                 // back to colliding with everything, their own dog included
                 c.mb.collisionFilter = { ...c.mb.collisionFilter, group: 0 };
+                c.mb.isSensor = false;
                 MBody.setVelocity(c.mb, { x: wv.x, y: wv.y });
                 MBody.setAngularVelocity(c.mb, wav);
               }
