@@ -544,6 +544,15 @@
 @media (prefers-reduced-motion: reduce) {
   .diffThumb { transition: none; }
 }
+/* Hover: a quarter bigger, so the grab point announces itself before you take
+   hold of it. The thumb itself is pointer-events none, so the hover has to be
+   read off the track it sits in. :not(.diffThumbBig) keeps the drag scale
+   winning, since a descendant selector would otherwise outrank the plain class
+   and shrink the thumb the moment you started dragging it. Behind
+   (hover: hover) so a finger never leaves it stuck big. */
+@media (hover: hover) {
+  .diffTrack:hover .diffThumb:not(.diffThumbBig) { transform: scale(1.25); }
+}
 /* The travelled part of the track, below the thumb. */
 .diffFill {
   position: absolute;

@@ -3895,12 +3895,30 @@ export default function BreedTree({
         left = Math.max(left, Math.round(rail.right + GAP));
       }
     }
+    // Two per row where the screen allows it, so a second card opens BESIDE the
+    // first rather than 40px down and on top of it. That 40px cascade was the
+    // whole reason they buried each other.
+    const perRow = vw >= 2 * 180 + 3 * GAP ? 2 : 1;
+    if (perRow === 2) cardW = Math.min(cardW, Math.floor((vw - 3 * GAP) / 2));
+    const col = index % perRow;
+    const row = Math.floor(index / perRow);
+    left = left + col * (cardW + GAP);
     if (left + cardW > vw - 8) {
       cardW = Math.min(cardW, vw - 16);
       left = Math.max(8, vw - 8 - cardW);
     }
     if (left < 8) left = 8;
-    const top = Math.round(r.bottom + GAP + index * 40);
+    // ROW_H is an estimate, not a measurement: cardSpot runs at open time,
+    // before the card exists, so its real height cannot be read. Measuring it
+    // would mean opening, measuring and moving, which flickers. 210 is the
+    // tallest of the three at its widest.
+    const ROW_H = 210;
+    let top = Math.round(r.bottom + GAP + row * (ROW_H + GAP));
+    // Never start a card below the screen. This is what put them off the bottom:
+    // the top was taken off the info box, which sits low, with nothing checking
+    // the result was still visible.
+    const MIN_VISIBLE = 150;
+    top = Math.min(top, Math.max(8, vh - MIN_VISIBLE));
     return { left, top, width: cardW };
   };
   // While a circle is hovered, hide the circles nested inside it so its own
