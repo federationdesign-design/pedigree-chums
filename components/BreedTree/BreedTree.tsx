@@ -2306,7 +2306,7 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
       if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
-      const { Engine, Bodies, Body: MBody, Composite, Constraint, Events, Mouse, MouseConstraint } = Matter;
+      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -2535,17 +2535,20 @@ export default function BreedTree({
           all.push(nb);
           const cmb = mkCircle(nb, "circle", CIRCLE_OPTS);
           const rpx = ch.r * pxPerWorld;
-          // spread along the width, hanging just clear of the lower edge
+          // Spread along the width and sitting ON the lower edge rather than
+          // hanging clear of it, so a circle reads as stuck to its name rather
+          // than dangling off it.
           const ax = (-0.5 + (ci + 0.5) / kids.length) * wpx;
-          const ay = hpx / 2 + rpx * 0.75;
+          const ay = hpx / 2 + rpx * 0.4;
           MBody.setPosition(cmb, { x: b.mb.position.x + ax, y: b.mb.position.y + ay });
-          const link = Constraint.create({
-            bodyA: b.mb, pointA: { x: ax, y: ay },
-            bodyB: cmb, pointB: { x: 0, y: 0 },
-            length: 0, stiffness: 0.9, damping: 0.2, render: { visible: false },
-          });
-          Composite.add(world, link);
-          (b.cling as unknown[]).push(link);
+          // STATIC while attached, and driven off the word every frame further
+          // down. A Matter constraint was tried first and is a spring however
+          // stiff it is set, so the circles jittered against the word and rang
+          // through everything they touched. A static body cannot be moved by
+          // the solver at all, and still collides properly, so the chums bounce
+          // off it exactly as they would off the dog.
+          MBody.setStatic(cmb, true);
+          (b.cling as unknown[]).push({ mb: cmb, nb, ax, ay });
         });
         b.popped = true; // its children are already out, so a knock cannot pop it
       }
@@ -3296,6 +3299,22 @@ export default function BreedTree({
           acc -= STEP;
           stepped++;
         }
+        // Clinging circles ride their word exactly: position and angle taken
+        // straight off it, rotated into place. Nothing here is negotiated with
+        // the solver, so there is no wobble to pass on.
+        for (const w of bodies) {
+          const cl = w.cling as { mb: { position: { x: number; y: number } }; ax: number; ay: number }[] | undefined;
+          if (!cl || !cl.length || !w.mb) continue;
+          const wa = w.mb.angle as number;
+          const cs = Math.cos(wa), sn = Math.sin(wa);
+          for (const c of cl) {
+            MBody.setPosition(c.mb, {
+              x: w.mb.position.x + c.ax * cs - c.ay * sn,
+              y: w.mb.position.y + c.ax * sn + c.ay * cs,
+            });
+            MBody.setAngle(c.mb, wa);
+          }
+        }
         const dt = Math.max(0.004, Math.min(0.032, (stepped * STEP) / 1000 || 0.0166));
         // held bodies leave the world; released ones drop back in where lifted
         for (const b of all) {
@@ -3304,8 +3323,15 @@ export default function BreedTree({
             // Lifted: the children stop clinging and are simply pit objects from
             // here on. They keep whatever the word was doing at the moment it
             // left, so they fall away rather than dropping dead still.
-            if (b.cling && (b.cling as unknown[]).length) {
-              for (const link of b.cling as unknown[]) Composite.remove(world, link as never);
+            const cl = b.cling as { mb: never; ax: number; ay: number }[] | undefined;
+            if (cl && cl.length) {
+              const wv = b.mb.velocity;
+              const wav = b.mb.angularVelocity as number;
+              for (const c of cl) {
+                MBody.setStatic(c.mb, false);
+                MBody.setVelocity(c.mb, { x: wv.x, y: wv.y });
+                MBody.setAngularVelocity(c.mb, wav);
+              }
               b.cling = [];
             }
             Composite.remove(world, b.mb); b.mbIn = false;
