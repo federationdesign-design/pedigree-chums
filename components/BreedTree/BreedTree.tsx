@@ -4157,13 +4157,28 @@ export default function BreedTree({
               // it. Without this the circles vanish and the words stay floating
               // over nothing.
               const labelBuried = !!buriedSet && d !== hovered && buriedSet.has(d);
-              // The hovered circle's own name is the one to read, so anything it
-              // sits inside stands its name down while the pointer is there.
-              const overlaid = !!hovered && d !== hovered && hovered.ancestors().includes(d);
+              // TRUE OCCLUSION. An ancestor's name used to be stood down
+              // entirely while you pointed at a circle inside it, because the
+              // labels were once all drawn in one group above all the circles,
+              // so hiding was the only way to stop a name floating over the
+              // thing you were reading.
+              //
+              // The interleave changed that. Each node is now one <g> holding
+              // its circle and then its label, and descendants() hands parents
+              // back before children, so the hovered circle is ALREADY painted
+              // above its ancestors' labels. Standing the name down as well is
+              // what stopped the occlusion being real: the part of the name that
+              // reaches outside the hovered circle should still be readable, and
+              // only the part behind it should disappear.
+              //
+              // The doc has this down as D3 W3, needing the hovered circle
+              // redrawn above the labels with its own transform feed. That work
+              // is already done, by the interleave.
+
               // A name belongs to a circle. If the circle is not drawn, and an
               // echo circle is not, the name goes with it. Without this the
               // repeated names stayed floating over the parent they belong to.
-              const visible = (isInside || isLeafFocus) && !labelBuried && !overlaid && !hidden;
+              const visible = (isInside || isLeafFocus) && !labelBuried && !hidden;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               const labelEl = (
                 <g
