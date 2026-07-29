@@ -117,6 +117,12 @@ function countProgenitors(n: LineageNode): number {
 // since a main pit bomb IS a percentage circle and differs only in how it is
 // drawn. Exported so the mini pit uses this exact curve rather than a copy that
 // can drift. Nothing about the behaviour changes.
+// Mini pit only. The nodes were drawn at the main pit's size, which reads too
+// large once they are tucked onto the big circle rather than strung out on
+// lines, and larger than the chip the same dog drops as. One dial, applied
+// through nodeR below so the layout, the drawing, the card offsets and the
+// scatter all agree. 1 is the main pit's size.
+const PIT_NODE_SCALE = 0.78;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -268,6 +274,9 @@ export default function LineageMap({
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => { setPinned(new Map()); }, [breed.name]);
   // which collected card is showing its info label right now (toggled by tapping its i)
+  // Every node radius in this component goes through here, so the mini pit's
+  // smaller nodes cannot get out of step between layout and drawing.
+  const nodeR = (share: number) => radius(share) * (circular ? PIT_NODE_SCALE : 1);
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
   const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
@@ -507,7 +516,7 @@ export default function LineageMap({
       const rOf = (nd: Node): number => {
         const p = nd._parent;
         if (!p) return rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT;
-        return radius(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
+        return nodeR(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
       };
       let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
       // A lone child on the first ring has no fan spread to offset it, so it used
@@ -700,7 +709,7 @@ export default function LineageMap({
       const mix = live ? (root ? Math.round((live._leaves / root._leaves) * 100) : share) : (snap?.mix ?? snap?.share ?? 0);
       const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
       const note = live?.note ?? snap?.note ?? "";
-      const r = radius(share);
+      const r = nodeR(share);
       const d = r + 10 + CW / 2;
       // A solo dog has no node to pop from: the node was a duplicate of itself
       // and is no longer drawn. Popping from its coordinates throws the card out
@@ -796,7 +805,7 @@ export default function LineageMap({
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
     const circles = vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
-      return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
+      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name };
     });
     const rods = vis.slice(0, 70).map((n) => {
       const p = n._parent as Node;
@@ -888,7 +897,7 @@ export default function LineageMap({
       if (firstUnpicked.length > 0) {
         const n = firstUnpicked[0];
         const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
-        const rr = radius(sh), dd = rr + 10 + CW / 2;
+        const rr = nodeR(sh), dd = rr + 10 + CW / 2;
         const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
         setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
@@ -920,7 +929,7 @@ export default function LineageMap({
           window.setTimeout(() => {
             setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
             const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
-            const rr = radius(sh), dd = rr + 10 + CW / 2;
+            const rr = nodeR(sh), dd = rr + 10 + CW / 2;
             const px1 = n._x + Math.cos(n._dir) * dd, py1 = n._y + Math.sin(n._dir) * dd;
             setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: sh, status: nodeStatus(n.name, n.note) }); return x; });
             setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
@@ -940,7 +949,7 @@ export default function LineageMap({
         if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); }
         if (INSTR_NAMES.has(breed.name) && n.img && n._parent) {
           const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-          const rr = radius(sh), dd = rr + 10 + CW / 2;
+          const rr = nodeR(sh), dd = rr + 10 + CW / 2;
           const INSTR_OFFSETS: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
           const iOff = INSTR_OFFSETS[n.value as number] ?? {dx:0,dy:0};
           const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
@@ -1129,7 +1138,7 @@ export default function LineageMap({
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
     const circles = INSTR_NAMES.has(breed.name) ? [] : vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
-      return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
+      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name };
     });
     const rods = vis.slice(0, 70).map((n) => {
       const p = n._parent as Node;
@@ -1138,7 +1147,7 @@ export default function LineageMap({
     const pills = vis
       .filter((n) => (n.children && n.children.length) || !autoExposed.has(n._id))
       .slice(0, 50)
-      .map((n) => ({ x: n._x + pan.x, y: n._y - radius(shareOf(n)) - 13 + pan.y, w: n.name.length * 7.4 + 22, name: n.name }));
+      .map((n) => ({ x: n._x + pan.x, y: n._y - nodeR(shareOf(n)) - 13 + pan.y, w: n.name.length * 7.4 + 22, name: n.name }));
     onScatter?.({ circles, rods, pills });
     tween(520, (t) => setCollectT(t), () => {
       burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
@@ -1435,7 +1444,7 @@ export default function LineageMap({
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const r = radius(share);
+                const r = nodeR(share);
                 return (
                   <g
                     key={n._id}
@@ -1470,7 +1479,7 @@ export default function LineageMap({
                       } else if (n.img && n._parent) {
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                        const rr = radius(sh), dd = rr + 10 + CW / 2;
+                        const rr = nodeR(sh), dd = rr + 10 + CW / 2;
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
