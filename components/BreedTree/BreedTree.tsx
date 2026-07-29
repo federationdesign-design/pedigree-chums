@@ -1531,7 +1531,7 @@ export default function BreedTree({
   // returns zeros on a display:none element. A separate group answers to
   // nothing but the physics.
   const wordsGRef = useRef<SVGGElement | null>(null);
-  const wordBodiesRef = useRef<{ x: number; y: number; a: number }[]>([]);
+  const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
@@ -4364,7 +4364,21 @@ export default function BreedTree({
               same treatment a name wears inside its circle. */}
           <g ref={wordsGRef} textAnchor="middle" style={{ display: dropped ? "inline" : "none" }}>
             {wordList.map((w, i2) => (
-              <g key={i2} style={{ pointerEvents: "none", userSelect: "none" }}>
+              <g
+                key={i2}
+                // The word IS the object now, so it takes the tap. pointerEvents
+                // none was copied from the label styling, where a name must
+                // never intercept a tap meant for its circle. Here there is no
+                // circle behind it, so the tap fell through to the background
+                // and offered to leave the game.
+                style={{ pointerEvents: "auto", userSelect: "none", cursor: "grab" }}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const wn = wordBodiesRef.current[i2]?.n;
+                  if (wn) liftToLearn(e.currentTarget as Element, wn);
+                }}
+              >
                 <text
                   x={0}
                   y={0}
