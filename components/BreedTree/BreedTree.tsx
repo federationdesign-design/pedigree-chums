@@ -2529,6 +2529,16 @@ export default function BreedTree({
         const wpx = (f ? f.wv : b.r * 2 * k) / k * pxPerWorld;
         const hpx = (f ? f.hv : b.r * k) / k * pxPerWorld;
         b.cling = [];
+        // A word and its own circles must never collide with each other. They
+        // are placed overlapping on purpose, and the circles are static, so
+        // without this the solver reads a dynamic body sunk inside an infinite
+        // mass and fires the word out of it at speed, every frame. That was a
+        // rocket motor: press PLAY and the names left through the top of the
+        // screen. Matter's rule is that bodies sharing a NEGATIVE group never
+        // collide, so each dog gets its own, and everything else in the pit
+        // still hits them normally.
+        const clingGroup = -(b.idx + 1);
+        b.mb.collisionFilter = { ...b.mb.collisionFilter, group: clingGroup };
         kids.forEach((ch, ci) => {
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
@@ -2547,6 +2557,7 @@ export default function BreedTree({
           // through everything they touched. A static body cannot be moved by
           // the solver at all, and still collides properly, so the chums bounce
           // off it exactly as they would off the dog.
+          cmb.collisionFilter = { ...cmb.collisionFilter, group: clingGroup };
           MBody.setStatic(cmb, true);
           (b.cling as unknown[]).push({ mb: cmb, nb, ax, ay });
         });
@@ -3323,12 +3334,14 @@ export default function BreedTree({
             // Lifted: the children stop clinging and are simply pit objects from
             // here on. They keep whatever the word was doing at the moment it
             // left, so they fall away rather than dropping dead still.
-            const cl = b.cling as { mb: never; ax: number; ay: number }[] | undefined;
+            const cl = b.cling as { mb: { collisionFilter: Record<string, unknown> }; ax: number; ay: number }[] | undefined;
             if (cl && cl.length) {
               const wv = b.mb.velocity;
               const wav = b.mb.angularVelocity as number;
               for (const c of cl) {
                 MBody.setStatic(c.mb, false);
+                // back to colliding with everything, their own dog included
+                c.mb.collisionFilter = { ...c.mb.collisionFilter, group: 0 };
                 MBody.setVelocity(c.mb, { x: wv.x, y: wv.y });
                 MBody.setAngularVelocity(c.mb, wav);
               }
