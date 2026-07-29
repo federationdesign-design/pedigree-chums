@@ -118,7 +118,7 @@ const DIFF_DEFAULT = 5;
 // The three stops, as a fraction of a PIT-FULL cluster. 10 fills the pit, 5 is
 // half of it, 0 a quarter. Two straight segments, so 5 lands exactly on its own
 // number rather than somewhere between the ends.
-const DIFF_STOP_0 = 0.25;
+const DIFF_STOP_0 = 0.4;
 // 0.575, raised 15% from 0.50 by eye. The chips follow on their own: a badge
 // radius is a fraction of the mean circle radius, so growing the circles grows
 // them too. That only holds up to about 0.61, where BADGE_MAX_R takes over and
@@ -180,45 +180,20 @@ const DIFF_INSET = 16;
 // level 10 was measuring against a pit 2.1 times narrower than the real one and
 // came out 2.1x too small on the two-circle levels, which are 64% of them.
 //
-// Tuning hook: ?d0= ?d5= ?d10= override the three stops for one page load, so a
-// value can be judged live instead of costing a patch and a deploy each time.
-// Read once and cached. TEMPORARY, remove once the numbers are settled.
-// ?tilt= overrides the lean, in degrees. TEMPORARY, out with the rest.
-let tiltCache: number | null = null;
-function tiltDeg() {
-  if (tiltCache !== null) return tiltCache;
-  const q = typeof window === "undefined" ? null : new URLSearchParams(window.location.search);
-  const v = Number(q?.get("tilt"));
-  tiltCache = Number.isFinite(v) && v >= 0 && v <= 45 ? v : DIFF_TILT_DEG;
-  return tiltCache;
-}
-// ?bc= overrides the chip fraction for one page load, same idea as the stops.
-// TEMPORARY, out with them.
-let bcCache: number | null = null;
-function badgeFrac() {
-  if (bcCache !== null) return bcCache;
-  const q = typeof window === "undefined" ? null : new URLSearchParams(window.location.search);
-  const v = Number(q?.get("bc"));
-  bcCache = Number.isFinite(v) && v > 0 && v <= 2 ? v : BADGE_OF_CIRCLE;
-  return bcCache;
-}
-let stopsCache: { a: number; b: number; c: number } | null = null;
-function stops() {
-  if (stopsCache) return stopsCache;
-  const q = typeof window === "undefined" ? null : new URLSearchParams(window.location.search);
-  const num = (k: string, d: number) => {
-    const v = Number(q?.get(k));
-    return Number.isFinite(v) && v > 0 && v <= 2 ? v : d;
-  };
-  stopsCache = { a: num("d0", DIFF_STOP_0), b: num("d5", DIFF_STOP_5), c: num("d10", DIFF_STOP_10) };
-  return stopsCache;
-}
+// The tuning hooks ?d0= ?d5= ?d10= ?tilt= and ?bc= have been removed. They
+// existed so a number could be judged live instead of costing a patch and a
+// deploy each time, and they have now done that job: the tilt was compared at
+// 12.5 against 6.25 and 12.5 kept, and the easy end of the slider was compared
+// at 0.25, 0.40 and 0.55 and settled at 0.40. The three constants below are read
+// directly. ?toys=reset stays, on purpose.
 // level: null outside the mini pit, where the packing is used untouched.
 function diffScale(base: number, fit: number, level: number | null): number {
   if (level === null) return base;
   const l = Math.min(Math.max(level, 0), 10);
-  const { a, b, c } = stops();
-  const f = l <= 5 ? a + (l / 5) * (b - a) : b + ((l - 5) / 5) * (c - b);
+  const f =
+    l <= 5
+      ? DIFF_STOP_0 + (l / 5) * (DIFF_STOP_5 - DIFF_STOP_0)
+      : DIFF_STOP_5 + ((l - 5) / 5) * (DIFF_STOP_10 - DIFF_STOP_5);
   return fit * f;
 }
 // The pit itself, in the packed units relayoutMobile works in. After the
@@ -701,8 +676,8 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   // and then lean the pair off vertical. A rigid rotation of the whole cloud,
   // so every nested circle keeps its place inside its parent. The bounding box
   // below is measured after this, so the fit already allows for it.
-  if (level !== null && n === 2 && tiltDeg()) {
-    const t = (tiltDeg() * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
+  if (level !== null && n === 2 && DIFF_TILT_DEG) {
+    const t = (DIFF_TILT_DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
     pts.forEach((p) => {
       const nx = p.x * cs - p.y * sn;
       p.y = p.x * sn + p.y * cs;
@@ -1432,7 +1407,7 @@ export default function BreedTree({
     if (!d1.length) return BADGE_DRAW_R;
     const mean = d1.reduce((acc, n) => acc + n.r, 0) / d1.length;
     // into the space the chip is drawn in, before the fraction means anything
-    const drawn = (dockAside ? mean / PIT_SPAN : mean) * badgeFrac();
+    const drawn = (dockAside ? mean / PIT_SPAN : mean) * BADGE_OF_CIRCLE;
     const r = Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, drawn));
     if (!dockAside || level <= 5) return r;
     return r * (1 - ((Math.min(level, 10) - 5) / 5) * BADGE_TRIM);
