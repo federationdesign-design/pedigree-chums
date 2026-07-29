@@ -124,9 +124,15 @@ const DIFF_STOP_0 = 0.4;
 // them too. That only holds up to about 0.61, where BADGE_MAX_R takes over and
 // the chips stop tracking.
 const DIFF_STOP_5 = 0.575;
-// 0.92, not 1: a cluster at the literal full width sat too tight against the
-// walls once the ring and the tilt were in. This is the top-end dial.
-const DIFF_STOP_10 = 0.92;
+// 1: the top of the slider is the literal full pit width. `fit`, which this
+// multiplies, is already the scale at which the cluster spans wall to wall WITH
+// its rings allowed for, so 1 is flush rather than overflowing.
+//
+// It was 0.92, held back because a cluster at full width sat tight against the
+// walls once the ring and the tilt were in. That 8% is what showed as a gap
+// down each side at level 10. Tilt can still carry a circle a little past the
+// line, which is the trade for filling the width.
+const DIFF_STOP_10 = 1;
 // The docked view zooms out to 1.21x the frame, so the visible pit is this much
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
