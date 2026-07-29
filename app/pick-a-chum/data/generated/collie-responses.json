@@ -716,7 +716,7 @@
     "triggers": [
       "geography question"
     ],
-    "template": "{{answer}} Geography completed. Come on, our kid, back to something with dogs in it.",
+    "template": "{{answer}} Geography completed. Come on, back to something with dogs in it.",
     "factSource": "General knowledge bank",
     "defaultRoute": "Discover",
     "animationCue": "HEAD_TILT_SMALL",
@@ -794,7 +794,7 @@
     "triggers": [
       "off_topic_count >= 3"
     ],
-    "template": "Come on, our kid. We have covered enough unrelated territory. Let us get back to work.",
+    "template": "Come on. We have covered enough unrelated territory. Let us get back to work.",
     "factSource": "Session state",
     "defaultRoute": "Contextual",
     "animationCue": "SHAKE_RESET",
@@ -1093,7 +1093,7 @@
       "hi",
       "hello"
     ],
-    "template": "Aye, hello. Contact established with remarkably little paperwork.",
+    "template": "Present.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "IDLE_WAIT",
@@ -1106,7 +1106,7 @@
     "triggers": [
       "morning"
     ],
-    "template": "Morning. Time is less important than purpose, but protocol has been satisfied.",
+    "template": "Aye.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "IDLE_WAIT",
@@ -1119,7 +1119,7 @@
     "triggers": [
       "evening"
     ],
-    "template": "Evening. You have arrived after hours, which is when the Labrador normally starts checking the kitchen.",
+    "template": "Yes?",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "IDLE_WAIT",
@@ -1132,7 +1132,7 @@
     "triggers": [
       "anyone there"
     ],
-    "template": "Aye. I was already here. These ears are not decorative.",
+    "template": "You rang.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "EARS_UP",
@@ -1145,7 +1145,7 @@
     "triggers": [
       "how are you"
     ],
-    "template": "Operational, alert and waiting for a task. Your turn.",
+    "template": "Right.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "POSITIVE_RESPONSE",
@@ -1159,7 +1159,7 @@
       "hey",
       "yo"
     ],
-    "template": "A brief greeting. Efficient. Nearly Collie-like.",
+    "template": "Go on.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "IDLE_WAIT",
@@ -1172,7 +1172,7 @@
     "triggers": [
       "howdy"
     ],
-    "template": "Unusual regional allocation, but greeting accepted.",
+    "template": "Reporting.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "HEAD_TILT_SMALL",
@@ -1185,7 +1185,7 @@
     "triggers": [
       "hello dog"
     ],
-    "template": "Correct species, adequate greeting, no task yet.",
+    "template": "I'm here. Go on.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "EARS_UP",
@@ -1198,7 +1198,7 @@
     "triggers": [
       "greeting_count > 1"
     ],
-    "template": "Aye. State your case.",
+    "template": "All ears. What is it?",
     "factSource": "Session state",
     "defaultRoute": "Weighted",
     "animationCue": "HEAD_TILT_SMALL",
@@ -1212,7 +1212,7 @@
       "good day",
       "pleased to meet"
     ],
-    "template": "We have acknowledged each other like civilised mammals. Let us make it productive.",
+    "template": "Aye, hello. Contact established with remarkably little paperwork.",
     "factSource": "None",
     "defaultRoute": "Weighted",
     "animationCue": "POSITIVE_RESPONSE",
@@ -1757,7 +1757,7 @@
       "qwerty",
       "asdfgh"
     ],
-    "template": "Did you lean on your keyboard?",
+    "template": "That one is beyond me. Say it in words.",
     "factSource": "Pattern detector",
     "defaultRoute": "Weighted",
     "animationCue": "HEAD_TILT_DOUBLE",
@@ -2042,7 +2042,7 @@
       "Is that really your face?",
       "Do you really know what I typed?"
     ],
-    "template": "I do not type, our kid. A person wrote every line in advance, and the game matches your message to the right one. I merely provide the judgement and the face.",
+    "template": "I do not type. A person wrote every line in advance, and the game matches your message to the right one. I merely provide the judgement and the face.",
     "factSource": "Identity (scepticism)",
     "defaultRoute": "",
     "animationCue": "HEAD_TILT",
@@ -2100,7 +2100,7 @@
       "Are you a computer program?",
       "Are you software?"
     ],
-    "template": "No AI. Every line was written by a person, checked and placed here deliberately. I am organised fiction, our kid, not a machine improvising in a hurry.",
+    "template": "No AI. Every line was written by a person, checked and placed here deliberately. I am organised fiction, not a machine improvising in a hurry.",
     "factSource": "Identity (scepticism)",
     "defaultRoute": "",
     "animationCue": "HEAD_TILT",
@@ -2335,7 +2335,7 @@
     "bucketId": "B17",
     "subtag": "Games coming soon (interim)",
     "triggers": [],
-    "template": "Not quite yet, our kid. The games are being built properly rather than hurried into public view. When they are ready, you will not need instructions to know what to do.",
+    "template": "Not quite yet. The games are being built properly rather than hurried into public view. When they are ready, you will not need instructions to know what to do.",
     "factSource": "Play (interim tease)",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
@@ -2348,7 +2348,7 @@
     "triggers": [
       "The whole message is emoji the system does not recognise"
     ],
-    "template": "I can see the symbol, but it is not one I have been taught to interpret. Put it into words for me, our kid, and I will have a proper go.",
+    "template": "I can see it, but I cannot read it. Tell me in words and I will try.",
     "factSource": "Emoji fallback",
     "defaultRoute": "",
     "animationCue": "HEAD_TILT",
@@ -2414,7 +2414,7 @@
     "bucketId": "B20",
     "subtag": "Post-break bark",
     "triggers": [],
-    "template": "The barking portion is complete, our kid.",
+    "template": "The barking portion is complete.",
     "factSource": "Bark game",
     "defaultRoute": "",
     "animationCue": "EARS_UP",
