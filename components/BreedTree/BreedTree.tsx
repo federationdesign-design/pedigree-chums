@@ -1500,7 +1500,7 @@ export default function BreedTree({
   // this needs no new import and no second copy of the lookup.
   // Reference only, by decision: no onScore and no onRemove, so opening one
   // cannot collect a dog or change the round.
-  const [chumTree, setChumTree] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number } | null>(null);
+  const [chumTree, setChumTree] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -4710,15 +4710,16 @@ export default function BreedTree({
           has something to reveal. Drawing that as a node with a connector says
           the dog descends from itself. soloLeaf tells the layer to skip the node
           entirely and reveal straight out of the big circle instead. */}
-      {/* The chum's own family tree. Same overlay as the pit lift: fixed to the
-          viewport but translucent, so the learn area stays visible behind it and
-          the tree can be panned inside it. */}
+      {/* The chum's own family tree, drawn the way the MAIN PIT draws one: no
+          circular flag. That single flag is what carries the rectangular card,
+          the name pill under it, the green Collect button, the flight into the
+          corner and the big number, so all of that comes across for free.
+          onScore, onRemove and onScatter are all optional and all left off, so
+          the number flashes and the card flies but nothing is collected, nothing
+          leaves the pit and the round is untouched. Reference only, as agreed. */}
       {dockAside && chumTree && (
         <LineageMap
           breed={chumTree}
-          circular
-          ringColor="#ffd23e"
-          rootRadius={chumTree.r}
           currentScore={0}
           onClose={() => setChumTree(null)}
         />
@@ -4955,15 +4956,18 @@ export default function BreedTree({
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
-                        const card = (e.currentTarget as HTMLElement).parentElement;
-                        const cr = card?.getBoundingClientRect();
+                        // Not grown from the card. The rail lives in the top
+                        // left corner, so a card that size in that spot put the
+                        // whole tree up against two edges. It opens centred and
+                        // three quarters down instead, which is where the main
+                        // pit puts its own card and leaves room for the tree to
+                        // fan up and out of it.
                         setChumTree({
                           name: r.name,
                           image: r.image,
-                          x: cr ? cr.left + cr.width / 2 : window.innerWidth / 2,
-                          y: cr ? cr.top + cr.height / 2 : window.innerHeight / 2,
+                          x: window.innerWidth / 2,
+                          y: window.innerHeight * 0.75,
                           angle: 0,
-                          r: cr ? cr.width / 2 : 32, // grows from the card's own size
                         });
                       }}
                     >
