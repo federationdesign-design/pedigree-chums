@@ -25,6 +25,7 @@ import {
   type CounterView,
   lifecycleView,
 } from "./lifecycle";
+import { type MeasurementEvent, HG_EVENTS } from "./measure";
 
 export interface EngineDeps {
   // Read the raw string for a key, or null. May throw; the engine treats a
@@ -38,6 +39,10 @@ export interface EngineDeps {
   // Operational status from build config (BRIEF 5). Optional: defaults to OPEN,
   // the live experience, so existing callers are unaffected.
   status?: LifecycleStatus;
+  // Aggregate measurement sink (BRIEF 8). Optional: when absent the engine
+  // emits nothing, so existing callers and tests are unaffected. The browser
+  // supplies a consent-gated GA4 emitter; tests supply a spy.
+  track?: (event: MeasurementEvent) => void;
 }
 
 // A report that reached the engine but did not register because the campaign is
@@ -135,22 +140,32 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     }
     const { record: next, outcome } = applyReport(record, id, deps.now());
     if (outcome === "unknown") {
-      // Ignored, logged as a QA warning, never counted (BRIEF 3).
+      // Ignored, logged as a QA warning, never counted (BRIEF 3). The measured
+      // signal carries no raw id (no message content, BRIEF 8).
       deps.warn(`[hidden-games] unknown game id ignored: ${id}`);
+      deps.track?.({ name: HG_EVENTS.unknownId });
       return outcome;
     }
     if (outcome === "duplicate") {
       // A game may call as many times as it likes; the count does not move.
+      deps.track?.({ name: HG_EVENTS.duplicate, params: { game_id: id } });
       return outcome;
     }
     record = next;
     if (!safeSet(serializeRecord(record))) {
       // The find is kept in memory so play is unaffected, but it could not be
-      // saved: tell the visitor once (BRIEF 4.2).
-      storageBlocked = true;
+      // saved: tell the visitor once (BRIEF 4.2) and measure it once.
+      if (!storageBlocked) {
+        storageBlocked = true;
+        deps.track?.({ name: HG_EVENTS.storageBlocked });
+      }
     }
     snapshot = toState(record);
     emit();
+    deps.track?.({ name: HG_EVENTS.award, params: { game_id: id } });
+    if (snapshot.completed) {
+      deps.track?.({ name: HG_EVENTS.completion });
+    }
     return outcome;
   }
 

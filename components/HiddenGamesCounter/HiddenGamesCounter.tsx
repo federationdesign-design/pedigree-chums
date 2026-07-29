@@ -14,9 +14,13 @@
 //   first-ever view   -> the expanded introduction, once (D10)
 //   otherwise         -> the plain counter, plus a storage-blocked notice (4.2)
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSyncExternalStore } from "react";
-import { getHiddenGamesEngine } from "../../lib/hiddenGames/browserEngine";
+import {
+  getHiddenGamesEngine,
+  emitHiddenGamesEvent,
+} from "../../lib/hiddenGames/browserEngine";
+import { HG_EVENTS } from "../../lib/hiddenGames/measure";
 import {
   SUSPENDED,
   STORAGE_BLOCKED,
@@ -41,6 +45,7 @@ export default function HiddenGamesCounter() {
   const [blockedDismissed, setBlockedDismissed] = useState(false);
   const [introCollapsed, setIntroCollapsed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
+  const visibleTracked = useRef(false);
 
   // Safe defaults while state is null (server / hydration) so the hooks below
   // stay unconditional and stable.
@@ -88,6 +93,16 @@ export default function HiddenGamesCounter() {
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completionCardOpen]);
+
+  // Campaign visible (BRIEF 8): fire once when the campaign UI is first shown to
+  // this visitor. The emit is consent-gated, so it only reaches GA4 for
+  // consented visitors.
+  useEffect(() => {
+    if (state?.render && !visibleTracked.current) {
+      visibleTracked.current = true;
+      emitHiddenGamesEvent({ name: HG_EVENTS.visible });
+    }
+  }, [state?.render]);
 
   if (!state) return null;
 

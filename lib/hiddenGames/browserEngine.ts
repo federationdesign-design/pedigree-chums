@@ -12,6 +12,29 @@
 import type { GameId } from "./registry";
 import { createEngine, type HiddenGamesEngine } from "./engine";
 import { STATUS } from "./lifecycle";
+import type { MeasurementEvent } from "./measure";
+
+// Consent key, matching CookieBanner and Analytics (recon 03). GA4 loads only
+// after the visitor accepts, so we gate explicitly on the same value: this is
+// the first gtag('event') pattern in the repo. Measurement therefore covers
+// consented visitors only (BRIEF 8), sends aggregate params only, and never
+// throws so it cannot break the site.
+const CONSENT_KEY = "pc-cookie-consent";
+
+type Gtag = (command: string, name: string, params?: Record<string, unknown>) => void;
+
+export function emitHiddenGamesEvent(event: MeasurementEvent): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (window.localStorage.getItem(CONSENT_KEY) !== "accepted") return;
+    const gtag = (window as unknown as { gtag?: Gtag }).gtag;
+    if (typeof gtag === "function") {
+      gtag("event", event.name, event.params ?? {});
+    }
+  } catch {
+    // Measurement must never break play.
+  }
+}
 
 let singleton: HiddenGamesEngine | null = null;
 
@@ -28,6 +51,7 @@ export function getHiddenGamesEngine(): HiddenGamesEngine {
       if (typeof console !== "undefined") console.warn(message);
     },
     status: STATUS,
+    track: emitHiddenGamesEvent,
   });
   return singleton;
 }
