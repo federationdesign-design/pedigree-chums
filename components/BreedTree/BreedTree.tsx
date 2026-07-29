@@ -477,6 +477,15 @@ const FX_SCALE = 0.7;
 // a chain reaction and still scales with how packed the pit is, without turning
 // every bomb into a full clear.
 const BOMB_CHAIN_HOPS = 2;
+// A circle that comes OUT of another circle grows a third as it enters the pit.
+// The pack sizes a dog's children as a share of it, so each generation is a
+// fraction of the last, and by the third or fourth the circles are too small to
+// read, worst of all at the easy end of the slider where everything starts
+// small already. Applied once, at the moment of popping, and to the d3 node
+// rather than only the physics body: the drawn radius, the ring weight, the
+// ring inset and the label fitter all read d.r, so growing anything less than
+// all of them would put the picture out of step with the collisions.
+const POP_GROW = 1.33;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
@@ -2648,6 +2657,9 @@ export default function BreedTree({
         const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
           if (isEcho(ch)) continue;
+          // Grown once. b.popped guards popChildren against a second run, so
+          // this cannot compound down a deep tree.
+          ch.r = ch.r * POP_GROW;
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
