@@ -54,12 +54,6 @@
   filter: brightness(0.95);
 }
 @media (max-width: 768px) {
-  .autoBtn {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20.25px;
-    padding: 9px;
-  }
 }
 /* The back arrow: a play triangle facing left, so it reads as the way out
    rather than a dismissal. */
@@ -454,6 +448,17 @@
   transform-origin: 50% 100%;
   animation: chumPop 0.46s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+/* AFTER the base rule on purpose. This lived above it, which is the same
+   specificity, so the 100.8 base simply overrode it and the button stayed big on
+   phones however many times the figure was corrected. */
+@media (max-width: 768px) {
+  .autoBtn {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+    padding: 9px;
+  }
+}
 .autoLabel {
   font-family: var(--font-display), system-ui, sans-serif;
   color: #ffffff;
@@ -700,6 +705,11 @@
    mobile, 84 * 1.2 on desktop), radius 0.3 of the size, 5px border, yellow
    with a navy icon. Do not deviate from the main pit here. */
 .closeCircular {
+  /* The pit draws its own squares 18px in from the top and right edges. This
+     inherits top 33 from .close, which at 67.5 tall put its centre 15px below
+     the pit's, which is exactly the offset that was visible. */
+  top: 18px;
+  right: 18px;
   width: 100.8px;
   height: 100.8px;
   border-radius: 30.24px;
