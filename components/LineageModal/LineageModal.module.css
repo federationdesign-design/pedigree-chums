@@ -30,7 +30,9 @@
 .titleWrap {
   position: absolute;
   top: 24px;
-  left: 30px;
+  /* Centred on the pit's left axis, with the slider, the score and PLAY. The
+     row is a flex line, so shifting the wrapper carries the name with it. */
+  left: calc(var(--pit-axis, 51.8px) - clamp(56px, 11vw, 78px) / 2);
   max-width: 82%;
   z-index: 15;
   pointer-events: none;
@@ -139,10 +141,14 @@
 .scoreTotal {
   position: fixed;
   top: 84px;
-  left: 30px;
+  /* Centred on the axis: half of the 84 box either side of it. Was left 30 and
+     left-aligned, which put the digits wherever the number's own width happened
+     to leave them. */
+  left: calc(var(--pit-axis, 51.8px) - 42px);
   min-width: 84px;
+  width: 84px;
   box-sizing: border-box;
-  text-align: left;
+  text-align: center;
   color: #ffffff;
   font-family: var(--font-score), var(--font-pct), system-ui, sans-serif;
   font-weight: 400;

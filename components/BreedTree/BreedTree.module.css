@@ -491,7 +491,8 @@
    circles but clear of START, which rides at 80% of the stage height. */
 .diff {
   position: absolute;
-  left: 24px; /* nudged 10px right */
+  /* the track is 14 wide with a 3px border each side, so 20 across */
+  left: calc(var(--pit-axis, 51.8px) - 10px);
   /* top and height are set inline: the track runs to the cap of the S in START,
      which is computed from the same numbers the word uses */
   z-index: 16;
@@ -915,7 +916,11 @@
    level background in, which is a separate clip in the TSX. */
 .learnPlay {
   position: absolute;
-  left: 4%;
+  /* 15.5, and it is exact at every scale rather than a fitted number: the axis
+     is 18 + S/2 and the artboard is S + 5 across, so axis - (S+5)/2 is always
+     18 - 2.5 whatever S is. 4% used to drift away from the start screen's
+     button as the window widened. */
+  left: 15.5px;
   bottom: 3%;
   z-index: 16;
   border: 0;
