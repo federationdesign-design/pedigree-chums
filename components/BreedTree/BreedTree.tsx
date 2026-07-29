@@ -1537,12 +1537,6 @@ export default function BreedTree({
   const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null; held?: boolean }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
   const wordPopAtRef = useRef<number>(0);
-  // Whether the last press came from a finger. Touch has no hover, so the whole
-  // unlock was invisible on a phone. It now runs off a first tap instead, and
-  // this flag keeps the two paths apart: browsers fire a synthetic mouseenter on
-  // tap, which would set hovered before the click landed and make the first tap
-  // behave like the second, skipping the pop entirely.
-  const touchRef = useRef(false);
   // The pit-full wash. Zero when the countdown starts, a tenth more with every
   // second it counts down, solid on nought.
   const [fullAlpha, setFullAlpha] = useState(0);
@@ -2109,22 +2103,6 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
-    // TOUCH: the first tap on a first-ring circle does what a hover does on a
-    // mouse, which is come loose and show you what is inside. The second tap
-    // goes in. Same grammar as desktop, where hover previews and click enters,
-    // and it fails safely: two quick taps zoom, exactly as before.
-    if (
-      touchRef.current &&
-      dockAside &&
-      !dropped &&
-      !frozen &&
-      d.parent === focusRef.current &&
-      !!d.children?.length &&
-      hovered !== d
-    ) {
-      setHovered(d);
-      return;
-    }
     // once dropped, a circle that owns a body lifts out to the learn layer
     if (fellRef.current) {
       const pb = pitBodiesRef.current;
@@ -2194,7 +2172,7 @@ export default function BreedTree({
     // the box's close X) would fall through to onClose and drop the player
     // out of the whole game. In LEARN the close X is the deliberate way out,
     // so a background tap does nothing.
-    if (learning) { setHovered(null); return; }
+    if (learning) return;
     // Start screen: the X is the only way out. A tap on the blue background
     // used to close the pit outright, which is a harsh exit for a mis-tap and
     // inconsistent with the round and LEARN, both of which already ignore it.
@@ -3926,13 +3904,7 @@ export default function BreedTree({
           viewBox={viewBox}
           // Records the press only. No stopPropagation: the stage listener above
           // still has to see it to feed Matter's mouse.
-          onPointerDown={(ev) => {
-            // Every press in the pit passes through here, circles included,
-            // because nothing below stops propagation. It is the one place that
-            // reliably sees the pointer type before any tap is acted on.
-            touchRef.current = ev.pointerType === "touch";
-            bgPressRef.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp };
-          }}
+          onPointerDown={(ev) => { bgPressRef.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp }; }}
           onClick={disableZoom ? undefined : onBackground}
           // Zoomed in, a click on the background goes back to the top, so say
           // so. At the top it does nothing in LEARN, so it keeps the plain arrow
@@ -4045,8 +4017,6 @@ export default function BreedTree({
                     opacity: buried ? 0 : undefined,
                   }}
                   onMouseEnter={hidden || frozen ? undefined : () => {
-                    if (touchRef.current) return; // touch drives this from the tap
-
                     // Latched: while a big circle is unlocked, the circles
                     // tumbling inside it must not steal the hover. One of them
                     // sliding under a still pointer would end the hover on the
