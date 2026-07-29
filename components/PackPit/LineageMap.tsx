@@ -1398,7 +1398,15 @@ export default function LineageMap({
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      {showPack && !circular && !INSTR_NAMES.has(breed.name) && (
+      {/* Hidden in the mini pit, both uses of it. The clipboard and its
+          "Collect Ancestor Pack" label sat over the frames and read as a second
+          instruction beside the green Collect, which is the one that actually
+          finishes a dog here. The X/XX count above is a separate element and is
+          untouched.
+          NOTE: this button is also the ONLY way to reach the packed two-column
+          view, so that view is now unreachable in the mini pit. `circular`
+          already excluded the pit lift; `strongBg` adds the chum family tree. */}
+      {showPack && !circular && !strongBg && !INSTR_NAMES.has(breed.name) && (
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
