@@ -20,6 +20,15 @@
   overflow: visible;
   pointer-events: none;
 }
+/* PACKED, mini pit only. The placed cards are HTML at z-index 62 and 63, and
+   this svg carries no z-index at all, so it paints underneath them: the big dog
+   card and the green Complete button ended up behind the grid they belong to.
+   Lifting the svg over the cards is only safe once they are packed, because
+   while they are still being dragged into frames they have to stay on top of
+   the frames they are being dropped into. */
+.svgTop {
+  z-index: 10;
+}
 .close {
   position: fixed;
   top: 33px;

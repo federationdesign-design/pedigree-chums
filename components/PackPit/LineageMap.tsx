@@ -1420,7 +1420,7 @@ export default function LineageMap({
       {packed && packLabels.extinct && (
         <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+      <svg className={`${styles.svg}${packed && (circular || strongBg) ? " " + styles.svgTop : ""}`} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
@@ -1963,7 +1963,10 @@ export default function LineageMap({
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
                 pointerEvents: "none",
-                zIndex: 63 + i,
+                // Packed: below the svg, so the dog card and the Complete
+                // button read as the front of the screen rather than being
+                // buried under the collection.
+                zIndex: packed && (circular || strongBg) ? 5 : 63 + i,
                 boxShadow: "0 3px 3px rgba(0,0,0,0.32)",
                 userSelect: "none",
               }}
@@ -1991,7 +1994,7 @@ export default function LineageMap({
               transformOrigin: "center",
               pointerEvents: "all",
               cursor: !PACK_BREEDS.has(c.name) ? "zoom-in" : "default",
-              zIndex: 62,
+              zIndex: packed && (circular || strongBg) ? 4 : 62,
               // circular: the yellow ring rides as a box-shadow spread rather than
               // an outline, because box-shadow always follows border-radius
               // white in the learn layer: yellow is the pit's colour and it read as
