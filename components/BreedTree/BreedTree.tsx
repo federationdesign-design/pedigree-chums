@@ -4793,14 +4793,37 @@ export default function BreedTree({
                 {/* invisible hit area, so the tap target is not just the glyphs */}
                 <rect
                   x={w.anchor === "end" ? w.x - hitW : w.x}
-                  y={w.y - hitH / 2}
-                  width={hitW}
-                  height={hitH}
+                  y={w.y - (w.key === "start" ? 84 * pitScale * 1.2 * upp : hitH) / 2}
+                  width={w.key === "start" ? 84 * pitScale * 1.2 * upp : hitW}
+                  height={w.key === "start" ? 84 * pitScale * 1.2 * upp : hitH}
                   fill="transparent"
                 />
+                {w.key === "start" ? (() => {
+                  // The same square as the close X, the info square and the
+                  // learn PLAY: uSz = 84 * pitScale * 1.2, rx 0.3 of it, a 5px
+                  // navy rim. Those figures are in CSS pixels there and this is
+                  // drawn in svg units, so each is multiplied by upp. Anchored
+                  // by its left edge at w.x, which is where the word started.
+                  const S = 84 * pitScale * 1.2 * upp;
+                  const rim = 5 * upp;
+                  const gh = S * 0.34, gw = S * 0.30;
+                  const cx = w.x + S / 2, cy = w.y;
+                  const hv = wordHover === w.key ? 1.06 : 1;
+                  return (
+                    <g transform={`translate(${cx},${cy}) scale(${hv}) translate(${-cx},${-cy})`}>
+                      <rect x={w.x} y={cy - S / 2} width={S} height={S} rx={S * 0.3}
+                        fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={rim} />
+                      <path
+                        d={`M${cx - gw * 0.3},${cy - gh / 2} L${cx + gw * 0.7},${cy} L${cx - gw * 0.3},${cy + gh / 2} Z`}
+                        fill="var(--navy, #0a3a57)" stroke="var(--navy, #0a3a57)"
+                        strokeWidth={S * 0.07} strokeLinejoin="round"
+                      />
+                    </g>
+                  );
+                })() : (
                 <text x={w.x} y={w.y} textAnchor={w.anchor} dominantBaseline="central"
                   style={{
-                    fill: w.key === "learn" ? "var(--yellow, #ffd23e)" : "#003cff",
+                    fill: "var(--yellow, #ffd23e)",
                     fontFamily: "var(--font-display), system-ui, sans-serif",
                     fontSize: `${fs * upp * (wordHover === w.key ? 1.08 : 1)}px`,
                     letterSpacing: `${2 * upp}px`,
@@ -4814,6 +4837,7 @@ export default function BreedTree({
                   }}>
                   {w.label}
                 </text>
+                )}
               </g>
             ));
           })()}
@@ -4839,14 +4863,20 @@ export default function BreedTree({
             // START's glyph top is worked out with the same numbers the word
             // itself uses, so the two stay together if either is retuned.
             const st = stageRef.current;
-            const stW = st ? st.clientWidth : 390;
-            const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const topFrac = 0.045; // plus a 100px nudge below, applied in css units
             // 1.24 is the glyph half-height as a multiple of fs/vbHc, measured
             // off the rendered word rather than assumed: Luckiest Guy at this
             // scale sits taller in its box than a nominal 0.62 would suggest.
-            const startTopFrac = 0.5 + WORD_START_Y - (fs / vbHc) * 1.24;
+            // PLAY is a square now, not a word, so the track stops at the top
+            // of the button rather than at the cap of a letter. Half the
+            // square's height, in the same view units, using the same figures
+            // the button itself uses. The old glyph maths and its 1.24 fudge
+            // factor go with the word.
+            const stH = st ? st.clientHeight : 844;
+            const uppS = (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(stH, 1);
+            const btnHalf = (84 * pitScale * 1.2 * uppS) / 2;
+            const startTopFrac = 0.5 + WORD_START_Y - btnHalf / vbHc;
             // nudged 20px down, and the track shortens by the same so its foot
             // stays on the cap of the P
             return {
