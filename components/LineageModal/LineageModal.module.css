@@ -540,6 +540,10 @@
 .exitBtns {
   display: flex;
   gap: 16px;
+  /* Four options now, not two, so they wrap rather than run off a phone. */
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: min(92vw, 460px);
 }
 
 /* Lives. A heart badge and a run of segments, drawn in the pit's own language

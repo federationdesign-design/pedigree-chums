@@ -147,6 +147,19 @@ export default function LineageModal({ name, image, character, lineage, onClose,
     setRunKey((k) => k + 1); // remounts the pit fresh, in learn
   };
   const backToLearn = () => goLearn(true);
+  // Back to this level's start screen: the pit remounts unstarted, in play
+  // rather than learn. Deliberately NOT replay(), which also zeroes the score:
+  // that one belongs to a spent run. Charged a life for the same reason going
+  // to learn is, since it abandons a live round, and a free escape from a
+  // losing one would make the lives meaningless.
+  const backToStart = () => {
+    onSpendLife?.();
+    setPhase("play");
+    setResumeInLearn(false);
+    setSlowmo(false);
+    setCaptionOpen(false);
+    setRunKey((k) => k + 1);
+  };
   const replay = () => {
     setPhase("play");
     setResumeInLearn(false);
@@ -364,19 +377,37 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onClick={() => setExitAsk(false)}
         >
           <div className={css.exitPanel} onClick={(e) => e.stopPropagation()}>
-            <div className={css.exitTitle}>LEAVE GAME</div>
+            <div className={css.exitTitle}>PAUSED</div>
+            {/* Ordered least destructive first, so the safe choice is the one
+                under the thumb and the way out of the game is last. */}
             <div className={css.exitBtns}>
-              <button type="button" className={css.endBtn} onClick={onClose} aria-label="Yes, leave the game">
-                Yes
-              </button>
               <button
                 type="button"
                 className={`${css.endBtn} ${css.endBtnAlt}`}
                 onClick={() => setExitAsk(false)}
-                aria-label="No, keep playing"
+                aria-label="Keep playing"
                 autoFocus
               >
-                No
+                Keep playing
+              </button>
+              <button
+                type="button"
+                className={css.endBtn}
+                onClick={() => { setExitAsk(false); backToLearn(); }}
+                aria-label="Go to the learn area"
+              >
+                Learn area
+              </button>
+              <button
+                type="button"
+                className={css.endBtn}
+                onClick={() => { setExitAsk(false); backToStart(); }}
+                aria-label="Back to the start screen"
+              >
+                Start screen
+              </button>
+              <button type="button" className={css.endBtn} onClick={onClose} aria-label="Leave the game">
+                Leave game
               </button>
             </div>
           </div>
