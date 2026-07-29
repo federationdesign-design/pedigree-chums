@@ -1534,7 +1534,7 @@ export default function BreedTree({
   // returns zeros on a display:none element. A separate group answers to
   // nothing but the physics.
   const wordsGRef = useRef<SVGGElement | null>(null);
-  const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null }[]>([]);
+  const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null; held?: boolean }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
   const wordPopAtRef = useRef<number>(0);
   const runFallRef = useRef<(() => void) | null>(null);
@@ -1917,6 +1917,17 @@ export default function BreedTree({
           const el = wg.children[i2] as SVGGElement | undefined;
           if (!el) continue;
           const b = wb[i2];
+          // A word follows its dog out of the pit. Lifting sets held, and
+          // collecting adds the node to removedNodes and leaves held set, so the
+          // two together cover both: hidden while it is up on the layer above,
+          // and gone for good once it has been learnt. Without this a collected
+          // name stayed lying in the pit with no body under it. Read off the
+          // body rather than off React state, because the physics loop holds an
+          // older closure and would see a stale learnNode.
+          const wn = b.n;
+          const wGone = b.held || (!!wn && removedNodesRef.current.has(wn));
+          el.setAttribute("display", wGone ? "none" : "inline");
+          if (wGone) continue;
           // The pop. `now` is zero on every caller that is not the physics
           // loop, and a zero there would freeze the words at nothing, so no
           // clock means full size.
