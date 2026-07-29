@@ -1445,6 +1445,28 @@ for (const inp of ['tell me about him', 'my dad likes labradors', 'is he a good 
       : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}` : null });
 })();
 
+// ---- Task 45: commercial requires a product word; dog/breed price questions avoid DST001 ----
+// A price/buying question carrying a dog word or breed name must not open the offer modal
+// NOR receive the game's price via the FAQ layer: it refuses to guess, and the served text
+// must contain neither £9.99 nor £6.99 (Task 46).
+for (const inp of ['how much is a labrador', 'how much is a puppy', 'where can I buy a dog', 'how much does a dog cost']) {
+  check(inp, { action: 'gk_unknown' }, { notAction: 'open_discount_popup', assert: (_r, resp) => (/£9\.99|£6\.99/.test(resp.text) ? `served the game price for a dog/breed question: ${resp.text}` : null) });
+}
+// An explicit product word, or a bare phrase with no breed topic, still opens DST001.
+check('where can I buy the game', { action: 'open_discount_popup' });
+check('how much is it', { action: 'open_discount_popup' }); // fresh session, no topic -> the game
+// The topic slot (Task 27) decides a bare "how much is it": a breed topic means the dog.
+(() => {
+  const s = newSession();
+  check('tell me about labradors', { action: 'breed_page' }, { session: s });
+  check('how much is it', {}, { session: s, notAction: 'open_discount_popup' });
+})();
+(() => {
+  const s = newSession();
+  check('how much is the game', { action: 'open_discount_popup' }, { session: s });
+  check('how much is it', { action: 'open_discount_popup' }, { session: s });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

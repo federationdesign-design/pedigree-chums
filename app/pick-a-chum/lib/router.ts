@@ -96,6 +96,12 @@ const COMMERCIAL_EXCLUDE = [
   'get it for me', 'purchase it for me',
 ];
 
+// Task 45: the offer modal is about the product, never a dog. A buy/price phrase opens it
+// only with an explicit product word (Steve's list), so a dog/breed price question ("how
+// much is a labrador") can never infer the product. See the commercial check for the topic
+// rule that lets a bare "how much is it" resolve to the game when no breed is in play.
+const PRODUCT_WORDS = ['game', 'games', 'pack', 'packs', 'cards', 'card', 'deck', 'set', 'pick a chum'];
+
 const RULES = [
   'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
   'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
@@ -511,6 +517,17 @@ function hasBreedWord(words: Set<string>, token: string): boolean {
   return words.has(token) || words.has(token + 's') || (token.endsWith('s') && words.has(token.slice(0, -1)));
 }
 
+// Task 45: does the message name a dog or a breed? A generic dog word, or any breed page's
+// title token or alias. Reuses the existing breed data, no new breed list. Used to stop a
+// dog/breed price question from opening the offer modal.
+const DOG_WORDS = ['dog', 'dogs', 'puppy', 'puppies', 'pup', 'pups'];
+function namesDogOrBreed(c: string, words: Set<string>): boolean {
+  if (DOG_WORDS.some((w) => words.has(w))) return true;
+  return BREED_PAGES.some(
+    (p) => p.tokens.some((t) => hasBreedWord(words, t)) || p.aliases.some((a) => (a.includes(' ') ? c.includes(a) : words.has(a))),
+  );
+}
+
 function breedPageRes(p: BreedPage): Resolution {
   return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_page', breedSlug: p.slug, breedTitle: p.title, url: p.url, destinationId: p.slug };
 }
@@ -748,6 +765,19 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // UNLESS the phrasing is a manipulation/proxy request ("buy it for me", "without
   // signing"), which must not reach the buy path.
   if (hasAny(N, COMMERCIAL) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+    // Task 45/46: the offer modal AND the FAQ price answer are about the product, never a dog.
+    // An explicit product word always opens the offer modal. A price/buy question that instead
+    // names a dog or a breed, or whose bare "it" points at a breed topic (Task 27), must get no
+    // game price via DST001 OR the FAQ layer: it refuses to guess (gk_unknown), because there is
+    // no dog price to give and £9.99 would be wrong. A bare phrase with a commercial/game topic
+    // or no topic still means the game and opens DST001.
+    const words = new Set(c.match(/[a-z]+/g) ?? []);
+    if (hasAny(N, PRODUCT_WORDS)) {
+      return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+    }
+    if (namesDogOrBreed(c, words) || state.topic?.kind === 'breed') {
+      return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'gk_unknown', note: 'Dog/breed price question: no dog price exists; refuse rather than quote the game price.' };
+    }
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
   }
 
