@@ -237,7 +237,19 @@ export default function LineageMap({
   // Mobile only: the pack grid lays each section out as one long horizontal strip
   // and the player swipes it left/right. gridX is that scroll offset (0 .. minGridXRef).
   const isMobile = vp.w <= 768;
-  const CW = isMobile ? Math.round(CARD * 0.85) : CARD; // frames + picture cards run 15% smaller on phones
+  // 15% smaller on phones, and a further 5% in the mini pit, where five frames
+  // have to sit across a screen that used to hold four. Done here rather than in
+  // a second variable because CW drives the frames, the picture cards, the drop
+  // targets and the corner adornments alike: shrinking only the grid would leave
+  // the cards the wrong size for the holes they drop into.
+  const CW = isMobile
+    ? circular || strongBg
+      // 5% down, then capped so five ALWAYS fit: 14px of margin each side and a
+      // 6px gutter between. A 320 screen cannot hold five 60px frames at all, so
+      // without this cap the last column simply falls off the right.
+      ? Math.min(Math.round(CARD * 0.85 * 0.95), Math.floor((vp.w - 28 - 24) / 5))
+      : Math.round(CARD * 0.85)
+    : CARD;
   const [gridX, setGridX] = useState(0);
   useEffect(() => setGridX(0), [breed.name]);
   const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
@@ -656,14 +668,30 @@ export default function LineageMap({
   // The empty frames the player drags each collected card into: a row of living up
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
   // sx - pan.x so they stay put while the tree pans behind them.
-  const F_LEFT = isMobile ? 52 : 96;
+  // MINI PIT, PHONE: five frames across instead of four.
+  //
+  // Three dogs carry more than 28 ancestors, and at four across on a 92 pitch
+  // those ran off the bottom of a phone. The frame comes down 5%, the gutter
+  // closes up, and the pitch is FITTED to the viewport rather than fixed,
+  // because a fixed pitch that suits a 390 screen overflows a 320 one and small
+  // screens are the entire point of this.
+  const fiveUp = (circular || strongBg) && isMobile;
+  const MCOLS = fiveUp ? 5 : 4; // phones: one continuous grid, this many wide before it wraps
+  const F_EDGE = 14;
+  const F_LEFT = fiveUp ? F_EDGE + CW / 2 : isMobile ? 52 : 96;
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
-  const F_COL = circular ? CW + 3 : isMobile ? 92 : 112, F_ROW = circular ? CW + 3 : isMobile ? 92 : 112; // mini pit: 3px gutter; else tighter pitch on phones to match the 15% smaller cards
+  // the widest pitch that still lands the last column inside the right margin,
+  // never tighter than a 6px gutter and never looser than 76
+  const fitCol = MCOLS > 1 ? (vp.w - 2 * F_EDGE - CW) / (MCOLS - 1) : CW;
+  const F_COL = fiveUp
+    ? Math.max(CW + 6, Math.min(76, fitCol))
+    : circular ? CW + 3 : isMobile ? 92 : 112;
+  const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
-  const MCOLS = 4; // phones: one continuous grid, four frames wide before it wraps
-  const chumTop = circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // mini pit: rows ride high under the title; else clear of the top-left chrome (and desktop section headers)
+  // Tucked under the X/XX counter, which sits at top 26 and is about 32 tall.
+  const chumTop = fiveUp ? 96 : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240;
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
