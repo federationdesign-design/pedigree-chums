@@ -485,7 +485,12 @@ const BOMB_CHAIN_HOPS = 2;
 // rather than only the physics body: the drawn radius, the ring weight, the
 // ring inset and the label fitter all read d.r, so growing anything less than
 // all of them would put the picture out of step with the collisions.
-const POP_GROW = 1.33;
+const POP_GROW = 1.5;
+// And a floor, in screen pixels across. Growth alone can never win: each
+// generation is a share of the last, so the shrinking compounds and any
+// multiplier is beaten one level further down. A floor ends it. 50 across is
+// about the smallest circle worth aiming a finger at.
+const POP_MIN_PX = 50;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
 // A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
@@ -2657,9 +2662,13 @@ export default function BreedTree({
         const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
           if (isEcho(ch)) continue;
-          // Grown once. b.popped guards popChildren against a second run, so
-          // this cannot compound down a deep tree.
-          ch.r = ch.r * POP_GROW;
+          // Grown once, then floored. b.popped guards popChildren against a
+          // second run, so this cannot compound down a deep tree. The floor is
+          // given in screen pixels and converted here, because the packed radii
+          // are world units and the difficulty slider changes what a world unit
+          // is worth: a fixed world figure would be the wrong size at one end of
+          // the slider or the other.
+          ch.r = Math.max(ch.r * POP_GROW, POP_MIN_PX / 2 / pxPerWorld);
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
