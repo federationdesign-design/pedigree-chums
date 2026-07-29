@@ -1373,6 +1373,34 @@ export default function BreedTree({
   const railRef = useRef<HTMLDivElement>(null);
   const asideOff = useRef({ x: 0, y: 0 });
   const asideDrag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  // The rail lives inside the box's element, so a press on it used to bubble to
+  // the box's own drag and carry both away together. It now has its own, which
+  // pins it to the screen and leaves the box exactly where it is.
+  const railDrag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const railMovedRef = useRef(false);
+  const railDown = (e: React.PointerEvent) => {
+    const t = e.target as HTMLElement;
+    if (t.closest("button, a, input, select, textarea")) return; // a card is still a card
+    const el = railRef.current;
+    if (!el) return;
+    e.stopPropagation(); // the box must not hear this
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    railDrag.current = { sx: e.clientX, sy: e.clientY, ox: r.left, oy: r.top };
+    railMovedRef.current = true;
+    try { el.setPointerCapture(e.pointerId); } catch { /* no capture available */ }
+  };
+  const railMove = (e: React.PointerEvent) => {
+    const d = railDrag.current;
+    if (!d) return;
+    e.stopPropagation();
+    setRailPin({ left: Math.round(d.ox + (e.clientX - d.sx)), top: Math.round(d.oy + (e.clientY - d.sy)) });
+  };
+  const railUp = (e: React.PointerEvent) => {
+    if (!railDrag.current) return;
+    e.stopPropagation();
+    railDrag.current = null;
+  };
   const asideDown = (e: React.PointerEvent) => {
     if (!dockAside) return;
     const t = e.target as HTMLElement;
@@ -1480,7 +1508,9 @@ export default function BreedTree({
     if (!hideCaption) {
       boxEverShownRef.current = true;
       setRailHidden(false);
-      setRailPin(null);
+      // Only reclaim the rail if the user has never moved it. Once they have,
+      // it is theirs and the box has no business dragging it back.
+      if (!railMovedRef.current) setRailPin(null);
       // Back on show: the box is home again, so pick the side afresh. Without
       // this a rail sent left during a drag stays left and reopens off-page.
       const b = asideRef.current?.getBoundingClientRect();
@@ -5355,6 +5385,10 @@ export default function BreedTree({
           {dockAside && learning && !railHidden && renderRail.length > 0 && (
             <div
               ref={railRef}
+              onPointerDown={railDown}
+              onPointerMove={railMove}
+              onPointerUp={railUp}
+              onPointerCancel={railUp}
               className={`${styles.relRail} ${
                 hideCaption && !railPin
                   ? styles.relRailHome

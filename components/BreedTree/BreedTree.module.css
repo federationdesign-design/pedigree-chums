@@ -832,9 +832,14 @@
 }
 .relCardName {
   position: absolute;
-  left: 50%;
-  top: calc(100% + 4px);
-  transform: translateX(-50%);
+  /* Beside, not below. Below put it under the next row of the grid, where it
+     was covered and unreadable. Which side depends on where the rail is: it
+     always points AWAY from the edge the rail is against, so the label runs
+     into open screen rather than off it. The rules that pick the side are with
+     the rail's own position classes further down. */
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
   white-space: nowrap;
   background: var(--navy, #0a3a57);
   color: #ffffff;
@@ -851,6 +856,12 @@
 /* Tap keeps it up. Hover shows it on a mouse only, so a finger never leaves one
    stuck open. */
 .relCardNameOn { opacity: 1; }
+/* The rail hangs to the RIGHT of the box, so it is the nearer thing to the
+   screen edge and the label goes left, back toward the middle. */
+.relRailRight .relCardName {
+  left: auto;
+  right: calc(100% + 6px);
+}
 @media (hover: hover) {
   .relCardDone:hover .relCardName { opacity: 1; }
 }
