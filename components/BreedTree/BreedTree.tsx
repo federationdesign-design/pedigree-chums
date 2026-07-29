@@ -3346,10 +3346,23 @@ export default function BreedTree({
           // between the pit walls. Tree size stops mattering.
           const spans: [number, number][] = [];
           let inZone = 0;
-          for (const b of all) {
-            if (b.held) continue;
-            if (Math.hypot(b.vx, b.vy) > worldH * 0.03) continue;
-            if (b.y - b.r < zoneY) { inZone++; spans.push([b.x - b.r, b.x + b.r]); }
+          const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
+            if (held) return;
+            if (Math.hypot(vx, vy) > worldH * 0.03) return;
+            if (y - r < zoneY) { inZone++; spans.push([x - r, x + r]); }
+          };
+          for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
+          // The CHUM CARDS count too. They never did, because `all` is only the
+          // level's own dogs and their chips, and the chums live in their own
+          // list. On a two-circle level that left the test looking at four
+          // objects while the screen filled with seventeen chum cards, so a pit
+          // that was visibly stuffed never reached the threshold and the
+          // countdown never started. Their body is a square of side `dia`, so
+          // half of that is the radius the span wants. Their world radius is
+          // recovered from the drawn size the same way everything else here is.
+          for (const c of chumBodiesRef.current) {
+            const cr = ((c.mb?.bounds?.max?.x ?? 0) - (c.mb?.bounds?.min?.x ?? 0)) / 2 / pxPerWorld;
+            if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held);
           }
           let covered = 0;
           if (spans.length) {
