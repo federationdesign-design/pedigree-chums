@@ -1887,7 +1887,11 @@ export default function BreedTree({
   // outside it to be spoiled, and leaving it alone keeps the level's shape
   // exactly as signed off.
   function ringInset(d: Node, v: View): number {
-    return d.depth >= 2 ? (strokeWidthFor(d) * strokeK(v)) / 2 : 0;
+    // Mini pit only. The chum breed pages share this component and were never
+    // meant to change: their rings are a quarter weight, so insetting shrank a
+    // depth-2 circle by 0.9% of its radius and deeper ones by less. Invisible,
+    // but unasked for, and it moved a surface that was already signed off.
+    return dockAside && d.depth >= 2 ? (strokeWidthFor(d) * strokeK(v)) / 2 : 0;
   }
   function drawR(d: Node, v: View, k: number): number {
     return Math.max(0.5, d.r * k - ringInset(d, v));
