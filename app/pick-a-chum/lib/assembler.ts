@@ -47,10 +47,15 @@ const BARK_ACK_PLACEHOLDER = '[B20 bark-acknowledgement line, copy pending]';
 // Per-breed SHARED factual answer (no dog voice). Task 39: the ten v6 "Brief Aligned
 // Pass" first-contact rewrites (curly apostrophes normalised to straight), held as code
 // constants (not workbook rows); migrate into the workbook with the other breed copy later.
-// DRAFT-UNVERIFIED. The v6 copy pass is approved for wording, not for
-// accuracy. The historical claims still need checking against the breed
-// pages and a Kennel Club source before this branch merges. The rewrite
-// moved several facts, so this check restarts rather than carries over.
+// VERIFIED 29 July 2026 against Kennel Club, breed club and heritage
+// sources. All ten claims supported. Two notes: the French Bulldog line
+// restores "Nottingham" per the Kennel Club's own wording. The
+// Staffordshire line is accurate but deliberately omits that the close
+// handling took place in fighting pits; the Staffordshire Bull Terrier
+// Heritage Centre records that fighting dogs were handled in the pit by
+// owners and judges and so were bred to be trustworthy with humans. That
+// omission is an editorial decision for a children's product, not an
+// oversight.
 const BREED_FACTS: Record<string, string> = {
   labrador:
     'Labrador ancestors hauled nets through Newfoundland waters. The pond obsession has proper historical backing.',
@@ -65,7 +70,7 @@ const BREED_FACTS: Record<string, string> = {
   beagle:
     'Beagles were bred so people could follow the hunt on foot. That voice was designed to travel.',
   'french-bulldog':
-    'British lace workers took small Bulldogs to France. American breeders later backed the upright bat ears.',
+    'Nottingham lace workers took small Bulldogs to France. American breeders later backed the upright bat ears.',
   pug:
     'Pugs lived in Chinese imperial courts, sometimes with guards. Important treatment became the working assumption.',
   'german-shepherd':
