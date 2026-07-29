@@ -1671,6 +1671,13 @@ export default function BreedTree({
   const fullTriggeredRef = useRef(false);
   // The pit-full countdown, ported from the main pit: huge sequential digits
   // 10 to 0 over the stage, a pause on 0, then GAME OVER hands to the shell.
+  // The handles have to leave this function to be cancellable at all. Before,
+  // `tick` was a local and the element was a local, so nothing outside could
+  // ever stop it: once the pit read as full the round was over even if you then
+  // cleared the floor. The main pit does not work that way, and this is its rule.
+  const cdTickRef = useRef<number | null>(null);
+  const cdElRef = useRef<HTMLDivElement | null>(null);
+  const cdGraceRef = useRef(0);
   const runCountdown = () => {
     const st = stageRef.current;
     if (!st) { onPitFull?.(); return; }
@@ -1681,16 +1688,21 @@ export default function BreedTree({
     let i = 0;
     el.textContent = steps[i];
     setFullAlpha(0);
+    cdElRef.current = el;
     const tick = window.setInterval(() => {
       i++;
       if (i < steps.length) { el.textContent = steps[i]; setFullAlpha(i / 10); return; }
       window.clearInterval(tick);
+      cdTickRef.current = null;
       // hold on 0, then GAME OVER, then hand over
       window.setTimeout(() => {
+        // Past the point of rescue: nought has landed, so stop listening.
+        if (cdElRef.current !== el) return;
         el.textContent = "GAME OVER";
-        window.setTimeout(() => { el.remove(); onPitFull?.(); }, 1400);
+        window.setTimeout(() => { el.remove(); cdElRef.current = null; onPitFull?.(); }, 1400);
       }, 1200);
     }, 1000);
+    cdTickRef.current = tick;
   };
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
@@ -3639,7 +3651,7 @@ export default function BreedTree({
         zoomTo(viewRef.current, now);
         drawNumbers(now, viewRef.current);
         // pit-full: settled bodies whose tops reach the spawn zone, pit-style
-        if (!fullTriggeredRef.current && now - started > 4000) {
+        if (now - started > 4000 && now > cdGraceRef.current) {
           const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
           // "Full" used to mean five settled bodies reaching the top zone, a
           // count borrowed from the main pit, which always holds dozens of
@@ -3687,9 +3699,26 @@ export default function BreedTree({
           // well past the visible stage
           const pitW = (xR - xL) || 1;
           const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
-          if (blocked || inZone >= 5) {
+          const full = blocked || inZone >= 5;
+          if (full && !fullTriggeredRef.current) {
             fullTriggeredRef.current = true;
             runCountdown();
+          } else if (!full && fullTriggeredRef.current) {
+            // ROOM AGAIN, so the countdown is called off mid-count, exactly as
+            // the main pit does it: collect the dogs or throw the toys out and
+            // the digits go away.
+            //
+            // Written out here rather than as a helper on purpose. A plain
+            // function in the component body that touches refs and setState
+            // reads as render work to the compiler, and this runs inside the
+            // physics loop, which is the opposite of render.
+            if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+            if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
+            setFullAlpha(0);
+            fullTriggeredRef.current = false;
+            // The same 2.5s grace the main pit allows, so clearing one object
+            // cannot leave the digits flickering on and off at the threshold.
+            cdGraceRef.current = now + 2500;
           }
         }
         stillFrames = still ? stillFrames + 1 : 0;
