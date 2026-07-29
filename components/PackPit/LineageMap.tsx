@@ -648,6 +648,10 @@ export default function LineageMap({
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
   const clip = "lm-clip-root";
+  // Mini pit, a dog with a tree: the root card and the Complete button inside it
+  // are drawn in a second svg on top of the placed cards. Lifting the cards down
+  // instead would have hidden the very pictures the player just placed.
+  const liftRoot = circular || strongBg;
 
   // The empty frames the player drags each collected card into: a row of living up
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
@@ -1362,6 +1366,11 @@ export default function LineageMap({
     );
   };
 
+  // Built ONCE. It is needed either in the main svg or in the lifted layer above
+  // the cards, never both, and rootCard reads refs: calling it twice would add a
+  // second read during render for no gain.
+  const treeRoot = soloLeaf ? null : rootCard(breed.x, breed.y);
+
   return (
     <>
     <div
@@ -1428,7 +1437,7 @@ export default function LineageMap({
       {packed && packLabels.extinct && (
         <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      <svg className={`${styles.svg}${packed && (circular || strongBg) ? " " + styles.svgTop : ""}`} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+      <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
@@ -1862,7 +1871,11 @@ export default function LineageMap({
               );
             })}
 {/* stacked duplicate cards rendered as fixed HTML below */}
-            {!soloLeaf && rootCard(breed.x, breed.y)}
+            {/* In the mini pit this is drawn in its own layer above the cards
+                instead, see liftRoot below. The placed cards are HTML with a
+                z-index and this svg has none, so drawn here the dog card and its
+                Complete button end up buried under the collection. */}
+            {!soloLeaf && !liftRoot && treeRoot}
           </>
         ) : (
           <>
@@ -1971,10 +1984,7 @@ export default function LineageMap({
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
                 pointerEvents: "none",
-                // Packed: below the svg, so the dog card and the Complete
-                // button read as the front of the screen rather than being
-                // buried under the collection.
-                zIndex: packed && (circular || strongBg) ? 5 : 63 + i,
+                zIndex: 63 + i,
                 boxShadow: "0 3px 3px rgba(0,0,0,0.32)",
                 userSelect: "none",
               }}
@@ -2002,7 +2012,7 @@ export default function LineageMap({
               transformOrigin: "center",
               pointerEvents: "all",
               cursor: !PACK_BREEDS.has(c.name) ? "zoom-in" : "default",
-              zIndex: packed && (circular || strongBg) ? 4 : 62,
+              zIndex: 62,
               // circular: the yellow ring rides as a box-shadow spread rather than
               // an outline, because box-shadow always follows border-radius
               // white in the learn layer: yellow is the pit's colour and it read as
@@ -2165,6 +2175,24 @@ export default function LineageMap({
           </div>
         );
       })()}
+      {/* THE LIFTED ROOT. A second svg over the top, same viewBox and same pan,
+          carrying only the dog card and the Complete button that lives inside
+          it. This is why: the placed cards are HTML with a z-index and the main
+          svg has none, so anything drawn there sits underneath them. Pushing the
+          cards down instead would have hidden the pictures the player just
+          placed, which is worse. pointer-events stays none on the layer itself,
+          so only the buttons inside it take a press. */}
+      {liftRoot && hasTree && !soloLeaf && (
+        <svg
+          className={`${styles.svg} ${styles.svgTop}`}
+          viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
+          width={vp.w}
+          height={vp.h}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {treeRoot}
+        </svg>
+      )}
     </div>
     {boxPop && !circular && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />

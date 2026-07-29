@@ -27,7 +27,8 @@
    while they are still being dragged into frames they have to stay on top of
    the frames they are being dropped into. */
 .svgTop {
-  z-index: 10;
+  /* above the placed cards, which sit at 62 and 63 */
+  z-index: 70;
 }
 .close {
   position: fixed;
