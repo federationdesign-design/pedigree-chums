@@ -1987,7 +1987,7 @@ export default function LineageMap({
         // into the viewport either way.
         const zoomOpen = zoomedId === c.id;
         const zoomSize = CW * 3;
-        const PANEL_W = 190, EDGE = 8, GAP = 14;
+        const PANEL_W = 219, EDGE = 8, GAP = 14; // 190, up 15% by request
         const vw = typeof window === "undefined" ? 1024 : window.innerWidth;
         const vh = typeof window === "undefined" ? 768 : window.innerHeight;
         const rightLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + GAP + pan.x;

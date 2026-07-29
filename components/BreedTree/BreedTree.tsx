@@ -1414,6 +1414,32 @@ export default function BreedTree({
   // zoomed and touching the slider would have thrown you out of the circle you
   // were reading. It cannot happen, because there is nothing to touch.
   const showDiff = dockAside && gravity && isMobile && entered && !started && focus.depth === 0;
+  // LEARN ONLY: the top-right square goes back to the level's start screen, the
+  // one with LEARN and PLAY on it. No confirmation, by request: nothing is at
+  // stake in learn, so a prompt would only be in the way. The pit keeps its X and
+  // its paused menu, because there a stray tap can cost you a round.
+  //
+  // It is setLearning(false) without setStarted(true), which is exactly what the
+  // PLAY button does minus starting the round, so the view reset below is copied
+  // from there rather than reinvented: a zoomed-in focus left behind would make
+  // the start screen open inside one circle.
+  const backToStartScreen = () => {
+    unlockStop();
+    setHovered(null);
+    setAncestryFor(null);
+    setAncHidden(true);
+    setTrainHidden(true);
+    setTempHidden(true);
+    setChumTree(null);
+    cancelAnimationFrame(rafRef.current);
+    focusRef.current = nodes[0];
+    setFocus(nodes[0]);
+    const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+    homeWRef.current = rootV[2];
+    zoomTo(rootV);
+    if (!hideCaption) onToggleCaption?.();
+    setLearning(false);
+  };
   const asideDown = (e: React.PointerEvent) => {
     if (!dockAside) return;
     const t = e.target as HTMLElement;
@@ -4830,7 +4856,7 @@ export default function BreedTree({
             return defs.map((d) => (
               <g key={d.kind} ref={uiRefFor(d.kind)}
                 role="button"
-                aria-label={d.kind === "close" ? "Close the pit" : d.kind === "learn" ? "Back to the learn area" : "Breed information"}
+                aria-label={d.kind === "close" ? (learning ? "Back to the start screen" : "Close the pit") : d.kind === "learn" ? "Back to the learn area" : "Breed information"}
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
                 style={{
                   cursor: "pointer",
@@ -4843,16 +4869,28 @@ export default function BreedTree({
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
-                  const act = d.kind === "close" ? onPitClose : d.kind === "learn" ? onBackToLearn : onToggleCaption;
+                  const act = d.kind === "close" ? (learning ? backToStartScreen : onPitClose) : d.kind === "learn" ? onBackToLearn : onToggleCaption;
                   startDrag(e, b && !b.fixed ? b : null, act);
                 }}>
                 <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
                   style={{ fill: "var(--yellow, #ffd23e)", stroke: "var(--navy, #0a3a57)", strokeWidth: 5 * upp }} />
                 {d.kind === "close" ? (
-                  <g stroke="var(--navy, #0a3a57)" strokeWidth={iconStroke} strokeLinecap="round">
-                    <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
-                    <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
-                  </g>
+                  learning ? (
+                    // A play triangle facing left: in learn this square goes
+                    // back rather than closing anything, so an X would be a lie.
+                    <path
+                      d={`M${half * 0.30},${-half * 0.40} L${-half * 0.34},0 L${half * 0.30},${half * 0.40} Z`}
+                      fill="var(--navy, #0a3a57)"
+                      stroke="var(--navy, #0a3a57)"
+                      strokeWidth={iconStroke * 0.8}
+                      strokeLinejoin="round"
+                    />
+                  ) : (
+                    <g stroke="var(--navy, #0a3a57)" strokeWidth={iconStroke} strokeLinecap="round">
+                      <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
+                      <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
+                    </g>
+                  )
                 ) : d.kind === "learn" ? (
                   // The dock's brain, filled navy like every other pit icon.
                   // Its artboard is 217.1 x 215.6, so it is scaled to the
