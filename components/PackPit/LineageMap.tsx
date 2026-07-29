@@ -514,7 +514,13 @@ export default function LineageMap({
     if (!root) return [] as Node[];
     const list: Node[] = [];
     root._x = breed.x;
-    root._y = breed.y;
+    // MINI PIT: the whole tree rides 75px higher, card and nodes together.
+    //
+    // Moving the card alone would have broken it: the percentage nodes are laid
+    // out around this point and tuck onto the card's rim, so shifting one without
+    // the other separates them. Lifting the root lifts everything hung off it,
+    // which also clears the Complete button off the bottom of the card.
+    root._y = breed.y - (circular || strongBg ? 75 : 0);
     root._dir = -Math.PI / 2 + base;
     list.push(root);
     const walk = (n: Node, depth: number) => {
@@ -1397,7 +1403,7 @@ export default function LineageMap({
   // Built ONCE. It is needed either in the main svg or in the lifted layer above
   // the cards, never both, and rootCard reads refs: calling it twice would add a
   // second read during render for no gain.
-  const treeRoot = soloLeaf ? null : rootCard(breed.x, breed.y);
+  const treeRoot = soloLeaf ? null : rootCard(breed.x, breed.y - (liftRoot ? 75 : 0));
 
   return (
     <>
