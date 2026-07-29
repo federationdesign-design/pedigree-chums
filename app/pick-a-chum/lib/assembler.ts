@@ -236,6 +236,19 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       return { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url, destinationId: dest?.destinationId };
     }
 
+    case 'price_answer': {
+      // Task 49: the in-chat price answer, rendered from FAQ008 but through a distinct action so
+      // the S12 safety machine treats it like buying (non-meaningful, blocked in a protected
+      // state). Same assembly as faq_answer for FAQ008: the approved answer plus a B04 wrapper.
+      const f = data.faq.find((x) => x.faqId === 'FAQ008');
+      const ctx = baseContext(n);
+      const answer = fill(f?.resolvedAnswer ?? '', ctx);
+      const r = pickResponse(data, 'B04', session.usedResponseIds);
+      const wrapper = r ? fill(r.template, ctx) : '';
+      const text = [answer, wrapper].filter(Boolean).join(' ').trim() || 'That is a fair question.';
+      return { responseId: 'B04-FAQ008', text, dog };
+    }
+
     case 'gk_answer': {
       const g = data.generalKnowledge.find((x) => x.questionId === res.gkId);
       const pivot = copy(data, 'Collie pivot', 'Geordie');

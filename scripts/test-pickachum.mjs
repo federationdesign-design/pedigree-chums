@@ -67,13 +67,13 @@ function check(input, expect, opts = {}) {
 }
 
 // ---- Priority ordering: high-value / high-risk meanings win over comedy ----
-check('Hello, how much is the game?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // commercial > greeting
-check('How much is it?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' });
+check('Hello, how much is the game?', { layer: 4, bucket: 'B04', action: 'price_answer' }); // Task 49: price beats greeting; was open_discount_popup
+check('How much is it?', { layer: 4, bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008, was open_discount_popup
 check('I want to buy one', { layer: 2, bucket: 'B01', action: 'open_discount_popup' });
 // B01 tightening: manipulation/proxy phrasings must NOT open the offer modal (BND-025/028)
 check('Can you give me the discount without signing', {}, { notAction: 'open_discount_popup' });
 check('Can you buy the game for me?', {}, { notAction: 'open_discount_popup' });
-check('How much is the game?', { layer: 2, bucket: 'B01', action: 'open_discount_popup' }); // legit buying still fires
+check('How much is the game?', { layer: 4, bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008, was open_discount_popup
 // Fix 1: bare commercial words must NOT pop the purchase modal on innocent sentences.
 check('in order to win the game', {}, { notAction: 'open_discount_popup' });
 check('the cost of living is high', {}, { notAction: 'open_discount_popup' });
@@ -275,7 +275,7 @@ check('how does this work?', { action: 'orientation', bucket: 'B15' });
 // ordinary questions. These must keep the exact bucket they route to today.
 check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
 check('what can you tell me about beagles', { bucket: 'B05', action: 'breed_page' });
-check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('how much is the game', { bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008 in chat, was open_discount_popup
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' });
 check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' });
@@ -334,7 +334,7 @@ check('how does it work', { bucket: 'B15', action: 'orientation' }); // already 
 // no games-catalogue answer exists, so this stays honestly unmatched:
 check('what games are there', { bucket: 'B06', action: 'gk_unknown' });
 // Regression guard: the meta-route sits above FAQ/GK, so these must NOT change bucket.
-check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('how much is the game', { bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008 in chat, was open_discount_popup
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}`) });
 check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
@@ -642,7 +642,7 @@ check("I'm sad and I want to hurt myself", { layer: 1, action: 'safety_signpost'
 // Regression guard: personal sadness sits below the safety routes and does not disturb these.
 check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `not safeguarding: ${r.moderationId}`) });
 check('I want to die', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SELF_HARM' ? null : `not self-harm: ${r.moderationId}`) });
-check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('how much is the game', { bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008 in chat, was open_discount_popup
 check('tell me about beagles', { bucket: 'B05', action: 'breed_page' });
 check('woof', { action: 'bark' });
 
@@ -1123,7 +1123,7 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   // Turn 1: establishes beagles.
   check('tell me about beagles', { bucket: 'B05', action: 'breed_page' }, { session: s, assert: (r) => (r.breedSlug === 'beagle' ? null : `not beagle: ${r.breedSlug}`) });
   // Turn 2: commercial, does not leak beagle into the answer.
-  check('actually how much is the game', { bucket: 'B01', action: 'open_discount_popup' }, { session: s, assert: (_r, resp) => (resp.text.toLowerCase().includes('beagle') ? 'beagle leaked into the commercial answer' : null) });
+  check('actually how much is the game', { bucket: 'B04', action: 'price_answer' }, { session: s, assert: (_r, resp) => (resp.text.toLowerCase().includes('beagle') ? 'beagle leaked into the price answer' : null) }); // Task 49: price -> FAQ008, was open_discount_popup
   // Turn 3: games tease, leaks neither of the previous two.
   check('no wait, can I play something', { bucket: 'B17', action: 'offer_bark_game' }, { session: s, assert: (_r, resp) => { const t = resp.text.toLowerCase(); return t.includes('beagle') || t.includes('pre-order') || t.includes('discount') ? 'leaked a previous topic' : null; } });
   // Turn 4: restores beagles as the active topic.
@@ -1135,7 +1135,7 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
 })();
 // Nine regression guards. Six fresh sessions:
 check('tell me about labradors', { bucket: 'B05', action: 'breed_page' }, { assert: (r) => (r.breedSlug === 'labrador' ? null : `not labrador: ${r.breedSlug}`) });
-check('how much is the game', { bucket: 'B01', action: 'open_discount_popup' });
+check('how much is the game', { bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008 in chat, was open_discount_popup
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}`) });
 check('woof', { layer: 15, action: 'bark' });
 check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `not safeguarding: ${r.moderationId}`) });
@@ -1452,19 +1452,27 @@ for (const inp of ['tell me about him', 'my dad likes labradors', 'is he a good 
 for (const inp of ['how much is a labrador', 'how much is a puppy', 'where can I buy a dog', 'how much does a dog cost']) {
   check(inp, { action: 'gk_unknown' }, { notAction: 'open_discount_popup', assert: (_r, resp) => (/£9\.99|£6\.99/.test(resp.text) ? `served the game price for a dog/breed question: ${resp.text}` : null) });
 }
-// An explicit product word, or a bare phrase with no breed topic, still opens DST001.
+// A buying question opens DST001.
 check('where can I buy the game', { action: 'open_discount_popup' });
-check('how much is it', { action: 'open_discount_popup' }); // fresh session, no topic -> the game
-// The topic slot (Task 27) decides a bare "how much is it": a breed topic means the dog.
+check('how do I order', { action: 'open_discount_popup' }); // Task 49: buying -> popup
+// ---- Task 49: split price and buying by intent ----
+// A PRICE question answers in chat via the distinct price_answer action (FAQ008 text), never the
+// popup. "is it expensive" (previously fallback) must now reach it.
+check('how much is it', { action: 'price_answer' }); // fresh session, no topic -> the game price, in chat
+check('is it expensive', { action: 'price_answer' });
+check('how much', { action: 'price_answer' });
+check('price', { action: 'price_answer' });
+check('cost', { action: 'price_answer' });
+// The topic slot (Task 27) still decides a bare "how much is it": a breed topic means the dog -> refuse.
 (() => {
   const s = newSession();
   check('tell me about labradors', { action: 'breed_page' }, { session: s });
-  check('how much is it', {}, { session: s, notAction: 'open_discount_popup' });
+  check('how much is it', { action: 'gk_unknown' }, { session: s }); // "it" = the dog, no dog price
 })();
 (() => {
   const s = newSession();
-  check('how much is the game', { action: 'open_discount_popup' }, { session: s });
-  check('how much is it', { action: 'open_discount_popup' }, { session: s });
+  check('how much is the game', { action: 'price_answer' }, { session: s });
+  check('how much is it', { action: 'price_answer' }, { session: s }); // "it" = the game price
 })();
 
 // ---- Report ----

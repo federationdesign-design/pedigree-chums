@@ -157,6 +157,7 @@ export type ActionType =
   | 'neutral_refusal' // Task 34: PROTECTED_AFTERCARE decline of a blocked game/sales/comedy request (no safety surface)
   | 'goodbye' // Task 36: a farewell (whole-message match) -> the approved goodbye line
   | 'out_of_scope' // Task 37: a valid question on a topic the site does not cover -> the approved out-of-scope line (never the repair ladder)
+  | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog
   | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a safe grown-up
   | 'breed_page' // confident named-breed match: link to that breed's page

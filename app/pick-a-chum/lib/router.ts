@@ -79,6 +79,7 @@ const COMMERCIAL = [
   'where can i buy', 'where to buy', 'can i buy', 'how do i buy', 'how can i buy',
   'purchase the game', 'purchase one', 'purchase it', 'want to purchase',
   'order the game', 'order one', 'order it', 'place an order', 'pre order', 'preorder',
+  'how do i order', 'how can i order', 'where do i order', 'can i order',
   'how much is', 'how much does', 'how much for', 'what does it cost', 'the price of', 'price of the game', 'what is the price',
   'when does it launch', 'launch date', 'release date', 'when is it out', 'when is it released', 'when can i get it',
   'is it available', 'when is it available', 'available to buy',
@@ -101,6 +102,12 @@ const COMMERCIAL_EXCLUDE = [
 // much is a labrador") can never infer the product. See the commercial check for the topic
 // rule that lets a bare "how much is it" resolve to the game when no breed is in play.
 const PRODUCT_WORDS = ['game', 'games', 'pack', 'packs', 'cards', 'card', 'deck', 'set', 'pick a chum'];
+
+// Task 49: split the commercial route by intent. A PRICE question answers in chat (FAQ008 via a
+// distinct price_answer action); a BUYING question opens the offer modal. These are the price
+// markers: "how much" covers every "how much..." phrasing; "price"/"cost"/"expensive" cover the
+// noun and adjective forms ("whats the price", "what does it cost", "is it expensive").
+const PRICE_INTENT = ['how much', 'price', 'cost', 'expensive'];
 
 const RULES = [
   'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
@@ -764,19 +771,21 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 2: buying, launch and 30% discount. A buying word opens the offer modal,
   // UNLESS the phrasing is a manipulation/proxy request ("buy it for me", "without
   // signing"), which must not reach the buy path.
-  if (hasAny(N, COMMERCIAL) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
-    // Task 45/46: the offer modal AND the FAQ price answer are about the product, never a dog.
-    // An explicit product word always opens the offer modal. A price/buy question that instead
-    // names a dog or a breed, or whose bare "it" points at a breed topic (Task 27), must get no
-    // game price via DST001 OR the FAQ layer: it refuses to guess (gk_unknown), because there is
-    // no dog price to give and £9.99 would be wrong. A bare phrase with a commercial/game topic
-    // or no topic still means the game and opens DST001.
+  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT)) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+    // Task 45/46: the offer modal AND the price answer are about the product, never a dog. A
+    // price/buy question that names a dog or breed, or whose bare "it" points at a breed topic
+    // (Task 27), carrying no explicit product word, gets neither: it refuses to guess
+    // (gk_unknown), because there is no dog price and £9.99 would be wrong.
     const words = new Set(c.match(/[a-z]+/g) ?? []);
-    if (hasAny(N, PRODUCT_WORDS)) {
-      return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
-    }
-    if (namesDogOrBreed(c, words) || state.topic?.kind === 'breed') {
+    if (!hasAny(N, PRODUCT_WORDS) && (namesDogOrBreed(c, words) || state.topic?.kind === 'breed')) {
       return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'gk_unknown', note: 'Dog/breed price question: no dog price exists; refuse rather than quote the game price.' };
+    }
+    // Task 49: split by intent. A PRICE question answers in chat via FAQ008, through a distinct
+    // price_answer action that renders FAQ008's text but is NOT a MEANINGFUL_TOPIC, so the S12
+    // safety machine holds/refuses it exactly as it does buying (it is in AFTERCARE_BLOCKED and
+    // is not meaningful). A BUYING question opens the offer modal (DST001).
+    if (hasAny(N, PRICE_INTENT)) {
+      return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'price_answer', faqId: 'FAQ008' };
     }
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
   }
