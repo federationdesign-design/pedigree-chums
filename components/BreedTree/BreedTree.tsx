@@ -1407,6 +1407,13 @@ export default function BreedTree({
     e.stopPropagation();
     railDrag.current = null;
   };
+  // The difficulty slider is now offered in LEARN as well as on the start
+  // screen. focus.depth === 0 is doing real work here: it means the slider is
+  // simply absent while you are zoomed into a circle, which removes the worst
+  // of the risk. A level change re-packs and resets focus to the root, so being
+  // zoomed and touching the slider would have thrown you out of the circle you
+  // were reading. It cannot happen, because there is nothing to touch.
+  const showDiff = dockAside && gravity && isMobile && entered && !started && focus.depth === 0;
   const asideDown = (e: React.PointerEvent) => {
     if (!dockAside) return;
     const t = e.target as HTMLElement;
@@ -4994,7 +5001,7 @@ export default function BreedTree({
           orientation does not depend on writing-mode support, which only landed
           in Safari 17.4, and so the thumb can carry the pit's own yellow square
           look. Mobile only: the fill has no effect on the desktop layout. */}
-      {dockAside && gravity && isMobile && entered && !started && !learning && focus.depth === 0 && (
+      {showDiff && (
         <div
           className={styles.diff}
           style={(() => {
@@ -5041,6 +5048,22 @@ export default function BreedTree({
               setDiffDragging(true);
               // Clear any preview the pointer raised on its way to the slider.
               setStartPeek(false);
+              // Two things have to let go before a re-pack, now the slider can
+              // be reached from LEARN.
+              //
+              // hovered holds a NODE, and a re-pack hands back a whole new
+              // array, so the old one would linger as a dog no longer in the
+              // tree, driving the box header and the label rules from a ghost.
+              //
+              // And the hover unlock writes offsets straight onto the wrappers.
+              // Left running, a circle that had come loose would stay displaced
+              // at its old position while everything around it resized.
+              //
+              // Done here rather than in applyLevel: that is a plain function in
+              // the component body, so the compiler reads calls like these as
+              // render work. A pointer handler is unambiguously not.
+              unlockStop();
+              setHovered(null);
               setLearnPeek(false);
               setLevelFromY(e.clientY);
             }}
@@ -5397,7 +5420,7 @@ export default function BreedTree({
               onPointerCancel={railUp}
               className={`${styles.relRail} ${
                 hideCaption && !railPin
-                  ? styles.relRailHome
+                  ? `${styles.relRailHome}${showDiff ? " " + styles.relRailHomeDiff : ""}`
                   : railSide === "left"
                   ? styles.relRailLeft
                   : styles.relRailRight
