@@ -1066,7 +1066,13 @@ export default function BreedTree({
   const UNLOCK_ITER = 12;      // constraint passes per frame
   const UNLOCK_HOME_MS = 260;  // the trip back
   const UNLOCK_REST = 0.0006;  // moved less than this fraction of R counts as still
-  type UnlockKid = { n: Node; i: number; ox: number; oy: number; px: number; py: number; vx: number; vy: number };
+  // `els` is every wrapper index this circle drags with it: its own, then each
+  // of its descendants. Circles are one flat list of sibling <g>s, not nested,
+  // so moving a parent's wrapper does nothing to the circles drawn inside it.
+  // Without this the outer circle came loose and left its own contents standing
+  // exactly where they were. `i` is kept because the fan and the collision pass
+  // still key off the circle itself.
+  type UnlockKid = { n: Node; i: number; els: number[]; ox: number; oy: number; px: number; py: number; vx: number; vy: number };
   type UnlockState = {
     parent: Node;
     kids: UnlockKid[];
@@ -1085,8 +1091,10 @@ export default function BreedTree({
     if (!u || !cg) return;
     const k = SIZE / viewRef.current[2];
     for (const kd of u.kids) {
-      const w = cg.children[kd.i] as SVGGElement | undefined;
-      if (w) w.setAttribute("transform", `translate(${kd.ox * k},${kd.oy * k})`);
+      for (const j of kd.els) {
+        const w = cg.children[j] as SVGGElement | undefined;
+        if (w) w.setAttribute("transform", `translate(${kd.ox * k},${kd.oy * k})`);
+      }
     }
   };
   const unlockStop = () => {
@@ -1096,8 +1104,10 @@ export default function BreedTree({
     const cg = circlesRef.current;
     if (cg) {
       for (const kd of u.kids) {
-        const w = cg.children[kd.i] as SVGGElement | undefined;
-        if (w) w.removeAttribute("transform");
+        for (const j of kd.els) {
+          const w = cg.children[j] as SVGGElement | undefined;
+          if (w) w.removeAttribute("transform");
+        }
       }
     }
     unlockRef.current = null;
@@ -1257,6 +1267,9 @@ export default function BreedTree({
       return {
         n,
         i: nodes.indexOf(n),
+        // itself first, then everything nested inside it, so the whole dog
+        // travels as one piece
+        els: n.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
         ox: 0,
         oy: 0,
         px: 0,
