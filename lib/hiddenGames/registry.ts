@@ -29,7 +29,10 @@ export interface Registry {
 export const REGISTRY: Registry = {
   campaign_version: "HIDDEN_GAMES_2026_01",
   mode: "ACHIEVEMENT_ONLY",
-  opens_at: "TO BE CONFIRMED",
+  // Stage 1 is open-ended and opens when the campaign merges to main; the
+  // lifecycle status controls whether it runs. So opens_at stays null rather
+  // than a placeholder (owner decision, 29 July 2026).
+  opens_at: null,
   closes_at: null,
   games: [
     {

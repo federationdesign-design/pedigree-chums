@@ -102,9 +102,9 @@ export default function RootLayout({
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul
             2026 (BRIEF 6.1, NEEDS_OWNER Q01). */}
         <HiddenGamesCounter />
-        {/* G01 now awards on the first pointer interaction with the Main Pit
-            (CHANGE-LIST C01), wired inside PackPit. RouteWatcher is unmounted
-            and pending removal; see NEEDS_OWNER Q06. */}
+        {/* G01 awards on the first pointer interaction with the Main Pit
+            (CHANGE-LIST C01), wired inside PackPit. RouteWatcher was removed
+            (NEEDS_OWNER Q06). */}
         <CookieBanner />
         <Analytics />
       </body>
