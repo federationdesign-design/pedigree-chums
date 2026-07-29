@@ -428,6 +428,7 @@ export default function BreedStrip({ era }: { era: string }) {
             // is what forces it.
             setRunKey((k) => k + 1);
           }}
+          levelNo={Math.max(0, levelList.findIndex((b) => b.name === active.name))}
           name={active.name}
           image={active.image}
           character={active.character}

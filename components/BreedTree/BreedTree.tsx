@@ -882,6 +882,7 @@ export default function BreedTree({
   onClose,
   centred = false,
   size = 760,
+  levelNo,
   collectedChums,
   onChumCollected,
   hideLabels = false,
@@ -923,6 +924,9 @@ export default function BreedTree({
   // Chums collected on THIS level, by name, and the callback that adds one.
   // Per level by decision: the set lives in LineageModal, which already
   // unmounts between levels, so there is no storage and nothing to reset.
+  // Zero-based campaign level, shown bottom right on the start screen as two
+  // digits. Passed down from BreedStrip, which owns the level list.
+  levelNo?: number;
   collectedChums?: Set<string>;
   onChumCollected?: (name: string) => void;
   hideLabels?: boolean;
@@ -5008,7 +5012,14 @@ export default function BreedTree({
                 })() : (
                 <text x={w.x} y={w.y} textAnchor={w.anchor} dominantBaseline="central"
                   style={{
-                    fill: "var(--yellow, #ffd23e)",
+                    // White with a black outline, the circles' treatment with the
+                    // halo colour swapped. paint-order stroke keeps the stroke
+                    // behind the glyph so the letterforms stay clean.
+                    fill: "#ffffff",
+                    stroke: "#000000",
+                    strokeWidth: `${4 * upp}px`,
+                    paintOrder: "stroke",
+                    strokeLinejoin: "round",
                     fontFamily: "var(--font-display), system-ui, sans-serif",
                     fontSize: `${fs * upp * (wordHover === w.key ? 1.08 : 1)}px`,
                     letterSpacing: `${2 * upp}px`,
@@ -5025,6 +5036,43 @@ export default function BreedTree({
                 )}
               </g>
             ));
+          })()}
+          {/* THE LEVEL NUMBER. Bottom right, on the same line as PLAY and at the
+              same size as LEARN, so the three read as one row. Black with a white
+              outline: the inverse of LEARN, which is white with a black one.
+              Zero-padded to two digits and no word, by request. */}
+          {dockAside && gravity && entered && !started && !learning && focus.depth === 0 && levelNo !== undefined && (() => {
+            const st = stageRef.current;
+            const stW = st ? st.clientWidth : 390;
+            const upp = (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st ? st.clientHeight : 844, 1);
+            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
+            const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
+            const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
+            const xMinC = -vbWc / 2;
+            const m = 18 * upp;
+            return (
+              <text
+                x={xMinC + vbWc - m}
+                y={vbHc * WORD_START_Y}
+                textAnchor="end"
+                dominantBaseline="central"
+                style={{
+                  fill: "#000000",
+                  stroke: "#ffffff",
+                  strokeWidth: `${4 * upp}px`,
+                  paintOrder: "stroke",
+                  strokeLinejoin: "round",
+                  fontFamily: "var(--font-display), system-ui, sans-serif",
+                  fontSize: `${fsL * upp}px`,
+                  letterSpacing: `${2 * upp}px`,
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
+                aria-label={`Level ${levelNo}`}
+              >
+                {String(levelNo).padStart(2, "0")}
+              </text>
+            );
           })()}
         </svg>
         {/* J17: the canvas effects layer, above the SVG, never takes a pointer. */}

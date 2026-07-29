@@ -77,6 +77,8 @@ type Props = {
   // Photo of the level the player is about to unlock, for the Round Won screen.
   nextLevelImage?: string;
   onStartOver?: () => void;
+  // Zero-based campaign level, straight through to the pit's start screen.
+  levelNo?: number;
   // Lives are owned by the page, since they have to survive between levels.
   // The modal only displays them and decides whether a retry may be offered.
   lives?: number;
@@ -92,7 +94,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -271,6 +273,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}
           onRelativeTap={(slug, nm) => setLeavePage({ slug, name: nm })}
+          levelNo={levelNo}
           collectedChums={collectedChums}
           onChumCollected={(n) => setCollectedChums((prev) => (prev.has(n) ? prev : new Set(prev).add(n)))}
           hideCaption={!captionOpen}
