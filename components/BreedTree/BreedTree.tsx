@@ -1698,7 +1698,14 @@ export default function BreedTree({
       window.setTimeout(() => {
         // Past the point of rescue: nought has landed, so stop listening.
         if (cdElRef.current !== el) return;
-        el.textContent = "GAME OVER";
+        // "Oh no..." rather than GAME OVER: the shell's own screen says that a
+        // moment later, and saying it twice made the first one look like a bug.
+        // Sized and shadowed to match .endFlash on that screen, so the two read
+        // as one beat rather than two different treatments.
+        el.textContent = "Oh no...";
+        el.style.fontSize = "clamp(6.8rem, 24vw, 16rem)";
+        el.style.textShadow = "0 4px 40px rgba(0,0,0,0.55)";
+        el.style.lineHeight = "0.82";
         window.setTimeout(() => { el.remove(); cdElRef.current = null; onPitFull?.(); }, 1400);
       }, 1200);
     }, 1000);
