@@ -1537,6 +1537,9 @@ export default function BreedTree({
   const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null; held?: boolean }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
   const wordPopAtRef = useRef<number>(0);
+  // The pit-full wash. Zero when the countdown starts, a tenth more with every
+  // second it counts down, solid on nought.
+  const [fullAlpha, setFullAlpha] = useState(0);
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
   // The pit-full countdown, ported from the main pit: huge sequential digits
@@ -1550,9 +1553,10 @@ export default function BreedTree({
     const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
     let i = 0;
     el.textContent = steps[i];
+    setFullAlpha(0);
     const tick = window.setInterval(() => {
       i++;
-      if (i < steps.length) { el.textContent = steps[i]; return; }
+      if (i < steps.length) { el.textContent = steps[i]; setFullAlpha(i / 10); return; }
       window.clearInterval(tick);
       // hold on 0, then GAME OVER, then hand over
       window.setTimeout(() => {
@@ -2158,10 +2162,11 @@ export default function BreedTree({
     // calling performance.now() here counts as impure render work.
     if (e && p && (e.timeStamp - p.t >= 350 || Math.hypot(e.clientX - p.x, e.clientY - p.y) >= 8)) return;
     if (focusRef.current !== nodes[0]) { zoom(nodes[0]); return; }
-    // Once the round is running a stray tap on the background must not throw the
-    // player out. A missed grab at a circle lands here, and losing a round that
-    // way is miserable. Route it through the same confirmation the close X uses.
-    if (started && onPitClose) { onPitClose(); return; }
+    // Once the round is running a tap on the background does NOTHING. It used to
+    // route to the leave-game confirmation, which still meant a missed grab at a
+    // chip could pull you out of a round you were winning. The close X is the
+    // only way out of a live pit.
+    if (started) return;
     // LEARN never sets started, so without this a stray tap on the pit
     // background (exposed around the floating blue box, e.g. a near-miss on
     // the box's close X) would fall through to onClose and drop the player
@@ -4761,6 +4766,14 @@ export default function BreedTree({
             style={{ background: `linear-gradient(${levelTheme.sky[0]}, ${levelTheme.sky[1]})` }}
           />
           <img className={styles.levelBg} src={levelTheme.bg} alt="" draggable={false} />
+          {/* The pit-full wash. Placed HERE on purpose: these three are all
+              position absolute with no z-index, so DOM order is the stack. Sky,
+              then the level picture, then this, then the floor. It therefore
+              covers the sky and the picture and never the floor, and the whole
+              .level layer sits below the stage, so the words, chips and cards
+              stay clear of it too. Different from the main pit, which snaps its
+              pattern on at 90% full with no fade. */}
+          <div className={styles.levelPaws} style={{ opacity: fullAlpha }} />
           <img
             className={styles.levelFloor}
             src={levelTheme.floor}

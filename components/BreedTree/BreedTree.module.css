@@ -599,6 +599,18 @@
 }
 /* the ground strip runs the full width. Its bottom offset is set inline from
    the measured surface, so the drawn earth lines up with the physics slabs. */
+/* The pit-full wash. Tiled paws, faded in a tenth at a time by the countdown,
+   solid on nought. Sits between the level picture and the floor by DOM order,
+   so it never covers the floor art. No transition on opacity: the steps are a
+   second apart and are meant to read as steps. */
+.levelPaws {
+  position: absolute;
+  inset: 0;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  pointer-events: none;
+}
 .levelFloor {
   position: absolute;
   left: 0;
