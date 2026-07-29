@@ -136,6 +136,7 @@ export default function LineageMap({
   soloLeaf = false,
   rootRadius,
   ringColor,
+  strongBg = false,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
@@ -151,6 +152,11 @@ export default function LineageMap({
   // the circle looks like the one just picked up. Without it the card keeps its
   // own yellow stroke over a blue fill, which reads as two thin rings.
   ringColor?: string;
+  // The heavier wash. It used to ride on `circular`, which was fine while the
+  // only caller wanting it also wanted round cards. The chum family tree wants
+  // the main pit's rectangular card AND the mini pit's darker background, so the
+  // two are separated. The main pit passes neither and is unchanged.
+  strongBg?: boolean;
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (data: {
@@ -1316,7 +1322,7 @@ export default function LineageMap({
   return (
     <>
     <div
-      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}`}
+      className={`${styles.overlay}${circular || strongBg ? " " + styles.overlayStrong : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}

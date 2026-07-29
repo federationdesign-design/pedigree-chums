@@ -4720,6 +4720,7 @@ export default function BreedTree({
       {dockAside && chumTree && (
         <LineageMap
           breed={chumTree}
+          strongBg
           currentScore={0}
           onClose={() => setChumTree(null)}
         />
