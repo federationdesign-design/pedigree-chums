@@ -3211,7 +3211,11 @@ export default function BreedTree({
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
           const SHOVE_R = bsz * 5.5;
-          const SHOVE_F = 0.9 * radOf(bombMb);
+          // The blast came straight from the main pit, where the cards are far
+          // heavier and a shove that size reads as a thump. In the mini pit the
+          // same figure cleared the whole floor. Cut to a sixth. The reach is
+          // unchanged: it was the force that was wrong, not how far it carried.
+          const SHOVE_F = 0.15 * radOf(bombMb);
           for (const o of live) {
             if (claimed.has(o)) continue;
             const dx = o.position.x - bx, dy = o.position.y - by;
@@ -3231,10 +3235,13 @@ export default function BreedTree({
             const mult = k2 === "rod" || k2 === "pill" ? 0.80 : k2 === "circle" ? 0.10 : 0.15;
             const mag = SHOVE_F * fall * fall * (o.mass || 1) * mult;
             MBody.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 });
-            MBody.setAngularVelocity(o, (Math.random() - 0.5) * 0.6 * (fall + 0.2));
+            MBody.setAngularVelocity(o, (Math.random() - 0.5) * 0.25 * (fall + 0.2));
+            // The ceilings matter more than the force: they decide the worst
+            // case, which is what threw things off the top of the screen. 40 and
+            // -20 are the main pit's, on bodies several times the mass.
             const spd = Math.hypot(o.velocity.x, o.velocity.y);
-            if (spd > 40) { const sc2 = 40 / spd; MBody.setVelocity(o, { x: o.velocity.x * sc2, y: o.velocity.y * sc2 }); }
-            if (o.velocity.y < -20) MBody.setVelocity(o, { x: o.velocity.x, y: -20 });
+            if (spd > 14) { const sc2 = 14 / spd; MBody.setVelocity(o, { x: o.velocity.x * sc2, y: o.velocity.y * sc2 }); }
+            if (o.velocity.y < -8) MBody.setVelocity(o, { x: o.velocity.x, y: -8 });
           }
           wake();
         }, BOMB_BURST_MS));
