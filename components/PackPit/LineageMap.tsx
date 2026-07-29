@@ -1864,16 +1864,34 @@ export default function LineageMap({
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
         if (!c || !text) return null;
-        // if zoom is open for same card, sit right of the zoomed image; otherwise right of the card
+        // Sits to the RIGHT of the card, or of the zoomed image if that is open.
+        // Cards near the right edge had nowhere to put it: the panel is fixed
+        // and 190 wide, and nothing checked whether that would land off screen,
+        // so the text was squeezed against the edge and clipped. If it will not
+        // fit to the right it now goes BELOW the card instead, and is clamped
+        // into the viewport either way.
         const zoomOpen = zoomedId === c.id;
         const zoomSize = CW * 3;
-        const left = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + 14 + pan.x;
-        const top = zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y : c.cardY - CW / 2 - 6 + pan.y;
+        const PANEL_W = 190, EDGE = 8, GAP = 14;
+        const vw = typeof window === "undefined" ? 1024 : window.innerWidth;
+        const vh = typeof window === "undefined" ? 768 : window.innerHeight;
+        const rightLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + GAP + pan.x;
+        const fitsRight = rightLeft + PANEL_W <= vw - EDGE;
+        const cardLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x : c.cardX - CW / 2 + pan.x;
+        const cardBottom = zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y + zoomSize : c.cardY + CW / 2 + pan.y;
+        const left = fitsRight
+          ? rightLeft
+          : Math.max(EDGE, Math.min(vw - EDGE - PANEL_W, cardLeft));
+        const topRaw = fitsRight
+          ? (zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y : c.cardY - CW / 2 - 6 + pan.y)
+          : cardBottom + GAP;
+        // and never start below the fold, whichever side it ended up on
+        const top = Math.max(EDGE, Math.min(topRaw, vh - 120));
         return (
           <div
             onMouseLeave={() => setInfoHover(null)}
             style={{
-              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "auto",
+              position: "fixed", left, top, maxWidth: PANEL_W, zIndex: 100, pointerEvents: "auto",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
