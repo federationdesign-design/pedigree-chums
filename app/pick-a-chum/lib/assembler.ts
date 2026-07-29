@@ -395,12 +395,13 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
     }
 
     case 'breed_hub': {
-      // Shared hub line + the active dog's handoff, with the breed index page
-      // (/chums) attached as the contextual [LINK]. Note: /chums currently renders a
-      // placeholder stub, but it is a real route, so this is not an invented target.
+      // Shared hub line + the active dog's handoff, with the breed index attached as the
+      // contextual [LINK]. Task 48: repointed from the /chums stub ("Chums index - hello") to
+      // DST006 /know-your-chums, the real breed explorer (the route-map already treats it as
+      // the Know Your Chums index; individual dog pages stay at /chums/<slug>).
       const handoff = navHandoff(data, dog, session);
       const text = handoff ? `${BREED_HUB_LINE} ${handoff}` : BREED_HUB_LINE;
-      return { responseId: 'BREED-HUB', text, dog, destinationId: 'chums-index', url: '/chums' };
+      return { responseId: 'BREED-HUB', text, dog, destinationId: 'DST006', url: '/know-your-chums' };
     }
 
     case 'breed_best': {
