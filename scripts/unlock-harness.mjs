@@ -21,6 +21,33 @@
 //   ./node_modules/.bin/tsc /tmp/lh/*.ts --outDir /tmp/lh --module commonjs --target es2020 --skipLibCheck --esModuleInterop
 //   LINEAGE_JS=/tmp/lh/lineage.js UK_JS=/tmp/lh/uk-breeds.js node scripts/unlock-harness.mjs
 //
+// DEPTHS picks which parents to measure, default 1, which is the original
+// behaviour. DEPTHS=1,2,3 sweeps the deeper rings.
+//
+// WHAT IT FOUND, 30 July, DEPTH SWEEP. The unlock fires only for direct children
+// of the focus. Before letting it reach children of children, the question was
+// whether the same constants hold deeper, where a circle is a fraction of the
+// size in a fraction of the space. Run with DEPTHS=1,2,3, all 90 levels:
+//
+//   parent   | cases | spread median | rest median | rest worst | peak overlap
+//   d1, 2 kids | 52  | 0.02s         | 4.72s       | 6.85s      | 0.0000
+//   d2, 2 kids | 51  | 0.37s         | 3.98s       | 5.97s      | 0.0000
+//   d3, 2 kids | 46  | 0.08s         | 3.43s       | 5.10s      | 0.0000
+//
+// DEEPER IS BETTER, not worse. Rest comes sooner at every step down, and peak
+// overlap is zero throughout, so nothing jitters and nothing escapes its parent.
+// Three fears going in were all unfounded: jitter from an absolute rest
+// threshold (it is proportional, `UNLOCK_REST * P.r`), circles escaping the ring
+// (overlap says no), and movement too small to see (they spread).
+//
+// The spread test was made PROPORTIONAL for this run, `SPREAD * (P.r / 100)`.
+// A flat unit of travel is a far bigger ask of a small circle, so an absolute
+// threshold would have flattered the deep cases. It still held.
+//
+// So the physics is not the obstacle. The obstacle is that unlockRef holds ONE
+// unlock and `if (insideCurrent) return;` deliberately stops a nested circle
+// starting its own. Making it nestable is the work, not the tuning.
+//
 // WHAT IT FOUND, 29 July, 86 cases across all 90 mini pit levels at difficulty 5:
 //
 //   children | spread median | rest median | rest worst
@@ -306,7 +333,13 @@ function run(levelName, opts = {}) {
   relayoutMobile(nodes, aspect, level, tilt);
 
   const out = [];
-  for (const P of nodes.filter((n) => n.depth === 1)) {
+  // DEPTH SWEEP, added 30 July. The unlock only fires for direct children of the
+  // focus, so only depth-1 parents were ever measured. To let it reach children
+  // of children the same physics has to hold at depth 2 and 3, where a circle is
+  // a fraction of the size in a fraction of the space, and the constants were
+  // tuned for the first ring. DEPTHS=1 keeps the original behaviour.
+  const depths = (process.env.DEPTHS || "1").split(",").map(Number);
+  for (const P of nodes.filter((n) => depths.includes(n.depth))) {
     const kids = unlockStart(P);
     if (kids.length < 2) continue;
     let t = 0, still = 0, apart = null, rest = null, peak = worstOverlap(kids);
@@ -316,13 +349,18 @@ function run(levelName, opts = {}) {
       const ov = worstOverlap(kids);
       peak = Math.max(peak, ov);
       const side = widestSideways(kids);
-      if (apart === null && side >= SPREAD) apart = t;
-      if (apart !== null && side < SPREAD) apart = null; // must STAY apart
+      // Proportional, not absolute. A depth-3 circle is a fraction of a
+      // depth-1 one, so a flat 1.0 unit of travel is a far bigger ask of the
+      // small one and would have flattered the deep cases.
+      const spreadNeed = SPREAD * (P.r / 100);
+      if (apart === null && side >= spreadNeed) apart = t;
+      if (apart !== null && side < spreadNeed) apart = null; // must STAY apart
       still = moved < UNLOCK_REST * P.r ? still + dt : 0;
       if (still > REST_SECONDS && rest === null) { rest = t; break; }
     }
     out.push({
       level: levelName, parent: P.data.name, n: kids.length,
+      depth: P.depth,
       R: +P.r.toFixed(1),
       apart: apart === null ? null : +apart.toFixed(2),
       rest: rest === null ? null : +rest.toFixed(2),
@@ -340,23 +378,26 @@ for (const nm of names) {
   try { rows = run(nm); } catch { continue; }
   if (!rows) continue;
   for (const r of rows) {
-    if (!byCount.has(r.n)) byCount.set(r.n, []);
-    byCount.get(r.n).push(r);
+    const key = `d${r.depth} n${r.n}`;
+    if (!byCount.has(key)) byCount.set(key, []);
+    byCount.get(key).push(r);
   }
 }
 
-console.log("Unlock settling times. Real tree, real pack, relayoutMobile applied, depth-1 parent.");
+console.log("Unlock settling times. Real tree, real pack, relayoutMobile applied.");
+console.log("parents at depth " + (process.env.DEPTHS || "1") + ".");
 console.log("aspect 0.5, difficulty " + DIFF_DEFAULT + ", tilt " + DIFF_TILT_DEG + ", dt 1/60, cap 12s.\n");
-console.log("children | cases | spread median | spread worst | rest median | rest worst | peak overlap");
-console.log("---------|-------|--------------|-------------|-------------|------------|-------------");
+console.log("depth/kids | cases | spread median | spread worst | rest median | rest worst | peak overlap");
+console.log("-----------|-------|--------------|-------------|-------------|------------|-------------");
 const med = (a) => { const s = [...a].sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : null; };
 for (const k of [...byCount.keys()].sort()) {
+  // eslint-disable-next-line no-unused-vars
   const rows = byCount.get(k);
   const ap = rows.map((r) => r.apart).filter((v) => v !== null);
   const re = rows.map((r) => r.rest).filter((v) => v !== null);
   const ov = rows.map((r) => r.peakOverlap);
   console.log(
-    String(k).padEnd(9) + "| " + String(rows.length).padEnd(6) +
+    String(k).padEnd(11) + "| " + String(rows.length).padEnd(6) +
     "| " + String(med(ap) ?? "none").padEnd(13) +
     "| " + String(ap.length ? Math.max(...ap) : "none").padEnd(12) +
     "| " + String(med(re) ?? "none").padEnd(12) +
