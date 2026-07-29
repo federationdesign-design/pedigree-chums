@@ -108,6 +108,19 @@ const PERSON_REF = [
 ];
 const ACTION = ['touched', 'touches', 'made me', 'showed me', 'hurt', 'kissed', 'licked', 'rubbed', 'grabbed', 'forced', 'made me touch'];
 
+// Task 43: fear-of-a-person disclosure. A fear or harm word paired with a person
+// reference reaches the approved safeguarding response (no new copy). The harm words
+// reuse the existing ACTION list; the fear indicators are Steve's, taken from the
+// recorder logs. The person list is Steve's. Applied additively below (only when
+// nothing else matched), so a person reference ALONE never triggers it and every
+// existing safety route keeps priority. Closes a browser-tested gap where "don't let
+// him get me" climbed the repair ladder and was dismissed by REPAIR-L3 (goodbye).
+const FEAR_HARM = [...ACTION, 'get me', 'coming', 'away from me', 'find me', 'hiding from'];
+const FEAR_PERSON = [
+  'him', 'her', 'he', 'she', 'the man', 'the woman', 'my dad', 'my mum', 'my uncle',
+  'my aunt', 'my brother', 'my sister', 'my teacher', 'that man',
+];
+
 // Reporting frames: the visitor is quoting abuse aimed at THEM ("my dad called me
 // stupid"), which is a safeguarding disclosure, not abuse to moderate. When one of
 // these precedes an ABUSE term, route to SAFEGUARDING, not the ABUSE boundary.
@@ -217,6 +230,15 @@ export function detectSafety(n: Normalised): SafetyHit | null {
       bestLen = t.length;
       hit = { kind: cat.kind, moderationId: cat.moderationId, action: cat.action };
     }
+  }
+
+  // Task 43: fear-of-a-person disclosure. A fear/harm word plus a person reference is a
+  // child in fear of someone -> the approved safeguarding response. Additive: runs only
+  // when nothing above matched, so harm-others, self-harm and the exact safeguarding
+  // phrases keep priority, and a bare person reference (no fear word, e.g. "tell me about
+  // him", "is he a good dog") is never a hit.
+  if (hit === null && hasAny(n, FEAR_HARM) && hasAny(n, FEAR_PERSON)) {
+    hit = { kind: 'safeguarding', moderationId: 'MOD_SAFEGUARDING', action: 'safety_signpost' };
   }
   return hit;
 }

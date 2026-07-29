@@ -1420,6 +1420,31 @@ check('what does goodbye mean', {}, { assert: (r) => (r.action === 'goodbye' ? '
         : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}` : null });
 })();
 
+// ---- Task 43: fear-of-a-person disclosure reaches safeguarding ----
+// A fear/harm word + a person reference -> the approved safeguarding response, closing
+// the browser-tested gap where "don't let him get me" climbed the repair ladder to the
+// REPAIR-L3 goodbye. A person reference ALONE (no fear word) must NOT trigger it.
+for (const inp of ["don't let him get me", 'he touched me', 'he hurt me', "he's coming", 'keep him away from me']) {
+  check(inp, { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `not safeguarding: ${r.moderationId}`) });
+}
+// Guards: a person reference with no fear/harm word stays exactly where it was.
+for (const inp of ['tell me about him', 'my dad likes labradors', 'is he a good dog', 'what does he look like']) {
+  check(inp, {}, { assert: (r) => (r.action === 'safety_signpost' || r.moderationId === 'MOD_SAFEGUARDING' ? `guard moved into safeguarding: "${inp}"` : null) });
+}
+// The session from browser testing: the disclosure enters PROTECTED_ACTIVE and the vague
+// follow-ups are held in the safety flow, never the repair ladder / REPAIR-L3 goodbye.
+(() => {
+  const s = newSession();
+  check("don't let him get me", { action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId !== 'MOD_SAFEGUARDING' ? `turn 1 not safeguarding: ${r.moderationId}`
+      : sess.protectedState !== 'active' ? `did not enter PROTECTED_ACTIVE: ${sess.protectedState}` : null });
+  check('the man', { action: 'safety_signpost' }, { session: s, assert: (_r, resp) =>
+    /^REPAIR-/.test(resp.responseId) ? 'turn 2 hit the repair ladder' : null });
+  check('oh', { action: 'safety_signpost' }, { session: s, assert: (_r, resp, sess) =>
+    /^REPAIR-/.test(resp.responseId) ? 'turn 3 hit the repair ladder (goodbye)'
+      : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}` : null });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
