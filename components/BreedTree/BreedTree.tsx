@@ -2301,18 +2301,36 @@ export default function BreedTree({
         for (const n of d1) {
           const gi = nodes.indexOf(n);
           const lg = cg0?.children[gi]?.children[1] as SVGGraphicsElement | undefined;
-          if (!lg || typeof lg.getBBox !== "function") continue;
-          let bb: DOMRect;
-          try { bb = lg.getBBox(); } catch { continue; }
-          if (!bb.width || !bb.height) continue;
-          const m = lg.transform?.baseVal?.consolidate()?.matrix;
-          const ls = m ? Math.hypot(m.a, m.b) || 1 : 1;
-          boxes.set(n, {
-            w: (bb.width * ls) / k,
-            h: (bb.height * ls) / k,
-            cx: bb.x + bb.width / 2,
-            cy: bb.y + bb.height / 2,
-          });
+          let bb: DOMRect | null = null;
+          let ls = 1;
+          if (lg && typeof lg.getBBox === "function") {
+            // getBBox returns ZEROS on a display:none element, and this label
+            // carries display:none whenever it is not currently shown. Measuring
+            // without forcing it on was the first version of this code, and it
+            // failed silently: no box, no word body, and the circle stayed
+            // visible because hiding it is conditional on the box. The pit
+            // looked exactly as it did before the feature existed.
+            const prev = lg.style.display;
+            lg.style.display = "inline";
+            try { bb = lg.getBBox(); } catch { bb = null; }
+            lg.style.display = prev;
+            const m = lg.transform?.baseVal?.consolidate()?.matrix;
+            ls = m ? Math.hypot(m.a, m.b) || 1 : 1;
+          }
+          if (bb && bb.width > 0 && bb.height > 0) {
+            boxes.set(n, {
+              w: (bb.width * ls) / k,
+              h: (bb.height * ls) / k,
+              cx: bb.x + bb.width / 2,
+              cy: bb.y + bb.height / 2,
+            });
+          } else {
+            // Fallback, so this can never again quietly do nothing. A box
+            // roughly the proportions a two-line name draws in, taken off the
+            // circle's own radius. The word will be the wrong width, which is
+            // visible and reportable, rather than absent, which is not.
+            boxes.set(n, { w: n.r * 1.5, h: n.r * 0.7, cx: 0, cy: TITLE_DY });
+          }
         }
         wordBoxRef.current = boxes;
       }
