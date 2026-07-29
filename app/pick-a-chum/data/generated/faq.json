@@ -21,13 +21,13 @@
     "alternativePhrasings": [
       "who can play"
     ],
-    "canonicalAnswer": "{{approved_age_and_audience_answer}}",
+    "canonicalAnswer": "Pick a Chum is for ages seven and up.",
     "sourcePage": "Product / FAQ",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Separate product age from competition eligibility.",
-    "resolvedAnswer": "It's designed for ages 7 and up, and plays best with 2 or more people. Younger children can absolutely join in with a grown-up, matching cartoon dogs to real ones is exactly the kind of thing they love.",
+    "resolvedAnswer": "Pick a Chum is for ages seven and up.",
     "resolvedCta": null
   },
   {
@@ -102,13 +102,13 @@
       "Hot Dog",
       "other way to play"
     ],
-    "canonicalAnswer": "{{approved_hot_dog_mode_answer}}",
+    "canonicalAnswer": "Hot Dogs is a memory version. Everyone sees the hands, then hides them. The whole thing is here:",
     "sourcePage": "Rules",
-    "cta": "Full game rules",
+    "cta": "/hot-dogs",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Memory restriction and revealed hands.",
-    "resolvedAnswer": "Plenty. There's Hot Dogs, a memory twist where everyone shows their hand for a few seconds after the draw, then hides it again. If you remember which dog another player is holding and you spot that breed in real life first, you steal their chum. You can also play bingo-style (first to complete a row of chums), Top Trumps-style stat battles, or make up your own house rules. There's a whole page on Hot Dogs.",
+    "resolvedAnswer": "Hot Dogs is a memory version. Everyone sees the hands, then hides them. The whole thing is here:",
     "resolvedCta": "/hot-dogs"
   },
   {
@@ -120,13 +120,13 @@
       "how much",
       "£6.99"
     ],
-    "canonicalAnswer": "{{approved_price_answer}}",
+    "canonicalAnswer": "Pre-order now for £6.99 instead of the usual £9.99, with free UK mainland delivery. We will email your launch code and date.",
     "sourcePage": "Campaign / product",
     "cta": "Get 30% Off",
     "campaignState": "PRE_LAUNCH",
     "contentStatus": "Confirm before launch",
     "notes": "Clarify full price versus discounted price.",
-    "resolvedAnswer": "The retail price is £9.99, but right now we're running a pre-launch discount that brings it down to £6.99, with free UK mainland delivery included. You can only get the £6.99 price if you pre-order before the game is released; once it's out, it's full price. We're launching very soon, pre-order now to lock in the discount, and we'll email you a code to use on launch day along with the release date the moment it's confirmed.",
+    "resolvedAnswer": "Pre-order now for £6.99 instead of the usual £9.99, with free UK mainland delivery. We will email your launch code and date.",
     "resolvedCta": null
   },
   {

@@ -590,19 +590,6 @@
     "status": "Draft approved for MVP review"
   },
   {
-    "responseId": "B05-R04",
-    "bucketId": "B05",
-    "subtag": "Health overview",
-    "triggers": [
-      "breed health"
-    ],
-    "template": "{{approved_health_summary}} That is general breed information, not a diagnosis. A vet handles the individual dog.",
-    "factSource": "Dog database",
-    "defaultRoute": "Breed profile",
-    "animationCue": "HEAD_TILT_MEDIUM",
-    "status": "Draft approved for MVP review"
-  },
-  {
     "responseId": "B05-R05",
     "bucketId": "B05",
     "subtag": "Training",
