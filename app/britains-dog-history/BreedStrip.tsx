@@ -52,6 +52,10 @@ export default function BreedStrip({ era }: { era: string }) {
     lineage: LineageNode;
   };
   const [active, setActive] = useState<Active | null>(null);
+  // Bumped on a retry so the modal remounts even though the level name has not
+  // changed. Without it, Restart on the same level would leave the round exactly
+  // as it was lost.
+  const [runKey, setRunKey] = useState(0);
   const [campaignScore, setCampaignScore] = useState(0); // carries across levels, resets on start over
   // Lives run alongside the score and last for one run at the pit, not for ever:
   // opening a level from the page starts you at three again. A retry spends one.
@@ -378,7 +382,7 @@ export default function BreedStrip({ era }: { era: string }) {
 
       {active && (
         <LineageModal
-          key={active.name}
+          key={`${active.name}:${runKey}`}
           era={era}
           initialScore={campaignScore}
           onScoreChange={setCampaignScore}
@@ -412,12 +416,17 @@ export default function BreedStrip({ era }: { era: string }) {
             setCampaignScore(0);
           }}
           onStartOver={() => {
-            // a retry costs a life; at zero the modal never offers this
+            // A retry costs a life and replays THIS level. It used to rebuild
+            // level one and wipe the campaign total, so failing level two threw
+            // away every level already cleared as well as the score. Losing your
+            // place is what running out of lives is for, and the modal only
+            // offers Restart while lives remain.
             setLives((l) => Math.max(0, l - 1));
             setStreak(0);
-            setCampaignScore(0); // game over: the campaign total resets with level 1
-            const fa = levelList[0] ? buildActive(levelList[0]) : null;
-            if (fa) setActive(fa);
+            // The modal is keyed on the level name, so replaying the same one
+            // would not remount and the round would not reset. The run counter
+            // is what forces it.
+            setRunKey((k) => k + 1);
           }}
           name={active.name}
           image={active.image}
