@@ -1494,6 +1494,13 @@ export default function BreedTree({
     const top = Math.max(pad, Math.min(r.top, window.innerHeight - r.height - pad));
     setRailPin({ top, left });
   }, [hideCaption]);
+  // Item 13, the chum family tree. A rail dog lifted onto its own layer, the
+  // same LineageMap the pit lift already uses, fed from the card it grew out of.
+  // No tree prop: LineageMap falls back to getLineage(breed.name) on its own, so
+  // this needs no new import and no second copy of the lookup.
+  // Reference only, by decision: no onScore and no onRemove, so opening one
+  // cannot collect a dog or change the round.
+  const [chumTree, setChumTree] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number } | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -4703,6 +4710,19 @@ export default function BreedTree({
           has something to reveal. Drawing that as a node with a connector says
           the dog descends from itself. soloLeaf tells the layer to skip the node
           entirely and reveal straight out of the big circle instead. */}
+      {/* The chum's own family tree. Same overlay as the pit lift: fixed to the
+          viewport but translucent, so the learn area stays visible behind it and
+          the tree can be panned inside it. */}
+      {dockAside && chumTree && (
+        <LineageMap
+          breed={chumTree}
+          circular
+          ringColor="#ffd23e"
+          rootRadius={chumTree.r}
+          currentScore={0}
+          onClose={() => setChumTree(null)}
+        />
+      )}
       {learnNode && learnCard && (
         <LineageMap
           breed={learnCard}
@@ -4920,6 +4940,36 @@ export default function BreedTree({
                   aria-label={`View ${r.name}`}
                 >
                   <img src={bust(r.image)} alt="" draggable={false} />
+                  {/* The "i" lives on the SELECTED card only. A badge on all
+                      seventeen would be about 14px, under a fingertip, and would
+                      fight the tap that picks the dog. The picked card is
+                      already enlarged, so there is room. A span rather than a
+                      button because it sits inside one; the press is stopped
+                      here so the card does not deselect underneath it. */}
+                  {ancestryFor?.slug === r.slug && (
+                    <span
+                      className={styles.relCardInfo}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Family tree for ${r.name}`}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const card = (e.currentTarget as HTMLElement).parentElement;
+                        const cr = card?.getBoundingClientRect();
+                        setChumTree({
+                          name: r.name,
+                          image: r.image,
+                          x: cr ? cr.left + cr.width / 2 : window.innerWidth / 2,
+                          y: cr ? cr.top + cr.height / 2 : window.innerHeight / 2,
+                          angle: 0,
+                          r: cr ? cr.width / 2 : 32, // grows from the card's own size
+                        });
+                      }}
+                    >
+                      i
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

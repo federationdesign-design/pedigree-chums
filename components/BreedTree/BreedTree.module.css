@@ -788,6 +788,34 @@
   z-index: 3;
 }
 .relCard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The "i" on the picked chum. Sits inside the card, which is overflow: hidden,
+   so it is placed just in from the bottom-right corner rather than overhanging.
+   Sized off the card so it scales with it: the picked card runs 56 to 88px, so
+   this lands between 22 and 35px, a real tap target. The card needs position
+   relative for it, which it did not have before and which changes nothing else,
+   since nothing inside it was positioned. */
+.relCard { position: relative; }
+.relCardInfo {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 40%;
+  height: 40%;
+  min-width: 20px;
+  min-height: 20px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 2px solid var(--navy, #0a3a57);
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: 0.85rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(10, 58, 87, 0.45);
+}
 @keyframes relPop {
   0% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
   60% { opacity: 1; transform: scale(1.08) rotate(4deg); }
