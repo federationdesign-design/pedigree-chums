@@ -47,3 +47,7 @@ FETCH_HEAD
 *.patch
 .claude/settings.local.json
 agent/
+
+# Playwright
+/test-results/
+/playwright-report/
