@@ -1381,8 +1381,31 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={circular ? `${styles.close} ${styles.closeCircular}` : styles.close} onClick={onClose} aria-label="Close">
-        &times;
+      {/* BACK, not close. A play triangle facing left: it takes you back a layer
+          rather than dismissing anything.
+          closeCircular is now applied for the chum family tree too, not only the
+          pit lift. Without it that screen fell back to .close, which is 52px
+          with no border, against the pit's 100.8 with a 5px navy stroke: the
+          size and the missing stroke line were both this. */}
+      <button
+        type="button"
+        className={liftRoot ? `${styles.close} ${styles.closeCircular}` : styles.close}
+        onClick={onClose}
+        aria-label="Back"
+      >
+        {liftRoot ? (
+          <svg className={styles.backGlyph} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M17 4 L7 12 L17 20 Z"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : (
+          <>&times;</>
+        )}
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
         const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)

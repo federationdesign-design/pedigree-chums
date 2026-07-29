@@ -53,6 +53,21 @@
 .close:hover {
   filter: brightness(0.95);
 }
+@media (max-width: 768px) {
+  .autoBtn {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+    padding: 9px;
+  }
+}
+/* The back arrow: a play triangle facing left, so it reads as the way out
+   rather than a dismissal. */
+.backGlyph {
+  width: 42%;
+  height: 42%;
+  display: block;
+}
 
 .edge {
   fill: none;
@@ -422,8 +437,12 @@
    (centred under the root). Appears 5s in while circles are still yellow. */
 .autoWrap {
   position: fixed;
-  right: calc(clamp(18px, 4vw, 48px) + 100px); /* just left of the shake button */
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* same axis as the shake button */
+  /* ON the shake button's spot, not beside it. Same right, same bottom, and the
+     button below carries the same 100.8 / 67.5 pair, so the two are
+     interchangeable rather than merely near each other. The shake button is not
+     reachable behind this overlay, so there is nothing to collide with. */
+  right: clamp(18px, 4vw, 48px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   z-index: 10000;
   cursor: pointer;
 }
@@ -446,12 +465,13 @@
 }
 .autoBtn {
   display: block;
-  width: 84px;
-  height: 84px;
+  /* the shake and slowmo figures, so all three read as one family */
+  width: 100.8px;
+  height: 100.8px;
   box-sizing: border-box;
-  padding: 10px;
+  padding: 12px;
   background: var(--yellow);
-  border-radius: 20px;
+  border-radius: 30.24px;
   object-fit: contain;
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
