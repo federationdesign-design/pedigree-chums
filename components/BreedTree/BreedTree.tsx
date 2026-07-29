@@ -429,6 +429,11 @@ function measureEm(line: string, font: string | null): number {
 }
 // Steve: names two point sizes larger than the fitted size. Single tunable.
 const TITLE_BOOST = 2;
+// A name in the pit is drawn 30% larger than it was inside its circle. It has
+// no ring or picture around it any more, so at the circle's own size it read as
+// small print rather than as an object. Only in the pit: lift it out and it goes
+// back to the circle it always was, at the circle's size.
+const PIT_WORD_SCALE = 1.3;
 // How much of the pit's width settled bodies must block, at the top zone, for
 // the round to be over. A fraction rather than a head count, because a mini pit
 // tree often holds only two or three circles. Two bodies is the floor, so one
@@ -1510,6 +1515,12 @@ export default function BreedTree({
   const pillsGRef = useRef<SVGGElement>(null);
   const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
   const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
+  // Each dropped name's real drawn box, measured off the DOM at drop time and
+  // converted into world units. Measured rather than derived: the label sits
+  // inside a group that zoomTo has already scaled, and its text block is offset
+  // from the group origin by TITLE_DY, so both the size and the centre have to
+  // come from getBBox rather than from the constants.
+  const wordBoxRef = useRef<Map<Node, { w: number; h: number; cx: number; cy: number }>>(new Map());
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
   // The pit-full countdown, ported from the main pit: huge sequential digits
@@ -1932,8 +1943,13 @@ export default function BreedTree({
       const ty = (d.y - v[1]) * k;
       // one <g> per node: [0] is the circle, [1] is its label
       const wrap = cg?.children[i] as SVGGElement | undefined;
+      // In the pit a dog is its NAME. The circle stands down and the label
+      // takes the body's place, its angle and the 30% size, spinning about its
+      // own middle rather than orbiting its anchor.
+      const box = fellRef.current ? wordBoxRef.current.get(d) : undefined;
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       if (c) {
+        c.setAttribute("display", box ? "none" : "inline");
         c.setAttribute("transform", `translate(${tx},${ty})`);
         c.setAttribute("r", String(drawR(d, v, k)));
         // The radius is scaled by the view but the stroke was not, so a circle
@@ -1942,7 +1958,17 @@ export default function BreedTree({
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
-        if (d === focusRef.current) {
+        if (box) {
+          const pbz = pitBodiesRef.current;
+          const bodyz = pbz?.owned.has(d) ? pbz.find(d) : undefined;
+          const ang = ((bodyz as unknown as { a?: number } | undefined)?.a ?? 0) * 57.2958;
+          const lsw = isMobileRef.current ? Math.max(0.4, Math.min(1.25, (d.r * k) / 250)) : 1;
+          const sw = lsw * PIT_WORD_SCALE;
+          l.setAttribute(
+            "transform",
+            `translate(${tx},${ty}) rotate(${ang}) scale(${sw}) translate(${-box.cx},${-box.cy})`
+          );
+        } else if (d === focusRef.current) {
           // The focused circle's own label sits at its centre.
           l.setAttribute("transform", "translate(0,0)");
         } else {
@@ -2014,7 +2040,11 @@ export default function BreedTree({
       x: cr.left + cr.width / 2,
       y: cr.top + cr.height / 2,
       angle: (body as unknown as { a?: number }).a ?? 0,
-      r: cr.width / 2, // keep the circle's on-screen size on the next layer
+      // The circle's own size, not the word's. In the pit the tapped element is
+      // the name, so its width is a name's width and reading the rect would
+      // hand the next layer a card as wide as the longest breed name. The pit
+      // froze pixels-per-world at drop time, so the true radius is that.
+      r: wordBoxRef.current.has(d) ? d.r * (fxPxPerWorldRef.current || 1) : cr.width / 2,
       ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
     });
     setLearnNode(d);
@@ -2039,7 +2069,11 @@ export default function BreedTree({
           x: cr.left + cr.width / 2,
           y: cr.top + cr.height / 2,
           angle: (body as unknown as { a?: number }).a ?? 0,
-          r: cr.width / 2, // keep the circle's on-screen size on the next layer
+          // The circle's own size, not the word's. In the pit the tapped element is
+      // the name, so its width is a name's width and reading the rect would
+      // hand the next layer a card as wide as the longest breed name. The pit
+      // froze pixels-per-world at drop time, so the true radius is that.
+      r: wordBoxRef.current.has(d) ? d.r * (fxPxPerWorldRef.current || 1) : cr.width / 2,
           ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
         });
         setLearnNode(d);
@@ -2253,6 +2287,35 @@ export default function BreedTree({
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
+      // ---- measure each name as it is actually drawn ----
+      // Three coordinate spaces meet here and deriving the answer from the
+      // constants would be guesswork: getBBox returns the group's LOCAL box,
+      // the group already carries a scale zoomTo applied, and the text block is
+      // offset from the group origin. So read the box, read the scale back off
+      // the group's own matrix, and convert view units to world by dividing by
+      // k. cx and cy are the block's centre in local units, needed because a
+      // word must spin about its middle rather than orbit its anchor.
+      {
+        const cg0 = circlesRef.current;
+        const boxes = new Map<Node, { w: number; h: number; cx: number; cy: number }>();
+        for (const n of d1) {
+          const gi = nodes.indexOf(n);
+          const lg = cg0?.children[gi]?.children[1] as SVGGraphicsElement | undefined;
+          if (!lg || typeof lg.getBBox !== "function") continue;
+          let bb: DOMRect;
+          try { bb = lg.getBBox(); } catch { continue; }
+          if (!bb.width || !bb.height) continue;
+          const m = lg.transform?.baseVal?.consolidate()?.matrix;
+          const ls = m ? Math.hypot(m.a, m.b) || 1 : 1;
+          boxes.set(n, {
+            w: (bb.width * ls) / k,
+            h: (bb.height * ls) / k,
+            cx: bb.x + bb.width / 2,
+            cy: bb.y + bb.height / 2,
+          });
+        }
+        wordBoxRef.current = boxes;
+      }
       // yellow % badges become small bodies, spawned at each circle's lower-right rim
       const BADGE_R = badgeDrawRRef.current / k;
       const badges: Body[] = d1.map((n, i) => ({
@@ -2277,8 +2340,34 @@ export default function BreedTree({
         Composite.add(world, mb);
         return mb;
       };
-      for (const b of bodies) mkCircle(b, "circle", CIRCLE_OPTS);
+      // A dog is its NAME in the pit, so its body is the box that name draws
+      // in, not a circle. The chips are untouched and stay circles.
+      // opts mirrors mkCircle's shape without borrowing its `any`: a small local
+      // type, because a bare `any` here is a lint error in this file.
+      type BodyOpts = { restitution: number; friction: number; frictionAir: number; density: number };
+      const mkWord = (b: Body, opts: BodyOpts) => {
+        const p = pxFromWorld(b.x, b.y);
+        const box = b.n ? wordBoxRef.current.get(b.n) : undefined;
+        const wpx = Math.max(8, (box ? box.w : b.r * 2) * pxPerWorld * PIT_WORD_SCALE);
+        const hpx = Math.max(8, (box ? box.h : b.r * 2) * pxPerWorld * PIT_WORD_SCALE);
+        const mb = Bodies.rectangle(p.x, p.y, wpx, hpx, { ...opts, chamfer: { radius: Math.min(wpx, hpx) * 0.18 } });
+        mb.plugin = { bridge: b, kind: "circle" };
+        b.mb = mb; b.mbIn = true;
+        Composite.add(world, mb);
+        return mb;
+      };
+      for (const b of bodies) mkWord(b, CIRCLE_OPTS);
       for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
+      // The opening shove: up and out, the first name one way and the next the
+      // other, with a spin so they arrive already tumbling rather than dropping
+      // dead straight. Alternating by index rather than by position, so a level
+      // with three or four names still fans instead of all leaning one way.
+      bodies.forEach((b, i) => {
+        if (!b.mb) return;
+        const dir = i % 2 === 0 ? -1 : 1;
+        MBody.setVelocity(b.mb, { x: dir * vps(0.55), y: -vps(0.75) });
+        MBody.setAngularVelocity(b.mb, dir * 0.14);
+      });
       // walls and floor: thick statics, pit-style, in px space
       const T = 600;
       const pL = pxFromWorld(xL, yF), pR = pxFromWorld(xR, yF);
@@ -3672,6 +3761,9 @@ export default function BreedTree({
   // name, not just the first ring. The chum pages keep the single ring they
   // have always had, and PLAY is untouched.
   const deepLabels = dockAside && !dropped;
+  // The drop used to take every name with it. The level's own dogs now ARE their
+  // names once the pit starts, so theirs have to stay up.
+  const pitWords = dockAside && dropped;
   const labelSet = deepLabels ? new Set(focus.descendants()) : null;
 
   return (
@@ -3943,7 +4035,8 @@ export default function BreedTree({
               // A name belongs to a circle. If the circle is not drawn, and an
               // echo circle is not, the name goes with it. Without this the
               // repeated names stayed floating over the parent they belong to.
-              const visible = (isInside || isLeafFocus) && !labelBuried && !overlaid && !hidden;
+              const isPitWord = pitWords && d.depth === 1;
+              const visible = (isInside || isLeafFocus || isPitWord) && !labelBuried && !overlaid && !hidden;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               const labelEl = (
                 <g
