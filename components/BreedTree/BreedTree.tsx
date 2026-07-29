@@ -3151,7 +3151,7 @@ export default function BreedTree({
         circleRadius?: number;
         mass?: number;
         isStatic?: boolean;
-        plugin?: { kind?: string; bridge?: Body; prop?: { dead?: boolean } };
+        plugin?: { kind?: string; bridge?: Body; prop?: { dead?: boolean; toyKind?: string } };
       };
       // The px radius of any body, circle or not. Rods and pills are rectangles
       // and have no circleRadius, so fall back to the larger half-extent.
@@ -3238,7 +3238,7 @@ export default function BreedTree({
           // heavier and a shove that size reads as a thump. In the mini pit the
           // same figure cleared the whole floor. Cut to a sixth. The reach is
           // unchanged: it was the force that was wrong, not how far it carried.
-          const SHOVE_F = 0.19 * radOf(bombMb); // 0.15, up a quarter by request
+          const SHOVE_F = 0.171 * radOf(bombMb); // 0.19, down a tenth by request
           for (const o of live) {
             if (claimed.has(o)) continue;
             const dx = o.position.x - bx, dy = o.position.y - by;
@@ -3255,7 +3255,17 @@ export default function BreedTree({
             if (dist > SHOVE_R) continue;
             const fall = 1 - dist / SHOVE_R;
             const k2 = o.plugin?.kind;
-            const mult = k2 === "rod" || k2 === "pill" ? 0.80 : k2 === "circle" ? 0.10 : 0.15;
+            // The rock takes a tenth of what everything else does.
+            //
+            // Note what the line below is doing: multiplying the force by the
+            // object's own mass CANCELS the mass, because force is mass times
+            // acceleration. So every object was accelerated the same however
+            // heavy it was, and the rock, which is roughly ten times the
+            // density of anything else in here, flew like a chip. The term is
+            // left in place because the rest of the tuning is built on it, and
+            // the rock is divided out by hand instead.
+            const isRock = o.plugin?.prop?.toyKind === "rock";
+            const mult = (k2 === "rod" || k2 === "pill" ? 0.80 : k2 === "circle" ? 0.10 : 0.15) / (isRock ? 10 : 1);
             const mag = SHOVE_F * fall * fall * (o.mass || 1) * mult;
             MBody.applyForce(o, o.position, { x: (dx / dist) * mag, y: (dy / dist) * mag - mag * 0.25 });
             MBody.setAngularVelocity(o, (Math.random() - 0.5) * 0.31 * (fall + 0.2));
@@ -3263,8 +3273,10 @@ export default function BreedTree({
             // case, which is what threw things off the top of the screen. 40 and
             // -20 are the main pit's, on bodies several times the mass.
             const spd = Math.hypot(o.velocity.x, o.velocity.y);
-            if (spd > 18) { const sc2 = 18 / spd; MBody.setVelocity(o, { x: o.velocity.x * sc2, y: o.velocity.y * sc2 }); }
-            if (o.velocity.y < -10) MBody.setVelocity(o, { x: o.velocity.x, y: -10 });
+            const cap = isRock ? 4 : 16;
+            if (spd > cap) { const sc2 = cap / spd; MBody.setVelocity(o, { x: o.velocity.x * sc2, y: o.velocity.y * sc2 }); }
+            const upCap = isRock ? 2.5 : 9;
+            if (o.velocity.y < -upCap) MBody.setVelocity(o, { x: o.velocity.x, y: -upCap });
           }
           wake();
         }, BOMB_BURST_MS));
