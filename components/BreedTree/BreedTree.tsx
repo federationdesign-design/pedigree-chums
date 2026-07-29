@@ -854,6 +854,8 @@ export default function BreedTree({
   onClose,
   centred = false,
   size = 760,
+  collectedChums,
+  onChumCollected,
   hideLabels = false,
   disableZoom = false,
   fill = false,
@@ -890,6 +892,11 @@ export default function BreedTree({
   onClose?: () => void;
   centred?: boolean;
   size?: number;
+  // Chums collected on THIS level, by name, and the callback that adds one.
+  // Per level by decision: the set lives in LineageModal, which already
+  // unmounts between levels, so there is no storage and nothing to reset.
+  collectedChums?: Set<string>;
+  onChumCollected?: (name: string) => void;
   hideLabels?: boolean;
   disableZoom?: boolean;
   fill?: boolean;
@@ -1484,6 +1491,9 @@ export default function BreedTree({
   // Reference only, by decision: no onScore and no onRemove, so opening one
   // cannot collect a dog or change the round.
   const [chumTree, setChumTree] = useState<{ name: string; image: string; x: number; y: number; angle: number } | null>(null);
+  // A collected card shows nothing but a tick, so its name has to be reachable.
+  // Tap toggles it; hover shows it too, in CSS, behind (hover: hover).
+  const [namedChum, setNamedChum] = useState<string | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -3867,9 +3877,9 @@ export default function BreedTree({
     const names = [...new Set(nodes.filter((n) => n.depth > 0).map((n) => n.data.name))];
     if (!names.length) return [] as { image: string; band: string }[];
     return descendantPackBreeds(names)
-      .filter((b) => !!b.image)
+      .filter((b) => !!b.image && !collectedChums?.has(b.name))
       .map((b) => ({ image: b.image, band: b.sizeBand as string }));
-  }, [nodes]);
+  }, [nodes, collectedChums]);
   useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
   // That dog's ancestry breakdown, the same figures as its own page.
   const ancestryRows = useMemo(
@@ -5094,6 +5104,7 @@ export default function BreedTree({
           breed={chumTree}
           strongBg
           currentScore={0}
+          onRemove={(n) => onChumCollected?.(n)}
           onClose={() => setChumTree(null)}
         />
       )}
@@ -5306,14 +5317,31 @@ export default function BreedTree({
                 <button
                   key={r.slug}
                   type="button"
-                  className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}`}
+                  className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}${collectedChums?.has(r.name) ? " " + styles.relCardDone : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
-                  onClick={() => { if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; } if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); setTempHidden(true); } setAncestryFor({ name: r.name, slug: r.slug, note: r.note, image: r.image }); }}
+                  onClick={() => {
+                    // Collected: the picture is gone and a tick is in its place,
+                    // so a tap has nothing left to select. It toggles the name
+                    // instead, which is the only thing still worth reading.
+                    if (collectedChums?.has(r.name)) { setNamedChum((n) => (n === r.slug ? null : r.slug)); return; }
+                    if (ancestryFor?.slug === r.slug) { setAncestryFor(null); return; }
+                    if (!ancestryFor) { setAncHidden(true); setTrainHidden(true); setTempHidden(true); }
+                    setAncestryFor({ name: r.name, slug: r.slug, note: r.note, image: r.image });
+                  }}
                   title={r.name}
-                  aria-label={`View ${r.name}`}
+                  aria-label={collectedChums?.has(r.name) ? `${r.name}, collected` : `View ${r.name}`}
                 >
-                  <img src={bust(r.image)} alt="" draggable={false} />
+                  {collectedChums?.has(r.name) ? (
+                    <>
+                      <svg className={styles.relCardTick} viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 12.5 L9.5 18 L20 6.5" fill="none" stroke="#ffffff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className={`${styles.relCardName}${namedChum === r.slug ? " " + styles.relCardNameOn : ""}`}>{r.name}</span>
+                    </>
+                  ) : (
+                    <img src={bust(r.image)} alt="" draggable={false} />
+                  )}
                   {/* The "i" lives on the SELECTED card only. A badge on all
                       seventeen would be about 14px, under a fingertip, and would
                       fight the tap that picks the dog. The picked card is

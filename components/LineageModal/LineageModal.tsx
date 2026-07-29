@@ -108,6 +108,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const router = useRouter();
   const [leavePage, setLeavePage] = useState<{ slug: string; name: string } | null>(null);
   const [captionOpen, setCaptionOpen] = useState(false); // hidden behind the info icon (rolled back by request)
+  // Chums collected on this level. Per level by decision, so no storage and no
+  // reset: this component already unmounts when the level changes.
+  const [collectedChums, setCollectedChums] = useState<Set<string>>(new Set());
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
   useEffect(() => {
@@ -247,6 +250,8 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}
           onRelativeTap={(slug, nm) => setLeavePage({ slug, name: nm })}
+          collectedChums={collectedChums}
+          onChumCollected={(n) => setCollectedChums((prev) => (prev.has(n) ? prev : new Set(prev).add(n)))}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}

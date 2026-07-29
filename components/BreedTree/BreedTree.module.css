@@ -816,6 +816,44 @@
    relative for it, which it did not have before and which changes nothing else,
    since nothing inside it was positioned. */
 .relCard { position: relative; }
+/* Collected. The picture goes, the tile turns green and wears a white tick.
+   overflow is opened up because the name label hangs below the tile, and the
+   tile is only 38 to 56px so it could never sit inside. */
+.relCardDone {
+  background: #1f9d55;
+  border-color: #22c55e;
+  overflow: visible;
+}
+.relCardTick {
+  position: absolute;
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+}
+.relCardName {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--navy, #0a3a57);
+  color: #ffffff;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 4;
+}
+/* Tap keeps it up. Hover shows it on a mouse only, so a finger never leaves one
+   stuck open. */
+.relCardNameOn { opacity: 1; }
+@media (hover: hover) {
+  .relCardDone:hover .relCardName { opacity: 1; }
+}
 .relCardInfo {
   position: absolute;
   right: 3px;
