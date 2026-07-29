@@ -75,6 +75,15 @@
 .node:hover .disc {
   stroke-width: 5;
 }
+/* Mini pit only. 3 was out of language beside a pit whose UI squares wear a 5px
+   navy rim and whose circles are heavier still, so the nodes read as thin. The
+   main pit keeps the original. */
+.discPit {
+  stroke-width: 5;
+}
+.node:hover .discPit {
+  stroke-width: 7;
+}
 .pct {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;

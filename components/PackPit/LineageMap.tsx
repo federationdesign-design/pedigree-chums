@@ -67,6 +67,9 @@ type Node = LineageNode & {
   _leaves: number;
   _x: number;
   _y: number;
+  // Mini pit only. True when this node overlaps its parent, which means there
+  // is no daylight between them and therefore no line worth drawing.
+  _tucked?: boolean;
   _dir: number; // outward direction this node sits at, so its own children fan away
 };
 
@@ -538,10 +541,35 @@ export default function LineageMap({
       }
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
-      const step = spread / Math.max(cnt, 2);
+      // MINI PIT: children sit on a ring around their parent, and the ring's
+      // radius is whichever is larger of two things.
+      //
+      //   the shoulder  the radius that tucks a node onto the parent's rim, so
+      //                 it overlaps and reads like the single-child card, which
+      //                 springs straight out of the big circle with no line
+      //   the fit       the smallest radius at which neighbours do not touch
+      //                 each other, worked out from the fan angle and the node
+      //                 size rather than a guessed constant
+      //
+      // Taking the larger makes it grade itself. Two children tuck onto the
+      // shoulder. Four or five are pushed out because they have to be. And the
+      // connector is drawn only when the ring has been pushed past the parent's
+      // edge, so a line appears exactly when there is a gap to justify it and
+      // never as a stub between two touching discs.
+      //
+      // A pair also gets a wider fan, so both can sit on the shoulder without
+      // crowding each other.
+      const spreadUsed = circular && cnt === 2 ? Math.max(spread, Math.PI * 1.1) : spread;
+      const step = spreadUsed / Math.max(cnt, 2);
+      const kidR = Math.max(...kids.map((k) => rOf(k)), 1);
+      const SIB_GAP = 8;
+      const fitD = cnt < 2 ? 0 : (2 * kidR + SIB_GAP) / (2 * Math.max(0.05, Math.sin(step / 2)));
+      const shoulderD = rOf(n) + kidR * 0.2; // tucked: overlaps by 0.8 of a node
+      const ringD = Math.max(shoulderD, fitD);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
-        const d2 = circular ? rOf(n) + rOf(k) + 50 : dist;
+        const d2 = circular ? ringD : dist;
+        if (circular) k._tucked = ringD <= rOf(n) + rOf(k);
         k._x = n._x + Math.cos(a) * d2;
         k._y = n._y + Math.sin(a) * d2;
         k._dir = a;
@@ -1387,7 +1415,7 @@ export default function LineageMap({
                 the original order, with the root drawn last. */}
             {soloLeaf && rootCard(breed.x, breed.y)}
             {shown
-              .filter((n) => n._parent && !soloLeaf)
+              .filter((n) => n._parent && !soloLeaf && !n._tucked)
               .map((n) => {
                 const p = n._parent as Node;
                 return (
@@ -1449,9 +1477,9 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={(n.img && (placedImgs.has(n.img as string) || packed)) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <circle className={`${styles.disc} ${circular ? styles.discPit : ""} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={(n.img && (placedImgs.has(n.img as string) || packed)) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
-                      fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
+                      fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * (circular ? 0.625 : 0.5))}
                       style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
