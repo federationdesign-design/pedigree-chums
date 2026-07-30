@@ -163,7 +163,12 @@
      calc rather than folded into the three values, because the middle term is
      viewport-relative: baking it in would give 3pt on one screen width and
      something else on every other. No shadow, by request. */
-  font-size: calc(clamp(6.8rem, 24vw, 16rem) - 5pt);
+  /* The FLOOR is what renders, not the vw term: 24vw on a 453px screen is
+     108.7px, a hair under the old 6.8rem minimum, so the minimum always won
+     and the viewport term never got a say. MEDIEVAL, the longest word, needed
+     about 90px to fit inside the 405px of content width. 6rem less 5pt is
+     89.3px, which fits with roughly 15px to spare. */
+  font-size: calc(clamp(6rem, 24vw, 16rem) - 5pt);
   color: #ffffff;
   line-height: 1;
   text-align: center;
