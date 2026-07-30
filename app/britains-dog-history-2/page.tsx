@@ -131,7 +131,7 @@ export default function HistoryV2Page() {
                         className={[
                           styles.panel,
                           p.kind === "fact" ? styles.panelFact : "",
-                          p.kind === "text" ? styles.panelText : "",
+                          p.kind !== "fact" ? styles.panelTop : "",
                         ].filter(Boolean).join(" ")}
                       >
                         {p.kind === "text" && (
@@ -235,7 +235,9 @@ export default function HistoryV2Page() {
                back to a panel replays the roll instead of the browser deciding
                nothing changed. */
             void el.offsetWidth;
-            el.classList.add(rollDir >= 0 ? CLS_FROM_RIGHT : CLS_FROM_LEFT);
+            /* Forward swipes bring the circle in from the LEFT, and going
+               back brings it in from the right. */
+            el.classList.add(rollDir >= 0 ? CLS_FROM_LEFT : CLS_FROM_RIGHT);
           }
 
           function onRollScroll() {

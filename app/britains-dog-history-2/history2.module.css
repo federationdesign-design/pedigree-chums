@@ -293,15 +293,14 @@
   text-align: center;
 }
 
-/* The section's own text panel. Two separate things were putting space above
-   the first paragraph: the panel's 22px top padding, and `justify-content:
-   center`, which pushes the block into the middle of the leftover height.
-   Both are removed here so the text starts flush against the split, matching
-   the photograph above it, which is full bleed and has no padding at all. The
-   bullet and fact panels keep the centring: their content is short and reads
-   correctly in the middle. */
-.panelText {
-  padding-top: 0;
+/* The text panel and the bullet panels. Both start their content 25px below
+   the split rather than floating in the middle of the panel.
+   `justify-content: flex-start` is not optional here: with the panel's default
+   centring, a top padding is invisible, because the block is positioned by the
+   leftover height rather than by the top edge. The fact panels are untouched
+   and stay centred. */
+.panelTop {
+  padding-top: 25px;
   justify-content: flex-start;
 }
 
@@ -323,7 +322,10 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.1;
-  margin: 0;
+  /* 15px from the title. The panel's own flex gap is 12, so this adds the
+     remaining 3. Shorthand rather than a margin-top longhand, so a later
+     `margin` of equal specificity cannot silently wipe it. */
+  margin: 3px 0 0;
 }
 
 /* Round, centred, half the panel width, above the words. aspect-ratio keeps
