@@ -1692,6 +1692,12 @@ export default function BreedTree({
   const [fullAlpha, setFullAlpha] = useState(0);
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
+  // Set when the countdown was started by a CHUM REACHING THE FLOOR rather than
+  // by the pit filling. The two need different endings: a full pit can be
+  // emptied, so that countdown is called off, but a chum has already landed and
+  // no amount of tidying undoes it. Without this flag the occupancy check would
+  // see room in the pit a frame later and cancel a countdown that should stand.
+  const floorTriggeredRef = useRef(false);
   // The pit-full countdown, ported from the main pit: huge sequential digits
   // 10 to 0 over the stage, a pause on 0, then GAME OVER hands to the shell.
   // The handles have to leave this function to be cancellable at all. Before,
@@ -3508,6 +3514,26 @@ export default function BreedTree({
           // the first thing to reach the floor is always a dog circle, because
           // nothing else is in the pit yet: that is the beat the toys run from
           if (pa.kind === "floor" || pb2.kind === "floor") armToys();
+          // A CHUM ON THE FLOOR STARTS THE COUNTDOWN.
+          //
+          // The chums arrive late, after the dogs, the chips and every prop, so
+          // by the time one reaches the floor the pit has genuinely run out of
+          // things to land on. No dwell time and no counting: the first one is
+          // the signal, which is what was asked for.
+          //
+          // The floor bodies were already tagged kind "floor" and the chums
+          // kind "chum", and this listener already existed, so this is the whole
+          // change rather than the start of one.
+          if (!fullTriggeredRef.current) {
+            const chumHitFloor =
+              (pa.kind === "chum" && pb2.kind === "floor") ||
+              (pb2.kind === "chum" && pa.kind === "floor");
+            if (chumHitFloor) {
+              fullTriggeredRef.current = true;
+              floorTriggeredRef.current = true;
+              runCountdown();
+            }
+          }
           const nrm = pair.collision.normal;
           const rv = Math.abs((B.velocity.x - A.velocity.x) * nrm.x + (B.velocity.y - A.velocity.y) * nrm.y);
           let flashed = false;
@@ -3781,7 +3807,7 @@ export default function BreedTree({
           if (full && !fullTriggeredRef.current) {
             fullTriggeredRef.current = true;
             runCountdown();
-          } else if (!full && fullTriggeredRef.current) {
+          } else if (!full && fullTriggeredRef.current && !floorTriggeredRef.current) {
             // ROOM AGAIN, so the countdown is called off mid-count, exactly as
             // the main pit does it: collect the dogs or throw the toys out and
             // the digits go away.
@@ -3794,6 +3820,10 @@ export default function BreedTree({
             if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
             setFullAlpha(0);
             fullTriggeredRef.current = false;
+            // Paired with the flag above: this branch only runs for a pit-full
+            // countdown, but clearing both keeps the two in step if the cancel
+            // ever gets another caller.
+            floorTriggeredRef.current = false;
             // The same 2.5s grace the main pit allows, so clearing one object
             // cannot leave the digits flickering on and off at the threshold.
             cdGraceRef.current = now + 2500;
