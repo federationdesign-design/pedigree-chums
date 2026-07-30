@@ -204,59 +204,62 @@ export default function HistoryV2Page() {
             el.textContent = sub + ' / 8';
           }
 
-          /* CIRCLE ROLL-IN. The circles are invisible until the carousel has
-             come to rest, then the one on the settled panel rolls in from the
-             side the reader has just come from, so it reads as being carried
-             along by the swipe. Class names are interpolated from the CSS
-             module because the built names are hashed and cannot be typed as
-             literals here. */
-          var ROLL_SETTLE_MS = 140;
-          var CLS_FROM_RIGHT = '${styles.rollFromRight}';
-          var CLS_FROM_LEFT = '${styles.rollFromLeft}';
-          var rollTimer = null;
-          var lastLeft = carousel.scrollLeft;
-          var rollDir = 1;                       /* 1 = going forward */
+          /* CIRCLE ROLL-IN, driven by scroll POSITION rather than by a timer.
+             The old version waited for the carousel to settle and then ran a
+             keyframe animation, which meant the circle arrived after the swipe
+             had already finished, and it was cleared to nothing the moment the
+             next swipe began, so it vanished rather than leaving with its own
+             panel. Position-driven fixes both: the roll is a function of how
+             far the panel is from centre, so it starts the instant the finger
+             moves and is complete the instant the panel lands.
 
-          function clearRolls() {
-            var all = document.querySelectorAll('[data-pc-roll]');
-            for (var i = 0; i < all.length; i++) {
-              all[i].classList.remove(CLS_FROM_RIGHT);
-              all[i].classList.remove(CLS_FROM_LEFT);
-            }
-          }
+             It rolls IN from the left on approach, and once it has arrived it
+             stays put and simply travels off with the rest of the panel. That
+             is why the arrived flag exists: without it the roll would run
+             on the way out, and the circle would slide the wrong way against
+             the text beside it. */
+          var ROLL_TURN_DEG = 229;   /* one panel of travel for a circle half a
+                                        panel wide: 1 / (pi x 0.5) of a turn */
+          var rollEls = document.querySelectorAll('[data-pc-roll]');
 
-          function settleRoll() {
+          function updateRoll() {
             var w = carousel.clientWidth;
             if (!w) return;
-            var g = Math.round(carousel.scrollLeft / w);
-            var el = document.querySelector('[data-pc-roll="' + g + '"]');
-            if (!el) return;
-            /* Reading a layout property flushes the class removal, so coming
-               back to a panel replays the roll instead of the browser deciding
-               nothing changed. */
-            void el.offsetWidth;
-            /* Forward swipes bring the circle in from the LEFT, and going
-               back brings it in from the right. */
-            el.classList.add(rollDir >= 0 ? CLS_FROM_LEFT : CLS_FROM_RIGHT);
-          }
-
-          function onRollScroll() {
-            var now = carousel.scrollLeft;
-            if (now !== lastLeft) {
-              rollDir = now > lastLeft ? 1 : -1;
-              lastLeft = now;
+            var here = carousel.scrollLeft / w;
+            for (var i = 0; i < rollEls.length; i++) {
+              var el = rollEls[i];
+              var off = here - parseFloat(el.getAttribute('data-pc-roll'));
+              var d = Math.abs(off);
+              var t;
+              if (d >= 1) {
+                el.removeAttribute('data-pc-arrived');   /* off screen, re-arm */
+                t = 0;
+              } else if (el.hasAttribute('data-pc-arrived')) {
+                t = 1;                                    /* riding with the panel */
+              } else {
+                t = 1 - d;
+                if (d < 0.02) el.setAttribute('data-pc-arrived', '1');
+              }
+              var x = -(1 - t) * w;                       /* enters from the LEFT */
+              var a = -(1 - t) * ROLL_TURN_DEG;           /* clockwise, ie rolling right */
+              el.style.transform = 'translate(' + x.toFixed(1) + 'px, -50px) rotate(' + a.toFixed(1) + 'deg)';
+              el.style.opacity = t.toFixed(3);
             }
-            clearRolls();
-            if (rollTimer) clearTimeout(rollTimer);
-            rollTimer = setTimeout(settleRoll, ROLL_SETTLE_MS);
           }
 
+          var rollQueued = false;
           carousel.addEventListener('scroll', function(){
-            update(); updateCount(); onRollScroll();
+            update(); updateCount();
+            /* The roll writes styles on up to 36 elements, so it is thrown onto
+               the next frame rather than run inside the scroll event. */
+            if (!rollQueued) {
+              rollQueued = true;
+              requestAnimationFrame(function(){ rollQueued = false; updateRoll(); });
+            }
           }, { passive: true });
           update();
           updateCount();
-          settleRoll();
+          updateRoll();
 
           function goTo(idx) {
             /* Re-queried each time so the handler still works if React has

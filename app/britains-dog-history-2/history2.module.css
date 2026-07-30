@@ -212,6 +212,9 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Mirrored. Applies to the video and the still that stands in for it, so the
+     poster and the footage cannot face opposite ways while it loads. */
+  transform: scaleX(-1);
 }
 
 .slideCount {
@@ -320,7 +323,7 @@
 
 .bulletText {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 30px;
+  font-size: 27px; /* 10% down from 30px */
   font-style: italic;
   font-weight: 600;
   color: #ffffff;
@@ -354,46 +357,16 @@
   position: relative;
   z-index: 4;
   transform: translate(0, -50px);
-  /* Invisible until the carousel settles. The script adds one of the two
-     classes below, and `forwards` holds the finished state. */
+  /* Both of these are overwritten by the script every frame. They are the
+     off-screen starting state, so nothing flashes into view before the first
+     scroll event. */
   opacity: 0;
 }
 
-/* Rolling, not sliding. A circle covering this distance turns a fixed amount:
-   it travels one panel width, and its circumference is pi times its diameter,
-   which is half a panel width. 1 / (pi x 0.5) is 0.637 of a turn, so 229deg.
-   Rolling leftwards is anticlockwise, so the angle counts down to zero; coming
-   the other way it counts up. That is what stops it looking like a sticker
-   being dragged across the screen. */
-.rollFromRight {
-  animation: pcRollLeftward 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-.rollFromLeft {
-  animation: pcRollRightward 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-@keyframes pcRollLeftward {
-  from {
-    opacity: 1;
-    transform: translate(100vw, -50px) rotate(229deg);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -50px) rotate(0deg);
-  }
-}
-
-@keyframes pcRollRightward {
-  from {
-    opacity: 1;
-    transform: translate(-100vw, -50px) rotate(-229deg);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -50px) rotate(0deg);
-  }
-}
+/* The roll is driven from scroll position by the script, which writes both
+   `transform` and `opacity` directly. There are no keyframes any more: a
+   timed animation could only start after the swipe had finished, which is
+   what made the circle arrive late and vanish on the way out. */
 
 .factLabel {
   font-family: var(--font-display, "Luckiest Guy", cursive);
@@ -401,12 +374,16 @@
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.03em;
   line-height: 1.05;
-  /* 30px between the circle's visible bottom edge and this line. The circle is
-     drawn 50px above where it is laid out, so the gap on screen is the panel's
-     12px flex gap plus that 50px, which is 62. Taking 32 back off leaves 30.
-     Written as the shorthand deliberately: a longhand here would be wiped by
-     any later `margin` of equal specificity. */
-  margin: -32px 0 0;
+  /* About 15px between the circle's visible bottom edge and this line, half
+     what it was. The circle is drawn 50px above where it is laid out, so the
+     gap on screen is the panel's 12px flex gap, plus that 50px, plus the half
+     pixel of leading above the capitals: 30.5. Taking 47 off the flex gap
+     rather than 32 halves it.
+     COMPUTED, NOT MEASURED. The method was verified against a screenshot for
+     the bullet title, but this panel has not been measured.
+     Shorthand deliberately: a longhand here would be wiped by any later
+     `margin` of equal specificity. */
+  margin: -47px 0 0;
 }
 
 .factText {
@@ -415,6 +392,9 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
-  /* The panel's own 12px flex gap, less 5. */
-  margin: -5px 0 0;
+  /* About 12px from the label, half what it was. The 24px it measured is the
+     12.5px of descender room under the capitals, plus the 7px of box gap, plus
+     4.8px of leading above this line. Taking a further 12 off gets there.
+     COMPUTED, NOT MEASURED, same caveat as the rule above. */
+  margin: -17px 0 0;
 }
