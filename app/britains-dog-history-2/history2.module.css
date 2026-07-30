@@ -445,3 +445,205 @@
      target was 18.25. Hence -23. Unaffected by the circle's height. */
   margin: -23px 0 0;
 }
+
+/* ---- The vertical dog run --------------------------------------------- */
+
+/* Deliberately transparent, so the site's own fixed background shows through:
+   the diagonal gradient on `body` and the paw pattern on `body::before`. Every
+   other panel paints an opaque blue over both. */
+.timelinePanel {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100%;
+  scroll-snap-align: start;
+  overflow: hidden;
+}
+
+.timelineRun {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  /* Vertical panning handed back to the browser for touches that start in
+     here. The carousel around it is pan-x. See TimelineRun.tsx: this is only
+     half the fix, the script also has to stand down. */
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.timelineRun::-webkit-scrollbar {
+  display: none;
+}
+
+.dogScreen {
+  height: 100%;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* Card geometry copied from .node / .flipCard in history.module.css, so the
+   two pages cannot drift apart. Sized for a phone rather than the desktop
+   clamp, which tops out at 260px. */
+.dogCard {
+  position: relative;
+  width: min(78vw, 340px);
+  aspect-ratio: 1 / 1;
+}
+
+.dogFlipCard {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  perspective: 900px;
+  border-radius: var(--radius-card, 22px);
+}
+
+.dogFlipInner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+
+.dogFront,
+.dogBack {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card, 22px);
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.dogFront {
+  background: #ffffff;
+}
+
+.dogThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The family tree glyph, top right. Copied from .lineageBadge. */
+.dogBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dogBadge svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* The information "i", directly below the tree glyph. Copied verbatim from
+   .relCardInfo in BreedTree.module.css: blue fill, white ring, italic Georgia.
+   Sits outside the card's button, so it cannot swallow the card's own tap. */
+.dogInfo {
+  position: absolute;
+  top: 52px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--blue-deep, #0c5b92);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Status tag across the foot of the card. Copied from .nodeTag. */
+.dogTag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 7px 0;
+  color: #ffffff;
+}
+
+.dogTag_extinct { background: #d64545; }
+.dogTag_trending { background: #2e9e5b; }
+.dogTag_popular { background: #2e9e5b; }
+.dogTag_indecline { background: #e08a1e; }
+.dogTag_endangered { background: #e08a1e; }
+
+/* The back of the card: yellow ground, blue words. */
+.dogBack {
+  transform: rotateY(180deg);
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  padding: 22px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.dogNote {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.dogHint {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  color: var(--blue-deep, #0b78bd);
+}
+
+.dogName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.8rem, 8vw, 2.6rem);
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}

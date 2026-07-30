@@ -4,6 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import { SECTIONS } from "./sections";
 import ScrubVideo from "./ScrubVideo";
 import FitWord from "./FitWord";
+import TimelineRun from "./TimelineRun";
 import styles from "./history2.module.css";
 
 export const metadata: Metadata = {
@@ -62,6 +63,7 @@ const FACT_LIFT_PX = 60;
 type Entry =
   | { type: "intro" }
   | { type: "era"; words: string[] }
+  | { type: "timeline"; era: string }
   | { type: "section"; si: number };
 
 const SEQUENCE: Entry[] = [
@@ -70,6 +72,8 @@ const SEQUENCE: Entry[] = [
   // Sits directly after Medieval and Tudor, which is where the
   // ancient-medieval strip sits on the desktop page.
   { type: "era", words: ["Ancient", "to", "medieval", "dogs"] },
+  // The vertical run: eleven dogs, scrolled downwards inside one panel.
+  { type: "timeline", era: "ancient-medieval" },
   ...SECTIONS.slice(1).map((_, i) => ({ type: "section" as const, si: i + 1 })),
 ];
 
@@ -136,6 +140,10 @@ export default function HistoryV2Page() {
                 single full-screen slide with no photograph. */}
             {LAID_OUT.map(({ entry, first }, ei) => {
               if (entry.type === "intro") return null;
+
+              if (entry.type === "timeline") {
+                return <TimelineRun key={`t${ei}`} era={entry.era} panelIndex={first} />;
+              }
 
               if (entry.type === "era") {
                 return (
@@ -386,6 +394,11 @@ export default function HistoryV2Page() {
               if (axis === 'v') carousel.style.scrollSnapType = 'none';
             }
             if (axis !== 'v') return;                    /* horizontal: native handles it */
+            /* The vertical run has the wheel. Without this the drag would be
+               converted to horizontal movement and the dogs could not be
+               scrolled at all: touch-action alone does not stop this listener,
+               because it is bound to the carousel and the touch bubbles. */
+            if (carousel.getAttribute('data-pc-vlock') === '1') return;
             var now = Date.now();
             if (now > lastT) vel = (lastY - t.clientY) / (now - lastT);
             lastY = t.clientY; lastT = now;
@@ -394,6 +407,7 @@ export default function HistoryV2Page() {
 
           carousel.addEventListener('touchend', function(){
             if (axis !== 'v') return;
+            if (carousel.getAttribute('data-pc-vlock') === '1') { axis = null; return; }
             axis = null;
             var w = carousel.clientWidth;
             var idx;
