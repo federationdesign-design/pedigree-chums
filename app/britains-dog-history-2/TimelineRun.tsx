@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ukBreeds } from "../../data/uk-breeds";
+import FitWord from "./FitWord";
 import styles from "./history2.module.css";
 
 /*
@@ -33,7 +34,18 @@ const TAG_LABEL: Record<string, string> = {
   endangered: "Endangered",
 };
 
-export default function TimelineRun({ era, panelIndex }: { era: string; panelIndex: number }) {
+export default function TimelineRun({
+  era,
+  panelIndex,
+  words,
+}: {
+  era: string;
+  panelIndex: number;
+  /* The era title, one word per line. It is the first SCREEN OF THIS RUN, not
+     a horizontal slide of its own, so the reader scrolls down from it into
+     the dogs rather than swiping sideways. */
+  words: string[];
+}) {
   const breeds = ukBreeds.filter((b) => b.strip === era).sort((a, b) => a.anchor - b.anchor);
   const [flipped, setFlipped] = useState<string | null>(null);
   const runRef = useRef<HTMLDivElement | null>(null);
@@ -75,6 +87,12 @@ export default function TimelineRun({ era, panelIndex }: { era: string; panelInd
   return (
     <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
       <div ref={runRef} className={styles.timelineRun}>
+        {/* Screen one: the era title and nothing else. */}
+        <div className={styles.eraScreen}>
+          {words.map((w, wi) => (
+            <FitWord key={wi} text={w} className={styles.eraWord} />
+          ))}
+        </div>
         {breeds.map((b) => {
           const isFlipped = flipped === b.name;
           return (

@@ -149,24 +149,7 @@
 
 /* ---- Section slides --------------------------------------------------- */
 
-/* ---- Era title slide -------------------------------------------------- */
-
-/* A full screen of words and nothing else. Same blue as the panels, since
-   there is no photograph here and inventing a second background colour would
-   introduce a value nobody asked for. */
-.eraSlide {
-  flex: 0 0 100vw;
-  width: 100vw;
-  height: 100%;
-  scroll-snap-align: start;
-  box-sizing: border-box;
-  padding: 24px;
-  background: var(--blue-deep, #0b78bd);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-}
+/* ---- Era title, the first screen of the vertical run ----------------- */
 
 /* One word per line, each filling the width. The SVG carries its own viewBox
    cut to the word, so `width: 100%` is what does the scaling.
@@ -480,6 +463,12 @@
 .dogScreen {
   height: 100%;
   scroll-snap-align: start;
+  /* THE NOTCH. `y mandatory` on its own still lets a hard flick fly past
+     several dogs: it only decides where momentum finally settles. `always`
+     forces the scroll to stop at every snap point, so each dog has to be
+     pushed past deliberately. A real CSS feature rather than a trick, and it
+     compiles clean for Safari 15 and Chrome, so no sticky element is needed. */
+  scroll-snap-stop: always;
   box-sizing: border-box;
   padding: 24px;
   display: flex;
@@ -487,6 +476,20 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
+}
+
+/* The title screen is a notch too, so the reader stops on it rather than
+   flying straight into the first dog. */
+.eraScreen {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  box-sizing: border-box;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
 /* Card geometry copied from .node / .flipCard in history.module.css, so the

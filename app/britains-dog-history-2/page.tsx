@@ -3,7 +3,6 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import { SECTIONS } from "./sections";
 import ScrubVideo from "./ScrubVideo";
-import FitWord from "./FitWord";
 import TimelineRun from "./TimelineRun";
 import styles from "./history2.module.css";
 
@@ -62,8 +61,7 @@ const FACT_LIFT_PX = 60;
    put every counter after it out by one. */
 type Entry =
   | { type: "intro" }
-  | { type: "era"; words: string[] }
-  | { type: "timeline"; era: string }
+  | { type: "timeline"; era: string; words: string[] }
   | { type: "section"; si: number };
 
 const SEQUENCE: Entry[] = [
@@ -71,9 +69,10 @@ const SEQUENCE: Entry[] = [
   { type: "section", si: 0 },
   // Sits directly after Medieval and Tudor, which is where the
   // ancient-medieval strip sits on the desktop page.
-  { type: "era", words: ["Ancient", "to", "medieval", "dogs"] },
-  // The vertical run: eleven dogs, scrolled downwards inside one panel.
-  { type: "timeline", era: "ancient-medieval" },
+  // The vertical run: the era title, then eleven dogs, scrolled downwards
+  // inside a single panel. The title is the top of this run rather than a
+  // slide beside it.
+  { type: "timeline", era: "ancient-medieval", words: ["Ancient", "to", "medieval", "dogs"] },
   ...SECTIONS.slice(1).map((_, i) => ({ type: "section" as const, si: i + 1 })),
 ];
 
@@ -142,16 +141,8 @@ export default function HistoryV2Page() {
               if (entry.type === "intro") return null;
 
               if (entry.type === "timeline") {
-                return <TimelineRun key={`t${ei}`} era={entry.era} panelIndex={first} />;
-              }
-
-              if (entry.type === "era") {
                 return (
-                  <div key={`e${ei}`} className={styles.eraSlide} data-pc-panel={first}>
-                    {entry.words.map((w, wi) => (
-                      <FitWord key={wi} text={w} className={styles.eraWord} />
-                    ))}
-                  </div>
+                  <TimelineRun key={`t${ei}`} era={entry.era} panelIndex={first} words={entry.words} />
                 );
               }
 
