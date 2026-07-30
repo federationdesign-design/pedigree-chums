@@ -38,6 +38,14 @@ export type LevelTheme = {
   // mix-blend-mode: overlay, so it tints the backdrop rather than painting over
   // it. Optional: an era without one keeps the stylesheet's pink.
   wash?: string;
+  /* The props slot: the objects that drop in together part way through, in
+     place of the pit's stick, big stick and rock. Any length. The first two
+     arrive together and the rest follow one after another, so the original
+     rhythm holds however many there are.
+     Omit it and the era keeps the default three.
+     Typed loosely on purpose: the kinds themselves are the pit's business, and
+     naming them here would make this data file depend on the component. */
+  props?: string[];
 };
 
 const THEMES: Record<string, LevelTheme> = {
@@ -73,6 +81,8 @@ const THEMES: Record<string, LevelTheme> = {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     wash: "#fdf251",
+    // Tudor swaps the woodland props for household ones.
+    props: ["newspaper", "fork", "shoe"],
   },
 };
 

@@ -269,6 +269,25 @@ const TOY_BONE_GONE_KEY = "pc-minipit-bone-gone";
 // Dropped after the rock and before the chums, so it lands on a floor that has
 // something on it rather than into an empty pit.
 const TOY_BONE_GAP = 900;
+/* ---- Era props -------------------------------------------------------------
+   Objects that belong to one era rather than to the pit as a whole. They take
+   the place of the stick, big stick and rock in the props slot, and an era with
+   no set of its own keeps those three.
+
+   PNG WITH ALPHA, NOT SVG. A toy is drawn with an SVG <image href>, which takes
+   any format: the flag has been a JPEG since the beginning. What matters is
+   transparency, or the object lands as a white box. Aspects are the artwork's
+   own trimmed dimensions. */
+const TOY_NEWSPAPER_SRC = "/toy-newspaper.png";
+const TOY_NEWSPAPER_ASPECT = 560 / 247;
+const TOY_FORK_SRC = "/toy-fork.png";
+const TOY_FORK_ASPECT = 420 / 596;
+const TOY_SHOE_SRC = "/toy-shoe.png";
+const TOY_SHOE_ASPECT = 520 / 343;
+const TOY_NEWSPAPER_GONE_KEY = "pc-minipit-newspaper-gone";
+const TOY_FORK_GONE_KEY = "pc-minipit-fork-gone";
+const TOY_SHOE_GONE_KEY = "pc-minipit-shoe-gone";
+
 const STICK_ASPECT = 1368 / 299.7;
 const ROCK_ASPECT = 756.3 / 659.2;
 // Used-up toys stay gone for the rest of the session: the flag once its message
@@ -328,12 +347,18 @@ const CHUM_VW = 0.1;
 const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 3, giant: 5 / 3 };
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone";
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
+  | "newspaper" | "fork" | "shoe";
+/* The props slot: the three objects that arrive together part way through the
+   drop. A theme can replace them, which is how an era gets its own things to
+   knock about. */
+export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig", "rock"];
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
   cookies: TOY_COOKIES_SRC,
   bone: TOY_BONE_SRC,
+  newspaper: TOY_NEWSPAPER_SRC, fork: TOY_FORK_SRC, shoe: TOY_SHOE_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
@@ -342,6 +367,7 @@ const TOY_GONE_KEY: Record<ToyKind, string> = {
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
   cookies: TOY_COOKIES_SEEN_KEY,
   bone: TOY_BONE_GONE_KEY,
+  newspaper: TOY_NEWSPAPER_GONE_KEY, fork: TOY_FORK_GONE_KEY, shoe: TOY_SHOE_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -3020,8 +3046,18 @@ export default function BreedTree({
           // its 2.05 aspect makes it twice the stick's depth, so it lands as a
           // substantial object rather than a twig
           : kind === "bone" ? ballDia * 1.6
+          // Era props. The newspaper is a long roll so it takes the stick's
+          // length; the fork and the shoe are hand-sized, so they read at the
+          // ball's width like the rock does.
+          : kind === "newspaper" ? ballDia * 1.6
+          : kind === "fork" ? ballDia * 1.15
+          : kind === "shoe" ? ballDia * 1.25
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT : dia;
+        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
+          : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
+          : kind === "fork" ? dia / TOY_FORK_ASPECT
+          : kind === "shoe" ? dia / TOY_SHOE_ASPECT
+          : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
         const px = kind === "flag"
@@ -3046,6 +3082,11 @@ export default function BreedTree({
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           // the main pit's own bone figures, PackPit line 405
           : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
+          // A rolled newspaper and a wooden-soled shoe land dead and stay put.
+          // The fork is lighter and skitters a little, so it keeps some bounce.
+          : kind === "newspaper" ? { restitution: 0.16, friction: 0.6, frictionStatic: 1.0, frictionAir: 0.008, density: 0.004 }
+          : kind === "shoe" ? { restitution: 0.14, friction: 0.7, frictionStatic: 1.1, frictionAir: 0.008, density: 0.008 }
+          : kind === "fork" ? { restitution: 0.32, friction: 0.4, frictionAir: 0.005, density: 0.003 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
@@ -3102,6 +3143,17 @@ export default function BreedTree({
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : kind === "cookies"
                 ? Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: hgt * 0.16 } })
+              /* The era props are all oblongs rather than balls, so each gets a
+                 chamfered rectangle at its own drawn proportions. A circle would
+                 roll a newspaper down the slope like a barrel, and it would put
+                 a fork's body miles outside its handle. */
+              : kind === "newspaper" || kind === "fork" || kind === "shoe"
+                ? (() => {
+                    const b = Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: Math.min(dia, hgt) * 0.22 } });
+                    // Dropped at a tilt, so they do not all land square.
+                    MBody.setAngle(b, (Math.random() - 0.5) * 0.9);
+                    return b;
+                  })()
                 : Bodies.circle(px, py, r, opts);
         // fromVertices is avoided deliberately: it produced a ragged body when
         // it was tried on the pit floor. A plain polygon squashed to the
@@ -3168,11 +3220,18 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
         const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
-        // both sticks together, then the rock half a second later so it gets
-        // its own thump rather than landing under them
-        toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
-        toyTimers.push(window.setTimeout(() => spawnToy("stickBig"), propsAt));
-        toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt + TOY_ROCK_GAP));
+        /* THE PROPS SLOT, from the level's theme. An era with no set of its own
+           gets the stick, big stick and rock, which is what every era had.
+           The first two arrive together and the rest follow at the rock's gap,
+           so a set of any length keeps the original rhythm: a pair thumps in,
+           then the stragglers land one after another rather than in a heap. */
+        const props: ToyKind[] = levelTheme?.props?.length
+          ? (levelTheme.props as ToyKind[])
+          : DEFAULT_PROPS;
+        props.forEach((kind: ToyKind, i: number) => {
+          const at = i < 2 ? propsAt : propsAt + TOY_ROCK_GAP * (i - 1);
+          toyTimers.push(window.setTimeout(() => spawnToy(kind), at));
+        });
         const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
         toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
         toyTimers.push(window.setTimeout(spawnChums, boneAt + CHUM_GAP));
