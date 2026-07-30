@@ -128,7 +128,11 @@ export default function HistoryV2Page() {
                     {panels.map((p, pi) => (
                       <div
                         key={pi}
-                        className={p.kind === "fact" ? `${styles.panel} ${styles.panelFact}` : styles.panel}
+                        className={[
+                          styles.panel,
+                          p.kind === "fact" ? styles.panelFact : "",
+                          p.kind === "text" ? styles.panelText : "",
+                        ].filter(Boolean).join(" ")}
                       >
                         {p.kind === "text" && (
                           <>
@@ -145,7 +149,12 @@ export default function HistoryV2Page() {
                         {p.kind === "fact" && (
                           <>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img className={styles.factImg} src={p.image} alt="" />
+                            <img
+                              className={styles.factImg}
+                              src={p.image}
+                              alt=""
+                              data-pc-roll={1 + si * PANELS_PER_SECTION + pi}
+                            />
                             <p className={styles.factLabel}>Did you know?</p>
                             <p className={styles.factText}>{p.text}</p>
                           </>
@@ -195,9 +204,57 @@ export default function HistoryV2Page() {
             el.textContent = sub + ' / 8';
           }
 
-          carousel.addEventListener('scroll', function(){ update(); updateCount(); }, { passive: true });
+          /* CIRCLE ROLL-IN. The circles are invisible until the carousel has
+             come to rest, then the one on the settled panel rolls in from the
+             side the reader has just come from, so it reads as being carried
+             along by the swipe. Class names are interpolated from the CSS
+             module because the built names are hashed and cannot be typed as
+             literals here. */
+          var ROLL_SETTLE_MS = 140;
+          var CLS_FROM_RIGHT = '${styles.rollFromRight}';
+          var CLS_FROM_LEFT = '${styles.rollFromLeft}';
+          var rollTimer = null;
+          var lastLeft = carousel.scrollLeft;
+          var rollDir = 1;                       /* 1 = going forward */
+
+          function clearRolls() {
+            var all = document.querySelectorAll('[data-pc-roll]');
+            for (var i = 0; i < all.length; i++) {
+              all[i].classList.remove(CLS_FROM_RIGHT);
+              all[i].classList.remove(CLS_FROM_LEFT);
+            }
+          }
+
+          function settleRoll() {
+            var w = carousel.clientWidth;
+            if (!w) return;
+            var g = Math.round(carousel.scrollLeft / w);
+            var el = document.querySelector('[data-pc-roll="' + g + '"]');
+            if (!el) return;
+            /* Reading a layout property flushes the class removal, so coming
+               back to a panel replays the roll instead of the browser deciding
+               nothing changed. */
+            void el.offsetWidth;
+            el.classList.add(rollDir >= 0 ? CLS_FROM_RIGHT : CLS_FROM_LEFT);
+          }
+
+          function onRollScroll() {
+            var now = carousel.scrollLeft;
+            if (now !== lastLeft) {
+              rollDir = now > lastLeft ? 1 : -1;
+              lastLeft = now;
+            }
+            clearRolls();
+            if (rollTimer) clearTimeout(rollTimer);
+            rollTimer = setTimeout(settleRoll, ROLL_SETTLE_MS);
+          }
+
+          carousel.addEventListener('scroll', function(){
+            update(); updateCount(); onRollScroll();
+          }, { passive: true });
           update();
           updateCount();
+          settleRoll();
 
           function goTo(idx) {
             /* Re-queried each time so the handler still works if React has
