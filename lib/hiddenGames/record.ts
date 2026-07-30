@@ -28,6 +28,9 @@ export interface HiddenGamesRecord {
   // Whether the visitor has seen the one-time completion celebration (D11).
   // Same additive, optional treatment as intro_seen, in the same record.
   completion_seen: boolean;
+  // Whether the visitor has seen the first-visit prelude card (C03). Same
+  // additive, optional treatment; schema stays 3.
+  prelude_seen: boolean;
 }
 
 // Why a record read differed from a clean restore. Used only for the
@@ -53,6 +56,7 @@ export function freshRecord(nowMs: number): HiddenGamesRecord {
     updated_at: new Date(nowMs).toISOString(),
     intro_seen: false,
     completion_seen: false,
+    prelude_seen: false,
   };
 }
 
@@ -130,6 +134,7 @@ export function readRecord(
       updated_at: updatedAt,
       intro_seen: obj.intro_seen === true,
       completion_seen: obj.completion_seen === true,
+      prelude_seen: obj.prelude_seen === true,
     },
     note: "restored",
   };
@@ -160,6 +165,7 @@ export function applyReport(
       updated_at: new Date(nowMs).toISOString(),
       intro_seen: record.intro_seen, // a find never resets the intro flag
       completion_seen: record.completion_seen,
+      prelude_seen: record.prelude_seen,
     },
     outcome: "awarded",
   };
