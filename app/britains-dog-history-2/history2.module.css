@@ -163,7 +163,7 @@
      calc rather than folded into the three values, because the middle term is
      viewport-relative: baking it in would give 3pt on one screen width and
      something else on every other. No shadow, by request. */
-  font-size: calc(clamp(6.8rem, 24vw, 16rem) - 3pt);
+  font-size: calc(clamp(6.8rem, 24vw, 16rem) - 5pt);
   color: #ffffff;
   line-height: 1;
   text-align: center;
@@ -535,27 +535,21 @@
 
 /* ---- The timeline rail ------------------------------------------------ */
 
-/* The line's first stretch, on the title screen. Runs from under the text to
-   the foot of that screen, where the rail above picks it up, so the two read
-   as one line. 22vh puts the marker's centre 76% down, as in the concept. */
+/* The line's first stretch, on the title screen. It is DRAWN BY THE SCROLL:
+   `--pc-grow` runs 0 to 1 and scales the bar from its top edge, which is where
+   the disc sits, so the line appears to grow downwards out of the circle.
+   A transform rather than a height, so it costs nothing per frame. */
 .railStart {
   position: absolute;
   left: 50%;
   bottom: 0;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scaleY(var(--pc-grow, 0));
+  transform-origin: top center;
   width: 7px;
   height: 22vh;
   background: #ffffff;
   border-radius: var(--radius-pill, 999px);
   pointer-events: none;
-  /* Nothing until the reader moves. The disc arrives on its own timer and the
-     line follows the first scroll. */
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.railStartOn {
-  opacity: 1;
 }
 
 /* The head of the timeline. Geometry copied from .node::before on the desktop
@@ -580,7 +574,10 @@
   pointer-events: none;
   /* Held back 1.3s. `backwards` applies the opening frame during the delay,
      so the disc is genuinely absent rather than shown and then animated. */
-  animation: pcDotIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 1.3s backwards;
+  /* Nothing on screen until 1.2s. `both` keeps the opening frame during the
+     delay AND the closing frame after, so there is no flash at either end. */
+  opacity: 0;
+  animation: pcDotIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 1.2s both;
   transition: background 0.4s ease;
 }
 

@@ -66,6 +66,7 @@ export default function TimelineRun({
   /* True once the reader has moved at all. Turns the head of the rail green. */
   const [moved, setMoved] = useState(false);
   const runRef = useRef<HTMLDivElement | null>(null);
+  const startRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     const carousel = document.getElementById("mobile-carousel");
@@ -83,6 +84,14 @@ export default function TimelineRun({
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
       carousel.setAttribute("data-pc-vlock", onThisPanel && !atBottom ? "1" : "0");
       if (run.scrollTop > 4) setMoved(true);
+      /* The line is drawn by the scroll rather than faded in. Full length by
+         the time one screen has passed, which is where the next leg takes
+         over. */
+      const bar = startRef.current;
+      if (bar) {
+        const p = Math.min(1, Math.max(0, run.scrollTop / (run.clientHeight || 1)));
+        bar.style.setProperty("--pc-grow", p.toFixed(3));
+      }
     };
 
     const queue = () => {
@@ -117,7 +126,7 @@ export default function TimelineRun({
           {/* The head of the timeline sits on THIS screen, under the text, as
               in the concept. Its line reaches the foot of the screen and the
               rail below continues from exactly that edge. */}
-          <span className={`${styles.railStart} ${moved ? styles.railStartOn : ""}`} aria-hidden="true">
+          <span ref={startRef} className={styles.railStart} aria-hidden="true">
             <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
           </span>
         </div>
