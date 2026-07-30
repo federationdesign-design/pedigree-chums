@@ -105,7 +105,20 @@ export default function TimelineRun({
       const onThisPanel = here === panelIndex;
       // 2px of slack: sub-pixel scroll positions never land exactly on the end.
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
-      carousel.setAttribute("data-pc-vlock", onThisPanel && !atBottom ? "1" : "0");
+      const lock = onThisPanel && !atBottom;
+      carousel.setAttribute("data-pc-vlock", lock ? "1" : "0");
+      /* The attribute alone only stops TOUCH: the script reads it in its
+         touchmove handler. A trackpad, a mouse wheel or a keyboard scrolls the
+         carousel natively and never reaches that handler, which is how the
+         reader could slide sideways out of the run before reaching the last
+         dog. Clamping overflow is what actually holds them. scrollLeft is
+         written back because changing overflow can reset it. */
+      const keep = carousel.scrollLeft;
+      const want = lock ? "hidden" : "";
+      if (carousel.style.overflowX !== want) {
+        carousel.style.overflowX = want;
+        carousel.scrollLeft = keep;
+      }
       if (run.scrollTop > 4) setMoved(true);
       /* ONE line for the whole run. Its top is pinned to the disc and its
          length is simply how far you have scrolled plus the card's own inset,
@@ -135,6 +148,7 @@ export default function TimelineRun({
       run.removeEventListener("scroll", queue);
       // Never leave the rest of the page locked if this unmounts mid-scroll.
       carousel.setAttribute("data-pc-vlock", "0");
+      carousel.style.overflowX = "";
     };
   }, [panelIndex]);
 
