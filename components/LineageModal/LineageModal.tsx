@@ -290,7 +290,14 @@ export default function LineageModal({ name, image, character, lineage, onClose,
              screens where no round exists and there is nothing at stake. It
              only earns its place mid-round, where a stray tap in the corner
              would throw away a live game. */
-          onPitClose={() => (running ? setExitAsk(true) : onClose())}
+          /* NOTHING TO PAUSE, NOTHING TO CONFIRM. On the learn and start screens
+             there is no round, so the X closes outright.
+             During a round the pit now handles it itself: the X drops a red
+             leave and a green rewind into the pit, and tapping it again takes
+             them away. Two deliberate taps, the same protection the PAUSED
+             panel gave, without a screen over the game. */
+          onPitClose={onClose}
+          onBackToStart={backToStart}
           onRoundWon={() => {
             setPhase("won");
             // celebration: confetti over the flash (canvas-confetti, CDN pattern)

@@ -942,6 +942,7 @@ export default function BreedTree({
   registerSlowmo,
   onToggleCaption,
   onPitClose,
+  onBackToStart,
   onRoundWon,
   onPitFull,
   rootNote,
@@ -986,6 +987,9 @@ export default function BreedTree({
   registerSlowmo?: (fn: () => void) => void;
   onToggleCaption?: () => void;
   onPitClose?: () => void;
+  /* The pit menu's green rewind: back to THIS level's start screen. Owned by
+     the host, because it costs a life and remounts the round. */
+  onBackToStart?: () => void;
   onRoundWon?: () => void;
   onPitFull?: () => void;
   rootNote?: string;
@@ -1861,15 +1865,28 @@ export default function BreedTree({
   // toggle are navy rounded squares that start fixed in the corner, sink and
   // tilt a notch on every knock, give way on the fifth, then tumble like
   // anything else. A tap always works, wherever they are.
-  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: "close" | "desc" | "learn" };
+  type UiKind = "close" | "desc" | "learn" | "leave" | "restart";
+  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind };
   const uiBodiesRef = useRef<UiBody[] | null>(null);
+  /* THE PIT MENU. Two more squares, a red X to leave and a green rewind back to
+     the start screen, dropped into the pit by the corner X and taken away by
+     tapping it again. They replace the PAUSED panel: the two taps are the same
+     protection a confirm gave, without a screen over the game.
+     They are NOT in the physics world while the menu is closed, so nothing can
+     collide with a square that is not on screen. The frame loop below syncs
+     world membership to this ref. */
+  const [pitMenu, setPitMenu] = useState(false);
+  const pitMenuRef = useRef(false);
+  useEffect(() => { pitMenuRef.current = pitMenu; }, [pitMenu]);
   const uiCloseRef = useRef<SVGGElement>(null);
   const uiDescRef = useRef<SVGGElement>(null);
   const uiLearnRef = useRef<SVGGElement>(null);
   // Picks the element for a UI square. Three of them now, so the old two-way
   // ternary would have quietly handed "learn" the description square.
-  const uiRefFor = (k: "close" | "desc" | "learn") =>
-    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : uiLearnRef;
+  const uiLeaveRef = useRef<SVGGElement>(null);
+  const uiRestartRef = useRef<SVGGElement>(null);
+  const uiRefFor = (k: UiKind) =>
+    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : uiRestartRef;
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
   // Where and when a press on the pit background began, so a drag can be told
   // apart from a tap. Read by onBackground.
@@ -2733,15 +2750,27 @@ export default function BreedTree({
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          /* The two menu squares. Loose from the moment they arrive, so they
+             fall and tumble rather than sitting fixed like the corner three.
+             Parked on the corner X until the menu opens, which is where they
+             drop from. */
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind: "leave" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind: "restart" },
         ];
       }
       const uiBodies = uiBodiesRef.current;
+      /* Which squares belong to the pit menu rather than the corner. Their
+         bodies are built like any other, but they are held out of the world
+         until the menu opens: a body outside the world collides with nothing,
+         which is exactly what an off-screen control should do. */
+      const isMenuKind = (k: string) => k === "leave" || k === "restart";
       for (const u of uiBodies as any[]) {
         const p = pxFromWorld(u.x, u.y);
         const um = Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
         um.plugin = { ui: u };
         u.mb = um;
-        Composite.add(world, um);
+        u.mbIn = !isMenuKind(u.kind);
+        if (u.mbIn) Composite.add(world, um);
       }
 
       const all = bodies.concat(badges);
@@ -3890,7 +3919,32 @@ export default function BreedTree({
           }
         }
         const uis = uiBodiesRef.current as any[] | null;
+        /* THE MENU'S IN AND OUT. Driven from the ref rather than from React, so
+           it happens inside the loop that owns the world. Opening drops each
+           square from the corner X with a nudge, so they fall in rather than
+           appearing. Closing takes them straight back out. */
+        if (uis) {
+          const want = pitMenuRef.current;
+          for (const u of uis) {
+            if (u.kind !== "leave" && u.kind !== "restart") continue;
+            if (want && !u.mbIn) {
+              const anchor = uis.find((z) => z.kind === "close");
+              const px0 = pxFromWorld(anchor ? anchor.x : u.x, anchor ? anchor.y : u.y);
+              MBody.setPosition(u.mb, px0);
+              MBody.setAngle(u.mb, 0);
+              // A sideways nudge each, so they do not stack in one column.
+              MBody.setVelocity(u.mb, { x: u.kind === "leave" ? -3.2 : -1.1, y: 2.4 });
+              MBody.setAngularVelocity(u.mb, u.kind === "leave" ? -0.12 : 0.12);
+              Composite.add(world, u.mb);
+              u.mbIn = true;
+            } else if (!want && u.mbIn) {
+              Composite.remove(world, u.mb);
+              u.mbIn = false;
+            }
+          }
+        }
         if (uis) for (const u of uis) {
+          if (u.mbIn === false) continue;
           if (!u.fixed && u.mb) {
             if (!isDragged(u)) {
               const w = worldFromPx(u.mb.position.x, u.mb.position.y);
@@ -5095,12 +5149,19 @@ export default function BreedTree({
             // During a round the second square is the way back to learn. It
             // takes the description square's slot, which is safe because that
             // one only ever appears in learn.
-            const kinds = (started && onBackToLearn
-              ? ["close", "learn"]
-              : learning && hideCaption
-              ? ["close", "desc"]
-              : ["close"]) as readonly ("close" | "desc" | "learn")[];
-            const defs: { kind: "close" | "desc" | "learn"; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
+            /* The corner set, plus the two menu squares while the menu is
+               open. The menu only exists during a round: on the start screen
+               and in learn the X already closes or goes back outright, so
+               there is nothing to warn about. */
+            const kinds = ([
+              ...(started && onBackToLearn
+                ? ["close", "learn"]
+                : learning && hideCaption
+                ? ["close", "desc"]
+                : ["close"]),
+              ...(pitMenu && started ? ["leave", "restart"] : []),
+            ]) as readonly UiKind[];
+            const defs: { kind: UiKind; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
               const b = ub?.find((u) => u.kind === kind);
               return {
                 kind,
@@ -5114,7 +5175,17 @@ export default function BreedTree({
             return defs.map((d) => (
               <g key={d.kind} ref={uiRefFor(d.kind)}
                 role="button"
-                aria-label={d.kind === "close" ? (learning ? "Back to the start screen" : "Close the pit") : d.kind === "learn" ? "Back to the learn area" : "Breed information"}
+                aria-label={
+                  d.kind === "close"
+                    ? (learning ? "Back to the start screen" : started ? "Pit menu" : "Close the pit")
+                    : d.kind === "leave"
+                    ? "Leave the game"
+                    : d.kind === "restart"
+                    ? "Back to the start screen"
+                    : d.kind === "learn"
+                    ? "Back to the learn area"
+                    : "Breed information"
+                }
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
                 style={{
                   cursor: "pointer",
@@ -5127,12 +5198,46 @@ export default function BreedTree({
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
-                  const act = d.kind === "close" ? (learning ? backToStartScreen : onPitClose) : d.kind === "learn" ? onBackToLearn : onToggleCaption;
+                  /* THE CORNER X IS A TOGGLE DURING A ROUND. It drops the two
+                     menu squares in and takes them away again, which is the
+                     "keep playing" option without needing a button for it.
+                     Outside a round it still closes or goes back outright. */
+                  const act =
+                    d.kind === "close"
+                      ? (learning ? backToStartScreen : started ? () => setPitMenu((o) => !o) : onPitClose)
+                      : d.kind === "leave"
+                      ? () => { setPitMenu(false); onPitClose?.(); }
+                      : d.kind === "restart"
+                      ? () => { setPitMenu(false); onBackToStart?.(); }
+                      : d.kind === "learn"
+                      ? onBackToLearn
+                      : onToggleCaption;
                   startDrag(e, b && !b.fixed ? b : null, act);
                 }}>
                 <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
-                  style={{ fill: "var(--yellow, #ffd23e)", stroke: "var(--navy, #0a3a57)", strokeWidth: 5 * upp }} />
-                {d.kind === "close" ? (
+                  style={{
+                    /* The two menu squares carry their own colour so the choice
+                       reads before the glyph does: red leaves, green goes back.
+                       Everything else stays the pit's yellow. */
+                    fill:
+                      d.kind === "leave" ? "#ef4444" : d.kind === "restart" ? "#22c55e" : "var(--yellow, #ffd23e)",
+                    stroke: "var(--navy, #0a3a57)",
+                    strokeWidth: 5 * upp,
+                  }} />
+                {d.kind === "leave" ? (
+                  // White on red, the same X the corner uses.
+                  <g stroke="#ffffff" strokeWidth={iconStroke} strokeLinecap="round">
+                    <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
+                    <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
+                  </g>
+                ) : d.kind === "restart" ? (
+                  // Rewind, two triangles, matching the pause menu's green
+                  // button so the action is recognisable from the old menu.
+                  <g fill="#ffffff">
+                    <path d={`M${half * 0.04},${-half * 0.42} L${-half * 0.44},0 L${half * 0.04},${half * 0.42} Z`} />
+                    <path d={`M${half * 0.52},${-half * 0.42} L${half * 0.04},0 L${half * 0.52},${half * 0.42} Z`} />
+                  </g>
+                ) : d.kind === "close" ? (
                   learning ? (
                     // A play triangle facing left: in learn this square goes
                     // back rather than closing anything, so an X would be a lie.
