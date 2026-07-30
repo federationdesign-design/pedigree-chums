@@ -7,7 +7,7 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog, ActionType } from './types';
-import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
+import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { Topic } from './session';
 
@@ -735,6 +735,57 @@ export function extractCandidateSubject(n0: Normalised, data: ChumData): string 
   return null;
 }
 
+// Task 80: the canned-conversation buckets. Each B21-B39 row carries its column-D trigger
+// phrases; the LONGEST matching trigger wins (the most specific row). B40 is the no-subject
+// fallback, served by the engine, so it is excluded. Matched in resolve() above the non-answer
+// zone (gk_unknown / fallback / gibberish) but below every real route.
+//
+// Matching is deliberately tight because this layer sits above gk_unknown: a full-input exact
+// match always counts, but a trigger only matches as a substring when it is specific (three or
+// more words). That keeps short generic triggers ("who", "how long", "cats") from hijacking real
+// questions ("who is the prime minister", "how long does a game take") while still letting a
+// multi-word phrase ("do you like cats") match inside a longer message.
+const CANNED_BUCKETS = /^B(2[1-9]|3[0-9])$/;
+function cannedTriggerHits(c: string, hay: string, trig: string, exactOnly: boolean): boolean {
+  if (c === trig) return true; // exact full-input match, any length
+  if (exactOnly) return false; // the override path (beating a real answer) demands an exact match
+  return trig.indexOf(' ') !== trig.lastIndexOf(' ') && hay.includes(` ${trig} `); // else a >=3-word phrase
+}
+// exactOnly is used when a canned answer is allowed to OVERRIDE a real route (identity / orientation
+// / clarifier / FAQ): a substring hit is too loose there ("what do you do when a dog barks" is a
+// real FAQ, not B27), so only a full-input match overrides. The in-router fall-through check (over
+// the non-answer zone) leaves it false, so a phrase can still match inside a longer stray message.
+function matchCanned(c: string, data: ChumData, exactOnly = false): { bucket: string; responseId: string } | null {
+  const cc = c.replace(/'/g, ''); // apostrophe-insensitive: the workbook triggers are written without them, so "what's this" matches "whats this"
+  const hay = ` ${cc} `;
+  let best: { bucket: string; responseId: string; len: number } | null = null;
+  for (const r of data.collieResponses) {
+    if (!CANNED_BUCKETS.test(r.bucketId)) continue;
+    for (const t of r.triggers) {
+      const trig = normalise(t).compact.replace(/'/g, '');
+      if (!trig || trig.startsWith('any ')) continue; // skip the "ANY unrecognised input" pseudo-trigger
+      if (cannedTriggerHits(cc, hay, trig, exactOnly) && (!best || trig.length > best.len)) {
+        best = { bucket: r.bucketId, responseId: r.responseId, len: trig.length };
+      }
+    }
+  }
+  return best ? { bucket: best.bucket, responseId: best.responseId } : null;
+}
+function cannedResolution(m: { bucket: string; responseId: string }): Resolution {
+  const res: Resolution = { layer: 9, layerName: 'Recognised conversation', bucket: m.bucket, action: 'canned', responseId: m.responseId };
+  if (m.responseId === 'B34-CHUMDROP-01') res.destinationId = 'DST002'; // ChumDrop; the assembler resolves its URL
+  return res;
+}
+// The canned resolution for an input, or null. Exported so the engine can let a canned answer
+// override the four "old voice" routes Steve named (identity, orientation, the bare-help clarifier
+// and soft FAQ matches) that otherwise resolve above the in-router canned check below. Safety,
+// grief, breed pages, the bark game and every hard answer keep priority; only safety outranks it.
+export function resolveCanned(n0: Normalised, data: ChumData): Resolution | null {
+  const n = applyAliases(n0, buildAliasMap(data.misspellings));
+  const m = matchCanned(n.compact, data, true); // exact-only: overriding a real answer needs a full match
+  return m ? cannedResolution(m) : null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
@@ -1078,6 +1129,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (gk) {
       return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'gk_answer', gkId: gk.gkId };
     }
+  }
+
+  // Task 80: the canned-conversation buckets (B21-B39). Placed after the known-GK answer above
+  // and before the GK refuse-to-guess below, so a specific canned reply beats a "no approved
+  // record" non-answer, while every real answer (safety, breed, FAQ, identity, known GK, ...) that
+  // resolves earlier still wins. B34's first row hands over the ChumDrop page as a link.
+  {
+    const canned = matchCanned(c, data);
+    if (canned) return cannedResolution(canned);
   }
 
   // Layer 6 (continued): a general-knowledge-shaped question with no approved

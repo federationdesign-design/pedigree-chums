@@ -34,30 +34,16 @@ export interface Session {
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
   complaintOpened: boolean; // Task 25b: the full FAQ015 complaint answer was already served this context (subsequent turns get the short repeat)
-  repairCount: number; // Task 29: consecutive failed-understanding turns (the repair ladder rung); a valid intent resets it
-  // Task 56: the dog-led loop counters. Not read by anything yet (no flag, no served change).
-  // noActionCount increments wherever the fallback path fires today (the same trigger as the
-  // repair ladder: FAILED_UNDERSTANDING outside a protected state), capped at 4. The fourth
-  // consecutive fire rolls it over: it resets to 0 and increments completedLoops. It is also
-  // reset to 0 by any non-fallback resolution (a successful route, game start, safety route,
-  // stop or goodbye all fall through to the reset), and both reset on a new session.
-  noActionCount: number;
-  completedLoops: number; // Task 56: how many times noActionCount was reset by reaching 4
   // Task 57: the dog-led loop's candidate subject, carried for one turn. Set on a fallback-family
   // turn (the fallback catch-all or the GK refuse-to-guess) outside a protected state to the
   // canonical inside-world entity found in the input, or null when none is present. Cleared to
-  // null on every other turn. Not read by anything yet (no served change).
+  // null on every other turn.
   candidateSubject: string | null;
-  // Task 58: the dog-led loop's session-level flags. candidateEverFound latches true the first
-  // time any candidate subject is found this session (D3: the ORIENT nudge is withheld if the
-  // visitor is exploring rather than stuck). orientServed caps the ORIENT nudge at once per
-  // session. Both reset on a new session.
-  candidateEverFound: boolean;
-  orientServed: boolean;
-  // Task 71: whether the loop's repeat (LOOP-01) has already fired in the CURRENT loop. LOOP-01
-  // fires on the first candidate-bearing turn of a loop, once, rather than at a fixed counter
-  // position, so a blank opening turn no longer spends the repeat. Reset whenever the loop resets
-  // (the counter rolls over at 4, or a non-fallback turn breaks the loop) and on a new session.
+  // Task 79: whether the fallback's repeat (LOOP-01) has already fired in the current run of
+  // consecutive fallback turns. LOOP-01 fires on the first candidate-bearing turn, once; a
+  // non-fallback turn breaks the run and re-arms it. Reset on a new session. (Task 79 retired the
+  // loop counter, the completed-loop count, the ORIENT nudge and the repair ladder: the fallback
+  // now has exactly two outcomes, a repeat/offer for a subject or B40 "im a dog" for none.)
   loopRepeatUsed: boolean;
   // Task 68: the subject the previous turn offered via LOOP-01 (repeat) or LOOP-02 (destination),
   // awaiting a yes/no. A bare affirmation next turn routes to this subject's destination; anything
@@ -87,12 +73,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     personalSadnessCount: 0,
     lastWasComplaint: false,
     complaintOpened: false,
-    repairCount: 0,
-    noActionCount: 0,
-    completedLoops: 0,
     candidateSubject: null,
-    candidateEverFound: false,
-    orientServed: false,
     loopRepeatUsed: false,
     pendingConfirm: null,
     topic: null,

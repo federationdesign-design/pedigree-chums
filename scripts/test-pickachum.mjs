@@ -141,11 +141,12 @@ check('dogs', { action: 'breed_hub' });
 check('whats the best dog breed', { action: 'breed_best' });
 check('tell me about labradors', { action: 'breed_page' }, { url: '/chums/labrador' });
 check('tell me about border collies', { action: 'breed_page' }, { url: '/chums/border-collie' });
-// Regression (pass3): an identity question must reach B16 identity, never the breed
-// hub. The hub's bare-word rule collapses "are you a dog" to "dog"; identity is
-// checked first and now carries the trigger.
-check('are you a dog', { bucket: 'B16', action: 'identity' });
-check('are you a real dog', { bucket: 'B16', action: 'identity' });
+// Task 80: the exact identity triggers Steve moved to B23 now answer in the new terse voice
+// ("im a dog") instead of the B16 identity spiel. A non-exact identity question still gets the B16
+// route -- canned overrides a real answer only on a full-input match, so the breed hub is still
+// never reached for these.
+check('are you a dog', { bucket: 'B23', action: 'canned' }, { assert: (_r, resp) => (resp.text === 'im a dog' ? null : `not B23: ${resp.text}`) });
+check('are you a real dog', { bucket: 'B23', action: 'canned' });
 check('are you actually a dog', { bucket: 'B16', action: 'identity' });
 // Regression (pass3): a transfer verb + a chatbot dog name is a handoff, not a
 // breed page. A named breed with no verb is unchanged.
@@ -173,14 +174,17 @@ check('border collie', { action: 'breed_page' }, { url: '/chums/border-collie' }
 
 // ---- Specialist transfers (with context) ----
 check('Sausages.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' });
-check('Tell me a joke.', { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'boxer' });
+// Task 80: jokes are now answered in chat by B30 (the knock-knock flow) instead of transferring to
+// the Boxer. B30's trigger phrases (joke / tell me a joke / make me laugh / knock knock) win over
+// the old JOKE->boxer transfer. ("say something funny" still reaches offer_bark_game, above canned.)
+check('Tell me a joke.', { layer: 9, bucket: 'B30', action: 'canned' }, { assert: (_r, resp) => (resp.text === 'Knock knock' ? null : `joke not B30: ${resp.text}`) });
 
 // ---- Recognised conversation ----
 check('Hello.', { layer: 9, bucket: 'B09', action: 'converse' });
 check('heyyyy', { layer: 9, bucket: 'B09', action: 'converse' }); // elongation: heyyyy -> hey
 check('Test', { layer: 9, bucket: 'B10', action: 'converse' });
-check('Sit', { layer: 9, bucket: 'B11', action: 'converse' });
-check('I have three cats', { layer: 9, bucket: 'B12', action: 'converse' }); // personal statement (bored moved to FUN)
+check('Sit', { layer: 9, bucket: 'B22', action: 'canned' }); // Task 80: "sit" -> B22 "im already sitting" (was a B11 command)
+check('I have three cats', { layer: 9, bucket: 'B12', action: 'converse' }); // personal statement; "cats" alone is exact-only, so a three-word sentence is not hijacked by B21
 // Fix 4: the single-word bucket no longer echoes the input (standing exemption).
 //   before: check('Kettle', { layer: 9, bucket: 'B13', action: 'converse' }, { assert: includes('kettle') ? null : 'expected original word inserted' });
 //   after:  a single word gets the non-echoing fallback line and must NOT contain the input.
@@ -189,7 +193,7 @@ check('Kettle', { bucket: 'B13', action: 'fallback' }, { assert: (_r, resp) => (
 // Q1: 'help' removed from the B11 COMMAND pool, so help-seeking is no longer
 // answered with a dog command ("Sit? I am running the session."). Real safety
 // routing of these inputs is a later phase; here we assert only that they no
-// longer reach B11. 'Sit' etc. still reach B11 (asserted above).
+// longer reach B11. ('Sit' now reaches B22, the tricks bucket, asserted above.)
 check('I need help', {}, { assert: (r) => (r.bucket === 'B11' ? 'help-seeking reached the B11 command pool' : null) });
 check('pleeeassssee help me', {}, { assert: (r) => (r.bucket === 'B11' ? 'help-seeking reached the B11 command pool' : null) });
 
@@ -268,8 +272,10 @@ check('my brother makes me look at his willy', { action: 'safety_signpost' }, { 
 })();
 
 // ---- Task 9: orientation routing widened so onboarding questions reach B15 ----
-check('whats this?', { action: 'orientation', bucket: 'B15' });
-check('what can you do', { action: 'orientation', bucket: 'B15' });
+// Task 80: these two exact triggers now answer in the terse voice (B28 "A website", B27), canned
+// having been raised above orientation. Other onboarding questions still reach B15 (corpus below).
+check('whats this?', { action: 'canned', bucket: 'B28' });
+check('what can you do', { action: 'canned', bucket: 'B27' });
 check('where do I start', { action: 'orientation', bucket: 'B15' });
 // 'how does this work?' overlaps the TESTING list on "does this work"; orientation
 // (layer 11) is evaluated before the conversation layer (9), so orientation wins.
@@ -658,7 +664,9 @@ const T22_SAFETY = [
   ["don't want to wake up", 'MOD_SELF_HARM'], ["can't do this anymore", 'MOD_SELF_HARM'],
   ["don't feel safe at home", 'MOD_SAFEGUARDING'], ["can't tell anyone", 'MOD_GENERAL_DISTRESS'],
 ];
-const T22_ROUTER = [["what's this", 'B15', 'orientation'], ["what i'm saying", 'B16', 'identity']];
+// Task 80: "what's this" / "whats this" now answer from B28 ("A website"); the apostrophe folding
+// still holds (all three forms route the same). "what i'm saying" is unchanged (B16 identity).
+const T22_ROUTER = [["what's this", 'B28', 'canned'], ["what i'm saying", 'B16', 'identity']];
 for (const [p, mod] of T22_SAFETY)
   for (const form of [p.replace(/'/g, ''), p, curly22(p)])
     check(form, { layer: 1, action: 'safety_signpost' }, { assert: (r) => (r.moderationId === mod ? null : `want ${mod}, got ${r.moderationId}`) });
@@ -717,10 +725,9 @@ check('help me', { action: 'clarifier' });
 })();
 
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
-// Task 58: the route is still gk_unknown, but from count 1 the dog-led loop supersedes the
-// GK-UNKNOWN served text (a no-candidate first miss now serves LOOP-03). GK-UNKNOWN's own line
-// stays in the code until Task 59 retires it. (Was: asserted the approved gk-unknown line.)
-check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.responseId === 'LOOP-03' && ['Huh.', 'Hmm.'].includes(resp.text) ? null : `expected LOOP-03 puzzled line, got ${resp.responseId} "${resp.text}"`) });
+// Task 79: the route is still gk_unknown (a football score is a GK question with no record), but
+// with no candidate subject the fallback serves B40 "im a dog" in place of the GK-UNKNOWN line.
+check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.responseId === 'B40-NOSUBJECT-01' && resp.text === 'im a dog' ? null : `expected the im-a-dog line, got ${resp.responseId} "${resp.text}"`) });
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
 check('can I talk to another dog', { action: 'transfer_request' }, { assert: (_r, resp) => (resp.text.includes('hand you over') ? null : 'expected transfer-request line') });
 check('transfer me', { action: 'transfer_request' });
@@ -967,8 +974,8 @@ const isBarkAct = (a) => a === 'bark' || a === 'bark_break' || a === 'bark_ack';
   const s = newSession();
   s.activeDog = 'terrier';
   s.barkStreakByDog.terrier = 3;
-  submit(data, s, 'tell me a joke');
-  barkCase('BARK-T13', s.barkStreakByDog.terrier === 0 && s.activeDog === 'boxer', `terrier ${s.barkStreakByDog.terrier} active ${s.activeDog}`);
+  submit(data, s, 'Sausages.'); // a food question transfers to the Labrador (Task 80: jokes no longer transfer)
+  barkCase('BARK-T13', s.barkStreakByDog.terrier === 0 && s.activeDog === 'labrador', `terrier ${s.barkStreakByDog.terrier} active ${s.activeDog}`);
 })();
 // T14: a completed dog stays completed while another begins its own round 1
 (() => {
@@ -1262,73 +1269,63 @@ check('can someone help me', { action: 'safety_signpost' }, { assert: (r, resp) 
   check('ok', {}, { session: s, assert: (_r, _resp, sess) => (sess.topic === null ? null : `topic survived the protected exchange: ${JSON.stringify(sess.topic)}`) });
 })();
 
-// ---- Task 29: the repair ladder. Failed understanding climbs the three approved rungs;
-// a valid new intent (including safety) cancels the ladder and resets the count. ----
+// ---- Task 79: the fallback has two outcomes and never escalates. A no-candidate miss serves
+// B40 "im a dog" every time; there is no ladder, no rung rotation, no counter. A valid new intent
+// (including safety) still resolves normally. (The repair ladder, LOOP-03/04, the ORIENT nudge and
+// the loop counter were all retired in Task 79.) ----
 const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t);
-// The full S08 script as one session.
+// The full S08 script as one session: repeated no-candidate misses all serve B40; a real intent
+// resolves plainly.
 (() => {
   const s = newSession();
-  // Task 58: the repair ladder's repairCount still climbs underneath (1,2,3,4), but the dog-led
-  // loop now serves the text in place of REPAIR-L1/L2/L3/B13-FALLBACK (all no-candidate here, so
-  // LOOP-03 x3 then LOOP-04). The served text still never carries an unresolved token, and never
-  // repeats the same exact line twice in a row (LOOP-03 rotates Huh./Hmm.).
   const turns = [
-    ['whats the thing with the cards', 'faq_answer', null, 0],
-    ['no not that', 'fallback', 'LOOP-03', 1],
-    ['I mean the pictures on them', 'fallback', 'LOOP-03', 2],
-    ["you're not understanding me", 'fallback', 'LOOP-03', 3],
-    ['forget it', 'fallback', 'LOOP-04', 4],
-    ['actually can you help me find something', 'clarifier', null, 0],
-    ['the name generator', 'link', null, 0],
+    ['whats the thing with the cards', 'faq_answer', null],
+    ['no not that', 'fallback', 'B40-NOSUBJECT-01'],
+    ['I mean the pictures on them', 'fallback', 'B40-NOSUBJECT-01'],
+    ["you're not understanding me", 'fallback', 'B40-NOSUBJECT-01'],
+    ['forget it', 'fallback', 'B40-NOSUBJECT-01'],
+    ['actually can you help me find something', 'clarifier', null],
+    ['the name generator', 'link', null],
   ];
-  let ok = true, note = '', prevText = null;
-  for (const [inp, act, rid, cnt] of turns) {
+  let ok = true, note = '';
+  for (const [inp, act, rid] of turns) {
     const { resolution: r, response } = submit(data, s, inp);
     if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
     if (rid && response.responseId !== rid) { ok = false; note += `"${inp}" respId ${response.responseId} want ${rid}; `; }
-    if (s.repairCount !== cnt) { ok = false; note += `"${inp}" repairCount ${s.repairCount} want ${cnt}; `; }
-    if (/^LOOP-/.test(response.responseId)) {
-      if (hasUnresolvedTok(response.text)) { ok = false; note += `"${inp}" unresolved token; `; }
-      if (prevText === response.text) { ok = false; note += `"${inp}" exact line repeated in a row; `; }
-      prevText = response.text;
-    } else prevText = null;
+    if (hasUnresolvedTok(response.text)) { ok = false; note += `"${inp}" unresolved token; `; }
   }
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'S08: repair ladder + loop, one session', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
+  rows.push({ ok, input: 'S08: fallback serves im a dog, a real intent resolves', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
 })();
-// rung 1 then a valid breed request -> ladder clears, breed answers.
+// a no-candidate miss then a valid breed request -> the breed answers.
 (() => {
   const s = newSession();
-  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'LOOP-03' ? null : `not loop puzzled line: ${resp.responseId}`) }); // Task 58: loop supersedes REPAIR-L1
-  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, _resp, sess) =>
-    sess.repairCount !== 0 ? `ladder not cleared: ${sess.repairCount}` : r.breedSlug === 'labrador' ? null : `breed wrong: ${r.breedSlug}` });
+  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'B40-NOSUBJECT-01' ? null : `not the im-a-dog line: ${resp.responseId}`) });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r) => (r.breedSlug === 'labrador' ? null : `breed wrong: ${r.breedSlug}`) });
 })();
-// a safety signal during repair -> safety wins, ladder abandoned.
+// a safety signal after a miss -> safety wins.
 (() => {
   const s = newSession();
-  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'LOOP-03' ? null : `not loop puzzled line: ${resp.responseId}`) }); // Task 58: loop supersedes REPAIR-L1
-  check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
-    r.moderationId !== 'MOD_SAFEGUARDING' ? `safety lost: ${r.moderationId}` : sess.repairCount !== 0 ? `ladder not abandoned: ${sess.repairCount}` : null });
+  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'B40-NOSUBJECT-01' ? null : `not the im-a-dog line: ${resp.responseId}`) });
+  check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r) =>
+    (r.moderationId !== 'MOD_SAFEGUARDING' ? `safety lost: ${r.moderationId}` : null) });
 })();
-// the ladder never repeats the same rung twice in a row (consecutive misses climb L1/L2/L3,
-// then the plain catch-all), and no repair response contains an unresolved token.
+// Task 79: with no candidate the fallback serves the SAME line every time -- no rotation, no
+// escalation, no unresolved token. (This deliberately inverts the old "no exact line repeats"
+// invariant: she says "im a dog" however many times it happens.)
 (() => {
-  // Task 58: the loop supersedes the ladder. Five no-candidate fallback turns serve
-  // LOOP-03, LOOP-03, LOOP-03, LOOP-04, then (counter rolled over) LOOP-03 again. The served
-  // TEXT never repeats the same exact line twice in a row (LOOP-03 rotates Huh./Hmm.), and no
-  // served line carries an unresolved token.
   const s = newSession();
   const ids = [], texts = [];
   for (const inp of ['the wardrobe negotiated with marmalade', 'purple clocks drifting sideways', 'invisible tuesday melting quietly', 'the fifth wheel sang loudly', 'marmalade thoughts wander far']) {
     const { response } = submit(data, s, inp);
     ids.push(response.responseId); texts.push(response.text);
-    if (/^LOOP-/.test(response.responseId) && hasUnresolvedTok(response.text)) { fail++; rows.push({ ok: false, input: 'loop token', layer: '-', bucket: '-', action: 'loop', note: `${response.responseId} has a token` }); }
   }
-  const order = ids[0] === 'LOOP-03' && ids[1] === 'LOOP-03' && ids[2] === 'LOOP-03' && ids[3] === 'LOOP-04' && ids[4] === 'LOOP-03';
-  const noRepeat = !texts.some((t, i) => i > 0 && t === texts[i - 1]);
-  const ok = order && noRepeat;
+  const allB40 = ids.every((id) => id === 'B40-NOSUBJECT-01');
+  const allSame = texts.every((t) => t === 'im a dog');
+  const noTok = !texts.some((t) => hasUnresolvedTok(t));
+  const ok = allB40 && allSame && noTok;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'loop: no exact line repeats in a row', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `ids=${ids.join(',')} texts=${texts.join('|')}` });
+  rows.push({ ok, input: 'Task79: no-candidate fallback serves im a dog every time', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `ids=${ids.join(',')} texts=${texts.join('|')}` });
 })();
 
 // ---- Task 28: bark game wired (offer / explain / exit), fun_tease renamed offer_bark_game.
@@ -1372,8 +1369,8 @@ check('stop', {}, { assert: (r) => (r.action === 'bark_exit' ? 'stop reached the
   const s = newSession();
   const turns = [
     ['hi', 'converse'],
-    ['whats this?', 'orientation'],
-    ['what can you do', 'orientation'],
+    ['whats this?', 'canned'], // Task 80: B28 "A website"
+    ['what can you do', 'canned'], // Task 80: B27
     ['tell me about dogs', 'breed_hub'],
     ['I like labradors', 'breed_page'],
     ['whats a labrador like', 'breed_page'],
@@ -1432,8 +1429,6 @@ check('what does goodbye mean', {}, { assert: (r) => (r.action === 'goodbye' ? '
       if (/^REPAIR-/.test(response.responseId)) { ok = false; note += `"${inp}" reached the repair ladder; `; }
     }
   }
-  // Out-of-scope must not climb the repair ladder (it is a resolved intent, not a miss).
-  if (s.repairCount !== 0) { ok = false; note += `repairCount ${s.repairCount} want 0; `; }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'S09: full script, out-of-scope t1-2', layer: '-', bucket: '-', action: 'out_of_scope', note: ok ? '' : note });
 })();
@@ -1502,81 +1497,57 @@ check('cost', { action: 'price_answer' });
   check('how much is it', { action: 'price_answer' }, { session: s }); // "it" = the game price
 })();
 
-// ---- Task 56/58: the dog-led loop counters + serving ----
-// Four consecutive no-candidate fallback turns: the no-action counter climbs 1,2,3 then rolls to
-// 0 with completedLoops 1; the served line is the loop's (LOOP-03 x3, LOOP-04), superseding the
-// repair-ladder rungs (which still climb repairCount underneath; Task 59 retires them).
+// ---- Task 79: the two-outcome fallback (no counter, no ladder, no escalation) ----
+// Consecutive no-candidate fallback turns all serve B40 "im a dog"; nothing climbs or changes.
 (() => {
   const s = newSession();
-  check('the thing over there', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 1 && se.completedLoops === 0 && resp.responseId === 'LOOP-03' ? null : `t1 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
-  check('that does not help', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 2 && se.completedLoops === 0 && resp.responseId === 'LOOP-03' ? null : `t2 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
-  check('i really cannot say', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 3 && se.completedLoops === 0 && resp.responseId === 'LOOP-03' ? null : `t3 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
-  check('something something else', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'LOOP-04' ? null : `t4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+  for (const inp of ['the thing over there', 'that does not help', 'i really cannot say', 'something something else']) {
+    check(inp, { action: 'fallback' }, { session: s, assert: (_r, resp) =>
+      resp.responseId === 'B40-NOSUBJECT-01' && resp.text === 'im a dog' ? null : `${inp} -> ${resp.responseId} "${resp.text}"` });
+  }
 })();
-// A successful route resets the no-action counter (completedLoops is a running total, kept).
+// A successful route breaks the run and re-arms the repeat (loopRepeatUsed back to false).
 (() => {
   const s = newSession();
   check('the thing over there', { action: 'fallback' }, { session: s });
   check('that does not help', { action: 'fallback' }, { session: s });
-  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 0 ? null : `no-action not reset by a successful route: ${se.noActionCount}` });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, _resp, se) =>
+    se.loopRepeatUsed !== false ? `repeat not re-armed: ${se.loopRepeatUsed}` : r.breedSlug === 'labrador' ? null : `breed wrong: ${r.breedSlug}` });
 })();
-// The loop counter uses the BROADER fallback family: four consecutive gk_unknown turns advance
-// the counter and complete a loop WITHOUT climbing the repair ladder (repairCount stays 0). g1 is
-// no-candidate (LOOP-03); g2 is the FIRST candidate-bearing turn, so it repeats (LOOP-01, Task 71),
-// not LOOP-03; g3 is a later candidate with the repeat spent, so LOOP-03.
+// The gk_unknown half of the fallback family behaves identically: a no-candidate gk_unknown serves
+// B40, and a candidate-bearing gk_unknown repeats (LOOP-01) then offers (LOOP-02), like a plain
+// fallback. (The old loop counter and the repair ladder are gone.)
 (() => {
   const s = newSession();
-  check('whats up', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 1 && se.completedLoops === 0 && se.repairCount === 0 && resp.responseId === 'LOOP-03' ? null : `g1 noAction=${se.noActionCount} loops=${se.completedLoops} repair=${se.repairCount} rid=${resp.responseId}` });
-  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 2 && resp.responseId === 'LOOP-01' ? null : `g2 noAction=${se.noActionCount} rid=${resp.responseId}` });
-  check('what type of jobs do dogs do', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 3 && resp.responseId === 'LOOP-03' ? null : `g3 noAction=${se.noActionCount} rid=${resp.responseId}` });
-  check('whats your name', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'LOOP-04' ? null : `g4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
-})();
-// The two fallback-family kinds count together: a fallback and a gk_unknown interleaved still
-// reach a completed loop at the fourth fire.
-(() => {
-  const s = newSession();
-  check('the thing over there', { action: 'fallback' }, { session: s, assert: (r, resp, se) => se.noActionCount === 1 ? null : `m1 ${se.noActionCount}` });
-  check('whats up', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) => se.noActionCount === 2 ? null : `m2 ${se.noActionCount}` });
-  check('that does not help', { action: 'fallback' }, { session: s, assert: (r, resp, se) => se.noActionCount === 3 ? null : `m3 ${se.noActionCount}` });
-  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) => se.noActionCount === 0 && se.completedLoops === 1 ? null : `m4 noAction=${se.noActionCount} loops=${se.completedLoops}` });
-})();
-// A new session starts both counters at zero.
-(() => {
-  const s = newSession();
-  const ok = s.noActionCount === 0 && s.completedLoops === 0;
-  ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task56: new session counters zero', layer: '-', bucket: '-', action: 'loop counters', note: ok ? '' : `noAction=${s.noActionCount} loops=${s.completedLoops}` });
+  check('what is the latest football score', { action: 'gk_unknown' }, { session: s, assert: (_r, resp) =>
+    resp.responseId === 'B40-NOSUBJECT-01' && resp.text === 'im a dog' ? null : `no-candidate gk -> ${resp.responseId} "${resp.text}"` });
+  const s2 = newSession();
+  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s2, assert: (_r, resp) =>
+    resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `gk candidate t1 ${resp.responseId} "${resp.text}"` });
+  check('what type of jobs do dogs do', { action: 'gk_unknown' }, { session: s2, assert: (_r, resp) =>
+    resp.responseId === 'LOOP-02' && resp.text === 'The dog breeds?' ? null : `gk candidate t2 ${resp.responseId} "${resp.text}"` });
 })();
 
-// ---- Task 58: the dog-led loop served, the grief route, and the safety guards ----
-// A loop WITH a MAPPING candidate ("game" -> the card game rules): count 1 -> LOOP-01 "game?";
-// count 2 -> LOOP-02 names the destination; count 3 -> LOOP-03; count 4 -> LOOP-04 (Ok./Right.).
+// ---- Task 79: a candidate-bearing fallback repeats once, then offers the route forever ----
+// A MAPPING candidate ("game" -> the card game rules): LOOP-01 "Game?" once, then LOOP-02 "The
+// card game rules?" on every following turn. No LOOP-03/04, no escalation.
 (() => {
   const s = newSession();
   check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Game?' ? null : `c1 ${resp.responseId} "${resp.text}"` });
   check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The card game rules?' ? null : `c2 ${resp.responseId} "${resp.text}"` });
-  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' && ['Huh.', 'Hmm.'].includes(resp.text) ? null : `c3 ${resp.responseId} "${resp.text}"` });
-  check('game', { action: 'fallback' }, { session: s, assert: (r, resp, se) => resp.responseId === 'LOOP-04' && ['Ok.', 'Right.'].includes(resp.text) && se.completedLoops === 1 ? null : `c4 ${resp.responseId} "${resp.text}" loops=${se.completedLoops}` });
+  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The card game rules?' ? null : `c3 ${resp.responseId} "${resp.text}"` });
 })();
-// Task 71: a dog candidate repeats on the first candidate turn ("Dogs?", capitalised), then
-// offers the breed hub at LOOP-02 (Fault 2: dog words now map to the hub, agreeing with confirm).
+// A dog candidate repeats on the first candidate turn ("Dogs?", capitalised), then offers the breed
+// hub (dog words map to the hub, agreeing with the confirm path). "why do dogs yawn" now answers
+// from B31, so a gk_unknown dog question exercises the loop instead.
 (() => {
   const s = newSession();
-  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `s1 ${resp.responseId} "${resp.text}"` });
-  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The dog breeds?' ? null : `s2 ${resp.responseId} "${resp.text}"` });
+  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `s1 ${resp.responseId} "${resp.text}"` });
+  check('what type of jobs do dogs do', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The dog breeds?' ? null : `s2 ${resp.responseId} "${resp.text}"` });
 })();
 // GRIEF ROUTE. The bereavement sequence "I used to have a dog" -> "it ran away" -> "I miss her"
 // ends on the grief line every turn, never Huh./Ok./a goodbye, and never enters the loop
-// (noActionCount stays 0). Served text is ':(' with the screen-reader label.
+// never reaching the fallback. Served text is ':(' with the screen-reader label.
 (() => {
   const s = newSession();
   const seq = ['I used to have a dog', 'it ran away', 'I miss her'];
@@ -1587,7 +1558,6 @@ check('cost', { action: 'price_answer' });
     if (response.text !== ':(') { ok = false; note += `"${inp}" text "${response.text}"; `; }
     if (response.ariaLabel !== 'the Collie looks sad') { ok = false; note += `"${inp}" ariaLabel "${response.ariaLabel}"; `; }
     if (!/^GRIEF-/.test(response.responseId)) { ok = false; note += `"${inp}" rid ${response.responseId}; `; }
-    if (s.noActionCount !== 0) { ok = false; note += `"${inp}" reached the loop (noAction ${s.noActionCount}); `; }
   }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'Task58: grief sequence ends on grief, not the loop', layer: '-', bucket: '-', action: 'grief', note: ok ? '' : note });
@@ -1596,24 +1566,17 @@ check('cost', { action: 'price_answer' });
 check('my dog died', { action: 'grief' }, { assert: (r, resp) => r.griefCategory === 'GRIEF-01' && resp.text === ':(' ? null : `died -> ${r.griefCategory} "${resp.text}"` });
 check('my dog ran away', { action: 'grief' }, { assert: (r, resp) => r.griefCategory === 'GRIEF-02' && resp.text === ':(' ? null : `ranaway -> ${r.griefCategory}` });
 check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefCategory === 'GRIEF-03' ? null : `unwell -> ${r.griefCategory}` });
-// D3 ORIENT: after two completed no-candidate loops, one ORIENT nudge; then the loop resumes.
+// Task 79: the ORIENT-after-two-loops nudge was retired. Ten no-candidate misses in a row all
+// serve B40 "im a dog" -- no ORIENT, no counter, no escalation, ever.
 (() => {
   const s = newSession();
-  for (let i = 0; i < 8; i++) submit(data, s, 'the thing over there'); // 2 loops, no candidate ever
-  const { response: r9 } = submit(data, s, 'the thing over there');
-  const { response: r10 } = submit(data, s, 'the thing over there');
-  const ok = r9.responseId === 'ORIENT' && r9.text === 'Ask about the game or a dog. I know both departments.' && s.orientServed && r10.responseId === 'LOOP-03';
+  let ok = true, note = '';
+  for (let i = 0; i < 10; i++) {
+    const { response } = submit(data, s, 'the thing over there');
+    if (response.responseId !== 'B40-NOSUBJECT-01') { ok = false; note = `turn ${i} served ${response.responseId}`; break; }
+  }
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task58: ORIENT once after 2 loops (no candidate)', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `r9=${r9.responseId} r10=${r10.responseId} served=${s.orientServed}` });
-})();
-// D3 withheld: if a candidate was ever found, ORIENT never fires (the visitor is exploring).
-(() => {
-  const s = newSession();
-  for (let i = 0; i < 8; i++) submit(data, s, 'why do dogs yawn'); // candidate "dog" every turn
-  const { response: r9 } = submit(data, s, 'why do dogs yawn');
-  const ok = s.candidateEverFound && r9.responseId !== 'ORIENT';
-  ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task58: ORIENT withheld when a candidate was found', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `r9=${r9.responseId} everFound=${s.candidateEverFound}` });
+  rows.push({ ok, input: 'Task79: no-candidate misses never escalate (no ORIENT)', layer: '-', bucket: '-', action: 'loop', note });
 })();
 // SAFETY GUARD: inside PROTECTED_ACTIVE a fallback-family input never serves a loop line and
 // never clears the protected state.
@@ -1621,12 +1584,12 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
   const s = newSession();
   const { resolution: rs } = submit(data, s, 'I want to hurt myself');
   const enteredActive = s.protectedState === 'active' && (rs.action === 'safety_signpost' || rs.action === 'safety_boundary');
-  const { response: r2 } = submit(data, s, 'the thing over there'); // would be a loop line outside protection
-  const noLoop = !/^LOOP-/.test(r2.responseId) && !['Huh.', 'Hmm.', 'Ok.', 'Right.', ':)'].includes(r2.text);
+  const { response: r2 } = submit(data, s, 'the thing over there'); // would be B40 "im a dog" outside protection
+  const noLoop = !/^LOOP-/.test(r2.responseId) && r2.responseId !== 'B40-NOSUBJECT-01' && !['Huh.', 'Hmm.', 'Ok.', 'Right.', ':)', 'im a dog'].includes(r2.text);
   const stillActive = s.protectedState === 'active';
-  const ok = enteredActive && noLoop && stillActive && s.noActionCount === 0;
+  const ok = enteredActive && noLoop && stillActive;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task58: loop never serves/clears inside PROTECTED_ACTIVE', layer: '-', bucket: '-', action: 'safety', note: ok ? '' : `active=${s.protectedState} r2=${r2.responseId} "${r2.text}" noAction=${s.noActionCount}` });
+  rows.push({ ok, input: 'Task58: fallback never serves/clears inside PROTECTED_ACTIVE', layer: '-', bucket: '-', action: 'safety', note: ok ? '' : `active=${s.protectedState} r2=${r2.responseId} "${r2.text}"` });
 })();
 // The bark game still works, break (B19) and acknowledgement (B20) included.
 (() => {
@@ -1654,25 +1617,27 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
   check('game', { action: 'fallback' }, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `not LOOP-02: ${resp.responseId}` });
   check('yes', { action: 'rules_answer' }, { session: s });
 })();
-// A "no" advances the loop rather than routing.
+// A "no" after the repeat clears the pending offer; "no" carries no candidate, so the turn serves
+// B40 "im a dog" (Task 79: no ladder to advance).
 (() => {
   const s = newSession();
   check('game', { action: 'fallback' }, { session: s }); // LOOP-01, pendingConfirm "game"
-  check('no', { action: 'fallback' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'LOOP-03' && se.noActionCount === 2 ? null : `no did not advance: ${resp.responseId} noAction=${se.noActionCount}` });
+  check('no', { action: 'fallback' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'B40-NOSUBJECT-01' && se.pendingConfirm === null ? null : `no not handled: ${resp.responseId} conf=${se.pendingConfirm}` });
 })();
-// A dog subject confirms to the breed hub, so LOOP-01 "dog?" never invites a dead-end yes.
+// A dog subject confirms to the breed hub, so LOOP-01 "Dogs?" never invites a dead-end yes. (Uses a
+// gk_unknown dog question, since "why do dogs yawn" now answers from B31.)
 (() => {
   const s = newSession();
-  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s }); // LOOP-01 "dog?"
+  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s }); // LOOP-01 "Dogs?"
   check('yes', { action: 'breed_hub' }, { session: s });
 })();
 // pendingConfirm clears once consumed: "game" then "yes" then "yes" -> the second yes does NOT
-// route again off a stale confirmation; it is an ordinary input that advances the loop.
+// route again off a stale confirmation; it carries no candidate, so it serves B40.
 (() => {
   const s = newSession();
   check('game', { action: 'fallback' }, { session: s }); // LOOP-01, pendingConfirm "game"
   check('yes', { action: 'rules_answer' }, { session: s, assert: (_r, _resp, se) => se.pendingConfirm === null ? null : `pendingConfirm not cleared: ${se.pendingConfirm}` });
-  check('yes', { action: 'fallback' }, { session: s, assert: (_r, resp) => /^LOOP-/.test(resp.responseId) ? null : `stale confirm routed: ${resp.responseId}` });
+  check('yes', { action: 'fallback' }, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `stale confirm routed: ${resp.responseId}` });
 })();
 
 // ---- Task 69: route the "get" buying forms to commercial (product-word / commercial-topic gated) ----
@@ -1681,7 +1646,7 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
 (() => {
   const s = newSession();
   check('The cards I saw somebody playing with them', { action: 'faq_answer' }, { session: s, assert: (r) => r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}` });
-  check('Yes them', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-03' ? null : `not LOOP-03: ${resp.responseId}` });
+  check('Yes them', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `not the im-a-dog line: ${resp.responseId}` });
   check('The cards, where can I get them?', { action: 'open_discount_popup' }, { session: s });
   check("Yes, you've told me about the cards. I want to know where I can get them.", { action: 'open_discount_popup' }, { session: s });
 })();
@@ -1699,28 +1664,28 @@ check('how do I get the cards', { action: 'open_discount_popup' }); // get verb 
 check('where can I get the game?', { action: 'open_discount_popup' }); // get verb + "game" (the gap the rule closes)
 check('where can I get the deck?', { action: 'open_discount_popup' }); // get verb + "deck"
 
-// ---- Task 71: LOOP-01 fires on the first candidate turn, and dog subjects agree with confirm ----
-// The traced session: a blank opening (LOOP-03) no longer spends the repeat; the first
+// ---- Task 71/79: LOOP-01 fires on the first candidate turn, and dog subjects agree with confirm ----
+// The traced session: a blank opening (B40 "im a dog") no longer spends the repeat; the first
 // candidate-bearing turn repeats the subject (LOOP-01 "Dogs?"), then a yes routes to the hub.
 (() => {
   const s = newSession();
-  check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-03' && resp.text === 'Huh.' ? null : `t1 ${resp.responseId} "${resp.text}"` });
+  check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' && resp.text === 'im a dog' ? null : `t1 ${resp.responseId} "${resp.text}"` });
   check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
   check('yes', { action: 'breed_hub' }, { session: s });
 })();
-// Second session: a no after the repeat advances the loop rather than routing to the hub.
+// Second session: a no after the repeat clears the offer and (no candidate in "no") serves B40.
 (() => {
   const s = newSession();
-  check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-03' ? null : `t1 ${resp.responseId}` });
+  check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `t1 ${resp.responseId}` });
   check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
-  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' && r.action !== 'breed_hub' ? null : `t3 advanced wrong: ${resp.responseId}/${r.action}` });
+  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'B40-NOSUBJECT-01' && r.action !== 'breed_hub' ? null : `t3 wrong: ${resp.responseId}/${r.action}` });
 })();
-// The repeat is once per loop and resets with the loop: two candidate turns in a row give
-// LOOP-01 then LOOP-02 (offer), not LOOP-01 twice.
+// The repeat is once per run: two candidate turns in a row give LOOP-01 then LOOP-02 (offer), not
+// LOOP-01 twice. (Uses a gk_unknown dog question, since "why do dogs yawn" now answers from B31.)
 (() => {
   const s = newSession();
-  check('why do dogs yawn', {}, { session: s, assert: (_r, resp, se) => resp.responseId === 'LOOP-01' && se.loopRepeatUsed === true ? null : `r1 ${resp.responseId} used=${se.loopRepeatUsed}` });
-  check('why do dogs yawn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `r2 ${resp.responseId}` });
+  check('why do dogs sniff other dogs bums', {}, { session: s, assert: (_r, resp, se) => resp.responseId === 'LOOP-01' && se.loopRepeatUsed === true ? null : `r1 ${resp.responseId} used=${se.loopRepeatUsed}` });
+  check('what type of jobs do dogs do', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `r2 ${resp.responseId}` });
 })();
 // All the accepted affirmation forms confirm after a loop offer; an unrelated reply does not.
 (() => {
@@ -1760,11 +1725,11 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
   }
 })();
 // The candidate is stored on the session for one turn on a fallback-family turn, and cleared
-// otherwise. "why do dogs yawn" routes to gk_unknown (a fallback-family outcome), so the
-// candidate 'dog' is carried; a successful breed page carries none (cleared).
+// otherwise. "why do dogs sniff other dogs bums" routes to gk_unknown (a fallback-family outcome),
+// so the candidate 'dogs' is carried; a successful breed page carries none (cleared).
 (() => {
   const s = newSession();
-  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
+  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
     se.candidateSubject === 'dogs' ? null : `candidate not stored on fallback-family turn: ${JSON.stringify(se.candidateSubject)}` });
   check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
     se.candidateSubject === null ? null : `candidate not cleared on a successful route: ${JSON.stringify(se.candidateSubject)}` });

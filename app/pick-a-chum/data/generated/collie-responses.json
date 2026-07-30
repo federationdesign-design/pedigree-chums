@@ -2417,5 +2417,921 @@
     "defaultRoute": "",
     "animationCue": "EARS_UP",
     "status": "Approved copy (bark game)"
+  },
+  {
+    "responseId": "B21-CATS-01",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "cats",
+      "cat",
+      "catz",
+      "kitten"
+    ],
+    "template": "Where?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B21-CATS-02",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "there was one in my garden",
+      "i saw a cat"
+    ],
+    "template": "oh too late then",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B21-CATS-03",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "it comes back most days",
+      "it lives next door"
+    ],
+    "template": "ok, give me notice next time and we will form a plan",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B21-CATS-04",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "do you like cats"
+    ],
+    "template": "im told they taste good",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B21-CATS-05",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "squirrels",
+      "birds",
+      "foxes",
+      "rabbits"
+    ],
+    "template": "Where?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B22-TRICKS-01",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "sit"
+    ],
+    "template": "im already sitting",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B22-TRICKS-02",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "speak"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B22-TRICKS-03",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "beg"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B22-TRICKS-04",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "lie down",
+      "stay"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B23-IDENTITY-01",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "are you a real dog",
+      "are you a dog"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B23-IDENTITY-02",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "but are you REAL",
+      "so youre fake",
+      "youre not real"
+    ],
+    "template": "no, im live in a game",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B23-IDENTITY-03",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "whats your name",
+      "do you have a name"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B23-IDENTITY-04",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "but whats your NAME",
+      "your actual name"
+    ],
+    "template": "border collie",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B24-RUDE-01",
+    "bucketId": "B24",
+    "subtag": "rude",
+    "triggers": [
+      "youre stupid",
+      "youre useless",
+      "this is rubbish"
+    ],
+    "template": ":(",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B24-RUDE-02",
+    "bucketId": "B24",
+    "subtag": "rude",
+    "triggers": [
+      "i hate you"
+    ],
+    "template": "woof",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B24-RUDE-03",
+    "bucketId": "B24",
+    "subtag": "rude",
+    "triggers": [
+      "ok sorry",
+      "sorry"
+    ],
+    "template": ":)",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B25-CANTSEE-01",
+    "bucketId": "B25",
+    "subtag": "cantsee",
+    "triggers": [
+      "whats that link",
+      "what link"
+    ],
+    "template": "a game",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B25-CANTSEE-02",
+    "bucketId": "B25",
+    "subtag": "cantsee",
+    "triggers": [
+      "which page do i want",
+      "which one should i read"
+    ],
+    "template": "any",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B25-CANTSEE-03",
+    "bucketId": "B25",
+    "subtag": "cantsee",
+    "triggers": [
+      "this one",
+      "that one",
+      "the first one"
+    ],
+    "template": "games?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B25-CANTSEE-04",
+    "bucketId": "B25",
+    "subtag": "cantsee",
+    "triggers": [
+      "it looks complicated",
+      "theres too much"
+    ],
+    "template": "games?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B26-SMALLTALK-01",
+    "bucketId": "B26",
+    "subtag": "smalltalk",
+    "triggers": [
+      "whats up",
+      "whats going on",
+      "how are you doing"
+    ],
+    "template": "Not much, im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B27-CAPABILITY-01",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "what do you do",
+      "what can you do"
+    ],
+    "template": "I can help you",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B27-CAPABILITY-02",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "can you help me",
+      "will you help"
+    ],
+    "template": "Yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B27-CAPABILITY-03",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "what is this chat for"
+    ],
+    "template": "I help you find stuff and answer simple questions",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B28-WHATISTHIS-01",
+    "bucketId": "B28",
+    "subtag": "whatisthis",
+    "triggers": [
+      "whats this",
+      "whats this about",
+      "the site"
+    ],
+    "template": "A website",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B29-NICE-01",
+    "bucketId": "B29",
+    "subtag": "nice",
+    "triggers": [
+      "lol",
+      "ha",
+      "haha",
+      "ha ok",
+      "they sound cool",
+      "thats good"
+    ],
+    "template": ":)",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B30-JOKE-01",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "joke",
+      "tell me a joke",
+      "make me laugh",
+      "say something funny"
+    ],
+    "template": "Knock knock",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B30-JOKE-02",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "knock knock",
+      "whos there"
+    ],
+    "template": "Woof woof woof",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-01",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "do dogs dream",
+      "do you dream"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-02",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "do you store data",
+      "do you collect data"
+    ],
+    "template": "cookies",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-03",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "why do dogs yawn",
+      "do you yawn"
+    ],
+    "template": "We are bored.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-04",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "why do dogs wag their tails"
+    ],
+    "template": "we are happy",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-05",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "do you wag yours"
+    ],
+    "template": "when happy",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-06",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "why do dogs sniff everything"
+    ],
+    "template": "we see if we know each other",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-07",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "do you sniff me"
+    ],
+    "template": "are you a dog too?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-08",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "how do dogs see"
+    ],
+    "template": "eyes and nose",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-09",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "do you see colours",
+      "can dogs see colour"
+    ],
+    "template": "not like humans",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-10",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "how fast can you run"
+    ],
+    "template": "not as fast as the greyhound",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B31-FACTS-11",
+    "bucketId": "B31",
+    "subtag": "facts",
+    "triggers": [
+      "do all dogs bite"
+    ],
+    "template": "all dogs eat",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-01",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do dogs get bored",
+      "do you get bored"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-02",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "what do you do when youre bored"
+    ],
+    "template": "yawn",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-03",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you sleep a lot",
+      "do you nap"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-04",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you snore"
+    ],
+    "template": "don't know",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-05",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "whats your favourite food"
+    ],
+    "template": "whatever has just hit the floor",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-06",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like walks"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-07",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "how far",
+      "how long"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-08",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like the rain"
+    ],
+    "template": "sometimes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-09",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like baths",
+      "do you like getting washed"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-10",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "whats your favourite colour"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-11",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you ever get told off"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B32-SELF-12",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like the postman"
+    ],
+    "template": "who?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B33-PACK-01",
+    "bucketId": "B33",
+    "subtag": "pack",
+    "triggers": [
+      "do you know any other dogs",
+      "do you have friends"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B33-PACK-02",
+    "bucketId": "B33",
+    "subtag": "pack",
+    "triggers": [
+      "who",
+      "who are they",
+      "whos your best friend"
+    ],
+    "template": "53 too many to name",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B33-PACK-03",
+    "bucketId": "B33",
+    "subtag": "pack",
+    "triggers": [
+      "can i see a dog",
+      "show me a dog"
+    ],
+    "template": "Yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B34-CHUMDROP-01",
+    "bucketId": "B34",
+    "subtag": "chumdrop",
+    "triggers": [
+      "the falling game",
+      "dogs falling",
+      "the tetris one"
+    ],
+    "template": "the falling one is here",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B34-CHUMDROP-02",
+    "bucketId": "B34",
+    "subtag": "chumdrop",
+    "triggers": [
+      "my friend showed me",
+      "my friend told me"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B35-NOFACT-01",
+    "bucketId": "B35",
+    "subtag": "nofact",
+    "triggers": [
+      "whats the oldest breed",
+      "any fact she does not hold"
+    ],
+    "template": "i dont know, im just a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B36-COMPARE-01",
+    "bucketId": "B36",
+    "subtag": "compare",
+    "triggers": [
+      "whats better a labrador or a pug",
+      "which is best"
+    ],
+    "template": "do you want fun or a nap?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B37-SCARED-01",
+    "bucketId": "B37",
+    "subtag": "scared",
+    "triggers": [
+      "dogs scare me",
+      "im scared of dogs"
+    ],
+    "template": ":(",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B37-SCARED-02",
+    "bucketId": "B37",
+    "subtag": "scared",
+    "triggers": [
+      "a big one barked at me"
+    ],
+    "template": "oh no, sorry. Would you like to see some cute puppies?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B38-MYDOG-01",
+    "bucketId": "B38",
+    "subtag": "mydog",
+    "triggers": [
+      "i have a dog",
+      "we got a puppy"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B38-MYDOG-02",
+    "bucketId": "B38",
+    "subtag": "mydog",
+    "triggers": [
+      "hes called ollie",
+      "shes called bella"
+    ],
+    "template": ":)",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B38-MYDOG-03",
+    "bucketId": "B38",
+    "subtag": "mydog",
+    "triggers": [
+      "shes a spaniel"
+    ],
+    "template": "i know 3 spaniels",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B38-MYDOG-04",
+    "bucketId": "B38",
+    "subtag": "mydog",
+    "triggers": [
+      "do you know bella"
+    ],
+    "template": "is she a cocker, springer or cavalier?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B39-PARENT-01",
+    "bucketId": "B39",
+    "subtag": "parent",
+    "triggers": [
+      "is this suitable for a 6 year old",
+      "is it ok for young children"
+    ],
+    "template": "can they read?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B40-NOSUBJECT-01",
+    "bucketId": "B40",
+    "subtag": "nosubject",
+    "triggers": [
+      "ANY unrecognised input with no candidate subject"
+    ],
+    "template": "im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

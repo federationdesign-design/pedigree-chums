@@ -31,6 +31,7 @@ export interface Assembled {
 // close). Approved by Steve. An emoticon has no useful spoken form, so the UI renders this
 // as the accessible name instead.
 export const SAD_FACE_SR_LABEL = 'the Collie looks sad';
+export const SMILE_FACE_SR_LABEL = 'the Collie smiles';
 
 const DOG_LABEL: Record<Dog, string> = {
   collie: 'Collie',
@@ -208,6 +209,22 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       // Task 58: a dog bereavement. The dog just looks sad; it does not try to fix it or say
       // something clumsy. All three scenarios (GRIEF-01/02/03) share this one gentle line.
       return { responseId: res.griefCategory ?? 'GRIEF', text: ':(', ariaLabel: SAD_FACE_SR_LABEL, dog };
+
+    case 'canned': {
+      // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers. Serve the
+      // exact matched row's template verbatim. The faces ':(' and ':)' are non-verbal, so they get
+      // an accessible name like grief's ':('. B34's first row hands over the ChumDrop page.
+      const r = data.collieResponses.find((x) => x.responseId === res.responseId);
+      const text = r?.template ?? '';
+      const rid = res.responseId ?? res.bucket ?? 'B21';
+      if (text === ':(') return { responseId: rid, text, ariaLabel: SAD_FACE_SR_LABEL, dog };
+      if (text === ':)') return { responseId: rid, text, ariaLabel: SMILE_FACE_SR_LABEL, dog };
+      if (res.destinationId) {
+        const dest = data.destinations.find((d) => d.destinationId === res.destinationId);
+        return { responseId: rid, text, dog, destinationId: res.destinationId, url: res.url ?? dest?.resolvedUrl ?? null };
+      }
+      return { responseId: rid, text, dog };
+    }
 
     case 'open_discount_popup': {
       const r = pickResponse(data, 'B01', session.usedResponseIds);

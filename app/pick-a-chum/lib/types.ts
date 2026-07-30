@@ -158,6 +158,7 @@ export type ActionType =
   | 'goodbye' // Task 36: a farewell (whole-message match) -> the approved goodbye line
   | 'out_of_scope' // Task 37: a valid question on a topic the site does not cover -> the approved out-of-scope line (never the repair ladder)
   | 'grief' // Task 58: a dog bereavement (died / lost / old-unwell) -> the gentle ':(' line; below urgent safety, above the loop, never reaches the loop
+  | 'canned' // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers; serves the specific responseId. Sits above the non-answer zone (gk_unknown / fallback), below every real route.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog
   | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a safe grown-up
@@ -188,4 +189,5 @@ export interface Resolution {
   breedOptions?: { title: string; slug: string; url: string }[]; // breed_choice: the two options
   griefCategory?: string; // Task 58: which grief scenario matched (GRIEF-01 died / GRIEF-02 lost / GRIEF-03 old-unwell); all serve the same ':(' line
   mirror?: string; // Task 76: the greeting word to echo back for a B09 greeting (the only response built from the input)
+  responseId?: string; // Task 80: the specific canned-conversation row (B21-B39) the input matched; the assembler serves that row's template
 }
