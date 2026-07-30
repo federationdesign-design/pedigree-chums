@@ -139,7 +139,7 @@
 }
 
 .preludeWarning {
-  margin: 0;
+  margin: 0 0 0.4em; /* C05: vertical spacing above the display line */
   font-family: var(--font-unica), system-ui, sans-serif;
   font-size: 1.3rem;
   color: var(--navy);
@@ -156,7 +156,7 @@
   font-weight: 400;
   font-size: 1.9rem;
   color: var(--hg-accent);
-  line-height: 1.05;
+  line-height: 0.9em; /* C05 */
 }
 
 /* Introduction card (D10), campaign palette. C04: scaled up ~1/3, max-width
