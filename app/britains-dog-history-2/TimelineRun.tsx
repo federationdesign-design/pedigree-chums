@@ -106,11 +106,6 @@ export default function TimelineRun({
           </span>
         </div>
 
-        {/* Everything from here down carries the timeline. The rail is a child
-            of this wrapper rather than of the scroller, so it spans exactly
-            the dogs and starts where the title screen ends: the wrapper's own
-            height is the line's length, with no measuring involved. */}
-        <div className={styles.railWrap}>
         {breeds.map((b) => {
           const isFlipped = flipped === b.name;
           return (
@@ -227,7 +222,6 @@ export default function TimelineRun({
             </div>
           );
         })}
-        </div>
       </div>
     </div>
   );

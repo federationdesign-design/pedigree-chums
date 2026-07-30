@@ -462,6 +462,11 @@
 }
 
 .dogScreen {
+  /* 100% of the SCROLLER, which is only true while these are its direct
+     children. They were briefly nested inside a wrapper that had no height of
+     its own, so this resolved to auto, every screen shrank to its content and
+     both rail legs collapsed to nothing. Do not reintroduce a wrapper here
+     without giving it a height. */
   height: 100%;
   scroll-snap-align: start;
   /* THE NOTCH. `y mandatory` on its own still lets a hard flick fly past
@@ -515,13 +520,6 @@
 }
 
 /* ---- The timeline rail ------------------------------------------------ */
-
-/* Wraps the dogs, not the whole scroller, so the rail's length is simply this
-   element's height. The line therefore starts where the title screen ends and
-   finishes with the last dog, with nothing measured in JavaScript. */
-.railWrap {
-  position: relative;
-}
 
 /* The line's first stretch, on the title screen. Runs from under the text to
    the foot of that screen, where the rail above picks it up, so the two read
