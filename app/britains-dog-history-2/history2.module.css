@@ -314,7 +314,10 @@
 
 .slideIntro {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.95rem;
+  /* Up from 0.95. This is the opening paragraph of every era, and it is the
+     first thing read on a section, so it carries more weight than the detail
+     slide that follows it. */
+  font-size: 1.2rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
