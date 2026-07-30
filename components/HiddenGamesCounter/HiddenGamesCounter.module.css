@@ -128,8 +128,8 @@
 /* SVG icon: scale the rendered width/height, not by stretching (C04). */
 .preludeIcon {
   flex: none;
-  width: 59px;
-  height: 59px;
+  width: 120px;
+  height: auto;
   display: block;
 }
 
