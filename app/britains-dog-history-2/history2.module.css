@@ -1051,6 +1051,54 @@
   margin: 12px 0 0;
 }
 
+/* THE CARD IS SQUARE WHILE THE PICTURE IS SHOWING.
+
+   Both faces share one grid cell, so the taller of the two set the card's
+   height even when it was turned away. On a long note the yellow face hung up
+   to 311px below the picture, invisible, and the marker row sat under THAT
+   rather than under the photograph. The gap then differed on every dog
+   according to how many words its note had, and no margin could win.
+
+   An absolutely positioned grid item does not size its row. So while the
+   picture is showing, the yellow face is taken out of the flow and the row is
+   left to the square. When the card turns, it comes back into the flow and the
+   card grows to fit its words, which is what makes the yellow always fit.
+
+   The marker row therefore moves when a long card is turned over. That is what
+   .markerHopA and B are for. */
+.dogBackFolded {
+  position: absolute;
+  inset: 0;
+}
+
+/* THE HOP. The icons drop to nothing and come back, so the reader never sees
+   the row travel. Out fast, held through the middle of the turn while the card
+   resizes, back on the tail of it.
+
+   Two identical animations because re-applying one class does not replay a CSS
+   animation. The markup alternates between them on every turn.
+
+   Timed against .dogFlipInner's 0.5s flip, and it sits on the ROW rather than
+   its three children, which carry their own arrival animation. */
+.markerHopA,
+.markerHopB {
+  animation: pcMarkerHop 0.5s ease both;
+}
+
+@keyframes pcMarkerHop {
+  0% { opacity: 1; transform: scale(1); }
+  20% { opacity: 0; transform: scale(0); }
+  60% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markerHopA,
+  .markerHopB {
+    animation: none;
+  }
+}
+
 /* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
 .markerDot {
   position: relative;

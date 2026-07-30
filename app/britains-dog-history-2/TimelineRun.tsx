@@ -75,6 +75,18 @@ export default function TimelineRun({
 }) {
   const breeds = ukBreeds.filter((b) => b.strip === era).sort((a, b) => a.anchor - b.anchor);
   const [flipped, setFlipped] = useState<string | null>(null);
+  /* Bumped every time a card turns. The marker row's hop animation is keyed off
+     whether this is odd or even, which is what restarts it: re-applying the
+     same class does not replay a CSS animation, and alternating between two
+     identical ones does, without remounting the row and losing its ref.
+     A dog with no entry here has never been flipped, so it never hops on load. */
+  const [hop, setHop] = useState<Record<string, number>>({});
+  /* THE ONLY WAY TO TURN A CARD. Six call sites used to set the flip state
+     directly, so any new one would silently miss the hop. */
+  const turnCard = (name: string, to: string | null) => {
+    setFlipped(to);
+    setHop((h) => ({ ...h, [name]: (h[name] ?? 0) + 1 }));
+  };
   /* True once the reader has moved at all. Turns the head of the rail green. */
   const [moved, setMoved] = useState(false);
   /* The outbound link awaiting confirmation, or null. */
@@ -364,9 +376,9 @@ export default function TimelineRun({
                         role="button"
                         tabIndex={0}
                         aria-label={`About ${b.name}`}
-                        onClick={(e) => { e.stopPropagation(); setFlipped(b.name); }}
+                        onClick={(e) => { e.stopPropagation(); turnCard(b.name, b.name); }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped(b.name); }
+                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); turnCard(b.name, b.name); }
                         }}
                       />
                       {/* The name sits ON the picture, above the status bar. */}
@@ -377,7 +389,9 @@ export default function TimelineRun({
                         </span>
                       )}
                     </span>
-                    <span className={styles.dogBack}>
+                    <span
+                      className={`${styles.dogBack} ${isFlipped ? "" : styles.dogBackFolded}`}
+                    >
                       <span className={styles.dogHint}>
                         Tap to learn about this dog
                       </span>
@@ -388,9 +402,9 @@ export default function TimelineRun({
                         role="button"
                         tabIndex={0}
                         aria-label="Turn the card back"
-                        onClick={(e) => { e.stopPropagation(); setFlipped(null); }}
+                        onClick={(e) => { e.stopPropagation(); turnCard(b.name, null); }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped(null); }
+                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); turnCard(b.name, null); }
                         }}
                       >
                       </span>
@@ -446,7 +460,14 @@ export default function TimelineRun({
 
               </div>
               <div
-                className={`${styles.markerRow} ${arrived[b.name] ? styles.markerIn : ""}`}
+                className={[
+                  styles.markerRow,
+                  arrived[b.name] ? styles.markerIn : "",
+                  /* Alternating classes, so the same animation replays on every
+                     turn. No class at all until the card has been flipped once,
+                     or all eleven would hop on page load. */
+                  hop[b.name] ? (hop[b.name] % 2 ? styles.markerHopA : styles.markerHopB) : "",
+                ].filter(Boolean).join(" ")}
                 data-dog={b.name}
                 ref={(el) => { rowRefs.current[b.name] = el; }}
               >
@@ -472,11 +493,11 @@ export default function TimelineRun({
                   role="button"
                   tabIndex={0}
                   aria-label={`About ${b.name}`}
-                  onClick={() => setFlipped(isFlipped ? null : b.name)}
+                  onClick={() => turnCard(b.name, isFlipped ? null : b.name)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setFlipped(isFlipped ? null : b.name);
+                      turnCard(b.name, isFlipped ? null : b.name);
                     }
                   }}
                 >
