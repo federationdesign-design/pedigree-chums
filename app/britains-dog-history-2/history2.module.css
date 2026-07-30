@@ -714,6 +714,14 @@
   color: #0b0b0b;
 }
 
+/* Half the numeral's stroke on the word beneath it. The stroke is set on the
+   outline copy as a whole and inherited, so the word needs its own value or it
+   takes the numeral's. It is a much smaller face, and the same absolute weight
+   read far heavier on it. */
+.eraCountOutline .eraCountWord {
+  -webkit-text-stroke: 5px #ffffff;
+}
+
 .eraCountNum,
 .eraCountWord {
   font-family: var(--font-display), system-ui, sans-serif;
@@ -1036,9 +1044,11 @@
   justify-content: center;
   gap: 20px;
   padding: 0;
-  /* 40px clear of the card. Margin rather than padding: padding would sit
-     inside the row and reopen the break in the line above the disc. */
-  margin: 40px 0 0;
+  /* 12px clear of the card, measured off the concept: the gap there is 3.4% of
+     the card width, which is about 12px at this size. It was 40.
+     Margin rather than padding: padding would sit inside the row and reopen
+     the break in the line above the disc. */
+  margin: 12px 0 0;
 }
 
 /* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
