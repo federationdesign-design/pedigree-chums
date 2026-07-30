@@ -175,7 +175,7 @@
   letter-spacing: 0.03em;
   line-height: 0.9em;
   color: #ffffff;
-  text-align: left;
+  text-align: center;
 }
 
 /* ---- Section groups: sticky top, panels beneath --------------------- */
@@ -533,7 +533,8 @@
 
 /* The line between the title and the head of the timeline. */
 .eraNote {
-  margin: 22px 0 0;
+  /* Tight under the title: the band already carries 14px below the words. */
+  margin: 0;
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1rem;
   font-weight: 600;

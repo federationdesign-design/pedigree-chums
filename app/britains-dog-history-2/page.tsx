@@ -75,7 +75,7 @@ const SEQUENCE: Entry[] = [
   {
     type: "timeline",
     era: "ancient-medieval",
-    words: ["Ancient", "to", "medieval", "dogs"],
+    words: ["Ancient\u2192", "Medieval", "Dogs"],
     note: "At the the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
   },
   ...SECTIONS.slice(1).map((_, i) => ({ type: "section" as const, si: i + 1 })),
