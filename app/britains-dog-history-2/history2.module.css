@@ -1,0 +1,351 @@
+/* Britain's dog history, version 2: the horizontal carousel.
+
+   Ported from app/good-dog-bad-dog/good-dog-bad-dog.module.css. The class
+   names have dropped their `mobile` prefix because on this page the carousel
+   is the whole page, not a mobile alternative to a desktop grid.
+
+   RULE ORDER MATTERS. Rules of equal specificity resolve last-one-wins, so
+   every override in this file sits BELOW the rule it overrides. A mobile
+   override placed above its base rule is silently ignored, which has cost
+   real time on this project more than once. */
+
+.page {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 100dvh;
+}
+
+/* Outer wrap: full viewport, clips overflow */
+.carouselWrap {
+  display: block;
+  width: 100vw;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Inner scroll container */
+.carousel {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  height: 100%;
+  width: 100%;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Slide 0: the intro ---------------------------------------------- */
+
+/* The difference from good-dog-bad-dog: the header photograph carries the
+   slide instead of a blue gradient. The image is a layer of its own rather
+   than a background on .introSlide so the tint can sit between it and the
+   text without tinting the text as well. */
+.introSlide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.introImg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--blue-sky, #5cc4ee) url("/history-hero.jpg") center / cover no-repeat;
+}
+
+/* Legibility, not decoration. The source photograph is light across its
+   upper half and white display type was unreadable over it. The gradient is
+   weakest at the top, where the image is worth seeing, and strongest at the
+   foot, where the text and the button sit. */
+.introTint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 58, 87, 0.15) 0%,
+    rgba(10, 58, 87, 0.55) 45%,
+    rgba(10, 58, 87, 0.82) 100%
+  );
+}
+
+.introBody {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 60px 28px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.introTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(3rem, 14vw, 5rem);
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+
+.titleAccent {
+  color: var(--yellow, #ffd23e);
+}
+
+.introText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* Green CTA -- matches the name selector's "Go" button and the
+   good-dog-bad-dog intro button, same colours and same drop shadow. */
+.introBtn {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 16px 44px;
+  border: none;
+  border-radius: 14px;
+  background: #22c55e;
+  color: #ffffff;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #16a34a;
+}
+
+.introBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #16a34a;
+}
+
+/* ---- Section slides --------------------------------------------------- */
+
+/* ---- Section groups: sticky top, panels beneath --------------------- */
+
+/* One group per section, nine panels wide. It is a column so the image can
+   sit above the panel row, and the row is what makes it nine screens wide. */
+.sectionGroup {
+  flex: 0 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* THE MECHANISM. Sticky to the left edge of the scroller, so it holds its
+   position on screen for the whole nine panels of its own section, then is
+   pushed out by the next section's group. One scroller, no nesting, which is
+   what lets a swipe anywhere move the page. */
+.stickyTop {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: 0 0 52%;
+  width: 100vw;
+  min-height: 0;
+}
+
+.panelRow {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+/* One sub-slide. Fixed to the viewport width so it does not measure itself
+   against the group, which is nine times wider. */
+.panel {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100%;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 22px 24px 34px;
+  background: var(--blue-deep, #0b78bd);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.slideImg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* The photograph and the video are interchangeable in the sticky top, so they
+   are sized by one rule rather than two that could drift apart. */
+.topMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slideCount {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(10, 58, 87, 0.72);
+  color: #ffffff;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* The title's home is the foot of the image, not the top of the text half.
+   Absolute rather than a flex child so it cannot push the photograph around. */
+.slideTitleWrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 0 24px 14px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.slideTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  /* 50pt flat, as asked. This replaces clamp(1.7rem, 7.5vw, 2.4rem), so the
+     title no longer scales with the viewport: it is the same 66.67px on a
+     360px phone as on a 430px one. */
+  font-size: 50pt;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  line-height: 0.9em;
+  margin: 0;
+}
+
+.slideIntro {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.slideDetail {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ---- Progress bar ------------------------------------------------------ */
+
+.progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 5px;
+  width: 0;
+  z-index: 5;
+  background: var(--yellow, #ffd23e);
+  pointer-events: none;
+}
+
+/* Fact panels only. `overflow: visible` undoes the scroll clipping every
+   other panel needs, because the circle is deliberately drawn outside this
+   box. The text panels keep their scrolling: their detail paragraphs are the
+   long ones. */
+.panelFact {
+  overflow: visible;
+  text-align: center;
+}
+
+/* ---- Panel content ---------------------------------------------------- */
+
+.bulletTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 30pt;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.bulletText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Round, centred, half the panel width, above the words. aspect-ratio keeps
+   it a true circle whatever the source crop is. */
+.factImg {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto;
+  /* Up 50px, over the photograph. A transform rather than a negative margin
+     so nothing else in the panel moves: the label and the text stay exactly
+     where they were. z-index clears the sticky header, which sits at 3. */
+  position: relative;
+  z-index: 4;
+  transform: translateY(-50px);
+}
+
+.factLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 30pt;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.factText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.35;
+  /* The panel's own 12px flex gap, less 5. */
+  margin: -5px 0 0;
+}
