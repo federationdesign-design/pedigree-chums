@@ -1767,7 +1767,25 @@ export default function BreedTree({
   // world coordinates stays locked to its circle through pan and zoom.
   const fxCanvasRef = useRef<HTMLCanvasElement>(null);
   // Runs before the toy timers, which do not start until a circle lands.
-  useEffect(() => { resetToysIfAsked(); }, []);
+  useEffect(() => {
+    resetToysIfAsked();
+    // TOY RETIREMENT IS PER ROUND, not per tab.
+    //
+    // It used to live in sessionStorage for the life of the tab, so once you had
+    // thrown the ball clear or read the flag's message they were gone until you
+    // opened a new tab or remembered ?toys=reset. That is defensible for a
+    // player and miserable for anyone testing: every reload of a working tab
+    // came up short of half its props, which read as the toys being broken.
+    //
+    // This component remounts for every level and every retry, so clearing here
+    // means a fresh round always brings a full set, while a single round still
+    // spends them: throw the ball out and it stays out until the round ends.
+    //
+    // The cookie panel is NOT cleared here on purpose. It is gated on consent,
+    // which is localStorage and permanent, because answering it once is meant to
+    // count for good. To see that one again you have to clear site data.
+    try { for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k); } catch { /* private mode */ }
+  }, []);
   // Consent arrives as an event whichever way it was given, so the pit clears
   // its cookie objects from one place rather than from each button.
   useEffect(() => {
