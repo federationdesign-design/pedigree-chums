@@ -308,7 +308,10 @@
 
 .bulletTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 60pt;
+  /* 40pt, which is 20% below the section title's 50pt, so the section title
+     stays the dominant word on screen. It was 60pt, ie 20% ABOVE it, which is
+     why GREEDY read louder than MEDIEVAL AND TUDOR BRITAIN. */
+  font-size: 40pt;
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.03em;
   line-height: 1.05;
@@ -322,16 +325,18 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.1;
-  /* 22px from the title on screen, half what it was.
-     MEASURED, not estimated. In a 908x1516 screenshot at a device pixel ratio
-     of 2, the bottom of the GREEDY glyphs sat at y1039 and the top of this
-     line at y1128: 88 device pixels, so 44 CSS px. Only 15 of that was CSS.
-     The other 29 is empty space inside the two line boxes, most of it the
-     descender room Luckiest Guy reserves under a word in capitals.
-     So the visible gap is `margin-top + 41`, and 22px needs -19.
+  /* 22px from the title on screen.
+     DECOMPOSED FROM A SCREENSHOT, not estimated. At 60pt the visible gap was
+     44px and only 15 of that was CSS. The rest is empty space inside the two
+     line boxes: 25px of descender room below the capitals, which a word in
+     caps never uses, and 4.5px above the italic line.
+     That 25px is 0.3125 of the font size, so it SHRINKS with the type. The
+     title is now 40pt, where the slack is 16.7px, and 16.7 + 12 + 4.5 = 33.2,
+     so -11 lands on 22. At 60pt the same 22px needed -19.
+     RECALCULATE THIS WHENEVER .bulletTitle CHANGES SIZE.
      Shorthand rather than a longhand, so a later `margin` of equal
      specificity cannot silently wipe it. */
-  margin: -19px 0 0;
+  margin: -11px 0 0;
 }
 
 /* Round, centred, half the panel width, above the words. aspect-ratio keeps
