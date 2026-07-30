@@ -15,6 +15,29 @@
   min-height: 100dvh;
 }
 
+/* THE FOOTER IS WHY THE PAGE JARRED.
+
+   Nav is position: fixed and every layout-level widget is fixed too, so the
+   footer was the only thing adding height below a 100dvh wrap. That made the
+   DOCUMENT a second, vertical scroller.
+
+   On every other panel that was harmless: .carousel is touch-action: pan-x,
+   which refuses vertical dragging outright. .timelineRun sets pan-y to get the
+   dog run scrolling, and at the top or bottom of the run that drag chained
+   straight through to the document. The page slid, Safari collapsed its bars,
+   100dvh changed by about 117px on a 414 x 896 phone, and all twelve screens
+   resized mid-scroll. That resize is the drift, not a layout bug in the run.
+
+   Hidden rather than removed: it stays in the markup for crawlers, and it
+   comes back with the desktop layout. MOVE THIS INSIDE THE MOBILE MEDIA QUERY
+   when v2 gains one, or the desktop layout will lose its footer too.
+
+   display: none rather than overscroll-behavior alone because that property
+   only landed in Safari 16, and an iPhone 12 can still be running iOS 14. */
+.footerOff {
+  display: none;
+}
+
 /* Outer wrap: full viewport, clips overflow */
 .carouselWrap {
   display: block;
@@ -483,6 +506,12 @@
      here. The carousel around it is pan-x. See TimelineRun.tsx: this is only
      half the fix, the script also has to stand down. */
   touch-action: pan-y;
+  /* Second layer under .footerOff. Keeps a drag that reaches either end of the
+     run inside the run instead of chaining out to whatever scrolls behind it.
+     Safari 16 and up, so it does nothing on an iPhone 12 left on iOS 14 or 15,
+     which is exactly why .footerOff carries the fix and this only backs it up.
+     Costs the rubber-band bounce at the two ends. */
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }

@@ -428,7 +428,13 @@ export default function HistoryV2Page() {
         })();` }} />
 
       </main>
-      <Footer />
+      {/* Kept in the markup, taken out of the layout. See .footerOff: it was
+          the only element adding height below the 100dvh wrap, which made the
+          document a second vertical scroller and let a drag inside the dog run
+          chain out to it. */}
+      <div className={styles.footerOff}>
+        <Footer />
+      </div>
     </>
   );
 }
