@@ -35,9 +35,6 @@ const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
   { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
 ];
 
-const WARNING =
-  "You are about to be linked to another site (and dogs), and we can't control anything from this point. Remember to come back and carry on exploring";
-
 const TAG_LABEL: Record<string, string> = {
   extinct: "Extinct",
   trending: "Trending",
@@ -65,6 +62,8 @@ export default function TimelineRun({
   const [flipped, setFlipped] = useState<string | null>(null);
   /* True once the reader has moved at all. Turns the head of the rail green. */
   const [moved, setMoved] = useState(false);
+  /* The outbound link awaiting confirmation, or null. */
+  const [leaving, setLeaving] = useState<string | null>(null);
   const runRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<HTMLSpanElement | null>(null);
 
@@ -113,6 +112,35 @@ export default function TimelineRun({
 
   return (
     <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
+      {/* Our own leave notice. The browser's confirm cannot be branded, and a
+          panel inside the card would sit in a rotated, backface-hidden box.
+          This is fixed to the viewport instead, clear of all of that. */}
+      {leaving && (
+        <div className={styles.leaveWrap} role="dialog" aria-modal="true">
+          <div className={styles.leaveCard}>
+            <p className={styles.leaveText}>
+              You are about to be linked to another site (and dogs), and we can&apos;t
+              control anything from this point. Remember to come back and carry on
+              exploring
+            </p>
+            <div className={styles.leaveRow}>
+              <button
+                type="button"
+                className={styles.leaveGo}
+                onClick={() => {
+                  window.open(leaving, "_blank", "noopener,noreferrer");
+                  setLeaving(null);
+                }}
+              >
+                Off we go
+              </button>
+              <button type="button" className={styles.leaveStay} onClick={() => setLeaving(null)}>
+                Stay here
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div ref={runRef} className={styles.timelineRun}>
         {/* Screen one: the era title, then the line that introduces the
             timeline below it. */}
@@ -162,14 +190,18 @@ export default function TimelineRun({
                         <span className={styles.dogThumb} />
                       )}
                       {/* The family tree glyph, copied from .lineageBadge */}
-                      <span className={styles.dogBadge} aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                          <circle cx="12" cy="5" r="2.4" />
-                          <circle cx="6" cy="18" r="2.4" />
-                          <circle cx="18" cy="18" r="2.4" />
-                          <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
-                        </svg>
-                      </span>
+                      {/* Turns the card over. Replaces the tree glyph that
+                          used to sit here, which did nothing. */}
+                      <span
+                        className={styles.frontFlip}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`About ${b.name}`}
+                        onClick={(e) => { e.stopPropagation(); setFlipped(b.name); }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped(b.name); }
+                        }}
+                      />
                       {/* The name sits ON the picture, above the status bar. */}
                       <span className={styles.dogNameOver}>{b.name}</span>
                       {b.tag && (
@@ -206,7 +238,7 @@ export default function TimelineRun({
                             aria-label="Read more on another site"
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (window.confirm(WARNING)) window.open(o.href, "_blank", "noopener,noreferrer");
+                              setLeaving(o.href);
                             }}
                           >
                             i

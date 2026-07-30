@@ -645,7 +645,9 @@
    The delay lets the flip reach halfway first. */
 .dogFrontOff {
   visibility: hidden;
-  transition: visibility 0s linear 0.26s;
+  /* The flip runs 0.5s, so hiding at 0.2s clears the name a full 0.3s
+     before it lands, which is what stops it showing mirrored mid-turn. */
+  transition: visibility 0s linear 0.2s;
 }
 
 .dogThumb {
@@ -655,27 +657,26 @@
   display: block;
 }
 
-/* The family tree glyph, top right. Copied from .lineageBadge. */
-.dogBadge {
+/* The flip control on the picture side. Same masked artwork as the one on the
+   yellow face, in white so it reads against a photograph. */
+.frontFlip {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--yellow, #ffd23e);
-  border: 3px solid var(--navy, #0a3a57);
-  box-sizing: border-box;
-  color: var(--navy, #0a3a57);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dogBadge svg {
-  width: 20px;
-  height: 20px;
-  fill: currentColor;
+  top: 12px;
+  right: 12px;
+  width: 52px;
+  height: 52px;
+  z-index: 2;
+  cursor: pointer;
+  background: #ffffff;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+  -webkit-mask-image: url("/flip-icon.svg");
+  mask-image: url("/flip-icon.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 /* Status tag across the foot of the card. Copied from .nodeTag. */
@@ -721,6 +722,8 @@
   /* Doubled from 1rem, then 4pt off. */
   font-size: calc(2rem - 4pt);
   line-height: 1.1em;
+  /* 20px clear of the row of links above. */
+  margin: 20px 0 0;
 }
 
 /* White type on the blue, not blue type on the yellow. White alone would not
@@ -732,9 +735,10 @@
   letter-spacing: 0.03em;
   line-height: 0.9em;
   color: #ffffff;
-  background: var(--blue-deep, #0b78bd);
+  background: #22c55e;
   border-radius: var(--radius-pill, 999px);
-  padding: 12px 18px;
+  /* 10% more top and bottom, 12 to 13.2. */
+  padding: 13.2px 18px;
 }
 
 /* The smaller line under the button. */
@@ -743,7 +747,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.25;
-  color: var(--blue-deep, #0b78bd);
+  color: #0a3a57;
   text-align: center;
   max-width: 30ch;
 }
@@ -855,15 +859,14 @@
    information icon sat on the card itself and therefore showed on both faces,
    where it collided with the tree glyph in the same corner. */
 .backFlip,
-/* The three outbound buttons, stacked down the right. */
+/* The three outbound buttons, in a ROW across the card. They were stacked and
+   absolutely positioned, which pushed them over the text and off the edge.
+   In the flow now, so the words can never run under them. */
 .backLinks {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 14px;
 }
 
 /* 33% down from 80. */
@@ -921,3 +924,57 @@
   font-size: 40px;
   line-height: 1;
 }
+
+/* ---- Leaving the site -------------------------------------------------- */
+
+.leaveWrap {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 58, 87, 0.55);
+}
+
+.leaveCard {
+  max-width: 34ch;
+  border-radius: var(--radius-card, 22px);
+  background: var(--yellow, #ffd23e);
+  color: #0a3a57;
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(10, 58, 87, 0.45);
+}
+
+.leaveText {
+  margin: 0 0 20px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.leaveRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.leaveGo,
+.leaveStay {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  border-radius: var(--radius-pill, 999px);
+  padding: 13px 20px;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+}
+
+.leaveGo { background: #22c55e; }
+.leaveStay { background: var(--blue-deep, #0b78bd); }
