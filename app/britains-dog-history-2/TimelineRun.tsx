@@ -37,7 +37,7 @@ const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
 
 /* How far down a dog screen the card sits. The line is drawn to exactly this
    depth, so the two meet. */
-const CARD_INSET = 200;
+const CARD_INSET = 125;
 
 const TAG_LABEL: Record<string, string> = {
   extinct: "Extinct",
@@ -71,6 +71,25 @@ export default function TimelineRun({
   const runRef = useRef<HTMLDivElement | null>(null);
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const dotRef = useRef<HTMLSpanElement | null>(null);
+  /* Marker rows that have arrived on screen. An observer rather than a timer:
+     a CSS delay would fire on all eleven at once when the page loads, so ten
+     of them would have popped long before the reader got there. */
+  const [arrived, setArrived] = useState<Record<string, boolean>>({});
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const key = (e.target as HTMLElement).dataset.dog;
+          if (e.isIntersecting && key) setArrived((a) => (a[key] ? a : { ...a, [key]: true }));
+        }
+      },
+      { threshold: 0.6 }
+    );
+    Object.values(rowRefs.current).forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const carousel = document.getElementById("mobile-carousel");
@@ -277,7 +296,11 @@ export default function TimelineRun({
 
 
               </div>
-              <div className={styles.markerRow}>
+              <div
+                className={`${styles.markerRow} ${arrived[b.name] ? styles.markerIn : ""}`}
+                data-dog={b.name}
+                ref={(el) => { rowRefs.current[b.name] = el; }}
+              >
                 {/* Opens the level. NOT WIRED YET: LineageModal and the lives,
                     streak and campaign score it needs still live inside
                     BreedStrip. */}

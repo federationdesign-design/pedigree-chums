@@ -516,7 +516,9 @@
      box tops out near 90vw and the card can never reach 95. */
   /* The card sits 200px down, clear of the menu. The line is drawn to the
      same depth, so the two meet exactly. */
-  padding: 200px 12px 0;
+  /* 125px down, 75 up from 200. CARD_INSET in TimelineRun.tsx carries the
+     same figure and the line is drawn to it, so keep the two in step. */
+  padding: 125px 12px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -984,3 +986,18 @@
 
 .leaveGo { background: #22c55e; }
 .leaveStay { background: var(--blue-deep, #0b78bd); }
+
+/* The marker's three pieces arrive when the row does, not when the page loads.
+   Staggered: disc first, then the buttons either side. */
+.markerRow > * {
+  opacity: 0;
+  transform: scale(0.2);
+}
+
+.markerIn > * {
+  animation: pcDotIn 0.32s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.markerIn > *:nth-child(2) { animation-delay: 0s; }
+.markerIn > *:nth-child(1) { animation-delay: 0.16s; }
+.markerIn > *:nth-child(3) { animation-delay: 0.16s; }
