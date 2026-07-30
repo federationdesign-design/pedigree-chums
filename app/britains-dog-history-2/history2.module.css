@@ -754,14 +754,16 @@
 .dogHint {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   /* Bigger button, bigger label. */
-  font-size: 1.5rem;
+  /* Up one point. calc, so it is a true 1pt at any width. */
+  font-size: calc(1.5rem + 1pt);
   letter-spacing: 0.03em;
   line-height: 0.9em;
   color: #ffffff;
   background: #22c55e;
   border-radius: var(--radius-pill, 999px);
   /* 10% more top and bottom, 12 to 13.2. */
-  padding: 18px 26px;
+  /* Wider than it is tall: 26px to 42px on the sides, top and bottom held. */
+  padding: 18px 42px;
 }
 
 /* The smaller line under the button. */
