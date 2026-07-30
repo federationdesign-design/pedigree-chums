@@ -254,6 +254,10 @@
   letter-spacing: 0.03em;
   line-height: 0.9em;
   margin: 0;
+  /* Copied verbatim from .essayHeroTitle in good-dog-bad-dog.module.css, which
+     is the same job on the same site: a Luckiest Guy display title sitting
+     over an arbitrary photograph. Tight offset, wide blur. Not invented. */
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
 }
 
 .slideIntro {
