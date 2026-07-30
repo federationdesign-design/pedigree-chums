@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ukBreeds } from "../../data/uk-breeds";
-import FitWord from "./FitWord";
 import styles from "./history2.module.css";
 
 /*
@@ -90,7 +89,9 @@ export default function TimelineRun({
         {/* Screen one: the era title and nothing else. */}
         <div className={styles.eraScreen}>
           {words.map((w, wi) => (
-            <FitWord key={wi} text={w} className={styles.eraWord} />
+            <span key={wi} className={styles.eraWord}>
+              {w}
+            </span>
           ))}
         </div>
         {breeds.map((b) => {

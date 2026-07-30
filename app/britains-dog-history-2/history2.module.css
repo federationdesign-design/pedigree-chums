@@ -151,18 +151,19 @@
 
 /* ---- Era title, the first screen of the vertical run ----------------- */
 
-/* One word per line, each filling the width. The SVG carries its own viewBox
-   cut to the word, so `width: 100%` is what does the scaling.
-   Colour, shadow and family copied from .endFlash in LineageModal.module.css,
-   which is the game over screen. `filter` rather than `text-shadow`, because
-   text-shadow does not apply to SVG text. */
+/* One word per line, EVERY WORD THE SAME SIZE. Copied from .endFlash and
+   .endFlashWord in LineageModal.module.css, which is the game over screen.
+   An earlier version scaled each word to fill the width, which made "to" as
+   wide as "medieval". Wrong: the game over screen sets one size and lets the
+   words fall where they fall. */
 .eraWord {
   display: block;
-  width: 100%;
-  height: auto;
-  fill: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  filter: drop-shadow(0 4px 40px rgba(0, 0, 0, 0.6));
+  font-size: clamp(3.4rem, 12vw, 8rem);
+  color: #ffffff;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* ---- Section groups: sticky top, panels beneath --------------------- */
