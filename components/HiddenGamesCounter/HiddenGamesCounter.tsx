@@ -1,18 +1,16 @@
 "use client";
 
-// Hidden Games Stage 1: the fixed progress counter.
+// Hidden Games counter (C03 timed reveal + prelude + palette).
 //
-// A small fixed figure in the bottom-left corner (BRIEF 6.1). Restore before
-// render (BRIEF 9): the count is read through useSyncExternalStore whose server
-// snapshot is null, so the server and first hydration draw nothing and a
-// returning visitor never sees a 0/2 flash.
+// First visit (prelude not yet seen): a timed sequence from page load -
+//   0-5s   nothing renders
+//   5-8s   the prelude card
+//   8-12s  the introduction card
+//   >12s   the plain counter
+// Return visit (prelude seen): the counter renders immediately.
 //
-// States, in precedence order:
-//   DRAFT / ARCHIVED  -> nothing renders
-//   SUSPENDED / CLOSED-> the lifecycle message (BRIEF 5)
-//   completed (2/2)   -> the completion state, two approved lines (D11)
-//   first-ever view   -> the expanded introduction, once (D10)
-//   otherwise         -> the plain counter, plus a storage-blocked notice (4.2)
+// Lifecycle (suspended/closed/hidden) and completion take precedence over the
+// timed sequence. The palette is the campaign palette (C03).
 
 import { useEffect, useRef, useState } from "react";
 import { useSyncExternalStore } from "react";
@@ -28,11 +26,17 @@ import {
   CAMPAIGN_INTRO,
   COMPLETION_HEADING,
   COMPLETION_BODY,
+  PRELUDE_WARNING,
+  PRELUDE_HEADING,
 } from "../../lib/hiddenGames/copy";
 import styles from "./HiddenGamesCounter.module.css";
 
-const INTRO_TIMEOUT_MS = 10000; // D10: auto-collapse after ten seconds
-const COMPLETION_TIMEOUT_MS = 10000; // D11: same ten-second auto-collapse
+const PRELUDE_AT = 5000; // C03 timings, from page load
+const INTRO_AT = 8000;
+const COUNTER_AT = 12000;
+const COMPLETION_TIMEOUT_MS = 10000; // D11 completion auto-collapse
+
+type Phase = "pending" | "hidden" | "prelude" | "intro" | "counter";
 
 export default function HiddenGamesCounter() {
   const state = useSyncExternalStore(
@@ -43,70 +47,60 @@ export default function HiddenGamesCounter() {
 
   const [minimised, setMinimised] = useState(false);
   const [blockedDismissed, setBlockedDismissed] = useState(false);
-  const [introCollapsed, setIntroCollapsed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
+  const [phase, setPhase] = useState<Phase>("pending");
+  const [preludeClosed, setPreludeClosed] = useState(false);
   const visibleTracked = useRef(false);
 
-  // Safe defaults while state is null (server / hydration) so the hooks below
-  // stay unconditional and stable.
-  const view = state?.view ?? "hidden";
-  const introSeen = state?.introSeen ?? true; // unknown -> treat as seen (no flash)
-  const completed = state?.completed ?? false;
-  const completionSeen = state?.completionSeen ?? true;
-  const count = state?.count ?? 0;
+  // Timed reveal (C03). Mount-once; reads the engine directly, not the reactive
+  // state, so find-driven re-renders never restart the sequence.
+  useEffect(() => {
+    const engine = getHiddenGamesEngine();
+    const s = engine.getState();
+    if (s.preludeSeen || s.view !== "counter") {
+      setPhase("counter"); // return visit, or a lifecycle view: show now
+      return;
+    }
+    setPhase("hidden");
+    const t1 = window.setTimeout(() => setPhase("prelude"), PRELUDE_AT);
+    const t2 = window.setTimeout(() => {
+      setPhase("intro");
+      engine.markPreludeSeen();
+    }, INTRO_AT);
+    const t3 = window.setTimeout(() => {
+      setPhase("counter");
+      engine.markIntroSeen();
+    }, COUNTER_AT);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
+    };
+  }, []);
 
-  const introEligible = view === "counter" && !introSeen && !completed;
-  const introOpen = introEligible && !introCollapsed;
-  const completionCardOpen =
-    completed && !completionSeen && !completionCollapsed;
-
-  // Collapse the intro and persist the seen flag, once (D10).
-  const collapseIntro = () => {
-    setIntroCollapsed(true);
-    getHiddenGamesEngine().markIntroSeen();
-  };
-
-  // Collapse the completion celebration and persist its seen flag, once (D11).
   const collapseCompletion = () => {
     setCompletionCollapsed(true);
     getHiddenGamesEngine().markCompletionSeen();
   };
 
-  // The first find collapses the intro (the count moved above zero).
+  // Completion celebration auto-collapse (D11).
   useEffect(() => {
-    if (introEligible && count > 0 && !introCollapsed) collapseIntro();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, introEligible]);
-
-  // Ten-second auto-collapse while the intro is open.
-  useEffect(() => {
-    if (!introOpen) return;
-    const t = window.setTimeout(collapseIntro, INTRO_TIMEOUT_MS);
-    return () => window.clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [introOpen]);
-
-  // Ten-second auto-collapse while the completion card is open.
-  useEffect(() => {
-    if (!completionCardOpen) return;
+    if (!(state?.completed && !state?.completionSeen && !completionCollapsed)) return;
     const t = window.setTimeout(collapseCompletion, COMPLETION_TIMEOUT_MS);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completionCardOpen]);
+  }, [state?.completed, state?.completionSeen, completionCollapsed]);
 
-  // Campaign visible (BRIEF 8): fire once when the campaign UI is first shown to
-  // this visitor. The emit is consent-gated, so it only reaches GA4 for
-  // consented visitors.
+  // Campaign visible (measurement) once, when the campaign first shows something.
   useEffect(() => {
-    if (state?.render && !visibleTracked.current) {
+    const showing = phase === "prelude" || phase === "intro" || phase === "counter";
+    if (state?.render && showing && !visibleTracked.current) {
       visibleTracked.current = true;
       emitHiddenGamesEvent({ name: HG_EVENTS.visible });
     }
-  }, [state?.render]);
+  }, [state?.render, phase]);
 
   if (!state) return null;
-
-  // DRAFT (hidden from public) and ARCHIVED (component does not render).
   if (!state.render) return null;
 
   if (state.view === "suspended") {
@@ -116,7 +110,6 @@ export default function HiddenGamesCounter() {
       </div>
     );
   }
-
   if (state.view === "closed") {
     return (
       <div className={styles.notice} role="status" aria-live="polite">
@@ -125,19 +118,18 @@ export default function HiddenGamesCounter() {
     );
   }
 
-  // Completed (2/2): show the celebration once (D11), then collapse to a
-  // persistent completed chip. Same show-once-then-persist pattern as the intro.
+  // Completion (2/2): celebration once, then a persistent completed chip.
   if (state.completed) {
-    if (completionCardOpen) {
+    if (!state.completionSeen && !completionCollapsed) {
       return (
         <div className={styles.completed} role="status" aria-live="polite">
           <button
             type="button"
-            className={styles.completeDismiss}
+            className={styles.iconBtn}
             onClick={collapseCompletion}
             aria-label="Dismiss completion message"
           >
-            {"×"}
+            <img className={styles.redIcon} src="/red-icon.svg" alt="" />
           </button>
           <p className={styles.completeHeading}>{COMPLETION_HEADING}</p>
           <p className={styles.completeBody}>{COMPLETION_BODY}</p>
@@ -146,35 +138,50 @@ export default function HiddenGamesCounter() {
     }
     return (
       <div className={styles.completeChip} role="status" aria-live="polite">
-        <span className={styles.completeTick} aria-hidden="true">
-          {"✓"}
-        </span>
         <span>{state.label}</span>
       </div>
     );
   }
 
-  // First-ever view: the expanded introduction (D10).
-  if (introOpen) {
+  // Timed sequence (first visit) or immediate (return / lifecycle).
+  if (phase === "pending" || phase === "hidden") return null;
+
+  if (phase === "prelude") {
+    if (preludeClosed) return null;
+    return (
+      <div className={styles.prelude} role="status" aria-live="polite">
+        <img className={styles.preludeIcon} src="/prelude-icon.svg" alt="" />
+        <div className={styles.preludeText}>
+          <p className={styles.preludeWarning}>{PRELUDE_WARNING}</p>
+          <p className={styles.preludeHeading} data-hg-aa-exception>{PRELUDE_HEADING}</p>
+        </div>
+        <button
+          type="button"
+          className={styles.preludeClose}
+          onClick={() => {
+            setPreludeClosed(true);
+            getHiddenGamesEngine().markPreludeSeen();
+          }}
+          aria-label="Close"
+        >
+          <img className={styles.redIcon} src="/red-icon.svg" alt="" />
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "intro") {
     return (
       <div className={styles.intro} role="status" aria-live="polite">
         <p className={styles.introLine}>{CAMPAIGN_INTRO}</p>
         <div className={styles.introFoot}>
           <span className={styles.label}>{state.label}</span>
-          <button
-            type="button"
-            className={styles.introDismiss}
-            onClick={collapseIntro}
-            aria-label="Dismiss introduction"
-          >
-            {"×"}
-          </button>
         </div>
       </div>
     );
   }
 
-  // Plain counter.
+  // phase === "counter"
   if (minimised) {
     return (
       <button
@@ -194,11 +201,11 @@ export default function HiddenGamesCounter() {
         <span className={styles.label}>{state.label}</span>
         <button
           type="button"
-          className={styles.minimise}
+          className={styles.minimiseBtn}
           onClick={() => setMinimised(true)}
           aria-label="Minimise hidden games progress"
         >
-          {"-"}
+          <img className={styles.minimiseIcon} src="/red-icon.svg" alt="" />
         </button>
       </div>
       {state.storageBlocked && !blockedDismissed && (
@@ -206,11 +213,11 @@ export default function HiddenGamesCounter() {
           <span>{STORAGE_BLOCKED}</span>
           <button
             type="button"
-            className={styles.blockedDismiss}
+            className={styles.iconBtn}
             onClick={() => setBlockedDismissed(true)}
             aria-label="Dismiss storage warning"
           >
-            {"×"}
+            <img className={styles.redIcon} src="/red-icon.svg" alt="" />
           </button>
         </div>
       )}

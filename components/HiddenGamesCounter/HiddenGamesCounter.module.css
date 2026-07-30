@@ -1,149 +1,166 @@
-/* Hidden Games Stage 1 counter. Fixed to the bottom-left corner, the corner
-   OfferLauncher (right edge) does not hold (BRIEF 6.1). Sits below the nav
-   (z 300) and the mini-pit overlay (z 900), above ordinary page content. A
-   small navy chip in the existing launcher style; this is a chip, not a page
-   background, so the no-dark-page-background rule is not in play. */
-.counter {
+/* Hidden Games counter, campaign palette (C03): #4dabe9 container, thick white
+   rounded border. Body text is navy for WCAG AA contrast on the light-blue
+   container (the specified accent #f7ed57 fails AA on #4dabe9 - flagged to the
+   owner). Sizes/weights/letter-spacing are left as minimal defaults for the
+   owner to set. */
+
+.chipBase {
   position: fixed;
   bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
   left: clamp(12px, 3vw, 22px);
   z-index: 90;
+  background: var(--hg-container);
+  color: var(--navy);
+  border: 3px solid var(--hg-border);
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.counter {
+  composes: chipBase;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px 9px 14px;
+  padding: 8px 10px 8px 14px;
   border-radius: var(--radius-pill, 999px);
-  background: var(--navy);
-  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3),
-    inset 0 0 0 2px var(--yellow);
 }
 
 .label {
-  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   font-size: 0.9rem;
   line-height: 1.1;
-  color: var(--cream);
+  color: var(--navy);
   white-space: nowrap;
 }
 
-.minimise {
+/* Icon buttons (minimise, dismiss, prelude close). The red icon renders as an
+   SVG image, never a text glyph, so it centres rather than sitting on a
+   baseline (C03). */
+.minimiseBtn,
+.iconBtn,
+.preludeClose {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
   padding: 0;
   border: none;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: var(--navy);
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1rem;
-  line-height: 1;
+  background: transparent;
   cursor: pointer;
 }
 
-/* Minimised state: a compact yellow pill showing just the numbers, so the
-   visitor keeps their progress in view without the full chip. Progress lives in
-   the engine, so minimising loses nothing (BRIEF 6.1). */
+.redIcon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* Minimise is smaller than the other controls (C03). */
+.minimiseIcon {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+
+.preludeClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+/* Minimised: a compact pill in campaign styling. */
 .reveal {
-  position: fixed;
-  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
-  left: clamp(12px, 3vw, 22px);
-  z-index: 90;
+  composes: chipBase;
   padding: 7px 12px;
-  border: 2px solid var(--navy);
   border-radius: var(--radius-pill, 999px);
-  background: var(--yellow);
-  color: var(--navy);
-  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   font-size: 0.9rem;
   line-height: 1;
   cursor: pointer;
 }
 
-/* Lifecycle messages (SUSPENDED, CLOSED). A wrapping card in the same
-   bottom-left corner as the counter, sized to read on a phone without covering
-   navigation or form actions (BRIEF 6.1). */
+/* Lifecycle messages (SUSPENDED, CLOSED). */
 .notice {
-  position: fixed;
-  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
-  left: clamp(12px, 3vw, 22px);
-  z-index: 90;
+  composes: chipBase;
   max-width: min(320px, calc(100vw - 24px));
   padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--navy);
-  color: var(--cream);
-  font-family: var(--font-body), system-ui, sans-serif;
+  border-radius: 16px;
   font-weight: 600;
   font-size: 0.82rem;
   line-height: 1.35;
-  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3), inset 0 0 0 2px var(--yellow);
 }
 
-/* Storage-blocked notice. Sits just above the counter chip, same corner, so it
-   reads as attached to it (BRIEF 4.2). Cream on navy border to stand apart from
-   the navy chip below. */
+/* Storage-blocked notice, above the counter chip. */
 .blocked {
-  position: fixed;
+  composes: chipBase;
   bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px) + 50px);
-  left: clamp(12px, 3vw, 22px);
-  z-index: 90;
   display: flex;
   align-items: flex-start;
   gap: 8px;
   max-width: min(320px, calc(100vw - 24px));
   padding: 10px 12px;
   border-radius: 14px;
-  background: var(--cream);
-  color: var(--navy);
-  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
   font-size: 0.78rem;
   line-height: 1.35;
-  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3), inset 0 0 0 2px var(--navy);
 }
 
-.blockedDismiss {
-  flex: none;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--navy);
-  color: var(--cream);
-  font-size: 0.9rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/* Campaign introduction (D10). Expanded card in the same corner; the count sits
-   in the footer with a dismiss control. */
-.intro {
+/* Prelude card (C03): icon left, two lines of text, red close top-right. */
+.prelude {
+  composes: chipBase;
   position: fixed;
-  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
-  left: clamp(12px, 3vw, 22px);
-  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(340px, calc(100vw - 24px));
+  padding: 14px 40px 14px 16px;
+  border-radius: 16px;
+}
+
+.preludeIcon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+.preludeText {
+  display: flex;
+  flex-direction: column;
+}
+
+.preludeWarning {
+  margin: 0;
+  font-family: var(--font-unica), system-ui, sans-serif;
+  color: var(--navy);
+  line-height: 1.1;
+}
+
+/* The prelude display line is the brand accent #f7ed57 on #4dabe9. This is a
+   deliberate, owner-accepted WCAG AA exception (2.07:1), documented in BRIEF
+   section 9 and scoped to this one large Luckiest Guy line only. Everything else
+   in the campaign stays navy, which passes AA. */
+.preludeHeading {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  color: var(--hg-accent);
+  line-height: 1.05;
+}
+
+/* Introduction card (D10), campaign palette. */
+.intro {
+  composes: chipBase;
   max-width: min(300px, calc(100vw - 24px));
   padding: 14px 16px;
   border-radius: 16px;
-  background: var(--navy);
-  color: var(--cream);
-  box-shadow: 0 12px 28px rgba(10, 58, 87, 0.34), inset 0 0 0 2px var(--yellow);
 }
 
 .introLine {
   margin: 0 0 10px;
-  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
   font-size: 0.9rem;
   line-height: 1.35;
-  color: var(--cream);
+  color: var(--navy);
 }
 
 .introFoot {
@@ -153,35 +170,25 @@
   gap: 10px;
 }
 
-.introDismiss {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: var(--navy);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/* Completion (D11). Distinct completed styling (yellow card) and one brief
-   non-blocking pop. The pop is the only motion; under reduced motion it is
-   removed and the distinct styling alone marks completion. */
+/* Completion (D11), campaign palette. One brief non-blocking pop, removed under
+   reduced motion (static highlight = the distinct card). */
 .completed {
+  composes: chipBase;
   position: fixed;
-  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
-  left: clamp(12px, 3vw, 22px);
-  z-index: 90;
   max-width: min(300px, calc(100vw - 24px));
   padding: 14px 16px;
   border-radius: 16px;
-  background: var(--yellow);
-  color: var(--navy);
-  box-shadow: 0 12px 28px rgba(10, 58, 87, 0.34), inset 0 0 0 2px var(--navy);
   animation: hgComplete 720ms cubic-bezier(0.34, 1.5, 0.5, 1) both;
+}
+
+.completed .completeHeading {
+  padding-right: 24px;
+}
+
+.iconBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 .completeHeading {
@@ -195,67 +202,23 @@
 
 .completeBody {
   margin: 0;
-  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
   font-size: 0.84rem;
   line-height: 1.35;
   color: var(--navy);
 }
 
-/* Keep the heading clear of the top-right dismiss. */
-.completed .completeHeading {
-  padding-right: 24px;
-}
-
-.completeDismiss {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--navy);
-  color: var(--cream);
-  font-size: 0.95rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/* Persistent completed chip (D11): the counter in completed styling, shown
-   after the celebration collapses and on every later page. */
 .completeChip {
-  position: fixed;
-  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
-  left: clamp(12px, 3vw, 22px);
-  z-index: 90;
+  composes: chipBase;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 9px 14px;
   border-radius: var(--radius-pill, 999px);
-  background: var(--yellow);
-  color: var(--navy);
-  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   font-size: 0.9rem;
   line-height: 1.1;
   white-space: nowrap;
-  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3), inset 0 0 0 2px var(--navy);
-}
-
-.completeTick {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--navy);
-  color: var(--yellow);
-  font-size: 0.7rem;
-  font-weight: 800;
 }
 
 @keyframes hgComplete {
@@ -270,33 +233,18 @@
   }
 }
 
-/* Reduced motion: no pop; the distinct yellow card is the static highlight. */
 @media (prefers-reduced-motion: reduce) {
   .completed {
     animation: none;
   }
 }
 
-/* On small screens keep clear of navigation, cookie controls and form actions
-   by hugging the very corner with a slightly smaller footprint. */
 @media (max-width: 480px) {
-  .label {
-    font-size: 0.82rem;
-  }
   .notice,
   .blocked,
   .intro,
-  .completed {
+  .completed,
+  .prelude {
     max-width: min(280px, calc(100vw - 24px));
-  }
-  .notice,
-  .blocked {
-    font-size: 0.76rem;
-  }
-  .introLine {
-    font-size: 0.85rem;
-  }
-  .completeHeading {
-    font-size: 1.05rem;
   }
 }

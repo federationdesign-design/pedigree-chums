@@ -7,6 +7,27 @@ const RECORD_KEY = "pedigree_hidden_games:HIDDEN_GAMES_2026_01";
 // recorded in BRIEF 9.4; that plus two real-device spot checks are owner work.
 // These are the campaign-scoped assertions Playwright can make directly.
 
+// Seed a return visit so the counter is immediate (not gated by the C03 reveal).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((key) => {
+    if (localStorage.getItem(key as string)) return; // keep progress across reload/nav
+    localStorage.setItem(
+      key as string,
+      JSON.stringify({
+        record_schema: 3,
+        campaign_version: "HIDDEN_GAMES_2026_01",
+        total_at_last_seen: 2,
+        completed_game_ids: [],
+        count: 0,
+        updated_at: new Date().toISOString(),
+        intro_seen: true,
+        completion_seen: false,
+        prelude_seen: true,
+      })
+    );
+  }, RECORD_KEY);
+});
+
 test("no 0/2 flash before restored progress for a returning visitor", async ({ page }) => {
   await page.addInitScript((key) => {
     localStorage.setItem(
@@ -20,6 +41,7 @@ test("no 0/2 flash before restored progress for a returning visitor", async ({ p
         updated_at: new Date().toISOString(),
         intro_seen: true,
         completion_seen: false,
+        prelude_seen: true,
       })
     );
   }, RECORD_KEY);

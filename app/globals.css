@@ -17,6 +17,10 @@ html {
   --navy: #0a3a57;        /* dark text */
   --cream: #fbf7ec;       /* warm off-white */
   --white: #ffffff;
+  /* Hidden Games campaign palette (CHANGE-LIST C03) */
+  --hg-container: #4dabe9;
+  --hg-accent: #f7ed57;
+  --hg-border: #ffffff;
 
   --radius-card: 22px;
   --radius-pill: 999px;
