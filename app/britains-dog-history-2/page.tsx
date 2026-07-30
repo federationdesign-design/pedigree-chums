@@ -30,14 +30,19 @@ export const metadata: Metadata = {
    the progress bar and the snap index reading the same single sequence. */
 
 type Panel =
-  | { kind: "text"; intro: string; detail: string }
+  /* `lead` is the section's opening paragraph, which gets the larger face.
+     The two paragraphs used to share one slide. They are now a slide each,
+     because on a phone the pair ran well past a screenful. */
+  | { kind: "text"; text: string; lead: boolean }
   | { kind: "bullet"; text: string; title?: string }
   | { kind: "fact"; text: string; image: string };
 
-/* Nine panels per section: the text panel, then the four bullets, then the
-   four facts. Shared with the counter script and the video scrub, both of
-   which convert a global panel index into a section and a position within it. */
-const PANELS_PER_SECTION = 9;
+/* TEN panels per section: the opening paragraph, the second paragraph, then
+   the four bullets and the four facts. Shared with the counter script and the
+   video scrub, both of which convert a global panel index into a section and a
+   position within it, so this is the only place the figure is written.
+   It was nine until the text panel was split in two. */
+const PANELS_PER_SECTION = 10;
 
 /* How far the fact circle rides above where it is laid out, so it breaks the
    top edge of the blue panel.
@@ -126,7 +131,8 @@ const SEQUENCE: Entry[] = [
 
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
   return [
-    { kind: "text", intro: s.intro, detail: s.detail },
+    { kind: "text", text: s.intro, lead: true },
+    { kind: "text", text: s.detail, lead: false },
     ...s.bullets.map((b, i) => ({ kind: "bullet" as const, text: b, title: s.bulletTitles?.[i] })),
     ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image })),
   ];
@@ -251,10 +257,9 @@ export default function HistoryV2Page() {
                         ].filter(Boolean).join(" ")}
                       >
                         {p.kind === "text" && (
-                          <>
-                            <p className={styles.slideIntro}>{p.intro}</p>
-                            <p className={styles.slideDetail}>{p.detail}</p>
-                          </>
+                          <p className={p.lead ? styles.slideIntro : styles.slideDetail}>
+                            {p.text}
+                          </p>
                         )}
                         {p.kind === "bullet" && (
                           <>
@@ -317,9 +322,15 @@ export default function HistoryV2Page() {
             var el = counters[parseInt(sec, 10)];
             if (!el) return;
             var sub = parseInt(panel.getAttribute('data-pc-sub'), 10);
-            if (sub === 0) { el.style.visibility = 'hidden'; return; }
+            /* Subs 0 and 1 are the section's two text slides. The counter is
+               about the EIGHT content cards after them, four bullets and four
+               facts, so it stays hidden on both and starts at one on the first
+               bullet. It tested sub against 0 while the text was one slide.
+               NO BACKTICKS IN HERE: this whole script is a template literal
+               and a backtick in a comment closes it. */
+            if (sub <= 1) { el.style.visibility = 'hidden'; return; }
             el.style.visibility = '';
-            el.textContent = sub + ' / 8';
+            el.textContent = (sub - 1) + ' / 8';
           }
 
           /* CIRCLE ROLL-IN, driven by scroll POSITION rather than by a timer.
