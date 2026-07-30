@@ -275,7 +275,25 @@
   pointer-events: none;
 }
 
+/* Fact panels only. `overflow: visible` undoes the scroll clipping every
+   other panel needs, because the circle is deliberately drawn outside this
+   box. The text panels keep their scrolling: their detail paragraphs are the
+   long ones. */
+.panelFact {
+  overflow: visible;
+  text-align: center;
+}
+
 /* ---- Panel content ---------------------------------------------------- */
+
+.bulletTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 30pt;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  margin: 0;
+}
 
 .bulletText {
   font-family: var(--font-body, "Montserrat", sans-serif);
@@ -296,6 +314,12 @@
   border-radius: 50%;
   display: block;
   margin: 0 auto;
+  /* Up 50px, over the photograph. A transform rather than a negative margin
+     so nothing else in the panel moves: the label and the text stay exactly
+     where they were. z-index clears the sticky header, which sits at 3. */
+  position: relative;
+  z-index: 4;
+  transform: translateY(-50px);
 }
 
 .factLabel {
@@ -313,5 +337,6 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
-  margin: 0;
+  /* The panel's own 12px flex gap, less 5. */
+  margin: -5px 0 0;
 }

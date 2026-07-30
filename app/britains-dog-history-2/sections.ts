@@ -13,6 +13,8 @@ export type Section = {
   era?: string; // which breed-strip era shows above this card
   intro: string;
   bullets: string[];
+  // One short title per bullet, same order. Only Medieval has these so far.
+  bulletTitles?: string[];
   detail: string;
   facts: { text: string; image?: string }[];
   image: string; // /history/<name>.jpg image path; drop art in later
@@ -32,6 +34,7 @@ export const SECTIONS: Section[] = [
       "By Tudor times, Henry VIII kept spaniels, beagles and greyhounds, and owned sixty-five dog leashes.",
       "Ladies of the court adored their little lapdogs, which they fondly called 'comforters'.",
     ],
+    bulletTitles: ["Greedy", "Gruesome", "Lavish", "Lapdogs"],
     detail:
       "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
     facts: [

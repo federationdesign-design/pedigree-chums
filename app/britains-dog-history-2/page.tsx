@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 type Panel =
   | { kind: "text"; intro: string; detail: string }
-  | { kind: "bullet"; text: string }
+  | { kind: "bullet"; text: string; title?: string }
   | { kind: "fact"; text: string; image: string };
 
 /* Nine panels per section: the text panel, then the four bullets, then the
@@ -37,7 +37,7 @@ type Panel =
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
   return [
     { kind: "text", intro: s.intro, detail: s.detail },
-    ...s.bullets.map((b) => ({ kind: "bullet" as const, text: b })),
+    ...s.bullets.map((b, i) => ({ kind: "bullet" as const, text: b, title: s.bulletTitles?.[i] })),
     ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image })),
   ];
 }
@@ -97,7 +97,12 @@ export default function HistoryV2Page() {
                         alt={s.imageAlt}
                         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                       />
-                      <div className={styles.slideCount}>{si + 1} / {SECTIONS.length}</div>
+                      {/* Sub-slide counter. The value is written by the script
+                          below, because this element lives in the sticky header
+                          and has to change as the panels beneath it scroll. The
+                          markup carries a sensible first value so there is
+                          nothing invented on screen before the script runs. */}
+                      <div className={styles.slideCount} data-pc-count={si}>1 / 8</div>
                       {/* The title sits ON the photograph rather than at the top
                           of the text half. Last child so it paints over the image. */}
                       <div className={styles.slideTitleWrap}>
@@ -111,7 +116,10 @@ export default function HistoryV2Page() {
 
                   <div className={styles.panelRow}>
                     {panels.map((p, pi) => (
-                      <div key={pi} className={styles.panel}>
+                      <div
+                        key={pi}
+                        className={p.kind === "fact" ? `${styles.panel} ${styles.panelFact}` : styles.panel}
+                      >
                         {p.kind === "text" && (
                           <>
                             <p className={styles.slideIntro}>{p.intro}</p>
@@ -119,7 +127,10 @@ export default function HistoryV2Page() {
                           </>
                         )}
                         {p.kind === "bullet" && (
-                          <p className={styles.bulletText}>{p.text}</p>
+                          <>
+                            {p.title && <p className={styles.bulletTitle}>{p.title}</p>}
+                            <p className={styles.bulletText}>{p.text}</p>
+                          </>
                         )}
                         {p.kind === "fact" && (
                           <>
@@ -153,8 +164,30 @@ export default function HistoryV2Page() {
             var max = carousel.scrollWidth - carousel.clientWidth;
             bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
           }
-          carousel.addEventListener('scroll', update, { passive: true });
+          /* Sub-slide counter. Nine panels per section: index 0 is the
+             section's own text panel and is not a sub-slide, so it shows
+             nothing there, then 1 to 8 across the four bullets and the four
+             facts. Only the current section's counter is touched, so a
+             neighbouring one cannot flash the wrong figure mid-transition. */
+          var PANELS_PER_SECTION = 9;
+          var counters = document.querySelectorAll('[data-pc-count]');
+          function updateCount() {
+            var w = carousel.clientWidth;
+            if (!w) return;
+            var g = Math.round(carousel.scrollLeft / w);
+            if (g < 1) return;                       /* the intro slide */
+            var si = Math.floor((g - 1) / PANELS_PER_SECTION);
+            var sub = (g - 1) % PANELS_PER_SECTION;
+            var el = counters[si];
+            if (!el) return;
+            if (sub === 0) { el.style.visibility = 'hidden'; return; }
+            el.style.visibility = '';
+            el.textContent = sub + ' / 8';
+          }
+
+          carousel.addEventListener('scroll', function(){ update(); updateCount(); }, { passive: true });
           update();
+          updateCount();
 
           function goTo(idx) {
             /* Re-queried each time so the handler still works if React has
