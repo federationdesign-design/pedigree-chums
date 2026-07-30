@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import { SECTIONS } from "./sections";
 import ScrubVideo from "./ScrubVideo";
+import FitWord from "./FitWord";
 import styles from "./history2.module.css";
 
 export const metadata: Metadata = {
@@ -47,6 +48,31 @@ const PANELS_PER_SECTION = 9;
    starting state and points here. */
 const FACT_LIFT_PX = 60;
 
+/* THE SEQUENCE OF SLIDES.
+
+   Panels used to be addressed with arithmetic: section k started at
+   1 + k * 9. That only held while every entry in the carousel was either the
+   single intro slide or a nine-panel section. The era title slide breaks it,
+   and so will every one after it.
+
+   So the running index is computed here once, at render, and written onto each
+   panel as `data-pc-panel`. The counter reads that attribute instead of
+   recalculating, which means adding a slide anywhere can no longer silently
+   put every counter after it out by one. */
+type Entry =
+  | { type: "intro" }
+  | { type: "era"; words: string[] }
+  | { type: "section"; si: number };
+
+const SEQUENCE: Entry[] = [
+  { type: "intro" },
+  { type: "section", si: 0 },
+  // Sits directly after Medieval and Tudor, which is where the
+  // ancient-medieval strip sits on the desktop page.
+  { type: "era", words: ["Ancient", "to", "medieval", "dogs"] },
+  ...SECTIONS.slice(1).map((_, i) => ({ type: "section" as const, si: i + 1 })),
+];
+
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
   return [
     { kind: "text", intro: s.intro, detail: s.detail },
@@ -54,6 +80,20 @@ function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
     ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image })),
   ];
 }
+
+/* The sequence laid out with its running panel index. Module scope, not inside
+   the component: the sequence never changes, so this is computed once at
+   import rather than on every render. It also keeps a mutable accumulator out
+   of render, which the compiler correctly refuses. */
+const LAID_OUT = (() => {
+  let cursor = 0;
+  return SEQUENCE.map((entry) => {
+    const count = entry.type === "section" ? PANELS_PER_SECTION : 1;
+    const first = cursor;
+    cursor += count;
+    return { entry, first, count };
+  });
+})();
 
 export default function HistoryV2Page() {
   return (
@@ -68,7 +108,7 @@ export default function HistoryV2Page() {
                 rather than the blue gradient good-dog-bad-dog uses. A tint
                 sits over it because the source image is light in the upper
                 half and white display type was unreadable on it. */}
-            <div className={styles.slide}>
+            <div className={styles.slide} data-pc-panel="0">
               <div className={styles.introSlide}>
                 <div className={styles.introImg} aria-hidden="true" />
                 <div className={styles.introTint} aria-hidden="true" />
@@ -91,17 +131,28 @@ export default function HistoryV2Page() {
               </div>
             </div>
 
-            {/* One group per section. The image and title are STICKY at the
-                left edge, so they hold their position while the group's nine
-                panels scroll past beneath them, then slide out when the next
-                section's group arrives. This is why there is no second scroll
-                container: the whole page is still one horizontal scroller and
-                a swipe anywhere moves it. */}
-            {SECTIONS.map((s, si) => {
+            {/* Everything after the intro, in order. A section renders as a
+                sticky-topped group of nine panels; an era title renders as a
+                single full-screen slide with no photograph. */}
+            {LAID_OUT.map(({ entry, first }, ei) => {
+              if (entry.type === "intro") return null;
+
+              if (entry.type === "era") {
+                return (
+                  <div key={`e${ei}`} className={styles.eraSlide} data-pc-panel={first}>
+                    {entry.words.map((w, wi) => (
+                      <FitWord key={wi} text={w} className={styles.eraWord} />
+                    ))}
+                  </div>
+                );
+              }
+
+              const s = SECTIONS[entry.si];
+              const si = entry.si;
               const prefix = s.title.slice(0, s.title.length - s.accent.length);
               const panels = panelsFor(s);
               return (
-                <div key={si} className={styles.sectionGroup}>
+                <div key={`s${si}`} className={styles.sectionGroup}>
                   <div className={styles.stickyTop}>
                     <div className={styles.slideImg}>
                       {s.video ? (
@@ -109,8 +160,8 @@ export default function HistoryV2Page() {
                           src={s.video}
                           poster={s.image}
                           className={styles.topMedia}
-                          sectionIndex={si}
-                          panelsPerSection={PANELS_PER_SECTION}
+                          firstPanel={first}
+                          panelCount={PANELS_PER_SECTION}
                         />
                       ) : (
                         /* eslint-disable-next-line @next/next/no-img-element */
@@ -137,6 +188,9 @@ export default function HistoryV2Page() {
                     {panels.map((p, pi) => (
                       <div
                         key={pi}
+                        data-pc-panel={first + pi}
+                        data-pc-sec={si}
+                        data-pc-sub={pi}
                         className={[
                           styles.panel,
                           p.kind === "fact" ? styles.panelFact : "",
@@ -162,7 +216,7 @@ export default function HistoryV2Page() {
                               className={styles.factImg}
                               src={p.image}
                               alt=""
-                              data-pc-roll={1 + si * PANELS_PER_SECTION + pi}
+                              data-pc-roll={first + pi}
                             />
                             <p className={styles.factLabel}>Did you know?</p>
                             <p className={styles.factText}>{p.text}</p>
@@ -192,22 +246,24 @@ export default function HistoryV2Page() {
             var max = carousel.scrollWidth - carousel.clientWidth;
             bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
           }
-          /* Sub-slide counter. Nine panels per section: index 0 is the
-             section's own text panel and is not a sub-slide, so it shows
-             nothing there, then 1 to 8 across the four bullets and the four
-             facts. Only the current section's counter is touched, so a
-             neighbouring one cannot flash the wrong figure mid-transition. */
-          var PANELS_PER_SECTION = ${PANELS_PER_SECTION};
+          /* Sub-slide counter. It reads the settled panel's own attributes
+             rather than deriving them from a modulus. The modulus was only
+             correct while every carousel child was one slide or nine, which
+             stopped being true the moment an era title was inserted. Panels
+             that are not part of a section carry no data-pc-sec, so the
+             counters are left alone on those. */
           var counters = document.querySelectorAll('[data-pc-count]');
           function updateCount() {
             var w = carousel.clientWidth;
             if (!w) return;
             var g = Math.round(carousel.scrollLeft / w);
-            if (g < 1) return;                       /* the intro slide */
-            var si = Math.floor((g - 1) / PANELS_PER_SECTION);
-            var sub = (g - 1) % PANELS_PER_SECTION;
-            var el = counters[si];
+            var panel = document.querySelector('[data-pc-panel="' + g + '"]');
+            if (!panel) return;
+            var sec = panel.getAttribute('data-pc-sec');
+            if (sec === null) return;
+            var el = counters[parseInt(sec, 10)];
             if (!el) return;
+            var sub = parseInt(panel.getAttribute('data-pc-sub'), 10);
             if (sub === 0) { el.style.visibility = 'hidden'; return; }
             el.style.visibility = '';
             el.textContent = sub + ' / 8';

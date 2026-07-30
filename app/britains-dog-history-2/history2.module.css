@@ -149,6 +149,39 @@
 
 /* ---- Section slides --------------------------------------------------- */
 
+/* ---- Era title slide -------------------------------------------------- */
+
+/* A full screen of words and nothing else. Same blue as the panels, since
+   there is no photograph here and inventing a second background colour would
+   introduce a value nobody asked for. */
+.eraSlide {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100%;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+  padding: 24px;
+  background: var(--blue-deep, #0b78bd);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* One word per line, each filling the width. The SVG carries its own viewBox
+   cut to the word, so `width: 100%` is what does the scaling.
+   Colour, shadow and family copied from .endFlash in LineageModal.module.css,
+   which is the game over screen. `filter` rather than `text-shadow`, because
+   text-shadow does not apply to SVG text. */
+.eraWord {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: #ffffff;
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  filter: drop-shadow(0 4px 40px rgba(0, 0, 0, 0.6));
+}
+
 /* ---- Section groups: sticky top, panels beneath --------------------- */
 
 /* One group per section, nine panels wide. It is a column so the image can
