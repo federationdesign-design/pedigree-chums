@@ -63,15 +63,15 @@
 
 .preludeClose {
   position: absolute;
-  top: 11px;
-  right: 11px;
+  top: 16px;
+  right: 16px;
 }
 
 /* C04: the prelude's close icon scales up ~1/3. Card-scoped so the shared
    .redIcon (completion, storage-blocked) is unchanged. */
 .prelude .redIcon {
-  width: 27px;
-  height: 27px;
+  width: 40px;
+  height: 40px;
 }
 
 /* Minimised: a compact pill in campaign styling. */
@@ -119,17 +119,19 @@
   position: fixed;
   display: flex;
   align-items: center;
-  gap: 16px;
-  max-width: min(452px, calc(100vw - 40px));
-  padding: 19px 53px 19px 21px;
+  gap: 24px;
+  max-width: min(678px, calc(100vw - 40px));
+  padding: 28px 80px 28px 32px;
   border-radius: 21px;
 }
 
 /* SVG icon: scale the rendered width/height, not by stretching (C04). */
 .preludeIcon {
   flex: none;
-  width: 59px;
-  height: 59px;
+  width: 260px;
+  height: auto;
+  margin-top: -34px;
+  align-self: center;
   display: block;
 }
 
@@ -141,7 +143,7 @@
 .preludeWarning {
   margin: 0 0 0.4em; /* C05: vertical spacing above the display line */
   font-family: var(--font-unica), system-ui, sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.95rem;
   color: var(--navy);
   line-height: 1.1;
 }
@@ -154,7 +156,7 @@
   margin: 0;
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 400;
-  font-size: 1.9rem;
+  font-size: 2.85rem;
   color: var(--hg-accent);
   line-height: 0.9em; /* C05 */
 }
