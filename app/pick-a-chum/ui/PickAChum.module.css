@@ -28,7 +28,9 @@
 .launcher {
   position: fixed;
   left: -36px;
-  bottom: -36px;
+  /* Task 73: raised 200px total (was -36px) to clear the HiddenGamesCounter, which shares this
+     bottom-left corner (z-index 90, above the launcher's 50). */
+  bottom: 164px;
   width: 72px;
   height: 72px;
   border-radius: 50%;
@@ -460,7 +462,8 @@
 @media (max-width: 480px) {
   .launcher {
     left: 16px;
-    bottom: 16px;
+    /* Task 73: raised 200px total (was 16px) to clear the HiddenGamesCounter in this corner. */
+    bottom: 216px;
     width: 60px;
     height: 60px;
   }
