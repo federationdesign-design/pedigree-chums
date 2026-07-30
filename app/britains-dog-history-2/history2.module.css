@@ -1224,9 +1224,19 @@
 
 /* The marker's three pieces arrive when the row does, not when the page loads.
    Staggered: disc first, then the buttons either side. */
+/* DECORATION MUST NOT GATE CONTENT. This rule used to set opacity: 0 here, so
+   the three icons were invisible until a pop-in animation ran. Whenever the
+   arrival trigger failed, the whole marker row disappeared rather than simply
+   not popping, and it read as the row being missing from the page.
+
+   That failed under an IntersectionObserver and then again under a scroll
+   test, which was the tell: the fault was never the trigger, it was that
+   anything visible depended on one at all.
+
+   The icons now rest visible. The pop still runs when arrival fires, because
+   the animation carries its own opening frame. */
 .markerRow > * {
-  opacity: 0;
-  transform: scale(0.2);
+  opacity: 1;
 }
 
 .markerIn > * {
