@@ -74,9 +74,15 @@ export function breedCardKind(name: string): BreedCardKind | null {
 export default function BreedStrip({
   era,
   renderLevels,
+  onEraComplete,
 }: {
   era: string;
   renderLevels?: (open: BreedStripOpen) => React.ReactNode;
+  /* Called when a won level's next level belongs to a different era, instead of
+     rolling on into it. Only the history slider passes this, because only it
+     has somewhere to send the player. Without it the run continues across the
+     join exactly as it does today, which is what the live page wants. */
+  onEraComplete?: () => void;
 }) {
   const router = useRouter();
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -357,13 +363,23 @@ export default function BreedStrip({
   /* The level window, built once and used by both presentations. It is the
      whole reason the slider borrows this component rather than copying it:
      every rule below is written here and nowhere else. */
+  /* THE JOIN. The level list runs across all nine eras, so winning the last dog
+     of one silently offers the first dog of the next. Comparing the next
+     level's own strip against this strip is the whole test, and it needs no
+     memory of what has been played: intercepting at every join means the round
+     can never be outside this era to begin with. */
+  const nextUp = active ? nextLevelOf(active.name) : null;
+  const crossing = !!(onEraComplete && nextUp && nextUp.strip !== era);
+
   const modal = active && (
     <LineageModal
       key={`${active.name}:${runKey}`}
       era={era}
       initialScore={campaignScore}
       onScoreChange={setCampaignScore}
-      nextLevelLabel={nextLevelOf(active.name)?.name}
+      onNextEra={crossing ? () => { setActive(null); onEraComplete?.(); } : undefined}
+      nextEraLabel={crossing && nextUp ? ERA_LABELS[nextUp.strip] ?? nextUp.strip : undefined}
+      nextLevelLabel={crossing ? undefined : nextUp?.name}
       nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
       lives={lives}
       livesMax={LIVES_MAX}

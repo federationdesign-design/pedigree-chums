@@ -154,11 +154,18 @@ export default function HistoryV2Page() {
               if (entry.type === "intro") return null;
 
               if (entry.type === "timeline") {
+                /* Where the NEXT run starts, so finishing an era can carry the
+                   reader straight to it. Read off the laid-out sequence rather
+                   than worked out from a stride: the runs are eleven panels
+                   apart today, and that would stop being true the moment a
+                   panel is added anywhere before them. */
+                const nextRun = LAID_OUT.slice(ei + 1).find((l) => l.entry.type === "timeline");
                 return (
                   <TimelineRun
                     key={`t${ei}`}
                     era={entry.era}
                     panelIndex={first}
+                    nextRunPanel={nextRun?.first}
                     words={entry.words}
                     note={entry.note}
                   />

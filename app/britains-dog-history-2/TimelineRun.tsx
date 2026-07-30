@@ -63,9 +63,14 @@ export default function TimelineRun({
   panelIndex,
   words,
   note,
+  nextRunPanel,
 }: {
   era: string;
   panelIndex: number;
+  /* The panel index of the NEXT era's run, so finishing this era can carry the
+     reader straight there. Undefined on the last run, which simply means the
+     pit closes and leaves them where they were. */
+  nextRunPanel?: number;
   /* The line that sits between the title and the head of the timeline. */
   note: string;
   /* The era title, one word per line. It is the first SCREEN OF THIS RUN, not
@@ -92,6 +97,10 @@ export default function TimelineRun({
   /* The outbound link awaiting confirmation, or null. */
   const [leaving, setLeaving] = useState<string | null>(null);
   const runRef = useRef<HTMLDivElement | null>(null);
+  /* True while the carousel is being driven to another panel. The scroll sync
+     below pins the carousel to THIS panel while the run is locked, so without
+     this it would yank a programmatic move straight back on its first frame. */
+  const movingRef = useRef(false);
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const dotRef = useRef<HTMLSpanElement | null>(null);
   /* Marker rows that have arrived on screen, so their three icons pop in as
@@ -141,6 +150,8 @@ export default function TimelineRun({
       const onThisPanel = Math.abs(pos - panelIndex) < 0.02;
       // Not our panel and never was: touch nothing, measure nothing.
       if (!onThisPanel && !owns) return;
+      // A move is under way: stand down entirely so the pin cannot fight it.
+      if (movingRef.current) return;
       // 2px of slack: sub-pixel scroll positions never land exactly on the end.
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
       const lock = onThisPanel && !atBottom;
@@ -215,6 +226,32 @@ export default function TimelineRun({
       }
     };
   }, [panelIndex]);
+
+  /* Carry the reader to another panel. The off and on dance around
+     scroll-snap-type is not optional: `x mandatory` blocks a programmatic
+     smooth scroll on iOS Safari outright, which is the same reason the intro
+     button in page.tsx does it. The 400ms fallback covers a browser that
+     ignored the smooth request, and the lock is released first because a
+     clamped overflowX would refuse the scroll. */
+  const goToPanel = (idx: number) => {
+    const carousel = document.getElementById("mobile-carousel");
+    if (!carousel) return;
+    const w = carousel.clientWidth;
+    if (!w) return;
+    movingRef.current = true;
+    carousel.setAttribute("data-pc-vlock", "0");
+    carousel.style.overflowX = "";
+    carousel.style.scrollSnapType = "none";
+    const from = carousel.scrollLeft;
+    const target = idx * w;
+    carousel.scrollTo({ left: target, behavior: "smooth" });
+    window.setTimeout(() => {
+      if (Math.abs(carousel.scrollLeft - from) < 2) carousel.scrollLeft = target;
+    }, 400);
+    window.setTimeout(() => { carousel.style.scrollSnapType = ""; }, 700);
+    // Held past the snap restore, so the last settling frame cannot re-pin us.
+    window.setTimeout(() => { movingRef.current = false; }, 900);
+  };
 
   return (
     <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
@@ -302,7 +339,13 @@ export default function TimelineRun({
         {/* A fragment comes back from BreedStrip, so these screens stay DIRECT
             children of the scroller. They are height: 100% of it and a wrapper
             here would collapse every one of them. */}
-        <BreedStrip era={era} renderLevels={(open) => breeds.map((b) => {
+        <BreedStrip
+          era={era}
+          /* Finish the era and the pit hands back here, landing on the next
+             era's run. Passed only when there IS a next run, so the final era
+             simply closes as it does today. */
+          onEraComplete={nextRunPanel === undefined ? undefined : () => goToPanel(nextRunPanel)}
+          renderLevels={(open) => breeds.map((b) => {
           const isFlipped = flipped === b.name;
           /* undefined for a dog with no level. 62 of the 90 open one, 28 go to
              their own breed page instead, which is the live page's rule and
