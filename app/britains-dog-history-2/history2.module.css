@@ -455,7 +455,25 @@
   overflow: hidden;
 }
 
+/* THE line. One element for the whole run, so there is no second line to
+   disagree with the first. Its top and height are written by the script: top
+   is the disc's foot, height is the scroll position plus the card's inset, so
+   the end of the line always lands on the next card's top edge. Behind the
+   cards, whose front face is opaque, so it simply disappears under them. */
+.runLine {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 0;
+  background: #ffffff;
+  border-radius: var(--radius-pill, 999px);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .timelineRun {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -496,7 +514,9 @@
      24px above plus 24px below measured as a 50px break in the line.
      Side padding is 12px so a 95vw card fits; at 24px each side the content
      box tops out near 90vw and the card can never reach 95. */
-  padding: 0 12px;
+  /* The card sits 200px down, clear of the menu. The line is drawn to the
+     same depth, so the two meet exactly. */
+  padding: 200px 12px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -546,19 +566,6 @@
 
 /* ---- The timeline rail ------------------------------------------------ */
 
-/* Drawn by the scroll. `--pc-grow` runs 0 to 1 and scales the bar from its top
-   edge, which is where the disc sits, so the line grows out of the circle. */
-.railStart {
-  flex: 1 1 0;
-  min-height: 0;
-  width: 7px;
-  background: #ffffff;
-  border-radius: var(--radius-pill, 999px);
-  transform: scaleY(var(--pc-grow, 0));
-  transform-origin: top center;
-  pointer-events: none;
-}
-
 /* The head of the timeline. In the flow inside .railHead, so it cannot be
    placed over the paragraph, and not a child of the line, so the line's scale
    cannot squash it. */
@@ -579,7 +586,7 @@
 
 /* Takes whatever height the words leave, and holds the disc and the line. */
 .railHead {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -763,18 +770,6 @@
 
 /* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
 
-/* The stretches of line above and below the card. `flex: 1` on both means they
-   split whatever space the card and the marker row leave, so the line stops
-   dead at the card's top edge and picks up under the marker. Nothing is
-   measured and nothing needs re-measuring when the card changes size. */
-.railLeg {
-  flex: 1 1 0;
-  width: 7px;
-  min-height: 0;
-  background: #ffffff;
-  border-radius: var(--radius-pill, 999px);
-}
-
 /* The name, over the picture and above the status bar. MEASURED from the
    concept: caps about 32.5 CSS px tall, which is roughly a 45px face. */
 .dogNameOver {
@@ -811,6 +806,8 @@
 
 /* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
 .markerDot {
+  position: relative;
+  z-index: 1;
   width: 45px;
   height: 45px;
   border-radius: 50%;

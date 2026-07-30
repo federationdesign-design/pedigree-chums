@@ -35,6 +35,10 @@ const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
   { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
 ];
 
+/* How far down a dog screen the card sits. The line is drawn to exactly this
+   depth, so the two meet. */
+const CARD_INSET = 200;
+
 const TAG_LABEL: Record<string, string> = {
   extinct: "Extinct",
   trending: "Trending",
@@ -65,7 +69,8 @@ export default function TimelineRun({
   /* The outbound link awaiting confirmation, or null. */
   const [leaving, setLeaving] = useState<string | null>(null);
   const runRef = useRef<HTMLDivElement | null>(null);
-  const startRef = useRef<HTMLSpanElement | null>(null);
+  const lineRef = useRef<HTMLSpanElement | null>(null);
+  const dotRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     const carousel = document.getElementById("mobile-carousel");
@@ -83,16 +88,17 @@ export default function TimelineRun({
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
       carousel.setAttribute("data-pc-vlock", onThisPanel && !atBottom ? "1" : "0");
       if (run.scrollTop > 4) setMoved(true);
-      /* The line is drawn by the scroll rather than faded in. Full length by
-         the time one screen has passed, which is where the next leg takes
-         over. */
-      const bar = startRef.current;
-      if (bar) {
-        /* Complete after HALF a screen, not a whole one. At a full screen the
-           line was still part drawn when the next screen's leg arrived, which
-           read as two lines with a gap between them. */
-        const p = Math.min(1, Math.max(0, run.scrollTop / ((run.clientHeight || 1) * 0.5)));
-        bar.style.setProperty("--pc-grow", p.toFixed(3));
+      /* ONE line for the whole run. Its top is pinned to the disc and its
+         length is simply how far you have scrolled plus the card's own inset,
+         so its end always sits exactly where the next card's top edge is.
+         That is what makes it touch the card at the moment the scroll settles,
+         and it cannot read as two lines because there is only one. */
+      const line = lineRef.current;
+      const dot = dotRef.current;
+      if (line && dot) {
+        const top = dot.offsetTop + dot.offsetHeight;
+        line.style.top = `${top}px`;
+        line.style.height = `${Math.max(0, run.scrollTop + CARD_INSET - top)}px`;
       }
     };
 
@@ -145,6 +151,7 @@ export default function TimelineRun({
         </div>
       )}
       <div ref={runRef} className={styles.timelineRun}>
+        <span ref={lineRef} className={styles.runLine} aria-hidden="true" />
         {/* Screen one: the era title, then the line that introduces the
             timeline below it. */}
         <div className={styles.eraScreen}>
@@ -168,12 +175,11 @@ export default function TimelineRun({
               words already are. The wrapper is not scaled, so the disc keeps its
               shape while the line draws itself. */}
           <span className={styles.railHead} aria-hidden="true">
-            <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
-            <span ref={startRef} className={styles.railStart} />
-          </span>
+            <span ref={dotRef} className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
+            </span>
         </div>
 
-        {breeds.map((b, bi) => {
+        {breeds.map((b) => {
           const isFlipped = flipped === b.name;
           return (
             <div key={b.name} className={styles.dogScreen}>
@@ -181,10 +187,6 @@ export default function TimelineRun({
                   the marker. Both legs are flex children that take the
                   leftover space, so they meet the card and the row exactly
                   with nothing measured. */}
-              {/* No leg above the FIRST dog: the title screen's own line already
-                  runs down to here, and two of them read as two separate
-                  lines rather than one. */}
-              {bi > 0 && <span className={styles.railLeg} aria-hidden="true" />}
               <div className={styles.dogCard}>
                 {/* The whole card is the target: tapping anywhere opens the
                     level. The information icon sits OUTSIDE this button rather
@@ -309,12 +311,6 @@ export default function TimelineRun({
                   i
                 </span>
               </div>
-              {/* Nothing below the first marker until the reader moves. */}
-              <span
-                className={styles.railLeg}
-                style={bi === 0 && !moved ? { visibility: "hidden" } : undefined}
-                aria-hidden="true"
-              />
             </div>
           );
         })}
