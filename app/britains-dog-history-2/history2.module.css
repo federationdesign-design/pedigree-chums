@@ -864,11 +864,14 @@
 }
 
 .dogFlashLearn {
-  width: 40%;
+  /* 40% plus a tenth. Grows from the top left anchor, so the words spread down
+     and right and the left edge stays put. */
+  width: 44%;
   aspect-ratio: 720 / 416.7;
-  /* Sat about right vertically already. Only the left edge moves, out to just
-     past the card, as the learn concept shows. */
-  margin: 2% 0 0 -0.6%;
+  /* Up 10px from the 2% that was here, which is 2.7% of a 373px card. Kept as
+     a percentage rather than a flat value so it stays in proportion when the
+     card shrinks. */
+  margin: -0.7% 0 0 -0.6%;
   background-image: url("/history/flash-learn.svg");
 }
 
