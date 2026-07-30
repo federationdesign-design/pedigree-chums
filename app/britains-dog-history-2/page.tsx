@@ -38,6 +38,15 @@ type Panel =
    which convert a global panel index into a section and a position within it. */
 const PANELS_PER_SECTION = 9;
 
+/* How far the fact circle rides above where it is laid out, so it breaks the
+   top edge of the blue panel.
+   THIS IS THE AUTHORITATIVE VALUE. The roll script rewrites the circle's
+   transform on every scroll frame, so a figure changed only in the CSS is
+   overwritten before anyone sees it. That is exactly what happened when this
+   went from 50 to 60. The CSS carries the same number as the pre-script
+   starting state and points here. */
+const FACT_LIFT_PX = 60;
+
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
   return [
     { kind: "text", intro: s.intro, detail: s.detail },
@@ -242,7 +251,7 @@ export default function HistoryV2Page() {
               }
               var x = -(1 - t) * w;                       /* enters from the LEFT */
               var a = -(1 - t) * ROLL_TURN_DEG;           /* clockwise, ie rolling right */
-              el.style.transform = 'translate(' + x.toFixed(1) + 'px, -50px) rotate(' + a.toFixed(1) + 'deg)';
+              el.style.transform = 'translate(' + x.toFixed(1) + 'px, -${FACT_LIFT_PX}px) rotate(' + a.toFixed(1) + 'deg)';
               el.style.opacity = t.toFixed(3);
             }
           }

@@ -355,12 +355,22 @@
   border-radius: 50%;
   display: block;
   margin: 0 auto;
-  /* Up 50px, over the photograph. A transform rather than a negative margin
-     so nothing else in the panel moves: the label and the text stay exactly
-     where they were. z-index clears the sticky header, which sits at 3. */
+  /* Up 60px, over the photograph, 10 more than before so more of the circle
+     clears the top of the blue. Measured at 50px it broke the edge by only
+     5.5px, so this takes it to about 15.5px.
+     THE AUTHORITATIVE VALUE IS `FACT_LIFT_PX` IN page.tsx. The roll script
+     rewrites this transform on every scroll frame, so changing it here alone
+     has no effect. Keep the two in step.
+     A transform rather than a negative margin, so nothing else in the panel
+     moves: the label and the text stay exactly where they were.
+     z-index clears the sticky header, which sits at 3. */
   position: relative;
   z-index: 4;
-  transform: translate(0, -50px);
+  transform: translate(0, -60px);
+  /* Copied verbatim from .titlePortrait in LineageModal.module.css, which is
+     the same thing in the same place: a round dog photograph on this page.
+     Not invented. */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
   /* Both of these are overwritten by the script every frame. They are the
      off-screen starting state, so nothing flashes into view before the first
      scroll event. */
@@ -378,16 +388,16 @@
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.03em;
   line-height: 1.05;
-  /* About 15px between the circle's visible bottom edge and this line, half
-     what it was. The circle is drawn 50px above where it is laid out, so the
-     gap on screen is the panel's 12px flex gap, plus that 50px, plus the half
-     pixel of leading above the capitals: 30.5. Taking 47 off the flex gap
-     rather than 32 halves it.
-     COMPUTED, NOT MEASURED. The method was verified against a screenshot for
-     the bullet title, but this panel has not been measured.
+  /* MEASURED, not computed. In a 902x1662 screenshot at a device pixel ratio
+     of 2, the circle's bottom edge sat at y1255 and the top of these capitals
+     at y1323: 67 device pixels, so 33.5 CSS px, with this margin at -47.
+     When you asked for it halved the margin was -32 and the gap was 48.5, so
+     the target was 24.25. Margin moves the gap one for one, hence -56.
+     NOTE: the circle now rides 10px higher than when that was measured, so the
+     gap on screen is 10px wider than this figure. See .factImg.
      Shorthand deliberately: a longhand here would be wiped by any later
      `margin` of equal specificity. */
-  margin: -47px 0 0;
+  margin: -56px 0 0;
 }
 
 .factText {
@@ -396,9 +406,9 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
-  /* About 12px from the label, half what it was. The 24px it measured is the
-     12.5px of descender room under the capitals, plus the 7px of box gap, plus
-     4.8px of leading above this line. Taking a further 12 off gets there.
-     COMPUTED, NOT MEASURED, same caveat as the rule above. */
-  margin: -17px 0 0;
+  /* MEASURED, same screenshot. The capitals ended at y1378 and this
+     paragraph began at y1428: 49 device pixels, so 24.5 CSS px, with this
+     margin at -17. At -5, when you asked for it halved, it was 36.5, so the
+     target was 18.25. Hence -23. Unaffected by the circle's height. */
+  margin: -23px 0 0;
 }
