@@ -819,7 +819,10 @@
   left: 0;
   width: 44%;
   aspect-ratio: 1 / 1;
-  background: #fdf251;
+  /* #feee08, chosen by eye against the concept. The concept file itself
+     samples as #fdf251, which was the first value here, but side by side it
+     read as the weaker of the two. Sampled, not guessed. */
+  background: #feee08;
   /* Corner to corner, so the hypotenuse runs top right to bottom left. */
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }
