@@ -287,12 +287,22 @@ const BALL_PINK_FILTER = [
 // The level's chums pour in after the rock. They are scenery, not toys: they
 // cannot be grabbed, opened or scored, and they are props rather than pit
 // bodies, so they never count toward the pit-full loss. Size mirrors the learn
-// rail thumbnail, clamp(38px, 7.5vw, 56px), so they read as the same objects.
+// rail thumbnail, clamp(38px, 7.5vw, 56px), but 33% larger: see CHUM_MIN below.
 const CHUM_GAP = 600;       // after the rock, so the rock keeps its own beat
 const CHUM_STAGGER = 85;    // ms between each, so they cascade rather than clump
-const CHUM_MIN = 38;
-const CHUM_MAX = 56;
-const CHUM_VW = 0.075;
+// 33% up on clamp(38px, 7.5vw, 56px) by request.
+//
+// ALL THREE had to move, not just the vw. On a 390px phone 390 * 0.075 is 29,
+// which the minimum floors to 38, so the chums drop at CHUM_MIN on every phone
+// and raising only the vw would have changed nothing on the device this is
+// tested on.
+//
+// This deliberately breaks the match with the learn rail thumbnail, which stays
+// at clamp(38px, 7.5vw, 56px). They used to be the same size so they read as the
+// same object; the pit ones are now half a step bigger than their rail card.
+const CHUM_MIN = 51;
+const CHUM_MAX = 75;
+const CHUM_VW = 0.1;
 // The main pit sizes every card off its breed's size band, PackPit.tsx line 22:
 // small 57.5, medium 62.5, large 72.5, giant 82.5, used as a half-width. Those
 // are the ratios, reproduced here against medium so the figure above stays the
