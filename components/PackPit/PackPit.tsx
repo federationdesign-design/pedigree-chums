@@ -5,10 +5,14 @@ import { breeds, breedCard } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import LineageMap from "./LineageMap";
+import { createPitEffects } from "./pitEffects";
 import HowToPlay from "../HowToPlay/HowToPlay";
 import GameOver from "../GameOver/GameOver";
 import { startCheckout } from "../Offer/startCheckout";
+import { startFixedTimestep } from "./fixedTimestep";
 import styles from "./PackPit.module.css";
+import BritainMessage from "./BritainMessage";
+import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 
 // Score milestones: crossing one fires a centre-screen celebration with confetti.
 // Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
@@ -115,7 +119,7 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   // Start false if cookies already accepted/rejected in a previous session
-  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookies") ? true : false);
+  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookie-consent") ? true : false);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   // true only when the game-over trigger fired because all 54 were collected
@@ -294,7 +298,7 @@ export default function PackPit() {
       const BALLS = isMobile ? [ball] : [ball, ball, ball];
       const HEAVY = [bone, slipper];
 
-      const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
+      const { Engine, Render, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events, Constraint } = Matter;
 
       // Pre-build slipper compound body AFTER Body is available - avoids freeze on drop
       const slipperW = BIG * (isMobile ? 6.65 : 8.31), slipperH = slipperW / 2.721;
@@ -339,10 +343,18 @@ export default function PackPit() {
       });
       renderRef.current = render;
       Render.run(render);
-      const runner = Runner.create();
+      const runner = startFixedTimestep(Engine, engine); // fixed 60Hz sim on any display (fixes 2x speed on 120Hz screens)
       runnerRef.current = runner;
       slowmoRef.current = () => { if (engine.timing.timeScale === 1) { engine.timing.timeScale = 0.25; slowmoActiveRef.current = true; } else { engine.timing.timeScale = 1; slowmoActiveRef.current = false; } };
-      Runner.run(runner, engine);
+      let simDebugCleanup: (() => void) | null = null;
+      if (window.location.search.includes("simdebug")) {
+        const el = document.createElement("div");
+        el.style.cssText = "position:fixed;top:8px;left:8px;z-index:9999;background:#0a3a57;color:#ffd23e;font:700 14px Montserrat,sans-serif;padding:6px 10px;border-radius:8px;pointer-events:none;border:2px solid #ffd23e";
+        el.textContent = "sim speed x--";
+        document.body.appendChild(el);
+        const simDebugId = setInterval(() => { el.textContent = "sim speed x" + runner.ratio().toFixed(2); }, 250);
+        simDebugCleanup = () => { clearInterval(simDebugId); el.remove(); };
+      }
 
       let walls: any[] = [];
       function buildWalls(w: number, h: number) {
@@ -1082,8 +1094,8 @@ export default function PackPit() {
 if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new Event("pc:cookies-accepted"));
           const ax = hit.position.x, ay = hit.position.y, asz = (hit.plugin.half || 40) * 1.7, bt = performance.now();
-          bursts.push({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });
-          bursts.push({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 });
+          fxKit.pushBurst({ x: ax, y: ay, s: asz, born: bt, life: 480, colour: "#ff2d78", rot: 0 });
+          fxKit.pushBurst({ x: ax, y: ay, s: asz * 0.66, born: bt, life: 480, colour: "#ffd23e", rot: 18 });
           numAt(ax, ay, 2000);
           Composite.remove(engine.world, hit); acceptBody = null;
           clearCookieObjects(true);
@@ -1092,8 +1104,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         if (hit.plugin?.kind === "cookiereject") { cookieBannerOpenRef.current = false;
           window.dispatchEvent(new Event("pc:cookies-rejected"));
           const rx = hit.position.x, ry = hit.position.y, rsz = (hit.plugin.half || 40) * 1.6, bt = performance.now();
-          bursts.push({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });
-          bursts.push({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 });
+          fxKit.pushBurst({ x: rx, y: ry, s: rsz, born: bt, life: 460, colour: "#0c5b92", rot: 0 });
+          fxKit.pushBurst({ x: rx, y: ry, s: rsz * 0.66, born: bt, life: 460, colour: "#9a9a9a", rot: 18 });
           clearCookieObjects();
           return true;
         }
@@ -1229,6 +1241,20 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       render.canvas.addEventListener("click", onClick);
       render.canvas.addEventListener("touchstart", onTouchStart, { passive: true });
       render.canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+      // G01 "The Main Pit" (CHANGE-LIST C01): the first deliberate pointer press
+      // on the pit awards the hidden game, mirroring G02 (which awards on
+      // starting the mini pit). A pointerdown is a deliberate act; unlike
+      // devicemotion it cannot fire from the phone merely moving, and unlike
+      // gameOver it cannot fire from inactivity. Finding and starting a game is
+      // enough; the visitor need not play on.
+      let g01Reported = false;
+      const onFirstPitPointer = () => {
+        if (g01Reported) return;
+        g01Reported = true;
+        reportHiddenGame("G01");
+        render.canvas.removeEventListener("pointerdown", onFirstPitPointer);
+      };
+      render.canvas.addEventListener("pointerdown", onFirstPitPointer);
 
       function rrect(ctx: any, x: number, y: number, w: number, h: number, r: number) {
         if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
@@ -1750,7 +1776,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         }
       }
       // a quick pink starburst, fired only when a circle is pressed while still active
-      const bursts: any[] = [];
       const gooBlobs: any[] = []; // soft white blobs for the gooey logo+bone fuse
       let fused = false;          // the logo+bone fuse fires once
       // arrow-autofuse: when the logo and a LANDED bone come within 500px, a yellow
@@ -1845,16 +1870,11 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       };
       Events.on(engine, "beforeUpdate", onFuseMagnet);
       // Events.on(engine, "beforeUpdate", onArrowFuse); // auto-fuse arrow disabled
-      const burstAt = (x: number, y: number, s: number) => bursts.push({ x, y, s, born: performance.now(), life: 420, colour: "#ff2d78", rot: 0 });
-      // An explosion is three starbursts at once, red then yellow then white, each
-      // turned 11 degrees further than the last, so a detonation reads far harder
-      // than a single press. Strength scales with the circle's percentage figure.
-      const explodeAt = (x: number, y: number, s: number) => {
-        const born = performance.now();
-        bursts.push({ x, y, s, born, life: 520, colour: "#e23a0e", rot: 0 });  // outer red-orange
-        bursts.push({ x, y, s, born, life: 520, colour: "#ff7a1a", rot: 11 }); // mid orange
-        bursts.push({ x, y, s, born, life: 520, colour: "#ffc62e", rot: 22 }); // inner yellow
-      };
+      // The blast effects now live in pitEffects.ts and are shared with the mini
+      // pit, so the two can never drift. Destructured so every existing call
+      // site below reads exactly as it did.
+      const fxKit = createPitEffects();
+      const { burstAt, explodeAt, pushBoom, emitFuseSparks, FUSE_LIGHT_AT } = fxKit;
       // Three different grey balls thrown out with the blast, like smoke and debris.
       const greyPop = (x: number, y: number) => {
         const greys: [string, string][] = [["#9a9a9a", "rgba(70,70,70,0.5)"], ["#c4c4c4", "rgba(90,90,90,0.5)"], ["#6f6f6f", "rgba(40,40,40,0.5)"]];
@@ -1870,105 +1890,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       };
       const blastSize = (b: any) => (b.plugin?.half || 21) * (1 + (b.plugin?.share || 0) / 25); // a bigger % figure = a bigger boom
       // ---- pop-art comic blast fired on bomb detonation: flash and sparkle, three irregular jagged bursts with black keylines, flung 5-point stars and the two lightning bolts, smoke behind, then the comic word ----
-      const TAUb = Math.PI * 2;
-      const _bolt1 = new Image(); _bolt1.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjEyNTAuNjMgMTM5MS42NyAxMzQyLjU4IDIxMTIuMjUiPgo8cGF0aCBmaWxsPSIjMjExODE2IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0gMjE4MC40MCwyMDQ4LjA5IEwgMjMyMy45MiwyMDA5LjAyIEwgMjA0Ni4zNiwyMzk0Ljk4IEwgMjA4NS45NywyNDQ4Ljc0IEwgMjIwNi4wOCwyNDA4LjYxIEwgMTQzNy4yMiwzMjM4Ljg5IEwgMTY4Mi45OSwyNjMzLjMxIEwgMTY0Mi43NywyNTkwLjQ3IEwgMTUxNS44NCwyNjMyLjg2IEwgMTUxNS43NCwyNjMyLjg5IEwgMTUxNS43NSwyNjMyLjg4IEwgMTcyNC4wMSwyMjQwLjg5IEwgMTY4NS42MCwyMTkzLjY4IEwgMTU1My43NSwyMjMyLjExIEwgMTU1My43NCwyMjMyLjExIEwgMTU1My43NSwyMjMyLjA5IEwgMTg4MC4yOSwxNjA0LjE5IEwgMTg4MC4zNywxNjA0LjE4IEwgMjQ1MC4yMiwxNTA0LjMzIEwgMjQ1MC4zMiwxNTA0LjMxIEwgMjQ1MC4yNSwxNTA0LjQyIEwgMjE0My4wNiwxOTk3LjkyIFogTSAyMzU2Ljk0LDE1NjcuMzYgTCAxOTEwLjY0LDE2NDUuNTkgTCAxNjQ0LjA5LDIxNTguMTIgTCAxNzQ4LjA0LDIxMjcuODggTCAxODUyLjM5LDIwOTcuNTEgTCAxODAxLjQwLDIxOTMuNDQgTCAxNjEwLjMzLDI1NTMuMDEgTCAxNjk0LjkwLDI1MjQuNzUgTCAxNzg5LjQ4LDI0OTMuMjAgTCAxNzUyLjA2LDI1ODUuNDUgTCAxNTc0LjEzLDMwMjMuODkgTCAyMDUxLjM1LDI1MDguNTMgTCAxOTk3LjcwLDI1MjYuNDQgTCAxODYzLjIwLDI1NzEuMzAgTCAxOTQ1Ljk1LDI0NTYuMjAgTCAyMjExLjQ1LDIwODcuMDMgTCAyMTA5LjgxLDIxMTQuNzUgTCAxOTk3LjA3LDIxNDUuNDkgTCAyMDU4LjgzLDIwNDYuMjYgWiAiLz4KPHBhdGggZmlsbD0iI2ZmZmZmZiIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNIDIzNTYuOTQsMTU2Ny4zNiBMIDE5MTAuNjQsMTY0NS41OSBMIDE2NDQuMDksMjE1OC4xMiBMIDE3NDguMDQsMjEyNy44OCBMIDE4NTIuMzksMjA5Ny41MSBMIDE4MDEuNDAsMjE5My40NCBMIDE2MTAuMzMsMjU1My4wMSBMIDE2OTQuOTAsMjUyNC43NSBMIDE3ODkuNDgsMjQ5My4yMCBMIDE3NTIuMDYsMjU4NS40NSBMIDE1NzQuMTMsMzAyMy44OSBMIDIwNTEuMzUsMjUwOC41MyBMIDE5OTcuNzAsMjUyNi40NCBMIDE4NjMuMjAsMjU3MS4zMCBMIDE5NDUuOTUsMjQ1Ni4yMCBMIDIyMTEuNDUsMjA4Ny4wMyBMIDIxMDkuODEsMjExNC43NSBMIDE5OTcuMDcsMjE0NS40OSBMIDIwNTguODMsMjA0Ni4yNiBaICIvPgo8cGF0aCBmaWxsPSIjZjlkZTA2IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0gMjI4Mi4yMTA5MzggMTU4MC41IEwgMTk0OS43NSAyMTU4LjQyMTg3NSBMIDIxNjAuNjI4OTA2IDIxMDAuODc4OTA2IEwgMTgxOC4wNTA3ODEgMjU5Mi43NjE3MTkgTCAxODYzLjIzODI4MSAyNTcxLjMwMDc4MSBMIDE5OTMuMzkwNjI1IDI1MjcuODc4OTA2IEwgMTU5MC4yMzA0NjkgMjk4NC4yMzA0NjkgTCAxNzUyLjA1ODU5NCAyNTg1LjQ0OTIxOSBMIDE3ODkuNDgwNDY5IDI0OTMuMTk5MjE5IEwgMTY5NC44OTg0MzggMjUyNC43NSBMIDE2MTAuMzI4MTI1IDI1NTMuMDExNzE5IEwgMTgwMS4zOTg0MzggMjE5My40NDE0MDYgTCAxODUyLjM5MDYyNSAyMDk3LjUxMTcxOSBMIDE3NDguMDM5MDYyIDIxMjcuODc4OTA2IEwgMTY0NC4wODk4NDQgMjE1OC4xMjEwOTQgTCAxOTEwLjY0MDYyNSAxNjQ1LjU4OTg0NCBMIDIyODIuMjEwOTM4IDE1ODAuNSAiLz4KPC9zdmc+";
-      const _bolt2 = new Image(); _bolt2.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIzNzQuOTIgMTQ2MS4xMCAxMjY1LjM0IDE3NDUuODUiPgo8cGF0aCBmaWxsPSIjMjExODE2IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0gMzQ5MS42NywxNTc2Ljc1IEwgMzE0My44OCwyMDkyLjQ2IEwgMzE4NC44OCwyMTQ1LjAxIEwgMzMyOC4yMiwyMDkzLjA3IEwgMjU2MC4wNSwyOTM5LjQ3IEwgMjgwNy44MSwyMzIzLjc3IEwgMjc2Ny41OCwyMjgxLjAyIEwgMjY0MC4yNSwyMzIzLjUyIEwgMjY0MC4yMywyMzIzLjUzIEwgMjk2My4xOSwxNjkwLjAxIEwgMjk2My4yMCwxNjg5Ljk4IEwgMjk2My40MSwxNjg5Ljk0IEwgMzQ5MS42OCwxNTc2LjczIFogTSAzMDQ1LjY2LDIxNTUuOTMgTCAzMzg5LjkxLDE2NDUuNDcgTCAyOTk0LjI5LDE3MzAuMjUgTCAyNzMyLjEwLDIyNDQuNjAgTCAyODE5LjMzLDIyMTUuNDUgTCAyOTEzLjQ1LDIxODQuMDIgTCAyODc2LjQ0LDIyNzUuOTggTCAyNjk4LjIyLDI3MTguOTEgTCAzMTY5Ljk5LDIxOTkuMTQgTCAzMDk5LjM2LDIyMjQuNzQgTCAyOTY2Ljg5LDIyNzIuNzcgWiAiLz4KPHBhdGggZmlsbD0iI2ZmZmZmZiIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNIDMwNDUuNjYsMjE1NS45MyBMIDMzODkuOTEsMTY0NS40NyBMIDI5OTQuMjksMTczMC4yNSBMIDI3MzIuMTAsMjI0NC42MCBMIDI4MTkuMzMsMjIxNS40NSBMIDI5MTMuNDUsMjE4NC4wMiBMIDI4NzYuNDQsMjI3NS45OCBMIDI2OTguMjIsMjcxOC45MSBMIDMxNjkuOTksMjE5OS4xNCBMIDMwOTkuMzYsMjIyNC43NCBMIDI5NjYuODksMjI3Mi43NyBaICIvPgo8cGF0aCBmaWxsPSIjZjJlMDE1IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0gMzMxOS40NDE0MDYgMTY2MC41ODk4NDQgTCAyOTE4Ljk0MTQwNiAyMjkwLjEyODkwNiBMIDI5NjYuODkwNjI1IDIyNzIuNzY5NTMxIEwgMzA1OC44Mzk4NDQgMjIzOS40NDkyMTkgTCAzMDk5LjM1OTM3NSAyMjI0LjczODI4MSBMIDMxMjUuMjEwOTM4IDIyMTUuMzcxMDk0IEwgMjcxOS4xMjg5MDYgMjY2Ni45ODgyODEgTCAyODc2LjQ0MTQwNiAyMjc1Ljk4MDQ2OSBMIDI5MTMuNDQ5MjE5IDIxODQuMDE5NTMxIEwgMjgxOS4zMjgxMjUgMjIxNS40NDkyMTkgTCAyNzMyLjEwMTU2MiAyMjQ0LjYwMTU2MiBMIDI5OTQuMjg5MDYyIDE3MzAuMjUgTCAzMzE5LjQ0MTQwNiAxNjYwLjU4OTg0NCAiLz4KPC9zdmc+";
-      const boltImgs = [_bolt1, _bolt2];
-      const boltAR = [0.6356, 0.7248];
-      const boomWords = ["EXTINCT", "DONE", "POOF", "GONE"];
-      const rndb = (a: number, b: number) => a + Math.random() * (b - a);
-      const eob = (t: number) => 1 - Math.pow(1 - t, 3);
-      const clampb = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
-      const jaggedB = () => {
-        const n = 11 + Math.floor(Math.random() * 5); const tips: number[] = []; let a = rndb(0, 0.3);
-        for (let i = 0; i < n; i++) { a += (TAUb / n) * rndb(0.55, 1.45); tips.push(a); }
-        const pts: { a: number; r: number }[] = [];
-        for (let i = 0; i < tips.length; i++) { const tipA = tips[i]; pts.push({ a: tipA, r: rndb(0.55, 1.15) }); const nextA = i + 1 < tips.length ? tips[i + 1] : tips[0] + TAUb; pts.push({ a: tipA + (nextA - tipA) * rndb(0.3, 0.7), r: rndb(0.28, 0.5) }); }
-        return pts;
-      };
-      const pathForB = (pts: { a: number; r: number }[], S: number, scale: number, rot: number) => {
-        const pa = new Path2D();
-        pts.forEach((pt, i) => { const a = pt.a + rot, x = Math.cos(a) * pt.r * S * scale, y = Math.sin(a) * pt.r * S * scale; if (i) pa.lineTo(x, y); else pa.moveTo(x, y); });
-        pa.closePath(); return pa;
-      };
-      const star5B = (c: any, sz: number) => { c.beginPath(); for (let i = 0; i < 10; i++) { const a = (i / 10) * TAUb - Math.PI / 2, r = i % 2 ? sz * 0.45 : sz, x = Math.cos(a) * r, y = Math.sin(a) * r; if (i) c.lineTo(x, y); else c.moveTo(x, y); } c.closePath(); };
-      const star4B = (c: any, cx: number, cy: number, len: number, wid: number) => { c.beginPath(); for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2, tx = cx + Math.cos(a) * len, ty = cy + Math.sin(a) * len, px = cx + Math.cos(a + Math.PI / 2) * wid, py = cy + Math.sin(a + Math.PI / 2) * wid, qx = cx + Math.cos(a - Math.PI / 2) * wid, qy = cy + Math.sin(a - Math.PI / 2) * wid; c.moveTo(cx, cy); c.lineTo(px, py); c.lineTo(tx, ty); c.lineTo(qx, qy); c.closePath(); } c.fill(); };
-      const makeCfB = () => { const a: any[] = []; for (let i = 0; i < 12; i++) { const type = Math.random() < 0.55 ? "star" : "bolt"; a.push({ type, ang: rndb(0, TAUb), sp: rndb(1.4, 2.7), rot: rndb(0, TAUb), spin: rndb(-7, 7), col: Math.random() < 0.5 ? "#e23a0e" : "#ffd23e", sz: type === "bolt" ? rndb(0.22, 0.42) : rndb(0.1, 0.2), delay: rndb(0, 0.14), bolt: Math.floor(Math.random() * 2) }); } return a; };
-      const makeSmB = () => { const a: any[] = []; for (let i = 0; i < 6; i++) { a.push({ ang: rndb(0, TAUb), sp: rndb(0.5, 1.3), r: rndb(0.32, 0.55), g: Math.floor(rndb(0, 2)), delay: rndb(0, 0.16), puff: [[0, 0], [rndb(-0.5, 0.5), rndb(-0.4, 0.2)], [rndb(-0.4, 0.6), rndb(-0.1, 0.5)]] }); } return a; };
-      const GREYB = ["#b9b9b9", "#9a9a9a"];
-      // ---- fuse fizz: sparks that catch and build as a bomb's five-second fuse burns down ----
-      const fuseSparks: any[] = [];
-      const FUSE_COLS = ["#ffd23e", "#fff8e6", "#ff7a1a"];
-      const FUSE_LIGHT_AT = 2; // the fuse stays dark on hit 1 and catches from hit 2
-      const emitFuseSparks = (x: number, y: number, intensity: number) => {
-        const n = 1 + Math.floor(intensity * 5); // attempts per frame, more as it climbs
-        for (let i = 0; i < n; i++) {
-          if (Math.random() > 0.18 + intensity * 0.78) continue; // sparse and faint at low intensity, near-constant at full
-          const a = -Math.PI / 2 + (Math.random() - 0.5) * (0.7 + intensity * 1.7); // tighter spit when low, wider spray when high
-          const sp = 0.7 + Math.random() * (1.0 + intensity * 2.8); // slower drips low, faster shower high
-          fuseSparks.push({ x: x + (Math.random() - 0.5) * (4 + intensity * 7), y: y + (Math.random() - 0.5) * (4 + intensity * 7), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: 1 + Math.random() * (0.8 + intensity * 2.6), born: performance.now(), life: 220 + Math.random() * 280, col: FUSE_COLS[Math.floor(Math.random() * FUSE_COLS.length)] });
-        }
-      };
-      const drawFuseSparks = (ctx: any, now: number) => {
-        for (let i = fuseSparks.length - 1; i >= 0; i--) {
-          const s = fuseSparks[i], t = (now - s.born) / s.life;
-          if (t >= 1) { fuseSparks.splice(i, 1); continue; }
-          s.x += s.vx; s.y += s.vy; s.vy += 0.05; s.vx *= 0.97;
-          ctx.save(); ctx.globalAlpha = 1 - t; ctx.fillStyle = s.col;
-          ctx.beginPath(); ctx.arc(s.x, s.y, s.r * (1 - t * 0.5), 0, Math.PI * 2); ctx.fill();
-          ctx.restore();
-        }
-      };
-      const booms: any[] = [];
-      const pushBoom = (x: number, y: number, S: number) => { booms.push({ x, y, born: performance.now(), S, b0: jaggedB(), b1: jaggedB(), b2: jaggedB(), r0: rndb(0, TAUb), r1: rndb(0, TAUb), r2: rndb(0, TAUb), cf: makeCfB(), sm: makeSmB(), brot: rndb(-0.12, 0.12), word: boomWords[Math.floor(rndb(0, boomWords.length))] }); };
-      const drawBooms = (ctx: any, now: number) => {
-        for (let i = booms.length - 1; i >= 0; i--) {
-          const b = booms[i], t = (now - b.born) / 1150; if (t >= 1) { booms.splice(i, 1); continue; } const S = b.S;
-          for (const sp of b.sm) { const lt = clampb((t - 0.42 - sp.delay) / (0.58 - sp.delay), 0, 1); if (lt <= 0 || lt >= 1) continue; const dist = sp.sp * S * lt, cx = b.x + Math.cos(sp.ang) * dist, cy = b.y + Math.sin(sp.ang) * dist - S * 0.8 * lt, r = sp.r * S * (0.5 + lt * 1.2), al = (lt < 0.2 ? lt / 0.2 : 1) * (1 - lt) * 0.55; ctx.save(); ctx.globalAlpha = al; ctx.fillStyle = GREYB[sp.g]; for (const p of sp.puff) { ctx.beginPath(); ctx.arc(cx + p[0] * r, cy + p[1] * r, r * 0.72, 0, TAUb); ctx.fill(); } ctx.restore(); }
-          const ft = clampb(t / 0.1, 0, 1);
-          if (ft < 1) { ctx.save(); ctx.globalAlpha = 1 - ft; ctx.fillStyle = "#fff8e6"; star4B(ctx, b.x, b.y, S * (1.6 + ft * 0.6), S * 0.12); ctx.restore(); }
-          const cct = clampb(t / 0.4, 0, 1);
-          if (cct < 1) { ctx.save(); ctx.globalAlpha = (1 - cct) * 0.85; ctx.fillStyle = "#fff8e6"; ctx.beginPath(); ctx.arc(b.x, b.y, S * (0.4 + cct * 0.5), 0, TAUb); ctx.fill(); ctx.restore(); }
-          let psc; if (t < 0.16) psc = eob(t / 0.16) * 1.12; else if (t < 0.27) psc = 1.12 - 0.12 * ((t - 0.16) / 0.11); else psc = 1;
-          const bfade = clampb(t < 0.66 ? 1 : 1 - (t - 0.66) / 0.15, 0, 1);
-          const layers: [string, string, number, number, number][] = [["b0", "#e23a0e", 1.12, b.r0, -1.4], ["b1", "#ff7a1a", 0.92, b.r1, 1.1], ["b2", "#ffd23e", 0.7, b.r2, -0.85]];
-          ctx.save(); ctx.translate(b.x, b.y); ctx.globalAlpha = bfade;
-          for (const L of layers) { const pa = pathForB(b[L[0]], S, L[2] * psc, L[3] + t * L[4]); ctx.fillStyle = L[1]; ctx.fill(pa); ctx.lineJoin = "round"; ctx.lineWidth = S * 0.017; ctx.strokeStyle = "#211816"; ctx.stroke(pa); }
-          ctx.restore();
-          for (const c of b.cf) { const lt = clampb((t - 0.07 - c.delay) / (0.9 - c.delay), 0, 1); if (lt <= 0 || lt >= 1) continue; const tr = eob(lt), d = S * 0.5 + c.sp * S * tr, cx = b.x + Math.cos(c.ang) * d, cy = b.y + Math.sin(c.ang) * d - S * 0.12 * tr, sz = c.sz * S, al = clampb(lt < 0.12 ? lt / 0.12 : lt < 0.66 ? 1 : 1 - (lt - 0.66) / 0.17, 0, 1); ctx.save(); ctx.globalAlpha = al; ctx.translate(cx, cy); ctx.rotate(c.rot + lt * c.spin); if (c.type === "star") { ctx.fillStyle = c.col; ctx.lineJoin = "round"; star5B(ctx, sz); ctx.fill(); ctx.lineWidth = sz * 0.053; ctx.strokeStyle = "#211816"; ctx.stroke(); } else { const im = boltImgs[c.bolt]; if (im.complete && im.naturalWidth) { const h = sz * 1.05, w = h * boltAR[c.bolt]; ctx.drawImage(im, -w / 2, -h / 2, w, h); } } ctx.restore(); }
-          if (b.word) { const lt = clampb((t - 0.05) / 0.6, 0, 1); if (lt < 1) { let sc; if (lt < 0.28) sc = eob(lt / 0.28) * 1.15; else sc = 1.15 - 0.15 * ((lt - 0.28) / 0.72); const al = clampb(lt < 0.72 ? 1 : 1 - (lt - 0.72) / 0.14, 0, 1); ctx.save(); ctx.globalAlpha = al; ctx.translate(b.x, b.y - S * 0.02); ctx.rotate(b.brot); ctx.scale(sc, sc); ctx.font = "400 " + Math.round(S * 0.7) + 'px "Luckiest Guy", system-ui, sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#ffffff"; ctx.fillText(b.word, 0, 0); ctx.restore(); } }
-        }
-      };
 
-      function drawBursts(ctx: any, now: number) {
-        for (let i = bursts.length - 1; i >= 0; i--) {
-          const bu = bursts[i], t = (now - bu.born) / bu.life;
-          if (t >= 1) { bursts.splice(i, 1); continue; }
-          const reach = bu.s * (0.35 + t * 0.85), inner = bu.s * (0.12 + t * 0.4);
-          ctx.save(); ctx.globalAlpha = (1 - t); ctx.translate(bu.x, bu.y);
-          ctx.rotate((t * 5 + (bu.rot || 0)) * Math.PI / 180); // rotate over the pop, plus this layer's fixed offset
-          ctx.strokeStyle = bu.colour || "#ff2d78"; ctx.lineWidth = 2.4; ctx.lineCap = "round";
-          for (let k = 0; k < 12; k++) {
-            const a = (k / 12) * Math.PI * 2;
-            ctx.beginPath();
-            ctx.moveTo(Math.cos(a) * inner, Math.sin(a) * inner);
-            ctx.lineTo(Math.cos(a) * reach, Math.sin(a) * reach);
-            ctx.stroke();
-          }
-          ctx.fillStyle = bu.colour || "#ff2d78";
-          for (let k = 0; k < 5; k++) {
-            const a = (k / 5) * Math.PI * 2 + 0.3, rr = reach * 1.05, sx = Math.cos(a) * rr, sy = Math.sin(a) * rr, sz = 3 * (1 - t) + 1.5;
-            ctx.beginPath();
-            for (let p = 0; p < 5; p++) {
-              const aa = a + (p / 5) * Math.PI * 2;
-              const px = sx + Math.cos(aa) * sz, py = sy + Math.sin(aa) * sz;
-              p === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-            }
-            ctx.closePath(); ctx.fill();
-          }
-          ctx.restore();
-        }
-      }
       // little white numbers that flash up on a hit or tap
       function drawNumbers(ctx: any, now: number) {
         for (let i = numbers.length - 1; i >= 0; i--) {
@@ -2101,7 +2023,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           }
         }
         if (popped.length) Composite.remove(engine.world, popped);
-        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); drawFuseSparks(ctx, now); drawBursts(ctx, now); drawBooms(ctx, now); drawNumbers(ctx, now); return; }
+        if (lineageOpenRef.current) { for (const b of bodies) drawBall(ctx, b, 1, false); drawParticles(ctx, now); fxKit.draw(ctx, now); drawNumbers(ctx, now); return; }
         // pattern stays lit while any dog card rests on the floor, with the impact
         // window below still covering the strobe of cards bouncing during the pour
         const floorTop = walls[0].bounds.min.y;
@@ -2267,9 +2189,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           ctx.fillStyle = "#fff"; ctx.fillText(label, hp.x, ly); ctx.restore();
         }
         drawParticles(ctx, now);
-        drawFuseSparks(ctx, now);
-        drawBursts(ctx, now);
-        drawBooms(ctx, now);
+        fxKit.draw(ctx, now);
         drawNumbers(ctx, now);
       };
       removeBreedRef.current = (name: string) => {
@@ -3135,6 +3055,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         render.canvas.removeEventListener("click", onClick);
         render.canvas.removeEventListener("touchstart", onTouchStart);
         render.canvas.removeEventListener("touchend", onTouchEnd);
+        render.canvas.removeEventListener("pointerdown", onFirstPitPointer);
         window.removeEventListener("devicemotion", onMotion);
         window.removeEventListener("deviceorientation", onOrient);
         motionRef.current = () => {};
@@ -3146,7 +3067,8 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         Events.off(engine, "collisionStart", onPctHit);
         Events.off(engine, "collisionStart", onKnockScore);
         Render.stop(render);
-        Runner.stop(runner);
+        runner.stop();
+        if (simDebugCleanup) simDebugCleanup();
         if (dangerTimer) clearTimeout(dangerTimer);
         if (throbIntervalOuter) clearInterval(throbIntervalOuter);
         Composite.clear(engine.world, false);
@@ -3269,32 +3191,15 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           </div>
         );
       })()}
-      {britainMsg !== null && (() => {
-        // find the union jack body so the tick button can poof it
-        const ujBody = typeof window !== "undefined"
-          ? (() => { try { const all = (window as any).__matter_world_bodies; return all ? all.find((b: any) => b.plugin?.kind === "unionjack" && !b.plugin.popped) : null; } catch { return null; } })()
-          : null;
-        return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-            <div style={{ position: "relative", pointerEvents: "auto", maxWidth: "clamp(320px,45vw,680px)", width: "90%", padding: "clamp(24px,3vw,48px) clamp(28px,4vw,56px) clamp(36px,5vw,64px)", borderRadius: "24px", background: "rgba(255,255,255,0.12)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", border: "2px solid rgba(255,255,255,0.35)", boxShadow: "0 16px 48px rgba(10,58,87,0.28)", textAlign: "center" }}>
-              <p style={{ fontFamily: "var(--font-display,'Luckiest Guy',system-ui)", fontSize: "clamp(20px,3.4vw,44px)", color: "#ffffff", margin: "0 0 clamp(12px,2vw,24px)", textShadow: "0 3px 0 rgba(10,58,87,0.5), 0 0 20px rgba(255,255,255,0.15)", letterSpacing: "0.02em" }}>Designed &amp; Printed in Britain</p>
-              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(13px,1.6vw,20px)", fontWeight: 600, color: "#ffffff", margin: "0 0 clamp(8px,1.2vw,16px)", lineHeight: 1.6, opacity: 0.92 }}>Every card in the Pedigree Chums™ deck is printed right here in Britain, using sustainable inks on premium card stock.</p>
-              <p style={{ fontFamily: "Montserrat,sans-serif", fontSize: "clamp(13px,1.6vw,20px)", fontWeight: 600, color: "#ffffff", margin: "0", lineHeight: 1.6, opacity: 0.92 }}>Conceived, illustrated and crafted by a British creative team with a passion for dogs.</p>
-              <button
-                onClick={() => {
-                  setBritainMsg(null);
-                  // poof the flag via a custom event that PackPit physics loop can hear
-                  window.dispatchEvent(new Event("pc:britain-dismiss"));
-                }}
-                style={{ position: "absolute", bottom: 0, left: "50%", transform: "translate(-50%, 50%)", width: "clamp(52px,6vw,72px)", height: "clamp(52px,6vw,72px)", borderRadius: "50%", border: "4px solid rgba(255,255,255,0.5)", background: "radial-gradient(circle at 38% 35%, #6ee86e, #22b422 55%, #157a15)", boxShadow: "0 4px 16px rgba(10,58,87,0.35), inset 0 2px 4px rgba(255,255,255,0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "clamp(22px,3vw,36px)", lineHeight: 1 }}
-                aria-label="Got it"
-              >
-                &#10003;
-              </button>
-            </div>
-          </div>
-        );
-      })()}
+      {britainMsg !== null && (
+        <BritainMessage
+          onDismiss={() => {
+            setBritainMsg(null);
+            // poof the flag via a custom event the physics loop listens for
+            window.dispatchEvent(new Event("pc:britain-dismiss"));
+          }}
+        />
+      )}
       {shelfOpen && (() => {
         const counts = new Map<string, number>();
         for (const n of collectedChums) counts.set(n, (counts.get(n) || 0) + 1);

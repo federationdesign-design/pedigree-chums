@@ -27,16 +27,59 @@
   justify-content: flex-end;
 }
 
-.title {
+.titleWrap {
   position: absolute;
   top: 24px;
-  left: 30px;
-  width: auto;
-  max-width: 78%;
+  /* Centred on the pit's left axis, with the slider, the score and PLAY. The
+     row is a flex line, so shifting the wrapper carries the name with it. */
+  left: calc(var(--pit-axis, 51.8px) - clamp(56px, 11vw, 78px) / 2);
+  max-width: 82%;
   z-index: 15;
   pointer-events: none;
+  /* Two rows now, stacked: the level's own dog on top and whatever circle is
+     being looked at underneath it. The row itself keeps the old horizontal
+     layout, so a single-row title is pixel for pixel what it always was. */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.titlePortraitWrap {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
+.titlePortrait {
+  /* Was clamp(40px, 8vw, 54px), the same figure the learn box uses for its own
+     head portrait. Grown so the level's dog reads at title weight rather than
+     as a bullet beside it. Change this one clamp and the two below follow. */
+  width: clamp(56px, 11vw, 78px);
+  height: clamp(56px, 11vw, 78px);
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.titleStatus {
+  position: absolute;
+  right: 2px;
+  bottom: 3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.title {
+  width: auto;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.65rem, 6.5vw, 5.85rem);
+  font-size: clamp(1.35rem, 3.25vw, 2.95rem);
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -72,7 +115,7 @@
 
 @media (max-width: 640px) {
   .title {
-    font-size: clamp(1.7rem, 10vw, 3.1rem);
+    font-size: clamp(0.9rem, 5vw, 1.6rem);
   }
 }
 
@@ -97,9 +140,13 @@
 /* Score counter, copied from the pit's .scoreTotal, sitting under the close X. */
 .scoreTotal {
   position: fixed;
-  top: 78px;
-  right: clamp(18px, 4vw, 48px);
+  top: 84px;
+  /* Centred on the axis: half of the 84 box either side of it. Was left 30 and
+     left-aligned, which put the digits wherever the number's own width happened
+     to leave them. */
+  left: calc(var(--pit-axis, 51.8px) - 42px);
   min-width: 84px;
+  width: 84px;
   box-sizing: border-box;
   text-align: center;
   color: #ffffff;
@@ -120,16 +167,20 @@
 }
 
 /* Shake button, copied from the pit. */
-.shake {
+/* Shake and slow motion match the in-pit squares exactly: the main pit's
+   BIG * 1.2 (100.8px desktop, 67.5px at 768px and below), radius 0.3 of the
+   size, 5px navy stroke, yellow fill. They were 84px flat, which read larger
+   than everything else in the mini pit. */
+.shake,
+.slowmo {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   right: clamp(18px, 4vw, 48px);
   z-index: 30;
-  width: 84px;
-  height: 84px;
+  width: 100.8px;
+  height: 100.8px;
   padding: 0;
   border: 0;
-  border-radius: 20px;
+  border-radius: 30.24px;
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -137,15 +188,52 @@
   color: var(--navy);
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
 }
-.shake:active {
+.shake {
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+.slowmo {
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 100.8px + 12px);
+}
+.shake:active,
+.slowmo:active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
 }
+.slowmoActive {
+  background: var(--navy);
+}
+.slowmoActive .slowmoIcon {
+  filter: brightness(0) saturate(100%) invert(91%) sepia(44%) saturate(800%) hue-rotate(5deg) brightness(105%);
+}
 .shakeIcon {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 77px;
+  height: 77px;
   background: url("/jelly-shake.png") center / contain no-repeat;
+}
+.slowmoIcon {
+  display: block;
+  width: 62px;
+  height: 62px;
+}
+@media (max-width: 768px) {
+  .shake,
+  .slowmo {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+  }
+  .slowmo {
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px) + 67.5px + 10px);
+  }
+  .shakeIcon {
+    width: 51px;
+    height: 51px;
+  }
+  .slowmoIcon {
+    width: 41px;
+    height: 41px;
+  }
 }
 .shakeFlash {
   animation: lmShakeFlash 0.3s ease-out forwards;
@@ -154,4 +242,375 @@
   0%   { filter: brightness(1); }
   30%  { filter: brightness(1.5); }
   100% { filter: brightness(1); }
+}
+
+/* Round won / game over, in the main pit's flash style. */
+.endOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  background: rgba(10, 58, 87, 0.45);
+}
+.endFlash {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(3.4rem, 12vw, 8rem);
+  color: #ffffff;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
+  animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+  text-align: center;
+  line-height: 1;
+}
+.endFlashWord {
+  display: block;
+}
+@keyframes lmEndPop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.endBtns {
+  display: flex;
+  gap: 14px;
+}
+.endBtn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 800;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 14px 30px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.35);
+}
+.endBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.35);
+}
+/* Icon-only versions of the end buttons: square rather than a text pill, so the
+   glyph sits in the middle instead of being letterboxed. Sized off the shake and
+   slowmo buttons, which are the pit's own icon family. */
+.endBtnIcon {
+  width: 100.8px;
+  height: 100.8px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.endIcon {
+  width: 52%;
+  height: 52%;
+  display: block;
+  color: currentColor;
+}
+.endIconReplay {
+  background-image: url("/replay-icon.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+@media (max-width: 768px) {
+  .endBtnIcon {
+    width: 67.5px;
+    height: 67.5px;
+  }
+}
+.endBtnAlt {
+  background: #ffffff;
+}
+
+/* ── Round Won ──────────────────────────────────────────────────────────
+   Its own screen rather than a flash with a button under it: what you just
+   finished, what it was worth, and what is coming next, stacked down the
+   page. The next level's photo fills the lower half and bleeds off the
+   bottom, so the screen ends on the dog you are about to meet. */
+/* Round Won is a SCREEN, not a veil. At 45% opacity the pit's own title, lives
+   bar and floor all showed through, which is why the breed name appeared twice
+   and the lives sat across the score. Opaque, and the pit is simply gone. */
+.winOverlay {
+  background: linear-gradient(180deg, #2a1a4e 0%, #1b3f7d 42%, #1a5ea8 100%);
+}
+.winWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(96px, 24vw, 150px) clamp(14px, 3vw, 26px) clamp(118px, 28vw, 180px);
+  overflow: hidden;
+  text-align: center;
+}
+/* Pinned to the same coordinates as .titleWrap, so the tick lands exactly
+   where the dog portrait sat and the name keeps the title's size. It reads as
+   the level title with the portrait swapped for a tick, not a second title. */
+.winTop {
+  position: absolute;
+  top: 24px;
+  left: 30px;
+  right: clamp(14px, 3vw, 26px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 2;
+}
+.winDone {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.winDone svg,
+.winDone img {
+  /* the portrait's exact size */
+  width: clamp(56px, 11vw, 78px);
+  height: clamp(56px, 11vw, 78px);
+  flex: none;
+}
+/* the title's exact type */
+.winDoneName {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.35rem, 3.25vw, 2.95rem);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-align: left;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.winDoneLine {
+  display: block;
+}
+.winBanner {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1rem, 3.4vw, 1.7rem);
+  line-height: 1;
+  color: #22c55e;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: right;
+}
+.winScore {
+  transform: rotate(-7deg);
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 800;
+  font-size: clamp(1.2rem, 5vw, 2.4rem);
+  color: var(--yellow, #ffd23e);
+  z-index: 2;
+}
+/* Tilted, like the mock. Sits above the photo. */
+.winFlash {
+  position: relative;
+  z-index: 2;
+  padding-top: 10px;
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(5.2rem, 26vw, 14rem);
+  line-height: 0.82;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.55);
+  transform: rotate(-7deg);
+  margin: clamp(4px, 1.5vw, 14px) 0 clamp(16px, 4vw, 30px);
+  z-index: 2;
+  animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.winNextLead {
+  /* Directly under ROUND WON, which lands it on the top of the photo. It was
+     pushed to the foot of the column, which put it down by the dog's feet. */
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 3.2vw, 1.3rem);
+  color: #ffffff;
+  z-index: 2;
+}
+.winNextName {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2.6rem, 13vw, 6.2rem);
+  line-height: 1;
+  color: #ff2d95;
+  text-transform: uppercase;
+  margin-top: 2px;
+  z-index: 2;
+}
+/* Bleeds off the bottom behind the button. */
+/* Full bleed. It was capped at 620px and set to contain, which drew it as a
+   rectangle with visible edges floating over the pit. Now it covers the whole
+   lower half, edge to edge, and runs off the bottom of the screen. */
+.winNextImg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 62%;
+  object-fit: cover;
+  object-position: center bottom;
+  /* Cut on the slant, high on the left and dropping to the right, so the photo
+     arrives as a diagonal band rather than a straight seam. */
+  clip-path: polygon(0 0, 100% 7%, 100% 100%, 0 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.winGo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(18px, 5vw, 40px);
+  z-index: 3;
+  /* Narrower than it was, with the label doing the work: roughly twice the
+     type and only just enough room either side of it. */
+  min-width: min(66vw, 380px);
+  font-size: clamp(2.3rem, 11vw, 3.7rem);
+  padding-left: clamp(8px, 2vw, 14px);
+  padding-right: clamp(8px, 2vw, 14px);
+}
+.winGo:active {
+  transform: translateX(-50%) translateY(2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .winFlash { animation: none; }
+}
+/* Next level: the house CTA, matching the chum calculator's start button and
+   the home page primary. It used to be a yellow pill shrunk to half size by an
+   inline transform, which read as a mistake rather than a button. */
+.endBtnGo {
+  appearance: none;
+  border: none;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.3rem, 4.2vw, 1.9rem);
+  letter-spacing: 0.04em;
+  background: #22c55e;
+  color: #ffffff;
+  border-radius: 14px;
+  padding: clamp(16px, 3.4vw, 26px) clamp(26px, 5vw, 40px);
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+.endBtnGo:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.4);
+}
+/* The end screen's way out: the same yellow square with a navy X that the pit
+   and every other surface uses, parked in the top right. */
+.endClose {
+  position: absolute;
+  top: clamp(14px, 3vw, 24px);
+  right: clamp(14px, 3vw, 24px);
+  width: clamp(54px, 11vw, 74px);
+  height: clamp(54px, 11vw, 74px);
+  padding: 0;
+  box-sizing: border-box;
+  border: 5px solid var(--navy, #0a3a57);
+  border-radius: 22%;
+  background: var(--yellow, #ffd23e);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
+}
+.endClose svg {
+  width: 62%;
+  height: 62%;
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+.endClose:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(10, 58, 87, 0.3);
+}
+
+/* Exit confirmation. The close X no longer closes the pit on its own: it asks
+   first, because losing a round to a stray tap is a miserable way to leave.
+   Built from the same parts as the end overlay so it reads as one family. */
+.exitOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 58, 87, 0.55);
+  animation: lmExitFade 0.18s ease-out;
+}
+@keyframes lmExitFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.exitPanel {
+  background: var(--blue-deep, #0b78bd);
+  border: 6px solid var(--navy, #0a3a57);
+  border-radius: 28px;
+  padding: 26px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 12px 0 rgba(10, 58, 87, 0.35);
+  animation: lmExitPop 0.34s cubic-bezier(0.2, 1.4, 0.4, 1);
+  max-width: min(86vw, 420px);
+}
+@keyframes lmExitPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.exitTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2.4rem, 9vw, 3.6rem);
+  color: #ffffff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.exitBtns {
+  display: flex;
+  gap: 16px;
+  /* Four options now, not two, so they wrap rather than run off a phone. */
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: min(92vw, 460px);
+}
+
+/* Lives. A heart badge and a run of segments, drawn in the pit's own language
+   rather than shipped as artwork: navy stroke, yellow fill, red pips. Spent
+   segments stay in place as empty sockets so the ceiling is always readable. */
+/* Lives sit under the title portrait, on the left, so they read as part of
+   the dog's own block. The offset is the portrait's own clamp plus the
+   titleWrap top, which keeps them tucked under it at every width. */
+.lives {
+  position: absolute;
+  top: calc(24px + clamp(56px, 11vw, 78px) + 10px);
+  left: 30px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.livesBar {
+  display: flex;
+  gap: 4px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: var(--blue-deep, #0b78bd);
+  border: 3px solid var(--navy, #0a3a57);
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.35);
+}
+.lifePip {
+  width: 13px;
+  height: 20px;
+  border-radius: 4px;
+  background: #e23b3b;
+  border: 2px solid var(--navy, #0a3a57);
+}
+.lifePipSpent {
+  background: rgba(10, 58, 87, 0.45);
 }

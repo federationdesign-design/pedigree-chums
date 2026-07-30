@@ -4,6 +4,8 @@ import localFont from "next/font/local";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
+import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
+import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
 
@@ -97,6 +99,15 @@ export default function RootLayout({
         {children}
         <PickAChumLauncher />
         <OfferLauncher />
+        {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul
+            2026 (BRIEF 6.1, NEEDS_OWNER Q01). */}
+        <HiddenGamesCounter />
+        {/* Discovery toast (C02): confirms each non-final find, above the mini
+            pit modal so a G02 find is visible. */}
+        <HiddenGamesToast />
+        {/* G01 awards on the first pointer interaction with the Main Pit
+            (CHANGE-LIST C01), wired inside PackPit. RouteWatcher was removed
+            (NEEDS_OWNER Q06). */}
         <CookieBanner />
         <Analytics />
       </body>

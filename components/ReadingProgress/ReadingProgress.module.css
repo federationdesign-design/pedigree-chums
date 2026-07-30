@@ -11,7 +11,11 @@
     left: 0;
     right: 0;
     height: 36px;
-    z-index: 500;
+    /* 98 sits above the footer (95) and below the Get code launcher (100),
+       which must stay clickable. Raising the launcher instead would push it
+       above its own modal (120) and the open menu, so the bar comes down
+       rather than the launcher going up. */
+    z-index: 98;
     pointer-events: none;
   }
 
@@ -32,11 +36,13 @@
      taller than the track itself so they read clearly against the fill */
   /* z-index above .fill so notches stay visible once the yellow fill
      has passed over them, instead of being covered by it */
+  /* -6px reaches through the footer's 6px yellow top border, so the notches
+     meet the bottom of the yellow rather than stopping at the track. */
   .notch {
     position: absolute;
-    bottom: 0;
+    bottom: -6px;
     width: 4px;
-    height: 18px;
+    height: 24px;
     background: var(--navy, #0a3a57);
     z-index: 3;
   }

@@ -5,6 +5,7 @@ import styles from "./TrainingCard.module.css";
 
 interface Props {
   data: TrainingDifficulty;
+  compact?: boolean;
 }
 
 const SCORE_COLOURS = ["#22c55e", "#4ade80", "#ffd23e", "#fb923c", "#ef4444"];
@@ -26,7 +27,7 @@ function describeArc(cx: number, cy: number, r: number, startDeg: number, endDeg
   return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
 }
 
-export default function TrainingCard({ data }: Props) {
+export default function TrainingCard({ data, compact = false }: Props) {
   const { score, label, traits, goodFor, watchOut } = data;
   const colour = SCORE_COLOURS[score - 1];
   const bgColour = SCORE_BG[score - 1];
@@ -37,12 +38,12 @@ export default function TrainingCard({ data }: Props) {
   const endDeg = 180 + fillDeg;
 
   return (
-    <div className={styles.inner}>
-      <p className={styles.heading}>Training</p>
+    <div className={`${styles.inner}${compact ? " " + styles.innerCompact : ""}`}>
+      {!compact && <p className={styles.heading}>Training</p>}
 
       {/* Arc gauge */}
       <div className={styles.gaugeWrap}>
-        <svg viewBox="0 0 260 110" width={260} height={110} aria-label={`Training difficulty gauge: ${score} out of 5`}>
+        <svg viewBox="0 0 260 110" width={compact ? 208 : 260} height={compact ? 88 : 110} style={compact ? { maxWidth: "100%", height: "auto" } : undefined} aria-label={`Training difficulty gauge: ${score} out of 5`}>
           {/* Track arc */}
           <path
             d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 180, 360)}
@@ -94,38 +95,43 @@ export default function TrainingCard({ data }: Props) {
         </svg>
 
         {/* Label pill */}
-        <div className={styles.labelPill} style={{ background: bgColour, color: colour, borderColor: colour }}>
+        <div className={`${styles.labelPill}${compact ? " " + styles.labelPillCompact : ""}`} style={{ background: bgColour, color: colour, borderColor: colour }}>
           {label}
         </div>
       </div>
 
       {/* Traits */}
-      <ul className={styles.traitsList}>
-        {traits.map((t) => (
-          <li key={t} className={styles.trait}>
-            <span className={styles.traitDot} style={{ background: colour }} />
-            {t}
-          </li>
-        ))}
-      </ul>
+      {!compact && (
+        <ul className={styles.traitsList}>
+          {traits.map((t) => (
+            <li key={t} className={styles.trait}>
+              <span className={styles.traitDot} style={{ background: colour }} />
+              {t}
+            </li>
+          ))}
+        </ul>
+      )}
 
-      {/* Good for / watch out */}
-      <div className={styles.infoRow}>
-        <div className={styles.infoBlock}>
-          <span className={styles.infoTitle}>Excels at</span>
-          <span className={styles.infoText}>{goodFor}</span>
-        </div>
-      </div>
-      <div className={styles.infoRow}>
-        <div className={styles.infoBlockWarn}>
-          <span className={styles.infoTitle}>Watch out for</span>
-          <span className={styles.infoText}>{watchOut}</span>
-        </div>
-      </div>
+      {!compact && (
+        <>
+          <div className={styles.infoRow}>
+            <div className={styles.infoBlock}>
+              <span className={styles.infoTitle}>Excels at</span>
+              <span className={styles.infoText}>{goodFor}</span>
+            </div>
+          </div>
+          <div className={styles.infoRow}>
+            <div className={styles.infoBlockWarn}>
+              <span className={styles.infoTitle}>Watch out for</span>
+              <span className={styles.infoText}>{watchOut}</span>
+            </div>
+          </div>
 
-      <p className={styles.disclaimer}>
-        Typical breed traits. Individual dogs vary with socialisation and consistency of training.
-      </p>
+          <p className={styles.disclaimer}>
+            Typical breed traits. Individual dogs vary with socialisation and consistency of training.
+          </p>
+        </>
+      )}
     </div>
   );
 }

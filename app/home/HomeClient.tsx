@@ -11,14 +11,14 @@ export default function HomeClient() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Labrador, Cockapoo, Pug...");
+  const [placeholder, setPlaceholder] = useState("Labrador...");
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // Mobile shows a single example breed; wider screens show the full list.
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
     const apply = () =>
-      setPlaceholder(mq.matches ? "Labrador" : "Labrador, Cockapoo, Pug...");
+      setPlaceholder(mq.matches ? "Labrador" : "Labrador...");
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
@@ -55,7 +55,7 @@ export default function HomeClient() {
         <div className={styles.heroTint} aria-hidden="true" />
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>Pedigree <span>Chums</span></h1>
-          <p className={styles.heroSub}>The on-the-go dog spotting game. 54 breeds to discover.</p>
+          <p className={styles.heroSub}>The on-the-go dog spotting game.<br />54 breeds to discover.</p>
         </div>
       </section>
 
@@ -87,14 +87,16 @@ export default function HomeClient() {
             autoComplete="off"
             spellCheck={false}
           />
-          <button
-            type="button"
-            className={styles.searchGo}
-            onClick={goToTopMatch}
-            aria-label="Go"
-          >
-            GO
-          </button>
+          {query.trim().length > 0 && (
+            <button
+              type="button"
+              className={styles.searchGo}
+              onClick={goToTopMatch}
+              aria-label="Go"
+            >
+              GO
+            </button>
+          )}
           {open && query.trim().length > 0 && (
             <div className={styles.dropdown}>
               {filtered.length > 0 ? filtered.map((b) => (
@@ -131,7 +133,7 @@ export default function HomeClient() {
             Pedigree <span>Chums</span>
           </h2>
           <p className={styles.productDesc}>
-            The on-the-go dog spotting game for curious minds and dog lovers. 54 illustrated breed cards packed with traits, stats, and tell-tale features. Spot a dog. Call it out. Claim your chum.
+            The on-the-go <span className={styles.productDescHi}>dog spotting game</span> for curious minds and dog lovers. <span className={`${styles.productDescWhite} ${styles.productDescUnderline}`}>54 illustrated breed cards</span> packed with traits, stats, and tell-tale features. <span className={styles.productDescHi}>Spot a dog. </span><span className={styles.productDescWhite}>Make a friend, </span><span className={`${styles.productDescYellow} ${styles.productDescUnderline}`}>you have a new chum.</span>
           </p>
           <div className={styles.productMeta}>
             <div className={styles.metaItem}>

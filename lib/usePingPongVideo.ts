@@ -29,18 +29,21 @@ export function usePingPongVideo(
     let dir = 1; // current motion direction (+1 forward, -1 backward)
     let raf = 0;
     let last = 0;
+    let hold = 0; // hold at a bound until this timestamp (buffer between legs)
     let running = false;
+
+    const HOLD_MS = 500; // half-second pause at each end before it turns around
 
     v.muted = true; // required for any autoplay-adjacent behaviour
     try { v.pause(); } catch {}
 
     const tick = (ts: number) => {
       const d = v.duration;
-      if (isFinite(d) && d > 0 && last) {
+      if (isFinite(d) && d > 0 && last && ts >= hold) {
         const dt = Math.min(0.05, (ts - last) / 1000); // clamp tab-switch gaps
         let t = v.currentTime + dir * dt;
-        if (t >= d - EPS) { t = d - EPS; dir = -1; }
-        else if (t <= EPS) { t = EPS; dir = 1; }
+        if (t >= d - EPS) { t = d - EPS; dir = -1; hold = ts + HOLD_MS; }
+        else if (t <= EPS) { t = EPS; dir = 1; hold = ts + HOLD_MS; }
         try { v.currentTime = t; } catch {}
       }
       last = ts;

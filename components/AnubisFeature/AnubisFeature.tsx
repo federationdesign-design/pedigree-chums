@@ -31,7 +31,7 @@ export default function AnubisFeature() {
           </div>
           <div className={styles.bottom}>
             <p className={styles.title}>
-              <span className={styles.titleAccent}>Anubis:</span> The Grave-Robber We Made a God
+              <span className={styles.titleAccent}>Anubis:</span> The Scavenger Made Into a God
             </p>
             <span className={styles.btn}>About this dog</span>
           </div>

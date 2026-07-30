@@ -11,7 +11,7 @@
 .heading {
   margin: 0 0 clamp(10px, 1.4vw, 18px);
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(40px, 6vw, 84px);
+  font-size: clamp(64px, 10vw, 128px);
   line-height: 1.02;
   color: #ffffff;
   text-align: center;
@@ -134,7 +134,7 @@
 
 @media (max-width: 700px) {
   .heading {
-    font-size: clamp(30px, 8vw, 44px);
+    font-size: clamp(40px, 11vw, 72px);
   }
   .media {
     width: clamp(200px, 66vw, 300px);

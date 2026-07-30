@@ -7,9 +7,9 @@ import { ukBreeds } from "../../data/uk-breeds";
 import { breedInfo } from "../../data/breedInfo";
 import styles from "./BreedTreeMap.module.css";
 
-type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
+export type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
 
-const TAG_STYLE: Record<BreedTag, { bg: string }> = {
+export const TAG_STYLE: Record<BreedTag, { bg: string }> = {
   extinct:      { bg: "#d64545" },
   trending:     { bg: "#2e9e5b" },
   popular:      { bg: "#4ade80" },
@@ -124,7 +124,7 @@ const LIVING_NAMES = new Set<string>(
   [...ukBreeds.map((b) => b.name), ...breeds.map((b) => b.name)].map((s) => s.toLowerCase().trim())
 );
 
-function nodeStatus(name: string, note: string): BreedTag | null {
+export function nodeStatus(name: string, note: string): BreedTag | null {
   const n = (note || "").toLowerCase();
   if (n.includes("extinct")) return "extinct";
   if (n.includes("in decline") || n.includes("declining")) return "in-decline";

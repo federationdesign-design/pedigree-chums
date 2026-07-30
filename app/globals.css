@@ -21,7 +21,24 @@ html {
   --radius-card: 22px;
   --radius-pill: 999px;
   --shadow-card: 0 18px 40px rgba(10, 58, 87, 0.28);
+  /* THE PIT'S LEFT AXIS. Four things line up on it: the level portrait, the
+     score, the difficulty slider and the PLAY button. It is defined by PLAY,
+     because PLAY is the one that cannot move: on the start screen that square is
+     drawn 18px in from the stage edge, so the axis is 18 plus half the square.
+     The square is 84 * pitScale * 1.2, and pitScale drops to 0.67 at 768px and
+     below, which is the breakpoint mirrored just under this.
+     Declared here rather than in a module because BreedTree and LineageModal
+     both need it and neither contains the other's elements. One source, so the
+     four cannot drift apart. */
+  --pit-axis: 51.8px;
 }
+
+@media (min-width: 769px) {
+  :root {
+    --pit-axis: 68.4px;
+  }
+}
+
 
 * {
   box-sizing: border-box;

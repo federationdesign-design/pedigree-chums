@@ -14,11 +14,26 @@
   z-index: -1;
   pointer-events: auto;
 }
+.fxCanvas {
+  /* J17: the canvas effects layer. The SVG fills the stage, so the canvas and
+     the SVG are the same rectangle and the screen transform read off the SVG
+     applies to the canvas unchanged. Never takes a pointer. */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 2;
+}
 .stage svg {
   width: 100%;
   height: 100%;
   display: block;
   transition: opacity 0.3s ease;
+  /* The pit owns the gesture, like the main pit does on its cards: without
+     this a touch drag on a dog or badge is read as a scroll and fights you. */
+  touch-action: none;
 }
 
 .aside {
@@ -80,6 +95,7 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  color: var(--yellow, #ffd23e);
 }
 .cShare {
   display: inline-block;
@@ -241,16 +257,44 @@
   flex-direction: column;
 }
 .asideDocked {
+  /* picked up and moved like a chum-page card: the pointer owns it, so the
+     browser must not claim the gesture for scrolling */
+  touch-action: none;
+  cursor: grab;
   position: absolute;
-  left: 10%;
+  /* 10px left of centre, so the rail hanging off the right-hand edge has room
+     and its second column stops running off the screen. Then 50px further
+     left and 100px further down, which is also where it lands when a circle
+     pops it back open: the start and the reopen share this one rule.
+     max() is the guard: on a narrow phone 10% - 70px goes negative and would
+     take the box off the left edge, so it stops at 8px in. */
+  left: max(8px, calc(10% - 70px));
   right: auto;
-  top: clamp(112px, 17vh, 190px);
+  top: calc(clamp(112px, 17vh, 190px) + 100px);
   bottom: auto;
-  width: 80%;
+  /* a third narrower than the 80% it was: the write-up reflows, no type
+     changes size, and the rail still hangs off the right-hand edge */
+  width: 53.6%;
   max-width: none;
   z-index: 15;
   gap: 12px;
   padding: 0;
+}
+.asideDocked:active {
+  cursor: grabbing;
+}
+
+/* The +100px push above was measured on a desktop stage. On a narrow screen the
+   box keeps its 53.6% width, the write-up reflows taller, and its foot runs into
+   the PLAY button sitting at bottom 3%. The push eases back to +60 there, which
+   is the figure noted in the handover. The desktop position is untouched.
+   Capping the height with a scroll was the other option and was rejected:
+   the chum rail is an absolutely positioned descendant sitting outside the box
+   at left: calc(100% - 2px), so any overflow on this element would clip it. */
+@media (max-width: 900px) {
+  .asideDocked {
+    top: calc(clamp(112px, 17vh, 190px) + 60px);
+  }
 }
 .stageDocked {
   position: absolute;
@@ -283,6 +327,34 @@
 }
 
 /* Small X in the corner of the docked caption. */
+/* The rail's own way out, shown only once the box is closed. Same yellow as the
+   box's X, parked above the first thumbnail. */
+.railClose {
+  position: absolute;
+  /* measured off the frame's padding box, so both figures carry the 10px
+     padding: this keeps the X exactly where it sat against the cards */
+  top: -20px;
+  right: 10px;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--yellow, #ffd23e);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+.railClose svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
 .captionClose {
   position: absolute;
   top: 8px;
@@ -298,4 +370,945 @@
   justify-content: center;
   padding: 0;
   cursor: pointer;
+}
+
+/* START button: the pit stays inert until this is pressed. Drawn inside the
+   SVG so it shares the in-pit UI vocabulary (navy square, yellow rim) and
+   scales with the stage. A slow pulse marks it as the thing to press. */
+.startBtn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: btStartPulse 1.6s ease-in-out infinite;
+}
+.startBtn:active {
+  animation: none;
+  transform: scale(0.96);
+}
+@keyframes btStartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .startBtn { animation: none; }
+}
+
+/* LEARN wash: the pink layer from the design, blending in 'overlay' so the dogs
+   and the blue behind it tint rather than being covered. It waits off the
+   top-right corner, tilted; hovering LEARN slides it partway in for a preview,
+   and choosing LEARN brings it all the way in and levels it out. Touch has no
+   hover, so on a phone the tap plays the same slide as the reveal. */
+/* Learn background: Steve's own composition, a masonry stack of the same icon at
+   varied placement and scale. It sits UNDER the pink, so the wash stays a flat
+   tint and the artwork is not double-blended.
+   It is a heavy file, 394KB and around 51,740 points, and worth revisiting: the
+   same look can be had from a handful of tiles at a fraction of the weight. Left
+   as drawn for now, deliberately. */
+.learnPattern {
+  position: fixed;
+  /* The same paw pattern as the homepage and the main pit (paw-pattern2.svg),
+     tiled at 144px, so the learn area shares the site background. */
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+.learnPatternOn {
+  opacity: 0.5;
+}
+
+.learnWash {
+  position: fixed;
+  inset: -60%;
+  background: #ec0376;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  /* Behind the stage, at the level background's own depth, so it tints the
+     backdrop and nothing else. At z-index 40 it sat over the whole pit and
+     blended the dog photographs and the icons along with it. */
+  z-index: -1;
+  transform: rotate(-18deg) translate3d(115%, -60%, 0);
+  transition: transform 560ms cubic-bezier(0.22, 0.9, 0.3, 1);
+  will-change: transform;
+}
+.learnWashPeek {
+  transform: rotate(-18deg) translate3d(46%, -22%, 0);
+}
+.learnWashOn {
+  transform: rotate(0deg) translate3d(0, 0, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .learnWash { transition: none; }
+}
+
+/* Round portrait of the dog whose tree is open, at the head of the docked box.
+   Mini pit only: the chum page caption stays text-only. */
+/* The head of the box is a row: portrait on the left, name beside it. It used to
+   be a centred stack with a yellow ring, which read as a second card sitting on
+   the box rather than as its heading. A third smaller, no ring, left aligned. */
+.cHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.cPortrait {
+  display: block;
+  width: clamp(40px, 8vw, 54px);
+  height: clamp(40px, 8vw, 54px);
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  pointer-events: none;
+  user-select: none;
+}
+/* Sits between the level's name and the selected circle's, naming the link
+   between them. Montserrat rather than the display face: it is connective
+   tissue, not a heading, and should not compete with either name. */
+.cRelated {
+  display: block;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-size: 0.72rem;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
+  margin-top: 1px;
+}
+/* the level's own name, beside the portrait */
+.cHeadName {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  color: #ffffff;
+  font-size: clamp(1.1rem, 5vw, 1.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+
+/* Difficulty slider: start screen only, mounted down the left of the stage.
+   10 hardest at the top, 0 easiest at the bottom, default 5. It sits above the
+   circles but clear of START, which rides at 80% of the stage height. */
+.diff {
+  position: absolute;
+  /* the track is 14 wide with a 3px border each side, so 20 across */
+  left: calc(var(--pit-axis, 51.8px) - 10px);
+  /* top and height are set inline: the track runs to the cap of the S in START,
+     which is computed from the same numbers the word uses */
+  z-index: 16;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.diffTrack {
+  position: relative;
+  flex: 1;
+  width: 14px;
+  border-radius: 999px;
+  background: var(--blue-deep, #0b78bd);
+  border: 3px solid var(--navy, #0a3a57);
+  box-shadow: 0 3px 10px rgba(10, 58, 87, 0.3);
+  /* the pointer owns the gesture: a phone must not read a drag as a scroll */
+  touch-action: none;
+  cursor: pointer;
+}
+.diffTrack:focus-visible {
+  outline: 3px solid var(--yellow, #ffd23e);
+  outline-offset: 3px;
+}
+/* A plain white disc, no figure inside. With the numbers gone the thumb's
+   position along the track is the whole readout, so it is drawn large enough to
+   be an easy target and to read at a glance. */
+.diffThumb {
+  position: absolute;
+  left: 50%;
+  width: 38px;
+  height: 38px;
+  margin: 0 0 -19px -19px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 4px solid var(--navy, #0a3a57);
+  box-shadow: 0 3px 10px rgba(10, 58, 87, 0.35);
+  pointer-events: none;
+  transition: transform 0.14s cubic-bezier(0.2, 1.4, 0.4, 1);
+  transform-origin: center;
+}
+/* Held: twice the size, so the thumb stays visible under a fingertip. Scaled
+   rather than resized, so the centre stays exactly on the level it points at. */
+.diffThumbBig {
+  transform: scale(2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .diffThumb { transition: none; }
+}
+/* Hover: a quarter bigger, so the grab point announces itself before you take
+   hold of it. The thumb itself is pointer-events none, so the hover has to be
+   read off the track it sits in. :not(.diffThumbBig) keeps the drag scale
+   winning, since a descendant selector would otherwise outrank the plain class
+   and shrink the thumb the moment you started dragging it. Behind
+   (hover: hover) so a finger never leaves it stuck big. */
+@media (hover: hover) {
+  .diffTrack:hover .diffThumb:not(.diffThumbBig) { transform: scale(1.25); }
+}
+/* The travelled part of the track, below the thumb. */
+.diffFill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--navy, #0a3a57);
+  pointer-events: none;
+}
+
+/* Level background: a themed picture and ground strip that replace the pit's
+   flat blue. It never moves. A clip cuts it along the LEARN wash's own leading
+   edge, so the two are halves of one split screen, and START carries that cut
+   past the seam until the level covers everything. z-index 0 keeps the whole
+   thing under the stage (z-index 1), so it can never intercept a tap or sit
+   over a dog circle. */
+.level {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: clip-path 560ms cubic-bezier(0.22, 0.9, 0.3, 1);
+  /* deliberately no will-change: this layer is a full-screen illustration, and
+     holding it on the compositor for the whole round made the pit measurably
+     less responsive. The transition is a one-off 560ms wipe and is smooth
+     without it. */
+}
+.level.levelSlow {
+  transition-duration: 2800ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .level { transition: none; }
+}
+.levelSky {
+  position: absolute;
+  inset: -40%;
+}
+/* the picture keeps its own proportions and is anchored to the bottom, so the
+   horizon stays on the floor and the crop is taken off the top */
+.levelBg {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  transform: translateX(-50%);
+  object-fit: cover;
+  object-position: bottom center;
+  user-select: none;
+}
+/* the ground strip runs the full width. Its bottom offset is set inline from
+   the measured surface, so the drawn earth lines up with the physics slabs. */
+/* The pit-full wash. Tiled paws, faded in a tenth at a time by the countdown,
+   solid on nought. Sits between the level picture and the floor by DOM order,
+   so it never covers the floor art. No transition on opacity: the steps are a
+   second apart and are meant to read as steps. */
+.levelPaws {
+  position: absolute;
+  inset: 0;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  pointer-events: none;
+}
+.levelFloor {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+/* Status marker on the learn-box portrait: same red/amber/green as the pit. */
+.cPortraitWrap {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
+.cStatus {
+  position: absolute;
+  right: 1px;
+  bottom: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* Share breakdown (the pill's content) below the write-up. */
+.cBreak {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-family: var(--font-body, "Montserrat", system-ui);
+  color: #ffffff;
+}
+.cBreakBig {
+  font-weight: 800;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.cBreakRow {
+  font-weight: 600;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+.cBreakTitle {
+  font-weight: 700;
+  font-size: 0.7rem;
+  margin-top: 5px;
+}
+.cBreakNote {
+  font-size: 0.66rem;
+  line-height: 1.45;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+/* The small print starts folded behind this. It is a button so the box's own
+   drag handler steps aside for it, the same way it does for the close X. */
+.cNoteDots {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  margin-top: 2px;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 800;
+  font-size: 0.8rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffd23e);
+  cursor: pointer;
+}
+.cNoteDots:focus-visible {
+  outline: 2px solid var(--yellow, #ffd23e);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* The chum share line and its pie sit on one row, text first. */
+.cBreakBigRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cBreakBigRow .cBreakBig {
+  margin-bottom: 0;
+}
+/* Same diameter as the portrait at the head of the box. */
+.cPie {
+  display: block;
+  width: clamp(40px, 8vw, 54px);
+  height: clamp(40px, 8vw, 54px);
+  flex: none;
+  pointer-events: none;
+}
+/* The percentage figure itself, in the box's yellow. */
+.cPct {
+  color: var(--yellow, #ffd23e);
+}
+
+/* Name and relation line stacked in a column beside the portrait, so the
+   "is related to:" line sits directly under the card title, not the image. */
+.cHeadText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* Keep the title clear of the close X in the top-right: it wraps to another
+     line rather than running under the button, however long the name is. */
+  padding-right: 28px;
+}
+
+/* Related pack dogs rail: square cards down one side of the learn box.
+   The 10px of padding and the 2px border are the drag handle. A press on a card
+   opens that chum instead of dragging, so the frame is the part you grab. Its
+   top and side offsets are pulled back by the 12px the frame adds, which keeps
+   the cards themselves exactly where they were. */
+.relRail {
+  position: absolute;
+  top: -12px;
+  z-index: 12;
+  display: grid;
+  grid-auto-flow: column;
+  /* Fixed column tracks: an enlarged card overflows its own cell instead of
+     widening the column, so the two columns never shift sideways. */
+  grid-auto-columns: clamp(38px, 7.5vw, 56px);
+  gap: 8px;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background: none;
+  cursor: grab;
+  transition: border-color 0.15s ease;
+  pointer-events: auto;
+}
+.relRail:active { cursor: grabbing; }
+/* Shown only while the pointer is near the rail but not on a card: it is a
+   grab handle, so it appears where grabbing actually works. */
+.relRail:hover { border-color: rgba(255, 255, 255, 0.45); }
+.relRail:has(.relCard:hover) { border-color: transparent; cursor: default; }
+/* Beside the box, on whichever side has room. */
+.relRailRight { left: calc(100% - 2px); }
+.relRailLeft { right: calc(100% - 2px); }
+/* Where the rail starts, before the blue box has ever been opened. Pinned to
+   the screen under the SECOND portrait in the stacked title, on the left.
+   The figures are the title's own: LineageModal puts .titleWrap at top 24px and
+   left 30px, each row is one portrait tall at clamp(56px, 11vw, 78px), and the
+   two rows are 8px apart. Two portraits plus that gap plus 10px of air is where
+   the second dog's picture ends. Change the portrait clamp there and this needs
+   to change with it. The lives bar sits at the same left but only renders while
+   a round is running, and the rail is learn only, so they never meet. */
+.relRailHome {
+  position: fixed;
+  left: 30px;
+  top: calc(42px + 2 * clamp(56px, 11vw, 78px));
+  right: auto;
+  bottom: auto;
+}
+/* Clear of the difficulty slider, which shares this edge whenever it is on
+   screen. The slider sits at left 24 and its thumb is 38 across, so it reaches
+   about 50; this starts past that with room to breathe. Only applied when the
+   slider is actually there, so a desktop, where it never renders, keeps the
+   rail where it was. */
+.relRailHomeDiff {
+  left: 82px;
+}
+.relCard {
+  width: clamp(38px, 7.5vw, 56px);
+  height: clamp(38px, 7.5vw, 56px);
+  padding: 0;
+  border: 2px solid var(--yellow, #ffd23e);
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(10, 58, 87, 0.35);
+  opacity: 0;
+  transform: scale(0.4);
+  animation: relPop 360ms cubic-bezier(0.2, 0.8, 0.3, 1.2) forwards;
+  transition: width 0.18s ease, height 0.18s ease, border-color 0.18s ease, rotate 0.18s ease;
+}
+/* The picked chum: near twice the size so it pushes its neighbours apart, and a
+   white outline instead of the yellow the others carry. Capped so it never
+   spills off a phone. */
+/* The selected card is the only one wearing the info badge, and that badge
+   overhangs, so this card must stop clipping its own children. */
+.relCardOn {
+  overflow: visible;
+  width: clamp(56px, 11vw, 88px);
+  height: clamp(56px, 11vw, 88px);
+  justify-self: center;
+  align-self: center;
+  border-color: #ffffff;
+  box-shadow: 0 3px 14px rgba(10, 58, 87, 0.55);
+  /* a slight tilt so the enlarged card reads as lifted off the pile, making the
+     small overlap onto its neighbours look deliberate */
+  rotate: -3deg;
+  z-index: 3;
+}
+.relCard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The "i" on the picked chum. Sits inside the card, which is overflow: hidden,
+   so it is placed just in from the bottom-right corner rather than overhanging.
+   Sized off the card so it scales with it: the picked card runs 56 to 88px, so
+   this lands between 22 and 35px, a real tap target. The card needs position
+   relative for it, which it did not have before and which changes nothing else,
+   since nothing inside it was positioned. */
+.relCard { position: relative; }
+/* Collected. The picture goes, the tile turns green and wears a white tick.
+   overflow is opened up because the name label hangs below the tile, and the
+   tile is only 38 to 56px so it could never sit inside. */
+.relCardDone {
+  background: #1f9d55;
+  border-color: #22c55e;
+  overflow: visible;
+}
+.relCardTick {
+  position: absolute;
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+}
+.relCardName {
+  position: absolute;
+  /* Beside, not below. Below put it under the next row of the grid, where it
+     was covered and unreadable. Which side depends on where the rail is: it
+     always points AWAY from the edge the rail is against, so the label runs
+     into open screen rather than off it. The rules that pick the side are with
+     the rail's own position classes further down. */
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  background: var(--navy, #0a3a57);
+  color: #ffffff;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 4;
+}
+/* Tap keeps it up. Hover shows it on a mouse only, so a finger never leaves one
+   stuck open. */
+.relCardNameOn { opacity: 1; }
+/* The rail hangs to the RIGHT of the box, so it is the nearer thing to the
+   screen edge and the label goes left, back toward the middle. */
+.relRailRight .relCardName {
+  left: auto;
+  right: calc(100% + 6px);
+}
+@media (hover: hover) {
+  .relCardDone:hover .relCardName { opacity: 1; }
+}
+/* Copied FIGURE FOR FIGURE from the main pit's own info badge, which lives
+   inline in LineageMap: 28 square, --blue-deep fill, a 2px white ring, a white
+   italic Georgia i, and overhanging the top-right corner by 14. It was yellow
+   with a navy border and tucked inside the card, which was a second style
+   invented for no reason. Overhanging needs .relCardOn to stop clipping, below. */
+.relCardInfo {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--blue-deep, #0c5b92);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+@keyframes relPop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
+  60% { opacity: 1; transform: scale(1.08) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes relPopOut {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
+}
+.relCardLeaving {
+  animation: relPopOut 300ms cubic-bezier(0.45, 0, 0.7, 0.2) forwards;
+  pointer-events: none;
+}
+
+/* Big white PLAY, bottom-left of the learn area, to jump into the round. */
+/* PLAY is a square now, the same square as the close X and the info icon. All
+   of the type rules have gone with the word; the SVG inside sizes the button,
+   so the only job left here is where it sits. Hovering it still slides the
+   level background in, which is a separate clip in the TSX. */
+.learnPlay {
+  position: absolute;
+  /* 15.5, and it is exact at every scale rather than a fitted number: the axis
+     is 18 + S/2 and the artboard is S + 5 across, so axis - (S+5)/2 is always
+     18 - 2.5 whatever S is. 4% used to drift away from the start screen's
+     button as the window widened. */
+  left: 15.5px;
+  bottom: 3%;
+  z-index: 16;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.learnPlay:focus-visible {
+  outline: 3px solid var(--yellow, #ffd23e);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+/* Ancestry card: opens below the box when a rail dog is tapped, same breakdown
+   as that breed's own page. Rides with the box like the rail does. */
+.ancCard {
+  position: fixed;
+  top: 6%;
+  right: 4%;
+  width: min(88vw, 330px);
+  z-index: 21;
+  touch-action: none;
+  background: #0a2a3f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0 0 10px;
+  animation: ancIn 260ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+@keyframes ancIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ancCard { animation: none; }
+}
+.ancClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--yellow, #ffd23e);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+.ancTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  padding: 0 16px;
+  margin-bottom: 2px;
+}
+.ancDog {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: #ffffff;
+  padding: 0 16px 8px;
+  opacity: 0.85;
+}
+.ancRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 14px;
+}
+.ancName {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ancBarWrap {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ancBar {
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.ancPct {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: 0.82rem;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.02em;
+  text-align: right;
+}
+.ancDisclaimer {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-size: 0.6rem;
+  color: #ffffff;
+  padding: 8px 16px 0;
+  line-height: 1.5;
+  font-style: italic;
+  opacity: 0.8;
+}
+.ancLink {
+  display: block;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--yellow, #ffd23e);
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 700;
+  font-size: 0.68rem;
+  text-decoration: underline;
+  padding: 10px 16px 0;
+  cursor: pointer;
+  text-align: left;
+}
+/* Detached learn cards: Ancestry and Training float free of the blue box, each
+   with its own close, opened by tapping a rail dog. */
+.learnCards {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 360px);
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+}
+.learnCards .ancCard { margin-top: 0; }
+.trainCard {
+  position: fixed;
+  bottom: 6%;
+  right: 4%;
+  width: min(92vw, 218px);
+  z-index: 21;
+  touch-action: none;
+  background: #0a2a3f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0 0 8px;
+  animation: ancIn 260ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.cardHead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 34px 6px 14px;
+  cursor: grab;
+}
+.cardIcon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--yellow, #ffd23e);
+  display: inline-flex;
+}
+.cardIcon svg { width: 100%; height: 100%; }
+.cardHeadText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.cardTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+.cardSub {
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: #ffffff;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Temperament card: same slim width as the training card. A Pros/Cons toggle
+   over white bullet text. Only the active toggle carries colour, as an outline
+   (green for pros, red for cons), never a filled block. */
+.tempCard {
+  position: fixed;
+  bottom: 6%;
+  right: 4%;
+  width: min(92vw, 218px);
+  z-index: 21;
+  touch-action: none;
+  background: #0a2a3f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0 0 10px;
+  animation: ancIn 260ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.tempTabs {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  padding: 2px 14px 10px;
+}
+/* The same pill as the training card's difficulty label: compact Montserrat,
+   1.5px border, 20px radius, a solid colour for text and border with that same
+   colour at 15% as a faint fill. Pros green, Cons red; the inactive tab is
+   muted so only the chosen one carries colour. */
+.tempTab {
+  appearance: none;
+  cursor: pointer;
+  display: inline-block;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 3px 14px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-weight: 700;
+  font-size: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.tempTabPro.tempTabOn {
+  color: #22c55e;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+}
+.tempTabCon.tempTabOn {
+  color: #ef4444;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+.tempList {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tempItem {
+  position: relative;
+  padding-left: 14px;
+  font-family: var(--font-body, "Montserrat", system-ui);
+  font-weight: 600;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #ffffff;
+}
+.tempItem::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+}
+/* Reopen dock: a closed learn card drops to an icon on the right, tap to reopen. */
+.learnDock {
+  position: fixed;
+  right: 3%;
+  bottom: 4%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 22;
+}
+.learnDockBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--navy, #0a3a57);
+  border: 2px solid var(--yellow, #ffd23e);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+  position: relative;
+  animation: dockPop 440ms cubic-bezier(0.2, 0.9, 0.3, 1.5) both;
+}
+.learnDockIcon {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  color: var(--yellow, #ffd23e);
+}
+.learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
+.cardTitleWhite {
+  color: #ffffff;
+}
+.cardTitleName {
+  color: #ffffff;
+}
+/* Dock icons puff into existence: a pop with a little smoke halo. */
+.learnDockBtn::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.28) 42%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: -1;
+  animation: dockSmoke 560ms ease-out both;
+}
+@keyframes dockPop {
+  0% { transform: scale(0); opacity: 0; }
+  55% { transform: scale(1.2); opacity: 1; }
+  78% { transform: scale(0.94); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes dockSmoke {
+  0% { transform: scale(0.35); opacity: 0.85; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .learnDockBtn { animation: none; }
+  .learnDockBtn::before { animation: none; opacity: 0; }
+}
+
+/* ---- Zoom cursors -------------------------------------------------------
+   Steve's own magnifiers, inlined as data URIs rather than files in public/:
+   a cursor fetched over the network is not decoded until it is first needed,
+   which would make the press-flash lag the very first time you click.
+
+   The icon colour carries a second meaning on top of the plus and minus:
+     WHITE  a big circle, the first ring you are looking at
+     YELLOW a circle nested inside one of those
+   and a press inverts whichever one you are on, which is what :active gives
+   us for free, with no JS and no state.
+
+   The minus only ever appears when you are already zoomed in, by definition,
+   so it has no white resting variant. That is not an omission.
+
+   20 by 19, hotspot 7 7, the centre of the lens measured off the ring
+   path, so the point you click is the middle of the glass. The keyword after
+   the comma is the fallback for any browser that refuses an SVG cursor. */
+
+/* first ring: plus, white at rest */
+.curZoomIn {
+  cursor: url("data:image/svg+xml,%3Csvg%20width='20'%20height='19'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20720%20704.2'%3E%3Cpath%20fill='%23fff'%20d='M229.8,154.3v75.6h-75.6c-17.1,0-30.9,13.8-30.9,30.9s13.8,30.9,30.9,30.9h75.6v75.6c0,17.1,13.8,30.9,30.9,30.9s30.9-13.8,30.9-30.9v-75.6h75.6c17.1,0,30.9-13.8,30.9-30.9s-13.8-30.9-30.9-30.9h-75.6v-75.6c0-17.1-13.8-30.9-30.9-30.9s-30.9,13.8-30.9,30.9Z'/%3E%3Cg%3E%3Cpath%20fill='%23fff'%20d='M.3,234.6c3.6-15.9,6.4-31.9,10.9-47.5C45.5,69.4,155.1-5.7,281.2,1.9c114.5,6.9,215.7,99.7,234.6,215.7,10.5,64.3-1.9,124.4-38.2,184.7,4.2,2.7,10,5.2,14.2,9.3,65.6,63.9,131.1,127.9,196.1,192.3,11.4,11.2,20.4,24.8,30.5,37.4v25.2c-21.6,48.8-66.1,43.3-95.1,13.3-64.5-66.8-132.2-130.6-198.4-195.9-4.3-4.2-6.7-10.3-10-15.4-8.1,6-12.1,8.4-16,10.8-143.4,91-333,22.8-385.7-138.8-5.6-17.1-8.6-35.1-12.9-52.7,0-17.8,0-35.5,0-53.3ZM447.3,260.7c.2-103.1-83.9-187.8-186.7-188-104.1-.1-187.8,83.3-188.2,187.7-.5,103.2,83.2,187.3,186.7,187.6,104.4.3,188.1-83,188.3-187.3Z'/%3E%3C/g%3E%3C/svg%3E") 7 7, zoom-in;
+}
+.curZoomIn:active {
+  cursor: url("data:image/svg+xml,%3Csvg%20width='20'%20height='19'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20720%20704.2'%3E%3Cpath%20fill='%23fff200'%20d='M229.8,154.3v75.6h-75.6c-17.1,0-30.9,13.8-30.9,30.9s13.8,30.9,30.9,30.9h75.6v75.6c0,17.1,13.8,30.9,30.9,30.9s30.9-13.8,30.9-30.9v-75.6h75.6c17.1,0,30.9-13.8,30.9-30.9s-13.8-30.9-30.9-30.9h-75.6v-75.6c0-17.1-13.8-30.9-30.9-30.9s-30.9,13.8-30.9,30.9Z'/%3E%3Cg%3E%3Cpath%20fill='%23fff'%20d='M.3,234.6c3.6-15.9,6.4-31.9,10.9-47.5C45.5,69.4,155.1-5.7,281.2,1.9c114.5,6.9,215.7,99.7,234.6,215.7,10.5,64.3-1.9,124.4-38.2,184.7,4.2,2.7,10,5.2,14.2,9.3,65.6,63.9,131.1,127.9,196.1,192.3,11.4,11.2,20.4,24.8,30.5,37.4v25.2c-21.6,48.8-66.1,43.3-95.1,13.3-64.5-66.8-132.2-130.6-198.4-195.9-4.3-4.2-6.7-10.3-10-15.4-8.1,6-12.1,8.4-16,10.8-143.4,91-333,22.8-385.7-138.8-5.6-17.1-8.6-35.1-12.9-52.7,0-17.8,0-35.5,0-53.3ZM447.3,260.7c.2-103.1-83.9-187.8-186.7-188-104.1-.1-187.8,83.3-188.2,187.7-.5,103.2,83.2,187.3,186.7,187.6,104.4.3,188.1-83,188.3-187.3Z'/%3E%3C/g%3E%3C/svg%3E") 7 7, zoom-in;
+}
+/* nested deeper: plus, yellow at rest */
+.curZoomInOn {
+  cursor: url("data:image/svg+xml,%3Csvg%20width='20'%20height='19'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20720%20704.2'%3E%3Cpath%20fill='%23fff200'%20d='M229.8,154.3v75.6h-75.6c-17.1,0-30.9,13.8-30.9,30.9s13.8,30.9,30.9,30.9h75.6v75.6c0,17.1,13.8,30.9,30.9,30.9s30.9-13.8,30.9-30.9v-75.6h75.6c17.1,0,30.9-13.8,30.9-30.9s-13.8-30.9-30.9-30.9h-75.6v-75.6c0-17.1-13.8-30.9-30.9-30.9s-30.9,13.8-30.9,30.9Z'/%3E%3Cg%3E%3Cpath%20fill='%23fff'%20d='M.3,234.6c3.6-15.9,6.4-31.9,10.9-47.5C45.5,69.4,155.1-5.7,281.2,1.9c114.5,6.9,215.7,99.7,234.6,215.7,10.5,64.3-1.9,124.4-38.2,184.7,4.2,2.7,10,5.2,14.2,9.3,65.6,63.9,131.1,127.9,196.1,192.3,11.4,11.2,20.4,24.8,30.5,37.4v25.2c-21.6,48.8-66.1,43.3-95.1,13.3-64.5-66.8-132.2-130.6-198.4-195.9-4.3-4.2-6.7-10.3-10-15.4-8.1,6-12.1,8.4-16,10.8-143.4,91-333,22.8-385.7-138.8-5.6-17.1-8.6-35.1-12.9-52.7,0-17.8,0-35.5,0-53.3ZM447.3,260.7c.2-103.1-83.9-187.8-186.7-188-104.1-.1-187.8,83.3-188.2,187.7-.5,103.2,83.2,187.3,186.7,187.6,104.4.3,188.1-83,188.3-187.3Z'/%3E%3C/g%3E%3C/svg%3E") 7 7, zoom-in;
+}
+.curZoomInOn:active {
+  cursor: url("data:image/svg+xml,%3Csvg%20width='20'%20height='19'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20720%20704.2'%3E%3Cpath%20fill='%23fff'%20d='M229.8,154.3v75.6h-75.6c-17.1,0-30.9,13.8-30.9,30.9s13.8,30.9,30.9,30.9h75.6v75.6c0,17.1,13.8,30.9,30.9,30.9s30.9-13.8,30.9-30.9v-75.6h75.6c17.1,0,30.9-13.8,30.9-30.9s-13.8-30.9-30.9-30.9h-75.6v-75.6c0-17.1-13.8-30.9-30.9-30.9s-30.9,13.8-30.9,30.9Z'/%3E%3Cg%3E%3Cpath%20fill='%23fff'%20d='M.3,234.6c3.6-15.9,6.4-31.9,10.9-47.5C45.5,69.4,155.1-5.7,281.2,1.9c114.5,6.9,215.7,99.7,234.6,215.7,10.5,64.3-1.9,124.4-38.2,184.7,4.2,2.7,10,5.2,14.2,9.3,65.6,63.9,131.1,127.9,196.1,192.3,11.4,11.2,20.4,24.8,30.5,37.4v25.2c-21.6,48.8-66.1,43.3-95.1,13.3-64.5-66.8-132.2-130.6-198.4-195.9-4.3-4.2-6.7-10.3-10-15.4-8.1,6-12.1,8.4-16,10.8-143.4,91-333,22.8-385.7-138.8-5.6-17.1-8.6-35.1-12.9-52.7,0-17.8,0-35.5,0-53.3ZM447.3,260.7c.2-103.1-83.9-187.8-186.7-188-104.1-.1-187.8,83.3-188.2,187.7-.5,103.2,83.2,187.3,186.7,187.6,104.4.3,188.1-83,188.3-187.3Z'/%3E%3C/g%3E%3C/svg%3E") 7 7, zoom-in;
+}
+/* minus, only ever shown while zoomed in, so yellow at rest */
+.curZoomOut {
+  cursor: url("data:image/svg+xml,%3Csvg%20width='20'%20height='19'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20720%20704.2'%3E%3Cpath%20fill='%23fff200'%20d='M154.1,229.9c-17.1,0-30.9,13.8-30.9,30.9s13.8,30.9,30.9,30.9h213c17.1,0,30.9-13.8,30.9-30.9s-13.8-30.9-30.9-30.9h-213Z'/%3E%3Cg%3E%3Cpath%20fill='%23fff'%20d='M.3,234.6c3.6-15.9,6.4-31.9,10.9-47.5C45.5,69.4,155.1-5.7,281.2,1.9c114.5,6.9,215.7,99.7,234.6,215.7,10.5,64.3-1.9,124.4-38.2,184.7,4.2,2.7,10,5.2,14.2,9.3,65.6,63.9,131.1,127.9,196.1,192.3,11.4,11.2,20.4,24.8,30.5,37.4v25.2c-21.6,48.8-66.1,43.3-95.1,13.3-64.5-66.8-132.2-130.6-198.4-195.9-4.3-4.2-6.7-10.3-10-15.4-8.1,6-12.1,8.4-16,10.8-143.4,91-333,22.8-385.7-138.8-5.6-17.1-8.6-35.1-12.9-52.7,0-17.8,0-35.5,0-53.3ZM447.3,260.7c.2-103.1-83.9-187.8-186.7-188-104.1-.1-187.8,83.3-188.2,187.7-.5,103.2,83.2,187.3,186.7,187.6,104.4.3,188.1-83,188.3-187.3Z'/%3E%3C/g%3E%3C/svg%3E") 7 7, zoom-out;
+}
+.curZoomOut:active {
+  cursor: url("data:image/svg+xml,%3Csvg%20width='20'%20height='19'%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20720%20704.2'%3E%3Cpath%20fill='%23fff'%20d='M154.1,229.9c-17.1,0-30.9,13.8-30.9,30.9s13.8,30.9,30.9,30.9h213c17.1,0,30.9-13.8,30.9-30.9s-13.8-30.9-30.9-30.9h-213Z'/%3E%3Cg%3E%3Cpath%20fill='%23fff'%20d='M.3,234.6c3.6-15.9,6.4-31.9,10.9-47.5C45.5,69.4,155.1-5.7,281.2,1.9c114.5,6.9,215.7,99.7,234.6,215.7,10.5,64.3-1.9,124.4-38.2,184.7,4.2,2.7,10,5.2,14.2,9.3,65.6,63.9,131.1,127.9,196.1,192.3,11.4,11.2,20.4,24.8,30.5,37.4v25.2c-21.6,48.8-66.1,43.3-95.1,13.3-64.5-66.8-132.2-130.6-198.4-195.9-4.3-4.2-6.7-10.3-10-15.4-8.1,6-12.1,8.4-16,10.8-143.4,91-333,22.8-385.7-138.8-5.6-17.1-8.6-35.1-12.9-52.7,0-17.8,0-35.5,0-53.3ZM447.3,260.7c.2-103.1-83.9-187.8-186.7-188-104.1-.1-187.8,83.3-188.2,187.7-.5,103.2,83.2,187.3,186.7,187.6,104.4.3,188.1-83,188.3-187.3Z'/%3E%3C/g%3E%3C/svg%3E") 7 7, zoom-out;
 }

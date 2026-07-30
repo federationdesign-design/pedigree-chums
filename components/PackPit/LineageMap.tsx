@@ -67,9 +67,19 @@ type Node = LineageNode & {
   _leaves: number;
   _x: number;
   _y: number;
+  // Mini pit only. True when this node overlaps its parent, which means there
+  // is no daylight between them and therefore no line worth drawing.
+  _tucked?: boolean;
   _dir: number; // outward direction this node sits at, so its own children fan away
 };
 
+// Single child on the first ring of the circular layer: angle from horizontal,
+// and which way it leans (1 right, -1 left). Two numbers, nothing else uses them.
+const SOLO_DEG = 33;
+const SOLO_SIDE = 1;
+// How far inside the screen edge the walls sit, in px. 0 puts them on the glass,
+// so the node may sit flush against the very edge and still be fully visible.
+const WALL_PAD = 0;
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
@@ -103,7 +113,17 @@ function countProgenitors(n: LineageNode): number {
   const c = n.children || [];
   return c.reduce((s, x) => s + 1 + countProgenitors(x), 0);
 }
-function radius(share: number) {
+// The size of a percentage circle, and therefore of the bomb that replaces one,
+// since a main pit bomb IS a percentage circle and differs only in how it is
+// drawn. Exported so the mini pit uses this exact curve rather than a copy that
+// can drift. Nothing about the behaviour changes.
+// Mini pit only. The nodes were drawn at the main pit's size, which reads too
+// large once they are tucked onto the big circle rather than strung out on
+// lines, and larger than the chip the same dog drops as. One dial, applied
+// through nodeR below so the layout, the drawing, the card offsets and the
+// scatter all agree. 1 is the main pit's size.
+const PIT_NODE_SCALE = 0.78;
+export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
 function lean(a: number) {
@@ -120,19 +140,55 @@ export default function LineageMap({
   onScatter,
   onScore,
   currentScore = 0,
+  tree,
+  circular = false,
+  soloLeaf = false,
+  rootRadius,
+  ringColor,
+  strongBg = false,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
+  tree?: LineageNode;
+  circular?: boolean;
+  // A dog with no ancestors is handed a synthetic child by BreedTree: itself,
+  // drawn again, so this layer has something to reveal. Rendering that as a node
+  // on a connector claims the dog descends from itself, so when this is set the
+  // node and its rod are skipped and the reveal comes straight out of the big
+  // circle. Placement then finishes the round on its own, with no green button.
+  soloLeaf?: boolean;
+  rootRadius?: number;
+  // Mini pit only: the ring the lifted dog wore in the pit, carried through so
+  // the circle looks like the one just picked up. Without it the card keeps its
+  // own yellow stroke over a blue fill, which reads as two thin rings.
+  ringColor?: string;
+  // The heavier wash. It used to ride on `circular`, which was fine while the
+  // only caller wanting it also wanted round cards. The chum family tree wants
+  // the main pit's rectangular card AND the mini pit's darker background, so the
+  // two are separated. The main pit passes neither and is unchanged.
+  strongBg?: boolean;
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (data: {
     circles: { x: number; y: number; r: number; share: number; name: string }[];
     rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[];
     pills: { x: number; y: number; w: number; name: string }[];
+    big?: { x: number; y: number; r: number; name: string };
   }) => void;
   onScore?: (v: number) => void;
   currentScore?: number;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
+  const [rootGone, setRootGone] = useState(false);
+  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
+  useEffect(() => {
+    if (!circular) return;
+    const w = window as unknown as Record<string, unknown>;
+    if (typeof w["confetti"] === "function") { confettiRef.current = w["confetti"] as (o: Record<string, unknown>) => void; return; }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
+    script.onload = () => { confettiRef.current = w["confetti"] as (o: Record<string, unknown>) => void; };
+    document.head.appendChild(script);
+  }, [circular]);
   // Preload all images for instruction cards so they appear instantly when tapped
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name)) return;
@@ -151,7 +207,7 @@ export default function LineageMap({
   }, []);
 
   const root = useMemo(() => {
-    const t = getLineage(breed.name);
+    const t = tree ?? getLineage(breed.name);
     if (!t) return null;
     const r = JSON.parse(JSON.stringify(t)) as Node;
     const assign = (n: Node, id: string, parent: Node | null) => {
@@ -162,7 +218,8 @@ export default function LineageMap({
     };
     assign(r, "0", null);
     return r;
-  }, [breed.name]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [breed.name, tree]);
 
   const hasTree = !!(root && root.children && root.children.length);
 
@@ -180,7 +237,19 @@ export default function LineageMap({
   // Mobile only: the pack grid lays each section out as one long horizontal strip
   // and the player swipes it left/right. gridX is that scroll offset (0 .. minGridXRef).
   const isMobile = vp.w <= 768;
-  const CW = isMobile ? Math.round(CARD * 0.85) : CARD; // frames + picture cards run 15% smaller on phones
+  // 15% smaller on phones, and a further 5% in the mini pit, where five frames
+  // have to sit across a screen that used to hold four. Done here rather than in
+  // a second variable because CW drives the frames, the picture cards, the drop
+  // targets and the corner adornments alike: shrinking only the grid would leave
+  // the cards the wrong size for the holes they drop into.
+  const CW = isMobile
+    ? circular || strongBg
+      // 5% down, then capped so five ALWAYS fit: 14px of margin each side and a
+      // 6px gutter between. A 320 screen cannot hold five 60px frames at all, so
+      // without this cap the last column simply falls off the right.
+      ? Math.min(Math.round(CARD * 0.85 * 0.95), Math.floor((vp.w - 28 - 24) / 5))
+      : Math.round(CARD * 0.85)
+    : CARD;
   const [gridX, setGridX] = useState(0);
   useEffect(() => setGridX(0), [breed.name]);
   const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
@@ -217,6 +286,9 @@ export default function LineageMap({
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => { setPinned(new Map()); }, [breed.name]);
   // which collected card is showing its info label right now (toggled by tapping its i)
+  // Every node radius in this component goes through here, so the mini pit's
+  // smaller nodes cannot get out of step between layout and drawing.
+  const nodeR = (share: number) => radius(share) * (circular ? PIT_NODE_SCALE : 1);
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
   const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
@@ -442,23 +514,97 @@ export default function LineageMap({
     if (!root) return [] as Node[];
     const list: Node[] = [];
     root._x = breed.x;
-    root._y = breed.y;
+    // MINI PIT: the whole tree rides 75px higher, card and nodes together.
+    //
+    // Moving the card alone would have broken it: the percentage nodes are laid
+    // out around this point and tuck onto the card's rim, so shifting one without
+    // the other separates them. Lifting the root lifts everything hung off it,
+    // which also clears the Complete button off the bottom of the card.
+    root._y = breed.y - (circular || strongBg ? 75 : 0);
     root._dir = -Math.PI / 2 + base;
     list.push(root);
     const walk = (n: Node, depth: number) => {
       const kids = open.has(n._id) && n.children && n.children.length ? (n.children as Node[]) : null;
       if (!kids) return;
       const cnt = kids.length;
-      const spread = depth === 0 ? SPREAD1 : SPREADN;
-      let center = depth === 0 ? -Math.PI / 2 + base : n._dir;
+      const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
+      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
+      // mini pit: the connector is aware of both circles' real sizes - the
+      // child clears the parent's EDGE by 50px whatever size either circle is
+      const rOf = (nd: Node): number => {
+        const p = nd._parent;
+        if (!p) return rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT;
+        return nodeR(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
+      };
+      let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
+      // A lone child on the first ring has no fan spread to offset it, so it used
+      // to sit dead vertical above the dog. Lean it out on the diagonal instead.
+      // SOLO_DEG is measured from horizontal, the way the connector reads on
+      // screen: 90 is the old vertical, 33 is the diagonal.
+      if (circular && depth === 0 && cnt === 1) {
+        const rad = (SOLO_DEG * Math.PI) / 180;
+        center = SOLO_SIDE > 0 ? -rad : -(Math.PI - rad);
+        // Walls down both sides of the layer. The node cannot pass them, so when
+        // the diagonal would push it off the edge the arm swings up toward
+        // vertical until the whole node, name pill included, clears the wall.
+        const kid = kids[0];
+        const reach = rOf(n) + rOf(kid) + 50;
+        const half = Math.max(rOf(kid), (kid.name.length * 7.4 + 22) / 2);
+        const vw = typeof window !== "undefined" ? window.innerWidth : 0;
+        if (vw > 0) {
+          const clears = (ang: number) => {
+            const cx = n._x + Math.cos(ang) * reach;
+            return cx - half >= WALL_PAD && cx + half <= vw - WALL_PAD;
+          };
+          const upright = -Math.PI / 2; // straight up
+          const stepR = (2 * Math.PI) / 180;
+          let a = center;
+          for (let i = 0; i < 60 && !clears(a); i++) {
+            if (Math.abs(a - upright) <= stepR) { a = upright; break; }
+            a += a > upright ? -stepR : stepR; // swing toward vertical, never past it
+          }
+          center = a;
+        }
+      }
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
-      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
-      const step = spread / Math.max(cnt, 2);
+      // MINI PIT: children sit on a ring around their parent, and the ring's
+      // radius is whichever is larger of two things.
+      //
+      //   the shoulder  the radius that tucks a node onto the parent's rim, so
+      //                 it overlaps and reads like the single-child card, which
+      //                 springs straight out of the big circle with no line
+      //   the fit       the smallest radius at which neighbours do not touch
+      //                 each other, worked out from the fan angle and the node
+      //                 size rather than a guessed constant
+      //
+      // Taking the larger makes it grade itself. Two children tuck onto the
+      // shoulder. Four or five are pushed out because they have to be. And the
+      // connector is drawn only when the ring has been pushed past the parent's
+      // edge, so a line appears exactly when there is a gap to justify it and
+      // never as a stub between two touching discs.
+      //
+      // A pair also gets a wider fan, so both can sit on the shoulder without
+      // crowding each other.
+      const spreadUsed = circular && cnt === 2 ? Math.max(spread, Math.PI * 1.1) : spread;
+      const step = spreadUsed / Math.max(cnt, 2);
+      const kidR = Math.max(...kids.map((k) => rOf(k)), 1);
+      const SIB_GAP = 8;
+      const fitD = cnt < 2 ? 0 : (2 * kidR + SIB_GAP) / (2 * Math.max(0.05, Math.sin(step / 2)));
+      // Tucked, but poking clear. The root card is painted AFTER these nodes on
+      // a multi-child dog, so anything sitting too far in is simply covered by
+      // the photograph, which is what was hiding them. The extra 18 is the
+      // daylight that keeps a node readable against the card's own ring, which
+      // is itself 11 wide.
+      const NODE_POKE = 18;
+      const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
+      const ringD = Math.max(shoulderD, fitD);
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
-        k._x = n._x + Math.cos(a) * dist;
-        k._y = n._y + Math.sin(a) * dist;
+        const d2 = circular ? ringD : dist;
+        if (circular) k._tucked = ringD <= rOf(n) + rOf(k);
+        k._x = n._x + Math.cos(a) * d2;
+        k._y = n._y + Math.sin(a) * d2;
         k._dir = a;
         list.push(k);
         walk(k, depth + 1);
@@ -507,17 +653,51 @@ export default function LineageMap({
     setInfoHover(null);
   };
 
-  const tagW = breed.name.length * 9.5 + 28;
+  // long names wrap to a second line: the pill grows in depth, the corner
+  // radius stays fixed so the capsule shape never changes
+  const splitName = (nm: string): string[] => {
+    if (nm.length <= 16) return [nm];
+    const mid = Math.floor(nm.length / 2);
+    let best = -1;
+    for (let i = 0; i < nm.length; i++) if (nm[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
+    return best === -1 ? [nm] : [nm.slice(0, best), nm.slice(best + 1)];
+  };
+  const tagLines = circular ? splitName(breed.name) : [breed.name];
+  const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
+  const tagH = tagLines.length > 1 ? 60 : 32;
   const clip = "lm-clip-root";
+  // Mini pit, a dog with a tree: the root card and the Complete button inside it
+  // are drawn in a second svg on top of the placed cards. Lifting the cards down
+  // instead would have hidden the very pictures the player just placed.
+  const liftRoot = circular || strongBg;
 
   // The empty frames the player drags each collected card into: a row of living up
   // top, the long-gone below. Positions are screen coords, rendered pan-fixed as
   // sx - pan.x so they stay put while the tree pans behind them.
-  const F_LEFT = isMobile ? 52 : 96;
-  const F_COL = isMobile ? 92 : 112, F_ROW = isMobile ? 92 : 112; // tighter pitch on phones to match the 15% smaller cards
+  // MINI PIT, PHONE: five frames across instead of four.
+  //
+  // Three dogs carry more than 28 ancestors, and at four across on a 92 pitch
+  // those ran off the bottom of a phone. The frame comes down 5%, the gutter
+  // closes up, and the pitch is FITTED to the viewport rather than fixed,
+  // because a fixed pitch that suits a 390 screen overflows a 320 one and small
+  // screens are the entire point of this.
+  const fiveUp = (circular || strongBg) && isMobile;
+  const MCOLS = fiveUp ? 5 : 4; // phones: one continuous grid, this many wide before it wraps
+  const F_EDGE = 14;
+  const F_LEFT = fiveUp ? F_EDGE + CW / 2 : isMobile ? 52 : 96;
+  // On a circle the rim at 45 degrees sits this far in from the bounding box, so
+  // corner adornments tuck against the edge instead of floating outside it.
+  const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
+  // the widest pitch that still lands the last column inside the right margin,
+  // never tighter than a 6px gutter and never looser than 76
+  const fitCol = MCOLS > 1 ? (vp.w - 2 * F_EDGE - CW) / (MCOLS - 1) : CW;
+  const F_COL = fiveUp
+    ? Math.max(CW + 6, Math.min(76, fitCol))
+    : circular ? CW + 3 : isMobile ? 92 : 112;
+  const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
-  const MCOLS = 4; // phones: one continuous grid, four frames wide before it wraps
-  const chumTop = isMobile ? 170 : 240; // rows sit clear of the top-left chrome (and the section headers on desktop); mobile lifted 20px so the deepest breeds fit before Collect
+  // Tucked under the X/XX counter, which sits at top 26 and is about 32 tall.
+  const chumTop = fiveUp ? 111 : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
@@ -573,10 +753,21 @@ export default function LineageMap({
       const mix = live ? (root ? Math.round((live._leaves / root._leaves) * 100) : share) : (snap?.mix ?? snap?.share ?? 0);
       const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
       const note = live?.note ?? snap?.note ?? "";
-      const r = radius(share);
+      const r = nodeR(share);
       const d = r + 10 + CW / 2;
-      const baseX = live ? live._x + Math.cos(live._dir) * d : 0;
-      const baseY = live ? live._y + Math.sin(live._dir) * d : 0;
+      // A solo dog has no node to pop from: the node was a duplicate of itself
+      // and is no longer drawn. Popping from its coordinates throws the card out
+      // to wherever that invisible node sat, which is a long way from the dog.
+      // For these dogs the card comes out of the big circle itself.
+      // A solo dog has no node to pop from. The card springs out of the big
+      // circle's top-right shoulder, offset by that circle's own radius so it
+      // sits clear whatever size the dog is, rather than hiding dead centre.
+      // circR is declared further down, so use the same expression it does:
+      // the dog's own radius, clamped, falling back to ROOT off the mini pit
+      const bigR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+      const soloOff = bigR * 0.72;
+      const baseX = soloLeaf ? breed.x + soloOff : live ? live._x + Math.cos(live._dir) * d : 0;
+      const baseY = soloLeaf ? breed.y - soloOff : live ? live._y + Math.sin(live._dir) * d : 0;
       const pos = dragPos.get(id);
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
@@ -612,6 +803,103 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal;
+  // Mini pit levels: every frame filled means this circle is fully learnt.
+  // No collect step: poof the card and its nodes out of existence, remove the
+  // circle from the pit, and close, exactly like the instructional finish.
+  const circularDoneRef = useRef(false);
+  // The Learn button rides the circle's bottom rim. If circle+button would sit
+  // off-screen (or under the top chrome), the whole assembly hops into view:
+  // the pit's pct-circle hop, verbatim shape (300ms, -sin(t*PI)*A*(1-t)),
+  // landing with the heavy-book dust poof.
+  useEffect(() => {
+    if (!circular) return;
+    const BTN_CLEAR = 58; // button overlaps the rim; just its lower half + margin
+    const M = 10;
+    const vh = typeof window !== "undefined" ? window.innerHeight : vp.h;
+    const cyNow = breed.y + pan.y;
+    const bottomOver = cyNow + circR + BTN_CLEAR - (vh - M);
+    const topOver = (M + 96) - (cyNow - circR);
+    const dy = bottomOver > 0 ? bottomOver : topOver > 0 ? -topOver : 0;
+    if (!dy) return;
+    const oy = pan.y;
+    const A = Math.max(14, Math.min(44, Math.abs(dy) * 0.18));
+    const t0 = performance.now();
+    let raf = 0;
+    const stepA = (now: number) => {
+      const t = Math.min(1, (now - t0) / 300);
+      setPan((p) => ({ ...p, y: oy - dy * t - Math.sin(t * Math.PI) * A * (1 - t) }));
+      if (t < 1) { raf = requestAnimationFrame(stepA); return; }
+      const pid = puffSeq.current++;
+      setPuffs((p) => [...p, { id: pid, sx: breed.x + pan.x, sy: breed.y + oy - dy + circR }]);
+      window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+    };
+    raf = requestAnimationFrame(stepA);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [circular]);
+  const [scattered, setScattered] = useState(false);
+  // Mini pit: the tag pill (and on Complete, every node and rod) tips into the
+  // pit as live physics objects, main-pit style. Positions are CURRENT layer
+  // positions in client px; the pit gives pills a hit limit once they land.
+  const circR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+  const emitCircularScatter = (includeNodes: boolean) => {
+    const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y + circR, w: tagW, name: breed.name }];
+    if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
+    const vis = shown.filter((n) => n._parent);
+    const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+    const circles = vis.slice(0, 60).map((n) => {
+      const share = shareOf(n);
+      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name };
+    });
+    const rods = vis.slice(0, 70).map((n) => {
+      const p = n._parent as Node;
+      return { x1: p._x + pan.x, y1: p._y + pan.y, x2: n._x + pan.x, y2: n._y + pan.y, lit: open.has(n._id) };
+    });
+    // A solo dog leaves a full-size circle behind. It has to come from where the
+    // big circle actually sits, which is breed.x plus the pan, the same point
+    // burstAt uses. Spawning from the unpanned figure puts it up where the node
+    // centre used to be, which is not where the dog was.
+    const big = soloLeaf
+      ? { x: breed.x + pan.x, y: breed.y + pan.y, r: circR, name: breed.name }
+      : undefined;
+    onScatter?.({ circles: soloLeaf ? [] : circles, rods: soloLeaf ? [] : rods, pills, big });
+  };
+  // Green Complete pressed: at the very same instant the layer stops drawing
+  // the tree and everything drops into the pit - zero-lag handover.
+  const circularComplete = () => {
+    if (circularDoneRef.current) return;
+    circularDoneRef.current = true;
+    emitCircularScatter(true);
+    setScattered(true);
+    burstAt(breed.x, breed.y, circR * 1.33);
+    setRootGone(true);
+    confettiRef.current?.({
+      particleCount: 150,
+      spread: 100,
+      origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h },
+      colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"],
+      startVelocity: 45,
+    });
+    window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
+  };
+  // Solo dog: there is no node to turn green and no Complete button to press,
+  // so landing the image in its frame IS the completion. circularComplete does
+  // the rest, which is what the green button has always called: scatter into the
+  // pit, burst the big circle, confetti, remove and close.
+  useEffect(() => {
+    if (!soloLeaf || !circular || !framesDone) return;
+    const t = window.setTimeout(() => circularComplete(), 420); // let the frame settle first
+    return () => window.clearTimeout(t);
+  }, [soloLeaf, circular, framesDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A solo dog's synthetic child is opened on arrival, so the first double-click
+  // pops the card straight out of the big circle rather than spending a step
+  // revealing a node that is never drawn.
+  useEffect(() => {
+    if (!soloLeaf || !circular || !root) return;
+    setOpen((prev) => { const s = new Set(prev); s.add(root._id); return s; });
+  }, [soloLeaf, circular, root]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
@@ -653,7 +941,7 @@ export default function LineageMap({
       if (firstUnpicked.length > 0) {
         const n = firstUnpicked[0];
         const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
-        const rr = radius(sh), dd = rr + 10 + CW / 2;
+        const rr = nodeR(sh), dd = rr + 10 + CW / 2;
         const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
         setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
@@ -685,7 +973,7 @@ export default function LineageMap({
           window.setTimeout(() => {
             setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
             const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
-            const rr = radius(sh), dd = rr + 10 + CW / 2;
+            const rr = nodeR(sh), dd = rr + 10 + CW / 2;
             const px1 = n._x + Math.cos(n._dir) * dd, py1 = n._y + Math.sin(n._dir) * dd;
             setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: sh, status: nodeStatus(n.name, n.note) }); return x; });
             setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
@@ -705,7 +993,7 @@ export default function LineageMap({
         if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); }
         if (INSTR_NAMES.has(breed.name) && n.img && n._parent) {
           const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-          const rr = radius(sh), dd = rr + 10 + CW / 2;
+          const rr = nodeR(sh), dd = rr + 10 + CW / 2;
           const INSTR_OFFSETS: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
           const iOff = INSTR_OFFSETS[n.value as number] ?? {dx:0,dy:0};
           const px1 = n._x + Math.cos(n._dir) * dd + iOff.dx, py1 = n._y + Math.sin(n._dir) * dd + iOff.dy;
@@ -894,7 +1182,7 @@ export default function LineageMap({
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
     const circles = INSTR_NAMES.has(breed.name) ? [] : vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
-      return { x: n._x + pan.x, y: n._y + pan.y, r: radius(share), share, name: n.name };
+      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name };
     });
     const rods = vis.slice(0, 70).map((n) => {
       const p = n._parent as Node;
@@ -903,7 +1191,7 @@ export default function LineageMap({
     const pills = vis
       .filter((n) => (n.children && n.children.length) || !autoExposed.has(n._id))
       .slice(0, 50)
-      .map((n) => ({ x: n._x + pan.x, y: n._y - radius(shareOf(n)) - 13 + pan.y, w: n.name.length * 7.4 + 22, name: n.name }));
+      .map((n) => ({ x: n._x + pan.x, y: n._y - nodeR(shareOf(n)) - 13 + pan.y, w: n.name.length * 7.4 + 22, name: n.name }));
     onScatter?.({ circles, rods, pills });
     tween(520, (t) => setCollectT(t), () => {
       burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
@@ -925,6 +1213,11 @@ export default function LineageMap({
 
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => {
+    if (rootGone) return null;
+    const R = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+    // One band, not a stroke over a contrasting fill. Heavier in the mini pit so
+    // it carries the weight the pit's own rings have.
+    const rootRingW = circular && ringColor ? 11 : 5;
     const rx = cx, ry = cy; // root card stays in SVG content space; pan moves the whole tree including it
     const baseDeg = (cardLean * 180) / Math.PI;
     const rootXf = collecting && collectRef.current
@@ -983,14 +1276,19 @@ export default function LineageMap({
             <text x={0} y={IH/2-FOOTER/2} textAnchor="middle" dominantBaseline="central" style={{fill:"#0a3a57",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:fs,fontWeight:400}}>{caption}</text>
           </>);
         })() : (<>
-          <clipPath id={clip}><rect x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} rx={20} /></clipPath>
-          <rect x={-ROOT-5} y={-ROOT-5} width={ROOT*2+10} height={ROOT*2+10} rx={24} className={styles.rootCard} />
-          {breed.image ? <image href={bust(breed.image)} x={-ROOT} y={-ROOT} width={ROOT*2} height={ROOT*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          <clipPath id={clip}><rect x={-R} y={-R} width={R*2} height={R*2} rx={circular ? R : 20} /></clipPath>
+          <rect
+            x={-R-rootRingW} y={-R-rootRingW}
+            width={R*2+rootRingW*2} height={R*2+rootRingW*2}
+            rx={circular ? R + rootRingW : 24}
+            className={styles.rootCard}
+            style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
+          {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
-      <g className={styles.rootHit} transform={`translate(${rx},${ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
-        {!INSTR_NAMES.has(breed.name) && (<><rect className={styles.tag} x={-tagW/2} y={-16} width={tagW} height={32} rx={16} /><text className={styles.tagText} textAnchor="middle" dominantBaseline="central">{breed.name}</text></>)}
+      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry + R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
+        {!INSTR_NAMES.has(breed.name) && !circular && (<g transform={undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={tagH / 2} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
         {!packed && !collecting && !framesDone ? (() => {
@@ -1008,12 +1306,18 @@ export default function LineageMap({
           const instrIconClicks = INSTR_NAMES.has(breed.name) ? instrFirstUnpicked.length : 0;
           const frontierClicks = frontierNodes.length > 0 ? (INSTR_NAMES.has(breed.name) ? frontierNodes.length : 1) : 0;
           const toPopClick = toPopNodes.length > 0 ? 1 : 0; // always count if images to expose
-          const unplacedClick = unplacedCards.length > 0 ? 1 : 0; // always count if cards to place
+          // Placing follows exposing, always. Counting only the cards that
+          // already exist meant the placement click was invisible until the
+          // images had popped, so two clicks read as "x1" and then "x1" again.
+          // In the mini pit, count the placement step as soon as we know there
+          // is something to expose. Left alone in the main pit, which has not
+          // been asked for and shows longer chains.
+          const unplacedClick = unplacedCards.length > 0 || (circular && toPopNodes.length > 0) ? 1 : 0;
           const stepsLeft = instrIconClicks + frontierClicks + toPopClick + unplacedClick;
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,62)`}
+            transform={`translate(0,${circular ? 4 : 62})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
@@ -1025,9 +1329,23 @@ export default function LineageMap({
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
+                {/* Mini pit: the counter sits INSIDE the pill, bottom right. It
+                    used to hang off the right-hand side at x=108, which ran
+                    clean off the screen whenever the lifted dog sat near the
+                    right edge. Same size, same style, just brought inside, and
+                    inside chumTop so it presses down with the button. */}
+                {circular && stepsLeft > 0 && (
+                  <text
+                    x={88}
+                    y={23}
+                    textAnchor="end"
+                    dominantBaseline="central"
+                    style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 14, fill: "#ffffff", pointerEvents: "none" }}
+                  >{`x${stepsLeft} more`}</text>
+                )}
               </g>
             </g>
-            {stepsLeft > 0 && (
+            {!circular && stepsLeft > 0 && (
               <text
                 x={108}
                 y={5}
@@ -1039,8 +1357,27 @@ export default function LineageMap({
           </g>
           );
         })() : null}
+        {/* Mini pit: green Complete replaces Learn once every frame is filled */}
+        {circular && framesDone && !rootGone && !scattered ? (
+          <g
+            className={styles.removeBtn}
+            transform={`translate(0,4)`}
+            onClick={(e) => { e.stopPropagation(); circularComplete(); }}
+            role="button"
+            aria-label="Complete"
+          >
+            <g className={styles.chumPop}>
+              <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.chumBase} />
+              <g className={styles.chumTop}>
+                <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.chumPill} />
+                <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
+                <text className={styles.chumText} textAnchor="middle" dominantBaseline="central" y={5}>Complete</text>
+              </g>
+            </g>
+          </g>
+        ) : null}
         {/* Green button - Complete/skip for instructional, Pack chum for dog cards */}
-        {(canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
+        {!circular && (canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (!packed && !collecting && !framesDone ? 138 : 62)})`}
@@ -1063,18 +1400,46 @@ export default function LineageMap({
     );
   };
 
+  // Built ONCE. It is needed either in the main svg or in the lifted layer above
+  // the cards, never both, and rootCard reads refs: calling it twice would add a
+  // second read during render for no gain.
+  const treeRoot = soloLeaf ? null : rootCard(breed.x, breed.y - (liftRoot ? 75 : 0));
+
   return (
     <>
     <div
-      className={styles.overlay}
+      className={`${styles.overlay}${circular || strongBg ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayAlt : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
-        &times;
+      {/* BACK, not close. A play triangle facing left: it takes you back a layer
+          rather than dismissing anything.
+          closeCircular is now applied for the chum family tree too, not only the
+          pit lift. Without it that screen fell back to .close, which is 52px
+          with no border, against the pit's 100.8 with a 5px navy stroke: the
+          size and the missing stroke line were both this. */}
+      <button
+        type="button"
+        className={liftRoot ? `${styles.close} ${styles.closeCircular}` : styles.close}
+        onClick={onClose}
+        aria-label="Back"
+      >
+        {liftRoot ? (
+          <svg className={styles.backGlyph} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M17 4 L7 12 L17 20 Z"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : (
+          <>&times;</>
+        )}
       </button>
       {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
         const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)
@@ -1099,7 +1464,15 @@ export default function LineageMap({
       {frameTotal > 0 && !packed && !collecting && frameSlots.extinct.length > 0 && (
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: extinctTop - 90 }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      {showPack && !INSTR_NAMES.has(breed.name) && (
+      {/* Hidden in the mini pit, both uses of it. The clipboard and its
+          "Collect Ancestor Pack" label sat over the frames and read as a second
+          instruction beside the green Collect, which is the one that actually
+          finishes a dog here. The X/XX count above is a separate element and is
+          untouched.
+          NOTE: this button is also the ONLY way to reach the packed two-column
+          view, so that view is now unreachable in the mini pit. `circular`
+          already excluded the pit lift; `strongBg` adds the chum family tree. */}
+      {showPack && !circular && !strongBg && !INSTR_NAMES.has(breed.name) && (
         <button
           type="button"
           className={`${styles.packBtn} ${packed ? styles.packDone : ""} ${allBlue && !packed ? styles.packReady : ""}`.trim()}
@@ -1125,9 +1498,13 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <g style={{ opacity: removing ? 0 : 1, transition: "opacity 0.12s ease-out" }}>
+            <g style={{ opacity: removing || scattered ? 0 : 1, display: scattered ? "none" : undefined, transition: "opacity 0.12s ease-out" }}>
+            {/* A solo dog's card pops out of the big circle, so the circle has
+                to be painted first or it covers the card. Every other dog keeps
+                the original order, with the root drawn last. */}
+            {soloLeaf && rootCard(breed.x, breed.y)}
             {shown
-              .filter((n) => n._parent)
+              .filter((n) => n._parent && !soloLeaf && !n._tucked)
               .map((n) => {
                 const p = n._parent as Node;
                 return (
@@ -1142,12 +1519,12 @@ export default function LineageMap({
                 );
               })}
             {shown
-              .filter((n) => n._parent)
+              .filter((n) => n._parent && !soloLeaf)
               .map((n) => {
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
                 const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                const r = radius(share);
+                const r = nodeR(share);
                 return (
                   <g
                     key={n._id}
@@ -1182,20 +1559,20 @@ export default function LineageMap({
                       } else if (n.img && n._parent) {
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
                         const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-                        const rr = radius(sh), dd = rr + 10 + CW / 2;
+                        const rr = nodeR(sh), dd = rr + 10 + CW / 2;
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
                         setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px, y: py }); return x; });
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={(n.img && (placedImgs.has(n.img as string) || packed)) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    <circle className={`${styles.disc} ${circular ? styles.discPit : ""} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={(n.img && (placedImgs.has(n.img as string) || packed)) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
-                      fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * 0.5)}
+                      fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * (circular ? 0.625 : 0.5))}
                       style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
-                    {(hasKids || !autoExposed.has(n._id)) ? (() => {
+                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
                       const nmY = -r - 13;
                       return (
@@ -1245,7 +1622,7 @@ export default function LineageMap({
                     y={f.sy - pan.y - CW / 2}
                     width={CW}
                     height={CW}
-                    rx={15}
+                    rx={circular ? CW / 2 : 15}
                   />
                   {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame, clipped */
                     <>
@@ -1447,10 +1824,16 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
-                  {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard} />}
+                  {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
+                  {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
+                    /* Mini pit: a circle that popped out of a dog wears that
+                       dog's ring colour, so it is obvious where it came from.
+                       The main pit keeps its own blue and white scheme. */
+                    style={circular && ringColor ? { stroke: ringColor } : undefined} />}
                   {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:12,fontWeight:400,pointerEvents:"none" as const}; const by1=c.cardY+CW/2+48; const by2=c.cardY+CW/2+40; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by2}>{l1}</tspan><tspan x={c.cardX} dy={20}>{l2}</tspan></text>):(<text x={c.cardX} y={by1} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
-                  {isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+                  {/* The status dot is reference information, so it belongs to
+                      the learning side. The mini pit is a game: no dot there. */}
+                  {!circular && isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
                     const ts = TAG_STYLE[c.status ?? "extinct"]; // no tag means old stock, counted as gone, so red
                     const dx = c.cardX - CW / 2, dy = c.cardY - CW / 2; // top-left corner, protruding like the close button
                     return (
@@ -1463,7 +1846,7 @@ export default function LineageMap({
                     const ccx = c.cardX - CW / 2, ccy = c.cardY + CW / 2; // bottom-left corner, on loose cards only (placed cards show the magnifier)
                     return (
                       <g
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: "pointer", display: circular ? "none" : undefined }}
                         onPointerDown={(e) => { e.stopPropagation(); }}
                         onClick={(e) => { e.stopPropagation(); removeCard(c.id); }}
                         role="button"
@@ -1495,7 +1878,9 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {packed && (isTopOfStack(c) || PACK_BREEDS.has(c.name)) && zoomedId !== c.id && (() => { /* chum-fix: chums always show their pill */
+                  {/* Once a card is home in its frame the picture is the point,
+                      so in the mini pit the percentage comes off it. */}
+                  {!(circular && placedSet.has(c.id)) && packed && (isTopOfStack(c) || PACK_BREEDS.has(c.name)) && zoomedId !== c.id && (() => { /* chum-fix: chums always show their pill */
                     const pw = 50, ph = 24, py = c.cardY + CW / 2 - ph / 2 - 2; // pill near the foot of the card (nudged down)
                     const pillRight = c.cardX + CW / 2 + 1; // right-aligned to the card, nudged 5px left
                     // ADJ* tag overlapping the badge's top-right, only when the figure was actually adjusted
@@ -1508,14 +1893,14 @@ export default function LineageMap({
                         onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                       >
                         <rect x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
-                        <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />
+                        {!circular && <rect className={styles.mixPill} x={pillRight - pw} y={py} width={pw} height={ph} rx={ph / 2} style={{ filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.45))", pointerEvents: "none" }} />}
                         <text className={styles.mixText} textAnchor="end" x={pillRight - 6} y={py + ph / 2 + 1} dominantBaseline="central">
                           {(pillMix < 1 ? "<1%" : `${rolledMix(c.id, pillMix)}%`) + (wasAdjusted ? "*" : "")}
                         </text>
                       </g>
                     );
                   })()}
-                  {isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) ? (() => {
+                  {!(circular && placedSet.has(c.id)) && isTopOfStack(c) && (placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) ? (() => {
                     const ix = c.cardX + CW / 2, iy = c.cardY - CW / 2; // top-right corner
                     return (
                       <g
@@ -1543,7 +1928,11 @@ export default function LineageMap({
               );
             })}
 {/* stacked duplicate cards rendered as fixed HTML below */}
-            {rootCard(breed.x, breed.y)}
+            {/* In the mini pit this is drawn in its own layer above the cards
+                instead, see liftRoot below. The placed cards are HTML with a
+                z-index and this svg has none, so drawn here the dog card and its
+                Complete button end up buried under the collection. */}
+            {!soloLeaf && !liftRoot && treeRoot}
           </>
         ) : (
           <>
@@ -1596,16 +1985,34 @@ export default function LineageMap({
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
         if (!c || !text) return null;
-        // if zoom is open for same card, sit right of the zoomed image; otherwise right of the card
+        // Sits to the RIGHT of the card, or of the zoomed image if that is open.
+        // Cards near the right edge had nowhere to put it: the panel is fixed
+        // and 190 wide, and nothing checked whether that would land off screen,
+        // so the text was squeezed against the edge and clipped. If it will not
+        // fit to the right it now goes BELOW the card instead, and is clamped
+        // into the viewport either way.
         const zoomOpen = zoomedId === c.id;
         const zoomSize = CW * 3;
-        const left = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + 14 + pan.x;
-        const top = zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y : c.cardY - CW / 2 - 6 + pan.y;
+        const PANEL_W = 219, EDGE = 8, GAP = 14; // 190, up 15% by request
+        const vw = typeof window === "undefined" ? 1024 : window.innerWidth;
+        const vh = typeof window === "undefined" ? 768 : window.innerHeight;
+        const rightLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + GAP + pan.x;
+        const fitsRight = rightLeft + PANEL_W <= vw - EDGE;
+        const cardLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x : c.cardX - CW / 2 + pan.x;
+        const cardBottom = zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y + zoomSize : c.cardY + CW / 2 + pan.y;
+        const left = fitsRight
+          ? rightLeft
+          : Math.max(EDGE, Math.min(vw - EDGE - PANEL_W, cardLeft));
+        const topRaw = fitsRight
+          ? (zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y : c.cardY - CW / 2 - 6 + pan.y)
+          : cardBottom + GAP;
+        // and never start below the fold, whichever side it ended up on
+        const top = Math.max(EDGE, Math.min(topRaw, vh - 120));
         return (
           <div
             onMouseLeave={() => setInfoHover(null)}
             style={{
-              position: "fixed", left, top, maxWidth: 190, zIndex: 100, pointerEvents: "auto",
+              position: "fixed", left, top, maxWidth: PANEL_W, zIndex: 100, pointerEvents: "auto",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
@@ -1630,18 +2037,30 @@ export default function LineageMap({
               key={`stk-html-${sid}`}
               style={{
                 position: "fixed", left, top, width: CW, height: CW,
-                borderRadius: 15, overflow: "hidden",
+                borderRadius: circular ? "50%" : 15, overflow: "hidden",
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
                 pointerEvents: "none",
-                zIndex: 63 + i,
+                // BEHIND the primary card, which sits at 62, not on top of it.
+                //
+                // These were at 63 + i, so a stacked frame's duplicates covered
+                // the primary's percentage pill, its info badge and its
+                // magnifier. The pill was never missing: it was underneath.
+                // Raising the pill could not fix it either, because the card
+                // carries its own z-index and therefore its own stacking
+                // context, so a child can never climb out past 62.
+                //
+                // Behind also reads better: the primary stays whole and the
+                // duplicates fan out from under it, which is what a pile of
+                // cards actually looks like.
+                zIndex: 61 - i,
                 boxShadow: "0 3px 3px rgba(0,0,0,0.32)",
                 userSelect: "none",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={encodeURI(bust(f.img))} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              <div style={{ position: "absolute", inset: 0, borderRadius: 15, border: "3px solid rgba(255,255,255,0.3)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", inset: 0, borderRadius: circular ? "50%" : 15, border: "3px solid rgba(255,255,255,0.3)", pointerEvents: "none" }} />
             </div>
           );
         });
@@ -1657,16 +2076,22 @@ export default function LineageMap({
             draggable={false}
             style={{
               position: "fixed", left, top, width: CW, height: CW,
-              borderRadius: 15, overflow: "visible",
+              borderRadius: circular ? "50%" : 15, overflow: "visible",
               transform: `rotate(${cardDeg}deg)`,
               transformOrigin: "center",
               pointerEvents: "all",
               cursor: !PACK_BREEDS.has(c.name) ? "zoom-in" : "default",
               zIndex: 62,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              // circular: the yellow ring rides as a box-shadow spread rather than
+              // an outline, because box-shadow always follows border-radius
+              // white in the learn layer: yellow is the pit's colour and it read as
+              // pit furniture sitting on top of the learning view
+              boxShadow: circular
+                ? "0 0 0 3px #ffffff, 0 2px 8px rgba(0,0,0,0.25)"
+                : "0 2px 8px rgba(0,0,0,0.25)",
               userSelect: "none",
               touchAction: "none",
-              outline: "3px solid var(--yellow, #ffd23e)",
+              outline: circular ? "none" : "3px solid var(--yellow, #ffd23e)",
               outlineOffset: "-1px",
             }}
             onClick={(e) => { e.stopPropagation(); }}
@@ -1675,7 +2100,7 @@ export default function LineageMap({
             onPointerUp={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
             onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
-            <div style={{ width: "100%", height: "100%", borderRadius: 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
+            <div style={{ width: "100%", height: "100%", borderRadius: circular ? "50%" : 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={encodeURI(bust(c.img))}
@@ -1690,9 +2115,9 @@ export default function LineageMap({
               </div>
             )}
             {/* magnify icon bottom-left */}
-            {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
+            {!circular && isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (
               <button
-                style={{ position: "absolute", left: 4, bottom: 4, width: 28, height: 28, border: "none", borderRadius: 8, background: "rgba(10,58,87,0.75)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, zIndex: 65 }}
+                style={{ position: "absolute", left: 4, bottom: 4, width: 28, height: 28, border: "none", borderRadius: 8, background: "transparent", filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.85))", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); magnifyHold(c.id); }}
                 onPointerDown={(e) => e.stopPropagation()}
               >
@@ -1703,13 +2128,13 @@ export default function LineageMap({
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
               const ts = TAG_STYLE[c.status ?? "extinct"];
               return (
-                <div title={ts.label} style={{ position: "absolute", left: -4, top: -4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
+                <div title={ts.label} style={{ position: "absolute", left: circular ? RIM_IN - 6 : -4, top: circular ? RIM_IN - 6 : -4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
               );
             })()}
             {/* info icon top-right */}
             {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
-                style={{ position: "absolute", right: -14, top: -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                style={{ position: "absolute", right: circular ? RIM_IN - 14 : -14, top: circular ? RIM_IN - 14 : -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
@@ -1722,7 +2147,7 @@ export default function LineageMap({
                 <div
                   onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  style={{ position: "absolute", right: -2, bottom: -14, background: "rgba(10,58,87,0.85)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 65 }}
+                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: -2, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)" }}
                 >
                   {pillTxt}
                 </div>
@@ -1819,11 +2244,29 @@ export default function LineageMap({
           </div>
         );
       })()}
+      {/* THE LIFTED ROOT. A second svg over the top, same viewBox and same pan,
+          carrying only the dog card and the Complete button that lives inside
+          it. This is why: the placed cards are HTML with a z-index and the main
+          svg has none, so anything drawn there sits underneath them. Pushing the
+          cards down instead would have hidden the pictures the player just
+          placed, which is worse. pointer-events stays none on the layer itself,
+          so only the buttons inside it take a press. */}
+      {liftRoot && hasTree && !soloLeaf && (
+        <svg
+          className={`${styles.svg} ${styles.svgTop}`}
+          viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
+          width={vp.w}
+          height={vp.h}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {treeRoot}
+        </svg>
+      )}
     </div>
-    {boxPop && (
+    {boxPop && !circular && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
-    {showAuto && (
+    {showAuto && !circular && (
       <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />

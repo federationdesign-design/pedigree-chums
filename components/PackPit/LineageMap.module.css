@@ -20,6 +20,16 @@
   overflow: visible;
   pointer-events: none;
 }
+/* PACKED, mini pit only. The placed cards are HTML at z-index 62 and 63, and
+   this svg carries no z-index at all, so it paints underneath them: the big dog
+   card and the green Complete button ended up behind the grid they belong to.
+   Lifting the svg over the cards is only safe once they are packed, because
+   while they are still being dragged into frames they have to stay on top of
+   the frames they are being dropped into. */
+.svgTop {
+  /* above the placed cards, which sit at 62 and 63 */
+  z-index: 70;
+}
 .close {
   position: fixed;
   top: 33px;
@@ -42,6 +52,15 @@
 }
 .close:hover {
   filter: brightness(0.95);
+}
+@media (max-width: 768px) {
+}
+/* The back arrow: a play triangle facing left, so it reads as the way out
+   rather than a dismissal. */
+.backGlyph {
+  width: 42%;
+  height: 42%;
+  display: block;
 }
 
 .edge {
@@ -74,6 +93,15 @@
 }
 .node:hover .disc {
   stroke-width: 5;
+}
+/* Mini pit only. 3 was out of language beside a pit whose UI squares wear a 5px
+   navy rim and whose circles are heavier still, so the nodes read as thin. The
+   main pit keeps the original. */
+.discPit {
+  stroke-width: 5;
+}
+.node:hover .discPit {
+  stroke-width: 7;
 }
 .pct {
   font-family: var(--font-body), system-ui, sans-serif;
@@ -109,7 +137,9 @@
   stroke-linejoin: round;
 }
 .pickCardStack {
-  stroke: var(--yellow);
+  /* white in the learn layer, matching the ring on a zoomed card. Yellow is the
+     pit's colour and read as pit furniture laid over the learning view. */
+  stroke: #ffffff;
 }
 .pickCaption {
   fill: rgba(10, 58, 87, 0.88);
@@ -401,8 +431,12 @@
    (centred under the root). Appears 5s in while circles are still yellow. */
 .autoWrap {
   position: fixed;
-  right: calc(clamp(18px, 4vw, 48px) + 100px); /* just left of the shake button */
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* same axis as the shake button */
+  /* ON the shake button's spot, not beside it. Same right, same bottom, and the
+     button below carries the same 100.8 / 67.5 pair, so the two are
+     interchangeable rather than merely near each other. The shake button is not
+     reachable behind this overlay, so there is nothing to collide with. */
+  right: clamp(18px, 4vw, 48px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   z-index: 10000;
   cursor: pointer;
 }
@@ -425,12 +459,13 @@
 }
 .autoBtn {
   display: block;
-  width: 84px;
-  height: 84px;
+  /* the shake and slowmo figures, so all three read as one family */
+  width: 100.8px;
+  height: 100.8px;
   box-sizing: border-box;
-  padding: 10px;
+  padding: 12px;
   background: var(--yellow);
-  border-radius: 20px;
+  border-radius: 30.24px;
   object-fit: contain;
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
@@ -637,4 +672,65 @@
 .pauseBtnActive {
   background: var(--navy);
   color: var(--yellow);
+}
+
+/* Mini pit levels: a much stronger wash so the dotted frames read clearly
+   over the bright popup pit. Intuitive beats instructions. */
+.overlayStrong {
+  background: radial-gradient(120% 120% at 50% 40%, rgba(15, 110, 165, 0.62), rgba(8, 62, 100, 0.86));
+}
+/* The reference layer, the chum's own family tree, wears the same wash rotated
+   18 degrees round the wheel, which is 5% of it. Both stops carry the same
+   rotation so the gradient keeps its shape and only its hue moves: 202 to 220
+   degrees, and 205 to 223. Enough to tell at a glance which of the two layers
+   you are on, without reading as a different design.
+   The pit lift, where you actually complete a dog, keeps the original. */
+.overlayAlt {
+  background: radial-gradient(120% 120% at 50% 40%, rgba(15, 65, 165, 0.62), rgba(8, 34, 100, 0.86));
+}
+
+/* mini pit: overlay close matches the in-pit menu squares (navy, yellow stroke) */
+/* Matches the main pit's menu square exactly: BIG * 1.2 (84 * 0.67 * 1.2 on
+   mobile, 84 * 1.2 on desktop), radius 0.3 of the size, 5px border, yellow
+   with a navy icon. Do not deviate from the main pit here. */
+.closeCircular {
+  /* The pit draws its own squares 18px in from the top and right edges. This
+     inherits top 33 from .close, which at 67.5 tall put its centre 15px below
+     the pit's, which is exactly the offset that was visible. */
+  top: 18px;
+  right: 18px;
+  width: 100.8px;
+  height: 100.8px;
+  border-radius: 30.24px;
+  background: var(--yellow);
+  border: 5px solid var(--navy);
+  color: var(--navy);
+  font-size: 3.1rem;
+}
+.closeCircular:hover {
+  background: var(--yellow);
+  color: var(--navy);
+}
+@media (max-width: 768px) {
+  .closeCircular {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+    font-size: 2.1rem;
+  }
+}
+
+/* AT THE END OF THE FILE on purpose, and this is the third attempt at it.
+   The first put it near the top, the second put it just above .autoLabel, which
+   I assumed came after the base .autoBtn rule. It does not: the base sits below
+   both. Same specificity means the last one wins, so anywhere above the base
+   rule this is simply ignored and the button stays 100.8 on a phone. Here there
+   is nothing after it. */
+@media (max-width: 768px) {
+  .autoBtn {
+    width: 67.5px;
+    height: 67.5px;
+    border-radius: 20.25px;
+    padding: 9px;
+  }
 }

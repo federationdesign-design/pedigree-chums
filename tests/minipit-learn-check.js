@@ -1,0 +1,153 @@
+// GUARD-008: the start screen offers PLAY and LEARN, and LEARN is a separate
+// mode that never arms the pit.
+//   a) LEARN sits right and high, PLAY sits left and low
+//   b) hovering LEARN slides the pink wash partway in (desktop preview)
+//   c) choosing LEARN brings the wash fully in, opens the blue box, hides both
+//      words, and leaves the pit completely inert
+//   d) the wash blends in 'overlay', so dogs and chrome tint rather than vanish
+//   e) closing the blue box returns to the start screen with both words back
+// Run with dev server up: node tests/minipit-learn-check.js
+const { chromium } = require('playwright');
+
+const readScreen = () => {
+  const svg = document.querySelector('[role="dialog"] svg');
+  const out = { vw: window.innerWidth, vh: window.innerHeight };
+  if (svg) {
+    svg.querySelectorAll('text').forEach((t) => {
+      // the word reads PLAY now; matched by text because this guard checks
+      // where the words sit, not what they do
+      if (t.textContent !== 'PLAY' && t.textContent !== 'LEARN') return;
+      const r = t.getBoundingClientRect();
+      out[t.textContent] = { left: Math.round(r.left), right: Math.round(r.right), midY: Math.round(r.y + r.height / 2) };
+    });
+    const c1 = svg.querySelectorAll('circle')[1];
+    const m = c1 && (c1.getAttribute('transform') || '').match(/-?[\d.]+/g);
+    out.circleY = m ? Math.round(+m[1]) : null;
+    out.toys = Array.from(svg.querySelectorAll('image'))
+      .filter((i) => /tennis-ball|uk-icon/.test(i.getAttribute('href') || '')).length;
+  }
+  const wash = document.querySelector('[class*="learnWash"]');
+  out.wash = wash ? { peek: wash.className.includes('WashPeek'), on: wash.className.includes('WashOn'),
+                      blend: getComputedStyle(wash).mixBlendMode, hits: getComputedStyle(wash).pointerEvents } : null;
+  const aside = document.querySelector('[class*="asideDocked"]');
+  out.boxOpen = !!aside && getComputedStyle(aside).display !== 'none';
+  return out;
+};
+
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  const errs = [];
+  p.on('pageerror', (e) => errs.push(e.message.slice(0, 200)));
+  await p.goto('http://localhost:3000/britains-dog-history', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(6000);
+  await p.getByRole('button', { name: 'View Celtic Hound family tree' }).click();
+  await p.waitForTimeout(2800);
+
+  const s0 = await p.evaluate(readScreen);
+  // a) LEARN hugs the right, PLAY hugs the left and sits low. The vertical
+  // bounds were 0.45 and 0.55 of the screen; both words have since moved down
+  // deliberately, LEARN to 26% and PLAY to 91%, so the test now allows for that
+  // while still requiring LEARN above PLAY.
+  const placed = !!(s0.LEARN && s0.PLAY
+    && s0.LEARN.right >= s0.vw - 30 && s0.LEARN.midY < s0.vh * 0.45
+    && s0.PLAY.left <= 30 && s0.PLAY.midY > s0.vh * 0.55
+    && s0.LEARN.midY < s0.PLAY.midY);
+
+  // b) hover preview
+  await p.locator('[aria-label="Learn about these breeds"]').hover({ force: true });
+  await p.waitForTimeout(700);
+  const s1 = await p.evaluate(readScreen);
+  const peeked = !!(s1.wash && s1.wash.peek && !s1.wash.on);
+
+  // c) choose LEARN
+  await p.locator('[aria-label="Learn about these breeds"]').click({ force: true });
+  await p.waitForTimeout(1000);
+  const s2 = await p.evaluate(readScreen);
+  const entered = !!(s2.wash && s2.wash.on && s2.boxOpen && !s2.PLAY && !s2.LEARN);
+  const blendOk = !!(s2.wash && s2.wash.blend === 'overlay' && s2.wash.hits === 'none');
+
+  // g) mini pit only: the box leads with a round portrait of the dog whose tree
+  //    is open, and drops the "keep digging" prompt. The chum page keeps both
+  //    as they were, which is checked at the end.
+  const boxContent = await p.evaluate(() => {
+    const a = document.querySelector('[class*="asideDocked"]');
+    const img = a && a.querySelector('img[class*="cPortrait"]');
+    return {
+      hasPortrait: !!img,
+      round: img ? getComputedStyle(img).borderRadius : null,
+      alt: img ? img.alt : null,
+      digging: (a ? a.innerText : '').includes('keep digging'),
+    };
+  });
+  const boxOk = boxContent.hasPortrait && boxContent.round === '50%' && !boxContent.digging;
+  console.log('box content:', JSON.stringify(boxContent), '| ok:', boxOk);
+
+  // f) the blue box can be picked up and moved, like a chum-page card, and it
+  //    snaps back to its docked spot the next time it opens
+  const boxAt = () => p.evaluate(() => {
+    const a = document.querySelector('[class*="asideDocked"]');
+    if (!a) return null;
+    const r = a.getBoundingClientRect();
+    return { x: Math.round(r.left), y: Math.round(r.top) };
+  });
+  const bBefore = await boxAt();
+  if (bBefore) {
+    await p.mouse.move(bBefore.x + 60, bBefore.y + 16);
+    await p.mouse.down();
+    for (let i = 1; i <= 6; i++) { await p.mouse.move(bBefore.x + 60 + i * 12, bBefore.y + 16 + i * 15); await p.waitForTimeout(20); }
+    await p.mouse.up();
+    await p.waitForTimeout(300);
+  }
+  const bAfter = await boxAt();
+  const dragged = !!(bBefore && bAfter && Math.abs(bAfter.x - bBefore.x - 72) < 6 && Math.abs(bAfter.y - bBefore.y - 90) < 6);
+  console.log('box drag:', JSON.stringify({ from: bBefore, to: bAfter }), '| moved:', dragged);
+
+  // and the pit stays completely inert, well past every drop beat
+  await p.waitForTimeout(8000);
+  const s3 = await p.evaluate(readScreen);
+  const inert = s3.toys === 0 && s2.circleY !== null && Math.abs(s3.circleY - s2.circleY) < 3;
+
+  // e) closing the box no longer leaves LEARN. The corner X is the single exit
+  // everywhere now, so shutting the box drops you into learn-with-the-box-down,
+  // a state that did not previously exist, and the info square appears to bring
+  // the box back.
+  await p.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('[class*="asideDocked"] button'));
+    const x = btns.find((b2) => /close/i.test(b2.getAttribute('aria-label') || '') || /^[×✕x]$/i.test((b2.textContent || '').trim()));
+    if (x) x.click();
+  });
+  await p.waitForTimeout(900);
+  const s4 = await p.evaluate(readScreen);
+  // still in learn: the words are gone, the box is down, and the square is there
+  const squareBack = await p.evaluate(() => !!document.querySelector('[aria-label="Breed information"]'));
+  const returned = !s4.boxOpen && squareBack;
+
+  // reopening puts the box back where it belongs, not where it was dropped
+  await p.locator('[aria-label="Breed information"]').click({ force: true });
+  await p.waitForTimeout(1000);
+  const bHome = await boxAt();
+  const snapped = !!(bHome && bBefore && bHome.x === bBefore.x && bHome.y === bBefore.y);
+  console.log('reopened at:', JSON.stringify(bHome), '| snapped home:', snapped);
+
+  // the chum page must be untouched by any of this
+  await p.goto('http://localhost:3000/chums/boxer', { waitUntil: 'domcontentloaded' });
+  await p.waitForTimeout(8000);
+  const chum = await p.evaluate(() => ({
+    portraits: document.querySelectorAll('img[class*="cPortrait"]').length,
+    digging: document.body.innerText.includes('keep digging'),
+  }));
+  const chumUntouched = chum.portraits === 0 && chum.digging === true;
+  console.log('chum page:', JSON.stringify(chum), '| untouched:', chumUntouched);
+
+  console.log('placement:', JSON.stringify({ LEARN: s0.LEARN, PLAY: s0.PLAY, vw: s0.vw, vh: s0.vh }), '| ok:', placed);
+  console.log('hover peek:', peeked, '| entered learn:', entered, '| blend:', blendOk);
+  console.log('pit inert:', inert, JSON.stringify({ toys: s3.toys, circleY: s3.circleY }), '| returned:', returned);
+
+  const pass = !!(placed && peeked && entered && blendOk && inert && returned
+    && dragged && snapped && boxOk && chumUntouched && errs.length === 0);
+  if (errs.length) console.log('pageerrors:', errs.slice(0, 3));
+  console.log(pass ? 'PASS GUARD-008' : 'FAIL GUARD-008');
+  await b.close();
+  process.exit(pass ? 0 : 1);
+})();

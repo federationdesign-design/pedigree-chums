@@ -15,7 +15,7 @@ interface Props {
   onReopen: (id: string) => void;
 }
 
-const ICONS: Record<string, ReactElement> = {
+export const ICONS: Record<string, ReactElement> = {
 
   /* Temperament -- brain */
   infoBox: (

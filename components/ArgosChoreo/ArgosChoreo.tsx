@@ -12,7 +12,13 @@ import DogPoll, { PollOption } from "../DogPoll/DogPoll";
   naturally. No scroll hijacking anywhere -- the page always scrolls freely.
 */
 
-function useSceneProgress() {
+/* `lead` is how far down the viewport the scene's top must be before progress
+   starts, as a fraction of the screen. 0.66 suits scenes whose content fades
+   in from nothing, so the build is under way as they arrive. Pass 0 for
+   scenes whose first frame is already fully visible -- there is no blank
+   arrival to cover, and starting early just means the first transition
+   happens before the caption below the image has reached the screen. */
+function useSceneProgress(lead = 0.66) {
   const sceneRef = useRef<HTMLDivElement | null>(null);
   const [p, setP] = useState(0);
   useEffect(() => {
@@ -22,9 +28,17 @@ function useSceneProgress() {
       const el = sceneRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const travel = r.height - window.innerHeight;
+      const vh = window.innerHeight;
+      /* Progress used to be -r.top / travel, which stays at 0 for the whole
+         time the scene is travelling up the screen. Every element was
+         therefore invisible while reserving its full height -- a screen of
+         blank rectangle before anything began. Progress now starts the moment
+         the scene's top enters the lower third of the viewport, so the build
+         is already under way as the scene arrives. */
+      const LEAD = vh * lead;
+      const travel = r.height - vh + LEAD;
       if (travel <= 0) return setP(1);
-      setP(Math.min(1, Math.max(0, -r.top / travel)));
+      setP(Math.min(1, Math.max(0, (LEAD - r.top) / travel)));
     };
     const onScroll = () => {
       if (!raf) {
@@ -35,7 +49,7 @@ function useSceneProgress() {
     window.addEventListener("scroll", onScroll, { passive: true });
     update();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [lead]);
   return { sceneRef, p };
 }
 
@@ -109,13 +123,24 @@ export function QuotePollScene({
   footnote?: string;
 }) {
   const { sceneRef, p } = useSceneProgress();
-  const line = clamp01(p / 0.24);
-  const mark = p >= 0.25;
-  const text = clamp01((p - 0.3) / 0.28);
+  /* Quote-above-poll is a paired unit, so the reader should always have
+     something to read. The line used to take the first 24% of the scene on
+     its own, which was a screen and a half of empty page before any words
+     arrived. It now draws quickly and the quote follows straight behind it. */
+  const line = clamp01(p / 0.06);
+  const mark = p >= 0.04;
+  const text = clamp01((p - 0.04) / 0.26);
   // poll starts fading in the moment the yellow line finishes extending
   // (p=0.24), overlapping with the mark/text build rather than waiting
-  const pollCard = clamp01((p - 0.24) / 0.3);
-  const btns = clamp01((p - 0.6) / 0.15);
+  /* The card holds its full height from the first frame, so while it is
+     transparent the reader is looking at a screen of nothing. It now fades in
+     from the very start and lands ahead of the quote, so the poll is already
+     on screen as the quote comes into focus rather than arriving after it. */
+  const pollCard = clamp01(p / 0.22);
+  /* Same idea: the buttons used to land at p = 0.75 and the last quarter of
+     the scene was dead. They now fade in over twice the scroll, finishing at
+     0.9, which also holds the reader a little longer before the lock. */
+  const btns = clamp01((p - 0.30) / 0.55);
   /* Lock engages the moment the buttons are fully visible -- not later --
      so there is never a window where the reader is blocked before they can
      even see something to click. */
@@ -258,7 +283,10 @@ export function StatueBulletsChoreo({
   /* Auto-pan continuously with vertical scroll progress (first 55% of the
      scene) until the reader swipes manually, at which point native touch
      takes over completely and this effect stops writing to scrollLeft. */
-  const galleryP = clamp01(p / 0.55);
+  /* The pan used to finish at p = 0.55, leaving 45% of the scene as dead
+     scroll with nothing moving. Spreading it to 0.9 uses that tail instead.
+     The scene is unchanged, so the pan is slower, not faster. */
+  const galleryP = clamp01(p / 0.9);
   useEffect(() => {
     const track = trackRef.current;
     if (!track || swiped.current) return;
@@ -270,9 +298,15 @@ export function StatueBulletsChoreo({
   // quote build progress, starting almost immediately (p ~ 0) and
   // finishing well before the scene ends, so there is minimal dwell
   // before release into the next paragraph
-  const qLine = clamp01(p / 0.45);
-  const qMark = p >= 0.46;
-  const qText = clamp01((p - 0.5) / 0.35);
+  const qLine = clamp01(p / 0.14);
+  const qMark = p >= 0.12;
+  /* Ends at p = 0.97 rather than 0.85. The scene length is unchanged, so
+     nothing speeds up -- the build simply uses the tail of the scroll that
+     was previously dead dwell with the quote just sitting there. */
+  /* Was 0.5 to 0.97, which left the quote holder reserving its height while
+     invisible for the first half of the scene -- a blank rectangle under the
+     images. It now builds alongside the gallery pan instead of after it. */
+  const qText = clamp01((p - 0.12) / 0.78);
 
   return (
     <div ref={sceneRef} className={bullets ? styles.bulletScene : quote ? styles.bulletSceneNoBullets : styles.bulletSceneNoBullets}>
@@ -281,8 +315,22 @@ export function StatueBulletsChoreo({
           {slides.map((sl, i) => (
             <figure key={sl.src} className={styles.statueSlide}>
               <div className={styles.statueImgBox}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={sl.src} alt={sl.alt} loading="lazy" />
+                {/* A slide is a video purely by file extension, so callers keep
+                    passing the same {src, alt, caption} shape. Muted + playsInline
+                    are what make autoplay permitted on iOS. */}
+                {/\.(mp4|webm)$/i.test(sl.src) ? (
+                  <video
+                    src={sl.src}
+                    aria-label={sl.alt}
+                    autoPlay
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={sl.src} alt={sl.alt} loading="lazy" />
+                )}
                 <span className={styles.statueCount}>{i + 1} / {slides.length}</span>
               </div>
               <figcaption className={styles.statueCaption}>{sl.caption}</figcaption>
@@ -358,6 +406,175 @@ export function HomerCrossfade({
     </div>
   );
 }
+
+/* ── Wipe sequence ──
+   Frames stack and build as the reader scrolls. Frame 0 is the resting state and
+   is always fully drawn; every later frame is revealed by a clip-path inset that
+   retreats from the right edge leftwards, so it wipes in from the right rather
+   than fading. Captions are grouped: each entry names the frame index at which
+   it takes over, so text holds still while the artwork draws itself in. */
+export function WipeSequence({
+  images,
+  alt,
+  captions,
+  mode = "wipe",
+  frameRatio,
+  sceneVh,
+  hold = 0,
+  captionSize = "small",
+  captionMode = "swap",
+}: {
+  images: string[];
+  alt: string;
+  captions?: {
+    /* Reveal keyed to a frame index... */
+    fromFrame?: number;
+    /* ...or to raw scroll progress, 0 to 1, when you want more caption steps
+       than there are images. Takes precedence over fromFrame. */
+    fromProgress?: number;
+    title?: string;
+    titleTone?: "yellow" | "white";
+    text: React.ReactNode;
+    tone?: "yellow" | "white" | "navy";
+  }[];
+  /* "wipe" reveals each frame from the right edge; "fade" cross-dissolves. */
+  mode?: "wipe" | "fade";
+  /* e.g. "1115 / 1260" to crop the frames to a fixed shape. Omit to keep the
+     artwork's own proportions with no cropping at all. */
+  frameRatio?: string;
+  /* Scene height in vh. Defaults to 40vh of scroll per unit plus a screen for
+     the sticky stage, where a unit is one fade or one hold. */
+  sceneVh?: number;
+  /* Scroll spent holding each frame fully visible, measured in fade-lengths.
+     0 means each frame starts being replaced the instant it lands, which is
+     the old behaviour. 1 means every frame gets a still moment exactly as
+     long as the fade that brought it in. */
+  hold?: number;
+  /* "large" matches the statue gallery's bullet treatment: 1.3rem, weight 600,
+     centred. Use it when each slide gets one short line rather than a
+     paragraph of explanatory text. */
+  captionSize?: "small" | "large";
+  /* "swap" replaces the caption at each step. "stack" keeps every caption on
+     screen and adds the next one beneath it, so the lines build up. */
+  captionMode?: "swap" | "stack";
+}) {
+  /* No lead: frame 1 is opaque from the start, so nothing needs covering, and
+     transitions must not begin until the caption beneath the image is on
+     screen. */
+  const { sceneRef, p } = useSceneProgress(0);
+  const n = images.length;
+  const steps = Math.max(1, n - 1);
+  /* The scene is divided into units: one per fade, plus `hold` per frame.
+     Frame i fades in over the single unit that starts once every earlier fade
+     and every hold up to and including its own has been scrolled through. */
+  const units = n * hold + steps;
+  const revealFor = (i: number) => clamp01(p * units - (i * hold + (i - 1)));
+  let topFrame = 0;
+  for (let i = 1; i < n; i++) if (revealFor(i) > 0) topFrame = i;
+  const caps = captions ?? [];
+  const shown = (c: { fromFrame?: number; fromProgress?: number }) =>
+    c.fromProgress !== undefined ? p >= c.fromProgress : (c.fromFrame ?? 0) <= topFrame;
+  let capIdx = 0;
+  for (let i = 0; i < caps.length; i++) {
+    if (shown(caps[i])) capIdx = i;
+  }
+  const height = sceneVh ?? 100 + units * 40;
+  return (
+    <div
+      ref={sceneRef}
+      className={styles.wipeScene}
+      style={{ "--scene-vh": height } as React.CSSProperties}
+    >
+      <div className={styles.wipeStage}>
+        <div className={styles.wipeLayers} style={frameRatio ? { aspectRatio: frameRatio } : undefined}>
+          {images.map((src, i) => {
+            if (i === 0) {
+              /* eslint-disable-next-line @next/next/no-img-element */
+              return (
+                <img
+                  key={src}
+                  src={src}
+                  alt={alt}
+                  className={frameRatio ? styles.wipeBaseCrop : styles.wipeBase}
+                />
+              );
+            }
+            const reveal = revealFor(i);
+            return (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                key={src}
+                src={src}
+                alt=""
+                aria-hidden="true"
+                className={styles.wipeLayer}
+                style={
+                  mode === "fade"
+                    ? { opacity: reveal }
+                    : { clipPath: `inset(0 0 0 ${(1 - reveal) * 100}%)` }
+                }
+              />
+            );
+          })}
+        </div>
+        {/* key forces a remount so each new caption fades in */}
+        {caps.length > 0 && captionMode === "stack" && (
+          <div className={styles.wipeCaptionStack}>
+            {caps.map((c, i) =>
+              shown(c) ? (
+                /* keyed by index so lines already on screen stay mounted and
+                   only the newly revealed one plays its fade-in */
+                <p
+                  key={i}
+                  className={`${styles.wipeCaption} ${
+                    captionSize === "large" ? styles.wipeCaptionLarge : ""
+                  } ${
+                    c.tone === "yellow"
+                      ? styles.wipeCaptionYellow
+                      : c.tone === "navy"
+                        ? styles.wipeCaptionNavy
+                        : styles.wipeCaptionWhite
+                  }`}
+                >
+                  {c.text}
+                </p>
+              ) : null,
+            )}
+          </div>
+        )}
+        {caps.length > 0 && captionMode === "swap" && (
+          <p
+            key={capIdx}
+            className={`${styles.wipeCaption} ${
+              captionSize === "large" ? styles.wipeCaptionLarge : ""
+            } ${
+              caps[capIdx].tone === "yellow"
+                ? styles.wipeCaptionYellow
+                : caps[capIdx].tone === "navy"
+                  ? styles.wipeCaptionNavy
+                  : styles.wipeCaptionWhite
+            }`}
+          >
+            {caps[capIdx].title && (
+              <>
+                <strong
+                  className={
+                    caps[capIdx].titleTone === "white" ? styles.wipeTitleWhite : styles.wipeTitleYellow
+                  }
+                >
+                  {caps[capIdx].title}
+                </strong>
+                <br />
+              </>
+            )}
+            {caps[capIdx].text}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 /* ── Gated video ─────────────────────────────────────────────────────────
    Wraps the smell-of-home figure. On mobile the video pins at the top of

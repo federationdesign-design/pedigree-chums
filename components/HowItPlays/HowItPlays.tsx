@@ -53,12 +53,17 @@ export default function HowItPlays() {
       if (delta === 0) return;
       const max = el.scrollWidth - el.clientWidth;
       if (max <= 0) return;
+      // 1px tolerance: scrollWidth/clientWidth are fractional, so scrollLeft can
+      // top out a fraction short of `max` and never satisfy a strict `>= max`.
+      // Without the slack the rail keeps swallowing wheel events at the far end
+      // and the page never scrolls on down past the fully-extended row.
+      const EDGE = 1;
       if (delta > 0) {
-        if (el.scrollLeft >= max) return; // all cards passed -> page continues
+        if (el.scrollLeft >= max - EDGE) return; // all cards passed -> page continues
         e.preventDefault();
         el.scrollLeft = Math.min(el.scrollLeft + delta, max);
       } else {
-        if (el.scrollLeft <= 0) return; // back at the start -> page scrolls up
+        if (el.scrollLeft <= EDGE) return; // back at the start -> page scrolls up
         e.preventDefault();
         el.scrollLeft = Math.max(el.scrollLeft + delta, 0);
       }

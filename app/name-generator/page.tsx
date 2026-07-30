@@ -3052,10 +3052,14 @@ export default function NameGeneratorPage() {
           </div>
         </div>
       )}
+      {/* Only the shortlist bar pins to the bottom of the viewport. The footer
+          stays in normal document flow, as on every other page, so it no longer
+          floats over the content. The footer's z-index (95) is above this
+          wrapper's (90), so it covers the bar as it scrolls into view. */}
       <div style={{ position:"sticky", bottom:0, zIndex:90 }}>
         {!showKnockout && <ShortlistBar shortlist={shortlist} onRemove={removeFromShortlist} onClear={clearShortlist} onKnockout={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} landingIdx={landingIdx} />}
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 }

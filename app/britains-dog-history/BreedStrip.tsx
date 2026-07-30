@@ -19,6 +19,12 @@ function DogIcon() {
   );
 }
 
+// Lives: three to begin, a ceiling of six, one back for every three levels
+// completed without a loss in between.
+const LIVES_START = 3;
+const LIVES_MAX = 6;
+const LIVES_STREAK = 3;
+
 const ERA_LABELS: Record<string, string> = {
   "ancient-medieval": "Ancient to medieval",
   c1500: "Tudor times",
@@ -46,6 +52,40 @@ export default function BreedStrip({ era }: { era: string }) {
     lineage: LineageNode;
   };
   const [active, setActive] = useState<Active | null>(null);
+  // Bumped on a retry so the modal remounts even though the level name has not
+  // changed. Without it, Restart on the same level would leave the round exactly
+  // as it was lost.
+  const [runKey, setRunKey] = useState(0);
+  const [campaignScore, setCampaignScore] = useState(0); // carries across levels, resets on start over
+  // Lives run alongside the score and last for one run at the pit, not for ever:
+  // opening a level from the page starts you at three again. A retry spends one.
+  // Three levels completed in a row earns one back, up to a ceiling of six, and
+  // a loss breaks the streak, which is what "in a row" has to mean.
+  const [lives, setLives] = useState(LIVES_START);
+  const [streak, setStreak] = useState(0);
+
+  // The mini pits are levels: every popup-capable breed, in timeline order
+  // across all eras. Round Won advances to the next; Game Over restarts at
+  // the very first.
+  const STRIP_ORDER = ["ancient-medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
+  const buildActive = (b: UKBreed): Active | null => {
+    const pn = resolveLineageName(b.name);
+    const lin = getLineage(pn);
+    if (!lin) return null;
+    const pk = packBreeds.find((x) => x.name === pn);
+    return { name: b.name, image: pk?.image ?? b.image ?? "", character: pk?.character ?? b.note, fact: pk?.fact, lineage: lin };
+  };
+  const levelList = ukBreeds
+    .slice()
+    .sort((a, b) => (STRIP_ORDER.indexOf(a.strip) - STRIP_ORDER.indexOf(b.strip)) || (a.anchor - b.anchor))
+    .filter((b) => {
+      const pn = resolveLineageName(b.name);
+      return !packBreeds.find((x) => x.name === pn)?.slug && !!getLineage(pn);
+    });
+  const nextLevelOf = (name: string): UKBreed | null => {
+    const i = levelList.findIndex((b) => b.name === name);
+    return i >= 0 && i + 1 < levelList.length ? levelList[i + 1] : null;
+  };
 
   const breeds: UKBreed[] = ukBreeds
     .filter((b) => b.strip === era)
@@ -260,14 +300,18 @@ export default function BreedStrip({ era }: { era: string }) {
             const open = pack?.slug
               ? () => router.push(`/chums/${pack.slug}`)
               : lineage
-              ? () =>
+              ? () => {
+                  // opening a level from the page is a fresh run
+                  setLives(LIVES_START);
+                  setStreak(0);
                   setActive({
                     name: b.name,
                     image: pack?.image ?? b.image ?? "",
                     character: pack?.character ?? b.note,
                     fact: pack?.fact,
                     lineage,
-                  })
+                  });
+                }
               : undefined;
             return (
               <div key={b.name} data-node className={styles.node} role="listitem">
@@ -338,6 +382,53 @@ export default function BreedStrip({ era }: { era: string }) {
 
       {active && (
         <LineageModal
+          key={`${active.name}:${runKey}`}
+          era={era}
+          initialScore={campaignScore}
+          onScoreChange={setCampaignScore}
+          nextLevelLabel={nextLevelOf(active.name)?.name}
+          nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
+          lives={lives}
+          livesMax={LIVES_MAX}
+          onNextLevel={() => {
+            // a level completed: three in a row earns a life back
+            setStreak((st) => {
+              const next = st + 1;
+              if (next % LIVES_STREAK === 0) setLives((l) => Math.min(LIVES_MAX, l + 1));
+              return next;
+            });
+            const nb = nextLevelOf(active.name);
+            const na = nb ? buildActive(nb) : null;
+            if (na) setActive(na);
+          }}
+          onLost={() => setStreak(0)} // a loss breaks the run toward the next life
+          onSpendLife={() => {
+            // Leaving a live round to go and read costs a life, exactly like a
+            // retry does, and breaks the streak for the same reason.
+            setLives((l) => Math.max(0, l - 1));
+            setStreak(0);
+          }}
+          onResetRun={() => {
+            // PLAY AGAIN on a spent run: lives and the campaign total go back
+            // to the start, but the player keeps their place in the level.
+            setLives(LIVES_START);
+            setStreak(0);
+            setCampaignScore(0);
+          }}
+          onStartOver={() => {
+            // A retry costs a life and replays THIS level. It used to rebuild
+            // level one and wipe the campaign total, so failing level two threw
+            // away every level already cleared as well as the score. Losing your
+            // place is what running out of lives is for, and the modal only
+            // offers Restart while lives remain.
+            setLives((l) => Math.max(0, l - 1));
+            setStreak(0);
+            // The modal is keyed on the level name, so replaying the same one
+            // would not remount and the round would not reset. The run counter
+            // is what forces it.
+            setRunKey((k) => k + 1);
+          }}
+          levelNo={Math.max(0, levelList.findIndex((b) => b.name === active.name))}
           name={active.name}
           image={active.image}
           character={active.character}

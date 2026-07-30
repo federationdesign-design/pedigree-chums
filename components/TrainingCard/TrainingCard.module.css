@@ -22,6 +22,14 @@
   gap: 8px;
 }
 
+.labelPill.labelPillCompact {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-weight: 700;
+  font-size: 0.5rem;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 .labelPill {
   display: inline-block;
   border: 1.5px solid;
@@ -114,4 +122,8 @@
   color: #ffffff;
   line-height: 1.45;
   margin: 0;
+}
+.innerCompact {
+  padding: 0 5px 12px;
+  gap: 8px;
 }

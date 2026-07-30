@@ -31,7 +31,8 @@ export default function HomePage() {
           </h2>
           <p className={styles.cardsLead}>Each card includes:</p>
           <ul className={styles.cardsList}>
-            <li className={styles.cardsPoint}>Breed traits and temperament</li>
+            <li className={styles.cardsPoint}>Breed traits</li>
+            <li className={styles.cardsPoint}>Temperament examples</li>
             <li className={styles.cardsPoint}>Coat colours and markings</li>
             <li className={styles.cardsPoint}>Size and build</li>
             <li className={styles.cardsPoint}>Tell-tale identifiers</li>

@@ -114,18 +114,86 @@
 }
 
 /* ── Essay body ─────────────────────────────────────────────── */
+/* == Vertical rhythm =====================================================
+   Space belongs BETWEEN things, not ON them.
+
+   No element in the essay body carries a vertical margin of its own. The
+   parent places every gap via the `* + *` rules below, which means:
+     - gaps can never collapse against each other (the old divider bug)
+     - a bottom margin can never turn up uninvited, because none exist
+     - deleting or reordering a block cannot orphan a gap
+
+   Every value is a multiple of --gap-s, so changing that one number
+   rescales the whole essay in proportion. It is the only number to touch
+   if the page wants opening up or tightening. */
+.essayBody {
+  --gap-xs: 9px;   /* 0.5x -- a heading and its own first line */
+  --gap-s: 18px;   /* 1x   -- between paragraphs (the base unit) */
+  --gap-m: 27px;   /* 1.5x -- before a heading */
+  --gap-l: 36px;   /* 2x   -- around quotes, scenes and rules */
+  --gap-xl: 54px;  /* 3x   -- section breaks */
+}
+
+/* The class is doubled on purpose. `.essayBody p { margin: 0 }` scores one
+   class plus one element, which outranks a single class, so an undoubled
+   rhythm rule loses to it and every paragraph gap collapses to nothing.
+   Doubling scores two classes and wins, without resorting to !important. */
+.essayBody.essayBody > * + * { margin-top: var(--gap-s); }
+
+.essayBody.essayBody > * + h2,
+.essayBody.essayBody > * + h3,
+.essayBody.essayBody > * + .subhead { margin-top: var(--gap-m); }
+.essayBody.essayBody > h2 + *,
+.essayBody.essayBody > h3 + *,
+.essayBody.essayBody > .subhead + * { margin-top: var(--gap-xs); }
+
+.essayBody.essayBody > * + .pullquote,
+.essayBody.essayBody > .pullquote + *,
+.essayBody.essayBody > * + .rule,
+.essayBody.essayBody > .rule + *,
+.essayBody.essayBody > * + .sceneMobile,
+.essayBody.essayBody > .sceneMobile + *,
+.essayBody.essayBody > * + .desktopOnly,
+.essayBody.essayBody > .desktopOnly + *,
+.essayBody.essayBody > * + .videoGate,
+.essayBody.essayBody > .videoGate + * { margin-top: var(--gap-l); }
+
+/* the Spacer component's element -- it supplies its own height */
+.spacer { flex: none; }
+
+/* Seam opt-out: blocks that must butt against the one above. The rhythm
+   rules score three classes, so a seam rule needs to match that and come
+   later to win. Without this, .timelineScene.tightTop's deliberate -25px
+   was being replaced by the rhythm's gap and the join opened up. */
+.essayBody.essayBody > .tightTop { margin-top: -25px; }
+
+/* The rhythm rules above only reach DIRECT children of .essayBody, so a rule
+   nested inside a scene wrapper gets no gap at all. This gives the line its
+   spacing wherever it sits. Direct children still match the rules above,
+   which score higher, so nothing here overrides them. */
+.essayBody .rule { margin-top: var(--gap-l); }
+
+/* The rhythm rules above only reach DIRECT children of .essayBody, so a rule
+   nested inside a scene wrapper gets no gap at all. This gives the line its
+   spacing wherever it sits. Direct children still match the rules above,
+   which score higher, so nothing here overrides them. */
+.essayBody .rule { margin-top: var(--gap-l); }
+
+.essayBody.essayBody > .spacer,
+.essayBody.essayBody > .spacer + * { margin-top: 0; }
+
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1.3;
-  margin: 0 0 18px;
+  margin: 0;
 }
 
 /* First paragraph treatment */
 .essayBullets {
-  margin: 0 0 18px;
+  margin: 0;
   padding-left: 26px;
   list-style: disc; /* globals.css resets list-style: none -- restore markers */
 }
@@ -136,10 +204,12 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.55;
-  margin-bottom: 14px;
+  margin: 0;
   list-style: disc;
   padding-left: 4px;
 }
+
+.essayBullets li + li { margin-top: 14px; }
 
 .essayBullets li::marker {
   color: var(--yellow, #ffd23e);
@@ -181,12 +251,27 @@
   color: #ffffff;
   text-decoration: underline;
   text-underline-offset: 4px;
-  margin: 28px 0 14px;
+  margin: 0;
+}
+
+/* Full-width divider rule. A bare 1px line with no space of its own: the
+   rhythm rules above give it --gap-l on both sides, so it is even by
+   construction rather than by hand-tuning. */
+.rule {
+  height: 1px;
+  background: #ffffff;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .essayBody h3.h3Navy {
   color: var(--navy, #0a3a57);
   text-align: center;
+  font-weight: 700;
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .subhead {
@@ -195,7 +280,7 @@
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin: 48px 0 16px;
+  margin: 0;
   line-height: 0.9em;
 }
 
@@ -635,9 +720,10 @@
   font-weight: 500;
   font-style: italic;
   color: var(--navy, #0a3a57);
-  line-height: 1.35;
-  margin: 56px 0;
-  padding: 24px 0 24px 20px;
+  line-height: 1.1em;
+  margin: 0;
+  /* right padding shortens the measure so quotes do not run the full width */
+  padding: 24px 12% 24px 20px;
   border-left: 10px solid var(--yellow, #ffd23e);
   border-radius: 6px;
   max-width: 100%;
@@ -1047,11 +1133,6 @@
     margin-bottom: 18px;
   }
 
-  .noteDivider {
-    border-top: 1px solid rgba(255, 255, 255, 0.45);
-    margin-top: 16px;
-  }
-
   .essayBody .introPara {
     font-size: 1.35rem;
   }
@@ -1117,7 +1198,7 @@
 
   .sceneMobile {
     display: block;
-    margin: 30px 0;
+    margin: 0;
   }
 
   .desktopOnly {
@@ -1169,12 +1250,12 @@
 
   /* Carousel scene: full-bleed, component handles inner padding */
   .carouselScene {
-    margin: 30px -20px;
+    margin: 0 -20px;
   }
 
   /* Full-bleed inline image scene */
   .imageScene {
-    margin: 30px -20px;
+    margin: 0 -20px;
   }
 
   .imageScene img {
@@ -1184,7 +1265,7 @@
 
   /* Timeline scene: full-bleed navy panel */
   .timelineScene {
-    margin: 34px -20px;
+    margin: 0 -20px;
     padding: 26px 20px 20px;
     background: var(--navy, #0a3a57);
   }
@@ -1272,7 +1353,7 @@
 
   /* Parallax scene: image pins, card scrolls over it */
   .parallaxScene {
-    margin: 34px -20px;
+    margin: 0 -20px;
     position: relative;
   }
 

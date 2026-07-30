@@ -43,3 +43,11 @@ patch_*.py
 =
 public/chumdrrop-minigame.mov
 public/_to_delete/
+FETCH_HEAD
+*.patch
+.claude/settings.local.json
+agent/
+
+# Playwright
+/test-results/
+/playwright-report/

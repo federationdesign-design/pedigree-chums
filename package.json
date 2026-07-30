@@ -10,19 +10,22 @@
     "build:chumdata": "node scripts/build-chumdata.mjs",
     "test:pickachum": "tsx scripts/test-pickachum.mjs",
     "replay:pickachum": "tsx scripts/replay-pickachum.mjs",
-    "sim": "tsx scripts/sim-multi-turn.mjs"
+    "sim": "tsx scripts/sim-multi-turn.mjs",
+    "test:hidden-games": "node --import ./tests/hidden-games/register-ts.mjs --test tests/hidden-games/*.test.mjs"
   },
   "dependencies": {
     "d3-hierarchy": "^3.1.2",
     "d3-interpolate": "^3.0.1",
     "html2canvas-pro": "^2.3.0",
-    "matter-js": "^0.19.0",
+    "matter-js": "0.19.0",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "stripe": "^22.2.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4",
     "@types/d3-hierarchy": "^3.1.7",
     "@types/d3-interpolate": "^3.0.4",
@@ -31,10 +34,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
-    "playwright": "^1.61.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
-    "typescript": "^5",
-    "xlsx": "^0.18.5"
+    "typescript": "^5"
   }
 }

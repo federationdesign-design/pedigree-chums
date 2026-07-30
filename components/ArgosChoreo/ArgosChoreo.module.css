@@ -1,11 +1,13 @@
 /* All choreography is mobile-only; on desktop these render nothing special
    because the scenes themselves are gated behind .sceneMobile in the page. */
 
+/* No min-height. The content is top-aligned, so a full-screen box just left a
+   tall empty tail below the last element -- which is what the gap under the
+   gallery quotes was. Hugging the content removes it, and because the stage is
+   now shorter it also stays pinned for longer, which is the inertia we want. */
 .stage {
   position: sticky;
   top: 130px;
-  min-height: calc(100vh - 130px);
-  min-height: calc(100svh - 130px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -118,7 +120,8 @@
   overflow: hidden;
 }
 
-.statueImgBox img {
+.statueImgBox img,
+.statueImgBox video {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
@@ -258,4 +261,114 @@
   text-align: center;
   margin: 0;
   padding-top: 14px;
+}
+
+/* ── Wipe sequence ───────────────────────────────────────────
+   Scene height sets how long the whole build takes. With 8 frames there are 7
+   wipes, so 420vh minus the sticky stage leaves roughly 45vh of scroll per
+   wipe. Raise this number to slow the build down. */
+/* --scene-vh is set inline by the component, so each scene sizes itself to the
+   number of transitions it has. The two declarations keep the vh fallback. */
+.wipeScene {
+  height: calc(var(--scene-vh, 420) * 1vh);
+  height: calc(var(--scene-vh, 420) * 1svh);
+}
+
+.wipeStage {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+}
+
+/* The frame shape comes from the component: pass frameRatio to crop to a fixed
+   ratio, or omit it to keep the artwork's own proportions with no cropping. */
+.wipeLayers {
+  position: relative;
+  line-height: 0;
+  overflow: hidden;
+}
+
+/* No crop: the base image sets the height, so nothing is trimmed. */
+.wipeBase {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Cropped: the container's aspect-ratio governs, and cover trims evenly from
+   the top and bottom (or the sides, if the ratio is wider than the artwork). */
+.wipeBaseCrop {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.wipeLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: clip-path;
+}
+
+/* min-height reserves room for the longest caption so the block does not jump
+   in height as the text swaps between groups. */
+/* Scoped under .wipeStage on purpose. This caption is a <p> inside .essayBody,
+   and `.essayBody p` (class + element) outranks a bare `.wipeCaption` class, so
+   an unscoped rule here loses silently on font-size, margin and colour. Two
+   classes beat one class plus one element, so this wins. Same trap the essay
+   stylesheet already documents for .pinnedQuoteText. */
+.wipeStage .wipeCaption {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.175rem; /* .essayBody p is 1.05rem on mobile, so this is +2px */
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: center;
+  margin: 32px auto 0; /* clear gap between the image and the caption */
+  width: 75%;
+  padding: 0;
+  animation: wipeCaptionIn 260ms ease-out both;
+}
+
+/* Captions alternate yellow, white, yellow, white down the sequence. Both read
+   against the blue page gradient the essay body sits on. Scoped for the same
+   specificity reason as above. */
+.wipeStage .wipeCaptionYellow { color: var(--yellow, #ffd23e); font-weight: 700; }
+.wipeStage .wipeCaptionWhite { color: #ffffff; }
+.wipeStage .wipeCaptionNavy { color: var(--navy, #0a3a57); }
+
+/* Matches .choreoBullets on the statue gallery: one short line per slide,
+   set larger and centred rather than as a paragraph of explanation. */
+/* Stacked captions: the first keeps the gap under the image, the rest sit
+   tight beneath the line above, matching the statue gallery's bullet rhythm. */
+.wipeCaptionStack .wipeCaption {
+  margin-top: 0;
+  /* Smaller and wider than a swap caption: a stack has several blocks on
+     screen at once, so it has to earn its height. .wipeCaptionLarge is
+     declared after this and still wins where it is applied. */
+  font-size: 1rem;
+  line-height: 1.35;
+  width: 86%;
+}
+.wipeCaptionStack .wipeCaption:first-child { margin-top: 28px; }
+.wipeCaptionStack .wipeCaption + .wipeCaption { margin-top: 14px; }
+
+.wipeStage .wipeCaptionLarge {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.3em;
+  width: 88%;
+}
+
+/* Title colour is set per caption, independent of the body colour. <strong> is
+   already bold, so yellow titles satisfy "yellow is always bold". */
+.wipeStage .wipeTitleYellow { color: var(--yellow, #ffd23e); }
+.wipeStage .wipeTitleWhite { color: #ffffff; }
+
+@keyframes wipeCaptionIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
 }
