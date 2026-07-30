@@ -723,7 +723,8 @@
   font-size: calc(2rem - 4pt);
   line-height: 1.1em;
   /* 20px clear of the row of links above. */
-  margin: 20px 0 0;
+  /* Tighter under the text. */
+  margin: 20px 0 -6px;
 }
 
 /* White type on the blue, not blue type on the yellow. White alone would not
@@ -731,14 +732,15 @@
    behind them. */
 .dogHint {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.05rem;
+  /* Bigger button, bigger label. */
+  font-size: 1.5rem;
   letter-spacing: 0.03em;
   line-height: 0.9em;
   color: #ffffff;
   background: #22c55e;
   border-radius: var(--radius-pill, 999px);
   /* 10% more top and bottom, 12 to 13.2. */
-  padding: 13.2px 18px;
+  padding: 18px 26px;
 }
 
 /* The smaller line under the button. */

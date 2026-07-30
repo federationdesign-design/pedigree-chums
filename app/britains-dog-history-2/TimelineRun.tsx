@@ -211,6 +211,9 @@ export default function TimelineRun({
                       )}
                     </span>
                     <span className={styles.dogBack}>
+                      <span className={styles.dogHint}>
+                        Tap to learn about this dog
+                      </span>
                       <span className={styles.dogNote}>{b.note}</span>
                       {/* Top left: back to the picture. */}
                       <span
@@ -244,9 +247,6 @@ export default function TimelineRun({
                             i
                           </span>
                         ))}
-                      </span>
-                      <span className={styles.dogHint}>
-                        Tap to learn about this dog
                       </span>
                       <span className={styles.dogSub}>
                         There dogs you know today came from this lineage route,
