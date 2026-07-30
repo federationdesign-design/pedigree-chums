@@ -98,6 +98,12 @@ export default function TimelineRun({
             </span>
           ))}
           <p className={styles.eraNote}>{note}</p>
+          {/* The head of the timeline sits on THIS screen, under the text, as
+              in the concept. Its line reaches the foot of the screen and the
+              rail below continues from exactly that edge. */}
+          <span className={styles.railStart} aria-hidden="true">
+            <span className={styles.railDot} />
+          </span>
         </div>
 
         {/* Everything from here down carries the timeline. The rail is a child
@@ -105,7 +111,6 @@ export default function TimelineRun({
             the dogs and starts where the title screen ends: the wrapper's own
             height is the line's length, with no measuring involved. */}
         <div className={styles.railWrap}>
-          <span className={styles.railDot} aria-hidden="true" />
           <span className={styles.rail} aria-hidden="true" />
         {breeds.map((b) => {
           const isFlipped = flipped === b.name;
@@ -179,6 +184,43 @@ export default function TimelineRun({
                 </span>
               </div>
               <span className={styles.dogName}>{b.name}</span>
+
+              {/* The same words that are on the back of the card. */}
+              <p className={styles.dogNoteUnder}>{b.note}</p>
+
+              <div className={styles.dogActions}>
+                {/* Turns the card over. Nothing else. */}
+                <span
+                  className={styles.actionInfo}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`About ${b.name}`}
+                  onClick={() => setFlipped(isFlipped ? null : b.name)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setFlipped(isFlipped ? null : b.name);
+                    }
+                  }}
+                >
+                  i
+                </span>
+                {/* Opens the level. NOT WIRED YET: LineageModal and the lives,
+                    streak and campaign score it needs still live inside
+                    BreedStrip. That is the next stage. */}
+                <button
+                  type="button"
+                  className={styles.actionTree}
+                  aria-label={`Open the ${b.name} family tree`}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="5" r="2.4" />
+                    <circle cx="6" cy="18" r="2.4" />
+                    <circle cx="18" cy="18" r="2.4" />
+                    <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
+                  </svg>
+                </button>
+              </div>
             </div>
           );
         })}

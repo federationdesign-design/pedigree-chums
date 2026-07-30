@@ -474,7 +474,10 @@
   /* Extra room on the left for the rail, which the cards must not sit on.
      Written into the shorthand rather than as a longhand above it: a
      `padding-left` there would be silently wiped by this line. */
-  padding: 24px 24px 24px 60px;
+  /* Side padding cut to 12px so a 95vw card actually fits: at 24px each side
+     the content box tops out near 90vw. The 60px left inset is gone with the
+     left-hand rail, which is now centred. */
+  padding: 24px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -485,6 +488,7 @@
 /* The title screen is a notch too, so the reader stops on it rather than
    flying straight into the first dog. */
 .eraScreen {
+  position: relative;
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -524,9 +528,28 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 32px;
-  width: 4px;
-  background: rgba(255, 255, 255, 0.32);
+  left: 50%;
+  transform: translateX(-50%);
+  /* MEASURED FROM THE CONCEPT at a device pixel ratio of 2: 14 device pixels
+     wide, so 7 CSS px, solid white, and centred rather than left-hand. */
+  width: 7px;
+  background: #ffffff;
+  border-radius: var(--radius-pill, 999px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* The line's first stretch, on the title screen. Runs from under the text to
+   the foot of that screen, where the rail above picks it up, so the two read
+   as one line. 22vh puts the marker's centre 76% down, as in the concept. */
+.railStart {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 22vh;
+  background: #ffffff;
   border-radius: var(--radius-pill, 999px);
   pointer-events: none;
 }
@@ -538,16 +561,18 @@
    and reads as a gap rather than an outline. */
 .railDot {
   position: absolute;
-  top: 0;
-  left: 32px;
-  width: 16px;
-  height: 16px;
-  margin-left: -6px;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  /* MEASURED: a 37px yellow disc inside a 5px white ring, 47px overall. Much
+     bigger than the desktop page's 16px dot, and ringed white not #008eff.
+     Sits on top of the line, so the line starts at the marker's foot. */
+  width: 47px;
+  height: 47px;
   border-radius: 50%;
   background: var(--yellow, #ffd23e);
-  border: 4px solid #ffffff;
+  border: 5px solid #ffffff;
   box-sizing: border-box;
-  z-index: 1;
   pointer-events: none;
 }
 
@@ -556,7 +581,10 @@
    clamp, which tops out at 260px. */
 .dogCard {
   position: relative;
-  width: min(78vw, 340px);
+  /* Over the rail, which runs down the middle of the screen. */
+  z-index: 1;
+  /* 95vw, up from 78. Cap raised in proportion, 340 x 95/78. */
+  width: min(95vw, 414px);
   aspect-ratio: 1 / 1;
 }
 
@@ -702,10 +730,72 @@
 
 .dogName {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.8rem, 8vw, 2.6rem);
+  /* Doubled: was clamp(1.8rem, 8vw, 2.6rem). */
+  font-size: clamp(3.6rem, 16vw, 5.2rem);
   color: #ffffff;
   letter-spacing: 0.03em;
   line-height: 1;
   text-align: center;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* The note repeated under the name, the same words as the back of the card. */
+.dogNoteUnder {
+  margin: 0;
+  max-width: 34ch;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dogActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+/* One size and shape for both, so they read as a pair. */
+.actionInfo,
+.actionTree {
+  appearance: none;
+  padding: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Copied from .relCardInfo in BreedTree.module.css: blue fill, white ring,
+   italic Georgia. Scaled from 28px to sit level with the tree button. */
+.actionInfo {
+  background: var(--blue-deep, #0c5b92);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+}
+
+/* The family tree glyph, from .lineageBadge on the desktop page. */
+.actionTree {
+  background: var(--yellow, #ffd23e);
+  border: 3px solid #ffffff;
+  color: var(--navy, #0a3a57);
+}
+
+.actionTree svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
 }
