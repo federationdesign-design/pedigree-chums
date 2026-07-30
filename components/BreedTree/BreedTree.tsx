@@ -1705,7 +1705,19 @@ export default function BreedTree({
     const st = stageRef.current;
     if (!st) { onPitFull?.(); return; }
     const el = document.createElement("div");
-    el.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+    // MOBILE: top right, out of the middle of the pit, so the digits do not sit
+    // over the thing you are trying to play. Desktop keeps the centre, where
+    // there is room for them.
+    //
+    // The top-right corner already holds the back square and the brain, 67.5
+    // each with 18 of margin, so the digits are dropped below both rather than
+    // laid over them. That is why the top inset is 180 and not 18.
+    const cdMobile = isMobileRef.current;
+    el.style.cssText =
+      "position:absolute;inset:0;z-index:200;display:flex;font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6);" +
+      (cdMobile
+        ? "align-items:flex-start;justify-content:flex-end;padding:180px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
+        : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
     const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
     let i = 0;
