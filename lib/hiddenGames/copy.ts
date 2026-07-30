@@ -29,6 +29,11 @@ export const COMPLETION_HEADING = "You found every hidden game!";
 export const COMPLETION_BODY =
   "You completed the first Pedigree Chums Hidden Games challenge.";
 
+// CHANGE-LIST C03 prelude card, owner-approved verbatim. Line 1 renders in
+// Unica One, line 2 in Luckiest Guy (the display font).
+export const PRELUDE_WARNING = "Warning:";
+export const PRELUDE_HEADING = "THIS WEBSITE MAY CONTAIN GAMES";
+
 // CHANGE-LIST C02 discovery toast, owner-approved verbatim. {remaining} is
 // resolved from the registry (total - count), never written into the copy as a
 // literal, so it stays correct as games are added.

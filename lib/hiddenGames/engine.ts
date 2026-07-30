@@ -69,12 +69,15 @@ export interface CounterState {
   completed: boolean;
   // Whether the visitor has seen the one-time completion celebration (D11).
   completionSeen: boolean;
+  // Whether the visitor has seen the first-visit prelude card (C03).
+  preludeSeen: boolean;
 }
 
 export interface HiddenGamesEngine {
   reportHiddenGame: (id: string) => EngineOutcome;
   markIntroSeen: () => void;
   markCompletionSeen: () => void;
+  markPreludeSeen: () => void;
   getState: () => CounterState;
   subscribe: (listener: () => void) => () => void;
   // A non-final award (CHANGE-LIST C02): the listener receives the remaining
@@ -122,6 +125,7 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       introSeen: record.intro_seen,
       completed: total > 0 && count === total,
       completionSeen: record.completion_seen,
+      preludeSeen: record.prelude_seen,
     };
   }
 
@@ -207,10 +211,21 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     emit();
   }
 
+  // Mark the first-visit prelude as seen and persist it (C03), so a return visit
+  // skips the cards and shows the counter immediately. Same best-effort write.
+  function markPreludeSeen(): void {
+    if (record.prelude_seen) return;
+    record = { ...record, prelude_seen: true };
+    safeSet(serializeRecord(record));
+    snapshot = toState(record);
+    emit();
+  }
+
   return {
     reportHiddenGame,
     markIntroSeen,
     markCompletionSeen,
+    markPreludeSeen,
     getState: () => snapshot,
     subscribe: (listener: () => void) => {
       listeners.add(listener);

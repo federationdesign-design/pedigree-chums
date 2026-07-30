@@ -6,6 +6,28 @@ import { test, expect, type Page } from "@playwright/test";
 
 const pit = (page: Page) => page.locator("canvas").first();
 
+// Seed a return visit so the counter is immediate (this tests completion, not
+// the C03 timed reveal).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((key) => {
+    if (localStorage.getItem(key as string)) return; // keep progress across reload/nav
+    localStorage.setItem(
+      key as string,
+      JSON.stringify({
+        record_schema: 3,
+        campaign_version: "HIDDEN_GAMES_2026_01",
+        total_at_last_seen: 2,
+        completed_game_ids: [],
+        count: 0,
+        updated_at: new Date().toISOString(),
+        intro_seen: true,
+        completion_seen: false,
+        prelude_seen: true,
+      })
+    );
+  }, "pedigree_hidden_games:HIDDEN_GAMES_2026_01");
+});
+
 test("J03 complete both finds: achievement copy, no prize/code/entry wording", async ({ page }) => {
   // G01: touch the Main Pit on the home route.
   await page.goto("/");

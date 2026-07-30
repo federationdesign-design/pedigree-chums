@@ -11,7 +11,7 @@ import { getHiddenGamesEngine } from "../../lib/hiddenGames/browserEngine";
 import { discoveryToast } from "../../lib/hiddenGames/copy";
 import styles from "./HiddenGamesToast.module.css";
 
-const TOAST_MS = 4500; // auto-dismiss; no dismiss control
+const TOAST_MS = 7000; // auto-dismiss; no dismiss control (C03: 4.5s -> 7s)
 
 export default function HiddenGamesToast() {
   const [toast, setToast] = useState<{ remaining: number; key: number } | null>(

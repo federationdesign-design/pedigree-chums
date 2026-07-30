@@ -259,6 +259,16 @@ const COOKIE_CONSENT_KEY = "pc-cookie-consent";
 function cookieConsentGiven(): boolean {
   try { return !!localStorage.getItem(COOKIE_CONSENT_KEY); } catch { return false; }
 }
+// The bone, brought over from the main pit. Its artboard is 205 x 100, and the
+// body it needs is a COMPOUND one: two end lobes and a shaft. A single capsule
+// the size of the bounding box leaves air above and below the shaft, which is
+// exactly the fault the stick's own three-part body was built to avoid.
+const TOY_BONE_SRC = "/big-bone.svg";
+const BONE_ASPECT = 205 / 100;
+const TOY_BONE_GONE_KEY = "pc-minipit-bone-gone";
+// Dropped after the rock and before the chums, so it lands on a floor that has
+// something on it rather than into an empty pit.
+const TOY_BONE_GAP = 900;
 const STICK_ASPECT = 1368 / 299.7;
 const ROCK_ASPECT = 756.3 / 659.2;
 // Used-up toys stay gone for the rest of the session: the flag once its message
@@ -318,11 +328,12 @@ const CHUM_VW = 0.1;
 const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 3, giant: 5 / 3 };
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies";
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone";
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
   cookies: TOY_COOKIES_SRC,
+  bone: TOY_BONE_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
@@ -330,6 +341,7 @@ const TOY_GONE_KEY: Record<ToyKind, string> = {
   stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
   cookies: TOY_COOKIES_SEEN_KEY,
+  bone: TOY_BONE_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -1680,6 +1692,12 @@ export default function BreedTree({
   const [fullAlpha, setFullAlpha] = useState(0);
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
+  // Set when the countdown was started by a CHUM REACHING THE FLOOR rather than
+  // by the pit filling. The two need different endings: a full pit can be
+  // emptied, so that countdown is called off, but a chum has already landed and
+  // no amount of tidying undoes it. Without this flag the occupancy check would
+  // see room in the pit a frame later and cancel a countdown that should stand.
+  const floorTriggeredRef = useRef(false);
   // The pit-full countdown, ported from the main pit: huge sequential digits
   // 10 to 0 over the stage, a pause on 0, then GAME OVER hands to the shell.
   // The handles have to leave this function to be cancellable at all. Before,
@@ -1693,7 +1711,22 @@ export default function BreedTree({
     const st = stageRef.current;
     if (!st) { onPitFull?.(); return; }
     const el = document.createElement("div");
-    el.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+    // MOBILE: top right, out of the middle of the pit, so the digits do not sit
+    // over the thing you are trying to play. Desktop keeps the centre, where
+    // there is room for them.
+    //
+    // The top-right corner already holds the back square and the brain, 67.5
+    // each with 18 of margin, so the digits are dropped below both rather than
+    // laid over them. That is why the top inset is 180 and not 18.
+    const cdMobile = isMobileRef.current;
+    el.style.cssText =
+      "position:absolute;inset:0;z-index:200;display:flex;font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6);" +
+      (cdMobile
+        // The top-right CORNER, over the close square, as asked. It was 180px
+        // down because I placed it below the pit's own squares from their
+        // measurements rather than from what is actually on screen.
+        ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
+        : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
     const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
     let i = 0;
@@ -1713,10 +1746,27 @@ export default function BreedTree({
         // moment later, and saying it twice made the first one look like a bug.
         // Sized and shadowed to match .endFlash on that screen, so the two read
         // as one beat rather than two different treatments.
+        // MATCHED TO THE GAME OVER TEXT, figure for figure, from .endFlash plus
+        // its inline size override: centred, clamp(6.8rem, 24vw, 16rem), a 0.6
+        // shadow and a line-height of 1. No rotation, which I had wrong before.
+        //
+        // The container is re-centred here too. On mobile the digits sit in the
+        // top-right corner, and this word must not: it is the same beat as the
+        // shell's own screen and belongs in the same place on it.
         el.textContent = "Oh no...";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
+        el.style.padding = "0";
+        el.style.textAlign = "center";
         el.style.fontSize = "clamp(6.8rem, 24vw, 16rem)";
-        el.style.textShadow = "0 4px 40px rgba(0,0,0,0.55)";
-        el.style.lineHeight = "0.82";
+        el.style.textShadow = "0 4px 40px rgba(0,0,0,0.6)";
+        el.style.lineHeight = "1";
+        // The game over screen's own wash at HALF strength, so the two read as
+        // one build rather than two screens: this one comes up at 50%, then the
+        // shell's fades in over it to full. Its alphas are 0.62 and 0.86 there.
+        el.style.background =
+          "radial-gradient(120% 120% at 50% 40%, rgba(15,65,165,0.31), rgba(8,34,100,0.43))";
+        el.style.transition = "background 0.35s ease";
         window.setTimeout(() => { el.remove(); cdElRef.current = null; onPitFull?.(); }, 1400);
       }, 1200);
     }, 1000);
@@ -1737,7 +1787,25 @@ export default function BreedTree({
   // world coordinates stays locked to its circle through pan and zoom.
   const fxCanvasRef = useRef<HTMLCanvasElement>(null);
   // Runs before the toy timers, which do not start until a circle lands.
-  useEffect(() => { resetToysIfAsked(); }, []);
+  useEffect(() => {
+    resetToysIfAsked();
+    // TOY RETIREMENT IS PER ROUND, not per tab.
+    //
+    // It used to live in sessionStorage for the life of the tab, so once you had
+    // thrown the ball clear or read the flag's message they were gone until you
+    // opened a new tab or remembered ?toys=reset. That is defensible for a
+    // player and miserable for anyone testing: every reload of a working tab
+    // came up short of half its props, which read as the toys being broken.
+    //
+    // This component remounts for every level and every retry, so clearing here
+    // means a fresh round always brings a full set, while a single round still
+    // spends them: throw the ball out and it stays out until the round ends.
+    //
+    // The cookie panel is NOT cleared here on purpose. It is gated on consent,
+    // which is localStorage and permanent, because answering it once is meant to
+    // count for good. To see that one again you have to clear site data.
+    try { for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k); } catch { /* private mode */ }
+  }, []);
   // Consent arrives as an event whichever way it was given, so the pit clears
   // its cookie objects from one place rather than from each button.
   useEffect(() => {
@@ -2912,8 +2980,12 @@ export default function BreedTree({
           : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2
+          // the bone reads at the stick's width: both are elongated props, and
+          // its 2.05 aspect makes it twice the stick's depth, so it lands as a
+          // substantial object rather than a twig
+          : kind === "bone" ? ballDia * 1.6
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : dia;
+        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
         const px = kind === "flag"
@@ -2936,6 +3008,8 @@ export default function BreedTree({
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
           : kind === "cookies" ? { restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.004 } // the main pit's own panel figures
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
+          // the main pit's own bone figures, PackPit line 405
+          : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
@@ -2971,6 +3045,23 @@ export default function BreedTree({
                 MBody.setAngle(body, startAngle);
                 return body;
               })()
+            : kind === "bone"
+              ? (() => {
+                  // Two end lobes and a shaft, the main pit's construction
+                  // scaled to this pit's pixels. Its artboard is 205 x 100 with
+                  // the lobes centred at x 25 and 180, radius 38, and a shaft
+                  // 130 x 28 through the middle: PackPit lines 406 to 412.
+                  const k4 = dia / 205;
+                  const lobe = 38 * k4;
+                  const parts = [
+                    Bodies.circle(px + (25 - 102.5) * k4, py, lobe, opts),
+                    Bodies.circle(px + (180 - 102.5) * k4, py, lobe, opts),
+                    Bodies.rectangle(px, py, 130 * k4, 28 * k4, { ...opts, chamfer: { radius: 14 * k4 } }),
+                  ];
+                  const body = MBody.create({ parts, ...opts });
+                  MBody.setAngle(body, (Math.random() - 0.5) * 0.6);
+                  return body;
+                })()
             : kind === "rock"
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : kind === "cookies"
@@ -3046,7 +3137,9 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
         toyTimers.push(window.setTimeout(() => spawnToy("stickBig"), propsAt));
         toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt + TOY_ROCK_GAP));
-        toyTimers.push(window.setTimeout(spawnChums, propsAt + TOY_ROCK_GAP + CHUM_GAP));
+        const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
+        toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
+        toyTimers.push(window.setTimeout(spawnChums, boneAt + CHUM_GAP));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
@@ -3459,6 +3552,26 @@ export default function BreedTree({
           // the first thing to reach the floor is always a dog circle, because
           // nothing else is in the pit yet: that is the beat the toys run from
           if (pa.kind === "floor" || pb2.kind === "floor") armToys();
+          // A CHUM ON THE FLOOR STARTS THE COUNTDOWN.
+          //
+          // The chums arrive late, after the dogs, the chips and every prop, so
+          // by the time one reaches the floor the pit has genuinely run out of
+          // things to land on. No dwell time and no counting: the first one is
+          // the signal, which is what was asked for.
+          //
+          // The floor bodies were already tagged kind "floor" and the chums
+          // kind "chum", and this listener already existed, so this is the whole
+          // change rather than the start of one.
+          if (!fullTriggeredRef.current) {
+            const chumHitFloor =
+              (pa.kind === "chum" && pb2.kind === "floor") ||
+              (pb2.kind === "chum" && pa.kind === "floor");
+            if (chumHitFloor) {
+              fullTriggeredRef.current = true;
+              floorTriggeredRef.current = true;
+              runCountdown();
+            }
+          }
           const nrm = pair.collision.normal;
           const rv = Math.abs((B.velocity.x - A.velocity.x) * nrm.x + (B.velocity.y - A.velocity.y) * nrm.y);
           let flashed = false;
@@ -3542,6 +3655,32 @@ export default function BreedTree({
           Engine.update(engine, STEP);
           acc -= STEP;
           stepped++;
+        }
+        // ESCAPE NET. Anything that ends up below the floor is put back.
+        //
+        // Objects have been seen passing through the floor and continuing down,
+        // usually while moving fast. It should not be possible: the floor slabs
+        // are 600 thick, the opening shoves are about 3px per step, and the blast
+        // is capped at 16, so a body would need to travel 600px in one step to
+        // tunnel. The only bodies that pass through anything are the clinging
+        // circles, and they are static while they are sensors, so they cannot
+        // fall. I could not find the cause by reading.
+        //
+        // So rather than keep hunting a rare path, the failure is made
+        // recoverable. Below the floor's midline means it has escaped, whatever
+        // the reason, and it is returned to the top of the pit with its motion
+        // cleared. A player sees an object come back rather than vanish, which is
+        // the difference between a quirk and a lost round.
+        {
+          const escapeY = pL.y + T * 0.5;
+          for (const mb of Composite.allBodies(world) as { isStatic?: boolean; position: { x: number; y: number } }[]) {
+            if (mb.isStatic) continue;
+            if (mb.position.y <= escapeY) continue;
+            const backX = pL.x + 30 + Math.random() * Math.max(1, wPx - 60);
+            MBody.setPosition(mb as never, { x: backX, y: pTop.y - 40 });
+            MBody.setVelocity(mb as never, { x: 0, y: 0 });
+            MBody.setAngularVelocity(mb as never, 0);
+          }
         }
         // Clinging circles ride their word exactly: position and angle taken
         // straight off it, rotated into place. Nothing here is negotiated with
@@ -3732,7 +3871,7 @@ export default function BreedTree({
           if (full && !fullTriggeredRef.current) {
             fullTriggeredRef.current = true;
             runCountdown();
-          } else if (!full && fullTriggeredRef.current) {
+          } else if (!full && fullTriggeredRef.current && !floorTriggeredRef.current) {
             // ROOM AGAIN, so the countdown is called off mid-count, exactly as
             // the main pit does it: collect the dogs or throw the toys out and
             // the digits go away.
@@ -3745,6 +3884,10 @@ export default function BreedTree({
             if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
             setFullAlpha(0);
             fullTriggeredRef.current = false;
+            // Paired with the flag above: this branch only runs for a pit-full
+            // countdown, but clearing both keeps the two in step if the cancel
+            // ever gets another caller.
+            floorTriggeredRef.current = false;
             // The same 2.5s grace the main pit allows, so clearing one object
             // cannot leave the digits flickering on and off at the threshold.
             cdGraceRef.current = now + 2500;
@@ -5091,7 +5234,7 @@ export default function BreedTree({
                     // behind the glyph so the letterforms stay clean.
                     fill: "#ffffff",
                     stroke: "#000000",
-                    strokeWidth: `${7 * upp}px`, // 4, up three points by request
+                    strokeWidth: `${9 * upp}px`, // 4, then 7, now 9: two rounds of +3 and +2
                     paintOrder: "stroke",
                     strokeLinejoin: "round",
                     fontFamily: "var(--font-display), system-ui, sans-serif",
@@ -5133,7 +5276,7 @@ export default function BreedTree({
                 style={{
                   fill: "#000000",
                   stroke: "#ffffff",
-                  strokeWidth: `${7 * upp}px`, // 4, up three points by request
+                  strokeWidth: `${9 * upp}px`, // 4, then 7, now 9: two rounds of +3 and +2
                   paintOrder: "stroke",
                   strokeLinejoin: "round",
                   fontFamily: "var(--font-display), system-ui, sans-serif",

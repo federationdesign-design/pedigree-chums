@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Dela_Gothic_One, Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P } from "next/font/google";
+import { Dela_Gothic_One, Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P, Unica_One } from "next/font/google";
 import localFont from "next/font/local";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
@@ -55,6 +55,15 @@ const score = Press_Start_2P({
   display: "swap",
 });
 
+// Unica One (Eduardo Tunni) is used for the "Warning:" line of the Hidden Games
+// prelude card (C03).
+const unica = Unica_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-unica",
+  display: "swap",
+});
+
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://pedigree-chums.vercel.app";
 
@@ -94,7 +103,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
         {children}
         <PickAChumLauncher />
