@@ -190,15 +190,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   // so running legitimately transitions again, and the engine dedupes by ID.
   useEffect(() => { if (running) reportHiddenGame("G02"); }, [running]);
 
-  useEffect(() => {
-    let t: number | undefined;
-    try {
-      if (!localStorage.getItem("pc-cookie-consent")) {
-        t = window.setTimeout(() => window.dispatchEvent(new Event("pc:open-cookies")), 1000);
-      }
-    } catch { /* private mode */ }
-    return () => window.clearTimeout(t);
-  }, []);
+  // NO COOKIE BANNER IN THE PIT, by design.
+  //
+  // This used to dispatch pc:open-cookies a second after the pit opened, which
+  // asked the site-wide banner to appear. It could never be seen: the banner is
+  // z-index 55 and this overlay is z-index 900 with an opaque background, so it
+  // rendered underneath. That looked like a bug and was reported as one.
+  //
+  // It is not being lifted above the pit, because a banner is not what the pit
+  // wants. The consent object here is the cookies-policy PANEL that falls into
+  // the pit two seconds in: it gets in your way until you answer it, and
+  // answering scores. Same consent, earned rather than nagged.
 
   useEffect(() => {
     // Escape closes the pit as before, but while the exit panel is up it answers
