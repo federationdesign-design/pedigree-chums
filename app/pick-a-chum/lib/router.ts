@@ -84,7 +84,20 @@ const COMMERCIAL = [
   'when does it launch', 'launch date', 'release date', 'when is it out', 'when is it released', 'when can i get it',
   'is it available', 'when is it available', 'available to buy',
   'discount', '30%', '30 percent', 'mailing list', 'sign me up', 'sign up', 'get one', 'want one', 'in stock',
-  'where can i get it', 'where do i get it',
+];
+
+// Task 69: the "get" buying forms, as a RULE not an enumeration. A get/buy/order VERB phrase
+// combined with ANY product word (below) reaches commercial, so "where can I get the game/cards/
+// deck" all route to buying and anything added to PRODUCT_WORDS later is covered automatically.
+// The verb phrase alone is never enough (never a bare "get"), and the product word alone is never
+// enough, so "how do I get a dog" (the rescue question) and "where can I get help" stay off the
+// buy path. Both "can I" and "I can" question orderings are listed. The old unconditional
+// 'where can i get it' forms were removed from COMMERCIAL, so a bare "where can I get it" (no
+// product word) no longer opens the modal.
+const GET_VERBS = [
+  'where can i get', 'where do i get', 'how do i get', 'how can i get',
+  'where can i buy', 'where do i buy', 'how do i order',
+  'where i can get', 'how i can get', 'where i can buy',
 ];
 
 // Manipulation / proxy phrasings that contain a buying word but must NOT open the
@@ -101,7 +114,7 @@ const COMMERCIAL_EXCLUDE = [
 // only with an explicit product word (Steve's list), so a dog/breed price question ("how
 // much is a labrador") can never infer the product. See the commercial check for the topic
 // rule that lets a bare "how much is it" resolve to the game when no breed is in play.
-const PRODUCT_WORDS = ['game', 'games', 'pack', 'packs', 'cards', 'card', 'deck', 'set', 'pick a chum'];
+const PRODUCT_WORDS = ['game', 'games', 'pack', 'packs', 'cards', 'card', 'deck', 'set', 'chums', 'pick a chum'];
 
 // Task 49: split the commercial route by intent. A PRICE question answers in chat (FAQ008 via a
 // distinct price_answer action); a BUYING question opens the offer modal. These are the price
@@ -454,6 +467,27 @@ export interface RouterState {
   lastWasComplaint?: boolean; // an open complaint context: defer breed retrieval until it clears
   protectedState?: 'active' | 'aftercare' | null; // S12 protected-state machine (Task 15)
   personalSadnessCount?: number; // Task 20: qualifying personal-sadness statements so far this session
+  pendingConfirm?: string | null; // Task 68: subject offered by LOOP-01/LOOP-02 last turn, awaiting yes/no
+}
+
+// Task 68: bare affirmations that confirm a loop offer. Whole-message forms only, so "yes but
+// tell me about labradors" is not swallowed. "no" is deliberately NOT here: it advances the loop.
+const CONFIRM_YES = new Set(['yes', 'yeah', 'yep', 'yup', 'aye', 'that one', 'correct', 'uh huh', 'uhhuh', 'yes please']);
+function isConfirmYes(compact: string): boolean {
+  return CONFIRM_YES.has(compact.trim());
+}
+// Route a confirmed loop subject to its destination. Mirrors the loop's offer mapping: a breed
+// title -> that breed's page; a game-family word -> the card game rules; a generic dog word -> the
+// breed hub. Returns null when the subject has no destination (the confirmation then falls through
+// and the loop advances).
+const CONFIRM_GAME_WORDS = new Set(['cards', 'deck', 'set', 'rules', 'play', 'chums', 'game']);
+const CONFIRM_DOG_WORDS = new Set(['dog', 'dogs', 'doggy', 'puppy', 'pup', 'breed', 'breeds']);
+function confirmResolution(subject: string): Resolution | null {
+  const p = BREED_PAGES.find((x) => x.title === subject);
+  if (p) return breedPageRes(p);
+  if (CONFIRM_GAME_WORDS.has(subject)) return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B02', action: 'rules_answer', destinationId: 'DST011' };
+  if (CONFIRM_DOG_WORDS.has(subject)) return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
+  return null;
 }
 
 // ---- Breed page retrieval (10 proof breeds) ----
@@ -791,6 +825,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     }
   }
 
+  // Task 68: confirmation after a loop offer. If the previous turn served LOOP-01 or LOOP-02
+  // (state.pendingConfirm holds the offered subject) and this turn is a bare affirmation, route
+  // to that subject's destination, so a "yes" does something instead of inviting an unsupported
+  // answer. Below safety/grief so a disclosure is never read as a confirmation; a "no" (or any
+  // non-affirmation) is not caught here and falls through, advancing the loop.
+  if (state.pendingConfirm && isConfirmYes(c)) {
+    const routed = confirmResolution(state.pendingConfirm);
+    if (routed) return routed;
+  }
+
   // Task 27: explicit topic return. A generic return ("you were saying", "what were you
   // saying about them", "go back") with no named subject restores the stored topic. Below
   // every safety route and only when a topic is stored (cleared on PROTECTED_ACTIVE), so a
@@ -828,7 +872,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 2: buying, launch and 30% discount. A buying word opens the offer modal,
   // UNLESS the phrasing is a manipulation/proxy request ("buy it for me", "without
   // signing"), which must not reach the buy path.
-  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT)) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+  // Task 69: a get/buy/order verb phrase PLUS any product word reaches buying (never the verb or
+  // the product word alone). So "where can I get the game/cards/deck" route to buying, while
+  // "how do I get a dog" / "where can I get help" (no product word) do not, and the topic slot
+  // already being commercial also satisfies the second half.
+  const getVerb = hasAny(N, GET_VERBS) && (hasAny(N, PRODUCT_WORDS) || state.topic?.kind === 'commercial');
+  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT) || getVerb) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
     // Task 45/46: the offer modal AND the price answer are about the product, never a dog. A
     // price/buy question that names a dog or breed, or whose bare "it" points at a breed topic
     // (Task 27), carrying no explicit product word, gets neither: it refuses to guess

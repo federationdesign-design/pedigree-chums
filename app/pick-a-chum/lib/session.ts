@@ -54,6 +54,11 @@ export interface Session {
   // session. Both reset on a new session.
   candidateEverFound: boolean;
   orientServed: boolean;
+  // Task 68: the subject the previous turn offered via LOOP-01 (repeat) or LOOP-02 (destination),
+  // awaiting a yes/no. A bare affirmation next turn routes to this subject's destination; anything
+  // else (including "no") clears it and lets the loop advance. Set only when LOOP-01/LOOP-02 is
+  // served; null otherwise. Reset on a new session.
+  pendingConfirm: string | null;
   topic: Topic | null; // Task 27: the current subject + kind (folds in the old lastBreedSlug)
   previousTopic: Topic | null; // Task 27: the prior subject, so an explicit return has something to restore
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
@@ -83,6 +88,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     candidateSubject: null,
     candidateEverFound: false,
     orientServed: false,
+    pendingConfirm: null,
     topic: null,
     previousTopic: null,
     barkStreakByDog: {},

@@ -141,6 +141,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     lastWasComplaint: session.lastWasComplaint,
     protectedState: wasProtected,
     personalSadnessCount: session.personalSadnessCount,
+    pendingConfirm: session.pendingConfirm,
   });
 
   // Task 15 (S12) protected-state machine. When a protected state is already live, a
@@ -299,12 +300,16 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
       response.text = LOOP_03_VARIANTS[(count - 1) % LOOP_03_VARIANTS.length];
       response.responseId = 'LOOP-03';
     }
+    // Task 68: only LOOP-01 (repeat) and LOOP-02 (destination offer) pose a yes/no; remember the
+    // offered subject so a bare affirmation next turn can route to its destination.
+    session.pendingConfirm = response.responseId === 'LOOP-01' || response.responseId === 'LOOP-02' ? subject : null;
     if (count >= 4) {
       session.noActionCount = 0;
       session.completedLoops += 1;
     }
   } else {
     session.noActionCount = 0;
+    session.pendingConfirm = null;
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)

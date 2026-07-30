@@ -1625,6 +1625,83 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
   rows.push({ ok, input: 'Task58: bark game still works (break + ack)', layer: '-', bucket: '-', action: 'bark', note: ok ? '' : `break=${br.action} ack=${ack.action}` });
 })();
 
+// ---- Task 68: confirmation after a loop offer (LOOP-01 / LOOP-02) ----
+// "card" -> LOOP-01 "cards?"; a bare "yes" then reaches the card route (rules), NOT another loop.
+// (Bare "cards" routes to FAQ004 directly, so the loop-triggering form is "card"/"game"/"deck".)
+(() => {
+  const s = newSession();
+  check('card', { action: 'fallback' }, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' ? null : `offer ${resp.responseId}` });
+  check('yes', { action: 'rules_answer' }, { session: s, assert: (r) => r.destinationId === 'DST011' ? null : `not the card route: ${r.destinationId}` });
+})();
+// Confirmation also works after LOOP-02 (the destination offer).
+(() => {
+  const s = newSession();
+  check('game', { action: 'fallback' }, { session: s }); // LOOP-01
+  check('game', { action: 'fallback' }, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `not LOOP-02: ${resp.responseId}` });
+  check('yes', { action: 'rules_answer' }, { session: s });
+})();
+// A "no" advances the loop rather than routing.
+(() => {
+  const s = newSession();
+  check('game', { action: 'fallback' }, { session: s }); // LOOP-01, pendingConfirm "game"
+  check('no', { action: 'fallback' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'LOOP-03' && se.noActionCount === 2 ? null : `no did not advance: ${resp.responseId} noAction=${se.noActionCount}` });
+})();
+// A dog subject confirms to the breed hub, so LOOP-01 "dog?" never invites a dead-end yes.
+(() => {
+  const s = newSession();
+  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s }); // LOOP-01 "dog?"
+  check('yes', { action: 'breed_hub' }, { session: s });
+})();
+// pendingConfirm clears once consumed: "game" then "yes" then "yes" -> the second yes does NOT
+// route again off a stale confirmation; it is an ordinary input that advances the loop.
+(() => {
+  const s = newSession();
+  check('game', { action: 'fallback' }, { session: s }); // LOOP-01, pendingConfirm "game"
+  check('yes', { action: 'rules_answer' }, { session: s, assert: (_r, _resp, se) => se.pendingConfirm === null ? null : `pendingConfirm not cleared: ${se.pendingConfirm}` });
+  check('yes', { action: 'fallback' }, { session: s, assert: (_r, resp) => /^LOOP-/.test(resp.responseId) ? null : `stale confirm routed: ${resp.responseId}` });
+})();
+
+// ---- Task 69: route the "get" buying forms to commercial (product-word / commercial-topic gated) ----
+// The reported session: pack contents stays, "Yes them" is a loop turn, and the "where can I get
+// them" buying forms (product word "cards" present) now open the buy modal, not the FAQ004 blurb.
+(() => {
+  const s = newSession();
+  check('The cards I saw somebody playing with them', { action: 'faq_answer' }, { session: s, assert: (r) => r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}` });
+  check('Yes them', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-03' ? null : `not LOOP-03: ${resp.responseId}` });
+  check('The cards, where can I get them?', { action: 'open_discount_popup' }, { session: s });
+  check("Yes, you've told me about the cards. I want to know where I can get them.", { action: 'open_discount_popup' }, { session: s });
+})();
+// GUARDS — none of these may move onto the buy path.
+check('how much is a labrador', { action: 'gk_unknown' }); // dog price: refuse, unchanged
+check('where can I buy a dog', { action: 'gk_unknown' }); // dog buy: refuse, unchanged
+check('how do I get a dog', { action: 'fallback' }, { assert: (r) => r.action !== 'open_discount_popup' ? null : 'the rescue question reached the buy modal' }); // rescue question
+check('can I get a dog free', { action: 'fallback' }, { assert: (r) => r.action !== 'open_discount_popup' ? null : 'reached the buy modal' });
+check('where can I get help', { action: 'gk_unknown' }, { assert: (r) => r.action !== 'open_discount_popup' ? null : 'help reached commercial' });
+// Product-word gate: a bare "get" form with no product word / commercial topic does NOT open the
+// modal (Task 69 tightening); a get verb + ANY product word does. The rule (not an enumeration)
+// covers game/cards/deck alike.
+check('where can I get it?', { action: 'gk_unknown' });
+check('how do I get the cards', { action: 'open_discount_popup' }); // get verb + "cards"
+check('where can I get the game?', { action: 'open_discount_popup' }); // get verb + "game" (the gap the rule closes)
+check('where can I get the deck?', { action: 'open_discount_popup' }); // get verb + "deck"
+// All the accepted affirmation forms confirm after a loop offer; an unrelated reply does not.
+(() => {
+  let ok = true, note = '';
+  for (const form of ['yeah', 'yep', 'aye', 'that one', 'correct', 'uh huh']) {
+    const s = newSession();
+    submit(data, s, 'card'); // LOOP-01 offer, pendingConfirm "cards"
+    const { resolution: r } = submit(data, s, form);
+    if (r.action !== 'rules_answer') { ok = false; note += `"${form}" -> ${r.action}; `; }
+  }
+  // A real question after an offer routes normally (not the confirm), and clears the pending offer.
+  const s2 = newSession();
+  submit(data, s2, 'game');
+  const { resolution: q } = submit(data, s2, 'how much is the game');
+  if (q.action !== 'price_answer') { ok = false; note += `unrelated reply -> ${q.action}; `; }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task68: affirmation forms confirm, other replies route normally', layer: '-', bucket: '-', action: 'confirm', note: ok ? '' : note });
+})();
+
 // ---- Task 57: candidate subject extraction (reuses the breed/alias/misspelling matcher) ----
 (() => {
   const ex = (input) => extractCandidateSubject(normalise(input), data);
