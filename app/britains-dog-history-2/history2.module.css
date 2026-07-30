@@ -692,12 +692,21 @@
 
 /* The white behind. Fill AND stroke are white, so this copy is a fattened
    silhouette of the letterform with nothing showing through. */
+/* The white behind. Fill AND stroke are white, so this copy is a fattened
+   silhouette of the letterform with nothing showing through.
+
+   MATCHED TO THE PIT'S LEVEL NUMBER. That one is SVG text with a 9 unit white
+   stroke and paint-order: stroke, which puts the whole halo outside the letter.
+   Measured off the two screens side by side, this rendered a 13px halo at 14px
+   of stroke while the pit's read 9px, so the stroke comes down by the same
+   ratio. Not halved on theory: a centred stroke and a stacked copy do not
+   thicken alike, so the number is taken from what actually rendered. */
 .eraCountOutline {
   position: absolute;
   right: 0;
   bottom: 0;
   color: #ffffff;
-  -webkit-text-stroke: 14px #ffffff;
+  -webkit-text-stroke: 10px #ffffff;
 }
 
 .eraCountFill {
