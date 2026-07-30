@@ -87,7 +87,7 @@ export const SECTIONS: Section[] = [
       "Sighthounds such as the Greyhound and Whippet were built for speed and the chase.",
       "Guarding and droving breeds protected homes and moved cattle to market.",
     ],
-    bulletTitles: ["Herding", "Rating", "Catching", "Gaurding"],
+    bulletTitles: ["Herding", "Rating", "Catching", "Guarding"],
     detail:
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     facts: [
@@ -111,7 +111,7 @@ export const SECTIONS: Section[] = [
       "A national ban on the public highways followed in 1854.",
       "The campaign against dog-carts helped shape Britain's early animal-welfare laws.",
     ],
-    bulletTitles: ["Dog taxi's, dog carriages, dog sleds", "London dog ban", "More bans on dogs stopping them from working", "It was for the money"],
+    bulletTitles: ["Dog taxis, dog carriages, dog sleds", "London dog ban", "More bans on dogs stopping them from working", "It was for the money"],
     detail:
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
     facts: [
@@ -159,7 +159,7 @@ export const SECTIONS: Section[] = [
       "The story says he kept watch over the grave for fourteen years until his own death in 1872.",
       "A statue and fountain were raised in his honour, and still draw visitors today.",
     ],
-    bulletTitles: ["Terrier", "Loyalty", "Legdengy", "Immortalised"],
+    bulletTitles: ["Terrier", "Loyalty", "Legendary", "Immortalised"],
     detail:
       "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
     facts: [
