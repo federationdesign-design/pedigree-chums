@@ -35,6 +35,11 @@ export interface TurnRow {
   matchedSignals: string; // blank until the router exposes matched triggers
   gapType: string; // near_miss | no_match | ambiguous (only no_match derivable now)
   clusterKey: string; // input normalised, stopwords stripped, tokens deduped + sorted
+  // Task 57: the dog-led loop's candidate subject for this turn. On a fallback-family turn it is
+  // the canonical inside-world entity found in the input (or blank when none, in which case the
+  // raw input column IS the content-gap entry); blank on every other turn. Blank on safety turns
+  // (D6: it derives from the raw input, which is never stored for a safety disclosure).
+  candidate: string;
 }
 
 export interface Aggregate {
@@ -49,6 +54,7 @@ export const COLUMNS: (keyof TurnRow)[] = [
   'layer', 'layerName', 'bucket', 'action', 'confidence', 'responseId',
   'responseText', 'transferTo', 'outcome', 'verdict',
   'topIntent', 'topScore', 'runnerUp', 'runnerUpScore', 'matchedSignals', 'gapType', 'clusterKey',
+  'candidate',
 ];
 
 // Cluster key: normalise the input, drop very common words, dedupe and sort the
@@ -164,6 +170,7 @@ export function buildRow(e: TurnEvent, now: string): TurnRow {
     matchedSignals: '',
     gapType: gapTypeOf(outcome),
     clusterKey: safety ? '' : clusterKeyOf(e.input),
+    candidate: safety ? '' : e.candidateSubject ?? '',
   };
 }
 

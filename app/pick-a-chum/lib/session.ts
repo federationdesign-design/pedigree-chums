@@ -35,6 +35,19 @@ export interface Session {
   lastWasComplaint: boolean; // the previous turn answered the complaint/contact FAQ (for follow-up context)
   complaintOpened: boolean; // Task 25b: the full FAQ015 complaint answer was already served this context (subsequent turns get the short repeat)
   repairCount: number; // Task 29: consecutive failed-understanding turns (the repair ladder rung); a valid intent resets it
+  // Task 56: the dog-led loop counters. Not read by anything yet (no flag, no served change).
+  // noActionCount increments wherever the fallback path fires today (the same trigger as the
+  // repair ladder: FAILED_UNDERSTANDING outside a protected state), capped at 4. The fourth
+  // consecutive fire rolls it over: it resets to 0 and increments completedLoops. It is also
+  // reset to 0 by any non-fallback resolution (a successful route, game start, safety route,
+  // stop or goodbye all fall through to the reset), and both reset on a new session.
+  noActionCount: number;
+  completedLoops: number; // Task 56: how many times noActionCount was reset by reaching 4
+  // Task 57: the dog-led loop's candidate subject, carried for one turn. Set on a fallback-family
+  // turn (the fallback catch-all or the GK refuse-to-guess) outside a protected state to the
+  // canonical inside-world entity found in the input, or null when none is present. Cleared to
+  // null on every other turn. Not read by anything yet (no served change).
+  candidateSubject: string | null;
   topic: Topic | null; // Task 27: the current subject + kind (folds in the old lastBreedSlug)
   previousTopic: Topic | null; // Task 27: the prior subject, so an explicit return has something to restore
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
@@ -59,6 +72,9 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     lastWasComplaint: false,
     complaintOpened: false,
     repairCount: 0,
+    noActionCount: 0,
+    completedLoops: 0,
+    candidateSubject: null,
     topic: null,
     previousTopic: null,
     barkStreakByDog: {},

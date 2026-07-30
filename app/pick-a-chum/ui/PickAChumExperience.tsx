@@ -309,6 +309,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       resolution: result.resolution,
       response: r,
       transferTo: swapped ? toDog : undefined,
+      candidateSubject: session.candidateSubject, // Task 57: set by submit on the mutated session
     });
     const userMsg: Message = { id: idRef.current++, who: 'user', text };
     setInput('');

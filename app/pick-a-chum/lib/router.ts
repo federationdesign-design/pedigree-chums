@@ -649,6 +649,50 @@ function matchDogName(c: string): Dog | null {
   return null;
 }
 
+// Task 57: the confirmed inside-world entity list (final), MINUS the breed names, which
+// are matched by the breed matcher instead (so an alias or misspelling resolves to the
+// canonical breed). "pack" is deliberately EXCLUDED: "cards" already covers "whats in the
+// pack", and leaving pack out preserves the intended answer to "I want a Six pack". Matched
+// as whole words only (no fuzz), like the other bare-word sets in this file, so a longer
+// word is never fuzzed into a false entity.
+const INSIDE_WORLD_WORDS = [
+  // Dogs
+  'dog', 'dogs', 'doggy', 'puppy', 'pup', 'breed', 'breeds',
+  // Game
+  'cards', 'deck', 'set', 'rules', 'play', 'chums', 'game',
+  // Site
+  'page', 'link', 'website', 'site', 'generator',
+  // Dog bits
+  'bark', 'woof', 'paw', 'tail', 'walk', 'fetch', 'lead', 'collar', 'bone',
+  // Names (the four chatbot dogs)
+  'collie', 'labrador', 'boxer', 'terrier',
+  // History
+  'history', 'origin', 'jobs', 'bred', 'ancestors',
+];
+
+// Task 57: extract the dog-led loop's candidate subject from an input. Reuses the breed
+// matcher, the alias table and the misspelling table exactly as they are (no new language
+// processing): a breed, alias or curated misspelling resolves to the canonical breed name;
+// otherwise the first inside-world entity word present is the candidate; otherwise none.
+// A pure read of the input, so callers can log the candidate (or, when null, the raw input,
+// which is the content-gap list). Called with no topic so only entities IN the input count.
+export function extractCandidateSubject(n0: Normalised, data: ChumData): string | null {
+  const n = applyAliases(n0, buildAliasMap(data.misspellings));
+  const c = n.compact;
+  const breed = matchBreed(c, n, {} as RouterState);
+  if (breed) {
+    if (breed.action === 'breed_page' && breed.breedTitle) return breed.breedTitle;
+    if (breed.action === 'breed_choice' && breed.breedOptions?.length) return breed.breedOptions[0].title;
+  }
+  const words = new Set(n.words);
+  // Whole-word match with the same mechanical plural/singular tolerance the breed matcher
+  // uses (hasBreedWord), so "games"/"cards" match "game"/"cards" without authoring plurals.
+  for (const w of INSIDE_WORLD_WORDS) {
+    if (hasBreedWord(words, w)) return w;
+  }
+  return null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then

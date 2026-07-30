@@ -4,7 +4,7 @@
 
 import { ChumData, Resolution } from './types';
 import { normalise } from './normalise';
-import { resolve } from './router';
+import { resolve, extractCandidateSubject } from './router';
 import { assemble, Assembled } from './assembler';
 import { Session, Topic } from './session';
 import { detectSadnessClear } from './safety';
@@ -92,6 +92,11 @@ const COMPLAINT_REPEAT_LINE = 'Noted. Put that in the email too and someone will
 // emoji_only each keep their own diagnostic line, so they are NOT ladder rungs; like any
 // non-catch-all turn they cancel the ladder and reset the count.
 const FAILED_UNDERSTANDING = new Set(['fallback']);
+// Task 57: the "no approved answer" outcomes that a candidate subject is extracted for. This
+// is the Task-55 fallback set: the repair/B13 free-text catch-all (action 'fallback', which
+// also carries the REPAIR-L1/L2/L3 rungs) plus the deliberate GK refuse-to-guess (gk_unknown).
+// Broader than FAILED_UNDERSTANDING above, which drives the repair ladder and the loop counter.
+const FALLBACK_FAMILY = new Set(['fallback', 'gk_unknown']);
 const REPAIR_LADDER: Record<number, { id: string; text: string }> = {
   1: { id: 'REPAIR-L1', text: 'That one got past me. Say it a different way and I will try again.' },
   2: { id: 'REPAIR-L2', text: 'That could mean a few things. Do you mean a dog breed, or how the card game works?' },
@@ -226,6 +231,34 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   } else {
     session.repairCount = 0;
   }
+
+  // Task 56: the dog-led loop's no-action counter. It uses the BROADER fallback family
+  // (the B13/repair catch-all AND the GK refuse-to-guess), not the narrow repair-ladder
+  // trigger above: gk_unknown is where the inside-world questions actually land ("why do
+  // dogs sniff other dogs bums", "what type of jobs do dogs do"), so the loop must count
+  // those too or it would never fire on the questions it exists for. Capped at 4: the
+  // fourth consecutive fire rolls the counter over (reset to 0) and completes one loop.
+  // Reset to 0 by any non-fallback-family resolution (a successful route, game start,
+  // safety route, stop or goodbye). Not read by anything yet; no served response changes.
+  if (session.protectedState === null && FALLBACK_FAMILY.has(resolution.action)) {
+    session.noActionCount += 1;
+    if (session.noActionCount >= 4) {
+      session.noActionCount = 0;
+      session.completedLoops += 1;
+    }
+  } else {
+    session.noActionCount = 0;
+  }
+
+  // Task 57: the dog-led loop's candidate subject. On a fallback-family turn outside a protected
+  // state (the fallback catch-all, or the GK refuse-to-guess: the Task-55 fallback set), extract
+  // the canonical inside-world entity from the input and carry it for one turn; otherwise clear it.
+  // Reuses the entity matcher only (no new language processing) and is read by nothing yet, so no
+  // served response changes. Held null during a protected state, like the dialogue topic (Task 27).
+  session.candidateSubject =
+    session.protectedState === null && FALLBACK_FAMILY.has(resolution.action)
+      ? extractCandidateSubject(n, data)
+      : null;
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
   if (!session.lastWasComplaint) session.complaintOpened = false; // Task 25b: a clear topic change ends the complaint context, so the next complaint gets the full answer again

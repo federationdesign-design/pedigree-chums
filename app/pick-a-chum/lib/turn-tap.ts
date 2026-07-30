@@ -17,6 +17,7 @@ export interface TurnEvent {
   resolution: Resolution;
   response: Assembled;
   transferTo?: Dog; // set when this turn switched the active dog
+  candidateSubject?: string | null; // Task 57: the loop's candidate inside-world subject this turn, or null
 }
 
 type Sink = (e: TurnEvent) => void;

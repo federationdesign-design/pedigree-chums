@@ -33,6 +33,8 @@ const data = {
 
 const { submit } = await import(pathToFileURL(join(LIB, 'engine.ts')).href);
 const { newSession } = await import(pathToFileURL(join(LIB, 'session.ts')).href);
+const { normalise } = await import(pathToFileURL(join(LIB, 'normalise.ts')).href);
+const { extractCandidateSubject } = await import(pathToFileURL(join(LIB, 'router.ts')).href);
 const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEligible } = await import(
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
@@ -1473,6 +1475,90 @@ check('cost', { action: 'price_answer' });
   const s = newSession();
   check('how much is the game', { action: 'price_answer' }, { session: s });
   check('how much is it', { action: 'price_answer' }, { session: s }); // "it" = the game price
+})();
+
+// ---- Task 56: the dog-led loop counters (thin; both advance and reset, no served change) ----
+// Four consecutive fallback turns climb the repair ladder AND the no-action counter; the fourth
+// rolls the counter over (reset to 0) and completes one loop. The served responseId is asserted
+// alongside, proving the counters changed no served response (the ladder rungs are unchanged).
+(() => {
+  const s = newSession();
+  check('the thing over there', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 1 && se.completedLoops === 0 && resp.responseId === 'REPAIR-L1' ? null : `t1 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+  check('that does not help', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 2 && se.completedLoops === 0 && resp.responseId === 'REPAIR-L2' ? null : `t2 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+  check('i really cannot say', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 3 && se.completedLoops === 0 && resp.responseId === 'REPAIR-L3' ? null : `t3 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+  check('something something else', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'B13-FALLBACK' ? null : `t4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+})();
+// A successful route resets the no-action counter (completedLoops is a running total, kept).
+(() => {
+  const s = newSession();
+  check('the thing over there', { action: 'fallback' }, { session: s });
+  check('that does not help', { action: 'fallback' }, { session: s });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 0 ? null : `no-action not reset by a successful route: ${se.noActionCount}` });
+})();
+// The loop counter uses the BROADER fallback family: four consecutive gk_unknown turns (the
+// inside-world questions land here) advance the counter and complete a loop, WITHOUT climbing
+// the repair ladder (gk_unknown keeps its own GK-UNKNOWN line, so no served response changes).
+(() => {
+  const s = newSession();
+  check('whats up', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 1 && se.completedLoops === 0 && se.repairCount === 0 && resp.responseId === 'GK-UNKNOWN' ? null : `g1 noAction=${se.noActionCount} loops=${se.completedLoops} repair=${se.repairCount} rid=${resp.responseId}` });
+  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 2 && resp.responseId === 'GK-UNKNOWN' ? null : `g2 noAction=${se.noActionCount} rid=${resp.responseId}` });
+  check('what type of jobs do dogs do', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 3 && resp.responseId === 'GK-UNKNOWN' ? null : `g3 noAction=${se.noActionCount} rid=${resp.responseId}` });
+  check('whats your name', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
+    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'GK-UNKNOWN' ? null : `g4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+})();
+// The two fallback-family kinds count together: a fallback and a gk_unknown interleaved still
+// reach a completed loop at the fourth fire.
+(() => {
+  const s = newSession();
+  check('the thing over there', { action: 'fallback' }, { session: s, assert: (r, resp, se) => se.noActionCount === 1 ? null : `m1 ${se.noActionCount}` });
+  check('whats up', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) => se.noActionCount === 2 ? null : `m2 ${se.noActionCount}` });
+  check('that does not help', { action: 'fallback' }, { session: s, assert: (r, resp, se) => se.noActionCount === 3 ? null : `m3 ${se.noActionCount}` });
+  check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) => se.noActionCount === 0 && se.completedLoops === 1 ? null : `m4 noAction=${se.noActionCount} loops=${se.completedLoops}` });
+})();
+// A new session starts both counters at zero.
+(() => {
+  const s = newSession();
+  const ok = s.noActionCount === 0 && s.completedLoops === 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task56: new session counters zero', layer: '-', bucket: '-', action: 'loop counters', note: ok ? '' : `noAction=${s.noActionCount} loops=${s.completedLoops}` });
+})();
+
+// ---- Task 57: candidate subject extraction (reuses the breed/alias/misspelling matcher) ----
+(() => {
+  const ex = (input) => extractCandidateSubject(normalise(input), data);
+  const cases = [
+    ['labrador', 'Labrador'], // a known breed -> canonical
+    ['tell me about labradors', 'Labrador'], // plural, still canonical
+    ['staffy', 'Staffordshire Bull Terrier'], // an alias -> canonical breed
+    ['why do dogs yawn', 'dog'], // dogs is now on the list
+    ['games', 'game'], // plural game word, inside-world
+    ['I want a Six pack', null], // pack is EXCLUDED, no other entity -> no candidate
+    ['whats up', null], // no inside-world entity -> no candidate
+  ];
+  for (const [input, want] of cases) {
+    const got = ex(input);
+    const ok = got === want;
+    ok ? pass++ : fail++;
+    rows.push({ ok, input: `Task57 cand: ${input.slice(0, 22)}`, layer: '-', bucket: '-', action: 'candidate', note: ok ? '' : `got ${JSON.stringify(got)} want ${JSON.stringify(want)}` });
+  }
+})();
+// The candidate is stored on the session for one turn on a fallback-family turn, and cleared
+// otherwise. "why do dogs yawn" routes to gk_unknown (a fallback-family outcome), so the
+// candidate 'dog' is carried; a successful breed page carries none (cleared).
+(() => {
+  const s = newSession();
+  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
+    se.candidateSubject === 'dog' ? null : `candidate not stored on fallback-family turn: ${JSON.stringify(se.candidateSubject)}` });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
+    se.candidateSubject === null ? null : `candidate not cleared on a successful route: ${JSON.stringify(se.candidateSubject)}` });
 })();
 
 // ---- Report ----
