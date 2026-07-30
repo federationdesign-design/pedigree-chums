@@ -302,7 +302,7 @@ export default function TimelineRun({
         {/* A fragment comes back from BreedStrip, so these screens stay DIRECT
             children of the scroller. They are height: 100% of it and a wrapper
             here would collapse every one of them. */}
-        <BreedStrip era={era} renderLevels={(open) => breeds.map((b) => {
+        <BreedStrip era={era} renderLevels={(open) => breeds.map((b, bi) => {
           const isFlipped = flipped === b.name;
           /* undefined for a dog with no level. 62 of the 90 open one, 28 go to
              their own breed page instead, which is the live page's rule and
@@ -311,6 +311,10 @@ export default function TimelineRun({
           /* Learn, play or neither. The flash and the tap read the same answer,
              so a card cannot advertise a level it will not open. */
           const kind = breedCardKind(b.name);
+          /* The foot of the run. Its node stops meaning "carry on down" and
+             starts meaning "carry on sideways", so it moves to the right edge
+             and turns to face that way. */
+          const isLast = bi === breeds.length - 1;
           return (
             <div key={b.name} className={styles.dogScreen}>
               {/* The rail arrives, stops at the card, and begins again below
@@ -495,7 +499,21 @@ export default function TimelineRun({
                     <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
                   </svg>
                 </button>
-                <span className={`${styles.markerDot} ${passed[b.name] ? styles.markerDotGo : ""}`} aria-hidden="true" />
+                {/* HIDDEN, NOT REMOVED, on the last dog. The row is centred, so
+                    dropping the disc out of the flow would close the gap and
+                    slide the tree and information icons inward, breaking the
+                    column they hold down the whole run. It keeps its box, and
+                    the end node is drawn separately at the right edge. */}
+                <span
+                  className={`${styles.markerDot} ${passed[b.name] ? styles.markerDotGo : ""} ${isLast ? styles.markerDotOff : ""}`}
+                  aria-hidden="true"
+                />
+                {isLast && (
+                  <span
+                    className={`${styles.markerDot} ${styles.markerDotEnd}`}
+                    aria-label="Swipe on to the next section"
+                  />
+                )}
                 {/* Turns the card over. Nothing else. */}
                 <span
                   className={styles.markerInfo}

@@ -1045,6 +1045,8 @@
    bottom and read as two more gaps. The row is now exactly as tall as the
    disc, so the legs meet it edge to edge. */
 .markerRow {
+  /* The end node on the last dog is positioned against this. */
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1122,6 +1124,49 @@
 /* Green once the reader has moved past this dog. */
 .markerDotGo {
   background: #22c55e;
+}
+
+/* THE ARROW INSIDE EVERY NODE. Drawn as a mask with white behind it, the same
+   way the card's flip control works, so it comes out white whatever colours the
+   file itself carries and the artwork never needs editing.
+   Pointing down, because down is where the reader goes next. */
+.markerDot::after {
+  content: "";
+  position: absolute;
+  inset: 24%;
+  background: #ffffff;
+  -webkit-mask-image: url("/node-arrow.svg");
+  mask-image: url("/node-arrow.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* The last dog keeps its box so the two icons either side do not move. */
+.markerDotOff {
+  visibility: hidden;
+}
+
+/* THE END NODE. At the foot of a run the timeline has finished, so a node in
+   the middle pointing down is telling the reader to do something there is no
+   longer anywhere to do. This one sits at the right edge and faces the way they
+   actually have to go, which is sideways to the next section.
+   Absolute, so it takes no space in the centred row. */
+.markerDotEnd {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  visibility: visible;
+}
+
+/* Quarter turn anticlockwise: the file is drawn pointing down, so this is the
+   one number to change if it is drawn some other way. */
+.markerDotEnd::after {
+  transform: rotate(-90deg);
 }
 
 .markerTree,
