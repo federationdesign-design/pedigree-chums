@@ -173,8 +173,6 @@ export default function TimelineRun({
                           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped(null); }
                         }}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/flip-icon.svg" alt="" />
                       </span>
                       {/* Top right: away to another site, with a warning first.
                           A native confirm rather than a panel of our own: it

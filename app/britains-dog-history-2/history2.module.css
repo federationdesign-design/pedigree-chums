@@ -721,16 +721,23 @@
 .dogNote {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  /* Doubled from 1rem. */
-  font-size: 2rem;
-  line-height: 1.35;
+  /* Doubled from 1rem, then 2pt off. */
+  font-size: calc(2rem - 2pt);
+  line-height: 1.1em;
 }
 
+/* White type on the blue, not blue type on the yellow. White alone would not
+   hold against the yellow ground, so the blue moves from the letters to a pill
+   behind them. */
 .dogHint {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.05rem;
   letter-spacing: 0.03em;
-  color: var(--blue-deep, #0b78bd);
+  line-height: 0.9em;
+  color: #ffffff;
+  background: var(--blue-deep, #0b78bd);
+  border-radius: var(--radius-pill, 999px);
+  padding: 12px 18px;
 }
 
 /* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
@@ -843,8 +850,9 @@
 .backLink {
   position: absolute;
   top: 14px;
-  width: 60px;
-  height: 60px;
+  /* Up from 60. */
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -854,15 +862,20 @@
   z-index: 2;
 }
 
-/* Doubled from the 30px icon this replaces. */
+/* The artwork is used as a MASK rather than an image, so it renders in the
+   dark blue whatever colours the SVG itself carries. An <img> cannot be
+   recoloured from CSS; a mask can. */
 .backFlip {
   left: 14px;
-}
-
-.backFlip img {
-  width: 100%;
-  height: 100%;
-  display: block;
+  background: var(--blue-deep, #0c5b92);
+  -webkit-mask-image: url("/flip-icon.svg");
+  mask-image: url("/flip-icon.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 /* Same blue and white ring as every other information icon on the page. */
@@ -874,6 +887,6 @@
   font-family: Georgia, serif;
   font-style: italic;
   font-weight: 700;
-  font-size: 30px;
+  font-size: 40px;
   line-height: 1;
 }
