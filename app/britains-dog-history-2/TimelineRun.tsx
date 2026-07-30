@@ -25,6 +25,10 @@ import styles from "./history2.module.css";
   roll is: a timer fires at the wrong moment on a slow swipe.
 */
 
+/* The outbound reference on the back of a card. */
+const OUTBOUND =
+  "https://penelope.uchicago.edu/Thayer/e/roman/texts/strabo/4e%2A.html";
+
 const TAG_LABEL: Record<string, string> = {
   extinct: "Extinct",
   trending: "Trending",
@@ -158,6 +162,40 @@ export default function TimelineRun({
                     </span>
                     <span className={styles.dogBack}>
                       <span className={styles.dogNote}>{b.note}</span>
+                      {/* Top left: back to the picture. */}
+                      <span
+                        className={styles.backFlip}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Turn the card back"
+                        onClick={(e) => { e.stopPropagation(); setFlipped(null); }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped(null); }
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/flip-icon.svg" alt="" />
+                      </span>
+                      {/* Top right: away to another site, with a warning first.
+                          A native confirm rather than a panel of our own: it
+                          cannot be missed, it cannot be styled away by the
+                          card's 3D transform, and it works with no extra
+                          state. Say if you would rather have a designed one. */}
+                      <span
+                        className={styles.backLink}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Read more about this dog on another site"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const ok = window.confirm(
+                            "You are about to be linked to another site (and dogs), and we can't control anything from this point. Remember to come back and carry on exploring"
+                          );
+                          if (ok) window.open(OUTBOUND, "_blank", "noopener,noreferrer");
+                        }}
+                      >
+                        i
+                      </span>
                       <span className={styles.dogHint}>
                         Tap to learn about the dogs you know today that come from
                         this lineage root
@@ -166,29 +204,7 @@ export default function TimelineRun({
                   </span>
                 </button>
 
-                {/* The information "i". Its only job is to turn the card over.
-                    On the desktop page the flip is on hover, which a phone
-                    does not have, so without this the back face is
-                    unreachable on mobile. */}
-                <span
-                  className={styles.dogInfo}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`About ${b.name}`}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFlipped(isFlipped ? null : b.name);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setFlipped(isFlipped ? null : b.name);
-                    }
-                  }}
-                >
-                  i
-                </span>
+
               </div>
               <div className={styles.markerRow}>
                 {/* Opens the level. NOT WIRED YET: LineageModal and the lives,

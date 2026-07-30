@@ -661,31 +661,6 @@
   fill: currentColor;
 }
 
-/* The information "i", directly below the tree glyph. Copied verbatim from
-   .relCardInfo in BreedTree.module.css: blue fill, white ring, italic Georgia.
-   Sits outside the card's button, so it cannot swallow the card's own tap. */
-.dogInfo {
-  position: absolute;
-  top: 52px;
-  right: 12px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--blue-deep, #0c5b92);
-  border: 2px solid #ffffff;
-  color: #ffffff;
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-}
-
 /* Status tag across the foot of the card. Copied from .nodeTag. */
 .dogTag {
   position: absolute;
@@ -836,5 +811,49 @@
   font-style: italic;
   font-weight: 700;
   font-size: 20px;
+  line-height: 1;
+}
+
+/* ---- Buttons on the yellow face --------------------------------------- */
+
+/* Inside .dogBack, so they appear only once the card has turned. The old
+   information icon sat on the card itself and therefore showed on both faces,
+   where it collided with the tree glyph in the same corner. */
+.backFlip,
+.backLink {
+  position: absolute;
+  top: 14px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+/* Doubled from the 30px icon this replaces. */
+.backFlip {
+  left: 14px;
+}
+
+.backFlip img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Same blue and white ring as every other information icon on the page. */
+.backLink {
+  right: 14px;
+  background: var(--blue-deep, #0c5b92);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 30px;
   line-height: 1;
 }
