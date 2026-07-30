@@ -284,6 +284,17 @@ const TOY_FORK_SRC = "/toy-fork.png";
 const TOY_FORK_ASPECT = 420 / 596;
 const TOY_SHOE_SRC = "/toy-shoe.png";
 const TOY_SHOE_ASPECT = 520 / 343;
+/* Drawn WIDTH in px, and the angle each drops at. Flat pixels on purpose: these
+   two are sized against the pit itself rather than against the ball like every
+   other prop, because near-vertical they are read as height, not width.
+   86 and 94 degrees sit either side of upright, so the pair leans apart.
+   Rotated, a 400px newspaper is only 176px across and a 500px shoe 330px, which
+   is what lets them be this big in a pit about 390px wide. */
+const TOY_NEWSPAPER_W = 400;
+const TOY_NEWSPAPER_DEG = 86;
+const TOY_SHOE_W = 500;
+const TOY_SHOE_DEG = 94;
+
 const TOY_NEWSPAPER_GONE_KEY = "pc-minipit-newspaper-gone";
 const TOY_FORK_GONE_KEY = "pc-minipit-fork-gone";
 const TOY_SHOE_GONE_KEY = "pc-minipit-shoe-gone";
@@ -353,6 +364,10 @@ type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "c
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
 export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig", "rock"];
+/* Which side the first prop falls on. Flipped every time a pit arms its props,
+   so a reader playing several levels does not watch the same object land in the
+   same corner every time. Module scope, so it survives a pit remounting. */
+let propStartLeft = true;
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
@@ -3026,7 +3041,9 @@ export default function BreedTree({
           }, i * CHUM_STAGGER));
         });
       };
-      const spawnToy = (kind: ToyKind) => {
+      /* `side` is -1 for the left half of the pit and 1 for the right. Only the
+         era props pass it; everything else keeps its own placement. */
+      const spawnToy = (kind: ToyKind, side?: -1 | 1) => {
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
         if (toyRetired(TOY_GONE_KEY[kind])) return;
@@ -3049,9 +3066,9 @@ export default function BreedTree({
           // Era props. The newspaper is a long roll so it takes the stick's
           // length; the fork and the shoe are hand-sized, so they read at the
           // ball's width like the rock does.
-          : kind === "newspaper" ? ballDia * 1.6
+          : kind === "newspaper" ? TOY_NEWSPAPER_W
           : kind === "fork" ? ballDia * 1.15
-          : kind === "shoe" ? ballDia * 1.25
+          : kind === "shoe" ? TOY_SHOE_W
           : BIGT * 0.6 * 2;
         const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
@@ -3060,9 +3077,22 @@ export default function BreedTree({
           : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
+        /* THE FOOTPRINT, NOT THE WIDTH. Turned near upright these two are far
+           narrower than they are long, so placing them by `dia` would treat a
+           400px newspaper as 400px of floor and shove it into one spot. What
+           they actually occupy across the pit is the OTHER dimension. */
+        const upright = kind === "newspaper" || kind === "shoe";
+        const foot = upright ? hgt : dia;
         const px = kind === "flag"
           ? pL.x + wPx * 0.7
-          : pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40);
+          : side
+            ? (() => {
+                // Half the pit each, so two props can never share a side.
+                const half = Math.max(foot + 20, wPx / 2);
+                const lo = side < 0 ? pL.x : pL.x + wPx - half;
+                return lo + foot / 2 + 10 + Math.random() * Math.max(1, half - foot - 20);
+              })()
+            : pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40);
         // Spawn ABOVE the visible top so the toy is already falling when it
         // enters, exactly as the main pit does. Take the top edge from the stage
         // rectangle, not from the viewBox mapping: the viewBox can reach well
@@ -3150,8 +3180,15 @@ export default function BreedTree({
               : kind === "newspaper" || kind === "fork" || kind === "shoe"
                 ? (() => {
                     const b = Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: Math.min(dia, hgt) * 0.22 } });
-                    // Dropped at a tilt, so they do not all land square.
-                    MBody.setAngle(b, (Math.random() - 0.5) * 0.9);
+                    /* The newspaper and the shoe drop near upright, a few
+                       degrees either side of vertical so the pair leans apart.
+                       The fork keeps a random tilt: it is small enough that a
+                       fixed angle would read as a repeat. */
+                    const deg =
+                      kind === "newspaper" ? TOY_NEWSPAPER_DEG
+                      : kind === "shoe" ? TOY_SHOE_DEG
+                      : null;
+                    MBody.setAngle(b, deg === null ? (Math.random() - 0.5) * 0.9 : (deg * Math.PI) / 180);
                     return b;
                   })()
                 : Bodies.circle(px, py, r, opts);
@@ -3228,9 +3265,16 @@ export default function BreedTree({
         const props: ToyKind[] = levelTheme?.props?.length
           ? (levelTheme.props as ToyKind[])
           : DEFAULT_PROPS;
+        /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
+           the opposite side to the one before it, so two can never come down
+           together in the same corner, and the whole sequence starts on the
+           other side next time a pit arms. */
+        const firstLeft = propStartLeft;
+        propStartLeft = !propStartLeft;
         props.forEach((kind: ToyKind, i: number) => {
           const at = i < 2 ? propsAt : propsAt + TOY_ROCK_GAP * (i - 1);
-          toyTimers.push(window.setTimeout(() => spawnToy(kind), at));
+          const left = i % 2 === 0 ? firstLeft : !firstLeft;
+          toyTimers.push(window.setTimeout(() => spawnToy(kind, left ? -1 : 1), at));
         });
         const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
         toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
