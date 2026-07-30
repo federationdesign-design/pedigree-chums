@@ -873,11 +873,15 @@
 }
 
 .dogFlashPlay {
-  width: 34%;
+  /* 34% plus a fifth. Growing from the top left anchor, so the words spread
+     down and right and their top edge stays where the margin puts it. */
+  width: 40.8%;
   aspect-ratio: 720 / 665;
-  /* Clears the card's top edge by about 5% of the card width and its left edge
-     by about 1%, which is what the concept close-up showed. */
-  margin: -5.7% 0 0 -1.3%;
+  /* Clears the card's top edge by about 4% of the card width and its left edge
+     by about 1%. Down 5px from the 5.7% that was here, as a percentage rather
+     than a flat value so the overhang stays in proportion when the card
+     shrinks. 5px on a 393px card is 1.3%. */
+  margin: -4.4% 0 0 -1.3%;
   background-image: url("/history/flash-learn-play.svg");
 }
 
