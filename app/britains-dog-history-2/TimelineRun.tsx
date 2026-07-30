@@ -88,7 +88,10 @@ export default function TimelineRun({
          over. */
       const bar = startRef.current;
       if (bar) {
-        const p = Math.min(1, Math.max(0, run.scrollTop / (run.clientHeight || 1)));
+        /* Complete after HALF a screen, not a whole one. At a full screen the
+           line was still part drawn when the next screen's leg arrived, which
+           read as two lines with a gap between them. */
+        const p = Math.min(1, Math.max(0, run.scrollTop / ((run.clientHeight || 1) * 0.5)));
         bar.style.setProperty("--pc-grow", p.toFixed(3));
       }
     };
@@ -154,11 +157,15 @@ export default function TimelineRun({
           {/* The head of the timeline sits on THIS screen, under the text, as
               in the concept. Its line reaches the foot of the screen and the
               rail below continues from exactly that edge. */}
-          {/* Disc and line are SIBLINGS. The disc used to sit inside the line,
-              and the line is scaled to draw it as you scroll, so the disc was
-              scaled with it and rendered as a flat ellipse. */}
-          <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} aria-hidden="true" />
-          <span ref={startRef} className={styles.railStart} aria-hidden="true" />
+          {/* Disc and line sit IN THE FLOW, under the text, inside a wrapper
+              that takes whatever height is left. That is what stops the disc
+              landing on the paragraph: it can no longer be placed anywhere the
+              words already are. The wrapper is not scaled, so the disc keeps its
+              shape while the line draws itself. */}
+          <span className={styles.railHead} aria-hidden="true">
+            <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
+            <span ref={startRef} className={styles.railStart} />
+          </span>
         </div>
 
         {breeds.map((b) => {

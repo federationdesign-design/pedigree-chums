@@ -510,7 +510,7 @@
      is LEFT and the disc can no longer land on the paragraph.
      Written into the shorthand: a padding-bottom above this line would be
      silently wiped by it. */
-  padding: 24px 24px 24vh;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -531,31 +531,24 @@
 
 /* ---- The timeline rail ------------------------------------------------ */
 
-/* The line's first stretch, on the title screen. It is DRAWN BY THE SCROLL:
-   `--pc-grow` runs 0 to 1 and scales the bar from its top edge, which is where
-   the disc sits, so the line appears to grow downwards out of the circle.
-   A transform rather than a height, so it costs nothing per frame. */
+/* Drawn by the scroll. `--pc-grow` runs 0 to 1 and scales the bar from its top
+   edge, which is where the disc sits, so the line grows out of the circle. */
 .railStart {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%) scaleY(var(--pc-grow, 0));
-  transform-origin: top center;
+  flex: 1 1 0;
+  min-height: 0;
   width: 7px;
-  height: 22vh;
   background: #ffffff;
   border-radius: var(--radius-pill, 999px);
+  transform: scaleY(var(--pc-grow, 0));
+  transform-origin: top center;
   pointer-events: none;
 }
 
-/* The head of the timeline. Positioned against the SCREEN, not against the
-   line: it was a child of the line, and the line is scaled to draw itself as
-   the reader scrolls, so the disc was scaled with it and came out as a flat
-   ellipse. `bottom: 22vh` is the line's own top edge, so it still sits on it. */
+/* The head of the timeline. In the flow inside .railHead, so it cannot be
+   placed over the paragraph, and not a child of the line, so the line's scale
+   cannot squash it. */
 .railDot {
-  position: absolute;
-  left: 50%;
-  bottom: 22vh;
+  flex: 0 0 auto;
   width: 47px;
   height: 47px;
   border-radius: 50%;
@@ -563,13 +556,20 @@
   border: 5px solid #ffffff;
   box-sizing: border-box;
   pointer-events: none;
-  z-index: 1;
-  transform: translateX(-50%);
   opacity: 0;
-  /* Pops rather than fades. Opacity snaps to full inside the first 1% of the
-     run, so only the scale is animated and there is no ramp. */
+  /* Pops rather than fades: opacity snaps to full inside the first 1%. */
   animation: pcDotIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 1.2s both;
   transition: background 0.4s ease;
+}
+
+/* Takes whatever height the words leave, and holds the disc and the line. */
+.railHead {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 26px;
 }
 
 /* Once the reader has started moving. */
@@ -578,9 +578,9 @@
 }
 
 @keyframes pcDotIn {
-  0% { opacity: 0; transform: translateX(-50%) scale(0.2); }
-  1% { opacity: 1; transform: translateX(-50%) scale(0.2); }
-  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+  0% { opacity: 0; transform: scale(0.2); }
+  1% { opacity: 1; transform: scale(0.2); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* Card geometry copied from .node / .flipCard in history.module.css, so the
